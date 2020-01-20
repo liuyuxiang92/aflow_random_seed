@@ -21,9 +21,7 @@
 #warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
-/*
- This class computes temperature dependent PDIS curves using SCQHA temperature and volume data.
-*/
+//This class computes temperature dependent PDIS curves using SCQHA temperature and volume data.
 
 namespace apl
 {
@@ -73,10 +71,10 @@ namespace apl
     _kpoints=kpoints;
 
     if(_kpoints.size()==0)
-      {
-	_logger<< apl::error <<"_kpoints.size()==0"<<apl::endl;
-	return false;
-      }
+    {
+      _logger<< apl::error <<"_kpoints.size()==0"<<apl::endl;
+      return false;
+    }
 
     if(!calculation_freqs()) return false;
     return true;
@@ -85,10 +83,10 @@ namespace apl
   bool T_spectra_SCQHA_QHA3P::calculation_freqs()
   {
     if(_kpoints.size()==0)
-      {
-        _logger<<apl::error<<"kpoints.size()=0"<<apl::endl;
-        return false;
-      }
+    {
+      _logger<<apl::error<<"kpoints.size()=0"<<apl::endl;
+      return false;
+    }
     return get_dynamicalmatrices_along_path();
   }
   // ***************************************************************************************
@@ -100,21 +98,21 @@ namespace apl
     _qha_gpvol = _runeos.get_scqha_volumes();
 
     if( (_qha_gpdir.size()==0))
-      {
-        _logger<<  apl::warning <<"directory size is zero remove LOCK and apl.xml and run again"<<apl::endl;
-        return false;
-      }
+    {
+      _logger<<  apl::warning <<"directory size is zero remove LOCK and apl.xml and run again"<<apl::endl;
+      return false;
+    }
     if((_qha_gpvol.size()==0))
-      {
-        _logger<<  apl::warning<<"volume size is zero remove LOCK and apl.xml and run again"<<apl::endl;
-        return false;
-      }
+    {
+      _logger<<  apl::warning<<"volume size is zero remove LOCK and apl.xml and run again"<<apl::endl;
+      return false;
+    }
     if((_qha_gpvol.size()!=3))
-      {
-        _is_vol_err=true;
-        _logger<<  apl::warning<< "qha_gpvol.size()!=3, SCQHA calculations skipped"<<apl::endl;
-        return false;
-      }
+    {
+      _is_vol_err=true;
+      _logger<<  apl::warning<< "qha_gpvol.size()!=3, SCQHA calculations skipped"<<apl::endl;
+      return false;
+    }
 
     _delta_V=0.5*((_qha_gpvol[2]-_qha_gpvol[1])+(_qha_gpvol[1]-_qha_gpvol[0]));
     _V0=_qha_gpvol[1];
@@ -153,20 +151,20 @@ namespace apl
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-//    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
     _gp_path_test.resize(ncpus, false);
     // Show info 
     string msg="";
     if( ncpus == 1 )
-      {
-	msg="Calculating dynamical matrices along path";
-	_logger.initProgressBar(msg);
-      }
+    {
+      msg="Calculating dynamical matrices along path";
+      _logger.initProgressBar(msg);
+    }
     else
-      {
-	msg="Calculating dynamical matrices along path (" + stringify(ncpus) + " threads)";
-	_logger.initProgressBar(msg);
-      }
+    {
+      msg="Calculating dynamical matrices along path (" + stringify(ncpus) + " threads)";
+      _logger.initProgressBar(msg);
+    }
 
     // Distribute the calculation
     int startIndex, endIndex;
@@ -178,21 +176,21 @@ namespace apl
       threads.push_back( new std::thread(&T_spectra_SCQHA_QHA3P::get_freqs_in_threads,this,startIndex,endIndex, icpu) );
     }
 
-/* OBSOLETE ME180801
-    for(int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = icpu * qpointsPerCPU;
-      endIndex = startIndex + qpointsPerCPU;
-      if( ( (uint)endIndex > _kpoints.size() ) ||
-          ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
-        endIndex = _kpoints.size();
-      threads.push_back( new std::thread(&T_spectra_SCQHA_QHA3P::get_freqs_in_threads,this,startIndex,endIndex, icpu) );
-    }
+    /* OBSOLETE ME180801
+       for(int icpu = 0; icpu < ncpus; icpu++) {
+       startIndex = icpu * qpointsPerCPU;
+       endIndex = startIndex + qpointsPerCPU;
+       if( ( (uint)endIndex > _kpoints.size() ) ||
+       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
+       endIndex = _kpoints.size();
+       threads.push_back( new std::thread(&T_spectra_SCQHA_QHA3P::get_freqs_in_threads,this,startIndex,endIndex, icpu) );
+       }
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {
-      threads[i]->join();
-      delete threads[i];
+    threads[i]->join();
+    delete threads[i];
     }
-*/
+    */
 
     // Done
     _logger.finishProgressBar();
@@ -219,81 +217,81 @@ namespace apl
     double dv2=0.25*_delta_V*_delta_V;
 
     for(int In=startIndex;In<endIndex;In++)
+    {
+      xvector<double> qpoint;
+      xmatrix<xcomplex<double> >  DM0(_nBranches,_nBranches,1,1);//at volume 0
+      qpoint=_kpoints[In];
+      DM0=_pc.getDynamicalMatrix(qpoint);
+
+      xvector<double> eigenvalues(_nBranches, 1);
+      xmatrix<xcomplex<double> > eigenvectors(_nBranches, _nBranches, 1,1);
+
+      xvector<double> eigenvaluesM(_nBranches, 1);
+      xmatrix<xcomplex<double> > eigenvectorsM(_nBranches, _nBranches, 1,1);
+
+      xvector<double> eigenvaluesP(_nBranches, 1);
+      xmatrix<xcomplex<double> > eigenvectorsP(_nBranches, _nBranches, 1,1);
+
+      apl::aplEigensystems e;
+      e.eigen_calculation(DM0, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
+
+
+      apl::aplEigensystems eM;
+      eM.eigen_calculation(_DMm[In], eigenvaluesM, eigenvectorsM, APL_MV_EIGEN_SORT_VAL_ASC);
+
+      apl::aplEigensystems eP;
+      eP.eigen_calculation(_DMp[In], eigenvaluesP, eigenvectorsP, APL_MV_EIGEN_SORT_VAL_ASC);
+
+      for(uint j=1; j<=_nBranches; j++)
       {
-	xvector<double> qpoint;
-	xmatrix<xcomplex<double> >  DM0(_nBranches,_nBranches,1,1);//at volume 0
-	qpoint=_kpoints[In];
-	DM0=_pc.getDynamicalMatrix(qpoint);
+        if(_iszero(eigenvalues[j]))eigenvalues[j]=0.0;
+        if(eigenvalues[j]<0){
+          if(_isnegative(eigenvalues[j]))
+          {
+            _logger<<  apl::warning <<"negative eigenvalue: = " <<eigenvalues[j]<<apl::endl;
+            _is_negative_freq=true;
+            return;
+          } else eigenvalues[j]=0.00;
+        }
+        _freqs_path[In][j]=sqrt(eigenvalues[j])*RAW2Hz;
+      }// nBranch loop end
 
-	xvector<double> eigenvalues(_nBranches, 1);
-	xmatrix<xcomplex<double> > eigenvectors(_nBranches, _nBranches, 1,1);
+      for(uint j=1; j<=_nBranches; j++)
+      {
+        if(_iszero(eigenvaluesM[j]))eigenvaluesM[j]=0.0;
+        if(eigenvaluesM[j]<0){
+          if(_isnegative(eigenvaluesM[j]))
+          {
+            _logger<<  apl::warning <<"negative eigenvalueM: = " <<eigenvaluesM[j]<<apl::endl;
+            _is_negative_freq=true;
+            return;
+          } else eigenvaluesM[j]=0.00;
+        }
+        _freqs_pathM[In][j]=sqrt(eigenvaluesM[j])*RAW2Hz;
+      }// nBranch loop end
 
-	xvector<double> eigenvaluesM(_nBranches, 1);
-	xmatrix<xcomplex<double> > eigenvectorsM(_nBranches, _nBranches, 1,1);
+      for(uint j=1; j<=_nBranches; j++)
+      {
+        if(_iszero(eigenvaluesP[j]))eigenvaluesP[j]=0.0;
+        if(eigenvaluesP[j]<0){
+          if(_isnegative(eigenvaluesP[j]))
+          {
+            _logger<<  apl::warning <<"negative eigenvalueP: = " <<eigenvaluesP[j]<<apl::endl;
+            _is_negative_freq=true;
+            return;
+          } else eigenvaluesP[j]=0.00;
+        }
+        _freqs_pathP[In][j]=sqrt(eigenvaluesP[j])*RAW2Hz;
+      }// nBranch loop end
 
-	xvector<double> eigenvaluesP(_nBranches, 1);
-	xmatrix<xcomplex<double> > eigenvectorsP(_nBranches, _nBranches, 1,1);
-
-	apl::aplEigensystems e;
-	e.eigen_calculation(DM0, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
-
-
-	apl::aplEigensystems eM;
-	eM.eigen_calculation(_DMm[In], eigenvaluesM, eigenvectorsM, APL_MV_EIGEN_SORT_VAL_ASC);
-
-	apl::aplEigensystems eP;
-	eP.eigen_calculation(_DMp[In], eigenvaluesP, eigenvectorsP, APL_MV_EIGEN_SORT_VAL_ASC);
-
-	for(uint j=1; j<=_nBranches; j++)
-	  {
-	    if(_iszero(eigenvalues[j]))eigenvalues[j]=0.0;
-	    if(eigenvalues[j]<0){
-              if(_isnegative(eigenvalues[j]))
-		{
-		  _logger<<  apl::warning <<"negative eigenvalue: = " <<eigenvalues[j]<<apl::endl;
-                  _is_negative_freq=true;
-		  return;
-		} else eigenvalues[j]=0.00;
-	    }
-	    _freqs_path[In][j]=sqrt(eigenvalues[j])*RAW2Hz;
-	  }// nBranch loop end
-
-	for(uint j=1; j<=_nBranches; j++)
-	  {
-	    if(_iszero(eigenvaluesM[j]))eigenvaluesM[j]=0.0;
-	    if(eigenvaluesM[j]<0){
-              if(_isnegative(eigenvaluesM[j]))
-		{
-		  _logger<<  apl::warning <<"negative eigenvalueM: = " <<eigenvaluesM[j]<<apl::endl;
-                  _is_negative_freq=true;
-		  return;
-		} else eigenvaluesM[j]=0.00;
-	    }
-	    _freqs_pathM[In][j]=sqrt(eigenvaluesM[j])*RAW2Hz;
-	  }// nBranch loop end
-
-	for(uint j=1; j<=_nBranches; j++)
-	  {
-	    if(_iszero(eigenvaluesP[j]))eigenvaluesP[j]=0.0;
-	    if(eigenvaluesP[j]<0){
-              if(_isnegative(eigenvaluesP[j]))
-		{
-		  _logger<<  apl::warning <<"negative eigenvalueP: = " <<eigenvaluesP[j]<<apl::endl;
-                  _is_negative_freq=true;
-		  return;
-		} else eigenvaluesP[j]=0.00;
-	    }
-	    _freqs_pathP[In][j]=sqrt(eigenvaluesP[j])*RAW2Hz;
-	  }// nBranch loop end
-
-	xvector<double> d1fdv1(_nBranches, 1);
-	xvector<double> d2fdv2(_nBranches, 1);
-	for(uint j=1; j<=_nBranches; j++)
-	  {
-            _d1fdv1[In][j]= (-_freqs_pathM[In][j] + _freqs_pathP[In][j])/_delta_V;
-            _d2fdv2[In][j]= (_freqs_pathM[In][j] + _freqs_pathP[In][j] - 2.0* _freqs_path[In][j])/dv2;
-          }
+      xvector<double> d1fdv1(_nBranches, 1);
+      xvector<double> d2fdv2(_nBranches, 1);
+      for(uint j=1; j<=_nBranches; j++)
+      {
+        _d1fdv1[In][j]= (-_freqs_pathM[In][j] + _freqs_pathP[In][j])/_delta_V;
+        _d2fdv2[In][j]= (_freqs_pathM[In][j] + _freqs_pathP[In][j] - 2.0* _freqs_path[In][j])/dv2;
       }
+    }
 
     _gp_path_test[cpuid]=true;
   }//fn end
@@ -303,25 +301,25 @@ namespace apl
     double dv=V_T-_qha_gpvol[1];
 
     for(uint In=0; In<_kpoints.size(); In++)
+    {
+      for(uint j=1; j<=_nBranches; j++)
       {
-	for(uint j=1; j<=_nBranches; j++)
-	  {
-	    _freqs_T[In][j]=_freqs_path[In][j]+_d1fdv1[In][j]*dv+0.5*_d2fdv2[In][j]*dv*dv;
-	  }
+        _freqs_T[In][j]=_freqs_path[In][j]+_d1fdv1[In][j]*dv+0.5*_d2fdv2[In][j]*dv*dv;
       }
+    }
 
     if(_freqs_T.size()==0)
-      {
-        _logger<<apl::error <<"_freqs_T size is zero "<<apl::endl; return;
-      }
+    {
+      _logger<<apl::error <<"_freqs_T size is zero "<<apl::endl; return;
+    }
     else if(path.size()==0)
-      {
-        _logger<<apl::error <<"path size is zero "<<apl::endl; return;
-      }
+    {
+      _logger<<apl::error <<"path size is zero "<<apl::endl; return;
+    }
     else if(path_seg.size()==0)
-      {
-        _logger<<apl::error <<"path_seg size is zero "<<apl::endl; return;
-      }
+    {
+      _logger<<apl::error <<"path_seg size is zero "<<apl::endl; return;
+    }
 
     string outfile =  "aflow.scqha_pdis_"+NumToStr<double>(T);
 
@@ -350,15 +348,19 @@ namespace apl
     for(uint i=0; i<isize; i++){
       os_gp<< setw(5) << path_seg[i];
       os_gp<< setprecision(6)<<std::fixed << std::showpoint
-	   << setw(15) << path[i];
+        << setw(15) << path[i];
 
       for(uint j=1; j<=jsize; j++){
-	os_gp<<setprecision(6)<<std::fixed << std::showpoint
-	     <<setw(15)<<_freqs_T[i][j];
+        os_gp<<setprecision(6)<<std::fixed << std::showpoint
+          <<setw(15)<<_freqs_T[i][j];
       }os_gp<<"\n";}
 
     if(!aurostd::stringstream2file(os_gp, outfile, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.scqha_pdis_T");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.scqha_pdis_T");
+      string function = "T_spectra_SCQHA_QHA3P::write_T_dispersion()";
+      string message = "Cannot write aflow.scqha_pdis_T";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -366,7 +368,11 @@ namespace apl
   bool T_spectra_SCQHA_QHA3P::read_matrix(vector<xmatrix<xcomplex<double> > >&A, const string file)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P:: Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P:: Missing file: "+file);
+      string function = "T_spectra_SCQHA_QHA3P::read_matrix()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
 
     ifstream in;
@@ -374,7 +380,7 @@ namespace apl
     if (!in.is_open()){_logger<<apl::error <<file<<" not able to open "<<apl::endl; return false;}
     for(uint I=0;I<A.size();I++){
       for(uint J=1;J<=_nBranches;J++){
-	in.read( (char *)(&A[I][J][1]), _nBranches*sizeof(xcomplex<double>) );
+        in.read( (char *)(&A[I][J][1]), _nBranches*sizeof(xcomplex<double>) );
       }}
     in.clear();
     in.close();
@@ -400,12 +406,20 @@ namespace apl
   {
     string file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE;  // ME190428
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      // ME191031
+      //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      string function = "T_spectra_SCQHA_QHA3P::read_PDIS()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      string function = "T_spectra_SCQHA_QHA3P::read_PDIS()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     } 
     uint line_count = 0;  
     hash_lines.clear();
@@ -425,12 +439,12 @@ namespace apl
   }
   // ***************************************************************************************
   template <typename T>
-  string T_spectra_SCQHA_QHA3P::NumToStr ( T Number )
-  {
-    ostringstream ss;
-    ss << Number;
-    return ss.str();
-  }
+    string T_spectra_SCQHA_QHA3P::NumToStr ( T Number )
+    {
+      ostringstream ss;
+      ss << Number;
+      return ss.str();
+    }
   // ***************************************************************************************
   bool T_spectra_SCQHA_QHA3P::exists_test0 (const std::string& name)
   {

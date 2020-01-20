@@ -49,9 +49,9 @@ int lcm (int a, int b);
 int CalculateLcmofVector(vector<int> Num);
 
 struct str_num_data {
-    double decimal;
-    int fac;
-    int denom;
+  double decimal;
+  int fac;
+  int denom;
 };
 str_num_data OptimizePoccValue(double dvalue, double tol);
 void OptimizeXstr(xstructure &a, ofstream &FileMESSAGE, _aflags &aflags);
@@ -78,13 +78,13 @@ bool CheckMultiOccupied(xstructure& xstr);
 xstructure CleanVacancy(xstructure& xstr);
 
 struct strno_energy {
-    double energy;
-    int number;
+  double energy;
+  int number;
 };
 
 struct xstr_energy {
-    xstructure xstr;
-    double energy;
+  xstructure xstr;
+  double energy;
 };
 void PrintGulpEnergies(vector<xstructure>& vxstr);
 bool sortenergy (strno_energy str_i, strno_energy str_j);

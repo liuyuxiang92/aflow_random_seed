@@ -401,7 +401,7 @@ namespace aurostd {
   void StringstreamClean(stringstream& stream);
   int FindIfStringInStream(const string& key,std::istream& instream);
   // remove comments
-  
+
   // about printing
   void PrintMessageStream(ofstream& FileERROR,ostringstream& stream,const bool& quiet);
   void PrintMessageStream(std::ostream& FileERROR,ostringstream& stream,const bool& quiet);
@@ -493,11 +493,11 @@ namespace aurostd {
   vector<string> stream2vectorstring(stringstream& stringstreamIN);
   vector<string> string2vectorstring(const string& stringIN,bool consecutive=false,bool trim_edges=false);  //CO 170613, defaults to usual string2tokens() behavior
   string liststring2string(string="",string="",string="",string="",string="",string="",string="",string="",
-			   string="",string="",string="",string="",string="",string="",string="",string="",
-			   string="",string="",string="",string="",string="",string="",string="",string="",
-			   string="",string="",string="",string="",string="",string="",string="",string="",
-			   string="",string="",string="",string="",string="",string="",string="",string="",
-			   string="",string="",string="",string="",string="",string="",string="",string="");
+      string="",string="",string="",string="",string="",string="",string="",string="",
+      string="",string="",string="",string="",string="",string="",string="",string="",
+      string="",string="",string="",string="",string="",string="",string="",string="",
+      string="",string="",string="",string="",string="",string="",string="",string="",
+      string="",string="",string="",string="",string="",string="",string="",string="");
   uint stream2dequestring(std::istream& istreamIN,deque<string> &vstringout);
   uint stream2dequestring(std::ifstream& ifstreamIN,deque<string> &vstringout);
   uint stream2dequestring(stringstream& stringstreamIN,deque<string> &vstringout);
@@ -624,6 +624,10 @@ namespace aurostd {
   // [OBSOLETE] string uint2string(uint from) __xprototype;
   // [OBSOLETE] string longint2string(long int from) __xprototype;
   // [OBSOLETE] string float2string(float from) __xprototype;
+  //  string utype2string(const std::basic_string<char, std::char_traits<char>, std::allocator<char> >& from) __xprototype;
+  //  string utype2string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > from) __xprototype;
+  //string utype2string(string from) __xprototype;
+  //  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > utype2string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > from) __xprototype;
   template<typename utype> string utype2string(const utype& from) __xprototype;
   template<typename utype> string utype2string(const utype& from,int precision) __xprototype;
   string utype2string(double from,bool roff);
@@ -634,11 +638,12 @@ namespace aurostd {
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);
+  // string utype2string(const string& from) __xprototype;
   // [OBSOLETE]  template<class u1> string utype2string(u1) __xprototype;
   // [OBSOLETE]  template<class u1, class u2> string utype2string(u1,u2) __xprototype;
   // [OBSOLETE]  template<class u1, class u2, class u3> string utype2string(u1,u2,u3) __xprototype;
   // [OBSOLETE]  template<class u1, class u2, class u3, class u4> string utype2string(u1,u2,u3,u4) __xprototype;
-  
+
   template<class utype> deque<utype> utypes2deque(utype u1) __xprototype;
   template<class utype> deque<utype> utypes2deque(utype u1,utype u2) __xprototype;
   template<class utype> deque<utype> utypes2deque(utype u1,utype u2,utype u3) __xprototype;
@@ -659,7 +664,7 @@ namespace aurostd {
   bool StringsAlphabetic(const vector<string>& input,bool allow_identical=true);  //CO 180801
   bool StringsAlphabetic(const deque<string>& input,bool allow_identical=true);  //CO 180801
   string StringSubst(string &strstring, const string &strfind, const string &strreplace);
-//  string StringSubst(string &strstring, const string &strfind0, const string &strfind1, const string &strfind2, const string &strfind3, const string &strreplace);
+  //  string StringSubst(string &strstring, const string &strfind0, const string &strfind1, const string &strfind2, const string &strfind3, const string &strreplace);
   string StringSubst(string &strstring, const char &charfind, const char &charreplace);
   void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  // ME190128 - fixed type declaration
   // about present substrings
@@ -765,191 +770,191 @@ namespace aurostd {
 
 namespace aurostd {   // DOUBLE
   class _sort_double_value0 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]<v2[0]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]<v2[0]); } };
   class _isort_double_value0 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]>v2[0]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]>v2[0]); } };
   class _sort_double_value1 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[1]<v2[1]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[1]<v2[1]); } };
   class _isort_double_value1 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[1]>v2[1]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[1]>v2[1]); } };
   class _sort_double_value2 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[2]<v2[2]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[2]<v2[2]); } };
   class _isort_double_value2 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[2]>v2[2]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[2]>v2[2]); } };
   class _sort_double_value3 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[3]<v2[3]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[3]<v2[3]); } };
   class _isort_double_value3 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[3]>v2[3]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[3]>v2[3]); } };
   class _sort_double_value4 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[4]<v2[4]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[4]<v2[4]); } };
   class _isort_double_value4 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[4]>v2[4]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[4]>v2[4]); } };
   class _sort_double_value5 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[5]<v2[5]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[5]<v2[5]); } };
   class _isort_double_value5 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[5]>v2[5]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[5]>v2[5]); } };
   class _sort_double_value6 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[6]<v2[6]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[6]<v2[6]); } };
   class _isort_double_value6 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[6]>v2[6]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[6]>v2[6]); } };
   class _sort_double_value7 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[7]<v2[7]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[7]<v2[7]); } };
   class _isort_double_value7 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[7]>v2[7]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[7]>v2[7]); } };
   class _sort_double_value8 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[8]<v2[8]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[8]<v2[8]); } };
   class _isort_double_value8 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[8]>v2[8]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[8]>v2[8]); } };
   class _sort_double_value9 {                    // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[9]<v2[9]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[9]<v2[9]); } };
   class _isort_double_value9 {                   // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[9]>v2[9]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[9]>v2[9]); } };
   class _sort_double_value01 {                // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]<v2[0]+v2[1]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]<v2[0]+v2[1]); } };
   class _isort_double_value01 {               // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]>v2[0]+v2[1]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]>v2[0]+v2[1]); } };
   class _sort_double_value012 {                // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]<v2[0]+v2[1]+v2[2]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]<v2[0]+v2[1]+v2[2]); } };
   class _isort_double_value012 {               // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]>v2[0]+v2[1]+v2[2]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]>v2[0]+v2[1]+v2[2]); } };
   class _sort_double_value0123 {                // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]<v2[0]+v2[1]+v2[2]+v2[3]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]<v2[0]+v2[1]+v2[2]+v2[3]); } };
   class _isort_double_value0123 {               // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]>v2[0]+v2[1]+v2[2]+v2[3]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]>v2[0]+v2[1]+v2[2]+v2[3]); } };
   class _sort_double_value01234 {                // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]+v1[4]<v2[0]+v2[1]+v2[2]+v2[3]+v2[4]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]+v1[4]<v2[0]+v2[1]+v2[2]+v2[3]+v2[4]); } };
   class _isort_double_value01234 {               // sorting through reference
-  public:
-    bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]+v1[4]>v2[0]+v2[1]+v2[2]+v2[3]+v2[4]); } };
+    public:
+      bool operator()(const vector<double>& v1, const vector<double>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]+v1[4]>v2[0]+v2[1]+v2[2]+v2[3]+v2[4]); } };
 }
 // int
 namespace aurostd {   // INT
   class _sort_int_value0 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]<v2[0]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]<v2[0]); } };
   class _isort_int_value0 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]>v2[0]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]>v2[0]); } };
   class _sort_int_value1 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[1]<v2[1]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[1]<v2[1]); } };
   class _isort_int_value1 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[1]>v2[1]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[1]>v2[1]); } };
   class _sort_int_value2 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[2]<v2[2]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[2]<v2[2]); } };
   class _isort_int_value2 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[2]>v2[2]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[2]>v2[2]); } };
   class _sort_int_value3 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[3]<v2[3]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[3]<v2[3]); } };
   class _isort_int_value3 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[3]>v2[3]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[3]>v2[3]); } };
   class _sort_int_value4 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[4]<v2[4]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[4]<v2[4]); } };
   class _isort_int_value4 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[4]>v2[4]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[4]>v2[4]); } };
   class _sort_int_value5 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[5]<v2[5]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[5]<v2[5]); } };
   class _isort_int_value5 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[5]>v2[5]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[5]>v2[5]); } };
   class _sort_int_value6 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[6]<v2[6]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[6]<v2[6]); } };
   class _isort_int_value6 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[6]>v2[6]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[6]>v2[6]); } };
   class _sort_int_value7 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[7]<v2[7]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[7]<v2[7]); } };
   class _isort_int_value7 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[7]>v2[7]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[7]>v2[7]); } };
   class _sort_int_value8 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[8]<v2[8]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[8]<v2[8]); } };
   class _isort_int_value8 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[8]>v2[8]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[8]>v2[8]); } };
   class _sort_int_value9 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[9]<v2[9]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[9]<v2[9]); } };
   class _isort_int_value9 {                   // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[9]>v2[9]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[9]>v2[9]); } };
   class _sort_int_value01 {                // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]<v2[0]+v2[1]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]<v2[0]+v2[1]); } };
   class _isort_int_value01 {               // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]>v2[0]+v2[1]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]>v2[0]+v2[1]); } };
   class _sort_int_value012 {                // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]<v2[0]+v2[1]+v2[2]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]<v2[0]+v2[1]+v2[2]); } };
   class _isort_int_value012 {               // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]>v2[0]+v2[1]+v2[2]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]>v2[0]+v2[1]+v2[2]); } };
   class _sort_int_value0123 {                // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]<v2[0]+v2[1]+v2[2]+v2[3]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]<v2[0]+v2[1]+v2[2]+v2[3]); } };
   class _isort_int_value0123 {               // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]>v2[0]+v2[1]+v2[2]+v2[3]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]>v2[0]+v2[1]+v2[2]+v2[3]); } };
   class _sort_int_value01234 {                // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]+v1[4]<v2[0]+v2[1]+v2[2]+v2[3]+v2[4]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]+v1[4]<v2[0]+v2[1]+v2[2]+v2[3]+v2[4]); } };
   class _isort_int_value01234 {               // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]+v1[4]>v2[0]+v2[1]+v2[2]+v2[3]+v2[4]); } };
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const { return (bool) (v1[0]+v1[1]+v1[2]+v1[3]+v1[4]>v2[0]+v2[1]+v2[2]+v2[3]+v2[4]); } };
   // STRING
   void sort(vector<string>& arg);
   void sort(deque<string>& arg);
   void sort_remove_duplicates(vector<string>& arg);
   void sort_remove_duplicates(deque<string>& arg);
   class _sort_string_ {                    // sorting through reference
-  public:
-    bool operator()(const string& str1, const string& str2) const { return (bool) (str1<str2);}
+    public:
+      bool operator()(const string& str1, const string& str2) const { return (bool) (str1<str2);}
   };
   void rsort(vector<string>& arg);
   void rsort(deque<string>& arg);
   void rsort_remove_duplicates(vector<string>& arg);
   void rsort_remove_duplicates(deque<string>& arg);
 
-  
+
   // _STRING_INT_
   void sort(vector<string>& varg1,vector<int>& varg2);
   void sort(deque<string>& varg1,deque<int>& varg2);
@@ -958,8 +963,8 @@ namespace aurostd {   // INT
     int arg2;
   };
   class _sort_string_int_ {                    // sorting through reference
-  public:
-    bool operator()(const _string_int_& x1, const _string_int_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _string_int_& x1, const _string_int_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _STRING_DOUBLE_
   void sort(vector<string>& varg1,vector<double>& varg2);
@@ -969,8 +974,8 @@ namespace aurostd {   // INT
     double arg2;
   };
   class _sort_string_double_ {                    // sorting through reference
-  public:
-    bool operator()(const _string_double_& x1, const _string_double_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _string_double_& x1, const _string_double_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _STRING_STRING_
   void sort(vector<string>& varg1,vector<string>& varg2);
@@ -980,8 +985,8 @@ namespace aurostd {   // INT
     string arg2;
   };
   class _sort_string_string_ {                    // sorting through reference
-  public:
-    bool operator()(const _string_string_& x1, const _string_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _string_string_& x1, const _string_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _DOUBLE_INT_
   void sort(vector<double>& varg1,vector<int>& varg2);
@@ -991,8 +996,8 @@ namespace aurostd {   // INT
     int arg2;
   };
   class _sort_double_int_ {                    // sorting through reference
-  public:
-    bool operator()(const _double_int_& x1, const _double_int_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _double_int_& x1, const _double_int_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _DOUBLE_DOUBLE_
   void sort(vector<double>& varg1,vector<double>& varg2);
@@ -1002,8 +1007,8 @@ namespace aurostd {   // INT
     double arg2;
   };
   class _sort_double_double_ {                    // sorting through reference
-  public:
-    bool operator()(const _double_double_& x1, const _double_double_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _double_double_& x1, const _double_double_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _DOUBLE_STRING_
   void sort(vector<double>& varg1,vector<string>& varg2);
@@ -1013,8 +1018,8 @@ namespace aurostd {   // INT
     string arg2;
   };
   class _sort_double_string_ {                    // sorting through reference
-  public:
-    bool operator()(const _double_string_& x1, const _double_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _double_string_& x1, const _double_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _STRING_INT_STRING
   void sort(vector<string>& varg1,vector<int>& varg2,vector<string>& varg3);
@@ -1025,8 +1030,8 @@ namespace aurostd {   // INT
     string arg3;
   };
   class _sort_string_int_string_ {             // sorting through reference
-  public:
-    bool operator()(const _string_int_string_& x1, const _string_int_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _string_int_string_& x1, const _string_int_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _STRING_DOUBLE_STRING
   void sort(vector<string>& varg1,vector<double>& varg2,vector<string>& varg3);
@@ -1037,8 +1042,8 @@ namespace aurostd {   // INT
     string arg3;
   };
   class _sort_string_double_string_ {             // sorting through reference
-  public:
-    bool operator()(const _string_double_string_& x1, const _string_double_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _string_double_string_& x1, const _string_double_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _STRING_STRING_STRING
   void sort(vector<string>& varg1,vector<string>& varg2,vector<string>& varg3);
@@ -1049,8 +1054,8 @@ namespace aurostd {   // INT
     string arg3;
   };
   class _sort_string_string_string_ {             // sorting through reference
-  public:
-    bool operator()(const _string_string_string_& x1, const _string_string_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _string_string_string_& x1, const _string_string_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _STRING_STRING_DOUBLE_STRING
   void sort(vector<string>& varg1,vector<string>& varg2,vector<double>& varg3,vector<string>& varg4);
@@ -1062,8 +1067,8 @@ namespace aurostd {   // INT
     string arg4;
   };
   class _sort_string_string_double_string_ {             // sorting through reference
-  public:
-    bool operator()(const _string_string_double_string_& x1, const _string_string_double_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _string_string_double_string_& x1, const _string_string_double_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
   // _STRING_STRING_DOUBLE_DOUBLE_STRING
   void sort(vector<string>& varg1,vector<string>& varg2,vector<double>& varg3,vector<double>& varg4,vector<string>& varg5);
@@ -1076,8 +1081,8 @@ namespace aurostd {   // INT
     string arg5;
   };
   class _sort_string_string_double_double_string_ {             // sorting through reference
-  public:
-    bool operator()(const _string_string_double_double_string_& x1, const _string_string_double_double_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
+    public:
+      bool operator()(const _string_string_double_double_string_& x1, const _string_string_double_double_string_& x2) const { return (bool) (x1.arg1<x2.arg1);}
   };
 }
 
@@ -1088,11 +1093,11 @@ template<class utype> utype Cnk(utype n,utype k) __xprototype; // http://en.wiki
 
 // ***************************************************************************
 namespace aurostd {
-  /* template <typename utype> utype sum(vector<utype>& a) {
-     utype result = 0;
-     for (unsigned int i=0; i<a.size();i++) result += a.at(i);
-     return result;
-     } */
+  //template <typename utype> utype sum(vector<utype>& a) {
+  //utype result = 0;
+  //for (unsigned int i=0; i<a.size();i++) result += a.at(i);
+  //return result;
+  //}
   vector<vector<double> > ShiftFirstColumn(const vector<vector<double> >& vva, const double& value);
   vector<vector<double> > ShrinkValuesExceptFirstColumn(const vector<vector<double> >& vva, const double& Fi);
   vector<vector<double> > NormalizeAndSum3DVector(const vector<vector<vector<double> > >& vvva, const vector<double>& vFi);
@@ -1122,123 +1127,123 @@ namespace aurostd {
   // joins int/string type of objects together by a delimiter
   string joinWDelimiter(const xvector<int>& ientries, const char& _delimiter);
   string joinWDelimiter(const xvector<int>& ientries, const char& _delimiter,
-			const char& _l_delimiter);
+      const char& _l_delimiter);
   string joinWDelimiter(const xvector<int>& ientries, const char& _delimiter,
-			const char& _m_delimiter, const char& _l_delimiter);
+      const char& _m_delimiter, const char& _l_delimiter);
   string joinWDelimiter(const xvector<int>& ientries, const string& _delimiter);
   string joinWDelimiter(const xvector<int>& ientries, const string& _delimiter,
       const string& _l_delimiter);
   string joinWDelimiter(const xvector<int>& ientries, const string& _delimiter,
-			const string& _m_delimiter, const string& _l_delimiter);
+      const string& _m_delimiter, const string& _l_delimiter);
   string joinWDelimiter(const xvector<int>& ientries, const stringstream& delimiter);
   string joinWDelimiter(const xvector<int>& ientries, const stringstream& delimiter,
-			const stringstream& m_delimiter,
-			const stringstream& l_delimiter);
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const char& _delimiter);
   string joinWDelimiter(const vector<int>& ientries, const char& _delimiter,
-			const char& _l_delimiter);
+      const char& _l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const char& _delimiter,
-			const char& _m_delimiter, const char& _l_delimiter);
+      const char& _m_delimiter, const char& _l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const string& _delimiter);
   string joinWDelimiter(const vector<int>& ientries, const string& _delimiter,
       const string& _l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const string& _delimiter,
-			const string& _m_delimiter, const string& _l_delimiter);
+      const string& _m_delimiter, const string& _l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const stringstream& delimiter);
   string joinWDelimiter(const vector<int>& ientries, const stringstream& delimiter,
       const stringstream& l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const stringstream& delimiter,
       const stringstream& l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const stringstream& delimiter,
-			const stringstream& m_delimiter,
-			const stringstream& l_delimiter);
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const char& _delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const char& _delimiter,
       const char& _l_delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const char& _delimiter,
-			const char& _m_delimiter, const char& _l_delimiter);
+      const char& _m_delimiter, const char& _l_delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const string& _delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const string& _delimiter,
       const string& _l_delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const string& _delimiter,
-			const string& _m_delimiter, const string& _l_delimiter);
+      const string& _m_delimiter, const string& _l_delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const stringstream& delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const stringstream& delimiter,
       const stringstream& l_delimiter);
   string joinWDelimiter(const vector<uint>& uientries, const stringstream& delimiter,
-			const stringstream& m_delimiter,
-			const stringstream& l_delimiter);
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const char& _delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const char& _delimiter,
       const char& _l_delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const char& _delimiter,
-			const char& _m_delimiter, const char& _l_delimiter);
+      const char& _m_delimiter, const char& _l_delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const string& _delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const string& _delimiter,
       const string& _l_delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const string& _delimiter,
-			const string& _m_delimiter, const string& _l_delimiter);
+      const string& _m_delimiter, const string& _l_delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const stringstream& delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const stringstream& delimiter,
       const stringstream& l_delimiter);
   string joinWDelimiter(const vector<string>& _sentries, const stringstream& delimiter,
-			const stringstream& m_delimiter,
-			const stringstream& l_delimiter);
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
   string joinWDelimiter(const deque<int>& ientries, const char& _delimiter);
   string joinWDelimiter(const deque<int>& ientries, const char& _delimiter,
       const char& _l_delimiter);
   string joinWDelimiter(const deque<int>& ientries, const char& _delimiter,
-			const char& _m_delimiter, const char& _l_delimiter);
+      const char& _m_delimiter, const char& _l_delimiter);
   string joinWDelimiter(const deque<int>& ientries, const string& _delimiter);
   string joinWDelimiter(const deque<int>& ientries, const string& _delimiter,
       const string& _l_delimiter);
   string joinWDelimiter(const deque<int>& ientries, const string& _delimiter,
-			const string& _m_delimiter, const string& _l_delimiter);
+      const string& _m_delimiter, const string& _l_delimiter);
   string joinWDelimiter(const deque<int>& ientries, const stringstream& delimiter);
   string joinWDelimiter(const deque<int>& ientries, const stringstream& delimiter,
       const stringstream& l_delimiter);
   string joinWDelimiter(const deque<int>& ientries, const stringstream& delimiter,
-			const stringstream& m_delimiter,
-			const stringstream& l_delimiter);
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const char& _delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const char& _delimiter,
       const char& _l_delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const char& _delimiter,
-			const char& _m_delimiter, const char& _l_delimiter);
+      const char& _m_delimiter, const char& _l_delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const string& _delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const string& _delimiter,
       const string& _l_delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const string& _delimiter,
-			const string& _m_delimiter, const string& _l_delimiter);
+      const string& _m_delimiter, const string& _l_delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const stringstream& delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const stringstream& delimiter,
       const stringstream& l_delimiter);
   string joinWDelimiter(const deque<uint>& uientries, const stringstream& delimiter,
-			const stringstream& m_delimiter,
-			const stringstream& l_delimiter);
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const char& _delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const char& _delimiter,
       const char& _l_delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const char& _delimiter,
-			const char& _m_delimiter, const char& _l_delimiter);
+      const char& _m_delimiter, const char& _l_delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const string& _delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const string& _delimiter,
       const string& _l_delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const string& _delimiter,
-			const string& _m_delimiter, const string& _l_delimiter);
+      const string& _m_delimiter, const string& _l_delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const stringstream& delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const stringstream& delimiter,
       const stringstream& l_delimiter);
   string joinWDelimiter(const deque<string>& _sentries, const stringstream& delimiter,
-			const stringstream& m_delimiter,
-			const stringstream& l_delimiter);
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
 // DX 1/18/18 - Add xcomplex to json
 namespace aurostd {
- template<typename utype> string _xcomplex2json(xcomplex<utype>& number) __xprototype;
- string xcomplex2json(xcomplex<double>& number);
+  template<typename utype> string _xcomplex2json(xcomplex<utype>& number) __xprototype;
+  string xcomplex2json(xcomplex<double>& number);
 }
 
 // DX 8/3/17 - Add Matrix print out
@@ -1286,13 +1291,13 @@ namespace aurostd {
     explicit b64_encoder_proxy(std::ostream & os):os(os){}
 
     template<typename Rhs>
-    friend std::ostream & operator<<(b64_encoder_proxy const& b, 
-                                     Rhs const& rhs) {
-      return b.os << rhs;
-    }
+      friend std::ostream & operator<<(b64_encoder_proxy const& b, 
+          Rhs const& rhs) {
+        return b.os << rhs;
+      }
 
     friend std::ostream & operator<<(b64_encoder_proxy const& b, 
-                                     ifstream& file) {
+        ifstream& file) {
       // Stop eating new lines in binary mode!!!
       file.unsetf(std::ios::skipws);
 
@@ -1308,8 +1313,8 @@ namespace aurostd {
 
       return b.os << base64Encoder(reinterpret_cast<const unsigned char*>(&vec[0]), vec.size());
     }
-  
-  private:
+
+    private:
     std::ostream & os;
   };
 
@@ -1319,25 +1324,25 @@ namespace aurostd {
     explicit b64_decoder_proxy(std::ostream & os):os(os){}
 
     template<typename Rhs>
-    friend std::ostream & operator<<(b64_decoder_proxy const& b, 
-                                     Rhs const& rhs) {
-      return b.os << rhs;
-    }
+      friend std::ostream & operator<<(b64_decoder_proxy const& b, 
+          Rhs const& rhs) {
+        return b.os << rhs;
+      }
 
     friend std::ostream & operator<<(b64_decoder_proxy const& b, 
-                                     std::string const& rhs) {
+        std::string const& rhs) {
       return b.os << base64Decoder(rhs);
     }
 
-  private:
+    private:
     std::ostream & os;
   };
-  
+
   //structure that allows "cout << b64_encoder << ifstream"
   struct b64_encoder_creator { };
   extern b64_encoder_creator b64_encoder;
   b64_encoder_proxy operator<<(std::ostream & os, b64_encoder_creator);
-  
+
   //structure that allows "ofstream << b64_decoder << string" 
   //WARNING, SPITS BINARY CHARACTERS OUT IF COUT
   struct b64_decoder_creator { };
@@ -1347,9 +1352,9 @@ namespace aurostd {
 
 //binary to base64 conversion
 const std::string base64_chars = 
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  "abcdefghijklmnopqrstuvwxyz"
-  "0123456789+/";
+"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+"abcdefghijklmnopqrstuvwxyz"
+"0123456789+/";
 //CO - END
 
 #endif

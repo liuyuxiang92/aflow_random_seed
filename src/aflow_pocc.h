@@ -35,8 +35,8 @@ const string AFLOW_POCC_TAG="[AFLOW_POCC]";
 //we should not need to have more than 30 species, but if you want to add to list
 //I recommend adding IN ORDER so that elements become more different left to right (like periodic table)
 const string STD_ELEMENTS_LIST="Sc Ti V Cr Mn Fe Co Ni Cu Zn "
-                               "Y Zr Nb Mo Tc Ru Rh Pd Ag Cd "
-                               "La Hf Ta W Re Os Ir Pt Au Hg ";
+"Y Zr Nb Mo Tc Ru Rh Pd Ag Cd "
+"La Hf Ta W Re Os Ir Pt Au Hg ";
 
 namespace pocc {
   class POccCalculator; //forward declaration
@@ -48,7 +48,7 @@ namespace pocc {
   xstructure extractPARTCAR(const string& AflowIn);
 
   vector<double> getVTemperatures(const string& temp_string);
-  
+
   void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash);
   void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string& site_config_index_str);
   unsigned long long int getDGFromXStructureTitle(const string& title);
@@ -59,14 +59,14 @@ namespace pocc {
   bool patchStructuresUniqueFile(stringstream& structures_file_ss);
   void patchStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
 
-	void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss=cout);
+  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss=cout);
   vector<string> getElementsList();
 
   class POccUnit;  //forward declaration
   class POccSiteConfiguration;    //forward declaration
   struct UFFParamAtom;  //forward declaration
   struct UFFParamBond;  //forward declaration
- 
+
   //bool sortAtoms(const _atom& a1,const _atom& a2);
   //bool getNextSiteConfiguration(vector<vector<POccSiteConfiguration> >& vv_count_configs,vector<uint>& v_config_order,vector<int>& v_config_iterators,vector<vector<int> >& v_types_config);
   bool getNextSiteConfiguration(vector<vector<POccSiteConfiguration> >& vv_count_configs,vector<int>& v_config_iterators,vector<vector<int> >& v_types_config);
@@ -162,7 +162,7 @@ namespace pocc {
       bool operator<(const POccSuperCell& other) const;
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - END
-      
+
       unsigned long long int m_hnf_index;
       unsigned long long int m_site_config_index;
       unsigned long long int m_degeneracy;
@@ -186,7 +186,7 @@ namespace pocc {
     double getHNFIndex() const;
     double getSiteConfigIndex() const;
     double getUFFEnergy() const;
-    
+
     vector<POccSuperCell> m_psc_set;
     double m_energy_dft;  //only calculate this for the set
     double m_probability;
@@ -198,7 +198,7 @@ namespace pocc{
   struct UFFParamAtom{
     //no need (YET) to make a class, simple ints and double, no real methods
     const UFFParamAtom& operator=(const UFFParamAtom& b);
-    
+
     string symbol;
     double r1;        //bond distance
     double theta0;
@@ -217,7 +217,7 @@ namespace pocc{
     //no need (YET) to make a class, simple ints and double, no real methods
     const UFFParamBond& operator=(const UFFParamBond& b);
     void calculate(UFFParamAtom& uffp1,UFFParamAtom& uffp2,double distij);
-    
+
     double ren;
     double R0;
     double Kij;
@@ -243,11 +243,11 @@ namespace pocc {
       const POccSiteConfiguration& operator=(const POccSiteConfiguration& b);
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - END
-      
+
       //debug
       //vector<int> types_configuration_debug;                  //atom types, vacancy is -1
       //debug
-   
+
       int site;                                         //reflexive
       int i_hnf;                                        //reflexive
       bool partial_occupation_flag;
@@ -263,7 +263,7 @@ namespace pocc {
       int vacancy_count;
       double max_site_error;
       //double error_total;
-      
+
       void prepareNoPOccConfig();
       void preparePOccConfig();
       int getNextOccupationMultiple(int i_hnf,xvector<int>& xv_occupation_multiple);
@@ -291,7 +291,7 @@ namespace pocc {
       //constructors - STOP
       ~POccCalculatorTemplate();
       //NECESSARY PUBLIC CLASS METHODS - END
-      
+
       xstructure xstr_pocc;                   //input from PARTCAR
       aurostd::xoption m_p_flags;             //e.g., vpflow
       _aflags m_aflags;                       //standard aflow flags
@@ -299,7 +299,7 @@ namespace pocc {
       xstructure xstr_nopocc;                 //will contain symmetry objects (_sym_op, pgroups most important here)
       vector<uint> types2pc_map;              //list of atom indices where types2pc_map(0) is 1st type 0 atom, types2pc_map(1) is 1st type 1 atom, etc.
       vector<string> m_species_redecoration;  //species used to redecorate xstr's for consistent symmetry/uff energies
-      
+
       void setPOccFlags(const aurostd::xoption& pocc_flags);
       void setAFlags(const _aflags& Aflags);                      //standard _aflags
       void setPOccStructure(const xstructure& xstr_pocc);
@@ -348,7 +348,7 @@ namespace pocc {
       const POccUFFEnergyAnalyzer& operator=(const POccUFFEnergyAnalyzer& b);
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - END
-      
+
       //underlying data structures
       bool m_initialized;
       xmatrix<double> hnf_mat;
@@ -361,7 +361,7 @@ namespace pocc {
       xstructure xstr_ss;       //superstructure
       vector<int> sc2pc_map;
       vector<int> pc2sc_map;
-      
+
       void initialize(ostream& oss=cout);
       void initialize(const aurostd::xoption& pocc_flags,ostream& oss=cout); 
       void initialize(const _aflags& aflags,ostream& oss=cout);
@@ -503,7 +503,7 @@ namespace pocc {
       xDOSCAR m_xdoscar;
       vector<double> m_Egap;
       double m_Egap_net;
-      
+
       void initialize(ostream& oss=cout);
       void initialize(const _aflags& aflags,ostream& oss=cout);
       void initialize(const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
@@ -563,7 +563,7 @@ namespace pocc {
       void setPOccStructure(const xstructure& xstr_pocc);
       void setKFlags(const _kflags& Kflags);                      //standard _kflags
       void setVFlags(const _vflags& Vflags);                      //standard _vflags
-      
+
       void writePARTCAR() const;
       void generateStructures(const _xvasp& xvasp);
       xstructure createXStructure(const POccSuperCell& psc,int n_hnf=0,unsigned long long int hnf_count=0,unsigned long long int types_config_permutations_count=0,bool clean_structure=false,bool primitivize=false);
@@ -605,7 +605,7 @@ namespace pocc {
       void free();
       void copy(const POccCalculator& b);
       //NECESSARY END CLASS METHODS - END
-      
+
       //hnf matrices
       int a_start, b_start, c_start;
       int d_start, e_start, f_start;
@@ -626,15 +626,15 @@ namespace pocc {
       const xmatrix<double>& getLattice() const;
       const vector<_sym_op>& getPGroup() const;
       //const StructureConfiguration& getXStrCountConfiguration(uint i) const;
-      
+
       //void calculateHNF();                   //get n_hnf
-      
+
       //useful internal methods
       //vector<_sym_op> getPGroups();           //fetch pgroups of xstr_nopocc
       //uint getHNFCount();                     //get count of hnf matrices, refers to v_hnf
       //xmatrix<double> getHNFMatrix(uint i);   //fetch specific hnf matrix, refers to v_hnf
       //_atom getAtom(uint i);                  //grab specific atom, refers to xstr_pocc
-      
+
       //table stuff
       //set some nice printing precisions and paddings, mostly definitions
       uint getHNFTabelPOCCPrecision() const;
@@ -645,18 +645,18 @@ namespace pocc {
       string getHeaderMaxSiteError() const;
       string getHeaderMaxStoichError() const;
       string getHeaderStoichiometry() const;
-      
+
       string hnfTableHeader();
       void writeHNFTableOutput(int i_hnf,double& stoich_error,double& site_error);
       string hnfTableLineOutput(int i_hnf,int str_config);
       //void setHNFTablePadding(int _AFLOW_POCC_PRECISION_);
-      
+
       void partitionPOccSites();              //get pocc_sites
       xvector<double> calculateStoichEachType(vector<vector<int> >& v_types_config);
       void calculateSymNonPOccStructure(bool verbose=true);          //calculate symmetry of non-pocc structure
       void propagateEquivalentAtoms2POccStructure();  //propagates equivalent atoms info from xstr_sym to xstr_pocc for sorting
       void redecorateXStructures();            //redecorate xstr_nopocc for standardization of UFF energies
-      
+
       //void getSiteCountConfigurations(int i_hnf,double& stoich_error);
       void getSiteCountConfigurations(int i_hnf);
       void getOptimizedSiteCountConfigurations(int site,int i_hnf,vector<POccSiteConfiguration>& v_site_configs);

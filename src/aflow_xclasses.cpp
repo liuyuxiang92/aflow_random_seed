@@ -189,7 +189,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vflag_outreach=b.vflag_outreach;
   vflag_control=b.vflag_control;
   vschema=b.vschema;
-    // AFLOWRC
+  // AFLOWRC
   aflowrc_filename=b.aflowrc_filename;    // AFLOWRC
   aflowrc_content=b.aflowrc_content;    // AFLOWRC
   vaflowrc.clear();for(uint i=0;i<b.vaflowrc.size();i++) vaflowrc.push_back(b.vaflowrc.at(i));   // AFLOWRC
@@ -209,12 +209,10 @@ const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
   return *this;
 }
 
-/*
-  _XHOST::_XHOST(const _XHOST& b) { // copy PUBLIC
-  //  free();*this=b;
-  copy(b);
-  }
-*/
+//_XHOST::_XHOST(const _XHOST& b) { // copy PUBLIC
+////  free();*this=b;
+//copy(b);
+//}
 
 void _XHOST::free() { // free PRIVATE
   ostrPID.clear();ostrPID.str(string(""));
@@ -715,14 +713,14 @@ _vflags::_vflags() {
   //  REPEAT
   KBIN_VASP_REPEAT.clear();                                      // REPEAT
   KBIN_VASP_REPEAT.push("");                                // REPEAT
-  
+
   KBIN_VASP_FORCE_OPTION_NOTUNE.clear();                         // NOTUNE
   KBIN_VASP_FORCE_OPTION_SYSTEM_AUTO.clear();                    // SYSTEM_AUTO
- 
+
   //  RELAX_MODE
   KBIN_VASP_FORCE_OPTION_RELAX_MODE.clear();                     // RELAX_MODE forces/energy     
   KBIN_VASP_FORCE_OPTION_RELAX_MODE.push(DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME); // RELAX_MODE forces/energy    
-  
+
   //  RELAX_TYPE
   KBIN_VASP_FORCE_OPTION_RELAX_TYPE.clear();                     // RELAX_TYPE geometry   
   KBIN_VASP_FORCE_OPTION_RELAX_TYPE.push("");               // RELAX_TYPE geometry    
@@ -739,7 +737,7 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_ABMIX.push(DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME); // ABMIX
   KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.clear();          // AUTO_PSEUDOPOTENTIALS
   KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.push(DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE); // AUTO_PSEUDOPOTENTIALS
-  
+
   // ENMAX_MULTIPLY
   KBIN_VASP_FORCE_OPTION_ENMAX_MULTIPLY_EQUAL.clear();
   //  KBIN_VASP_FORCE_OPTION_ENMAX_MULTIPLY_EQUAL.push("1.4");
@@ -766,9 +764,9 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.push(aurostd::utype2string(0.1));  //default //CO181128
   // RWIGS
   KBIN_VASP_FORCE_OPTION_RWIGS_STATIC                            = FALSE;
-  
+
   KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.clear();                     // SKIP_NOMIX
-  
+
   //  KBIN_VASP_FORCE_OPTION_TRISTATE.clear();                       // 
 
   KBIN_VASP_FORCE_OPTION_SPIN.clear();                           // SPIN
@@ -787,9 +785,10 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_WAVECAR.option                          = DEFAULT_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR.clear();                         // CHGCAR
   KBIN_VASP_FORCE_OPTION_CHGCAR.option                           = DEFAULT_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
+  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.clear();                    // ME191028
   KBIN_VASP_FORCE_OPTION_LSCOUPLING.clear();                     // LSCOUPLING
   KBIN_VASP_FORCE_OPTION_LSCOUPLING.option                       = DEFAULT_VASP_FORCE_OPTION_LSCOUPLING; // LSCOUPLING
-  
+
   KBIN_VASP_FORCE_OPTION_LDAU0.clear();                          // LDAU0
   KBIN_VASP_FORCE_OPTION_LDAU1.clear();                          // LDAU1
   KBIN_VASP_FORCE_OPTION_LDAU2.clear();                          // LDAU2
@@ -844,7 +843,7 @@ _vflags::_vflags() {
   KBIN_VASP_KPOINTS_PHONONS_KPPRA.push("1");                // KPPRA
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME.clear();                     // KSCHEME
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME.push(DEFAULT_PHONONS_KSCHEME);  //"Gamma");           // KSCHEME
-  
+
   KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.clear();         // PARITY
   // BANDS
   // KBIN_VASP_KPOINTS_BANDS_LATTICE
@@ -922,7 +921,7 @@ void _vflags::copy(const _vflags& b) {
 
   KBIN_VASP_FORCE_OPTION_NOTUNE                                  = b.KBIN_VASP_FORCE_OPTION_NOTUNE;  // NOTUNE
   KBIN_VASP_FORCE_OPTION_SYSTEM_AUTO                             = b.KBIN_VASP_FORCE_OPTION_SYSTEM_AUTO;  // SYSTEM_AUTO
- 
+
   // RELAX_MODE
   KBIN_VASP_FORCE_OPTION_RELAX_MODE                              = b.KBIN_VASP_FORCE_OPTION_RELAX_MODE; // RELAX_MODE
 
@@ -935,7 +934,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_IVDW                                    = b.KBIN_VASP_FORCE_OPTION_IVDW; // IVDW
   KBIN_VASP_FORCE_OPTION_ABMIX                                   = b.KBIN_VASP_FORCE_OPTION_ABMIX; // ABMIX
   KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS                   = b.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS; // AUTO_PSEUDOPOTENTIALS
- 
+
   KBIN_VASP_FORCE_OPTION_SKIP_NOMIX                              = b.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX; // SKIP_NOMIX
   // ENMAX_MULTIPLY
   KBIN_VASP_FORCE_OPTION_ENMAX_MULTIPLY_EQUAL                    = b.KBIN_VASP_FORCE_OPTION_ENMAX_MULTIPLY_EQUAL;
@@ -956,7 +955,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_RWIGS_STATIC                            = b.KBIN_VASP_FORCE_OPTION_RWIGS_STATIC;
 
   // KBIN_VASP_FORCE_OPTION_TRISTATE                                = b.KBIN_VASP_FORCE_OPTION_TRISTATE; // TRISTATE
- 
+
   KBIN_VASP_FORCE_OPTION_SPIN                                    = b.KBIN_VASP_FORCE_OPTION_SPIN; // SPIN
   KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1                     = b.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1;
   KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2                     = b.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2; 
@@ -966,6 +965,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_SYM                                     = b.KBIN_VASP_FORCE_OPTION_SYM; // SYM
   KBIN_VASP_FORCE_OPTION_WAVECAR                                 = b.KBIN_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR                                  = b.KBIN_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
+  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE                             = b.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE;  // ME1901028
   KBIN_VASP_FORCE_OPTION_LSCOUPLING                              = b.KBIN_VASP_FORCE_OPTION_LSCOUPLING; // LSCOUPLING
   KBIN_VASP_FORCE_OPTION_LDAU0                                   = b.KBIN_VASP_FORCE_OPTION_LDAU0;  // LDAU0
   KBIN_VASP_FORCE_OPTION_LDAU1                                   = b.KBIN_VASP_FORCE_OPTION_LDAU1;  // LDAU1

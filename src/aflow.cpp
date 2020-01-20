@@ -101,7 +101,7 @@ namespace aflowlib {
     if(library=="LIB8" || library=="lib8") { vlib.push_back("LIB8");}
     if(library=="LIB9" || library=="lib9") { vlib.push_back("LIB9");}
     if(library=="ICSD" || library=="icsd") { vlib.push_back("ICSD");}
- 
+
     for(uint i=0;i<vlib.size();i++) {
       if(VERBOSE) cerr << "aflowlib::LIB2SCRUB **********************************" << endl;
       if(VERBOSE) cerr << "aflowlib::LIB2SCRUB TESTING vlib.at(i)=" << vlib.at(i) << endl;
@@ -114,9 +114,9 @@ namespace aflowlib {
       //      cerr << "aflowlib::LIB2SCRUB ordering " << endl;
       sort(list2found.begin(),list2found.end());
       //     cerr << "aflowlib::LIB2SCRUB list2found.size()=" << list2found.size() << endl;
-	
-      vector<string> listLIB2RAW,listRM,listANRL,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listREMOVE_MPCDF,listICSD2LINK;
-      stringstream ossLIB2RAW,ossRM,ossANRL,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossREMOVE_MPCDF,ossICSD2LINK;
+
+      vector<string> listLIB2RAW,listRM,listANRL,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK;
+      stringstream ossLIB2RAW,ossRM,ossANRL,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK;
 
       vector<string> tokens;
       vector<string> vremoveALL;
@@ -127,258 +127,242 @@ namespace aflowlib {
 
       bool LIB2AUID=FALSE;//TRUE;
       bool REMOVE_MARYLOU=TRUE;
-      bool REMOVE_MPCDF=TRUE;
       bool ICSD2LINK=TRUE;//TRUE;
-      
+
       for(uint j=0;j<list2found.size();j++) {
-	string directory_LIB=list2found.at(j);
-	aurostd::StringSubst(directory_LIB,"/"+_AFLOWIN_,"");
-	string directory_RAW=directory_LIB;
-	aurostd::StringSubst(directory_RAW,"/LIB/","/RAW/");
-	string directory_WEB=directory_LIB;
-	aurostd::StringSubst(directory_WEB,"/LIB/","/WEB/");
+        string directory_LIB=list2found.at(j);
+        aurostd::StringSubst(directory_LIB,"/"+_AFLOWIN_,"");
+        string directory_RAW=directory_LIB;
+        aurostd::StringSubst(directory_RAW,"/LIB/","/RAW/");
+        string directory_WEB=directory_LIB;
+        aurostd::StringSubst(directory_WEB,"/LIB/","/WEB/");
 
-	vector<string> files2found;
-	//	aurostd::execute2string("find "+directory_RAW);
-	// aurostd::string2vectorstring(aurostd::execute2string("find "+directory_RAW),files2found);
+        vector<string> files2found;
+        //	aurostd::execute2string("find "+directory_RAW);
+        // aurostd::string2vectorstring(aurostd::execute2string("find "+directory_RAW),files2found);
 
-	// emergency check LIB2AUID from old to new
+        // emergency check LIB2AUID from old to new
 
-	if(ICSD2LINK && vlib.at(i)=="ICSD") {
-	  aurostd::string2tokens(directory_LIB,tokens,"_");
-	  if(tokens.size()>2) {
-	    if(tokens.at(tokens.size()-2)=="ICSD") {
-	      if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) &&  // check aflow.in
-		 aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) &&   // check aflowlib.out {
-		 aurostd::FileExist(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {  // check aflowlib.out {
-		// cerr << directory_LIB << " " << directory_RAW << " " << directory_WEB << endl;
-		string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
-		if(!aurostd::FileExist(directory_ICSD2LINK+"/LIB")) {
-		  //	    cerr << directory_ICSD2LINK << endl;
-		    listICSD2LINK.push_back(directory_ICSD2LINK);
-		    ossICSD2LINK << "mkdir -pv " << directory_ICSD2LINK << endl;
-		    ossICSD2LINK << "rm -fv " << directory_ICSD2LINK << "/LIB" << endl;
-		    ossICSD2LINK << "ln -sfv " << directory_LIB << " " << directory_ICSD2LINK << "/LIB" << endl;
-		    ossICSD2LINK << "rm -fv " << directory_ICSD2LINK << "/RAW" << endl;
-		    ossICSD2LINK << "ln -sfv " << directory_RAW << " " << directory_ICSD2LINK << "/RAW" << endl;
-		    ossICSD2LINK << "rm -fv " << directory_ICSD2LINK << "/WEB" << endl;
-		    ossICSD2LINK << "ln -sfv " << directory_WEB << " " << directory_ICSD2LINK << "/WEB" << endl;
-		    fixes++; 
-		}
-	      }
-	    }
-	  }
-	}
-	
-	
-	// check LIB2AUID MISSING	
-	if(REMOVE_MARYLOU) {
-	  if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
-	    string directory_MARYLOU="~/LIBS/"+directory_LIB;
-	    aurostd::StringSubst(directory_MARYLOU,"common","");
-	    aurostd::StringSubst(directory_MARYLOU,"//","");
-	      aurostd::StringSubst(directory_MARYLOU,"//","");
-	      
-	      //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-	      listREMOVE_MARYLOU.push_back(directory_MARYLOU);
-	      ossREMOVE_MARYLOU << "rm -rfv \"" << directory_MARYLOU << "\"" << endl;
-	      //	    fixes++;
-	  }
-	}	
-	if(REMOVE_MPCDF) {
-	  if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
-	    string directory_MPCDF="~/LIBS/"+directory_LIB;
-	    aurostd::StringSubst(directory_MPCDF,"common","");
-	    aurostd::StringSubst(directory_MPCDF,"//","");
-	      aurostd::StringSubst(directory_MPCDF,"//","");
-	      
-	      //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-	      listREMOVE_MPCDF.push_back(directory_MPCDF);
-	      ossREMOVE_MPCDF << "rm -rfv \"" << directory_MPCDF << "\"" << endl;
-	      //	    fixes++;
-	  }
-	}
+        if(ICSD2LINK && vlib.at(i)=="ICSD") {
+          aurostd::string2tokens(directory_LIB,tokens,"_");
+          if(tokens.size()>2) {
+            if(tokens.at(tokens.size()-2)=="ICSD") {
+              if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) &&  // check aflow.in
+                  aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) &&   // check aflowlib.out
+                  aurostd::FileExist(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT))  // check aflowlib.out
+              { //CO200106 - patching for auto-indenting
+                // cerr << directory_LIB << " " << directory_RAW << " " << directory_WEB << endl;
+                string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
+                if(!aurostd::FileExist(directory_ICSD2LINK+"/LIB")) {
+                  //	    cerr << directory_ICSD2LINK << endl;
+                  listICSD2LINK.push_back(directory_ICSD2LINK);
+                  ossICSD2LINK << "mkdir -pv " << directory_ICSD2LINK << endl;
+                  ossICSD2LINK << "rm -fv " << directory_ICSD2LINK << "/LIB" << endl;
+                  ossICSD2LINK << "ln -sfv " << directory_LIB << " " << directory_ICSD2LINK << "/LIB" << endl;
+                  ossICSD2LINK << "rm -fv " << directory_ICSD2LINK << "/RAW" << endl;
+                  ossICSD2LINK << "ln -sfv " << directory_RAW << " " << directory_ICSD2LINK << "/RAW" << endl;
+                  ossICSD2LINK << "rm -fv " << directory_ICSD2LINK << "/WEB" << endl;
+                  ossICSD2LINK << "ln -sfv " << directory_WEB << " " << directory_ICSD2LINK << "/WEB" << endl;
+                  fixes++; 
+                }
+              }
+            }
+          }
+        }
 
-	// check LIB2AUID MISSING	
-	if(LIB2AUID) {
-	  if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) ||
-	     aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-	    if(aflowlib::LIB2AUID(directory_LIB,TRUE,FALSE)) {	    
-	      //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-	      listLIB2AUID.push_back(directory_LIB);
-	      if(_AFLOWIN_=="aflow.in") {
-		ossLIB2AUID << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --lib2auid=\"" << directory_LIB << "\"" << endl;
-		fixes++;
-	      }
-	      //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-	      if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-		ossLIB2AUID << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --lib2auid=\"" << directory_LIB << "\"" << endl;
-		fixes++;
-	      }
-	    }
-	  }
-	}
-	
-	// check LIB2RAW MISSING	
-	if(!aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) ||
-	   !aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) ||
-	   !aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) {
-	  //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-	  listLIB2RAW.push_back(directory_LIB);
-	  if(_AFLOWIN_=="aflow.in") {
-	    ossLIB2RAW << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
-	    fixes++;
-	  }
-	  //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-	  if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-	    ossLIB2RAW << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
-	    fixes++;
-	  }
-	}
-	// check LIB2RAW EXISTANT BUT MESSED UP
-	if(aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) && 
-	   aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-	  //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-	  if(aurostd::FileExist(directory_RAW+"/aflow.fgroup.orig.json") ||
-	     aurostd::FileExist(directory_RAW+"/aflow.pgroupk_xtal.relax.json") || // force
-	     aurostd::FileExist(directory_RAW+"/aflow.pgroup_xtal.relax.out")) {
-	    //	    cerr << "aflowlib::LIB2SCRUB FOUND OVERWRITTEN = " << directory_RAW << " " << endl;
-	    listINCOMPLETE.push_back(directory_LIB);
-	    ossINCOMPLETE << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
-	    fixes++;
-	  }	
-	}
-	
-	// check REMOVE normal
-	for(uint k=0;k<vremoveALL.size();k++) {
-	  if(aurostd::FileExist(directory_LIB+"/"+vremoveALL.at(k))) {
-	    //   cerr << "aflowlib::LIB2SCRUB removing " << directory_LIB << "/" << vremoveALL.at(k) << endl;
-	    listRM.push_back(directory_LIB+"/"+vremoveALL.at(k));
-	    ossRM << "rm -fv \"" << directory_LIB << "/" << vremoveALL.at(k) << "\"" << endl;
-	    fixes++;	    
-	    // [SAFETY]	    aurostd::RemoveFile(directory_LIB+"/"+vremoveALL.at(k));
-	  }
-	}
-	
-	// check REMOVE LIB6_LIB7
-	//	if(vlib.at(i)=="LIB5" || vlib.at(i)=="LIB6" || vlib.at(i)=="LIB7")
-	if(vlib.at(i)=="LIB6" || vlib.at(i)=="LIB7")
-	  {
-	  //	  cerr << "LIB6_LIB7" << endl;
-	  for(uint k=0;k<vremoveLIB6_LIB7.size();k++) {
-	    string FILE_relax1,FILE_relax2,FILE_static;
-	    FILE_relax1=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".relax1.xz";
-	    FILE_relax2=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".relax2.xz";
-	    FILE_static=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".static.xz";
-	    if(aurostd::FileExist(FILE_static)) {
-	      if(aurostd::FileExist(FILE_relax1)) {
-		//   cerr << "aflowlib::LIB2SCRUB removing " << FILE_relax1 << endl;
-		listRM.push_back(FILE_relax1);
-		ossRM << "rm -fv \"" << FILE_relax1 << "\"" << endl;
-		fixes++; }
-	      if(aurostd::FileExist(FILE_relax2)) {
-		//   cerr << "aflowlib::LIB2SCRUB removing " << FILE_relax2 << endl;
-		listRM.push_back(FILE_relax2);
-		ossRM << "rm -fv \"" << FILE_relax2 << "\"" << endl;
-		fixes++; }
-	    }
-	  }
-	}
-	
-	// check AGL_FIX
-	if(aurostd::FileExist(directory_LIB+"/agl_aflow.in") && aurostd::FileExist(directory_LIB+"/LOCK") && !aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-	  listAGL2FIX.push_back(directory_LIB+"/agl_aflow.in");
-	  ossAGL2FIX << "cp \"" << directory_LIB << "/" << "LOCK\"" << " \"" << directory_LIB << "/" << "agl.LOCK\"" << endl;
-	  fixes++;	    
-	}
- 
-	// check LIB2RAW - ANRL	
-	if(aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) && 
-	   aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-	  //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-	  if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"anrl_label")) {
-	    //	    cerr << "aflowlib::LIB2SCRUB ANRL FOUND = " << directory_RAW << "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
-	  } else {
-	    //	    cerr << "aflowlib::LIB2SCRUB ANRL NOT FOUND = " << directory_RAW << "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
-	    listANRL.push_back(directory_LIB);
-	    ossANRL << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
-	    fixes++;
-	  }	
-	}
-	
-	// RETOUCHING DATE OF AFLOW.IN TO REPRESENT AFLOW.END.OUT
-	if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) && 
-	   aurostd::FileExist(directory_LIB+"/aflow.end.out")) {
-	  struct stat fileInfo_IN,fileInfo_OUT;
-	  stat(string(directory_LIB+"/"+_AFLOWIN_).c_str(), &fileInfo_IN);
-	  stat(string(directory_LIB+"/aflow.end.out").c_str(), &fileInfo_OUT);
-	  if(fileInfo_IN.st_mtime!=fileInfo_OUT.st_mtime) {
-	    // std::cout << "FILE=" << string(directory_LIB+"/aflow.in") << ":" << fileInfo_IN.st_mtime << endl;
-	    // std::cout << "FILE=" << string(directory_LIB+"/aflow.end.out") << ":" << fileInfo_OUT.st_mtime << endl;
-	    listTOUCH.push_back(directory_LIB);
-	    string date=std::ctime(&fileInfo_OUT.st_mtime);
-	    if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
-	    ossTOUCH << "echo " << directory_LIB << " && " << "touch -m --date=\"" << date << "\" " << string(directory_LIB+"/aflow.in") << " " << string(directory_LIB+"/aflow.end.out") << " " << string(directory_LIB+"/LOCK*") << " " << string(directory_LIB+"/*.xz") << endl;
-	    fixes++;
-	    stringstream sss;
-	    sss << "touch -m --date=\"" << date << "\" " << string(directory_LIB+"/aflow.in") << " " << string(directory_LIB+"/aflow.end.out") << " " << string(directory_LIB+"/LOCK*") << " " << string(directory_LIB+"/*.xz");
-	    //	    aurostd::execute(sss);
-	    //  cout << "FIXED " << directory_LIB << endl;
-	  }
-	}
-	  
-	// some step debug
-	aurostd::ProgressBar(cerr,"aflowlib::LIB2SCRUB ",j,list2found.size(),1,1,1);
+
+        // check LIB2AUID MISSING	
+        if(REMOVE_MARYLOU) {
+          if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
+            string directory_MARYLOU="~/LIBS/"+directory_LIB;
+            aurostd::StringSubst(directory_MARYLOU,"common","");
+            aurostd::StringSubst(directory_MARYLOU,"//","");
+            aurostd::StringSubst(directory_MARYLOU,"//","");
+
+            //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+            listREMOVE_MARYLOU.push_back(directory_MARYLOU);
+            ossREMOVE_MARYLOU << "rm -rfv \"" << directory_MARYLOU << "\"" << endl;
+            //	    fixes++;
+          }
+        }	
+
+        // check LIB2AUID MISSING	
+        if(LIB2AUID) {
+          if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) ||
+              aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+            if(aflowlib::LIB2AUID(directory_LIB,TRUE,FALSE)) {	    
+              //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+              listLIB2AUID.push_back(directory_LIB);
+              if(_AFLOWIN_=="aflow.in") {
+                ossLIB2AUID << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --lib2auid=\"" << directory_LIB << "\"" << endl;
+                fixes++;
+              }
+              //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
+              if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
+              { //CO200106 - patching for auto-indenting
+                ossLIB2AUID << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --lib2auid=\"" << directory_LIB << "\"" << endl;
+                fixes++;
+              }
+            }
+          }
+        }
+
+        // check LIB2RAW MISSING	
+        if(!aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) ||
+            !aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) ||
+            !aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) {
+          //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+          listLIB2RAW.push_back(directory_LIB);
+          if(_AFLOWIN_=="aflow.in") {
+            ossLIB2RAW << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
+            fixes++;
+          }
+          //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
+          if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
+          { //CO200106 - patching for auto-indenting
+            ossLIB2RAW << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
+            fixes++;
+          }
+        }
+        // check LIB2RAW EXISTANT BUT MESSED UP
+        if(aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) && 
+            aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+          //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+          if(aurostd::FileExist(directory_RAW+"/aflow.fgroup.orig.json") ||
+              aurostd::FileExist(directory_RAW+"/aflow.pgroupk_xtal.relax.json") || // force
+              aurostd::FileExist(directory_RAW+"/aflow.pgroup_xtal.relax.out")) {
+            //	    cerr << "aflowlib::LIB2SCRUB FOUND OVERWRITTEN = " << directory_RAW << " " << endl;
+            listINCOMPLETE.push_back(directory_LIB);
+            ossINCOMPLETE << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
+            fixes++;
+          }	
+        }
+
+        // check REMOVE normal
+        for(uint k=0;k<vremoveALL.size();k++) {
+          if(aurostd::FileExist(directory_LIB+"/"+vremoveALL.at(k))) {
+            //   cerr << "aflowlib::LIB2SCRUB removing " << directory_LIB << "/" << vremoveALL.at(k) << endl;
+            listRM.push_back(directory_LIB+"/"+vremoveALL.at(k));
+            ossRM << "rm -fv \"" << directory_LIB << "/" << vremoveALL.at(k) << "\"" << endl;
+            fixes++;	    
+            // [SAFETY]	    aurostd::RemoveFile(directory_LIB+"/"+vremoveALL.at(k));
+          }
+        }
+
+        // check REMOVE LIB6_LIB7
+        //	if(vlib.at(i)=="LIB5" || vlib.at(i)=="LIB6" || vlib.at(i)=="LIB7")
+        if(vlib.at(i)=="LIB6" || vlib.at(i)=="LIB7")
+        {
+          //	  cerr << "LIB6_LIB7" << endl;
+          for(uint k=0;k<vremoveLIB6_LIB7.size();k++) {
+            string FILE_relax1,FILE_relax2,FILE_static;
+            FILE_relax1=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".relax1.xz";
+            FILE_relax2=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".relax2.xz";
+            FILE_static=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".static.xz";
+            if(aurostd::FileExist(FILE_static)) {
+              if(aurostd::FileExist(FILE_relax1)) {
+                //   cerr << "aflowlib::LIB2SCRUB removing " << FILE_relax1 << endl;
+                listRM.push_back(FILE_relax1);
+                ossRM << "rm -fv \"" << FILE_relax1 << "\"" << endl;
+                fixes++; }
+              if(aurostd::FileExist(FILE_relax2)) {
+                //   cerr << "aflowlib::LIB2SCRUB removing " << FILE_relax2 << endl;
+                listRM.push_back(FILE_relax2);
+                ossRM << "rm -fv \"" << FILE_relax2 << "\"" << endl;
+                fixes++; }
+            }
+          }
+        }
+
+        // check AGL_FIX
+        if(aurostd::FileExist(directory_LIB+"/agl_aflow.in") && aurostd::FileExist(directory_LIB+"/LOCK") && !aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
+          listAGL2FIX.push_back(directory_LIB+"/agl_aflow.in");
+          ossAGL2FIX << "cp \"" << directory_LIB << "/" << "LOCK\"" << " \"" << directory_LIB << "/" << "agl.LOCK\"" << endl;
+          fixes++;	    
+        }
+
+        // check LIB2RAW - ANRL	
+        if(aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) && 
+            aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+          //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+          if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"anrl_label")) {
+            //	    cerr << "aflowlib::LIB2SCRUB ANRL FOUND = " << directory_RAW << "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
+          } else {
+            //	    cerr << "aflowlib::LIB2SCRUB ANRL NOT FOUND = " << directory_RAW << "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
+            listANRL.push_back(directory_LIB);
+            ossANRL << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
+            fixes++;
+          }	
+        }
+
+        // RETOUCHING DATE OF AFLOW.IN TO REPRESENT AFLOW.END.OUT
+        if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) && 
+            aurostd::FileExist(directory_LIB+"/aflow.end.out")) {
+          struct stat fileInfo_IN,fileInfo_OUT;
+          stat(string(directory_LIB+"/"+_AFLOWIN_).c_str(), &fileInfo_IN);
+          stat(string(directory_LIB+"/aflow.end.out").c_str(), &fileInfo_OUT);
+          if(fileInfo_IN.st_mtime!=fileInfo_OUT.st_mtime) {
+            // std::cout << "FILE=" << string(directory_LIB+"/aflow.in") << ":" << fileInfo_IN.st_mtime << endl;
+            // std::cout << "FILE=" << string(directory_LIB+"/aflow.end.out") << ":" << fileInfo_OUT.st_mtime << endl;
+            listTOUCH.push_back(directory_LIB);
+            string date=std::ctime(&fileInfo_OUT.st_mtime);
+            if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
+            ossTOUCH << "echo " << directory_LIB << " && " << "touch -m --date=\"" << date << "\" " << string(directory_LIB+"/aflow.in") << " " << string(directory_LIB+"/aflow.end.out") << " " << string(directory_LIB+"/LOCK*") << " " << string(directory_LIB+"/*.xz") << endl;
+            fixes++;
+            stringstream sss;
+            sss << "touch -m --date=\"" << date << "\" " << string(directory_LIB+"/aflow.in") << " " << string(directory_LIB+"/aflow.end.out") << " " << string(directory_LIB+"/LOCK*") << " " << string(directory_LIB+"/*.xz");
+            //	    aurostd::execute(sss);
+            //  cout << "FIXED " << directory_LIB << endl;
+          }
+        }
+
+        // some step debug
+        aurostd::ProgressBar(cerr,"aflowlib::LIB2SCRUB ",j,list2found.size(),1,1,1);
       }
       cerr << "aflowlib::LIB2SCRUB listLIB2RAW.size()=" << listLIB2RAW.size() << endl;
       if(listLIB2RAW.size()) {
-	aurostd::stringstream2file(ossLIB2RAW,XHOST.tmpfs+"/xscrubber."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber."+vlib.at(i));
+        aurostd::stringstream2file(ossLIB2RAW,XHOST.tmpfs+"/xscrubber."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber."+vlib.at(i));
       }
       cerr << "aflowlib::LIB2SCRUB listICSD2LINK.size()=" << listICSD2LINK.size() << endl;
       if(listICSD2LINK.size()) {
-	aurostd::stringstream2file(ossICSD2LINK,XHOST.tmpfs+"/xscrubber_ICSD2LINK."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ICSD2LINK."+vlib.at(i));
+        aurostd::stringstream2file(ossICSD2LINK,XHOST.tmpfs+"/xscrubber_ICSD2LINK."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ICSD2LINK."+vlib.at(i));
       }
-       cerr << "aflowlib::LIB2SCRUB listLIB2AUID.size()=" << listLIB2AUID.size() << endl;
+      cerr << "aflowlib::LIB2SCRUB listLIB2AUID.size()=" << listLIB2AUID.size() << endl;
       if(listLIB2AUID.size()) {
-	aurostd::stringstream2file(ossLIB2AUID,XHOST.tmpfs+"/xscrubber_LIB2AUID."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_LIB2AUID."+vlib.at(i));
+        aurostd::stringstream2file(ossLIB2AUID,XHOST.tmpfs+"/xscrubber_LIB2AUID."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_LIB2AUID."+vlib.at(i));
       }
-     cerr << "aflowlib::LIB2SCRUB listREMOVE_MARYLOU.size()=" << listREMOVE_MARYLOU.size() << endl;
+      cerr << "aflowlib::LIB2SCRUB listREMOVE_MARYLOU.size()=" << listREMOVE_MARYLOU.size() << endl;
       if(listREMOVE_MARYLOU.size()) {
-	aurostd::stringstream2file(ossREMOVE_MARYLOU,XHOST.tmpfs+"/xscrubber_REMOVE_MARYLOU."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_REMOVE_MARYLOU."+vlib.at(i));
+        aurostd::stringstream2file(ossREMOVE_MARYLOU,XHOST.tmpfs+"/xscrubber_REMOVE_MARYLOU."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_REMOVE_MARYLOU."+vlib.at(i));
       }
-     cerr << "aflowlib::LIB2SCRUB listREMOVE_MPCDF.size()=" << listREMOVE_MPCDF.size() << endl;
-      if(listREMOVE_MPCDF.size()) {
-	aurostd::stringstream2file(ossREMOVE_MPCDF,XHOST.tmpfs+"/xscrubber_REMOVE_MPCDF."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_REMOVE_MPCDF."+vlib.at(i));
-      }
-     cerr << "aflowlib::LIB2SCRUB listRM.size()=" << listRM.size() << endl;
+      cerr << "aflowlib::LIB2SCRUB listRM.size()=" << listRM.size() << endl;
       if(listRM.size()) {
-	aurostd::stringstream2file(ossRM,XHOST.tmpfs+"/xscrubber_RM."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_RM."+vlib.at(i));
+        aurostd::stringstream2file(ossRM,XHOST.tmpfs+"/xscrubber_RM."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_RM."+vlib.at(i));
       }
       cerr << "aflowlib::LIB2SCRUB listANRL.size()=" << listANRL.size() << endl;
       if(listANRL.size()) {
-	aurostd::stringstream2file(ossANRL,XHOST.tmpfs+"/xscrubber_ANRL."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ANRL."+vlib.at(i));
+        aurostd::stringstream2file(ossANRL,XHOST.tmpfs+"/xscrubber_ANRL."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ANRL."+vlib.at(i));
       }
       cerr << "aflowlib::LIB2SCRUB listINCOMPLETE.size()=" << listINCOMPLETE.size() << endl;
       if(listINCOMPLETE.size()) {
-	aurostd::stringstream2file(ossINCOMPLETE,XHOST.tmpfs+"/xscrubber_INCOMPLETE."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_INCOMPLETE."+vlib.at(i));
+        aurostd::stringstream2file(ossINCOMPLETE,XHOST.tmpfs+"/xscrubber_INCOMPLETE."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_INCOMPLETE."+vlib.at(i));
       }
       cerr << "aflowlib::LIB2SCRUB listAGL2FIX.size()=" << listAGL2FIX.size() << endl;
       if(listAGL2FIX.size()) {
-	aurostd::stringstream2file(ossAGL2FIX,XHOST.tmpfs+"/xscrubber_AGL2FIX."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_AGL2FIX."+vlib.at(i));
+        aurostd::stringstream2file(ossAGL2FIX,XHOST.tmpfs+"/xscrubber_AGL2FIX."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_AGL2FIX."+vlib.at(i));
       }
       cerr << "aflowlib::LIB2SCRUB listTOUCH.size()=" << listTOUCH.size() << endl;
       if(listTOUCH.size()) {
-	aurostd::stringstream2file(ossTOUCH,XHOST.tmpfs+"/xscrubber_TOUCH."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_TOUCH."+vlib.at(i));
+        aurostd::stringstream2file(ossTOUCH,XHOST.tmpfs+"/xscrubber_TOUCH."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_TOUCH."+vlib.at(i));
       }
     }
     if(VERBOSE) cerr << "aflowlib::LIB2SCRUB fixes=" << fixes << endl;
@@ -408,7 +392,7 @@ namespace aflowlib {
     if(VERBOSE) cerr << "aflowlib::LIB2AUID directory_LIB=" << directory_LIB << endl;
     if(VERBOSE) cerr << "aflowlib::LIB2AUID directory_RAW=" << directory_RAW << endl;
     if(VERBOSE) cerr << "aflowlib::LIB2AUID directory_WEB=" << directory_WEB << endl;
-    
+
     // if(aurostd::FileExist(directory_LIB)) {
     //   // cout << "aflowlib::LIB2AUID EXIST   = " << directory_LIB << endl;
     // } else {
@@ -431,8 +415,8 @@ namespace aflowlib {
       _aflowlib_entry entry_tmp(string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT));
       string auid=entry_tmp.auid;
       if(auid.size()!=22) {
-	cerr << "aflowlib::LIB2AUID: error on size of auid=" << auid << endl;
-	exit(0);
+        cerr << "aflowlib::LIB2AUID: error on size of auid=" << auid << endl;
+        exit(0);
       }
       directory_old_LIB_AUID=init::AFLOW_Projects_Directories("AUID")+"/LIB";
       directory_old_RAW_AUID=init::AFLOW_Projects_Directories("AUID")+"/RAW";
@@ -442,96 +426,96 @@ namespace aflowlib {
       directory_new_WEB_AUID=init::AFLOW_Projects_Directories("AUID");
       directory_new_AUID=init::AFLOW_Projects_Directories("AUID");
       for(uint i=0;i<entry_tmp.vauid.size();i++) {
-	directory_old_LIB_AUID+="/"+entry_tmp.vauid.at(i);
-	directory_old_RAW_AUID+="/"+entry_tmp.vauid.at(i);
-	directory_old_WEB_AUID+="/"+entry_tmp.vauid.at(i);
-	directory_new_LIB_AUID+="/"+entry_tmp.vauid.at(i);
-	directory_new_RAW_AUID+="/"+entry_tmp.vauid.at(i);
-	directory_new_WEB_AUID+="/"+entry_tmp.vauid.at(i);
- 	directory_new_AUID+="/"+entry_tmp.vauid.at(i);
+        directory_old_LIB_AUID+="/"+entry_tmp.vauid.at(i);
+        directory_old_RAW_AUID+="/"+entry_tmp.vauid.at(i);
+        directory_old_WEB_AUID+="/"+entry_tmp.vauid.at(i);
+        directory_new_LIB_AUID+="/"+entry_tmp.vauid.at(i);
+        directory_new_RAW_AUID+="/"+entry_tmp.vauid.at(i);
+        directory_new_WEB_AUID+="/"+entry_tmp.vauid.at(i);
+        directory_new_AUID+="/"+entry_tmp.vauid.at(i);
       }
       directory_new_LIB_AUID+="/LIB";
       directory_new_RAW_AUID+="/RAW";
       directory_new_WEB_AUID+="/WEB";
 
       if(!TEST) {
-	// [OBSOLETE] if(aurostd::FileExist(directory_old_LIB_AUID)) {
-	// [OBSOLETE]   // cout << "aflowlib::LIB2AUID EXIST   = " << directory_old_LIB_AUID << endl;
-	// [OBSOLETE] } else {
-	// [OBSOLETE]   cout << "aflowlib::LIB2AUID MISSING = " << directory_old_LIB_AUID << endl;
-	// [OBSOLETE] }
-	// [OBSOLETE] if(aurostd::FileExist(directory_old_RAW_AUID)) {
-	// [OBSOLETE]   // cout << "aflowlib::LIB2AUID EXIST   = " << directory_old_RAW_AUID << endl;
-	// [OBSOLETE] } else {
-	// [OBSOLETE]   cout << "aflowlib::LIB2AUID MISSING = " << directory_old_RAW_AUID << endl;
-	// [OBSOLETE] }
-	// [OBSOLETE] if(aurostd::FileExist(directory_old_WEB_AUID)) {
-	// [OBSOLETE]   // cout << "aflowlib::LIB2AUID EXIST   = " << directory_old_WEB_AUID << endl;
-	// [OBSOLETE] } else {
-	// [OBSOLETE]   cout << "aflowlib::LIB2AUID MISSING = " << directory_old_WEB_AUID << endl;
-	// [OBSOLETE] }
-	if(aurostd::FileExist(directory_new_LIB_AUID)) {
-	  // cout << "aflowlib::LIB2AUID EXIST   = " << directory_new_LIB_AUID << endl;
-	} else {
-	  cout << "aflowlib::LIB2AUID MISSING = " << directory_new_LIB_AUID << endl;
-	}
-	if(aurostd::FileExist(directory_new_RAW_AUID)) {
-	  // cout << "aflowlib::LIB2AUID EXIST   = " << directory_new_RAW_AUID << endl;
-	} else {
-	  cout << "aflowlib::LIB2AUID MISSING = " << directory_new_RAW_AUID << endl;
-	}
-	if(aurostd::FileExist(directory_new_WEB_AUID)) {
-	  // cout << "aflowlib::LIB2AUID EXIST   = " << directory_new_WEB_AUID << endl;
-	} else {
-	  cout << "aflowlib::LIB2AUID MISSING = " << directory_new_WEB_AUID << endl;
-	}
+        // [OBSOLETE] if(aurostd::FileExist(directory_old_LIB_AUID)) {
+        // [OBSOLETE]   // cout << "aflowlib::LIB2AUID EXIST   = " << directory_old_LIB_AUID << endl;
+        // [OBSOLETE] } else {
+        // [OBSOLETE]   cout << "aflowlib::LIB2AUID MISSING = " << directory_old_LIB_AUID << endl;
+        // [OBSOLETE] }
+        // [OBSOLETE] if(aurostd::FileExist(directory_old_RAW_AUID)) {
+        // [OBSOLETE]   // cout << "aflowlib::LIB2AUID EXIST   = " << directory_old_RAW_AUID << endl;
+        // [OBSOLETE] } else {
+        // [OBSOLETE]   cout << "aflowlib::LIB2AUID MISSING = " << directory_old_RAW_AUID << endl;
+        // [OBSOLETE] }
+        // [OBSOLETE] if(aurostd::FileExist(directory_old_WEB_AUID)) {
+        // [OBSOLETE]   // cout << "aflowlib::LIB2AUID EXIST   = " << directory_old_WEB_AUID << endl;
+        // [OBSOLETE] } else {
+        // [OBSOLETE]   cout << "aflowlib::LIB2AUID MISSING = " << directory_old_WEB_AUID << endl;
+        // [OBSOLETE] }
+        if(aurostd::FileExist(directory_new_LIB_AUID)) {
+          // cout << "aflowlib::LIB2AUID EXIST   = " << directory_new_LIB_AUID << endl;
+        } else {
+          cout << "aflowlib::LIB2AUID MISSING = " << directory_new_LIB_AUID << endl;
+        }
+        if(aurostd::FileExist(directory_new_RAW_AUID)) {
+          // cout << "aflowlib::LIB2AUID EXIST   = " << directory_new_RAW_AUID << endl;
+        } else {
+          cout << "aflowlib::LIB2AUID MISSING = " << directory_new_RAW_AUID << endl;
+        }
+        if(aurostd::FileExist(directory_new_WEB_AUID)) {
+          // cout << "aflowlib::LIB2AUID EXIST   = " << directory_new_WEB_AUID << endl;
+        } else {
+          cout << "aflowlib::LIB2AUID MISSING = " << directory_new_WEB_AUID << endl;
+        }
       }
-      
+
       if(aurostd::FileExist(directory_RAW) && !aurostd::FileExist(directory_new_RAW_AUID)) {
-	//	cout << "aflowlib::LIB2AUID: directory_AUID_RAW=" << directory_new_RAW_AUID << " -> " << directory_RAW << endl;
-	if(TEST) {
-	  return true;
-	} else {
-	  cout << "aflowlib::LIB2AUID: linking file AUID_LIB->LIB: " << directory_new_LIB_AUID << " -> " << directory_LIB << endl; cout.flush();
-	  aurostd::DirectoryMake(directory_new_AUID);
-	  aurostd::LinkFile(directory_LIB,directory_new_LIB_AUID);         // LINK
-	  //	aurostd::execute(XHOST.command("beep")+" -f 2500 -l 1");
-	}
+        //	cout << "aflowlib::LIB2AUID: directory_AUID_RAW=" << directory_new_RAW_AUID << " -> " << directory_RAW << endl;
+        if(TEST) {
+          return true;
+        } else {
+          cout << "aflowlib::LIB2AUID: linking file AUID_LIB->LIB: " << directory_new_LIB_AUID << " -> " << directory_LIB << endl; cout.flush();
+          aurostd::DirectoryMake(directory_new_AUID);
+          aurostd::LinkFile(directory_LIB,directory_new_LIB_AUID);         // LINK
+          //	aurostd::execute(XHOST.command("beep")+" -f 2500 -l 1");
+        }
       }
       if(aurostd::FileExist(directory_RAW) && !aurostd::FileExist(directory_new_RAW_AUID)) {
-	//	cout << "aflowlib::LIB2AUID: directory_AUID_RAW=" << directory_new_RAW_AUID << " -> " << directory_RAW << endl;
-	if(TEST) {
-	  return true;
-	} else {
-	  cout << "aflowlib::LIB2AUID: linking file AUID_RAW->RAW: " << directory_new_RAW_AUID << " -> " << directory_RAW << endl; cout.flush();
-	  aurostd::DirectoryMake(directory_new_AUID);
-	  aurostd::LinkFile(directory_RAW,directory_new_RAW_AUID);         // LINK
-	  //	aurostd::execute(XHOST.command("beep")+" -f 2600 -l 1");
-	}
+        //	cout << "aflowlib::LIB2AUID: directory_AUID_RAW=" << directory_new_RAW_AUID << " -> " << directory_RAW << endl;
+        if(TEST) {
+          return true;
+        } else {
+          cout << "aflowlib::LIB2AUID: linking file AUID_RAW->RAW: " << directory_new_RAW_AUID << " -> " << directory_RAW << endl; cout.flush();
+          aurostd::DirectoryMake(directory_new_AUID);
+          aurostd::LinkFile(directory_RAW,directory_new_RAW_AUID);         // LINK
+          //	aurostd::execute(XHOST.command("beep")+" -f 2600 -l 1");
+        }
       }
       if(aurostd::FileExist(directory_WEB) && !aurostd::FileExist(directory_new_WEB_AUID)) {
-	//	cout << "aflowlib::LIB2AUID: directory_AUID_WEB=" << directory_new_WEB_AUID << " -> " << directory_WEB << endl;
-	if(TEST) {
-	  return true;
-	} else {
-	  cout << "aflowlib::LIB2AUID: linking file AUID_WEB->WEB: " << directory_new_WEB_AUID << " -> " << directory_WEB << endl; cout.flush();
-	  aurostd::DirectoryMake(directory_new_AUID);
-	  aurostd::LinkFile(directory_WEB,directory_new_WEB_AUID);         // LINK
-	  //	aurostd::execute(XHOST.command("beep")+" -f 2500 -l 1");
-	}
+        //	cout << "aflowlib::LIB2AUID: directory_AUID_WEB=" << directory_new_WEB_AUID << " -> " << directory_WEB << endl;
+        if(TEST) {
+          return true;
+        } else {
+          cout << "aflowlib::LIB2AUID: linking file AUID_WEB->WEB: " << directory_new_WEB_AUID << " -> " << directory_WEB << endl; cout.flush();
+          aurostd::DirectoryMake(directory_new_AUID);
+          aurostd::LinkFile(directory_WEB,directory_new_WEB_AUID);         // LINK
+          //	aurostd::execute(XHOST.command("beep")+" -f 2500 -l 1");
+        }
       }
       if(!aurostd::FileExist(directory_WEB) && aurostd::FileExist(directory_RAW) && !aurostd::FileExist(directory_new_WEB_AUID)) { // no WEB so point to RAW
-	//	cout << "aflowlib::LIB2AUID: directory_AUID_WEB=" << directory_new_WEB_AUID << " -> " << directory_RAW << endl;
-	if(TEST) {
-	  return true;
-	} else {
-	  cout << "aflowlib::LIB2AUID: linking file AUID_WEB->RAW: " << directory_new_WEB_AUID << " -> " << directory_RAW << endl; cout.flush();
-	  aurostd::DirectoryMake(directory_new_AUID);
-	  aurostd::LinkFile(directory_RAW,directory_new_WEB_AUID);         // LINK
-	  //	aurostd::execute(XHOST.command("beep")+" -f 2500 -l 1");
-	}
+        //	cout << "aflowlib::LIB2AUID: directory_AUID_WEB=" << directory_new_WEB_AUID << " -> " << directory_RAW << endl;
+        if(TEST) {
+          return true;
+        } else {
+          cout << "aflowlib::LIB2AUID: linking file AUID_WEB->RAW: " << directory_new_WEB_AUID << " -> " << directory_RAW << endl; cout.flush();
+          aurostd::DirectoryMake(directory_new_AUID);
+          aurostd::LinkFile(directory_RAW,directory_new_WEB_AUID);         // LINK
+          //	aurostd::execute(XHOST.command("beep")+" -f 2500 -l 1");
+        }
       }
-      
+
       //      directory_old_LIB_AUID=init::AFLOW_Projects_Directories("AUID")+"/LIB/"+auid.substr(0,8); for(uint i=8;i<=20;i+=2) directory_old_LIB_AUID+="/"+auid.substr(i,2);  // splitting aflow:ab/cd..
     }
     if(VERBOSE) cerr << "aflowlib::LIB2AUID directory_old_LIB_AUID=" << directory_old_LIB_AUID << endl;
@@ -540,7 +524,7 @@ namespace aflowlib {
     if(VERBOSE) cerr << "aflowlib::LIB2AUID directory_new_LIB_AUID=" << directory_new_LIB_AUID << endl;
     if(VERBOSE) cerr << "aflowlib::LIB2AUID directory_new_RAW_AUID=" << directory_new_RAW_AUID << endl;
     if(VERBOSE) cerr << "aflowlib::LIB2AUID directory_new_WEB_AUID=" << directory_new_WEB_AUID << endl;
-   
+
     if(VERBOSE) cerr << "aflowlib::LIB2AUID END" << endl;
     return false;
   }
@@ -552,9 +536,9 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
-  
+
   message << "Performing gcd test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  
+
   int a=0,b=0,x1=0,y1=0,gcd=0;
 
   a=25;b=15;
@@ -580,7 +564,7 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     }
     return FALSE;
   }
-  
+
   a=0;b=15;
   aurostd::GCD(a,b,gcd,x1,y1);
   if(!(gcd==15 && x1==0 && y1==1)){
@@ -592,7 +576,7 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     }
     return FALSE;
   }
-  
+
   a=-5100;b=30450;
   aurostd::GCD(a,b,gcd,x1,y1);
   if(!(gcd==150 && x1==-6 && y1==-1)){
@@ -615,7 +599,7 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
-  
+
   //test ehermite
   xmatrix<int> ehermite(2,2);
   aurostd::getEHermite(5,12,ehermite);
@@ -637,7 +621,7 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   A1[3][1]=6;A1[3][2]=8;A1[3][3]=9;
 
   aurostd::getSmithNormalForm(A1,U1,V1,S1);
-  
+
   if(LDEBUG){
     cerr << soliloquy << " A=" << endl;cerr << A1 << endl;
     cerr << soliloquy << " U=" << endl;cerr << U1 << endl;
@@ -682,7 +666,7 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   A2[3][1]=1050;  A2[3][2]=-18900; A2[3][3]=79380;   A2[3][4]=-117600; A2[3][5]=56700;
   A2[4][1]=-1400; A2[4][2]=26880;  A2[4][3]=-117600; A2[4][4]=179200;  A2[4][5]=-88200;
   A2[5][1]=630;   A2[5][2]=-12600; A2[5][3]=56700;   A2[5][4]=-88200;  A2[5][5]=44100;
-  
+
   aurostd::getSmithNormalForm(A2,U2,V2,S2);
 
   if(LDEBUG){ //COME BACK AND PATCH FOR ANSWERS
@@ -691,334 +675,334 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     cerr << soliloquy << " V=" << endl;cerr << V2 << endl;
     cerr << soliloquy << " S=" << endl;cerr << S2 << endl;
   }
-  
+
   message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return TRUE; // CO 180419
 }
-  
+
 int main(int _argc,char **_argv) {
   string soliloquy="main():"; // CO 180419
   ostream& oss=cout;  // CO 180419
   try{
-  bool LDEBUG=FALSE; // TRUE;
-  if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
-  std::vector<string> argv(aurostd::get_arguments_from_input(_argc,_argv));
-  if(LDEBUG) cerr << "AFLOW-MAIN [2]" << endl;
-  std::vector<string> cmds;  
-  // MACHINE
-  init::InitMachine(FALSE,argv,cmds,cerr);    
-  if(LDEBUG || XHOST.DEBUG) cerr << "AFLOW-MAIN [3]" << endl;
+    bool LDEBUG=FALSE; // TRUE;
+    if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
+    std::vector<string> argv(aurostd::get_arguments_from_input(_argc,_argv));
+    if(LDEBUG) cerr << "AFLOW-MAIN [2]" << endl;
+    std::vector<string> cmds;  
+    // MACHINE
+    init::InitMachine(FALSE,argv,cmds,cerr);    
+    if(LDEBUG || XHOST.DEBUG) cerr << "AFLOW-MAIN [3]" << endl;
 
-  // aurostd::TmpDirectoryCreate("test");
-  // cerr << args2flag(argv,"--aaa|--bbb |--ccc") << endl; exit(0);
-  // CHECK USERS MACHINES - DEBUG
-  
-  // initialize_templates_never_call_this_procedure(1);
+    // aurostd::TmpDirectoryCreate("test");
+    // cerr << args2flag(argv,"--aaa|--bbb |--ccc") << endl; exit(0);
+    // CHECK USERS MACHINES - DEBUG
 
-  // INITIALIZE ***************************************************
-  // INIT LOOK UP TABLES
-  atoms_initialize();
-  elements_initialize();
-  // spacegroup::SpaceGroupInitialize(); only if necessary
-  // INFORMATION **************************************************
-  AFLOW_PTHREADS::FLAG=AFLOW_PTHREADS::Check_Threads(argv,!XHOST.QUIET);
- 
-  bool Arun=FALSE;
-  if(!Arun && aurostd::args2flag(argv,cmds,"--prx|--prx="))  {Arun=TRUE;PERFORM_PRX(cout);}
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test_getpp")) {
-    if(KBIN::VASP_PseudoPotential_CleanName_TEST()){return 0;}
-    return 1;
-  }
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO190911
-    string soliloquy="test_xmatrix()::";
-    bool LDEBUG=TRUE; // TRUE;
-    xmatrix<double> mat;
-    mat(1,1)=5;mat(1,2)=9;mat(1,3)=12;
-    mat(2,1)=7;mat(2,2)=10;mat(2,3)=13;
-    mat(3,1)=8;mat(3,2)=11;mat(3,3)=14;
-    if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
-    //getmat()
-    xmatrix<double> submat;
-    mat.getmatInPlace(submat,2,3,2,3);
-    if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
-    //setmat()
-    mat.setmat(submat,1,1); //do nothing
-    if(LDEBUG){
-      cerr << soliloquy << " replacing with submat at 1,1" << endl;
-      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    // initialize_templates_never_call_this_procedure(1);
+
+    // INITIALIZE ***************************************************
+    // INIT LOOK UP TABLES
+    atoms_initialize();
+    elements_initialize();
+    // spacegroup::SpaceGroupInitialize(); only if necessary
+    // INFORMATION **************************************************
+    AFLOW_PTHREADS::FLAG=AFLOW_PTHREADS::Check_Threads(argv,!XHOST.QUIET);
+
+    bool Arun=FALSE;
+    if(!Arun && aurostd::args2flag(argv,cmds,"--prx|--prx="))  {Arun=TRUE;PERFORM_PRX(cout);}
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_getpp")) {
+      if(KBIN::VASP_PseudoPotential_CleanName_TEST()){return 0;}
+      return 1;
     }
-    xvector<double> xv;
-    xv(1)=2;xv(2)=3;xv(3)=4;
-    if(LDEBUG){cerr << soliloquy << " xv=" << xv << endl;}
-    mat.setmat(xv,1,false); //row
-    if(LDEBUG){
-      cerr << soliloquy << " replacing with xv at row=1" << endl;
-      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
-    }
-    mat.setmat(xv,2,true); //col
-    if(LDEBUG){
-      cerr << soliloquy << " replacing with xv at col=2" << endl;
-      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
-    }
-    //setrow()
-    mat.setrow(xv,2);
-    if(LDEBUG){
-      cerr << soliloquy << " replacing with xv at row=2" << endl;
-      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
-    }
-    //setcol()
-    mat.setcol(xv,3);
-    if(LDEBUG){
-      cerr << soliloquy << " replacing with xv at col=3" << endl;
-      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
-    }
-    return 1;
-  }
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test_stefano")) {
-    uint y=2017,m=11;
-    m+=1;
-    for(uint i=0;i<200;i++) {
-      if(m==0) {
- 	cout << "mv \"unknown.pdf\" stefano_" << y << m << ".pdf" << endl;
-      } else {
-	if(m<10) {
-	  cout << "mv \"unknown(" << i << ").pdf\" stefano_" << y << "0" << m << ".pdf" << endl;
-	} else {
-	  cout << "mv \"unknown(" << i << ").pdf\" stefano_" << y << m << ".pdf" << endl;
-	}
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO190911
+      string soliloquy="test_xmatrix()::";
+      bool LDEBUG=TRUE; // TRUE;
+      xmatrix<double> mat;
+      mat(1,1)=5;mat(1,2)=9;mat(1,3)=12;
+      mat(2,1)=7;mat(2,2)=10;mat(2,3)=13;
+      mat(3,1)=8;mat(3,2)=11;mat(3,3)=14;
+      if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
+      //getmat()
+      xmatrix<double> submat;
+      mat.getmatInPlace(submat,2,3,2,3);
+      if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
+      //setmat()
+      mat.setmat(submat,1,1); //do nothing
+      if(LDEBUG){
+        cerr << soliloquy << " replacing with submat at 1,1" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
       }
-      m--;
-      if(m==0) {y--;m+=12;} 
+      xvector<double> xv;
+      xv(1)=2;xv(2)=3;xv(3)=4;
+      if(LDEBUG){cerr << soliloquy << " xv=" << xv << endl;}
+      mat.setmat(xv,1,false); //row
+      if(LDEBUG){
+        cerr << soliloquy << " replacing with xv at row=1" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+      }
+      mat.setmat(xv,2,true); //col
+      if(LDEBUG){
+        cerr << soliloquy << " replacing with xv at col=2" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+      }
+      //setrow()
+      mat.setrow(xv,2);
+      if(LDEBUG){
+        cerr << soliloquy << " replacing with xv at row=2" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+      }
+      //setcol()
+      mat.setcol(xv,3);
+      if(LDEBUG){
+        cerr << soliloquy << " replacing with xv at col=3" << endl;
+        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+      }
+      return 1;
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_stefano")) {
+      uint y=2017,m=11;
+      m+=1;
+      for(uint i=0;i<200;i++) {
+        if(m==0) {
+          cout << "mv \"unknown.pdf\" stefano_" << y << m << ".pdf" << endl;
+        } else {
+          if(m<10) {
+            cout << "mv \"unknown(" << i << ").pdf\" stefano_" << y << "0" << m << ".pdf" << endl;
+          } else {
+            cout << "mv \"unknown(" << i << ").pdf\" stefano_" << y << m << ".pdf" << endl;
+          }
+        }
+        m--;
+        if(m==0) {y--;m+=12;} 
+      }
       //exit(0);
       return 0; // CO 180419
-   }
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO190601
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO190601
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
-
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
-    deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - aflow.cpp:main: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
-	
-    for(uint iext=0;iext<vext.size();iext++) { 
-      cout << "\"" << vext.at(iext) << "\"" << " " << "\"" << vcat.at(iext) << "\"" << endl;
     }
-    
-    int dim=7;
-    cout << "dimm=" << dim << endl;
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
-    xmatrix<double> m(dim,dim),mi(dim,dim);
-    for(int i=1;i<=dim;i++) 
-      for(int j=1;j<=dim;j++)
-	m(i,j)=aurostd::ran0();
-    cout << "m=" << endl << m << endl;
-    mi=inverse(m);
-    cout << "mi=" << endl << mi << endl;
-    cout << "mi*m=" << endl << det(mi*m) << endl; 
-     
+      deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
+      deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
+      if(vext.size()!=vcat.size()) { cerr << "ERROR - aflow.cpp:main: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+
+      for(uint iext=0;iext<vext.size();iext++) { 
+        cout << "\"" << vext.at(iext) << "\"" << " " << "\"" << vcat.at(iext) << "\"" << endl;
+      }
+
+      int dim=7;
+      cout << "dimm=" << dim << endl;
+
+      xmatrix<double> m(dim,dim),mi(dim,dim);
+      for(int i=1;i<=dim;i++) 
+        for(int j=1;j<=dim;j++)
+          m(i,j)=aurostd::ran0();
+      cout << "m=" << endl << m << endl;
+      mi=inverse(m);
+      cout << "mi=" << endl << mi << endl;
+      cout << "mi*m=" << endl << det(mi*m) << endl; 
+
       // CO how to create 64bit string from binary file
       //string b64String;
       //aurostd::bin2base64("aflow_logo.pdf",b64String);
       //cout << b64String << endl;
 
-    string test="2.730747137  -2.730747137-12.397646334";
-    vector<string> _tokens;
-    aurostd::string2tokens(test,_tokens,"-");
-    for(uint i=0;i<_tokens.size();i++){
-      cerr << _tokens[i] << endl;
-    }
+      string test="2.730747137  -2.730747137-12.397646334";
+      vector<string> _tokens;
+      aurostd::string2tokens(test,_tokens,"-");
+      for(uint i=0;i<_tokens.size();i++){
+        cerr << _tokens[i] << endl;
+      }
       //exit(0);
       return 0; // CO 180419
-    // COREY START 170614 - some SQLITE tests
-    //http://zetcode.com/db/sqlitec/ - more tests here
-    //this will create test.db file
-    sqlite3 *db;
-    char *err_msg = 0;
-    int rc = sqlite3_open("test.db", &db);
-    if(rc != SQLITE_OK) {
+      // COREY START 170614 - some SQLITE tests
+      //http://zetcode.com/db/sqlitec/ - more tests here
+      //this will create test.db file
+      sqlite3 *db;
+      char *err_msg = 0;
+      int rc = sqlite3_open("test.db", &db);
+      if(rc != SQLITE_OK) {
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return 1;
-    }
-    char const *sql = "DROP TABLE IF EXISTS Cars;" 
-                "CREATE TABLE Cars(Id INT, Name TEXT, Price INT);" 
-                "INSERT INTO Cars VALUES(1, 'Audi', 52642);" 
-                "INSERT INTO Cars VALUES(2, 'Mercedes', 57127);" 
-                "INSERT INTO Cars VALUES(3, 'Skoda', 9000);" 
-                "INSERT INTO Cars VALUES(4, 'Volvo', 29000);" 
-                "INSERT INTO Cars VALUES(5, 'Bentley', 350000);" 
-                "INSERT INTO Cars VALUES(6, 'Citroen', 21000);" 
-                "INSERT INTO Cars VALUES(7, 'Hummer', 41400);" 
-                "INSERT INTO Cars VALUES(8, 'Volkswagen', 21600);";
-    rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
-    if(rc != SQLITE_OK ) {
+      }
+      char const *sql = "DROP TABLE IF EXISTS Cars;" 
+        "CREATE TABLE Cars(Id INT, Name TEXT, Price INT);" 
+        "INSERT INTO Cars VALUES(1, 'Audi', 52642);" 
+        "INSERT INTO Cars VALUES(2, 'Mercedes', 57127);" 
+        "INSERT INTO Cars VALUES(3, 'Skoda', 9000);" 
+        "INSERT INTO Cars VALUES(4, 'Volvo', 29000);" 
+        "INSERT INTO Cars VALUES(5, 'Bentley', 350000);" 
+        "INSERT INTO Cars VALUES(6, 'Citroen', 21000);" 
+        "INSERT INTO Cars VALUES(7, 'Hummer', 41400);" 
+        "INSERT INTO Cars VALUES(8, 'Volkswagen', 21600);";
+      rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+      if(rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);        
         sqlite3_close(db);
         return 1;
-    } 
-    sqlite3_close(db);
-    //return 0;
+      } 
+      sqlite3_close(db);
+      //return 0;
 
-    //MORE TESTS
-    //printf("%s\n,sqlite3_libversion()");
-    //    sqlite3 *db;
-    //sqlite3_stmt *res;
-    //int rc = sqlite3_open(":memory:", &db);
-    //if(rc != SQLITE_OK) {
-    //    fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-    //    sqlite3_close(db);
-    //    return 1;
-    //}
-    //rc = sqlite3_prepare_v2(db, "SELECT SQLITE_VERSION()", -1, &res, 0);    
-    //if(rc != SQLITE_OK) {
-    //    fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
-    //    sqlite3_close(db);
-    //    return 1;
-    //}    
-    //rc = sqlite3_step(res);
-    //if(rc == SQLITE_ROW) {
-    //    printf("%s\n", sqlite3_column_text(res, 0));
-    //}
-    //sqlite3_finalize(res);
-    //sqlite3_close(db);
-    //return 0;
-    
-    //quick easy test
-    cerr << sqlite3_libversion() << endl;
-    // COREY END 170614 - some SQLITE tests
-    aurostd::xcomplex<double> x(123.0,456.0);
-    cout << x.re << "," << x.im << " - " << x.real() << "," << x.imag() << " - " << x << endl;
-    x.re=111;x.im=222;
-    cout << x.re << "," << x.im << " - " << x.real() << "," << x.imag() << " - " << x << endl;
-    cout << aurostd::PaddedPOST("EMIN= -30.0",10) << endl;;
-    stringstream for_corey;
-    for_corey << "scatter/use mapped color={draw=black,fill=mapped color,solid}";
-    string corey=for_corey.str();
-    cout << corey << endl;
-    stringstream aus;
-    aus << "************************   00000  MESSAGE KPOINTS KSHIFT=[" << 1 << " " << 2 << " " << 3 << "]" << " ************************ " << endl;
-    cout << aus.str() << endl;
-    //exit(0);
-    return 0; // CO 180419
-  }
-  
-  if(!Arun && aurostd::args2attachedflag(argv,"--bin2base64=")) {
-    string b64String;
-    aurostd::bin2base64(aurostd::args2attachedstring(argv,"--bin2base64=",""),b64String);
-    cout << b64String << endl;
-    exit(0);
-  }
+      //MORE TESTS
+      //printf("%s\n,sqlite3_libversion()");
+      //    sqlite3 *db;
+      //sqlite3_stmt *res;
+      //int rc = sqlite3_open(":memory:", &db);
+      //if(rc != SQLITE_OK) {
+      //    fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+      //    sqlite3_close(db);
+      //    return 1;
+      //}
+      //rc = sqlite3_prepare_v2(db, "SELECT SQLITE_VERSION()", -1, &res, 0);    
+      //if(rc != SQLITE_OK) {
+      //    fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
+      //    sqlite3_close(db);
+      //    return 1;
+      //}    
+      //rc = sqlite3_step(res);
+      //if(rc == SQLITE_ROW) {
+      //    printf("%s\n", sqlite3_column_text(res, 0));
+      //}
+      //sqlite3_finalize(res);
+      //sqlite3_close(db);
+      //return 0;
 
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test=POTCAR|--test=POTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=POTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=POTCAR.static"+DEFAULT_KZIP_EXT+"|--test=POTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test=DOSCAR|--test=DOSCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.static"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xDOSCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test=EIGENVAL|--test=EIGENVAL.relax1"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.relax2"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.static"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xEIGENVAL(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test=OUTCAR|--test=OUTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.static"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xOUTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test=KPOINTS|--test=KPOINTS.relax1"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.relax2"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.static"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xKPOINTS(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;}  // CO 180419
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test=vasprun|--test=vasprun.xml.relax1"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.relax2"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.static"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xVASPRUNXML(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test=IBZKPT|--test=IBZKPT.relax1"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.relax2"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.static"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xIBZKPT(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
- if(!Arun && aurostd::args2flag(argv,cmds,"--test=CHGCAR|--test=CHGCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.static"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-   XHOST.DEBUG=TRUE;xCHGCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
-
- if(!Arun && (aurostd::args2flag(argv,cmds,"--scrub") || aurostd::args2attachedflag(argv,"--scrub="))) {
-   //  XHOST.DEBUG=TRUE;
-   aflowlib::LIB2SCRUB(aurostd::args2attachedstring(argv,"--scrub=","ALL"),TRUE);
-   exit(0);
- }
- if(!Arun && (aurostd::args2attachedflag(argv,"--lib2auid="))) {
-   //  XHOST.DEBUG=TRUE;
-   aflowlib::LIB2AUID(aurostd::args2attachedstring(argv,"--lib2auid=","ALL"),FALSE,TRUE); // no test, act
-   exit(0);
- }
- if(!Arun && (aurostd::args2flag(argv,cmds,"--mosfet") || aurostd::args2attachedflag(argv,"--mosfet="))) {
-   //  XHOST.DEBUG=TRUE;
-   aflowlib::MOSFET(aurostd::args2attachedutype<int>(argv,"--mosfet=",0),TRUE);
-   exit(0);
- }
- if(!Arun && (aurostd::args2flag(argv,cmds,"--mail2scan") || aurostd::args2attachedflag(argv,"--mail2scan="))) {
-   //  XHOST.DEBUG=TRUE;
-   aflowlib::MAIL2SCAN(aurostd::args2attachedstring(argv,"--mail2scan=","/var/mail/auro"),TRUE);
-   exit(0);
- }
-		  
-
- if(!Arun && aurostd::args2flag(argv,cmds,"--test_proto1")) {
-    vector<xstructure> vstr;
-    vector<string> vlattice;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
-    aflowlib::_aflowlib_entry data;
-    vector<aflowlib::_aflowlib_entry> vdata;
-    for(uint i=4;i<vlattice.size();i++) {
-      data.clear();
-      data.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",cout,FALSE);vdata.push_back(data);
-      cout << "AFLOWLIB " << vlattice.at(i) << "=" << data.vaflowlib_entries.size() << endl;
-      for(uint j=0;j<data.vaflowlib_entries.size();j++) {
-	aflowlib::_aflowlib_entry dataj;
-	dataj.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/"+data.vaflowlib_entries.at(j),cout,TRUE);
-       	aurostd::StringSubst(dataj.aurl,"aflowlib","materials");
-	if(dataj.aurl!="") {
-	  xstructure str(dataj.aurl,"CONTCAR.relax.vasp",IOAFLOW_AUTO);
-	  xEIGENVAL xEIGENVAL; xEIGENVAL.GetPropertiesUrlFile(dataj.aurl,"EIGENVAL.bands"+DEFAULT_KZIP_EXT+"",FALSE);
-	  xOUTCAR xOUTCAR; xOUTCAR.GetPropertiesUrlFile(dataj.aurl,"OUTCAR.static"+DEFAULT_KZIP_EXT+"",FALSE);
-	  xDOSCAR xDOSCAR; xDOSCAR.GetPropertiesUrlFile(dataj.aurl,"DOSCAR.static"+DEFAULT_KZIP_EXT+"",FALSE);
-	  // if(aurostd::args2flag(argv,cmds,"--vasp")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.vasp",stream);
-	  // if(aurostd::args2flag(argv,cmds,"--qe")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.qe",stream);
-	  // if(aurostd::args2flag(argv,cmds,"--abinit")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.abinit",stream);
-	  // if(aurostd::args2flag(argv,cmds,"--aims")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.aims",stream);
-	  vstr.push_back(str);
-	  cerr << "vstr.size()=" << vstr.size() << "  "
-	       << "str.atoms.size()=" << str.atoms.size() << "  "
-	       << "OUTCAR.static"+DEFAULT_KZIP_EXT+".size()=" << xOUTCAR.vcontent.size() << "  "
-	       << "DOSCAR.static"+DEFAULT_KZIP_EXT+".size()=" << xDOSCAR.vcontent.size() << "  "
-	       << "EIGENVAL.static"+DEFAULT_KZIP_EXT+".size()=" << xEIGENVAL.vcontent.size() << "  "
-	       << endl;
-	  //	  cerr << str << endl;
-	}
-      }
-    }
+      //quick easy test
+      cerr << sqlite3_libversion() << endl;
+      // COREY END 170614 - some SQLITE tests
+      aurostd::xcomplex<double> x(123.0,456.0);
+      cout << x.re << "," << x.im << " - " << x.real() << "," << x.imag() << " - " << x << endl;
+      x.re=111;x.im=222;
+      cout << x.re << "," << x.im << " - " << x.real() << "," << x.imag() << " - " << x << endl;
+      cout << aurostd::PaddedPOST("EMIN= -30.0",10) << endl;;
+      stringstream for_corey;
+      for_corey << "scatter/use mapped color={draw=black,fill=mapped color,solid}";
+      string corey=for_corey.str();
+      cout << corey << endl;
+      stringstream aus;
+      aus << "************************   00000  MESSAGE KPOINTS KSHIFT=[" << 1 << " " << 2 << " " << 3 << "]" << " ************************ " << endl;
+      cout << aus.str() << endl;
       //exit(0);
       return 0; // CO 180419
-  }
+    }
 
-  if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test1")) {Arun=TRUE;PERFORM_TEST1(cout);}
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test3")) {Arun=TRUE;PERFORM_TEST3(cout);}
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {return (slab::slabTest()?0:1);}  //CO190601  //CO190629 if TRUE(==1), return 0 (normal)
-  if(!Arun && XHOST.vflag_control.flag("MACHINE"))  {Arun=TRUE;init::InitMachine(TRUE,argv,cmds,cout);}
-  
-  // **************************************************************
-  // INTERCEPT AFLOW
-  if(!Arun && XHOST.vflag_control.flag("SWITCH_AFLOW")) {Arun=TRUE;AFLOW_main(argv);}
-  // DX
-  if(!Arun && XHOST.vflag_control.flag("AFLOWIN_SYM")) {Arun=TRUE;AFLOW_main(argv);} 
-  // DX
-  if(!Arun && (XHOST.vflag_aflow.flag("CLEAN") || XHOST.vflag_aflow.flag("XCLEAN") || XHOST.AFLOW_RUNDIRflag || XHOST.AFLOW_MULTIflag || XHOST.AFLOW_RUNXflag)) {
-    Arun=TRUE;AFLOW_main(argv);
-  }
-  //  // **************************************************************
-  // // INTERCEPT AFLOWLIB
-  // MOVED INSIDE PFLOW
-  // if(!Arun && XHOST.vflag_control.flag("SWITCH_AFLOWLIB") && !XHOST.vflag_pflow.flag("PROTOS") && !XHOST.vflag_pflow.flag("PROTOS_ICSD") && !XHOST.vflag_pflow.flag("PROTO")) {Arun=TRUE;aflowlib::WEB_Aflowlib_Entry_PHP(argv,cout);}
-  // **************************************************************
-  // INTERCEPT APENNSY
-  if(!Arun && XHOST.vflag_control.flag("SWITCH_APENNSY1")) {Arun=TRUE;Apennsymain(argv,cmds);}
-  if(!Arun && XHOST.vflag_control.flag("SWITCH_APENNSY2")) {Arun=TRUE;Apennsymain(argv,cmds);}
-  
-  // **************************************************************
-  // INTERCEPT aconvasp/aqe/apennsy by title
-  if(!Arun && aurostd::substring2bool(XHOST.progname,"aconvasp","convasp")) {Arun=TRUE;pflow::main(argv,cmds);}
-  if(!Arun && aurostd::substring2bool(XHOST.progname,"aqe")) {Arun=TRUE;pflow::main(argv,cmds);}
-  if(!Arun && aurostd::substring2bool(XHOST.progname,"apennsy")) {Arun=TRUE;Apennsymain(argv,cmds);}
-  
-  // **************************************************************
-  // intercept commands
+    if(!Arun && aurostd::args2attachedflag(argv,"--bin2base64=")) {
+      string b64String;
+      aurostd::bin2base64(aurostd::args2attachedstring(argv,"--bin2base64=",""),b64String);
+      cout << b64String << endl;
+      exit(0);
+    }
+
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test=POTCAR|--test=POTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=POTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=POTCAR.static"+DEFAULT_KZIP_EXT+"|--test=POTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
+      XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test=DOSCAR|--test=DOSCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.static"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.bands"+DEFAULT_KZIP_EXT+"")) {
+      XHOST.DEBUG=TRUE;xDOSCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test=EIGENVAL|--test=EIGENVAL.relax1"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.relax2"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.static"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.bands"+DEFAULT_KZIP_EXT+"")) {
+      XHOST.DEBUG=TRUE;xEIGENVAL(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test=OUTCAR|--test=OUTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.static"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
+      XHOST.DEBUG=TRUE;xOUTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test=KPOINTS|--test=KPOINTS.relax1"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.relax2"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.static"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.bands"+DEFAULT_KZIP_EXT+"")) {
+      XHOST.DEBUG=TRUE;xKPOINTS(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;}  // CO 180419
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test=vasprun|--test=vasprun.xml.relax1"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.relax2"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.static"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.bands"+DEFAULT_KZIP_EXT+"")) {
+      XHOST.DEBUG=TRUE;xVASPRUNXML(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test=IBZKPT|--test=IBZKPT.relax1"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.relax2"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.static"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.bands"+DEFAULT_KZIP_EXT+"")) {
+      XHOST.DEBUG=TRUE;xIBZKPT(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test=CHGCAR|--test=CHGCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.static"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.bands"+DEFAULT_KZIP_EXT+"")) {
+      XHOST.DEBUG=TRUE;xCHGCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+
+    if(!Arun && (aurostd::args2flag(argv,cmds,"--scrub") || aurostd::args2attachedflag(argv,"--scrub="))) {
+      //  XHOST.DEBUG=TRUE;
+      aflowlib::LIB2SCRUB(aurostd::args2attachedstring(argv,"--scrub=","ALL"),TRUE);
+      exit(0);
+    }
+    if(!Arun && (aurostd::args2attachedflag(argv,"--lib2auid="))) {
+      //  XHOST.DEBUG=TRUE;
+      aflowlib::LIB2AUID(aurostd::args2attachedstring(argv,"--lib2auid=","ALL"),FALSE,TRUE); // no test, act
+      exit(0);
+    }
+    if(!Arun && (aurostd::args2flag(argv,cmds,"--mosfet") || aurostd::args2attachedflag(argv,"--mosfet="))) {
+      //  XHOST.DEBUG=TRUE;
+      aflowlib::MOSFET(aurostd::args2attachedutype<int>(argv,"--mosfet=",0),TRUE);
+      exit(0);
+    }
+    if(!Arun && (aurostd::args2flag(argv,cmds,"--mail2scan") || aurostd::args2attachedflag(argv,"--mail2scan="))) {
+      //  XHOST.DEBUG=TRUE;
+      aflowlib::MAIL2SCAN(aurostd::args2attachedstring(argv,"--mail2scan=","/var/mail/auro"),TRUE);
+      exit(0);
+    }
+
+
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_proto1")) {
+      vector<xstructure> vstr;
+      vector<string> vlattice;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
+      aflowlib::_aflowlib_entry data;
+      vector<aflowlib::_aflowlib_entry> vdata;
+      for(uint i=4;i<vlattice.size();i++) {
+        data.clear();
+        data.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",cout,FALSE);vdata.push_back(data);
+        cout << "AFLOWLIB " << vlattice.at(i) << "=" << data.vaflowlib_entries.size() << endl;
+        for(uint j=0;j<data.vaflowlib_entries.size();j++) {
+          aflowlib::_aflowlib_entry dataj;
+          dataj.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/"+data.vaflowlib_entries.at(j),cout,TRUE);
+          aurostd::StringSubst(dataj.aurl,"aflowlib","materials");
+          if(dataj.aurl!="") {
+            xstructure str(dataj.aurl,"CONTCAR.relax.vasp",IOAFLOW_AUTO);
+            xEIGENVAL xEIGENVAL; xEIGENVAL.GetPropertiesUrlFile(dataj.aurl,"EIGENVAL.bands"+DEFAULT_KZIP_EXT+"",FALSE);
+            xOUTCAR xOUTCAR; xOUTCAR.GetPropertiesUrlFile(dataj.aurl,"OUTCAR.static"+DEFAULT_KZIP_EXT+"",FALSE);
+            xDOSCAR xDOSCAR; xDOSCAR.GetPropertiesUrlFile(dataj.aurl,"DOSCAR.static"+DEFAULT_KZIP_EXT+"",FALSE);
+            // if(aurostd::args2flag(argv,cmds,"--vasp")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.vasp",stream);
+            // if(aurostd::args2flag(argv,cmds,"--qe")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.qe",stream);
+            // if(aurostd::args2flag(argv,cmds,"--abinit")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.abinit",stream);
+            // if(aurostd::args2flag(argv,cmds,"--aims")) aurostd::url2stringstream(dataj.aurl+"/CONTCAR.relax.aims",stream);
+            vstr.push_back(str);
+            cerr << "vstr.size()=" << vstr.size() << "  "
+              << "str.atoms.size()=" << str.atoms.size() << "  "
+              << "OUTCAR.static"+DEFAULT_KZIP_EXT+".size()=" << xOUTCAR.vcontent.size() << "  "
+              << "DOSCAR.static"+DEFAULT_KZIP_EXT+".size()=" << xDOSCAR.vcontent.size() << "  "
+              << "EIGENVAL.static"+DEFAULT_KZIP_EXT+".size()=" << xEIGENVAL.vcontent.size() << "  "
+              << endl;
+            //	  cerr << str << endl;
+          }
+        }
+      }
+      //exit(0);
+      return 0; // CO 180419
+    }
+
+    if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test1")) {Arun=TRUE;PERFORM_TEST1(cout);}
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test3")) {Arun=TRUE;PERFORM_TEST3(cout);}
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {return (slab::slabTest()?0:1);}  //CO190601  //CO190629 if TRUE(==1), return 0 (normal)
+    if(!Arun && XHOST.vflag_control.flag("MACHINE"))  {Arun=TRUE;init::InitMachine(TRUE,argv,cmds,cout);}
+
+    // **************************************************************
+    // INTERCEPT AFLOW
+    if(!Arun && XHOST.vflag_control.flag("SWITCH_AFLOW")) {Arun=TRUE;AFLOW_main(argv);}
+    // DX
+    if(!Arun && XHOST.vflag_control.flag("AFLOWIN_SYM")) {Arun=TRUE;AFLOW_main(argv);} 
+    // DX
+    if(!Arun && (XHOST.vflag_aflow.flag("CLEAN") || XHOST.vflag_aflow.flag("XCLEAN") || XHOST.AFLOW_RUNDIRflag || XHOST.AFLOW_MULTIflag || XHOST.AFLOW_RUNXflag)) {
+      Arun=TRUE;AFLOW_main(argv);
+    }
+    //  // **************************************************************
+    // // INTERCEPT AFLOWLIB
+    // MOVED INSIDE PFLOW
+    // if(!Arun && XHOST.vflag_control.flag("SWITCH_AFLOWLIB") && !XHOST.vflag_pflow.flag("PROTOS") && !XHOST.vflag_pflow.flag("PROTOS_ICSD") && !XHOST.vflag_pflow.flag("PROTO")) {Arun=TRUE;aflowlib::WEB_Aflowlib_Entry_PHP(argv,cout);}
+    // **************************************************************
+    // INTERCEPT APENNSY
+    if(!Arun && XHOST.vflag_control.flag("SWITCH_APENNSY1")) {Arun=TRUE;Apennsymain(argv,cmds);}
+    if(!Arun && XHOST.vflag_control.flag("SWITCH_APENNSY2")) {Arun=TRUE;Apennsymain(argv,cmds);}
+
+    // **************************************************************
+    // INTERCEPT aconvasp/aqe/apennsy by title
+    if(!Arun && aurostd::substring2bool(XHOST.progname,"aconvasp","convasp")) {Arun=TRUE;pflow::main(argv,cmds);}
+    if(!Arun && aurostd::substring2bool(XHOST.progname,"aqe")) {Arun=TRUE;pflow::main(argv,cmds);}
+    if(!Arun && aurostd::substring2bool(XHOST.progname,"apennsy")) {Arun=TRUE;Apennsymain(argv,cmds);}
+
+    // **************************************************************
+    // intercept commands
     if(!Arun && XHOST.vflag_control.flag("MULTI=SH")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_sh(argv);/*exit(0)*/return 0;}  // CO 180419
     if(!Arun && XHOST.vflag_control.flag("MULTI=BZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bzip2",argv);/*exit(0)*/return 0;}  // CO 180419
     if(!Arun && XHOST.vflag_control.flag("MULTI=BUNZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);/*exit(0)*/return 0;}  // CO 180419
@@ -1032,122 +1016,122 @@ int main(int _argc,char **_argv) {
     if(!Arun && XHOST.vflag_control.flag("MONITOR")) {Arun=TRUE;AFLOW_monitor(argv);/*exit(0)*/return 0;} // CO 180419
     if(!Arun && XHOST.vflag_control.flag("GETTEMP")) {Arun=TRUE;AFLOW_getTEMP(argv);/*exit(0)*/return 0;} // CO 180419
 
-  // **************************************************************
-  // INTERCEPT HELP
-  if(XHOST.vflag_control.flag("AFLOW_HELP")) {
-    cout << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
+    // **************************************************************
+    // INTERCEPT HELP
+    if(XHOST.vflag_control.flag("AFLOW_HELP")) {
+      cout << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
-    cout << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
-    return 0;
-  }  // ME180531
-  if(XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3"))  {
-    cout << aflow::License_Preamble_aflow() << endl;
-    cout << " " << endl;
-    cout << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
-    cout << " " << endl;
-    cout << "*************************************************************************** " << endl;
+    if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
+      cout << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
+      return 0;
+    }  // ME180531
+    if(XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3"))  {
+      cout << aflow::License_Preamble_aflow() << endl;
+      cout << " " << endl;
+      cout << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
+      cout << " " << endl;
+      cout << "*************************************************************************** " << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_AFLOW"))  {
-    cout << init::InitGlobalObject("README_AFLOW_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_AFLOW"))  {
+      cout << init::InitGlobalObject("README_AFLOW_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
-    cout << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
+      cout << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
-    cout << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
+      cout << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_FROZSL"))  {
-    cout << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_FROZSL"))  {
+      cout << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_APL"))  {
-    cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_APL"))  {
+      cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_QHA"))  {
-    cout << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_QHA"))  {
+      cout << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_AAPL"))  {
-    cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_AAPL"))  {
+      cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_AGL"))  {
-    cout << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_AGL"))  {
+      cout << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_AEL"))  {
-    cout << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_AEL"))  {
+      cout << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_ANRL"))  {
-    cout << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_ANRL"))  {
+      cout << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO190401
-    cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO190401
+    if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO190401
+      cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO190401
       /*exit(1)*/return 0;} // << endl; // CO 190401
-  if(XHOST.vflag_control.flag("README_GFA"))  {
-    cout << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_GFA"))  {
+      cout << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
-    cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
+      cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_CCE"))  {
-    cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_CCE"))  {
+      cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_CHULL"))  {
-    cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_CHULL"))  {
+      cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
-    cout << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
+      cout << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_APENNSY"))  {
-    cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_APENNSY"))  {
+      cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
-    cout << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
+      cout << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
-    cout << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
-    return 0;}  // ME 180531
-  if(XHOST.vflag_control.flag("README_XAFLOW"))  {
-    cout << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
+      cout << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
+      return 0;}  // ME 180531
+    if(XHOST.vflag_control.flag("README_XAFLOW"))  {
+      cout << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
-  if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
-    cout << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
+    if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
+      cout << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
- 
-  // **************************************************************
-  // PHP-WEB AND CURRICULUM AND HIGH-THROUGHPUT STUFF
-  ProcessPhpLatexCv();
-  //  ProcessSecurityOptions(argv,cmds); OLD STUFF AFLOW SECURITY
-  
-  // **************************************************************
-  bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
+
+    // **************************************************************
+    // PHP-WEB AND CURRICULUM AND HIGH-THROUGHPUT STUFF
+    ProcessPhpLatexCv();
+    //  ProcessSecurityOptions(argv,cmds); OLD STUFF AFLOW SECURITY
+
+    // **************************************************************
+    bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
     if(!Arun && VVERSION)  {Arun=TRUE; cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY // CO 180419
     if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl; /*exit(0)*/return 0;} // CO 180419
-  
-  // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
-  // [OBSOLETE]  Arun=TRUE;AFLOW_main1(argv,cmds);}
-  if(!Arun && XHOST.argv.size()==1 && (aurostd::substring2bool(XHOST.progname,"aflow")  || aurostd::substring2bool(XHOST.progname,"aflowd"))) {   
-    //   Arun=TRUE;AFLOW_main(argv);
-    Arun=TRUE;
-    //    cout << "******************************************************************************************************" << endl;
-    //  cout << aflow::Banner("BANNER_TINY") << endl;
-    cout << aflow::Banner("BANNER_BIG") << endl;
-    cout << aflow::Intro_aflow("aflow") << endl;
-    cout << pflow::Intro_pflow("aflow") << endl;
-    cout << aflow::Intro_sflow("aflow") << endl;
-    cout << aflow::Intro_HELP("aflow") << endl;
-    cout << aflow::Banner("BANNER_BIG") << endl;
-    //    cout << "XHOST.argv.size()=" << XHOST.argv.size()<< endl;
-    //    cout << "******************************************************************************************************" << endl;
-  }
 
-  // **************************************************************
-  // LAST RESOURCE PFLOW
-  if(!Arun) { 
-    Arun=TRUE;pflow::main(argv,cmds);
+    // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
+    // [OBSOLETE]  Arun=TRUE;AFLOW_main1(argv,cmds);}
+    if(!Arun && XHOST.argv.size()==1 && (aurostd::substring2bool(XHOST.progname,"aflow")  || aurostd::substring2bool(XHOST.progname,"aflowd"))) {   
+      //   Arun=TRUE;AFLOW_main(argv);
+      Arun=TRUE;
+      //    cout << "******************************************************************************************************" << endl;
+      //  cout << aflow::Banner("BANNER_TINY") << endl;
+      cout << aflow::Banner("BANNER_BIG") << endl;
+      cout << aflow::Intro_aflow("aflow") << endl;
+      cout << pflow::Intro_pflow("aflow") << endl;
+      cout << aflow::Intro_sflow("aflow") << endl;
+      cout << aflow::Intro_HELP("aflow") << endl;
+      cout << aflow::Banner("BANNER_BIG") << endl;
+      //    cout << "XHOST.argv.size()=" << XHOST.argv.size()<< endl;
+      //    cout << "******************************************************************************************************" << endl;
+    }
+
+    // **************************************************************
+    // LAST RESOURCE PFLOW
+    if(!Arun) { 
+      Arun=TRUE;pflow::main(argv,cmds);
+    }
+    // **************************************************************
+    // END
+    return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO190629 - more explicit return 0
   }
-  // **************************************************************
-  // END
-  return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO190629 - more explicit return 0
-}
   // CO 180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
   //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
@@ -1183,32 +1167,31 @@ namespace aflow {
   string License_Preamble_aflow(void) {
     //( C) 2003-2019 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
     stringstream strstream;
-    strstream << "\
-   \n\
-   *************************************************************************** \n\
-   *                                                                         * \n\
-   *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           * \n\
-   *                                                                         * \n\
-   *************************************************************************** \n\
-    Copyright 2003-2019 - Stefano Curtarolo - AFLOW.ORG consortium \n\
-    \n\
-    This file is part of AFLOW software. \n\
-    \n\
-    AFLOW is free software: you can redistribute it and/or modify \n\
-    it under the terms of the GNU General Public License as published by \n\
-    the Free Software Foundation, either version 3 of the License, or \n\
-    (at your option) any later version. \n\
-    \n\
-    This program is distributed in the hope that it will be useful, \n\
-    but WITHOUT ANY WARRANTY; without even the implied warranty of \n\
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n\
-    GNU General Public License for more details. \n\
-    \n\
-    You should have received a copy of the GNU General Public License \n\
-    along with this program.  If not, see <http://www.gnu.org/licenses/>. \n\
-    \n\
-   *************************************************************************** \n\
- " << endl;
+    strstream << endl;
+    strstream << "***************************************************************************" << endl;
+    strstream << "*                                                                         *" << endl;
+    strstream << "*           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+    strstream << "*                                                                         *" << endl;
+    strstream << "***************************************************************************" << endl;
+    strstream << "Copyright 2003-2019 - Stefano Curtarolo - AFLOW.ORG consortium" << endl;
+    strstream << endl;
+    strstream << "This file is part of AFLOW software." << endl;
+    strstream << endl;
+    strstream << "AFLOW is free software: you can redistribute it and/or modify" << endl;
+    strstream << "it under the terms of the GNU General Public License as published by" << endl;
+    strstream << "the Free Software Foundation, either version 3 of the License, or" << endl;
+    strstream << "(at your option) any later version." << endl;
+    strstream << endl;
+    strstream << "This program is distributed in the hope that it will be useful," << endl;
+    strstream << "but WITHOUT ANY WARRANTY; without even the implied warranty of" << endl;
+    strstream << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the" << endl;
+    strstream << "GNU General Public License for more details." << endl;
+    strstream << endl;
+    strstream << "You should have received a copy of the GNU General Public License" << endl;
+    strstream << "along with this program.  If not, see <http://www.gnu.org/licenses/>." << endl;
+    strstream << endl;
+    strstream << "***************************************************************************" << endl;
+    strstream << endl;
     return strstream.str();
   }
 } // namespace aflow
@@ -1217,49 +1200,51 @@ namespace aflow {
 // ***************************************************************************
 // aflow::Intro_aflow
 // ***************************************************************************
+// patched by CO200106 to avoid long string construction (patching for indents)
 namespace aflow {
   string Intro_aflow(string x) {
     //( C) 2003-2019 Stefano Curtarolo, MIT-Duke University stefano@duke.edu
     stringstream strstream;
-    strstream << "\
-   \n\
-******* BEGIN INFORMATION MODE ********************************************************************* \n\
-  "<< x<<" -h | --help | --readme_aflow   CHECK \n\
-  "<< x<<" --version | -v                 CHECK \n\
-  "<< x<<" --machine                      CHECK \n\
-******* END INFORMATION MODE *********************************************************************** \n\
-  \n\
-******* BEGIN RUNNING MODE ************************************************************************* \n\
-  "<< x<<" --run | --run=multi | --run=N   COMMANDS for running \n\
-  "<< x<<" --clean | -c                    COMMAND for cleaning   \n\
-  \n\
-  MODIFIERS \n\
-   --DIRECTORY[=| ]dir | --D[=| ]dir | --d[=| ]dir \n\
-   --FILE[=| ]file | --F[=| ]file | --f[=| ]file  \n\
-   --quiet | -quiet | -q  \n\
-   --loop  \n\
-   --sort | -sort \n\
-   --reverse | -rsort \n\
-   --random | -rnd \n\
-   --force | -force \n\
-   --mem=XX | --maxmem=XX \n\
-   --readme= xaflow | aflow | aconvasp | aflowrc | scripting | apennsy | apl | agl | ael | anrl | compare | gfa | symmetry | chull | errors | exceptions | frozsl CHECK !!!! \n\
-   --np=NUMBER |   --npmax     \n\
-   --generate_aflowin_from_vasp \n\
-   --generate_vasp_from_aflowin | --generate \n\
-   --use_aflow.in=XXX \n\
-   --use_LOCK=XXX \n\
-   --use_tmpfs=XXXX  \n\
- \n\
-  MODIFIERS MPI/SERIAL PARAMETERS \n\
-   --mpi | -nompi | --serial  \n\
- \n\
-  HOST ORIENTED OPTION \n\
-   --machine=beta | beta_openmpi | qrats | qflow | conrad | eos | materials | habana | aflowlib | ranger | kraken \n\
-             marylou | parsons | jellium | ohad | host1 \n\
-             raptor --np=N | diamond --np=N \n\
-******* END RUNNING MODE *************************************************************************** \n\
- " << endl;
+    string tab="  ";
+    string xspaces="";for(uint i=0;i<x.size();i++){xspaces+=" ";} //spaces size of x
+    strstream << endl;
+    strstream << "******* BEGIN INFORMATION MODE *********************************************************************" << endl;
+    strstream << tab << x << " -h|--help|--readme_aflow   CHECK" << endl;
+    strstream << tab << x << " --version|-v                 CHECK" << endl;
+    strstream << tab << x << " --machine                      CHECK" << endl;
+    strstream << "******* END INFORMATION MODE ***********************************************************************" << endl;
+    strstream << endl;
+    strstream << "******* BEGIN RUNNING MODE *************************************************************************" << endl;
+    strstream << tab << x << " --run|--run=multi|--run=N   COMMANDS for running" << endl;
+    strstream << tab << x << " --clean|-c                    COMMAND for cleaning  " << endl;
+    strstream << endl;
+    strstream << " MODIFIERS" << endl;
+    strstream << tab << " --DIRECTORY[=| ]dir|--D[=| ]dir|--d[=| ]dir" << endl;
+    strstream << tab << " --FILE[=| ]file|--F[=| ]file|--f[=| ]file " << endl;
+    strstream << tab << " --quiet|-quiet|-q " << endl;
+    strstream << tab << " --loop " << endl;
+    strstream << tab << " --sort|-sort" << endl;
+    strstream << tab << " --reverse|-rsort" << endl;
+    strstream << tab << " --random|-rnd" << endl;
+    strstream << tab << " --force|-force" << endl;
+    strstream << tab << " --mem=XX|--maxmem=XX" << endl;
+    strstream << tab << " --readme= xaflow|aflow|aconvasp|aflowrc|scripting|apennsy|apl|agl|ael|anrl|compare|gfa|symmetry|chull|errors|exceptions|frozsl CHECK !!!!" << endl;
+    strstream << tab << " --np=NUMBER|--npmax" << endl;
+    strstream << tab << " --generate_aflowin_from_vasp" << endl;
+    strstream << tab << " --generate_vasp_from_aflowin|--generate" << endl;
+    strstream << tab << " --use_aflow.in=XXX" << endl;
+    strstream << tab << " --use_LOCK=XXX" << endl;
+    strstream << tab << " --use_tmpfs=XXXX " << endl;
+    strstream << endl;
+    strstream << " MODIFIERS MPI/SERIAL PARAMETERS" << endl;
+    strstream << tab << " --mpi|-nompi|--serial " << endl;
+    strstream << endl;
+    strstream << " HOST ORIENTED OPTION" << endl;
+    strstream << tab << " --machine=beta|beta_openmpi|qrats|qflow|conrad|eos|materials|habana|aflowlib|ranger|kraken" << endl;
+    strstream << tab << "           marylou|parsons|jellium|ohad|host1" << endl;
+    strstream << tab << "           raptor --np=N|diamond --np=N" << endl;
+    strstream << "******* END RUNNING MODE ***************************************************************************" << endl;
+    strstream << endl;
     // --readme=htresources
     return strstream.str();
   }
@@ -1268,36 +1253,38 @@ namespace aflow {
 // ***************************************************************************
 // aflow::Intro_sflow
 // ***************************************************************************
+// patched by CO200106 to avoid long string construction (patching for indents)
 namespace aflow {
   string Intro_sflow(string x) {
     stringstream strstream;
-    strstream << "\
-******* BEGIN SCRIPTING MODE *********************************************************************** \n\
- AFLOW SCRIPTING COMMANDS \n\
-  "<< x<<" --justafter=string \n\
-  "<< x<<" --justbefore=string \n\
-  "<< x<<" --justbetween=string_from[,string_to] \n\
-  "<< x<<" --qsub=N,file \n\
-  "<< x<<" --qdel=aaa,nnn:mmm,aaa,bbb,ccc \n\
-  "<< x<<" --bsub=N,file \n\
-  "<< x<<" --bkill=aaa,nnn:mmm,aaa,bbb,ccc \n\
-  "<< x<<" --sbatch=N,file \n\
-  "<< x<<" --scancel=aaa,nnn:mmm,aaa,bbb,ccc \n\
-  "<< x<<" --kill=aaa,nnn:mmm,aaa,bbb,ccc \n\
-  "<< x<<" --multi=sh [--np=NUMBER | npmax | nothing] [--F[ILE]] file \n\
-  "<< x<<" --multi=zip [--prefix PREFIX] [--size SSSS] --F[ILE] file | --D[IRECTORY directory1 directory2 .... \n\
-  "<< x<<" --multi=bzip2 [--np=NUMBER | npmax | nothing] --F[ILE] file1 file2 file3 ....  \n\
-  "<< x<<" --multi=bunzip2 [--np=NUMBER | npmax | nothing] --F[ILE] file1.bz2 file2.bz2 file3.bz2 .... \n\
-  "<< x<<" --multi=gzip [--np=NUMBER | npmax | nothing] --F[ILE] file1 file2 file3 ....  \n\
-  "<< x<<" --multi=gunzip [--np=NUMBER | npmax | nothing] --F[ILE] file1.gz file2.gz file3.gz .... \n\
-  "<< x<<" --multi=xzip [--np=NUMBER | npmax | nothing] --F[ILE] file1 file2 file3 ....  \n\
-  "<< x<<" --multi=xunzip [--np=NUMBER | npmax | nothing] --F[ILE] file1.xz file2.xz file3.xz .... \n\
-  "<< x<<" --multi=bz2xz [--np=NUMBER | npmax | nothing] --F[ILE] file1.bz2 file2.bz2 file3.bz2 .... \n\
-  "<< x<<" --multi=gz2xz [--np=NUMBER | npmax | nothing] --F[ILE] file1.gz file2.gz file3.gz .... \n\
-  "<< x<<" --getTEMP [--runstat | --runbar | --refresh=X | --warning_beep=T | --warning_halt=T | --mem=XX ] \n\
-  "<< x<<" --monitor [--mem=XX] \n\
-******* END SCRIPTING MODE ************************************************************************* \n\
- " << endl;
+    string tab="  ";
+    //string xspaces="";for(uint i=0;i<x.size();i++){xspaces+=" ";} //spaces size of x
+    strstream << "******* BEGIN SCRIPTING MODE ***********************************************************************" << endl;
+    strstream << " AFLOW SCRIPTING COMMANDS" << endl;
+    strstream << tab << x << " --justafter=string" << endl;
+    strstream << tab << x << " --justbefore=string" << endl;
+    strstream << tab << x << " --justbetween=string_from[,string_to]" << endl;
+    strstream << tab << x << " --qsub=N,file" << endl;
+    strstream << tab << x << " --qdel=aaa,nnn:mmm,aaa,bbb,ccc" << endl;
+    strstream << tab << x << " --bsub=N,file" << endl;
+    strstream << tab << x << " --bkill=aaa,nnn:mmm,aaa,bbb,ccc" << endl;
+    strstream << tab << x << " --sbatch=N,file" << endl;
+    strstream << tab << x << " --scancel=aaa,nnn:mmm,aaa,bbb,ccc" << endl;
+    strstream << tab << x << " --kill=aaa,nnn:mmm,aaa,bbb,ccc" << endl;
+    strstream << tab << x << " --multi=sh [--np=NUMBER|npmax|nothing] [--F[ILE]] file" << endl;
+    strstream << tab << x << " --multi=zip [--prefix PREFIX] [--size SSSS] --F[ILE] file|--D[IRECTORY directory1 directory2 ...." << endl;
+    strstream << tab << x << " --multi=bzip2 [--np=NUMBER|npmax|nothing] --F[ILE] file1 file2 file3 ...." << endl;
+    strstream << tab << x << " --multi=bunzip2 [--np=NUMBER|npmax|nothing] --F[ILE] file1.bz2 file2.bz2 file3.bz2 ...." << endl;
+    strstream << tab << x << " --multi=gzip [--np=NUMBER|npmax|nothing] --F[ILE] file1 file2 file3 ...." << endl;
+    strstream << tab << x << " --multi=gunzip [--np=NUMBER|npmax|nothing] --F[ILE] file1.gz file2.gz file3.gz ...." << endl;
+    strstream << tab << x << " --multi=xzip [--np=NUMBER|npmax|nothing] --F[ILE] file1 file2 file3 ...." << endl;
+    strstream << tab << x << " --multi=xunzip [--np=NUMBER|npmax|nothing] --F[ILE] file1.xz file2.xz file3.xz ...." << endl;
+    strstream << tab << x << " --multi=bz2xz [--np=NUMBER|npmax|nothing] --F[ILE] file1.bz2 file2.bz2 file3.bz2 ...." << endl;
+    strstream << tab << x << " --multi=gz2xz [--np=NUMBER|npmax|nothing] --F[ILE] file1.gz file2.gz file3.gz ...." << endl;
+    strstream << tab << x << " --getTEMP [--runstat|--runbar|--refresh=X|--warning_beep=T|--warning_halt=T|--mem=XX]" << endl;
+    strstream << tab << x << " --monitor [--mem=XX]" << endl;
+    strstream << "******* END SCRIPTING MODE *************************************************************************" << endl;
+    strstream << endl;
     return strstream.str();
   }
 } // namespace aflow
@@ -1305,58 +1292,60 @@ namespace aflow {
 // ***************************************************************************
 // aflow::Intro_HELP
 // ***************************************************************************
+// patched by CO200106 to avoid long string construction (patching for indents)
 namespace aflow {
   string Intro_HELP(string x) {
     stringstream strstream;
-    strstream << "\
-******* BEGIN HELP MODE **************************************************************************** \n\
- AFLOW HELP AVAILABLE HELPS  \n\
-  "<< x<<" --license \n\
-           License information.  \n\
-  "<< x<<" --help \n\
-           This help.  \n\
-  "<< x<<" --readme \n\
-           The list of all the commands available.  \n\
-  "<< x<<" --readme=xaflow \n\
-           Returns the HELP information for the installation of aflow. \n\
-  "<< x<<" --readme=aflow | --readme=run | --readme_aflow  \n\
-           Returns the HELP information for the \"running machinery\".  \n\
-  "<< x<<" --readme=aflowrc \n\
-           Returns the HELP information for the installation of aflow. \n\
-  "<< x<<" --readme=pflow | --readme=processor | --readme=aconvasp | --readme_aconvasp \n\
-           Returns the HELP information for the \"processing machinery\".  \n\
-  "<< x<<" --readme=scripting | --readme_scripting \n\
-           Returns the HELP information for the \"scripting\" operations.  \n\
-  "<< x<<" --readme=apl | --readme_apl \n\
-           Returns the HELP information for the \"aflow-harmonic-phonon-library\".  \n\
-  "<< x<<" --readme=qha | --readme_qha | --readme=qha3p | --readme_qha3p | --readme=scqha | --readme_scqha \n\
-           Returns the HELP information for the \"aflow-quasi-harmonic-library\".  \n\
-  "<< x<<" --readme=aapl | --readme_aapl \n\
-           Returns the HELP information for the \"aflow-anharmonic-phonon-library (AFLOW-AAPL)\".  \n\
-  "<< x<<" --readme=agl | --readme_agl \n\
-           Returns the HELP information for the \"aflow-gibbs-library (AFLOW-AGL)\".  \n\
-  "<< x<<" --readme=ael | --readme_ael \n\
-           Returns the HELP information for the \"aflow-elastic-library (AFLOW-AEL)\".  \n\
-  "<< x<<" --readme=anrl | --readme_anrl \n\
-           Returns the HELP information for the \"aflow library of prototypes\".  \n\
-  "<< x<<" --readme=compare | --readme_compare \n\
-           Returns the HELP information for the \"structure geometry comparison code\".  \n\
-  "<< x<<" --readme=gfa | --readme_gfa \n\
-           Returns the HELP information for the \"glass-forming-ability code\".  \n\
-  "<< x<<" --readme=symmetry | --readme_symmetry \n\
-           Returns the HELP information for the \"symmetry library (AFLOW-SYM)\".  \n\
-  "<< x<<" --readme=chull | --readme_chull \n\
-           Returns the HELP information for the \"convex hull library (AFLOW-hull)\".  \n\
-  "<< x<<" --readme=errors | --readme=exceptions | --readme_errors | --readme_exceptions \n\
-           Returns the HELP information for exception handling in AFLOW.  \n\
-  "<< x<<" --readme=partial_occupation | --readme=pocc | --readme_pocc \n\
-           Returns the HELP information for the \"partial occupation library\".  \n\
-  "<< x<<" --readme=apennsy | --readme_apennsy \n\
-           Returns the HELP information for the \"apennsy\" binary phase diagram generator.  \n\
-  "<< x<<" --readme=frozsl|--readme_frozsl \n\
-           Returns the HELP information for the \"frozsl\" add ons. \n\
-******* END HELP MODE ****************************************************************************** \n\
- " << endl;
+    string tab="  ";
+    string xspaces="";for(uint i=0;i<x.size();i++){xspaces+=" ";} //xspacess size of x
+    strstream << "******* BEGIN HELP MODE ****************************************************************************" << endl;
+    strstream << " AFLOW HELP AVAILABLE HELPS" << endl;
+    strstream << tab << x << " --license" << endl;
+    strstream << tab << xspaces << " " << tab << "License information." << endl;
+    strstream << tab << x << " --help" << endl;
+    strstream << tab << xspaces << " " << tab << "This help." << endl;
+    strstream << tab << x << " --readme" << endl;
+    strstream << tab << xspaces << " " << tab << "The list of all the commands available." << endl;
+    strstream << tab << x << " --readme=xaflow" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the installation of aflow." << endl;
+    strstream << tab << x << " --readme=aflow|--readme=run|--readme_aflow" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"running machinery\"." << endl;
+    strstream << tab << x << " --readme=aflowrc" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the installation of aflow." << endl;
+    strstream << tab << x << " --readme=pflow|--readme=processor|--readme=aconvasp|--readme_aconvasp" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"processing machinery\"." << endl;
+    strstream << tab << x << " --readme=scripting|--readme_scripting" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"scripting\" operations." << endl;
+    strstream << tab << x << " --readme=apl|--readme_apl" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow-harmonic-phonon-library\"." << endl;
+    strstream << tab << x << " --readme=qha|--readme_qha|--readme=qha3p|--readme_qha3p|--readme=scqha|--readme_scqha" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow-quasi-harmonic-library\"." << endl;
+    strstream << tab << x << " --readme=aapl|--readme_aapl" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow-anharmonic-phonon-library (AFLOW-AAPL)\"." << endl;
+    strstream << tab << x << " --readme=agl|--readme_agl" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow-gibbs-library (AFLOW-AGL)\"." << endl;
+    strstream << tab << x << " --readme=ael|--readme_ael" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow-elastic-library (AFLOW-AEL)\"." << endl;
+    strstream << tab << x << " --readme=anrl|--readme_anrl" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"aflow library of prototypes\"." << endl;
+    strstream << tab << x << " --readme=compare|--readme_compare" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"structure geometry comparison code\"." << endl;
+    strstream << tab << x << " --readme=gfa|--readme_gfa" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"glass-forming-ability code\"." << endl;
+    strstream << tab << x << " --readme=symmetry|--readme_symmetry" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"symmetry library (AFLOW-SYM)\"." << endl;
+    strstream << tab << x << " --readme=chull|--readme_chull" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"convex hull library (AFLOW-hull)\"." << endl;
+    strstream << tab << x << " --readme=errors|--readme=exceptions|--readme_errors|--readme_exceptions" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for exception handling in AFLOW." << endl;
+    strstream << tab << x << " --readme=partial_occupation|--readme=pocc|--readme_pocc" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"partial occupation library\"." << endl;
+    strstream << tab << x << " --readme=apennsy|--readme_apennsy" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"apennsy\" binary phase diagram generator." << endl;
+    strstream << tab << x << " --readme=frozsl|--readme_frozsl" << endl;
+    strstream << tab << xspaces << " " << tab << "Returns the HELP information for the \"frozsl\" add ons." << endl;
+    strstream << "******* END HELP MODE ******************************************************************************" << endl;
+    strstream << endl;
     return strstream.str();
   }
 } // namespace aflow

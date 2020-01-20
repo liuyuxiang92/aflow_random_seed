@@ -67,8 +67,8 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
   string aflowin=aflags.Directory+"/"+_AFLOWIN_;
 
   if(!aurostd::FileExist(aflowin)) {
-      FileMESSAGE << "ERROR" << ": file not found " << aflowin << endl;
-      return FALSE;
+    FileMESSAGE << "ERROR" << ": file not found " << aflowin << endl;
+    return FALSE;
   }
 
   string AflowIn;aurostd::file2string(aflowin,AflowIn);
@@ -88,7 +88,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
 
     file_aflowin << AFLOWIN_SEPARATION_LINE << endl; 
     if(!aurostd::substring2bool(AflowIn,"[AFLOW_POCC]CALC")) {
-        file_aflowin << "[AFLOW_POCC]CALC "<< endl;
+      file_aflowin << "[AFLOW_POCC]CALC "<< endl;
     }
 
     vector<xstructure> vecgroupxstr_sorted;
@@ -98,26 +98,26 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
 
     unsigned long long int Num_calculated;
     unsigned long long int Num_xstr;
-    
+
     if(1){  //OLD KESONG
       vecgroupxstr_sorted = Partial2Supercell(xstr_pocc);  //170721 CO - KESONG OLD code
       Num_xstr=vecgroupxstr_sorted.size();
 
-    if(Num_xstr<MaxNumberPOSCAR) {
+      if(Num_xstr<MaxNumberPOSCAR) {
         Num_calculated=Num_xstr;
-    }
-    else {
+      }
+      else {
         Num_calculated=MaxNumberPOSCAR;
-    }
+      }
 
       for(unsigned long long int i=0;i<Num_calculated;i++) {
-      ss.str("");
-      ss << "POCC_" << setfill('0') << setw(2) <<(i+1);
-      ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
-      ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]START." <<ss.str() << endl;
-      ssxstr_sorted << vecgroupxstr_sorted.at(i);
-      ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
-      ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
+        ss.str("");
+        ss << "POCC_" << setfill('0') << setw(2) <<(i+1);
+        ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
+        ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]START." <<ss.str() << endl;
+        ssxstr_sorted << vecgroupxstr_sorted.at(i);
+        ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
+        ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
       }
     } else {  //START COREY
       aurostd::xoption pflags;
@@ -126,11 +126,11 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
       if(!pcalc.m_initialized){exit(1);}
       //[CO190131 - OBSOLETE]if(!pcalc.calculate()){exit(1);}
       pcalc.calculate();
-      
+
       //vector<xstructure> vecgroupxstr_sorted = pcalc.getUniqueDerivativeStructures(); //too much memory
 
       Num_xstr=pcalc.getUniqueSuperCellsCount();//vecgroupxstr_sorted.size();
-      
+
       //NO NEED TO LIMIT HERE, just print everything out, who cares?
       //if (Num_xstr<MaxNumberPOSCAR) {
       Num_calculated=Num_xstr;
@@ -145,7 +145,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
       //ofstream FileMESSAGE;
       message << "Creating list of (primitivized) unique derivative supercells. Please be patient as primitivization can be slow";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-      
+
       for(unsigned long long int i=0;i<Num_calculated;i++) {
         ss.str("");
         ss << "POCC_" << setfill('0') << setw(2) <<(i+1);
@@ -181,7 +181,7 @@ str_num_data OptimizePoccValue(double dvalue, double tol) {
   str_num_data optimized_dvalue;
 
   if(tol<1E-6) {
-      tol = 0.001;
+    tol = 0.001;
   }
 
   int Nmax=100;
@@ -260,7 +260,7 @@ void UpdateXstr(xstructure &xstr_orig, ofstream &FileMESSAGE, _aflags &aflags) {
     ostringstream aus;
     aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is " << xstr_orig.partial_occupation_site_tol << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO 180409
     if(xstr_orig.partial_occupation_site_tol>1E-6) { //CO 180409
-        epsilon = xstr_orig.partial_occupation_site_tol; //CO 180409
+      epsilon = xstr_orig.partial_occupation_site_tol; //CO 180409
     }
     else {
       aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is not set " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_); //CO 180409
@@ -295,7 +295,7 @@ void OptimizeXstr(xstructure &a, ofstream &FileMESSAGE, _aflags &aflags) {
 }
 
 // ***************************************************************************
-// void string_replaceAll(std::string& str, const std::string& from, const std::string& to) {
+// void string_replaceAll(std::string& str, const std::string& from, const std::string& to)
 // ***************************************************************************
 void string_replaceAll(std::string& str, const std::string& from, const std::string& to) 
 {
@@ -312,13 +312,13 @@ void string_replaceAll(std::string& str, const std::string& from, const std::str
 bool is_number(const std::string& s) {
   std::string::const_iterator it = s.begin();
   while (it != s.end() && std::isdigit(*it)) {
-      ++it;
+    ++it;
   }
   return !s.empty() && it == s.end();
 }
 
 // ***************************************************************************
-//  double CalculateDistanceXstructure(xstructure& xstr, int i, int j) {
+//  double CalculateDistanceXstructure(xstructure& xstr, int i, int j)
 // ***************************************************************************
 double CalculateDistanceXstructure(xstructure& xstr, int i, int j) {
   double d1=xstr.atoms.at(i).cpos(1)-xstr.atoms.at(j).cpos(1);
@@ -345,9 +345,9 @@ vector<vector<int> > NormalisedNumberXstructure(xstructure& xstr) {
     for (unsigned int j=0; j<a.size();j++) {
       int k2=a.at(j).at(0);
       if(CheckOneSite(xstr,k1,k2)) {
-	insert_flag = true;
-	a.at(j).push_back(k1);
-	break;
+        insert_flag = true;
+        a.at(j).push_back(k1);
+        break;
       }
     }
     if(! insert_flag) {
@@ -390,7 +390,7 @@ bool CheckPartialOccupation(xstructure& xstr) {
   if(xstr.partial_occupation_flag) {
     for (unsigned int i=0; i<xstr.atoms.size(); i++) {
       if(xstr.atoms.at(i).partial_occupation_flag) {
-          RunFLAG=true;
+        RunFLAG=true;
       }
     }
   }
@@ -405,7 +405,7 @@ bool CheckOneSite(xstructure& xstr, int i, int j) {
   double epsilon=1E-3;
   bool RunFLAG=false; 
   if(CalculateDistanceXstructure(xstr, i, j)<epsilon) {
-      RunFLAG=true;
+    RunFLAG=true;
   }
   return RunFLAG;
 }
@@ -455,7 +455,7 @@ bool CheckVacancyOnOnesite(xstructure& xstr, unsigned int k) {
   if(a.at(k).size()==1) {
     int n_xstr_orig=a.at(k).at(0);
     if(xstr.atoms.at(n_xstr_orig).partial_occupation_value<1.0) {
-        RunFLAG=true;
+      RunFLAG=true;
     }
   }  else {
     double SumTmp=0.0;
@@ -464,7 +464,7 @@ bool CheckVacancyOnOnesite(xstructure& xstr, unsigned int k) {
       SumTmp+=xstr.atoms.at(j).partial_occupation_value;
     }
     if(SumTmp<1.0) {
-        RunFLAG=true;
+      RunFLAG=true;
     }
   }
   return RunFLAG;
@@ -495,37 +495,37 @@ bool CheckVacancy(xstructure& xstr)
   bool RunFLAG=false;
   if(CheckPartialOccupation(xstr)) {
     if(!CheckMultiOccupied(xstr)) {
-        RunFLAG=true;
+      RunFLAG=true;
     }
     else {
       vector<vector<int> > a=NormalisedNumberXstructure(xstr);
       for (uint i=0;i<a.size();i++) {
-	for (uint j=0; j<a.at(i).size();j++) {
-	  cout << a.at(i).at(j) << " ";
-	}
-	cout << endl;
+        for (uint j=0; j<a.at(i).size();j++) {
+          cout << a.at(i).at(j) << " ";
+        }
+        cout << endl;
       }
 
       vector<double> SumOccupation;
       double SumTmp;
       for (unsigned int i=0; i<a.size();i++) {
-	SumTmp=0.0;
-	for (unsigned int j=0; j<a.at(i).size(); j++) {
-	  int k=a.at(i).at(j);
-	  SumTmp+=xstr.atoms.at(k).partial_occupation_value;
-	}
-	SumOccupation.push_back(SumTmp);
+        SumTmp=0.0;
+        for (unsigned int j=0; j<a.at(i).size(); j++) {
+          int k=a.at(i).at(j);
+          SumTmp+=xstr.atoms.at(k).partial_occupation_value;
+        }
+        SumOccupation.push_back(SumTmp);
       }
       for(unsigned int i=0; i<SumOccupation.size();i++) { 
-	if((1-SumOccupation.at(i))>1E-4) {
-        RunFLAG=true;
-    }
-	else if(SumOccupation.at(i)>1) {
-	  cerr << "Error! Please check your occupation value carefully  !!! " << endl;
-	  cerr << "The total occupation on some site exceeds 1.0 !!!" << endl;
-	  cerr << "I refuse to run this silly job!" << endl;
-	  exit(1);
-	}
+        if((1-SumOccupation.at(i))>1E-4) {
+          RunFLAG=true;
+        }
+        else if(SumOccupation.at(i)>1) {
+          cerr << "Error! Please check your occupation value carefully  !!! " << endl;
+          cerr << "The total occupation on some site exceeds 1.0 !!!" << endl;
+          cerr << "I refuse to run this silly job!" << endl;
+          exit(1);
+        }
       }
     }
   }
@@ -538,13 +538,13 @@ bool CheckVacancy(xstructure& xstr)
 vector<vector<int> > CalculatecRange(xstructure& xstr) {
   int Ntype;
   if(CheckVacancy(xstr)) {
-      Ntype=xstr.num_each_type.size()+1;
+    Ntype=xstr.num_each_type.size()+1;
   }
   else {
-      Ntype=xstr.num_each_type.size();
+    Ntype=xstr.num_each_type.size();
   }
   int nDFull=NormalisedNumberXstructure(xstr).size(); 
-    
+
   vector<vector<int> > XstrcRange;
   vector<int> cRangeTmp;
   if(CheckPartialOccupation(xstr)) {
@@ -580,28 +580,27 @@ vector<vector<int> > CalculatecRange(xstructure& xstr) {
       cRangeTmp.push_back(Xstrlcm);
       XstrcRange.push_back(cRangeTmp);
     }
-    /*The second algorithm
-      int sum_num=0;
-      for (uint i=0; i<XstrcRange.size();i++) {
-      sum_num+=XstrcRange.at(i).at(0);
-      }
-      cRangeTmp.clear();
-      cRangeTmp.push_back(XstrcRange.at(0).at(2)-sum_num);
-      cRangeTmp.push_back(XstrcRange.at(0).at(2)-sum_num);
-      cRangeTmp.push_back(XstrcRange.at(0).at(2));
-      XstrcRange.push_back(cRangeTmp);
-    */
+    //The second algorithm
+    //int sum_num=0;
+    //for (uint i=0; i<XstrcRange.size();i++) {
+    //sum_num+=XstrcRange.at(i).at(0);
+    //}
+    //cRangeTmp.clear();
+    //cRangeTmp.push_back(XstrcRange.at(0).at(2)-sum_num);
+    //cRangeTmp.push_back(XstrcRange.at(0).at(2)-sum_num);
+    //cRangeTmp.push_back(XstrcRange.at(0).at(2));
+    //XstrcRange.push_back(cRangeTmp);
 
     int sumtmp=0;
     for (uint i=0; i<XstrcRange.size();i++) {
       sumtmp+=XstrcRange.at(i).at(0); 
     }
-        
+
     if(sumtmp!=XstrcRange.at(0).at(2)) { //sumtmp2 does not contain vacancy; sumtmp contains vacancy
       int sumtmp2=0;
       int k=XstrcRange.size();
       for (int i=0; i<(k-1);i++) {
-	sumtmp2+=XstrcRange.at(i).at(0);
+        sumtmp2+=XstrcRange.at(i).at(0);
       }
       XstrcRange.at(k-1).at(0)=XstrcRange.at(0).at(2)-sumtmp2;
       XstrcRange.at(k-1).at(1)=XstrcRange.at(0).at(2)-sumtmp2;
@@ -652,10 +651,10 @@ int lcm (int a, int b) {
 // ***************************************************************************
 int gcd(int a, int b) {
   if(a%b==0) {
-      return b;
+    return b;
   }
   else {
-      return gcd(b, a%b);
+    return gcd(b, a%b);
   }
 }
 // ***************************************************************************
@@ -679,7 +678,7 @@ vector<int> Decimal2Fraction(double a) {
     while(abs(a)>Tol_DecimalPart && NumDiff>Tol_FracDeciDiff) {
       b=int(1.0/a);
       if(b>MaxDenominator) {
-	break;
+        break;
       }
       IntList.push_back(b);
       a=1.0/a-b;
@@ -760,7 +759,7 @@ namespace pocc {
       cerr << "Warnning!!! Atom Species are not assigned! They are defaulted to H." << endl;
       AtomSpecies.clear();
       for (uint i=0; i<xstr.num_each_type.size();i++) {
-	AtomSpecies.push_back("H");
+        AtomSpecies.push_back("H");
       }
     }
 
@@ -780,7 +779,7 @@ namespace pocc {
       cerr << "Warnning!!! Atom Species are not assigned! They are defaulted to H." << endl;
       AtomSpecies.clear();
       for (uint i=0; i<xstr.num_each_type.size();i++) {
-	AtomSpecies.push_back("H");
+        AtomSpecies.push_back("H");
       }
     }
 
@@ -802,9 +801,9 @@ namespace pocc {
     int iatom=0;
     for(uint itype=0; itype<xstr.num_each_type.size();itype++) {
       for (int j=0; j<xstr.num_each_type.at(itype);j++) {
-	xstr.atoms.at(iatom).name=AtomSpecies.at(itype);
-	xstr.atoms.at(iatom).name_is_given=TRUE;
-	iatom++;
+        xstr.atoms.at(iatom).name=AtomSpecies.at(itype);
+        xstr.atoms.at(iatom).name_is_given=TRUE;
+        iatom++;
       }
     }
 
@@ -869,7 +868,7 @@ namespace pocc {
     vector<string> vgulp_output_line, vgulp_output;
     while(getline(ss_gulp_out, line)) {
       if(line.find(anchor_word_Total_energy) !=string::npos) {
-	vgulp_output.push_back(line);
+        vgulp_output.push_back(line);
       }
     }
     aurostd::string2tokens(vgulp_output.at(0), vgulp_output_line, " ");
@@ -906,7 +905,7 @@ namespace pocc {
     vector<string> vgulp_output_line, vgulp_output;
     while(getline(ss_gulp_out, line)) {
       if(line.find(anchor_word_Total_energy) !=string::npos) {
-	vgulp_output.push_back(line);
+        vgulp_output.push_back(line);
       }
     }
     aurostd::string2tokens(vgulp_output.at(0), vgulp_output_line, " ");
@@ -1064,7 +1063,7 @@ void combine(vector<int> &range, vector<vector<int> > &final_result, int n) {
 // vector<xmatrix<double> > CalculateHNF(xstructure a, int n)
 // ***************************************************************************
 vector<xmatrix<double> > CalculateHNF(xstructure str, int n) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
   //xstructure str=a; //CO, already copies
   str.BringInCell();
 
@@ -1088,19 +1087,19 @@ vector<xmatrix<double> > CalculateHNF(xstructure str, int n) {
   for(int a=1;a<=n;a++) {
     for(int c=1;c<=n/a;c++) {
       for(int f=1;f<=n/a/c;f++) {
-	if(a*c*f==n) {
-	  for(int b=0;b<c;b++) {
-	    for(int d=0;d<f;d++) {
-	      for(int e=0;e<f;e++) {
-		i++;
-		HNF(1,1)=a;HNF(1,2)=0;HNF(1,3)=0;
-		HNF(2,1)=b;HNF(2,2)=c;HNF(2,3)=0;
-		HNF(3,1)=d;HNF(3,2)=e;HNF(3,3)=f;
-		vHNF.push_back(HNF);
-	      }
+        if(a*c*f==n) {
+          for(int b=0;b<c;b++) {
+            for(int d=0;d<f;d++) {
+              for(int e=0;e<f;e++) {
+                i++;
+                HNF(1,1)=a;HNF(1,2)=0;HNF(1,3)=0;
+                HNF(2,1)=b;HNF(2,2)=c;HNF(2,3)=0;
+                HNF(3,1)=d;HNF(3,2)=e;HNF(3,3)=f;
+                vHNF.push_back(HNF);
+              }
+            }
+          }
         }
-      }
-    }
       }
     }
   }
@@ -1123,17 +1122,17 @@ vector<xmatrix<double> > CalculateHNF(xstructure str, int n) {
         cerr << Bj << endl;
       }
       for(uint pgroup=0;pgroup<non_pocc_xstr.pgroup.size()&&found==FALSE;pgroup++) {                  // cycle through the pgroup of str
-	R=trasp(non_pocc_xstr.pgroup.at(pgroup).Uc); 
+        R=trasp(non_pocc_xstr.pgroup.at(pgroup).Uc); 
         if(LDEBUG) { //CO 180409
           cerr << "POINT GROUP " << endl;
           cerr << R << endl;
         }
-	H=aurostd::inverse(Bj)*aurostd::inverse(R)*Bi;
+        H=aurostd::inverse(Bj)*aurostd::inverse(R)*Bi;
         if(LDEBUG) { //CO 180409
           cerr << "H" << endl;
           cerr << H << endl;
         }
-	if(aurostd::isinteger(H)) {found=TRUE;}
+        if(aurostd::isinteger(H)) {found=TRUE;}
       }
     }
     if(found==FALSE) { // not found, then plug
@@ -1298,8 +1297,8 @@ xstructure NormalizeXstructure(xstructure a) {
   for(uint i=0; i<NormalisedNumber.size(); i++) {
     if(NormalisedNumber.at(i).size() >= 2) {
       for (uint j=1; j<NormalisedNumber.at(i).size();j++) { //Keep the first one
-	int k=NormalisedNumber.at(i).at(j);
-	removed_number.push_back(k);
+        int k=NormalisedNumber.at(i).at(j);
+        removed_number.push_back(k);
       }
     }
   }
@@ -1335,15 +1334,15 @@ vector<vector<int> > CalculateXstrNumberSupercell(xstructure a, int n) {
 int hnf_double2int(double a) {   
   double adiff=a-int(a);
   if(adiff >=0 && adiff < 0.5 ) {
-      return int(a);
+    return int(a);
   }
   else {
-      return int(a)+1;
+    return int(a)+1;
   }
 }
 
 // ***************************************************************************
-// bool CheckDoubleOccupied<xstructure xstr_orig) {
+// bool CheckDoubleOccupied(xstructure xstr_orig)
 // ***************************************************************************
 bool CheckDoubleOccupied(xstructure xstr_orig) {
   //DoubleOccupied means two atoms occupy one position or one atom and one vacancy occupy one position
@@ -1410,14 +1409,14 @@ void CombineAll(const vector<vector<vector<int> > > &allVecs, size_t vecIndex, v
   //function to combine all the vectors (choose one from each one)
   //Call method: CombineAll(d, 0, e, f); d initial vector; e temporary vector, f final result
   if(vecIndex >= allVecs.size())
-    {   
-      vector<vector<int> > str_tmp;
-      for(uint i=0;i<intSoFar.size();i++) { 
-	str_tmp.push_back(intSoFar.at(i));
-      }   
-      results.push_back(str_tmp);
-      return;
+  {   
+    vector<vector<int> > str_tmp;
+    for(uint i=0;i<intSoFar.size();i++) { 
+      str_tmp.push_back(intSoFar.at(i));
     }   
+    results.push_back(str_tmp);
+    return;
+  }   
   for (size_t i=0; i<allVecs.at(vecIndex).size(); i++) {
     vector<vector<int> > tmp=intSoFar;
     tmp.push_back(allVecs.at(vecIndex).at(i));
@@ -1430,7 +1429,7 @@ void CombineAll(const vector<vector<vector<int> > > &allVecs, size_t vecIndex, v
 // ***************************************************************************
 vector<string> CalculateSecondAtomicNameSupercell(xstructure xstr_orig, int n) {
   vector<string> AtomicNameSupercell;
-  //    if(CheckDoubleOccupied(xstr_orig)) {
+  //    if(CheckDoubleOccupied(xstr_orig)) {  //[CO200106 - close bracket for indenting]}
   xstructure xstr_norm = NormalizeXstructure(xstr_orig); //Format POSCAR
   vector<vector<int> > num_norm_xstr = NormalisedNumberXstructure(xstr_orig); //Format normalized POSCAR's number using 2D vector
   vector<vector<int> > vec_num_supercell=CalculateXstrNumberSupercell(xstr_norm,n); //Produce supercell's number using 2D vector
@@ -1439,24 +1438,24 @@ vector<string> CalculateSecondAtomicNameSupercell(xstructure xstr_orig, int n) {
     if(xstr_norm.atoms.at(i).partial_occupation_flag) {
       //if this is partial occupation
       if(num_norm_xstr.at(i).size()==1) {
-	//This means this site only contains vacancy
-	for (uint j=0;j<vec_num_supercell.at(i).size();j++) {
-	  AtomicNameSupercell.push_back(name_vacancy);
-	}
+        //This means this site only contains vacancy
+        for (uint j=0;j<vec_num_supercell.at(i).size();j++) {
+          AtomicNameSupercell.push_back(name_vacancy);
+        }
       }
       else {
-	//This means site site contains another element
-	int int_tmp = num_norm_xstr.at(i).at(1); //Read the atomic number in xstr_orig
-	string tmp_second_element_name = xstr_orig.atoms.at(int_tmp).name; //Read the name
-	for (uint j=0;j<vec_num_supercell.at(i).size();j++) {
-	  AtomicNameSupercell.push_back(tmp_second_element_name);
-	}
+        //This means site site contains another element
+        int int_tmp = num_norm_xstr.at(i).at(1); //Read the atomic number in xstr_orig
+        string tmp_second_element_name = xstr_orig.atoms.at(int_tmp).name; //Read the name
+        for (uint j=0;j<vec_num_supercell.at(i).size();j++) {
+          AtomicNameSupercell.push_back(tmp_second_element_name);
+        }
       }
     }
     else {
       for (uint j=0;j<vec_num_supercell.at(i).size();j++) {
-	string tmp_name=xstr_norm.atoms.at(i).name;
-	AtomicNameSupercell.push_back(tmp_name);
+        string tmp_name=xstr_norm.atoms.at(i).name;
+        AtomicNameSupercell.push_back(tmp_name);
       }
     }
   }
@@ -1479,7 +1478,7 @@ vector<vector<int> > GenerateSupercellAtomNumber(xstructure xstr_orig, int n) {
   //    vector<vector<int> > atom_num_supercell = CalculateXstrNumberSupercell(xstr_orig, n); //format like 0 1 2 3; 4 5 6 7
   //    We just need to store the atoms' number using normalized xstructure
 
-  //if(CheckDoubleOccupied(xstr_orig)) {
+  //if(CheckDoubleOccupied(xstr_orig)) {  //[CO200106 - close bracket for indenting]}
   for (uint i=0; i<xstr_norm.atoms.size();i++) {
     if(xstr_norm.atoms.at(i).partial_occupation_flag) {
       int num_vacancy= hnf_double2int((1-xstr_norm.atoms.at(i).partial_occupation_value)*n);
@@ -1506,7 +1505,7 @@ vector<vector<int> > GenerateSupercellAtomNumber(xstructure xstr_orig, int n) {
     tmp.clear();
     for (uint j=0; j<final_num_result.at(i).size();j++) {
       for (uint k=0; k<final_num_result.at(i).at(j).size();k++) {
-	tmp.push_back(final_num_result.at(i).at(j).at(k));
+        tmp.push_back(final_num_result.at(i).at(j).at(k));
       }
     }
     formated_final_num.push_back(tmp);
@@ -1830,20 +1829,20 @@ int InitializeXstr(xstructure &xstr, vector<string> vxstr_species_ori, ofstream 
       error_iatom.at(iatom)=1.0;
       M_iatom.at(iatom)=0;
       for(int j=0;j<=HNFi;j++) {
-	eps=abs((double) j/HNFi-xstr.atoms.at(iatom).partial_occupation_value);
-	if(eps<error_iatom.at(iatom)) {
-	  error_iatom.at(iatom)=eps;
-	  M_iatom.at(iatom)=(uint) j;
-	  effective_pocc_iatom.at(iatom)=(double) M_iatom.at(iatom)/HNFi;
-	}
+        eps=abs((double) j/HNFi-xstr.atoms.at(iatom).partial_occupation_value);
+        if(eps<error_iatom.at(iatom)) {
+          error_iatom.at(iatom)=eps;
+          M_iatom.at(iatom)=(uint) j;
+          effective_pocc_iatom.at(iatom)=(double) M_iatom.at(iatom)/HNFi;
+        }
       }
     }
 
     for(uint iatom=0;iatom<xstr.atoms.size();iatom++) {
       if(xstr.atoms.at(iatom).partial_occupation_value<1.0) {
-	stringstream aus;aus.precision(digits);aus.setf(std::ios::fixed,std::ios::floatfield);
-	aus << effective_pocc_iatom.at(iatom) << "," << error_iatom.at(iatom) << "," << M_iatom.at(iatom) << "/" << HNFi;
-	oss << "| " << aurostd::PaddedPOST(aus.str(),digits2) << " " ;
+        stringstream aus;aus.precision(digits);aus.setf(std::ios::fixed,std::ios::floatfield);
+        aus << effective_pocc_iatom.at(iatom) << "," << error_iatom.at(iatom) << "," << M_iatom.at(iatom) << "/" << HNFi;
+        oss << "| " << aurostd::PaddedPOST(aus.str(),digits2) << " " ;
       }
     }
     error=aurostd::max(error_iatom);
@@ -1891,41 +1890,41 @@ vector<vector<xstructure> > Partial2Xstr_Fivefold_Occupied(xstructure xstr, int 
   vector<string>  element_name; //replacing original name
   for (uint i=0; i<xstr_norm.atoms.size();i++) {
     if((NormalisedNumber.at(i).size()==5) || 
-       ((NormalisedNumber.at(i).size()==4)&& CheckVacancyOnOnesite(xstr,i)))
-      { //tripled occupied
-	int k1= NormalisedNumber.at(i).at(0);
-	int k2= NormalisedNumber.at(i).at(1);
-	int k3= NormalisedNumber.at(i).at(2);
-	int k4= NormalisedNumber.at(i).at(3);
-	double sum_first_four_pocc_value = xstr.atoms.at(k1).partial_occupation_value
-	  + xstr.atoms.at(k2).partial_occupation_value 
-	  + xstr.atoms.at(k3).partial_occupation_value
-	  + xstr.atoms.at(k4).partial_occupation_value;
-	int num_vacancy= hnf_double2int((1-sum_first_four_pocc_value)*nHNF);
-	for (int k=0; k<num_vacancy; k++) {
-	  if(NormalisedNumber.at(i).size()==5) { //If it contains four elements
-	    int k5=NormalisedNumber.at(i).at(4); //get the the name of the 5th element
-	    element_name.push_back(xstr.atoms.at(k5).name);
-	  }
-	  else { //if it contains three elements and one vacancy
-	    element_name.push_back(name_vacancy);
-	  }
-	}
-	vector<int> vec_num_part=atom_num_supercell.at(i);
-	//get rid of the numbers of the first three atom
-	//the 4th and 5th atoms will be thought as one entry, so we need to remove the first three
-	float first_three_pocc_value = xstr.atoms.at(k1).partial_occupation_value 
-	  + xstr.atoms.at(k2).partial_occupation_value
-	  + xstr.atoms.at(k3).partial_occupation_value;
-	int num_first_three = hnf_double2int(first_three_pocc_value*nHNF);
-	vector<int> vec_num_part_new; 
-	for (uint i=num_first_three; i<vec_num_part.size();i++) {
-	  vec_num_part_new.push_back(vec_num_part.at(i));
-	}
-	vector<vector<int> > num_com_vacancy; num_com_vacancy.clear();
-	combine(vec_num_part_new, num_com_vacancy, num_vacancy);
-	vec_vec_vec_num_vacancy.push_back(num_com_vacancy);
+        ((NormalisedNumber.at(i).size()==4)&& CheckVacancyOnOnesite(xstr,i)))
+    { //tripled occupied
+      int k1= NormalisedNumber.at(i).at(0);
+      int k2= NormalisedNumber.at(i).at(1);
+      int k3= NormalisedNumber.at(i).at(2);
+      int k4= NormalisedNumber.at(i).at(3);
+      double sum_first_four_pocc_value = xstr.atoms.at(k1).partial_occupation_value
+        + xstr.atoms.at(k2).partial_occupation_value 
+        + xstr.atoms.at(k3).partial_occupation_value
+        + xstr.atoms.at(k4).partial_occupation_value;
+      int num_vacancy= hnf_double2int((1-sum_first_four_pocc_value)*nHNF);
+      for (int k=0; k<num_vacancy; k++) {
+        if(NormalisedNumber.at(i).size()==5) { //If it contains four elements
+          int k5=NormalisedNumber.at(i).at(4); //get the the name of the 5th element
+          element_name.push_back(xstr.atoms.at(k5).name);
+        }
+        else { //if it contains three elements and one vacancy
+          element_name.push_back(name_vacancy);
+        }
       }
+      vector<int> vec_num_part=atom_num_supercell.at(i);
+      //get rid of the numbers of the first three atom
+      //the 4th and 5th atoms will be thought as one entry, so we need to remove the first three
+      float first_three_pocc_value = xstr.atoms.at(k1).partial_occupation_value 
+        + xstr.atoms.at(k2).partial_occupation_value
+        + xstr.atoms.at(k3).partial_occupation_value;
+      int num_first_three = hnf_double2int(first_three_pocc_value*nHNF);
+      vector<int> vec_num_part_new; 
+      for (uint i=num_first_three; i<vec_num_part.size();i++) {
+        vec_num_part_new.push_back(vec_num_part.at(i));
+      }
+      vector<vector<int> > num_com_vacancy; num_com_vacancy.clear();
+      combine(vec_num_part_new, num_com_vacancy, num_vacancy);
+      vec_vec_vec_num_vacancy.push_back(num_com_vacancy);
+    }
   }
   vector<vector<vector<int> > > final_num_result;
   vector<vector<int> >  tmp_vect;
@@ -1937,7 +1936,7 @@ vector<vector<xstructure> > Partial2Xstr_Fivefold_Occupied(xstructure xstr, int 
     tmp.clear();
     for (uint j=0; j<final_num_result.at(i).size();j++) {
       for (uint k=0; k<final_num_result.at(i).at(j).size();k++) {
-	tmp.push_back(final_num_result.at(i).at(j).at(k));
+        tmp.push_back(final_num_result.at(i).at(j).at(k));
       }
     }
     formated_final_num.push_back(tmp);
@@ -1952,10 +1951,10 @@ vector<vector<xstructure> > Partial2Xstr_Fivefold_Occupied(xstructure xstr, int 
     for (uint i=0; i<vec_xstr.size();i++) {
       xstructure xstr_tmp = vec_xstr.at(i);
       for (uint j=0; j<formated_final_num.size();j++) {
-	total++;
-	vector<int> vec_int = formated_final_num.at(j);
-	xstructure new_xstr = XstrSubstitute(xstr_tmp, vec_int, element_name);
-	vec_new_xstr.push_back(new_xstr);
+        total++;
+        vector<int> vec_int = formated_final_num.at(j);
+        xstructure new_xstr = XstrSubstitute(xstr_tmp, vec_int, element_name);
+        vec_new_xstr.push_back(new_xstr);
       }
     }
     vec_vec_xstr_fivefold.push_back(vec_new_xstr);
@@ -1995,35 +1994,35 @@ vector<vector<xstructure> > Partial2Xstr_Fourfold_Occupied(xstructure xstr, int 
   vector<string>  element_name; //replacing original name
   for (uint i=0; i<xstr_norm.atoms.size();i++) {
     if((NormalisedNumber.at(i).size()==4) || 
-       ((NormalisedNumber.at(i).size()==3)&& CheckVacancyOnOnesite(xstr,i)))
-      { //tripled occupied
-	int k1= NormalisedNumber.at(i).at(0);
-	int k2= NormalisedNumber.at(i).at(1);
-	int k3= NormalisedNumber.at(i).at(2);
-	double sum_first_three_pocc_value = xstr.atoms.at(k1).partial_occupation_value
-	  + xstr.atoms.at(k2).partial_occupation_value + xstr.atoms.at(k3).partial_occupation_value;
-	int num_vacancy= hnf_double2int((1-sum_first_three_pocc_value)*nHNF);
-	for (int k=0; k<num_vacancy; k++) {
-	  if(NormalisedNumber.at(i).size()==4) { //If it contains four elements
-	    int k4=NormalisedNumber.at(i).at(3); //get the the name of  4th element
-	    element_name.push_back(xstr.atoms.at(k4).name);
-	  }
-	  else { //if it contains three elements and one vacancy
-	    element_name.push_back(name_vacancy);
-	  }
-	}
-	vector<int> vec_num_part=atom_num_supercell.at(i);
-	//get rid of the numbers of the first two atom
-	float first_two_pocc_value = xstr.atoms.at(k1).partial_occupation_value + xstr.atoms.at(k2).partial_occupation_value;
-	int num_first_two = hnf_double2int(first_two_pocc_value*nHNF);
-	vector<int> vec_num_part_new; 
-	for (uint i=num_first_two; i<vec_num_part.size();i++) {
-	  vec_num_part_new.push_back(vec_num_part.at(i));
-	}
-	vector<vector<int> > num_com_vacancy; num_com_vacancy.clear();
-	combine(vec_num_part_new, num_com_vacancy, num_vacancy);
-	vec_vec_vec_num_vacancy.push_back(num_com_vacancy);
+        ((NormalisedNumber.at(i).size()==3)&& CheckVacancyOnOnesite(xstr,i)))
+    { //tripled occupied
+      int k1= NormalisedNumber.at(i).at(0);
+      int k2= NormalisedNumber.at(i).at(1);
+      int k3= NormalisedNumber.at(i).at(2);
+      double sum_first_three_pocc_value = xstr.atoms.at(k1).partial_occupation_value
+        + xstr.atoms.at(k2).partial_occupation_value + xstr.atoms.at(k3).partial_occupation_value;
+      int num_vacancy= hnf_double2int((1-sum_first_three_pocc_value)*nHNF);
+      for (int k=0; k<num_vacancy; k++) {
+        if(NormalisedNumber.at(i).size()==4) { //If it contains four elements
+          int k4=NormalisedNumber.at(i).at(3); //get the the name of  4th element
+          element_name.push_back(xstr.atoms.at(k4).name);
+        }
+        else { //if it contains three elements and one vacancy
+          element_name.push_back(name_vacancy);
+        }
       }
+      vector<int> vec_num_part=atom_num_supercell.at(i);
+      //get rid of the numbers of the first two atom
+      float first_two_pocc_value = xstr.atoms.at(k1).partial_occupation_value + xstr.atoms.at(k2).partial_occupation_value;
+      int num_first_two = hnf_double2int(first_two_pocc_value*nHNF);
+      vector<int> vec_num_part_new; 
+      for (uint i=num_first_two; i<vec_num_part.size();i++) {
+        vec_num_part_new.push_back(vec_num_part.at(i));
+      }
+      vector<vector<int> > num_com_vacancy; num_com_vacancy.clear();
+      combine(vec_num_part_new, num_com_vacancy, num_vacancy);
+      vec_vec_vec_num_vacancy.push_back(num_com_vacancy);
+    }
   }
   vector<vector<vector<int> > > final_num_result;
   vector<vector<int> >  tmp_vect;
@@ -2035,7 +2034,7 @@ vector<vector<xstructure> > Partial2Xstr_Fourfold_Occupied(xstructure xstr, int 
     tmp.clear();
     for (uint j=0; j<final_num_result.at(i).size();j++) {
       for (uint k=0; k<final_num_result.at(i).at(j).size();k++) {
-	tmp.push_back(final_num_result.at(i).at(j).at(k));
+        tmp.push_back(final_num_result.at(i).at(j).at(k));
       }
     }
     formated_final_num.push_back(tmp);
@@ -2050,10 +2049,10 @@ vector<vector<xstructure> > Partial2Xstr_Fourfold_Occupied(xstructure xstr, int 
     for (uint i=0; i<vec_xstr.size();i++) {
       xstructure xstr_tmp = vec_xstr.at(i);
       for (uint j=0; j<formated_final_num.size();j++) {
-	total++;
-	vector<int> vec_int = formated_final_num.at(j);
-	xstructure new_xstr = XstrSubstitute(xstr_tmp, vec_int, element_name);
-	vec_new_xstr.push_back(new_xstr);
+        total++;
+        vector<int> vec_int = formated_final_num.at(j);
+        xstructure new_xstr = XstrSubstitute(xstr_tmp, vec_int, element_name);
+        vec_new_xstr.push_back(new_xstr);
       }
     }
     vec_vec_xstr_fourfold.push_back(vec_new_xstr);
@@ -2092,33 +2091,33 @@ vector<vector<xstructure> > Partial2Xstr_Triple_Occupied(xstructure xstr, int nH
   vector<string>  element_name; //replacing original name
   for (uint i=0; i<xstr_norm.atoms.size();i++) {
     if((NormalisedNumber.at(i).size()==3) || 
-       ((NormalisedNumber.at(i).size()==2)&& CheckVacancyOnOnesite(xstr,i)))
-      { //tripled occupied
-	int k1= NormalisedNumber.at(i).at(0);
-	int k2= NormalisedNumber.at(i).at(1);
-	double sum_first_two_pocc_value = xstr.atoms.at(k1).partial_occupation_value
-	  + xstr.atoms.at(k2).partial_occupation_value;
-	int num_vacancy= hnf_double2int((1-sum_first_two_pocc_value)*nHNF);
-	for (int k=0; k<num_vacancy; k++) {
-	  if(NormalisedNumber.at(i).size()==3) { //If it contains three elements
-	    int k3=NormalisedNumber.at(i).at(2);
-	    element_name.push_back(xstr.atoms.at(k3).name);
-	  }
-	  else { //if it contains two elements and one vacancy
-	    element_name.push_back(name_vacancy);
-	  }
-	}
-	vector<int> vec_num_part=atom_num_supercell.at(i);
-	//get rid of the numbers of the first atom
-	int num_first_one = hnf_double2int(xstr.atoms.at(k1).partial_occupation_value*nHNF);
-	vector<int> vec_num_part_new; 
-	for (uint i=num_first_one; i<vec_num_part.size();i++) {
-	  vec_num_part_new.push_back(vec_num_part.at(i));
-	}
-	vector<vector<int> > num_com_vacancy; num_com_vacancy.clear();
-	combine(vec_num_part_new, num_com_vacancy, num_vacancy);
-	vec_vec_vec_num_vacancy.push_back(num_com_vacancy);
+        ((NormalisedNumber.at(i).size()==2)&& CheckVacancyOnOnesite(xstr,i)))
+    { //tripled occupied
+      int k1= NormalisedNumber.at(i).at(0);
+      int k2= NormalisedNumber.at(i).at(1);
+      double sum_first_two_pocc_value = xstr.atoms.at(k1).partial_occupation_value
+        + xstr.atoms.at(k2).partial_occupation_value;
+      int num_vacancy= hnf_double2int((1-sum_first_two_pocc_value)*nHNF);
+      for (int k=0; k<num_vacancy; k++) {
+        if(NormalisedNumber.at(i).size()==3) { //If it contains three elements
+          int k3=NormalisedNumber.at(i).at(2);
+          element_name.push_back(xstr.atoms.at(k3).name);
+        }
+        else { //if it contains two elements and one vacancy
+          element_name.push_back(name_vacancy);
+        }
       }
+      vector<int> vec_num_part=atom_num_supercell.at(i);
+      //get rid of the numbers of the first atom
+      int num_first_one = hnf_double2int(xstr.atoms.at(k1).partial_occupation_value*nHNF);
+      vector<int> vec_num_part_new; 
+      for (uint i=num_first_one; i<vec_num_part.size();i++) {
+        vec_num_part_new.push_back(vec_num_part.at(i));
+      }
+      vector<vector<int> > num_com_vacancy; num_com_vacancy.clear();
+      combine(vec_num_part_new, num_com_vacancy, num_vacancy);
+      vec_vec_vec_num_vacancy.push_back(num_com_vacancy);
+    }
   }
   vector<vector<vector<int> > > final_num_result;
   vector<vector<int> >  tmp_vect;
@@ -2130,7 +2129,7 @@ vector<vector<xstructure> > Partial2Xstr_Triple_Occupied(xstructure xstr, int nH
     tmp.clear();
     for (uint j=0; j<final_num_result.at(i).size();j++) {
       for (uint k=0; k<final_num_result.at(i).at(j).size();k++) {
-	tmp.push_back(final_num_result.at(i).at(j).at(k));
+        tmp.push_back(final_num_result.at(i).at(j).at(k));
       }
     }
     formated_final_num.push_back(tmp);
@@ -2145,10 +2144,10 @@ vector<vector<xstructure> > Partial2Xstr_Triple_Occupied(xstructure xstr, int nH
     for (uint i=0; i<vec_xstr.size();i++) {
       xstructure xstr_tmp = vec_xstr.at(i);
       for (uint j=0; j<formated_final_num.size();j++) {
-	total++;
-	vector<int> vec_int = formated_final_num.at(j);
-	xstructure new_xstr = XstrSubstitute(xstr_tmp, vec_int, element_name);
-	vec_new_xstr.push_back(new_xstr);
+        total++;
+        vector<int> vec_int = formated_final_num.at(j);
+        xstructure new_xstr = XstrSubstitute(xstr_tmp, vec_int, element_name);
+        vec_new_xstr.push_back(new_xstr);
       }
     }
     vec_vec_xstr_triple.push_back(vec_new_xstr);
@@ -2326,11 +2325,11 @@ bool CoordCompare(xstructure xstr1, xstructure xstr2) {
   else  {
     if(xstr1.atoms.size()==xstr2.atoms.size()) {
       for (uint i=0;i<xstr1.atoms.size();i++) {
-	double b1=0, b2=0, b3=0;
-	b1= xstr1.atoms.at(i).fpos[1] - xstr2.atoms.at(i).fpos[1];
-	b2= xstr1.atoms.at(i).fpos[2] - xstr2.atoms.at(i).fpos[2];
-	b3= xstr1.atoms.at(i).fpos[3] - xstr2.atoms.at(i).fpos[3];
-	sum += (b1*b1+b2*b2+b3*b3);
+        double b1=0, b2=0, b3=0;
+        b1= xstr1.atoms.at(i).fpos[1] - xstr2.atoms.at(i).fpos[1];
+        b2= xstr1.atoms.at(i).fpos[2] - xstr2.atoms.at(i).fpos[2];
+        b3= xstr1.atoms.at(i).fpos[3] - xstr2.atoms.at(i).fpos[3];
+        sum += (b1*b1+b2*b2+b3*b3);
       }
       if(sum <epsilon) {RUN_FLAG = true;}
     }
@@ -2398,7 +2397,7 @@ vector<xstructure> RemoveEquivalentXstr(vector<xstructure> vec_xstr, ofstream &F
     uint j;
     for (j=0; j<vec_xstr_energy_final.size();j++) {
       if(abs(vec_xstr_energy.at(i).energy-vec_xstr_energy_final.at(j).energy)<epsilon_etot) { //if they have same energy
-	break;
+        break;
       }
     }
     if(j==vec_xstr_energy_final.size()) {
@@ -2477,8 +2476,8 @@ namespace pocc {
       xstr2.BringInCell();
       pflow::Sort_atom_cpos(xstr2);
       if(CoordCompare(xstr1, xstr2)) {
-	RUN_FLAG = true;
-	break;
+        RUN_FLAG = true;
+        break;
       }
     }
     return RUN_FLAG;
@@ -2504,13 +2503,13 @@ namespace pocc {
     for (uint i=0; i<vec_rot.size();i++) {
       xstructure xstr2_sp_rot_tmp = vec_rot.at(i);
       for (uint j=0; j<xstr2_sp_rot_tmp.atoms.size();j++) {
-	xstr2_sp_rot_tmp.ShifOriginToAtom(j);
-	xstr2_sp.BringInCell();
-	pflow::Sort_atom_cpos(xstr2_sp_rot_tmp);
-	if(CoordCompare(xstr1_sp, xstr2_sp_rot_tmp)) {
-	  RUN_FLAG = true;
-	  break;
-	}
+        xstr2_sp_rot_tmp.ShifOriginToAtom(j);
+        xstr2_sp.BringInCell();
+        pflow::Sort_atom_cpos(xstr2_sp_rot_tmp);
+        if(CoordCompare(xstr1_sp, xstr2_sp_rot_tmp)) {
+          RUN_FLAG = true;
+          break;
+        }
       }
     }
     return RUN_FLAG;
@@ -2525,12 +2524,12 @@ namespace pocc {
     //only including rotations, because origin shift is alreay included in pocc::DIFF
     vector<xstructure> vec_xstr_rotated;
     xstructure xstr_tmp=xstr;
-    
+
     xstr.CalculateSymmetryPointGroup();
-    
+
     for(uint i=0; i<xstr.pgroup.size(); i++) {
       for (uint j=0; j<xstr.atoms.size();j++) {
-	xstr_tmp.atoms.at(j).fpos = xstr.pgroup.at(i).Uf*xstr.atoms.at(j).fpos;
+        xstr_tmp.atoms.at(j).fpos = xstr.pgroup.at(i).Uf*xstr.atoms.at(j).fpos;
       }
       vec_xstr_rotated.push_back(xstr_tmp); 
     }
@@ -2547,11 +2546,11 @@ namespace pocc {
     if(LDEBUG) {cerr << "pocc::DIFF: BEGIN" << endl;}
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
-    
+
     if(LDEBUG) {cerr << "pocc::DIFF: options=[" << options << "]" << endl;}
     if(LDEBUG) {cerr << "pocc::DIFF: tokens.size()=" << tokens.size() << endl;}
     if(LDEBUG) {for(uint i=0;i<tokens.size();i++) cerr << "pocc::DIFF: tokens.at(i)=" << tokens.at(i) << endl;}
-    
+
     if(tokens.size()<2) {
       init::ErrorOption(cout,options,"pocc::DIFF","aflow --diff=POSCAR1,POSCAR2");
       exit(0);
@@ -2566,7 +2565,7 @@ namespace pocc {
       cerr << "But I will still continue for test!" << endl;
     }
     cerr << "Now running void pocc::DIFF(string options) " << endl;
-    
+
     if(!pocc::DIFF_UFFENERGY(xstr1, xstr2)) {
       cerr << "Not equivalent!" << endl;
     }
@@ -2598,13 +2597,13 @@ void xstructure::AddAtom_POCC(const _atom& atom) {
   for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++) {
     if(atoms.at(iat).type==atom.type && atoms.at(iat).name==atom.name) {
       for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++) {
-	for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++) {
-	  for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
-	    aijk[1]=i;aijk[2]=j;aijk[3]=k;
-	    //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
-	    if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) {FOUND_POSITION=TRUE;}
-	  }
-    }
+        for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++) {
+          for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
+            aijk[1]=i;aijk[2]=j;aijk[3]=k;
+            //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
+            if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) {FOUND_POSITION=TRUE;}
+          }
+        }
       }
     }
   }
@@ -2617,7 +2616,7 @@ void xstructure::AddAtom_POCC(const _atom& atom) {
   for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++) {
     if(atom.name==species.at(isp)) {FOUND_SPECIES=TRUE;species_position=isp;}
   }
-  
+
   if(FOUND_SPECIES==FALSE) {
     if(LDEBUG) {cerr << "AddAtom new_specie=" << atom.name << endl;}
     num_each_type.push_back(1);
@@ -2645,38 +2644,38 @@ void xstructure::AddAtom_POCC(const _atom& atom) {
   // OLD STYLE
   atoms.push_back(btom);  MakeBasis(); return;
 
-  /*// NEW STYLE
-  bool found=FALSE;
-  if(0)  for(uint iat=0;iat<atoms.size()&&!found;iat++) {
-    if(iat<atoms.size()-1) {
-      if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
-	//	if(LDEBUG)
-	cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-	atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
-	found=TRUE;
-      }
-    }
-  }
-  if(1) {
-    std::deque<_atom>::iterator it=atoms.begin();
-    for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
-      if(iat<atoms.size()-1) {
-	//	cerr << "HERE0 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;
-	if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
-	  //	if(LDEBUG)
-	  //	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-	  atoms.insert(it+1,btom);  // it is iterator, fine for insert.
-	  found=TRUE;
-	}
-      }
-    }
-  }
-  // if never found add at the end
-  if(!found) atoms.push_back(btom);
-  // 
-  //  atoms.push_back(btom);
-  // done
-  MakeBasis(); // need to update NUMBER and BASIS */
+  //// NEW STYLE
+  //bool found=FALSE;
+  //if(0)  for(uint iat=0;iat<atoms.size()&&!found;iat++) {
+  //if(iat<atoms.size()-1) {
+  //if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
+  ////	if(LDEBUG)
+  //cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+  //atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
+  //found=TRUE;
+  //}
+  //}
+  //}
+  //if(1) {
+  //std::deque<_atom>::iterator it=atoms.begin();
+  //for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
+  //if(iat<atoms.size()-1) {
+  ////	cerr << "HERE0 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;
+  //if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
+  ////	if(LDEBUG)
+  ////	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+  //atoms.insert(it+1,btom);  // it is iterator, fine for insert.
+  //found=TRUE;
+  //}
+  //}
+  //}
+  //}
+  //// if never found add at the end
+  //if(!found) atoms.push_back(btom);
+  //// 
+  ////  atoms.push_back(btom);
+  //// done
+  //MakeBasis(); // need to update NUMBER and BASIS
 }
 
 // ***************************************************************************
@@ -2749,10 +2748,10 @@ namespace pocc {
       int j=NormalisedNumber.at(i).at(0);
       oss << xstr_in.atoms.at(j).cpos[1] << "   " << xstr_in.atoms.at(j).cpos[2] << "   " << xstr_in.atoms.at(j).cpos[3] << "   ";
       for (unsigned int k=0; k<LabelXstr.at(i).size();k++) { 
-	oss << LabelXstr.at(i).at(k);
-	if(LabelXstr.at(i).size()-k-1) {
-	  oss << "/";
-	}
+        oss << LabelXstr.at(i).at(k);
+        if(LabelXstr.at(i).size()-k-1) {
+          oss << "/";
+        }
       }
       oss << endl;
     }
@@ -2822,10 +2821,10 @@ namespace pocc {
       int j=NormalisedNumber.at(i).at(0);
       oss << xstr_in.atoms.at(j).cpos[1] << "   " << xstr_in.atoms.at(j).cpos[2] << "   " << xstr_in.atoms.at(j).cpos[3] << "   ";
       for (unsigned int k=0; k<LabelXstr.at(i).size();k++) { 
-	oss << LabelXstr.at(i).at(k);
-	if(LabelXstr.at(i).size()-k-1) {
-	  oss << "/";
-	}
+        oss << LabelXstr.at(i).at(k);
+        if(LabelXstr.at(i).size()-k-1) {
+          oss << "/";
+        }
       }
       oss << endl;
     }
@@ -2907,11 +2906,11 @@ namespace pocc {
     string title;
     aurostd::string2tokens(xstr.title, vectitle, " ");
     title=vectitle.at(0);
-    
+
     string str_species_ori = xstr.SpeciesString();
     vector<string> vxstr_species_ori;
     aurostd::string2tokens(str_species_ori, vxstr_species_ori, " ");
-  
+
     int nHNF = InitializeXstr(xstr, vxstr_species_ori,FileMESSAGE, aflags);
     int nMin = nHNF;
     int nMax = nHNF;
@@ -2967,12 +2966,12 @@ namespace pocc {
     for (unsigned int i=0; i<LabelXstr.size();i++) {
       LabelTmp.clear();
       for (unsigned int j=0; j<LabelXstr.at(i).size();j++) {
-	LabelTmp.push_back(LabelXstr.at(i).at(j));
+        LabelTmp.push_back(LabelXstr.at(i).at(j));
       }
       if(LabelXstr.at(i).size()<MaxNum) {
-	for (unsigned int k=0; k<(MaxNum-LabelXstr.at(i).size());k++) {
-	  LabelTmp.push_back(-1);
-	}
+        for (unsigned int k=0; k<(MaxNum-LabelXstr.at(i).size());k++) {
+          LabelTmp.push_back(-1);
+        }
       }
       NewLabelXstr.push_back(LabelTmp);
     }
@@ -2981,7 +2980,7 @@ namespace pocc {
     vector<int> OneDimensionLabelXstr;
     for (unsigned int i=0; i<NewLabelXstr.size();i++) {
       for (unsigned int j=0; j<NewLabelXstr.at(i).size();j++) {
-	OneDimensionLabelXstr.push_back(NewLabelXstr.at(i).at(j));
+        OneDimensionLabelXstr.push_back(NewLabelXstr.at(i).at(j));
       }
     }
     //-----------------------------------------------------------------------
@@ -3012,7 +3011,7 @@ namespace pocc {
     }
     for( int i=0; i<3; i++) {
       for (int j=0; j<Ntype; j++) {
-	cRange[i*Ntype+j]=cRange2[j*3+i];
+        cRange[i*Ntype+j]=cRange2[j*3+i];
       }
     }
     int NumCell=cRangeFrac.at(0).at(2)/nDFull;
@@ -3043,7 +3042,7 @@ namespace pocc {
       line.clear();
       getline(str_out,line);
       if(line.size()>0) {
-	lastline=line;
+        lastline=line;
       }
     }
     int strNi;
@@ -3084,11 +3083,11 @@ namespace pocc {
       string_replaceAll(xstr_partocc.title,"MULTIENUM", title); //Replace the name of POSCAR using the actual title
       //if xstr has vacancy, then we need to clean them
       if(VacancyFLAG) {
-	xstr_cleaned=CleanVacancy(xstr_partocc);
-	groupxstr.push_back(xstr_cleaned);
+        xstr_cleaned=CleanVacancy(xstr_partocc);
+        groupxstr.push_back(xstr_cleaned);
       }
       else {
-	groupxstr.push_back(xstr_partocc);
+        groupxstr.push_back(xstr_partocc);
       }
     }
     //To make sure safely remove the directory, we divide it into two steps
@@ -3096,7 +3095,7 @@ namespace pocc {
     stringstream ss_cmd;
     ss_cmd << "rm -rf " << tmpdir << endl;
     aurostd::execute(ss_cmd);
-    
+
     chdir(cur_dir_name.c_str());  //CO191112
     return groupxstr;
   }
@@ -3126,7 +3125,7 @@ namespace pocc {
     _aflags aflags;
     ostringstream aus;
     OptimizeXstr(xstr, FileMESSAGE, aflags);
-    
+
     vector<xstructure> groupxstr;
 #ifdef _AFLOW_GUS_POCC_
     groupxstr=pocc::MultienumGenerateXstr(xstr, FileMESSAGE, aflags);
@@ -3171,7 +3170,7 @@ namespace pocc {
     cout << "total number " << vxstr_final.size() << endl;
     */
     FileMESSAGE.close();
-    
+
     return TRUE;
   }
 }
@@ -3184,65 +3183,65 @@ namespace pocc {
   void POCC_SetOptions(string options, string& directory, double& T, double& DOS_Emin, double& DOS_Emax, double& DOSSCALE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: BEGIN" << endl;
+      cerr << "pocc::POCC_SetOptions: BEGIN" << endl;
     }
     directory="./"; DOS_Emin=DEFAULT_DOS_EMIN/2.0; DOS_Emax=DEFAULT_DOS_EMAX/2.0; DOSSCALE=DEFAULT_DOS_SCALE; // some defaults  
     T = 300.0;  //300K room temperature default
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
-    
+
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: options=[" << options << "]" << endl;
+      cerr << "pocc::POCC_SetOptions: options=[" << options << "]" << endl;
     }
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: tokens.size()=" << tokens.size() << endl;
+      cerr << "pocc::POCC_SetOptions: tokens.size()=" << tokens.size() << endl;
     }
     if(LDEBUG) {
-        for(uint i=0;i<tokens.size();i++) cerr << "pocc::POCC_SetOptions: tokens.at(i)=" << tokens.at(i) << endl;
+      for(uint i=0;i<tokens.size();i++) cerr << "pocc::POCC_SetOptions: tokens.at(i)=" << tokens.at(i) << endl;
     }
-    
+
     //Usage: program 0; --pocc_dos 1; directory 2; temperature 3, DOS_Emin 4; DOS_Emax 5; DOSSCALE 6
-    
+
     if(tokens.size()>=1) {
-        directory = tokens.at(0); 
+      directory = tokens.at(0); 
     }
     if(tokens.size()>=2) {
-        T = aurostd::string2utype<double>(tokens.at(1)); 
+      T = aurostd::string2utype<double>(tokens.at(1)); 
     }
     if(tokens.size()>=3) {
-        DOS_Emin = aurostd::string2utype<double>(tokens.at(2)); 
+      DOS_Emin = aurostd::string2utype<double>(tokens.at(2)); 
     }
     if(tokens.size()>=4) {
-        DOS_Emax = aurostd::string2utype<double>(tokens.at(3));
+      DOS_Emax = aurostd::string2utype<double>(tokens.at(3));
     }
     if(tokens.size()>=5) {
-        DOSSCALE = aurostd::string2utype<double>(tokens.at(4));
+      DOSSCALE = aurostd::string2utype<double>(tokens.at(4));
     }
-    
+
     // [OBSOLETE] if(directory=="") directory="./";
     // [OBSOLETE] if(T<0.01) T=0.01;
     // [OBSOLETE] if(DOS_Emin<=-999.9) DOS_Emin=DEFAULT_DOS_EMIN;
     // [OBSOLETE] if(DOS_Emax<=-999.9) DOS_Emax=DEFAULT_DOS_EMAX;
     // [OBSOLETE] if(DOSSCALE<=-999.9) DOSSCALE=DEFAULT_DOS_SCALE;
-    
+
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: directory=[" << directory << "]" << endl;
+      cerr << "pocc::POCC_SetOptions: directory=[" << directory << "]" << endl;
     }
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: T=" << T << endl;
+      cerr << "pocc::POCC_SetOptions: T=" << T << endl;
     }
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: DOS_Emin=" << DOS_Emin << endl;
+      cerr << "pocc::POCC_SetOptions: DOS_Emin=" << DOS_Emin << endl;
     }
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: DOS_Emax=" << DOS_Emax << endl;
+      cerr << "pocc::POCC_SetOptions: DOS_Emax=" << DOS_Emax << endl;
     }
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: DOSSCALE=" << DOSSCALE << endl;
+      cerr << "pocc::POCC_SetOptions: DOSSCALE=" << DOSSCALE << endl;
     }
 
     if(LDEBUG) {
-        cerr << "pocc::POCC_SetOptions: END" << endl;
+      cerr << "pocc::POCC_SetOptions: END" << endl;
     }
   }
 } // namespace pocc
@@ -3285,13 +3284,13 @@ namespace pocc {
       double delta_toten = vdelta_toten.at(i);
       DEi = vDE.at(i);
       if(NameDist=="B")  {
-          Fi = DEi*exp((-1.0)*delta_toten/(KBOLTZEV*T));    // Boltzmann distribution
+        Fi = DEi*exp((-1.0)*delta_toten/(KBOLTZEV*T));    // Boltzmann distribution
       }
       if(NameDist=="FD") {
-          Fi = DEi*1.0/(exp(delta_toten/(KBOLTZEV*T))+1.0); // Fermi-Dirac distribution
+        Fi = DEi*1.0/(exp(delta_toten/(KBOLTZEV*T))+1.0); // Fermi-Dirac distribution
       }
       if(NameDist=="BE") {
-          Fi = DEi*1.0/(exp(delta_toten/(KBOLTZEV*T))-1.0); // Bose-Einstein distribution
+        Fi = DEi*1.0/(exp(delta_toten/(KBOLTZEV*T))-1.0); // Bose-Einstein distribution
       }
       vFi.push_back(Fi);
     }
@@ -3314,8 +3313,8 @@ namespace pocc {
       vector<double> vtmp; vtmp.clear();
       vtmp.push_back(vva.at(i).at(0));
       for (uint j=1; j<vva.at(0).size();j=j+2) {
-	vtmp.push_back(vva.at(i).at(j+1)*(-1));   //exchange columns 1 and 2 spin_dn becomes spin_up
-	vtmp.push_back(vva.at(i).at(j)*(-1));   //spin_up becomes spin_dn
+        vtmp.push_back(vva.at(i).at(j+1)*(-1));   //exchange columns 1 and 2 spin_dn becomes spin_up
+        vtmp.push_back(vva.at(i).at(j)*(-1));   //spin_up becomes spin_dn
       }
       vvb.push_back(vtmp);
     }
@@ -3334,8 +3333,8 @@ namespace pocc {
       vector<double> vtmp; vtmp.clear();
       vtmp.push_back(vva.at(i).at(0));
       for (uint j=1; j<vva.at(i).size();j++) {
-	double tmp = 0.5*vva.at(i).at(j);  
-	vtmp.push_back(tmp); vtmp.push_back((-1)*tmp);
+        double tmp = 0.5*vva.at(i).at(j);  
+        vtmp.push_back(tmp); vtmp.push_back((-1)*tmp);
       }
       vvb.push_back(vtmp);
     }
@@ -3354,23 +3353,23 @@ namespace pocc {
     //weight
     for (uint i=0; i<vva.size();i++) {
       for (uint j=1; j<vva.at(i).size();j++) {
-	vva.at(i).at(j) *= weight;
+        vva.at(i).at(j) *= weight;
       }
     }
     //spin
     if(SPIN_FLAG) {
       if(TDOS.at(0).size()==3 || TDOS.at(0).size()==4) { //TDOS or TOTALPDOS, E, s, p, d
-	vvb = pocc::SpinSplitDOS(vva);
+        vvb = pocc::SpinSplitDOS(vva);
       } else if(TDOS.at(0).size()==5 && abs(mag) < 1E-6) { //must be TOTALPDOS: E, s, p, d, f, no-spin-polarized
-	vvb = pocc::SpinSplitDOS(vva);
+        vvb = pocc::SpinSplitDOS(vva);
       } else if((TDOS.at(0).size()==5) && ((-1)*mag > 1E-3 )) { //if magnetic moment is smaller than -0.001 and size is 5,  must be TDOS, 
-	vvb = SpinFlipDOS(vva);
+        vvb = SpinFlipDOS(vva);
       } else if((TDOS.at(0).size()==7) && ((-1)*mag > 1E-3 )) { //if magnetic moment is smaller than -0.001, size is 7, must be PDOS
-	vvb = SpinFlipDOS(vva);
+        vvb = SpinFlipDOS(vva);
       } else if((TDOS.at(0).size()==9) && ((-1)*mag > 1E-3 )) { //if magnetic moment is smaller than -0.001, size is 7, must be PDOS
-	vvb = SpinFlipDOS(vva);
+        vvb = SpinFlipDOS(vva);
       } else {
-	vvb = vva;
+        vvb = vva;
       }
     } else {
       vvb = vva;
@@ -3452,12 +3451,12 @@ void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE)
 namespace pocc {
   void POCC_GENERATE_DOSDATA(const string& directory, const double& T, vector<vector<double> >& TDOS_ONLY, vector<vector<double> >& PDOS_ONLY, vector<double>& POCC_Efermi, double& POCC_mag, double& Egap_net, vector<double>& Egap, vector<double>& vprob) {
     //Warnning: DOS is absolute value, no shift, and the output DOS, it is format is Energy, s, p, d, f, TDOS, TDOS_sum
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="pocc::POCC_GENERATE_DOSDATA():";
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     if(LDEBUG) {cerr << soliloquy << " directory=[" << directory << "]" << endl;}
- 
+
     string aflowin,MESSAGE="pocc::POCC_DOS ERROR";
     aflowin=string(directory +"/"+_AFLOWIN_);
     if(!aurostd::FileExist(aflowin)) {cerr << MESSAGE << ": file not found " << aflowin << endl; exit(1);}
@@ -3492,7 +3491,7 @@ namespace pocc {
       ostringstream aus;
       ofstream FileMESSAGE;
       //double kpt_tol;
-    
+
       bool found_ext=false;
       deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
       string outcar_file,doscar_file;
@@ -3501,13 +3500,13 @@ namespace pocc {
         found_ext=false;
         for(uint j=0;j<vext.size();j++){
           outcar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/OUTCAR.static"+vext[j]);
-	if(aurostd::FileExist(outcar_file)) {
-	  if(LDEBUG) {
-          aus << "00000  MESSAGE POCC OUTCAR file OK: " << outcar_file << " " << endl;
-      }
-	  if(LDEBUG) {
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      }
+          if(aurostd::FileExist(outcar_file)) {
+            if(LDEBUG) {
+              aus << "00000  MESSAGE POCC OUTCAR file OK: " << outcar_file << " " << endl;
+            }
+            if(LDEBUG) {
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            }
             voutcar_files.push_back(outcar_file);  // worse
             found_ext=true;
             break;
@@ -3515,21 +3514,21 @@ namespace pocc {
         }
         if(!found_ext){
           aus << "ERROR" << ": file not found " << aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/OUTCAR.static") << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  FLAG_ALLFILES_EXIST = false;
-	}
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          FLAG_ALLFILES_EXIST = false;
+        }
       }
       for(uint i=0;i<vrun.size();i++) {
         found_ext=false;
         for(uint j=0;j<vext.size();j++){
           doscar_file = aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/DOSCAR.static"+vext[j]);
-	if(aurostd::FileExist(doscar_file)) {
-	  if(LDEBUG) {
-          aus << "00000  MESSAGE POCC DOSCAR file OK: " << doscar_file << " " << endl;
-      }
-	  if(LDEBUG) {
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      }
+          if(aurostd::FileExist(doscar_file)) {
+            if(LDEBUG) {
+              aus << "00000  MESSAGE POCC DOSCAR file OK: " << doscar_file << " " << endl;
+            }
+            if(LDEBUG) {
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+            }
             vdoscar_files.push_back(doscar_file);
             found_ext=true;
             break;
@@ -3537,9 +3536,9 @@ namespace pocc {
         }
         if(!found_ext){
           aus << "ERROR" << ": file not found " << aurostd::CleanFileName(directory + "/ARUN."+vrun.at(i)+"/DOSCAR.static") << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  FLAG_ALLFILES_EXIST = false;
-	}
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          FLAG_ALLFILES_EXIST = false;
+        }
       }
       if(!FLAG_ALLFILES_EXIST) {exit(1);}
 
@@ -3548,69 +3547,69 @@ namespace pocc {
       vector<vector<double> > vEgap;
       bool POCC_SPIN_FLAG = false;  //default non-spin-polarized
       for (uint i=0; i<vrun.size();i++) {
-	if(LDEBUG) {
-        cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << endl;
-    }
-  //xstructure xstr=vxstr[i]; //CO 171002 - grab xstr's too
-  //CO 171002 - using tolerance from symmetry calc - START
-  //if(xstr.CalculateSymmetry()){kpt_tol=xstr.sym_eps;}
-  //else {kpt_tol=SYM::defaultTolerance(xstr);}
-  //CO 171002 - using tolerance from symmetry calc - STOP
+        if(LDEBUG) {
+          cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << endl;
+        }
+        //xstructure xstr=vxstr[i]; //CO 171002 - grab xstr's too
+        //CO 171002 - using tolerance from symmetry calc - START
+        //if(xstr.CalculateSymmetry()){kpt_tol=xstr.sym_eps;}
+        //else {kpt_tol=SYM::defaultTolerance(xstr);}
+        //CO 171002 - using tolerance from symmetry calc - STOP
 
-	xOUTCAR outcar_aus;
-	if(!outcar_aus.GetPropertiesFile(voutcar_files.at(i))){
-	  aus << "ERROR" << ": OUTCAR.static reading error " << outcar_aus.ERROR << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    exit(1);
-  }
-  double EFERMI=outcar_aus.Efermi;
-	outcar_aus.GetBandGap();
-	vions.push_back(outcar_aus.NIONS);
-	vtoten_per_atom.push_back(outcar_aus.enthalpy_atom);
-	vmag.push_back(outcar_aus.mag_cell);
-	string outcar_bands=voutcar_files.at(i);aurostd::StringSubst(outcar_bands,"static","bands");
-	if(aurostd::FileExist(outcar_bands)) {
-	  if(LDEBUG) {
-          cerr << "pocc::POCC_GENERATE_DOSDATA: loading outcar=" << outcar_bands << endl;
-      }
-	  outcar_aus.GetPropertiesFile(outcar_bands);
-	  outcar_aus.GetBandGap(EFERMI);
-	} 
-	vEgap_net.push_back(outcar_aus.Egap_net);
-	//	cerr << "CAMILO ??? outcar_aus.Egap.size()=" << outcar_aus.Egap.size() << endl;
-	vEgap.push_back(outcar_aus.Egap);
+        xOUTCAR outcar_aus;
+        if(!outcar_aus.GetPropertiesFile(voutcar_files.at(i))){
+          aus << "ERROR" << ": OUTCAR.static reading error " << outcar_aus.ERROR << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          exit(1);
+        }
+        double EFERMI=outcar_aus.Efermi;
+        outcar_aus.GetBandGap();
+        vions.push_back(outcar_aus.NIONS);
+        vtoten_per_atom.push_back(outcar_aus.enthalpy_atom);
+        vmag.push_back(outcar_aus.mag_cell);
+        string outcar_bands=voutcar_files.at(i);aurostd::StringSubst(outcar_bands,"static","bands");
+        if(aurostd::FileExist(outcar_bands)) {
+          if(LDEBUG) {
+            cerr << "pocc::POCC_GENERATE_DOSDATA: loading outcar=" << outcar_bands << endl;
+          }
+          outcar_aus.GetPropertiesFile(outcar_bands);
+          outcar_aus.GetBandGap(EFERMI);
+        } 
+        vEgap_net.push_back(outcar_aus.Egap_net);
+        //	cerr << "CAMILO ??? outcar_aus.Egap.size()=" << outcar_aus.Egap.size() << endl;
+        vEgap.push_back(outcar_aus.Egap);
 
-    if(LDEBUG||1) {
+        if(LDEBUG||1) {
           cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; DE=" << vDE[i] << "; NIONS=" << vions.at(i) << "; enthalpy_atom=" << vtoten_per_atom.at(i) << "; mag_cell=" << vmag.at(i) << "; Egap_net=" << vEgap_net.at(i) << endl;    // corey - should read out enthalpy/atom from STATIC, not BANDS
-    }
+        }
 
-//	if(LDEBUG||1) {
-//	cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; NIONS=" << outcar_aus.NIONS << "; enthalpy_atom=" << outcar_aus.enthalpy_atom << "; mag_cell=" << outcar_aus.mag_cell << "; Egap_net=" << outcar_aus.Egap_net << endl;   //corey
-//	}
+        //	if(LDEBUG||1) {
+        //	cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; NIONS=" << outcar_aus.NIONS << "; enthalpy_atom=" << outcar_aus.enthalpy_atom << "; mag_cell=" << outcar_aus.mag_cell << "; Egap_net=" << outcar_aus.Egap_net << endl;   //corey
+        //	}
       }
 
       int min_IONS = min(vions); 
       vector<double> vweight; //different ions in each structure
       for (uint i=0; i<vrun.size();i++) {   // will use this for DOS as it is extensive
-	vweight.push_back(double(1.0*min_IONS/vions.at(i))); //1.0 make int to double, otherwise it is zero!
+        vweight.push_back(double(1.0*min_IONS/vions.at(i))); //1.0 make int to double, otherwise it is zero!
       }
-  
+
       double min_toten = min(vtoten_per_atom);
       vector<double> vdelta_toten;
       for (uint i=0; i<vtoten_per_atom.size();i++) {
-	vdelta_toten.push_back(vtoten_per_atom.at(i) - min_toten);
+        vdelta_toten.push_back(vtoten_per_atom.at(i) - min_toten);
       }
-      
+
       // Calculate the probability boltzmann distribution
       vprob.clear(); 
       pocc::POCC_CalculateDistribution(vdelta_toten, vprob, T, "B", vDE); //Boltzmann
 
       if(0) { 
-	cerr << "check vprob: ";
-	for (uint i=0; i<vprob.size();i++) {
-        cerr << vprob.at(i) << " ";
-    }
-	cerr << " = " << aurostd::sum(vprob) << endl;// exit(0);
+        cerr << "check vprob: ";
+        for (uint i=0; i<vprob.size();i++) {
+          cerr << vprob.at(i) << " ";
+        }
+        cerr << " = " << aurostd::sum(vprob) << endl;// exit(0);
       }
 
       // vector<double> vmag_abs; 
@@ -3620,51 +3619,51 @@ namespace pocc {
 
       POCC_mag=0.0;
       for (uint i=0;i<vmag.size();i++) {
-	POCC_mag+=abs(vmag.at(i))*vprob.at(i); //Calculate average absolute magnetic moment
+        POCC_mag+=abs(vmag.at(i))*vprob.at(i); //Calculate average absolute magnetic moment
       }
-      
+
       Egap_net=0.0;
       for (uint i=0;i<vEgap_net.size();i++) {
-	Egap_net+=vEgap_net.at(i)*vprob.at(i); //Calculate average Egap_net
+        Egap_net+=vEgap_net.at(i)*vprob.at(i); //Calculate average Egap_net
       }
 
       Egap.clear();
       for(uint j=0;j<vEgap.at(0).size();j++) {
-	Egap.push_back(0);
-	for (uint i=0;i<vEgap.size();i++) {
-      //Calculate average Egap
-	  Egap.at(j)+=vEgap.at(0).at(j)*vprob.at(i);    //corey - otherwise, it crashes if you have Egap up AND Egap down (magnetized system)
-      //Egap.at(j)+=vEgap.at(i).at(j)*vprob.at(i);  //corey
-      }
+        Egap.push_back(0);
+        for (uint i=0;i<vEgap.size();i++) {
+          //Calculate average Egap
+          Egap.at(j)+=vEgap.at(0).at(j)*vprob.at(i);    //corey - otherwise, it crashes if you have Egap up AND Egap down (magnetized system)
+          //Egap.at(j)+=vEgap.at(i).at(j)*vprob.at(i);  //corey
+        }
       }
 
       // Get TDOS & TOTALPDOS DATA
       vector<vector<vector<double> > > POCC_TDOS, POCC_TOTALPDOS;
       for (uint i=0; i<vdoscar_files.size();i++) {
-	string doscar_file = vdoscar_files.at(i); stringstream ss_doscar; aurostd::efile2stringstream(doscar_file, ss_doscar); 
-	string outcar_file = voutcar_files.at(i); stringstream ss_outcar; aurostd::efile2stringstream(outcar_file, ss_outcar);
-	double Efermi; vector<vector<double> > TDOS, TOTALPDOS;
-  //CO 180218 - let's not mess around with kesong's functions too much
-  //for now, assume POCC runs have standard DOSCAR.static (PDOS in it)
-  //if no PDOS, exit
-  //I will fix later
-  if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
-    cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS, needed for POCC" << endl;
-    exit(1);
-  }
-  if(LDEBUG){
-    cerr << soliloquy << " TDOS.size()=" << TDOS.size() << endl;
-    for(uint i=0;i<TDOS.size();i++){
-      cerr << soliloquy << " TDOS[i=" << i << "].size()=" << TDOS[i].size() << endl;
-    }
-  }
-  //format TDOS, if spin and non-spin coexist, then format them into spin
-	vector<vector<double> > TDOSf, TOTALPDOSf;
-	TDOSf = pocc::POCC_Formalise(POCC_SPIN_FLAG, vweight.at(i), vmag.at(i), TDOS); 
-	TOTALPDOSf = pocc::POCC_Formalise(POCC_SPIN_FLAG, vweight.at(i), vmag.at(i), TOTALPDOS);
-	POCC_Efermi.push_back(Efermi);
-	POCC_TDOS.push_back(aurostd::ShiftFirstColumn(TDOSf, -1*Efermi)); //conver it into absolute value
-	POCC_TOTALPDOS.push_back(aurostd::ShiftFirstColumn(TOTALPDOSf, -1*Efermi));
+        string doscar_file = vdoscar_files.at(i); stringstream ss_doscar; aurostd::efile2stringstream(doscar_file, ss_doscar); 
+        string outcar_file = voutcar_files.at(i); stringstream ss_outcar; aurostd::efile2stringstream(outcar_file, ss_outcar);
+        double Efermi; vector<vector<double> > TDOS, TOTALPDOS;
+        //CO 180218 - let's not mess around with kesong's functions too much
+        //for now, assume POCC runs have standard DOSCAR.static (PDOS in it)
+        //if no PDOS, exit
+        //I will fix later
+        if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
+          cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS, needed for POCC" << endl;
+          exit(1);
+        }
+        if(LDEBUG){
+          cerr << soliloquy << " TDOS.size()=" << TDOS.size() << endl;
+          for(uint i=0;i<TDOS.size();i++){
+            cerr << soliloquy << " TDOS[i=" << i << "].size()=" << TDOS[i].size() << endl;
+          }
+        }
+        //format TDOS, if spin and non-spin coexist, then format them into spin
+        vector<vector<double> > TDOSf, TOTALPDOSf;
+        TDOSf = pocc::POCC_Formalise(POCC_SPIN_FLAG, vweight.at(i), vmag.at(i), TDOS); 
+        TOTALPDOSf = pocc::POCC_Formalise(POCC_SPIN_FLAG, vweight.at(i), vmag.at(i), TOTALPDOS);
+        POCC_Efermi.push_back(Efermi);
+        POCC_TDOS.push_back(aurostd::ShiftFirstColumn(TDOSf, -1*Efermi)); //conver it into absolute value
+        POCC_TOTALPDOS.push_back(aurostd::ShiftFirstColumn(TOTALPDOSf, -1*Efermi));
       }
 
       vector<vector<double> > POCC_TDOS_normalized = aurostd::NormalizeAndSum3DVector(POCC_TDOS, vprob);  //normalize TDOS
@@ -3740,14 +3739,14 @@ namespace pocc {
     ss_gnu << "set xrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     if(DOS.at(0).size()==10||(DOS.at(0).size()==12)) {
       if(DOSMAX*DOSSCALE!=0) {
-	ss_gnu << "set yrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
+        ss_gnu << "set yrange [" << DOSMAX*DOSSCALE*(-1) <<":"  << DOSMAX*DOSSCALE << "]" << endl;
       } else {
-	ss_gnu << "set yrange [0:2]" << endl;
+        ss_gnu << "set yrange [0:2]" << endl;
       }
     }
     if(DOS.at(0).size()==5||(DOS.at(0).size()==6)) {
       if(DOSMAX*DOSSCALE!=0) {
-	ss_gnu << "set yrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
+        ss_gnu << "set yrange [0:" << DOSMAX*DOSSCALE << "]" << endl;
       }
     }
     ss_gnu << endl;
@@ -3834,7 +3833,7 @@ namespace pocc {
     DOS_IDOS = aurostd::ShiftFirstColumn(DOS_IDOS, max(vEfermi)); //shift to Efermi
     if(LDEBUG) {cerr << soliloquy << " ShiftFirstColumn done" << endl;}
     double DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(DOS, DOS_Emin, DOS_Emax);
-    
+
     //write 2D vector into files
     vector<vector<double> >* p_DOS2FILE=&DOS;             //CO190808 - write out DOS_IDOS if desired
     if(PRINT_AVG_IDOS){p_DOS2FILE=&DOS_IDOS;}             //CO190808 - write out DOS_IDOS if desired
@@ -3879,18 +3878,18 @@ namespace pocc {
     //  cout << "Egap.size()=" << Egap.size() << endl;
     if(Egap.size() == 0) {  // CAMILO, can Egap have size = 0 ?? this is the <xOUTCAR.Egap> with vprob
       cout << "Temperature: " << Temperature 
-           << "  Egap_net:  " << Egap_net << endl ;
+        << "  Egap_net:  " << Egap_net << endl ;
     }
     if(Egap.size() == 1) {
       cout << "Temperature: " << Temperature 
-           << "  Egap up:  " << Egap.at(0) 
-           << "  Egap_net:  " << Egap_net << endl ;
+        << "  Egap up:  " << Egap.at(0) 
+        << "  Egap_net:  " << Egap_net << endl ;
     }
     if(Egap.size() == 2) {
       cout << "Temperature: " << Temperature 
-           << "  Egap up:  " << Egap.at(0) 
-           << "  Egap dn:  " << Egap.at(1) 
-           << "  Egap net: " << Egap_net << endl ;
+        << "  Egap up:  " << Egap.at(0) 
+        << "  Egap dn:  " << Egap.at(1) 
+        << "  Egap net: " << Egap_net << endl ;
     }
   }
 }
@@ -3923,32 +3922,32 @@ namespace pocc {
     end = b.end;
     length = b.length;
   }
-  
+
   void Bond::Set(xstructure xstr, _atom atomBGN, _atom atomEND) {
     xstr.ReScale(1.0); //safety
     bgn = atomBGN;
     end = atomEND;
     length = AtomDist(bgn, end);
   }
-  
+
   const Bond& Bond::operator=(const Bond& b) {
     if(this != &b) {copy(b);}
     return *this;
   }
-  
+
   bool Bond::operator==(const Bond &other) const {
     bool FLAG = false;
     if((SameAtom(bgn, other.end) && SameAtom(end, other.bgn)) ||
-       (SameAtom(bgn, other.bgn) && SameAtom(end, other.end))) {
-        FLAG=true;
+        (SameAtom(bgn, other.bgn) && SameAtom(end, other.end))) {
+      FLAG=true;
     }
     return FLAG;
   }
-  
+
   bool Bond::operator!=(const Bond &other) const {
     return !(*this == other);
   }
-  
+
   ostream& operator<<(ostream& os ,const Bond& bond) {
     cout << bond.bgn << endl;
     cout << bond.end << endl;
@@ -3966,12 +3965,12 @@ namespace pocc {
     for (uint i=1; i<Bonds_orig.size();i++) {
       uint j;
       for (j=0; j<Bonds_new.size();j++) {
-	if(Bonds_orig.at(i)==Bonds_new.at(j)) {
-	  break;
-	}
+        if(Bonds_orig.at(i)==Bonds_new.at(j)) {
+          break;
+        }
       }
       if(j==Bonds_new.size()) {
-	Bonds_new.push_back(Bonds_orig.at(i));
+        Bonds_new.push_back(Bonds_orig.at(i));
       }
     }
   }
@@ -4013,9 +4012,9 @@ namespace pocc {
   }   
 } // namespace pocc
 
-  // ***************************************************************************
-  // double pocc::CalculateBondEnergy(xstructure xstr, _atom atomi, _atom atomj)
-  // ***************************************************************************
+// ***************************************************************************
+// double pocc::CalculateBondEnergy(xstructure xstr, _atom atomi, _atom atomj)
+// ***************************************************************************
 namespace pocc {
   double CalculateBondEnergy(xstructure xstr, _atom atomi, _atom atomj) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO 180409
@@ -4040,9 +4039,9 @@ namespace pocc {
   }
 } // namespace pocc
 
-  // ***************************************************************************
-  // double pocc::CalculateNonBondEnergy(xstructure xstr, _atom atomi, _atom atomj)
-  // ***************************************************************************
+// ***************************************************************************
+// double pocc::CalculateNonBondEnergy(xstructure xstr, _atom atomi, _atom atomj)
+// ***************************************************************************
 namespace pocc {
   double CalculateNonBondEnergy(xstructure xstr, _atom atomi, _atom atomj) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO 180409
@@ -4081,9 +4080,9 @@ namespace pocc {
   }
 } // namespace pocc
 
-  // ***************************************************************************
-  // double pocc::CalculateUFFEnergy(xstructure xstr)
-  // ***************************************************************************
+// ***************************************************************************
+// double pocc::CalculateUFFEnergy(xstructure xstr)
+// ***************************************************************************
 namespace pocc {
   double CalculateUFFEnergy(xstructure xstr) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO 180409
@@ -4146,14 +4145,14 @@ namespace pocc {
 
     deque<_atom>  atom_tmp_bonded;
     deque<_atom>  atom_tmp_nonbonded;
-    
+
     if(LDEBUG) { //CO 180409
       cerr << "FULL " << endl;
       for(uint i=0;i<neigh_mat.size();i++){
         cerr << "i=" << i << " " << neigh_mat[i].size() << endl;
       }
     }
-    
+
     for(uint ia=0; ia<neigh_mat.size();ia++) {
       atom_tmp_bonded.clear(); atom_tmp_nonbonded.clear();
       _atom a = neigh_mat.at(ia).at(0);
@@ -4163,13 +4162,13 @@ namespace pocc {
 
       double dr0 = AtomDist(a,a1);
       for(uint in=2; in<neigh_mat.at(ia).size();in++) {
-	_atom an = neigh_mat.at(ia).at(in);
-	if(abs(AtomDist(a,an)-dr0)<0.5) {  
-	  atom_tmp_bonded.push_back(an);
-	}
-	else {
-	  atom_tmp_nonbonded.push_back(an);
-	}
+        _atom an = neigh_mat.at(ia).at(in);
+        if(abs(AtomDist(a,an)-dr0)<0.5) {  
+          atom_tmp_bonded.push_back(an);
+        }
+        else {
+          atom_tmp_nonbonded.push_back(an);
+        }
       }
       neigh_mat_bonded.push_back(atom_tmp_bonded);
       neigh_mat_nonbonded.push_back(atom_tmp_nonbonded);
@@ -4198,7 +4197,7 @@ namespace pocc {
     deque<deque<_atom> > neigh_mat_bonded;
     deque<deque<_atom> > neigh_mat_nonbonded;
     pocc::ExtractBonds(xstr, neigh_mat_bonded, neigh_mat_nonbonded);
-   
+
     //Bonds 
     vector<vector<Bond> > vv_xstrBonds;
     vector<Bond>  v_xstrBonds;
@@ -4206,18 +4205,18 @@ namespace pocc {
       _atom atomI=neigh_mat_bonded.at(i).at(0);
       v_xstrBonds.clear();
       for (uint j=1; j<neigh_mat_bonded.at(i).size();j++) {
-	_atom atomJ = neigh_mat_bonded.at(i).at(j);
-	Bond bondIJ; bondIJ.Set(xstr, atomI, atomJ);
-	v_xstrBonds.push_back(bondIJ);
+        _atom atomJ = neigh_mat_bonded.at(i).at(j);
+        Bond bondIJ; bondIJ.Set(xstr, atomI, atomJ);
+        v_xstrBonds.push_back(bondIJ);
       }
       vv_xstrBonds.push_back(v_xstrBonds);
     }
     for (uint i=0;i<vv_xstrBonds.size();i++) {
       for (uint j=0; j<vv_xstrBonds.at(i).size();j++) {
-	Bonds.push_back(vv_xstrBonds.at(i).at(j));
+        Bonds.push_back(vv_xstrBonds.at(i).at(j));
       }
     }
-    
+
     //NonBonds
     vector<vector<Bond> > vv_xstrNonBonds;
     vector<Bond>  v_xstrNonBonds;
@@ -4225,15 +4224,15 @@ namespace pocc {
       _atom atomI=neigh_mat_nonbonded.at(i).at(0);
       v_xstrNonBonds.clear();
       for (uint j=1; j<neigh_mat_nonbonded.at(i).size();j++) {
-	_atom atomJ = neigh_mat_nonbonded.at(i).at(j);
-	Bond bondIJ; bondIJ.Set(xstr, atomI, atomJ);
-	v_xstrNonBonds.push_back(bondIJ);
+        _atom atomJ = neigh_mat_nonbonded.at(i).at(j);
+        Bond bondIJ; bondIJ.Set(xstr, atomI, atomJ);
+        v_xstrNonBonds.push_back(bondIJ);
       }
       vv_xstrNonBonds.push_back(v_xstrNonBonds);
     }
     for (uint i=0;i<vv_xstrNonBonds.size();i++) {
       for (uint j=0; j<vv_xstrNonBonds.at(i).size();j++) {
-	NonBonds.push_back(vv_xstrNonBonds.at(i).at(j));
+        NonBonds.push_back(vv_xstrNonBonds.at(i).at(j));
       }
     }
   }
@@ -4479,7 +4478,7 @@ namespace pocc {
     else {return "Unknown";}                                                                                                    
   }                                                                                                                            
 } // namespace pocc                                                                                                            
-                                                                                                                               
+
 // ***************************************************************************                                                 
 // string pocc::ReturnUFFParameters(string atom)                                                                               
 // ***************************************************************************                                                 
@@ -4594,7 +4593,7 @@ namespace pocc {
     else {return "Unknown";}                                                                                                      
   }                                                                                                                             
 } // namespace pocc                                                                                                             
-                                                                                                                                
+
 // ***********************************************************************************************************************************************************
 // ***********************************************************************************************************************************************************
 // constructor for Class UFFPara                                                                                                
@@ -4747,7 +4746,7 @@ namespace pocc {
     //else {return "Hydrogen         H     1   1.007940   0.53    2.20     ";}                                        
     else {return "Unknown";}                                        
   }                                 
-                                    
+
   // ***********************************************************************************************************************************************************
   // Class for Atom                 
   Atom::Atom() {                     

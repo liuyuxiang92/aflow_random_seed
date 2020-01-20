@@ -13,18 +13,18 @@
 // ***************************************************************************
 namespace anrl { 
   uint PrototypeANRL_LoadList(vector<string>& vproto,
-			      vector<string>& vproto_label,
-			      vector<uint>& vproto_nspecies,
-			      vector<uint>& vproto_natoms,
-			      vector<uint>& vproto_spacegroup,
-			      vector<uint>& vproto_nunderscores,
-			      vector<uint>& vproto_nparameters,
-			      vector<string>& vproto_Pearson_symbol,
-			      vector<string>& vproto_params,
-			      vector<string>& vproto_Strukturbericht,
-			      vector<string>& vproto_prototype,
-			      vector<string>& vproto_dialect) {
-    
+      vector<string>& vproto_label,
+      vector<uint>& vproto_nspecies,
+      vector<uint>& vproto_natoms,
+      vector<uint>& vproto_spacegroup,
+      vector<uint>& vproto_nunderscores,
+      vector<uint>& vproto_nparameters,
+      vector<string>& vproto_Pearson_symbol,
+      vector<string>& vproto_params,
+      vector<string>& vproto_Strukturbericht,
+      vector<string>& vproto_prototype,
+      vector<string>& vproto_dialect) {
+
     vproto.clear();
     vproto_label.clear();
     vproto_nspecies.clear();
@@ -38,7 +38,7 @@ namespace anrl {
     vproto_prototype.clear();
     vproto_dialect.clear();
 
-    
+
     //Label     # of Species    # atoms/primcell    #space_group_number   # Underscores     # Parameters    pearson_symbol    params    Strukturbericht     Prototype   Dialect        
     // -------------------------------------------------------------------------
     // Part 1
@@ -639,7 +639,7 @@ namespace anrl {
     vproto.push_back("A2BCD4_tI16_82_ac_b_d_g;4;8;82;6;5;tI16;a,c/a,x5,y5,z5;-;Cu2(Zn,Fe)SnS4;Kesterite");
     //DX 20181211 - add Corey's kesterite structure - END
     // done now produce
-    
+
     // FROM PROTO LIST
     for(uint i=0;i<vproto.size();i++) {
       vproto_label.push_back("");
@@ -653,13 +653,13 @@ namespace anrl {
       vproto_Strukturbericht.push_back("");
       vproto_prototype.push_back("");
       vproto_dialect.push_back("");
-      
+
       anrl::vproto2tokens(vproto.at(i),
-			  vproto_label.at(i),vproto_nspecies.at(i),vproto_natoms.at(i),vproto_spacegroup.at(i),
-			  vproto_nunderscores.at(i),vproto_nparameters.at(i),vproto_Pearson_symbol.at(i),
-			  vproto_params.at(i),vproto_Strukturbericht.at(i),vproto_prototype.at(i),vproto_dialect.at(i));
+          vproto_label.at(i),vproto_nspecies.at(i),vproto_natoms.at(i),vproto_spacegroup.at(i),
+          vproto_nunderscores.at(i),vproto_nparameters.at(i),vproto_Pearson_symbol.at(i),
+          vproto_params.at(i),vproto_Strukturbericht.at(i),vproto_prototype.at(i),vproto_dialect.at(i));
     }
-    
+
     return vproto.size();
   }
 }
@@ -677,13 +677,13 @@ namespace anrl {
     //part2:0
     //part2:1
     //...
-    
+
     string function_name = "anrl::getANRLParameters()";
     stringstream message;
 
     vector<string> tokens;
     vector<string> vparameters;
-    
+
     string anrl_label = _anrl_label;
 
     // check if number suffix, i.e., predefined structure, with atomic volume scaling
@@ -693,7 +693,7 @@ namespace anrl {
       anrl_label = tokens[0];
       number_id = tokens[1];
     }
-    
+
     // add option to keep original scaling
     //bool keep_original_lattice_parameter = false;
 
@@ -3064,7 +3064,7 @@ namespace anrl {
       //DX 20190314 - loop over parameters - START
       for(uint p=0;p<vparameters.size();p++){
         aurostd::string2tokens(vparameters[p],tokens,",");
-      tokens[0]="-1";
+        tokens[0]="-1";
         vparameters[p]=aurostd::joinWDelimiter(tokens,",");
       }
       //DX 20190314 - loop over parameters - END

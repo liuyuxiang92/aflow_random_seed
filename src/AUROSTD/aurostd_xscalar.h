@@ -64,6 +64,14 @@
 #define atom2mol                6.0221408E23                    //CO 180329
 #define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO 180329
 
+//ME200107 - (A)APL conversion factors
+#define THz2Hz                      1E12
+#define Hz2THz                      1/THz2Hz
+#define au2THz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
+#define PLANCKSCONSTANT_hbar_THz    PLANCKSCONSTANT_hbar*THz2Hz // J/THz
+#define PLANCKSCONSTANTAMU_hbar_THz PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2THz)  // amu A^2 THz
+#define BEfactor_hbar_THz           PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
 
@@ -95,13 +103,13 @@
 
 //--------------------------------------------------------- extra on data types
 
-/* namespace aurostd { */
-/*   double atof(string str); */
-/*   int atoi(string str); */
-/*   long atol(string str); */
-/*   // long long atoll(string str); */
-/*   // long long atoq(string str); */
-/* } */
+// namespace aurostd {
+//   double atof(string str);
+//   int atoi(string str);
+//   long atol(string str);
+//   // long long atoll(string str);
+//   // long long atoq(string str);
+// }
 
 namespace aurostd {
   // namespace aurostd
@@ -137,7 +145,7 @@ namespace aurostd {
   void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance=0.01);  //CO191201
   void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO191201
   int LCM(int a,int b); //CO190520
-  
+
   template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;  //CO191201
   //bool isinteger(bool x,bool tolerance=(bool)0.01); //CO191201
   //bool isinteger(char x,char tolerance=(char)0.01); //CO191201
@@ -170,10 +178,10 @@ namespace aurostd {
   template<class utype> utype angle(utype,utype,utype,utype) __xprototype;
   template<class utype> utype modulus(utype,utype,utype) __xprototype;
   template<class utype> utype modulus(utype,utype) __xprototype;
-// [OBSOLETE]  template<class utype> utype round(utype) __xprototype;
-// [OBSOLETE]  template<class utype> utype floor(utype) __xprototype;
-// [OBSOLETE]  template<class utype> utype ceil(utype) __xprototype;
-// [OBSOLETE]  template<class utype> utype trunc(utype) __xprototype;
+  // [OBSOLETE]  template<class utype> utype round(utype) __xprototype;
+  // [OBSOLETE]  template<class utype> utype floor(utype) __xprototype;
+  // [OBSOLETE]  template<class utype> utype ceil(utype) __xprototype;
+  // [OBSOLETE]  template<class utype> utype trunc(utype) __xprototype;
 
   double ln(double);
   float lnf(float);
@@ -461,19 +469,18 @@ namespace aurostd {
   template<class utype> bool isdifferent(const utype&,const utype&) __xprototype;
   template<class utype> bool isequal(const utype&,const utype&,const utype&) __xprototype;
   template<class utype> bool isequal(const utype&,const utype&) __xprototype;
-  /* with utype
-     template<class utype> bool identical(utype,utype,utype) __xprototype;
-     template<class utype> bool identical(utype,utype) __xprototype;
-     template<class utype> bool isdifferent(utype,utype,utype) __xprototype;
-     template<class utype> bool isdifferent(utype,utype) __xprototype;
-     template<class utype> bool isequal(utype,utype,utype) __xprototype;
-     template<class utype> bool isequal(utype,utype) __xprototype;
-  */
+  // with utype
+  //template<class utype> bool identical(utype,utype,utype) __xprototype;
+  //template<class utype> bool identical(utype,utype) __xprototype;
+  //template<class utype> bool isdifferent(utype,utype,utype) __xprototype;
+  //template<class utype> bool isdifferent(utype,utype) __xprototype;
+  //template<class utype> bool isequal(utype,utype,utype) __xprototype;
+  //template<class utype> bool isequal(utype,utype) __xprototype;
 }
 
 //--------------------------------------------------------------- extra min/max // __XEXTRA_MINMAX_CPP
 namespace aurostd {
- // namespace aurostd
+  // namespace aurostd
   template<class utype> utype min(utype,utype) __xprototype;  // __XEXTRA_MINMAX_CPP
   template<class utype> utype min(utype,utype,utype) __xprototype;  // __XEXTRA_MINMAX_CPP
   template<class utype> utype min(utype,utype,utype,utype) __xprototype;  // __XEXTRA_MINMAX_CPP

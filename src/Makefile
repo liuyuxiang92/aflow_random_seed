@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
 
-VERSNUMBER=3.1.228
+VERSNUMBER=3.1.229
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -93,9 +93,9 @@ BACKUP=/common/AFLOW/SRC/
 
 # ME190823 - SQLite options
 # See https://www.sqlite.org/compile.html for compile-time options
-# The link recommends -DSQLITE-THREADSAFE=0, but that would disable
+# The link recommends -DSQLITE_THREADSAFE=0, but that would disable
 # all threading capabilities
-SQLITE_OPTS=-DSQLITE-THREADSAFE=1
+SQLITE_OPTS=-DSQLITE_THREADSAFE=1
 
 # Library MKL dynamic link
 #LIB_MKL= -L /opt/intel/mkl100/lib/32 -lmkl_lapack -lmkl_core -lmkl_intel -lmkl_sequential
@@ -830,8 +830,12 @@ APL/aflow_apl_pdisc.o: APL/aflow_apl_pdisc.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makef
 	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_pdisc.cpp -c
 	touch $@
 APL/aflow_aapl_tcond.o: APL/aflow_aapl_tcond.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_aapl_tcond.cpp -c
+#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_aapl_tcond.cpp -c
+# ME191212
+# Using -O3 and allowing inlining can significantly decrease runtime of the code.
+# It also decreases the file size of the binary by 120 kb.
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) -Wall -W -O3 -std=gnu++0x APL/aflow_aapl_tcond.cpp -c
 	touch $@
 APL/aflow_qha_dm_pdos_save.o: APL/aflow_qha_dm_pdos_save.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 #	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
@@ -1187,8 +1191,8 @@ aflowSYM_check:
 		if [ "$$ANSWER_PGROUPS" -ne "$$COUNT_PGROUPS" ] || [ "$$ANSWER_PGROUPKS" -ne "$$COUNT_PGROUPKS" ] || [ "$$ANSWER_FGROUPS" -ne "$$COUNT_FGROUPS" ] || [ "$$ANSWER_PGROUP_XTALS" -ne "$$COUNT_PGROUP_XTALS" ] || [ "$$ANSWER_PGROUPK_XTALS" -ne "$$COUNT_PGROUPK_XTALS" ] || [ "$$ANSWER_AGROUPS" -ne "$$COUNT_AGROUPS" ] || [ "$$ANSWER_SGROUPS" -ne "$$COUNT_SGROUPS" ]; then "aflowSYM did not return one of the correct group cardinalities for './aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only'; (ANSWER==FOUND) $$ANSWER_PGROUPS==$$COUNT_PGROUPS, $$ANSWER_PGROUPKS==$$COUNT_PGROUPKS, $$ANSWER_FGROUPS==$$COUNT_FGROUPS, $$ANSWER_PGROUP_XTALS==$$COUNT_PGROUP_XTALS, $$ANSWER_PGROUPK_XTALS==$$COUNT_PGROUPK_XTALS, $$ANSWER_AGROUPS==$$COUNT_AGROUPS, $$ANSWER_SGROUPS==$$COUNT_SGROUPS"  && exit 1; fi
 	@echo "aflowSYM test 1 passed!"
 aflow_xtal_match_check:
-	@echo "Running aflow_xtal_match test 1" && ANSWER=3 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
-		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_match did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
+	@echo "Running aflow_xtal_match test 1" && ANSWER=1 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
+		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_match did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
 	@echo "aflow_xtal_match test 1 passed!"
 www:	web
 clean:

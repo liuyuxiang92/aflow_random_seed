@@ -160,36 +160,36 @@ const SymmetryInformationITC& SymmetryInformationITC::operator=(const SymmetryIn
 
 // output
 ostream& operator<<(ostream& oss, const SymmetryInformationITC& SymmetryInformationITC){
- 
+
   oss << "SymmetryInformationITC: " << "Number of potential sym_mats: " << SymmetryInformationITC.sym_mats.size() << endl;
   oss << "SymmetryInformationITC: Cannot print all attributes; too much to print. Call attributes separately." << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "glideplanes: " << aurostd::joinWDelimiter(glideplanes,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "glideplanes_hex: " << aurostd::joinWDelimiter(glideplanes_hex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "glidetrans: " << aurostd::joinWDelimiter(glidetrans,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "glidetrans_hex: " << aurostd::joinWDelimiter(glidetrans_hex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "glidesymbols: " << aurostd::joinWDelimiter(glidesymbols,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "glidesymbols_hex: " << aurostd::joinWDelimiter(glidesymbols_hex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "index_cubic: " << aurostd::joinWDelimiter(index_cubic,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "index_hex: " << aurostd::joinWDelimiter(index_hex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "index_rhom: " << aurostd::joinWDelimiter(index_rhom,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "index_tetr: " << aurostd::joinWDelimiter(index_tetr,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "index_ortho: " << aurostd::joinWDelimiter(index_ortho,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "index_mono_b: " << aurostd::joinWDelimiter(index_mono_b,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "index_mono_c: " << aurostd::joinWDelimiter(index_mono_c,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "index_tric: " << aurostd::joinWDelimiter(index_tric,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "sym_mats: " << aurostd::joinWDelimiter(sym_mats,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "symbol: " << aurostd::joinWDelimiter(symbol,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "dirparam: " << aurostd::joinWDelimiter(dirparam,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "sym_mats_direction: " << aurostd::joinWDelimiter(sym_mats_direction,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "sym_mats_hex: " << aurostd::joinWDelimiter(sym_mats_hex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "symbol_hex: " << aurostd::joinWDelimiter(symbol_hex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "dirparam_hex: " << aurostd::joinWDelimiter(dirparam_hex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "sym_mats_direction_hex: " << aurostd::joinWDelimiter(sym_mats_direction_hex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "sym_ops: " << aurostd::joinWDelimiter(sym_ops,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "generators: " << aurostd::joinWDelimiter(generators,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "sgindex: " << aurostd::joinWDelimiter(sgindex,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]oss << "gl_sgs: " << aurostd::joinWDelimiter(gl_sgs,",") << endl;
-//DX 20190215 [TOO MUCH TO PRINT]
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "glideplanes: " << aurostd::joinWDelimiter(glideplanes,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "glideplanes_hex: " << aurostd::joinWDelimiter(glideplanes_hex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "glidetrans: " << aurostd::joinWDelimiter(glidetrans,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "glidetrans_hex: " << aurostd::joinWDelimiter(glidetrans_hex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "glidesymbols: " << aurostd::joinWDelimiter(glidesymbols,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "glidesymbols_hex: " << aurostd::joinWDelimiter(glidesymbols_hex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "index_cubic: " << aurostd::joinWDelimiter(index_cubic,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "index_hex: " << aurostd::joinWDelimiter(index_hex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "index_rhom: " << aurostd::joinWDelimiter(index_rhom,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "index_tetr: " << aurostd::joinWDelimiter(index_tetr,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "index_ortho: " << aurostd::joinWDelimiter(index_ortho,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "index_mono_b: " << aurostd::joinWDelimiter(index_mono_b,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "index_mono_c: " << aurostd::joinWDelimiter(index_mono_c,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "index_tric: " << aurostd::joinWDelimiter(index_tric,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "sym_mats: " << aurostd::joinWDelimiter(sym_mats,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "symbol: " << aurostd::joinWDelimiter(symbol,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "dirparam: " << aurostd::joinWDelimiter(dirparam,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "sym_mats_direction: " << aurostd::joinWDelimiter(sym_mats_direction,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "sym_mats_hex: " << aurostd::joinWDelimiter(sym_mats_hex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "symbol_hex: " << aurostd::joinWDelimiter(symbol_hex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "dirparam_hex: " << aurostd::joinWDelimiter(dirparam_hex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "sym_mats_direction_hex: " << aurostd::joinWDelimiter(sym_mats_direction_hex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "sym_ops: " << aurostd::joinWDelimiter(sym_ops,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "generators: " << aurostd::joinWDelimiter(generators,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "sgindex: " << aurostd::joinWDelimiter(sgindex,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]oss << "gl_sgs: " << aurostd::joinWDelimiter(gl_sgs,",") << endl;
+  //DX 20190215 [TOO MUCH TO PRINT]
   return oss;
 }
 //DX 20190215 - added new class - END
@@ -276,8 +276,8 @@ namespace SYM {
 namespace SYM{
   bool latticeVectorsSame(xvector<double>& a, xvector<double>& b, xvector<double>& c, double& tol) {
     return ((aurostd::abs(a(1) - b(1)) <= tol && aurostd::abs(a(2) - b(2)) <= tol && aurostd::abs(a(3) - b(3)) <= tol) ||
-            (aurostd::abs(a(1) - c(1)) <= tol && aurostd::abs(a(2) - c(2)) <= tol && aurostd::abs(a(3) - c(3)) <= tol) ||
-            (aurostd::abs(b(1) - c(1)) <= tol && aurostd::abs(b(2) - c(2)) <= tol && aurostd::abs(b(3) - c(3)) <= tol));
+        (aurostd::abs(a(1) - c(1)) <= tol && aurostd::abs(a(2) - c(2)) <= tol && aurostd::abs(a(3) - c(3)) <= tol) ||
+        (aurostd::abs(b(1) - c(1)) <= tol && aurostd::abs(b(2) - c(2)) <= tol && aurostd::abs(b(3) - c(3)) <= tol));
   }
 } //namespace SYM
 
@@ -467,7 +467,7 @@ namespace SYM {
 // ******************************************************************************
 namespace SYM {
   vector<vector<vector<string> > > getWyckoffLettersWithSameMultiplcityAndSiteSymmetry(uint& space_group_number, 
-                                   vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice){ 
+      vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice){ 
     // Get the set of Wyckoff letters with the same multiplicity and site symmetry
     bool LDEBUG=(false || XHOST.DEBUG);
 
@@ -490,7 +490,7 @@ namespace SYM {
       }
       grouped_possible_Wyckoff_letters.push_back(possible_Wyckoff_letters);
     }
- 
+
     // print
     if(LDEBUG) {
       for(uint i=0;i<grouped_possible_Wyckoff_letters.size();i++){
@@ -512,7 +512,7 @@ namespace SYM {
 // ******************************************************************************
 namespace SYM {
   vector<string> splitSiteSymmetry(const string& site_symmetry){ //DX 20190730 - added const
-    
+
     // Split the site symmetry symbol into its primary, secondary, and teriary
     // directions (see ITC-A pgs. 28-29 for site symmetry info).
 
@@ -524,7 +524,7 @@ namespace SYM {
       split_site_symmetry.push_back(site_symmetry);
       return split_site_symmetry;
     }
-    
+
     // if only primary direction (-1) or primary and secondary only (happens for rhl)
     if(site_symmetry.size()==2){
       // if inversion (-1)
@@ -546,7 +546,7 @@ namespace SYM {
       split_site_symmetry.push_back(site_symmetry);
       return split_site_symmetry;
     }
-    
+
     // if only primary and secondary direction with inversion 
     if(site_symmetry.size()==3 && aurostd::substring2bool(site_symmetry,"-")){
       if(site_symmetry[0]=='-'){
@@ -581,7 +581,7 @@ namespace SYM {
           }
         }
       }
-      
+
       // if two non-symmetry directions
       if(dot_index.size()==2){
         if(dot_direction[0]=="primary"){ 
@@ -888,7 +888,7 @@ namespace SYM {
     double out = infnorm<double>(vec);
     for (uint i = 0; i < vec.size(); i++) {
       if((vec[i] - min) > eps && vec[i] <= out) {
-	out = vec[i];
+        out = vec[i];
       }
     }
     return out;
@@ -906,11 +906,11 @@ namespace SYM {
     int index = 0; //DX 5/14/18 - added initialization 
     for (int i = 0; (uint)i < vec.size(); i++) {
       if((vec[i] - min) > eps && i != not_index1 && i != not_index2 && vec[i] <= out) {
-	out = vec[i];
-	index = i;
+        out = vec[i];
+        index = i;
       } else if(aurostd::abs(vec[i] - min) <= eps && i != not_index1 && i != not_index2) {
-	out = vec[i];
-	index = i;
+        out = vec[i];
+        index = i;
       }
     }
     return index;
@@ -925,12 +925,12 @@ namespace SYM {
     if(str.size() > 0) {
       uint i = str.size() - 1;
       while (str[i] == ' ') {
-	i--;
+        i--;
       }
       str.erase(i + 1, str.size() - 1);
       i = 0;
       while (str[i] == ' ') {
-	i++;
+        i++;
       }
       str.erase(0, i);
     }
@@ -947,16 +947,16 @@ namespace SYM {
     ostringstream oss;
     for (uint i = 0; i < str.size(); i += 0) {
       if(str[i] != ' ') {
-	oss << str[i];
+        oss << str[i];
       }
       if(i > 0 && str[i] == ' ') {
-	out.push_back(oss.str());
-	oss.str("");
-	while (str[i] == ' ') {
-	  i++;
-	}
+        out.push_back(oss.str());
+        oss.str("");
+        while (str[i] == ' ') {
+          i++;
+        }
       } else {
-	i++;
+        i++;
       }
     }
     return out;
@@ -974,16 +974,16 @@ namespace SYM {
     ostringstream oss;
     for (uint i = 0; i < str.size(); i += 0) {
       if(str[i] != c) {
-	oss << str[i];
+        oss << str[i];
       }
       if(i > 0 && str[i] == c) {
-	out.push_back(oss.str());
-	oss.str("");
-	while (str[i] == c) {
-	  i++;
-	}
+        out.push_back(oss.str());
+        oss.str("");
+        while (str[i] == c) {
+          i++;
+        }
       } else {
-	i++;
+        i++;
       }
     }
     return out;
@@ -1033,20 +1033,18 @@ namespace SYM {
   }
 } //namespace SYM
 
-/*
 // ******************************************************************************
 // DotPro (Modulus) (Overloaded)
 // ******************************************************************************
-namespace SYM {
-  double modulus(xvector<double> a) {
-    double out = 0.0;
-    for (uint i = 0; i < (uint)a.urows; i++) {
-      out += a(i + 1) * a(i + 1);
-    }
-    return sqrt(out);
-  }
-} //namespace SYM
-*/
+//namespace SYM {
+//double modulus(xvector<double> a) {
+//double out = 0.0;
+//for (uint i = 0; i < (uint)a.urows; i++) {
+//out += a(i + 1) * a(i + 1);
+//}
+//return sqrt(out);
+//}
+//} //namespace SYM
 
 // ******************************************************************************
 // swap_rows
@@ -1080,8 +1078,8 @@ namespace SYM {
     for (uint i = 0; i < a.size(); i++) {
       //    cerr << a[i] << " " <<  b[i] << endl;
       if(aurostd::abs(a[i] - b[i]) > epsilon) {
-	out = false;
-	break;
+        out = false;
+        break;
       }
     }
     return out;
@@ -1103,8 +1101,8 @@ namespace SYM {
     for (uint i = 1; i <= (uint)a.urows; i++) {
       //cerr << a[i] << " compared to " <<  b[i] << endl;
       if(aurostd::abs(a(i) - b(i)) > epsilon) {
-	out = false;
-	break;
+        out = false;
+        break;
       }
     }
     return out;
@@ -1123,51 +1121,51 @@ namespace SYM {
     xmatrix<double> tmp(rowCount, columnCount);
     for (uint r = 0; r < rowCount; r++) {
       if(columnCount <= lead) {
-	break;
+        break;
       }
       uint i = r;
       while (aurostd::abs(M(i + 1, lead)) < tol) {
-	i = i + 1;
-	if(rowCount == i) {
-	  i = r;
-	  lead = lead + 1;
-	  if(columnCount == lead) {
-	    break;
-	  }
-	}
+        i = i + 1;
+        if(rowCount == i) {
+          i = r;
+          lead = lead + 1;
+          if(columnCount == lead) {
+            break;
+          }
+        }
       }
       //Problem with lead +1 here
       if(lead != columnCount) {
-	swap_rows(M, i + 1, r + 1);
-	//bool consider_half = false;
-	double divisor = M(r + 1, lead);
-	if(aurostd::abs(M(r + 1, lead)) > tol) {
-	  for (uint ii = 1; ii <= columnCount; ii++) {
-	    M(r + 1, ii) = double(M(r + 1, ii) / divisor);
-	  }
-	} else {
-	  for (uint row = r + 1; row < rowCount; row++) {
-	    if(aurostd::abs(M(row, lead)) > tol) {
-	      swap_rows(M, r + 1, row);
-	      break;
-	    }
-	  }
-	  double divisor = M(r + 1, lead);
-	  for (uint ii = 1; ii <= columnCount; ii++) {
-	    M(r + 1, ii) = double(M(r + 1, ii) / divisor);
-	  }
-	}
-	for (uint i = 0; i < rowCount; i++) {
-	  if(i != r) {
-	    for (uint c = 1; c <= columnCount; c++) {
-	      tmp(i + 1, c) = M(i + 1, c) - M(i + 1, lead) * M(r + 1, c);
-	    }
-	    for (uint c = 1; c <= columnCount; c++) {
-	      M(i + 1, c) = tmp(i + 1, c);
-	    }
-	  }
-	}
-	lead = lead + 1;
+        swap_rows(M, i + 1, r + 1);
+        //bool consider_half = false;
+        double divisor = M(r + 1, lead);
+        if(aurostd::abs(M(r + 1, lead)) > tol) {
+          for (uint ii = 1; ii <= columnCount; ii++) {
+            M(r + 1, ii) = double(M(r + 1, ii) / divisor);
+          }
+        } else {
+          for (uint row = r + 1; row < rowCount; row++) {
+            if(aurostd::abs(M(row, lead)) > tol) {
+              swap_rows(M, r + 1, row);
+              break;
+            }
+          }
+          double divisor = M(r + 1, lead);
+          for (uint ii = 1; ii <= columnCount; ii++) {
+            M(r + 1, ii) = double(M(r + 1, ii) / divisor);
+          }
+        }
+        for (uint i = 0; i < rowCount; i++) {
+          if(i != r) {
+            for (uint c = 1; c <= columnCount; c++) {
+              tmp(i + 1, c) = M(i + 1, c) - M(i + 1, lead) * M(r + 1, c);
+            }
+            for (uint c = 1; c <= columnCount; c++) {
+              M(i + 1, c) = tmp(i + 1, c);
+            }
+          }
+        }
+        lead = lead + 1;
       }
     }
   }
@@ -1187,22 +1185,22 @@ namespace SYM {
     for (uint i = 1; i <= numRows; i++) {
       allzero = true;
       for (uint j = 1; j <= numCols - 1; j++) {
-	if(aurostd::abs(M(i, j)) > tol) {
-	  allzero = false;
-	}
+        if(aurostd::abs(M(i, j)) > tol) {
+          allzero = false;
+        }
       }
       if(allzero == true) {
-	if(aurostd::abs(M(i, numCols)) > tol && aurostd::abs(M(i, numCols)) < 1 - tol) {
-	  return false;
-	}
+        if(aurostd::abs(M(i, numCols)) > tol && aurostd::abs(M(i, numCols)) < 1 - tol) {
+          return false;
+        }
       }
     }
     for (uint i = 1; i <= numRows; i++) {
       for (uint j = 1; j <= numCols - 1; j++) {
-	if(aurostd::abs(M(i, j) - 1) < tol) {
-	  tmp(j) = M(i, numCols);
-	  break;
-	}
+        if(aurostd::abs(M(i, j) - 1) < tol) {
+          tmp(j) = M(i, numCols);
+          break;
+        }
       }
     }
 
@@ -1227,22 +1225,22 @@ namespace SYM {
       allzero = true;
       int xyz = 0;
       for (uint j = 1; j <= numCols; j++) {
-	if(aurostd::abs(LHS[i][j]) > tol) {
-	  allzero = false;
-	  break;
-	}
+        if(aurostd::abs(LHS[i][j]) > tol) {
+          allzero = false;
+          break;
+        }
       }
       if(allzero == true) {
-	xyz = i % 3 + 1;
-	if(aurostd::abs(RHS[i]) > tol) {
-	  // Check if adding lattice vector components makes the RHS zero.
-	  if(aurostd::abs(aurostd::abs(RHS[i]) - aurostd::abs(lattice(1)[xyz])) < tol ||
-	      aurostd::abs(aurostd::abs(RHS[i]) - aurostd::abs(lattice(2)[xyz])) < tol ||
-	      aurostd::abs(aurostd::abs(RHS[i]) - aurostd::abs(lattice(3)[xyz])) < tol) {
-	    continue;
-	  }
-	  return false;
-	}
+        xyz = i % 3 + 1;
+        if(aurostd::abs(RHS[i]) > tol) {
+          // Check if adding lattice vector components makes the RHS zero.
+          if(aurostd::abs(aurostd::abs(RHS[i]) - aurostd::abs(lattice(1)[xyz])) < tol ||
+              aurostd::abs(aurostd::abs(RHS[i]) - aurostd::abs(lattice(2)[xyz])) < tol ||
+              aurostd::abs(aurostd::abs(RHS[i]) - aurostd::abs(lattice(3)[xyz])) < tol) {
+            continue;
+          }
+          return false;
+        }
       }
     }
 
@@ -1250,20 +1248,20 @@ namespace SYM {
     for (uint v = 0; v < LHS.size(); v++) {
       int xyz_v = v % 3 + 1;
       for (uint u = v + 1; u < LHS.size(); u++) {
-	int xyz_u = u % 3 + 1;
-	if(aurostd::abs(LHS[v][1] - LHS[u][1]) < tol && aurostd::abs(LHS[v][2] - LHS[u][2]) < tol && aurostd::abs(LHS[v][3] - LHS[u][3]) < tol) {
-	  if(aurostd::abs(RHS[v] - RHS[u]) > tol) {
-	    if(aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(1)[xyz_v])) < tol ||
-		aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(2)[xyz_v])) < tol ||
-		aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(3)[xyz_v])) < tol ||
-		aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(1)[xyz_u])) < tol ||
-		aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(2)[xyz_u])) < tol ||
-		aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(3)[xyz_u])) < tol) {
-	      continue;
-	    }
-	    return false;
-	  }
-	}
+        int xyz_u = u % 3 + 1;
+        if(aurostd::abs(LHS[v][1] - LHS[u][1]) < tol && aurostd::abs(LHS[v][2] - LHS[u][2]) < tol && aurostd::abs(LHS[v][3] - LHS[u][3]) < tol) {
+          if(aurostd::abs(RHS[v] - RHS[u]) > tol) {
+            if(aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(1)[xyz_v])) < tol ||
+                aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(2)[xyz_v])) < tol ||
+                aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(3)[xyz_v])) < tol ||
+                aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(1)[xyz_u])) < tol ||
+                aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(2)[xyz_u])) < tol ||
+                aurostd::abs(aurostd::abs(RHS[v] - RHS[u]) - aurostd::abs(lattice(3)[xyz_u])) < tol) {
+              continue;
+            }
+            return false;
+          }
+        }
       }
     }
     return true;
@@ -1315,13 +1313,13 @@ namespace SYM {
       rhs_tmp(3) = RHS[i + 2];
       xvector<double> rhs_cart_xvec = f2c * rhs_tmp;
       if(skew) {
-	      xvector<double> origin;
-	      rhs_cart_xvec = SYM::minimizeDistanceCartesianMethod(origin, rhs_cart_xvec, lattice); //DX 20190613
-	      //DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(origin, rhs_cart_xvec, rhs_tmp, c2f, f2c, tol); //DX 20190215
+        xvector<double> origin;
+        rhs_cart_xvec = SYM::minimizeDistanceCartesianMethod(origin, rhs_cart_xvec, lattice); //DX 20190613
+        //DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(origin, rhs_cart_xvec, rhs_tmp, c2f, f2c, tol); //DX 20190215
       } else {
         xvector<double> rhs_frac_xvec = SYM::minimizeDistanceFractionalMethod(rhs_tmp); //DX 20190613
         rhs_cart_xvec = f2c * rhs_frac_xvec; //DX 20190718 - rhs_frac_xvec not rhs_tmp //DX 20190613
-	      //DX 20190613 [OBSOLETE] SYM::PBC(rhs_tmp);
+        //DX 20190613 [OBSOLETE] SYM::PBC(rhs_tmp);
       }
       //DX 20190613 [OBSOLETE] rhs_cart_xvec = f2c * rhs_tmp;
       RHS_cart.push_back(rhs_cart_xvec(1));
@@ -1336,47 +1334,47 @@ namespace SYM {
     //extract three linearly independent vectors
     for (uint i = 0; i < LHS.size(); i++) {
       for (uint j = 1; j < LHS.size(); j++) {
-	for (uint k = 2; k < LHS.size(); k++) {
-	  firstLI = xvec2xmat(LHS[i], LHS[j], LHS[k]);
-	  if(aurostd::abs(aurostd::determinant(firstLI)) > 1e-10) {
-	    underdetermined = false;
-	    f1 = i;
-	    f2 = j;
-	    f3 = k;
-	    i = LHS_cart.size();
-	    j = LHS_cart.size();
-	    k = LHS_cart.size();
-	  }
-	}
+        for (uint k = 2; k < LHS.size(); k++) {
+          firstLI = xvec2xmat(LHS[i], LHS[j], LHS[k]);
+          if(aurostd::abs(aurostd::determinant(firstLI)) > 1e-10) {
+            underdetermined = false;
+            f1 = i;
+            f2 = j;
+            f3 = k;
+            i = LHS_cart.size();
+            j = LHS_cart.size();
+            k = LHS_cart.size();
+          }
+        }
       }
     }
     if(underdetermined == true) {
       //cerr << "underdetermined" << endl;
       //exists some freedom in selection of origin
       if(!checkLinearSystem(LHS_cart, RHS_cart, lattice,tol)) { //DX 20190215
-	//cerr << "NULL VECTORS GIVE NONZERO AUGMENTED PART!!!" << endl;
-	return false;
+        //cerr << "NULL VECTORS GIVE NONZERO AUGMENTED PART!!!" << endl;
+        return false;
       }
       // Need to check different cells (add integers to RHS) since this is a periodic linear system
       for (uint i = 0; i < 3; i++) {
-	for (uint j = 0; j < 3; j++) {
-	  for (uint k = 0; k < 3; k++) {
-	    vector<double> dS_mod = RHS;
-	    dS_mod[0] = RHS[0] + double(i);
-	    dS_mod[1] = RHS[1] + double(j);
-	    dS_mod[2] = RHS[2] + double(k);
-	    xmatrix<double> coeff_xmat = xvec2xmat(LHS, dS_mod);
-	    //cerr << "coeff (before): " << endl;
-	    //cerr << coeff_xmat << endl;
-	    ReducedRowEchelonForm(coeff_xmat,tol);
-	    //cerr << "coeff (after): " << endl;
-	    //cerr << coeff_xmat << endl;
-	    if(find_solution_UD(coeff_xmat, SOL, tol)) { //DX 20190215
-	      //cerr << "found sol: " << SOL << endl;
-	      return true;
-	    }
-	  }
-	}
+        for (uint j = 0; j < 3; j++) {
+          for (uint k = 0; k < 3; k++) {
+            vector<double> dS_mod = RHS;
+            dS_mod[0] = RHS[0] + double(i);
+            dS_mod[1] = RHS[1] + double(j);
+            dS_mod[2] = RHS[2] + double(k);
+            xmatrix<double> coeff_xmat = xvec2xmat(LHS, dS_mod);
+            //cerr << "coeff (before): " << endl;
+            //cerr << coeff_xmat << endl;
+            ReducedRowEchelonForm(coeff_xmat,tol);
+            //cerr << "coeff (after): " << endl;
+            //cerr << coeff_xmat << endl;
+            if(find_solution_UD(coeff_xmat, SOL, tol)) { //DX 20190215
+              //cerr << "found sol: " << SOL << endl;
+              return true;
+            }
+          }
+        }
       }
       return false;
     }
@@ -1389,51 +1387,51 @@ namespace SYM {
     // Need to check different cells (add integers to RHS) since this is a periodic linear system
     for (uint i = 0; i < 3; i++) {
       for (uint j = 0; j < 3; j++) {
-	for (uint k = 0; k < 3; k++) {
-	  xvector<double> dS_mod;
-	  dS_mod(1) = dS(1) + double(i);
-	  dS_mod(2) = dS(2) + double(j);
-	  dS_mod(3) = dS(3) + double(k);
-	  //Do you need to put a pseudoinverse here (use SVD)
-	  xvector<double> origin_shift = aurostd::inverse(firstLI) * dS_mod;
-	  bool found = true;
-	  for (uint ii = 0; ii < LHS_cart.size(); ii += 3) {
-	    xvector<double> coord;
-	    coord(1) = DotPro(LHS[ii], origin_shift) - RHS[ii];
-	    coord(2) = DotPro(LHS[ii + 1], origin_shift) - RHS[ii + 1];
-	    coord(3) = DotPro(LHS[ii + 2], origin_shift) - RHS[ii + 2];
-      double min_dist = 1e9; //DX 20190613
-	    if(skew) {
-	      xvector<double> origin;
-	      xvector<double> coord_cart = f2c * coord;
-	      xvector<double> min_coord_cart = SYM::minimizeDistanceCartesianMethod(origin, coord_cart, lattice); //DX 20190613
-         min_dist = aurostd::modulus(min_coord_cart); //DX 20190613
-	      //DX 20190613 [OBSOLETE] if(!SYM::minimizeCartesianDistance(origin, coord_cart, coord, c2f, f2c, tol)) { //DX 20190215
-	      //DX 20190613 [OBSOLETE]   found = false;
-	      //DX 20190613 [OBSOLETE]   break;
-	      //DX 20190613 [OBSOLETE] }
-	    } else {
-        xvector<double> min_frac_coord = SYM::minimizeDistanceFractionalMethod(coord); //DX 20190613
-        min_dist = aurostd::modulus(f2c * min_frac_coord); //DX 20190613
-	      //DX 20190613 [OBSOLETE] SYM::PBC(coord);
-	      //DX 20190613 [OBSOLETE] if(aurostd::modulus(f2c * coord) > tol) {
-	      //DX 20190613 [OBSOLETE]   found = false;
-	      //DX 20190613 [OBSOLETE]   break;
-	      //DX 20190613 [OBSOLETE] }
-	      }
+        for (uint k = 0; k < 3; k++) {
+          xvector<double> dS_mod;
+          dS_mod(1) = dS(1) + double(i);
+          dS_mod(2) = dS(2) + double(j);
+          dS_mod(3) = dS(3) + double(k);
+          //Do you need to put a pseudoinverse here (use SVD)
+          xvector<double> origin_shift = aurostd::inverse(firstLI) * dS_mod;
+          bool found = true;
+          for (uint ii = 0; ii < LHS_cart.size(); ii += 3) {
+            xvector<double> coord;
+            coord(1) = DotPro(LHS[ii], origin_shift) - RHS[ii];
+            coord(2) = DotPro(LHS[ii + 1], origin_shift) - RHS[ii + 1];
+            coord(3) = DotPro(LHS[ii + 2], origin_shift) - RHS[ii + 2];
+            double min_dist = 1e9; //DX 20190613
+            if(skew) {
+              xvector<double> origin;
+              xvector<double> coord_cart = f2c * coord;
+              xvector<double> min_coord_cart = SYM::minimizeDistanceCartesianMethod(origin, coord_cart, lattice); //DX 20190613
+              min_dist = aurostd::modulus(min_coord_cart); //DX 20190613
+              //DX 20190613 [OBSOLETE] if(!SYM::minimizeCartesianDistance(origin, coord_cart, coord, c2f, f2c, tol)) { //DX 20190215
+              //DX 20190613 [OBSOLETE]   found = false;
+              //DX 20190613 [OBSOLETE]   break;
+              //DX 20190613 [OBSOLETE] }
+            } else {
+              xvector<double> min_frac_coord = SYM::minimizeDistanceFractionalMethod(coord); //DX 20190613
+              min_dist = aurostd::modulus(f2c * min_frac_coord); //DX 20190613
+              //DX 20190613 [OBSOLETE] SYM::PBC(coord);
+              //DX 20190613 [OBSOLETE] if(aurostd::modulus(f2c * coord) > tol) {
+              //DX 20190613 [OBSOLETE]   found = false;
+              //DX 20190613 [OBSOLETE]   break;
+              //DX 20190613 [OBSOLETE] }
+            }
             //DX 20190613 - move loop outside if-statements - START
             if(min_dist > tol){
-		found = false;
-		break;
-	      }
+              found = false;
+              break;
+            }
             //DX 20190613 - move loop outside if-statements - END
-	  }
-	  if(found == true) {
-	    //cerr << "FOUND CART" << endl;
-	    SOL = origin_shift;
-	    return true;
-	  }
-	}
+          }
+          if(found == true) {
+            //cerr << "FOUND CART" << endl;
+            SOL = origin_shift;
+            return true;
+          }
+        }
       }
     }
     return false;
@@ -1444,24 +1442,22 @@ namespace SYM {
 // mod_one (Modify double by 1; to keep in unit cell)
 // ******************************************************************************
 // DX OBSOLETE? 9/8/17
-/*
-namespace SYM {
-  double mod_one(double d) {
-    //double delta=1e-6;
-    if(d == INFINITY || d != d || d == -INFINITY) {
-      cerr << "ERROR: (+-)INF or NAN value" << endl;
-      return d;
-    }
-    while (d >= 1 - _ZERO_TOL_ || aurostd::abs(d - 1) < _ZERO_TOL_) {
-      d = d - 1;
-    }
-    while (d < -_ZERO_TOL_) {
-      d = d + 1;
-    }
-    return d;
-  }
-} //namespace SYM
-*/
+//namespace SYM {
+//double mod_one(double d) {
+////double delta=1e-6;
+//if(d == INFINITY || d != d || d == -INFINITY) {
+//cerr << "ERROR: (+-)INF or NAN value" << endl;
+//return d;
+//}
+//while (d >= 1 - _ZERO_TOL_ || aurostd::abs(d - 1) < _ZERO_TOL_) {
+//d = d - 1;
+//}
+//while (d < -_ZERO_TOL_) {
+//d = d + 1;
+//}
+//return d;
+//}
+//} //namespace SYM
 
 // ******************************************************************************
 // get_symmetry_symbols
@@ -1478,23 +1474,24 @@ namespace SYM {
 
     for (uint i = 0; i < sg.length(); i++) {
       if(sg[i] == 0x0a) {
-	i++;
-	line++;
-	//add = true;
-	//tmp.clear();
+        i++;
+        line++;
+        //add = true;
+        //tmp.clear();
       }
-      if(line > 1) {  // && add == true){
-	if(sg[i] != '(') {
-	  tmp << sg[i];
-	  //cerr << sg[i] << " ";
-	} else {
-	  out.push_back(tmp.str());
-	  tmp.str("");
-	  //add = false;
-	  while (sg[i + 1] != 0x0a) {
-	    i++;
-	  }
-	}
+      if(line > 1)  // && add == true)
+      { //CO200106 - patching for auto-indenting
+        if(sg[i] != '(') {
+          tmp << sg[i];
+          //cerr << sg[i] << " ";
+        } else {
+          out.push_back(tmp.str());
+          tmp.str("");
+          //add = false;
+          while (sg[i + 1] != 0x0a) {
+            i++;
+          }
+        }
       }
     }
     return out;
@@ -1512,35 +1509,35 @@ namespace SYM {
     int mult_factor = 0;
     for (uint i = 0; i < sg.length(); i++) {
       if(sg[i] == 0x0a)
-	line++;
+        line++;
       if(line == 2)
-	break;
+        break;
       if(sg[i] == '(')
-	mult_factor++;
+        mult_factor++;
     }
     line = 0;
     ostringstream temp;
     for (uint i = 0; i < sg.length(); i++) {
       if(sg[i] == 0x0a)
-	line++;
+        line++;
       if(line > 1) {
-	ostringstream mult;
-	temp << sg[i];
-	if(sg[i] == 0x0a) {
-	  temp << temp.str() << endl;
-	  if(temp.str()[3] != ' ') {
-	    mult << temp.str()[1] << temp.str()[2] << temp.str()[3] << endl;
-	    wyckoff_multiplicities.push_back(atoi(mult.str().c_str()));
-	  } else if(temp.str()[2] != ' ') {
-	    mult << temp.str()[1] << temp.str()[2] << endl;
-	    wyckoff_multiplicities.push_back(atoi(mult.str().c_str()));
-	  } else {
-	    mult << temp.str()[1] << endl;
-	    //	  cerr << atoi(mult.str().c_str()) << endl;
-	    wyckoff_multiplicities.push_back(atoi(mult.str().c_str()));
-	  }
-	  temp.str("");
-	}
+        ostringstream mult;
+        temp << sg[i];
+        if(sg[i] == 0x0a) {
+          temp << temp.str() << endl;
+          if(temp.str()[3] != ' ') {
+            mult << temp.str()[1] << temp.str()[2] << temp.str()[3] << endl;
+            wyckoff_multiplicities.push_back(atoi(mult.str().c_str()));
+          } else if(temp.str()[2] != ' ') {
+            mult << temp.str()[1] << temp.str()[2] << endl;
+            wyckoff_multiplicities.push_back(atoi(mult.str().c_str()));
+          } else {
+            mult << temp.str()[1] << endl;
+            //	  cerr << atoi(mult.str().c_str()) << endl;
+            wyckoff_multiplicities.push_back(atoi(mult.str().c_str()));
+          }
+          temp.str("");
+        }
       }
     }
     return wyckoff_multiplicities;
@@ -1570,26 +1567,26 @@ namespace SYM {
       //    }
       //cerr << spaceg[i+1] << endl;
       if(spaceg[i] != ',' && spaceg[i] != ')' && spaceg[i] != '(' && spaceg[i] != ' ') {
-	if(spaceg[i] == '.') {
-	  os << spaceg[i];
-	  i++;
-	  os << spaceg[i];
-	  triplet.push_back(os.str());
-	} else if(spaceg[i + 1] == '/') {
-	  os << spaceg[i];
-	  os << spaceg[i + 1];
-	  os << spaceg[i + 2];
-	  i += 2;
-	  triplet.push_back(os.str());
-	} else {
-	  os << spaceg[i];
-	  triplet.push_back(os.str());
-	}
+        if(spaceg[i] == '.') {
+          os << spaceg[i];
+          i++;
+          os << spaceg[i];
+          triplet.push_back(os.str());
+        } else if(spaceg[i + 1] == '/') {
+          os << spaceg[i];
+          os << spaceg[i + 1];
+          os << spaceg[i + 2];
+          i += 2;
+          triplet.push_back(os.str());
+        } else {
+          os << spaceg[i];
+          triplet.push_back(os.str());
+        }
       }
       os.str("");
       if(triplet.size() == 3) {  //3 Dimensions
-	centering.push_back(triplet);
-	triplet.clear();
+        centering.push_back(triplet);
+        triplet.clear();
       }
       i++;
     }
@@ -1627,8 +1624,8 @@ namespace SYM{
         if(enumerated_letter<min_enumerated_letter){
           bool contains_variable = false;
           if(aurostd::substring2bool(positions[j], "x") || 
-             aurostd::substring2bool(positions[j], "y") || 
-             aurostd::substring2bool(positions[j], "z")){
+              aurostd::substring2bool(positions[j], "y") || 
+              aurostd::substring2bool(positions[j], "z")){
             contains_variable = true;
           }
           bool found_minimum_letter = false;
@@ -1694,7 +1691,7 @@ namespace SYM {
     int wyckoff_number = 0;
     for (uint a = 0; a < 28; a++) {
       if(wyckoff_letter == alpha_numeric[a].letter) {
-	wyckoff_number = alpha_numeric[a].number;
+        wyckoff_number = alpha_numeric[a].number;
       }
     }
     return wyckoff_number;
@@ -1725,26 +1722,26 @@ namespace SYM {
     int line = 0;
     for (uint i = 0; i < spaceg.length(); i++) {
       if(spaceg[i] == 0x0a)
-	line++;
+        line++;
       if(line > 1) {
-	temp << spaceg[i];
-	if(spaceg[i] == 0x0a) {
-	  string multiplicity, letter, site_symm, pos;
-	  temp >> multiplicity;
-	  temp >> letter;
-	  temp >> site_symm;
+        temp << spaceg[i];
+        if(spaceg[i] == 0x0a) {
+          string multiplicity, letter, site_symm, pos;
+          temp >> multiplicity;
+          temp >> letter;
+          temp >> site_symm;
           int tmp_mult = atoi(multiplicity.c_str());
           for(int m=0;m<tmp_mult;m++){
-	    temp >> pos;
+            temp >> pos;
             positions.push_back(pos);
           }
-	  if(atoi(multiplicity.c_str()) == mult && site_symm == site_symmetry) {
-	    all_positions.push_back(positions);
-	  }
+          if(atoi(multiplicity.c_str()) == mult && site_symm == site_symmetry) {
+            all_positions.push_back(positions);
+          }
           positions.clear();
-	  temp.str(std::string());
-	  temp.clear();
-	}
+          temp.str(std::string());
+          temp.clear();
+        }
       }
     }
   }
@@ -1757,7 +1754,7 @@ namespace SYM {
 namespace SYM {
   void get_Wyckoff_from_letter(uint space_group_number, string& space_group_setting, 
       string& Wyckoff_letter, uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions){
-    
+
     SymmetryInformationITC ITC_sym_info;
     ITC_sym_info.initsgs(space_group_setting);
     string spacegroupstring = ITC_sym_info.gl_sgs[space_group_number - 1];
@@ -1776,10 +1773,10 @@ namespace SYM {
     int line = 0;
     for (uint i = 0; i < spaceg.length(); i++) {
       if(spaceg[i] == 0x0a){
-	      line++;
+        line++;
       }
       if(line > 1) {
-	      temp << spaceg[i];
+        temp << spaceg[i];
         if(spaceg[i] == 0x0a) {
           string multiplicity, letter, site_symm, pos;
           temp >> multiplicity;
@@ -1795,11 +1792,11 @@ namespace SYM {
             break;
           }
           else {
-	          temp.str(std::string());
-	          temp.clear();
+            temp.str(std::string());
+            temp.clear();
             continue;
           }
-	}
+        }
       }
     }
   }
@@ -1843,38 +1840,37 @@ namespace SYM {
       coord++; 
     }
 
-    /*
-    stringstream ss_double;
-    string tmp_num;
-    int coord = 1;
-    for (uint i=0; i<string_postition.size(); i++) {
-      if(string_postition[i] != '(' && 
-         string_postition[i] != ',' && 
-         string_postition[i] != ')'){
-        ss_double << string_postition[i];
-      }
-      if(string_postition[i] == ',' || 
-         string_postition[i] == ')'){
-        ss_double >> tmp_num;
-        ss_double.str(std::string());
-        ss_double.clear();
-        // account for Wyckoff position as a fraction
-        if(tmp_num.find("/") != std::string::npos){
-          vector<string> tokens;
-          aurostd::string2tokens(tmp_num,tokens,"/");
-          if(tokens.size()==2){
-            double numerator = aurostd::string2utype<double>(tokens[0]);
-            double denominator = aurostd::string2utype<double>(tokens[1]);
-            vector_position[coord] = numerator/denominator;
-          }
-        }
-        else {
-          vector_position[coord] = aurostd::string2utype<double>(tmp_num);
-        }
-        coord++;
-      }
-    }
-    */
+    //stringstream ss_double;
+    //string tmp_num;
+    //int coord = 1;
+    //for (uint i=0; i<string_postition.size(); i++) {
+    //if(string_postition[i] != '(' && 
+    //string_postition[i] != ',' && 
+    //string_postition[i] != ')'){
+    //ss_double << string_postition[i];
+    //}
+    //if(string_postition[i] == ',' || 
+    //string_postition[i] == ')'){
+    //ss_double >> tmp_num;
+    //ss_double.str(std::string());
+    //ss_double.clear();
+    //// account for Wyckoff position as a fraction
+    //if(tmp_num.find("/") != std::string::npos){
+    //vector<string> tokens;
+    //aurostd::string2tokens(tmp_num,tokens,"/");
+    //if(tokens.size()==2){
+    //double numerator = aurostd::string2utype<double>(tokens[0]);
+    //double denominator = aurostd::string2utype<double>(tokens[1]);
+    //vector_position[coord] = numerator/denominator;
+    //}
+    //}
+    //else {
+    //vector_position[coord] = aurostd::string2utype<double>(tmp_num);
+    //}
+    //coord++;
+    //}
+    //}
+
     return vector_position;
   }
 }
@@ -1902,8 +1898,8 @@ namespace SYM {
         bool stored_shift=false; 
         for(uint p=0;p<possible_shifts.size();p++){
           if(aurostd::abs(aurostd::modulus(candidate_shift-possible_shifts[p]))<_ZERO_TOL_){
-          stored_shift=true;
-          break;
+            stored_shift=true;
+            break;
           }
         }
         if(!stored_shift){
@@ -1913,11 +1909,12 @@ namespace SYM {
           bool stored_other_shift =false;
           for(uint p=0;p<possible_shifts.size();p++){
             for(uint q=0;q<possible_shifts.size();q++){
-               //DX 20190905 [OBSOLETE-no more mod_one_xvec] if(aurostd::abs(aurostd::modulus(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_){
-               if(aurostd::abs(aurostd::modulus(BringInCell(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_){ //DX 20190905 
-                 stored_other_shift=true;
-                 break;
-               }
+              //DX 20190905 [OBSOLETE-no more mod_one_xvec] if(aurostd::abs(aurostd::modulus(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_)
+              if(aurostd::abs(aurostd::modulus(BringInCell(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_) //DX 20190905
+              { //CO200106 - patching for auto-indenting
+                stored_other_shift=true;
+                break;
+              }
             }
             if(!stored_other_shift){
               //DX 20190905 [OBSOLETE-no more mod_one_xvec] possible_shifts.push_back(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]));
@@ -1942,23 +1939,23 @@ namespace SYM {
     int line = 0;
     for (uint i = 0; i < spaceg.length(); i++) {
       if(spaceg[i] == 0x0a)
-	line++;
+        line++;
       if(line > 1) {
-	temp << spaceg[i];
-	if(spaceg[i] == 0x0a) {
-	  string multiplicity, letter, site_symm, first_pos;
-	  temp >> multiplicity;
-	  temp >> letter;
-	  temp >> site_symm;
-	  temp >> first_pos;
-	  if(atoi(multiplicity.c_str()) == mult && site_symm == site_symmetry) {
-	    site_symmetries.push_back(site_symm);
-	    letters.push_back(letter);
-	    positions.push_back(first_pos);
-	  }
-	  temp.str(std::string());
-	  temp.clear();
-	}
+        temp << spaceg[i];
+        if(spaceg[i] == 0x0a) {
+          string multiplicity, letter, site_symm, first_pos;
+          temp >> multiplicity;
+          temp >> letter;
+          temp >> site_symm;
+          temp >> first_pos;
+          if(atoi(multiplicity.c_str()) == mult && site_symm == site_symmetry) {
+            site_symmetries.push_back(site_symm);
+            letters.push_back(letter);
+            positions.push_back(first_pos);
+          }
+          temp.str(std::string());
+          temp.clear();
+        }
       }
     }
   }
@@ -1981,10 +1978,11 @@ namespace SYM {
     }
     vector<int> index;
     for (uint i = 0; i < mult_vec.size(); i++) {
-      //if(mult_vec[i]*get_centering(spaceg).size()==mult){
-      if(mult_vec[i] == mult) {
-	//cerr <<"match: " << i << endl;
-	index.push_back(i);
+      //if(mult_vec[i]*get_centering(spaceg).size()==mult)
+      if(mult_vec[i] == mult)
+      { //CO200106 - patching for auto-indenting
+        //cerr <<"match: " << i << endl;
+        index.push_back(i);
       }
     }
 
@@ -1993,37 +1991,38 @@ namespace SYM {
     int line = 0;
     for (uint i = 0; i < spaceg.length(); i++) {
       if(spaceg[i] == 0x0a)
-	line++;
+        line++;
       if(line > 1) {
-	temp << spaceg[i];
-	if(spaceg[i] == 0x0a) {
-	  sg_lines.push_back(temp.str());
-	  temp.str("");
-	}
+        temp << spaceg[i];
+        if(spaceg[i] == 0x0a) {
+          sg_lines.push_back(temp.str());
+          temp.str("");
+        }
       }
     }
     vector<string> equations;
 
     uint start = 0; //DX 5/14/18 - added initialization
 
-    //for(int l=0;l<sg_lines.size();l++){
-    for (uint l = index[0]; l < index[0] + index.size(); l++) {
+    //for(int l=0;l<sg_lines.size();l++)
+    for (uint l = index[0]; l < index[0] + index.size(); l++)
+    { //CO200106 - patching for auto-indenting
       for (uint i = 0; i < sg_lines[l].length(); i++) {
-	//cerr << sg_lines[l][i] << " ";
-	if(sg_lines[l][i] == '(') {
-	  start = i;
-	  break;
-	}
+        //cerr << sg_lines[l][i] << " ";
+        if(sg_lines[l][i] == '(') {
+          start = i;
+          break;
+        }
       }
       ostringstream temp_eqn;
       for (uint i = start; i < sg_lines[l].length(); i++) {
-	if(sg_lines[l][i] != '(' && sg_lines[l][i] != ')' && sg_lines[l][i] != ' ') {
-	  temp_eqn << sg_lines[l][i];
-	}
-	if(sg_lines[l][i] == ')') {
-	  equations.push_back(temp_eqn.str());
-	  temp_eqn.str("");
-	}
+        if(sg_lines[l][i] != '(' && sg_lines[l][i] != ')' && sg_lines[l][i] != ' ') {
+          temp_eqn << sg_lines[l][i];
+        }
+        if(sg_lines[l][i] == ')') {
+          equations.push_back(temp_eqn.str());
+          temp_eqn.str("");
+        }
       }
     }
     return equations;
@@ -2139,7 +2138,7 @@ namespace SYM {
   // ---------------------------------------------------------------------------
   // input: space group number + setting
   vector<vector<string> > getWyckoffEquations(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter){
-   
+
     // get Wyckoff information based on space group and setting
     SymmetryInformationITC ITC_sym_info;
     ITC_sym_info.initsgs(space_group_setting);
@@ -2155,7 +2154,7 @@ namespace SYM {
     uint Wyckoff_multiplicity = 0;
     string site_symmetry = "";
     vector<vector<string> > positions;
-  
+
     getWyckoffInformation(Wyckoff_string, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, positions);
 
     return positions;
@@ -2169,7 +2168,7 @@ namespace SYM {
   // ---------------------------------------------------------------------------
   // input: space group number + setting
   uint getWyckoffMultiplicity(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter){
-   
+
     // get Wyckoff information based on space group and setting
     SymmetryInformationITC ITC_sym_info;
     ITC_sym_info.initsgs(space_group_setting);
@@ -2185,7 +2184,7 @@ namespace SYM {
     uint Wyckoff_multiplicity = 0;
     string site_symmetry = "";
     vector<vector<string> > positions;
-  
+
     getWyckoffInformation(Wyckoff_string, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, positions);
 
     return Wyckoff_multiplicity;
@@ -2199,7 +2198,7 @@ namespace SYM {
   // ---------------------------------------------------------------------------
   // input: space group number + setting
   string getWyckoffSiteSymmetry(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter){
-   
+
     // get Wyckoff information based on space group and setting
     SymmetryInformationITC ITC_sym_info;
     ITC_sym_info.initsgs(space_group_setting);
@@ -2215,7 +2214,7 @@ namespace SYM {
     uint Wyckoff_multiplicity = 0;
     string site_symmetry = "";
     vector<vector<string> > positions;
-  
+
     getWyckoffInformation(Wyckoff_string, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, positions);
 
     return site_symmetry;
@@ -2347,10 +2346,11 @@ namespace SYM {
     }
     vector<int> index;
     for (uint i = 0; i < mult_vec.size(); i++) {
-      //if(mult_vec[i]*get_centering(spaceg).size()==mult){
-      if(mult_vec[i] == mult) {
-	//cerr <<"match: " << i << endl;
-	index.push_back(i);
+      //if(mult_vec[i]*get_centering(spaceg).size()==mult)
+      if(mult_vec[i] == mult)
+      { //CO200106 - patching for auto-indenting
+        //cerr <<"match: " << i << endl;
+        index.push_back(i);
       }
     }
 
@@ -2359,13 +2359,13 @@ namespace SYM {
     int line = 0;
     for (uint i = 0; i < spaceg.length(); i++) {
       if(spaceg[i] == 0x0a)
-	line++;
+        line++;
       if(line > 1) {
-	temp << spaceg[i];
-	if(spaceg[i] == 0x0a) {
-	  sg_lines.push_back(temp.str());
-	  temp.str("");
-	}
+        temp << spaceg[i];
+        if(spaceg[i] == 0x0a) {
+          sg_lines.push_back(temp.str());
+          temp.str("");
+        }
       }
     }
     vector<string> singlets;
@@ -2376,36 +2376,37 @@ namespace SYM {
 
     uint start = 0; //DX 5/14/18 - added initialization
 
-    //for(int l=0;l<sg_lines.size();l++){
-    for (uint l = index[0]; l < index[0] + index.size(); l++) {
+    //for(int l=0;l<sg_lines.size();l++)
+    for (uint l = index[0]; l < index[0] + index.size(); l++)
+    { //CO200106 - patching for auto-indenting
       for (uint i = 0; i < sg_lines[l].length(); i++) {
-	//cerr << sg_lines[l][i] << " ";
-	if(sg_lines[l][i] == '(') {
-	  start = i;
-	  break;
-	}
+        //cerr << sg_lines[l][i] << " ";
+        if(sg_lines[l][i] == '(') {
+          start = i;
+          break;
+        }
       }
       ostringstream temp1;
       for (uint i = start; i < sg_lines[l].length(); i++) {
-	//if(sg_lines[1][i]=='('){
-	//temp1;
-	//}
-	if(sg_lines[l][i] != '(' && sg_lines[l][i] != ')' && sg_lines[l][i] != ',' && sg_lines[l][i] != ' ') {
-	  temp1 << sg_lines[l][i];
-	  singlets.push_back(temp1.str());
-	  temp1.str("");
-	}
-	if(sg_lines[l][i] == ',' || sg_lines[l][i] == ')') {
-	  //cerr << temp1.str() << endl;
-	  temp1.str("");
-	  tuplets.push_back(singlets);
-	  singlets.clear();
-	}
-	if(sg_lines[l][i] == ')') {
-	  temp1.str("");
-	  wyckoff_set.push_back(tuplets); // DX 8/31/17 - wyckoff_positions to wyckoff_set
-	  tuplets.clear();
-	}
+        //if(sg_lines[1][i]=='('){
+        //temp1;
+        //}
+        if(sg_lines[l][i] != '(' && sg_lines[l][i] != ')' && sg_lines[l][i] != ',' && sg_lines[l][i] != ' ') {
+          temp1 << sg_lines[l][i];
+          singlets.push_back(temp1.str());
+          temp1.str("");
+        }
+        if(sg_lines[l][i] == ',' || sg_lines[l][i] == ')') {
+          //cerr << temp1.str() << endl;
+          temp1.str("");
+          tuplets.push_back(singlets);
+          singlets.clear();
+        }
+        if(sg_lines[l][i] == ')') {
+          temp1.str("");
+          wyckoff_set.push_back(tuplets); // DX 8/31/17 - wyckoff_positions to wyckoff_set
+          tuplets.clear();
+        }
       }
       all_wyckoff_sets.push_back(wyckoff_set); // DX 8/31/17
       wyckoff_set.clear(); // DX 8/31/17
@@ -2430,35 +2431,36 @@ namespace SYM {
     ostringstream oss;
     int reg = 0;   //Counter for tuplets
     int breg = 0;  //Counter for multiplicity blocks
-   
+
     // DX 8/31/17 - Altered scheme to store unshifted positions first, then the shifted positions -START
     for (uint w = 0; w < all_wyckoff_sets.size(); w++){
       for (uint ii = 0; ii < get_centering(spaceg).size(); ii++) {
-	for (uint k = 0; k < all_wyckoff_sets[w].size(); k++) {
-	  for (uint j = 0; j < all_wyckoff_sets[w][k].size(); j++) {  //for(int j=0;j<3;j++){
-	    for (uint i = 0; i < all_wyckoff_sets[w][k][j].size(); i++) {
-	      if(all_wyckoff_sets[w][k][j][i] != "\n")
-		oss << all_wyckoff_sets[w][k][j][i];
-	  }
-	  oss << "+" << get_centering(spaceg)[ii][j];
-	  singletvec.push_back(oss.str());
-	  oss.str("");
-	  reg++;
-	  if(reg % 3 == 0) {  //New line every tuplet
-	    //oss << endl;
-	    tupletvec.push_back(singletvec);
-	    //cerr << singletvec.size() << endl;
-	    singletvec.clear();
-	    breg++;
-	  }
-	}
-	if(breg % mult == 0) {  //New block for every wyckoff position
-	  outvec.push_back(tupletvec);
-	  tupletvec.clear();
-	  //oss << endl;
-	}
+        for (uint k = 0; k < all_wyckoff_sets[w].size(); k++) {
+          for (uint j = 0; j < all_wyckoff_sets[w][k].size(); j++)  //for(int j=0;j<3;j++)
+          { //CO200106 - patching for auto-indenting
+            for (uint i = 0; i < all_wyckoff_sets[w][k][j].size(); i++) {
+              if(all_wyckoff_sets[w][k][j][i] != "\n")
+                oss << all_wyckoff_sets[w][k][j][i];
+            }
+            oss << "+" << get_centering(spaceg)[ii][j];
+            singletvec.push_back(oss.str());
+            oss.str("");
+            reg++;
+            if(reg % 3 == 0) {  //New line every tuplet
+              //oss << endl;
+              tupletvec.push_back(singletvec);
+              //cerr << singletvec.size() << endl;
+              singletvec.clear();
+              breg++;
+            }
+          }
+          if(breg % mult == 0) {  //New block for every wyckoff position
+            outvec.push_back(tupletvec);
+            tupletvec.clear();
+            //oss << endl;
+          }
+        }
       }
-    }
     }
     // DX 8/31/17 - Altered scheme to store unshifted positions first, then the shifted positions -END
     //cerr << "outvec.size(): " << outvec.size() << endl;
@@ -2497,7 +2499,7 @@ namespace SYM {
     //modify mult and mult_vec if getcentering == false.
     if(getcentering == false) {
       for (uint i = 0; i < mult_vec.size(); i++) {
-	mult_vec[i] = mult_vec[i] / get_centering(spaceg).size();
+        mult_vec[i] = mult_vec[i] / get_centering(spaceg).size();
       }
       mult = mult / get_centering(spaceg).size();
     }
@@ -2505,8 +2507,8 @@ namespace SYM {
     vector<int> index;
     for (uint i = 0; i < mult_vec.size(); i++) {
       if(mult_vec[i] == mult) {
-	//cerr <<"match: " << i << endl;
-	index.push_back(i);
+        //cerr <<"match: " << i << endl;
+        index.push_back(i);
       }
     }
 
@@ -2515,13 +2517,13 @@ namespace SYM {
     int line = 0;
     for (uint i = 0; i < spaceg.length(); i++) {
       if(spaceg[i] == 0x0a)
-	line++;
+        line++;
       if(line > 1) {
-	temp << spaceg[i];
-	if(spaceg[i] == 0x0a) {
-	  sg_lines.push_back(temp.str());
-	  temp.str("");
-	}
+        temp << spaceg[i];
+        if(spaceg[i] == 0x0a) {
+          sg_lines.push_back(temp.str());
+          temp.str("");
+        }
       }
     }
     vector<string> singlets;
@@ -2530,35 +2532,35 @@ namespace SYM {
 
     uint start = 0; //DX 5/14/18 - added initialization
 
-    //for(int l=0;l<sg_lines.size();l++){
+    //for(int l=0;l<sg_lines.size();l++){ //[CO200106 - close bracket for indenting]}
     for (uint l = index[0]; l < index[0] + index.size(); l++) {
       for (uint i = 0; i < sg_lines[l].length(); i++) {
-	if(sg_lines[l][i] == '(') {
-	  start = i;
-	  break;
-	}
+        if(sg_lines[l][i] == '(') {
+          start = i;
+          break;
+        }
       }
       ostringstream temp1;
       for (uint i = start; i < sg_lines[l].length(); i++) {
-	//if(sg_lines[1][i]=='('){
-	//temp1;
-	//}
-	if(sg_lines[l][i] != '(' && sg_lines[l][i] != ')' && sg_lines[l][i] != ',' && sg_lines[l][i] != ' ') {
-	  temp1 << sg_lines[l][i];
-	  singlets.push_back(temp1.str());
-	  temp1.str("");
-	}
-	if(sg_lines[l][i] == ',' || sg_lines[l][i] == ')') {
-	  //cerr << temp1.str() << endl;
-	  temp1.str("");
-	  tuplets.push_back(singlets);
-	  singlets.clear();
-	}
-	if(sg_lines[l][i] == ')') {
-	  temp1.str("");
-	  wyckoff_positions.push_back(tuplets);
-	  tuplets.clear();
-	}
+        //if(sg_lines[1][i]=='('){
+        //temp1;
+        //}
+        if(sg_lines[l][i] != '(' && sg_lines[l][i] != ')' && sg_lines[l][i] != ',' && sg_lines[l][i] != ' ') {
+          temp1 << sg_lines[l][i];
+          singlets.push_back(temp1.str());
+          temp1.str("");
+        }
+        if(sg_lines[l][i] == ',' || sg_lines[l][i] == ')') {
+          //cerr << temp1.str() << endl;
+          temp1.str("");
+          tuplets.push_back(singlets);
+          singlets.clear();
+        }
+        if(sg_lines[l][i] == ')') {
+          temp1.str("");
+          wyckoff_positions.push_back(tuplets);
+          tuplets.clear();
+        }
       }
     }
 
@@ -2587,31 +2589,33 @@ namespace SYM {
     int reg = 0;   //Counter for tuplets
     int breg = 0;  //Counter for multiplicity blocks
     for (uint k = 0; k < wyckoff_positions.size(); k++) {
-      //for(uint ii=0;ii<get_centering(nocent).size();ii++){
-      //for(uint ii=0;ii<C;ii++){
-      for (uint j = 0; j < wyckoff_positions[k].size(); j++) {  //for(int j=0;j<3;j++){
-	for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
-	  if(wyckoff_positions[k][j][i] != "\n")
-	    oss << wyckoff_positions[k][j][i];
-	}
-	//oss << "+" << get_centering(spaceg)[ii][j];
-	singletvec.push_back(oss.str());
-	oss.str("");
-	reg++;
+      //for(uint ii=0;ii<get_centering(nocent).size();ii++)
+      //for(uint ii=0;ii<C;ii++)
+      //{ //CO200106 - patching for auto-indenting
+      for (uint j = 0; j < wyckoff_positions[k].size(); j++)  //for(int j=0;j<3;j++)
+      { //CO200106 - patching for auto-indenting
+        for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
+          if(wyckoff_positions[k][j][i] != "\n")
+            oss << wyckoff_positions[k][j][i];
+        }
+        //oss << "+" << get_centering(spaceg)[ii][j];
+        singletvec.push_back(oss.str());
+        oss.str("");
+        reg++;
 
-	if(reg % 3 == 0) {  //New line every tuplet
-	  //oss << endl;
-	  tupletvec.push_back(singletvec);
-	  //cerr << singletvec.size() << endl;
-	  singletvec.clear();
-	  breg++;
-	}
+        if(reg % 3 == 0) {  //New line every tuplet
+          //oss << endl;
+          tupletvec.push_back(singletvec);
+          //cerr << singletvec.size() << endl;
+          singletvec.clear();
+          breg++;
+        }
       }
       if(breg % mult == 0) {  //New block for every wyckoff position
-	//cerr << "breg: " << breg << endl;
-	outvec.push_back(tupletvec);
-	tupletvec.clear();
-	//oss << endl;
+        //cerr << "breg: " << breg << endl;
+        outvec.push_back(tupletvec);
+        tupletvec.clear();
+        //oss << endl;
       }
       //}
     }
@@ -2652,7 +2656,7 @@ namespace SYM {
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity){
     vector<string> general_positions;
     vector<vector<vector<string> > > testvvvstring = get_wyckoff_pos(spacegroupstring, general_wyckoff_multiplicity);
-    
+
     // DEBUG for(uint i=0;i<testvvvstring.size();i++){
     // DEBUG  for(uint j=0;j<testvvvstring[i].size();j++){
     // DEBUG   ::print(testvvvstring[i][j]);
@@ -2682,7 +2686,7 @@ namespace SYM {
 namespace SYM {
   vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting, 
       string& Wyckoff_letter, uint Wyckoff_multiplicity){
-    
+
     SymmetryInformationITC ITC_sym_info;
     ITC_sym_info.initsgs(space_group_setting);
     string spacegroupstring = ITC_sym_info.gl_sgs[space_group_number - 1];
@@ -2728,7 +2732,7 @@ namespace SYM {
     // DX 20190723
 
     string soliloquy = "SYM::formatWyckoffPosition()";
-    
+
     stringstream ss_eqn;
     string coordinate = "";
     vector<string> vec_coord;
@@ -2792,7 +2796,7 @@ namespace SYM {
     // clean up cases of -+ or +-
     coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
     coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-    
+
     return coordinate;
   }
 }
@@ -2823,7 +2827,7 @@ namespace SYM {
       message << "Wyckoff position must have 3 fields (e.g., \"x, y, z\"), input: " << orig_position;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // split position into x,y,z components (via commas)
     string reordered_position = "";
@@ -2846,7 +2850,7 @@ namespace SYM {
 // ******************************************************************************
 namespace SYM {
   bool shiftWyckoffPositions(deque<deque<_atom> >& equivalent_atoms_shifted, xvector<double>& previous_shift, 
-                             xvector<double>& new_shift){
+      xvector<double>& new_shift){
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     // == Subtract shift from previous iterations == //
     for (uint i = 0; i < equivalent_atoms_shifted.size(); i++) {
@@ -3281,56 +3285,55 @@ namespace SYM {
     return grouped_possible_Wyckoff_letters; 
   }
 }
-/*
-// ******************************************************************************
-// GetSameSymmetryWyckoffLetters
-// ******************************************************************************
-namespace SYM {
-  vector<vector<vector<string> > > GetSameSymmetryWyckoffLetters(uint space_group_number, string Wyckoff_letter_string, uint setting){;
-    vector<vector<string> > all_Wyckoff_sets;
-    vector<string> tokens, per_atom_tokens;
-    aurostd::string2tokens(Wyckoff_letter_string, tokens, ";");
-    
-    for(uint i=0;i<tokens.size();i++){
-      vector<string> Wyckoff_set;
-      aurostd::string2tokens(tokens[i],per_atom_tokens,",");
-      for(uint j=0;j<per_atom_tokens.size();j++){
-        Wyckoff_set.push_back(per_atom_tokens[j]);
-      }
-      all_Wyckoff_sets.push_back(Wyckoff_set);
-    }
-    
-    // get possible Wyckoff letters
-    stringstream axis_cell;
-    axis_cell.str(std::string());
-    //DX 20180806 [OBSOLETE] axis_cell << CCell.lattice_label_ITC << cell_choice;
-    axis_cell << setting; //DX 20180806 - use setting
-    SYM::initsgs(axis_cell.str());
-    //extern vector<string> gl_sgs;
-    using SYM::gl_sgs;
-    string spacegroupstring = gl_sgs[space_group_number - 1];
-    vector<vector<vector<string> > > grouped_possible_Wyckoff_letters;
-    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
-      vector<vector<string> > possible_Wyckoff_letters;
-      vector<vector<string> > grouped_possible_Wyckoff_site_symmetries;
-      for(uint j=0;j<grouped_Wyckoff_positions[i].site_symmetries.size();j++){
-        vector<string> site_syms;
-        vector<string> letters;
-        vector<string> positions;
-        SYM::get_certain_wyckoff_pos(spacegroupstring, grouped_Wyckoff_positions[i].multiplicities[j], grouped_Wyckoff_positions[i].site_symmetries[j], site_syms, letters, positions);
-        possible_Wyckoff_letters.push_back(letters);
-      }
-      grouped_possible_Wyckoff_letters.push_back(possible_Wyckoff_letters);
-    }
-    for(uint i=0;i<grouped_possible_Wyckoff_letters.size();i++){
-      for(uint j=0;j<grouped_possible_Wyckoff_letters[i].size();j++){
-        ::print(grouped_possible_Wyckoff_letters[i][j]);
-      }
-    }
-    return grouped_possible_Wyckoff_letters; 
-  }
-}
-*/
+
+//// ******************************************************************************
+//// GetSameSymmetryWyckoffLetters
+//// ******************************************************************************
+//namespace SYM {
+//vector<vector<vector<string> > > GetSameSymmetryWyckoffLetters(uint space_group_number, string Wyckoff_letter_string, uint setting){;
+//vector<vector<string> > all_Wyckoff_sets;
+//vector<string> tokens, per_atom_tokens;
+//aurostd::string2tokens(Wyckoff_letter_string, tokens, ";");
+//
+//for(uint i=0;i<tokens.size();i++){
+//vector<string> Wyckoff_set;
+//aurostd::string2tokens(tokens[i],per_atom_tokens,",");
+//for(uint j=0;j<per_atom_tokens.size();j++){
+//Wyckoff_set.push_back(per_atom_tokens[j]);
+//}
+//all_Wyckoff_sets.push_back(Wyckoff_set);
+//}
+//
+//// get possible Wyckoff letters
+//stringstream axis_cell;
+//axis_cell.str(std::string());
+////DX 20180806 [OBSOLETE] axis_cell << CCell.lattice_label_ITC << cell_choice;
+//axis_cell << setting; //DX 20180806 - use setting
+//SYM::initsgs(axis_cell.str());
+////extern vector<string> gl_sgs;
+//using SYM::gl_sgs;
+//string spacegroupstring = gl_sgs[space_group_number - 1];
+//vector<vector<vector<string> > > grouped_possible_Wyckoff_letters;
+//for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
+//vector<vector<string> > possible_Wyckoff_letters;
+//vector<vector<string> > grouped_possible_Wyckoff_site_symmetries;
+//for(uint j=0;j<grouped_Wyckoff_positions[i].site_symmetries.size();j++){
+//vector<string> site_syms;
+//vector<string> letters;
+//vector<string> positions;
+//SYM::get_certain_wyckoff_pos(spacegroupstring, grouped_Wyckoff_positions[i].multiplicities[j], grouped_Wyckoff_positions[i].site_symmetries[j], site_syms, letters, positions);
+//possible_Wyckoff_letters.push_back(letters);
+//}
+//grouped_possible_Wyckoff_letters.push_back(possible_Wyckoff_letters);
+//}
+//for(uint i=0;i<grouped_possible_Wyckoff_letters.size();i++){
+//for(uint j=0;j<grouped_possible_Wyckoff_letters[i].size();j++){
+//::print(grouped_possible_Wyckoff_letters[i][j]);
+//}
+//}
+//return grouped_possible_Wyckoff_letters; 
+//}
+//}
 
 // ******************************************************************************
 // blank
@@ -3340,7 +3343,7 @@ namespace SYM {
     bool out = true;
     for (uint i = 0; i < str_in.size(); i++) {
       if(str_in[i] != ' ')
-	out = false;
+        out = false;
     }
     return out;
   }
@@ -3355,7 +3358,7 @@ namespace SYM {
     bool contains = false;
     for (uint i = 0; i < str_in.length(); i++) {
       if(isalpha(str_in[i]))
-	contains = true;
+        contains = true;
     }
     return contains;
   }
@@ -3369,7 +3372,7 @@ namespace SYM {
     bool contains = false;
     for (uint i = 0; i < vint.size(); i++) {
       if(vint[i] == n)
-	contains = true;
+        contains = true;
     }
     return contains;
   }
@@ -3383,7 +3386,7 @@ namespace SYM {
     char c = '\0';
     for (uint i = 0; i < str_in.length(); i++) {
       if(isalpha(str_in[i]))
-	c = str_in[i];
+        c = str_in[i];
     }
     return c;
   }
@@ -3419,8 +3422,8 @@ namespace SYM {
     int numcount = 0;
     for (uint i = 0; i < str_in.length(); i++) {
       if(!isalpha(str_in[i]) && !isop(str_in[i])) {
-	oss << str_in[i];
-	numcount++;
+        oss << str_in[i];
+        numcount++;
       }
     }
     num = atof(oss.str().c_str());
@@ -3441,7 +3444,7 @@ namespace SYM {
     bool contains = false;
     for (uint i = 0; i < str_in.length(); i++) {
       if(str_in[i] == c)
-	contains = true;
+        contains = true;
     }
     return contains;
   }
@@ -3458,23 +3461,23 @@ namespace SYM {
     //  atof(tmpstr.c_str())
     for (uint k = 0; k < wyckoff_positions.size(); k++) {
       for (uint j = 0; j < wyckoff_positions[k].size(); j++) {
-	for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
-	  oss << wyckoff_positions[k][j][i];
-	}
-	string temp = oss.str();
-	if(!containschar(temp))
-	  cerr << atof(temp.c_str());
-	else {
-	  vector<string> tempvec = splitstring(temp);
-	  for (uint i = 0; i < tempvec.size(); i++) {
-	    if(!isalpha(tempvec[i][0]))
-	      cerr << atof(tempvec[i].c_str());
-	    else
-	      cerr << tempvec[i];
-	  }
-	}
-	oss.str("");
-	cerr << " ";
+        for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
+          oss << wyckoff_positions[k][j][i];
+        }
+        string temp = oss.str();
+        if(!containschar(temp))
+          cerr << atof(temp.c_str());
+        else {
+          vector<string> tempvec = splitstring(temp);
+          for (uint i = 0; i < tempvec.size(); i++) {
+            if(!isalpha(tempvec[i][0]))
+              cerr << atof(tempvec[i].c_str());
+            else
+              cerr << tempvec[i];
+          }
+        }
+        oss.str("");
+        cerr << " ";
       }
       cerr << endl;
     }
@@ -3490,13 +3493,14 @@ namespace SYM {
     vector<string> temp;
     for (uint i = 0; i < str.length(); i++) {
       oss << str[i];
-      //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' '){
-      if(!blank(oss.str())) {
-	if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-') {
-	  temp.push_back(oss.str());
-	  //cerr << oss.str();// << endl;
-	  oss.str("");
-	}
+      //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' ')
+      if(!blank(oss.str()))
+      { //CO200106 - patching for auto-indenting
+        if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-') {
+          temp.push_back(oss.str());
+          //cerr << oss.str();// << endl;
+          oss.str("");
+        }
       }
     }
 
@@ -3516,11 +3520,12 @@ namespace SYM {
     vector<string> temp;
     for (uint i = 0; i < str.length(); i++) {
       oss << str[i];
-      //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' '){
-      if(str[i + 1] == '\0' || str[i + 1] == ' ') {
-	temp.push_back(oss.str());
-	//cerr << oss.str();// << endl;
-	oss.str("");
+      //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' ')
+      if(str[i + 1] == '\0' || str[i + 1] == ' ')
+      { //CO200106 - patching for auto-indenting
+        temp.push_back(oss.str());
+        //cerr << oss.str();// << endl;
+        oss.str("");
       }
     }
 
@@ -3559,9 +3564,9 @@ namespace SYM {
       double denominator = 0;
       uint slash = whereischar(str, '/');
       for (uint i = 0; i < slash; i++)
-	ss_num << str[i];
+        ss_num << str[i];
       for (uint i = 0; i < (str.size() - slash); i++)
-	ss_den << str[i + slash + 1];
+        ss_den << str[i + slash + 1];
       string num_string = ss_num.str();
       const char* num = num_string.c_str();
       numerator = atof(num);
@@ -3569,14 +3574,14 @@ namespace SYM {
       const char* den = den_string.c_str();
       denominator = atof(den);
       if(neg == true) {
-	out = -numerator / denominator;
+        out = -numerator / denominator;
       } else {
-	out = numerator / denominator;
+        out = numerator / denominator;
       }
     } else {
       char dbl[256];
       for (uint i = 0; i < str.size(); i++)
-	dbl[i] = str[i];
+        dbl[i] = str[i];
       out = atof(dbl);
     }
     return out;
@@ -3608,8 +3613,8 @@ namespace SYM {
   void xstring(ostream& output, xmatrix<double> a) {
     for (uint i = 1; i <= (uint)a.urows; i++) {
       for (uint j = 1; j <= (uint)a.lrows; j++) {
-	if(aurostd::abs(a(i, j)) < 1e-8) { a(i, j) = 0; }
-	output << std::showpoint << setprecision(14) << a(i, j) << " ";
+        if(aurostd::abs(a(i, j)) < 1e-8) { a(i, j) = 0; }
+        output << std::showpoint << setprecision(14) << a(i, j) << " ";
       }
       cerr << endl;
     }
@@ -3625,7 +3630,7 @@ namespace SYM {
     double tol = 1e-10;
     for (uint i = 0; i < atomicBasis.size(); i++) {
       if(atomicBasis[i].fpos(lvec) > tol) {
-	atomicBasis[i].fpos(lvec) = 1 - atomicBasis[i].fpos(lvec);
+        atomicBasis[i].fpos(lvec) = 1 - atomicBasis[i].fpos(lvec);
       }
     }
   }
@@ -3682,30 +3687,30 @@ namespace SYM{
       bool skip = false;
       ostringstream oss;
       for (uint i = 0; i < splitstr[S].length(); i++) {
-	oss << splitstr[S][i];
+        oss << splitstr[S][i];
       }
       if(!containschar(oss.str())) {
-	if(havechar(oss.str(), '/')) {
-	  num += frac2dbl(oss.str());
-	} else {
-	  num += atof(oss.str().c_str());
-	}
-	oss.str("");
+        if(havechar(oss.str(), '/')) {
+          num += frac2dbl(oss.str());
+        } else {
+          num += atof(oss.str().c_str());
+        }
+        oss.str("");
       } else {
-	skip = true;
-	if(havechar(oss.str(), '/')) {
-	  out.dbl = frac2dbl(oss.str());
-	} else {
-	  out.dbl = whichnum(oss.str());
-	}
-	out.chr = whichchar(oss.str());
-	oss.str("");
+        skip = true;
+        if(havechar(oss.str(), '/')) {
+          out.dbl = frac2dbl(oss.str());
+        } else {
+          out.dbl = whichnum(oss.str());
+        }
+        out.chr = whichchar(oss.str());
+        oss.str("");
       }
       if(skip == false) {
-	out.dbl = num;
+        out.dbl = num;
       }
       if(aurostd::abs(out.dbl) > .00001) {
-	out_vec.push_back(out);
+        out_vec.push_back(out);
       }
     }
     if(out_vec.size() == 0) {
@@ -3724,14 +3729,14 @@ namespace SYM {
     //Wyckoff_positions[tuplets][singlets][singlet characters]
     for (uint k = 0; k < wyckoff_positions.size(); k++) {
       for (uint j = 0; j < wyckoff_positions[k].size(); j++) {
-	for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
-	  for (uint l = 0; l < simplify(wyckoff_positions[k][j][i]).size(); l++) {
-	    cerr << simplify(wyckoff_positions[k][j][i]).size();
-	    cerr << simplify(wyckoff_positions[k][j][i])[l].dbl << simplify(wyckoff_positions[k][j][i])[l].chr << " " << endl;
-	  }
-	  cerr << wyckoff_positions[k][j][i] << " ";
-	}
-	cerr << endl;
+        for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
+          for (uint l = 0; l < simplify(wyckoff_positions[k][j][i]).size(); l++) {
+            cerr << simplify(wyckoff_positions[k][j][i]).size();
+            cerr << simplify(wyckoff_positions[k][j][i])[l].dbl << simplify(wyckoff_positions[k][j][i])[l].chr << " " << endl;
+          }
+          cerr << wyckoff_positions[k][j][i] << " ";
+        }
+        cerr << endl;
       }
       cerr << endl;
     }
@@ -3750,17 +3755,17 @@ namespace SYM {
       vector<vector<vector<sdouble> > > temp2;
       //cerr <<"site sizes: " <<  wyckoff_positions[k].size() << endl;
       for (uint j = 0; j < wyckoff_positions[k].size(); j++) {
-	vector<vector<sdouble> > temp1;
-	for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
-	  //cerr << wyckoff_positions[k][j][i] << endl;
-	  vector<sdouble> tmpsd = simplify(wyckoff_positions[k][j][i]);
-	  //xb();
-	  //for(uint ix=0;ix<tmpsd.size();ix++){
-	  //  cerr <<"?: " <<  tmpsd[ix].dbl << " " << tmpsd[ix].chr << endl;
-	  //}
-	  temp1.push_back(simplify(wyckoff_positions[k][j][i]));
-	}
-	temp2.push_back(temp1);
+        vector<vector<sdouble> > temp1;
+        for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
+          //cerr << wyckoff_positions[k][j][i] << endl;
+          vector<sdouble> tmpsd = simplify(wyckoff_positions[k][j][i]);
+          //xb();
+          //for(uint ix=0;ix<tmpsd.size();ix++){
+          //  cerr <<"?: " <<  tmpsd[ix].dbl << " " << tmpsd[ix].chr << endl;
+          //}
+          temp1.push_back(simplify(wyckoff_positions[k][j][i]));
+        }
+        temp2.push_back(temp1);
       }
       //cerr << temp2.size() << endl;
       sdw.push_back(temp2);
@@ -3930,292 +3935,292 @@ namespace SYM {
     //MONOCLINIC
     if(pgroup == "2") {
       if(c == 'P') {
-	sgs.push_back(3);
-	sgs.push_back(4);
+        sgs.push_back(3);
+        sgs.push_back(4);
       }
       if(c == 'C') {
-	sgs.push_back(5);
+        sgs.push_back(5);
       }
     }
     if(pgroup == "m") {
       if(c == 'P') {
-	sgs.push_back(6);
-	sgs.push_back(7);
+        sgs.push_back(6);
+        sgs.push_back(7);
       }
       if(c == 'C') {
-	sgs.push_back(8);
-	sgs.push_back(9);
+        sgs.push_back(8);
+        sgs.push_back(9);
       }
     }
     if(pgroup == "2/m") {
       if(c == 'P') {
-	sgs.push_back(10);
-	sgs.push_back(11);
-	sgs.push_back(13);
-	sgs.push_back(14);
+        sgs.push_back(10);
+        sgs.push_back(11);
+        sgs.push_back(13);
+        sgs.push_back(14);
       }
       if(c == 'C') {
-	sgs.push_back(12);
-	sgs.push_back(15);
+        sgs.push_back(12);
+        sgs.push_back(15);
       }
     }
     //ORTHORHOMBIC
     if(pgroup == "222") {
       if(c == 'P') {
-	sgs.push_back(16);
-	sgs.push_back(17);
-	sgs.push_back(18);
-	sgs.push_back(19);
+        sgs.push_back(16);
+        sgs.push_back(17);
+        sgs.push_back(18);
+        sgs.push_back(19);
       }
       if(c == 'C') {
-	sgs.push_back(20);
-	sgs.push_back(21);
-	sgs.push_back(21);
+        sgs.push_back(20);
+        sgs.push_back(21);
+        sgs.push_back(21);
       }
       if(c == 'F') {
-	sgs.push_back(22);
+        sgs.push_back(22);
       }
       if(c == 'I') {
-	sgs.push_back(23);
-	sgs.push_back(24);
+        sgs.push_back(23);
+        sgs.push_back(24);
       }
     }
     if(pgroup == "mm2") {  //sgrange[0]=25;sgrange[1]=46;
       if(c == 'P') {
-	sgs.push_back(25);
-	sgs.push_back(26);
-	sgs.push_back(27);
-	sgs.push_back(28);
-	sgs.push_back(29);
-	sgs.push_back(30);
-	sgs.push_back(31);
-	sgs.push_back(32);
-	sgs.push_back(33);
-	sgs.push_back(34);
+        sgs.push_back(25);
+        sgs.push_back(26);
+        sgs.push_back(27);
+        sgs.push_back(28);
+        sgs.push_back(29);
+        sgs.push_back(30);
+        sgs.push_back(31);
+        sgs.push_back(32);
+        sgs.push_back(33);
+        sgs.push_back(34);
       }
       if(c == 'C') {
-	sgs.push_back(35);
-	sgs.push_back(36);
-	sgs.push_back(37);
-	sgs.push_back(38);
-	sgs.push_back(39);
-	sgs.push_back(40);
-	sgs.push_back(41);
+        sgs.push_back(35);
+        sgs.push_back(36);
+        sgs.push_back(37);
+        sgs.push_back(38);
+        sgs.push_back(39);
+        sgs.push_back(40);
+        sgs.push_back(41);
       }
       if(c == 'F') {
-	sgs.push_back(42);
-	sgs.push_back(43);
+        sgs.push_back(42);
+        sgs.push_back(43);
       }
       if(c == 'I') {
-	sgs.push_back(44);
-	sgs.push_back(45);
-	sgs.push_back(46);
+        sgs.push_back(44);
+        sgs.push_back(45);
+        sgs.push_back(46);
       }
     }
 
     if(pgroup == "mmm") {  //sgrange[0]=47;sgrange[1]=74;
       if(c == 'P') {
-	sgs.push_back(47);
-	sgs.push_back(48);
-	sgs.push_back(49);
-	sgs.push_back(50);
-	sgs.push_back(51);
-	sgs.push_back(52);
-	sgs.push_back(53);
-	sgs.push_back(54);
-	sgs.push_back(55);
-	sgs.push_back(56);
-	sgs.push_back(57);
-	sgs.push_back(58);
-	sgs.push_back(59);
-	sgs.push_back(60);
-	sgs.push_back(61);
-	sgs.push_back(62);
+        sgs.push_back(47);
+        sgs.push_back(48);
+        sgs.push_back(49);
+        sgs.push_back(50);
+        sgs.push_back(51);
+        sgs.push_back(52);
+        sgs.push_back(53);
+        sgs.push_back(54);
+        sgs.push_back(55);
+        sgs.push_back(56);
+        sgs.push_back(57);
+        sgs.push_back(58);
+        sgs.push_back(59);
+        sgs.push_back(60);
+        sgs.push_back(61);
+        sgs.push_back(62);
       }
       if(c == 'C') {
-	sgs.push_back(63);
-	sgs.push_back(64);
-	sgs.push_back(65);
-	sgs.push_back(66);
-	sgs.push_back(67);
-	sgs.push_back(68);
+        sgs.push_back(63);
+        sgs.push_back(64);
+        sgs.push_back(65);
+        sgs.push_back(66);
+        sgs.push_back(67);
+        sgs.push_back(68);
       }
       if(c == 'F') {
-	sgs.push_back(69);
-	sgs.push_back(70);
+        sgs.push_back(69);
+        sgs.push_back(70);
       }
       if(c == 'I') {
-	sgs.push_back(71);
-	sgs.push_back(72);
-	sgs.push_back(73);
-	sgs.push_back(74);
+        sgs.push_back(71);
+        sgs.push_back(72);
+        sgs.push_back(73);
+        sgs.push_back(74);
       }
     }
     //TETRAGONAL
     if(pgroup == "4") {  //sgrange[0]=75;sgrange[1]=80;
       if(c == 'P') {
-	sgs.push_back(75);
-	sgs.push_back(76);
-	sgs.push_back(77);
-	sgs.push_back(78);
+        sgs.push_back(75);
+        sgs.push_back(76);
+        sgs.push_back(77);
+        sgs.push_back(78);
       }
       if(c == 'I') {
-	sgs.push_back(79);
-	sgs.push_back(80);
+        sgs.push_back(79);
+        sgs.push_back(80);
       }
     }
     if(pgroup == "-4") {  //sgrange[0]=81;sgrange[1]=82;
       if(c == 'P') {
-	sgs.push_back(81);
+        sgs.push_back(81);
       }
       if(c == 'I') {
-	sgs.push_back(82);
+        sgs.push_back(82);
       }
     }
     if(pgroup == "4/m") {  //sgrange[0]=83;sgrange[1]=88;
       if(c == 'P') {
-	sgs.push_back(83);
-	sgs.push_back(84);
-	sgs.push_back(85);
-	sgs.push_back(86);
+        sgs.push_back(83);
+        sgs.push_back(84);
+        sgs.push_back(85);
+        sgs.push_back(86);
       }
       if(c == 'I') {
-	sgs.push_back(87);
-	sgs.push_back(88);
+        sgs.push_back(87);
+        sgs.push_back(88);
       }
     }
     if(pgroup == "422") {  //sgrange[0]=89;sgrange[1]=98;
       if(c == 'P') {
-	sgs.push_back(89);
-	sgs.push_back(90);
-	sgs.push_back(91);
-	sgs.push_back(92);
-	sgs.push_back(93);
-	sgs.push_back(94);
-	sgs.push_back(95);
-	sgs.push_back(96);
+        sgs.push_back(89);
+        sgs.push_back(90);
+        sgs.push_back(91);
+        sgs.push_back(92);
+        sgs.push_back(93);
+        sgs.push_back(94);
+        sgs.push_back(95);
+        sgs.push_back(96);
       }
       if(c == 'I') {
-	sgs.push_back(97);
-	sgs.push_back(98);
+        sgs.push_back(97);
+        sgs.push_back(98);
       }
     }
     if(pgroup == "4mm") {  //sgrange[0]=99;sgrange[1]=110;
       if(c == 'P') {
-	sgs.push_back(99);
-	sgs.push_back(100);
-	sgs.push_back(101);
-	sgs.push_back(102);
-	sgs.push_back(103);
-	sgs.push_back(104);
-	sgs.push_back(105);
-	sgs.push_back(106);
+        sgs.push_back(99);
+        sgs.push_back(100);
+        sgs.push_back(101);
+        sgs.push_back(102);
+        sgs.push_back(103);
+        sgs.push_back(104);
+        sgs.push_back(105);
+        sgs.push_back(106);
       }
       if(c == 'I') {
-	sgs.push_back(107);
-	sgs.push_back(108);
-	sgs.push_back(109);
-	sgs.push_back(110);
+        sgs.push_back(107);
+        sgs.push_back(108);
+        sgs.push_back(109);
+        sgs.push_back(110);
       }
     }
     if(pgroup == "-42m") {  //sgrange[0]=111;sgrange[1]=122;
       if(c == 'P') {
-	sgs.push_back(111);
-	sgs.push_back(112);
-	sgs.push_back(113);
-	sgs.push_back(114);
-	sgs.push_back(115);
-	sgs.push_back(116);
-	sgs.push_back(117);
-	sgs.push_back(118);
+        sgs.push_back(111);
+        sgs.push_back(112);
+        sgs.push_back(113);
+        sgs.push_back(114);
+        sgs.push_back(115);
+        sgs.push_back(116);
+        sgs.push_back(117);
+        sgs.push_back(118);
       }
       if(c == 'I') {
-	sgs.push_back(119);
-	sgs.push_back(120);
-	sgs.push_back(121);
-	sgs.push_back(122);
+        sgs.push_back(119);
+        sgs.push_back(120);
+        sgs.push_back(121);
+        sgs.push_back(122);
       }
     }
     if(pgroup == "4/mmm") {  //sgrange[0]=123;sgrange[1]=142;
       if(c == 'P') {
-	sgs.push_back(123);
-	sgs.push_back(124);
-	sgs.push_back(125);
-	sgs.push_back(126);
-	sgs.push_back(127);
-	sgs.push_back(128);
-	sgs.push_back(129);
-	sgs.push_back(130);
-	sgs.push_back(131);
-	sgs.push_back(132);
-	sgs.push_back(133);
-	sgs.push_back(134);
-	sgs.push_back(135);
-	sgs.push_back(136);
-	sgs.push_back(137);
-	sgs.push_back(138);
+        sgs.push_back(123);
+        sgs.push_back(124);
+        sgs.push_back(125);
+        sgs.push_back(126);
+        sgs.push_back(127);
+        sgs.push_back(128);
+        sgs.push_back(129);
+        sgs.push_back(130);
+        sgs.push_back(131);
+        sgs.push_back(132);
+        sgs.push_back(133);
+        sgs.push_back(134);
+        sgs.push_back(135);
+        sgs.push_back(136);
+        sgs.push_back(137);
+        sgs.push_back(138);
       }
       if(c == 'I') {
-	sgs.push_back(139);
-	sgs.push_back(140);
-	sgs.push_back(141);
-	sgs.push_back(142);
+        sgs.push_back(139);
+        sgs.push_back(140);
+        sgs.push_back(141);
+        sgs.push_back(142);
       }
     }
     //TRIGONAL
     if(pgroup == "3") {  //sgrange[0]=143;sgrange[1]=146;
       if(c == 'P') {
-	sgs.push_back(143);
-	sgs.push_back(144);
-	sgs.push_back(145);
+        sgs.push_back(143);
+        sgs.push_back(144);
+        sgs.push_back(145);
       }
       if(c == 'R') {
-	sgs.push_back(146);
+        sgs.push_back(146);
       }
     }
     if(pgroup == "-3") {  //sgrange[0]=147;sgrange[1]=148;
       if(c == 'P') {
-	sgs.push_back(147);
+        sgs.push_back(147);
       }
       if(c == 'R') {
-	sgs.push_back(148);
+        sgs.push_back(148);
       }
     }
     if(pgroup == "32") {  //sgrange[0]=149;sgrange[1]=155;
       if(c == 'P') {
-	sgs.push_back(149);
-	sgs.push_back(150);
-	sgs.push_back(151);
-	sgs.push_back(152);
-	sgs.push_back(153);
-	sgs.push_back(154);
+        sgs.push_back(149);
+        sgs.push_back(150);
+        sgs.push_back(151);
+        sgs.push_back(152);
+        sgs.push_back(153);
+        sgs.push_back(154);
       }
       if(c == 'R') {
-	sgs.push_back(155);
+        sgs.push_back(155);
       }
     }
     if(pgroup == "3m") {  //sgrange[0]=156;sgrange[1]=161;
       if(c == 'P') {
-	sgs.push_back(156);
-	sgs.push_back(157);
-	sgs.push_back(158);
-	sgs.push_back(159);
+        sgs.push_back(156);
+        sgs.push_back(157);
+        sgs.push_back(158);
+        sgs.push_back(159);
       }
       if(c == 'R') {
-	sgs.push_back(160);
-	sgs.push_back(161);
+        sgs.push_back(160);
+        sgs.push_back(161);
       }
     }
     if(pgroup == "-3m") {  //sgrange[0]=162;sgrange[1]=167;
       if(c == 'P') {
-	sgs.push_back(162);
-	sgs.push_back(163);
-	sgs.push_back(164);
-	sgs.push_back(165);
+        sgs.push_back(162);
+        sgs.push_back(163);
+        sgs.push_back(164);
+        sgs.push_back(165);
       }
       if(c == 'R') {
-	sgs.push_back(166);
-	sgs.push_back(167);
+        sgs.push_back(166);
+        sgs.push_back(167);
       }
     }
     //HEXAGONAL
@@ -4263,78 +4268,78 @@ namespace SYM {
     //CUBIC
     if(pgroup == "23") {  //sgrange[0]=195;sgrange[1]=199;
       if(c == 'P') {
-	sgs.push_back(195);
-	sgs.push_back(198);
+        sgs.push_back(195);
+        sgs.push_back(198);
       }
       if(c == 'F') {
-	sgs.push_back(196);
+        sgs.push_back(196);
       }
       if(c == 'I') {
-	sgs.push_back(197);
-	sgs.push_back(199);
+        sgs.push_back(197);
+        sgs.push_back(199);
       }
     }
     if(pgroup == "m-3") {  //sgrange[0]=200;sgrange[1]=206;
       if(c == 'P') {
-	sgs.push_back(200);
-	sgs.push_back(201);
-	sgs.push_back(205);
+        sgs.push_back(200);
+        sgs.push_back(201);
+        sgs.push_back(205);
       }
       if(c == 'F') {
-	sgs.push_back(202);
-	sgs.push_back(203);
+        sgs.push_back(202);
+        sgs.push_back(203);
       }
       if(c == 'I') {
-	sgs.push_back(204);
-	sgs.push_back(206);
+        sgs.push_back(204);
+        sgs.push_back(206);
       }
     }
     if(pgroup == "432") {  //sgrange[0]=207;sgrange[1]=214;
       if(c == 'P') {
-	sgs.push_back(207);
-	sgs.push_back(208);
-	sgs.push_back(212);
-	sgs.push_back(213);
+        sgs.push_back(207);
+        sgs.push_back(208);
+        sgs.push_back(212);
+        sgs.push_back(213);
       }
       if(c == 'F') {
-	sgs.push_back(209);
-	sgs.push_back(210);
+        sgs.push_back(209);
+        sgs.push_back(210);
       }
       if(c == 'I') {
-	sgs.push_back(211);
-	sgs.push_back(214);
+        sgs.push_back(211);
+        sgs.push_back(214);
       }
     }
     if(pgroup == "-43m") {  //sgrange[0]=215;sgrange[1]=220;
       if(c == 'P') {
-	sgs.push_back(215);
-	sgs.push_back(218);
+        sgs.push_back(215);
+        sgs.push_back(218);
       }
       if(c == 'F') {
-	sgs.push_back(216);
-	sgs.push_back(219);
+        sgs.push_back(216);
+        sgs.push_back(219);
       }
       if(c == 'I') {
-	sgs.push_back(217);
-	sgs.push_back(220);
+        sgs.push_back(217);
+        sgs.push_back(220);
       }
     }
     if(pgroup == "m-3m") {  //sgrange[0]=221;sgrange[1]=230;
       if(c == 'P') {
-	sgs.push_back(221);
-	sgs.push_back(222);
-	sgs.push_back(223);
-	sgs.push_back(224);
+        sgs.push_back(221);
+        sgs.push_back(222);
+        sgs.push_back(223);
+        sgs.push_back(224);
       }
       if(c == 'F') {
-	sgs.push_back(225);
-	sgs.push_back(226);
-	sgs.push_back(227);
-	sgs.push_back(228);
+        sgs.push_back(225);
+        sgs.push_back(226);
+        sgs.push_back(227);
+        sgs.push_back(228);
       }
       if(c == 'I') {
-	sgs.push_back(229);
-	sgs.push_back(230);
+        sgs.push_back(229);
+        sgs.push_back(230);
       }
     }
 
@@ -4348,8 +4353,8 @@ namespace SYM {
 // Obtain new lattice vectors corresponding to mirrors
 namespace SYM {
   vector<xvector<double> > getLatticeVectorsFromOriginalMirrorOperations(vector<Glide>& old_mirrors, vector<Glide>& new_mirrors,
-									 vector<xvector<double> >& lattice_vectors,
-									 bool& all_matched) {
+      vector<xvector<double> >& lattice_vectors,
+      bool& all_matched) {
     xvector<double> null_tol;
     null_tol(1) = _ZERO_TOL_;
     null_tol(2) = _ZERO_TOL_;
@@ -4358,24 +4363,24 @@ namespace SYM {
     for (uint i = 0; i < new_mirrors.size(); i++) {
       bool found = false;
       for (uint j = 0; j < old_mirrors.size(); j++) {
-	xvector<double> dir_diff = new_mirrors[i].return_direction() - old_mirrors[j].return_direction();
-	xvector<double> dir_add = new_mirrors[i].return_direction() + old_mirrors[j].return_direction();
-	xvector<double> point_diff = new_mirrors[i].return_point() - old_mirrors[j].return_point();
-	bool diff = (aurostd::abs(dir_diff(1)) < _ZERO_TOL_ && aurostd::abs(dir_diff(2)) < _ZERO_TOL_ && aurostd::abs(dir_diff(3)) < _ZERO_TOL_);
-	bool add = (aurostd::abs(dir_add(1)) < _ZERO_TOL_ && aurostd::abs(dir_add(2)) < _ZERO_TOL_ && aurostd::abs(dir_add(3)) < _ZERO_TOL_);
-	bool point = (aurostd::abs(point_diff(1)) < _ZERO_TOL_ && aurostd::abs(point_diff(2)) < _ZERO_TOL_ && aurostd::abs(point_diff(3)) < _ZERO_TOL_);
-	if((diff || add) && point) {
-	  if(add) {
-	    new_lattice_vectors.push_back(-lattice_vectors[j]);
-	  } else {
-	    new_lattice_vectors.push_back(lattice_vectors[j]);
-	  }
-	  found = true;
-	  break;
-	}
+        xvector<double> dir_diff = new_mirrors[i].return_direction() - old_mirrors[j].return_direction();
+        xvector<double> dir_add = new_mirrors[i].return_direction() + old_mirrors[j].return_direction();
+        xvector<double> point_diff = new_mirrors[i].return_point() - old_mirrors[j].return_point();
+        bool diff = (aurostd::abs(dir_diff(1)) < _ZERO_TOL_ && aurostd::abs(dir_diff(2)) < _ZERO_TOL_ && aurostd::abs(dir_diff(3)) < _ZERO_TOL_);
+        bool add = (aurostd::abs(dir_add(1)) < _ZERO_TOL_ && aurostd::abs(dir_add(2)) < _ZERO_TOL_ && aurostd::abs(dir_add(3)) < _ZERO_TOL_);
+        bool point = (aurostd::abs(point_diff(1)) < _ZERO_TOL_ && aurostd::abs(point_diff(2)) < _ZERO_TOL_ && aurostd::abs(point_diff(3)) < _ZERO_TOL_);
+        if((diff || add) && point) {
+          if(add) {
+            new_lattice_vectors.push_back(-lattice_vectors[j]);
+          } else {
+            new_lattice_vectors.push_back(lattice_vectors[j]);
+          }
+          found = true;
+          break;
+        }
       }
       if(found == false) {
-	all_matched = false;
+        all_matched = false;
       }
     }
     return new_lattice_vectors;
@@ -4388,51 +4393,51 @@ namespace SYM {
 // Obtain new lattice vectors corresponding to rotations
 namespace SYM {
   vector<xvector<double> > getLatticeVectorsFromOriginalRotationOperations(vector<Screw>& old_rotations_twofold,
-									   vector<Screw>& old_rotations_rot, vector<Screw>& new_rotations,
-									   vector<xvector<double> >& twofold_lattice_vectors,
-									   vector<xvector<double> >& rot_lattice_vectors,
-									   bool& all_matched) {
+      vector<Screw>& old_rotations_rot, vector<Screw>& new_rotations,
+      vector<xvector<double> >& twofold_lattice_vectors,
+      vector<xvector<double> >& rot_lattice_vectors,
+      bool& all_matched) {
     vector<xvector<double> > new_lattice_vectors;
     for (uint i = 0; i < new_rotations.size(); i++) {
       bool found = false;
       for (uint j = 0; j < old_rotations_twofold.size(); j++) {
-	xvector<double> dir_diff = new_rotations[i].return_direction() - old_rotations_twofold[j].return_direction();
-	xvector<double> dir_add = new_rotations[i].return_direction() + old_rotations_twofold[j].return_direction();
-	xvector<double> point_diff = new_rotations[i].return_point() - old_rotations_twofold[j].return_point();
-	bool diff = (aurostd::abs(dir_diff(1)) < _ZERO_TOL_ && aurostd::abs(dir_diff(2)) < _ZERO_TOL_ && aurostd::abs(dir_diff(3)) < _ZERO_TOL_);
-	bool add = (aurostd::abs(dir_add(1)) < _ZERO_TOL_ && aurostd::abs(dir_add(2)) < _ZERO_TOL_ && aurostd::abs(dir_add(3)) < _ZERO_TOL_);
-	bool point = (aurostd::abs(point_diff(1)) < _ZERO_TOL_ && aurostd::abs(point_diff(2)) < _ZERO_TOL_ && aurostd::abs(point_diff(3)) < _ZERO_TOL_);
-	if((diff || add) && point) {
-	  if(add) {
-	    new_lattice_vectors.push_back(-twofold_lattice_vectors[j]);
-	  } else {
-	    new_lattice_vectors.push_back(twofold_lattice_vectors[j]);
-	  }
-	  found = true;
-	  break;
-	}
+        xvector<double> dir_diff = new_rotations[i].return_direction() - old_rotations_twofold[j].return_direction();
+        xvector<double> dir_add = new_rotations[i].return_direction() + old_rotations_twofold[j].return_direction();
+        xvector<double> point_diff = new_rotations[i].return_point() - old_rotations_twofold[j].return_point();
+        bool diff = (aurostd::abs(dir_diff(1)) < _ZERO_TOL_ && aurostd::abs(dir_diff(2)) < _ZERO_TOL_ && aurostd::abs(dir_diff(3)) < _ZERO_TOL_);
+        bool add = (aurostd::abs(dir_add(1)) < _ZERO_TOL_ && aurostd::abs(dir_add(2)) < _ZERO_TOL_ && aurostd::abs(dir_add(3)) < _ZERO_TOL_);
+        bool point = (aurostd::abs(point_diff(1)) < _ZERO_TOL_ && aurostd::abs(point_diff(2)) < _ZERO_TOL_ && aurostd::abs(point_diff(3)) < _ZERO_TOL_);
+        if((diff || add) && point) {
+          if(add) {
+            new_lattice_vectors.push_back(-twofold_lattice_vectors[j]);
+          } else {
+            new_lattice_vectors.push_back(twofold_lattice_vectors[j]);
+          }
+          found = true;
+          break;
+        }
       }
       if(found == false) {
-	for (uint j = 0; j < old_rotations_rot.size(); j++) {
-	  xvector<double> dir_diff = new_rotations[i].return_direction() - old_rotations_rot[j].return_direction();
-	  xvector<double> dir_add = new_rotations[i].return_direction() + old_rotations_rot[j].return_direction();
-	  xvector<double> point_diff = new_rotations[i].return_point() - old_rotations_rot[j].return_point();
-	  bool diff = (aurostd::abs(dir_diff(1)) < _ZERO_TOL_ && aurostd::abs(dir_diff(2)) < _ZERO_TOL_ && aurostd::abs(dir_diff(3)) < _ZERO_TOL_);
-	  bool add = (aurostd::abs(dir_add(1)) < _ZERO_TOL_ && aurostd::abs(dir_add(2)) < _ZERO_TOL_ && aurostd::abs(dir_add(3)) < _ZERO_TOL_);
-	  bool point = (aurostd::abs(point_diff(1)) < _ZERO_TOL_ && aurostd::abs(point_diff(2)) < _ZERO_TOL_ && aurostd::abs(point_diff(3)) < _ZERO_TOL_);
-	  if((diff || add) && point) {
-	    if(add) {
-	      new_lattice_vectors.push_back(-rot_lattice_vectors[j]);
-	    } else {
-	      new_lattice_vectors.push_back(rot_lattice_vectors[j]);
-	    }
-	    found = true;
-	    break;
-	  }
-	}
+        for (uint j = 0; j < old_rotations_rot.size(); j++) {
+          xvector<double> dir_diff = new_rotations[i].return_direction() - old_rotations_rot[j].return_direction();
+          xvector<double> dir_add = new_rotations[i].return_direction() + old_rotations_rot[j].return_direction();
+          xvector<double> point_diff = new_rotations[i].return_point() - old_rotations_rot[j].return_point();
+          bool diff = (aurostd::abs(dir_diff(1)) < _ZERO_TOL_ && aurostd::abs(dir_diff(2)) < _ZERO_TOL_ && aurostd::abs(dir_diff(3)) < _ZERO_TOL_);
+          bool add = (aurostd::abs(dir_add(1)) < _ZERO_TOL_ && aurostd::abs(dir_add(2)) < _ZERO_TOL_ && aurostd::abs(dir_add(3)) < _ZERO_TOL_);
+          bool point = (aurostd::abs(point_diff(1)) < _ZERO_TOL_ && aurostd::abs(point_diff(2)) < _ZERO_TOL_ && aurostd::abs(point_diff(3)) < _ZERO_TOL_);
+          if((diff || add) && point) {
+            if(add) {
+              new_lattice_vectors.push_back(-rot_lattice_vectors[j]);
+            } else {
+              new_lattice_vectors.push_back(rot_lattice_vectors[j]);
+            }
+            found = true;
+            break;
+          }
+        }
       }
       if(found == false) {
-	all_matched = false;
+        all_matched = false;
       }
     }
     return new_lattice_vectors;
@@ -4546,7 +4551,7 @@ namespace SYM {
 // Group symmetrically equivalent atoms
 namespace SYM {
   deque<deque<_atom> > groupSymmetryEquivalentAtoms(deque<_atom>& atoms, xmatrix<double>& lattice, vector<xmatrix<double> >& sym_ops,
-						    vector<xvector<double> >& translations, double& min_dist, double& tol) { //DX 20190215 - added tol
+      vector<xvector<double> >& translations, double& min_dist, double& tol) { //DX 20190215 - added tol
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     deque<deque<_atom> > equivalent_atoms;
     xmatrix<double> f2c = trasp(lattice);
@@ -4703,7 +4708,7 @@ namespace SYM {
     int out = 0;
     for (uint i = 0; i < vec.size(); i++) {
       if(vec[i].fpos == n.fpos && vec[i].name == n.name) {
-	out = i;
+        out = i;
       }
     }
     return out;
@@ -4723,10 +4728,10 @@ namespace SYM {
     vector<int> indicies_vecs_in_plane;
     for (uint i = 0; i < big_expanded.size(); i++) {
       if(aurostd::modulus(big_expanded[i]) > _ZERO_TOL_ && aurostd::modulus(perp_to_vec) > _ZERO_TOL_) {
-	if(aurostd::abs(((aurostd::modulus(big_expanded[i]) + aurostd::modulus(perp_to_vec)) / (2.0)) * sin(aurostd::angle(big_expanded[i], perp_to_vec) - (Pi_r / 2.0))) < tol) {
-	  pnorms.push_back(aurostd::modulus(big_expanded[i]));
-	  indicies_vecs_in_plane.push_back(i);
-	}
+        if(aurostd::abs(((aurostd::modulus(big_expanded[i]) + aurostd::modulus(perp_to_vec)) / (2.0)) * sin(aurostd::angle(big_expanded[i], perp_to_vec) - (Pi_r / 2.0))) < tol) {
+          pnorms.push_back(aurostd::modulus(big_expanded[i]));
+          indicies_vecs_in_plane.push_back(i);
+        }
       }
     }
     vector<int> min_vecs;
@@ -4792,29 +4797,30 @@ namespace SYM {
       bool cont_dbl = true;
       xvector<double> lattice_vector = tmp_dbl[1] - tmp_dbl[0];
       for (int i = 0; i < 8; i++) {
-	//if(!is_lattice_point(Linv,candidate_mirror*expanded_cell[i])){
-	if(!is_lattice_point(L, candidate_mirror * expanded_cell[i], lattice_vector, radius, skew, tol)) { //DX 20190215 - added tol
-	  cont_dbl = false;
-	}
+        //if(!is_lattice_point(Linv,candidate_mirror*expanded_cell[i]))
+        if(!is_lattice_point(L, candidate_mirror * expanded_cell[i], lattice_vector, radius, skew, tol)) //DX 20190215 - added tol
+        { //CO200106 - patching for auto-indenting
+          cont_dbl = false;
+        }
       }
       if(cont_dbl == true) {
-	is_lattice_point(L, tmp_dbl[1] - tmp_dbl[0], lattice_vector, radius, skew, tol); //DX 20190215 - added tol
-	bool contained_in_list = false;
-	for (uint i = 0; i < mirror_ops_vec.size(); i++) {
-	  //Use function to compare rotation axes
-	  if(symmetry_axis_equivalent(L, Linv, nullvec, mpnorm, mirror_ops_vec[i].return_point(), mirror_ops_vec[i].return_direction(), tol)) { //DX 20190215 - added tol
-	    contained_in_list = true;
-	    if(aurostd::modulus(lattice_vector) < aurostd::modulus(lattice_vectors[i])) {
-	      lattice_vectors[i] = lattice_vector;
-	    }
-	    break;
-	  }
-	}
-	//Add to list if not already there
-	if(contained_in_list == false) {
-	  mirror_ops_vec.push_back(candidate_mirror);
-	  lattice_vectors.push_back(lattice_vector);
-	}
+        is_lattice_point(L, tmp_dbl[1] - tmp_dbl[0], lattice_vector, radius, skew, tol); //DX 20190215 - added tol
+        bool contained_in_list = false;
+        for (uint i = 0; i < mirror_ops_vec.size(); i++) {
+          //Use function to compare rotation axes
+          if(symmetry_axis_equivalent(L, Linv, nullvec, mpnorm, mirror_ops_vec[i].return_point(), mirror_ops_vec[i].return_direction(), tol)) { //DX 20190215 - added tol
+            contained_in_list = true;
+            if(aurostd::modulus(lattice_vector) < aurostd::modulus(lattice_vectors[i])) {
+              lattice_vectors[i] = lattice_vector;
+            }
+            break;
+          }
+        }
+        //Add to list if not already there
+        if(contained_in_list == false) {
+          mirror_ops_vec.push_back(candidate_mirror);
+          lattice_vectors.push_back(lattice_vector);
+        }
       }
       cmb_dbl = AllCombination42(2, tsize, cmb_dbl);
     }
@@ -4848,30 +4854,30 @@ namespace SYM {
       bool cont = true;
       xvector<double> lattice_vector;
       for (int i = 0; i < 8; i++) {
-	if(!points_equivalent(c2f, f2c, Nullvec, candidate_rotation * expanded_cell[i], lattice_vector, radius, skew, tol)) { //DX 20190215 - added tol
-	  cont = false;
-	}
+        if(!points_equivalent(c2f, f2c, Nullvec, candidate_rotation * expanded_cell[i], lattice_vector, radius, skew, tol)) { //DX 20190215 - added tol
+          cont = false;
+        }
       }
       if(cont == true) {
-	points_equivalent(c2f, f2c, Nullvec, tmp_dbl[1] - tmp_dbl[0], lattice_vector, radius, skew, tol); //DX 20190215
-	//MUST ELIMINATE DUPLICATES THAT ARISE BECAUSE OF EXPANDED LATTICE
-	//Check if operation is included in list
-	bool contained_in_list = false;
-	for (uint i = 0; i < twofold_ops_vec.size(); i++) {
-	  //Use function to compare rotation axes
-	  if(symmetry_axis_equivalent(L, Linv, point_on_axis, axis_direction, twofold_ops_vec[i].return_point(), twofold_ops_vec[i].return_direction(), tol)) { //DX 20190215 - added tol
-	    if(aurostd::modulus(lattice_vector) < aurostd::modulus(lattice_vectors[i])) {
-	      lattice_vectors[i] = lattice_vector;
-	    }
-	    contained_in_list = true;
-	    break;
-	  }
-	}
-	//Add to list if not already there
-	if(contained_in_list == false) {
-	  twofold_ops_vec.push_back(candidate_rotation);
-	  lattice_vectors.push_back(lattice_vector);
-	}
+        points_equivalent(c2f, f2c, Nullvec, tmp_dbl[1] - tmp_dbl[0], lattice_vector, radius, skew, tol); //DX 20190215
+        //MUST ELIMINATE DUPLICATES THAT ARISE BECAUSE OF EXPANDED LATTICE
+        //Check if operation is included in list
+        bool contained_in_list = false;
+        for (uint i = 0; i < twofold_ops_vec.size(); i++) {
+          //Use function to compare rotation axes
+          if(symmetry_axis_equivalent(L, Linv, point_on_axis, axis_direction, twofold_ops_vec[i].return_point(), twofold_ops_vec[i].return_direction(), tol)) { //DX 20190215 - added tol
+            if(aurostd::modulus(lattice_vector) < aurostd::modulus(lattice_vectors[i])) {
+              lattice_vectors[i] = lattice_vector;
+            }
+            contained_in_list = true;
+            break;
+          }
+        }
+        //Add to list if not already there
+        if(contained_in_list == false) {
+          twofold_ops_vec.push_back(candidate_rotation);
+          lattice_vectors.push_back(lattice_vector);
+        }
       }
       cmb_dbl = AllCombination42(2, tsize, cmb_dbl);
     }
@@ -4909,102 +4915,102 @@ namespace SYM {
       tmp_trip.push_back(expanded_lattice[cmb[2]]);
       tmpchar = discern_rot_sym(get_mod_angle_tensor(tmp_trip), tol); //DX 20190215 - added tol
       if(tmpchar != 'z') {
-	count++;
-	Screw candidate_rotation;
-	//Get axis direction
-	xvector<double> axis_direction = aurostd::vector_product(tmp_trip[1] - tmp_trip[0], tmp_trip[2] - tmp_trip[0]); //DX 20190905 - SYM::CrossPro() -> aurostd::vector_product()
-	xvector<double> full_direction = axis_direction;
-	bool found_point = false;
-	for (uint j = 0; j < big_expanded.size(); j++) {
-	  for (uint k = j + 1; k < big_expanded.size(); k++) {
-	    if((((aurostd::modulus(axis_direction) + aurostd::modulus(big_expanded[j] - big_expanded[k])) / 2.0) * sin(aurostd::angle(axis_direction, big_expanded[j] - big_expanded[k])) < tol)) { //DX 20190215
-	      full_direction = big_expanded[j] - big_expanded[k];
-	      axis_direction = big_expanded[j] - big_expanded[k];
-	      found_point = true;
-	      break;
-	    }
-	  }
-	  if(found_point == true) {
-	    break;
-	  }
-	}
-	if(found_point == false) {
-	  cmb = AllCombination42(3, tsize, cmb);
-	  continue;
-	}
-	axis_direction = (1 / aurostd::modulus(axis_direction)) * axis_direction;
-	//The point on axis can always be 0,0,0 for lattice (equivalent points and group theory)
-	xvector<double> point_on_axis = Nullvec;
-	//double zero_one = aurostd::modulus(tmp_trip[0]-tmp_trip[1]);
-	//double zero_two = aurostd::modulus(tmp_trip[0]-tmp_trip[2]);
-	if(tmpchar == 'a') {  //3-fold
-	  //point_on_axis = (1.0/3.0)*(tmp_trip[0]+tmp_trip[1]+tmp_trip[2]);
-	  candidate_rotation.get_screw_direct(axis_direction, point_on_axis, 3);
-	  rotation_order = 3.0;
-	}
-	if(tmpchar == 'b') {  //4-fold
-			       //if((zero_one-zero_two)>tol){
-	  //point_on_axis = (.5)*(tmp_trip[0]+tmp_trip[1]);
-	  //}
-	  //if((zero_two-zero_one)>tol){
-	  //point_on_axis = (.5)*(tmp_trip[0]+tmp_trip[2]);
-	  //}
-	  //if(aurostd::abs(zero_one-zero_two)<tol){
-	  //point_on_axis = (.5)*(tmp_trip[1]+tmp_trip[2]);
-	  //}
-	  candidate_rotation.get_screw_direct(axis_direction, point_on_axis, 4);
-	  rotation_order = 4.0;
-	}
-	if(tmpchar == 'c') {  //6-fold
-	  //if((zero_one-zero_two)>tol){
-	  //point_on_axis = (tmp_trip[0]+tmp_trip[1])-tmp_trip[2];
-	  //}
-	  //if((zero_two-zero_one)>tol){
-	  //point_on_axis = (tmp_trip[0]+tmp_trip[2])-tmp_trip[1];
-	  //}
-	  //if(aurostd::abs(zero_one-zero_two)<tol){
-	  //point_on_axis = (tmp_trip[1]+tmp_trip[2])-tmp_trip[0];
-	  //}
-	  candidate_rotation.get_screw_direct(axis_direction, point_on_axis, 6);
-	  rotation_order = 6.0;
-	}
-	bool cont = true;
-	xvector<double> lattice_vector;
-	//cerr << "candidate_rotation: " << candidate_rotation << endl;
-	//cerr << "+++++++++++++++++++++++++++++++++++++++" << endl;
-	for (int i = 0; i < 8; i++) {
-	  if(!points_equivalent(c2f, f2c, Nullvec, candidate_rotation * expanded_cell[i], lattice_vector, radius, skew, tol)) { //DX 20190215 - added tol
-	    cont = false;
-	  }
-	}
-	if(cont == true) {
-	  points_equivalent(c2f, f2c, Nullvec, full_direction, lattice_vector, radius, skew, tol); //DX 20190215 - added tol
-	  //MUST ELIMINATE DUPLICATES THAT ARISE BECAUSE OF EXPANDED LATTICE
-	  //Check if operation is included in list
-	  bool contained_in_list = false;
-	  for (uint i = 0; i < rotation_ops_vec.size(); i++) {
-	    //Only compare rotations with the same order
-	    if(aurostd::abs(rotation_ops_vec[i].return_order() - rotation_order) < _ZERO_TOL_) {
-	      //Use function to compare rotation axes
-	      if(symmetry_axis_equivalent(L, Linv, point_on_axis, axis_direction, rotation_ops_vec[i].return_point(), rotation_ops_vec[i].return_direction(), tol)) { //DX 20190215 - added tol
-		if(aurostd::modulus(lattice_vector) < aurostd::modulus(lattice_vectors[i])) {
-		  lattice_vectors[i] = lattice_vector;
-		}
-		contained_in_list = true;
-		break;
-	      }
-	    }
-	  }
-	  //Add to list if not already there
-	  if(contained_in_list == false) {
-	    rotation_ops_vec.push_back(candidate_rotation);
-	    lattice_vectors.push_back(lattice_vector);
-	    //cerr << tmpchar << endl;
-	    //cerr << candidate_rotation << endl;
-	    //cerr << "********************" << endl;
-	    rotation_ops++;
-	  }
-	}
+        count++;
+        Screw candidate_rotation;
+        //Get axis direction
+        xvector<double> axis_direction = aurostd::vector_product(tmp_trip[1] - tmp_trip[0], tmp_trip[2] - tmp_trip[0]); //DX 20190905 - SYM::CrossPro() -> aurostd::vector_product()
+        xvector<double> full_direction = axis_direction;
+        bool found_point = false;
+        for (uint j = 0; j < big_expanded.size(); j++) {
+          for (uint k = j + 1; k < big_expanded.size(); k++) {
+            if((((aurostd::modulus(axis_direction) + aurostd::modulus(big_expanded[j] - big_expanded[k])) / 2.0) * sin(aurostd::angle(axis_direction, big_expanded[j] - big_expanded[k])) < tol)) { //DX 20190215
+              full_direction = big_expanded[j] - big_expanded[k];
+              axis_direction = big_expanded[j] - big_expanded[k];
+              found_point = true;
+              break;
+            }
+          }
+          if(found_point == true) {
+            break;
+          }
+        }
+        if(found_point == false) {
+          cmb = AllCombination42(3, tsize, cmb);
+          continue;
+        }
+        axis_direction = (1 / aurostd::modulus(axis_direction)) * axis_direction;
+        //The point on axis can always be 0,0,0 for lattice (equivalent points and group theory)
+        xvector<double> point_on_axis = Nullvec;
+        //double zero_one = aurostd::modulus(tmp_trip[0]-tmp_trip[1]);
+        //double zero_two = aurostd::modulus(tmp_trip[0]-tmp_trip[2]);
+        if(tmpchar == 'a') {  //3-fold
+          //point_on_axis = (1.0/3.0)*(tmp_trip[0]+tmp_trip[1]+tmp_trip[2]);
+          candidate_rotation.get_screw_direct(axis_direction, point_on_axis, 3);
+          rotation_order = 3.0;
+        }
+        if(tmpchar == 'b') {  //4-fold
+          //if((zero_one-zero_two)>tol){
+          //point_on_axis = (.5)*(tmp_trip[0]+tmp_trip[1]);
+          //}
+          //if((zero_two-zero_one)>tol){
+          //point_on_axis = (.5)*(tmp_trip[0]+tmp_trip[2]);
+          //}
+          //if(aurostd::abs(zero_one-zero_two)<tol){
+          //point_on_axis = (.5)*(tmp_trip[1]+tmp_trip[2]);
+          //}
+          candidate_rotation.get_screw_direct(axis_direction, point_on_axis, 4);
+          rotation_order = 4.0;
+        }
+        if(tmpchar == 'c') {  //6-fold
+          //if((zero_one-zero_two)>tol){
+          //point_on_axis = (tmp_trip[0]+tmp_trip[1])-tmp_trip[2];
+          //}
+          //if((zero_two-zero_one)>tol){
+          //point_on_axis = (tmp_trip[0]+tmp_trip[2])-tmp_trip[1];
+          //}
+          //if(aurostd::abs(zero_one-zero_two)<tol){
+          //point_on_axis = (tmp_trip[1]+tmp_trip[2])-tmp_trip[0];
+          //}
+          candidate_rotation.get_screw_direct(axis_direction, point_on_axis, 6);
+          rotation_order = 6.0;
+        }
+        bool cont = true;
+        xvector<double> lattice_vector;
+        //cerr << "candidate_rotation: " << candidate_rotation << endl;
+        //cerr << "+++++++++++++++++++++++++++++++++++++++" << endl;
+        for (int i = 0; i < 8; i++) {
+          if(!points_equivalent(c2f, f2c, Nullvec, candidate_rotation * expanded_cell[i], lattice_vector, radius, skew, tol)) { //DX 20190215 - added tol
+            cont = false;
+          }
+        }
+        if(cont == true) {
+          points_equivalent(c2f, f2c, Nullvec, full_direction, lattice_vector, radius, skew, tol); //DX 20190215 - added tol
+          //MUST ELIMINATE DUPLICATES THAT ARISE BECAUSE OF EXPANDED LATTICE
+          //Check if operation is included in list
+          bool contained_in_list = false;
+          for (uint i = 0; i < rotation_ops_vec.size(); i++) {
+            //Only compare rotations with the same order
+            if(aurostd::abs(rotation_ops_vec[i].return_order() - rotation_order) < _ZERO_TOL_) {
+              //Use function to compare rotation axes
+              if(symmetry_axis_equivalent(L, Linv, point_on_axis, axis_direction, rotation_ops_vec[i].return_point(), rotation_ops_vec[i].return_direction(), tol)) { //DX 20190215 - added tol
+                if(aurostd::modulus(lattice_vector) < aurostd::modulus(lattice_vectors[i])) {
+                  lattice_vectors[i] = lattice_vector;
+                }
+                contained_in_list = true;
+                break;
+              }
+            }
+          }
+          //Add to list if not already there
+          if(contained_in_list == false) {
+            rotation_ops_vec.push_back(candidate_rotation);
+            lattice_vectors.push_back(lattice_vector);
+            //cerr << tmpchar << endl;
+            //cerr << candidate_rotation << endl;
+            //cerr << "********************" << endl;
+            rotation_ops++;
+          }
+        }
       }
       cmb = AllCombination42(3, tsize, cmb);
     }
@@ -5023,9 +5029,9 @@ namespace SYM {
 
     if(tmp(1) <= 1.0 + _ZERO_TOL_ && tmp(1) >= 0.0 - _ZERO_TOL_) {
       if(tmp(2) <= 1.0 + _ZERO_TOL_ && tmp(2) >= 0.0 - _ZERO_TOL_) {
-	if(tmp(3) <= 1.0 + _ZERO_TOL_ && tmp(3) >= 0.0 - _ZERO_TOL_) {
-	  inside = true;
-	}
+        if(tmp(3) <= 1.0 + _ZERO_TOL_ && tmp(3) >= 0.0 - _ZERO_TOL_) {
+          inside = true;
+        }
       }
     }
 
@@ -5048,9 +5054,9 @@ namespace SYM {
     //Either the point falls within the cell or the components outside the cell are linearly dependent on the Normal.
     if((P(1) < (1.0 - tol) && P(1) >= -tol) || aurostd::abs(DotPro(a, N)) > tol) {
       if((P(2) < (1.0 - tol) && P(2) >= -tol) || aurostd::abs(DotPro(b, N)) > tol) {
-	if((P(3) < (1.0 - tol) && P(3) >= -tol) || aurostd::abs(DotPro(c, N)) > tol) {
-	  inside = true;
-	}
+        if((P(3) < (1.0 - tol) && P(3) >= -tol) || aurostd::abs(DotPro(c, N)) > tol) {
+          inside = true;
+        }
       }
     }
     return inside;
@@ -5068,9 +5074,9 @@ namespace SYM {
     bool inside = false;
     if(P(1) < (1.0 - tol) && P(1) >= -tol) {
       if(P(2) < (1.0 - tol) && P(2) >= -tol) {
-	if(P(3) < (1.0 - tol) && P(3) >= -tol) {
-	  inside = true;
-	}
+        if(P(3) < (1.0 - tol) && P(3) >= -tol) {
+          inside = true;
+        }
       }
     }
     return inside;
@@ -5273,8 +5279,8 @@ namespace SYM {
     bool all = true;
     for (uint i = 0; i < v.size(); i++) {
       if(aurostd::abs(v[i] - v[0]) > tol) {
-	all = false;
-	break;
+        all = false;
+        break;
       }
     }
     return all;
@@ -5289,11 +5295,11 @@ namespace SYM {
   vector<xvector<double> > ReturnITCGenShift(int spacegroupnum, string axis_cell) {
     SymmetryInformationITC ITC_sym_info; //DX 20190215
     ITC_sym_info.initsgs(axis_cell); //DX 20190215
-//DX 20190215 [OBSOLETE]#ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE]    extern thread_local vector<string> gl_sgs;
-//DX 20190215 [OBSOLETE]#else
-//DX 20190215 [OBSOLETE]    extern vector<string> gl_sgs;
-//DX 20190215 [OBSOLETE]#endif
+    //DX 20190215 [OBSOLETE]#ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+    //DX 20190215 [OBSOLETE]    extern thread_local vector<string> gl_sgs;
+    //DX 20190215 [OBSOLETE]#else
+    //DX 20190215 [OBSOLETE]    extern vector<string> gl_sgs;
+    //DX 20190215 [OBSOLETE]#endif
     spacegroupnum = spacegroupnum - 1;
     vector<int> genlocations = generatorindex(spacegroupnum + 1);
     vector<xvector<double> > out;
@@ -5319,22 +5325,22 @@ namespace SYM {
 
     for (uint k = 0; k < tmpvvvsd[s].size(); k++) {
       if(intinvec(genlocations, k + 1)) {
-	xvector<double> oneshift;
-	for (uint j = 0; j < tmpvvvsd[s][k].size(); j++) {
-	  double filler = 0;
-	  for (uint i = 1; i < tmpvvvsd[s][k][j].size(); i++) {
-	    //cerr <<"dbl: " <<  tmpvvvsd[s][k][j][i].dbl << endl;
-	    //cerr << "chr: " <<  tmpvvvsd[s][k][j][i].chr << endl;
-	    char tmpchr = tmpvvvsd[s][k][j][i].chr;
-	    if(tmpchr == '\0') {
-	      double tmpdbl = tmpvvvsd[s][k][j][i].dbl;
-	      filler = filler + tmpdbl;
-	    }
-	  }
-	  oneshift(j + 1) = filler;
-	}
-	out.push_back(oneshift);
-	oneshift.clear();
+        xvector<double> oneshift;
+        for (uint j = 0; j < tmpvvvsd[s][k].size(); j++) {
+          double filler = 0;
+          for (uint i = 1; i < tmpvvvsd[s][k][j].size(); i++) {
+            //cerr <<"dbl: " <<  tmpvvvsd[s][k][j][i].dbl << endl;
+            //cerr << "chr: " <<  tmpvvvsd[s][k][j][i].chr << endl;
+            char tmpchr = tmpvvvsd[s][k][j][i].chr;
+            if(tmpchr == '\0') {
+              double tmpdbl = tmpvvvsd[s][k][j][i].dbl;
+              filler = filler + tmpdbl;
+            }
+          }
+          oneshift(j + 1) = filler;
+        }
+        out.push_back(oneshift);
+        oneshift.clear();
       }
     }
     return out;
@@ -5364,11 +5370,11 @@ namespace SYM {
     string axis_cell = "";
     SymmetryInformationITC ITC_sym_info; //DX 20190215
     ITC_sym_info.initsgs(axis_cell); //DX 20190215
-//DX 20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE]     extern thread_local vector<string> gl_sgs;
-//DX 20190215 [OBSOLETE] #else
-//DX 20190215 [OBSOLETE]     extern vector<string> gl_sgs;
-//DX 20190215 [OBSOLETE] #endif
+    //DX 20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+    //DX 20190215 [OBSOLETE]     extern thread_local vector<string> gl_sgs;
+    //DX 20190215 [OBSOLETE] #else
+    //DX 20190215 [OBSOLETE]     extern vector<string> gl_sgs;
+    //DX 20190215 [OBSOLETE] #endif
     xmatrix<double> L = spacegroup_to_lattice(spacegroupnum + 1);
 
     get_random_double(.1, .9);
@@ -5408,28 +5414,28 @@ namespace SYM {
       //r2 = .2;
       //r3 = .3;
       for (uint k = 0; k < tmpvvvsd[s].size(); k++) {
-	_atom tmp;
-	tmp.name = typestring;
-	for (uint j = 0; j < tmpvvvsd[s][k].size(); j++) {
-	  //xb();
-	  for (uint i = 0; i < tmpvvvsd[s][k][j].size(); i++) {
-	    //cerr <<"dbl: " <<  tmpvvvsd[s][k][j][i].dbl << endl;
-	    //cerr << "chr: " <<  tmpvvvsd[s][k][j][i].chr << endl;
-	    char tmpchr = tmpvvvsd[s][k][j][i].chr;
-	    double tmpdbl = tmpvvvsd[s][k][j][i].dbl;
+        _atom tmp;
+        tmp.name = typestring;
+        for (uint j = 0; j < tmpvvvsd[s][k].size(); j++) {
+          //xb();
+          for (uint i = 0; i < tmpvvvsd[s][k][j].size(); i++) {
+            //cerr <<"dbl: " <<  tmpvvvsd[s][k][j][i].dbl << endl;
+            //cerr << "chr: " <<  tmpvvvsd[s][k][j][i].chr << endl;
+            char tmpchr = tmpvvvsd[s][k][j][i].chr;
+            double tmpdbl = tmpvvvsd[s][k][j][i].dbl;
 
-	    if(tmpchr == 'x') {
-	      tmp.fpos(j + 1) += tmpdbl * r1;
-	    } else if(tmpchr == 'y') {
-	      tmp.fpos(j + 1) += tmpdbl * r2;
-	    } else if(tmpchr == 'z') {
-	      tmp.fpos(j + 1) += tmpdbl * r3;
-	    } else {
-	      tmp.fpos(j + 1) += tmpdbl;
-	    }
-	  }
-	}
-	atoms.push_back(tmp);
+            if(tmpchr == 'x') {
+              tmp.fpos(j + 1) += tmpdbl * r1;
+            } else if(tmpchr == 'y') {
+              tmp.fpos(j + 1) += tmpdbl * r2;
+            } else if(tmpchr == 'z') {
+              tmp.fpos(j + 1) += tmpdbl * r3;
+            } else {
+              tmp.fpos(j + 1) += tmpdbl;
+            }
+          }
+        }
+        atoms.push_back(tmp);
       }
       total += atoms.size();
       oss << atoms.size() - countold << " ";
@@ -5473,7 +5479,7 @@ namespace SYM {
     }
     for (uint i = 1; i < 4; i++) {
       if(aurostd::abs(ijk(i)) > 3 && (orig_cdiff - radius) > _ZERO_TOL_) {
-	return false;
+        return false;
       }
     }
     xvector<double> tmp_fdiff;
@@ -5518,7 +5524,7 @@ namespace SYM {
     xvector<double> tmp_fdiff;
     for (uint i = 1; i < 4; i++) {
       if(aurostd::abs(ijk(i)) > 3 && (orig_cdiff - radius) > _ZERO_TOL_) {
-	return false;
+        return false;
       }
       tmp_fdiff(i) = fdiff(i) + (double)ijk(i);
     }
@@ -5573,39 +5579,39 @@ namespace SYM {
       //otherwise have to prove that an 'a' exists where ((p2+a*N)-p1)*L_inv = integers
       tmp = (P2 - P1) * Linv;
       for (int i = 1; i < 4; i++) {
-	if(tmp(i) - floor(tmp(i)) < tol || ceil(tmp(i)) - tmp(i) < tol)
-	  count++;
+        if(tmp(i) - floor(tmp(i)) < tol || ceil(tmp(i)) - tmp(i) < tol)
+          count++;
       }
       if(count == 3) {
-	return same;
+        return same;
       } else {
-	for (int i = -2; i <= 2; i++) {
-	  for (int j = -2; j <= 2; j++) {
-	    for (int k = -2; k <= 2; k++) {
-	      nonzeros.clear();
-	      check = 0;
-	      T(1) = i;
-	      T(2) = j;
-	      T(3) = k;
-	      //cerr << T << endl;
-	      tmp = T * L + P1 - P2;
-	      for (int ii = 1; ii < 4; ii++) {
-		if(aurostd::abs(tmp(ii)) < tol && aurostd::abs(N1(ii)) < tol)
-		  check++;
-		if(aurostd::abs(N1(ii)) > tol) {
-		  nonzeros.push_back(tmp(ii) / N1(ii));
-		}
-	      }
-	      if(allsame(nonzeros) && check + nonzeros.size() == 3) {
-		same = true;
-		return same;
-	      } else {
-		same = false;
-		//	      return same;
-	      }
-	    }
-	  }
-	}
+        for (int i = -2; i <= 2; i++) {
+          for (int j = -2; j <= 2; j++) {
+            for (int k = -2; k <= 2; k++) {
+              nonzeros.clear();
+              check = 0;
+              T(1) = i;
+              T(2) = j;
+              T(3) = k;
+              //cerr << T << endl;
+              tmp = T * L + P1 - P2;
+              for (int ii = 1; ii < 4; ii++) {
+                if(aurostd::abs(tmp(ii)) < tol && aurostd::abs(N1(ii)) < tol)
+                  check++;
+                if(aurostd::abs(N1(ii)) > tol) {
+                  nonzeros.push_back(tmp(ii) / N1(ii));
+                }
+              }
+              if(allsame(nonzeros) && check + nonzeros.size() == 3) {
+                same = true;
+                return same;
+              } else {
+                same = false;
+                //	      return same;
+              }
+            }
+          }
+        }
       }
       return same;
     } else {
@@ -5652,8 +5658,8 @@ namespace SYM {
     int size = points[0].urows;
     for (uint i = 0; i < points.size(); i++) {
       if(points[i].urows != size) {
-	cerr << "aflow_symmetry_spacegroup.cpp::get_mod_angle_tensor: ERROR: Points must all be same dimension" << endl;
-	exit(1);
+        cerr << "aflow_symmetry_spacegroup.cpp::get_mod_angle_tensor: ERROR: Points must all be same dimension" << endl;
+        exit(1);
       }
     }
     //Choose first point as origin
@@ -5667,13 +5673,13 @@ namespace SYM {
 
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
-	metric_tensor(i + 1, j + 1) = aurostd::scalar_product(points_referenced_to_first[i], points_referenced_to_first[j]);
-	if(i != j) {
-	  metric_tensor(i + 1, j + 1) = acos(metric_tensor(i + 1, j + 1) / (aurostd::modulus(points_referenced_to_first[i]) * aurostd::modulus(points_referenced_to_first[j])));
-	}
-	if(i == j) {
-	  metric_tensor(i + 1, j + 1) = sqrt(metric_tensor(i + 1, j + 1));
-	}
+        metric_tensor(i + 1, j + 1) = aurostd::scalar_product(points_referenced_to_first[i], points_referenced_to_first[j]);
+        if(i != j) {
+          metric_tensor(i + 1, j + 1) = acos(metric_tensor(i + 1, j + 1) / (aurostd::modulus(points_referenced_to_first[i]) * aurostd::modulus(points_referenced_to_first[j])));
+        }
+        if(i == j) {
+          metric_tensor(i + 1, j + 1) = sqrt(metric_tensor(i + 1, j + 1));
+        }
       }
     }
     return metric_tensor;
@@ -5700,8 +5706,8 @@ namespace SYM {
     //Check 4-fold
     if(aurostd::abs(m(1, 1) - m(2, 2)) < tol) {
       if(SYM::checkAngle(m(1, 1), m(2, 2), m(1, 2), two_fold, tol)) { //DX 20190215
-	out = 'b';
-	return out;
+        out = 'b';
+        return out;
       }
     }
     if(((m(1, 1) / m(2, 2)) - sqrt(2) < tol || (m(1, 1) / m(2, 2)) - (1 / sqrt(2)) < tol) && SYM::checkAngle(m(1, 1), m(2, 2), m(1, 2), four_fold, tol)) { //DX 20190215
@@ -5711,8 +5717,8 @@ namespace SYM {
     //Check 6-fold
     if(aurostd::abs(m(1, 1) - m(2, 2)) < tol) {
       if(SYM::checkAngle(m(1, 1), m(2, 2), m(1, 2), six_fold_120, tol)) { //DX 20190215
-	out = 'c';
-	return out;
+        out = 'c';
+        return out;
       }
     }
     if(((m(1, 1) / m(2, 2)) - sqrt(3) < tol || (m(1, 1) / m(2, 2)) - (1 / sqrt(3)) < tol) && SYM::checkAngle(m(1, 1), m(2, 2), m(1, 2), six_fold_60, tol)) { //DX 20190215

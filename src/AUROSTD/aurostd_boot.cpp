@@ -108,8 +108,9 @@ template<class utype> bool initialize_scalar(utype d) {
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","",0);
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","","",0);
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","","","",0);
+  //  s=utype2string(s);
+  //  s=utype2string("  ");
 
-  
   //  utype uu; _aflowlib::web2utype("location",uu);
   // [OBSOLETE]  _aflowlib::web2utype("location",s);
   aurostd::url2tokens("location",vu); aurostd::url2tokens("location",vu," ");
@@ -135,6 +136,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   x*x;x*r;r*x;x*=y;x*=r; // multiplication	//CO190329 - clang doesn't like x=x, changing to x=y
   x/x;x/r;r/x;x/=y;x/=r; // division		//CO190329 - clang doesn't like x=x, changing to x=y
   x=y;x=r;               // equal		//CO190329 - clang doesn't like x=x, changing to x=y
+  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);// ME200107
   x=abs(x)+arg(x)+polar(r,r)+conj(x)+norm(x)+cos(x)+cosh(x)+exp(x)+log(x)+pow(x,x)+pow(x,int(1))+pow(x,r)+pow(r,x)+sin(x)+sinh(x)+sqrt(x); // functions
   r = magsqr(x);  // ME180907
 
@@ -147,9 +149,9 @@ template<class utype> bool initialize_xcomplex(utype d) {
   cout << vx << endl; // DX 1/15/18 - ostream was missing
   conj(vx);  // ME180904
 
-  aurostd::xmatrix<utype> mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO190329 - clang doesn't like x=x, changing to x=y
-  mx+mx;mx+=my;mx-mx;mx-=my;mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO190329 - clang doesn't like x=x, changing to x=y
-  sin(mx);sinh(mx);cos(mx);cosh(mx);exp(mx);
+  aurostd::xmatrix<utype > mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO190329 - clang doesn't like x=x, changing to x=y
+  mx=mx+mx;mx+=my;mx=mx-mx;mx-=my;mx=mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO190329 - clang doesn't like x=x, changing to x=y  //CO200106 - set the result or clang complains
+  mx=sin(mx);mx=sinh(mx);mx=cos(mx);mx=cosh(mx);mx=exp(mx); //CO200106 - set the result or clang complains
   aurostd::ones_xv<utype>();aurostd::ones_xv<utype>(3);aurostd::ones_xv<utype>(3,3); //CO190520
   aurostd::ones_xm<utype>();aurostd::ones_xm<utype>(3);aurostd::ones_xm<utype>(3,3);aurostd::ones_xm<utype>(1,2,3,4); //CO190520
   aurostd::eye<utype>();aurostd::eye<utype>(3);aurostd::eye<utype>(3,3);aurostd::eye<utype>(1,2,3,4); //CO190520
@@ -166,9 +168,12 @@ template<class utype> bool initialize_xcomplex(utype d) {
   m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
   cout << m << endl; // DX 1/15/18 - ostream
   vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME 180904
+  bool tf=false;  //CO200106 - set the result or clang complains
+  m=mx*m;tf=bool(m==n);tf=bool(m!=n);jacobiHermitian(m);vx=m(1); // ME190814  //CO200106 - set the result or clang complains
+  if(tf){;} //CO200106 - keep tf busy
 
   //  jacobi(m,vx,m);
- 
+
   return TRUE;
 }
 
@@ -186,7 +191,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   int i=0;double d=0,o=0;string s;
   aurostd::xvector<int> xvi(2);
   aurostd::xvector<double> xvd(2);
-  
+
   // initialize vector sort
   vector<utype> vutype;vector<int> vint;vector<uint> vuint;vector<double> vdouble;vector<string> vstring;
   aurostd::sort(vutype);aurostd::sort(vutype,vint);aurostd::sort(vutype,vdouble);
@@ -216,11 +221,11 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::string2tokensAdd(s,vuint,"");aurostd::string2tokensAdd(s,duint,"");
   aurostd::string2tokens(s,vutype,"");aurostd::string2tokens(s,dutype,"");
   aurostd::string2tokensAdd(s,vutype,"");aurostd::string2tokensAdd(s,dutype,"");
-  
+
   // initialize xvector sort
   xvector<utype> vxu;xvector<int> ixv;xvector<double> dxv;
   aurostd::quicksort2((uint) 0,ixv,dxv);aurostd::quicksort2((uint) 0,dxv,ixv);
-  
+
   // initialize scalars
   o+=nint(x)+factorial(x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);
   o+=max(x,x);o+=max(x,x,x);o+=max(x,x,x,x);o+=max(x,x,x,x,x);o+=max(x,x,x,x,x,x);o+=sign(x);
@@ -289,6 +294,8 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);shiftlrows(m,1);shiftlcols(m,1);shiftlrowscols(m,1,1);  //CO191201
   sin(m);sinh(m);cos(m);cosh(m);exp(m);
   aurostd::floor(m);aurostd::ceil(m);
+  // ME190718 - norms
+  aurostd::l1_norm(m);aurostd::frobenius_norm(m);aurostd::l2_norm(m);aurostd::linf_norm(m);
   // aurostd::trunc(m);aurostd::round(m);
 
   //[ME 180627 START]
@@ -356,7 +363,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   //[OBSOLETE ME180705]t8=x*t8;t8=-t8;t8=+t8;reset(t8);clear(t8);set(t8,x);x=min(t8);x=max(t8);x=trace(t8);t8=identity(t8);
   //[OBSOLETE ME180705]t8.clear();t8.set(x);t8.reset();t8=nint(t8);t8=sign(t8);t8=abs(t8);t8=floor(t8);t8=ceil(t8);//t8=round(t8);t8=trunc(t8);
   //[OBSOLETE ME180705]int i8[8+1];aurostd::xtensor8debug(t8,"");utype ******** b8;aurostd::allocate_xtensor8corpus(b8,i8,i8,i8);
-  
+
   return TRUE;
 }
 
@@ -400,7 +407,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     o+=aurostd::string2utype<float>("0");
     o+=aurostd::string2utype<double>("0");
     o+=aurostd::string2utype<long double>("0");
-    
+
     vector<bool> vxb;vector<char> vxc;vector<string> vxs;vector<unsigned int> vxui;vector<int> vxi;vector<long int> vxli;vector<long long int> vxlli;vector<float> vxf;vector<double> vxd;vector<long double> vxld;  //CO181226
     deque<bool> dxb;deque<char> dxc;deque<string> dxs;deque<unsigned int> dxui;deque<int> dxi;deque<long int> dxli;deque<long long int> dxlli;deque<float> dxf;deque<double> dxd;deque<long double> dxld; //CO181226
 
@@ -414,7 +421,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     dxf=aurostd::vector2deque<float>(vxf);  //CO181226
     dxd=aurostd::vector2deque<double>(vxd); //CO181226
     dxld=aurostd::vector2deque<long double>(vxld);  //CO181226
-    
+
     vxb=aurostd::deque2vector<bool>(dxb); //CO181226
     vxc=aurostd::deque2vector<char>(dxc); //CO181226
     vxs=aurostd::deque2vector<string>(dxs); //CO181226
@@ -425,7 +432,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     vxf=aurostd::deque2vector<float>(dxf);  //CO181226
     vxd=aurostd::deque2vector<double>(dxd); //CO181226
     vxld=aurostd::deque2vector<long double>(dxld);  //CO181226
-    
+
 #define AUROSTD_INITIALIZE_BOOL
     //#define AUROSTD_INITIALIZE_CHAR
 #define AUROSTD_INITIALIZE_STRING
@@ -439,7 +446,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #define AUROSTD_INITIALIZE_LONG_LONG_INT
 #define AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
 #define AUROSTD_INITIALIZE_COMPLEX_DOUBLE
-      
+
 
     aurostd::xmatrix<double> mxdouble;  //CO191201
 #ifdef AUROSTD_INITIALIZE_BOOL
@@ -506,7 +513,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
       o+=aurostd::isequal<float>(float(d),float(d),float(d));
       o+=aurostd::isdifferent<float>(float(d),float(d));
       o+=aurostd::isdifferent<float>(float(d),float(d),float(d));
-     }
+    }
 #endif
 #ifdef AUROSTD_INITIALIZE_DOUBLE
     if(1) { // AUROSTD_INITIALIZE_DOUBLE

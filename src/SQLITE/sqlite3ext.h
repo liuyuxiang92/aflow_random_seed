@@ -1,34 +1,34 @@
 /*
-** 2006 June 7
-**
-** The author disclaims copyright to this source code.  In place of
-** a legal notice, here is a blessing:
-**
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
-**
-*************************************************************************
-** This header file defines the SQLite interface for use by
-** shared libraries that want to be imported as extensions into
-** an SQLite instance.  Shared libraries that intend to be loaded
-** as extensions by SQLite should #include this file instead of 
-** sqlite3.h.
-*/
+ ** 2006 June 7
+ **
+ ** The author disclaims copyright to this source code.  In place of
+ ** a legal notice, here is a blessing:
+ **
+ **    May you do good and not evil.
+ **    May you find forgiveness for yourself and forgive others.
+ **    May you share freely, never taking more than you give.
+ **
+ *************************************************************************
+ ** This header file defines the SQLite interface for use by
+ ** shared libraries that want to be imported as extensions into
+ ** an SQLite instance.  Shared libraries that intend to be loaded
+ ** as extensions by SQLite should #include this file instead of 
+ ** sqlite3.h.
+ */
 #ifndef SQLITE3EXT_H
 #define SQLITE3EXT_H
 #include "sqlite3.h"
 
 /*
-** The following structure holds pointers to all of the SQLite API
-** routines.
-**
-** WARNING:  In order to maintain backwards compatibility, add new
-** interfaces to the end of this structure only.  If you insert new
-** interfaces in the middle of this structure, then older different
-** versions of SQLite will not be able to load each other's shared
-** libraries!
-*/
+ ** The following structure holds pointers to all of the SQLite API
+ ** routines.
+ **
+ ** WARNING:  In order to maintain backwards compatibility, add new
+ ** interfaces to the end of this structure only.  If you insert new
+ ** interfaces in the middle of this structure, then older different
+ ** versions of SQLite will not be able to load each other's shared
+ ** libraries!
+ */
 struct sqlite3_api_routines {
   void * (*aggregate_context)(sqlite3_context*,int nBytes);
   int  (*aggregate_count)(sqlite3_context*);
@@ -48,9 +48,9 @@ struct sqlite3_api_routines {
   int  (*changes)(sqlite3*);
   int  (*close)(sqlite3*);
   int  (*collation_needed)(sqlite3*,void*,void(*)(void*,sqlite3*,
-                           int eTextRep,const char*));
+        int eTextRep,const char*));
   int  (*collation_needed16)(sqlite3*,void*,void(*)(void*,sqlite3*,
-                             int eTextRep,const void*));
+        int eTextRep,const void*));
   const void * (*column_blob)(sqlite3_stmt*,int iCol);
   int  (*column_bytes)(sqlite3_stmt*,int iCol);
   int  (*column_bytes16)(sqlite3_stmt*,int iCol);
@@ -76,17 +76,17 @@ struct sqlite3_api_routines {
   int  (*complete)(const char*sql);
   int  (*complete16)(const void*sql);
   int  (*create_collation)(sqlite3*,const char*,int,void*,
-                           int(*)(void*,int,const void*,int,const void*));
+      int(*)(void*,int,const void*,int,const void*));
   int  (*create_collation16)(sqlite3*,const void*,int,void*,
-                             int(*)(void*,int,const void*,int,const void*));
+      int(*)(void*,int,const void*,int,const void*));
   int  (*create_function)(sqlite3*,const char*,int,int,void*,
-                          void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
-                          void (*xStep)(sqlite3_context*,int,sqlite3_value**),
-                          void (*xFinal)(sqlite3_context*));
+      void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
+      void (*xStep)(sqlite3_context*,int,sqlite3_value**),
+      void (*xFinal)(sqlite3_context*));
   int  (*create_function16)(sqlite3*,const void*,int,int,void*,
-                            void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
-                            void (*xStep)(sqlite3_context*,int,sqlite3_value**),
-                            void (*xFinal)(sqlite3_context*));
+      void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
+      void (*xStep)(sqlite3_context*,int,sqlite3_value**),
+      void (*xFinal)(sqlite3_context*));
   int (*create_module)(sqlite3*,const char*,const sqlite3_module*,void*);
   int  (*data_count)(sqlite3_stmt*pStmt);
   sqlite3 * (*db_handle)(sqlite3_stmt*);
@@ -132,18 +132,18 @@ struct sqlite3_api_routines {
   void  (*result_value)(sqlite3_context*,sqlite3_value*);
   void * (*rollback_hook)(sqlite3*,void(*)(void*),void*);
   int  (*set_authorizer)(sqlite3*,int(*)(void*,int,const char*,const char*,
-                         const char*,const char*),void*);
+        const char*,const char*),void*);
   void  (*set_auxdata)(sqlite3_context*,int,void*,void (*)(void*));
   char * (*xsnprintf)(int,char*,const char*,...);
   int  (*step)(sqlite3_stmt*);
   int  (*table_column_metadata)(sqlite3*,const char*,const char*,const char*,
-                                char const**,char const**,int*,int*,int*);
+      char const**,char const**,int*,int*,int*);
   void  (*thread_cleanup)(void);
   int  (*total_changes)(sqlite3*);
   void * (*trace)(sqlite3*,void(*xTrace)(void*,const char*),void*);
   int  (*transfer_bindings)(sqlite3_stmt*,sqlite3_stmt*);
   void * (*update_hook)(sqlite3*,void(*)(void*,int ,char const*,char const*,
-                                         sqlite_int64),void*);
+        sqlite_int64),void*);
   void * (*user_data)(sqlite3_context*);
   const void * (*value_blob)(sqlite3_value*);
   int  (*value_bytes)(sqlite3_value*);
@@ -166,18 +166,18 @@ struct sqlite3_api_routines {
   int (*clear_bindings)(sqlite3_stmt*);
   /* Added by 3.4.1 */
   int (*create_module_v2)(sqlite3*,const char*,const sqlite3_module*,void*,
-                          void (*xDestroy)(void *));
+      void (*xDestroy)(void *));
   /* Added by 3.5.0 */
   int (*bind_zeroblob)(sqlite3_stmt*,int,int);
   int (*blob_bytes)(sqlite3_blob*);
   int (*blob_close)(sqlite3_blob*);
   int (*blob_open)(sqlite3*,const char*,const char*,const char*,sqlite3_int64,
-                   int,sqlite3_blob**);
+      int,sqlite3_blob**);
   int (*blob_read)(sqlite3_blob*,void*,int,int);
   int (*blob_write)(sqlite3_blob*,const void*,int,int);
   int (*create_collation_v2)(sqlite3*,const char*,int,void*,
-                             int(*)(void*,int,const void*,int,const void*),
-                             void(*)(void*));
+      int(*)(void*,int,const void*,int,const void*),
+      void(*)(void*));
   int (*file_control)(sqlite3*,const char*,int,void*);
   sqlite3_int64 (*memory_highwater)(int);
   sqlite3_int64 (*memory_used)(void);
@@ -214,10 +214,10 @@ struct sqlite3_api_routines {
   const char *(*compileoption_get)(int);
   int (*compileoption_used)(const char*);
   int (*create_function_v2)(sqlite3*,const char*,int,int,void*,
-                            void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
-                            void (*xStep)(sqlite3_context*,int,sqlite3_value**),
-                            void (*xFinal)(sqlite3_context*),
-                            void(*xDestroy)(void*));
+      void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
+      void (*xStep)(sqlite3_context*,int,sqlite3_value**),
+      void (*xFinal)(sqlite3_context*),
+      void(*xDestroy)(void*));
   int (*db_config)(sqlite3*,int,...);
   sqlite3_mutex *(*db_mutex)(sqlite3*);
   int (*db_status)(sqlite3*,int,int*,int*,int);
@@ -251,9 +251,9 @@ struct sqlite3_api_routines {
   /* Version 3.8.7 and later */
   int (*auto_extension)(void(*)(void));
   int (*bind_blob64)(sqlite3_stmt*,int,const void*,sqlite3_uint64,
-                     void(*)(void*));
+      void(*)(void*));
   int (*bind_text64)(sqlite3_stmt*,int,const char*,sqlite3_uint64,
-                      void(*)(void*),unsigned char);
+      void(*)(void*),unsigned char);
   int (*cancel_auto_extension)(void(*)(void));
   int (*load_extension)(sqlite3*,const char*,const char*,char**);
   void *(*malloc64)(sqlite3_uint64);
@@ -261,9 +261,9 @@ struct sqlite3_api_routines {
   void *(*realloc64)(void*,sqlite3_uint64);
   void (*reset_auto_extension)(void);
   void (*result_blob64)(sqlite3_context*,const void*,sqlite3_uint64,
-                        void(*)(void*));
+      void(*)(void*));
   void (*result_text64)(sqlite3_context*,const char*,sqlite3_uint64,
-                         void(*)(void*), unsigned char);
+      void(*)(void*), unsigned char);
   int (*strglob)(const char*,const char*);
   /* Version 3.8.11 and later */
   sqlite3_value *(*value_dup)(const sqlite3_value*);
@@ -286,9 +286,9 @@ struct sqlite3_api_routines {
   void (*set_last_insert_rowid)(sqlite3*,sqlite3_int64);
   /* Version 3.20.0 and later */
   int (*prepare_v3)(sqlite3*,const char*,int,unsigned int,
-                    sqlite3_stmt**,const char**);
+      sqlite3_stmt**,const char**);
   int (*prepare16_v3)(sqlite3*,const void*,int,unsigned int,
-                      sqlite3_stmt**,const void**);
+      sqlite3_stmt**,const void**);
   int (*bind_pointer)(sqlite3_stmt*,int,void*,const char*,void(*)(void*));
   void (*result_pointer)(sqlite3_context*,void*,const char*,void(*)(void*));
   void *(*value_pointer)(sqlite3_value*,const char*);
@@ -312,11 +312,11 @@ struct sqlite3_api_routines {
   char *(*str_value)(sqlite3_str*);
   /* Version 3.25.0 and later */
   int (*create_window_function)(sqlite3*,const char*,int,int,void*,
-                            void (*xStep)(sqlite3_context*,int,sqlite3_value**),
-                            void (*xFinal)(sqlite3_context*),
-                            void (*xValue)(sqlite3_context*),
-                            void (*xInv)(sqlite3_context*,int,sqlite3_value**),
-                            void(*xDestroy)(void*));
+      void (*xStep)(sqlite3_context*,int,sqlite3_value**),
+      void (*xFinal)(sqlite3_context*),
+      void (*xValue)(sqlite3_context*),
+      void (*xInv)(sqlite3_context*,int,sqlite3_value**),
+      void(*xDestroy)(void*));
   /* Version 3.26.0 and later */
   const char *(*normalized_sql)(sqlite3_stmt*);
   /* Version 3.28.0 and later */
@@ -327,26 +327,26 @@ struct sqlite3_api_routines {
 };
 
 /*
-** This is the function signature used for all extension entry points.  It
-** is also defined in the file "loadext.c".
-*/
+ ** This is the function signature used for all extension entry points.  It
+ ** is also defined in the file "loadext.c".
+ */
 typedef int (*sqlite3_loadext_entry)(
-  sqlite3 *db,                       /* Handle to the database. */
-  char **pzErrMsg,                   /* Used to set error string on failure. */
-  const sqlite3_api_routines *pThunk /* Extension API function pointers. */
-);
+    sqlite3 *db,                       /* Handle to the database. */
+    char **pzErrMsg,                   /* Used to set error string on failure. */
+    const sqlite3_api_routines *pThunk /* Extension API function pointers. */
+    );
 
 /*
-** The following macros redefine the API routines so that they are
-** redirected through the global sqlite3_api structure.
-**
-** This header file is also used by the loadext.c source file
-** (part of the main SQLite library - not an extension) so that
-** it can get access to the sqlite3_api_routines structure
-** definition.  But the main library does not want to redefine
-** the API.  So the redefinition macros are only valid if the
-** SQLITE_CORE macros is undefined.
-*/
+ ** The following macros redefine the API routines so that they are
+ ** redirected through the global sqlite3_api structure.
+ **
+ ** This header file is also used by the loadext.c source file
+ ** (part of the main SQLite library - not an extension) so that
+ ** it can get access to the sqlite3_api_routines structure
+ ** definition.  But the main library does not want to redefine
+ ** the API.  So the redefinition macros are only valid if the
+ ** SQLITE_CORE macros is undefined.
+ */
 #if !defined(SQLITE_CORE) && !defined(SQLITE_OMIT_LOAD_EXTENSION)
 #define sqlite3_aggregate_context      sqlite3_api->aggregate_context
 #ifndef SQLITE_OMIT_DEPRECATED
@@ -621,15 +621,15 @@ typedef int (*sqlite3_loadext_entry)(
 #endif /* !defined(SQLITE_CORE) && !defined(SQLITE_OMIT_LOAD_EXTENSION) */
 
 #if !defined(SQLITE_CORE) && !defined(SQLITE_OMIT_LOAD_EXTENSION)
-  /* This case when the file really is being compiled as a loadable 
-  ** extension */
+/* This case when the file really is being compiled as a loadable 
+ ** extension */
 # define SQLITE_EXTENSION_INIT1     const sqlite3_api_routines *sqlite3_api=0;
 # define SQLITE_EXTENSION_INIT2(v)  sqlite3_api=v;
 # define SQLITE_EXTENSION_INIT3     \
-    extern const sqlite3_api_routines *sqlite3_api;
+  extern const sqlite3_api_routines *sqlite3_api;
 #else
-  /* This case when the file is being statically linked into the 
-  ** application */
+/* This case when the file is being statically linked into the 
+ ** application */
 # define SQLITE_EXTENSION_INIT1     /*no-op*/
 # define SQLITE_EXTENSION_INIT2(v)  (void)v; /* unused parameter */
 # define SQLITE_EXTENSION_INIT3     /*no-op*/

@@ -171,7 +171,7 @@ namespace chull {
       bool operator<(const ChullPoint& other) const;
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - STOP
-      
+
       //general attributes
       bool m_initialized;
       xvector<double> m_coords;           //most general hull coordinates
@@ -180,12 +180,12 @@ namespace chull {
       bool m_has_entry;
       bool m_formation_energy_coord;
       bool m_is_artificial;
-      
+
       //for organization of points
       uint m_i_nary;    //stoich_coords only
       uint m_i_alloy;   //stoich_coords_only
       uint m_i_coord_group;
-      
+
       //stoich_coords only!
       xvector<double> s_coords;         //stoich_coords, m_coords[0:rows-1]+hidden_dimension
       xvector<double> c_coords;         //composition coords, similar to stoich_coords, but with integers (except for POCC)
@@ -200,7 +200,7 @@ namespace chull {
       //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]xvector<double> m_decomp_coefs; //un-reduced coefficients here, reduced exist at the m_coord_groups level
       double m_stability_criterion;
       double m_n_plus_1_energy_gain;
-      
+
       //flags - MOVED TO xStream
       //aurostd::xoption m_cflags;
       //_aflags m_aflags;                  //used PURELY for the logger (path), so no need to pass into constructor, pull from m_cflags
@@ -212,7 +212,7 @@ namespace chull {
       bool initialize(ofstream& FileMESSAGE,ostream& oss=cout,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
       bool initialize(const xvector<double>& coord,ofstream& FileMESSAGE,ostream& oss=cout,bool has_stoich_coords=false,bool formation_energy_coord=false,bool is_artificial=false);
       bool initialize(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,ofstream& FileMESSAGE,ostream& oss=cout,bool formation_energy_coord=true);
-      
+
       //getters
       bool isWithinHalfHull(bool lower_hull=true) const;
       bool isGState() const;
@@ -235,12 +235,12 @@ namespace chull {
       double getStabilityCriterion(char units=_std_) const;
       double getRelativeStabilityCriterion() const;
       double getNPlus1EnergyGain(char units=_std_) const;
-      
+
       //setters
       void setHullCoords();
       void setHullCoords(const xvector<double>& coords);
       void setHullCoords(const xvector<int>& elements_present);
-     
+
       //general methods
       bool entryIdentical(const aflowlib::_aflowlib_entry& other) const;
 
@@ -251,16 +251,16 @@ namespace chull {
       void free();
       void copy(const ChullPoint& b);
       //NECESSARY END CLASS METHODS - END
-      
+
       //logger variables - MOVED TO xStream
       //ostream* m_p_oss;
       //ofstream* m_p_FileMESSAGE;
       //bool m_new_ofstream;  //for deletion later
-      
+
       //general setters - MOVED TO xStream
       //void setOFStream(ofstream& FileMESSAGE);
       //void setOSS(ostream& oss);
-      
+
       //temporary variables that come with every new calculate() command
       xvector<double> h_coords;  //dummy coord that changes per convex hull iteration, mere projection
 
@@ -302,7 +302,7 @@ namespace chull {
       bool m_initialized;
       uint ch_index;       //belongs to chull
       ChullPoint ch_point; //take only what you need from chullpoint, don't copy the whole thing (has entry which is large)
-      
+
       //initializer
       void initialize(const ChullPoint& point,uint index,bool full_copy=true);
     private:
@@ -361,7 +361,7 @@ namespace chull {
       //flags - MOVED TO xStream
       //aurostd::xoption m_cflags;
       //_aflags m_aflags;                  //used PURELY for the logger (path), so no need to pass into constructor, pull from m_cflags
-      
+
       //getters
       vector<uint> getCHIndices() const;
 
@@ -382,7 +382,7 @@ namespace chull {
       double getSignedVerticalDistanceToZero(const xvector<double>& point) const;
       double getSignedVerticalDistance(const ChullPoint& point) const;
       double getSignedVerticalDistance(const xvector<double>& point) const;
-      
+
       friend class ConvexHull;  //ConvexHull defines everything!
     private:
       //NECESSARY private CLASS METHODS - START
@@ -394,7 +394,7 @@ namespace chull {
       //ostream* m_p_oss;
       //ofstream* m_p_FileMESSAGE;
       //bool m_new_ofstream;  //for deletion later
-      
+
       //temporary variables that come with every new calculate() command
       bool f_visited;                         //temporary per calculation(), has it been visited?
       vector<FacetPoint> f_outside_set;
@@ -408,7 +408,7 @@ namespace chull {
       //void setCFlags(const aurostd::xoption& vpflow);
       //void setOFStream(ofstream& FileMESSAGE);
       //void setOSS(ostream& oss);
-      
+
       //validation methods - we split up as we build facets in pieces, and not all work
       //sometimes we find a (d-1)flat facet, so we remove
       //we want to return false vs. throw exception appropriately
@@ -430,7 +430,7 @@ namespace chull {
       void setHemisphere();
       void setFurthestPoint();
       void setRidges();
-      
+
       //hull specific
       void cleanFacet();  //clean state of facet
   };
@@ -451,14 +451,14 @@ namespace chull {
       bool operator<(const CoordGroup& other) const;
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - STOP
-      
+
       //initializer
       void initialize(const xvector<double>& coord,bool has_stoich_coords);
 
       //getters
       xvector<int> getElementsPresent() const;
       uint getDim() const;
-      
+
       //attributes
       bool m_initialized;
       xvector<double> m_coords;               // ChullPoint.getStoichiometricCoords()
@@ -469,7 +469,7 @@ namespace chull {
       uint m_hull_member;                     // points to ChullPoints
       uint m_ref_state;                       // first in order (artificial map)
       vector<uint> m_candidate_hull_points;   // also points to ChullPoints, refers to extremes of CoordGroup (half_hull's only has extrema)
-      
+
       //for organization of points
       uint m_i_nary;    //stoich_coords only
       uint m_i_alloy;   //stoich_coords_only
@@ -515,7 +515,7 @@ namespace chull {
       bool operator<(const Alloy& other) const;
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - STOP
-      
+
       //initializer
       void initialize(const xvector<int>& elements_present);
       bool belongs2Hull(const xvector<int>& hull_elements_present) const;  //checks if alloy is a member of the hull (via hull_elements_present)
@@ -526,7 +526,7 @@ namespace chull {
       uint m_dim;                                       //projected hull dimensionality
       vector<uint> m_coord_groups;
       vector<uint> m_facets;
-      
+
       friend class ConvexHull;  //ConvexHull defines everything!
     private:
       //NECESSARY private CLASS METHODS - START
@@ -551,7 +551,7 @@ namespace chull {
       bool operator<(const Nary& other) const;
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - STOP
-      
+
       //initializer
       void initialize(uint nary);
 
@@ -559,7 +559,7 @@ namespace chull {
       bool m_initialized;
       uint nary;
       vector<Alloy> m_alloys;
-      
+
       friend class ConvexHull;  //ConvexHull defines everything!
     private:
       //NECESSARY private CLASS METHODS - START
@@ -608,7 +608,7 @@ namespace chull {
       const ConvexHull& operator=(const ConvexHull& other);
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - STOP
-    
+
       //attributes
       bool m_initialized;
       vector<string> m_velements;
@@ -626,11 +626,11 @@ namespace chull {
       vector<ChullFacet> m_facets;
       vector<uint> m_i_facets;           //contains indices of most recently calculated facets, points to m_facets
       bool m_sort_energy_ascending;      //true for lower half hulls
-      
+
       //flags
       aurostd::xoption m_cflags;
       _aflags m_aflags;                  //used PURELY for the logger (path), so no need to pass into constructor, pull from m_cflags
-      
+
       //initialization methods
       bool initialize(ostream& _oss=cout);
       bool initialize(string alloy,ostream& _oss=cout);
@@ -726,16 +726,16 @@ namespace chull {
       void free();
       void copy(const ConvexHull& b);
       //NECESSARY END CLASS METHODS - END
-      
+
       //logger variables - MOVED TO xStream
       //ostream* m_p_oss;
       //ofstream* m_p_FileMESSAGE;
       //bool m_new_ofstream;  //for deletion later
-      
+
       //aflowrc definitions we don't want to redefine over and over again, just once at initialization
       bool m_allow_all_formation_energies;
       vector<string> m_allowed_dft_types;
-      
+
       //temporary variables that come with every new calculate() command
       uint h_dim;                                       //projected hull dimensionality
       xvector<int> m_elements_present;                  //stoich_coords only
@@ -753,7 +753,7 @@ namespace chull {
       // MOVED TO xStream
       //void setOFStream(ofstream& FileMESSAGE);
       //void setOSS(ostream& oss);
-      
+
       //wrapper for try/catch's
       bool createHull(string alloy);
       bool createHull(const vector<string>& velements);
@@ -789,7 +789,7 @@ namespace chull {
       vector<string> alloyToElements(const ChullPoint& point) const;
       vector<string> alloyToElements(uint i_nary,uint i_alloy) const;
       void checkStructurePoints();
-      
+
       //other methods associated with calculating hull
       void addPointToFacet(ChullFacet& facet,uint i_point);
       void initializeFacet(ChullFacet& facet,bool check_validity=true);
@@ -845,7 +845,7 @@ namespace chull {
       void setStabilityCriterion();
       void setNPlus1EnergyGain();
       void cleanHull(); //clean state of hull
-      
+
       //writer functions
       string prettyPrintCompound(const ChullPoint& point,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
       string prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;

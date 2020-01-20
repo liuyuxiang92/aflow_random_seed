@@ -31,7 +31,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
   if(XHOST.APENNSY_USE_LIBRARY) aflowlib::LOAD_Library_ALL(TRUE);
   // END_NEW_STYLE
   if(0)cerr << aflags.Directory << endl;  // warning: unused parameter ‘aflags’ [-Wunused-parameter]
-   
+
   aflowlib::_aflowlib_entry struct_proprts;
   LIBstructures_calcs=0;
   LIBstructures_holes=0;
@@ -50,9 +50,10 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
   fgets(string_line_TMELTING,1024,in_file_pointer_TMELTING);
   cerr << string_line_TMELTING << endl;
 #endif
-  for(uint nalloy=0;nalloy<alloys.size();nalloy++) {
+  for(uint nalloy=0;nalloy<alloys.size();nalloy++)
     //  cerr << "DEBUG [0]  " << "Nalloy=" << nalloy << endl;
-    // for(nalloy=1;nalloy<=1;nalloy++) {
+    // for(nalloy=1;nalloy<=1;nalloy++)
+  { //CO200106 - patching for auto-indenting
 #ifdef TMELTING
     fgets(string_line_TMELTING,1024,in_file_pointer_TMELTING);
     if(!strstr(string_line_TMELTING,alloys.at(nalloy))) {
@@ -87,7 +88,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     string pseudoA,pseudoB,speciesA,speciesB;
     KBIN::VASP_SplitAlloyPseudoPotentials(alloy_tmp,pseudoA,pseudoB);
     KBIN::VASP_SplitAlloySpecies(alloy_tmp,speciesA,speciesB);
-    /*
+
     // START_NEW_STYLE
     // grepping inside the LIRARY
     // uint aflowlib::GREP_Species_ALL(vector<string> vspecies,                   // IN   [0,nspecies[ the species Ag,Cd,...   nspecies=number of these items    nspecies=naries
@@ -99,18 +100,17 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     // 		      vector<string> &vList_Pmin,                       // OUT  [0,nspecies[ returns the prototype for reference
     // 		      vector<uint> &vList_Imin,                         // OUT  [0,nspecies[ returns the line index of vList.at(ispecies), in which we have the min enthalpy for reference
     // 		      vector<vector<vector<double> > > &vList_concs,    // OUT  [0,naries[*[0,vList.size()[*[0.nspecies[ the concentrations AxAyCz... where x+y+z=1 and it contains also ZEROS so that 0 0.25 0.75 is allowed
-    // 		      vector<vector<double> > &vList_Ef) {              // OUT  [0,naries[*[0,vList.size()[ returns the formation energy of the list
-    vector<string> vspecies;                         // IN   [0,nspecies[ the species Ag,Cd,...   nspecies=number of these items    nspecies=naries
-    vector<string> vspecies_pp;                      // IN   [0,nspecies[ the pseudopotentials Ag_pv, Cd_sv
-    vector<vector<string> > vList;                   // OUT  [0,naries[*[0,vList.size()[ returns the lines of the library containing A,B,C,AB,AC,BC,ABC....
-    vector<vector<vector<string> > > vList_tokens;   // OUT  [0,naries[*[0,vList.size()[*[0,size_tokens[ returns the tokens for each line of the vList
-    vector<vector<vector<string> > > vList_species;  // OUT  [0,naries[*[0,vList.size()[*nspecies  returns the species present
-    vector<double> vList_Hmin;                       // OUT  [0,nspecies[ returns the min enthalpy for reference
-    vector<string> vList_Pmin;                       // OUT  [0,nspecies[ returns the prototype for reference
-    vector<uint> vList_Imin;                         // OUT  [0,nspecies[ returns the line index of vList.at(ispecies), in which we have the min enthalpy for reference
-    vector<vector<vector<double> > > vList_concs;    // OUT  [0,naries[*[0,vList.size()[*[0.nspecies[ the concentrations AxAyCz... where x+y+z=1 and it contains also ZEROS so that 0 0.25 0.75 is allowed
-    vector<vector<double> > vList_Ef;                // OUT  [0,naries[*[0,vList.size()[ returns the formation energy of the list
-    */
+    // 		      vector<vector<double> > &vList_Ef) {              // OUT  [0,naries[*[0,vList.size()[ returns the formation energy of the list  //[CO200106 - close bracket for indenting]}
+    //vector<string> vspecies;                         // IN   [0,nspecies[ the species Ag,Cd,...   nspecies=number of these items    nspecies=naries
+    //vector<string> vspecies_pp;                      // IN   [0,nspecies[ the pseudopotentials Ag_pv, Cd_sv
+    //vector<vector<string> > vList;                   // OUT  [0,naries[*[0,vList.size()[ returns the lines of the library containing A,B,C,AB,AC,BC,ABC....
+    //vector<vector<vector<string> > > vList_tokens;   // OUT  [0,naries[*[0,vList.size()[*[0,size_tokens[ returns the tokens for each line of the vList
+    //vector<vector<vector<string> > > vList_species;  // OUT  [0,naries[*[0,vList.size()[*nspecies  returns the species present
+    //vector<double> vList_Hmin;                       // OUT  [0,nspecies[ returns the min enthalpy for reference
+    //vector<string> vList_Pmin;                       // OUT  [0,nspecies[ returns the prototype for reference
+    //vector<uint> vList_Imin;                         // OUT  [0,nspecies[ returns the line index of vList.at(ispecies), in which we have the min enthalpy for reference
+    //vector<vector<vector<double> > > vList_concs;    // OUT  [0,naries[*[0,vList.size()[*[0.nspecies[ the concentrations AxAyCz... where x+y+z=1 and it contains also ZEROS so that 0 0.25 0.75 is allowed
+    //vector<vector<double> > vList_Ef;                // OUT  [0,naries[*[0,vList.size()[ returns the formation energy of the list
 
     // START_NEW_STYLE
     // grepping inside the LIRARY
@@ -126,12 +126,12 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
 
     if(LDEBUG) cerr << " Creating concentrations" << endl;
     ZConcentrations.at(nalloy).clear();ZConcentrations.at(nalloy).push_back(-1.0);
-     vector<string> vaflowlibentry_url,vaflowlibentry_url_aus;   
+    vector<string> vaflowlibentry_url,vaflowlibentry_url_aus;   
     vaflowlibentry_url.clear();vaflowlibentry_url_aus.clear();
     vector<aflowlib::_aflowlib_entry> vaflowlib,vaflowlib_aus;
     vaflowlib.clear();vaflowlib_aus.clear();
     aflowlib::_aflowlib_entry _aflowlib_tmp;
-    
+
     // LOAD DATA !
     if(XHOST.APENNSY_USE_LIBRARY) { // from library in LOCAL SERVER
       if(LDEBUG) cerr << " XHOST.APENNSY_USE_LIBRARY" << endl;
@@ -147,28 +147,28 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
       if(LDEBUG) cerr << " XHOST.APENNSY_USE_SERVER" << endl;
       aurostd::string2tokens(aurostd::execute2string(string("find "+string(alloy)+" -name "+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)),vfiles,"\n");
       for(uint ilist=0;ilist<vfiles.size();ilist++) 
-	if(vfiles.at(ilist)!="") {_aflowlib_tmp.file2aflowlib(vfiles.at(ilist),cout); vaflowlib_aus.push_back(_aflowlib_tmp);}
+        if(vfiles.at(ilist)!="") {_aflowlib_tmp.file2aflowlib(vfiles.at(ilist),cout); vaflowlib_aus.push_back(_aflowlib_tmp);}
       for(uint ilist=0;ilist<vfiles.size();ilist++)
-	if(vfiles.at(ilist)!="") {vaflowlibentry_url_aus.push_back(vfiles.at(ilist));}
+        if(vfiles.at(ilist)!="") {vaflowlibentry_url_aus.push_back(vfiles.at(ilist));}
     }
-     // from directory in AFLOWLIB WEB SERVER
+    // from directory in AFLOWLIB WEB SERVER
     if(XHOST.APENNSY_SERVER_AFLOWLIB_ORG) {
       if(LDEBUG) cerr << " XHOST.APENNSY_SERVER_AFLOWLIB_ORG" << endl;
       // [OBSOLETE]   aurostd::url2tokens(string(alloy)+"/"+_XENTRY_+"?aflowlib_entries",vfiles,","); 
       aurostd::url2tokens(string(alloy)+"/?aflowlib_entries",vfiles,","); 
       for(uint ilist=0;ilist<vfiles.size();ilist++) 
-	if(vfiles.at(ilist)!="") {
-	  string url=string(alloy)+"/"+vfiles.at(ilist)+"/";
-	  aflowlib::_aflowlib_entry _aflowlib_tmp;
-	  _aflowlib_tmp.url2aflowlib(url,cout);
-	  if(!_aflowlib_tmp.entry.empty()) {
-	    vaflowlib_aus.push_back(_aflowlib_tmp);
-	    vaflowlibentry_url_aus.push_back(url);
-	    //	    vaflowlib.push_back(_aflowlib_tmp);
-	  }
-	}  
+        if(vfiles.at(ilist)!="") {
+          string url=string(alloy)+"/"+vfiles.at(ilist)+"/";
+          aflowlib::_aflowlib_entry _aflowlib_tmp;
+          _aflowlib_tmp.url2aflowlib(url,cout);
+          if(!_aflowlib_tmp.entry.empty()) {
+            vaflowlib_aus.push_back(_aflowlib_tmp);
+            vaflowlibentry_url_aus.push_back(url);
+            //	    vaflowlib.push_back(_aflowlib_tmp);
+          }
+        }  
     }
-    
+
     for(uint ilist=0;ilist<vaflowlib_aus.size();ilist++) {
       bool goodENTRY=TRUE;
       if(aurostd::substring2bool(vaflowlib_aus.at(ilist).entry,"LDAU")) goodENTRY=FALSE;
@@ -193,29 +193,29 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
       species=vaflowlib.at(ilist).species;
       nspecies=vaflowlib.at(ilist).nspecies;
       if(nspecies==1) {
-	if(species==speciesB) Cb=1.0;
-	if(species==speciesA) Cb=0.0;
+        if(species==speciesB) Cb=1.0;
+        if(species==speciesA) Cb=0.0;
       }
       if(nspecies==2) {
-	// [OBSOLETE] aflowlib::TokenExtractAFLOWLIB(vaflowlib.at(ilist).entry,"composition=",composition); // cerr << "(1) composition=" << composition << endl;
-	// [OBSOLETE] aflowlib::TokenExtractAFLOWLIB(vaflowlib.at(ilist).entry,"natoms=",natoms); // cerr << "(1) natoms=" << natoms << endl;
-	for(uint i=0;i<vaflowlib.at(ilist).vcomposition.size();i++) composition.push_back(vaflowlib.at(ilist).vcomposition.at(i));
-	natoms=vaflowlib.at(ilist).natoms;
-	Cb=((double) composition.at(1))/((double) natoms);
+        // [OBSOLETE] aflowlib::TokenExtractAFLOWLIB(vaflowlib.at(ilist).entry,"composition=",composition); // cerr << "(1) composition=" << composition << endl;
+        // [OBSOLETE] aflowlib::TokenExtractAFLOWLIB(vaflowlib.at(ilist).entry,"natoms=",natoms); // cerr << "(1) natoms=" << natoms << endl;
+        for(uint i=0;i<vaflowlib.at(ilist).vcomposition.size();i++) composition.push_back(vaflowlib.at(ilist).vcomposition.at(i));
+        natoms=vaflowlib.at(ilist).natoms;
+        Cb=((double) composition.at(1))/((double) natoms);
       }
       bool found=FALSE;
       for(uint ii=0;ii<ZConcentrations.at(nalloy).size()&&!found;ii++) found=(aurostd::abs(ZConcentrations.at(nalloy).at(ii)-Cb)<apennsy_epsilon);
       // check if neglection will affect number of concentrations
       if(aflags.vflag.flag("APENNSY::NEGLECT_STRUCTURES")) 
-	for(uint i=0;i<aflags.APENNSY_NEGLECT_STRUCTURES_vstrs.size();i++) 
-	  if(vaflowlib.at(ilist).prototype==aflags.APENNSY_NEGLECT_STRUCTURES_vstrs.at(i))
-	    found=TRUE; // it will be skipped
+        for(uint i=0;i<aflags.APENNSY_NEGLECT_STRUCTURES_vstrs.size();i++) 
+          if(vaflowlib.at(ilist).prototype==aflags.APENNSY_NEGLECT_STRUCTURES_vstrs.at(i))
+            found=TRUE; // it will be skipped
       // if everything is ok then:
       if(!found) ZConcentrations.at(nalloy).push_back(Cb);
     }
     std::sort(ZConcentrations.at(nalloy).begin(),ZConcentrations.at(nalloy).end());
     if(LDEBUG) cerr << "ZConcentrations.at(nalloy).size()=" << ZConcentrations.at(nalloy).size() << endl;
-    
+
     // PREPARE DYNAMIC DATA
     xvector<int> gndstates(ZConcentrations.at(nalloy).size()-1);    
     // alloys.size()*ZConcentrations.size() AlloyStructureIdentity
@@ -234,7 +234,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     if(LDEBUG) cerr << "RankLibInt.size()=" << RankLibInt.size() << endl;
     if(LDEBUG) cerr << "RankLib.at(nalloy).size()=" << RankLib.at(nalloy).size() << endl;
     if(LDEBUG) cerr << "RankLibInt.at(nalloy).size()=" << RankLibInt.at(nalloy).size() << endl;
-  
+
     //   DEBUG=TRUE;
     // cerr << "*" << pseudoA << "*" << pseudoB << endl;
     // cerr << "*************************************** "<< endl;
@@ -246,11 +246,11 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     // -------------------------------------------------------------------------------------
     // LOAD CLUSTER EXPANSION DATA !
     alloy_holes.at(nalloy)=0;
-    
+
     if(LDEBUG) cerr << "AlloyStructureIdentity.size()=" << AlloyStructureIdentity.size() << endl;
     if(LDEBUG) cerr << "AlloyStructureIdentity.at(nalloy).size()=" << AlloyStructureIdentity.at(nalloy).size() << endl;
     if(LDEBUG) cerr << "vaflowlib.size()=" << vaflowlib.size() << endl;
-    
+
     ZLibrary.at(nalloy).clear();
 
 
@@ -265,7 +265,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
       if(LDEBUG)  cerr << i << "   " << alloy << "/" << prototype << endl;
       cerr.flush();
       // ENERGY PROPERTIES
-        
+
       //    if(isavailable==TRUE && strnumber!=INF) {
       // 	if((Load_FCC==FALSE && Load_BCC==FALSE && Load_HCP==FALSE) || Load_ALL==TRUE || prototype=="3") struct_proprts.GetVASP(alloy,i,ishole,alphabetic,*this);
       // 	// check if FCC BCC HCP
@@ -322,166 +322,166 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
 
       //   cerr << prototype << " " << struct_proprts.energy_atom << endl;
       if(ishole==FALSE) {
-	LIBstructures_calcs++;
-	plug.vstr.clear();
-	//	if(struct_proprts.vstr.size()!=0 && struct_proprts.vstr.size()!=3) {
-	//	  cerr << "ERROR: struct_proprts.vstr.size()=" << struct_proprts.vstr.size() << endl;
-	// exit;
-	//	}
-	xstructure xstr;
-	if(XHOST.APENNSY_USE_SERVER) {
-	  string aurl;	
-	  // [OBSOLETE] aflowlib::TokenExtractAFLOWLIB(plug.entry,"aurl=",aurl);
-	  aurl=plug.aurl;
-	  aurl=aurostd::RemoveSubString(aurl,"nietzsche.mems.duke.edu:");aurl=aurostd::RemoveSubString(aurl,"nietzsche:");
-	  aurl=aurostd::RemoveSubString(aurl,"materials.duke.edu:");aurl=aurostd::RemoveSubString(aurl,"materials:");
-	  aurl=aurostd::RemoveSubString(aurl,"aflowlib.mems.duke.edu:");
-	  aurl=aurostd::RemoveSubString(aurl,"aflowlib.duke.edu:");aurl=aurostd::RemoveSubString(aurl,"aflowlib:");
-	  aurl=aurostd::StringSubst(aurl,"/LIB/","/RAW/");
-	  aurl=aurostd::StringSubst(aurl,"AFLOWDATA/LIB2_RAW/","/common/LIB2/RAW/");
-	  // PRE
-	  if(!aurostd::FileExist(aurl+"/POSCAR.relax1") && !aurostd::FileExist(aurl+"/POSCAR.orig")) {
-	    cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.orig/POSCAR.relax1" << endl;exit(0);}
-	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.orig")) {xstr=xstructure(aurl+"/POSCAR.orig",IOVASP_AUTO);}
-	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax1")) {xstr=xstructure(aurl+"/POSCAR.relax1",IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
-	  // MID
-	  if(!aurostd::FileExist(aurl+"/CONTCAR.relax1") && !aurostd::FileExist(aurl+"/POSCAR.relax2")) {
-	    cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
-	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax2")) {xstr=xstructure(aurl+"/POSCAR.relax2",IOVASP_AUTO);}
-	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax1")) {xstr=xstructure(aurl+"/CONTCAR.relax1",IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
-	  // POST
-	  if(!aurostd::FileExist(aurl+"/CONTCAR.relax") && !aurostd::FileExist(aurl+"/CONTCAR.relax2")) {
-	    cerr << "ERROR aurl=\"" << aurl << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
-	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax")) {xstr=xstructure(aurl+"/CONTCAR.relax",IOVASP_AUTO);}
-	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax2")) {xstr=xstructure(aurl+"/CONTCAR.relax2",IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
-	  //	plug.vstr.clear(); for(uint ii=0;ii<struct_proprts.vstr.size();ii++) plug.vstr.push_back(struct_proprts.vstr.at(ii));
-	  //	plug.nrelaxations=struct_proprts.nrelaxations;
-	  //	exit(0);
-	}
+        LIBstructures_calcs++;
+        plug.vstr.clear();
+        //	if(struct_proprts.vstr.size()!=0 && struct_proprts.vstr.size()!=3) {
+        //	  cerr << "ERROR: struct_proprts.vstr.size()=" << struct_proprts.vstr.size() << endl;
+        // exit;
+        //	}
+        xstructure xstr;
+        if(XHOST.APENNSY_USE_SERVER) {
+          string aurl;	
+          // [OBSOLETE] aflowlib::TokenExtractAFLOWLIB(plug.entry,"aurl=",aurl);
+          aurl=plug.aurl;
+          aurl=aurostd::RemoveSubString(aurl,"nietzsche.mems.duke.edu:");aurl=aurostd::RemoveSubString(aurl,"nietzsche:");
+          aurl=aurostd::RemoveSubString(aurl,"materials.duke.edu:");aurl=aurostd::RemoveSubString(aurl,"materials:");
+          aurl=aurostd::RemoveSubString(aurl,"aflowlib.mems.duke.edu:");
+          aurl=aurostd::RemoveSubString(aurl,"aflowlib.duke.edu:");aurl=aurostd::RemoveSubString(aurl,"aflowlib:");
+          aurl=aurostd::StringSubst(aurl,"/LIB/","/RAW/");
+          aurl=aurostd::StringSubst(aurl,"AFLOWDATA/LIB2_RAW/","/common/LIB2/RAW/");
+          // PRE
+          if(!aurostd::FileExist(aurl+"/POSCAR.relax1") && !aurostd::FileExist(aurl+"/POSCAR.orig")) {
+            cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.orig/POSCAR.relax1" << endl;exit(0);}
+          if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.orig")) {xstr=xstructure(aurl+"/POSCAR.orig",IOVASP_AUTO);}
+          if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax1")) {xstr=xstructure(aurl+"/POSCAR.relax1",IOVASP_AUTO);}
+          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          // MID
+          if(!aurostd::FileExist(aurl+"/CONTCAR.relax1") && !aurostd::FileExist(aurl+"/POSCAR.relax2")) {
+            cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
+          if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax2")) {xstr=xstructure(aurl+"/POSCAR.relax2",IOVASP_AUTO);}
+          if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax1")) {xstr=xstructure(aurl+"/CONTCAR.relax1",IOVASP_AUTO);}
+          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          // POST
+          if(!aurostd::FileExist(aurl+"/CONTCAR.relax") && !aurostd::FileExist(aurl+"/CONTCAR.relax2")) {
+            cerr << "ERROR aurl=\"" << aurl << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
+          if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax")) {xstr=xstructure(aurl+"/CONTCAR.relax",IOVASP_AUTO);}
+          if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax2")) {xstr=xstructure(aurl+"/CONTCAR.relax2",IOVASP_AUTO);}
+          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          //	plug.vstr.clear(); for(uint ii=0;ii<struct_proprts.vstr.size();ii++) plug.vstr.push_back(struct_proprts.vstr.at(ii));
+          //	plug.nrelaxations=struct_proprts.nrelaxations;
+          //	exit(0);
+        }
 
-	if(XHOST.APENNSY_SERVER_AFLOWLIB_ORG) { 	  // load files
-	  // PRE
-	  if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax1") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.orig")) {
-	    cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed POSCAR.orig/POSCAR.relax1" << endl;exit(0);}
-	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.orig")) {
-	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.orig"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax1")) {
-	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
- 	  // MID
-	  if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax1") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
-	    cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
-	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax1")) {
-	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
-	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.relax2"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
-	  // POST
-	  if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
-	    cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
-	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax")) {
-	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
-	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax2"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+        if(XHOST.APENNSY_SERVER_AFLOWLIB_ORG) { 	  // load files
+          // PRE
+          if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax1") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.orig")) {
+            cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed POSCAR.orig/POSCAR.relax1" << endl;exit(0);}
+          if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.orig")) {
+            stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.orig"));xstr=xstructure(aus,IOVASP_AUTO);}
+          if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax1")) {
+            stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
+          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          // MID
+          if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax1") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
+            cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
+          if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax1")) {
+            stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
+          if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
+            stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.relax2"));xstr=xstructure(aus,IOVASP_AUTO);}
+          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+          // POST
+          if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
+            cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
+          if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax")) {
+            stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax"));xstr=xstructure(aus,IOVASP_AUTO);}
+          if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
+            stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax2"));xstr=xstructure(aus,IOVASP_AUTO);}
+          plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
 
-	}
+        }
 
-	
-	// also holes must have something
-	plug.vNsgroup.clear();plug.vNsgroup.push_back(1);plug.vNsgroup.push_back(1);plug.vNsgroup.push_back(1);   // also holes must have something
-	plug.vsgroup.clear();plug.vsgroup.push_back("1");plug.vsgroup.push_back("1");plug.vsgroup.push_back("1");   // also holes must have something
-	// SPACEGROUP PROPERTIES
 
-	plug.energy_atom_relax1=plug.energy_atom;  // WRAPPER NEEDS TO BE FIXED
-	
-	// tiny corrections
-	if(pseudoA=="Cd" && pseudoB=="Pt" && prototype=="181") { //gamma_IrV
-	  plug.enthalpy_formation_atom-=0.0013;plug.enthalpy_formation_cell=plug.natoms*plug.enthalpy_formation_atom;
-	}
-	if(pseudoA=="Ir" && pseudoB=="V_sv" && prototype=="291") { //gamma_IrV
-	  plug.enthalpy_formation_cell-=0.001;plug.enthalpy_formation_atom-=0.0005;plug.enthalpy_cell-=0.001;plug.enthalpy_atom-=0.005;
-	}
-	if(pseudoA=="Hf_pv" && pseudoB=="Pd_pv" && prototype=="192") { // HfPd
-	  plug.enthalpy_formation_atom-=0.003;plug.enthalpy_formation_cell=plug.natoms*plug.enthalpy_formation_atom;
-	  plug.enthalpy_atom=plug.enthalpy_formation_atom;plug.enthalpy_cell=plug.natoms*plug.enthalpy_atom;
-	}
-	if(pseudoA=="Ir" && pseudoB=="Nb_sv" && prototype=="600.ABBAB") { // sigma
-	  plug.enthalpy_formation_cell+=0.001;plug.enthalpy_formation_atom+=0.0005;plug.enthalpy_cell+=0.001;plug.enthalpy_atom+=0.005;
-	  plug.enthalpy_formation_cell+=0.001;plug.enthalpy_formation_atom+=0.0005;plug.enthalpy_cell+=0.001;plug.enthalpy_atom+=0.005;
-	}
-	if(pseudoA=="Os_pv" && pseudoB=="Re_pv" && prototype=="122") { // sigma
-	  plug.enthalpy_formation_atom-=0.001;plug.enthalpy_formation_cell=plug.natoms*plug.enthalpy_formation_atom;
-	  plug.enthalpy_atom=plug.enthalpy_formation_atom;plug.enthalpy_cell=plug.natoms*plug.enthalpy_atom;
-	}
-	if(pseudoA=="Os_pv" && pseudoB=="Re_pv" && prototype=="448") { // sigma
-	  ishole=TRUE; // bug
-	}
+        // also holes must have something
+        plug.vNsgroup.clear();plug.vNsgroup.push_back(1);plug.vNsgroup.push_back(1);plug.vNsgroup.push_back(1);   // also holes must have something
+        plug.vsgroup.clear();plug.vsgroup.push_back("1");plug.vsgroup.push_back("1");plug.vsgroup.push_back("1");   // also holes must have something
+        // SPACEGROUP PROPERTIES
+
+        plug.energy_atom_relax1=plug.energy_atom;  // WRAPPER NEEDS TO BE FIXED
+
+        // tiny corrections
+        if(pseudoA=="Cd" && pseudoB=="Pt" && prototype=="181") { //gamma_IrV
+          plug.enthalpy_formation_atom-=0.0013;plug.enthalpy_formation_cell=plug.natoms*plug.enthalpy_formation_atom;
+        }
+        if(pseudoA=="Ir" && pseudoB=="V_sv" && prototype=="291") { //gamma_IrV
+          plug.enthalpy_formation_cell-=0.001;plug.enthalpy_formation_atom-=0.0005;plug.enthalpy_cell-=0.001;plug.enthalpy_atom-=0.005;
+        }
+        if(pseudoA=="Hf_pv" && pseudoB=="Pd_pv" && prototype=="192") { // HfPd
+          plug.enthalpy_formation_atom-=0.003;plug.enthalpy_formation_cell=plug.natoms*plug.enthalpy_formation_atom;
+          plug.enthalpy_atom=plug.enthalpy_formation_atom;plug.enthalpy_cell=plug.natoms*plug.enthalpy_atom;
+        }
+        if(pseudoA=="Ir" && pseudoB=="Nb_sv" && prototype=="600.ABBAB") { // sigma
+          plug.enthalpy_formation_cell+=0.001;plug.enthalpy_formation_atom+=0.0005;plug.enthalpy_cell+=0.001;plug.enthalpy_atom+=0.005;
+          plug.enthalpy_formation_cell+=0.001;plug.enthalpy_formation_atom+=0.0005;plug.enthalpy_cell+=0.001;plug.enthalpy_atom+=0.005;
+        }
+        if(pseudoA=="Os_pv" && pseudoB=="Re_pv" && prototype=="122") { // sigma
+          plug.enthalpy_formation_atom-=0.001;plug.enthalpy_formation_cell=plug.natoms*plug.enthalpy_formation_atom;
+          plug.enthalpy_atom=plug.enthalpy_formation_atom;plug.enthalpy_cell=plug.natoms*plug.enthalpy_atom;
+        }
+        if(pseudoA=="Os_pv" && pseudoB=="Re_pv" && prototype=="448") { // sigma
+          ishole=TRUE; // bug
+        }
         if(pseudoA=="Rh_pv" && pseudoB=="Zr_sv" && prototype=="381") { // wrong channel
           ishole=TRUE; // bug
         }
 
 
-	if(LDEBUG) cerr << "plug.entry=" << plug.entry << endl;
-	if(LDEBUG) cerr << "prototype=" << prototype << endl;
-	
-	struct_proprts.GetSGROUP(plug.entry);
-	plug.vNsgroup.clear(); for(uint ii=0;ii<struct_proprts.vNsgroup.size();ii++) plug.vNsgroup.push_back(struct_proprts.vNsgroup.at(ii));
-	plug.vsgroup.clear(); for(uint ii=0;ii<struct_proprts.vsgroup.size();ii++) plug.vsgroup.push_back(struct_proprts.vsgroup.at(ii));
-	if(LDEBUG) cerr << "plug.vNsgroup.size()=" << plug.vNsgroup.size() << endl;
-	if(LDEBUG) cerr << "plug.vsgroup.size()=" << plug.vsgroup.size() << endl;
+        if(LDEBUG) cerr << "plug.entry=" << plug.entry << endl;
+        if(LDEBUG) cerr << "prototype=" << prototype << endl;
 
-	plug.structure_name=plug.prototype;
-	plug.structure_description=plug.prototype;
+        struct_proprts.GetSGROUP(plug.entry);
+        plug.vNsgroup.clear(); for(uint ii=0;ii<struct_proprts.vNsgroup.size();ii++) plug.vNsgroup.push_back(struct_proprts.vNsgroup.at(ii));
+        plug.vsgroup.clear(); for(uint ii=0;ii<struct_proprts.vsgroup.size();ii++) plug.vsgroup.push_back(struct_proprts.vsgroup.at(ii));
+        if(LDEBUG) cerr << "plug.vNsgroup.size()=" << plug.vNsgroup.size() << endl;
+        if(LDEBUG) cerr << "plug.vsgroup.size()=" << plug.vsgroup.size() << endl;
 
-	plug.FixDescription();  // fix description
-	if(LDEBUG) cerr << "plug.structure_name=" << plug.structure_name << endl;
-	if(LDEBUG) cerr << "plug.structure_description=" << plug.structure_description << endl;
+        plug.structure_name=plug.prototype;
+        plug.structure_description=plug.prototype;
 
-	vector<string> tokens;
+        plug.FixDescription();  // fix description
+        if(LDEBUG) cerr << "plug.structure_name=" << plug.structure_name << endl;
+        if(LDEBUG) cerr << "plug.structure_description=" << plug.structure_description << endl;
 
-	aurostd::string2tokens(plug.composition,tokens,",");
-	plug.pureA=FALSE;plug.pureB=FALSE;
-	if(tokens.size()==2) {
-	  plug.stoich_a=aurostd::string2utype<double>(tokens.at(0))/((double) plug.natoms);                 // STOICH_A
-	  plug.stoich_b=aurostd::string2utype<double>(tokens.at(1))/((double) plug.natoms);                 // STOICH_B
-	}
-	if(tokens.size()==1 && plug.species==speciesA) {plug.stoich_a=1.0;plug.stoich_b=0.0;plug.pureA=TRUE;plug.pureB=FALSE;}
-	if(tokens.size()==1 && plug.species==speciesB) {plug.stoich_a=0.0;plug.stoich_b=1.0;plug.pureA=FALSE;plug.pureB=TRUE;}
+        vector<string> tokens;
 
-	// aurostd::string2tokens(plug.geometry,tokens,",");
-	// //	cerr << "tokens.size()=" << tokens.size() << endl;
-	// if(tokens.size()!=6) {cerr << "ERROR: (get_dimensions_properties) abc-tokens " << endl;cerr << plug.entry << endl;exit(0);}
+        aurostd::string2tokens(plug.composition,tokens,",");
+        plug.pureA=FALSE;plug.pureB=FALSE;
+        if(tokens.size()==2) {
+          plug.stoich_a=aurostd::string2utype<double>(tokens.at(0))/((double) plug.natoms);                 // STOICH_A
+          plug.stoich_b=aurostd::string2utype<double>(tokens.at(1))/((double) plug.natoms);                 // STOICH_B
+        }
+        if(tokens.size()==1 && plug.species==speciesA) {plug.stoich_a=1.0;plug.stoich_b=0.0;plug.pureA=TRUE;plug.pureB=FALSE;}
+        if(tokens.size()==1 && plug.species==speciesB) {plug.stoich_a=0.0;plug.stoich_b=1.0;plug.pureA=FALSE;plug.pureB=TRUE;}
 
-	// plug.unit_cell_a=(double) aurostd::string2utype<double>(tokens.at(0));         // UCELLD unit cell: a (max)
-	// plug.unit_cell_b=(double) aurostd::string2utype<double>(tokens.at(1));         // UCELLD unit cell: b
-	// plug.unit_cell_c=(double) aurostd::string2utype<double>(tokens.at(2));         // UCELLD unit cell: b
-	// plug.unit_cell_alpha=(double) aurostd::string2utype<double>(tokens.at(3));     // UCELLD unit cell: alpha (b,c)
-	// plug.unit_cell_beta=(double) aurostd::string2utype<double>(tokens.at(4));      // UCELLD unit cell: beta  (a,c)
-	// plug.unit_cell_gamma=(double) aurostd::string2utype<double>(tokens.at(5));     // UCELLD unit cell: gamma (a,b)
-	
-	aurostd::StringSubst(plug.entry,"NNN #0","");
-	//  cerr << plug.entry << endl;
+        // aurostd::string2tokens(plug.geometry,tokens,",");
+        // //	cerr << "tokens.size()=" << tokens.size() << endl;
+        // if(tokens.size()!=6) {cerr << "ERROR: (get_dimensions_properties) abc-tokens " << endl;cerr << plug.entry << endl;exit(0);}
 
-	aurostd::string2tokens(plug.nbondxx,tokens,",");
-	//	cerr << "plug.nbondxx=" << plug.nbondxx << endl;
-	//	cerr << "tokens.size()=" << tokens.size() << endl;
-	if(tokens.size()==1) {plug.bond_aa=aurostd::string2utype<double>(tokens.at(0));plug.bond_ab=0.0;plug.bond_bb=0.0;}
-	if(tokens.size()==3) {plug.bond_aa=aurostd::string2utype<double>(tokens.at(0));plug.bond_ab=aurostd::string2utype<double>(tokens.at(1));plug.bond_bb=aurostd::string2utype<double>(tokens.at(2));}
-	if(tokens.size()==0) {cerr << "ERROR: (get_dimensions_properties) nbondxx not enough tokens " << endl;cerr << plug.entry << endl;exit(0);}
-	// done
+        // plug.unit_cell_a=(double) aurostd::string2utype<double>(tokens.at(0));         // UCELLD unit cell: a (max)
+        // plug.unit_cell_b=(double) aurostd::string2utype<double>(tokens.at(1));         // UCELLD unit cell: b
+        // plug.unit_cell_c=(double) aurostd::string2utype<double>(tokens.at(2));         // UCELLD unit cell: b
+        // plug.unit_cell_alpha=(double) aurostd::string2utype<double>(tokens.at(3));     // UCELLD unit cell: alpha (b,c)
+        // plug.unit_cell_beta=(double) aurostd::string2utype<double>(tokens.at(4));      // UCELLD unit cell: beta  (a,c)
+        // plug.unit_cell_gamma=(double) aurostd::string2utype<double>(tokens.at(5));     // UCELLD unit cell: gamma (a,b)
 
-	if(!ishole && aflags.vflag.flag("APENNSY::NEGLECT_STRUCTURES")) 
-	  for(uint i=0;i<aflags.APENNSY_NEGLECT_STRUCTURES_vstrs.size()&&!ishole;i++) 
-	    if(prototype==aflags.APENNSY_NEGLECT_STRUCTURES_vstrs.at(i)) ishole=TRUE;
-	
-	if(!ishole) ZLibrary.at(nalloy).push_back(plug);
-	
+        aurostd::StringSubst(plug.entry,"NNN #0","");
+        //  cerr << plug.entry << endl;
+
+        aurostd::string2tokens(plug.nbondxx,tokens,",");
+        //	cerr << "plug.nbondxx=" << plug.nbondxx << endl;
+        //	cerr << "tokens.size()=" << tokens.size() << endl;
+        if(tokens.size()==1) {plug.bond_aa=aurostd::string2utype<double>(tokens.at(0));plug.bond_ab=0.0;plug.bond_bb=0.0;}
+        if(tokens.size()==3) {plug.bond_aa=aurostd::string2utype<double>(tokens.at(0));plug.bond_ab=aurostd::string2utype<double>(tokens.at(1));plug.bond_bb=aurostd::string2utype<double>(tokens.at(2));}
+        if(tokens.size()==0) {cerr << "ERROR: (get_dimensions_properties) nbondxx not enough tokens " << endl;cerr << plug.entry << endl;exit(0);}
+        // done
+
+        if(!ishole && aflags.vflag.flag("APENNSY::NEGLECT_STRUCTURES")) 
+          for(uint i=0;i<aflags.APENNSY_NEGLECT_STRUCTURES_vstrs.size()&&!ishole;i++) 
+            if(prototype==aflags.APENNSY_NEGLECT_STRUCTURES_vstrs.at(i)) ishole=TRUE;
+
+        if(!ishole) ZLibrary.at(nalloy).push_back(plug);
+
       } // i as Nstructures
-      
+
       // fix A6 becoming FCC: A6 => FCC sg(FCC=#225) sg(A6)=#129
       //      for(uint i1=1;i1<structures[2].size();i1++)
       // 	if(structures[2].at(i1).pureA==TRUE && structures[2].at(i1).name=="303") // A6 pure A
@@ -495,17 +495,17 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
       // 	    if(structures[2].at(i2).pureB==TRUE && structures[2].at(i2).name=="1") { // FCC pureB
       // 	      if(ZLibrary.at(nalloy).at(i1).vNsgroup.back()==225 && ZLibrary.at(nalloy).at(i1).enthalpy_atom<=ZLibrary.at(nalloy).at(i2).enthalpy_atom) {
       // 		ZLibrary.at(nalloy).at(i1).enthalpy_atom=ZLibrary.at(nalloy).at(i2).enthalpy_atom+0.001999;}} // A6 => FCC sg(FCC=#225) sg(A6)=#129
-      
+
     }
     if(LDEBUG)
       cerr << "ZLibrary.at(nalloy).size()=" << ZLibrary.at(nalloy).size() << endl;
-    
+
     //   for(uint j=0;j<ZLibrary.at(nalloy).size();j++) cerr << "ZLibrary.at(nalloy).at(" << j << ").vNsgroup.size()=" << ZLibrary.at(nalloy).at(j).vsgroup.at(1) << endl;
-  
+
     AlloyStructureIdentity.at(nalloy).clear();
     for(uint j=0;j<ZLibrary.at(nalloy).size();j++)
       AlloyStructureIdentity.at(nalloy).push_back(*(new vector<bool>(ZLibrary.at(nalloy).size()+1))); // alloys.size()*ZLibrary.at(nalloy).size()*ZLibrary.at(nalloy).size()
-    
+
     //   // from FORM ENERGY TO ORDER
     //    // ORDER PER STRUCTURES
     //    double xa=0.0,xb=0.0;
@@ -525,7 +525,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     // 	//  alloy_order.at(nalloy)=(double) max(alloy_order.at(nalloy),ZLibrary.at(nalloy).at(i).order_formation_atom*log(2.0)/1000/KBOLTZEV);
     // 	//  alloy_order.at(nalloy)=(double) max(alloy_order.at(nalloy),ZLibrary.at(nalloy).at(i).order_formation_atom*log(2.0)*1000);
     // 	alloy_order.at(nalloy)=(double) max(alloy_order.at(nalloy),ZLibrary.at(nalloy).at(i).order_formation_atom);
-  
+
     // determine miscibility from HT
     gndstates=xconvexhull(nalloy,*this);
     for(uint ii=1;ii<=ZConcentrations.at(nalloy).size()-1;ii++) 
@@ -533,17 +533,17 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     gndstates=xminenergy(nalloy,*this); 
     for(uint ii=1;ii<=ZConcentrations.at(nalloy).size()-1;ii++) 
       ZMINElibrary.at(nalloy).at(ii)=gndstates(ii);
-    
+
     // calculate max Hf and max Ts
     enthalpy_formation_atom_max.at(nalloy)=0.0;
     entropic_temperature_max.at(nalloy)=0.0;
     for(uint i=0;i<ZLibrary.at(nalloy).size();i++) {
       if(ZLibrary.at(nalloy).at(i).enthalpy_formation_atom<enthalpy_formation_atom_max.at(nalloy))
-	enthalpy_formation_atom_max.at(nalloy)=ZLibrary.at(nalloy).at(i).enthalpy_formation_atom;
+        enthalpy_formation_atom_max.at(nalloy)=ZLibrary.at(nalloy).at(i).enthalpy_formation_atom;
       if(ZLibrary.at(nalloy).at(i).entropic_temperature>entropic_temperature_max.at(nalloy))
-	entropic_temperature_max.at(nalloy)=ZLibrary.at(nalloy).at(i).entropic_temperature;
+        entropic_temperature_max.at(nalloy)=ZLibrary.at(nalloy).at(i).entropic_temperature;
     }
-      
+
     // fprintf(stderr," [");for(uint ii=1;ii<=ZConcentrations.at(nalloy).size()-1;ii++) fprintf(stderr," %3i",structures_number[ZGNDlibrary.at(nalloy).at(ii)]); fprintf(stderr," ]  ");
     // fprintf(stderr," [");for(uint ii=1;ii<=ZConcentrations.at(nalloy).size()-1;ii++) fprintf(stderr," %3i",structures_number[MINElibrary[ii].at(nalloy)]); fprintf(stderr," ]  ");
     // Determine MISCIBILITY
@@ -552,9 +552,9 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
       Alloy2MiscibilityHT.at(nalloy)=MISCIBILITY_SYSTEM_MISCIBLE;
     } else {
       if(ZLibrary.at(nalloy).size()>= MISCIBILITY_SYSTEM_CUTOFF) {
-	Alloy2MiscibilityHT.at(nalloy)=MISCIBILITY_SYSTEM_NOMIX;
+        Alloy2MiscibilityHT.at(nalloy)=MISCIBILITY_SYSTEM_NOMIX;
       } else {
-	Alloy2MiscibilityHT.at(nalloy)=MISCIBILITY_SYSTEM_UNKNOWN;
+        Alloy2MiscibilityHT.at(nalloy)=MISCIBILITY_SYSTEM_UNKNOWN;
       }
     }
     cerr << " ";
@@ -606,7 +606,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     aurostd::string2tokens(alloy,tokens,"/");int miscibility=MiscibilityCheck(tokens.at(tokens.size()-1));
     if(miscibility==MISCIBILITY_SYSTEM_UNKNOWN) cerr << "    MISCIBILITY_SYSTEM_UNKNOWN";
     for(uint i=0;i<ZGNDlibrary.at(nalloy).size();i++) if(ZGNDlibrary.at(nalloy).at(i)>=0) cerr << "    " << ZLibrary.at(nalloy).at(ZGNDlibrary.at(nalloy).at(i)).structure_name;
- 
+
     //    cerr << " " << alloy_deltamuBArich.at(nalloy) << " " << alloy_deltamuABrich.at(nalloy) << " "; // UNCALCULATED
     cerr << endl;
   } // nalloy<alloys.size()
@@ -649,25 +649,25 @@ xvector<int> xconvexhull(int nalloy,const APENNSY_Parameters &params) {
     for (uint j=0;j<params.ZLibrary.at(nalloy).size();j++) {
       //cout << "j=" << j << " " << params.ZLibrary.at(nalloy).at(j).structure_name << " " << params.ZLibrary.at(nalloy).at(j).stoich_b << " " << endl;
       if(aurostd::isequal(params.ZLibrary.at(nalloy).at(j).stoich_b,params.ZConcentrations.at(nalloy).at(i),CEPSILON) && params.ZLibrary.at(nalloy).at(j).enthalpy_formation_atom<gndEFlibrary(i)) {
-	gndEFlibrary(i)=params.ZLibrary.at(nalloy).at(j).enthalpy_formation_atom;
-	gndEFindex(i)=j;
+        gndEFlibrary(i)=params.ZLibrary.at(nalloy).at(j).enthalpy_formation_atom;
+        gndEFindex(i)=j;
       }
     }
     //    cout << "i=" << i <<  "   gndEFindex(i)=" << gndEFindex(i) << " " << params.ZLibrary.at(nalloy).at(gndEFindex(i)).structure_name << endl;
   }
   // for(uint i=1;i<=params.ZConcentrations.at(nalloy).size()-1;i++)
   //  if(gndEFindex(i)>0) cerr << params.ZLibrary.at(nalloy).at(gndEFindex(i)).structure_name << endl;
-  
+
   for(uint j=1;j<params.ZConcentrations.at(nalloy).size();j++) {
     for(uint k=1;k<params.ZConcentrations.at(nalloy).size();k++) {
       for(uint i=1;i<params.ZConcentrations.at(nalloy).size();i++) {
-	if(gndEFindex(i)>=0 && gndEFindex(j)>=0 && gndEFindex(k)>=0 && j<i && i<k) {
-	  c1=params.ZConcentrations.at(nalloy).at(j);c2=params.ZConcentrations.at(nalloy).at(k);c3=params.ZConcentrations.at(nalloy).at(i);alpha=(c3-c1)/(c2-c1);beta=(c2-c3)/(c2-c1);
-	  energy=beta*params.ZLibrary.at(nalloy).at(gndEFindex(j)).enthalpy_formation_atom+alpha*params.ZLibrary.at(nalloy).at(gndEFindex(k)).enthalpy_formation_atom;
-	  energy=beta*params.ZLibrary.at(nalloy).at(gndEFindex(j)).enthalpy_formation_atom+alpha*params.ZLibrary.at(nalloy).at(gndEFindex(k)).enthalpy_formation_atom;
-	  energy=beta*params.ZLibrary.at(nalloy).at(gndEFindex(j)).enthalpy_formation_atom+alpha*params.ZLibrary.at(nalloy).at(gndEFindex(k)).enthalpy_formation_atom;
-	  if(energy<params.ZLibrary.at(nalloy).at(gndEFindex(i)).enthalpy_formation_atom) gndEFindex(i)=-1;
-	}
+        if(gndEFindex(i)>=0 && gndEFindex(j)>=0 && gndEFindex(k)>=0 && j<i && i<k) {
+          c1=params.ZConcentrations.at(nalloy).at(j);c2=params.ZConcentrations.at(nalloy).at(k);c3=params.ZConcentrations.at(nalloy).at(i);alpha=(c3-c1)/(c2-c1);beta=(c2-c3)/(c2-c1);
+          energy=beta*params.ZLibrary.at(nalloy).at(gndEFindex(j)).enthalpy_formation_atom+alpha*params.ZLibrary.at(nalloy).at(gndEFindex(k)).enthalpy_formation_atom;
+          energy=beta*params.ZLibrary.at(nalloy).at(gndEFindex(j)).enthalpy_formation_atom+alpha*params.ZLibrary.at(nalloy).at(gndEFindex(k)).enthalpy_formation_atom;
+          energy=beta*params.ZLibrary.at(nalloy).at(gndEFindex(j)).enthalpy_formation_atom+alpha*params.ZLibrary.at(nalloy).at(gndEFindex(k)).enthalpy_formation_atom;
+          if(energy<params.ZLibrary.at(nalloy).at(gndEFindex(i)).enthalpy_formation_atom) gndEFindex(i)=-1;
+        }
       }
     }
   }
@@ -694,8 +694,8 @@ xvector<int> xminenergy(int nalloy,const APENNSY_Parameters &params) {
     gndEFindex(i)=0;
     for (j=0;j<params.ZLibrary.at(nalloy).size();j++) {
       if(aurostd::isequal(params.ZLibrary.at(nalloy).at(j).stoich_b,params.ZConcentrations.at(nalloy).at(i),CEPSILON) && params.ZLibrary.at(nalloy).at(j).enthalpy_formation_atom<gndEFlibrary(i)) {
-	gndEFlibrary(i)=params.ZLibrary.at(nalloy).at(j).enthalpy_formation_atom;
-	gndEFindex(i)=j;
+        gndEFlibrary(i)=params.ZLibrary.at(nalloy).at(j).enthalpy_formation_atom;
+        gndEFindex(i)=j;
       }
     }
   }
@@ -728,9 +728,9 @@ double GNDdistance(const int& i, const int& nalloy,const APENNSY_Parameters &par
     if(aurostd::isequal(params.ZConcentrations.at(nalloy).at(kk),params.ZLibrary.at(nalloy).at(i).stoich_b,CEPSILON)) {
       kk_mid=kk;
       if(params.ZGNDlibrary.at(nalloy).at(kk)>=0) {
-	distance=params.ZLibrary.at(nalloy).at(i).enthalpy_formation_atom-params.ZLibrary.at(nalloy).at(params.ZGNDlibrary.at(nalloy).at(kk)).enthalpy_formation_atom;
-	done=TRUE;
-	// questo se il punto e` un GNDSTATE
+        distance=params.ZLibrary.at(nalloy).at(i).enthalpy_formation_atom-params.ZLibrary.at(nalloy).at(params.ZGNDlibrary.at(nalloy).at(kk)).enthalpy_formation_atom;
+        done=TRUE;
+        // questo se il punto e` un GNDSTATE
       }
     }
   // se non e` un GNDSTATE, allora calcola distanza
@@ -835,32 +835,32 @@ void APENNSY_Parameters::MakeRankLib(void) {
         // NOW PRINT ENERGIES
         if(VERBOSE1) {
           printf("  %3.3f ",ZConcentrations.at(nalloy).at(j));
-	  for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++) printf("%+3.3f ",ZLibrary.at(nalloy).at(RankLib.at(nalloy).at(j).at(k)).enthalpy_formation_atom);
+          for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++) printf("%+3.3f ",ZLibrary.at(nalloy).at(RankLib.at(nalloy).at(j).at(k)).enthalpy_formation_atom);
           cout << endl;
         }
         // NOW ORDER STUFF !
 
-	// UP TO HERE
-	ausE.clear();ausI.clear();
-	for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++) {
-	  ausE.push_back(ZLibrary.at(nalloy).at(RankLib.at(nalloy).at(j).at(k)).enthalpy_formation_atom);
-	  ausI.push_back(RankLib.at(nalloy).at(j).at(k));
-	}
-	aurostd::sort(ausE,ausI);
-	for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++)
-	  RankLib.at(nalloy).at(j).at(k)=ausI.at(k);
+        // UP TO HERE
+        ausE.clear();ausI.clear();
+        for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++) {
+          ausE.push_back(ZLibrary.at(nalloy).at(RankLib.at(nalloy).at(j).at(k)).enthalpy_formation_atom);
+          ausI.push_back(RankLib.at(nalloy).at(j).at(k));
+        }
+        aurostd::sort(ausE,ausI);
+        for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++)
+          RankLib.at(nalloy).at(j).at(k)=ausI.at(k);
 
         // NOW PRINT NUMBERS
         if(VERBOSE) {
           printf("  %3.3f ",ZConcentrations.at(nalloy).at(j));
-	  for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++) printf("%6i ",RankLib.at(nalloy).at(j).at(k));
+          for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++) printf("%6i ",RankLib.at(nalloy).at(j).at(k));
           cout << endl;
         }
         // NOW PRINT ENERGIES
         if(VERBOSE1) {
           printf("  %3.3f ",ZConcentrations.at(nalloy).at(j));
-   	  for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++) printf("%+3.3f ",ZLibrary.at(nalloy).at(RankLib.at(nalloy).at(j).at(k)).enthalpy_formation_atom);
-	  cout << endl;
+          for(uint k=0;k<RankLib.at(nalloy).at(j).size();k++) printf("%+3.3f ",ZLibrary.at(nalloy).at(RankLib.at(nalloy).at(j).at(k)).enthalpy_formation_atom);
+          cout << endl;
         }
       }
     }
@@ -869,10 +869,10 @@ void APENNSY_Parameters::MakeRankLib(void) {
   for(uint k=0;k<alloys.size();k++) { // if(Alloy2MiscibilityHT.at(k)!=MISCIBILITY_SYSTEM_MISCIBLE)
     for(uint j=0;j<ZConcentrations.at(k).size();j++) {
       for(int i=RankLib.at(k).at(j).size()-1;i>=0;i--) {
-	if(ZConcentrations.at(k).at(j)<CEPSILON || ZConcentrations.at(k).at(j)>1-CEPSILON) {
-	  ZLibrary.at(k).at(RankLib.at(k).at(j).at((uint) i)).enthalpy_formation_atom -= ZLibrary.at(k).at(RankLib.at(k).at(j).at(0)).enthalpy_formation_atom;
-	  // cerr << "MakeRankLib:" << ZConcentrations.at(k).at(j) << " " << ZLibrary.at(k).at(RankLib.at(k).at(j).at((uint) i)).enthalpy_formation_atom << " " << (uint) i << endl;
-	}
+        if(ZConcentrations.at(k).at(j)<CEPSILON || ZConcentrations.at(k).at(j)>1-CEPSILON) {
+          ZLibrary.at(k).at(RankLib.at(k).at(j).at((uint) i)).enthalpy_formation_atom -= ZLibrary.at(k).at(RankLib.at(k).at(j).at(0)).enthalpy_formation_atom;
+          // cerr << "MakeRankLib:" << ZConcentrations.at(k).at(j) << " " << ZLibrary.at(k).at(RankLib.at(k).at(j).at((uint) i)).enthalpy_formation_atom << " " << (uint) i << endl;
+        }
       }
     }
   }
@@ -889,7 +889,7 @@ void APENNSY_Parameters::CheckAlloyRelaxationStructures(void) {   // check if 2 
   for(uint nalloy=0;nalloy<alloys.size();nalloy++)
     for(uint j1=0;j1<ZLibrary.at(nalloy).size();j1++)
       for(uint j2=0;j2<ZLibrary.at(nalloy).size();j2++)
-	AlloyStructureIdentity.at(nalloy).at(j1).at(j2)=FALSE;
+        AlloyStructureIdentity.at(nalloy).at(j1).at(j2)=FALSE;
   if(LDEBUG) cerr << "CheckAlloyRelaxationStructures MED" << endl;
   for(uint nalloy=0;nalloy<alloys.size();nalloy++) {
     for(uint j1=0;j1<ZLibrary.at(nalloy).size();j1++) {
@@ -904,35 +904,35 @@ void APENNSY_Parameters::CheckAlloyRelaxationStructures(void) {   // check if 2 
       normBB1=std::pow((double) ZLibrary.at(nalloy).at(j1).vgeometry.at(1),(double) 1.0/3.0);
       if(LDEBUG) cerr << ZLibrary.at(nalloy).at(j1).vNsgroup.back() << endl;
       for(uint j2=j1;j2<ZLibrary.at(nalloy).size();j2++) {
-	if(LDEBUG) cerr << "CheckAlloyRelaxationStructures MED nalloy=" << nalloy << " j1=" << j1  << " j2=" << j2 << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).structure_name=" << ZLibrary.at(nalloy).at(j1).structure_name << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).volume_cell=" << ZLibrary.at(nalloy).at(j1).volume_cell << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).vgeometry.at(0)=" << ZLibrary.at(nalloy).at(j1).vgeometry.at(0) << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).vgeometry.at(1)=" << ZLibrary.at(nalloy).at(j1).vgeometry.at(1) << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).vNsgroup.back()=" << ZLibrary.at(nalloy).at(j1).vNsgroup.back() << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).structure_name=" << ZLibrary.at(nalloy).at(j2).structure_name << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).volume_cell=" << ZLibrary.at(nalloy).at(j2).volume_cell << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).vgeometry.at(0)=" << ZLibrary.at(nalloy).at(j2).vgeometry.at(0) << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).vgeometry.at(1)=" << ZLibrary.at(nalloy).at(j2).vgeometry.at(1) << endl;
-	if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).vNsgroup.back()=" << ZLibrary.at(nalloy).at(j2).vNsgroup.back() << endl;
-	normAA2=std::pow((double) ZLibrary.at(nalloy).at(j2).volume_cell,(double) 1.0/3.0);  
-	normAB2=std::pow((double) ZLibrary.at(nalloy).at(j2).vgeometry.at(0),(double) 1.0/3.0);
-	normBB2=std::pow((double) ZLibrary.at(nalloy).at(j2).vgeometry.at(1),(double) 1.0/3.0);
-  	if(aurostd::isequal(ZLibrary.at(nalloy).at(j1).stoich_b,ZLibrary.at(nalloy).at(j2).stoich_b,CEPSILON) && ZLibrary.at(nalloy).at(j1).vNsgroup.back()==ZLibrary.at(nalloy).at(j2).vNsgroup.back()) {
-	  ausERR=abs(ZLibrary.at(nalloy).at(j1).enthalpy_formation_atom-ZLibrary.at(nalloy).at(j2).enthalpy_formation_atom);
-	  if(ausERR<dENERGY_CUTOFF) {
-	    ausERR=abs(2*(ZLibrary.at(nalloy).at(j1).volume_cell-ZLibrary.at(nalloy).at(j2).volume_cell)/(ZLibrary.at(nalloy).at(j1).volume_cell+ZLibrary.at(nalloy).at(j2).volume_cell)); // volume
-	    if(ausERR<dVOLUME_CUTOFF) {
-	      if(2*abs((ZLibrary.at(nalloy).at(j1).bond_aa*normAA1-ZLibrary.at(nalloy).at(j2).bond_aa*normAA2)/(ZLibrary.at(nalloy).at(j1).bond_aa*normAA1+ZLibrary.at(nalloy).at(j2).bond_aa*normAA2)) < dBONDSD_CUTOFF &&
-		 2*abs((ZLibrary.at(nalloy).at(j1).bond_ab*normAB1-ZLibrary.at(nalloy).at(j2).bond_ab*normAB2)/(ZLibrary.at(nalloy).at(j1).bond_ab*normAB1+ZLibrary.at(nalloy).at(j2).bond_ab*normAB2)) < dBONDSD_CUTOFF &&
-		 2*abs((ZLibrary.at(nalloy).at(j1).bond_bb*normBB1-ZLibrary.at(nalloy).at(j2).bond_bb*normBB2)/(ZLibrary.at(nalloy).at(j1).bond_bb*normBB1+ZLibrary.at(nalloy).at(j2).bond_bb*normBB2)) < dBONDSD_CUTOFF) {
-		//   cerr << ausERR << endl;
-		AlloyStructureIdentity.at(nalloy).at(j1).at(j2)=TRUE;
-		AlloyStructureIdentity.at(nalloy).at(j2).at(j1)=TRUE;
-	      }
-	    }
-	  }
-	}
+        if(LDEBUG) cerr << "CheckAlloyRelaxationStructures MED nalloy=" << nalloy << " j1=" << j1  << " j2=" << j2 << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).structure_name=" << ZLibrary.at(nalloy).at(j1).structure_name << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).volume_cell=" << ZLibrary.at(nalloy).at(j1).volume_cell << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).vgeometry.at(0)=" << ZLibrary.at(nalloy).at(j1).vgeometry.at(0) << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).vgeometry.at(1)=" << ZLibrary.at(nalloy).at(j1).vgeometry.at(1) << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j1).vNsgroup.back()=" << ZLibrary.at(nalloy).at(j1).vNsgroup.back() << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).structure_name=" << ZLibrary.at(nalloy).at(j2).structure_name << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).volume_cell=" << ZLibrary.at(nalloy).at(j2).volume_cell << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).vgeometry.at(0)=" << ZLibrary.at(nalloy).at(j2).vgeometry.at(0) << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).vgeometry.at(1)=" << ZLibrary.at(nalloy).at(j2).vgeometry.at(1) << endl;
+        if(LDEBUG) cerr << "ZLibrary.at(nalloy).at(j2).vNsgroup.back()=" << ZLibrary.at(nalloy).at(j2).vNsgroup.back() << endl;
+        normAA2=std::pow((double) ZLibrary.at(nalloy).at(j2).volume_cell,(double) 1.0/3.0);  
+        normAB2=std::pow((double) ZLibrary.at(nalloy).at(j2).vgeometry.at(0),(double) 1.0/3.0);
+        normBB2=std::pow((double) ZLibrary.at(nalloy).at(j2).vgeometry.at(1),(double) 1.0/3.0);
+        if(aurostd::isequal(ZLibrary.at(nalloy).at(j1).stoich_b,ZLibrary.at(nalloy).at(j2).stoich_b,CEPSILON) && ZLibrary.at(nalloy).at(j1).vNsgroup.back()==ZLibrary.at(nalloy).at(j2).vNsgroup.back()) {
+          ausERR=abs(ZLibrary.at(nalloy).at(j1).enthalpy_formation_atom-ZLibrary.at(nalloy).at(j2).enthalpy_formation_atom);
+          if(ausERR<dENERGY_CUTOFF) {
+            ausERR=abs(2*(ZLibrary.at(nalloy).at(j1).volume_cell-ZLibrary.at(nalloy).at(j2).volume_cell)/(ZLibrary.at(nalloy).at(j1).volume_cell+ZLibrary.at(nalloy).at(j2).volume_cell)); // volume
+            if(ausERR<dVOLUME_CUTOFF) {
+              if(2*abs((ZLibrary.at(nalloy).at(j1).bond_aa*normAA1-ZLibrary.at(nalloy).at(j2).bond_aa*normAA2)/(ZLibrary.at(nalloy).at(j1).bond_aa*normAA1+ZLibrary.at(nalloy).at(j2).bond_aa*normAA2)) < dBONDSD_CUTOFF &&
+                  2*abs((ZLibrary.at(nalloy).at(j1).bond_ab*normAB1-ZLibrary.at(nalloy).at(j2).bond_ab*normAB2)/(ZLibrary.at(nalloy).at(j1).bond_ab*normAB1+ZLibrary.at(nalloy).at(j2).bond_ab*normAB2)) < dBONDSD_CUTOFF &&
+                  2*abs((ZLibrary.at(nalloy).at(j1).bond_bb*normBB1-ZLibrary.at(nalloy).at(j2).bond_bb*normBB2)/(ZLibrary.at(nalloy).at(j1).bond_bb*normBB1+ZLibrary.at(nalloy).at(j2).bond_bb*normBB2)) < dBONDSD_CUTOFF) {
+                //   cerr << ausERR << endl;
+                AlloyStructureIdentity.at(nalloy).at(j1).at(j2)=TRUE;
+                AlloyStructureIdentity.at(nalloy).at(j2).at(j1)=TRUE;
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -965,7 +965,7 @@ bool APENNSY_Parameters::LibLoadAlloysLIB2(_aflags &aflags) {
     // [OBSOLETE]   aurostd::url2tokens(AFLOWLIB_PROJECT_GNDSTATE+string("/"+_XENTRY_+"?aflowlib_entries"),list,",");
     aurostd::url2tokens(AFLOWLIB_PROJECT_GNDSTATE+string("/?aflowlib_entries"),list,",");
   }
-  
+
   for(uint i=0;i<list.size();i++) {
     bool ok=TRUE;
     if(ok) ok=ok && !aurostd::substring2bool(list.at(i),"core");
@@ -1069,20 +1069,21 @@ bool APENNSY_Parameters::LibLoadAlloysALLOY(string alloy_name,_aflags &aflags) {
   if(PseudopotentialNoclean==FALSE) {
     for(uint i=0;i<paramsX_tmp.alloys.size();i++) {
       //  cerr << "[" << names << "] [" << KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i))) << "]" << endl;
-      // if(aurostd::substring2bool(KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i))),names)) {
-      if(names==KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i)))) { // only one
-	// if(names==paramsX_tmp.alloys.at(i)) { // only one
-	cerr << paramsX_tmp.alloys.at(i) << endl;
-	alloys.push_back(paramsX_tmp.alloys.at(i));
-	alloysRAW.push_back(paramsX_tmp.alloysRAW.at(i));
+      // if(aurostd::substring2bool(KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i))),names))
+      if(names==KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i)))) // only one
+      { //CO200106 - patching for auto-indenting
+        // if(names==paramsX_tmp.alloys.at(i)) { // only one  //[CO200106 - close bracket for indenting]}
+        cerr << paramsX_tmp.alloys.at(i) << endl;
+        alloys.push_back(paramsX_tmp.alloys.at(i));
+        alloysRAW.push_back(paramsX_tmp.alloysRAW.at(i));
       }
     }
   } else {
     for(uint i=0;i<paramsX_tmp.alloys.size();i++) {
       //     cerr << names << " * " << paramsX_tmp.alloys.at(i) << endl;
       if(names==paramsX_tmp.alloys.at(i)) { // only one
-	alloys.push_back(paramsX_tmp.alloys.at(i));
-	alloysRAW.push_back(paramsX_tmp.alloysRAW.at(i));
+        alloys.push_back(paramsX_tmp.alloys.at(i));
+        alloysRAW.push_back(paramsX_tmp.alloysRAW.at(i));
       }
     }
   }

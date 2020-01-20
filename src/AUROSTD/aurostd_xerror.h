@@ -8,8 +8,8 @@
 #define _AUROSTD_XERROR_H_
 
 namespace aurostd {
-// BEGIN CONSTANTS
-// Definitions for the named error code constant (see README, section 2.1.).
+  // BEGIN CONSTANTS
+  // Definitions for the named error code constant (see README, section 2.1.).
 
 #define _GENERIC_ERROR_        1
 #define _ILLEGAL_CODE_         2
@@ -37,29 +37,29 @@ namespace aurostd {
 #define _ALLOC_ALLOCATE_      61
 #define _ALLOC_INSUFFICIENT_  62
 
-// END CONSTANTS
+  // END CONSTANTS
 
-class xerror {
-  public:
-    xerror(const std::string&, const std::string&, const std::string&, int = 1);
-    xerror(const std::string&, const std::string&, const std::stringstream&, int = 1);
-    xerror(const std::string&, const std::stringstream&, const std::stringstream&, int = 1);
-    xerror(const std::string&, const std::stringstream&, const std::string&, int = 1);
-    ~xerror() throw() {};
-    int error_code;
-    std::string what();
-    std::string whereFunction();  //CO191201
-    std::string whereFileName();  //CO191201
-    std::string error_message;
-  private:
-    int error_type, error_number;
-    std::string file_name,function_name, message;
+  class xerror {
+    public:
+      xerror(const std::string&, const std::string&, const std::string&, int = 1);
+      xerror(const std::string&, const std::string&, const std::stringstream&, int = 1);
+      xerror(const std::string&, const std::stringstream&, const std::stringstream&, int = 1);
+      xerror(const std::string&, const std::stringstream&, const std::string&, int = 1);
+      ~xerror() throw() {};
+      int error_code;
+      std::string what();
+      std::string whereFunction();  //CO191201
+      std::string whereFileName();  //CO191201
+      std::string error_message;
+    private:
+      int error_type, error_number;
+      std::string file_name,function_name, message;
 
-    void buildException(const std::string&, const std::string&, const std::string&, const int&);
-    bool codeValid();
-    std::string buildMessageString();
-    std::string error_string();
-};
+      void buildException(const std::string&, const std::string&, const std::string&, const int&);
+      bool codeValid();
+      std::string buildMessageString();
+      std::string error_string();
+  };
 } // namespace aurostd
 
 #endif
