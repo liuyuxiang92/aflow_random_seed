@@ -108,8 +108,9 @@ template<class utype> bool initialize_scalar(utype d) {
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","",0);
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","","",0);
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","","","",0);
+  //  s=utype2string(s);
+  //  s=utype2string("  ");
 
-  
   //  utype uu; _aflowlib::web2utype("location",uu);
   // [OBSOLETE]  _aflowlib::web2utype("location",s);
   aurostd::url2tokens("location",vu); aurostd::url2tokens("location",vu," ");
@@ -172,7 +173,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   if(tf){;} //CO200106 - keep tf busy
 
   //  jacobi(m,vx,m);
- 
+
   return TRUE;
 }
 
@@ -190,7 +191,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   int i=0;double d=0,o=0;string s;
   aurostd::xvector<int> xvi(2);
   aurostd::xvector<double> xvd(2);
-  
+
   // initialize vector sort
   vector<utype> vutype;vector<int> vint;vector<uint> vuint;vector<double> vdouble;vector<string> vstring;
   aurostd::sort(vutype);aurostd::sort(vutype,vint);aurostd::sort(vutype,vdouble);
@@ -220,11 +221,11 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::string2tokensAdd(s,vuint,"");aurostd::string2tokensAdd(s,duint,"");
   aurostd::string2tokens(s,vutype,"");aurostd::string2tokens(s,dutype,"");
   aurostd::string2tokensAdd(s,vutype,"");aurostd::string2tokensAdd(s,dutype,"");
-  
+
   // initialize xvector sort
   xvector<utype> vxu;xvector<int> ixv;xvector<double> dxv;
   aurostd::quicksort2((uint) 0,ixv,dxv);aurostd::quicksort2((uint) 0,dxv,ixv);
-  
+
   // initialize scalars
   o+=nint(x)+factorial(x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);
   o+=max(x,x);o+=max(x,x,x);o+=max(x,x,x,x);o+=max(x,x,x,x,x);o+=max(x,x,x,x,x,x);o+=sign(x);
@@ -362,7 +363,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   //[OBSOLETE ME180705]t8=x*t8;t8=-t8;t8=+t8;reset(t8);clear(t8);set(t8,x);x=min(t8);x=max(t8);x=trace(t8);t8=identity(t8);
   //[OBSOLETE ME180705]t8.clear();t8.set(x);t8.reset();t8=nint(t8);t8=sign(t8);t8=abs(t8);t8=floor(t8);t8=ceil(t8);//t8=round(t8);t8=trunc(t8);
   //[OBSOLETE ME180705]int i8[8+1];aurostd::xtensor8debug(t8,"");utype ******** b8;aurostd::allocate_xtensor8corpus(b8,i8,i8,i8);
-  
+
   return TRUE;
 }
 
@@ -406,7 +407,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     o+=aurostd::string2utype<float>("0");
     o+=aurostd::string2utype<double>("0");
     o+=aurostd::string2utype<long double>("0");
-    
+
     vector<bool> vxb;vector<char> vxc;vector<string> vxs;vector<unsigned int> vxui;vector<int> vxi;vector<long int> vxli;vector<long long int> vxlli;vector<float> vxf;vector<double> vxd;vector<long double> vxld;  //CO181226
     deque<bool> dxb;deque<char> dxc;deque<string> dxs;deque<unsigned int> dxui;deque<int> dxi;deque<long int> dxli;deque<long long int> dxlli;deque<float> dxf;deque<double> dxd;deque<long double> dxld; //CO181226
 
@@ -420,7 +421,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     dxf=aurostd::vector2deque<float>(vxf);  //CO181226
     dxd=aurostd::vector2deque<double>(vxd); //CO181226
     dxld=aurostd::vector2deque<long double>(vxld);  //CO181226
-    
+
     vxb=aurostd::deque2vector<bool>(dxb); //CO181226
     vxc=aurostd::deque2vector<char>(dxc); //CO181226
     vxs=aurostd::deque2vector<string>(dxs); //CO181226
@@ -431,7 +432,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     vxf=aurostd::deque2vector<float>(dxf);  //CO181226
     vxd=aurostd::deque2vector<double>(dxd); //CO181226
     vxld=aurostd::deque2vector<long double>(dxld);  //CO181226
-    
+
 #define AUROSTD_INITIALIZE_BOOL
     //#define AUROSTD_INITIALIZE_CHAR
 #define AUROSTD_INITIALIZE_STRING
@@ -445,7 +446,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #define AUROSTD_INITIALIZE_LONG_LONG_INT
 #define AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
 #define AUROSTD_INITIALIZE_COMPLEX_DOUBLE
-      
+
 
     aurostd::xmatrix<double> mxdouble;  //CO191201
 #ifdef AUROSTD_INITIALIZE_BOOL
@@ -512,7 +513,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
       o+=aurostd::isequal<float>(float(d),float(d),float(d));
       o+=aurostd::isdifferent<float>(float(d),float(d));
       o+=aurostd::isdifferent<float>(float(d),float(d),float(d));
-     }
+    }
 #endif
 #ifdef AUROSTD_INITIALIZE_DOUBLE
     if(1) { // AUROSTD_INITIALIZE_DOUBLE

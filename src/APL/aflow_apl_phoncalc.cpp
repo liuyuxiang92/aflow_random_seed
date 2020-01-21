@@ -623,24 +623,26 @@ namespace apl {
               cerr << (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc)) << std::endl;
             }
             //CO - START
-            // ME191031 - use xerror
-            //} catch (APLLogicError& e) {
-        } catch (aurostd::xerror& e) {
-          //_logger << error << "Mapping problem " << j << " <-> ?. Skipping." << apl::endl;
-          //derivative structures are expected to lose symmetry, don't bother exiting
-          //CO181226 - forget about this junk
-          //if it's a derivative structure, we recalculate the symmetry for the supercell, it's necessary
-          //[CO181226 - OBSOLETE]if (!_supercell.isDerivativeStructure()) {
-          _logger << error << "Mapping problem " << j << " <-> ?." << apl::endl;
+          }
           // ME191031 - use xerror
-          //throw APLLogicError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); Mapping failed.");
-          string function = "apl::PhononCalculator::symmetrizeForceConstantMatrices()";
-          string message = "Mapping failed.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-          //[CO181226 - OBSOLETE]}
-          //[CO181226 - OBSOLETE]agroup_size -= 1;  //CO, reduce agroup size
-          //CO - END
-        }
+          //catch (APLLogicError& e)
+          catch (aurostd::xerror& e)
+          { //CO200106 - patching for auto-indenting
+            //_logger << error << "Mapping problem " << j << " <-> ?. Skipping." << apl::endl;
+            //derivative structures are expected to lose symmetry, don't bother exiting
+            //CO181226 - forget about this junk
+            //if it's a derivative structure, we recalculate the symmetry for the supercell, it's necessary
+            //[CO181226 - OBSOLETE]if (!_supercell.isDerivativeStructure()) {
+            _logger << error << "Mapping problem " << j << " <-> ?." << apl::endl;
+            // ME191031 - use xerror
+            //throw APLLogicError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); Mapping failed.");
+            string function = "apl::PhononCalculator::symmetrizeForceConstantMatrices()";
+            string message = "Mapping failed.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+            //[CO181226 - OBSOLETE]}
+            //[CO181226 - OBSOLETE]agroup_size -= 1;  //CO, reduce agroup size
+            //CO - END
+          }
         }
         m = ( 1.0 / agroup.size() ) * m; //CO190218
         //CO - START
@@ -2313,8 +2315,9 @@ namespace apl {
       string message = "Cannot read ["+_AFLOWIN_+"] file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
-    //while (getline(myfile, line)) {
-    while (line_count < vlines.size()) {
+    //while (getline(myfile, line))
+    while (line_count < vlines.size())
+    { //CO200106 - patching for auto-indenting
       line = vlines[line_count++];
       if (line == "") continue;
       if (line[0] == '#') continue;
@@ -2599,7 +2602,6 @@ namespace apl {
     //[CO191112 - OBSOLETE]    }
     //[CO191112 - OBSOLETE]    return forces;
     //[CO191112 - OBSOLETE]  }
-    //[CO191112 - OBSOLETE]}
     //[CO191112 - OBSOLETE]}
     //[CO191112 - OBSOLETE]return forces;
   }

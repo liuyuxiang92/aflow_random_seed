@@ -103,7 +103,7 @@ namespace SYM {
   class stringdouble {
     friend ostream& operator<<(ostream& output, const stringdouble& a);
 
-   public:
+    public:
     string type;
     double distance;
     xvector<double> coord;
@@ -120,7 +120,7 @@ namespace SYM {
     //friend bool operator==(const wyckoffsite& a, const wyckoffsite& b);
     friend ostream& operator<<(ostream& output, const wyckoffsite& a);
 
-   public:
+    public:
     wyckoffsite() {
       wyckoffSymbol = " ";
     };
@@ -139,7 +139,7 @@ namespace SYM {
     friend xvector<double> operator*(const xvector<double>& P, Screw& S);
     friend ostream& operator<<(ostream& output, const Screw& S);
 
-   private:
+    private:
     xmatrix<double> A;  //operator matrix
     void get_A();
     string linestring;          //parametric line
@@ -148,7 +148,7 @@ namespace SYM {
     xvector<double> one_point;  //a point on the axis (in get_A)
     xvector<double> direction_vector;
 
-   public:
+    public:
     Screw(){};
     ~Screw(){};
     void get_screw_direct(xvector<double> axis_dir, xvector<double> point, double order);
@@ -162,50 +162,50 @@ namespace SYM {
 
   //Glide (Glide Operation)
   class Glide {  //for a plane defined on the plane ax+by+cz=d with translation
-		 //(t1,t2,t3) the glide operation works as follows:
-		 // A.P + d*a + |a.P - d|*a + (t1,t2,t3)^T
-   private:
-    bool HEX;
-    bool DIRECT;
-    string planestring;           //parametric plane
-    xmatrix<double> A;            //reflecting matrix
-    xvector<double> a;            //normal vector or fixed point (if HEX)
-    xvector<double> T;            //translation vector
-    xvector<double> plane_point;  //point in plane for get_glide_direct
-    double d;                     // d in ax+by+cz+d
-    void get_A(xvector<double> n);
+    //(t1,t2,t3) the glide operation works as follows:
+    // A.P + d*a + |a.P - d|*a + (t1,t2,t3)^T
+    private:
+      bool HEX;
+      bool DIRECT;
+      string planestring;           //parametric plane
+      xmatrix<double> A;            //reflecting matrix
+      xvector<double> a;            //normal vector or fixed point (if HEX)
+      xvector<double> T;            //translation vector
+      xvector<double> plane_point;  //point in plane for get_glide_direct
+      double d;                     // d in ax+by+cz+d
+      void get_A(xvector<double> n);
 
-   public:
-    Glide() {
-      HEX = false;
-      DIRECT = false;
-      d = 0.0;
-    };
-    ~Glide(){};
-    //overload operator * for Glide
-    // cartesian
-    void get_glide_direct(xvector<double> n, xvector<double> p);
-    void get_glide_direct(xvector<double> n, xvector<double> p, xvector<double> trans);
-    xvector<double> return_point();      //returns point on plane
-    xvector<double> return_direction();  //returns normal to plane
-    friend xvector<double> operator*(Glide& G, const xvector<double>& P);
-    friend xvector<double> operator*(const xvector<double>& P, Glide& G);
-    friend ostream& operator<<(ostream& output, const Glide& S);
+    public:
+      Glide() {
+        HEX = false;
+        DIRECT = false;
+        d = 0.0;
+      };
+      ~Glide(){};
+      //overload operator * for Glide
+      // cartesian
+      void get_glide_direct(xvector<double> n, xvector<double> p);
+      void get_glide_direct(xvector<double> n, xvector<double> p, xvector<double> trans);
+      xvector<double> return_point();      //returns point on plane
+      xvector<double> return_direction();  //returns normal to plane
+      friend xvector<double> operator*(Glide& G, const xvector<double>& P);
+      friend xvector<double> operator*(const xvector<double>& P, Glide& G);
+      friend ostream& operator<<(ostream& output, const Glide& S);
   };
 
   //Translation
   class Translation {
-   private:
-    xvector<double> translation_vec;
+    private:
+      xvector<double> translation_vec;
 
-   public:
-    Translation(){};
-    ~Translation(){};
-    void get_translation(string ITCstring);
-    friend xvector<double> operator*(Translation& T, const xvector<double>& P);
-    friend xvector<double> operator*(const xvector<double>& P, Translation& T);
-    friend xvector<double> operator+(Translation& T, const xvector<double>& P);
-    friend xvector<double> operator+(const xvector<double>& P, Translation& T);
+    public:
+      Translation(){};
+      ~Translation(){};
+      void get_translation(string ITCstring);
+      friend xvector<double> operator*(Translation& T, const xvector<double>& P);
+      friend xvector<double> operator*(const xvector<double>& P, Translation& T);
+      friend xvector<double> operator+(Translation& T, const xvector<double>& P);
+      friend xvector<double> operator+(const xvector<double>& P, Translation& T);
   };
 
   //Inversion
@@ -213,8 +213,8 @@ namespace SYM {
     friend xvector<double> operator*(Inversion& I, const xvector<double>& P);
     friend xvector<double> operator*(const xvector<double>& P, Inversion& I);
 
-   private:
-   public:
+    private:
+    public:
     Inversion(){};
     ~Inversion(){};
     //overload operator * for Glide
@@ -260,9 +260,9 @@ namespace SYM {
   //  xvector<double> direction;
   //  xvector<double> screwglide;  //will also store inversion pnts for rotoinversion
   //  xvector<double> shift;
-//
-//    void clear();
-//  };
+  //
+  //    void clear();
+  //  };
 
   //Eqatoms
   struct eqatoms {
@@ -295,106 +295,107 @@ namespace SYM {
   // ******************************************************************************
 
   template <class d>
-  d infnorm(vector<d> vec) {
-    if (vec.size() == 0) {
-      cerr << "Empty vector!:infnorm" << endl;
-      exit(1);
-    }
-    d largest = vec[0];
-    for (uint i = 0; i < vec.size(); i++) {
-      if (vec[i] > largest) {
-	largest = vec[i];
+    d infnorm(vector<d> vec) {
+      if (vec.size() == 0) {
+        cerr << "Empty vector!:infnorm" << endl;
+        exit(1);
       }
+      d largest = vec[0];
+      for (uint i = 0; i < vec.size(); i++) {
+        if (vec[i] > largest) {
+          largest = vec[i];
+        }
+      }
+      return largest;
     }
-    return largest;
-  }
 
   template <class d>
-  int infnormindex(vector<d> vec) {
-    if (vec.size() == 0) {
-      cerr << "Empty vector!:infnormindex" << endl;
-      exit(1);
-    }
-    d largest = vec[0];
-    int out;
-    for (uint i = 0; i < vec.size(); i++) {
-      if (vec[i] > largest) {
-	//largest = vec[i];
-	out = i;
+    int infnormindex(vector<d> vec) {
+      if (vec.size() == 0) {
+        cerr << "Empty vector!:infnormindex" << endl;
+        exit(1);
       }
+      d largest = vec[0];
+      int out;
+      for (uint i = 0; i < vec.size(); i++) {
+        if (vec[i] > largest) {
+          //largest = vec[i];
+          out = i;
+        }
+      }
+      return out;
     }
-    return out;
-  }
 
   template <class d>
-  d infnorm(xvector<d> xvec) {
-    if (xvec.urows == 0) {
-      cerr << "Empty vector!:infnorm xvec" << endl;
-      exit(1);
-    }
-    d largest = aurostd::abs(xvec[1]);
-    for (int i = 0; i < xvec.urows; i++) {
-      if (aurostd::abs(xvec[i + 1]) > largest) {
-	largest = aurostd::abs(xvec[i + 1]);
+    d infnorm(xvector<d> xvec) {
+      if (xvec.urows == 0) {
+        cerr << "Empty vector!:infnorm xvec" << endl;
+        exit(1);
       }
+      d largest = aurostd::abs(xvec[1]);
+      for (int i = 0; i < xvec.urows; i++) {
+        if (aurostd::abs(xvec[i + 1]) > largest) {
+          largest = aurostd::abs(xvec[i + 1]);
+        }
+      }
+      return largest;
     }
-    return largest;
-  }
 
   template <typename T>
-  void remove_duplicates_rt(vector<T>& vec) {
-    //sort(vec.begin(), vec.end());//sorts ascending order
-    vec.erase(unique(vec.begin(), vec.end()), vec.end());
-    //sort(vec.begin(), vec.end(), std::greater<int>());//sorts in descending order
-  }
+    void remove_duplicates_rt(vector<T>& vec) {
+      //sort(vec.begin(), vec.end());//sorts ascending order
+      vec.erase(unique(vec.begin(), vec.end()), vec.end());
+      //sort(vec.begin(), vec.end(), std::greater<int>());//sorts in descending order
+    }
 
   template <class dmmy>
-  bool allsame(vector<dmmy> vec) {
-    bool all = true;
-    for (uint i = 0; i < vec.size(); i++) {
-      if (vec[i] != vec[0])
-	all = false;
+    bool allsame(vector<dmmy> vec) {
+      bool all = true;
+      for (uint i = 0; i < vec.size(); i++) {
+        if (vec[i] != vec[0])
+          all = false;
+      }
+      return all;
     }
-    return all;
-  }
 
   template <class dmmy>
-  bool invec(vector<dmmy> vec, dmmy n) {
-    bool contains = false;
-    for (uint i = 0; i < vec.size(); i++) {
-      if (vec[i] == n)
-	contains = true;
+    bool invec(vector<dmmy> vec, dmmy n) {
+      bool contains = false;
+      for (uint i = 0; i < vec.size(); i++) {
+        if (vec[i] == n)
+          contains = true;
+      }
+      return contains;
     }
-    return contains;
-  }
 
   template <class dmmy>
-  int invec_index(vector<dmmy> vec, dmmy n) {
-    int out;
-    for (uint i = 0; i < vec.size(); i++) {
-      if (vec[i] == n)
-	out = i;
+    int invec_index(vector<dmmy> vec, dmmy n) {
+      int out;
+      for (uint i = 0; i < vec.size(); i++) {
+        if (vec[i] == n)
+          out = i;
+      }
+      return out;
     }
-    return out;
-  }
 
   int invecindex(vector<_atom> vec, _atom n);
 
   template <class dmmy>
-  bool inveconce(vector<dmmy> vec, dmmy n) {
-    bool contains = false;
-    int count = 0;
-    for (uint i = 0; i < vec.size(); i++) {
-      if (vec[i] == n) {
-	count++;
+    bool inveconce(vector<dmmy> vec, dmmy n) {
+      bool contains = false;
+      int count = 0;
+      for (uint i = 0; i < vec.size(); i++) {
+        if (vec[i] == n) {
+          count++;
+        }
       }
+      //if(count >= 1)
+      if (count == 1)
+      { //CO200106 - patching for auto-indenting
+        contains = true;
+      }
+      return contains;
     }
-    //if(count >= 1){
-    if (count == 1) {
-      contains = true;
-    }
-    return contains;
-  }
 } //namespace SYM
 
 //End Templates
@@ -471,11 +472,11 @@ namespace SYM {
   string reorderWyckoffPosition(const string& orig_position); //DX 20190708
   bool shiftWyckoffPositions(deque<deque<_atom> >& equivalent_atoms_shifted, xvector<double>& previous_shift, xvector<double>& new_shift);
   bool findWyckoffPositions(xstructure& CCell, deque<_atom>& atomicbasis, vector<vector<vector<string> > >& tmpvvvstring,
-			    deque<deque<_atom> >& equivalent_atoms, deque<deque<_atom> >& equivalent_atoms_shifted,
-			    bool& foundspacegroup, string& spacegroupstring, bool& orig_origin_shift, xvector<double>& OriginShift,
-			    vector<int>& wyckoffmult, vector<string>& wyckoffsymbols, vector<wyckoffsite_ITC>& wyckoffVariables,
-			    deque<_atom>& wyckoffPositionsVector, vector<string>& wyckoffSymbols, ostringstream& woss,
-			    bool& obverse_force_transformed);
+      deque<deque<_atom> >& equivalent_atoms, deque<deque<_atom> >& equivalent_atoms_shifted,
+      bool& foundspacegroup, string& spacegroupstring, bool& orig_origin_shift, xvector<double>& OriginShift,
+      vector<int>& wyckoffmult, vector<string>& wyckoffsymbols, vector<wyckoffsite_ITC>& wyckoffVariables,
+      deque<_atom>& wyckoffPositionsVector, vector<string>& wyckoffSymbols, ostringstream& woss,
+      bool& obverse_force_transformed);
 
   vector<vector<string> > getWyckoffEquations(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX 20191030
   vector<vector<string> > getWyckoffEquations(const string& Wyckoff_string, const string& Wyckoff_letter); //DX 20191030
@@ -500,7 +501,7 @@ namespace SYM {
   string ExtractWyckoffMultiplicitiesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
   string ExtractWyckoffSiteSymmetriesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
   vector<vector<vector<string> > > getWyckoffLettersWithSameMultiplcityAndSiteSymmetry(uint& space_group_number, 
-                                   vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice); //DX 20190201  
+      vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice); //DX 20190201  
   vector<string> splitSiteSymmetry(const string& site_symmetry); //DX 20190219 //DX 20190730 - added const
 
   //TOPOLOGY FUNCTIONS
@@ -561,21 +562,21 @@ namespace SYM {
   bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
   bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
   deque<deque<_atom> > groupSymmetryEquivalentAtoms(deque<_atom>& atoms, xmatrix<double>& lattice, vector<xmatrix<double> >& sym_ops,
-						    vector<xvector<double> >& translations, double& min_dist, double& tol); //DX 20190215
+      vector<xvector<double> >& translations, double& min_dist, double& tol); //DX 20190215
   deque<deque<_atom> > shiftSymmetryEquivalentAtoms(deque<deque<_atom> >& equivalent_atoms, xmatrix<double>& lattice, xvector<double>& translation, double& min_dist, double& tol);
 
   // ******************************************************************************
   // RSTD Namespace Functions
   // ******************************************************************************
-//  namespace rstd {
+  //  namespace rstd {
   typedef std::map<int, xvector<double> > hash;
   //DX 20190905 [OBSOLETE] xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
   double DotPro(xvector<double> a, xvector<double> b);
-//  double modulus(xvector<double> a);
+  //  double modulus(xvector<double> a);
   double modulus(vector<double> a);
-//  //Linear Algebra Functions:
+  //  //Linear Algebra Functions:
   void swap_rows(xmatrix<double>& M, int a, int b);
-//  }
+  //  }
 
   xmatrix<double> concatenate(vector<xvector<double> >& V);
   xmatrix<double> concatenate(vector<xmatrix<double> >& V);
@@ -607,17 +608,17 @@ namespace SYM {
   vector<Screw> triplet_operations(vector<xvector<double> > expanded_lattice, vector<xvector<double> > expanded_cell, xmatrix<double> L, xmatrix<double> Linv, vector<xvector<double> >& lattice_vectors, double& radius, bool& skew, double& tol); //DX 20190215 - added tol
   vector<Screw> twofold_operations(vector<xvector<double> > expanded_lattice, vector<xvector<double> > expanded_cell, xmatrix<double> L, xmatrix<double> Linv, vector<xvector<double> >& lattice_vectors, double& radius, bool& skew, double& tol); //DX 20190215 - added tol
   vector<xvector<double> > getLatticeVectorsFromOriginalMirrorOperations(vector<Glide>& old_mirrors, vector<Glide>& new_mirrors,
-									 vector<xvector<double> >& lattice_vectors, bool& all_matched);
+      vector<xvector<double> >& lattice_vectors, bool& all_matched);
   vector<xvector<double> > getLatticeVectorsFromOriginalRotationOperations(vector<Screw>& old_rotations_twofold,
-									   vector<Screw>& old_rotations_higher, vector<Screw>& new_rotations,
-									   vector<xvector<double> >& twofold_lattice_vectors,
-									   vector<xvector<double> >& rot_lattice_vectors, bool& all_matched);
+      vector<Screw>& old_rotations_higher, vector<Screw>& new_rotations,
+      vector<xvector<double> >& twofold_lattice_vectors,
+      vector<xvector<double> >& rot_lattice_vectors, bool& all_matched);
 
   // COMBINATORICS FUNCTIONS
   void reduce_atom_deques(deque<_atom>& expanded, xmatrix<double>& lattice, double& min_dist, double& sym_tol); //DX 20190215
-//NOT IN SYM  vector<int> AllCombination41(int num, int total_num, int index);
-//NOT IN SYM  vector<int> AllCombination42(int num, int total_num, vector<int>& str_in);
-//NOT IN SYM  unsigned long int CombinationNr(int num, int total_num);
+  //NOT IN SYM  vector<int> AllCombination41(int num, int total_num, int index);
+  //NOT IN SYM  vector<int> AllCombination42(int num, int total_num, vector<int>& str_in);
+  //NOT IN SYM  unsigned long int CombinationNr(int num, int total_num);
   vector<vector<int> > permute(int n);
 
   //LATTICE FUNCTIONS
@@ -645,14 +646,12 @@ namespace SYM {
   void swap_columns(deque<_atom>& atomicBasis, int col1, int col2);
   void rearrange_columns(deque<_atom>& atomicBasis, int c1, int c2, int c3);
 } //namespace SYM
-/*
-//A structure to store "decomposition" of points in plane--plane locations and distances from planes:
-struct Proj {
-  vector<_atom> inplane_locations;
-  vector<double> distances_from_plane;
-  xvector<double> plane_normal;
-};
-*/
+////A structure to store "decomposition" of points in plane--plane locations and distances from planes:
+//struct Proj {
+//vector<_atom> inplane_locations;
+//vector<double> distances_from_plane;
+//xvector<double> plane_normal;
+//};
 void xb();  //print a break
 template <class d>
 void print(vector<d> vec) {
@@ -685,28 +684,28 @@ namespace SYM {
   // CONVENTIONAL LATTICE VECTOR FUNCTIONS
   void orient(xstructure& xstr, bool update_atom_positions=true);
   xstructure ConventionalCell(xstructure& xstr, int& IT, int& cell_choice, bool& last_orientation, string& crystalsystem_prev,
-			      xstructure& CrystOut_prev, vector<xmatrix<double> >& candidate_lattice_vectors_prev,
-			      vector<char>& candidate_lattice_chars_prev, symfolder& checkops, SymmetryInformationITC& ITC_sym_info, bool& lattice_reformed,
-			      vector<int>& lattice_pgroups, vector<xmatrix<double> >& lattice_sym_mats,
-			      vector<xmatrix<double> >& crystal_sym_mats, bool& symmetry_found);
+      xstructure& CrystOut_prev, vector<xmatrix<double> >& candidate_lattice_vectors_prev,
+      vector<char>& candidate_lattice_chars_prev, symfolder& checkops, SymmetryInformationITC& ITC_sym_info, bool& lattice_reformed,
+      vector<int>& lattice_pgroups, vector<xmatrix<double> >& lattice_sym_mats,
+      vector<xmatrix<double> >& crystal_sym_mats, bool& symmetry_found);
   bool findCubicLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec,
-			vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
   bool findTrigonalLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec, vector<xvector<double> >& big_expanded,
-			   vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
   bool findTetragonalLattice(vector<xvector<double> >& rot_lattice_vectors, vector<xvector<double> >& twofold_lattice_vectors,
-			     vector<Screw>& rot_ops_vec, vector<Screw>& twofold_ops_vec, vector<xvector<double> >& big_expanded,
-			     vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215
+      vector<Screw>& rot_ops_vec, vector<Screw>& twofold_ops_vec, vector<xvector<double> >& big_expanded,
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215
   bool findMonoclinicLattice(vector<xvector<double> >& mirror_lattice_vectors, vector<xvector<double> >& twofold_lattice_vectors,
-			     vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
-			     vector<char>& candidate_lattice_chars, int& cell_choice, double& tol); //DX 20180816 - added cell_choice //DX 20190215 - added tol
+      vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
+      vector<char>& candidate_lattice_chars, int& cell_choice, double& tol); //DX 20180816 - added cell_choice //DX 20190215 - added tol
   bool findTriclinicLattice(xmatrix<double>& lattice, vector<xmatrix<double> >& candidate_lattice_vectors,
-			    vector<char>& candidate_lattice_chars);
+      vector<char>& candidate_lattice_chars);
   bool findOrthorhombicLattice(vector<xvector<double> >& twofold_lattice_vectors, vector<xvector<double> >& mirror_lattice_vectors,
-			       vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
   bool findRhombohedralLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec,
-			       vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
   bool findRhombohedralSetting(vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
-                               vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
   bool determineLatticeCentering(vector<xvector<double> >& bravais_basis, int& bravais_count, xmatrix<double>& c2f, xmatrix<double>& f2c, bool& skew, vector<xvector<double> >& big_expanded, string& crystalsystem, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
   string getPearsonSymbol(char& centering, char& lattice_char, deque<_atom> atoms);
   uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX 20181010

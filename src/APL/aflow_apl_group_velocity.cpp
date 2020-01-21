@@ -20,12 +20,10 @@
 #warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
-/*
-  #  if __GNUC_PREREQ(4,9) // enable thread if gcc version is >= 4.9
-  #define AFLOW_APL_MULTITHREADS_ENABLE
-  #include <thread>
-  #endif
-*/
+//#  if __GNUC_PREREQ(4,9) // enable thread if gcc version is >= 4.9
+//#define AFLOW_APL_MULTITHREADS_ENABLE
+//#include <thread>
+//#endif
 namespace apl
 {
   // ***************************************************************************************
@@ -87,16 +85,16 @@ namespace apl
     //delete
 
     if (_kpoints.size()==0)
-      {
-        // ME190726 - exit clean-up
-	//_logger<<apl::error<<"group velocity calculation _kpoints.size()==0 "<<apl::endl; 
-	//exit(0);
-        // ME191031 - use xerror
-        //throw APLRuntimeError("group velocity calculation _kpoints.size()==0");
-        string function = "GroupVelocity::populate_variables()";
-        string message = "group velocity calculation _kpoints.size()==0";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-      }
+    {
+      // ME190726 - exit clean-up
+      //_logger<<apl::error<<"group velocity calculation _kpoints.size()==0 "<<apl::endl; 
+      //exit(0);
+      // ME191031 - use xerror
+      //throw APLRuntimeError("group velocity calculation _kpoints.size()==0");
+      string function = "GroupVelocity::populate_variables()";
+      string message = "group velocity calculation _kpoints.size()==0";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
 
   }
   // ***************************************************************************************
@@ -105,31 +103,31 @@ namespace apl
     if(!eigen_solver(1))return false;//at k-0
 
     if(!eigen_solver())return false;//three different, kx, ky and kz directions
-    
+
     return true;
   }
   // ***************************************************************************************
   bool GroupVelocity::eigen_solver()
   {
-  
+
     for(int dir=1; dir<=3; dir++)
-      { 
-	for(uint i=0; i!=_kpoints.size(); i++)
-	  {
-	    _kpoints_kp[i][dir]=0.0;
-	    _kpoints_km[i][dir]=0.0;
-	    _kpoints_kp[i][dir] = _kpoints[i][dir] + _kshift;
-	    _kpoints_km[i][dir] = _kpoints[i][dir] - _kshift;
-	  }
-	if(!eigen_solver(dir+1))return false;
-      }
-    for(uint i=0; i!=_gv.size(); i++)
+    { 
+      for(uint i=0; i!=_kpoints.size(); i++)
       {
-	for(int j=1; j<=_gv[i].rows; j++)
-	  {
-	    _phvel[i][j] = std::sqrt(std::pow(_gv[i][j][1], 2)+ std::pow(_gv[i][j][2], 2) + std::pow(_gv[i][j][3], 2));
-          }
+        _kpoints_kp[i][dir]=0.0;
+        _kpoints_km[i][dir]=0.0;
+        _kpoints_kp[i][dir] = _kpoints[i][dir] + _kshift;
+        _kpoints_km[i][dir] = _kpoints[i][dir] - _kshift;
       }
+      if(!eigen_solver(dir+1))return false;
+    }
+    for(uint i=0; i!=_gv.size(); i++)
+    {
+      for(int j=1; j<=_gv[i].rows; j++)
+      {
+        _phvel[i][j] = std::sqrt(std::pow(_gv[i][j][1], 2)+ std::pow(_gv[i][j][2], 2) + std::pow(_gv[i][j][3], 2));
+      }
+    }
     //calculate sound speed
     sound_speed();
     return true;
@@ -147,13 +145,13 @@ namespace apl
     vector<double> kmod; kmod.clear();
     kmod.resize(_kpoints.size(), 100.0);
     for(uint i=0; i!=_kpoints.size(); i++)
+    {
+      double k_norm_tmp = std::sqrt(std::pow(_kpoints[i][1], 2)+ std::pow(_kpoints[i][2], 2) + std::pow(_kpoints[i][3], 2));
+      if(!_iszero(k_norm_tmp))
       {
-	double k_norm_tmp = std::sqrt(std::pow(_kpoints[i][1], 2)+ std::pow(_kpoints[i][2], 2) + std::pow(_kpoints[i][3], 2));
-	if(!_iszero(k_norm_tmp))
-	  {
-	    kmod[i]=k_norm_tmp;
-	  }
+        kmod[i]=k_norm_tmp;
       }
+    }
     //vector<double>::iterator result = std::min_element(std::begin(kmod), std::end(kmod));
     int min_index= indexofSmallestElement(kmod);//std::distance(std::begin(kmod), result);
     double k_norm = kmod[min_index]; 
@@ -180,11 +178,11 @@ namespace apl
 
 
     for(int k=1; k<=3; k++)
-      {
-	double tmp=(2.0*M_PI*_freq[min_index][k])/k_norm;
-	tmp=1.0/tmp;
-	_sound_speed+=std::pow(tmp, 3);
-      }
+    {
+      double tmp=(2.0*M_PI*_freq[min_index][k])/k_norm;
+      tmp=1.0/tmp;
+      _sound_speed+=std::pow(tmp, 3);
+    }
     _sound_speed=(_sound_speed)/3.0;
     _sound_speed=std::pow(_sound_speed, -0.33333);
     dm<<"sound_speed "<<setw(15)<<_sound_speed*100.0<<setw(15)<<"m/sec"<<"\n";
@@ -222,14 +220,14 @@ namespace apl
     dm << std::setprecision(6);
     dm << std::fixed;
     for(uint i=0; i!=_gv.size(); i++)
+    {
+      dm<<"#k-vector"<<setw(15)<<_kpoints[i][1]<<setw(15)<<_kpoints[i][2]<<setw(15)<<_kpoints[i][3]<<"\n";
+      for(int j=1; j<=_gv[i].rows; j++)
       {
-	dm<<"#k-vector"<<setw(15)<<_kpoints[i][1]<<setw(15)<<_kpoints[i][2]<<setw(15)<<_kpoints[i][3]<<"\n";
-	for(int j=1; j<=_gv[i].rows; j++)
-	  {
-	    dm<<setw(15)<<_freq[i][j]<<setw(15)<<_phvel[i][j]<<setw(15)<<_gv[i][j][1]
-	      <<setw(15)<<_gv[i][j][2]<<setw(15)<<_gv[i][j][3]<<setw(15)<<_sound_speed<<"\n";
-	  }
+        dm<<setw(15)<<_freq[i][j]<<setw(15)<<_phvel[i][j]<<setw(15)<<_gv[i][j][1]
+          <<setw(15)<<_gv[i][j][2]<<setw(15)<<_gv[i][j][3]<<setw(15)<<_sound_speed<<"\n";
       }
+    }
     dm <<"[AFLOW] "<<STAR100<<"\n";
     dm <<"[AFLOW_GROUP_VELOCITY]END"<<"\n";
 
@@ -264,23 +262,23 @@ namespace apl
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-//    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
     _freq_test.resize(ncpus, false);
     // Show info 
     if( ncpus == 1 )
-      {
-        if(ktype==1)_logger.initProgressBar("Calculating eigenvalues for k-zero");
-        else if(ktype==2)_logger.initProgressBar("Calculating eigenvalues for kx-dir");
-        else if(ktype==3)_logger.initProgressBar("Calculating eigenvalues for ky-dir");
-        else if(ktype==4)_logger.initProgressBar("Calculating eigenvalues for kz-dir");
-      }
+    {
+      if(ktype==1)_logger.initProgressBar("Calculating eigenvalues for k-zero");
+      else if(ktype==2)_logger.initProgressBar("Calculating eigenvalues for kx-dir");
+      else if(ktype==3)_logger.initProgressBar("Calculating eigenvalues for ky-dir");
+      else if(ktype==4)_logger.initProgressBar("Calculating eigenvalues for kz-dir");
+    }
     else
-      {
-        if(ktype==1)_logger.initProgressBar("Calculating eigenvalues for k-zero (" + stringify(ncpus) + " threads)");
-        else if(ktype==2)_logger.initProgressBar("Calculating eigenvalues for kx-dir (" + stringify(ncpus) + " threads)");
-        else if(ktype==3)_logger.initProgressBar("Calculating eigenvalues for ky-dir (" + stringify(ncpus) + " threads)");
-        else if(ktype==4)_logger.initProgressBar("Calculating eigenvalues for kz-dir (" + stringify(ncpus) + " threads)");
-      }
+    {
+      if(ktype==1)_logger.initProgressBar("Calculating eigenvalues for k-zero (" + stringify(ncpus) + " threads)");
+      else if(ktype==2)_logger.initProgressBar("Calculating eigenvalues for kx-dir (" + stringify(ncpus) + " threads)");
+      else if(ktype==3)_logger.initProgressBar("Calculating eigenvalues for ky-dir (" + stringify(ncpus) + " threads)");
+      else if(ktype==4)_logger.initProgressBar("Calculating eigenvalues for kz-dir (" + stringify(ncpus) + " threads)");
+    }
 
     // Distribute the calculation
     int startIndex, endIndex;
@@ -292,16 +290,16 @@ namespace apl
       threads.push_back( new std::thread(&GroupVelocity::solve_eigenvalues_at_k,this,startIndex,endIndex, icpu, ktype) );
     }
 
-/* OBSOLETE ME180801
-    for(int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = icpu * qpointsPerCPU;
-      endIndex = startIndex + qpointsPerCPU;
-      if( ( (uint)endIndex > _kpoints.size() ) ||
-          ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
-        endIndex = _kpoints.size();
-      threads.push_back( new std::thread(&GroupVelocity::solve_eigenvalues_at_k,this,startIndex,endIndex, icpu, ktype) );
-    }
-*/
+    /* OBSOLETE ME180801
+       for(int icpu = 0; icpu < ncpus; icpu++) {
+       startIndex = icpu * qpointsPerCPU;
+       endIndex = startIndex + qpointsPerCPU;
+       if( ( (uint)endIndex > _kpoints.size() ) ||
+       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
+       endIndex = _kpoints.size();
+       threads.push_back( new std::thread(&GroupVelocity::solve_eigenvalues_at_k,this,startIndex,endIndex, icpu, ktype) );
+       }
+       */
 
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {
@@ -315,9 +313,9 @@ namespace apl
 
     uint bool_size=0;
     for(uint id=0; id!=_freq_test.size(); id++)
-      {
-	bool_size+=(uint)_freq_test[id];
-      }
+    {
+      bool_size+=(uint)_freq_test[id];
+    }
     if(bool_size==(uint)ncpus)pass=true;
     _freq_test.clear();
 #else
@@ -325,9 +323,9 @@ namespace apl
     //calculate_gp_in_path(0, (int)_kpoints.size(), 0, ktype);
     uint bool_size=0;
     for(uint id=0; id!=_freq_test.size(); id++)
-      {
-	bool_size+=(uint)_freq_test[id];
-      }
+    {
+      bool_size+=(uint)_freq_test[id];
+    }
     if(bool_size==1)pass=true;
 #endif
 
@@ -337,91 +335,91 @@ namespace apl
   void GroupVelocity::solve_eigenvalues_at_k(int startIndex, int endIndex, int cpuid, int ktype)
   {
     for(int In=startIndex;In<endIndex;In++)
+    {
+      xvector<double> qpoint;
+      xmatrix<xcomplex<double> >  DM(_nBranches,_nBranches,1,1);
+      xvector<double> qp;
+      xmatrix<xcomplex<double> >  DMp(_nBranches,_nBranches,1,1);
+      xvector<double> qm;
+      xmatrix<xcomplex<double> >  DMm(_nBranches,_nBranches,1,1);
+
+      if(ktype==1)
       {
-        xvector<double> qpoint;
-        xmatrix<xcomplex<double> >  DM(_nBranches,_nBranches,1,1);
-        xvector<double> qp;
-        xmatrix<xcomplex<double> >  DMp(_nBranches,_nBranches,1,1);
-        xvector<double> qm;
-        xmatrix<xcomplex<double> >  DMm(_nBranches,_nBranches,1,1);
-
-        if(ktype==1)
-	  {
-	    qpoint=_kpoints[In];
-	    DM=_pc.getDynamicalMatrix(qpoint);
-	  } else
-	  {
-	    qp=_kpoints_kp[In];
-	    DMp=_pc.getDynamicalMatrix(qp);
-	    qm=_kpoints_km[In];
-	    DMm=_pc.getDynamicalMatrix(qm);
-	  }
-
-
-	if(ktype==1)
-	  {
-	    //calculate eigenvalue and eigenvectors of a dynamical matirx
-            xvector<double> eigenvalues(_nBranches, 1);
-            xmatrix<xcomplex<double> > eigenvectors(_nBranches, _nBranches, 1,1);
-	    apl::aplEigensystems e;
-	    e.eigen_calculation(DM, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
-	    _eigenvectors[In]=eigenvectors;
-
-	    for(uint j=1; j<=_nBranches; j++)
-	      {
-		if(_iszero(eigenvalues[j]))eigenvalues[j]=0.0;
-		if(eigenvalues[j]<0){
-		  if(_isnegative(eigenvalues[j]))
-		    {
-		      _logger<<  apl::warning <<"GroupVelocity:: negative eigenvalue: = " <<eigenvalues[j]<<apl::endl;
-		      return;
-		    } else eigenvalues[j]=0.00;
-		}
-		_freq[In][j]=sqrt(eigenvalues[j])*RAW2Hz;
-	      }
-	  } else
-	  {
-            xvector<double> eigenvalues_p(_nBranches, 1);
-            xmatrix<xcomplex<double> > eigenvectors_p(_nBranches, _nBranches, 1,1);
-            xvector<double> eigenvalues_m(_nBranches, 1);
-            xmatrix<xcomplex<double> > eigenvectors_m(_nBranches, _nBranches, 1,1);
-	    apl::aplEigensystems e_p;
-	    e_p.eigen_calculation(DMp, eigenvalues_p, eigenvectors_p, APL_MV_EIGEN_SORT_VAL_ASC);
-	    apl::aplEigensystems e_m;
-	    e_p.eigen_calculation(DMm, eigenvalues_m, eigenvectors_m, APL_MV_EIGEN_SORT_VAL_ASC);
-
-	    for(uint j=1; j<=_nBranches; j++)
-	      {
-		if(_iszero(eigenvalues_p[j]))eigenvalues_p[j]=0.0;
-		if(_iszero(eigenvalues_m[j]))eigenvalues_m[j]=0.0;
-
-		if(eigenvalues_p[j]<0)
-		  {
-		    if(_isnegative(eigenvalues_p[j]))
-		      {
-			_logger<<  apl::warning <<"GroupVelocity:: negative eigenvalue: = " <<eigenvalues_p[j]<<apl::endl;
-			return;
-		      } else eigenvalues_p[j]=0.00;
-		  }
-		if(eigenvalues_m[j]<0)
-		  {
-		    if(_isnegative(eigenvalues_m[j]))
-		      {
-			_logger<<  apl::warning <<"GroupVelocity:: negative eigenvalue: = " <<eigenvalues_m[j]<<apl::endl;
-			return;
-		      } else eigenvalues_m[j]=0.00;
-		  }
-
-
-		_freq_kp[In][j]=sqrt(eigenvalues_p[j])*RAW2Hz;
-		_freq_km[In][j]=sqrt(eigenvalues_m[j])*RAW2Hz;
-
-		if(ktype==2)_gv[In][j][1]=(_freq_kp[In][j]-_freq_km[In][j])/(2.0*_kshift);
-		else if(ktype==3)_gv[In][j][2]=(_freq_kp[In][j]-_freq_km[In][j])/(2.0*_kshift);
-		else if(ktype==4)_gv[In][j][3]=(_freq_kp[In][j]-_freq_km[In][j])/(2.0*_kshift);
-	      }
-	  }
+        qpoint=_kpoints[In];
+        DM=_pc.getDynamicalMatrix(qpoint);
+      } else
+      {
+        qp=_kpoints_kp[In];
+        DMp=_pc.getDynamicalMatrix(qp);
+        qm=_kpoints_km[In];
+        DMm=_pc.getDynamicalMatrix(qm);
       }
+
+
+      if(ktype==1)
+      {
+        //calculate eigenvalue and eigenvectors of a dynamical matirx
+        xvector<double> eigenvalues(_nBranches, 1);
+        xmatrix<xcomplex<double> > eigenvectors(_nBranches, _nBranches, 1,1);
+        apl::aplEigensystems e;
+        e.eigen_calculation(DM, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
+        _eigenvectors[In]=eigenvectors;
+
+        for(uint j=1; j<=_nBranches; j++)
+        {
+          if(_iszero(eigenvalues[j]))eigenvalues[j]=0.0;
+          if(eigenvalues[j]<0){
+            if(_isnegative(eigenvalues[j]))
+            {
+              _logger<<  apl::warning <<"GroupVelocity:: negative eigenvalue: = " <<eigenvalues[j]<<apl::endl;
+              return;
+            } else eigenvalues[j]=0.00;
+          }
+          _freq[In][j]=sqrt(eigenvalues[j])*RAW2Hz;
+        }
+      } else
+      {
+        xvector<double> eigenvalues_p(_nBranches, 1);
+        xmatrix<xcomplex<double> > eigenvectors_p(_nBranches, _nBranches, 1,1);
+        xvector<double> eigenvalues_m(_nBranches, 1);
+        xmatrix<xcomplex<double> > eigenvectors_m(_nBranches, _nBranches, 1,1);
+        apl::aplEigensystems e_p;
+        e_p.eigen_calculation(DMp, eigenvalues_p, eigenvectors_p, APL_MV_EIGEN_SORT_VAL_ASC);
+        apl::aplEigensystems e_m;
+        e_p.eigen_calculation(DMm, eigenvalues_m, eigenvectors_m, APL_MV_EIGEN_SORT_VAL_ASC);
+
+        for(uint j=1; j<=_nBranches; j++)
+        {
+          if(_iszero(eigenvalues_p[j]))eigenvalues_p[j]=0.0;
+          if(_iszero(eigenvalues_m[j]))eigenvalues_m[j]=0.0;
+
+          if(eigenvalues_p[j]<0)
+          {
+            if(_isnegative(eigenvalues_p[j]))
+            {
+              _logger<<  apl::warning <<"GroupVelocity:: negative eigenvalue: = " <<eigenvalues_p[j]<<apl::endl;
+              return;
+            } else eigenvalues_p[j]=0.00;
+          }
+          if(eigenvalues_m[j]<0)
+          {
+            if(_isnegative(eigenvalues_m[j]))
+            {
+              _logger<<  apl::warning <<"GroupVelocity:: negative eigenvalue: = " <<eigenvalues_m[j]<<apl::endl;
+              return;
+            } else eigenvalues_m[j]=0.00;
+          }
+
+
+          _freq_kp[In][j]=sqrt(eigenvalues_p[j])*RAW2Hz;
+          _freq_km[In][j]=sqrt(eigenvalues_m[j])*RAW2Hz;
+
+          if(ktype==2)_gv[In][j][1]=(_freq_kp[In][j]-_freq_km[In][j])/(2.0*_kshift);
+          else if(ktype==3)_gv[In][j][2]=(_freq_kp[In][j]-_freq_km[In][j])/(2.0*_kshift);
+          else if(ktype==4)_gv[In][j][3]=(_freq_kp[In][j]-_freq_km[In][j])/(2.0*_kshift);
+        }
+      }
+    }
     _freq_test[cpuid]=true;
   }//fn end
   // ***************************************************************************************
@@ -432,10 +430,10 @@ namespace apl
 
     for(int i = 1; i < size; i++)
     {
-        if(array[i] < array[index])
-            index = i;              
+      if(array[i] < array[index])
+        index = i;              
     }
     return index;
-   }
+  }
   // ***************************************************************************************
 }//apl namespace end

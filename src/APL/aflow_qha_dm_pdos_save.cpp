@@ -50,12 +50,12 @@ namespace apl {
     string command="";
     if(aurostd::FileExist("apl.xml")){
       command =string("mv ")+string("apl.xml")+string("  ")+
-	string(_tmpdirfrefix)+string("/")+string("apl.xml.")+string(ex)+string(" ")+_devnull;
+        string(_tmpdirfrefix)+string("/")+string("apl.xml.")+string(ex)+string(" ")+_devnull;
       aurostd::execute2string(command);
     }
     if(aurostd::FileExist("DYNMAT")){
       command =string("mv ")+string("DYNMAT")+string(" ")+string(_tmpdirfrefix)+string("/")+string("DYNMAT.")+string(ex)+
-	string(" ")+_devnull;
+        string(" ")+_devnull;
       aurostd::execute2string(command);}
     //clear all variables
     _kpoints.clear();
@@ -84,17 +84,17 @@ namespace apl {
     xvector<double> kpoint(3);
     for(int s = 1; s <=nc; s++)
       for(int r = 1; r <= nb; r++)
-	for(int p = 1; p <= na; p++)
-	  {
-	    kpoint(1) = ( 2.0 * p - na - 1 ) / ( 2.0 * na );
-	    kpoint(2) = ( 2.0 * r - nb - 1 ) / ( 2.0 * nb );
-	    kpoint(3) = ( 2.0 * s - nc - 1 ) / ( 2.0 * nc );
-	    // Transform to cartesian coordinate
-	    kpoint = trasp(_klattice) * kpoint;
-	    _kpoints.push_back(kpoint);
-	    _weights.push_back(1.0);
-	  }
-    }
+        for(int p = 1; p <= na; p++)
+        {
+          kpoint(1) = ( 2.0 * p - na - 1 ) / ( 2.0 * na );
+          kpoint(2) = ( 2.0 * r - nb - 1 ) / ( 2.0 * nb );
+          kpoint(3) = ( 2.0 * s - nc - 1 ) / ( 2.0 * nc );
+          // Transform to cartesian coordinate
+          kpoint = trasp(_klattice) * kpoint;
+          _kpoints.push_back(kpoint);
+          _weights.push_back(1.0);
+        }
+  }
   // ***************************************************************************************
   void QHAsubdirectoryData::create_dm()
   {
@@ -104,8 +104,8 @@ namespace apl {
     string kfile_prefix = string(_tmpdirfrefix)+string("/")+string("k_") +string("mesh");
     string kfile        =string(kfile_prefix)+string(".")+string(ex);
     string weightfile   =string(kfile_prefix)+string("_weight")+string(".")+string(ex);
-    
-   _logger <<"Creating dynamical matrix "<< dmfile << apl::endl;
+
+    _logger <<"Creating dynamical matrix "<< dmfile << apl::endl;
 
     //saving DM 
     _dm.clear();
@@ -116,7 +116,7 @@ namespace apl {
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-//    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
 
     // Show info 
     if( ncpus == 1 )
@@ -135,16 +135,16 @@ namespace apl {
       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
     }
 
-/* OBSOLETE ME180801
-    for(int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = icpu * qpointsPerCPU;
-      endIndex = startIndex + qpointsPerCPU;
-      if( ( (uint)endIndex > _kpoints.size() ) ||
-          ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
-        endIndex = _kpoints.size();
-      threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
-    }
-*/
+    /* OBSOLETE ME180801
+       for(int icpu = 0; icpu < ncpus; icpu++) {
+       startIndex = icpu * qpointsPerCPU;
+       endIndex = startIndex + qpointsPerCPU;
+       if( ( (uint)endIndex > _kpoints.size() ) ||
+       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
+       endIndex = _kpoints.size();
+       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
+       }
+       */
 
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {
@@ -192,7 +192,7 @@ namespace apl {
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-//    int qpointsPerCPU = _kpoints.size() / ncpus;  ME180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  ME180801
 
     // Show info 
     if( ncpus == 1 )
@@ -211,16 +211,16 @@ namespace apl {
       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
     }
 
-/* OBSOLETE ME180801
-    for(int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = icpu * qpointsPerCPU;
-      endIndex = startIndex + qpointsPerCPU;
-      if( ( (uint)endIndex > _kpoints.size() ) ||
-          ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
-        endIndex = _kpoints.size();
-      threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
-    }
-*/
+    /* OBSOLETE ME180801
+       for(int icpu = 0; icpu < ncpus; icpu++) {
+       startIndex = icpu * qpointsPerCPU;
+       endIndex = startIndex + qpointsPerCPU;
+       if( ( (uint)endIndex > _kpoints.size() ) ||
+       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
+       endIndex = _kpoints.size();
+       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
+       }
+       */
 
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {
@@ -253,15 +253,15 @@ namespace apl {
   // ***************************************************************************************
   //check whether running directory is Gruneisen directory
   bool
-  QHAsubdirectoryData::check_GP()
-  {
-    string dir=_running_dir;
-    string tag=NumberToString<double>(_gp_vol_distortion);
-    string dir1=string(_AFLOW_QHA_PHONS_DIRECTORY_PREFIX_)+string("M")+string(tag);
-    string dir2=string(_AFLOW_QHA_PHONS_DIRECTORY_PREFIX_)+string("P")+string(tag);
-    if((dir==dir1)||(dir==dir2))return true;
-    else return false;
-  }
+    QHAsubdirectoryData::check_GP()
+    {
+      string dir=_running_dir;
+      string tag=NumberToString<double>(_gp_vol_distortion);
+      string dir1=string(_AFLOW_QHA_PHONS_DIRECTORY_PREFIX_)+string("M")+string(tag);
+      string dir2=string(_AFLOW_QHA_PHONS_DIRECTORY_PREFIX_)+string("P")+string(tag);
+      if((dir==dir1)||(dir==dir2))return true;
+      else return false;
+    }
   // ***************************************************************************************
   //check whether running directory is SCQHA directory
   bool QHAsubdirectoryData::check_SCQHA()
@@ -277,73 +277,73 @@ namespace apl {
   string QHAsubdirectoryData::getdir_name(string path)
   {
     vector<string> vec_str=splitWdelimiter<string>(path, "/");
-   _running_dir=vec_str[vec_str.size()-1];
-   _logger <<"Running directory "<< _running_dir << apl::endl;
+    _running_dir=vec_str[vec_str.size()-1];
+    _logger <<"Running directory "<< _running_dir << apl::endl;
 
     if( !aurostd::FileExist(_tmpdirfrefix) )
-      {
-	string bashcommand=string("mkdir -p ")+string(_tmpdirfrefix)+string("  ")+ _devnull;
-	aurostd::execute2string(bashcommand);
-      }
+    {
+      string bashcommand=string("mkdir -p ")+string(_tmpdirfrefix)+string("  ")+ _devnull;
+      aurostd::execute2string(bashcommand);
+    }
     return _running_dir;
   }
   // ***************************************************************************************
   template<class T> 
-  vector<T> QHAsubdirectoryData::splitWdelimiter(string s, string delimiter)
-   {
-   vector<T> lines;
-   size_t pos = 0;
-   std::string token;
-while ((pos = s.find(delimiter)) != std::string::npos) {
-    token = s.substr(0, pos);
-    vector<T> vec=split<T>(token);
-    for(uint i=0; i<vec.size(); i++)lines.push_back(vec[i]);
-    s.erase(0, pos + delimiter.length());
-}
-    vector<T> vec1=split<T>(s) ;
-    for(uint i=0; i<vec1.size(); i++)lines.push_back(vec1[i]);
+    vector<T> QHAsubdirectoryData::splitWdelimiter(string s, string delimiter)
+    {
+      vector<T> lines;
+      size_t pos = 0;
+      std::string token;
+      while ((pos = s.find(delimiter)) != std::string::npos) {
+        token = s.substr(0, pos);
+        vector<T> vec=split<T>(token);
+        for(uint i=0; i<vec.size(); i++)lines.push_back(vec[i]);
+        s.erase(0, pos + delimiter.length());
+      }
+      vector<T> vec1=split<T>(s) ;
+      for(uint i=0; i<vec1.size(); i++)lines.push_back(vec1[i]);
 
-return lines;
-}
+      return lines;
+    }
   // ***************************************************************************************
   //get running directory name
   vector<string>
-  QHAsubdirectoryData::directory_list(const string path)
-  {
-    vector<string> s;
-    FILE *in;
-    char buff[512];
-    if(!(in = popen(path.c_str(), "r"))){
-      // ME190726 - exit clean-up
-      //_logger<<apl::error<<"bash command can't not able to exacute"<<apl::endl; exit(0);
-      // ME191031 - use xerror
-      //throw APLRuntimeError("Cannot execute bash command.");
-      string function = "QHAsubdirectoryData::directory_list()";
-      string message = "Cannot execute bash command.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-    }
-    while(fgets(buff, sizeof(buff), in)!=NULL)
+    QHAsubdirectoryData::directory_list(const string path)
+    {
+      vector<string> s;
+      FILE *in;
+      char buff[512];
+      if(!(in = popen(path.c_str(), "r"))){
+        // ME190726 - exit clean-up
+        //_logger<<apl::error<<"bash command can't not able to exacute"<<apl::endl; exit(0);
+        // ME191031 - use xerror
+        //throw APLRuntimeError("Cannot execute bash command.");
+        string function = "QHAsubdirectoryData::directory_list()";
+        string message = "Cannot execute bash command.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      }
+      while(fgets(buff, sizeof(buff), in)!=NULL)
       {stringstream AFLOW;
-	string dirlist;
-	AFLOW << buff;
-	AFLOW >> dirlist;
-	s.push_back(dirlist);}
-    return s;
-  }
+        string dirlist;
+        AFLOW << buff;
+        AFLOW >> dirlist;
+        s.push_back(dirlist);}
+      return s;
+    }
   // ***************************************************************************************
-template<typename T> 
-   std::vector<T> QHAsubdirectoryData::split(const std::string& line){
-    std::istringstream is(line);
-    return std::vector<T>(std::istream_iterator<T>(is), std::istream_iterator<T>());
-}
+  template<typename T> 
+    std::vector<T> QHAsubdirectoryData::split(const std::string& line){
+      std::istringstream is(line);
+      return std::vector<T>(std::istream_iterator<T>(is), std::istream_iterator<T>());
+    }
   // ***************************************************************************************
   //Number to String conver function
   template <typename T>
-  string QHAsubdirectoryData:: NumberToString ( T Number ){
-    ostringstream ss;
-    ss << Number;
-    return ss.str();
-  }
+    string QHAsubdirectoryData:: NumberToString ( T Number ){
+      ostringstream ss;
+      ss << Number;
+      return ss.str();
+    }
   // ***************************************************************************************
   //this function returns dynamical matricx
   void  QHAsubdirectoryData::get_dm(int startIndex, int endIndex)
@@ -366,7 +366,7 @@ template<typename T>
 
     for(uint I=0;I<_dm.size();I++){
       for(uint J=1;J<=_nBranches;J++){
-	dmout.write( (char *)(&_dm[I][J][1]), _nBranches*sizeof(xcomplex<double>) );
+        dmout.write( (char *)(&_dm[I][J][1]), _nBranches*sizeof(xcomplex<double>) );
       }}
     dmout.clear();
     dmout.close();
@@ -383,7 +383,7 @@ template<typename T>
     kout<< setprecision(Set_QHA_Precision);
     for(uint kpoint=0; kpoint<_kpoints.size(); kpoint++){
       for(int i=1; i<=_kpoints[i].rows; i++){
-	kout<<setw(Set_QHA_Precision+10)<<_kpoints[kpoint][i];}
+        kout<<setw(Set_QHA_Precision+10)<<_kpoints[kpoint][i];}
       kout<<"\n";}
     kout.clear();
     kout.close();

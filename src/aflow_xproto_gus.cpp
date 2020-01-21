@@ -39,39 +39,39 @@ namespace aflowlib {
     string FileLibrary="",structure_line="";
     for(uint i=0;aflowlib::PrototypeBinaryGUS_Cache_LibraryS[i]!="XXX"&&structure_line.empty();i++)
       if(aurostd::substring2bool(aflowlib::PrototypeBinaryGUS_Cache_LibraryS[i],"gus"+auslat))
-	if(aurostd::substring2bool(aflowlib::PrototypeBinaryGUS_Cache_LibraryS[i],auslat+labelclean+" "))
-	  return aflowlib::PrototypeBinaryGUS_Cache_LibraryS[i];
+        if(aurostd::substring2bool(aflowlib::PrototypeBinaryGUS_Cache_LibraryS[i],auslat+labelclean+" "))
+          return aflowlib::PrototypeBinaryGUS_Cache_LibraryS[i];
     if(structure_line.empty()) {
       // NEED GUS LIBRARY
       // Search LIBRARY
       string FileLibrary="";
       for(uint j=0;j<vAFLOW_LIBRARY_DIRECTORIES.size()&&FileLibrary.empty();j++) {   // cycle through possible directories
-	if(FileLibrary.empty() && aurostd::FileExist(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat")) FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat";
-	if(FileLibrary.empty() && aurostd::FileExist(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.gz")) FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.gz";
-	if(FileLibrary.empty() && aurostd::FileExist(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.bz2")) FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.bz2";
-	if(FileLibrary.empty() && aurostd::FileExist(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.xz")) FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.xz";
+        if(FileLibrary.empty() && aurostd::FileExist(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat")) FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat";
+        if(FileLibrary.empty() && aurostd::FileExist(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.gz")) FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.gz";
+        if(FileLibrary.empty() && aurostd::FileExist(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.bz2")) FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.bz2";
+        if(FileLibrary.empty() && aurostd::FileExist(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.xz")) FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/aflow_library_gus.dat.xz";
       } // cycle through AFLOW LIBRARY as postfix
       if(FileLibrary!="") {
-	if(LDEBUG) { oaus << "00000  MESSAGE AFLOW LIBRARY  Found library file = [" << FileLibrary << "]" << endl; }
-	if(LDEBUG) { aurostd::PrintMessageStream(FileMESSAGE,oaus,XHOST.QUIET); }
+        if(LDEBUG) { oaus << "00000  MESSAGE AFLOW LIBRARY  Found library file = [" << FileLibrary << "]" << endl; }
+        if(LDEBUG) { aurostd::PrintMessageStream(FileMESSAGE,oaus,XHOST.QUIET); }
       } else {
-	oaus << "WWWWW  AFLOW_LIBRARY not found! " << endl;
-	aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
-	exit(0);
+        oaus << "WWWWW  AFLOW_LIBRARY not found! " << endl;
+        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        exit(0);
       }
       // FOUND
       if(aurostd::substring2bool(FileLibrary,".gz")) {
-	structure_line=aurostd::execute2string("zcat "+FileLibrary+" | grep gus"+auslat+" | grep \""+auslat+labelclean+" \"");
+        structure_line=aurostd::execute2string("zcat "+FileLibrary+" | grep gus"+auslat+" | grep \""+auslat+labelclean+" \"");
       } else {
-	if(aurostd::substring2bool(FileLibrary,".bz2")) {
-	  structure_line=aurostd::execute2string("bzcat "+FileLibrary+" | grep gus"+auslat+" | grep \""+auslat+labelclean+" \"");
-	} else {
-	  if(aurostd::substring2bool(FileLibrary,".xz")) {
-	    structure_line=aurostd::execute2string("xzcat "+FileLibrary+" | grep gus"+auslat+" | grep \""+auslat+labelclean+" \"");
-	  } else {
-	    structure_line=aurostd::execute2string("cat "+FileLibrary+" | grep gus"+auslat+" | grep \""+auslat+labelclean+" \"");
-	  }
-	}
+        if(aurostd::substring2bool(FileLibrary,".bz2")) {
+          structure_line=aurostd::execute2string("bzcat "+FileLibrary+" | grep gus"+auslat+" | grep \""+auslat+labelclean+" \"");
+        } else {
+          if(aurostd::substring2bool(FileLibrary,".xz")) {
+            structure_line=aurostd::execute2string("xzcat "+FileLibrary+" | grep gus"+auslat+" | grep \""+auslat+labelclean+" \"");
+          } else {
+            structure_line=aurostd::execute2string("cat "+FileLibrary+" | grep gus"+auslat+" | grep \""+auslat+labelclean+" \"");
+          }
+        }
       }
     }
     return structure_line;  // if found, otherwise return NIHIL;
@@ -80,9 +80,9 @@ namespace aflowlib {
 
 namespace aflowlib {
   xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,
-				string atomA,double volumeA,
-				string atomB,double volumeB,
-				double volume_in) {
+      string atomA,double volumeA,
+      string atomB,double volumeB,
+      double volume_in) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // good for all
     xstructure str("");str.lattice.clear();
@@ -125,11 +125,11 @@ namespace aflowlib {
       title_database="fcc";
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
-	oaus << "WWWWW  AFLOW_LIBRARY GUS FCC, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-	aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
-	return str;
+        oaus << "WWWWW  AFLOW_LIBRARY GUS FCC, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
+        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        return str;
       } else {
-	structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
+        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
       }
     }
     // --------- BCC found --------------
@@ -145,11 +145,11 @@ namespace aflowlib {
       title_database="bcc";
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
-	oaus << "WWWWW  AFLOW_LIBRARY GUS BCC, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-	aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
-	return str;
+        oaus << "WWWWW  AFLOW_LIBRARY GUS BCC, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
+        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        return str;
       } else {
-	structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
+        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
       }
     }
     // --------- HCP found --------------
@@ -166,11 +166,11 @@ namespace aflowlib {
       title_database="hcp";
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
-	oaus << "WWWWW  AFLOW_LIBRARY GUS HCP, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-	aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
-	return str;
+        oaus << "WWWWW  AFLOW_LIBRARY GUS HCP, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
+        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        return str;
       } else {
-	structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
+        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
       }
     }
     // --------- sc found --------------
@@ -186,11 +186,11 @@ namespace aflowlib {
       title_database="sc";
       bulksurf="bulk";
       if(labelnum==0 || labelnum>labelmax) {
-	oaus << "WWWWW  AFLOW_LIBRARY GUS HCP, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
-	aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
-	return str;
+        oaus << "WWWWW  AFLOW_LIBRARY GUS HCP, label (" << labelnum << ") out of boundary (1," << labelmax << ")" << endl;
+        aurostd::PrintWarningStream(FileMESSAGE,oaus,XHOST.QUIET);
+        return str;
       } else {
-	structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
+        structure_line=aflowlib::PrototypeBinaryGUS_Cache_LibraryS_Extract(FileMESSAGE,title_database,labelclean);
       }
     }
     // *********************************************************************
@@ -214,7 +214,7 @@ namespace aflowlib {
     aus >> a >> b >> c >> d >> e >> f;
     for(i=1;i<=3;i++)
       for(j=1;j<=3;j++)
-	aus >> L(i,j);
+        aus >> L(i,j);
     aus >> labeling;
     if(LDEBUG) { cerr << "DEBUG sizeN=" << sizeN << " nAt=" << nAt << " pgOps=" << pgOps << endl; }
     if(LDEBUG) { cerr << "DEBUG diag=" << diag << endl; }
@@ -240,19 +240,19 @@ namespace aflowlib {
     ic = 0;
     for(iD=1;iD<=(int) nD;iD++) {//**
       for( z1=0; z1<=a-1; z1++) {
-	for(j=1;j<=3;j++) aussLVinvXdvec(j)=sLVinvXdvec(j,iD);
-	for( z2=(b*z1)/a; z2<=c+(b*z1)/a - 1; z2++) {
-	  for( z3 = z1*(d-(e*b)/c)/a+(e*z2)/c; z3<= f+z1*(d-(e*b)/c)/a+(e*z2)/c - 1; z3++) {
-	    ic++;
-	    if(ic>(int) (nAt*nD)) { cerr << "EEEEE  Problem in basis atoms..." << endl;exit(0); }
-	    // call inverse(real(HNF,dp),Sinv)
-	    //** Move this to outside the loop: aurostd::inverse(HNF,Sinv);
-	    ausv=Sinv*aurostd::reshape((double) z1,(double) z2,(double) z3)+aussLVinvXdvec; //**
-	    // aurostd::inverse(HNF,Sinv);
-	    // ausv=Sinv*aurostd::reshape((double) z1,(double) z2,(double) z3);
-	    for(j=1;j<=3;j++) aBas(j,ic)=ausv(j);
-	  } // z3
-	} // z2
+        for(j=1;j<=3;j++) aussLVinvXdvec(j)=sLVinvXdvec(j,iD);
+        for( z2=(b*z1)/a; z2<=c+(b*z1)/a - 1; z2++) {
+          for( z3 = z1*(d-(e*b)/c)/a+(e*z2)/c; z3<= f+z1*(d-(e*b)/c)/a+(e*z2)/c - 1; z3++) {
+            ic++;
+            if(ic>(int) (nAt*nD)) { cerr << "EEEEE  Problem in basis atoms..." << endl;exit(0); }
+            // call inverse(real(HNF,dp),Sinv)
+            //** Move this to outside the loop: aurostd::inverse(HNF,Sinv);
+            ausv=Sinv*aurostd::reshape((double) z1,(double) z2,(double) z3)+aussLVinvXdvec; //**
+            // aurostd::inverse(HNF,Sinv);
+            // ausv=Sinv*aurostd::reshape((double) z1,(double) z2,(double) z3);
+            for(j=1;j<=3;j++) aBas(j,ic)=ausv(j);
+          } // z3
+        } // z2
       } // z1
     } // iD
     if(LDEBUG) { cerr << "DEBUG ic=" << ic << endl; }
@@ -308,63 +308,63 @@ namespace aflowlib {
     for(iat=0;iat<natoms;iat++) {
       cpos.clear();fpos.clear(); // clear positions
       if(labeling[iat]=='0') { // atoms A
-	_atom atom;
-	atom.CleanName();
-	atom.CleanSpin();
-	fpos(1)=aBas(1,iat+1);
-	fpos(2)=aBas(2,iat+1);
-	fpos(3)=aBas(3,iat+1);
-	cpos=F2C(str.lattice,fpos);
-	atom.fpos=fpos;
-	atom.cpos=cpos;
-	atom.name=atomA;
-	atom.type=0; // A is always type 0 !
-	atom.name_is_given=TRUE;
-	volume+=volumeA;
-	str.atoms.push_back(atom);
+        _atom atom;
+        atom.CleanName();
+        atom.CleanSpin();
+        fpos(1)=aBas(1,iat+1);
+        fpos(2)=aBas(2,iat+1);
+        fpos(3)=aBas(3,iat+1);
+        cpos=F2C(str.lattice,fpos);
+        atom.fpos=fpos;
+        atom.cpos=cpos;
+        atom.name=atomA;
+        atom.type=0; // A is always type 0 !
+        atom.name_is_given=TRUE;
+        volume+=volumeA;
+        str.atoms.push_back(atom);
       }
     }
     // perform atom B
     for(iat=0;iat<natoms;iat++) {
       cpos.clear();fpos.clear(); // clear positions
       if(labeling[iat]=='1') { // atoms B
-	_atom atom;
-	atom.CleanName();
-	atom.CleanSpin();
-	fpos(1)=aBas(1,iat+1);
-	fpos(2)=aBas(2,iat+1);
-	fpos(3)=aBas(3,iat+1);
-	cpos=F2C(str.lattice,fpos);
-	atom.fpos=fpos;
-	atom.cpos=cpos;
-	atom.name=atomB;
-	atom.type=0;
-	if(species_tmp.at(0)!="") { atom.type++; } // B is 0 or 1
-	atom.name_is_given=TRUE;
-	volume+=volumeB;
-	str.atoms.push_back(atom);
+        _atom atom;
+        atom.CleanName();
+        atom.CleanSpin();
+        fpos(1)=aBas(1,iat+1);
+        fpos(2)=aBas(2,iat+1);
+        fpos(3)=aBas(3,iat+1);
+        cpos=F2C(str.lattice,fpos);
+        atom.fpos=fpos;
+        atom.cpos=cpos;
+        atom.name=atomB;
+        atom.type=0;
+        if(species_tmp.at(0)!="") { atom.type++; } // B is 0 or 1
+        atom.name_is_given=TRUE;
+        volume+=volumeB;
+        str.atoms.push_back(atom);
       }
     }
     // perform atom C
     for(iat=0;iat<natoms;iat++) {
       cpos.clear();fpos.clear(); // clear positions
       if(labeling[iat]=='2') { // atoms C
-	_atom atom;
-	atom.CleanName();
-	atom.CleanSpin();
-	fpos(1)=aBas(1,iat+1);
-	fpos(2)=aBas(2,iat+1);
-	fpos(3)=aBas(3,iat+1);
-	cpos=F2C(str.lattice,fpos);
-	atom.fpos=fpos;
-	atom.cpos=cpos;
-	atom.name=atomC;
-	atom.type=0;
-	if(species_tmp.at(0)!="") { atom.type++; } // C is 0 or 1 or 2
-	if(species_tmp.at(1)!="") { atom.type++; } // C is 0 or 1 or 2
-	atom.name_is_given=TRUE;
-	volume+=volumeB;
-	str.atoms.push_back(atom);
+        _atom atom;
+        atom.CleanName();
+        atom.CleanSpin();
+        fpos(1)=aBas(1,iat+1);
+        fpos(2)=aBas(2,iat+1);
+        fpos(3)=aBas(3,iat+1);
+        cpos=F2C(str.lattice,fpos);
+        atom.fpos=fpos;
+        atom.cpos=cpos;
+        atom.name=atomC;
+        atom.type=0;
+        if(species_tmp.at(0)!="") { atom.type++; } // C is 0 or 1 or 2
+        if(species_tmp.at(1)!="") { atom.type++; } // C is 0 or 1 or 2
+        atom.name_is_given=TRUE;
+        volume+=volumeB;
+        str.atoms.push_back(atom);
       }
     }
     if(LDEBUG) { cerr << "DEBUG volumeA=" << volumeA << endl; }
@@ -384,12 +384,12 @@ namespace aflowlib {
     // make species
     for(uint i=0;i<species_tmp.size();i++) {
       if(species_tmp.at(i)!="") {
-	str.species.push_back(species_tmp.at(i));
-	str.species_pp.push_back(species_tmp.at(i));
-	str.species_pp_type.push_back("");
-	str.species_pp_version.push_back("");
-	str.species_pp_ZVAL.push_back(0.0);
-	str.species_volume.push_back(0.0);
+        str.species.push_back(species_tmp.at(i));
+        str.species_pp.push_back(species_tmp.at(i));
+        str.species_pp_type.push_back("");
+        str.species_pp_version.push_back("");
+        str.species_pp_ZVAL.push_back(0.0);
+        str.species_volume.push_back(0.0);
       }
     }
     return str;
