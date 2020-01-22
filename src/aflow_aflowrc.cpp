@@ -422,6 +422,8 @@
 #define         ARUN_DIRECTORY_PREFIX                         XHOST.adefault.getattachedscheme("ARUN_DIRECTORY_PREFIX")
 
 //DEFAULT POCC //CO181226
+#define AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO            string("ENUM")
+#define         DEFAULT_POCC_STRUCTURE_GENERATION_ALGO            XHOST.adefault.getattachedscheme("DEFAULT_POCC_STRUCTURE_GENERATION_ALGO")
 #define AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING                   string("0:2400:300")
 #define         DEFAULT_POCC_TEMPERATURE_STRING                   XHOST.adefault.getattachedscheme("DEFAULT_POCC_TEMPERATURE_STRING")
 #define AFLOWRC_DEFAULT_POCC_SITE_TOL                             0.001
@@ -1199,6 +1201,7 @@ namespace aflowrc {
     aflowrc::load_default("ARUN_DIRECTORY_PREFIX",AFLOWRC_ARUN_DIRECTORY_PREFIX);
 
     // DEFAULT POCC
+    aflowrc::load_default("DEFAULT_POCC_STRUCTURE_GENERATION_ALGO",AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO);
     aflowrc::load_default("DEFAULT_POCC_TEMPERATURE_STRING",AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);
     aflowrc::load_default("DEFAULT_POCC_SITE_TOL",AFLOWRC_DEFAULT_POCC_SITE_TOL);
     aflowrc::load_default("DEFAULT_POCC_STOICH_TOL",AFLOWRC_DEFAULT_POCC_STOICH_TOL);
@@ -1706,6 +1709,7 @@ namespace aflowrc {
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS POCC" << endl;
+    aflowrc << "DEFAULT_POCC_STRUCTURE_GENERATION_ALGO=\"" << AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO << "\"" << "// ENUM or UFF" << endl;
     aflowrc << "DEFAULT_POCC_TEMPERATURE_STRING=\"" << AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     aflowrc << "DEFAULT_POCC_SITE_TOL=" << AFLOWRC_DEFAULT_POCC_SITE_TOL << endl;
     aflowrc << "DEFAULT_POCC_STOICH_TOL=" << AFLOWRC_DEFAULT_POCC_STOICH_TOL << endl;
@@ -2178,6 +2182,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"ARUN_DIRECTORY_PREFIX\")=\"" << ARUN_DIRECTORY_PREFIX << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS POCC" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_STRUCTURE_GENERATION_ALGO\")=\"" << DEFAULT_POCC_STRUCTURE_GENERATION_ALGO << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_TEMPERATURE_STRING\")=\"" << DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_SITE_TOL\")=" << DEFAULT_POCC_SITE_TOL << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_STOICH_TOL\")=" << DEFAULT_POCC_STOICH_TOL << endl;
