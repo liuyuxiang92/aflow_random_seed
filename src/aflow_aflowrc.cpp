@@ -908,10 +908,11 @@ namespace aflowrc {
 namespace aflowrc {
   bool is_available(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
+    string soliloquy="aflowrc::is_available():";  //CO200122
     bool aflowrc_local=FALSE;
     bool aflowrc_global=FALSE;
-    if(LDEBUG) oss << "aflowrc::is_available: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::is_available: XHOST.home=" << XHOST.home << endl;
+    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
     // TESTING LOCAL OR USER BASED
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     aflowrc_local=aurostd::FileExist(AFLOWRC_FILENAME_LOCAL);
@@ -919,38 +920,38 @@ namespace aflowrc {
 
     // LOCAL=TRUE && GLOBAL=TRUE => take LOCAL
     if(aflowrc_local && aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=TRUE && GLOBAL=TRUE => LOCAL " << endl;
+      if(LDEBUG) oss << soliloquy << " LOCAL=TRUE && GLOBAL=TRUE => LOCAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << soliloquy << " END" << endl;
       return TRUE;
     }
     // LOCAL=TRUE && GLOBAL=FALSE => take LOCAL
     if(aflowrc_local && !aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=TRUE && GLOBAL=FALSE => LOCAL " << endl;
+      if(LDEBUG) oss << soliloquy << " LOCAL=TRUE && GLOBAL=FALSE => LOCAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL; 
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << soliloquy << " END" << endl;
       return TRUE;
     }
     // LOCAL=FALSE && GLOBAL=TRUE => take GLOBAL
     if(!aflowrc_local && aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=FALSE && GLOBAL=TRUE => GLOBAL " << endl;
+      if(LDEBUG) oss << soliloquy << " LOCAL=FALSE && GLOBAL=TRUE => GLOBAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_GLOBAL;
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << soliloquy << " END" << endl;
       return TRUE;
     }
     // LOCAL=FALSE && GLOBAL=FALSE => take NOTHING AND REWRITE
     if(!aflowrc_local && !aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=FALSE && GLOBAL=FALSE => NOTHING " << endl;
+      if(LDEBUG) oss << soliloquy << " LOCAL=FALSE && GLOBAL=FALSE => NOTHING " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL; // because it is going to write it
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << soliloquy << " END" << endl;
       return FALSE;
     }
 
-    if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+    if(LDEBUG) oss << soliloquy << " END" << endl;
     return FALSE;
   }
 } // namespace aflowrc
@@ -1450,10 +1451,11 @@ namespace aflowrc {
 namespace aflowrc {
   bool write_default(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
-    if(LDEBUG) oss << "aflowrc::write_default: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::write_default: XHOST.home=" << XHOST.home << endl;
+    string soliloquy="aflowrc::write_default():"; //CO200122
+    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-    if(LDEBUG) oss << "aflowrc::write_default: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
     stringstream aflowrc("");
     aflowrc << "// ****************************************************************************************************" << endl;
@@ -1941,9 +1943,9 @@ namespace aflowrc {
     //   XHOST.DEBUG=TRUE;
     //[CO190808 - issue this ONLY if it was written, should fix www-data]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;
     if(aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename) && aurostd::FileExist(XHOST.aflowrc_filename)){
-      cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO190808 - issue this ONLY if it was written, should fix www-data
+      cerr << "WARNING: " << soliloquy << " WRITING default " << XHOST.aflowrc_filename << endl;  //CO190808 - issue this ONLY if it was written, should fix www-data
     }
-    if(LDEBUG) oss << "aflowrc::write_default: END" << endl;
+    if(LDEBUG) oss << soliloquy << " END" << endl;
     //    exit(0);
     return TRUE;
   }
