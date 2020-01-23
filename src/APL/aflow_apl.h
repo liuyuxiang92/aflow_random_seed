@@ -1292,13 +1292,13 @@ namespace apl {
   class QMesh {
     public:
       QMesh(Logger&);
-      QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true);
-      QMesh(const vector<int>&, const xstructure&, Logger&, bool=true);
+      QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true, bool=true);
+      QMesh(const vector<int>&, const xstructure&, Logger&, bool=true, bool=true);
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
       void clear(Logger&);
-      void initialize(const xvector<int>&, const xstructure& xs, bool=true);
+      void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
 
       void makeIrreducible();
       void calculateLittleGroups();  // ME200109
@@ -1357,7 +1357,7 @@ namespace apl {
       vector<int> _weights;  // The weights of each irreducible q-point
 
       void setGrid(const xvector<int>&);
-      void setupReciprocalCell(xstructure);
+      void setupReciprocalCell(xstructure, bool);
       void generateGridPoints(bool);
       void shiftMesh(const xvector<double>&);
       void moveToBZ(xvector<double>&) const;

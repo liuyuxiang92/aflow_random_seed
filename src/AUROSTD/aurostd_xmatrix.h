@@ -464,7 +464,8 @@ namespace aurostd {
   //  identity(const int&,const int&,utype) __xprototype;
 
   template<class utype> xmatrix<utype>
-    identity(const utype&,const int&,const int&) __xprototype;
+    identity(const utype&, int, int=1);  // ME200123
+    //identity(const utype&,const int&,const int&) __xprototype; // OBSOLETE ME200123
 
   template<class utype> xmatrix<utype>  // conjugate
     conj(const xmatrix<utype>&) __xprototype; // ME 180904

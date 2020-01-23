@@ -4194,7 +4194,7 @@ namespace SYM {
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);     // translation
     a1=lattice(1);a2=lattice(2);a3=lattice(3);               // a1,a2,a3 are the rows of the lattice matrix
     Act=lattice;
-    Adt=aurostd::identity((double) 0,3,3);
+    Adt=aurostd::identity((double) 0,3);  // ME200123 - new identity format
     xvector<double> clatticedata(6),temp_clatticedata(6);    // triplet position
     clatticedata=_Getabc_angles(lattice,DEGREES);
     vector<xvector<double>*> grid_clattice; xvector<double> *grid_clattice_ptr;  // grid for rrr points
@@ -4465,7 +4465,7 @@ namespace SYM {
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);  // translation
     a1=lattice(1);a2=lattice(2);a3=lattice(3);            // a1,a2,a3 are the rows of the lattice matrix
     Act=lattice;
-    Adt=aurostd::identity((double) 0,3,3);
+    Adt=aurostd::identity((double) 0,3);  // ME200123 - new identity format
     xvector<double> clatticedata(6),temp_clatticedata(6); // triplet position
     clatticedata=_Getabc_angles(lattice,DEGREES);
     vector<xvector<double>*> grid_clattice; xvector<double> *grid_clattice_ptr;  // grid for rrr points
@@ -4670,7 +4670,7 @@ int PointGroup_HITS(xstructure &a,double _eps_) {
   xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);
   a1=lattice(1);a2=lattice(2);a3=lattice(3);
   Act=lattice;
-  Adt=aurostd::identity((double) 0,3,3);
+  Adt=aurostd::identity((double) 0,3);  // ME200123 - new identity format
   xvector<double> clatticedata(6),temp_clatticedata(6);
   clatticedata=_Getabc_angles(lattice,DEGREES);
   vector<xvector<double>*> grid_clattice; xvector<double> *grid_clattice_ptr;
@@ -7383,7 +7383,7 @@ namespace SYM {
     xvector<double> clatticedata(6),temp_clatticedata(6);
     a1=lattice(1);a2=lattice(2);a3=lattice(3);            // a1,a2,a3 are the rows of the lattice matrix
     Act=lattice;
-    Adt=aurostd::identity((double) 0,3,3);
+    Adt=aurostd::identity((double) 0,3);  // ME200123 - new identity format
     clatticedata=_Getabc_angles(lattice,DEGREES);
     vector<xvector<double>*> grid_clattice; xvector<double> *grid_clattice_ptr;  // grid for rrr points
     vector<xvector<double>*> grid_flattice; xvector<double> *grid_flattice_ptr;  // grid for ijk points

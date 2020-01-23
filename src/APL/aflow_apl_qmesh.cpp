@@ -30,14 +30,16 @@ namespace apl {
     free();
   }
 
-  QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, Logger& l, bool gamma_centered) : _logger(l) {
+  QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, Logger& l,
+      bool include_inversions, bool gamma_centered) : _logger(l) {
     free();
-    initialize(grid, xs, gamma_centered);
+    initialize(grid, xs, include_inversions, gamma_centered);
   }
 
-  QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, Logger& l, bool gamma_centered) : _logger(l) {
+  QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, Logger& l,
+      bool include_inversions, bool gamma_centered) : _logger(l) {
     free();
-    initialize(aurostd::vector2xvector(vgrid), xs, gamma_centered);
+    initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
   }
 
   // Copy constructors
@@ -115,9 +117,10 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the q-point grid
-  void QMesh::initialize(const xvector<int>& grid, const xstructure& xs, bool gamma_centered) {
+  void QMesh::initialize(const xvector<int>& grid, const xstructure& xs,
+      bool include_inversions, bool gamma_centered) {
     setGrid(grid);
-    setupReciprocalCell(xs);
+    setupReciprocalCell(xs, include_inversions);
     generateGridPoints(gamma_centered);
   }
 
@@ -132,7 +135,7 @@ namespace apl {
 
   //setupReciprocalCell///////////////////////////////////////////////////////
   // Sets up the reciprocal cell that belongs to the q-mesh.
-  void QMesh::setupReciprocalCell(xstructure xs) {
+  void QMesh::setupReciprocalCell(xstructure xs, bool include_inversions) {
     _recCell.rlattice = xs.lattice;
     _recCell.lattice = ReciprocalLattice(_recCell.rlattice);
     _recCell.f2c = trasp(_recCell.lattice);
@@ -147,22 +150,31 @@ namespace apl {
     double tol = _AFLOW_APL_EPS_;
     _recCell.skewed = SYM::isLatticeSkewed(_recCell.lattice, min_dist, tol);
 
-    // Calculate the point group of the reciprocal cell. "The Physics of
-    // Phonons" by G. P. Srivastava (p. 11) claims that pgroupk can be used to
-    // reduce the q-point grid, which seems to work for most phonon properties.
-    // However, the symmetry of the dynamical matrix (see DOI: 10.1103/RevModPhys.40.1)
-    // cannot be captured using pgroupk since it requires symmetry operations
+    // Calculate the point group of the reciprocal cell. Literature and phonon
+    // codes are not consistent about whether to use pgroupk or pgroupk_xtal.
+    // To get all symmetry properties (see DOI: 10.1103/RevModPhys.40.1),
+    // pgroupk_xtal must be used or else the transformation properties of the
+    // dynamical matrix cannot be captured since they require symmetry operations
     // that map atoms in real space. Thus, pgroupk_xtal needs to be used to
-    // get the irreducible wedge.
-    if (!xs.pgroupk_xtal_calculated) {
-      xs.CalculateSymmetryPointGroupKCrystal(false);
+    // get the irreducible wedge - using pgroupk is not correct.
+    // However, there are multiple properties such as the phonon frequencies,
+    // eigenvectors, or phonon-phonon scattering matrices that have inversion
+    // symmetry, which is not always present in pgroupk_xtal. So, unless the
+    // dynamical matrix itself is needed, the Patterson symmetry can be used
+    // to create the irreducible wedge.
+    if (include_inversions) {
+    } else {
       if (!xs.pgroupk_xtal_calculated) {
-        string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell()";
-        string message = "Calculation of the point group of the reciprocal cell unsuccessful.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        xs.CalculateSymmetryPointGroupKCrystal(false);
+        if (!xs.pgroupk_xtal_calculated) {
+          string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell()";
+          string message = "Calculation of the point group of the reciprocal cell unsuccessful.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        }
       }
     }
-    _recCell.pgroup = xs.pgroupk_xtal;
+    if (include_inversions) {;}
+    else _recCell.pgroup = xs.pgroupk_xtal;
   }
 
   //generateGridPoints////////////////////////////////////////////////////////
@@ -199,7 +211,7 @@ namespace apl {
       }
     }
 
-    // Determine if grid is gamma-centered and which dimensions are not
+    // Determine if the grid is gamma-centered and which dimensions are not
     bool gamma = true;
     xvector<double> shift(3);
     for (int i = 1; i < 4; i++) {
