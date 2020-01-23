@@ -14795,7 +14795,8 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
   deque<_atom> all_atom_vec;
   // latt maybe a rotated version of POSCAR, so need to incell-ized the fpos and cpos
   // sstr.BringInCell(); // with roundoff
-  sstr.BringInCell(-1.0); // no roundoff
+  sstr.BringInCell(); //DX+RF 20200121 - negative input is no longer accepted // no roundoff
+  //DX+RF 20200121 - negative input is no longer accepted : sstr.BringInCell(-1.0); // no roundoff
   for(ijk(1)=-imax;ijk(1)<=imax;ijk(1)++) {
     for(ijk(2)=-jmax;ijk(2)<=jmax;ijk(2)++) {
       for(ijk(3)=-kmax;ijk(3)<=kmax;ijk(3)++) {
