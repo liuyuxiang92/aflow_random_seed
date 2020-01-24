@@ -157,12 +157,11 @@ namespace apl {
     // dynamical matrix cannot be captured since they require symmetry operations
     // that map atoms in real space. Thus, pgroupk_xtal needs to be used to
     // get the irreducible wedge - using pgroupk is not correct.
-    // However, there are multiple properties such as the phonon frequencies,
-    // eigenvectors, or phonon-phonon scattering matrices that have inversion
-    // symmetry, which is not always present in pgroupk_xtal. So, unless the
-    // dynamical matrix itself is needed, the Patterson symmetry can be used
-    // to create the irreducible wedge.
-    if (include_inversions) {
+    // However, observables such as the phonon frequencies, eigenvectors, or
+    // phonon-phonon scattering matrices also have inversion symmetry, which is
+    // not always present in pgroupk_xtal. So, unless the dynamical matrix itself
+    // is needed, the Patterson symmetry can be used to create the irreducible wedge.
+    if (0 || include_inversions) {
     } else {
       if (!xs.pgroupk_xtal_calculated) {
         xs.CalculateSymmetryPointGroupKCrystal(false);
@@ -173,7 +172,7 @@ namespace apl {
         }
       }
     }
-    if (include_inversions) {;}
+    if (0 || include_inversions) {;}
     else _recCell.pgroup = xs.pgroupk_xtal;
   }
 
