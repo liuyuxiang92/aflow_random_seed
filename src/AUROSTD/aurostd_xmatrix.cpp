@@ -3968,7 +3968,7 @@ namespace aurostd {
       //the construction of the 2 by 2 elementary transformation.
       //we work with doubles inside, return int matrices later
 
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      bool LDEBUG=(TRUE || XHOST.DEBUG);
       string soliloquy="aurostd::getSmithNormalForm():";
       if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
