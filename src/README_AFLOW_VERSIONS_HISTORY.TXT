@@ -1,4 +1,4 @@
-3.1.228 - 2019/12/27
+3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
         -- added file2dequestring(), string2dequestring() (SC)
@@ -9,7 +9,7 @@
         -- AFLOW DFT calculations can now read in CHGCAR files. (ME)
         -- Improved runtimes and memory requirements for AAPL. (ME)
         -- Switched the thermal conductivity integration method to the tetrahedron method. (ME)
-        -- Added Grueneisen parameter and phase space calculation to thermal conductvity calculations. (ME)
+        -- Added Grueneisen parameter and phase space calculation to thermal conductivity calculations. (ME)
         -- APL and AAPL can now use the CHGCAR file from the ZEROSTATE calculation to speed up calculations. (ME)
         -- Replaced APLLogicError and APLRuntimeError with aurostd::xerror. (ME)
         -- Fixed bug in APL and AAPL that did not properly process -D option. (ME)

@@ -2287,11 +2287,11 @@ namespace chull {
   bool CoordGroup::operator<(const CoordGroup& other) const {
     // safety, so it doesn't break, but it's outside scope of function
     string soliloquy="CoordGroup::operator<():";
-    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between stoichiometries");} //{return (m_coords.rows<other.m_coords.rows);}
-  for(int i=m_coords.lrows;i<=m_coords.urows;i++) {
-    if(m_coords(i)!=other.m_coords(i)) {return (m_coords(i)<other.m_coords(i));}
-  }
-  return false;
+    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between stoichiometries");} //return (m_coords.rows<other.m_coords.rows);
+    for(int i=m_coords.lrows;i<=m_coords.urows;i++) {
+      if(m_coords(i)!=other.m_coords(i)) {return (m_coords(i)<other.m_coords(i));}
+    }
+    return false;
   }
 
   void CoordGroup::clear() {CoordGroup a;copy(a);} //clear PUBLIC
@@ -2400,11 +2400,11 @@ namespace chull {
   bool Alloy::operator<(const Alloy& other) const {
     // safety, so it doesn't break, but it's outside scope of function
     string soliloquy="Alloy::operator<():";
-    if(m_elements_present.rows!=other.m_elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between alloys");} //{return (m_elements_present.rows<other.m_elements_present.rows);}
-  for(int i=m_elements_present.lrows;i<=m_elements_present.urows;i++) {
-    if(m_elements_present[i]!=other.m_elements_present[i]) {return (m_elements_present[i]<other.m_elements_present[i]);}
-  }
-  return false;
+    if(m_elements_present.rows!=other.m_elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between alloys");} //return (m_elements_present.rows<other.m_elements_present.rows);
+    for(int i=m_elements_present.lrows;i<=m_elements_present.urows;i++) {
+      if(m_elements_present[i]!=other.m_elements_present[i]) {return (m_elements_present[i]<other.m_elements_present[i]);}
+    }
+    return false;
   }
 
   void Alloy::clear() {Alloy a;copy(a);} //clear PUBLIC
@@ -3818,3009 +3818,3012 @@ namespace chull {
       i_point=m_coord_groups[i_coord_group].m_points[0];        //lowest point for lower_hull, highest point for upper_hull
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
       if(m_lower_hull){
-        if(lessEqualZero(m_points[i_point].getLastCoord())){//std::signbit(m_points[i_point].getLastCoord())){
+        if(lessEqualZero(m_points[i_point].getLastCoord())) //std::signbit(m_points[i_point].getLastCoord()))
+        { //CO200106 - patching for auto-indenting
           m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
           if(LDEBUG) {
             cerr << soliloquy << " lower half hull point found: ";
             cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
           }
         }
-        } else {
-          if(greaterEqualZero(m_points[i_point].getLastCoord())){//!std::signbit(m_points[i_point].getLastCoord())){
-            m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
-            if(LDEBUG) {
-              cerr << soliloquy << " upper half hull point found: ";
-              cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
-            }
-          }
-          }
-          return; //below, we add other extreme in energy, which we don't care about for half hulls
-        }
-
-        i_point=m_coord_groups[i_coord_group].m_points[0];        //lowest energy point
-        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-        m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
-        if(LDEBUG) {
-          cerr << soliloquy << " hull point found: ";
-          cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
-        }
-        if(p_size>1){ //also grab other extreme
-          i_point=m_coord_groups[i_coord_group].m_points[p_size-1];
-          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      } else {
+        if(greaterEqualZero(m_points[i_point].getLastCoord()))  //!std::signbit(m_points[i_point].getLastCoord()))
+        { //CO200106 - patching for auto-indenting
           m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
           if(LDEBUG) {
-            cerr << soliloquy << " hull point found: ";
+            cerr << soliloquy << " upper half hull point found: ";
             cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
           }
         }
       }
+      return; //below, we add other extreme in energy, which we don't care about for half hulls
+    }
 
-      void ConvexHull::organizeHullPoints() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::organizeHullPoints():";
-        if(!m_coord_groups.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points have not been structured correctly");}
-        if(LDEBUG) {
-          cerr << soliloquy << " filtering points definitely NOT on the hull by energy" << endl;
-          cerr << soliloquy << " only looking for min/max energy points in all coord_groups" << endl;
-        }
-        for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){organizeHullPoints(i_coord_group);}
+    i_point=m_coord_groups[i_coord_group].m_points[0];        //lowest energy point
+    if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+    m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
+    if(LDEBUG) {
+      cerr << soliloquy << " hull point found: ";
+      cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
+    }
+    if(p_size>1){ //also grab other extreme
+      i_point=m_coord_groups[i_coord_group].m_points[p_size-1];
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
+      if(LDEBUG) {
+        cerr << soliloquy << " hull point found: ";
+        cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
       }
+    }
+  }
 
-      void ConvexHull::initializeNaries() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::initializeNaries():";
-        stringstream message;
-        //clear
-        for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-          for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-            m_naries[i_nary].m_alloys[i_alloy].clear();
-          }
-          m_naries[i_nary].clear();
-        }
-        m_naries.clear();
+  void ConvexHull::organizeHullPoints() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::organizeHullPoints():";
+    if(!m_coord_groups.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points have not been structured correctly");}
+    if(LDEBUG) {
+      cerr << soliloquy << " filtering points definitely NOT on the hull by energy" << endl;
+      cerr << soliloquy << " only looking for min/max energy points in all coord_groups" << endl;
+    }
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){organizeHullPoints(i_coord_group);}
+  }
 
-        //initialize with combinations of dim
-        Nary nary;
-        Alloy alloy;
-        aurostd::xcombos xc;
-        xvector<int> elements_present;
-        for(uint i_nary=0;i_nary<m_dim;i_nary++){
-          nary.initialize(i_nary+1);
-          m_naries.push_back(nary);
-          xc.reset(m_dim,i_nary+1,'C');
-          while(xc.increment()){
-            elements_present=aurostd::vector2xvector<int>(xc.getCombo());
-            alloy.initialize(elements_present);
-            m_naries[i_nary].m_alloys.push_back(alloy);
-          }
-        }
-        if(m_naries.size()<2){message << "m_naries.size()=0, xcombos may be broken";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-        if(!m_naries[0].m_alloys.size()){message << "m_naries[0].m_alloys.size()==0, xcombos may be broken";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-        //SORT NOW! do not sort later as we populate m_points with i_nary and i_alloy
-        for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-          std::sort(m_naries[i_nary].m_alloys.rbegin(),m_naries[i_nary].m_alloys.rend()); //descending order
-        }
-        std::sort(m_naries.begin(),m_naries.end());
-        if(LDEBUG) {cerr << soliloquy << " m_naries.size()=" << m_naries.size() << endl;}
+  void ConvexHull::initializeNaries() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::initializeNaries():";
+    stringstream message;
+    //clear
+    for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+      for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+        m_naries[i_nary].m_alloys[i_alloy].clear();
       }
+      m_naries[i_nary].clear();
+    }
+    m_naries.clear();
 
-      void ConvexHull::structurePoints() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::structurePoints():";
-        stringstream message;
-        m_coord_groups.clear();
-        m_naries.clear();
+    //initialize with combinations of dim
+    Nary nary;
+    Alloy alloy;
+    aurostd::xcombos xc;
+    xvector<int> elements_present;
+    for(uint i_nary=0;i_nary<m_dim;i_nary++){
+      nary.initialize(i_nary+1);
+      m_naries.push_back(nary);
+      xc.reset(m_dim,i_nary+1,'C');
+      while(xc.increment()){
+        elements_present=aurostd::vector2xvector<int>(xc.getCombo());
+        alloy.initialize(elements_present);
+        m_naries[i_nary].m_alloys.push_back(alloy);
+      }
+    }
+    if(m_naries.size()<2){message << "m_naries.size()=0, xcombos may be broken";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+    if(!m_naries[0].m_alloys.size()){message << "m_naries[0].m_alloys.size()==0, xcombos may be broken";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+    //SORT NOW! do not sort later as we populate m_points with i_nary and i_alloy
+    for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+      std::sort(m_naries[i_nary].m_alloys.rbegin(),m_naries[i_nary].m_alloys.rend()); //descending order
+    }
+    std::sort(m_naries.begin(),m_naries.end());
+    if(LDEBUG) {cerr << soliloquy << " m_naries.size()=" << m_naries.size() << endl;}
+  }
 
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+  void ConvexHull::structurePoints() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::structurePoints():";
+    stringstream message;
+    m_coord_groups.clear();
+    m_naries.clear();
 
-        //NOTE, m_points is UNTOUCHED (unsorted, fully populated) input, i.e., identical input of user
-        //HOWEVER, m_coord_groups[].m_points only contain indices to points that we will consider for the hull calculation, i.e., does not contain
-        //any points to be neglected (requested or otherwise)
-        //if you want input of the user, use m_points
-        //if you want points for the hull, go through m_coord_groups
-        if(LDEBUG) {cerr << soliloquy << " gathering points to neglect" << endl;}
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
 
-        bool remove_requested=m_cflags.flag("CHULL::NEGLECT");
-        bool see_neglect=m_cflags.flag("CHULL::SEE_NEGLECT");
-        bool remove_invalid=true;
-        bool remove_duplicate_entries=true;        //we remove duplicate entries from the database, but in general, keep input of user constant
-        bool remove_extreme=m_cflags.flag("CHULL::REMOVE_EXTREMA");
-        bool perform_outliers_analysis=DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS;
-        bool keep_outliers=(!perform_outliers_analysis || m_cflags.flag("CHULL::INCLUDE_OUTLIERS"));
-        bool remove_outliers=!keep_outliers;
-        if(LDEBUG) {cerr << soliloquy << " remove_outliers=" << remove_outliers << endl;}
+    //NOTE, m_points is UNTOUCHED (unsorted, fully populated) input, i.e., identical input of user
+    //HOWEVER, m_coord_groups[].m_points only contain indices to points that we will consider for the hull calculation, i.e., does not contain
+    //any points to be neglected (requested or otherwise)
+    //if you want input of the user, use m_points
+    //if you want points for the hull, go through m_coord_groups
+    if(LDEBUG) {cerr << soliloquy << " gathering points to neglect" << endl;}
 
-        vector<string> points_neglect;
-        double extrema_val;
-        if(remove_requested){aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),points_neglect,",");}
-        if(points_neglect.size()==0){remove_requested=false;}
+    bool remove_requested=m_cflags.flag("CHULL::NEGLECT");
+    bool see_neglect=m_cflags.flag("CHULL::SEE_NEGLECT");
+    bool remove_invalid=true;
+    bool remove_duplicate_entries=true;        //we remove duplicate entries from the database, but in general, keep input of user constant
+    bool remove_extreme=m_cflags.flag("CHULL::REMOVE_EXTREMA");
+    bool perform_outliers_analysis=DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS;
+    bool keep_outliers=(!perform_outliers_analysis || m_cflags.flag("CHULL::INCLUDE_OUTLIERS"));
+    bool remove_outliers=!keep_outliers;
+    if(LDEBUG) {cerr << soliloquy << " remove_outliers=" << remove_outliers << endl;}
+
+    vector<string> points_neglect;
+    double extrema_val;
+    if(remove_requested){aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),points_neglect,",");}
+    if(points_neglect.size()==0){remove_requested=false;}
+    if(remove_extreme){
+      extrema_val=aurostd::string2utype<double>(m_cflags.getattachedscheme("CHULL::REMOVE_EXTREMA"));
+      if(m_formation_energy_hull){
+        if(greaterEqualZero(extrema_val)){
+          message << "Ignoring remove extreme points flag -- you provided a number >= 0. H_f convex hull sits below 0";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+          remove_extreme=false;
+        }
+      } else {
+        if(lessEqualZero(extrema_val)){
+          message << "Ignoring remove extreme points flag -- you provided a number <= 0. T_S convex hull sits above 0";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+          remove_extreme=false;
+        }
+      }
+    }
+
+    vector<string> removing_messages;
+    if(remove_requested){removing_messages.push_back("undesired");}
+    if(remove_invalid){removing_messages.push_back("erroneous");}
+    if(remove_duplicate_entries){removing_messages.push_back("duplicate");}
+    if(remove_extreme){removing_messages.push_back("extreme");}
+    if(remove_outliers){removing_messages.push_back("outlier");}
+    if(removing_messages.size()){
+      message << "Filtering out " << aurostd::joinWDelimiter(removing_messages,"/") << " entries";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    }
+
+    //quick add in of PAW_GGA if not already included in allowed list
+    if(m_cflags.flag("CHULL::INCLUDE_PAW_GGA")&&(!aurostd::withinList(m_allowed_dft_types,"PAW_GGA"))){m_allowed_dft_types.push_back("PAW_GGA");}
+
+    //ignore bad database
+    bool ignore_bad_database=(DEFAULT_CHULL_IGNORE_KNOWN_ILL_CONVERGED && !m_cflags.flag("CHULL::INCLUDE_ILL_CONVERGED"));
+    if(LDEBUG) {cerr << soliloquy << " ignore_bad_database=" << ignore_bad_database << endl;}
+
+    //organize into coordgroups
+    if(LDEBUG) {cerr << soliloquy << " organizing into coordgroups" << endl;}
+    vector<uint> unique_entries;
+    string invalid_reason,canonical_auid;
+    char LOGGER_TYPE;
+    bool silent;
+    uint i_coord_group_sort;  //so it doesn't conflict with i_coord_group in for-loops
+    CoordGroup cg;
+    xvector<double> r_coords;
+    for(uint i=0,fl_size_i=m_points.size();i<fl_size_i;i++){
+      const ChullPoint& point=m_points[i];
+      const aflowlib::_aflowlib_entry& entry=m_points[i].m_entry;
+      if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+      // start remove points
+      if(remove_invalid && m_points[i].m_has_entry){
+        if(!entryValid(entry,invalid_reason,LOGGER_TYPE,ignore_bad_database)){
+          if(!invalid_reason.empty()){
+            silent=(!see_neglect && LOGGER_TYPE==_LOGGER_OPTION_);
+            message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: " << invalid_reason;
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
+          }
+          continue;
+        }
+        if(remove_duplicate_entries && !entryUnique(unique_entries,entry,canonical_auid)){
+          silent=(!see_neglect);
+          message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: duplicate database entry (see " << canonical_auid << ")";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_, silent);
+          continue;
+        }
+        unique_entries.push_back(i);
+        if(aurostd::withinList(points_neglect,entry.auid)){
+          message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: as requested";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+          continue;
+        }
         if(remove_extreme){
-          extrema_val=aurostd::string2utype<double>(m_cflags.getattachedscheme("CHULL::REMOVE_EXTREMA"));
           if(m_formation_energy_hull){
-            if(greaterEqualZero(extrema_val)){
-              message << "Ignoring remove extreme points flag -- you provided a number >= 0. H_f convex hull sits below 0";
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-              remove_extreme=false;
+            if(chull::H_f_atom(entry, _m_) < extrema_val){
+              message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: flagged as extreme with H_f = " << chull::H_f_atom(entry, _m_) << " (meV/atom)";
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+              continue;
             }
           } else {
-            if(lessEqualZero(extrema_val)){
-              message << "Ignoring remove extreme points flag -- you provided a number <= 0. T_S convex hull sits above 0";
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-              remove_extreme=false;
-            }
-          }
-        }
-
-        vector<string> removing_messages;
-        if(remove_requested){removing_messages.push_back("undesired");}
-        if(remove_invalid){removing_messages.push_back("erroneous");}
-        if(remove_duplicate_entries){removing_messages.push_back("duplicate");}
-        if(remove_extreme){removing_messages.push_back("extreme");}
-        if(remove_outliers){removing_messages.push_back("outlier");}
-        if(removing_messages.size()){
-          message << "Filtering out " << aurostd::joinWDelimiter(removing_messages,"/") << " entries";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-        }
-
-        //quick add in of PAW_GGA if not already included in allowed list
-        if(m_cflags.flag("CHULL::INCLUDE_PAW_GGA")&&(!aurostd::withinList(m_allowed_dft_types,"PAW_GGA"))){m_allowed_dft_types.push_back("PAW_GGA");}
-
-        //ignore bad database
-        bool ignore_bad_database=(DEFAULT_CHULL_IGNORE_KNOWN_ILL_CONVERGED && !m_cflags.flag("CHULL::INCLUDE_ILL_CONVERGED"));
-        if(LDEBUG) {cerr << soliloquy << " ignore_bad_database=" << ignore_bad_database << endl;}
-
-        //organize into coordgroups
-        if(LDEBUG) {cerr << soliloquy << " organizing into coordgroups" << endl;}
-        vector<uint> unique_entries;
-        string invalid_reason,canonical_auid;
-        char LOGGER_TYPE;
-        bool silent;
-        uint i_coord_group_sort;  //so it doesn't conflict with i_coord_group in for-loops
-        CoordGroup cg;
-        xvector<double> r_coords;
-        for(uint i=0,fl_size_i=m_points.size();i<fl_size_i;i++){
-          const ChullPoint& point=m_points[i];
-          const aflowlib::_aflowlib_entry& entry=m_points[i].m_entry;
-          if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-          // start remove points
-          if(remove_invalid && m_points[i].m_has_entry){
-            if(!entryValid(entry,invalid_reason,LOGGER_TYPE,ignore_bad_database)){
-              if(!invalid_reason.empty()){
-                silent=(!see_neglect && LOGGER_TYPE==_LOGGER_OPTION_);
-                message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: " << invalid_reason;
-                pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
-              }
-              continue;
-            }
-            if(remove_duplicate_entries && !entryUnique(unique_entries,entry,canonical_auid)){
-              silent=(!see_neglect);
-              message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: duplicate database entry (see " << canonical_auid << ")";
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_, silent);
-              continue;
-            }
-            unique_entries.push_back(i);
-            if(aurostd::withinList(points_neglect,entry.auid)){
-              message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: as requested";
+            if(chull::T_S(entry) > extrema_val){
+              message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: flagged as extreme with T_S = " << chull::T_S(entry) << " (K)";
               pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
               continue;
             }
-            if(remove_extreme){
-              if(m_formation_energy_hull){
-                if(chull::H_f_atom(entry, _m_) < extrema_val){
-                  message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: flagged as extreme with H_f = " << chull::H_f_atom(entry, _m_) << " (meV/atom)";
-                  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
-                  continue;
-                }
-              } else {
-                if(chull::T_S(entry) > extrema_val){
-                  message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: flagged as extreme with T_S = " << chull::T_S(entry) << " (K)";
-                  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
-                  continue;
-                }
-              }
-            }
           }
-          //// end remove points
-          //organize into m_naries
-          //perhaps think about organizing by c_coords instead in the future (int compare vs. double compare), would be more exact
-          //this would require adding a priority check for composition, and falling back to stoichiometry if composition is not available (artificial)
-          //not really a priority, we don't explore compositions that are so close (to within 1e-8)
-          //comparison of stoichiometry is more general, but less reliable than composition (to within tol)
-          //nevermind, vcomposition is a double anyway (in anticipation for POCC), so floating point comparisons are inevitable
-          r_coords=point.getStoichiometricCoords();
-          if(LDEBUG) {cerr << soliloquy << " point[" << i << "]: m_coords=" << point.m_coords << ", r_coords=" << r_coords << ", compound= " << point.m_entry.compound << ", dim=" << point.m_i_nary+1 << endl;}
-          if(!getCoordGroupIndex(r_coords,i_coord_group_sort)){
-            cg.initialize(r_coords,point.m_has_stoich_coords);
-            m_coord_groups.push_back(cg);
-            i_coord_group_sort=m_coord_groups.size()-1;
-          }
-          m_coord_groups[i_coord_group_sort].m_points.push_back(i);
-          if(m_coord_groups[i_coord_group_sort].m_has_stoich_coords && !point.m_has_stoich_coords){
-            message << "Mismatch among coord types (stoich vs. non-stoich coords), assuming non-stoich coords";
-            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-            m_coord_groups[i_coord_group_sort].m_has_stoich_coords=false;
-          }
-          if(point.isUnary()&&point.m_is_artificial){m_coord_groups[i_coord_group_sort].m_has_artificial_unary=true;}
         }
+      }
+      //// end remove points
+      //organize into m_naries
+      //perhaps think about organizing by c_coords instead in the future (int compare vs. double compare), would be more exact
+      //this would require adding a priority check for composition, and falling back to stoichiometry if composition is not available (artificial)
+      //not really a priority, we don't explore compositions that are so close (to within 1e-8)
+      //comparison of stoichiometry is more general, but less reliable than composition (to within tol)
+      //nevermind, vcomposition is a double anyway (in anticipation for POCC), so floating point comparisons are inevitable
+      r_coords=point.getStoichiometricCoords();
+      if(LDEBUG) {cerr << soliloquy << " point[" << i << "]: m_coords=" << point.m_coords << ", r_coords=" << r_coords << ", compound= " << point.m_entry.compound << ", dim=" << point.m_i_nary+1 << endl;}
+      if(!getCoordGroupIndex(r_coords,i_coord_group_sort)){
+        cg.initialize(r_coords,point.m_has_stoich_coords);
+        m_coord_groups.push_back(cg);
+        i_coord_group_sort=m_coord_groups.size()-1;
+      }
+      m_coord_groups[i_coord_group_sort].m_points.push_back(i);
+      if(m_coord_groups[i_coord_group_sort].m_has_stoich_coords && !point.m_has_stoich_coords){
+        message << "Mismatch among coord types (stoich vs. non-stoich coords), assuming non-stoich coords";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        m_coord_groups[i_coord_group_sort].m_has_stoich_coords=false;
+      }
+      if(point.isUnary()&&point.m_is_artificial){m_coord_groups[i_coord_group_sort].m_has_artificial_unary=true;}
+    }
 
-        //remove outliers before sort (BY MATCHING COORDS)
-        //we do this analysis EVEN if we keep outliers in the end, simply print out useful warnings for user
-        uint i_point=AUROSTD_MAX_UINT;
-        vector<uint> outliers;
+    //remove outliers before sort (BY MATCHING COORDS)
+    //we do this analysis EVEN if we keep outliers in the end, simply print out useful warnings for user
+    uint i_point=AUROSTD_MAX_UINT;
+    vector<uint> outliers;
 
-        if(perform_outliers_analysis){
-          if(m_has_stoich_coords){
-            //proceed through each set of binaries, find all sets of outliers and append together
-            xvector<int> elements_present;
-            vector<uint> _outliers;
-            aurostd::xcombos xc(m_dim,2,'C'); //binaries ONLY for now
-            while(xc.increment()){
-              elements_present=aurostd::vector2xvector<int>(xc.getCombo());
-              _outliers=getOutliers(elements_present);
-              outliers.insert(outliers.end(),_outliers.begin(),_outliers.end());
-            }
-          } else {outliers=getOutliers();}
+    if(perform_outliers_analysis){
+      if(m_has_stoich_coords){
+        //proceed through each set of binaries, find all sets of outliers and append together
+        xvector<int> elements_present;
+        vector<uint> _outliers;
+        aurostd::xcombos xc(m_dim,2,'C'); //binaries ONLY for now
+        while(xc.increment()){
+          elements_present=aurostd::vector2xvector<int>(xc.getCombo());
+          _outliers=getOutliers(elements_present);
+          outliers.insert(outliers.end(),_outliers.begin(),_outliers.end());
         }
+      } else {outliers=getOutliers();}
+    }
 
-        if(!remove_outliers){
-          message << "NOT removing outliers";
+    if(!remove_outliers){
+      message << "NOT removing outliers";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+      outliers.clear();
+    }
+
+    bool found_outlier;
+    vector<uint> points_to_remove;
+    uint valid_count=0;
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      points_to_remove.clear();
+      for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+        i_point=m_coord_groups[i_coord_group].m_points[i];
+        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+        found_outlier=false;
+        for(uint j=0,fl_size_j=outliers.size();j<fl_size_j&&!found_outlier;j++){if(i_point==outliers[j]){found_outlier=true;}}
+        if(found_outlier){points_to_remove.push_back(i);} //not i_point, so I can remove this index
+        else {if(!m_points[i_point].m_is_artificial){valid_count++;}}
+      }
+      if(points_to_remove.size()){
+        std::sort(points_to_remove.rbegin(),points_to_remove.rend()); //descending
+        if(LDEBUG) {cerr << soliloquy << " before outlier removal, count = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
+        for(uint i=0,fl_size_i=points_to_remove.size();i<fl_size_i;i++){
+          i_point=m_coord_groups[i_coord_group].m_points[points_to_remove[i]];
+          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+          message << "Removing outlier ";
+          if(m_points[i_point].m_has_entry){message << "auid=" << m_points[i_point].m_entry.auid;}
+          else {message << "m_coords=" << m_points[i_point].m_coords;}
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
-          outliers.clear();
+          m_coord_groups[i_coord_group].m_points.erase(m_coord_groups[i_coord_group].m_points.begin()+points_to_remove[i]);
         }
+        if(LDEBUG) {cerr << soliloquy << " after outlier removal, m_coord_groups[" << i_coord_group << "].m_points.size() = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
+      }
+    }
+    message << "Employing " << valid_count << " total entries for " << pflow::arity_string(m_dim,false,false) << " convex hull analysis";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-        bool found_outlier;
-        vector<uint> points_to_remove;
-        uint valid_count=0;
-        for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-          points_to_remove.clear();
-          for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-            i_point=m_coord_groups[i_coord_group].m_points[i];
-            if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-            found_outlier=false;
-            for(uint j=0,fl_size_j=outliers.size();j<fl_size_j&&!found_outlier;j++){if(i_point==outliers[j]){found_outlier=true;}}
-            if(found_outlier){points_to_remove.push_back(i);} //not i_point, so I can remove this index
-            else {if(!m_points[i_point].m_is_artificial){valid_count++;}}
-          }
-          if(points_to_remove.size()){
-            std::sort(points_to_remove.rbegin(),points_to_remove.rend()); //descending
-            if(LDEBUG) {cerr << soliloquy << " before outlier removal, count = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
-            for(uint i=0,fl_size_i=points_to_remove.size();i<fl_size_i;i++){
-              i_point=m_coord_groups[i_coord_group].m_points[points_to_remove[i]];
-              if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-              message << "Removing outlier ";
-              if(m_points[i_point].m_has_entry){message << "auid=" << m_points[i_point].m_entry.auid;}
-              else {message << "m_coords=" << m_points[i_point].m_coords;}
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
-              m_coord_groups[i_coord_group].m_points.erase(m_coord_groups[i_coord_group].m_points.begin()+points_to_remove[i]);
-            }
-            if(LDEBUG) {cerr << soliloquy << " after outlier removal, m_coord_groups[" << i_coord_group << "].m_points.size() = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
-          }
+    //remove empty m_coord_groups
+    vector<uint> empty_coord_groups;
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      if(m_coord_groups[i_coord_group].m_points.size()==0){empty_coord_groups.push_back(i_coord_group);}
+    }
+    std::sort(empty_coord_groups.rbegin(),empty_coord_groups.rend()); //descending
+    for(uint i=0,fl_size_i=empty_coord_groups.size();i<fl_size_i;i++){m_coord_groups.erase(m_coord_groups.begin()+empty_coord_groups[i]);}
+
+    //sort
+    m_sort_energy_ascending=!(m_half_hull==true && m_lower_hull==false); //upper half hull should sort DESCENDING (ground-state first)
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      std::sort(m_coord_groups[i_coord_group].m_points.begin(),m_coord_groups[i_coord_group].m_points.end(),sortWithinCoordGroup(m_points,m_sort_energy_ascending));  //ascending order
+    }
+    std::sort(m_coord_groups.rbegin(),m_coord_groups.rend()); //descending order for alphabetic print out later
+
+    //assign coord group indices to points, useful later
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      //set ref state
+      if(m_coord_groups[i_coord_group].m_points.size()){
+        m_coord_groups[i_coord_group].m_ref_state=artificialMap(m_coord_groups[i_coord_group].m_points[0]);
+      }
+      for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+        i_point=m_coord_groups[i_coord_group].m_points[i];
+        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+        m_points[i_point].m_i_coord_group=i_coord_group;
+      }
+    }
+    if(LDEBUG) {cerr << soliloquy << " done organizing into coordgroups" << endl;}
+
+    organizeHullPoints();
+
+    if(LDEBUG) {
+      cerr << soliloquy << " coord_groups structure:" << endl;
+      for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+        cerr << soliloquy << " coord_group[" << i_coord_group << "] coords=" << m_coord_groups[i_coord_group].m_coords << endl;
+        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+          cerr << soliloquy << " point[" << i << "] compound=" << m_points[m_coord_groups[i_coord_group].m_points[i]].m_entry.compound << " ";
+          cerr << "coords=" << m_points[m_coord_groups[i_coord_group].m_points[i]].m_coords << " ";
+          cerr << "has_stoich_coords=" << m_points[m_coord_groups[i_coord_group].m_points[i]].m_has_stoich_coords << " ";
+          cerr << "formation_energy_coord=" << m_points[m_coord_groups[i_coord_group].m_points[i]].m_formation_energy_coord << endl;
         }
-        message << "Employing " << valid_count << " total entries for " << pflow::arity_string(m_dim,false,false) << " convex hull analysis";
+      }
+    }
+
+    if(m_has_stoich_coords){
+      if(LDEBUG) {cerr << soliloquy << " stoich_coords found, also sorting into n-aries and alloys" << endl;}
+      message << "Stoichiometric coordinates detected, structuring entries by arity";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+      initializeNaries(); //create empty bins first, we can do this combinatorially
+
+      uint i_nary,i_alloy;
+      for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+        if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
+        //we already filled bins, if we cannot find alloy system, then it's a bust
+        if(!getAlloyIndex(m_coord_groups[i_coord_group],i_nary,i_alloy,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot get alloys index");}  //redo as we never done before
+        m_coord_groups[i_coord_group].m_i_nary=i_nary;
+        m_coord_groups[i_coord_group].m_i_alloy=i_alloy;
+        m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.push_back(i_coord_group);
+        //set i_nary and i_alloy to points too
+        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+          i_point=m_coord_groups[i_coord_group].m_points[i];
+          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+          m_points[i_point].m_i_nary=i_nary;
+          m_points[i_point].m_i_alloy=i_alloy;
+        }
+      }
+
+      bool only_within_half_hull=false; //m_half_hull; //these counts should reflect total entries
+      vector<vector<uint> > hull_sizes=getHullSizes(only_within_half_hull);
+      if(only_within_half_hull){
+        message << "Half hull detected, reducing entry count to those within the relevant hemisphere";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-
-        //remove empty m_coord_groups
-        vector<uint> empty_coord_groups;
-        for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-          if(m_coord_groups[i_coord_group].m_points.size()==0){empty_coord_groups.push_back(i_coord_group);}
-        }
-        std::sort(empty_coord_groups.rbegin(),empty_coord_groups.rend()); //descending
-        for(uint i=0,fl_size_i=empty_coord_groups.size();i<fl_size_i;i++){m_coord_groups.erase(m_coord_groups.begin()+empty_coord_groups[i]);}
-
-        //sort
-        m_sort_energy_ascending=!(m_half_hull==true && m_lower_hull==false); //upper half hull should sort DESCENDING (ground-state first)
-        for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-          std::sort(m_coord_groups[i_coord_group].m_points.begin(),m_coord_groups[i_coord_group].m_points.end(),sortWithinCoordGroup(m_points,m_sort_energy_ascending));  //ascending order
-        }
-        std::sort(m_coord_groups.rbegin(),m_coord_groups.rend()); //descending order for alphabetic print out later
-
-        //assign coord group indices to points, useful later
-        for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-          //set ref state
-          if(m_coord_groups[i_coord_group].m_points.size()){
-            m_coord_groups[i_coord_group].m_ref_state=artificialMap(m_coord_groups[i_coord_group].m_points[0]);
-          }
-          for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-            i_point=m_coord_groups[i_coord_group].m_points[i];
-            if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-            m_points[i_point].m_i_coord_group=i_coord_group;
-          }
-        }
-        if(LDEBUG) {cerr << soliloquy << " done organizing into coordgroups" << endl;}
-
-        organizeHullPoints();
-
-        if(LDEBUG) {
-          cerr << soliloquy << " coord_groups structure:" << endl;
-          for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-            cerr << soliloquy << " coord_group[" << i_coord_group << "] coords=" << m_coord_groups[i_coord_group].m_coords << endl;
-            for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-              cerr << soliloquy << " point[" << i << "] compound=" << m_points[m_coord_groups[i_coord_group].m_points[i]].m_entry.compound << " ";
-              cerr << "coords=" << m_points[m_coord_groups[i_coord_group].m_points[i]].m_coords << " ";
-              cerr << "has_stoich_coords=" << m_points[m_coord_groups[i_coord_group].m_points[i]].m_has_stoich_coords << " ";
-              cerr << "formation_energy_coord=" << m_points[m_coord_groups[i_coord_group].m_points[i]].m_formation_energy_coord << endl;
-            }
-          }
-        }
-
-        if(m_has_stoich_coords){
-          if(LDEBUG) {cerr << soliloquy << " stoich_coords found, also sorting into n-aries and alloys" << endl;}
-          message << "Stoichiometric coordinates detected, structuring entries by arity";
+      }
+      for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+        for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+          message << "Entries structure: employing " << getEntriesCount(i_nary,i_alloy,only_within_half_hull);
+          if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+          message << " entries, ";
+          message << hull_sizes[i_nary][i_alloy] << " entries total for ";
+          message << pflow::arity_string(i_nary+1,false,false) << " convex hull analysis";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-
-          initializeNaries(); //create empty bins first, we can do this combinatorially
-
-          uint i_nary,i_alloy;
-          for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-            if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
-            //we already filled bins, if we cannot find alloy system, then it's a bust
-            if(!getAlloyIndex(m_coord_groups[i_coord_group],i_nary,i_alloy,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot get alloys index");}  //redo as we never done before
-            m_coord_groups[i_coord_group].m_i_nary=i_nary;
-            m_coord_groups[i_coord_group].m_i_alloy=i_alloy;
-            m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.push_back(i_coord_group);
-            //set i_nary and i_alloy to points too
-            for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-              i_point=m_coord_groups[i_coord_group].m_points[i];
-              if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-              m_points[i_point].m_i_nary=i_nary;
-              m_points[i_point].m_i_alloy=i_alloy;
-            }
-          }
-
-          bool only_within_half_hull=false; //m_half_hull; //these counts should reflect total entries
-          vector<vector<uint> > hull_sizes=getHullSizes(only_within_half_hull);
-          if(only_within_half_hull){
-            message << "Half hull detected, reducing entry count to those within the relevant hemisphere";
-            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-          }
-          for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-            for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-              message << "Entries structure: employing " << getEntriesCount(i_nary,i_alloy,only_within_half_hull);
-              if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-              message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-              message << " entries, ";
-              message << hull_sizes[i_nary][i_alloy] << " entries total for ";
-              message << pflow::arity_string(i_nary+1,false,false) << " convex hull analysis";
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-            }
-          }
-
-          if(LDEBUG) {
-            for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-              cerr << soliloquy << " " << pflow::arity_string(i_nary+1,false,false) << ":" << endl;
-              for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-                cerr << soliloquy << " alloy[" << i_alloy << "]: elements_present=" << m_naries[i_nary].m_alloys[i_alloy].m_elements_present << endl;
-                for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
-                  i_coord_group_sort=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
-                  cerr << soliloquy << " coord_group[" << i_coord_group_sort << "]=" << m_coord_groups[i_coord_group_sort].m_coords << endl;
-                  for(uint j=0,fl_size_j=m_coord_groups[i_coord_group_sort].m_points.size();j<fl_size_j;j++){
-                    cerr << soliloquy << " compound=";
-                    cerr << (m_points[m_coord_groups[i_coord_group_sort].m_points[j]].m_is_artificial ? 
-                        string("ARTIFICIAL") : 
-                        m_points[m_coord_groups[i_coord_group_sort].m_points[j]].m_entry.compound) << " ";
-                    cerr << "coords=" << m_points[m_coord_groups[i_coord_group_sort].m_points[j]].m_coords << endl;
-                  }
-                }
-              }
-            }
-          }
         }
-        if(LDEBUG) {cerr << soliloquy << " done" << endl;}
       }
 
-      vector<string> ConvexHull::alloyToElements(const ChullPoint& point) const {return alloyToElements(point.m_i_nary,point.m_i_alloy);}
-      vector<string> ConvexHull::alloyToElements(uint i_nary,uint i_alloy) const {
-        string soliloquy="ConvexHull::alloyToElements():";
-        const xvector<int>& elements_present=getElementsPresent(i_nary,i_alloy);
-        if((uint)elements_present.rows!=m_velements.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between elements present and composition");}
-        vector<string> vout;
-        for(int i=elements_present.lrows;i<=elements_present.urows;i++){
-          if(elements_present[i]==1){vout.push_back(m_velements[i-elements_present.lrows]);}
-        }
-        return vout;
-      }
-
-      void ConvexHull::checkStructurePoints() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::checkStructurePoints():";
-        stringstream message;
-
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-
-        bool binary_statistics_check=true;
-
-        if(m_has_stoich_coords){
-          //UNARIES - START
-          //tests of stupidity
-          if(m_naries.size()!=m_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Missing n-aries");} //these are populated by default if done correctly
-          uint i_nary=0;
-          if(m_naries[i_nary].m_alloys.size()!=m_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Missing unary alloys");} //these are populated by default if done correctly
-
-          //check for ground-states (non-artificial points)
-          bool found_real,found_artificial;
-          uint i_coord_group,i_point,i_point_real;
+      if(LDEBUG) {
+        for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+          cerr << soliloquy << " " << pflow::arity_string(i_nary+1,false,false) << ":" << endl;
           for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-            if(m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected count of coordgroups for unaries, should only be 1");}
-            found_real=found_artificial=false;
-            i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[0];
-            for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i&&!(found_real&&found_artificial);i++){
-              i_point=m_coord_groups[i_coord_group].m_points[i];
-              if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-              if(m_points[i_point].m_is_artificial){found_artificial=true;}
-              else {
-                if(!found_real){i_point_real=i_point;}  //grab first i_point that's real
-                found_real=true;
-              }
-            }
-            if(m_add_artificial_unaries&&!found_artificial){
-              message << "Missing artificial points for";
-              if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
-              message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message.str()); message.str("");
-            }
-            if(found_real){
-              if(m_thermo_hull){
-                if(abs(m_points[i_point_real].getLastCoord())>=ENERGY_TOL){
-                  message << "Very skewed ground-state end point for";
-                  if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
-                  message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-                  message << " (auid=" << m_points[i_point_real].m_entry.auid << ")";
-                  message << ": abs(" << m_points[i_point_real].getLastCoord() << ")>=" << ENERGY_TOL << " [eV]";
-                  message << " (please report on AFLOW Forum: aflow.org/forum)";
-                  if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
-                  else {
-                    message << ". Override with --force (results may not be reliable).";
-                    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-                  }
-                }
-              }
-            } else {
-              message << "No ground-state available for";
-              if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
-              message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-            }
-          }
-          //UNARIES - STOP
-
-          //BINARIES - START
-          uint count_threshold_binaries_total=DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES;
-          if(binary_statistics_check){
-            i_nary=1;
-            uint count;
-            for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-              count=getEntriesCount(i_nary,i_alloy,false);  //check total first
-              if(count<count_threshold_binaries_total){
-                stringstream hull;
-                //safe in case m_velements was not set
-                if(m_velements.size()){hull << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-") << " ";}
-                hull << "[i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-                message << pflow::arity_string(i_nary+1,true,false) <<  " hull " << hull.str() << " is unreliable (total_entry_count=" << count << " < " << count_threshold_binaries_total << ")";
-                if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
-                else {
-                  message << ". Override with --force (results may not be reliable).";
-                  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-                }
+            cerr << soliloquy << " alloy[" << i_alloy << "]: elements_present=" << m_naries[i_nary].m_alloys[i_alloy].m_elements_present << endl;
+            for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
+              i_coord_group_sort=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
+              cerr << soliloquy << " coord_group[" << i_coord_group_sort << "]=" << m_coord_groups[i_coord_group_sort].m_coords << endl;
+              for(uint j=0,fl_size_j=m_coord_groups[i_coord_group_sort].m_points.size();j<fl_size_j;j++){
+                cerr << soliloquy << " compound=";
+                cerr << (m_points[m_coord_groups[i_coord_group_sort].m_points[j]].m_is_artificial ? 
+                    string("ARTIFICIAL") : 
+                    m_points[m_coord_groups[i_coord_group_sort].m_points[j]].m_entry.compound) << " ";
+                cerr << "coords=" << m_points[m_coord_groups[i_coord_group_sort].m_points[j]].m_coords << endl;
               }
             }
           }
-          //BINARIES - STOP
-        }
-        if(LDEBUG) {cerr << soliloquy << " done" << endl;}
-      }
-
-      void ConvexHull::addPointToFacet(ChullFacet& facet,uint i_point) {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::addPointToFacet():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        facet.addVertex(m_points[i_point],i_point);
-        if(LDEBUG) {
-          cerr << soliloquy << " facet.m_vertices.size()=" << facet.m_vertices.size() << endl;
-          for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
-            cerr << facet.m_vertices[i].ch_index << "  h_coords=" << facet.m_vertices[i].ch_point.h_coords << endl;
-          }
         }
       }
+    }
+    if(LDEBUG) {cerr << soliloquy << " done" << endl;}
+  }
 
-      void ConvexHull::initializeFacet(ChullFacet& facet,bool check_validity) {facet.initialize(h_reference,h_dim,check_validity);}
+  vector<string> ConvexHull::alloyToElements(const ChullPoint& point) const {return alloyToElements(point.m_i_nary,point.m_i_alloy);}
+  vector<string> ConvexHull::alloyToElements(uint i_nary,uint i_alloy) const {
+    string soliloquy="ConvexHull::alloyToElements():";
+    const xvector<int>& elements_present=getElementsPresent(i_nary,i_alloy);
+    if((uint)elements_present.rows!=m_velements.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between elements present and composition");}
+    vector<string> vout;
+    for(int i=elements_present.lrows;i<=elements_present.urows;i++){
+      if(elements_present[i]==1){vout.push_back(m_velements[i-elements_present.lrows]);}
+    }
+    return vout;
+  }
 
-      uint ConvexHull::getExtremePoint(uint dim) {
-        vector<FacetPoint> points_to_avoid;
-        return getExtremePoint(dim,points_to_avoid);
-      }
+  void ConvexHull::checkStructurePoints() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::checkStructurePoints():";
+    stringstream message;
 
-      uint ConvexHull::getExtremePoint(uint dim,const vector<FacetPoint>& points_to_avoid) {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getExtremePoint():";
-        stringstream message;
-        if(!h_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No starting points provided");}
-        uint i_point=AUROSTD_MAX_UINT;
-        double extreme=-1.0;  //since it's the abs() we check below, -1 is FINE
-        bool avoid=false;
-        if(LDEBUG) {
-          cerr << soliloquy << " h_points:" << endl;
-          for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
-            cerr << h_points[i] << "  h_coords=" << m_points[h_points[i]].h_coords << endl;
-          }
-          cerr << soliloquy << " points_to_avoid:" << endl;
-          for(uint j=0,fl_size_j=points_to_avoid.size();j<fl_size_j;j++){
-            cerr << points_to_avoid[j].ch_index << "  h_coords=" << m_points[points_to_avoid[j].ch_index].h_coords << endl;
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+
+    bool binary_statistics_check=true;
+
+    if(m_has_stoich_coords){
+      //UNARIES - START
+      //tests of stupidity
+      if(m_naries.size()!=m_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Missing n-aries");} //these are populated by default if done correctly
+      uint i_nary=0;
+      if(m_naries[i_nary].m_alloys.size()!=m_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Missing unary alloys");} //these are populated by default if done correctly
+
+      //check for ground-states (non-artificial points)
+      bool found_real,found_artificial;
+      uint i_coord_group,i_point,i_point_real;
+      for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+        if(m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected count of coordgroups for unaries, should only be 1");}
+        found_real=found_artificial=false;
+        i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[0];
+        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i&&!(found_real&&found_artificial);i++){
+          i_point=m_coord_groups[i_coord_group].m_points[i];
+          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+          if(m_points[i_point].m_is_artificial){found_artificial=true;}
+          else {
+            if(!found_real){i_point_real=i_point;}  //grab first i_point that's real
+            found_real=true;
           }
         }
-
-        int h_coords_index=0;
-        for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
-          h_coords_index=(int)dim+m_points[h_points[i]].h_coords.lrows;
-          if(h_coords_index>m_points[h_points[i]].h_coords.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid coordinate index");}
-          avoid=false;
-          for(uint j=0,fl_size_j=points_to_avoid.size();j<fl_size_j&&!avoid;j++){if(h_points[i]==points_to_avoid[j].ch_index){avoid=true;}}
-          if(avoid){continue;}
-          if(abs(m_points[h_points[i]].h_coords[h_coords_index])>extreme){
-            i_point=h_points[i];
-            extreme=abs(m_points[h_points[i]].h_coords[h_coords_index]);
-          }
-        }
-        if(i_point==AUROSTD_MAX_UINT){
-          message << "No point found, points_to_avoid is too restrictive (points_to_avoid.size()==" << points_to_avoid.size() << ")";
+        if(m_add_artificial_unaries&&!found_artificial){
+          message << "Missing artificial points for";
+          if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
+          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message.str()); message.str("");
         }
-        if(LDEBUG) {cerr << soliloquy << " i_point=" << i_point << endl;}
-        return i_point;
-      }
-
-      void ConvexHull::setCentroid() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setCentroid():";
-        vector<xvector<double> > points;
-        for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){points.push_back(m_points[h_points[i]].h_coords);}
-        h_centroid=h_reference=aurostd::getCentroid(points);  //fix h_reference later
-        //if(1){
-        //  //h_centroid[0]=0.5;h_centroid[1]=0.5;h_centroid[2]=-0.01;
-        //  for(int i=h_centroid.lrows;i<=h_centroid.urows-1;i++){h_centroid[i]=0.5;}
-        //  h_centroid[h_centroid.urows]=-0.01;
-        //}
-        if(LDEBUG) {cerr << soliloquy << " centroid: " << h_centroid << endl;}
-      }
-
-      vector<FacetPoint> ConvexHull::getInitialExtremePoints() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getInitialExtremePoints():";
-        if(LDEBUG) {cerr << soliloquy << " start" << endl;}
-        ChullFacet facet(*p_FileMESSAGE,*p_oss);  // CO 180305
-        string error;
-        //get first h_dim points from just the extremes, and plug into facet
-        //BAD CASE: fewer than h_dim points, this is NOT hull-able
-        if(h_points.size()<h_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not enough points to build an initial facet");}
-        for(uint i=0;i<h_dim;i++){addPointToFacet(facet,getExtremePoint(i,facet.m_vertices));}
-        if(!facet.isValid(error)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"An initial facet cannot be created per initial extreme points, invalid points input: "+error);}
-        initializeFacet(facet,false); //already validated
-        //now get furthest point from this facet, initialize outside set first
-        FacetPoint f_point;
-        for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
-          if(facet.isPointOnFacet(h_points[i])){continue;}
-          f_point.initialize(m_points[h_points[i]],h_points[i]);
-          facet.f_outside_set.push_back(f_point);
-          if(LDEBUG) {cerr << soliloquy << " adding to facet[" << 0 << "] outside set: " << h_points[i] << endl;}
-        }
-        if(facet.f_outside_set.size()){ //in special case where there are only 2 points in 2D, we simply return facet and not simplex
-          facet.setFurthestPoint();
-          facet.addVertex(facet.f_furthest_point); //already have a vector<uint> in m_points, simply append and return
-        }
-        if(LDEBUG) {
-          cerr << soliloquy << " building initial simplex with extreme points:" << endl;
-          for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
-            cerr << facet.m_vertices[i].ch_point.h_coords << endl;
-          }
-        }
-        return facet.m_vertices;
-      }
-
-      void ConvexHull::setNeighbors() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setNeighbors():";
-
-        //print ridges so far
-        if(LDEBUG) {
-          vector<uint> indices;
-          for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
-            indices=h_facets[i].getCHIndices();
-            cerr << soliloquy << " facet[" << i << "] has indices: ";
-            for(uint j=0,fl_size_j=indices.size();j<fl_size_j;j++){
-              cerr << indices[j];
-              if(j!=indices.size()-1){cerr << ",";}
-            }
-            cerr << endl;
-          }
-        }
-
-        for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){h_facets[i_facet].f_neighbors.clear();}
-        for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
-          for(uint j=i+1,fl_size_j=h_facets.size();j<fl_size_j;j++){
-            if(h_facets[i].shareRidge(h_facets[j])){
-              h_facets[i].f_neighbors.push_back(j);
-              h_facets[j].f_neighbors.push_back(i);
-            }
-          }
-          //can only perform this check if we have more than one h_facet, otherwise NO neighbors
-          if(h_facets.size()>1&&h_facets[i].f_neighbors.size()!=h_dim){
-            stringstream message;
-            if(LDEBUG) {
-              cerr << soliloquy << " neighbors for facet[i_facet=" << i << ",coords=";
-              for(uint j=0,fl_size_j=h_facets[i].m_vertices.size();j<fl_size_j;j++){cerr << h_facets[i].m_vertices[j].ch_point.h_coords << (j!=h_facets[i].m_vertices.size()-1?", ":"");}
-              cerr << "]: ";
-              for(uint j=0,fl_size_j=h_facets[i].f_neighbors.size();j<fl_size_j;j++){
-                cerr << h_facets[i].f_neighbors[j] << " ";
+        if(found_real){
+          if(m_thermo_hull){
+            if(abs(m_points[i_point_real].getLastCoord())>=ENERGY_TOL){
+              message << "Very skewed ground-state end point for";
+              if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
+              message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+              message << " (auid=" << m_points[i_point_real].m_entry.auid << ")";
+              message << ": abs(" << m_points[i_point_real].getLastCoord() << ")>=" << ENERGY_TOL << " [eV]";
+              message << " (please report on AFLOW Forum: aflow.org/forum)";
+              if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+              else {
+                message << ". Override with --force (results may not be reliable).";
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
               }
-              cerr << endl;
-              cerr << soliloquy << " is_vertical=" << h_facets[i].m_is_vertical << endl;
-            }
-            message << "Neighbor count (" << h_facets[i].f_neighbors.size() << ") and facet dimension (" << h_dim << ") mismatch";
-            if(m_cflags.flag("FORCE")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
-            else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-          }
-        }
-        for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){std::sort(h_facets[i].f_neighbors.begin(),h_facets[i].f_neighbors.end());}
-
-        if(LDEBUG) {
-          for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
-            cerr << soliloquy << " neighbors for facet[i_facet=" << i << ",coords=";
-            for(uint j=0,fl_size_j=h_facets[i].m_vertices.size();j<fl_size_j;j++){cerr << h_facets[i].m_vertices[j].ch_point.h_coords << (j!=h_facets[i].m_vertices.size()-1?", ":"");}
-            cerr << "]: ";
-            for(uint j=0,fl_size_j=h_facets[i].f_neighbors.size();j<fl_size_j;j++){
-              cerr << h_facets[i].f_neighbors[j] << " ";
-            }
-            cerr << endl;
-          }
-        }
-      }
-
-      void ConvexHull::createInitializeSimplex() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::createInitializeSimplex():";
-        //clear
-        h_facets.clear();
-        setCentroid();
-
-        vector<FacetPoint> initial_extreme_points=getInitialExtremePoints();
-        //fix h_reference now!
-        //NOTE: originally we used the hull centroid to determine alignment of facet normals
-        //however, this does not work in the case of 3D hulls with no 3D points (only 2D hull points)
-        //instead, we align with the centroid of the initial_extreme_points, as this point SHOULD be guaranteed to be in the hull
-        //the hull only gets bigger by accepting more points
-        //so we set h_reference first to h_centroid, since we don't care about the alignment of the normal inside getInitialExtremePoints()
-        //then we fix here and keep for all facets
-        vector<xvector<double> > points;
-        for(uint i=0,fl_size_i=initial_extreme_points.size();i<fl_size_i;i++){points.push_back(initial_extreme_points[i].ch_point.h_coords);}
-        h_reference=aurostd::getCentroid(points);
-        if(LDEBUG) {cerr << soliloquy << " new h_reference=" << h_reference << endl;}
-
-        //new first facet of endpoints
-
-        if(initial_extreme_points.size()==h_dim+1){if(LDEBUG) {cerr << soliloquy << " building initial simplex" << endl;}}
-        else if(initial_extreme_points.size()==h_dim){if(LDEBUG) {cerr << soliloquy << " not enough points to build a simplex, will settle for a facet instead" << endl;}}
-        else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not enough points to construct initial simplex/facet");}
-
-        //get dim combos of points
-        string error;
-        aurostd::xcombos xc(initial_extreme_points.size(),h_dim,'C');
-        vector<int> indices;
-        while(xc.increment()){
-          //remember, indices are NOT the indices themselves, but a place holder as to whether to include the number at the index
-          //e.g., indices==1,1,0; therefore, include indices 0,1
-          indices=xc.getCombo();
-          if(LDEBUG) {
-            cerr << soliloquy << " indices=";
-            for(uint i=0,fl_size_i=indices.size();i<fl_size_i;i++){cerr << indices[i] << (i!=indices.size()-1?",":"");}
-            cerr << endl;
-          }
-          h_facets.push_back(ChullFacet(*p_FileMESSAGE,*p_oss));  // CO 180305
-          for(uint i=0,fl_size_i=indices.size();i<fl_size_i;i++){
-            if(indices[i]==1){h_facets.back().addVertex(initial_extreme_points[i]);}
-          }
-          if(LDEBUG) {
-            cerr << soliloquy << " initial facet[" << h_facets.size() << "] new point[" << h_facets.back().m_vertices.size() << "] ";
-            cerr << "coords=" << m_points[h_facets.back().m_vertices.back().ch_index].h_coords << endl;
-          }
-          if(!h_facets.back().isValid(error)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"An initial facet cannot be created, invalid points input: "+error);}
-          initializeFacet(h_facets.back(),false); //already validated
-        }
-        if(initial_extreme_points.size()==h_dim+1){if(LDEBUG) {cerr << soliloquy << " initial simplex built" << endl;}}
-        else if(initial_extreme_points.size()==h_dim){if(LDEBUG) {cerr << soliloquy << " initial (single) facet built" << endl;}}
-        else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not enough points to construct initial simplex/facet");}
-
-        //if net distance, then it must be outside hull
-        bool associated;
-        FacetPoint f_point;
-        for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
-          associated=false;
-          if(LDEBUG) {cerr << soliloquy << " associating point[" << h_points[i] << "] to a facet's outside set" << endl;}
-          f_point.initialize(m_points[h_points[i]],h_points[i]);
-          for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet && !associated;i_facet++){
-            if(h_facets[i_facet].isPointOnFacet(f_point)){associated=true;} //skip the obvious
-            if(!associated && h_facets[i_facet].isPointOutside(f_point)){
-              h_facets[i_facet].f_outside_set.push_back(f_point);
-              associated=true;
-              if(LDEBUG) {cerr << soliloquy << " associating point[" << h_points[i] << "] with facet[" << i_facet << "].f_outside_set" << endl;}
-            }
-          }
-          if(!associated){
-            if(LDEBUG) {cerr << soliloquy << " NOT associating point[" << h_points[i] << "] with any facet outside set" << endl;}
-          }
-        }
-        //get furthest point
-        for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){
-          if(LDEBUG) {cerr << soliloquy << " facet[" << i_facet << "] has " << h_facets[i_facet].f_outside_set.size() << " outside points" << endl;}
-          h_facets[i_facet].setFurthestPoint();
-        }
-        setNeighbors();
-      }
-
-      void ConvexHull::setVisibleFacets(uint i_facet){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setVisibleFacets():";
-        if(i_facet>h_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index with h_facets");}
-        //clean
-        for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){h_facets[i].f_visited=false;}
-        h_visible_facets.clear();
-
-        //initialize
-        h_visible_facets.push_back(i_facet);
-        h_facets[i_facet].f_visited=true;
-
-        uint i_visible,i_neigh;
-        //[CO190409 - size() must be recalculated for EVERY loop]for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++){
-        for(uint i=0;i<h_visible_facets.size();i++){
-          i_visible=h_visible_facets[i];
-          for(uint j=0,fl_size_j=h_facets[i_visible].f_neighbors.size();j<fl_size_j;j++){
-            i_neigh=h_facets[i_visible].f_neighbors[j];
-            if(h_facets[i_neigh].f_visited){continue;}
-            h_facets[i_neigh].f_visited=true;
-            if(h_facets[i_neigh].isPointOutside(h_facets[i_facet].f_furthest_point)){h_visible_facets.push_back(i_neigh);}
-          }
-          //there's no need to set i=0 for this loop (unlike the facets loop in calculateFacets()
-          //we iterate through neighbors, visiting only once
-          //the neighbors of a facet do not change here
-        }
-
-        if(LDEBUG) {
-          cerr << soliloquy << " visible facets for facet[" << i_facet << "]: ";
-          for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++){cerr << h_visible_facets[i] << " ";}
-          cerr << endl;
-        }
-      }
-
-      void ConvexHull::setHorizonRidges(){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setHorizonRidges():";
-        if(!h_visible_facets.size()){return;}
-        h_horizon_ridges.clear();
-        bool match;
-        for(uint i1=0,fl_size_i1=h_visible_facets.size();i1<fl_size_i1;i1++){
-          for(uint j1=0,fl_size_j1=h_facets[h_visible_facets[i1]].m_ridges.size();j1<fl_size_j1;j1++){
-            match=false;
-            for(uint i2=0,fl_size_i2=h_visible_facets.size();i2<fl_size_i2&&!match;i2++){
-              if(i1==i2){continue;}
-              for(uint j2=0,fl_size_j2=h_facets[h_visible_facets[i2]].m_ridges.size();j2<fl_size_j2&&!match;j2++){
-                if(h_facets[h_visible_facets[i1]].m_ridges[j1].getCHIndices()==h_facets[h_visible_facets[i2]].m_ridges[j2].getCHIndices()){
-                  match=true;
-                }
-              }
-            }
-            if(!match){h_horizon_ridges.push_back(h_facets[h_visible_facets[i1]].m_ridges[j1]);}
-          }
-        }
-
-        if(LDEBUG) {
-          cerr << soliloquy << " horizon ridges: ";
-          for(uint i=0,fl_size_i=h_horizon_ridges.size();i<fl_size_i;i++){
-            for(uint j=0,fl_size_j=h_horizon_ridges[i].m_vertices.size();j<fl_size_j;j++){
-              cerr << h_horizon_ridges[i].m_vertices[j].ch_index << (j==h_horizon_ridges[i].m_vertices.size()-1?"":" ");
-            }
-            cerr << (i==h_horizon_ridges.size()-1?"":", ");
-          }
-          cerr << endl;
-        }
-      }
-
-      uint ConvexHull::createNewFacets(FacetPoint furthest_point){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::createNewFacets():";
-        if(furthest_point.ch_index>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index with furthest_point");}
-        uint old_facet_count=h_facets.size();
-        string error; //dummy so we don't recreate every time
-        for(uint i=0,fl_size_i=h_horizon_ridges.size();i<fl_size_i;i++){
-          //check obvious
-          if(h_horizon_ridges[i].isPointOnFacet(furthest_point)){
-            if(LDEBUG) {cerr << soliloquy << " skipping new facet: duplicate point" << endl;}
-            continue;
-          }
-          h_horizon_ridges[i].addVertex(furthest_point);
-          if(LDEBUG) {cerr << soliloquy << " furthest point for new facet: " << furthest_point.ch_index << " " << m_points[furthest_point.ch_index].h_coords << endl;}
-          if(!h_horizon_ridges[i].isValid(error)){  //corner case, happens when creating new facets on edges or corners of hull
-            if(LDEBUG) {cerr << soliloquy << " skipping new facet: " << error << endl;}
-            continue;
-          }
-          initializeFacet(h_horizon_ridges[i],false); //already validated
-          h_facets.push_back(h_horizon_ridges[i]);
-          if(LDEBUG) {
-            cerr << soliloquy << " new facet: ";
-            for(uint j=0,fl_size_j=h_facets.back().m_vertices.size();j<fl_size_j;j++){cerr << m_points[h_facets.back().m_vertices[j].ch_index].h_coords << " | ";}
-            cerr << endl;
-          }
-        }
-        if(LDEBUG) {cerr << soliloquy << " " << h_facets.size()-old_facet_count << " new facets" << endl;}
-        return h_facets.size()-old_facet_count;
-        //do neighbors at the end!
-      }
-
-      void ConvexHull::updateOutsideSet(uint new_facet_count){  //they are at the end of the list
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::updateOutsideSet():";
-        //we're deleting visible planes soon, so we need to reassess/reassign outside points
-        uint i_visible;
-        bool associated;
-        for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++){
-          i_visible=h_visible_facets[i];
-          for(uint j=0,fl_size_j=h_facets[i_visible].f_outside_set.size();j<fl_size_j;j++){
-            FacetPoint& f_point=h_facets[i_visible].f_outside_set[j];
-            associated=false;
-            if(LDEBUG) {cerr << soliloquy << " re-associating point[" << f_point.ch_index << "] with a new facet" << endl;}
-            for(uint fl_size_i_facet=h_facets.size(),i_facet=fl_size_i_facet-new_facet_count;i_facet<fl_size_i_facet&&!associated;i_facet++){
-              if(h_facets[i_facet].isPointOnFacet(f_point)){associated=true;} //skip the obvious
-              if(!associated && h_facets[i_facet].isPointOutside(f_point)){
-                h_facets[i_facet].f_outside_set.push_back(f_point);
-                associated=true;
-                if(LDEBUG) {cerr << soliloquy << " associating point[" << f_point.ch_index << "] with facet[" << i_facet << "].f_outside_set" << endl;}
-              }
-            }
-          }
-        }
-        for(uint fl_size_i_facet=h_facets.size(),i_facet=fl_size_i_facet-new_facet_count;i_facet<fl_size_i_facet;i_facet++){
-          if(LDEBUG) {cerr << soliloquy << " NEW facet[" << i_facet << "] has " << h_facets[i_facet].f_outside_set.size() << " outside points" << endl;}
-          h_facets[i_facet].setFurthestPoint();
-        }
-      }
-
-      void ConvexHull::deleteVisibleFacets() {
-        //sort in descending order because all indices above the point of deletion change
-        std::sort(h_visible_facets.rbegin(), h_visible_facets.rend());  //descending  //, std::greater<uint>());
-        for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++){h_facets.erase(h_facets.begin()+h_visible_facets[i]);}
-      }
-
-      void ConvexHull::removeDuplicateHullPoints() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::removeDuplicateHullPoints():";
-        std::sort(h_points.begin(),h_points.end());h_points.erase( std::unique( h_points.begin(), h_points.end() ), h_points.end() );  //first remove duplicate indices
-
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-        vector<uint> indices_2_remove;
-        for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
-          for(uint j=i+1,fl_size_j=h_points.size();j<fl_size_j;j++){
-            if(identical(m_points[h_points[i]].h_coords,m_points[h_points[j]].h_coords,ZERO_TOL)){
-              indices_2_remove.push_back(j);
-            }
-          }
-        }
-        if(LDEBUG) {
-          cerr << soliloquy << " removing points: ";
-          for(uint i=0,fl_size_i=indices_2_remove.size();i<fl_size_i;i++){cerr << indices_2_remove[i] << " ";}
-          cerr << endl;
-        }
-        std::sort(indices_2_remove.rbegin(),indices_2_remove.rend()); //descending
-        for(uint i=0,fl_size_i=indices_2_remove.size();i<fl_size_i;i++){h_points.erase(h_points.begin()+indices_2_remove[i]);}
-        if(LDEBUG) {cerr << soliloquy << " done" << endl;}
-      }
-
-      void ConvexHull::calculateFacets() {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        //only copy those possibly on the hull (does not include endpoints)
-        string soliloquy="ConvexHull::calculateFacets():";
-
-        h_facets.clear();
-        removeDuplicateHullPoints();
-        if(!h_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No points found on hull");}
-        h_dim=m_points[h_points[0]].h_coords.rows;
-
-        for(uint i=1,fl_size_i=h_points.size();i<fl_size_i;i++){
-          if((uint)m_points[h_points[i]].h_coords.rows!=h_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid initialization of hull coordinates");}
-        }
-
-        if(LDEBUG) {
-          for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
-            cerr << soliloquy << " m_coords=" << m_points[h_points[i]].m_coords << "; h_coords=" << m_points[h_points[i]].h_coords << endl; //<< "; relevant " << m_points[h_points[i]].isRelevantPoint(elements_present) << endl;
-          }
-        }
-
-        //main loop START - see algorithm here: 10.1145/235815.235821
-        createInitializeSimplex();
-
-        uint new_facet_count;
-        //[CO190409 - size() must be recalculated for EVERY loop]for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){
-        for(uint i_facet=0;i_facet<h_facets.size();i_facet++){
-          if(!h_facets[i_facet].f_outside_set.size()){continue;}  //the only way we exit this loop is if we continue for ALL facets
-          setVisibleFacets(i_facet);
-          setHorizonRidges();
-          new_facet_count=createNewFacets(h_facets[i_facet].f_furthest_point);
-          if(new_facet_count){
-            updateOutsideSet(new_facet_count);  //redistribute outside set among new facets (visible planes will go soon)
-            for(uint fl_size_i_facet=h_facets.size(),i_facet=fl_size_i_facet-new_facet_count;i_facet<fl_size_i_facet;i_facet++){h_facets[i_facet].setFurthestPoint();}  //get furthest points for new facets
-            deleteVisibleFacets();  //delete visible facets
-            setNeighbors();
-          }
-          i_facet=-1; //restart full loop!
-        }
-        //main loop END - see algorithm here: 10.1145/235815.235821
-
-        //resort points in facets with knowledge of normal
-        //if normal is pointed down, sort in descending order
-        bool sort_stoich_ascending;
-        for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
-          sort_stoich_ascending=!h_facets[i].m_in_lower_hemisphere;
-          std::sort(h_facets[i].m_vertices.begin(),h_facets[i].m_vertices.end(),
-              sortThermoPoints(sort_stoich_ascending,m_sort_energy_ascending));
-        }
-        std::sort(h_facets.begin(),h_facets.end(),sortFacetsByPoints(m_points));  //auto sort
-
-        if(LDEBUG) {
-          cerr << soliloquy << " hull points:" << endl;
-          for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){
-            cerr << soliloquy << " facet " << i_facet << ": ";
-            for(uint i=0,fl_size_i=h_facets[i_facet].m_vertices.size();i<fl_size_i;i++){
-              cerr << m_points[h_facets[i_facet].m_vertices[i].ch_index].h_coords << " - auid " << m_points[h_facets[i_facet].m_vertices[i].ch_index].m_entry.auid << " | ";
-            }
-            cerr << "normal " << h_facets[i_facet].m_normal << " | angles " << aurostd::getGeneralAngles(h_facets[i_facet].m_normal,ZERO_TOL) << endl;//<< " | x " << cos(h_facets[i_facet].m_angle) << " | y " << sin(h_facets[i_facet].m_angle)  << endl;
-          }
-        }
-      }
-
-      const xvector<int>& ConvexHull::getElementsPresent(uint i_nary,uint i_alloy) const {
-        string soliloquy="ConvexHull::setElementsPresent():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        return m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
-      }
-
-      void ConvexHull::setElementsPresent(uint i_nary,uint i_alloy){m_elements_present=getElementsPresent(i_nary,i_alloy);}
-
-      void ConvexHull::addRelevantUnariesToHullCalculation(uint i_nary,uint i_alloy) {
-        string soliloquy="ConvexHull::addRelevantUnariesToHullCalculation():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        return addRelevantUnariesToHullCalculation(m_naries[i_nary].m_alloys[i_alloy].m_elements_present);
-      }
-
-      void ConvexHull::addRelevantUnariesToHullCalculation(xvector<int>& elements_present) {
-        string soliloquy="ConvexHull::addRelevantUnariesToHullCalculation():";
-        uint i_nary=0;
-        if((uint)elements_present.rows!=m_naries[i_nary].m_alloys.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unary alloy is missing from m_naries");}
-        uint i_coord_group,i_point;
-        for(int i_alloy=elements_present.lrows;i_alloy<=elements_present.urows;i_alloy++){
-          if(elements_present[i_alloy]==1){
-            if(m_naries[i_nary].m_alloys[i_alloy-elements_present.lrows].m_coord_groups.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected count of coordgroups for unaries, should only be 1");}
-            i_coord_group=m_naries[i_nary].m_alloys[i_alloy-elements_present.lrows].m_coord_groups[0];
-            if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-            for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_candidate_hull_points.size();i<fl_size_i;i++){
-              i_point=m_coord_groups[i_coord_group].m_candidate_hull_points[i];
-              if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-              addPointToHullCalculation(i_point,elements_present);
-            }
-          }
-        }
-      }
-
-      void ConvexHull::addLowerDimensionPointsToHullCalculation(uint i_nary_max){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::addLowerDimensionPointsToHullCalculation():";
-        if(i_nary_max>m_naries.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-        //grab from m_naries[i_nary].m_alloys[i_alloy].m_facets
-        //we already added unaries, so there will be duplicates, but we safely remove in calculateFacets()
-        //don't worry about this yet
-        uint i_point=AUROSTD_MAX_UINT,i_facet=AUROSTD_MAX_UINT;
-        for(uint i_nary=1;i_nary<i_nary_max;i_nary++){
-          if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-          for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-            if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-            if(m_naries[i_nary].m_alloys[i_alloy].belongs2Hull(m_elements_present)){
-              for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_facets.size();i<fl_size_i;i++){
-                i_facet=m_naries[i_nary].m_alloys[i_alloy].m_facets[i];
-                if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
-                const ChullFacet& facet=m_facets[i_facet];
-                for(uint j=0,fl_size_j=facet.m_vertices.size();j<fl_size_j;j++){
-                  i_point=facet.m_vertices[j].ch_index;
-                  addPointToHullCalculation(i_point,m_elements_present); //this is hull specific, and set with setElementsPresent()
-                }
-              }
-            }
-          }
-        }
-        if(LDEBUG) {cerr << soliloquy << " done" << endl;}
-      }
-
-      void ConvexHull::addPointToHullCalculation(uint i_point){
-        string soliloquy="ConvexHull::addPointToHullCalculation():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        h_points.push_back(i_point);
-        m_points[i_point].setHullCoords();
-      }
-
-      void ConvexHull::addPointToHullCalculation(uint i_point,xvector<int>& elements_present){
-        string soliloquy="ConvexHull::addPointToHullCalculation():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        h_points.push_back(i_point);
-        m_points[i_point].setHullCoords(elements_present);
-      }
-
-      void ConvexHull::preparePointsForHullCalculation(uint i_nary,uint i_alloy) {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::preparePointsForHullCalculation():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-        h_points.clear();
-        addRelevantUnariesToHullCalculation(i_nary,i_alloy);
-        addLowerDimensionPointsToHullCalculation(i_nary); //don't worry about adding unary duplicates, we remove them robustly in calculateFacets()
-        uint i_coord_group,i_point;
-        for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
-          i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
-          if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-          for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_candidate_hull_points.size();j<fl_size_j;j++){
-            i_point=m_coord_groups[i_coord_group].m_candidate_hull_points[j];
-            if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-            addPointToHullCalculation(i_point,m_naries[i_nary].m_alloys[i_alloy].m_elements_present);
-          }
-        }
-        if(LDEBUG) {cerr << soliloquy << " done" << endl;}
-      }
-
-      void ConvexHull::preparePointsForHullCalculation() {
-        string soliloquy="ConvexHull::preparePointsForHullCalculation():";
-        h_points.clear();
-        //we already checked extremes in last (energy) direction, just add these to the hull
-        //don't include those points in between
-        uint i_point=AUROSTD_MAX_UINT;
-        for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-          if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-          for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_candidate_hull_points.size();i<fl_size_i;i++){
-            i_point=m_coord_groups[i_coord_group].m_candidate_hull_points[i];
-            if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-            addPointToHullCalculation(i_point);
-          }
-        }
-      }
-
-      uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const ChullPoint& point) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getNearestFacetVertically():";
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        if(LDEBUG) {cerr << soliloquy << " m_coords=" << point.m_coords << ", h_coords=" << point.h_coords << endl;}
-        return getNearestFacetVertically(i_facets,point.h_coords);
-      }
-
-      uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const xvector<double>& point) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        //determines nearness by vertical distance
-        string soliloquy="ConvexHull::getNearestFacetVertically():";
-        uint i_facet,i_facet_min;
-        uint i_facet_artificial=-1; //really large uint
-        double vdist,dist=AUROSTD_MAX_DOUBLE;
-        for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
-          i_facet=i_facets[i];
-          if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
-          const ChullFacet& facet=m_facets[i_facet];
-          if(!facet.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
-          if(facet.m_hypercollinear){continue;}
-          if(facet.m_is_vertical){continue;}
-          if(facet.m_is_artificial){
-            i_facet_artificial=i_facet;
-            continue;
-          }
-          if(LDEBUG) {cerr << soliloquy << " looking at facet[" << i_facet << "]" << endl;}
-          vdist=abs(facet.getSignedVerticalDistanceToZero(point));  //abs, //(repetita iuvant)
-          if(vdist<dist){
-            i_facet_min=i_facet;
-            dist=vdist;
-          }
-        }
-        //safety, return artificial facet if no other facets available
-        if(dist==AUROSTD_MAX_DOUBLE){
-          if(i_facet_artificial>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No nearest facet found");}
-          return i_facet_artificial;
-        }
-        return i_facet_min;
-      }
-
-      const vector<uint>& ConvexHull::getRelevantFacets(uint i_nary,uint i_alloy) const {
-        string soliloquy="ConvexHull::getRelevantFacets():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-
-        if(i_nary==0){  //unaries are special case
-          //try m_facets, otherwise start from top and go down
-          if(m_i_facets.size()){return m_i_facets;}
-          for(uint fl_size_i_nary=m_naries.size(),i_nary=fl_size_i_nary-1;i_nary<fl_size_i_nary;i_nary--){
-            for(uint fl_size_i_alloy=m_naries[i_nary].m_alloys.size(),i_alloy=fl_size_i_alloy-1;i_alloy<=fl_size_i_alloy;i_alloy--){
-              if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()){return m_naries[i_nary].m_alloys[i_alloy].m_facets;}
             }
           }
         } else {
+          message << "No ground-state available for";
+          if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
+          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        }
+      }
+      //UNARIES - STOP
+
+      //BINARIES - START
+      uint count_threshold_binaries_total=DEFAULT_CHULL_OUTLIER_ANALYSIS_COUNT_THRESHOLD_BINARIES;
+      if(binary_statistics_check){
+        i_nary=1;
+        uint count;
+        for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+          count=getEntriesCount(i_nary,i_alloy,false);  //check total first
+          if(count<count_threshold_binaries_total){
+            stringstream hull;
+            //safe in case m_velements was not set
+            if(m_velements.size()){hull << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-") << " ";}
+            hull << "[i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+            message << pflow::arity_string(i_nary+1,true,false) <<  " hull " << hull.str() << " is unreliable (total_entry_count=" << count << " < " << count_threshold_binaries_total << ")";
+            if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+            else {
+              message << ". Override with --force (results may not be reliable).";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+            }
+          }
+        }
+      }
+      //BINARIES - STOP
+    }
+    if(LDEBUG) {cerr << soliloquy << " done" << endl;}
+  }
+
+  void ConvexHull::addPointToFacet(ChullFacet& facet,uint i_point) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::addPointToFacet():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    facet.addVertex(m_points[i_point],i_point);
+    if(LDEBUG) {
+      cerr << soliloquy << " facet.m_vertices.size()=" << facet.m_vertices.size() << endl;
+      for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
+        cerr << facet.m_vertices[i].ch_index << "  h_coords=" << facet.m_vertices[i].ch_point.h_coords << endl;
+      }
+    }
+  }
+
+  void ConvexHull::initializeFacet(ChullFacet& facet,bool check_validity) {facet.initialize(h_reference,h_dim,check_validity);}
+
+  uint ConvexHull::getExtremePoint(uint dim) {
+    vector<FacetPoint> points_to_avoid;
+    return getExtremePoint(dim,points_to_avoid);
+  }
+
+  uint ConvexHull::getExtremePoint(uint dim,const vector<FacetPoint>& points_to_avoid) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getExtremePoint():";
+    stringstream message;
+    if(!h_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No starting points provided");}
+    uint i_point=AUROSTD_MAX_UINT;
+    double extreme=-1.0;  //since it's the abs() we check below, -1 is FINE
+    bool avoid=false;
+    if(LDEBUG) {
+      cerr << soliloquy << " h_points:" << endl;
+      for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
+        cerr << h_points[i] << "  h_coords=" << m_points[h_points[i]].h_coords << endl;
+      }
+      cerr << soliloquy << " points_to_avoid:" << endl;
+      for(uint j=0,fl_size_j=points_to_avoid.size();j<fl_size_j;j++){
+        cerr << points_to_avoid[j].ch_index << "  h_coords=" << m_points[points_to_avoid[j].ch_index].h_coords << endl;
+      }
+    }
+
+    int h_coords_index=0;
+    for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
+      h_coords_index=(int)dim+m_points[h_points[i]].h_coords.lrows;
+      if(h_coords_index>m_points[h_points[i]].h_coords.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid coordinate index");}
+      avoid=false;
+      for(uint j=0,fl_size_j=points_to_avoid.size();j<fl_size_j&&!avoid;j++){if(h_points[i]==points_to_avoid[j].ch_index){avoid=true;}}
+      if(avoid){continue;}
+      if(abs(m_points[h_points[i]].h_coords[h_coords_index])>extreme){
+        i_point=h_points[i];
+        extreme=abs(m_points[h_points[i]].h_coords[h_coords_index]);
+      }
+    }
+    if(i_point==AUROSTD_MAX_UINT){
+      message << "No point found, points_to_avoid is too restrictive (points_to_avoid.size()==" << points_to_avoid.size() << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message.str()); message.str("");
+    }
+    if(LDEBUG) {cerr << soliloquy << " i_point=" << i_point << endl;}
+    return i_point;
+  }
+
+  void ConvexHull::setCentroid() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setCentroid():";
+    vector<xvector<double> > points;
+    for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){points.push_back(m_points[h_points[i]].h_coords);}
+    h_centroid=h_reference=aurostd::getCentroid(points);  //fix h_reference later
+    //if(1){
+    //  //h_centroid[0]=0.5;h_centroid[1]=0.5;h_centroid[2]=-0.01;
+    //  for(int i=h_centroid.lrows;i<=h_centroid.urows-1;i++){h_centroid[i]=0.5;}
+    //  h_centroid[h_centroid.urows]=-0.01;
+    //}
+    if(LDEBUG) {cerr << soliloquy << " centroid: " << h_centroid << endl;}
+  }
+
+  vector<FacetPoint> ConvexHull::getInitialExtremePoints() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getInitialExtremePoints():";
+    if(LDEBUG) {cerr << soliloquy << " start" << endl;}
+    ChullFacet facet(*p_FileMESSAGE,*p_oss);  // CO 180305
+    string error;
+    //get first h_dim points from just the extremes, and plug into facet
+    //BAD CASE: fewer than h_dim points, this is NOT hull-able
+    if(h_points.size()<h_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not enough points to build an initial facet");}
+    for(uint i=0;i<h_dim;i++){addPointToFacet(facet,getExtremePoint(i,facet.m_vertices));}
+    if(!facet.isValid(error)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"An initial facet cannot be created per initial extreme points, invalid points input: "+error);}
+    initializeFacet(facet,false); //already validated
+    //now get furthest point from this facet, initialize outside set first
+    FacetPoint f_point;
+    for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
+      if(facet.isPointOnFacet(h_points[i])){continue;}
+      f_point.initialize(m_points[h_points[i]],h_points[i]);
+      facet.f_outside_set.push_back(f_point);
+      if(LDEBUG) {cerr << soliloquy << " adding to facet[" << 0 << "] outside set: " << h_points[i] << endl;}
+    }
+    if(facet.f_outside_set.size()){ //in special case where there are only 2 points in 2D, we simply return facet and not simplex
+      facet.setFurthestPoint();
+      facet.addVertex(facet.f_furthest_point); //already have a vector<uint> in m_points, simply append and return
+    }
+    if(LDEBUG) {
+      cerr << soliloquy << " building initial simplex with extreme points:" << endl;
+      for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
+        cerr << facet.m_vertices[i].ch_point.h_coords << endl;
+      }
+    }
+    return facet.m_vertices;
+  }
+
+  void ConvexHull::setNeighbors() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setNeighbors():";
+
+    //print ridges so far
+    if(LDEBUG) {
+      vector<uint> indices;
+      for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
+        indices=h_facets[i].getCHIndices();
+        cerr << soliloquy << " facet[" << i << "] has indices: ";
+        for(uint j=0,fl_size_j=indices.size();j<fl_size_j;j++){
+          cerr << indices[j];
+          if(j!=indices.size()-1){cerr << ",";}
+        }
+        cerr << endl;
+      }
+    }
+
+    for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){h_facets[i_facet].f_neighbors.clear();}
+    for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
+      for(uint j=i+1,fl_size_j=h_facets.size();j<fl_size_j;j++){
+        if(h_facets[i].shareRidge(h_facets[j])){
+          h_facets[i].f_neighbors.push_back(j);
+          h_facets[j].f_neighbors.push_back(i);
+        }
+      }
+      //can only perform this check if we have more than one h_facet, otherwise NO neighbors
+      if(h_facets.size()>1&&h_facets[i].f_neighbors.size()!=h_dim){
+        stringstream message;
+        if(LDEBUG) {
+          cerr << soliloquy << " neighbors for facet[i_facet=" << i << ",coords=";
+          for(uint j=0,fl_size_j=h_facets[i].m_vertices.size();j<fl_size_j;j++){cerr << h_facets[i].m_vertices[j].ch_point.h_coords << (j!=h_facets[i].m_vertices.size()-1?", ":"");}
+          cerr << "]: ";
+          for(uint j=0,fl_size_j=h_facets[i].f_neighbors.size();j<fl_size_j;j++){
+            cerr << h_facets[i].f_neighbors[j] << " ";
+          }
+          cerr << endl;
+          cerr << soliloquy << " is_vertical=" << h_facets[i].m_is_vertical << endl;
+        }
+        message << "Neighbor count (" << h_facets[i].f_neighbors.size() << ") and facet dimension (" << h_dim << ") mismatch";
+        if(m_cflags.flag("FORCE")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
+        else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      }
+    }
+    for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){std::sort(h_facets[i].f_neighbors.begin(),h_facets[i].f_neighbors.end());}
+
+    if(LDEBUG) {
+      for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
+        cerr << soliloquy << " neighbors for facet[i_facet=" << i << ",coords=";
+        for(uint j=0,fl_size_j=h_facets[i].m_vertices.size();j<fl_size_j;j++){cerr << h_facets[i].m_vertices[j].ch_point.h_coords << (j!=h_facets[i].m_vertices.size()-1?", ":"");}
+        cerr << "]: ";
+        for(uint j=0,fl_size_j=h_facets[i].f_neighbors.size();j<fl_size_j;j++){
+          cerr << h_facets[i].f_neighbors[j] << " ";
+        }
+        cerr << endl;
+      }
+    }
+  }
+
+  void ConvexHull::createInitializeSimplex() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::createInitializeSimplex():";
+    //clear
+    h_facets.clear();
+    setCentroid();
+
+    vector<FacetPoint> initial_extreme_points=getInitialExtremePoints();
+    //fix h_reference now!
+    //NOTE: originally we used the hull centroid to determine alignment of facet normals
+    //however, this does not work in the case of 3D hulls with no 3D points (only 2D hull points)
+    //instead, we align with the centroid of the initial_extreme_points, as this point SHOULD be guaranteed to be in the hull
+    //the hull only gets bigger by accepting more points
+    //so we set h_reference first to h_centroid, since we don't care about the alignment of the normal inside getInitialExtremePoints()
+    //then we fix here and keep for all facets
+    vector<xvector<double> > points;
+    for(uint i=0,fl_size_i=initial_extreme_points.size();i<fl_size_i;i++){points.push_back(initial_extreme_points[i].ch_point.h_coords);}
+    h_reference=aurostd::getCentroid(points);
+    if(LDEBUG) {cerr << soliloquy << " new h_reference=" << h_reference << endl;}
+
+    //new first facet of endpoints
+
+    if(initial_extreme_points.size()==h_dim+1){if(LDEBUG) {cerr << soliloquy << " building initial simplex" << endl;}}
+    else if(initial_extreme_points.size()==h_dim){if(LDEBUG) {cerr << soliloquy << " not enough points to build a simplex, will settle for a facet instead" << endl;}}
+    else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not enough points to construct initial simplex/facet");}
+
+    //get dim combos of points
+    string error;
+    aurostd::xcombos xc(initial_extreme_points.size(),h_dim,'C');
+    vector<int> indices;
+    while(xc.increment()){
+      //remember, indices are NOT the indices themselves, but a place holder as to whether to include the number at the index
+      //e.g., indices==1,1,0; therefore, include indices 0,1
+      indices=xc.getCombo();
+      if(LDEBUG) {
+        cerr << soliloquy << " indices=";
+        for(uint i=0,fl_size_i=indices.size();i<fl_size_i;i++){cerr << indices[i] << (i!=indices.size()-1?",":"");}
+        cerr << endl;
+      }
+      h_facets.push_back(ChullFacet(*p_FileMESSAGE,*p_oss));  // CO 180305
+      for(uint i=0,fl_size_i=indices.size();i<fl_size_i;i++){
+        if(indices[i]==1){h_facets.back().addVertex(initial_extreme_points[i]);}
+      }
+      if(LDEBUG) {
+        cerr << soliloquy << " initial facet[" << h_facets.size() << "] new point[" << h_facets.back().m_vertices.size() << "] ";
+        cerr << "coords=" << m_points[h_facets.back().m_vertices.back().ch_index].h_coords << endl;
+      }
+      if(!h_facets.back().isValid(error)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"An initial facet cannot be created, invalid points input: "+error);}
+      initializeFacet(h_facets.back(),false); //already validated
+    }
+    if(initial_extreme_points.size()==h_dim+1){if(LDEBUG) {cerr << soliloquy << " initial simplex built" << endl;}}
+    else if(initial_extreme_points.size()==h_dim){if(LDEBUG) {cerr << soliloquy << " initial (single) facet built" << endl;}}
+    else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not enough points to construct initial simplex/facet");}
+
+    //if net distance, then it must be outside hull
+    bool associated;
+    FacetPoint f_point;
+    for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
+      associated=false;
+      if(LDEBUG) {cerr << soliloquy << " associating point[" << h_points[i] << "] to a facet's outside set" << endl;}
+      f_point.initialize(m_points[h_points[i]],h_points[i]);
+      for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet && !associated;i_facet++){
+        if(h_facets[i_facet].isPointOnFacet(f_point)){associated=true;} //skip the obvious
+        if(!associated && h_facets[i_facet].isPointOutside(f_point)){
+          h_facets[i_facet].f_outside_set.push_back(f_point);
+          associated=true;
+          if(LDEBUG) {cerr << soliloquy << " associating point[" << h_points[i] << "] with facet[" << i_facet << "].f_outside_set" << endl;}
+        }
+      }
+      if(!associated){
+        if(LDEBUG) {cerr << soliloquy << " NOT associating point[" << h_points[i] << "] with any facet outside set" << endl;}
+      }
+    }
+    //get furthest point
+    for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){
+      if(LDEBUG) {cerr << soliloquy << " facet[" << i_facet << "] has " << h_facets[i_facet].f_outside_set.size() << " outside points" << endl;}
+      h_facets[i_facet].setFurthestPoint();
+    }
+    setNeighbors();
+  }
+
+  void ConvexHull::setVisibleFacets(uint i_facet){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setVisibleFacets():";
+    if(i_facet>h_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index with h_facets");}
+    //clean
+    for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){h_facets[i].f_visited=false;}
+    h_visible_facets.clear();
+
+    //initialize
+    h_visible_facets.push_back(i_facet);
+    h_facets[i_facet].f_visited=true;
+
+    uint i_visible,i_neigh;
+    //[CO190409 - size() must be recalculated for EVERY loop]for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++)
+    for(uint i=0;i<h_visible_facets.size();i++)
+    { //CO200106 - patching for auto-indenting
+      i_visible=h_visible_facets[i];
+      for(uint j=0,fl_size_j=h_facets[i_visible].f_neighbors.size();j<fl_size_j;j++){
+        i_neigh=h_facets[i_visible].f_neighbors[j];
+        if(h_facets[i_neigh].f_visited){continue;}
+        h_facets[i_neigh].f_visited=true;
+        if(h_facets[i_neigh].isPointOutside(h_facets[i_facet].f_furthest_point)){h_visible_facets.push_back(i_neigh);}
+      }
+      //there's no need to set i=0 for this loop (unlike the facets loop in calculateFacets()
+      //we iterate through neighbors, visiting only once
+      //the neighbors of a facet do not change here
+    }
+
+    if(LDEBUG) {
+      cerr << soliloquy << " visible facets for facet[" << i_facet << "]: ";
+      for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++){cerr << h_visible_facets[i] << " ";}
+      cerr << endl;
+    }
+  }
+
+  void ConvexHull::setHorizonRidges(){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setHorizonRidges():";
+    if(!h_visible_facets.size()){return;}
+    h_horizon_ridges.clear();
+    bool match;
+    for(uint i1=0,fl_size_i1=h_visible_facets.size();i1<fl_size_i1;i1++){
+      for(uint j1=0,fl_size_j1=h_facets[h_visible_facets[i1]].m_ridges.size();j1<fl_size_j1;j1++){
+        match=false;
+        for(uint i2=0,fl_size_i2=h_visible_facets.size();i2<fl_size_i2&&!match;i2++){
+          if(i1==i2){continue;}
+          for(uint j2=0,fl_size_j2=h_facets[h_visible_facets[i2]].m_ridges.size();j2<fl_size_j2&&!match;j2++){
+            if(h_facets[h_visible_facets[i1]].m_ridges[j1].getCHIndices()==h_facets[h_visible_facets[i2]].m_ridges[j2].getCHIndices()){
+              match=true;
+            }
+          }
+        }
+        if(!match){h_horizon_ridges.push_back(h_facets[h_visible_facets[i1]].m_ridges[j1]);}
+      }
+    }
+
+    if(LDEBUG) {
+      cerr << soliloquy << " horizon ridges: ";
+      for(uint i=0,fl_size_i=h_horizon_ridges.size();i<fl_size_i;i++){
+        for(uint j=0,fl_size_j=h_horizon_ridges[i].m_vertices.size();j<fl_size_j;j++){
+          cerr << h_horizon_ridges[i].m_vertices[j].ch_index << (j==h_horizon_ridges[i].m_vertices.size()-1?"":" ");
+        }
+        cerr << (i==h_horizon_ridges.size()-1?"":", ");
+      }
+      cerr << endl;
+    }
+  }
+
+  uint ConvexHull::createNewFacets(FacetPoint furthest_point){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::createNewFacets():";
+    if(furthest_point.ch_index>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index with furthest_point");}
+    uint old_facet_count=h_facets.size();
+    string error; //dummy so we don't recreate every time
+    for(uint i=0,fl_size_i=h_horizon_ridges.size();i<fl_size_i;i++){
+      //check obvious
+      if(h_horizon_ridges[i].isPointOnFacet(furthest_point)){
+        if(LDEBUG) {cerr << soliloquy << " skipping new facet: duplicate point" << endl;}
+        continue;
+      }
+      h_horizon_ridges[i].addVertex(furthest_point);
+      if(LDEBUG) {cerr << soliloquy << " furthest point for new facet: " << furthest_point.ch_index << " " << m_points[furthest_point.ch_index].h_coords << endl;}
+      if(!h_horizon_ridges[i].isValid(error)){  //corner case, happens when creating new facets on edges or corners of hull
+        if(LDEBUG) {cerr << soliloquy << " skipping new facet: " << error << endl;}
+        continue;
+      }
+      initializeFacet(h_horizon_ridges[i],false); //already validated
+      h_facets.push_back(h_horizon_ridges[i]);
+      if(LDEBUG) {
+        cerr << soliloquy << " new facet: ";
+        for(uint j=0,fl_size_j=h_facets.back().m_vertices.size();j<fl_size_j;j++){cerr << m_points[h_facets.back().m_vertices[j].ch_index].h_coords << " | ";}
+        cerr << endl;
+      }
+    }
+    if(LDEBUG) {cerr << soliloquy << " " << h_facets.size()-old_facet_count << " new facets" << endl;}
+    return h_facets.size()-old_facet_count;
+    //do neighbors at the end!
+  }
+
+  void ConvexHull::updateOutsideSet(uint new_facet_count){  //they are at the end of the list
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::updateOutsideSet():";
+    //we're deleting visible planes soon, so we need to reassess/reassign outside points
+    uint i_visible;
+    bool associated;
+    for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++){
+      i_visible=h_visible_facets[i];
+      for(uint j=0,fl_size_j=h_facets[i_visible].f_outside_set.size();j<fl_size_j;j++){
+        FacetPoint& f_point=h_facets[i_visible].f_outside_set[j];
+        associated=false;
+        if(LDEBUG) {cerr << soliloquy << " re-associating point[" << f_point.ch_index << "] with a new facet" << endl;}
+        for(uint fl_size_i_facet=h_facets.size(),i_facet=fl_size_i_facet-new_facet_count;i_facet<fl_size_i_facet&&!associated;i_facet++){
+          if(h_facets[i_facet].isPointOnFacet(f_point)){associated=true;} //skip the obvious
+          if(!associated && h_facets[i_facet].isPointOutside(f_point)){
+            h_facets[i_facet].f_outside_set.push_back(f_point);
+            associated=true;
+            if(LDEBUG) {cerr << soliloquy << " associating point[" << f_point.ch_index << "] with facet[" << i_facet << "].f_outside_set" << endl;}
+          }
+        }
+      }
+    }
+    for(uint fl_size_i_facet=h_facets.size(),i_facet=fl_size_i_facet-new_facet_count;i_facet<fl_size_i_facet;i_facet++){
+      if(LDEBUG) {cerr << soliloquy << " NEW facet[" << i_facet << "] has " << h_facets[i_facet].f_outside_set.size() << " outside points" << endl;}
+      h_facets[i_facet].setFurthestPoint();
+    }
+  }
+
+  void ConvexHull::deleteVisibleFacets() {
+    //sort in descending order because all indices above the point of deletion change
+    std::sort(h_visible_facets.rbegin(), h_visible_facets.rend());  //descending  //, std::greater<uint>());
+    for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++){h_facets.erase(h_facets.begin()+h_visible_facets[i]);}
+  }
+
+  void ConvexHull::removeDuplicateHullPoints() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::removeDuplicateHullPoints():";
+    std::sort(h_points.begin(),h_points.end());h_points.erase( std::unique( h_points.begin(), h_points.end() ), h_points.end() );  //first remove duplicate indices
+
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+    vector<uint> indices_2_remove;
+    for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
+      for(uint j=i+1,fl_size_j=h_points.size();j<fl_size_j;j++){
+        if(identical(m_points[h_points[i]].h_coords,m_points[h_points[j]].h_coords,ZERO_TOL)){
+          indices_2_remove.push_back(j);
+        }
+      }
+    }
+    if(LDEBUG) {
+      cerr << soliloquy << " removing points: ";
+      for(uint i=0,fl_size_i=indices_2_remove.size();i<fl_size_i;i++){cerr << indices_2_remove[i] << " ";}
+      cerr << endl;
+    }
+    std::sort(indices_2_remove.rbegin(),indices_2_remove.rend()); //descending
+    for(uint i=0,fl_size_i=indices_2_remove.size();i<fl_size_i;i++){h_points.erase(h_points.begin()+indices_2_remove[i]);}
+    if(LDEBUG) {cerr << soliloquy << " done" << endl;}
+  }
+
+  void ConvexHull::calculateFacets() {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    //only copy those possibly on the hull (does not include endpoints)
+    string soliloquy="ConvexHull::calculateFacets():";
+
+    h_facets.clear();
+    removeDuplicateHullPoints();
+    if(!h_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No points found on hull");}
+    h_dim=m_points[h_points[0]].h_coords.rows;
+
+    for(uint i=1,fl_size_i=h_points.size();i<fl_size_i;i++){
+      if((uint)m_points[h_points[i]].h_coords.rows!=h_dim){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid initialization of hull coordinates");}
+    }
+
+    if(LDEBUG) {
+      for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
+        cerr << soliloquy << " m_coords=" << m_points[h_points[i]].m_coords << "; h_coords=" << m_points[h_points[i]].h_coords << endl; //<< "; relevant " << m_points[h_points[i]].isRelevantPoint(elements_present) << endl;
+      }
+    }
+
+    //main loop START - see algorithm here: 10.1145/235815.235821
+    createInitializeSimplex();
+
+    uint new_facet_count;
+    //[CO190409 - size() must be recalculated for EVERY loop]for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++)
+    for(uint i_facet=0;i_facet<h_facets.size();i_facet++)
+    { //CO200106 - patching for auto-indenting
+      if(!h_facets[i_facet].f_outside_set.size()){continue;}  //the only way we exit this loop is if we continue for ALL facets
+      setVisibleFacets(i_facet);
+      setHorizonRidges();
+      new_facet_count=createNewFacets(h_facets[i_facet].f_furthest_point);
+      if(new_facet_count){
+        updateOutsideSet(new_facet_count);  //redistribute outside set among new facets (visible planes will go soon)
+        for(uint fl_size_i_facet=h_facets.size(),i_facet=fl_size_i_facet-new_facet_count;i_facet<fl_size_i_facet;i_facet++){h_facets[i_facet].setFurthestPoint();}  //get furthest points for new facets
+        deleteVisibleFacets();  //delete visible facets
+        setNeighbors();
+      }
+      i_facet=-1; //restart full loop!
+    }
+    //main loop END - see algorithm here: 10.1145/235815.235821
+
+    //resort points in facets with knowledge of normal
+    //if normal is pointed down, sort in descending order
+    bool sort_stoich_ascending;
+    for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
+      sort_stoich_ascending=!h_facets[i].m_in_lower_hemisphere;
+      std::sort(h_facets[i].m_vertices.begin(),h_facets[i].m_vertices.end(),
+          sortThermoPoints(sort_stoich_ascending,m_sort_energy_ascending));
+    }
+    std::sort(h_facets.begin(),h_facets.end(),sortFacetsByPoints(m_points));  //auto sort
+
+    if(LDEBUG) {
+      cerr << soliloquy << " hull points:" << endl;
+      for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){
+        cerr << soliloquy << " facet " << i_facet << ": ";
+        for(uint i=0,fl_size_i=h_facets[i_facet].m_vertices.size();i<fl_size_i;i++){
+          cerr << m_points[h_facets[i_facet].m_vertices[i].ch_index].h_coords << " - auid " << m_points[h_facets[i_facet].m_vertices[i].ch_index].m_entry.auid << " | ";
+        }
+        cerr << "normal " << h_facets[i_facet].m_normal << " | angles " << aurostd::getGeneralAngles(h_facets[i_facet].m_normal,ZERO_TOL) << endl;//<< " | x " << cos(h_facets[i_facet].m_angle) << " | y " << sin(h_facets[i_facet].m_angle)  << endl;
+      }
+    }
+  }
+
+  const xvector<int>& ConvexHull::getElementsPresent(uint i_nary,uint i_alloy) const {
+    string soliloquy="ConvexHull::setElementsPresent():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    return m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
+  }
+
+  void ConvexHull::setElementsPresent(uint i_nary,uint i_alloy){m_elements_present=getElementsPresent(i_nary,i_alloy);}
+
+  void ConvexHull::addRelevantUnariesToHullCalculation(uint i_nary,uint i_alloy) {
+    string soliloquy="ConvexHull::addRelevantUnariesToHullCalculation():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    return addRelevantUnariesToHullCalculation(m_naries[i_nary].m_alloys[i_alloy].m_elements_present);
+  }
+
+  void ConvexHull::addRelevantUnariesToHullCalculation(xvector<int>& elements_present) {
+    string soliloquy="ConvexHull::addRelevantUnariesToHullCalculation():";
+    uint i_nary=0;
+    if((uint)elements_present.rows!=m_naries[i_nary].m_alloys.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unary alloy is missing from m_naries");}
+    uint i_coord_group,i_point;
+    for(int i_alloy=elements_present.lrows;i_alloy<=elements_present.urows;i_alloy++){
+      if(elements_present[i_alloy]==1){
+        if(m_naries[i_nary].m_alloys[i_alloy-elements_present.lrows].m_coord_groups.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected count of coordgroups for unaries, should only be 1");}
+        i_coord_group=m_naries[i_nary].m_alloys[i_alloy-elements_present.lrows].m_coord_groups[0];
+        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_candidate_hull_points.size();i<fl_size_i;i++){
+          i_point=m_coord_groups[i_coord_group].m_candidate_hull_points[i];
+          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+          addPointToHullCalculation(i_point,elements_present);
+        }
+      }
+    }
+  }
+
+  void ConvexHull::addLowerDimensionPointsToHullCalculation(uint i_nary_max){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::addLowerDimensionPointsToHullCalculation():";
+    if(i_nary_max>m_naries.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+    //grab from m_naries[i_nary].m_alloys[i_alloy].m_facets
+    //we already added unaries, so there will be duplicates, but we safely remove in calculateFacets()
+    //don't worry about this yet
+    uint i_point=AUROSTD_MAX_UINT,i_facet=AUROSTD_MAX_UINT;
+    for(uint i_nary=1;i_nary<i_nary_max;i_nary++){
+      if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+      for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+        if(m_naries[i_nary].m_alloys[i_alloy].belongs2Hull(m_elements_present)){
+          for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_facets.size();i<fl_size_i;i++){
+            i_facet=m_naries[i_nary].m_alloys[i_alloy].m_facets[i];
+            if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
+            const ChullFacet& facet=m_facets[i_facet];
+            for(uint j=0,fl_size_j=facet.m_vertices.size();j<fl_size_j;j++){
+              i_point=facet.m_vertices[j].ch_index;
+              addPointToHullCalculation(i_point,m_elements_present); //this is hull specific, and set with setElementsPresent()
+            }
+          }
+        }
+      }
+    }
+    if(LDEBUG) {cerr << soliloquy << " done" << endl;}
+  }
+
+  void ConvexHull::addPointToHullCalculation(uint i_point){
+    string soliloquy="ConvexHull::addPointToHullCalculation():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    h_points.push_back(i_point);
+    m_points[i_point].setHullCoords();
+  }
+
+  void ConvexHull::addPointToHullCalculation(uint i_point,xvector<int>& elements_present){
+    string soliloquy="ConvexHull::addPointToHullCalculation():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    h_points.push_back(i_point);
+    m_points[i_point].setHullCoords(elements_present);
+  }
+
+  void ConvexHull::preparePointsForHullCalculation(uint i_nary,uint i_alloy) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::preparePointsForHullCalculation():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+    h_points.clear();
+    addRelevantUnariesToHullCalculation(i_nary,i_alloy);
+    addLowerDimensionPointsToHullCalculation(i_nary); //don't worry about adding unary duplicates, we remove them robustly in calculateFacets()
+    uint i_coord_group,i_point;
+    for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
+      i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
+      if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+      for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_candidate_hull_points.size();j<fl_size_j;j++){
+        i_point=m_coord_groups[i_coord_group].m_candidate_hull_points[j];
+        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+        addPointToHullCalculation(i_point,m_naries[i_nary].m_alloys[i_alloy].m_elements_present);
+      }
+    }
+    if(LDEBUG) {cerr << soliloquy << " done" << endl;}
+  }
+
+  void ConvexHull::preparePointsForHullCalculation() {
+    string soliloquy="ConvexHull::preparePointsForHullCalculation():";
+    h_points.clear();
+    //we already checked extremes in last (energy) direction, just add these to the hull
+    //don't include those points in between
+    uint i_point=AUROSTD_MAX_UINT;
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+      for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_candidate_hull_points.size();i<fl_size_i;i++){
+        i_point=m_coord_groups[i_coord_group].m_candidate_hull_points[i];
+        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+        addPointToHullCalculation(i_point);
+      }
+    }
+  }
+
+  uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const ChullPoint& point) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getNearestFacetVertically():";
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    if(LDEBUG) {cerr << soliloquy << " m_coords=" << point.m_coords << ", h_coords=" << point.h_coords << endl;}
+    return getNearestFacetVertically(i_facets,point.h_coords);
+  }
+
+  uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const xvector<double>& point) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    //determines nearness by vertical distance
+    string soliloquy="ConvexHull::getNearestFacetVertically():";
+    uint i_facet,i_facet_min;
+    uint i_facet_artificial=-1; //really large uint
+    double vdist,dist=AUROSTD_MAX_DOUBLE;
+    for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
+      i_facet=i_facets[i];
+      if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
+      const ChullFacet& facet=m_facets[i_facet];
+      if(!facet.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet not initialized");}
+      if(facet.m_hypercollinear){continue;}
+      if(facet.m_is_vertical){continue;}
+      if(facet.m_is_artificial){
+        i_facet_artificial=i_facet;
+        continue;
+      }
+      if(LDEBUG) {cerr << soliloquy << " looking at facet[" << i_facet << "]" << endl;}
+      vdist=abs(facet.getSignedVerticalDistanceToZero(point));  //abs, //(repetita iuvant)
+      if(vdist<dist){
+        i_facet_min=i_facet;
+        dist=vdist;
+      }
+    }
+    //safety, return artificial facet if no other facets available
+    if(dist==AUROSTD_MAX_DOUBLE){
+      if(i_facet_artificial>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No nearest facet found");}
+      return i_facet_artificial;
+    }
+    return i_facet_min;
+  }
+
+  const vector<uint>& ConvexHull::getRelevantFacets(uint i_nary,uint i_alloy) const {
+    string soliloquy="ConvexHull::getRelevantFacets():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+
+    if(i_nary==0){  //unaries are special case
+      //try m_facets, otherwise start from top and go down
+      if(m_i_facets.size()){return m_i_facets;}
+      for(uint fl_size_i_nary=m_naries.size(),i_nary=fl_size_i_nary-1;i_nary<fl_size_i_nary;i_nary--){
+        for(uint fl_size_i_alloy=m_naries[i_nary].m_alloys.size(),i_alloy=fl_size_i_alloy-1;i_alloy<=fl_size_i_alloy;i_alloy--){
           if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()){return m_naries[i_nary].m_alloys[i_alloy].m_facets;}
         }
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facets not calculated");
       }
+    } else {
+      if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()){return m_naries[i_nary].m_alloys[i_alloy].m_facets;}
+    }
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facets not calculated");
+  }
 
-      void ConvexHull::setHullMembers() {return setHullMembers(m_i_facets);}
-      void ConvexHull::setHullMembers(uint i_nary,uint i_alloy) {
-        string soliloquy="ConvexHull::setHullMembers():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        const vector<uint>& i_facets=getRelevantFacets(i_nary,i_alloy);//m_naries[i_nary].m_alloys[i_alloy].m_facets;
-        return setHullMembers(i_facets);
+  void ConvexHull::setHullMembers() {return setHullMembers(m_i_facets);}
+  void ConvexHull::setHullMembers(uint i_nary,uint i_alloy) {
+    string soliloquy="ConvexHull::setHullMembers():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    const vector<uint>& i_facets=getRelevantFacets(i_nary,i_alloy);//m_naries[i_nary].m_alloys[i_alloy].m_facets;
+    return setHullMembers(i_facets);
+  }
+
+  void ConvexHull::setHullMembers(const vector<uint>& i_facets) {
+    string soliloquy="ConvexHull::setHullMembers():";
+    if(!i_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
+    uint i_point=AUROSTD_MAX_UINT,g_state=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT,i_facet=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
+      i_facet=i_facets[i];
+      if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
+      for(uint j=0,fl_size_j=m_facets[i_facet].m_vertices.size();j<fl_size_j;j++){
+        i_point=m_facets[i_facet].m_vertices[j].ch_index;
+        if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+        //hull member == yes
+        m_points[i_point].m_is_on_hull=true;
+        m_coord_groups[i_coord_group].m_is_on_hull=true;
+        if(m_thermo_hull){m_coord_groups[i_coord_group].m_hull_member=i_point;}  //very safe, only one hull-member per coordgroup
+        //g-state == if not artificial point
+        g_state=artificialMap(i_point);
+        if(!m_points[g_state].m_is_artificial){m_points[g_state].m_is_g_state=true;}
       }
+    }
+  }
 
-      void ConvexHull::setHullMembers(const vector<uint>& i_facets) {
-        string soliloquy="ConvexHull::setHullMembers():";
-        if(!i_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
-        uint i_point=AUROSTD_MAX_UINT,g_state=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT,i_facet=AUROSTD_MAX_UINT;
-        for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
-          i_facet=i_facets[i];
-          if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
-          for(uint j=0,fl_size_j=m_facets[i_facet].m_vertices.size();j<fl_size_j;j++){
-            i_point=m_facets[i_facet].m_vertices[j].ch_index;
-            if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-            //hull member == yes
-            m_points[i_point].m_is_on_hull=true;
-            m_coord_groups[i_coord_group].m_is_on_hull=true;
-            if(m_thermo_hull){m_coord_groups[i_coord_group].m_hull_member=i_point;}  //very safe, only one hull-member per coordgroup
-            //g-state == if not artificial point
-            g_state=artificialMap(i_point);
-            if(!m_points[g_state].m_is_artificial){m_points[g_state].m_is_g_state=true;}
-          }
-        }
-      }
+  void ConvexHull::setNearestFacet(uint i_nary,uint i_alloy,uint i_coord_group){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setNearestFacet():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
+    if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
 
-      void ConvexHull::setNearestFacet(uint i_nary,uint i_alloy,uint i_coord_group){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setNearestFacet():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-        if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
-        if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+    uint i_point=m_coord_groups[i_coord_group].m_points[0];
+    if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+    ChullPoint& point=m_points[i_point];
+    //it's possible that h_coords has not been set (we only do it to points that make it to hull calc)
+    //so set again (repetita iuvant)
+    xvector<int>& elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
+    point.setHullCoords(elements_present);
+    const vector<uint>& i_facets=getRelevantFacets(i_nary,i_alloy);//m_naries[i_nary].m_alloys[i_alloy].m_facets;
+    uint i_facet=getNearestFacetVertically(i_facets,point);
+    m_coord_groups[i_coord_group].m_nearest_facet=i_facet;
+    if(LDEBUG) {
+      cerr << soliloquy << " nearest_facet[i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_coord_group=" << i_coord_group;
+      cerr << "]=" << m_coord_groups[i_coord_group].m_nearest_facet << endl;
+    }
+  }
 
-        uint i_point=m_coord_groups[i_coord_group].m_points[0];
-        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-        ChullPoint& point=m_points[i_point];
-        //it's possible that h_coords has not been set (we only do it to points that make it to hull calc)
-        //so set again (repetita iuvant)
-        xvector<int>& elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
-        point.setHullCoords(elements_present);
-        const vector<uint>& i_facets=getRelevantFacets(i_nary,i_alloy);//m_naries[i_nary].m_alloys[i_alloy].m_facets;
-        uint i_facet=getNearestFacetVertically(i_facets,point);
-        m_coord_groups[i_coord_group].m_nearest_facet=i_facet;
-        if(LDEBUG) {
-          cerr << soliloquy << " nearest_facet[i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_coord_group=" << i_coord_group;
-          cerr << "]=" << m_coord_groups[i_coord_group].m_nearest_facet << endl;
-        }
-      }
+  double ConvexHull::getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,uint i_point) const {
+    string soliloquy="ConvexHull::getSignedVerticalDistanceWithinCoordGroup():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    return getSignedVerticalDistanceWithinCoordGroup(i_coord_group,m_points[i_point]);
+  }
 
-      double ConvexHull::getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,uint i_point) const {
-        string soliloquy="ConvexHull::getSignedVerticalDistanceWithinCoordGroup():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        return getSignedVerticalDistanceWithinCoordGroup(i_coord_group,m_points[i_point]);
-      }
+  double ConvexHull::getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,const ChullPoint& point) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getSignedVerticalDistanceWithinCoordGroup():";
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+    if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    xvector<double> r_coords=point.getStoichiometricCoords();
+    if(!identical(m_coord_groups[i_coord_group].m_coords,r_coords,ZERO_TOL)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point does not belong to coordgroup");}
 
-      double ConvexHull::getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,const ChullPoint& point) const {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getSignedVerticalDistanceWithinCoordGroup():";
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-        if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        xvector<double> r_coords=point.getStoichiometricCoords();
-        if(!identical(m_coord_groups[i_coord_group].m_coords,r_coords,ZERO_TOL)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point does not belong to coordgroup");}
+    uint ref_point=artificialMap(m_coord_groups[i_coord_group].m_points[0]);  //don't need to set distance for artificial point, re-scale to this point
+    if(!isViablePoint(ref_point)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup contains invalid point");}
+    double ref_dist=0.0;
+    //if(m_coord_groups[i_coord_group].m_is_on_hull){ //just a check //bad check, doesn't apply to unaries
+    //if(!m_points[ref_point].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is on the hull, but hull point not found");}  //not the case for unaries
+    //} else {  //[CO200106 - close bracket for indenting]}
+    if(!m_coord_groups[i_coord_group].m_is_on_hull){
+      uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
+      if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
+      ref_dist=m_facets[i_facet].getSignedVerticalDistance(m_points[ref_point]);  //signed distance
+      //DO NOT CHECK SIGN OF VERTICAL DISTANCE, WE USE THIS FUNCTION FOR STABILITY CRITERION
+      //if(m_half_hull){  //tests of stupidity
+      //  //do not use signbit, add tol to zero (precision)
+      //  //sign of distance:
+      //  //independent of lower/upper hull:  above hull is negative, below hull is positive
+      //  bool should_be_positive=!m_lower_hull;
+      //  bool correct_sign_vertical_distance=chull::correctSignVerticalDistance(ref_dist,should_be_positive);
+      //  if( m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(lower half hull) found point BELOW hull (entry="+m_points[ref_point].m_entry.auid+",dist2Hull="+aurostd::utype2string(ref_dist,4)+")");}
+      //  if(!m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(upper half hull) found point ABOVE hull (entry="+m_points[ref_point].m_entry.auid+",dist2Hull="+aurostd::utype2string(ref_dist,4)+")");}
+      //}
+    }
+    double delta=(point.getLastCoord()-m_points[ref_point].getLastCoord());
+    double dist=ref_dist-delta;
+    if(LDEBUG) {
+      cerr << soliloquy << " point.m_entry.auid=" << point.m_entry.auid << endl;
+      cerr << soliloquy << " m_points[ref_point].m_entry.auid=" << m_points[ref_point].m_entry.auid << endl;
+      cerr << soliloquy << " point.m_entry.prototype=" << point.m_entry.prototype << endl;
+      cerr << soliloquy << " m_points[ref_point].m_entry.prototype=" << m_points[ref_point].m_entry.prototype << endl;
+      cerr << soliloquy << " point.m_coords=" << point.m_coords << endl;
+      cerr << soliloquy << " m_points[ref_point].m_coords=" << m_points[ref_point].m_coords << endl;
+      cerr << soliloquy << " ref_dist=" << ref_dist << endl;
+      cerr << soliloquy << " delta=" << delta << endl;
+      cerr << soliloquy << " dist=" << dist << endl;
+    }
+    return dist;
+  }
 
-        uint ref_point=artificialMap(m_coord_groups[i_coord_group].m_points[0]);  //don't need to set distance for artificial point, re-scale to this point
-        if(!isViablePoint(ref_point)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup contains invalid point");}
-        double ref_dist=0.0;
-        //if(m_coord_groups[i_coord_group].m_is_on_hull){ //just a check //bad check, doesn't apply to unaries
-        //if(!m_points[ref_point].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is on the hull, but hull point not found");}  //not the case for unaries
-        //} else {
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){
-          uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
-          if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
-          ref_dist=m_facets[i_facet].getSignedVerticalDistance(m_points[ref_point]);  //signed distance
-          //DO NOT CHECK SIGN OF VERTICAL DISTANCE, WE USE THIS FUNCTION FOR STABILITY CRITERION
-          //if(m_half_hull){  //tests of stupidity
-          //  //do not use signbit, add tol to zero (precision)
-          //  //sign of distance:
-          //  //independent of lower/upper hull:  above hull is negative, below hull is positive
-          //  bool should_be_positive=!m_lower_hull;
-          //  bool correct_sign_vertical_distance=chull::correctSignVerticalDistance(ref_dist,should_be_positive);
-          //  if( m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(lower half hull) found point BELOW hull (entry="+m_points[ref_point].m_entry.auid+",dist2Hull="+aurostd::utype2string(ref_dist,4)+")");}
-          //  if(!m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(upper half hull) found point ABOVE hull (entry="+m_points[ref_point].m_entry.auid+",dist2Hull="+aurostd::utype2string(ref_dist,4)+")");}
-          //}
-        }
-        double delta=(point.getLastCoord()-m_points[ref_point].getLastCoord());
-        double dist=ref_dist-delta;
-        if(LDEBUG) {
-          cerr << soliloquy << " point.m_entry.auid=" << point.m_entry.auid << endl;
-          cerr << soliloquy << " m_points[ref_point].m_entry.auid=" << m_points[ref_point].m_entry.auid << endl;
-          cerr << soliloquy << " point.m_entry.prototype=" << point.m_entry.prototype << endl;
-          cerr << soliloquy << " m_points[ref_point].m_entry.prototype=" << m_points[ref_point].m_entry.prototype << endl;
-          cerr << soliloquy << " point.m_coords=" << point.m_coords << endl;
-          cerr << soliloquy << " m_points[ref_point].m_coords=" << m_points[ref_point].m_coords << endl;
-          cerr << soliloquy << " ref_dist=" << ref_dist << endl;
-          cerr << soliloquy << " delta=" << delta << endl;
-          cerr << soliloquy << " dist=" << dist << endl;
-        }
+  double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const{
+    string soliloquy="ConvexHull::getDistanceToHull():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    return getDistanceToHull(m_points[i_point],redo,get_signed_distance);
+  }
+
+  double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo,bool get_signed_distance) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getDistanceToHull():";
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    //const vector<uint>& i_facets=m_i_facets;
+    double dist;
+    if(!redo){
+      if(LDEBUG) {cerr << soliloquy << " attempting to find coordgroup for fast distance calculation" << endl;}
+      uint i_coord_group=AUROSTD_MAX_UINT;
+      //only if the distances have already been found for all points, and we can identify the coordgroup (point may legitimately be outside)
+      //the redo in the getCoordGroupIndex() is VERY safe, so let's keep it
+      if(getCoordGroupIndex(point,i_coord_group,true)){
+        if(LDEBUG) {cerr << soliloquy << " found coordgroup[" << i_coord_group << "] (coords=" << m_coord_groups[i_coord_group].m_coords << ")" << endl;}
+        dist=getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point);
+        if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
+        if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
         return dist;
       }
-
-      double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const{
-        string soliloquy="ConvexHull::getDistanceToHull():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        return getDistanceToHull(m_points[i_point],redo,get_signed_distance);
-      }
-
-      double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo,bool get_signed_distance) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getDistanceToHull():";
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        //const vector<uint>& i_facets=m_i_facets;
-        double dist;
-        if(!redo){
-          if(LDEBUG) {cerr << soliloquy << " attempting to find coordgroup for fast distance calculation" << endl;}
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          //only if the distances have already been found for all points, and we can identify the coordgroup (point may legitimately be outside)
-          //the redo in the getCoordGroupIndex() is VERY safe, so let's keep it
-          if(getCoordGroupIndex(point,i_coord_group,true)){
-            if(LDEBUG) {cerr << soliloquy << " found coordgroup[" << i_coord_group << "] (coords=" << m_coord_groups[i_coord_group].m_coords << ")" << endl;}
-            dist=getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point);
-            if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
-            if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
-            return dist;
-          }
-          //  uint ref_point=m_coord_groups[i_coord_group].m_ref_state;
-          //  if(LDEBUG) {cerr << soliloquy << " preliminarily setting ref_point=" << ref_point << endl;}
-          //  double dist=AUROSTD_NAN;
-          //  if(isViablePoint(ref_point)){dist=m_points[ref_point].getDist2Hull(_std_);}
-          //  else {
-          //    if(m_coord_groups[i_coord_group].m_is_on_hull){
-          //      ref_point=m_coord_groups[i_coord_group].m_points[0];
-          //      if(isViablePoint(ref_point) && m_points[ref_point].m_is_on_hull){dist=0.0;} //some safety checks, but ultimately set to 0
-          //    }
-          //  }
-          //  if(LDEBUG) {
-          //    cerr << soliloquy << " m_points[ref_point=" << ref_point << "].m_coords=";
-          //    for(int i=m_points[ref_point].m_coords.lrows;i<=m_points[ref_point].m_coords.urows;i++){cerr << m_points[ref_point].m_coords[i] << " ";}
-          //    cerr << endl;
-          //    cerr << soliloquy << " dist of ref_point = " << dist << endl;
-          //  }
-          //  if(!m_points[ref_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-          //  if(dist<AUROSTD_NAN){ //safety
-          //    double delta=(m_points[ref_point].getLastCoord()-point.getLastCoord());
-          //    if(LDEBUG) {
-          //      cerr << soliloquy << " delta = " << delta << endl;
-          //      cerr << soliloquy << " dist+delta = " << dist+delta << endl;
-          //      cerr << soliloquy << " dist-delta = " << dist-delta << endl;
-          //      cerr << soliloquy << " delta-dist = " << delta-dist << endl;
-          //    }
-          //    if(LDEBUG) {cerr << soliloquy << " getSignedVerticalDistanceWithinCoordGroup()=" << getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point) << endl;}
-          //    return delta-dist;
-          //  }
-          //}
-      }
-      vector<uint> i_facets=m_i_facets;
-      //if we have stoich_coords, we need to find relevant facets
-      if(m_has_stoich_coords){
-        if(LDEBUG) {cerr << soliloquy << " stoich_coords detected, trying to find relevant facets" << endl;}
-        uint i_nary,i_alloy;
-        if(!getAlloyIndex(point,i_nary,i_alloy)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot get alloys index");}
-        if(i_nary==0){  //unaries are special cases, they RARELY work with normal getSignedVerticalDistance()
-          if(LDEBUG) {cerr << soliloquy << " found unary, need to use coordgroup to find distance (rarely works with normal getSignedVerticalDistance()" << endl;}
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find unary coordgroup");}
-          dist=getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point);
-          if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
-          if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
-          return dist;
-        }
-        i_facets=getRelevantFacets(i_nary,i_alloy);
-      } else {if(LDEBUG) {cerr << soliloquy << " searching through ALL facets for closet vertical distance" << endl;}}
-      //otherwise, all facets are relevant (same dimension)
-      uint i_facet=getNearestFacetVertically(i_facets,point);
-      dist=m_facets[i_facet].getSignedVerticalDistance(point);
-      if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
-      if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
-      return dist;
-      }
-
-      vector<double> ConvexHull::getDistancesToHull(const vector<string>& vauid,bool redo) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getDistancesToHull():";
-        stringstream message;
-        vector<double> vdist2hull;
-        uint i_point=AUROSTD_MAX_UINT;
-        for(uint i=0,fl_size_i=vauid.size();i<fl_size_i;i++){
-          const string& auid=vauid[i];
-          if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-          if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-          if(LDEBUG) {cerr << soliloquy << " grabbing distance to hull for i_point=" << i_point << endl;}
-          vdist2hull.push_back(getDistanceToHull(i_point,redo));
-        }
-        return vdist2hull;
-      }
-
-      bool ConvexHull::hullDistanceExtractionRequired() const {
-        if(thermoPropertiesExtractionRequired()){return true;}  //dependency
-        if(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&(m_cflags.flag("CHULL::LATEX_DOC")||m_cflags.flag("CHULL::PNG_IMAGE"))){
-          aurostd::xoption lflags=resolvePlotLabelSettings();
-          bool meta_labels=lflags.flag("CHULL::PLOT_META_LABELS");
-          bool labels_off_hull=lflags.flag("CHULL::PLOT_LABELS_OFF_HULL");
-          if(meta_labels&&labels_off_hull){return true;}  //need distances to hull here
-          bool no_doc=m_cflags.flag("CHULL::NO_DOC");
-          if(no_doc){return false;}
-          bool image_only=m_cflags.flag("CHULL::IMAGE_ONLY");
-          if(image_only){return false;}
-        }
-        return true;
-      }
-
-      bool ConvexHull::thermoPropertiesExtractionRequired() const {
-        if(thermoPostProcessingExtractionRequired()){return true;}  //dependency
-        if(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&(m_cflags.flag("CHULL::LATEX_DOC")||m_cflags.flag("CHULL::PNG_IMAGE"))){
-          aurostd::xoption lflags=resolvePlotLabelSettings();
-          bool icsd_labels=lflags.flag("CHULL::PLOT_ICSD_LABELS");
-          if(icsd_labels){return true;}
-          bool no_doc=m_cflags.flag("CHULL::NO_DOC");
-          if(no_doc){return false;}
-          bool image_only=m_cflags.flag("CHULL::IMAGE_ONLY");
-          if(image_only){return false;}
-        }
-        return true;
-      }
-
-      bool ConvexHull::thermoPostProcessingExtractionRequired() const {
-        if(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&(m_cflags.flag("CHULL::LATEX_DOC")||m_cflags.flag("CHULL::PNG_IMAGE"))){
-          bool no_doc=m_cflags.flag("CHULL::NO_DOC");
-          if(no_doc){return false;}
-          bool image_only=m_cflags.flag("CHULL::IMAGE_ONLY");
-          if(image_only){return false;}
-        }
-        return true;
-      }
-
-      void ConvexHull::setDistancesToHull(uint i_nary,uint i_alloy) {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setDistancesToHull():";
-        stringstream message;
-        if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-
-        bool perform_hull_distance_calculation=(1&&hullDistanceExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_HULL_DISTANCE_CALCULATION"))); //(1&&!(m_cflags.flag("CHULL::SKIP_HULL_DISTANCE_CALCULATION")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
-        if(!perform_hull_distance_calculation){return;}
-
-        message << "Gathering hull distance data for";
-        if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-        message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
-          i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
-          if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
-          if(!m_coord_groups[i_coord_group].m_initialized){continue;}
-          if(LDEBUG) {cerr << soliloquy << " looking at i_coord_group=" << i_coord_group << endl;}
-          if(!m_coord_groups[i_coord_group].m_is_on_hull){setNearestFacet(i_nary,i_alloy,i_coord_group);} //only off-hull need nearest facets
-          setDistancesToHull(i_nary,i_alloy,i_coord_group);
-        }
-      }
-
-      void ConvexHull::setDistancesToHull(uint i_nary,uint i_alloy,uint i_coord_group) {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setDistancesToHull():";
-        if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-        if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
-        if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-
-        uint i_point=m_coord_groups[i_coord_group].m_points[0];
-        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-        i_point=artificialMap(i_point); //don't need to set distance for artificial point, re-scale to this point
-        ChullPoint& point=m_points[i_point];
-        double dist_2_hull=0.0;
-        bool check_dist_2_hull=false;
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){ //off-hull, this is the reason it works for unaries, unaries coordgroup are declared ON-HULL, so dist==0 automatically
-          uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
-          dist_2_hull=m_facets[i_facet].getSignedVerticalDistance(point);  //do this "expensive" calculation only once, others are simply z-scaled
-          if(LDEBUG) {
-            cerr << soliloquy << " dist[coord=" << point.h_coords << "]=" << dist_2_hull << endl;
-            if(check_dist_2_hull){
-              cerr << soliloquy << " comparing fast dist calculation = "  << dist_2_hull;
-              cerr << " vs. slow dist calculation =" << getDistanceToHull(point) << endl;
-            }
-          }
-          if(m_half_hull){  //tests of stupidity
-            //do not use signbit, add tol to zero (precision)
-            //sign of distance:
-            //independent of lower/upper hull:  above hull is negative, below hull is positive
-            bool should_be_positive=!m_lower_hull;
-            bool correct_sign_vertical_distance=chull::correctSignVerticalDistance(dist_2_hull,should_be_positive);
-            if( m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(lower half hull) found point BELOW hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
-            if(!m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
-            //[OBSOLETE CO 180828]if(m_lower_hull){
-            //[OBSOLETE CO 180828]  if(notNegative(dist_2_hull,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(lower half hull) found point BELOW hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
-            //[OBSOLETE CO 180828]} else {
-            //[OBSOLETE CO 180828]  if(notPositive(dist_2_hull,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
-            //[OBSOLETE CO 180828]}
-          }
-        }
-        //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
-        //by convention, distances inside hull are NEGATIVE, following the reaction equation (spontaneous decomposition)
-        //which we just checked is the case, so force negative
-        //dist_2_hull=-abs(dist_2_hull); //force positive, the value is what we care about now
-        //[OBSOLETE CO 180828]point.m_dist_2_hull=m_coord_groups[i_coord_group].m_nearest_distance=dist_2_hull;
-        point.m_dist_2_hull=m_coord_groups[i_coord_group].m_nearest_distance=abs(dist_2_hull);
-        if(LDEBUG) {cerr << soliloquy << " |dist|=" << point.m_dist_2_hull << endl;}
-        uint j_point;
-        for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_points.size();j<fl_size_j;j++){
-          j_point=m_coord_groups[i_coord_group].m_points[j];
-          j_point=artificialMap(j_point); //don't need to set distance for artificial point, re-scale to this point
-          m_points[j_point].m_dist_2_hull=point.m_dist_2_hull;
-          //[OBSOLETE CO 180828]if(i_point!=j_point){m_points[j_point].m_dist_2_hull+=(point.getLastCoord()-m_points[j_point].getLastCoord());}  //simply ADD difference
-          if(i_point!=j_point){m_points[j_point].m_dist_2_hull+=abs(point.getLastCoord() - m_points[j_point].getLastCoord());}  //simply ADD difference
-          //it's possible that h_coords has not been set (we only do it to points that make it to hull calc)
-          //so set again (repetita iuvant)
-          if(LDEBUG) {
-            xvector<int>& elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
-            m_points[j_point].setHullCoords(elements_present);
-            cerr << soliloquy << " dist[coord=" << m_points[j_point].h_coords << "]=" << m_points[j_point].m_dist_2_hull << endl;
-          }
-        }
-      }
-
-      vector<uint> ConvexHull::extractDecompositionPhases(const ChullFacet& facet) const{
-        string soliloquy="ConvexHull::extractDecompositionPhases():";
-        uint i_point=AUROSTD_MAX_UINT;
-        vector<uint> decomp_phases;
-        for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
-          i_point=facet.m_vertices[i].ch_index;
-          decomp_phases.push_back(i_point);
-        }
-        if(decomp_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition phases found");}
-        std::sort(decomp_phases.begin(),
-            decomp_phases.end(),
-            sortCHullPoints(m_points,false,true)); //stoich sorting should be descending, energy sorting default okay here
-        return decomp_phases;
-      }
-
-      vector<uint> ConvexHull::getDecompositionPhases(uint i_point) const{
-        string soliloquy="ConvexHull::getDecompositionPhases():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        return getDecompositionPhases(m_points[i_point]);
-      }
-
-      vector<uint> ConvexHull::getDecompositionPhases(const ChullPoint& point) const{
-        string soliloquy="ConvexHull::getDecompositionPhases():";
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
-        uint i_facet=AUROSTD_MAX_UINT;
-        //polymorph possibility, other reductions in dimensionality are prescribed with the coefficients
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
-        if(found_coord_group){  //composition has already been considered by hull, might be g-state
-          if(m_coord_groups[i_coord_group].m_is_on_hull){
-            vector<uint> dcomp_phases;
-            dcomp_phases.push_back(m_coord_groups[i_coord_group].m_ref_state);
-            return dcomp_phases;
-          }
-          i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
-        }
-        vector<uint> i_facets=m_i_facets;  //default, most broad  //make a copy so we can reset if m_has_stoich_coords, don't worry, only vector<uint> (pointers essentially)
-        if(m_has_stoich_coords){
-          uint i_nary,i_alloy;
-          if(!getAlloyIndex(point,i_nary,i_alloy)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot get alloys index");}
-          i_facets=getRelevantFacets(i_nary,i_alloy);
-        }
-        if(!found_coord_group||(i_facet>m_facets.size()-1)){i_facet=getNearestFacetVertically(i_facets,point);}
-        return extractDecompositionPhases(m_facets[i_facet]);
-      }
-
-      void ConvexHull::setDecompositionPhases(uint i_nary,uint i_alloy,uint i_coord_group){
-        string soliloquy="ConvexHull::setDecompositionPhases():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-        if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
-        if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
-
-        uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
-        ChullFacet& facet=m_facets[i_facet];
-        m_coord_groups[i_coord_group].m_decomp_phases=extractDecompositionPhases(facet);
-      }
-
-      xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,vector_reduction_type vred) const{
-        string soliloquy="ConvexHull::getDecompositionCoefficients():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        return getDecompositionCoefficients(m_points[i_point],vred);
-      }
-
-      xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred) const{
-        string soliloquy="ConvexHull::getDecompositionCoefficients():";
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
-        if(found_coord_group){  //composition has already been considered by hull, might be g-state
-          if(m_coord_groups[i_coord_group].m_is_on_hull){
-            xvector<double> dcomp_coefs(2);
-            dcomp_coefs[dcomp_coefs.lrows]=dcomp_coefs[dcomp_coefs.lrows+1]=1.0;
-            return dcomp_coefs;
-          }
-          if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
-            return getDecompositionCoefficients(point,m_coord_groups[i_coord_group].m_decomp_phases,vred);
-          }
-        }
-        return getDecompositionCoefficients(point,getDecompositionPhases(point),vred);
-      }
-
-      xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
-        string soliloquy="ConvexHull::getDecompositionCoefficients():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        return getDecompositionCoefficients(m_points[i_point],decomp_phases,vred);
-      }
-
-      xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
-        string soliloquy="ConvexHull::getDecompositionCoefficients():";
-        //do m_coords_group first (REDUCED)
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        if(!decomp_phases.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition phases found");}
-        if(decomp_phases.size()==1){  //probably polymorph
-          uint i_point_other=decomp_phases[0];
-          if(!isViablePoint(i_point_other)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Index to decomposition phase not found");}
-          const ChullPoint& point_other=m_points[i_point_other];
-          uint i_coord_group=AUROSTD_MAX_UINT,i_coord_group_other=AUROSTD_MAX_UINT;
-          bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
-          bool found_coord_group_other=getCoordGroupIndex(point_other,i_coord_group_other);
-          if(found_coord_group&&found_coord_group_other&&i_coord_group==i_coord_group_other){ //definitely polymorph
-            xvector<double> dcomp_coefs(2);
-            dcomp_coefs[dcomp_coefs.lrows]=dcomp_coefs[dcomp_coefs.lrows+1]=1.0;
-            return dcomp_coefs;
-          }
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not enough decomposition phases provided");
-        }
-        vector<xvector<double> > lhs,rhs;
-        //lhs
-        lhs.push_back(point.getTruncatedReducedCoords(m_elements_present,vred));
-        //rhs
-        for(uint i=0,fl_size_i=decomp_phases.size();i<fl_size_i;i++){
-          if(decomp_phases[i]>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-          if(!m_points[decomp_phases[i]].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-          rhs.push_back(m_points[decomp_phases[i]].getTruncatedReducedCoords(m_elements_present,vred));
-        }
-        xvector<double> coef=balanceChemicalEquation(lhs,rhs,true,ZERO_TOL);  //normalize
-        //aurostd::shiftlrows(coef,0);
-        return coef;
-      }
-
-      void ConvexHull::setDecompositionCoefficients(uint i_nary,uint i_alloy,uint i_coord_group){
-        string soliloquy="ConvexHull::setDecompositionCoefficients():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-        if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
-        if(m_coord_groups[i_coord_group].m_decomp_phases.size()==0){setDecompositionPhases(i_nary,i_alloy,i_coord_group);}
-
-        //we get different coefficients between stoich and composition
-        //ALWAYS use composition (even POCC, simply won't reduce), and do NOT mix stoich + composition
-        uint i_point=m_coord_groups[i_coord_group].m_points[0];
-        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-        vector<uint>& decomp_phases=m_coord_groups[i_coord_group].m_decomp_phases;
-        m_coord_groups[i_coord_group].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,frac_vrt);
-
-        //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]//now do individual coefficients //[OBSOLETE - reduce by frac always], NO REDUCE
-        //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-        //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  i_point=m_coord_groups[i_coord_group].m_points[i];
-        //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-        //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  m_points[i_point].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,frac_vrt);
-        //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]}
-      }
-
-      void ConvexHull::setOffHullProperties(uint i_nary,uint i_alloy){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setOffHullProperties():";
-        stringstream message;
-        if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-
-        message << "Gathering decomposition reaction data for";
-        if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-        message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
-          i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
-          if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
-          if(!m_coord_groups[i_coord_group].m_initialized){continue;}
-          if(m_coord_groups[i_coord_group].m_is_on_hull){continue;}
-          if(LDEBUG) {cerr << soliloquy << " looking at i_coord_group=" << i_coord_group << endl;}
-          //setNearestFacet(i_nary,i_alloy,i_coord_group);    //we now do separately and previously (setDistancesToHull())
-          //setDistancesToHull(i_nary,i_alloy,i_coord_group); //we now do separately and previously (setDistancesToHull())
-          setDecompositionPhases(i_nary,i_alloy,i_coord_group);
-          setDecompositionCoefficients(i_nary,i_alloy,i_coord_group);
-        }
-      }
-
-      vector<uint> ConvexHull::getAdjacentFacets(uint hull_member,bool ignore_hypercollinear,bool ignore_vertical,bool ignore_artificial) const {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getAdjacentFacets():";
-        if(hull_member>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member has been identified");}
-        vector<uint> adjacent_i_facets;
-        if(!m_points[hull_member].m_is_on_hull){return adjacent_i_facets;}
-
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-
-        uint i_nary=m_points[hull_member].m_i_nary;
-        uint i_alloy=m_points[hull_member].m_i_alloy;
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        const vector<uint>& i_facets=getRelevantFacets(i_nary,i_alloy);//m_naries[i_nary].m_alloys[i_alloy].m_facets;
-        uint i_facet;
-        for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
-          i_facet=i_facets[i];
-          if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
-          if(ignore_hypercollinear && m_facets[i_facet].m_hypercollinear){continue;}  //really (d-1) facets
-          if(ignore_vertical && m_facets[i_facet].m_is_vertical){continue;}           //really (d-1) facets
-          if(ignore_artificial && m_facets[i_facet].m_is_artificial){continue;}       //contains all unaries
-          if(m_facets[i_facet].isPointOnFacet(hull_member)){adjacent_i_facets.push_back(i_facet);}
-        }
-        if(adjacent_i_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No adjacent facets found");}
-        if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
-        return adjacent_i_facets;
-      }
-
-      vector<vector<uint> > ConvexHull::getEquilibriumPhases(uint hull_member) const {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getEquilibriumPhases():";
-        if(hull_member>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        const ChullPoint& point=m_points[hull_member];
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        if(!point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equilibrium phases for non hull members");}
-        vector<vector<uint> > equilibrium_phases;
-
-        vector<uint> adjacent_i_facets=getAdjacentFacets(hull_member,true,true,true);
-        //make full copy of relevant facets so we can sort accordingly, ignore vertical and artificial facets
-        vector<ChullFacet> adjacent_facets;
-        for(uint i=0,fl_size_i=adjacent_i_facets.size();i<fl_size_i;i++){adjacent_facets.push_back(m_facets[adjacent_i_facets[i]]);}
-
-        //sort
-        for(uint i_facet=0,fl_size_i_facet=adjacent_facets.size();i_facet<fl_size_i_facet;i_facet++){
-          std::sort(adjacent_facets[i_facet].m_vertices.begin(),adjacent_facets[i_facet].m_vertices.end(),
-              sortThermoPoints(false,true)); //stoich sorting should be descending, energy sorting default okay here
-        }
-        std::sort(adjacent_facets.begin(),adjacent_facets.end(),
-            sortFacetsByPoints(m_points,false,false,false,false));  //not auto sort, sort everything descending
-
-        uint i_point=AUROSTD_MAX_UINT;
-        for(uint i_facet=0,fl_size_i_facet=adjacent_facets.size();i_facet<fl_size_i_facet;i_facet++){
-          if(LDEBUG) {cerr << soliloquy << " found new relevant facet[" << i_facet << "] with points: ";}
-          equilibrium_phases.push_back(vector<uint>(0));
-          for(uint i=0,fl_size_i=adjacent_facets[i_facet].m_vertices.size();i<fl_size_i;i++){
-            i_point=adjacent_facets[i_facet].m_vertices[i].ch_index;
-            equilibrium_phases.back().push_back(i_point);
-            if(LDEBUG) {cerr << m_points[i_point].h_coords << " [" << i_point << "]" << (i!=adjacent_facets[i_facet].m_vertices.size()-1?", ":"");}
-          }
-          if(LDEBUG) {cerr << endl;}
-        }
-        return equilibrium_phases;
-      }
-
-      void ConvexHull::setEquilibriumPhases(uint i_nary,uint i_alloy,uint i_coord_group){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setEquilibriumPhases():";
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){return;}
-        if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-
-        //get hull-member and check that it's correct
-        uint hull_member=m_coord_groups[i_coord_group].m_hull_member;
-        if(hull_member>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member has been identified");}
-        if(!m_points[hull_member].m_is_on_hull){return;}
-        if(m_points[hull_member].isUnary()){return;} //others are in equilibrium with it, must be context of mixture!
-
-        if(LDEBUG) {cerr << soliloquy << " looking at hull-member[" << hull_member << "]=" << m_points[hull_member].h_coords << endl;}
-
-        m_coord_groups[i_coord_group].m_equilibrium_phases=getEquilibriumPhases(hull_member);
-
-        if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
-      }
-
-      //strict === strictly differ
-      //if we don't know, because of AUROSTD_NAN's or NOSG's, we may still return false anyway to 
-      //continue on to more strict determination later
-      bool ConvexHull::energiesDiffer(uint i_point1,uint i_point2,bool strict) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::energiesDiffer():";
-        if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-
-        if(i_point1==i_point2){return false;}
-        if(!m_points[i_point1].m_has_entry){return strict;}  //if strict, then return that they do differ (true)
-        if(!m_points[i_point2].m_has_entry){return strict;}  //if strict, then return that they do differ (true)
-
-        const double& energy1=m_points[i_point1].getFormationEnthalpy();
-        const double& energy2=m_points[i_point2].getFormationEnthalpy();
-        if(LDEBUG) {cerr << soliloquy << energy1 << " vs. " << energy2 << endl;}
-        if(energy1>=AUROSTD_NAN || energy2>=AUROSTD_NAN){return strict;} //if strict, then return that they do differ (true)
-
-        bool differs=aurostd::isdifferent(energy1,energy2,ENERGY_TOL);
-        if(LDEBUG) {cerr << soliloquy << " energies do " << (differs?"":"NOT ") << "differ" << endl;}
-        return differs;
-      }
-
-      //strict === strictly differ
-      //if we don't know, because of AUROSTD_NAN's or NOSG's, we may still return false anyway to 
-      //continue on to more strict determination later
-      bool ConvexHull::spacegroupsDiffer(uint i_point1,uint i_point2,bool strict) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::spacegroupsDiffer():";
-        if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-
-        if(i_point1==i_point2){return false;}
-        if(!m_points[i_point1].m_has_entry){return strict;}  //if strict, then return that they do differ (true)
-        if(!m_points[i_point2].m_has_entry){return strict;}  //if strict, then return that they do differ (true)
-
-        const string& sg1=m_points[i_point1].getSG();
-        const string& sg2=m_points[i_point2].getSG();
-        if(LDEBUG) {cerr << soliloquy << sg1 << " vs. " << sg2 << endl;}
-        if(sg1==NOSG || sg2==NOSG){return strict;}  //if strict, then return that they do differ (true)
-
-        bool differs=(sg1!=sg2);
-        if(LDEBUG) {cerr << soliloquy << " spacegroups do " << (differs?"":"NOT ") << "differ" << endl;}
-        return differs;
-      }
-
-      bool ConvexHull::structuresEquivalent(uint i_point1,uint i_point2) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::structuresEquivalent():";
-        if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-
-        if(i_point1==i_point2){return true;}
-        //we will not be so stringent on throwing errors here, if we cannot find/load structure, simply return false
-        if(!m_points[i_point1].m_has_entry){return false;}
-        if(!m_points[i_point2].m_has_entry){return false;}
-
-        xstructure a,b;
-        if(!m_points[i_point1].getMostRelaxedXstructure(a)){return false;}
-        if(!m_points[i_point2].getMostRelaxedXstructure(b)){return false;}
-        //if(!m_points[i_point1].loadXstructures(true)){return false;}
-        //if(!m_points[i_point2].loadXstructures(true)){return false;}
-
-        //const xstructure& a=m_points[i_point1].m_entry.vstr[0];
-        //const xstructure& b=m_points[i_point2].m_entry.vstr[0];
-        if(LDEBUG) {
-          cerr << soliloquy << " loaded both structures" << endl;
-          cerr << soliloquy << " structure 1" << endl;
-          cerr << a;
-          cerr << soliloquy << " structure 2" << endl;
-          cerr << b;
-        }
-        bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX 1/23/18 - added fast_match = true // DX 190318 - not fast_match but optimized_match=false
-        if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
-        return are_equivalent;
-      }
-
-      vector<uint> ConvexHull::getEquivalentGStates(uint g_state) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getEquivalentGStates():";
-        if(g_state>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        const ChullPoint& point=m_points[g_state];
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        if(!point.m_is_g_state){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent g-states for non ground-state structures");}
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is not on the hull");}
-        bool perform_structure_comparison=(1&&(!m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
-
-        vector<uint> equivalent_g_states;
-
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-        uint i_point=AUROSTD_MAX_UINT;
-        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-          i_point=m_coord_groups[i_coord_group].m_points[i];
-          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-          if(g_state!=i_point){ //it is equivalent to self, so we only do checks if necessary
-            if(LDEBUG) {cerr << soliloquy << " comparing [auid=" << m_points[g_state].m_entry.auid << "] and [auid=" << m_points[i_point].m_entry.auid << "]" << endl;}
-            if(!m_points[i_point].m_has_entry){continue;}
-            if(energiesDiffer(g_state,i_point,false)){continue;} //first filter by those with wildly different energies, not strict
-            if(spacegroupsDiffer(g_state,i_point,false)){continue;} //first filter by those with wildly different spacegroups, not strict
-            if(!perform_structure_comparison){continue;}
-            if(!structuresEquivalent(g_state,i_point)){continue;}
-          }
-          equivalent_g_states.push_back(i_point);
-        }
-        if(LDEBUG) {
-          cerr << soliloquy << " g-state[" << g_state << "]=" << m_points[g_state].h_coords;
-          cerr << " equivalent structures=";
-          for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){cerr << equivalent_g_states[i] << (i!=equivalent_g_states.size()-1?", ":"");}
-          cerr << endl;
-        }
-        return equivalent_g_states;
-      }
-
-      bool ConvexHull::isICSD(uint i_point) const {
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::isICSD():";
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        string point_icsd_number=getICSDNumber(i_point,true);
-        if(LDEBUG) {cerr << soliloquy << " looking for icsd_number=" << point_icsd_number << endl;}
-        if(point_icsd_number.empty()){return false;}  //no possible match
-        if(m_icsd_entries.size()==0){return false;} //no possible match
-        string entry_icsd_number;
-        for(uint i=0,fl_size_i=m_icsd_entries.size();i<fl_size_i;i++){
-          if(i_point==m_icsd_entries[i]){return true;} //instant match
-          entry_icsd_number=getICSDNumber(m_icsd_entries[i],true);
-          if(LDEBUG) {cerr << soliloquy << " comparing with entry_icsd_number=" << entry_icsd_number << endl;}
-          if(entry_icsd_number.empty()){continue;}  //this is weird/bad, but let's not exit the whole program
-          //we need to get the STRING number (may have 0's in the front) and species/stoichiometry equivalent
-          //this can be done by looking at elements_present, since they map to species
-          if(point_icsd_number==entry_icsd_number && m_points[i_point].m_elements_present==m_points[m_icsd_entries[i]].m_elements_present){
-            if(LDEBUG) {
-              cerr << soliloquy << " found match: point[i_point=" << i_point << "].prototype=" << m_points[i_point].m_entry.prototype;
-              cerr << " vs. point[i_point=" << m_icsd_entries[i] << "].prototype=" << m_points[m_icsd_entries[i]].m_entry.prototype << endl;
-            }
-            return true;
-          }
-        }
-        return false;
-      }
-
-      void ConvexHull::setEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setEquivalentGStates():";
-        m_coord_groups[i_coord_group].m_equivalent_g_states.clear();
-        m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=false;
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){return;}
-        if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-
-        //we need to do a structure comparison, so get artificial map (did already before)
-        uint g_state=m_coord_groups[i_coord_group].m_ref_state;
-        if(g_state>m_points.size()-1){return;}
-        if(!m_points[g_state].m_has_entry){return;} //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry (structure) found");} //only point in coordgroup
-
-        if(LDEBUG) {cerr << soliloquy << " looking at g-state[" << g_state << "]=" << m_points[g_state].h_coords << endl;}
-        m_coord_groups[i_coord_group].m_equivalent_g_states=getEquivalentGStates(g_state);
-        if(!m_coord_groups[i_coord_group].m_equivalent_g_states.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
-        m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=true;
-        uint i_point=AUROSTD_MAX_UINT;
-        bool icsd_g_state,_icsd_g_state;              //whether icsd exists among g_states
-        uint i_canonical_icsd=AUROSTD_MAX_UINT;       //index of canonical icsd
-        uint canonical_icsd_number=AUROSTD_MAX_UINT;  //lowest number
-        uint icsd_number;
-        icsd_g_state=false;
-        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_equivalent_g_states.size();i<fl_size_i;i++){
-          i_point=m_coord_groups[i_coord_group].m_equivalent_g_states[i];
-          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-          m_points[i_point].m_is_equivalent_g_state=true; //g_state and equivalent_g_state should stay separate
-          //get icsd information
-          //we were strict in creating m_icsd_entries (only _ICSD_), but we need to check LIBs for ICSD_
-          if(aurostd::substring2bool(m_points[i_point].m_entry.prototype,"ICSD_")){  //remember, _ICSD_ means icsd catalog, but ICSD_ means LIBs
-            _icsd_g_state=isICSD(i_point);
-            icsd_g_state|=_icsd_g_state;
-            if(_icsd_g_state){  //find lowest icsd number
-              icsd_number=aurostd::string2utype<uint>(getICSDNumber(i_point,true));
-              if(icsd_number<canonical_icsd_number){
-                i_canonical_icsd=i_point;
-                canonical_icsd_number=icsd_number;
-              }
-            }
-            //aurostd::string2tokens(m_points[i_point].m_entry.prototype,tokens,"_");
-            //if(tokens.size()==3){ //skip everything else
-            //  icsd_number=aurostd::string2utype<uint>(tokens[2]);
-            //  if(icsd_number<canonical_icsd_number){
-            //    i_canonical_icsd=i_point;
-            //    canonical_icsd_number=icsd_number;
-            //  }
-            //}
-          }
-        }
-
-        m_coord_groups[i_coord_group].m_icsd_g_state=icsd_g_state;
-        m_coord_groups[i_coord_group].m_i_canonical_icsd=i_canonical_icsd;
-
-        if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
-      }
-
-      vector<uint> ConvexHull::getSymEquivalentGStates(uint g_state) const{
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::getSymEquivalentGStates():";
-        if(g_state>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        const ChullPoint& point=m_points[g_state];
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-        if(!point.m_is_g_state){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent g-states for non ground-state structures");}
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-
-        vector<uint> sym_equivalent_g_states;
-
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-        uint i_point=AUROSTD_MAX_UINT;
-        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-          i_point=m_coord_groups[i_coord_group].m_points[i];
-          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-          if(g_state!=i_point){if(spacegroupsDiffer(g_state,i_point,true)){continue;}}
-          sym_equivalent_g_states.push_back(i_point);
-        }
-        if(LDEBUG) {
-          cerr << soliloquy << " g-state[" << g_state << "]=" << m_points[g_state].h_coords;
-          cerr << " symmetrically equivalent structures=";
-          for(uint i=0,fl_size_i=sym_equivalent_g_states.size();i<fl_size_i;i++){cerr << sym_equivalent_g_states[i] << (i!=sym_equivalent_g_states.size()-1?", ":"");}
-          cerr << endl;
-        }
-        return sym_equivalent_g_states;
-      }
-
-      void ConvexHull::setSymEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setSymEquivalentGStates():";
-        m_coord_groups[i_coord_group].m_sym_equivalent_g_states.clear();
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-        if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){return;}
-        if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-
-        //we need to do a structure comparison, so get artificial map (did already before)
-        uint g_state=m_coord_groups[i_coord_group].m_ref_state;
-        if(g_state>m_points.size()-1){return;}
-        if(!m_points[g_state].m_has_entry){return;} //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry (structure) found");} //only point in coordgroup
-
-        if(LDEBUG) {cerr << soliloquy << " looking at g-state[" << g_state << "]=" << m_points[g_state].h_coords << endl;}
-        m_coord_groups[i_coord_group].m_sym_equivalent_g_states=getSymEquivalentGStates(g_state);
-        uint i_point=AUROSTD_MAX_UINT;
-        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_sym_equivalent_g_states.size();i<fl_size_i;i++){
-          i_point=m_coord_groups[i_coord_group].m_sym_equivalent_g_states[i];
-          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-          m_points[i_point].m_is_sym_equivalent_g_state=true; //g_state and sym_equivalent_g_state should stay separate
-        }
-        if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
-      }
-
-      void ConvexHull::setOnHullProperties(uint i_nary,uint i_alloy){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::setOnHullProperties():";
-        stringstream message;
-        if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-
-        message << "Gathering equilibrium phases and determining equivalent ground-states for";
-        if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-        message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        message << ", please be patient";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
-          i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
-          if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
-          if(!m_coord_groups[i_coord_group].m_initialized){continue;}
-          if(!m_coord_groups[i_coord_group].m_is_on_hull){continue;}
-          if(LDEBUG) {cerr << soliloquy << " looking at i_coord_group=" << i_coord_group << endl;}
-          //setDistancesToHull(i_nary,i_alloy,i_coord_group); //we now do separately and previously (setDistancesToHull())
-          //very important that you do not simply go through all facet points and find equilibrium points
-          //this will overwrite binary information with ternary information
-          //proceed safely with i_coord_group's
-          setEquilibriumPhases(i_nary,i_alloy,i_coord_group);
-          setSymEquivalentGStates(i_nary,i_alloy,i_coord_group);
-          setEquivalentGStates(i_nary,i_alloy,i_coord_group);
-        }
-      }
-
-      void ConvexHull::storeHullData(uint i_nary,uint i_alloy){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        string soliloquy="ConvexHull::storeHullData():";
-        stringstream message;
-        if(!h_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-
-        m_naries[i_nary].m_alloys[i_alloy].m_facets.clear();
-        for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
-          m_facets.push_back(h_facets[i]);
-          m_naries[i_nary].m_alloys[i_alloy].m_facets.push_back(m_facets.size()-1);
-        }
-        setHullMembers(i_nary,i_alloy);
-        if(LDEBUG) {
-          cerr << soliloquy << " hull points for i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;
-          for(uint i=0,fl_size_i=m_points.size();i<fl_size_i;i++){
-            if(m_points[i].m_is_on_hull){
-              cerr << soliloquy << " hull_point[" << i << "].m_coords=" << m_points[i].m_coords << endl;
-            }
-          }
-        }
-        message << "Hull properties stored for";
-        if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-        message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-      }
-
-      void ConvexHull::storeHullData() {
-        for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
-          m_facets.push_back(h_facets[i]);
-          m_i_facets.push_back(m_facets.size()-1);
-        }
-        setHullMembers();
-      }
-
-      void ConvexHull::extractThermodynamicProperties(uint i_nary,uint i_alloy){
-        string soliloquy="ConvexHull::extractThermodynamicProperties():";
-        stringstream message;
-        if(!h_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
-        if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
-        if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
-        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
-
-        bool perform_thermo_properties_extraction=(1&&thermoPropertiesExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION"))); //(1&&!(m_cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
-        if(!perform_thermo_properties_extraction){return;}
-        if(!m_thermo_hull){
-          message << "Cannot extract thermodynamic properties, thermodynamic hull NOT detected";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-          return;
-        }
-
-        message << "Thermodynamic hull detected, gathering on/off hull properties for";
-        if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-        message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        if(i_nary==0){message << " (last)";}
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-        setOffHullProperties(i_nary,i_alloy);
-        setOnHullProperties(i_nary,i_alloy);
-
-        message << "Thermodynamic properties calculated for";
-        if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-        message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-      }
-
-      void ConvexHull::thermodynamicsPostProcessing(){
-        //hull must be initialized for these analyses
-        string soliloquy="ConvexHull::thermodynamicsPostProcessing():";
-        stringstream message;
-        if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-        if(!m_thermo_hull){return;}
-
-        message << "Performing thermodynamic post-processing";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-
-        bool perform_stability_criterion=(1&&thermoPostProcessingExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
-        if(perform_stability_criterion){setStabilityCriterion();}
-
-        bool perform_n_plus_1_energy_gain=(1&&thermoPostProcessingExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS"))); //(1&&!(m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
-        if(perform_n_plus_1_energy_gain){setNPlus1EnergyGain();}
-
-        return;
-      }
-
-      void ConvexHull::calculate(){
-        bool LDEBUG=(FALSE || XHOST.DEBUG);
-        stringstream message;
-        string soliloquy="ConvexHull::calculate():";
-
-        for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-          if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-          for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-            m_points[m_coord_groups[i_coord_group].m_points[i]].m_is_on_hull=false; //completely refresh
-          }
-          m_coord_groups[i_coord_group].m_is_on_hull=false; //completely refresh
-        }
-
-        if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-        //we first run through alloy hulls IF stoich_coords, grabbing hull_members
-        if(m_has_stoich_coords){
-          message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-          if(!m_naries.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points have yet to be structured");}
-          for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){ //start at binaries
-            for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-              message << "Calculating " << pflow::arity_string(i_nary+1,false,false) << " hull for";
-              if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-              message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-              cleanHull();
-              setElementsPresent(i_nary,i_alloy); //m_has_stoich_coords only
-              preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
-              calculateFacets();
-              message << pflow::arity_string(i_nary+1,true,false) << " hull calculated for";
-              if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-              message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-              storeHullData(i_nary,i_alloy);
-              setDistancesToHull(i_nary,i_alloy); //do this always
-              if(m_thermo_hull){extractThermodynamicProperties(i_nary,i_alloy);}
-            }
-          }
-          //set unary properties last
-          //sort of a hack, but actually an intelligent solution
-          //unary hull-members will be identified in higher dimensions
-          //therefore, we simply need to calculate their properties
-          for(uint i_alloy=0,fl_size_i_alloy=m_naries[0].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){setDistancesToHull(0,i_alloy);} //do this always
-          if(m_thermo_hull){  //very safe, not sure how these algorithms perform outside of this domain, already know we have m_has_stoich_coords
-            //message << "Calculating thermodynamic properties for " << pflow::arity_string(1,false,true) << " (last)";
-            //pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-            for(uint i_alloy=0,fl_size_i_alloy=m_naries[0].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){extractThermodynamicProperties(0,i_alloy);} //knows to skip facet storage //setOnHullProperties(0,i_alloy);}
-        }
-        //print counts of g_states by dimension
-        uint gstate_count=0,total_gstate_count=0;
-        for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-          gstate_count=getGStateCount(i_nary);
-          message << "Found " << gstate_count << " " << pflow::arity_string(i_nary+1,false,false) << " ";
-          if(m_thermo_hull){message << "ground-state phases";}
-          else {message << "points on the hull";}
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-          total_gstate_count+=gstate_count;
-        }
-        message << "Found " << total_gstate_count << " ";
-        if(m_thermo_hull){message << "ground-state phases";}
-        else {message << "points on the hull";}
-        message << " total";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-      } else {
-        message << "Entering default convex hull calculation (full-dimensional)";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-        cleanHull();
-        preparePointsForHullCalculation();
-        calculateFacets();
-        message << "Hull calculated";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-        //print count of gstates (hull points)
-        for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-          message << "Found " << getGStateCount() << " points on the hull total";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-        }
-      }
-      storeHullData();  //that way, the largest dim facets get stored in m_facets!
-
-      //resort within coord_groups to expose hull-members!
-      for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-        std::sort(m_coord_groups[i_coord_group].m_points.begin(),m_coord_groups[i_coord_group].m_points.end(),sortWithinCoordGroup(m_points,m_sort_energy_ascending));  //ascending order
-      }
-      if(LDEBUG) {cerr << soliloquy << " done" << endl;}
+      //  uint ref_point=m_coord_groups[i_coord_group].m_ref_state;
+      //  if(LDEBUG) {cerr << soliloquy << " preliminarily setting ref_point=" << ref_point << endl;}
+      //  double dist=AUROSTD_NAN;
+      //  if(isViablePoint(ref_point)){dist=m_points[ref_point].getDist2Hull(_std_);}
+      //  else {
+      //    if(m_coord_groups[i_coord_group].m_is_on_hull){
+      //      ref_point=m_coord_groups[i_coord_group].m_points[0];
+      //      if(isViablePoint(ref_point) && m_points[ref_point].m_is_on_hull){dist=0.0;} //some safety checks, but ultimately set to 0
+      //    }
+      //  }
+      //  if(LDEBUG) {
+      //    cerr << soliloquy << " m_points[ref_point=" << ref_point << "].m_coords=";
+      //    for(int i=m_points[ref_point].m_coords.lrows;i<=m_points[ref_point].m_coords.urows;i++){cerr << m_points[ref_point].m_coords[i] << " ";}
+      //    cerr << endl;
+      //    cerr << soliloquy << " dist of ref_point = " << dist << endl;
+      //  }
+      //  if(!m_points[ref_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+      //  if(dist<AUROSTD_NAN){ //safety
+      //    double delta=(m_points[ref_point].getLastCoord()-point.getLastCoord());
+      //    if(LDEBUG) {
+      //      cerr << soliloquy << " delta = " << delta << endl;
+      //      cerr << soliloquy << " dist+delta = " << dist+delta << endl;
+      //      cerr << soliloquy << " dist-delta = " << dist-delta << endl;
+      //      cerr << soliloquy << " delta-dist = " << delta-dist << endl;
+      //    }
+      //    if(LDEBUG) {cerr << soliloquy << " getSignedVerticalDistanceWithinCoordGroup()=" << getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point) << endl;}
+      //    return delta-dist;
+      //  }
     }
-
-    double ConvexHull::getStabilityCriterion(const string& cauid) const {
-      string soliloquy="ConvexHull::getStabilityCriterion):";
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      vector<string> vcauid; vcauid.push_back(cauid);
-      vector<double> vsc=getStabilityCriterion(vcauid);
-      return vsc[0];
-    }
-
-    double ConvexHull::getStabilityCriterion(uint cpoint) const {
-      string soliloquy="ConvexHull::getStabilityCriterion):";
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      if(cpoint>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-      vector<uint> vcpoint; vcpoint.push_back(cpoint);
-      vector<double> vsc=getStabilityCriterion(vcpoint);
-      return vsc[0];
-    }
-
-    vector<double> ConvexHull::getStabilityCriterion(const vector<string>& vcauid) const {
-      string soliloquy="ConvexHull::getStabilityCriterion):";
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      stringstream message;
-
-      uint i_point=AUROSTD_MAX_UINT;
-      vector<uint> vcpoint; //follows vcauid
-      for(uint i=0,fl_size_i=vcauid.size();i<fl_size_i;i++){
-        const string& auid=vcauid[i];
-        if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-        if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-        vcpoint.push_back(i_point);
+    vector<uint> i_facets=m_i_facets;
+    //if we have stoich_coords, we need to find relevant facets
+    if(m_has_stoich_coords){
+      if(LDEBUG) {cerr << soliloquy << " stoich_coords detected, trying to find relevant facets" << endl;}
+      uint i_nary,i_alloy;
+      if(!getAlloyIndex(point,i_nary,i_alloy)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot get alloys index");}
+      if(i_nary==0){  //unaries are special cases, they RARELY work with normal getSignedVerticalDistance()
+        if(LDEBUG) {cerr << soliloquy << " found unary, need to use coordgroup to find distance (rarely works with normal getSignedVerticalDistance()" << endl;}
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find unary coordgroup");}
+        dist=getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point);
+        if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
+        if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
+        return dist;
       }
-      return getStabilityCriterion(vcpoint);
-    }
+      i_facets=getRelevantFacets(i_nary,i_alloy);
+    } else {if(LDEBUG) {cerr << soliloquy << " searching through ALL facets for closet vertical distance" << endl;}}
+    //otherwise, all facets are relevant (same dimension)
+    uint i_facet=getNearestFacetVertically(i_facets,point);
+    dist=m_facets[i_facet].getSignedVerticalDistance(point);
+    if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
+    if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
+    return dist;
+  }
 
-    vector<double> ConvexHull::getStabilityCriterion(const vector<uint>& vcpoint) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::getStabilityCriterion():";
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      stringstream message;
-
-      //get full set of points to neglect
-      uint i_point=AUROSTD_MAX_UINT;
-      ConvexHull fake_hull;
-      getFakeHull(vcpoint,fake_hull);
-
-      //since i_nary and i_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
-      uint i_nary=AUROSTD_MAX_UINT,i_alloy=AUROSTD_MAX_UINT;
-      vector<double> vscriterion;
-      ChullPoint point;
-      for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++) {
-        i_point=vcpoint[i];
-        //already checked validity of these points
-        point=m_points[i_point];
-        //we need to clean this point of any properties relevant to REAL hull (not to be confused with fake hull)
-        //clean first, then set h_coords
-        //in the case that it is not a unary, leverage i_alloy of REAL hull first, then clean
-        if(point.isUnary()){
-          point.cleanPointForHullTransfer();  //clean now
-          point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
-        }
-        else {
-          if(!getAlloyIndex(point,i_nary,i_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-          xvector<int> elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
-          if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
-          point.cleanPointForHullTransfer();      //clean now
-          point.setHullCoords(elements_present);  //just to be sure
-        }
-        if(LDEBUG) {cerr << soliloquy << " m.coords=" << point.m_coords << endl;}
-        if(LDEBUG) {cerr << soliloquy << " h.coords=" << point.h_coords << endl;}
-        vscriterion.push_back(fake_hull.getDistanceToHull(point,false));
-      }
-      return vscriterion;
-    }
-
-    void ConvexHull::getFakeHull(const vector<uint>& vcpoint,ConvexHull& fake_hull) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::getFakeHull():";
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      stringstream message;
-
-      //get full set of points to neglect
-      uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT,g_state=AUROSTD_MAX_UINT;
-
-      if(LDEBUG) {cerr << soliloquy << " initial points_to_neglect.size()=" << vcpoint.size() << endl;}
-
-      //vector<ChullPoint> points_to_neglect; //not sure why it needs to be vector of chullpoints, simply hold indices
-      vector<uint> points_to_neglect;
-      vector<uint> eq_gstates;
-      for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++){
-        i_point=vcpoint[i];
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        const ChullPoint& point=m_points[i_point];  //this point may not be on the hull, it may be an equivalent structure, but coordgroup is
-        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized chullpoint");}
-        if(!getCoordGroupIndex(point,i_coord_group)){message << "Coordgroup index not set (input[" << i << "])";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-        if(!m_coord_groups[i_coord_group].m_points.size()){message << "No points found within coordgroup (input[" << i << "])";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-        //if(!m_coord_groups[i_coord_group].m_is_on_hull){message << "Coordgroup not on the hull (input[" << i << "])";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);} //obsolete, now we don't assume coordgroup is on hull, we can remove ANY point
-        points_to_neglect.push_back(i_point);
-        if(m_coord_groups[i_coord_group].m_is_on_hull){
-          g_state=m_coord_groups[i_coord_group].m_ref_state;  //we lose i_point here, so make sure to add it before this if-statement, otherwise we get SUPER degeneracy
-          if(!m_points[g_state].m_is_g_state){message << "Coordgroup reference is not a ground-state structure (input[" << i << "])";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-          //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
-          if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
-          else {eq_gstates=getEquivalentGStates(g_state);}
-          if(!eq_gstates.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
-          //for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){points_to_neglect.push_back(m_points[eq_gstates[j]]);}
-          for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){points_to_neglect.push_back(eq_gstates[j]);}
-        }
-      }
-
-      std::sort(points_to_neglect.begin(),points_to_neglect.end());points_to_neglect.erase( std::unique( points_to_neglect.begin(), points_to_neglect.end() ), points_to_neglect.end() );  //first remove duplicate indices
-
-      if(LDEBUG) {
-        cerr << soliloquy << " points_to_neglect.size()=" << points_to_neglect.size() << endl;
-        cerr << soliloquy << " points_to_neglect: ";
-        for(uint i=0,fl_size_i=points_to_neglect.size();i<fl_size_i;i++){cerr << points_to_neglect[i] << " ";} 
-        cerr << endl;
-      }
-
-      //create new set of points
-      //bool found=false;
-      vector<ChullPoint> new_points;
-      //do NOT go through m_points, this may include some duplicates we previously excluded (now not duplicates since we are removing points: AlFe hull)
-      for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-          i_point=m_coord_groups[i_coord_group].m_points[i];
-          if(aurostd::withinList(points_to_neglect,i_point)){
-            if(LDEBUG) {cerr << soliloquy << " Removing point from fake hull (i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << ")" << endl;}
-            continue;
-          }
-          const ChullPoint& point=m_points[i_point];
-          if(point.m_is_artificial){continue;}  //they will be added again
-          //found=false;
-          //for(uint j=0,fl_size_j=points_to_neglect.size();j<fl_size_j&&!found;j++){
-          //  if(point.m_entry.auid==points_to_neglect[j].m_entry.auid){
-          //    if(LDEBUG) {cerr << soliloquy << " Removing (equivalent) ground-state (auid=" << points_to_neglect[j].m_entry.auid << ")" << endl;}
-          //    found=true;
-          //  }
-          //}
-          //if(found){continue;}
-          if(LDEBUG) {cerr << soliloquy << " including point[" << i_point << "].compound=" << point.m_entry.compound << endl;}
-          new_points.push_back(point);
-          new_points.back().cleanPointForHullTransfer();
-        }
-      }
-      if(!new_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No points found for pseudo convex hull");}
-
-      if(LDEBUG) {cerr << soliloquy << " Creating new (pseudo) hull without relevant g-states" << endl;}
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-      aurostd::xoption cflags=m_cflags;
-      cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true); //thermo properties NOT needed, just need hull
-      cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true); //this would be circular
-      cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS",true); //this would be circular
-      cflags.flag("FORCE",true); //need to avoid "Very skewed ground-state..." and "Unreliable hull" issues, we're removing points, so these may (and likely will) come up
-      //let's skip all this extra output
-      bool see_sub_output=false;//true;
-      ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
-      ofstream devnull("/dev/null");  //NULL
-      fake_hull.initialize(cflags,new_points,m_velements,devnull,oss_empty,m_half_hull,m_add_artificial_unaries);
-      oss_empty.clear();  //clear badbit, as cout is GLOBAL
-      if(!fake_hull.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not create pseudo convex hull");}
-    }
-
-    double ConvexHull::getNPlus1EnergyGain(const string& auid) const {
-      string soliloquy="ConvexHull::getNPlus1EnergyGain):";
-      stringstream message;
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      uint i_point=AUROSTD_MAX_UINT;
+  vector<double> ConvexHull::getDistancesToHull(const vector<string>& vauid,bool redo) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getDistancesToHull():";
+    stringstream message;
+    vector<double> vdist2hull;
+    uint i_point=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=vauid.size();i<fl_size_i;i++){
+      const string& auid=vauid[i];
       if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
       if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-      return getNPlus1EnergyGain(i_point);
+      if(LDEBUG) {cerr << soliloquy << " grabbing distance to hull for i_point=" << i_point << endl;}
+      vdist2hull.push_back(getDistanceToHull(i_point,redo));
+    }
+    return vdist2hull;
+  }
+
+  bool ConvexHull::hullDistanceExtractionRequired() const {
+    if(thermoPropertiesExtractionRequired()){return true;}  //dependency
+    if(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&(m_cflags.flag("CHULL::LATEX_DOC")||m_cflags.flag("CHULL::PNG_IMAGE"))){
+      aurostd::xoption lflags=resolvePlotLabelSettings();
+      bool meta_labels=lflags.flag("CHULL::PLOT_META_LABELS");
+      bool labels_off_hull=lflags.flag("CHULL::PLOT_LABELS_OFF_HULL");
+      if(meta_labels&&labels_off_hull){return true;}  //need distances to hull here
+      bool no_doc=m_cflags.flag("CHULL::NO_DOC");
+      if(no_doc){return false;}
+      bool image_only=m_cflags.flag("CHULL::IMAGE_ONLY");
+      if(image_only){return false;}
+    }
+    return true;
+  }
+
+  bool ConvexHull::thermoPropertiesExtractionRequired() const {
+    if(thermoPostProcessingExtractionRequired()){return true;}  //dependency
+    if(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&(m_cflags.flag("CHULL::LATEX_DOC")||m_cflags.flag("CHULL::PNG_IMAGE"))){
+      aurostd::xoption lflags=resolvePlotLabelSettings();
+      bool icsd_labels=lflags.flag("CHULL::PLOT_ICSD_LABELS");
+      if(icsd_labels){return true;}
+      bool no_doc=m_cflags.flag("CHULL::NO_DOC");
+      if(no_doc){return false;}
+      bool image_only=m_cflags.flag("CHULL::IMAGE_ONLY");
+      if(image_only){return false;}
+    }
+    return true;
+  }
+
+  bool ConvexHull::thermoPostProcessingExtractionRequired() const {
+    if(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&(m_cflags.flag("CHULL::LATEX_DOC")||m_cflags.flag("CHULL::PNG_IMAGE"))){
+      bool no_doc=m_cflags.flag("CHULL::NO_DOC");
+      if(no_doc){return false;}
+      bool image_only=m_cflags.flag("CHULL::IMAGE_ONLY");
+      if(image_only){return false;}
+    }
+    return true;
+  }
+
+  void ConvexHull::setDistancesToHull(uint i_nary,uint i_alloy) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setDistancesToHull():";
+    stringstream message;
+    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+
+    bool perform_hull_distance_calculation=(1&&hullDistanceExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_HULL_DISTANCE_CALCULATION"))); //(1&&!(m_cflags.flag("CHULL::SKIP_HULL_DISTANCE_CALCULATION")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
+    if(!perform_hull_distance_calculation){return;}
+
+    message << "Gathering hull distance data for";
+    if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
+      i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
+      if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
+      if(!m_coord_groups[i_coord_group].m_initialized){continue;}
+      if(LDEBUG) {cerr << soliloquy << " looking at i_coord_group=" << i_coord_group << endl;}
+      if(!m_coord_groups[i_coord_group].m_is_on_hull){setNearestFacet(i_nary,i_alloy,i_coord_group);} //only off-hull need nearest facets
+      setDistancesToHull(i_nary,i_alloy,i_coord_group);
+    }
+  }
+
+  void ConvexHull::setDistancesToHull(uint i_nary,uint i_alloy,uint i_coord_group) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setDistancesToHull():";
+    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+    if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
+    if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+
+    uint i_point=m_coord_groups[i_coord_group].m_points[0];
+    if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+    i_point=artificialMap(i_point); //don't need to set distance for artificial point, re-scale to this point
+    ChullPoint& point=m_points[i_point];
+    double dist_2_hull=0.0;
+    bool check_dist_2_hull=false;
+    if(!m_coord_groups[i_coord_group].m_is_on_hull){ //off-hull, this is the reason it works for unaries, unaries coordgroup are declared ON-HULL, so dist==0 automatically
+      uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
+      dist_2_hull=m_facets[i_facet].getSignedVerticalDistance(point);  //do this "expensive" calculation only once, others are simply z-scaled
+      if(LDEBUG) {
+        cerr << soliloquy << " dist[coord=" << point.h_coords << "]=" << dist_2_hull << endl;
+        if(check_dist_2_hull){
+          cerr << soliloquy << " comparing fast dist calculation = "  << dist_2_hull;
+          cerr << " vs. slow dist calculation =" << getDistanceToHull(point) << endl;
+        }
+      }
+      if(m_half_hull){  //tests of stupidity
+        //do not use signbit, add tol to zero (precision)
+        //sign of distance:
+        //independent of lower/upper hull:  above hull is negative, below hull is positive
+        bool should_be_positive=!m_lower_hull;
+        bool correct_sign_vertical_distance=chull::correctSignVerticalDistance(dist_2_hull,should_be_positive);
+        if( m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(lower half hull) found point BELOW hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
+        if(!m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
+        //[OBSOLETE CO 180828]if(m_lower_hull){
+        //[OBSOLETE CO 180828]  if(notNegative(dist_2_hull,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(lower half hull) found point BELOW hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
+        //[OBSOLETE CO 180828]} else {
+        //[OBSOLETE CO 180828]  if(notPositive(dist_2_hull,true)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
+        //[OBSOLETE CO 180828]}
+      }
+    }
+    //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
+    //by convention, distances inside hull are NEGATIVE, following the reaction equation (spontaneous decomposition)
+    //which we just checked is the case, so force negative
+    //dist_2_hull=-abs(dist_2_hull); //force positive, the value is what we care about now
+    //[OBSOLETE CO 180828]point.m_dist_2_hull=m_coord_groups[i_coord_group].m_nearest_distance=dist_2_hull;
+    point.m_dist_2_hull=m_coord_groups[i_coord_group].m_nearest_distance=abs(dist_2_hull);
+    if(LDEBUG) {cerr << soliloquy << " |dist|=" << point.m_dist_2_hull << endl;}
+    uint j_point;
+    for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_points.size();j<fl_size_j;j++){
+      j_point=m_coord_groups[i_coord_group].m_points[j];
+      j_point=artificialMap(j_point); //don't need to set distance for artificial point, re-scale to this point
+      m_points[j_point].m_dist_2_hull=point.m_dist_2_hull;
+      //[OBSOLETE CO 180828]if(i_point!=j_point){m_points[j_point].m_dist_2_hull+=(point.getLastCoord()-m_points[j_point].getLastCoord());}  //simply ADD difference
+      if(i_point!=j_point){m_points[j_point].m_dist_2_hull+=abs(point.getLastCoord() - m_points[j_point].getLastCoord());}  //simply ADD difference
+      //it's possible that h_coords has not been set (we only do it to points that make it to hull calc)
+      //so set again (repetita iuvant)
+      if(LDEBUG) {
+        xvector<int>& elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
+        m_points[j_point].setHullCoords(elements_present);
+        cerr << soliloquy << " dist[coord=" << m_points[j_point].h_coords << "]=" << m_points[j_point].m_dist_2_hull << endl;
+      }
+    }
+  }
+
+  vector<uint> ConvexHull::extractDecompositionPhases(const ChullFacet& facet) const{
+    string soliloquy="ConvexHull::extractDecompositionPhases():";
+    uint i_point=AUROSTD_MAX_UINT;
+    vector<uint> decomp_phases;
+    for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
+      i_point=facet.m_vertices[i].ch_index;
+      decomp_phases.push_back(i_point);
+    }
+    if(decomp_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition phases found");}
+    std::sort(decomp_phases.begin(),
+        decomp_phases.end(),
+        sortCHullPoints(m_points,false,true)); //stoich sorting should be descending, energy sorting default okay here
+    return decomp_phases;
+  }
+
+  vector<uint> ConvexHull::getDecompositionPhases(uint i_point) const{
+    string soliloquy="ConvexHull::getDecompositionPhases():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    return getDecompositionPhases(m_points[i_point]);
+  }
+
+  vector<uint> ConvexHull::getDecompositionPhases(const ChullPoint& point) const{
+    string soliloquy="ConvexHull::getDecompositionPhases():";
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
+    uint i_facet=AUROSTD_MAX_UINT;
+    //polymorph possibility, other reductions in dimensionality are prescribed with the coefficients
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
+    if(found_coord_group){  //composition has already been considered by hull, might be g-state
+      if(m_coord_groups[i_coord_group].m_is_on_hull){
+        vector<uint> dcomp_phases;
+        dcomp_phases.push_back(m_coord_groups[i_coord_group].m_ref_state);
+        return dcomp_phases;
+      }
+      i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
+    }
+    vector<uint> i_facets=m_i_facets;  //default, most broad  //make a copy so we can reset if m_has_stoich_coords, don't worry, only vector<uint> (pointers essentially)
+    if(m_has_stoich_coords){
+      uint i_nary,i_alloy;
+      if(!getAlloyIndex(point,i_nary,i_alloy)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot get alloys index");}
+      i_facets=getRelevantFacets(i_nary,i_alloy);
+    }
+    if(!found_coord_group||(i_facet>m_facets.size()-1)){i_facet=getNearestFacetVertically(i_facets,point);}
+    return extractDecompositionPhases(m_facets[i_facet]);
+  }
+
+  void ConvexHull::setDecompositionPhases(uint i_nary,uint i_alloy,uint i_coord_group){
+    string soliloquy="ConvexHull::setDecompositionPhases():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
+    if(m_coord_groups[i_coord_group].m_nearest_facet>m_facets.size()-1){setNearestFacet(i_nary,i_alloy,i_coord_group);}
+
+    uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
+    ChullFacet& facet=m_facets[i_facet];
+    m_coord_groups[i_coord_group].m_decomp_phases=extractDecompositionPhases(facet);
+  }
+
+  xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,vector_reduction_type vred) const{
+    string soliloquy="ConvexHull::getDecompositionCoefficients():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    return getDecompositionCoefficients(m_points[i_point],vred);
+  }
+
+  xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred) const{
+    string soliloquy="ConvexHull::getDecompositionCoefficients():";
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    if(point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition coefficients for hull members");}
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
+    if(found_coord_group){  //composition has already been considered by hull, might be g-state
+      if(m_coord_groups[i_coord_group].m_is_on_hull){
+        xvector<double> dcomp_coefs(2);
+        dcomp_coefs[dcomp_coefs.lrows]=dcomp_coefs[dcomp_coefs.lrows+1]=1.0;
+        return dcomp_coefs;
+      }
+      if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
+        return getDecompositionCoefficients(point,m_coord_groups[i_coord_group].m_decomp_phases,vred);
+      }
+    }
+    return getDecompositionCoefficients(point,getDecompositionPhases(point),vred);
+  }
+
+  xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
+    string soliloquy="ConvexHull::getDecompositionCoefficients():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    return getDecompositionCoefficients(m_points[i_point],decomp_phases,vred);
+  }
+
+  xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
+    string soliloquy="ConvexHull::getDecompositionCoefficients():";
+    //do m_coords_group first (REDUCED)
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    if(!decomp_phases.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No decomposition phases found");}
+    if(decomp_phases.size()==1){  //probably polymorph
+      uint i_point_other=decomp_phases[0];
+      if(!isViablePoint(i_point_other)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Index to decomposition phase not found");}
+      const ChullPoint& point_other=m_points[i_point_other];
+      uint i_coord_group=AUROSTD_MAX_UINT,i_coord_group_other=AUROSTD_MAX_UINT;
+      bool found_coord_group=getCoordGroupIndex(point,i_coord_group);
+      bool found_coord_group_other=getCoordGroupIndex(point_other,i_coord_group_other);
+      if(found_coord_group&&found_coord_group_other&&i_coord_group==i_coord_group_other){ //definitely polymorph
+        xvector<double> dcomp_coefs(2);
+        dcomp_coefs[dcomp_coefs.lrows]=dcomp_coefs[dcomp_coefs.lrows+1]=1.0;
+        return dcomp_coefs;
+      }
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Not enough decomposition phases provided");
+    }
+    vector<xvector<double> > lhs,rhs;
+    //lhs
+    lhs.push_back(point.getTruncatedReducedCoords(m_elements_present,vred));
+    //rhs
+    for(uint i=0,fl_size_i=decomp_phases.size();i<fl_size_i;i++){
+      if(decomp_phases[i]>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+      if(!m_points[decomp_phases[i]].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+      rhs.push_back(m_points[decomp_phases[i]].getTruncatedReducedCoords(m_elements_present,vred));
+    }
+    xvector<double> coef=balanceChemicalEquation(lhs,rhs,true,ZERO_TOL);  //normalize
+    //aurostd::shiftlrows(coef,0);
+    return coef;
+  }
+
+  void ConvexHull::setDecompositionCoefficients(uint i_nary,uint i_alloy,uint i_coord_group){
+    string soliloquy="ConvexHull::setDecompositionCoefficients():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+    if(m_coord_groups[i_coord_group].m_is_on_hull){return;}
+    if(m_coord_groups[i_coord_group].m_decomp_phases.size()==0){setDecompositionPhases(i_nary,i_alloy,i_coord_group);}
+
+    //we get different coefficients between stoich and composition
+    //ALWAYS use composition (even POCC, simply won't reduce), and do NOT mix stoich + composition
+    uint i_point=m_coord_groups[i_coord_group].m_points[0];
+    if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+    vector<uint>& decomp_phases=m_coord_groups[i_coord_group].m_decomp_phases;
+    m_coord_groups[i_coord_group].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,frac_vrt);
+
+    //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]//now do individual coefficients //[OBSOLETE - reduce by frac always], NO REDUCE
+    //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+    //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  i_point=m_coord_groups[i_coord_group].m_points[i];
+    //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+    //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  m_points[i_point].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,frac_vrt);
+    //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]}
+  }
+
+  void ConvexHull::setOffHullProperties(uint i_nary,uint i_alloy){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setOffHullProperties():";
+    stringstream message;
+    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+
+    message << "Gathering decomposition reaction data for";
+    if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
+      i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
+      if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
+      if(!m_coord_groups[i_coord_group].m_initialized){continue;}
+      if(m_coord_groups[i_coord_group].m_is_on_hull){continue;}
+      if(LDEBUG) {cerr << soliloquy << " looking at i_coord_group=" << i_coord_group << endl;}
+      //setNearestFacet(i_nary,i_alloy,i_coord_group);    //we now do separately and previously (setDistancesToHull())
+      //setDistancesToHull(i_nary,i_alloy,i_coord_group); //we now do separately and previously (setDistancesToHull())
+      setDecompositionPhases(i_nary,i_alloy,i_coord_group);
+      setDecompositionCoefficients(i_nary,i_alloy,i_coord_group);
+    }
+  }
+
+  vector<uint> ConvexHull::getAdjacentFacets(uint hull_member,bool ignore_hypercollinear,bool ignore_vertical,bool ignore_artificial) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getAdjacentFacets():";
+    if(hull_member>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member has been identified");}
+    vector<uint> adjacent_i_facets;
+    if(!m_points[hull_member].m_is_on_hull){return adjacent_i_facets;}
+
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+
+    uint i_nary=m_points[hull_member].m_i_nary;
+    uint i_alloy=m_points[hull_member].m_i_alloy;
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    const vector<uint>& i_facets=getRelevantFacets(i_nary,i_alloy);//m_naries[i_nary].m_alloys[i_alloy].m_facets;
+    uint i_facet;
+    for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
+      i_facet=i_facets[i];
+      if(i_facet>m_facets.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_facets");}
+      if(ignore_hypercollinear && m_facets[i_facet].m_hypercollinear){continue;}  //really (d-1) facets
+      if(ignore_vertical && m_facets[i_facet].m_is_vertical){continue;}           //really (d-1) facets
+      if(ignore_artificial && m_facets[i_facet].m_is_artificial){continue;}       //contains all unaries
+      if(m_facets[i_facet].isPointOnFacet(hull_member)){adjacent_i_facets.push_back(i_facet);}
+    }
+    if(adjacent_i_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No adjacent facets found");}
+    if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
+    return adjacent_i_facets;
+  }
+
+  vector<vector<uint> > ConvexHull::getEquilibriumPhases(uint hull_member) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getEquilibriumPhases():";
+    if(hull_member>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    const ChullPoint& point=m_points[hull_member];
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    if(!point.m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equilibrium phases for non hull members");}
+    vector<vector<uint> > equilibrium_phases;
+
+    vector<uint> adjacent_i_facets=getAdjacentFacets(hull_member,true,true,true);
+    //make full copy of relevant facets so we can sort accordingly, ignore vertical and artificial facets
+    vector<ChullFacet> adjacent_facets;
+    for(uint i=0,fl_size_i=adjacent_i_facets.size();i<fl_size_i;i++){adjacent_facets.push_back(m_facets[adjacent_i_facets[i]]);}
+
+    //sort
+    for(uint i_facet=0,fl_size_i_facet=adjacent_facets.size();i_facet<fl_size_i_facet;i_facet++){
+      std::sort(adjacent_facets[i_facet].m_vertices.begin(),adjacent_facets[i_facet].m_vertices.end(),
+          sortThermoPoints(false,true)); //stoich sorting should be descending, energy sorting default okay here
+    }
+    std::sort(adjacent_facets.begin(),adjacent_facets.end(),
+        sortFacetsByPoints(m_points,false,false,false,false));  //not auto sort, sort everything descending
+
+    uint i_point=AUROSTD_MAX_UINT;
+    for(uint i_facet=0,fl_size_i_facet=adjacent_facets.size();i_facet<fl_size_i_facet;i_facet++){
+      if(LDEBUG) {cerr << soliloquy << " found new relevant facet[" << i_facet << "] with points: ";}
+      equilibrium_phases.push_back(vector<uint>(0));
+      for(uint i=0,fl_size_i=adjacent_facets[i_facet].m_vertices.size();i<fl_size_i;i++){
+        i_point=adjacent_facets[i_facet].m_vertices[i].ch_index;
+        equilibrium_phases.back().push_back(i_point);
+        if(LDEBUG) {cerr << m_points[i_point].h_coords << " [" << i_point << "]" << (i!=adjacent_facets[i_facet].m_vertices.size()-1?", ":"");}
+      }
+      if(LDEBUG) {cerr << endl;}
+    }
+    return equilibrium_phases;
+  }
+
+  void ConvexHull::setEquilibriumPhases(uint i_nary,uint i_alloy,uint i_coord_group){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setEquilibriumPhases():";
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+    if(!m_coord_groups[i_coord_group].m_is_on_hull){return;}
+    if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+
+    //get hull-member and check that it's correct
+    uint hull_member=m_coord_groups[i_coord_group].m_hull_member;
+    if(hull_member>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No hull member has been identified");}
+    if(!m_points[hull_member].m_is_on_hull){return;}
+    if(m_points[hull_member].isUnary()){return;} //others are in equilibrium with it, must be context of mixture!
+
+    if(LDEBUG) {cerr << soliloquy << " looking at hull-member[" << hull_member << "]=" << m_points[hull_member].h_coords << endl;}
+
+    m_coord_groups[i_coord_group].m_equilibrium_phases=getEquilibriumPhases(hull_member);
+
+    if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
+  }
+
+  //strict === strictly differ
+  //if we don't know, because of AUROSTD_NAN's or NOSG's, we may still return false anyway to 
+  //continue on to more strict determination later
+  bool ConvexHull::energiesDiffer(uint i_point1,uint i_point2,bool strict) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::energiesDiffer():";
+    if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+
+    if(i_point1==i_point2){return false;}
+    if(!m_points[i_point1].m_has_entry){return strict;}  //if strict, then return that they do differ (true)
+    if(!m_points[i_point2].m_has_entry){return strict;}  //if strict, then return that they do differ (true)
+
+    const double& energy1=m_points[i_point1].getFormationEnthalpy();
+    const double& energy2=m_points[i_point2].getFormationEnthalpy();
+    if(LDEBUG) {cerr << soliloquy << energy1 << " vs. " << energy2 << endl;}
+    if(energy1>=AUROSTD_NAN || energy2>=AUROSTD_NAN){return strict;} //if strict, then return that they do differ (true)
+
+    bool differs=aurostd::isdifferent(energy1,energy2,ENERGY_TOL);
+    if(LDEBUG) {cerr << soliloquy << " energies do " << (differs?"":"NOT ") << "differ" << endl;}
+    return differs;
+  }
+
+  //strict === strictly differ
+  //if we don't know, because of AUROSTD_NAN's or NOSG's, we may still return false anyway to 
+  //continue on to more strict determination later
+  bool ConvexHull::spacegroupsDiffer(uint i_point1,uint i_point2,bool strict) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::spacegroupsDiffer():";
+    if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+
+    if(i_point1==i_point2){return false;}
+    if(!m_points[i_point1].m_has_entry){return strict;}  //if strict, then return that they do differ (true)
+    if(!m_points[i_point2].m_has_entry){return strict;}  //if strict, then return that they do differ (true)
+
+    const string& sg1=m_points[i_point1].getSG();
+    const string& sg2=m_points[i_point2].getSG();
+    if(LDEBUG) {cerr << soliloquy << sg1 << " vs. " << sg2 << endl;}
+    if(sg1==NOSG || sg2==NOSG){return strict;}  //if strict, then return that they do differ (true)
+
+    bool differs=(sg1!=sg2);
+    if(LDEBUG) {cerr << soliloquy << " spacegroups do " << (differs?"":"NOT ") << "differ" << endl;}
+    return differs;
+  }
+
+  bool ConvexHull::structuresEquivalent(uint i_point1,uint i_point2) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::structuresEquivalent():";
+    if(i_point1>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    if(i_point2>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+
+    if(i_point1==i_point2){return true;}
+    //we will not be so stringent on throwing errors here, if we cannot find/load structure, simply return false
+    if(!m_points[i_point1].m_has_entry){return false;}
+    if(!m_points[i_point2].m_has_entry){return false;}
+
+    xstructure a,b;
+    if(!m_points[i_point1].getMostRelaxedXstructure(a)){return false;}
+    if(!m_points[i_point2].getMostRelaxedXstructure(b)){return false;}
+    //if(!m_points[i_point1].loadXstructures(true)){return false;}
+    //if(!m_points[i_point2].loadXstructures(true)){return false;}
+
+    //const xstructure& a=m_points[i_point1].m_entry.vstr[0];
+    //const xstructure& b=m_points[i_point2].m_entry.vstr[0];
+    if(LDEBUG) {
+      cerr << soliloquy << " loaded both structures" << endl;
+      cerr << soliloquy << " structure 1" << endl;
+      cerr << a;
+      cerr << soliloquy << " structure 2" << endl;
+      cerr << b;
+    }
+    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX 1/23/18 - added fast_match = true // DX 190318 - not fast_match but optimized_match=false
+    if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
+    return are_equivalent;
+  }
+
+  vector<uint> ConvexHull::getEquivalentGStates(uint g_state) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getEquivalentGStates():";
+    if(g_state>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    const ChullPoint& point=m_points[g_state];
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    if(!point.m_is_g_state){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent g-states for non ground-state structures");}
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+    if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is not on the hull");}
+    bool perform_structure_comparison=(1&&(!m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
+
+    vector<uint> equivalent_g_states;
+
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+    uint i_point=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+      i_point=m_coord_groups[i_coord_group].m_points[i];
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      if(g_state!=i_point){ //it is equivalent to self, so we only do checks if necessary
+        if(LDEBUG) {cerr << soliloquy << " comparing [auid=" << m_points[g_state].m_entry.auid << "] and [auid=" << m_points[i_point].m_entry.auid << "]" << endl;}
+        if(!m_points[i_point].m_has_entry){continue;}
+        if(energiesDiffer(g_state,i_point,false)){continue;} //first filter by those with wildly different energies, not strict
+        if(spacegroupsDiffer(g_state,i_point,false)){continue;} //first filter by those with wildly different spacegroups, not strict
+        if(!perform_structure_comparison){continue;}
+        if(!structuresEquivalent(g_state,i_point)){continue;}
+      }
+      equivalent_g_states.push_back(i_point);
+    }
+    if(LDEBUG) {
+      cerr << soliloquy << " g-state[" << g_state << "]=" << m_points[g_state].h_coords;
+      cerr << " equivalent structures=";
+      for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){cerr << equivalent_g_states[i] << (i!=equivalent_g_states.size()-1?", ":"");}
+      cerr << endl;
+    }
+    return equivalent_g_states;
+  }
+
+  bool ConvexHull::isICSD(uint i_point) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::isICSD():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    string point_icsd_number=getICSDNumber(i_point,true);
+    if(LDEBUG) {cerr << soliloquy << " looking for icsd_number=" << point_icsd_number << endl;}
+    if(point_icsd_number.empty()){return false;}  //no possible match
+    if(m_icsd_entries.size()==0){return false;} //no possible match
+    string entry_icsd_number;
+    for(uint i=0,fl_size_i=m_icsd_entries.size();i<fl_size_i;i++){
+      if(i_point==m_icsd_entries[i]){return true;} //instant match
+      entry_icsd_number=getICSDNumber(m_icsd_entries[i],true);
+      if(LDEBUG) {cerr << soliloquy << " comparing with entry_icsd_number=" << entry_icsd_number << endl;}
+      if(entry_icsd_number.empty()){continue;}  //this is weird/bad, but let's not exit the whole program
+      //we need to get the STRING number (may have 0's in the front) and species/stoichiometry equivalent
+      //this can be done by looking at elements_present, since they map to species
+      if(point_icsd_number==entry_icsd_number && m_points[i_point].m_elements_present==m_points[m_icsd_entries[i]].m_elements_present){
+        if(LDEBUG) {
+          cerr << soliloquy << " found match: point[i_point=" << i_point << "].prototype=" << m_points[i_point].m_entry.prototype;
+          cerr << " vs. point[i_point=" << m_icsd_entries[i] << "].prototype=" << m_points[m_icsd_entries[i]].m_entry.prototype << endl;
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void ConvexHull::setEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setEquivalentGStates():";
+    m_coord_groups[i_coord_group].m_equivalent_g_states.clear();
+    m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=false;
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+    if(!m_coord_groups[i_coord_group].m_is_on_hull){return;}
+    if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+
+    //we need to do a structure comparison, so get artificial map (did already before)
+    uint g_state=m_coord_groups[i_coord_group].m_ref_state;
+    if(g_state>m_points.size()-1){return;}
+    if(!m_points[g_state].m_has_entry){return;} //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry (structure) found"); //only point in coordgroup
+
+    if(LDEBUG) {cerr << soliloquy << " looking at g-state[" << g_state << "]=" << m_points[g_state].h_coords << endl;}
+    m_coord_groups[i_coord_group].m_equivalent_g_states=getEquivalentGStates(g_state);
+    if(!m_coord_groups[i_coord_group].m_equivalent_g_states.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
+    m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=true;
+    uint i_point=AUROSTD_MAX_UINT;
+    bool icsd_g_state,_icsd_g_state;              //whether icsd exists among g_states
+    uint i_canonical_icsd=AUROSTD_MAX_UINT;       //index of canonical icsd
+    uint canonical_icsd_number=AUROSTD_MAX_UINT;  //lowest number
+    uint icsd_number;
+    icsd_g_state=false;
+    for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_equivalent_g_states.size();i<fl_size_i;i++){
+      i_point=m_coord_groups[i_coord_group].m_equivalent_g_states[i];
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      m_points[i_point].m_is_equivalent_g_state=true; //g_state and equivalent_g_state should stay separate
+      //get icsd information
+      //we were strict in creating m_icsd_entries (only _ICSD_), but we need to check LIBs for ICSD_
+      if(aurostd::substring2bool(m_points[i_point].m_entry.prototype,"ICSD_")){  //remember, _ICSD_ means icsd catalog, but ICSD_ means LIBs
+        _icsd_g_state=isICSD(i_point);
+        icsd_g_state|=_icsd_g_state;
+        if(_icsd_g_state){  //find lowest icsd number
+          icsd_number=aurostd::string2utype<uint>(getICSDNumber(i_point,true));
+          if(icsd_number<canonical_icsd_number){
+            i_canonical_icsd=i_point;
+            canonical_icsd_number=icsd_number;
+          }
+        }
+        //aurostd::string2tokens(m_points[i_point].m_entry.prototype,tokens,"_");
+        //if(tokens.size()==3){ //skip everything else
+        //  icsd_number=aurostd::string2utype<uint>(tokens[2]);
+        //  if(icsd_number<canonical_icsd_number){
+        //    i_canonical_icsd=i_point;
+        //    canonical_icsd_number=icsd_number;
+        //  }
+        //}
+      }
     }
 
-    double ConvexHull::getNPlus1EnergyGain(uint i_point) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::getNPlus1EnergyGain):";
-      stringstream message;
+    m_coord_groups[i_coord_group].m_icsd_g_state=icsd_g_state;
+    m_coord_groups[i_coord_group].m_i_canonical_icsd=i_canonical_icsd;
 
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-      ChullPoint point=m_points[i_point];
-      if(point.m_i_nary<1){ //forget about unaries and binaries
-        if(point.m_has_entry&&point.m_entry.enthalpy_formation_atom!=AUROSTD_NAN){return abs(point.m_entry.enthalpy_formation_atom);}
-        return 0;
+    if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
+  }
+
+  vector<uint> ConvexHull::getSymEquivalentGStates(uint g_state) const{
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getSymEquivalentGStates():";
+    if(g_state>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    const ChullPoint& point=m_points[g_state];
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    if(!point.m_is_g_state){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent g-states for non ground-state structures");}
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+
+    vector<uint> sym_equivalent_g_states;
+
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+    uint i_point=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+      i_point=m_coord_groups[i_coord_group].m_points[i];
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      if(g_state!=i_point){if(spacegroupsDiffer(g_state,i_point,true)){continue;}}
+      sym_equivalent_g_states.push_back(i_point);
+    }
+    if(LDEBUG) {
+      cerr << soliloquy << " g-state[" << g_state << "]=" << m_points[g_state].h_coords;
+      cerr << " symmetrically equivalent structures=";
+      for(uint i=0,fl_size_i=sym_equivalent_g_states.size();i<fl_size_i;i++){cerr << sym_equivalent_g_states[i] << (i!=sym_equivalent_g_states.size()-1?", ":"");}
+      cerr << endl;
+    }
+    return sym_equivalent_g_states;
+  }
+
+  void ConvexHull::setSymEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setSymEquivalentGStates():";
+    m_coord_groups[i_coord_group].m_sym_equivalent_g_states.clear();
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+    if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within coordgroups");}
+    if(!m_coord_groups[i_coord_group].m_is_on_hull){return;}
+    if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+
+    //we need to do a structure comparison, so get artificial map (did already before)
+    uint g_state=m_coord_groups[i_coord_group].m_ref_state;
+    if(g_state>m_points.size()-1){return;}
+    if(!m_points[g_state].m_has_entry){return;} //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry (structure) found"); //only point in coordgroup
+
+    if(LDEBUG) {cerr << soliloquy << " looking at g-state[" << g_state << "]=" << m_points[g_state].h_coords << endl;}
+    m_coord_groups[i_coord_group].m_sym_equivalent_g_states=getSymEquivalentGStates(g_state);
+    uint i_point=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_sym_equivalent_g_states.size();i<fl_size_i;i++){
+      i_point=m_coord_groups[i_coord_group].m_sym_equivalent_g_states[i];
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      m_points[i_point].m_is_sym_equivalent_g_state=true; //g_state and sym_equivalent_g_state should stay separate
+    }
+    if(LDEBUG) {cerr << soliloquy << " stop" << endl;}
+  }
+
+  void ConvexHull::setOnHullProperties(uint i_nary,uint i_alloy){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setOnHullProperties():";
+    stringstream message;
+    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+
+    message << "Gathering equilibrium phases and determining equivalent ground-states for";
+    if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    message << ", please be patient";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
+      i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
+      if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
+      if(!m_coord_groups[i_coord_group].m_initialized){continue;}
+      if(!m_coord_groups[i_coord_group].m_is_on_hull){continue;}
+      if(LDEBUG) {cerr << soliloquy << " looking at i_coord_group=" << i_coord_group << endl;}
+      //setDistancesToHull(i_nary,i_alloy,i_coord_group); //we now do separately and previously (setDistancesToHull())
+      //very important that you do not simply go through all facet points and find equilibrium points
+      //this will overwrite binary information with ternary information
+      //proceed safely with i_coord_group's
+      setEquilibriumPhases(i_nary,i_alloy,i_coord_group);
+      setSymEquivalentGStates(i_nary,i_alloy,i_coord_group);
+      setEquivalentGStates(i_nary,i_alloy,i_coord_group);
+    }
+  }
+
+  void ConvexHull::storeHullData(uint i_nary,uint i_alloy){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::storeHullData():";
+    stringstream message;
+    if(!h_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+
+    m_naries[i_nary].m_alloys[i_alloy].m_facets.clear();
+    for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
+      m_facets.push_back(h_facets[i]);
+      m_naries[i_nary].m_alloys[i_alloy].m_facets.push_back(m_facets.size()-1);
+    }
+    setHullMembers(i_nary,i_alloy);
+    if(LDEBUG) {
+      cerr << soliloquy << " hull points for i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;
+      for(uint i=0,fl_size_i=m_points.size();i<fl_size_i;i++){
+        if(m_points[i].m_is_on_hull){
+          cerr << soliloquy << " hull_point[" << i << "].m_coords=" << m_points[i].m_coords << endl;
+        }
       }
+    }
+    message << "Hull properties stored for";
+    if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  }
 
-      //since j_nary and j_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
-      uint j_nary=AUROSTD_MAX_UINT,j_alloy=AUROSTD_MAX_UINT;
-      if(!getAlloyIndex(point,j_nary,j_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
-      xvector<int> elements_present=m_naries[j_nary].m_alloys[j_alloy].m_elements_present;
-      if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
-      point.cleanPointForHullTransfer();      //clean now
-      point.setHullCoords(elements_present);  //just to be sure
+  void ConvexHull::storeHullData() {
+    for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
+      m_facets.push_back(h_facets[i]);
+      m_i_facets.push_back(m_facets.size()-1);
+    }
+    setHullMembers();
+  }
 
+  void ConvexHull::extractThermodynamicProperties(uint i_nary,uint i_alloy){
+    string soliloquy="ConvexHull::extractThermodynamicProperties():";
+    stringstream message;
+    if(!h_facets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull has yet to be calculated");}
+    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized alloy");}
+
+    bool perform_thermo_properties_extraction=(1&&thermoPropertiesExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION"))); //(1&&!(m_cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
+    if(!perform_thermo_properties_extraction){return;}
+    if(!m_thermo_hull){
+      message << "Cannot extract thermodynamic properties, thermodynamic hull NOT detected";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      return;
+    }
+
+    message << "Thermodynamic hull detected, gathering on/off hull properties for";
+    if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    if(i_nary==0){message << " (last)";}
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    setOffHullProperties(i_nary,i_alloy);
+    setOnHullProperties(i_nary,i_alloy);
+
+    message << "Thermodynamic properties calculated for";
+    if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  }
+
+  void ConvexHull::thermodynamicsPostProcessing(){
+    //hull must be initialized for these analyses
+    string soliloquy="ConvexHull::thermodynamicsPostProcessing():";
+    stringstream message;
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    if(!m_thermo_hull){return;}
+
+    message << "Performing thermodynamic post-processing";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+    bool perform_stability_criterion=(1&&thermoPostProcessingExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
+    if(perform_stability_criterion){setStabilityCriterion();}
+
+    bool perform_n_plus_1_energy_gain=(1&&thermoPostProcessingExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS"))); //(1&&!(m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
+    if(perform_n_plus_1_energy_gain){setNPlus1EnergyGain();}
+
+    return;
+  }
+
+  void ConvexHull::calculate(){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    stringstream message;
+    string soliloquy="ConvexHull::calculate():";
+
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+      for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+        m_points[m_coord_groups[i_coord_group].m_points[i]].m_is_on_hull=false; //completely refresh
+      }
+      m_coord_groups[i_coord_group].m_is_on_hull=false; //completely refresh
+    }
+
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+    //we first run through alloy hulls IF stoich_coords, grabbing hull_members
+    if(m_has_stoich_coords){
+      message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      if(!m_naries.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Points have yet to be structured");}
+      for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){ //start at binaries
+        for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+          message << "Calculating " << pflow::arity_string(i_nary+1,false,false) << " hull for";
+          if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+          cleanHull();
+          setElementsPresent(i_nary,i_alloy); //m_has_stoich_coords only
+          preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
+          calculateFacets();
+          message << pflow::arity_string(i_nary+1,true,false) << " hull calculated for";
+          if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+          storeHullData(i_nary,i_alloy);
+          setDistancesToHull(i_nary,i_alloy); //do this always
+          if(m_thermo_hull){extractThermodynamicProperties(i_nary,i_alloy);}
+        }
+      }
+      //set unary properties last
+      //sort of a hack, but actually an intelligent solution
+      //unary hull-members will be identified in higher dimensions
+      //therefore, we simply need to calculate their properties
+      for(uint i_alloy=0,fl_size_i_alloy=m_naries[0].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){setDistancesToHull(0,i_alloy);} //do this always
+      if(m_thermo_hull){  //very safe, not sure how these algorithms perform outside of this domain, already know we have m_has_stoich_coords
+        //message << "Calculating thermodynamic properties for " << pflow::arity_string(1,false,true) << " (last)";
+        //pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        for(uint i_alloy=0,fl_size_i_alloy=m_naries[0].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){extractThermodynamicProperties(0,i_alloy);} //knows to skip facet storage //setOnHullProperties(0,i_alloy);
+      }
+      //print counts of g_states by dimension
+      uint gstate_count=0,total_gstate_count=0;
+      for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+        gstate_count=getGStateCount(i_nary);
+        message << "Found " << gstate_count << " " << pflow::arity_string(i_nary+1,false,false) << " ";
+        if(m_thermo_hull){message << "ground-state phases";}
+        else {message << "points on the hull";}
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        total_gstate_count+=gstate_count;
+      }
+      message << "Found " << total_gstate_count << " ";
+      if(m_thermo_hull){message << "ground-state phases";}
+      else {message << "points on the hull";}
+      message << " total";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    } else {
+      message << "Entering default convex hull calculation (full-dimensional)";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      cleanHull();
+      preparePointsForHullCalculation();
+      calculateFacets();
+      message << "Hull calculated";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      //print count of gstates (hull points)
+      for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+        message << "Found " << getGStateCount() << " points on the hull total";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      }
+    }
+    storeHullData();  //that way, the largest dim facets get stored in m_facets!
+
+    //resort within coord_groups to expose hull-members!
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      std::sort(m_coord_groups[i_coord_group].m_points.begin(),m_coord_groups[i_coord_group].m_points.end(),sortWithinCoordGroup(m_points,m_sort_energy_ascending));  //ascending order
+    }
+    if(LDEBUG) {cerr << soliloquy << " done" << endl;}
+  }
+
+  double ConvexHull::getStabilityCriterion(const string& cauid) const {
+    string soliloquy="ConvexHull::getStabilityCriterion):";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    vector<string> vcauid; vcauid.push_back(cauid);
+    vector<double> vsc=getStabilityCriterion(vcauid);
+    return vsc[0];
+  }
+
+  double ConvexHull::getStabilityCriterion(uint cpoint) const {
+    string soliloquy="ConvexHull::getStabilityCriterion):";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    if(cpoint>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    vector<uint> vcpoint; vcpoint.push_back(cpoint);
+    vector<double> vsc=getStabilityCriterion(vcpoint);
+    return vsc[0];
+  }
+
+  vector<double> ConvexHull::getStabilityCriterion(const vector<string>& vcauid) const {
+    string soliloquy="ConvexHull::getStabilityCriterion):";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    stringstream message;
+
+    uint i_point=AUROSTD_MAX_UINT;
+    vector<uint> vcpoint; //follows vcauid
+    for(uint i=0,fl_size_i=vcauid.size();i<fl_size_i;i++){
+      const string& auid=vcauid[i];
+      if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      vcpoint.push_back(i_point);
+    }
+    return getStabilityCriterion(vcpoint);
+  }
+
+  vector<double> ConvexHull::getStabilityCriterion(const vector<uint>& vcpoint) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getStabilityCriterion():";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    stringstream message;
+
+    //get full set of points to neglect
+    uint i_point=AUROSTD_MAX_UINT;
+    ConvexHull fake_hull;
+    getFakeHull(vcpoint,fake_hull);
+
+    //since i_nary and i_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
+    uint i_nary=AUROSTD_MAX_UINT,i_alloy=AUROSTD_MAX_UINT;
+    vector<double> vscriterion;
+    ChullPoint point;
+    for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++) {
+      i_point=vcpoint[i];
+      //already checked validity of these points
+      point=m_points[i_point];
+      //we need to clean this point of any properties relevant to REAL hull (not to be confused with fake hull)
+      //clean first, then set h_coords
+      //in the case that it is not a unary, leverage i_alloy of REAL hull first, then clean
+      if(point.isUnary()){
+        point.cleanPointForHullTransfer();  //clean now
+        point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
+      }
+      else {
+        if(!getAlloyIndex(point,i_nary,i_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+        xvector<int> elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
+        if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
+        point.cleanPointForHullTransfer();      //clean now
+        point.setHullCoords(elements_present);  //just to be sure
+      }
       if(LDEBUG) {cerr << soliloquy << " m.coords=" << point.m_coords << endl;}
       if(LDEBUG) {cerr << soliloquy << " h.coords=" << point.h_coords << endl;}
+      vscriterion.push_back(fake_hull.getDistanceToHull(point,false));
+    }
+    return vscriterion;
+  }
 
-      //get full set of points to neglect
-      uint i_coord_group=AUROSTD_MAX_UINT;
-      vector<uint> vcpoint;
-      for(uint fl_size_i_nary=m_naries.size(),i_nary=(fl_size_i_nary-1);i_nary<fl_size_i_nary&&i_nary>=j_nary;i_nary--){ //go backwards!
-        if(LDEBUG) {cerr << soliloquy << " removing i_nary=" << i_nary << endl;}
-        for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-          for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
-            i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
-            for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_points.size();j<fl_size_j;j++){
-              vcpoint.push_back(m_coord_groups[i_coord_group].m_points[j]);
-            }
+  void ConvexHull::getFakeHull(const vector<uint>& vcpoint,ConvexHull& fake_hull) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getFakeHull():";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    stringstream message;
+
+    //get full set of points to neglect
+    uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT,g_state=AUROSTD_MAX_UINT;
+
+    if(LDEBUG) {cerr << soliloquy << " initial points_to_neglect.size()=" << vcpoint.size() << endl;}
+
+    //vector<ChullPoint> points_to_neglect; //not sure why it needs to be vector of chullpoints, simply hold indices
+    vector<uint> points_to_neglect;
+    vector<uint> eq_gstates;
+    for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++){
+      i_point=vcpoint[i];
+      if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+      const ChullPoint& point=m_points[i_point];  //this point may not be on the hull, it may be an equivalent structure, but coordgroup is
+      if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized chullpoint");}
+      if(!getCoordGroupIndex(point,i_coord_group)){message << "Coordgroup index not set (input[" << i << "])";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+      if(!m_coord_groups[i_coord_group].m_points.size()){message << "No points found within coordgroup (input[" << i << "])";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+      //if(!m_coord_groups[i_coord_group].m_is_on_hull){message << "Coordgroup not on the hull (input[" << i << "])";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);} //obsolete, now we don't assume coordgroup is on hull, we can remove ANY point
+      points_to_neglect.push_back(i_point);
+      if(m_coord_groups[i_coord_group].m_is_on_hull){
+        g_state=m_coord_groups[i_coord_group].m_ref_state;  //we lose i_point here, so make sure to add it before this if-statement, otherwise we get SUPER degeneracy
+        if(!m_points[g_state].m_is_g_state){message << "Coordgroup reference is not a ground-state structure (input[" << i << "])";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+        //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
+        if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
+        else {eq_gstates=getEquivalentGStates(g_state);}
+        if(!eq_gstates.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
+        //for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){points_to_neglect.push_back(m_points[eq_gstates[j]]);}
+        for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){points_to_neglect.push_back(eq_gstates[j]);}
+      }
+    }
+
+    std::sort(points_to_neglect.begin(),points_to_neglect.end());points_to_neglect.erase( std::unique( points_to_neglect.begin(), points_to_neglect.end() ), points_to_neglect.end() );  //first remove duplicate indices
+
+    if(LDEBUG) {
+      cerr << soliloquy << " points_to_neglect.size()=" << points_to_neglect.size() << endl;
+      cerr << soliloquy << " points_to_neglect: ";
+      for(uint i=0,fl_size_i=points_to_neglect.size();i<fl_size_i;i++){cerr << points_to_neglect[i] << " ";} 
+      cerr << endl;
+    }
+
+    //create new set of points
+    //bool found=false;
+    vector<ChullPoint> new_points;
+    //do NOT go through m_points, this may include some duplicates we previously excluded (now not duplicates since we are removing points: AlFe hull)
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+        i_point=m_coord_groups[i_coord_group].m_points[i];
+        if(aurostd::withinList(points_to_neglect,i_point)){
+          if(LDEBUG) {cerr << soliloquy << " Removing point from fake hull (i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << ")" << endl;}
+          continue;
+        }
+        const ChullPoint& point=m_points[i_point];
+        if(point.m_is_artificial){continue;}  //they will be added again
+        //found=false;
+        //for(uint j=0,fl_size_j=points_to_neglect.size();j<fl_size_j&&!found;j++){
+        //  if(point.m_entry.auid==points_to_neglect[j].m_entry.auid){
+        //    if(LDEBUG) {cerr << soliloquy << " Removing (equivalent) ground-state (auid=" << points_to_neglect[j].m_entry.auid << ")" << endl;}
+        //    found=true;
+        //  }
+        //}
+        //if(found){continue;}
+        if(LDEBUG) {cerr << soliloquy << " including point[" << i_point << "].compound=" << point.m_entry.compound << endl;}
+        new_points.push_back(point);
+        new_points.back().cleanPointForHullTransfer();
+      }
+    }
+    if(!new_points.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No points found for pseudo convex hull");}
+
+    if(LDEBUG) {cerr << soliloquy << " Creating new (pseudo) hull without relevant g-states" << endl;}
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    aurostd::xoption cflags=m_cflags;
+    cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true); //thermo properties NOT needed, just need hull
+    cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true); //this would be circular
+    cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS",true); //this would be circular
+    cflags.flag("FORCE",true); //need to avoid "Very skewed ground-state..." and "Unreliable hull" issues, we're removing points, so these may (and likely will) come up
+    //let's skip all this extra output
+    bool see_sub_output=false;//true;
+    ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
+    ofstream devnull("/dev/null");  //NULL
+    fake_hull.initialize(cflags,new_points,m_velements,devnull,oss_empty,m_half_hull,m_add_artificial_unaries);
+    oss_empty.clear();  //clear badbit, as cout is GLOBAL
+    if(!fake_hull.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not create pseudo convex hull");}
+  }
+
+  double ConvexHull::getNPlus1EnergyGain(const string& auid) const {
+    string soliloquy="ConvexHull::getNPlus1EnergyGain):";
+    stringstream message;
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    uint i_point=AUROSTD_MAX_UINT;
+    if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+    if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+    return getNPlus1EnergyGain(i_point);
+  }
+
+  double ConvexHull::getNPlus1EnergyGain(uint i_point) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getNPlus1EnergyGain):";
+    stringstream message;
+
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    ChullPoint point=m_points[i_point];
+    if(point.m_i_nary<1){ //forget about unaries and binaries
+      if(point.m_has_entry&&point.m_entry.enthalpy_formation_atom!=AUROSTD_NAN){return abs(point.m_entry.enthalpy_formation_atom);}
+      return 0;
+    }
+
+    //since j_nary and j_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
+    uint j_nary=AUROSTD_MAX_UINT,j_alloy=AUROSTD_MAX_UINT;
+    if(!getAlloyIndex(point,j_nary,j_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);}
+    xvector<int> elements_present=m_naries[j_nary].m_alloys[j_alloy].m_elements_present;
+    if(LDEBUG) {cerr << soliloquy << " elements_present=" << elements_present << endl;}
+    point.cleanPointForHullTransfer();      //clean now
+    point.setHullCoords(elements_present);  //just to be sure
+
+    if(LDEBUG) {cerr << soliloquy << " m.coords=" << point.m_coords << endl;}
+    if(LDEBUG) {cerr << soliloquy << " h.coords=" << point.h_coords << endl;}
+
+    //get full set of points to neglect
+    uint i_coord_group=AUROSTD_MAX_UINT;
+    vector<uint> vcpoint;
+    for(uint fl_size_i_nary=m_naries.size(),i_nary=(fl_size_i_nary-1);i_nary<fl_size_i_nary&&i_nary>=j_nary;i_nary--){ //go backwards!
+      if(LDEBUG) {cerr << soliloquy << " removing i_nary=" << i_nary << endl;}
+      for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+        for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
+          i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
+          for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_points.size();j<fl_size_j;j++){
+            vcpoint.push_back(m_coord_groups[i_coord_group].m_points[j]);
           }
         }
       }
-
-      if(LDEBUG) {
-        cerr << soliloquy << " points_to_neglect.size()=" << vcpoint.size() << endl;
-        std::sort(vcpoint.begin(),vcpoint.end());
-        cerr << soliloquy << " points_to_neglect: ";
-        for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++){cerr << vcpoint[i] << " ";} 
-        cerr << endl;
-      }
-
-      ConvexHull fake_hull;
-      getFakeHull(vcpoint,fake_hull);
-
-      return fake_hull.getDistanceToHull(point,false);
     }
 
-    void ConvexHull::setStabilityCriterion() {
-      bool LDEBUG = (FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::setStabilityCriterion():";
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      stringstream message;
+    if(LDEBUG) {
+      cerr << soliloquy << " points_to_neglect.size()=" << vcpoint.size() << endl;
+      std::sort(vcpoint.begin(),vcpoint.end());
+      cerr << soliloquy << " points_to_neglect: ";
+      for(uint i=0,fl_size_i=vcpoint.size();i<fl_size_i;i++){cerr << vcpoint[i] << " ";} 
+      cerr << endl;
+    }
 
-      message << "Determining stability criteria for ground-state structures, please be patient";
+    ConvexHull fake_hull;
+    getFakeHull(vcpoint,fake_hull);
+
+    return fake_hull.getDistanceToHull(point,false);
+  }
+
+  void ConvexHull::setStabilityCriterion() {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setStabilityCriterion():";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    stringstream message;
+
+    message << "Determining stability criteria for ground-state structures, please be patient";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+    vector<uint> g_states=getGStates(true);
+    uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT;
+    double scriterion;
+    vector<uint> eq_gstates;
+    for(uint i=0,fl_size_i=g_states.size();i<fl_size_i;i++){
+      i_point=g_states[i];
+      if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      if(LDEBUG) {cerr << soliloquy << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << endl;}
+      scriterion=getStabilityCriterion(i_point);
+      if(m_half_hull){
+        //do not use signbit, add tol to zero
+        //sign of distance:
+        //independent of lower/upper hull:  above hull is negative, below hull is positive
+        if(m_lower_hull){
+          if(notPositive(scriterion,true)) //std::signbit(scriterion))
+          { //CO200106 - patching for auto-indenting
+            message << "(lower half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
+            message << " (i_point=" << i_point;
+            message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
+            message << ",scriterion=" << scriterion << ")";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+          }
+        } else {
+          if(notNegative(scriterion,true)) //!std::signbit(scriterion))
+          { //CO200106 - patching for auto-indenting
+            message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
+            message << " (i_point=" << i_point;
+            message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
+            message << ",scriterion=" << scriterion << ")";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
+          }
+        }
+      }
+      //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
+      //set sign convention, negative for outside hull
+      //scriterion=abs(scriterion);
+      message << "Ground-state";
+      message << " (i_point=" << i_point;
+      message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
+      message << ") shows stability criterion = ";
+      message << chull::convertUnits(scriterion,(m_formation_energy_hull?_m_:_std_)) << " ";
+      message << (m_formation_energy_hull?"meV/atom":"K");
+      //this check should STILL work for unaries, as it's the difference of distances, and
+      //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive scriterion
+      //by convention, stability criterion are NEGATIVE as they are outside the hull
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      m_points[i_point].m_stability_criterion=scriterion;
+      //set equivalent ones
+      if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+      if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+      if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is not on the hull");}
+      m_coord_groups[i_coord_group].m_stability_criterion=m_points[i_point].m_stability_criterion;
+      //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
+      if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
+      else {eq_gstates=getEquivalentGStates(i_point);}
+      if(!eq_gstates.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
+      for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){
+        if(eq_gstates[j]>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+        if(!m_points[eq_gstates[j]].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(eq_gstates[j])+"] is not initialized");}
+        scriterion=m_points[i_point].m_stability_criterion;
+        scriterion+=(m_points[i_point].getLastCoord()-m_points[eq_gstates[j]].getLastCoord());
+        //if(m_formation_energy_hull){scriterion+=abs(H_f_atom(m_points[i_point])-H_f_atom(m_points[eq_gstates[j]]));}
+        //else {scriterion+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
+        //unaries could be really close to 0
+        //don't set if it becomes positive
+        if(std::signbit(m_points[i_point].m_stability_criterion)!=std::signbit(scriterion)){scriterion=0;}  //define these to be 0, AlFe hull look at Fe
+        m_points[eq_gstates[j]].m_stability_criterion=scriterion;
+      }
+    }
+  }
 
-      vector<uint> g_states=getGStates(true);
-      uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT;
-      double scriterion;
-      vector<uint> eq_gstates;
-      for(uint i=0,fl_size_i=g_states.size();i<fl_size_i;i++){
-        i_point=g_states[i];
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-        if(LDEBUG) {cerr << soliloquy << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << endl;}
-        scriterion=getStabilityCriterion(i_point);
+  void ConvexHull::setNPlus1EnergyGain() {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::setNPlus1EnergyGain():";
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    stringstream message;
+
+    message << "Determining N+1 energy gain for ground-state structures, please be patient";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+
+    vector<uint> g_states=getGStates(true);
+    uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT;
+    double np1egain;
+    vector<uint> eq_gstates;
+    bool test_binary_np1=true;  //turn me off when you're sure np1 is working
+    for(uint i=0,fl_size_i=g_states.size();i<fl_size_i;i++){
+      i_point=g_states[i];
+      if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      if(test_binary_np1==false&&m_points[i_point].m_i_nary<2){continue;} //unaries would be trivial, and binaries is simply H_f
+      if(LDEBUG) {cerr << soliloquy << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
+      np1egain=getNPlus1EnergyGain(i_point);
+      if(m_points[i_point].m_i_nary>0){ //skip unaries for this check, will be 0 by default
         if(m_half_hull){
           //do not use signbit, add tol to zero
           //sign of distance:
           //independent of lower/upper hull:  above hull is negative, below hull is positive
           if(m_lower_hull){
-            if(notPositive(scriterion,true)) //std::signbit(scriterion))
+            if(notPositive(np1egain,true)) //std::signbit(np1egain))
             { //CO200106 - patching for auto-indenting
               message << "(lower half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
               message << " (i_point=" << i_point;
               message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-              message << ",scriterion=" << scriterion << ")";
+              message << ",np1egain=" << np1egain << ")";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
             }
           } else {
-            if(notNegative(scriterion,true)) //!std::signbit(scriterion))
+            if(notNegative(np1egain,true)) //!std::signbit(np1egain))
             { //CO200106 - patching for auto-indenting
               message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
               message << " (i_point=" << i_point;
               message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-              message << ",scriterion=" << scriterion << ")";
+              message << ",np1egain=" << np1egain << ")";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
             }
           }
         }
-        //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
-        //set sign convention, negative for outside hull
-        //scriterion=abs(scriterion);
-        message << "Ground-state";
-        message << " (i_point=" << i_point;
-        message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-        message << ") shows stability criterion = ";
-        message << chull::convertUnits(scriterion,(m_formation_energy_hull?_m_:_std_)) << " ";
-        message << (m_formation_energy_hull?"meV/atom":"K");
-        //this check should STILL work for unaries, as it's the difference of distances, and
-        //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive scriterion
-        //by convention, stability criterion are NEGATIVE as they are outside the hull
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-        m_points[i_point].m_stability_criterion=scriterion;
-        //set equivalent ones
-        if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is not on the hull");}
-        m_coord_groups[i_coord_group].m_stability_criterion=m_points[i_point].m_stability_criterion;
-        //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
-        if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
-        else {eq_gstates=getEquivalentGStates(i_point);}
-        if(!eq_gstates.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
-        for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){
-          if(eq_gstates[j]>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-          if(!m_points[eq_gstates[j]].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(eq_gstates[j])+"] is not initialized");}
-          scriterion=m_points[i_point].m_stability_criterion;
-          scriterion+=(m_points[i_point].getLastCoord()-m_points[eq_gstates[j]].getLastCoord());
-          //if(m_formation_energy_hull){scriterion+=abs(H_f_atom(m_points[i_point])-H_f_atom(m_points[eq_gstates[j]]));}
-          //else {scriterion+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
-          //unaries could be really close to 0
-          //don't set if it becomes positive
-          if(std::signbit(m_points[i_point].m_stability_criterion)!=std::signbit(scriterion)){scriterion=0;}  //define these to be 0, AlFe hull look at Fe
-          m_points[eq_gstates[j]].m_stability_criterion=scriterion;
-        }
       }
-    }
-
-    void ConvexHull::setNPlus1EnergyGain() {
-      bool LDEBUG = (FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::setNPlus1EnergyGain():";
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
-      stringstream message;
-
-      message << "Determining N+1 energy gain for ground-state structures, please be patient";
+      //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
+      //set sign convention, negative for outside hull
+      //np1egain=abs(np1egain);
+      message << "Ground-state";
+      message << " (i_point=" << i_point;
+      message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
+      message << ") shows N+1 energy gain = ";
+      message << chull::convertUnits(np1egain,(m_formation_energy_hull?_m_:_std_)) << " ";
+      message << (m_formation_energy_hull?"meV/atom":"K");
+      //this check should STILL work for unaries, as it's the difference of distances, and
+      //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive np1egain
+      //by convention, energy gains are NEGATIVE as they are outside the hull
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-
-      vector<uint> g_states=getGStates(true);
-      uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT;
-      double np1egain;
-      vector<uint> eq_gstates;
-      bool test_binary_np1=true;  //turn me off when you're sure np1 is working
-      for(uint i=0,fl_size_i=g_states.size();i<fl_size_i;i++){
-        i_point=g_states[i];
-        if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-        if(test_binary_np1==false&&m_points[i_point].m_i_nary<2){continue;} //unaries would be trivial, and binaries is simply H_f
-        if(LDEBUG) {cerr << soliloquy << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
-        np1egain=getNPlus1EnergyGain(i_point);
-        if(m_points[i_point].m_i_nary>0){ //skip unaries for this check, will be 0 by default
-          if(m_half_hull){
-            //do not use signbit, add tol to zero
-            //sign of distance:
-            //independent of lower/upper hull:  above hull is negative, below hull is positive
-            if(m_lower_hull){
-              if(notPositive(np1egain,true)) //std::signbit(np1egain))
-              { //CO200106 - patching for auto-indenting
-                message << "(lower half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
-                message << " (i_point=" << i_point;
-                message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-                message << ",np1egain=" << np1egain << ")";
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-              }
-            } else {
-              if(notNegative(np1egain,true)) //!std::signbit(np1egain))
-              { //CO200106 - patching for auto-indenting
-                message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
-                message << " (i_point=" << i_point;
-                message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-                message << ",np1egain=" << np1egain << ")";
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
-              }
-            }
-          }
-        }
-        //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
-        //set sign convention, negative for outside hull
-        //np1egain=abs(np1egain);
-        message << "Ground-state";
-        message << " (i_point=" << i_point;
-        message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-        message << ") shows N+1 energy gain = ";
-        message << chull::convertUnits(np1egain,(m_formation_energy_hull?_m_:_std_)) << " ";
-        message << (m_formation_energy_hull?"meV/atom":"K");
-        //this check should STILL work for unaries, as it's the difference of distances, and
-        //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive np1egain
-        //by convention, energy gains are NEGATIVE as they are outside the hull
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-        m_points[i_point].m_n_plus_1_energy_gain=np1egain;
-        //set equivalent ones
-        if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
-        if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is not on the hull");}
-        m_coord_groups[i_coord_group].m_n_plus_1_energy_gain=m_points[i_point].m_n_plus_1_energy_gain;
-        //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
-        if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
-        else {eq_gstates=getEquivalentGStates(i_point);}
-        if(!eq_gstates.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
-        for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){
-          if(eq_gstates[j]>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-          if(!m_points[eq_gstates[j]].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(eq_gstates[j])+"] is not initialized");}
-          np1egain=m_points[i_point].m_n_plus_1_energy_gain;
-          np1egain+=(m_points[i_point].getLastCoord()-m_points[eq_gstates[j]].getLastCoord());
-          //if(m_formation_energy_hull){np1egain+=abs(H_f_atom(m_points[i_point])-H_f_atom(m_points[eq_gstates[j]]));}
-          //else {np1egain+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
-          //unaries could be really close to 0
-          //don't set if it becomes positive
-          if(std::signbit(m_points[i_point].m_n_plus_1_energy_gain)!=std::signbit(np1egain)){np1egain=0;}  //define these to be 0, AlFe hull look at Fe
-          m_points[eq_gstates[j]].m_n_plus_1_energy_gain=np1egain;
-        }
+      m_points[i_point].m_n_plus_1_energy_gain=np1egain;
+      //set equivalent ones
+      if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+      if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized coordgroup");}
+      if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup is not on the hull");}
+      m_coord_groups[i_coord_group].m_n_plus_1_energy_gain=m_points[i_point].m_n_plus_1_energy_gain;
+      //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
+      if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
+      else {eq_gstates=getEquivalentGStates(i_point);}
+      if(!eq_gstates.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No equivalent states found (not even self)");}
+      for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){
+        if(eq_gstates[j]>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+        if(!m_points[eq_gstates[j]].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(eq_gstates[j])+"] is not initialized");}
+        np1egain=m_points[i_point].m_n_plus_1_energy_gain;
+        np1egain+=(m_points[i_point].getLastCoord()-m_points[eq_gstates[j]].getLastCoord());
+        //if(m_formation_energy_hull){np1egain+=abs(H_f_atom(m_points[i_point])-H_f_atom(m_points[eq_gstates[j]]));}
+        //else {np1egain+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
+        //unaries could be really close to 0
+        //don't set if it becomes positive
+        if(std::signbit(m_points[i_point].m_n_plus_1_energy_gain)!=std::signbit(np1egain)){np1egain=0;}  //define these to be 0, AlFe hull look at Fe
+        m_points[eq_gstates[j]].m_n_plus_1_energy_gain=np1egain;
       }
     }
+  }
 
-    void ConvexHull::cleanHull() {
-      h_dim=0;
-      m_elements_present.clear();
-      h_points.clear();
-      h_centroid.clear();
-      h_reference.clear();
-      h_facets.clear();
-      h_visible_facets.clear();
-      h_horizon_ridges.clear();
+  void ConvexHull::cleanHull() {
+    h_dim=0;
+    m_elements_present.clear();
+    h_points.clear();
+    h_centroid.clear();
+    h_reference.clear();
+    h_facets.clear();
+    h_visible_facets.clear();
+    h_horizon_ridges.clear();
+  }
+
+  string ConvexHull::prettyPrintCompound(const ChullPoint& point,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
+    if(!point.m_has_entry){
+      string soliloquy="ConvexHull::prettyPrintCompound():";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry found");
     }
+    return prettyPrintCompound(point.m_entry,vred,exclude1,ftype);
+  }
 
-    string ConvexHull::prettyPrintCompound(const ChullPoint& point,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
-      if(!point.m_has_entry){
-        string soliloquy="ConvexHull::prettyPrintCompound():";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry found");
-      }
-      return prettyPrintCompound(point.m_entry,vred,exclude1,ftype);
-    }
-
-    string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
-      if(entry.vspecies.size()!=entry.vcomposition.size()) {
-        string soliloquy="ConvexHull::prettyPrintCompound():";
-        stringstream message;
-        message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
-        message << " (please report on AFLOW Forum: aflow.org/forum)";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-        return entry.compound;
-      }
-      return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  // ME190628
-    }
-
-    //[ME190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
-    //[ME190628 - moved to pflow_funcs.cpp]   return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype);
-    //[ME190628 - moved to pflow_funcs.cpp] }
-
-    //[ME190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // main function
-    //[ME190628 - moved to pflow_funcs.cpp]   // creates compound_label for LaTeX and text docs, like adding $_{}$
-    //[ME190628 - moved to pflow_funcs.cpp]   // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
-    //[ME190628 - moved to pflow_funcs.cpp]   string soliloquy="ConvexHull::prettyPrintCompound():";
-    //[ME190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
-    //[ME190628 - moved to pflow_funcs.cpp]   stringstream output;output.precision(precision);
-    //[ME190628 - moved to pflow_funcs.cpp]   if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vspecies.size() != vcomposition.rows");}
-    //[ME190628 - moved to pflow_funcs.cpp]   // special case, unary
-    //[ME190628 - moved to pflow_funcs.cpp]   if(vspecies.size() == 1) {
-    //[ME190628 - moved to pflow_funcs.cpp]     output << vspecies[0];
-    //[ME190628 - moved to pflow_funcs.cpp]     if(!exclude1) {output << (vred==gcd_vrt?1:vcomposition[vcomposition.lrows]);}
-    //[ME190628 - moved to pflow_funcs.cpp]     return output.str();
-    //[ME190628 - moved to pflow_funcs.cpp]   }
-    //[ME190628 - moved to pflow_funcs.cpp]   xvector<double> comp=vcomposition;
-    //[ME190628 - moved to pflow_funcs.cpp]   if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-    //[ME190628 - moved to pflow_funcs.cpp]   else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
-    //[ME190628 - moved to pflow_funcs.cpp]   else if(vred==no_vrt){;}
-    //[ME190628 - moved to pflow_funcs.cpp]   else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-    //[ME190628 - moved to pflow_funcs.cpp]   if(zeroWithinTol(aurostd::sum(comp))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Empty composition");}
-    //[ME190628 - moved to pflow_funcs.cpp]   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
-    //[ME190628 - moved to pflow_funcs.cpp]     output << vspecies[i];
-    //[ME190628 - moved to pflow_funcs.cpp]     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
-    //[ME190628 - moved to pflow_funcs.cpp]       if(ftype==latex_ft) {output << "$_{";
-    //[ME190628 - moved to pflow_funcs.cpp]       } else if(ftype==gnuplot_ft){output<< "_{";}
-    //[ME190628 - moved to pflow_funcs.cpp]       output << comp[i+comp.lrows];
-    //[ME190628 - moved to pflow_funcs.cpp]       if(ftype==latex_ft) {output << "}$";}
-    //[ME190628 - moved to pflow_funcs.cpp]       else if(ftype==gnuplot_ft){output<< "}";}
-    //[ME190628 - moved to pflow_funcs.cpp]     }
-    //[ME190628 - moved to pflow_funcs.cpp]   }
-    //[ME190628 - moved to pflow_funcs.cpp]   return output.str();
-    //[ME190628 - moved to pflow_funcs.cpp] }
-
-    string ConvexHull::getICSDNumber(uint i_point,bool remove_suffix) const{
-      string soliloquy="ConvexHull::getICSDNumber():";
-      if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-      return getICSDNumber(m_points[i_point],remove_suffix);
-    }
-
-    string ConvexHull::getICSDNumber(const ChullPoint& point,bool remove_suffix) const{
-      string soliloquy="ConvexHull::getICSDNumber():";
-      if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
-      if(!point.m_has_entry){return "";}
-      return getICSDNumber(point.m_entry,remove_suffix);
-
-    }
-    string ConvexHull::getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix) const{
-      string soliloquy="ConvexHull::getICSDNumber():";
-      const string& proto=entry.prototype;
-      if(!aurostd::substring2bool(proto,"ICSD_")){return "";}
-      vector<string> tokens;
-      aurostd::string2tokens(proto,tokens,"_");
-      string icsd_number;
-      if(tokens.size()==2){icsd_number=tokens[1];} //aurostd::substring2bool(proto,"ICSD_")
-      else if(tokens.size()==3&&aurostd::substring2bool(proto,"_ICSD_")){icsd_number=tokens[2];}
-      if(icsd_number.empty()){return icsd_number;}
-      if(remove_suffix){
-        aurostd::string2tokens(icsd_number,tokens,".");if(tokens.size()){icsd_number=tokens[0];}
-        aurostd::string2tokens(icsd_number,tokens,":");if(tokens.size()){icsd_number=tokens[0];}
-      }
-      return icsd_number;
-    }
-
-    string ConvexHull::prettyPrintPrototype(const ChullPoint& point, bool double_back_slash,bool icsd_label_skim) const {  // overload
-      if(!point.m_has_entry){
-        string soliloquy="ConvexHull::prettyPrintPrototype():";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry found");
-      }
-      return prettyPrintPrototype(point.m_entry,double_back_slash,icsd_label_skim);
-    }
-
-    string ConvexHull::prettyPrintPrototype(const aflowlib::_aflowlib_entry& entry, bool double_back_slash,bool icsd_label_skim) const {  // main function
-      // creates prototype_label for LaTeX ONLY, no use for this function otherwise
-      // escapes funny characters
-      if(entry.prototype.empty()) {
-        string soliloquy="ConvexHull::prettyPrintPrototype():";
-        stringstream message;
-        message << "Entry (auid=" << entry.auid << ") is ill-defined: empty prototype";
-        message << " (please report on AFLOW Forum: aflow.org/forum)";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-        return entry.prototype;
-      }
-      bool fix_icsd_labels=true;
-      string proto=entry.prototype;
-      if(fix_icsd_labels&&aurostd::substring2bool(proto,"ICSD_")){
-        vector<string> tokens;
-        string string_to_fix=getICSDNumber(entry,icsd_label_skim==true);  //remove suffix if skim label
-        //aurostd::string2tokens(proto,tokens,"_");
-        //if(tokens.size()==2){string_to_fix=tokens[1];} //aurostd::substring2bool(proto,"ICSD_")
-        //else if(tokens.size()==3&&aurostd::substring2bool(proto,"_ICSD_")){string_to_fix=tokens[2];}
-        if(!string_to_fix.empty()){
-          return (icsd_label_skim?"":"ICSD~")+(double_back_slash?string("\\\\"):string("\\"))+"#"+aurostd::fixStringLatex(string_to_fix,double_back_slash,false);
-        }
-        //else, just leave alone
-      }
-      return aurostd::fixStringLatex(proto,double_back_slash,false);
-    }
-
-    //[CO190419 - moved to aurostd_main.cpp]string ConvexHull::fixStringLatex(const string& input, bool double_back_slash,bool symmetry_string) const {
-    //[CO190419 - moved to aurostd_main.cpp]  // deals with special characters for LaTeX, like some characters in prototype
-    //[CO190419 - moved to aurostd_main.cpp]  // see http://tex.stackexchange.com/questions/34580/escape-character-in-latex
-    //[CO190419 - moved to aurostd_main.cpp]  // double_back_slash was needed SOMETIMES for gnuplot output, as one backslash
-    //[CO190419 - moved to aurostd_main.cpp]  // went away when writing to file, and  -- OBSOLETE NOW
-    //[CO190419 - moved to aurostd_main.cpp]  string soliloquy="ConvexHull::fixStringLatex():";
-    //[CO190419 - moved to aurostd_main.cpp]  string output;
-    //[CO190419 - moved to aurostd_main.cpp]  vector<char> problem_characters;
-    //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('&');
-    //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('%');
-    //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('$');
-    //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('#');
-    //[CO190419 - moved to aurostd_main.cpp]  if(!symmetry_string) {
-    //[CO190419 - moved to aurostd_main.cpp]    problem_characters.push_back('_');
-    //[CO190419 - moved to aurostd_main.cpp]    problem_characters.push_back('{');
-    //[CO190419 - moved to aurostd_main.cpp]    problem_characters.push_back('}');
-    //[CO190419 - moved to aurostd_main.cpp]  }
-    //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('~');  // different fix
-    //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('^');  // different fix
-    //[CO190419 - moved to aurostd_main.cpp]  string solution_string;
-    //[CO190419 - moved to aurostd_main.cpp]  solution_string = "\\\\";  // has to be string, \\ char does not work
-    //[CO190419 - moved to aurostd_main.cpp]  bool found_escaped_char;
-    //[CO190419 - moved to aurostd_main.cpp]  bool found_hyphen_symmetry = false;
-    //[CO190419 - moved to aurostd_main.cpp]  bool solved_hyphen_symmetry = false;
-    //[CO190419 - moved to aurostd_main.cpp]  for(uint i=0;i<input.length();i++) {
-    //[CO190419 - moved to aurostd_main.cpp]    // we first enter this loop because symmetry_string and input[i]=='-'
-    //[CO190419 - moved to aurostd_main.cpp]    // second enter loop because symmetry_string and found_hyphen_symmetry
-    //[CO190419 - moved to aurostd_main.cpp]    if(symmetry_string && (input[i] == '-' || found_hyphen_symmetry)) {
-    //[CO190419 - moved to aurostd_main.cpp]      if(!found_hyphen_symmetry) {
-    //[CO190419 - moved to aurostd_main.cpp]        // first enter loop, come here
-    //[CO190419 - moved to aurostd_main.cpp]        found_hyphen_symmetry = true;
-    //[CO190419 - moved to aurostd_main.cpp]        output.append((double_back_slash?string("\\"):string(""))+string("\\overline{"));
-    //[CO190419 - moved to aurostd_main.cpp]        // very important, we don't want to add hyphen, just replace
-    //[CO190419 - moved to aurostd_main.cpp]        // with overline, so continue
-    //[CO190419 - moved to aurostd_main.cpp]        continue;
-    //[CO190419 - moved to aurostd_main.cpp]      } else {
-    //[CO190419 - moved to aurostd_main.cpp]        // second enter loop, do nothing but turn this flag on
-    //[CO190419 - moved to aurostd_main.cpp]        // allow us to add input[i]
-    //[CO190419 - moved to aurostd_main.cpp]        found_hyphen_symmetry = false;
-    //[CO190419 - moved to aurostd_main.cpp]        solved_hyphen_symmetry = true;
-    //[CO190419 - moved to aurostd_main.cpp]      }
-    //[CO190419 - moved to aurostd_main.cpp]    } else {
-    //[CO190419 - moved to aurostd_main.cpp]      if(symmetry_string && solved_hyphen_symmetry) {
-    //[CO190419 - moved to aurostd_main.cpp]        // last step of symmetry_string fix, but we have to do this in part of
-    //[CO190419 - moved to aurostd_main.cpp]        // the loop to allow for next character to be identified as problem
-    //[CO190419 - moved to aurostd_main.cpp]        // character as well
-    //[CO190419 - moved to aurostd_main.cpp]        output.append(1, '}');
-    //[CO190419 - moved to aurostd_main.cpp]        solved_hyphen_symmetry = false;
-    //[CO190419 - moved to aurostd_main.cpp]      }
-    //[CO190419 - moved to aurostd_main.cpp]      // go through all problem characters
-    //[CO190419 - moved to aurostd_main.cpp]      for(uint j=0,fl_size_j=problem_characters.size();j<fl_size_j;j++) {
-    //[CO190419 - moved to aurostd_main.cpp]        if(input[i] == problem_characters[j]) {
-    //[CO190419 - moved to aurostd_main.cpp]          if(double_back_slash) {
-    //[CO190419 - moved to aurostd_main.cpp]            // if we find one, but it has double backslash, leave alone
-    //[CO190419 - moved to aurostd_main.cpp]            // doesn't matter what it is, if it has double backslash it's good
-    //[CO190419 - moved to aurostd_main.cpp]            // if we find one, but it only has single backslash, add one
-    //[CO190419 - moved to aurostd_main.cpp]            if(i && i - 1 && input[i - 1] == '\\' && input[i - 2] == '\\') {break;}
-    //[CO190419 - moved to aurostd_main.cpp]            else if(i && input[i - 1] == '\\') {
-    //[CO190419 - moved to aurostd_main.cpp]              output.append(1, '\\');  // just add one
-    //[CO190419 - moved to aurostd_main.cpp]              break;
-    //[CO190419 - moved to aurostd_main.cpp]            }
-    //[CO190419 - moved to aurostd_main.cpp]            // if we find one, give two backslashes
-    //[CO190419 - moved to aurostd_main.cpp]            output.append("\\\\");
-    //[CO190419 - moved to aurostd_main.cpp]            break;
-    //[CO190419 - moved to aurostd_main.cpp]          } else {
-    //[CO190419 - moved to aurostd_main.cpp]            // if we find one, but it has single backslash, leave alone
-    //[CO190419 - moved to aurostd_main.cpp]            // doesn't matter what it is, if it has single backslash it's good
-    //[CO190419 - moved to aurostd_main.cpp]            // if we find one, give single backslash
-    //[CO190419 - moved to aurostd_main.cpp]            if(i && input[i - 1] == '\\') {break;}  
-    //[CO190419 - moved to aurostd_main.cpp]            output.append(1, '\\');
-    //[CO190419 - moved to aurostd_main.cpp]            break;
-    //[CO190419 - moved to aurostd_main.cpp]          }
-    //[CO190419 - moved to aurostd_main.cpp]        }
-    //[CO190419 - moved to aurostd_main.cpp]      }
-    //[CO190419 - moved to aurostd_main.cpp]      // we also have to add {} for these characters
-    //[CO190419 - moved to aurostd_main.cpp]      if(input[i] == '~' || input[i] == '^') {output.append("{}");}
-    //[CO190419 - moved to aurostd_main.cpp]      found_escaped_char = false;
-    //[CO190419 - moved to aurostd_main.cpp]      if(input[i] == '\\') {
-    //[CO190419 - moved to aurostd_main.cpp]        for(uint j=0,fl_size_j=problem_characters.size();j<fl_size_j;j++) {
-    //[CO190419 - moved to aurostd_main.cpp]          // the only way this works if it's serving as an escape for a character
-    //[CO190419 - moved to aurostd_main.cpp]          // don't worry about double backslash here, we get to that when we find
-    //[CO190419 - moved to aurostd_main.cpp]          // the actual character
-    //[CO190419 - moved to aurostd_main.cpp]          if(i != (input.length() - 1) && input[i+1] == problem_characters[j]) {
-    //[CO190419 - moved to aurostd_main.cpp]            found_escaped_char = true;
-    //[CO190419 - moved to aurostd_main.cpp]            break;  // doesn't matter what it is, if it has backslash it's good
-    //[CO190419 - moved to aurostd_main.cpp]          }
-    //[CO190419 - moved to aurostd_main.cpp]        }
-    //[CO190419 - moved to aurostd_main.cpp]        // this is a problem, no way around it--we cannot output single backslash
-    //[CO190419 - moved to aurostd_main.cpp]        if(!found_escaped_char) {
-    //[CO190419 - moved to aurostd_main.cpp]          stringstream message;
-    //[CO190419 - moved to aurostd_main.cpp]          message << "Extraneous backslash found in \"" << input << "\" which may cause problems for LaTeX/gnuplot";
-    //[CO190419 - moved to aurostd_main.cpp]          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
-    //[CO190419 - moved to aurostd_main.cpp]          return input;
-    //[CO190419 - moved to aurostd_main.cpp]        }
-    //[CO190419 - moved to aurostd_main.cpp]      }
-    //[CO190419 - moved to aurostd_main.cpp]    }
-    //[CO190419 - moved to aurostd_main.cpp]    // add in character from input
-    //[CO190419 - moved to aurostd_main.cpp]    output.append(1, input[i]);
-    //[CO190419 - moved to aurostd_main.cpp]  }
-    //[CO190419 - moved to aurostd_main.cpp]  return output;
-    //[CO190419 - moved to aurostd_main.cpp]}
-
-    string ConvexHull::getPlotHeaderPDF(char function_mode,const string& column_header,bool display_color_gradient) const {
-      // produces addplot latex string
-      string soliloquy="ConvexHull::getPlotHeaderPDF():";
+  string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
+    if(entry.vspecies.size()!=entry.vcomposition.size()) {
+      string soliloquy="ConvexHull::prettyPrintCompound():";
       stringstream message;
-      stringstream addplot_output_ss;addplot_output_ss.str("");
+      message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
+      message << " (please report on AFLOW Forum: aflow.org/forum)";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      return entry.compound;
+    }
+    return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  // ME190628
+  }
 
-      uint dimension=getDim();
-      bool reverse_axes=DEFAULT_CHULL_LATEX_REVERSE_AXIS;
+  //[ME190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
+  //[ME190628 - moved to pflow_funcs.cpp]   return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype);
+  //[ME190628 - moved to pflow_funcs.cpp] }
 
-      // http://tex.stackexchange.com/questions/59070/pgfplots-remove-darker-borders-on-marks
-      // this string WILL cause warnings when compiling, but it's correct, no way to
-      // fix it with our current compiler
-      stringstream tmp_dark_border_points_command;
-      tmp_dark_border_points_command << "scatter/use mapped color={draw=black,fill=mapped color,solid}";
+  //[ME190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // main function
+  //[ME190628 - moved to pflow_funcs.cpp]   // creates compound_label for LaTeX and text docs, like adding $_{}$
+  //[ME190628 - moved to pflow_funcs.cpp]   // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
+  //[ME190628 - moved to pflow_funcs.cpp]   string soliloquy="ConvexHull::prettyPrintCompound():";
+  //[ME190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
+  //[ME190628 - moved to pflow_funcs.cpp]   stringstream output;output.precision(precision);
+  //[ME190628 - moved to pflow_funcs.cpp]   if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vspecies.size() != vcomposition.rows");}
+  //[ME190628 - moved to pflow_funcs.cpp]   // special case, unary
+  //[ME190628 - moved to pflow_funcs.cpp]   if(vspecies.size() == 1) {
+  //[ME190628 - moved to pflow_funcs.cpp]     output << vspecies[0];
+  //[ME190628 - moved to pflow_funcs.cpp]     if(!exclude1) {output << (vred==gcd_vrt?1:vcomposition[vcomposition.lrows]);}
+  //[ME190628 - moved to pflow_funcs.cpp]     return output.str();
+  //[ME190628 - moved to pflow_funcs.cpp]   }
+  //[ME190628 - moved to pflow_funcs.cpp]   xvector<double> comp=vcomposition;
+  //[ME190628 - moved to pflow_funcs.cpp]   if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+  //[ME190628 - moved to pflow_funcs.cpp]   else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+  //[ME190628 - moved to pflow_funcs.cpp]   else if(vred==no_vrt){;}
+  //[ME190628 - moved to pflow_funcs.cpp]   else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+  //[ME190628 - moved to pflow_funcs.cpp]   if(zeroWithinTol(aurostd::sum(comp))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Empty composition");}
+  //[ME190628 - moved to pflow_funcs.cpp]   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
+  //[ME190628 - moved to pflow_funcs.cpp]     output << vspecies[i];
+  //[ME190628 - moved to pflow_funcs.cpp]     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
+  //[ME190628 - moved to pflow_funcs.cpp]       if(ftype==latex_ft) {output << "$_{";
+  //[ME190628 - moved to pflow_funcs.cpp]       } else if(ftype==gnuplot_ft){output<< "_{";}
+  //[ME190628 - moved to pflow_funcs.cpp]       output << comp[i+comp.lrows];
+  //[ME190628 - moved to pflow_funcs.cpp]       if(ftype==latex_ft) {output << "}$";}
+  //[ME190628 - moved to pflow_funcs.cpp]       else if(ftype==gnuplot_ft){output<< "}";}
+  //[ME190628 - moved to pflow_funcs.cpp]     }
+  //[ME190628 - moved to pflow_funcs.cpp]   }
+  //[ME190628 - moved to pflow_funcs.cpp]   return output.str();
+  //[ME190628 - moved to pflow_funcs.cpp] }
 
-      string dark_border_points_command = tmp_dark_border_points_command.str();
+  string ConvexHull::getICSDNumber(uint i_point,bool remove_suffix) const{
+    string soliloquy="ConvexHull::getICSDNumber():";
+    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    return getICSDNumber(m_points[i_point],remove_suffix);
+  }
 
-      // first do a check that the function_mode is not out of scope
-      if(dimension == 2) {
-        if(function_mode != ADDPLOT_MODE_HULL_POINTS &&
-            function_mode != ADDPLOT_MODE_OFF_HULL_POINTS &&
-            function_mode != ADDPLOT_MODE_HULL_FACETS) {
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode (2D) and function mode mismatch");
-        }
-        if(m_velements.size() != 2) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode (2D) and elements.size() mismatch");}
-      } else if(dimension == 3) {
-        if(function_mode != ADDPLOT_MODE_HULL_POINTS &&
-            function_mode != ADDPLOT_MODE_OFF_HULL_POINTS &&
-            function_mode != ADDPLOT_MODE_HULL_FACETS &&
-            function_mode != ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS &&
-            function_mode != ADDPLOT_MODE_HEAT_MAPS) {
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode (3D) and function mode mismatch");
-        }
-        if(m_velements.size() != 3) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode (3D) and elements.size() mismatch");}
-      } else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode out of scope");}
+  string ConvexHull::getICSDNumber(const ChullPoint& point,bool remove_suffix) const{
+    string soliloquy="ConvexHull::getICSDNumber():";
+    if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized point");}
+    if(!point.m_has_entry){return "";}
+    return getICSDNumber(point.m_entry,remove_suffix);
 
-      //also check column_header
-      bool found=false;
-      for(uint i=0,fl_size_i=m_velements.size();i<fl_size_i;i++){found|=(column_header==m_velements[i]);}
-      found|=(column_header=="H_f_meVatom");
-      found|=(column_header=="H_f_kJmol");
-      found|=(column_header=="T_S");
-      found|=(column_header=="Dist2hull");
-      if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input column_header mode out of scope ("+column_header+")");}
+  }
+  string ConvexHull::getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix) const{
+    string soliloquy="ConvexHull::getICSDNumber():";
+    const string& proto=entry.prototype;
+    if(!aurostd::substring2bool(proto,"ICSD_")){return "";}
+    vector<string> tokens;
+    aurostd::string2tokens(proto,tokens,"_");
+    string icsd_number;
+    if(tokens.size()==2){icsd_number=tokens[1];} //aurostd::substring2bool(proto,"ICSD_")
+    else if(tokens.size()==3&&aurostd::substring2bool(proto,"_ICSD_")){icsd_number=tokens[2];}
+    if(icsd_number.empty()){return icsd_number;}
+    if(remove_suffix){
+      aurostd::string2tokens(icsd_number,tokens,".");if(tokens.size()){icsd_number=tokens[0];}
+      aurostd::string2tokens(icsd_number,tokens,":");if(tokens.size()){icsd_number=tokens[0];}
+    }
+    return icsd_number;
+  }
 
-      // main addplot function
-      if(dimension == 2) {addplot_output_ss << "\\addplot+[" << endl;}
-      else {  // dimension==3
-        if(function_mode == ADDPLOT_MODE_HEAT_MAPS) {addplot_output_ss << "\\addplot3[" << endl;}
-        else {addplot_output_ss << "\\addplot3+[" << endl;}
+  string ConvexHull::prettyPrintPrototype(const ChullPoint& point, bool double_back_slash,bool icsd_label_skim) const {  // overload
+    if(!point.m_has_entry){
+      string soliloquy="ConvexHull::prettyPrintPrototype():";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No entry found");
+    }
+    return prettyPrintPrototype(point.m_entry,double_back_slash,icsd_label_skim);
+  }
+
+  string ConvexHull::prettyPrintPrototype(const aflowlib::_aflowlib_entry& entry, bool double_back_slash,bool icsd_label_skim) const {  // main function
+    // creates prototype_label for LaTeX ONLY, no use for this function otherwise
+    // escapes funny characters
+    if(entry.prototype.empty()) {
+      string soliloquy="ConvexHull::prettyPrintPrototype():";
+      stringstream message;
+      message << "Entry (auid=" << entry.auid << ") is ill-defined: empty prototype";
+      message << " (please report on AFLOW Forum: aflow.org/forum)";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      return entry.prototype;
+    }
+    bool fix_icsd_labels=true;
+    string proto=entry.prototype;
+    if(fix_icsd_labels&&aurostd::substring2bool(proto,"ICSD_")){
+      vector<string> tokens;
+      string string_to_fix=getICSDNumber(entry,icsd_label_skim==true);  //remove suffix if skim label
+      //aurostd::string2tokens(proto,tokens,"_");
+      //if(tokens.size()==2){string_to_fix=tokens[1];} //aurostd::substring2bool(proto,"ICSD_")
+      //else if(tokens.size()==3&&aurostd::substring2bool(proto,"_ICSD_")){string_to_fix=tokens[2];}
+      if(!string_to_fix.empty()){
+        return (icsd_label_skim?"":"ICSD~")+(double_back_slash?string("\\\\"):string("\\"))+"#"+aurostd::fixStringLatex(string_to_fix,double_back_slash,false);
       }
+      //else, just leave alone
+    }
+    return aurostd::fixStringLatex(proto,double_back_slash,false);
+  }
 
-      if(function_mode == ADDPLOT_MODE_HULL_FACETS ||
-          function_mode == ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS) {
-        addplot_output_ss << "mark=none," << endl;
-        if(function_mode == ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS) {
-          addplot_output_ss << "color=white," << endl;
-          addplot_output_ss << "solid," << endl;
-          addplot_output_ss << "line width=2.0pt," << endl;
-        } else {  // function_mode==ADDPLOT_MODE_HULL_FACETS
-          addplot_output_ss << "color=black," << endl;
-          addplot_output_ss << "solid," << endl;
-          if(dimension == 3) {addplot_output_ss << "line width=2pt," << endl;}
-        }
-        addplot_output_ss << "] table ";
-        if(dimension == 2) {
-          if(reverse_axes){addplot_output_ss << "[x=" << m_velements[0];}
-          else {addplot_output_ss << "[x=" << m_velements[1];}
-          addplot_output_ss << ",y=" << column_header;
-          addplot_output_ss << "]";
-        } else {  // dimension==3
-          addplot_output_ss << "[x=" << m_velements[1];
-          addplot_output_ss << ",y=" << m_velements[0];
-          addplot_output_ss << ",z=" << m_velements[2] << "]";  // flipping x and y
-        }
-      } else {  // function_mode==ADDPLOT_MODE_HULL_POINTS||function_mode==ADDPLOT_MODE_OFF_HULL_POINTS||function_mode==ADDPLOT_MODE_HEAT_MAPS
-        if(function_mode == ADDPLOT_MODE_HEAT_MAPS) {
-          addplot_output_ss << "patch," << endl;
-          addplot_output_ss << "patch type=triangle," << endl;
-          addplot_output_ss << "shader=interp," << endl;
-        } else {
-          addplot_output_ss << "only marks," << endl;  // IMPORTANT, no lines
-          if(function_mode == ADDPLOT_MODE_HULL_POINTS) {
-            addplot_output_ss << "mark=*," << endl;
-            if(dimension == 2) {addplot_output_ss << "mark size=4," << endl;}
-            else {  // dimension==3
-              addplot_output_ss << "mark size=5," << endl;
-              addplot_output_ss << "line width=2pt," << endl;
-            }
-          } else {  // function_mode==ADDPLOT_MODE_OFF_HULL_POINTS
-            addplot_output_ss << "mark=x," << endl;
-            addplot_output_ss << "mark options={scale=2,line width=2,solid";
-          }
-        }
-        if(display_color_gradient || function_mode == ADDPLOT_MODE_HEAT_MAPS) {  
-          // this OR statement doesn't practically matter, since one does not work without the other, 
-          // but I keep it here so that the output of the string is complete
-          if(function_mode == ADDPLOT_MODE_OFF_HULL_POINTS) {addplot_output_ss << "}," << endl;}
-          addplot_output_ss << "point meta=\\thisrow{" << column_header << "}," << endl;  // uses point meta as color data
-          addplot_output_ss << "nodes near coords*={}," << endl;  // no labels, but we need this for colors
-          // GOT IT! // http://tex.stackexchange.com/questions/59070/pgfplots-remove-darker-borders-on-marks
-          if(function_mode == ADDPLOT_MODE_HULL_POINTS) {addplot_output_ss << dark_border_points_command << "," << endl;}
-          addplot_output_ss << "visualization depends on={\\thisrow{" << column_header << "} \\as \\" << column_header << "}," << endl;  // defines visualization dependency
-        } else {
-          if(function_mode == ADDPLOT_MODE_HULL_POINTS) {addplot_output_ss << "mark options={draw=black,fill=blue,solid}," << endl;}
-          else {addplot_output_ss << ",draw=red}," << endl;}// function_mode==ADDPLOT_MODE_OFF_HULL_POINTS
-        }
-        addplot_output_ss << "] table ";
-        if(dimension == 2) {
-          if(reverse_axes){addplot_output_ss << "[x=" << m_velements[0];}
-          else {addplot_output_ss << "[x=" << m_velements[1];}
-          addplot_output_ss << ",y=" << column_header;
-          addplot_output_ss << "]";
-        } else {  // dimension==3
-          addplot_output_ss << "[x=" << m_velements[1];
-          addplot_output_ss << ",y=" << m_velements[0];
-          addplot_output_ss << ",z=" << m_velements[2] << "]";  // flipping x and y
-        }
-      }
-      addplot_output_ss << "{" << endl;
-      for(uint i=0,fl_size_i=m_velements.size();i<fl_size_i;i++){addplot_output_ss << aurostd::PaddedPOST(m_velements[i], 30);}
-      addplot_output_ss << aurostd::PaddedPOST("H_f_meVatom", 30);
-      addplot_output_ss << aurostd::PaddedPOST("H_f_kJmol", 30);
-      addplot_output_ss << aurostd::PaddedPOST("T_S", 30);
-      if(PRINT_DIST2HULL_COL_TEX){
-        addplot_output_ss << aurostd::PaddedPOST("Dist2hull", 30);
-      }
-      addplot_output_ss << endl;
+  //[CO190419 - moved to aurostd_main.cpp]string ConvexHull::fixStringLatex(const string& input, bool double_back_slash,bool symmetry_string) const {
+  //[CO190419 - moved to aurostd_main.cpp]  // deals with special characters for LaTeX, like some characters in prototype
+  //[CO190419 - moved to aurostd_main.cpp]  // see http://tex.stackexchange.com/questions/34580/escape-character-in-latex
+  //[CO190419 - moved to aurostd_main.cpp]  // double_back_slash was needed SOMETIMES for gnuplot output, as one backslash
+  //[CO190419 - moved to aurostd_main.cpp]  // went away when writing to file, and  -- OBSOLETE NOW
+  //[CO190419 - moved to aurostd_main.cpp]  string soliloquy="ConvexHull::fixStringLatex():";
+  //[CO190419 - moved to aurostd_main.cpp]  string output;
+  //[CO190419 - moved to aurostd_main.cpp]  vector<char> problem_characters;
+  //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('&');
+  //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('%');
+  //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('$');
+  //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('#');
+  //[CO190419 - moved to aurostd_main.cpp]  if(!symmetry_string) {
+  //[CO190419 - moved to aurostd_main.cpp]    problem_characters.push_back('_');
+  //[CO190419 - moved to aurostd_main.cpp]    problem_characters.push_back('{');
+  //[CO190419 - moved to aurostd_main.cpp]    problem_characters.push_back('}');
+  //[CO190419 - moved to aurostd_main.cpp]  }
+  //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('~');  // different fix
+  //[CO190419 - moved to aurostd_main.cpp]  problem_characters.push_back('^');  // different fix
+  //[CO190419 - moved to aurostd_main.cpp]  string solution_string;
+  //[CO190419 - moved to aurostd_main.cpp]  solution_string = "\\\\";  // has to be string, \\ char does not work
+  //[CO190419 - moved to aurostd_main.cpp]  bool found_escaped_char;
+  //[CO190419 - moved to aurostd_main.cpp]  bool found_hyphen_symmetry = false;
+  //[CO190419 - moved to aurostd_main.cpp]  bool solved_hyphen_symmetry = false;
+  //[CO190419 - moved to aurostd_main.cpp]  for(uint i=0;i<input.length();i++) {
+  //[CO190419 - moved to aurostd_main.cpp]    // we first enter this loop because symmetry_string and input[i]=='-'
+  //[CO190419 - moved to aurostd_main.cpp]    // second enter loop because symmetry_string and found_hyphen_symmetry
+  //[CO190419 - moved to aurostd_main.cpp]    if(symmetry_string && (input[i] == '-' || found_hyphen_symmetry)) {
+  //[CO190419 - moved to aurostd_main.cpp]      if(!found_hyphen_symmetry) {
+  //[CO190419 - moved to aurostd_main.cpp]        // first enter loop, come here
+  //[CO190419 - moved to aurostd_main.cpp]        found_hyphen_symmetry = true;
+  //[CO190419 - moved to aurostd_main.cpp]        output.append((double_back_slash?string("\\"):string(""))+string("\\overline{"));
+  //[CO190419 - moved to aurostd_main.cpp]        // very important, we don't want to add hyphen, just replace
+  //[CO190419 - moved to aurostd_main.cpp]        // with overline, so continue
+  //[CO190419 - moved to aurostd_main.cpp]        continue;
+  //[CO190419 - moved to aurostd_main.cpp]      } else {
+  //[CO190419 - moved to aurostd_main.cpp]        // second enter loop, do nothing but turn this flag on
+  //[CO190419 - moved to aurostd_main.cpp]        // allow us to add input[i]
+  //[CO190419 - moved to aurostd_main.cpp]        found_hyphen_symmetry = false;
+  //[CO190419 - moved to aurostd_main.cpp]        solved_hyphen_symmetry = true;
+  //[CO190419 - moved to aurostd_main.cpp]      }
+  //[CO190419 - moved to aurostd_main.cpp]    } else {
+  //[CO190419 - moved to aurostd_main.cpp]      if(symmetry_string && solved_hyphen_symmetry) {
+  //[CO190419 - moved to aurostd_main.cpp]        // last step of symmetry_string fix, but we have to do this in part of
+  //[CO190419 - moved to aurostd_main.cpp]        // the loop to allow for next character to be identified as problem
+  //[CO190419 - moved to aurostd_main.cpp]        // character as well
+  //[CO190419 - moved to aurostd_main.cpp]        output.append(1, '}');
+  //[CO190419 - moved to aurostd_main.cpp]        solved_hyphen_symmetry = false;
+  //[CO190419 - moved to aurostd_main.cpp]      }
+  //[CO190419 - moved to aurostd_main.cpp]      // go through all problem characters
+  //[CO190419 - moved to aurostd_main.cpp]      for(uint j=0,fl_size_j=problem_characters.size();j<fl_size_j;j++) {
+  //[CO190419 - moved to aurostd_main.cpp]        if(input[i] == problem_characters[j]) {
+  //[CO190419 - moved to aurostd_main.cpp]          if(double_back_slash) {
+  //[CO190419 - moved to aurostd_main.cpp]            // if we find one, but it has double backslash, leave alone
+  //[CO190419 - moved to aurostd_main.cpp]            // doesn't matter what it is, if it has double backslash it's good
+  //[CO190419 - moved to aurostd_main.cpp]            // if we find one, but it only has single backslash, add one
+  //[CO190419 - moved to aurostd_main.cpp]            if(i && i - 1 && input[i - 1] == '\\' && input[i - 2] == '\\') {break;}
+  //[CO190419 - moved to aurostd_main.cpp]            else if(i && input[i - 1] == '\\') {
+  //[CO190419 - moved to aurostd_main.cpp]              output.append(1, '\\');  // just add one
+  //[CO190419 - moved to aurostd_main.cpp]              break;
+  //[CO190419 - moved to aurostd_main.cpp]            }
+  //[CO190419 - moved to aurostd_main.cpp]            // if we find one, give two backslashes
+  //[CO190419 - moved to aurostd_main.cpp]            output.append("\\\\");
+  //[CO190419 - moved to aurostd_main.cpp]            break;
+  //[CO190419 - moved to aurostd_main.cpp]          } else {
+  //[CO190419 - moved to aurostd_main.cpp]            // if we find one, but it has single backslash, leave alone
+  //[CO190419 - moved to aurostd_main.cpp]            // doesn't matter what it is, if it has single backslash it's good
+  //[CO190419 - moved to aurostd_main.cpp]            // if we find one, give single backslash
+  //[CO190419 - moved to aurostd_main.cpp]            if(i && input[i - 1] == '\\') {break;}  
+  //[CO190419 - moved to aurostd_main.cpp]            output.append(1, '\\');
+  //[CO190419 - moved to aurostd_main.cpp]            break;
+  //[CO190419 - moved to aurostd_main.cpp]          }
+  //[CO190419 - moved to aurostd_main.cpp]        }
+  //[CO190419 - moved to aurostd_main.cpp]      }
+  //[CO190419 - moved to aurostd_main.cpp]      // we also have to add {} for these characters
+  //[CO190419 - moved to aurostd_main.cpp]      if(input[i] == '~' || input[i] == '^') {output.append("{}");}
+  //[CO190419 - moved to aurostd_main.cpp]      found_escaped_char = false;
+  //[CO190419 - moved to aurostd_main.cpp]      if(input[i] == '\\') {
+  //[CO190419 - moved to aurostd_main.cpp]        for(uint j=0,fl_size_j=problem_characters.size();j<fl_size_j;j++) {
+  //[CO190419 - moved to aurostd_main.cpp]          // the only way this works if it's serving as an escape for a character
+  //[CO190419 - moved to aurostd_main.cpp]          // don't worry about double backslash here, we get to that when we find
+  //[CO190419 - moved to aurostd_main.cpp]          // the actual character
+  //[CO190419 - moved to aurostd_main.cpp]          if(i != (input.length() - 1) && input[i+1] == problem_characters[j]) {
+  //[CO190419 - moved to aurostd_main.cpp]            found_escaped_char = true;
+  //[CO190419 - moved to aurostd_main.cpp]            break;  // doesn't matter what it is, if it has backslash it's good
+  //[CO190419 - moved to aurostd_main.cpp]          }
+  //[CO190419 - moved to aurostd_main.cpp]        }
+  //[CO190419 - moved to aurostd_main.cpp]        // this is a problem, no way around it--we cannot output single backslash
+  //[CO190419 - moved to aurostd_main.cpp]        if(!found_escaped_char) {
+  //[CO190419 - moved to aurostd_main.cpp]          stringstream message;
+  //[CO190419 - moved to aurostd_main.cpp]          message << "Extraneous backslash found in \"" << input << "\" which may cause problems for LaTeX/gnuplot";
+  //[CO190419 - moved to aurostd_main.cpp]          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+  //[CO190419 - moved to aurostd_main.cpp]          return input;
+  //[CO190419 - moved to aurostd_main.cpp]        }
+  //[CO190419 - moved to aurostd_main.cpp]      }
+  //[CO190419 - moved to aurostd_main.cpp]    }
+  //[CO190419 - moved to aurostd_main.cpp]    // add in character from input
+  //[CO190419 - moved to aurostd_main.cpp]    output.append(1, input[i]);
+  //[CO190419 - moved to aurostd_main.cpp]  }
+  //[CO190419 - moved to aurostd_main.cpp]  return output;
+  //[CO190419 - moved to aurostd_main.cpp]}
 
-      return addplot_output_ss.str();
+  string ConvexHull::getPlotHeaderPDF(char function_mode,const string& column_header,bool display_color_gradient) const {
+    // produces addplot latex string
+    string soliloquy="ConvexHull::getPlotHeaderPDF():";
+    stringstream message;
+    stringstream addplot_output_ss;addplot_output_ss.str("");
+
+    uint dimension=getDim();
+    bool reverse_axes=DEFAULT_CHULL_LATEX_REVERSE_AXIS;
+
+    // http://tex.stackexchange.com/questions/59070/pgfplots-remove-darker-borders-on-marks
+    // this string WILL cause warnings when compiling, but it's correct, no way to
+    // fix it with our current compiler
+    stringstream tmp_dark_border_points_command;
+    tmp_dark_border_points_command << "scatter/use mapped color={draw=black,fill=mapped color,solid}";
+
+    string dark_border_points_command = tmp_dark_border_points_command.str();
+
+    // first do a check that the function_mode is not out of scope
+    if(dimension == 2) {
+      if(function_mode != ADDPLOT_MODE_HULL_POINTS &&
+          function_mode != ADDPLOT_MODE_OFF_HULL_POINTS &&
+          function_mode != ADDPLOT_MODE_HULL_FACETS) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode (2D) and function mode mismatch");
+      }
+      if(m_velements.size() != 2) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode (2D) and elements.size() mismatch");}
+    } else if(dimension == 3) {
+      if(function_mode != ADDPLOT_MODE_HULL_POINTS &&
+          function_mode != ADDPLOT_MODE_OFF_HULL_POINTS &&
+          function_mode != ADDPLOT_MODE_HULL_FACETS &&
+          function_mode != ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS &&
+          function_mode != ADDPLOT_MODE_HEAT_MAPS) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode (3D) and function mode mismatch");
+      }
+      if(m_velements.size() != 3) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode (3D) and elements.size() mismatch");}
+    } else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input dimension mode out of scope");}
+
+    //also check column_header
+    bool found=false;
+    for(uint i=0,fl_size_i=m_velements.size();i<fl_size_i;i++){found|=(column_header==m_velements[i]);}
+    found|=(column_header=="H_f_meVatom");
+    found|=(column_header=="H_f_kJmol");
+    found|=(column_header=="T_S");
+    found|=(column_header=="Dist2hull");
+    if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input column_header mode out of scope ("+column_header+")");}
+
+    // main addplot function
+    if(dimension == 2) {addplot_output_ss << "\\addplot+[" << endl;}
+    else {  // dimension==3
+      if(function_mode == ADDPLOT_MODE_HEAT_MAPS) {addplot_output_ss << "\\addplot3[" << endl;}
+      else {addplot_output_ss << "\\addplot3+[" << endl;}
     }
 
-    string ConvexHull::getPlotPointContentPDF(const ChullPoint& point,bool zero_end_point,bool zero_dist_2_hull) const {  //true,false
-      bool LDEBUG = (FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::getPlotPointContentPDF():";
-      if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-
-      // initializations
-      stringstream addplot_output_ss;
-      // no precision
-      stringstream num_ss;
-
-      // explicit dimensions
-      for(int i=point.s_coords.lrows;i<=point.s_coords.urows;i++) {
-        addplot_output_ss << aurostd::PaddedPOST(aurostd::utype2string(point.s_coords[i],FULL_PRECISION), 30);
+    if(function_mode == ADDPLOT_MODE_HULL_FACETS ||
+        function_mode == ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS) {
+      addplot_output_ss << "mark=none," << endl;
+      if(function_mode == ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS) {
+        addplot_output_ss << "color=white," << endl;
+        addplot_output_ss << "solid," << endl;
+        addplot_output_ss << "line width=2.0pt," << endl;
+      } else {  // function_mode==ADDPLOT_MODE_HULL_FACETS
+        addplot_output_ss << "color=black," << endl;
+        addplot_output_ss << "solid," << endl;
+        if(dimension == 3) {addplot_output_ss << "line width=2pt," << endl;}
       }
-      // enthalpy of formation, row 4
-      // fix for unaries, set to 0
-      if((zero_end_point && point.isUnary()) || !point.m_has_entry) {  // IMPORTANT, these must go through 0
-        // no need for precision for next few columns, leave it same way as received from AFLOW
-        addplot_output_ss << aurostd::PaddedPOST(0, 30); //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
-        //H_f but in units of kJ/mol, row 5
-        addplot_output_ss << aurostd::PaddedPOST(0, 30); //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
-        // entropic temperature, row 6
-        addplot_output_ss << aurostd::PaddedPOST(0, 30); //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
+      addplot_output_ss << "] table ";
+      if(dimension == 2) {
+        if(reverse_axes){addplot_output_ss << "[x=" << m_velements[0];}
+        else {addplot_output_ss << "[x=" << m_velements[1];}
+        addplot_output_ss << ",y=" << column_header;
+        addplot_output_ss << "]";
+      } else {  // dimension==3
+        addplot_output_ss << "[x=" << m_velements[1];
+        addplot_output_ss << ",y=" << m_velements[0];
+        addplot_output_ss << ",z=" << m_velements[2] << "]";  // flipping x and y
+      }
+    } else {  // function_mode==ADDPLOT_MODE_HULL_POINTS||function_mode==ADDPLOT_MODE_OFF_HULL_POINTS||function_mode==ADDPLOT_MODE_HEAT_MAPS
+      if(function_mode == ADDPLOT_MODE_HEAT_MAPS) {
+        addplot_output_ss << "patch," << endl;
+        addplot_output_ss << "patch type=triangle," << endl;
+        addplot_output_ss << "shader=interp," << endl;
       } else {
-        // no need for precision for next few columns, leave it same way as received from AFLOW
-        num_ss << chull::H_f_atom(point, _m_);
-        addplot_output_ss << aurostd::PaddedPOST(num_ss.str(), 30);
-        num_ss.str("");
-        //H_f but in units of kJ/mol, row 5
-        num_ss << meVatom2kJmol * chull::H_f_atom(point, _m_);
-        addplot_output_ss << aurostd::PaddedPOST(num_ss.str(), 30);
-        num_ss.str("");
-        // entropic temperature, row 6
-        num_ss << chull::T_S(point);
-        addplot_output_ss << aurostd::PaddedPOST(num_ss.str(), 30);
-        num_ss.str("");
+        addplot_output_ss << "only marks," << endl;  // IMPORTANT, no lines
+        if(function_mode == ADDPLOT_MODE_HULL_POINTS) {
+          addplot_output_ss << "mark=*," << endl;
+          if(dimension == 2) {addplot_output_ss << "mark size=4," << endl;}
+          else {  // dimension==3
+            addplot_output_ss << "mark size=5," << endl;
+            addplot_output_ss << "line width=2pt," << endl;
+          }
+        } else {  // function_mode==ADDPLOT_MODE_OFF_HULL_POINTS
+          addplot_output_ss << "mark=x," << endl;
+          addplot_output_ss << "mark options={scale=2,line width=2,solid";
+        }
       }
-      if(PRINT_DIST2HULL_COL_TEX){
-        // dist_2_hull, row 7
-        if(zero_dist_2_hull) {addplot_output_ss << aurostd::PaddedPOST(0, 30);} //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);}
+      if(display_color_gradient || function_mode == ADDPLOT_MODE_HEAT_MAPS) {  
+        // this OR statement doesn't practically matter, since one does not work without the other, 
+        // but I keep it here so that the output of the string is complete
+        if(function_mode == ADDPLOT_MODE_OFF_HULL_POINTS) {addplot_output_ss << "}," << endl;}
+        addplot_output_ss << "point meta=\\thisrow{" << column_header << "}," << endl;  // uses point meta as color data
+        addplot_output_ss << "nodes near coords*={}," << endl;  // no labels, but we need this for colors
+        // GOT IT! // http://tex.stackexchange.com/questions/59070/pgfplots-remove-darker-borders-on-marks
+        if(function_mode == ADDPLOT_MODE_HULL_POINTS) {addplot_output_ss << dark_border_points_command << "," << endl;}
+        addplot_output_ss << "visualization depends on={\\thisrow{" << column_header << "} \\as \\" << column_header << "}," << endl;  // defines visualization dependency
+      } else {
+        if(function_mode == ADDPLOT_MODE_HULL_POINTS) {addplot_output_ss << "mark options={draw=black,fill=blue,solid}," << endl;}
+        else {addplot_output_ss << ",draw=red}," << endl;}// function_mode==ADDPLOT_MODE_OFF_HULL_POINTS
+      }
+      addplot_output_ss << "] table ";
+      if(dimension == 2) {
+        if(reverse_axes){addplot_output_ss << "[x=" << m_velements[0];}
+        else {addplot_output_ss << "[x=" << m_velements[1];}
+        addplot_output_ss << ",y=" << column_header;
+        addplot_output_ss << "]";
+      } else {  // dimension==3
+        addplot_output_ss << "[x=" << m_velements[1];
+        addplot_output_ss << ",y=" << m_velements[0];
+        addplot_output_ss << ",z=" << m_velements[2] << "]";  // flipping x and y
+      }
+    }
+    addplot_output_ss << "{" << endl;
+    for(uint i=0,fl_size_i=m_velements.size();i<fl_size_i;i++){addplot_output_ss << aurostd::PaddedPOST(m_velements[i], 30);}
+    addplot_output_ss << aurostd::PaddedPOST("H_f_meVatom", 30);
+    addplot_output_ss << aurostd::PaddedPOST("H_f_kJmol", 30);
+    addplot_output_ss << aurostd::PaddedPOST("T_S", 30);
+    if(PRINT_DIST2HULL_COL_TEX){
+      addplot_output_ss << aurostd::PaddedPOST("Dist2hull", 30);
+    }
+    addplot_output_ss << endl;
+
+    return addplot_output_ss.str();
+  }
+
+  string ConvexHull::getPlotPointContentPDF(const ChullPoint& point,bool zero_end_point,bool zero_dist_2_hull) const {  //true,false
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getPlotPointContentPDF():";
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+
+    // initializations
+    stringstream addplot_output_ss;
+    // no precision
+    stringstream num_ss;
+
+    // explicit dimensions
+    for(int i=point.s_coords.lrows;i<=point.s_coords.urows;i++) {
+      addplot_output_ss << aurostd::PaddedPOST(aurostd::utype2string(point.s_coords[i],FULL_PRECISION), 30);
+    }
+    // enthalpy of formation, row 4
+    // fix for unaries, set to 0
+    if((zero_end_point && point.isUnary()) || !point.m_has_entry) {  // IMPORTANT, these must go through 0
+      // no need for precision for next few columns, leave it same way as received from AFLOW
+      addplot_output_ss << aurostd::PaddedPOST(0, 30); //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
+      //H_f but in units of kJ/mol, row 5
+      addplot_output_ss << aurostd::PaddedPOST(0, 30); //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
+      // entropic temperature, row 6
+      addplot_output_ss << aurostd::PaddedPOST(0, 30); //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
+    } else {
+      // no need for precision for next few columns, leave it same way as received from AFLOW
+      num_ss << chull::H_f_atom(point, _m_);
+      addplot_output_ss << aurostd::PaddedPOST(num_ss.str(), 30);
+      num_ss.str("");
+      //H_f but in units of kJ/mol, row 5
+      num_ss << meVatom2kJmol * chull::H_f_atom(point, _m_);
+      addplot_output_ss << aurostd::PaddedPOST(num_ss.str(), 30);
+      num_ss.str("");
+      // entropic temperature, row 6
+      num_ss << chull::T_S(point);
+      addplot_output_ss << aurostd::PaddedPOST(num_ss.str(), 30);
+      num_ss.str("");
+    }
+    if(PRINT_DIST2HULL_COL_TEX){
+      // dist_2_hull, row 7
+      if(zero_dist_2_hull) {addplot_output_ss << aurostd::PaddedPOST(0, 30);} //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
       else {addplot_output_ss << aurostd::PaddedPOST(aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION), 30);}
     }
     // end line
@@ -7645,8 +7648,9 @@ namespace chull {
           //[OBSOLETE CO 180227]  if(m_formation_energy_hull){if(z_filter_cutoff > 0.0){z_filter_cutoff = 0.0;}}
           //[OBSOLETE CO 180227]  else {if(z_filter_cutoff < 0.0){z_filter_cutoff = 0.0;}}
           //[OBSOLETE CO 180227]}
-        }//[OBSOLETE CO 180227]else {z_filter_cutoff = 0.0;}
-      if(LDEBUG) {cerr << soliloquy << " z_filter_cutoff=" << z_filter_cutoff << endl;}
+          //[OBSOLETE CO 180227]else {z_filter_cutoff = 0.0;}
+        }
+        if(LDEBUG) {cerr << soliloquy << " z_filter_cutoff=" << z_filter_cutoff << endl;}
       }
       if(filter_by_distance) {
         dist_filter_cutoff = filter_cutoff; 
@@ -7832,13 +7836,13 @@ namespace chull {
       }
 
       //set to doc_only if a worthless image
-      //[CO1812226 - OBSOLETE]if(!doc_only && (dimension == 2 || dimension == 3)) {
-      if(!plot_points_count){
+      //[CO1812226 - OBSOLETE]if(!doc_only && (dimension == 2 || dimension == 3))
+      if(!plot_points_count)
+      { //CO200106 - patching for auto-indenting
         doc_only=true;
         message << "CHULL::DOC_ONLY set to TRUE (no plot points found)";
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       }
-      //[CO1812226 - OBSOLETE]}
 
       ////////////////////////////////////////////////////////////////////////////
       // END Gathering points for plotting
@@ -8017,337 +8021,382 @@ namespace chull {
         _doc_header_TEX_ss << " & ";
       }
       //include small redundant header - START
-      _doc_header_TEX_ss << "\\begin{tabular}{@{}r@{}}"; //\\begin{tabular}[x]{@{}r@{}}
-    _doc_header_TEX_ss << "\\large " << string("\\printAlloy") << "\\ summary"; // (V" << string(AFLOW_VERSION) << ")"; //Materials Snapshot";
-    _doc_header_TEX_ss << "\\\\";
-    _doc_header_TEX_ss << "\\large " << string("\\printCountTotalEntries\\") << " entries";
-    _doc_header_TEX_ss << "\\\\";
-    _doc_header_TEX_ss << "\\large \\today";  //\\today~\\currenttime
-    _doc_header_TEX_ss << "\\end{tabular}" << " \%HEADER" << endl;
-    //[CO190226 - TABU IS BROKEN IN TeX Live 2019]_doc_header_TEX_ss << "\\end{tabu}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\end{tabular}" << " \%HEADER" << endl;
-    //include small redundant header - END
-    _doc_header_TEX_ss << "\\end{lrbox}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\newsavebox{\\snapshotTableHeaderTwo}" << " \%this is NOT dynamic, so simply define once with right geometry and keep forever" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\newgeometry{" << MARGIN_REPORT << "}" << " \%HEADER" << endl;  //force geometry of the table early, so columns are properly sized in headers //new geometry introduces \\newpage automatically
-    //LRBOXES store as text, so whatever inherits it doesn't know it's a XX (tabu in this case, which conflicts with fancyheader)
-    _doc_header_TEX_ss << "\\begin{lrbox}{\\snapshotTableHeaderTwo}" << " \%store as text \%HEADER" << endl;
-    _doc_header_TEX_ss << getSnapshotTableHeader(headers,true);
-    _doc_header_TEX_ss << "\\end{lrbox}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\restoregeometry" << " \%HEADER" << endl;
-    // fancypagestyle2 for first page of report
-    _doc_header_TEX_ss << "\\fancypagestyle{reportPage1}{" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\fancyhf{}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\fancyhead[C]{\\usebox{\\snapshotTableHeaderOne}}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\fancyfoot[C]{\\thepage}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\renewcommand{\\headrulewidth}{0pt}     \% size of header line" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\renewcommand{\\footrulewidth}{0pt}     \% size of header line" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "}" << " \%HEADER" << endl;
-    // fancypagestyle3 for beyond first page
-    _doc_header_TEX_ss << "\\fancypagestyle{reportPage2}{" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\fancyhf{}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\fancyhead[C]{\\usebox{\\snapshotTableHeaderTwo}}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\fancyfoot[C]{\\thepage}" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\renewcommand{\\headrulewidth}{0pt}     \% size of header line" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "\\renewcommand{\\footrulewidth}{0pt}     \% size of header line" << " \%HEADER" << endl;
-    _doc_header_TEX_ss << "}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\begin{tabular}{@{}r@{}}";
+      _doc_header_TEX_ss << "\\large " << string("\\printAlloy") << "\\ summary"; // (V" << string(AFLOW_VERSION) << ")"; //Materials Snapshot";
+      _doc_header_TEX_ss << "\\\\";
+      _doc_header_TEX_ss << "\\large " << string("\\printCountTotalEntries\\") << " entries";
+      _doc_header_TEX_ss << "\\\\";
+      _doc_header_TEX_ss << "\\large \\today";  //\\today~\\currenttime
+      _doc_header_TEX_ss << "\\end{tabular}" << " \%HEADER" << endl;
+      //[CO190226 - TABU IS BROKEN IN TeX Live 2019]_doc_header_TEX_ss << "\\end{tabu}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\end{tabular}" << " \%HEADER" << endl;
+      //include small redundant header - END
+      _doc_header_TEX_ss << "\\end{lrbox}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\newsavebox{\\snapshotTableHeaderTwo}" << " \%this is NOT dynamic, so simply define once with right geometry and keep forever" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\newgeometry{" << MARGIN_REPORT << "}" << " \%HEADER" << endl;  //force geometry of the table early, so columns are properly sized in headers //new geometry introduces \\newpage automatically
+      //LRBOXES store as text, so whatever inherits it doesn't know it's a XX (tabu in this case, which conflicts with fancyheader)
+      _doc_header_TEX_ss << "\\begin{lrbox}{\\snapshotTableHeaderTwo}" << " \%store as text \%HEADER" << endl;
+      _doc_header_TEX_ss << getSnapshotTableHeader(headers,true);
+      _doc_header_TEX_ss << "\\end{lrbox}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\restoregeometry" << " \%HEADER" << endl;
+      // fancypagestyle2 for first page of report
+      _doc_header_TEX_ss << "\\fancypagestyle{reportPage1}{" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\fancyhf{}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\fancyhead[C]{\\usebox{\\snapshotTableHeaderOne}}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\fancyfoot[C]{\\thepage}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\renewcommand{\\headrulewidth}{0pt}     \% size of header line" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\renewcommand{\\footrulewidth}{0pt}     \% size of header line" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "}" << " \%HEADER" << endl;
+      // fancypagestyle3 for beyond first page
+      _doc_header_TEX_ss << "\\fancypagestyle{reportPage2}{" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\fancyhf{}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\fancyhead[C]{\\usebox{\\snapshotTableHeaderTwo}}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\fancyfoot[C]{\\thepage}" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\renewcommand{\\headrulewidth}{0pt}     \% size of header line" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "\\renewcommand{\\footrulewidth}{0pt}     \% size of header line" << " \%HEADER" << endl;
+      _doc_header_TEX_ss << "}" << " \%HEADER" << endl;
     }
-    if(!image_only){_doc_header_TEX_ss << "\\newAlloyFormatted{" << input_hyphened << "}{" << count_total_entries << "}" << endl;} //{" << count_total_entries << "}" << endl;}
+    if(!image_only){_doc_header_TEX_ss << "\\newAlloyFormatted{" << input_hyphened << "}{" << count_total_entries << "}" << endl;} //{" << count_total_entries << "}" << endl;
 
-  //////////////////////////////////////////////////////////////////////////////
-  // END Document header (for now)
-  //////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+    // END Document header (for now)
+    //////////////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////////
-  // START Image on first page
-  //////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+    // START Image on first page
+    //////////////////////////////////////////////////////////////////////////////
 
-  if(!doc_only && (dimension == 2 || dimension == 3)) {
-    ////////////////////////////////////////////////////////////////////////////
-    // START More header commands specific to tikz pic
-    ////////////////////////////////////////////////////////////////////////////
+    if(!doc_only && (dimension == 2 || dimension == 3)) {
+      ////////////////////////////////////////////////////////////////////////////
+      // START More header commands specific to tikz pic
+      ////////////////////////////////////////////////////////////////////////////
 
-    doc_header_TEX_ss << "\\usepackage{pgfplots}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usepackage{pdflscape}" << " \%HEADER" << endl;
-    //[MOVED UP]doc_header_TEX_ss << "\\usepackage{array} \%m{}" << " \%HEADER" << endl;
-    //[MOVED UP]doc_header_TEX_ss << "\\usepackage{setspace} \%setstretch linespacing" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\pgfplotsset{compat=1.10}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usepgfplotslibrary{ternary,units}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usetikzlibrary{decorations.pathmorphing,pgfplots.units,backgrounds}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usepackage{tikz}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usetikzlibrary{positioning}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\usepackage{pgfplots}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\usepackage{pdflscape}" << " \%HEADER" << endl;
+      //[MOVED UP]doc_header_TEX_ss << "\\usepackage{array} \%m" << " \%HEADER" << endl;  %brackets
+      //[MOVED UP]doc_header_TEX_ss << "\\usepackage{setspace} \%setstretch linespacing" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\pgfplotsset{compat=1.10}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\usepgfplotslibrary{ternary,units}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\usetikzlibrary{decorations.pathmorphing,pgfplots.units,backgrounds}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\usepackage{tikz}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\usetikzlibrary{positioning}" << " \%HEADER" << endl;
 
-    if(dimension == 3) {
-      doc_header_TEX_ss << "\\usetikzlibrary{pgfplots.ternary}" << " \%HEADER" << endl;
-    }
-    if(image_only) {
-      doc_header_TEX_ss << "\\pgfrealjobname{CHull}" << " \%HEADER" << endl;  // dummy name
-    }
-    doc_header_TEX_ss << "\\pgfdeclarelayer{background}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\pgfdeclarelayer{foreground}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\pgfsetlayers{background,main,foreground}" << " \%HEADER" << endl;
-
-    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{R}[1]{>{\\raggedleft \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{X}[1]{>{\\setstretch{0.5} \\centering  \\arraybackslash}m{#1} } \%setstretch changes line spacing" << " \%HEADER" << endl;
-
-    doc_header_TEX_ss << _doc_header_TEX_ss.str();
-    _doc_header_TEX_ss.str("");  // don't repeat
-
-    doc_header_TEX_ss << "\\newgeometry{" << MARGIN_PICTURE << "}" << endl; //new geometry introduces \\newpage automatically
-    if(image_only) {doc_header_TEX_ss << "\\beginpgfgraphicnamed{aflow_" << input << "_hull}" << " \%HEADER" << endl;}
-    if(!image_only){
-      doc_header_TEX_ss << "\\thispagestyle{hullImage}" << endl;  //empty
-      doc_header_TEX_ss << "\\begin{landscape}" << endl;
-      doc_header_TEX_ss << "\\centering{" << endl;
-      doc_header_TEX_ss << "\\topskip0pt" << endl;
-      doc_header_TEX_ss << "\\vspace*{\\fill}" << endl;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // END More header commands specific to tikz pic
-    ////////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////////////////////////////////
-    // START Determining if points range enough to have color/heat map
-    // functionality
-    ////////////////////////////////////////////////////////////////////////////
-
-    int approx_num_ticks=5;
-    double extra_padding_multiplier=(rotate_labels?0.225:0.1);
-
-    if(m_formation_energy_hull) {
-      min_point = chull::convertUnits(min_point, _m_);
-      if(plot_iso_max_latent_heat){ //min_point might change with iso_max
-        double old_min_point=min_point;
-        min_point=min(min_point,iso_max_latent_heat_min);
-        if(abs(old_min_point-min_point)>abs(max_point - old_min_point)/(double)approx_num_ticks){ //is it bigger than ~tic distance?
-          extra_padding_multiplier/=2.0; //don't need so much MORE padding, T_S label is flat, and we just made sure T_S is well below rotated labels
-        }
+      if(dimension == 3) {
+        doc_header_TEX_ss << "\\usetikzlibrary{pgfplots.ternary}" << " \%HEADER" << endl;
       }
-      max_point = chull::convertUnits(max_point, _m_);
-    }
+      if(image_only) {
+        doc_header_TEX_ss << "\\pgfrealjobname{CHull}" << " \%HEADER" << endl;  // dummy name
+      }
+      doc_header_TEX_ss << "\\pgfdeclarelayer{background}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\pgfdeclarelayer{foreground}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\pgfsetlayers{background,main,foreground}" << " \%HEADER" << endl;
 
-    //do after everything
-    if(image_only){extra_padding_multiplier*=1.5;}
+      //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+      //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+      //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{R}[1]{>{\\raggedleft \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+      //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{X}[1]{>{\\setstretch{0.5} \\centering  \\arraybackslash}m{#1} } \%setstretch changes line spacing" << " \%HEADER" << endl;
 
-    point_range = max_point - min_point;
-    //bool set_max_tick_spacing_2D=false;//true; //max space between ticks=XX (in yticklabel style),  // CO 180227  //this hardly works, we need to set it exactly, COMPLETELY REMOVED
-    //int max_tick_spacing=1;
-    bool set_y_range_exactly=true;
-    double y_tick_distance=0.25;
-    double y_tick_distance_right=y_tick_distance; ///10.0;
-    double ymin=(m_formation_energy_hull?-ZERO_RANGE_TOL:0);//-ZERO_RANGE_TOL;
-    double ymax=(m_formation_energy_hull?0:ZERO_RANGE_TOL);//ZERO_RANGE_TOL;
-    double y_range=abs(ymax-ymin);
-    double round_to_value=getRoundToValue(point_range);
-    double extra_padding=(point_range)*extra_padding_multiplier; //to avoid label clashing with axis, 20% should be enough
-    //int extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, false);  //round down to keep tight, unless you get 0, need more padding  //CO190724 - explicit double->int conversion (floor is fine)
-    //if(extra_padding==0){extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, true);}  //CO190724 - explicit double->int conversion (floor is fine)
+      doc_header_TEX_ss << _doc_header_TEX_ss.str();
+      _doc_header_TEX_ss.str("");  // don't repeat
 
-    //adding conversion between meV/atom to kJ/mol
-    bool showkJmolaxis = m_formation_energy_hull;  //default
-    double kJmol_threshold = 1.0/((double)meVatom2kJmol); //should give about 10, 1 kJ/mol -> 10 meV/atom
-    if(0 && showkJmolaxis && y_range<kJmol_threshold){showkJmolaxis=false;}  //we need integer y tick distance, don't show if it's not at least as big as ~10meV/atom, we should now be able to handle fractional y_dist
+      doc_header_TEX_ss << "\\newgeometry{" << MARGIN_PICTURE << "}" << endl; //new geometry introduces \\newpage automatically
+      if(image_only) {doc_header_TEX_ss << "\\beginpgfgraphicnamed{aflow_" << input << "_hull}" << " \%HEADER" << endl;}
+      if(!image_only){
+        doc_header_TEX_ss << "\\thispagestyle{hullImage}" << endl;  //empty
+        doc_header_TEX_ss << "\\begin{landscape}" << endl;
+        doc_header_TEX_ss << "\\centering{" << endl;
+        doc_header_TEX_ss << "\\topskip0pt" << endl;
+        doc_header_TEX_ss << "\\vspace*{\\fill}" << endl;
+      }
 
-    if(showkJmolaxis){y_tick_distance_right/=10.0;} //default value, store AFTER setting showkJmolaxis
+      ////////////////////////////////////////////////////////////////////////////
+      // END More header commands specific to tikz pic
+      ////////////////////////////////////////////////////////////////////////////
 
-    if(LDEBUG) {
-      cerr << soliloquy << " range" << endl;
-      cerr << soliloquy << " max:     " << max_point << endl;
-      cerr << soliloquy << " min:     " << min_point << endl;
-      cerr << soliloquy << " point_range: " << point_range << endl;
-    }
+      ////////////////////////////////////////////////////////////////////////////
+      // START Determining if points range enough to have color/heat map
+      // functionality
+      ////////////////////////////////////////////////////////////////////////////
 
-    // range functionality
-    // http://tex.stackexchange.com/questions/69248/set-ticklabels-for-colorbar
+      int approx_num_ticks=5;
+      double extra_padding_multiplier=(rotate_labels?0.225:0.1);
 
-    if(dimension == 2) {
-      include_color_bar=false;
-      message << "CHULL::COLOR_BAR set to FALSE (dimension==2)";
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+      if(m_formation_energy_hull) {
+        min_point = chull::convertUnits(min_point, _m_);
+        if(plot_iso_max_latent_heat){ //min_point might change with iso_max
+          double old_min_point=min_point;
+          min_point=min(min_point,iso_max_latent_heat_min);
+          if(abs(old_min_point-min_point)>abs(max_point - old_min_point)/(double)approx_num_ticks){ //is it bigger than ~tic distance?
+            extra_padding_multiplier/=2.0; //don't need so much MORE padding, T_S label is flat, and we just made sure T_S is well below rotated labels
+          }
+        }
+        max_point = chull::convertUnits(max_point, _m_);
+      }
 
-      show_heat_map=false;
-      message << "CHULL::HEAT_MAP set to FALSE (dimension==2)";
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-    }
-    // determine whether we can have a colorbar
-    // recently added: (plot_points_count==1&&!show_heat_map)
-    // we need difference data, so if there's only one "colored" data, no way to establish a color spectrum
-    if( !plot_points_count || (dimension==3 && !show_heat_map && plot_points_count<2) || (abs(point_range) < ZERO_TOL)) {
-      include_color_bar=false;
-      show_heat_map=false;
-      display_color_gradient=false;
+      //do after everything
+      if(image_only){extra_padding_multiplier*=1.5;}
+
+      point_range = max_point - min_point;
+      //bool set_max_tick_spacing_2D=false;//true; //max space between ticks=XX (in yticklabel style),  // CO 180227  //this hardly works, we need to set it exactly, COMPLETELY REMOVED
+      //int max_tick_spacing=1;
+      bool set_y_range_exactly=true;
+      double y_tick_distance=0.25;
+      double y_tick_distance_right=y_tick_distance; ///10.0;
+      double ymin=(m_formation_energy_hull?-ZERO_RANGE_TOL:0);//-ZERO_RANGE_TOL;
+      double ymax=(m_formation_energy_hull?0:ZERO_RANGE_TOL);//ZERO_RANGE_TOL;
+      double y_range=abs(ymax-ymin);
+      double round_to_value=getRoundToValue(point_range);
+      double extra_padding=(point_range)*extra_padding_multiplier; //to avoid label clashing with axis, 20% should be enough
+      //int extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, false);  //round down to keep tight, unless you get 0, need more padding  //CO190724 - explicit double->int conversion (floor is fine)
+      //if(extra_padding==0){extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, true);}  //CO190724 - explicit double->int conversion (floor is fine)
+
+      //adding conversion between meV/atom to kJ/mol
+      bool showkJmolaxis = m_formation_energy_hull;  //default
+      double kJmol_threshold = 1.0/((double)meVatom2kJmol); //should give about 10, 1 kJ/mol -> 10 meV/atom
+      if(0 && showkJmolaxis && y_range<kJmol_threshold){showkJmolaxis=false;}  //we need integer y tick distance, don't show if it's not at least as big as ~10meV/atom, we should now be able to handle fractional y_dist
+
+      if(showkJmolaxis){y_tick_distance_right/=10.0;} //default value, store AFTER setting showkJmolaxis
+
       if(LDEBUG) {
-        cerr << soliloquy << " plot points count = " << plot_points_count << endl;
-        cerr << soliloquy << " plot points count no end points = " << plot_points_count_no_end_points << endl;
+        cerr << soliloquy << " range" << endl;
+        cerr << soliloquy << " max:     " << max_point << endl;
+        cerr << soliloquy << " min:     " << min_point << endl;
+        cerr << soliloquy << " point_range: " << point_range << endl;
       }
-      if(!plot_points_count) {
-        message << "CHULL::COLOR_BAR set to FALSE, no entries found";
+
+      // range functionality
+      // http://tex.stackexchange.com/questions/69248/set-ticklabels-for-colorbar
+
+      if(dimension == 2) {
+        include_color_bar=false;
+        message << "CHULL::COLOR_BAR set to FALSE (dimension==2)";
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-        message << "CHULL::COLOR_GRADIENT set to FALSE, no entries found";
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-        message << "CHULL::HEAT_MAP set to FALSE, no entries found";
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-      }
-      if(dimension==3 && !show_heat_map && plot_points_count<2) {
-        message << "CHULL::COLOR_BAR set to FALSE, not enough non-unary entries found";
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-        message << "CHULL::COLOR_GRADIENT set to FALSE, not enough non-unary entries found";
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-        message << "CHULL::HEAT_MAP set to FALSE, not enough non-unary entries found";
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-      }
-      if(zeroWithinTol(point_range)) {
-        message << "CHULL::COLOR_BAR set to FALSE, hull has no depth";
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-        message << "CHULL::COLOR_GRADIENT set to FALSE, hull has no depth";
-        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
-        message << "CHULL::HEAT_MAP set to FALSE, hull has no depth";
+
+        show_heat_map=false;
+        message << "CHULL::HEAT_MAP set to FALSE (dimension==2)";
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // END Determining if points range enough to have color/heat map
-    // functionality
-    ////////////////////////////////////////////////////////////////////////////
-
-    // doc_header_TEX_ss ends here, we need to get data first, see
-    // pseudo_preliminary_axes_TEX_ss (hrefs)
-
-    ////////////////////////////////////////////////////////////////////////////
-    // START Tikz pic settings
-    ////////////////////////////////////////////////////////////////////////////
-
-    //_tikzpic_settings_TEX_ss comes before tikzpic_TEX_ss
-    _tikzpic_settings_TEX_ss << "\\begin{tikzpicture}[font=" << general_image_font_size;
-    _tikzpic_settings_TEX_ss << "]";
-    _tikzpic_settings_TEX_ss << endl;
-    // end of _tikzpic_settings_TEX_ss, we need to get data first, see
-    // pseudo_preliminary_axes_TEX_ss (hrefs)
-    // common settings between two axes
-    if((!plot_points_count) || (abs(point_range) < ZERO_RANGE_TOL)) {
-      //simply do not calculate ymin, ymax (ints)
-      //
-      //ymin=-ZERO_RANGE_TOL;
-      //ymax=ZERO_RANGE_TOL;
-    } else {
-      // easier to figure out ranges in meV, stays meV
-      // between lowest label and bottom line, increase if need more
-      // we might have hull endpoints higher than 0
-      if(!m_formation_energy_hull && !(plot_unaries && unary_g_state_unstable) && (!plot_unstable || abs(min_point) < ZERO_TOL)) {ymin=0;}
-      else {
-        ymin=min_point;
-        if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
-          if(m_formation_energy_hull){ymin-=extra_padding;}  // CO 180227 - we need to avoid labels here
-          ymin=roundDouble(ymin,(int)round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN //CO190724 - explicit double->int conversion (floor is fine)
+      // determine whether we can have a colorbar
+      // recently added: (plot_points_count==1&&!show_heat_map)
+      // we need difference data, so if there's only one "colored" data, no way to establish a color spectrum
+      if( !plot_points_count || (dimension==3 && !show_heat_map && plot_points_count<2) || (abs(point_range) < ZERO_TOL)) {
+        include_color_bar=false;
+        show_heat_map=false;
+        display_color_gradient=false;
+        if(LDEBUG) {
+          cerr << soliloquy << " plot points count = " << plot_points_count << endl;
+          cerr << soliloquy << " plot points count no end points = " << plot_points_count_no_end_points << endl;
+        }
+        if(!plot_points_count) {
+          message << "CHULL::COLOR_BAR set to FALSE, no entries found";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+          message << "CHULL::COLOR_GRADIENT set to FALSE, no entries found";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+          message << "CHULL::HEAT_MAP set to FALSE, no entries found";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        }
+        if(dimension==3 && !show_heat_map && plot_points_count<2) {
+          message << "CHULL::COLOR_BAR set to FALSE, not enough non-unary entries found";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+          message << "CHULL::COLOR_GRADIENT set to FALSE, not enough non-unary entries found";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+          message << "CHULL::HEAT_MAP set to FALSE, not enough non-unary entries found";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        }
+        if(zeroWithinTol(point_range)) {
+          message << "CHULL::COLOR_BAR set to FALSE, hull has no depth";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+          message << "CHULL::COLOR_GRADIENT set to FALSE, hull has no depth";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+          message << "CHULL::HEAT_MAP set to FALSE, hull has no depth";
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         }
       }
-      // between highest label and top line, increase if need more
-      // we might have hull endpoints higher than 0
-      if(m_formation_energy_hull && !(plot_unaries && unary_g_state_unstable) && (!plot_unstable || abs(max_point) < ZERO_TOL)) {ymax=0;}
-      else {
-        ymax=max_point;
-        if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
-          if(!m_formation_energy_hull){ymax+=extra_padding;}  // CO 180227 - we need to avoid labels here
-          ymax=roundDouble(ymax,(int)round_to_value,true);  //we want max to be MORE POSITIVE, so round UP  //CO190724 - explicit double->int conversion (floor is fine)
-        }
-      }
-      y_range=abs(ymax-ymin);
-      //max_tick_spacing=int(y_range/4);
-      y_tick_distance=y_tick_distance_right=getYTickDistance(y_range,approx_num_ticks,round_to_value);
 
-      //need new y_tick_distance if showkJmolaxis
-      if(showkJmolaxis){
-        double round_to_value_right=getRoundToValue(meVatom2kJmol*point_range);
-        y_tick_distance_right=getYTickDistance(meVatom2kJmol*y_range,approx_num_ticks,round_to_value_right);
-      }
+      ////////////////////////////////////////////////////////////////////////////
+      // END Determining if points range enough to have color/heat map
+      // functionality
+      ////////////////////////////////////////////////////////////////////////////
 
-      if(0||LDEBUG) {
-        cerr << soliloquy << " point_range                                        = " << point_range << endl;
-        cerr << soliloquy << " min_point                                          = " << min_point << endl;
-        cerr << soliloquy << " max_point                                          = " << max_point << endl;
-        cerr << soliloquy << " round_to_value                                     = " << round_to_value << endl;
-        //cerr << soliloquy << " roundDouble(min_point,(int)round_to_value,false)        = " << roundDouble(min_point, (int)round_to_value, false) << endl; //CO190724 - explicit double->int conversion (floor is fine)
-        //cerr << soliloquy << " roundDouble(max_point,(int)round_to_value,true)         = " << roundDouble(max_point, (int)round_to_value, true) << endl;  //CO190724 - explicit double->int conversion (floor is fine)
-        cerr << soliloquy << " extra_padding                                      = " << extra_padding << endl;
-        cerr << soliloquy << " ymin                                               = " << ymin << endl;
-        cerr << soliloquy << " ymax                                               = " << ymax << endl;
-        //cerr << soliloquy << " max_tick_spacing                                   = " << max_tick_spacing << endl;
-        cerr << soliloquy << " y_tick_distance                                    = " << y_tick_distance << endl;
-        cerr << soliloquy << " y_tick_distance_right                              = " << y_tick_distance_right << endl;
-      }
-      //need to convert to kJ/mol for right axis
-      //if(dimension==2){
-      //  common_settings_TEX_ss << "ymin=" << ymin << "," << endl;
-      //  common_settings_TEX_ss << "ymax=" << ymax << "," << endl;
-      //}
-    }
-    common_settings_TEX_ss << "clip=false," << endl;  // for labels
+      // doc_header_TEX_ss ends here, we need to get data first, see
+      // pseudo_preliminary_axes_TEX_ss (hrefs)
 
-    double image_width=19;
-    if(dimension==3){image_width=17;}
-    common_settings_TEX_ss << "width=" << image_width << "cm," << endl;
+      ////////////////////////////////////////////////////////////////////////////
+      // START Tikz pic settings
+      ////////////////////////////////////////////////////////////////////////////
 
-    //hsize is not well defined, especially for image only
-    //double image_height_proportion=0.65;
-    //if(dimension==3){image_height_proportion=1.0;}
-    //string image_height_str=aurostd::utype2string(image_height_proportion)+"\\hsize";  //better to define in terms of page, since this is what we are confined to
-    //better to use cm
-    double image_width_proportion=0.8;                //approx 15cm given 19cm width
-    if(dimension==3){image_width_proportion=1.2;}     //approx 20cm given 17cm width
-    common_settings_TEX_ss << "height=" << image_width_proportion*image_width << "cm," << endl;
-
-    if(dimension==3){common_settings_TEX_ss << "axis line style={line width=3pt}," << endl;}
-    //if(dimension == 2) {common_settings_TEX_ss << 20;}
-    //else {  // dimension==3
-    //  //corey change me if we see otherwise
-    //  //if(include_color_bar) {
-    //  //  if(image_only) {common_settings_TEX_ss << 21;}
-    //  //  else {common_settings_TEX_ss << 17;}  // only time we change size
-    //  //} else {common_settings_TEX_ss << 21;}
-    //}
-    //common_settings_TEX_ss << "cm," << endl;
-    //if(dimension == 2) {
-    //  if(image_only) {common_settings_TEX_ss << "height=0.8\\hsize," << endl;}
-    //  else {common_settings_TEX_ss << "height=0.55\\hsize," << endl;}
-    //} else {
-    //  common_settings_TEX_ss << "height=\\hsize," << endl;
-    //  common_settings_TEX_ss << "axis line style={line width=3pt}," << endl;
-    //}
-    common_settings_TEX_ss << "grid=none," << endl;
-    common_settings_TEX_ss << "axis on top," << endl;  // prevents heat map overlap issues
-
-    ////////////////////////////////////////////////////////////////////////////
-    // START Axis
-    ////////////////////////////////////////////////////////////////////////////
-
-    double unary_distance_axis_3D=0.25;
-    if(image_only){unary_distance_axis_3D=0.35;} // COREY FIX
-
-    uint g_state;
-    if(dimension == 2) {
-      uint top_axis_point, bottom_axis_point;
-      if(!reverse_axes) {
-        top_axis_point = 0;
-        bottom_axis_point = 1;
+      //_tikzpic_settings_TEX_ss comes before tikzpic_TEX_ss
+      _tikzpic_settings_TEX_ss << "\\begin{tikzpicture}[font=" << general_image_font_size;
+      _tikzpic_settings_TEX_ss << "]";
+      _tikzpic_settings_TEX_ss << endl;
+      // end of _tikzpic_settings_TEX_ss, we need to get data first, see
+      // pseudo_preliminary_axes_TEX_ss (hrefs)
+      // common settings between two axes
+      if((!plot_points_count) || (abs(point_range) < ZERO_RANGE_TOL)) {
+        //simply do not calculate ymin, ymax (ints)
+        //
+        //ymin=-ZERO_RANGE_TOL;
+        //ymax=ZERO_RANGE_TOL;
       } else {
-        top_axis_point = 1;
-        bottom_axis_point = 0;
+        // easier to figure out ranges in meV, stays meV
+        // between lowest label and bottom line, increase if need more
+        // we might have hull endpoints higher than 0
+        if(!m_formation_energy_hull && !(plot_unaries && unary_g_state_unstable) && (!plot_unstable || abs(min_point) < ZERO_TOL)) {ymin=0;}
+        else {
+          ymin=min_point;
+          if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
+            if(m_formation_energy_hull){ymin-=extra_padding;}  // CO 180227 - we need to avoid labels here
+            ymin=roundDouble(ymin,(int)round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN //CO190724 - explicit double->int conversion (floor is fine)
+          }
+        }
+        // between highest label and top line, increase if need more
+        // we might have hull endpoints higher than 0
+        if(m_formation_energy_hull && !(plot_unaries && unary_g_state_unstable) && (!plot_unstable || abs(max_point) < ZERO_TOL)) {ymax=0;}
+        else {
+          ymax=max_point;
+          if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
+            if(!m_formation_energy_hull){ymax+=extra_padding;}  // CO 180227 - we need to avoid labels here
+            ymax=roundDouble(ymax,(int)round_to_value,true);  //we want max to be MORE POSITIVE, so round UP  //CO190724 - explicit double->int conversion (floor is fine)
+          }
+        }
+        y_range=abs(ymax-ymin);
+        //max_tick_spacing=int(y_range/4);
+        y_tick_distance=y_tick_distance_right=getYTickDistance(y_range,approx_num_ticks,round_to_value);
+
+        //need new y_tick_distance if showkJmolaxis
+        if(showkJmolaxis){
+          double round_to_value_right=getRoundToValue(meVatom2kJmol*point_range);
+          y_tick_distance_right=getYTickDistance(meVatom2kJmol*y_range,approx_num_ticks,round_to_value_right);
+        }
+
+        if(0||LDEBUG) {
+          cerr << soliloquy << " point_range                                        = " << point_range << endl;
+          cerr << soliloquy << " min_point                                          = " << min_point << endl;
+          cerr << soliloquy << " max_point                                          = " << max_point << endl;
+          cerr << soliloquy << " round_to_value                                     = " << round_to_value << endl;
+          //cerr << soliloquy << " roundDouble(min_point,(int)round_to_value,false)        = " << roundDouble(min_point, (int)round_to_value, false) << endl; //CO190724 - explicit double->int conversion (floor is fine)
+          //cerr << soliloquy << " roundDouble(max_point,(int)round_to_value,true)         = " << roundDouble(max_point, (int)round_to_value, true) << endl;  //CO190724 - explicit double->int conversion (floor is fine)
+          cerr << soliloquy << " extra_padding                                      = " << extra_padding << endl;
+          cerr << soliloquy << " ymin                                               = " << ymin << endl;
+          cerr << soliloquy << " ymax                                               = " << ymax << endl;
+          //cerr << soliloquy << " max_tick_spacing                                   = " << max_tick_spacing << endl;
+          cerr << soliloquy << " y_tick_distance                                    = " << y_tick_distance << endl;
+          cerr << soliloquy << " y_tick_distance_right                              = " << y_tick_distance_right << endl;
+        }
+        //need to convert to kJ/mol for right axis
+        //if(dimension==2){
+        //  common_settings_TEX_ss << "ymin=" << ymin << "," << endl;
+        //  common_settings_TEX_ss << "ymax=" << ymax << "," << endl;
+        //}
       }
-      // first axis - kJ/atom, top and right axes, x label only for padding
-      if(showkJmolaxis){ //||!image_only) {  //padding purposes
-        //only needed if we want to pad for pseudo-centering (by eye), it is perfectly centered, but logos are different shapes
-        //no need to pad for eye, waste of time
-        if(0){ 
+      common_settings_TEX_ss << "clip=false," << endl;  // for labels
+
+      double image_width=19;
+      if(dimension==3){image_width=17;}
+      common_settings_TEX_ss << "width=" << image_width << "cm," << endl;
+
+      //hsize is not well defined, especially for image only
+      //double image_height_proportion=0.65;
+      //if(dimension==3){image_height_proportion=1.0;}
+      //string image_height_str=aurostd::utype2string(image_height_proportion)+"\\hsize";  //better to define in terms of page, since this is what we are confined to
+      //better to use cm
+      double image_width_proportion=0.8;                //approx 15cm given 19cm width
+      if(dimension==3){image_width_proportion=1.2;}     //approx 20cm given 17cm width
+      common_settings_TEX_ss << "height=" << image_width_proportion*image_width << "cm," << endl;
+
+      if(dimension==3){common_settings_TEX_ss << "axis line style={line width=3pt}," << endl;}
+      //if(dimension == 2) {common_settings_TEX_ss << 20;}
+      //else {  // dimension==3
+      //  //corey change me if we see otherwise
+      //  //if(include_color_bar) {
+      //  //  if(image_only) {common_settings_TEX_ss << 21;}
+      //  //  else {common_settings_TEX_ss << 17;}  // only time we change size
+      //  //} else {common_settings_TEX_ss << 21;}
+      //}
+      //common_settings_TEX_ss << "cm," << endl;
+      //if(dimension == 2) {
+      //  if(image_only) {common_settings_TEX_ss << "height=0.8\\hsize," << endl;}
+      //  else {common_settings_TEX_ss << "height=0.55\\hsize," << endl;}
+      //} else {
+      //  common_settings_TEX_ss << "height=\\hsize," << endl;
+      //  common_settings_TEX_ss << "axis line style={line width=3pt}," << endl;
+      //}
+      common_settings_TEX_ss << "grid=none," << endl;
+      common_settings_TEX_ss << "axis on top," << endl;  // prevents heat map overlap issues
+
+      ////////////////////////////////////////////////////////////////////////////
+      // START Axis
+      ////////////////////////////////////////////////////////////////////////////
+
+      double unary_distance_axis_3D=0.25;
+      if(image_only){unary_distance_axis_3D=0.35;} // COREY FIX
+
+      uint g_state;
+      if(dimension == 2) {
+        uint top_axis_point, bottom_axis_point;
+        if(!reverse_axes) {
+          top_axis_point = 0;
+          bottom_axis_point = 1;
+        } else {
+          top_axis_point = 1;
+          bottom_axis_point = 0;
+        }
+        // first axis - kJ/atom, top and right axes, x label only for padding
+        if(showkJmolaxis) //||!image_only)   //padding purposes
+        { //CO200106 - patching for auto-indenting
+          //only needed if we want to pad for pseudo-centering (by eye), it is perfectly centered, but logos are different shapes
+          //no need to pad for eye, waste of time
+          if(0){ 
+            pseudo_preliminary_axes_TEX_ss << "\\begin{axis}[" << endl;
+            //BETTER CENTERING without labels
+            //if(!image_only){
+            //  pseudo_preliminary_axes_TEX_ss << "xlabel={";
+            //  g_state=getUnaryGState(top_axis_point);
+            //  //opacity==0
+            //  //if(!plot_unaries && isViableGState(g_state)) {
+            //  //  if(internal_links_graph2report) {
+            //  //    pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+            //  //  } else if(no_doc && external_links) {
+            //  //    pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+            //  //  }
+            //  //}
+            //  pseudo_preliminary_axes_TEX_ss << "{" << m_velements[top_axis_point] << "}";
+            //  pseudo_preliminary_axes_TEX_ss << "}," << endl;
+            //  pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(xticklabel cs:" << top_axis_point << ")}";
+            //  pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+            //}
+            pseudo_preliminary_axes_TEX_ss << "ylabel={{(kJ/mol)}}," << endl;
+            pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size; // << ",rotate=180";
+            pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+            pseudo_preliminary_axes_TEX_ss << "axis x line*=top," << endl;
+            pseudo_preliminary_axes_TEX_ss << "axis y line*=right," << endl;
+            pseudo_preliminary_axes_TEX_ss << "tick pos=right," << endl;
+            pseudo_preliminary_axes_TEX_ss << "xtick={1,0.8,0.6,0.4,0.2,0}," << endl;
+            pseudo_preliminary_axes_TEX_ss << "xticklabels={}," << endl;
+            pseudo_preliminary_axes_TEX_ss << "xticklabel shift=6pt," << endl;
+            pseudo_preliminary_axes_TEX_ss << "yticklabel shift=6pt," << endl;
+            pseudo_preliminary_axes_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5";
+            pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+            if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance_right << "}," << endl;}
+            pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
+            pseudo_preliminary_axes_TEX_ss << "xmin=0," << endl;
+            pseudo_preliminary_axes_TEX_ss << "xmax=1," << endl;
+            //removed ymin/ymax from common settings
+            pseudo_preliminary_axes_TEX_ss << "ymin=" << (showkJmolaxis?meVatom2kJmol:1.0) * ymin << "," << endl;
+            pseudo_preliminary_axes_TEX_ss << "ymax=" << (showkJmolaxis?meVatom2kJmol:1.0) * ymax << "," << endl;
+            // insert common settings
+            pseudo_preliminary_axes_TEX_ss << common_settings_TEX_ss.str();
+            pseudo_preliminary_axes_TEX_ss << "]" << endl;
+            pseudo_preliminary_axes_TEX_ss << "\\end{axis}" << endl;
+          }
+
+          // second axis - kJ/atom, top and right axes, x label only for padding
           pseudo_preliminary_axes_TEX_ss << "\\begin{axis}[" << endl;
           //BETTER CENTERING without labels
           //if(!image_only){
           //  pseudo_preliminary_axes_TEX_ss << "xlabel={";
-          //  g_state=getUnaryGState(top_axis_point);
+          //  g_state=getUnaryGState(bottom_axis_point);
           //  //opacity==0
           //  //if(!plot_unaries && isViableGState(g_state)) {
           //  //  if(internal_links_graph2report) {
@@ -8356,14 +8405,14 @@ namespace chull {
           //  //    pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
           //  //  }
           //  //}
-          //  pseudo_preliminary_axes_TEX_ss << "{" << m_velements[top_axis_point] << "}";
+          //  pseudo_preliminary_axes_TEX_ss << "{" << m_velements[bottom_axis_point] << "}";
           //  pseudo_preliminary_axes_TEX_ss << "}," << endl;
-          //  pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(xticklabel cs:" << top_axis_point << ")}";
+          //  pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(xticklabel cs:" << bottom_axis_point << ")}";
           //  pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
           //}
           pseudo_preliminary_axes_TEX_ss << "ylabel={{(kJ/mol)}}," << endl;
           pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size; // << ",rotate=180";
-          pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+          pseudo_preliminary_axes_TEX_ss << "}," << endl;
           pseudo_preliminary_axes_TEX_ss << "axis x line*=top," << endl;
           pseudo_preliminary_axes_TEX_ss << "axis y line*=right," << endl;
           pseudo_preliminary_axes_TEX_ss << "tick pos=right," << endl;
@@ -8372,7 +8421,7 @@ namespace chull {
           pseudo_preliminary_axes_TEX_ss << "xticklabel shift=6pt," << endl;
           pseudo_preliminary_axes_TEX_ss << "yticklabel shift=6pt," << endl;
           pseudo_preliminary_axes_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5";
-          pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+          pseudo_preliminary_axes_TEX_ss << "}," << endl;
           if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance_right << "}," << endl;}
           pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
           pseudo_preliminary_axes_TEX_ss << "xmin=0," << endl;
@@ -8386,55 +8435,89 @@ namespace chull {
           pseudo_preliminary_axes_TEX_ss << "\\end{axis}" << endl;
         }
 
-        // second axis - kJ/atom, top and right axes, x label only for padding
-        pseudo_preliminary_axes_TEX_ss << "\\begin{axis}[" << endl;
-        //BETTER CENTERING without labels
-        //if(!image_only){
-        //  pseudo_preliminary_axes_TEX_ss << "xlabel={";
-        //  g_state=getUnaryGState(bottom_axis_point);
-        //  //opacity==0
-        //  //if(!plot_unaries && isViableGState(g_state)) {
-        //  //  if(internal_links_graph2report) {
-        //  //    pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-        //  //  } else if(no_doc && external_links) {
-        //  //    pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
-        //  //  }
-        //  //}
-        //  pseudo_preliminary_axes_TEX_ss << "{" << m_velements[bottom_axis_point] << "}";
-        //  pseudo_preliminary_axes_TEX_ss << "}," << endl;
-        //  pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(xticklabel cs:" << bottom_axis_point << ")}";
-        //  pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
-        //}
-        pseudo_preliminary_axes_TEX_ss << "ylabel={{(kJ/mol)}}," << endl;
-        pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size; // << ",rotate=180";
-        pseudo_preliminary_axes_TEX_ss << "}," << endl;
-        pseudo_preliminary_axes_TEX_ss << "axis x line*=top," << endl;
-        pseudo_preliminary_axes_TEX_ss << "axis y line*=right," << endl;
-        pseudo_preliminary_axes_TEX_ss << "tick pos=right," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xtick={1,0.8,0.6,0.4,0.2,0}," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xticklabels={}," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xticklabel shift=6pt," << endl;
-        pseudo_preliminary_axes_TEX_ss << "yticklabel shift=6pt," << endl;
-        pseudo_preliminary_axes_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5";
-        pseudo_preliminary_axes_TEX_ss << "}," << endl;
-        if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance_right << "}," << endl;}
-        pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xmin=0," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xmax=1," << endl;
-        //removed ymin/ymax from common settings
-        pseudo_preliminary_axes_TEX_ss << "ymin=" << (showkJmolaxis?meVatom2kJmol:1.0) * ymin << "," << endl;
-        pseudo_preliminary_axes_TEX_ss << "ymax=" << (showkJmolaxis?meVatom2kJmol:1.0) * ymax << "," << endl;
-        // insert common settings
-        pseudo_preliminary_axes_TEX_ss << common_settings_TEX_ss.str();
-        pseudo_preliminary_axes_TEX_ss << "]" << endl;
-        pseudo_preliminary_axes_TEX_ss << "\\end{axis}" << endl;
-      }
+        //third axis - meV/atom, left x label only, make other stuff color white so it's not seen (exists for positioning purposes)
+        if(0){
+          //this axis is NO longer needed, we use xticklabel exclusive now
+          pseudo_preliminary_axes_TEX_ss << "\\begin{axis}[" << endl;
+          pseudo_preliminary_axes_TEX_ss << "xlabel={";
+          g_state=getUnaryGState(top_axis_point);
+          if(!plot_unaries && isViableGState(g_state)) {
+            if(internal_links_graph2report) {
+              pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+            } else if(no_doc && external_links) {
+              pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+            }
+          }
+          pseudo_preliminary_axes_TEX_ss << "{" << m_velements[top_axis_point] << "}";
+          pseudo_preliminary_axes_TEX_ss << "}," << endl;
+          pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(axis cs:" << top_axis_point << "," << ymin << ")}}," << endl; //{(xticklabel cs:" << top_axis_point << ")}," << endl;  //CO200106 - patching for auto-indenting
+          //add "max space between ticks=60" to change colorbar tick density
+          if(showkJmolaxis){
+            pseudo_preliminary_axes_TEX_ss << "axis x line*=bottom," << endl;
+            pseudo_preliminary_axes_TEX_ss << "axis y line*=left," << endl;
+            pseudo_preliminary_axes_TEX_ss << "tick pos=left," << endl;
+          }
+          pseudo_preliminary_axes_TEX_ss << "xtick={1,0.8,0.6,0.4,0.2,0}," << endl;
+          pseudo_preliminary_axes_TEX_ss << "xticklabel style={opacity=0},  \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+          pseudo_preliminary_axes_TEX_ss << "xticklabel shift=6pt," << endl;
+          pseudo_preliminary_axes_TEX_ss << "yticklabel shift=6pt," << endl;
+          pseudo_preliminary_axes_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5";
+          pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+          if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance << "}," << endl;}
+          pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
+          pseudo_preliminary_axes_TEX_ss << "xmin=0," << endl;
+          pseudo_preliminary_axes_TEX_ss << "xmax=1," << endl;
+          //removed ymin/ymax from common settings
+          pseudo_preliminary_axes_TEX_ss << "ymin=" << ymin << "," << endl;
+          pseudo_preliminary_axes_TEX_ss << "ymax=" << ymax << "," << endl;
+          // insert common settings
+          pseudo_preliminary_axes_TEX_ss << common_settings_TEX_ss.str();
+          pseudo_preliminary_axes_TEX_ss << "]" << endl;
+          pseudo_preliminary_axes_TEX_ss << "\\end{axis}" << endl;
+        }
 
-      //third axis - meV/atom, left x label only, make other stuff color white so it's not seen (exists for positioning purposes)
-      if(0){
-        //this axis is NO longer needed, we use xticklabel exclusive now
+        // real axis - meV/atom, right x label and all points data
         pseudo_preliminary_axes_TEX_ss << "\\begin{axis}[" << endl;
-        pseudo_preliminary_axes_TEX_ss << "xlabel={";
+        //xlabel is NO longer needed, we use xticklabel exclusive now
+        //pseudo_preliminary_axes_TEX_ss << "xlabel={";
+        //g_state=getUnaryGState(bottom_axis_point);
+        //if(!plot_unaries && isViableGState(g_state)) {
+        //  if(internal_links_graph2report) {
+        //    pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+        //  } else if(no_doc && external_links) {
+        //    pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+        //  }
+        //}
+        //pseudo_preliminary_axes_TEX_ss << "{" << m_velements[bottom_axis_point] << "}";
+        //pseudo_preliminary_axes_TEX_ss << "}," << endl;
+        //pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(axis cs:" << bottom_axis_point << "," << ymin << ")}}," << endl; //{(xticklabel cs:" << bottom_axis_point << ")}," << endl;
+        pseudo_preliminary_axes_TEX_ss << "ylabel={{" << (m_formation_energy_hull?"$H_{\\mathrm{f}}$ (meV/atom)":"$T_{\\mathrm{S}}$ (K)") << "}}," << endl;
+        //pseudo_preliminary_axes_TEX_ss << "ylabel={{" << (m_formation_energy_hull?"formation enthalpy (meV/atom)":"entropic temperature (K)") << "}}," << endl;
+        //if(m_formation_energy_hull) {pseudo_preliminary_axes_TEX_ss << "{formation enthalpy (meV/atom)}";}
+        //else {pseudo_preliminary_axes_TEX_ss << "{entropic temperature (K)}";}
+        //pseudo_preliminary_axes_TEX_ss << "}," << endl;
+        pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << "}," << endl;
+        //add "max space between ticks=60" to change colorbar tick density
+        if(showkJmolaxis){
+          pseudo_preliminary_axes_TEX_ss << "axis x line*=bottom," << endl;
+          pseudo_preliminary_axes_TEX_ss << "axis y line*=left," << endl;
+          pseudo_preliminary_axes_TEX_ss << "tick pos=left," << endl;
+        }
+        pseudo_preliminary_axes_TEX_ss << "xtick={1,0.8,0.6,0.4,0.2,0}," << endl;
+        pseudo_preliminary_axes_TEX_ss << "xticklabels={";
+
+        g_state=getUnaryGState(bottom_axis_point);
+        if(!plot_unaries && isViableGState(g_state)) {
+          if(internal_links_graph2report) {
+            pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+          } else if(no_doc && external_links) {
+            pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+          }
+        }
+        pseudo_preliminary_axes_TEX_ss << "{" << label_image_font_size << " " << m_velements[bottom_axis_point] << "}";
+
+        pseudo_preliminary_axes_TEX_ss << ",0.8,0.6,0.4,0.2,";
+
         g_state=getUnaryGState(top_axis_point);
         if(!plot_unaries && isViableGState(g_state)) {
           if(internal_links_graph2report) {
@@ -8443,179 +8526,388 @@ namespace chull {
             pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
           }
         }
-        pseudo_preliminary_axes_TEX_ss << "{" << m_velements[top_axis_point] << "}";
+        pseudo_preliminary_axes_TEX_ss << "{" << label_image_font_size << " " << m_velements[top_axis_point] << "}";
+
         pseudo_preliminary_axes_TEX_ss << "}," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(axis cs:" << top_axis_point << "," << ymin << ")}}," << endl; //{(xticklabel cs:" << top_axis_point << ")}}," << endl;
-        //add "max space between ticks=60" to change colorbar tick density
-        if(showkJmolaxis){
-          pseudo_preliminary_axes_TEX_ss << "axis x line*=bottom," << endl;
-          pseudo_preliminary_axes_TEX_ss << "axis y line*=left," << endl;
-          pseudo_preliminary_axes_TEX_ss << "tick pos=left," << endl;
-        }
-        pseudo_preliminary_axes_TEX_ss << "xtick={1,0.8,0.6,0.4,0.2,0}," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xticklabel style={opacity=0},  \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
         pseudo_preliminary_axes_TEX_ss << "xticklabel shift=6pt," << endl;
         pseudo_preliminary_axes_TEX_ss << "yticklabel shift=6pt," << endl;
         pseudo_preliminary_axes_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5";
-        pseudo_preliminary_axes_TEX_ss << ",opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+        pseudo_preliminary_axes_TEX_ss << "}," << endl;
         if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance << "}," << endl;}
         pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xmin=0," << endl;
-        pseudo_preliminary_axes_TEX_ss << "xmax=1," << endl;
-        //removed ymin/ymax from common settings
-        pseudo_preliminary_axes_TEX_ss << "ymin=" << ymin << "," << endl;
-        pseudo_preliminary_axes_TEX_ss << "ymax=" << ymax << "," << endl;
-        // insert common settings
-        pseudo_preliminary_axes_TEX_ss << common_settings_TEX_ss.str();
-        pseudo_preliminary_axes_TEX_ss << "]" << endl;
-        pseudo_preliminary_axes_TEX_ss << "\\end{axis}" << endl;
-      }
+      } else {  // dimension==3
+        //first axis - kJ/mol, only for right color bar
+        if(showkJmolaxis){
+          if(display_color_gradient) {
+            if(include_color_bar) {
+              pseudo_preliminary_axes_TEX_ss << "\\begin{ternaryaxis}[" << endl;
+              // Ylabel
+              pseudo_preliminary_axes_TEX_ss << "ylabel={";
+              g_state=getUnaryGState(0);
+              if(!plot_unaries && isViableGState(g_state)) {
+                if(internal_links_graph2report) {
+                  pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+                } else if(no_doc && external_links) {
+                  pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+                }
+              }
+              pseudo_preliminary_axes_TEX_ss << "{" << m_velements[0] << "}";
+              pseudo_preliminary_axes_TEX_ss << "}," << endl;
+              pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << ",at={(axis cs:0,1,0)},anchor=north east,below=" << unary_distance_axis_3D << "cm,left=" << unary_distance_axis_3D << "cm,opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+              // Xlabel
+              pseudo_preliminary_axes_TEX_ss << "xlabel={";
+              g_state=getUnaryGState(1);
+              if(!plot_unaries && isViableGState(g_state)) {
+                if(internal_links_graph2report) {
+                  pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+                } else if(no_doc && external_links) {
+                  pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+                }
+              }
+              pseudo_preliminary_axes_TEX_ss << "{" << m_velements[1] << "}";
+              pseudo_preliminary_axes_TEX_ss << "}," << endl;
+              pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(axis cs:1,0,0)},anchor=south,above=" << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm,opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+              // Zlabel
+              pseudo_preliminary_axes_TEX_ss << "zlabel={";
+              g_state=getUnaryGState(2);
+              if(!plot_unaries && isViableGState(g_state)) {
+                if(internal_links_graph2report) {
+                  pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+                } else if(no_doc && external_links) {
+                  pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+                }
+              }
+              pseudo_preliminary_axes_TEX_ss << "{" << m_velements[2] << "}";
+              //if(!plot_unaries && isViableGState(g_state)) {
+              //  if(internal_links_graph2report) {pseudo_preliminary_axes_TEX_ss << "}";}
+              //  else if(no_doc && external_links) {pseudo_preliminary_axes_TEX_ss << "}";}
+              //}
+              pseudo_preliminary_axes_TEX_ss << "}," << endl;
+              pseudo_preliminary_axes_TEX_ss << "zlabel style={font=" << label_image_font_size << ",at={(axis cs:0,0,1)},anchor=north west,below=" << unary_distance_axis_3D << "cm,right=" << unary_distance_axis_3D << "cm,opacity=0},  \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
+              pseudo_preliminary_axes_TEX_ss << "xmin=0," << endl;
+              pseudo_preliminary_axes_TEX_ss << "xmax=1," << endl;
+              pseudo_preliminary_axes_TEX_ss << "ymin=0," << endl;
+              pseudo_preliminary_axes_TEX_ss << "ymax=1," << endl;
+              pseudo_preliminary_axes_TEX_ss << "zmin=0," << endl;
+              pseudo_preliminary_axes_TEX_ss << "zmax=1," << endl;
+              pseudo_preliminary_axes_TEX_ss << "ticks=none," << endl;
+              //removed ymin/ymax from common settings
+              pseudo_preliminary_axes_TEX_ss << common_settings_TEX_ss.str();
+              // start colorbar
+              // http://tex.stackexchange.com/questions/73025/how-to-change-label-and-ticks-of-a-pgfplots-colorbar
+              pseudo_preliminary_axes_TEX_ss << "colorbar," << endl;
+              pseudo_preliminary_axes_TEX_ss << "colorbar style={" << endl;
+              pseudo_preliminary_axes_TEX_ss << "shift={(1.75cm,0cm)}," << endl; //-0cm
+              pseudo_preliminary_axes_TEX_ss << "ylabel={{(kJ/mol)}}," << endl;
+              pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << "}," << endl;
+              pseudo_preliminary_axes_TEX_ss << "axis y line*=left," << endl;
+              // ytick={18,20,25,...,45}
+              pseudo_preliminary_axes_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5}," << endl;
+              pseudo_preliminary_axes_TEX_ss << "yticklabel shift=6pt," << endl;
+              double round_to_value_right=getRoundToValue(meVatom2kJmol*point_range);
+              double y_tick_distance_right=getYTickDistance(meVatom2kJmol*y_range,approx_num_ticks,round_to_value_right);
+              if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance_right << "}," << endl;}
+              pseudo_preliminary_axes_TEX_ss << "ytick align=outside," << endl;
+              pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
+              pseudo_preliminary_axes_TEX_ss << "ymin=" << meVatom2kJmol * ymin << "," << endl;
+              pseudo_preliminary_axes_TEX_ss << "ymax=" << meVatom2kJmol * ymax << "," << endl;
+              pseudo_preliminary_axes_TEX_ss << "}," << endl;
+              // end colorbar
+              pseudo_preliminary_axes_TEX_ss << "colormap={mymap}{" << color_map << "}," << endl;  // https://www.sharelatex.com/learn/Pgfplots_package
+              // pseudo_preliminary_axes_TEX_ss << "colorbar, colormap/jet," << endl;
+              pseudo_preliminary_axes_TEX_ss << "]" << endl;
+              // add hullPoints and heat map data
+              // there might only be one hullPoint, which breaks the colorbar code
+              //heat map data first
+              num_horizontal_planes=0;
+              added_header=false;
+              if(show_heat_map) {
+                for(uint i=0,fl_size_i=m_i_facets.size();i<fl_size_i;i++) {
+                  const ChullFacet& facet=m_facets[m_i_facets[i]];
+                  if(facet.m_is_artificial){continue;}
+                  if(facet.m_is_vertical) {
+                    if(LDEBUG) {cerr << soliloquy << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+                  } else {
+                    if(LDEBUG) {cerr << soliloquy << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+                    num_horizontal_planes++;
+                  }
+                  chull_points = facet.getCHIndices();
+                  added_header=false;
+                  for(uint j=0,fl_size_j=chull_points.size();j<fl_size_j;j++) {
+                    const ChullPoint& point = m_points[chull_points[j]];
+                    // convex hull facets color
+                    if(j == 0) {
+                      pseudo_preliminary_axes_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HEAT_MAPS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+                      added_header=true;
+                    }
+                    pseudo_preliminary_axes_TEX_ss << getPlotPointContentPDF(point, true, true);
+                  }
+                  if(added_header){pseudo_preliminary_axes_TEX_ss << "};" << endl;}
+                }
+              }
+              //now hullPoints
+              added_header=false;
+              for(uint i=0,fl_size_i=hull_points.size();i<fl_size_i;i++) {
+                const ChullPoint& point = m_points[hull_points[i]];
+                if(!point.m_has_entry) {continue;}
+                if(!plot_unaries && point.isUnary()) {continue;}
+                if(!added_header){
+                  pseudo_preliminary_axes_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,"H_f_kJmol",display_color_gradient);
+                  added_header=true;
+                }
+                pseudo_preliminary_axes_TEX_ss << getPlotPointContentPDF(point, false, true);
+              }
+              if(plot_unaries){
+                for(uint i=0;i<dimension;i++) {
+                  g_state=getUnaryGState(i);
+                  if(g_state>m_points.size()-1){continue;}
+                  const ChullPoint& point = m_points[g_state];
+                  if(!point.m_has_entry) {continue;}
+                  if(!added_header){
+                    pseudo_preliminary_axes_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,"H_f_kJmol",display_color_gradient);
+                    added_header=true;
+                  }
+                  pseudo_preliminary_axes_TEX_ss << getPlotPointContentPDF(point, false, true);
+                }
+              }
+              if(added_header){pseudo_preliminary_axes_TEX_ss << "};" << endl;}
+              if(plot_off_hull){
+                added_header=false;
+                for(uint i=0,fl_size_i=plot_points.size();i<fl_size_i;i++){
+                  const ChullPoint& point=m_points[plot_points[i]];
+                  if(point.m_is_g_state) {continue;}  // we already plotted these points
+                  if(!added_header){
+                    pseudo_preliminary_axes_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_OFF_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+                    added_header=true;
+                  }
+                  pseudo_preliminary_axes_TEX_ss << getPlotPointContentPDF(point, false, false);
+                }
+                if(added_header){pseudo_preliminary_axes_TEX_ss << "};" << endl;}
+              }
+              //add entry count, date, and logo here (all opacity = 0)
+              if(1){
+                node_option_ss << "opacity=" << 0 << ",shift={(" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
+                //if(include_banner){node_position_ss << "axis cs:0.75,0.125,0.125";} //more complicated than necessary
+                //else {
+                node_position_ss << "axis cs:1,0,0";
+                //}
+                node_content_ss << "\\includegraphics[scale=0.25]{" << aflow_logo_skinny_file << "}";
+                pseudo_preliminary_axes_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+              }
+              if(small_banner)  //image_only)
+              { //CO200106 - patching for auto-indenting
+                pseudo_preliminary_axes_TEX_ss << "\\begin{pgfonlayer}{background}" << endl;  // for overlap
+                node_option_ss << "opacity=0.0,anchor=south,shift={(-" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
+                node_position_ss << "axis cs:1,0,0";
+                node_content_ss << general_image_font_size << " " << count_total_entries << " entries"; // doesn't work with externalizing images printCountTotalEntries
+                pseudo_preliminary_axes_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
 
-      // real axis - meV/atom, right x label and all points data
-      pseudo_preliminary_axes_TEX_ss << "\\begin{axis}[" << endl;
-      //xlabel is NO longer needed, we use xticklabel exclusive now
-      //pseudo_preliminary_axes_TEX_ss << "xlabel={";
-      //g_state=getUnaryGState(bottom_axis_point);
-      //if(!plot_unaries && isViableGState(g_state)) {
-      //  if(internal_links_graph2report) {
-      //    pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-      //  } else if(no_doc && external_links) {
-      //    pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
-      //  }
-      //}
-      //pseudo_preliminary_axes_TEX_ss << "{" << m_velements[bottom_axis_point] << "}";
-      //pseudo_preliminary_axes_TEX_ss << "}," << endl;
-      //pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(axis cs:" << bottom_axis_point << "," << ymin << ")}}," << endl; //{(xticklabel cs:" << bottom_axis_point << ")}}," << endl;
-      pseudo_preliminary_axes_TEX_ss << "ylabel={{" << (m_formation_energy_hull?"$H_{\\mathrm{f}}$ (meV/atom)":"$T_{\\mathrm{S}}$ (K)") << "}}," << endl;
-      //pseudo_preliminary_axes_TEX_ss << "ylabel={{" << (m_formation_energy_hull?"formation enthalpy (meV/atom)":"entropic temperature (K)") << "}}," << endl;
-      //if(m_formation_energy_hull) {pseudo_preliminary_axes_TEX_ss << "{formation enthalpy (meV/atom)}";}
-      //else {pseudo_preliminary_axes_TEX_ss << "{entropic temperature (K)}";}
-      //pseudo_preliminary_axes_TEX_ss << "}," << endl;
-      pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << "}," << endl;
-      //add "max space between ticks=60" to change colorbar tick density
-      if(showkJmolaxis){
-        pseudo_preliminary_axes_TEX_ss << "axis x line*=bottom," << endl;
-        pseudo_preliminary_axes_TEX_ss << "axis y line*=left," << endl;
-        pseudo_preliminary_axes_TEX_ss << "tick pos=left," << endl;
-      }
-      pseudo_preliminary_axes_TEX_ss << "xtick={1,0.8,0.6,0.4,0.2,0}," << endl;
-      pseudo_preliminary_axes_TEX_ss << "xticklabels={";
-
-      g_state=getUnaryGState(bottom_axis_point);
-      if(!plot_unaries && isViableGState(g_state)) {
-        if(internal_links_graph2report) {
-          pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-        } else if(no_doc && external_links) {
-          pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+                node_option_ss << "opacity=0.0,anchor=south,shift={(" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
+                node_position_ss << "axis cs:1,0,0";
+                node_content_ss << general_image_font_size << " \\today";
+                pseudo_preliminary_axes_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+                pseudo_preliminary_axes_TEX_ss << "\\end{pgfonlayer}{background}" << endl;
+              }
+              pseudo_preliminary_axes_TEX_ss << "\\end{ternaryaxis}" << endl;
+            }
+          }
         }
-      }
-      pseudo_preliminary_axes_TEX_ss << "{" << label_image_font_size << " " << m_velements[bottom_axis_point] << "}";
 
-      pseudo_preliminary_axes_TEX_ss << ",0.8,0.6,0.4,0.2,";
-
-      g_state=getUnaryGState(top_axis_point);
-      if(!plot_unaries && isViableGState(g_state)) {
-        if(internal_links_graph2report) {
-          pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-        } else if(no_doc && external_links) {
-          pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+        //real axis - meV/atom
+        pseudo_preliminary_axes_TEX_ss << "\\begin{ternaryaxis}[" << endl;
+        // Ylabel
+        pseudo_preliminary_axes_TEX_ss << "ylabel={";
+        g_state=getUnaryGState(0);
+        if(!plot_unaries && isViableGState(g_state)) {
+          if(internal_links_graph2report) {
+            pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+          } else if(no_doc && external_links) {
+            pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+          }
         }
+        pseudo_preliminary_axes_TEX_ss << "{" << m_velements[0] << "}";
+        pseudo_preliminary_axes_TEX_ss << "}," << endl;
+        pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << ",at={(axis cs:0,1,0)},anchor=north east,below=" << unary_distance_axis_3D << "cm,left=" << unary_distance_axis_3D << "cm}," << endl;
+        // Xlabel
+        pseudo_preliminary_axes_TEX_ss << "xlabel={";
+        g_state=getUnaryGState(1);
+        if(!plot_unaries && isViableGState(g_state)) {
+          if(internal_links_graph2report) {
+            pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+          } else if(no_doc && external_links) {
+            pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+          }
+        }
+        pseudo_preliminary_axes_TEX_ss << "{" << m_velements[1] << "}";
+        pseudo_preliminary_axes_TEX_ss << "}," << endl;
+        pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(axis cs:1,0,0)},anchor=south,above=" << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm}," << endl;
+        // Zlabel
+        pseudo_preliminary_axes_TEX_ss << "zlabel={";
+        g_state=getUnaryGState(2);
+        if(!plot_unaries && isViableGState(g_state)) {
+          if(internal_links_graph2report) {
+            pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
+          } else if(no_doc && external_links) {
+            pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
+          }
+        }
+        pseudo_preliminary_axes_TEX_ss << "{" << m_velements[2] << "}";
+        pseudo_preliminary_axes_TEX_ss << "}," << endl;
+        pseudo_preliminary_axes_TEX_ss << "zlabel style={font=" << label_image_font_size << ",at={(axis cs:0,0,1)},anchor=north west,below=" << unary_distance_axis_3D << "cm,right=" << unary_distance_axis_3D << "cm}," << endl;
       }
-      pseudo_preliminary_axes_TEX_ss << "{" << label_image_font_size << " " << m_velements[top_axis_point] << "}";
+      // tikzpic_settings_TEX starts here
+      tikzpic_settings_TEX_ss << "xmin=0," << endl;
+      tikzpic_settings_TEX_ss << "xmax=1," << endl;
+      if(dimension == 2) {
+        tikzpic_settings_TEX_ss << "ymin=" << ymin << "," << endl;
+        tikzpic_settings_TEX_ss << "ymax=" << ymax << "," << endl;
+      } else {  // dimension==3
+        tikzpic_settings_TEX_ss << "ymin=0," << endl;
+        tikzpic_settings_TEX_ss << "ymax=1," << endl;
+        tikzpic_settings_TEX_ss << "zmin=0," << endl;
+        tikzpic_settings_TEX_ss << "zmax=1," << endl;
+        tikzpic_settings_TEX_ss << "ticks=none," << endl;
+      }
+      //removed ymin/ymax from common settings
+      tikzpic_settings_TEX_ss << common_settings_TEX_ss.str();
 
-      pseudo_preliminary_axes_TEX_ss << "}," << endl;
-      pseudo_preliminary_axes_TEX_ss << "xticklabel shift=6pt," << endl;
-      pseudo_preliminary_axes_TEX_ss << "yticklabel shift=6pt," << endl;
-      pseudo_preliminary_axes_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5";
-      pseudo_preliminary_axes_TEX_ss << "}," << endl;
-      if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance << "}," << endl;}
-      pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
-  } else {  // dimension==3
-    //first axis - kJ/mol, only for right color bar
-    if(showkJmolaxis){
+      ////////////////////////////////////////////////////////////////////////////
+      // END Tikz pic settings
+      ////////////////////////////////////////////////////////////////////////////
+
+      ////////////////////////////////////////////////////////////////////////////
+      // START Colorbar settings
+      ////////////////////////////////////////////////////////////////////////////
+
+      // won't enter if dimension==2, colorbar automatically turned off
+      // start colorbar
+      // http://tex.stackexchange.com/questions/73025/how-to-change-label-and-ticks-of-a-pgfplots-colorbar
       if(display_color_gradient) {
         if(include_color_bar) {
-          pseudo_preliminary_axes_TEX_ss << "\\begin{ternaryaxis}[" << endl;
-          // Ylabel
-          pseudo_preliminary_axes_TEX_ss << "ylabel={";
-          g_state=getUnaryGState(0);
-          if(!plot_unaries && isViableGState(g_state)) {
-            if(internal_links_graph2report) {
-              pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-            } else if(no_doc && external_links) {
-              pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
-            }
-          }
-          pseudo_preliminary_axes_TEX_ss << "{" << m_velements[0] << "}";
-          pseudo_preliminary_axes_TEX_ss << "}," << endl;
-          pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << ",at={(axis cs:0,1,0)},anchor=north east,below=" << unary_distance_axis_3D << "cm,left=" << unary_distance_axis_3D << "cm,opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
-          // Xlabel
-          pseudo_preliminary_axes_TEX_ss << "xlabel={";
-          g_state=getUnaryGState(1);
-          if(!plot_unaries && isViableGState(g_state)) {
-            if(internal_links_graph2report) {
-              pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-            } else if(no_doc && external_links) {
-              pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
-            }
-          }
-          pseudo_preliminary_axes_TEX_ss << "{" << m_velements[1] << "}";
-          pseudo_preliminary_axes_TEX_ss << "}," << endl;
-          pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(axis cs:1,0,0)},anchor=south,above=" << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm,opacity=0}, \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
-          // Zlabel
-          pseudo_preliminary_axes_TEX_ss << "zlabel={";
-          g_state=getUnaryGState(2);
-          if(!plot_unaries && isViableGState(g_state)) {
-            if(internal_links_graph2report) {
-              pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-            } else if(no_doc && external_links) {
-              pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
-            }
-          }
-          pseudo_preliminary_axes_TEX_ss << "{" << m_velements[2] << "}";
-          //if(!plot_unaries && isViableGState(g_state)) {
-          //  if(internal_links_graph2report) {pseudo_preliminary_axes_TEX_ss << "}";}
-          //  else if(no_doc && external_links) {pseudo_preliminary_axes_TEX_ss << "}";}
-          //}
-          pseudo_preliminary_axes_TEX_ss << "}," << endl;
-          pseudo_preliminary_axes_TEX_ss << "zlabel style={font=" << label_image_font_size << ",at={(axis cs:0,0,1)},anchor=north west,below=" << unary_distance_axis_3D << "cm,right=" << unary_distance_axis_3D << "cm,opacity=0},  \%we need labels for proper padding, but avoid bolder labels with opacity==0" << endl;
-          pseudo_preliminary_axes_TEX_ss << "xmin=0," << endl;
-          pseudo_preliminary_axes_TEX_ss << "xmax=1," << endl;
-          pseudo_preliminary_axes_TEX_ss << "ymin=0," << endl;
-          pseudo_preliminary_axes_TEX_ss << "ymax=1," << endl;
-          pseudo_preliminary_axes_TEX_ss << "zmin=0," << endl;
-          pseudo_preliminary_axes_TEX_ss << "zmax=1," << endl;
-          pseudo_preliminary_axes_TEX_ss << "ticks=none," << endl;
-          //removed ymin/ymax from common settings
-          pseudo_preliminary_axes_TEX_ss << common_settings_TEX_ss.str();
-          // start colorbar
-          // http://tex.stackexchange.com/questions/73025/how-to-change-label-and-ticks-of-a-pgfplots-colorbar
-          pseudo_preliminary_axes_TEX_ss << "colorbar," << endl;
-          pseudo_preliminary_axes_TEX_ss << "colorbar style={" << endl;
-          pseudo_preliminary_axes_TEX_ss << "shift={(1.75cm,0cm)}," << endl; //-0cm
-          pseudo_preliminary_axes_TEX_ss << "ylabel={{(kJ/mol)}}," << endl;
-          pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << "}," << endl;
-          pseudo_preliminary_axes_TEX_ss << "axis y line*=left," << endl;
+          tikzpic_settings_TEX_ss << "colorbar," << endl;
+          tikzpic_settings_TEX_ss << "colorbar style={" << endl;
+          tikzpic_settings_TEX_ss << "shift={(1.75cm,0cm)}," << endl;  //-0cm
+          tikzpic_settings_TEX_ss << "ylabel={{" << (m_formation_energy_hull?"formation enthalpy (meV/atom)":"entropic temperature (K)") << "}}," << endl;
+          tikzpic_settings_TEX_ss << "ylabel style={font=" << label_image_font_size; // << ",rotate=180";
+          tikzpic_settings_TEX_ss << "}," << endl;
+          if(showkJmolaxis){tikzpic_settings_TEX_ss << "axis y line*=right," << endl;}
           // ytick={18,20,25,...,45}
-          pseudo_preliminary_axes_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5}," << endl;
-          pseudo_preliminary_axes_TEX_ss << "yticklabel shift=6pt," << endl;
-          double round_to_value_right=getRoundToValue(meVatom2kJmol*point_range);
-          double y_tick_distance_right=getYTickDistance(meVatom2kJmol*y_range,approx_num_ticks,round_to_value_right);
-          if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance_right << "}," << endl;}
-          pseudo_preliminary_axes_TEX_ss << "ytick align=outside," << endl;
-          pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
-          pseudo_preliminary_axes_TEX_ss << "ymin=" << meVatom2kJmol * ymin << "," << endl;
-          pseudo_preliminary_axes_TEX_ss << "ymax=" << meVatom2kJmol * ymax << "," << endl;
-          pseudo_preliminary_axes_TEX_ss << "}," << endl;
-          // end colorbar
-          pseudo_preliminary_axes_TEX_ss << "colormap={mymap}{" << color_map << "}," << endl;  // https://www.sharelatex.com/learn/Pgfplots_package
-          // pseudo_preliminary_axes_TEX_ss << "colorbar, colormap/jet," << endl;
-          pseudo_preliminary_axes_TEX_ss << "]" << endl;
-          // add hullPoints and heat map data
-          // there might only be one hullPoint, which breaks the colorbar code
-          //heat map data first
+          tikzpic_settings_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5}," << endl;
+          tikzpic_settings_TEX_ss << "yticklabel shift=6pt," << endl;
+          if(set_y_range_exactly){tikzpic_settings_TEX_ss << "ytick distance={" << y_tick_distance << "}," << endl;}
+          tikzpic_settings_TEX_ss << "ytick align=outside," << endl;
+          tikzpic_settings_TEX_ss << "scaled y ticks=false," << endl;
+          tikzpic_settings_TEX_ss << "ymin=" << ymin << "," << endl;
+          tikzpic_settings_TEX_ss << "ymax=" << ymax << "," << endl;
+          tikzpic_settings_TEX_ss << "}," << endl;
+        }
+        // end colorbar
+        tikzpic_settings_TEX_ss << "colormap={mymap}{" << color_map << "}," << endl;  // https://www.sharelatex.com/learn/Pgfplots_package
+        // tikzpic_settings_TEX_ss << "colorbar, colormap/jet," << endl;
+      }
+      tikzpic_settings_TEX_ss << "]" << endl;
+
+      ////////////////////////////////////////////////////////////////////////////
+      // END Colorbar settings
+      ////////////////////////////////////////////////////////////////////////////
+
+      ////////////////////////////////////////////////////////////////////////////
+      // START Plotting everything on the hull (facet lines, colors, etc.)
+      ////////////////////////////////////////////////////////////////////////////
+
+      // for 2d, we go through points2d (in order by stoichiometry), otherwise, we
+      // go through planes (order doesn't matter)
+      if(dimension == 2) {
+        // we use vertices vs. hull_points for facets because vertices
+        // contain artificial end points for plotting
+
+        added_header=false;
+        for(uint i=0,fl_size_i=hull_points.size();i<fl_size_i;i++) {
+          if(!added_header){
+            tikzpic_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+            added_header=true;
+          }
+          tikzpic_TEX_ss << getPlotPointContentPDF(m_points[hull_points[i]], true, true);
+        }
+        if(added_header){tikzpic_TEX_ss << "};" << endl;}
+
+        // we plot hullpoints for points on hull ONLY (not lines)
+        added_header=false;
+        for(uint i=0,fl_size_i=hull_points.size();i<fl_size_i;i++) {
+          const ChullPoint point=m_points[hull_points[i]];
+          if(!point.m_has_entry) {continue;}
+          if(!plot_unaries && point.isUnary()) {continue;}
+          if(!added_header){
+            tikzpic_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+            added_header=true;
+          }
+          tikzpic_TEX_ss << getPlotPointContentPDF(point, false, true);
+        }
+        if(plot_unaries){
+          for(uint i=0;i<dimension;i++) {
+            g_state=getUnaryGState(i);
+            if(g_state>m_points.size()-1){continue;}
+            const ChullPoint& point = m_points[g_state];
+            if(!point.m_has_entry) {continue;}
+            if(!added_header){
+              tikzpic_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+              added_header=true;
+            }
+            tikzpic_TEX_ss << getPlotPointContentPDF(point, false, true);
+          }
+        }
+        if(added_header){tikzpic_TEX_ss << "};" << endl;}
+      } else {  // dimension==3
+        //////////////////////////////////////////////////////////////////////////
+        // START 3D Heat maps and facet lines
+        //////////////////////////////////////////////////////////////////////////
+
+        // this option allows for overlapping facet lines (may or may not be desired)
+        if(draw_all_facet_lines) {
           num_horizontal_planes=0;
-          added_header=false;
+          for(uint i=0,fl_size_i=m_i_facets.size();i<fl_size_i;i++) {
+            const ChullFacet& facet=m_facets[m_i_facets[i]];
+            if(facet.m_is_artificial){continue;}
+            if(facet.m_is_vertical) {
+              if(LDEBUG) {cerr << soliloquy << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+            } else {
+              if(LDEBUG) {cerr << soliloquy << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+              num_horizontal_planes++;
+            }
+            chull_points = facet.getCHIndices();
+            chull_points.push_back(chull_points[0]);  // that way we get full facet
+            added_header=false;
+            for(uint j=0,fl_size_j=chull_points.size();j<fl_size_j;j++) {
+              const ChullPoint& point = m_points[chull_points[j]];
+              // keep first coord
+              if(j == 0) {
+                // convex hull facets color
+                heat_map_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HEAT_MAPS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+                // convex hull facets (lines)
+                convex_hull_facets_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+                // thick white line for contrast
+                convex_hull_facets_drop_shadow_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+                added_header=true;
+              }
+              convex_hull_facets_TEX_ss << getPlotPointContentPDF(point, true, true);
+              convex_hull_facets_drop_shadow_TEX_ss << getPlotPointContentPDF(point, true, true);
+              if(j!=chull_points.size()-1) {  // heatmap doesn't need first coord repeated
+                heat_map_TEX_ss << getPlotPointContentPDF(point, true, true);
+              }
+            }
+            // end line for connecting facet lines
+            if(added_header){
+              convex_hull_facets_TEX_ss << "};" << endl;
+              convex_hull_facets_drop_shadow_TEX_ss << "};" << endl;
+              heat_map_TEX_ss << "};" << endl;
+            }
+          }
+        } else {
+          // no choice but to go through planes twice, once for
+          // heatmap, the other for facet lines/drop shadows
+
+          // heatmap
+          num_horizontal_planes=0;
           if(show_heat_map) {
             for(uint i=0,fl_size_i=m_i_facets.size();i<fl_size_i;i++) {
               const ChullFacet& facet=m_facets[m_i_facets[i]];
@@ -8632,277 +8924,21 @@ namespace chull {
                 const ChullPoint& point = m_points[chull_points[j]];
                 // convex hull facets color
                 if(j == 0) {
-                  pseudo_preliminary_axes_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HEAT_MAPS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+                  heat_map_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HEAT_MAPS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
                   added_header=true;
                 }
-                pseudo_preliminary_axes_TEX_ss << getPlotPointContentPDF(point, true, true);
+                heat_map_TEX_ss << getPlotPointContentPDF(point, true, true);
               }
-              if(added_header){pseudo_preliminary_axes_TEX_ss << "};" << endl;}
+              if(added_header){heat_map_TEX_ss << "};" << endl;}
             }
           }
-          //now hullPoints
-          added_header=false;
-          for(uint i=0,fl_size_i=hull_points.size();i<fl_size_i;i++) {
-            const ChullPoint& point = m_points[hull_points[i]];
-            if(!point.m_has_entry) {continue;}
-            if(!plot_unaries && point.isUnary()) {continue;}
-            if(!added_header){
-              pseudo_preliminary_axes_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,"H_f_kJmol",display_color_gradient);
-              added_header=true;
-            }
-            pseudo_preliminary_axes_TEX_ss << getPlotPointContentPDF(point, false, true);
-          }
-          if(plot_unaries){
-            for(uint i=0;i<dimension;i++) {
-              g_state=getUnaryGState(i);
-              if(g_state>m_points.size()-1){continue;}
-              const ChullPoint& point = m_points[g_state];
-              if(!point.m_has_entry) {continue;}
-              if(!added_header){
-                pseudo_preliminary_axes_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,"H_f_kJmol",display_color_gradient);
-                added_header=true;
-              }
-              pseudo_preliminary_axes_TEX_ss << getPlotPointContentPDF(point, false, true);
-            }
-          }
-          if(added_header){pseudo_preliminary_axes_TEX_ss << "};" << endl;}
-          if(plot_off_hull){
-            added_header=false;
-            for(uint i=0,fl_size_i=plot_points.size();i<fl_size_i;i++){
-              const ChullPoint& point=m_points[plot_points[i]];
-              if(point.m_is_g_state) {continue;}  // we already plotted these points
-              if(!added_header){
-                pseudo_preliminary_axes_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_OFF_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-                added_header=true;
-              }
-              pseudo_preliminary_axes_TEX_ss << getPlotPointContentPDF(point, false, false);
-            }
-            if(added_header){pseudo_preliminary_axes_TEX_ss << "};" << endl;}
-          }
-          //add entry count, date, and logo here (all opacity = 0)
-          if(1){
-            node_option_ss << "opacity=" << 0 << ",shift={(" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
-            //if(include_banner){node_position_ss << "axis cs:0.75,0.125,0.125";} //more complicated than necessary
-            //else {
-            node_position_ss << "axis cs:1,0,0";
-            //}
-            node_content_ss << "\\includegraphics[scale=0.25]{" << aflow_logo_skinny_file << "}";
-            pseudo_preliminary_axes_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-          }
-          if(small_banner){//image_only){
-            pseudo_preliminary_axes_TEX_ss << "\\begin{pgfonlayer}{background}" << endl;  // for overlap
-            node_option_ss << "opacity=0.0,anchor=south,shift={(-" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
-            node_position_ss << "axis cs:1,0,0";
-            node_content_ss << general_image_font_size << " " << count_total_entries << " entries"; // doesn't work with externalizing images printCountTotalEntries
-            pseudo_preliminary_axes_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-
-            node_option_ss << "opacity=0.0,anchor=south,shift={(" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
-            node_position_ss << "axis cs:1,0,0";
-            node_content_ss << general_image_font_size << " \\today";
-            pseudo_preliminary_axes_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-            pseudo_preliminary_axes_TEX_ss << "\\end{pgfonlayer}{background}" << endl;
-          }
-          pseudo_preliminary_axes_TEX_ss << "\\end{ternaryaxis}" << endl;
-          }
-        }
-      }
-
-      //real axis - meV/atom
-      pseudo_preliminary_axes_TEX_ss << "\\begin{ternaryaxis}[" << endl;
-      // Ylabel
-      pseudo_preliminary_axes_TEX_ss << "ylabel={";
-      g_state=getUnaryGState(0);
-      if(!plot_unaries && isViableGState(g_state)) {
-        if(internal_links_graph2report) {
-          pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-        } else if(no_doc && external_links) {
-          pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
-        }
-      }
-      pseudo_preliminary_axes_TEX_ss << "{" << m_velements[0] << "}";
-      pseudo_preliminary_axes_TEX_ss << "}," << endl;
-      pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << ",at={(axis cs:0,1,0)},anchor=north east,below=" << unary_distance_axis_3D << "cm,left=" << unary_distance_axis_3D << "cm}," << endl;
-      // Xlabel
-      pseudo_preliminary_axes_TEX_ss << "xlabel={";
-      g_state=getUnaryGState(1);
-      if(!plot_unaries && isViableGState(g_state)) {
-        if(internal_links_graph2report) {
-          pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-        } else if(no_doc && external_links) {
-          pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
-        }
-      }
-      pseudo_preliminary_axes_TEX_ss << "{" << m_velements[1] << "}";
-      pseudo_preliminary_axes_TEX_ss << "}," << endl;
-      pseudo_preliminary_axes_TEX_ss << "xlabel style={font=" << label_image_font_size << ",at={(axis cs:1,0,0)},anchor=south,above=" << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm}," << endl;
-      // Zlabel
-      pseudo_preliminary_axes_TEX_ss << "zlabel={";
-      g_state=getUnaryGState(2);
-      if(!plot_unaries && isViableGState(g_state)) {
-        if(internal_links_graph2report) {
-          pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-        } else if(no_doc && external_links) {
-          pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
-        }
-      }
-      pseudo_preliminary_axes_TEX_ss << "{" << m_velements[2] << "}";
-      pseudo_preliminary_axes_TEX_ss << "}," << endl;
-      pseudo_preliminary_axes_TEX_ss << "zlabel style={font=" << label_image_font_size << ",at={(axis cs:0,0,1)},anchor=north west,below=" << unary_distance_axis_3D << "cm,right=" << unary_distance_axis_3D << "cm}," << endl;
-    }
-    // tikzpic_settings_TEX starts here
-    tikzpic_settings_TEX_ss << "xmin=0," << endl;
-    tikzpic_settings_TEX_ss << "xmax=1," << endl;
-    if(dimension == 2) {
-      tikzpic_settings_TEX_ss << "ymin=" << ymin << "," << endl;
-      tikzpic_settings_TEX_ss << "ymax=" << ymax << "," << endl;
-    } else {  // dimension==3
-      tikzpic_settings_TEX_ss << "ymin=0," << endl;
-      tikzpic_settings_TEX_ss << "ymax=1," << endl;
-      tikzpic_settings_TEX_ss << "zmin=0," << endl;
-      tikzpic_settings_TEX_ss << "zmax=1," << endl;
-      tikzpic_settings_TEX_ss << "ticks=none," << endl;
-    }
-    //removed ymin/ymax from common settings
-    tikzpic_settings_TEX_ss << common_settings_TEX_ss.str();
-
-    ////////////////////////////////////////////////////////////////////////////
-    // END Tikz pic settings
-    ////////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////////////////////////////////
-    // START Colorbar settings
-    ////////////////////////////////////////////////////////////////////////////
-
-    // won't enter if dimension==2, colorbar automatically turned off
-    // start colorbar
-    // http://tex.stackexchange.com/questions/73025/how-to-change-label-and-ticks-of-a-pgfplots-colorbar
-    if(display_color_gradient) {
-      if(include_color_bar) {
-        tikzpic_settings_TEX_ss << "colorbar," << endl;
-        tikzpic_settings_TEX_ss << "colorbar style={" << endl;
-        tikzpic_settings_TEX_ss << "shift={(1.75cm,0cm)}," << endl;  //-0cm
-        tikzpic_settings_TEX_ss << "ylabel={{" << (m_formation_energy_hull?"formation enthalpy (meV/atom)":"entropic temperature (K)") << "}}," << endl;
-        tikzpic_settings_TEX_ss << "ylabel style={font=" << label_image_font_size; // << ",rotate=180";
-        tikzpic_settings_TEX_ss << "}," << endl;
-        if(showkJmolaxis){tikzpic_settings_TEX_ss << "axis y line*=right," << endl;}
-        // ytick={18,20,25,...,45}
-        tikzpic_settings_TEX_ss << "yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=5}," << endl;
-        tikzpic_settings_TEX_ss << "yticklabel shift=6pt," << endl;
-        if(set_y_range_exactly){tikzpic_settings_TEX_ss << "ytick distance={" << y_tick_distance << "}," << endl;}
-        tikzpic_settings_TEX_ss << "ytick align=outside," << endl;
-        tikzpic_settings_TEX_ss << "scaled y ticks=false," << endl;
-        tikzpic_settings_TEX_ss << "ymin=" << ymin << "," << endl;
-        tikzpic_settings_TEX_ss << "ymax=" << ymax << "," << endl;
-        tikzpic_settings_TEX_ss << "}," << endl;
-      }
-      // end colorbar
-      tikzpic_settings_TEX_ss << "colormap={mymap}{" << color_map << "}," << endl;  // https://www.sharelatex.com/learn/Pgfplots_package
-      // tikzpic_settings_TEX_ss << "colorbar, colormap/jet," << endl;
-    }
-    tikzpic_settings_TEX_ss << "]" << endl;
-
-    ////////////////////////////////////////////////////////////////////////////
-    // END Colorbar settings
-    ////////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////////////////////////////////
-    // START Plotting everything on the hull (facet lines, colors, etc.)
-    ////////////////////////////////////////////////////////////////////////////
-
-    // for 2d, we go through points2d (in order by stoichiometry), otherwise, we
-    // go through planes (order doesn't matter)
-    if(dimension == 2) {
-      // we use vertices vs. hull_points for facets because vertices
-      // contain artificial end points for plotting
-
-      added_header=false;
-      for(uint i=0,fl_size_i=hull_points.size();i<fl_size_i;i++) {
-        if(!added_header){
-          tikzpic_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-          added_header=true;
-        }
-        tikzpic_TEX_ss << getPlotPointContentPDF(m_points[hull_points[i]], true, true);
-      }
-      if(added_header){tikzpic_TEX_ss << "};" << endl;}
-
-      // we plot hullpoints for points on hull ONLY (not lines)
-      added_header=false;
-      for(uint i=0,fl_size_i=hull_points.size();i<fl_size_i;i++) {
-        const ChullPoint point=m_points[hull_points[i]];
-        if(!point.m_has_entry) {continue;}
-        if(!plot_unaries && point.isUnary()) {continue;}
-        if(!added_header){
-          tikzpic_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-          added_header=true;
-        }
-        tikzpic_TEX_ss << getPlotPointContentPDF(point, false, true);
-      }
-      if(plot_unaries){
-        for(uint i=0;i<dimension;i++) {
-          g_state=getUnaryGState(i);
-          if(g_state>m_points.size()-1){continue;}
-          const ChullPoint& point = m_points[g_state];
-          if(!point.m_has_entry) {continue;}
-          if(!added_header){
-            tikzpic_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-            added_header=true;
-          }
-          tikzpic_TEX_ss << getPlotPointContentPDF(point, false, true);
-        }
-      }
-      if(added_header){tikzpic_TEX_ss << "};" << endl;}
-    } else {  // dimension==3
-      //////////////////////////////////////////////////////////////////////////
-      // START 3D Heat maps and facet lines
-      //////////////////////////////////////////////////////////////////////////
-
-      // this option allows for overlapping facet lines (may or may not be desired)
-      if(draw_all_facet_lines) {
-        num_horizontal_planes=0;
-        for(uint i=0,fl_size_i=m_i_facets.size();i<fl_size_i;i++) {
-          const ChullFacet& facet=m_facets[m_i_facets[i]];
-          if(facet.m_is_artificial){continue;}
-          if(facet.m_is_vertical) {
-            if(LDEBUG) {cerr << soliloquy << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
-          } else {
-            if(LDEBUG) {cerr << soliloquy << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
-            num_horizontal_planes++;
-          }
-          chull_points = facet.getCHIndices();
-          chull_points.push_back(chull_points[0]);  // that way we get full facet
-          added_header=false;
-          for(uint j=0,fl_size_j=chull_points.size();j<fl_size_j;j++) {
-            const ChullPoint& point = m_points[chull_points[j]];
-            // keep first coord
-            if(j == 0) {
-              // convex hull facets color
-              heat_map_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HEAT_MAPS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-              // convex hull facets (lines)
-              convex_hull_facets_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-              // thick white line for contrast
-              convex_hull_facets_drop_shadow_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-              added_header=true;
-            }
-            convex_hull_facets_TEX_ss << getPlotPointContentPDF(point, true, true);
-            convex_hull_facets_drop_shadow_TEX_ss << getPlotPointContentPDF(point, true, true);
-            if(j!=chull_points.size()-1) {  // heatmap doesn't need first coord repeated
-              heat_map_TEX_ss << getPlotPointContentPDF(point, true, true);
-            }
-          }
-          // end line for connecting facet lines
-          if(added_header){
-            convex_hull_facets_TEX_ss << "};" << endl;
-            convex_hull_facets_drop_shadow_TEX_ss << "};" << endl;
-            heat_map_TEX_ss << "};" << endl;
-          }
-        }
-      } else {
-        // no choice but to go through planes twice, once for
-        // heatmap, the other for facet lines/drop shadows
-
-        // heatmap
-        num_horizontal_planes=0;
-        if(show_heat_map) {
+          // save time by not saving WHOLE chullPoints, just compositional part of
+          // xvector for facet lines
+          //vector<vector<xvector<double> > > facet_lines, facet_lines_dropshadow;
+          //fix UNWANTEDFACETLINE to check indices, not actual coords
+          num_horizontal_planes=0;
+          for(uint ii=0,fl_size_ii=facet_lines.size();ii<fl_size_ii;ii++){facet_lines[ii].clear();} facet_lines.clear();
+          for(uint ii=0,fl_size_ii=facet_lines_dropshadow.size();ii<fl_size_ii;ii++){facet_lines_dropshadow[ii].clear();} facet_lines_dropshadow.clear();
           for(uint i=0,fl_size_i=m_i_facets.size();i<fl_size_i;i++) {
             const ChullFacet& facet=m_facets[m_i_facets[i]];
             if(facet.m_is_artificial){continue;}
@@ -8913,551 +8949,522 @@ namespace chull {
               num_horizontal_planes++;
             }
             chull_points = facet.getCHIndices();
-            added_header=false;
-            for(uint j=0,fl_size_j=chull_points.size();j<fl_size_j;j++) {
-              const ChullPoint& point = m_points[chull_points[j]];
-              // convex hull facets color
-              if(j == 0) {
-                heat_map_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HEAT_MAPS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-                added_header=true;
-              }
-              heat_map_TEX_ss << getPlotPointContentPDF(point, true, true);
-            }
-            if(added_header){heat_map_TEX_ss << "};" << endl;}
-          }
-        }
-        // save time by not saving WHOLE chullPoints, just compositional part of
-        // xvector for facet lines
-        //vector<vector<xvector<double> > > facet_lines, facet_lines_dropshadow;
-        //fix UNWANTEDFACETLINE to check indices, not actual coords
-        num_horizontal_planes=0;
-        for(uint ii=0,fl_size_ii=facet_lines.size();ii<fl_size_ii;ii++){facet_lines[ii].clear();} facet_lines.clear();
-        for(uint ii=0,fl_size_ii=facet_lines_dropshadow.size();ii<fl_size_ii;ii++){facet_lines_dropshadow[ii].clear();} facet_lines_dropshadow.clear();
-        for(uint i=0,fl_size_i=m_i_facets.size();i<fl_size_i;i++) {
-          const ChullFacet& facet=m_facets[m_i_facets[i]];
-          if(facet.m_is_artificial){continue;}
-          if(facet.m_is_vertical) {
-            if(LDEBUG) {cerr << soliloquy << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
-          } else {
-            if(LDEBUG) {cerr << soliloquy << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
-            num_horizontal_planes++;
-          }
-          chull_points = facet.getCHIndices();
-          chull_points.push_back(chull_points[0]);  // that way we get full facet
-          if(LDEBUG) {cerr << soliloquy << " looking for all unwanted facets" << endl;}
-          for(uint l=0,fl_size_l=chull_points.size();l<fl_size_l - 1;l++) {
-            if(LDEBUG) {cerr << soliloquy << " looking at point l=" << l << " and l=" << l + 1 << endl;}
-            if(!unwantedFacetLine(chull_points[l], chull_points[l+1], facet_lines, true)) {
-              if(LDEBUG) {cerr << soliloquy << " plotting point l=" << l << " and l=" << l + 1 << endl;}
-              // convex hull facets (lines)
-              convex_hull_facets_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-              for(uint j=0;j<2;j++) {
-                const ChullPoint& point = m_points[chull_points[l+j]];
-                convex_hull_facets_TEX_ss << getPlotPointContentPDF(point, true, true);
-              }
-              // end line for connecting facet lines
-              convex_hull_facets_TEX_ss << "};" << endl;
-            } else {
-              if(LDEBUG) {
-                cerr << soliloquy << " skipping l=" << l << " and l=" << l + 1 << endl;
-                cerr << soliloquy << " l=" << l << " is " << m_points[chull_points[l]].m_coords << endl;
-                cerr << soliloquy << " l=" << l+1 << " is " << m_points[chull_points[l+1]].m_coords << endl;
-              }
-            }
-            if(hull_drop_shadow) {
-              if(!unwantedFacetLine(chull_points[l], chull_points[l+1], facet_lines_dropshadow, false)){
-                if(LDEBUG) {cerr << soliloquy << " plotting drop shadow l=" << l << " and l=" << l + 1 << endl;}
-                // thick white line for contrast
-                convex_hull_facets_drop_shadow_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+            chull_points.push_back(chull_points[0]);  // that way we get full facet
+            if(LDEBUG) {cerr << soliloquy << " looking for all unwanted facets" << endl;}
+            for(uint l=0,fl_size_l=chull_points.size();l<fl_size_l - 1;l++) {
+              if(LDEBUG) {cerr << soliloquy << " looking at point l=" << l << " and l=" << l + 1 << endl;}
+              if(!unwantedFacetLine(chull_points[l], chull_points[l+1], facet_lines, true)) {
+                if(LDEBUG) {cerr << soliloquy << " plotting point l=" << l << " and l=" << l + 1 << endl;}
+                // convex hull facets (lines)
+                convex_hull_facets_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
                 for(uint j=0;j<2;j++) {
                   const ChullPoint& point = m_points[chull_points[l+j]];
-                  convex_hull_facets_drop_shadow_TEX_ss << getPlotPointContentPDF(point, true, true);
+                  convex_hull_facets_TEX_ss << getPlotPointContentPDF(point, true, true);
                 }
                 // end line for connecting facet lines
-                convex_hull_facets_drop_shadow_TEX_ss << "};" << endl;
+                convex_hull_facets_TEX_ss << "};" << endl;
               } else {
                 if(LDEBUG) {
-                  cerr << soliloquy << " skipping drop shadow l=" << l << " and l=" << l + 1 << endl;
+                  cerr << soliloquy << " skipping l=" << l << " and l=" << l + 1 << endl;
                   cerr << soliloquy << " l=" << l << " is " << m_points[chull_points[l]].m_coords << endl;
                   cerr << soliloquy << " l=" << l+1 << " is " << m_points[chull_points[l+1]].m_coords << endl;
                 }
               }
+              if(hull_drop_shadow) {
+                if(!unwantedFacetLine(chull_points[l], chull_points[l+1], facet_lines_dropshadow, false)){
+                  if(LDEBUG) {cerr << soliloquy << " plotting drop shadow l=" << l << " and l=" << l + 1 << endl;}
+                  // thick white line for contrast
+                  convex_hull_facets_drop_shadow_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+                  for(uint j=0;j<2;j++) {
+                    const ChullPoint& point = m_points[chull_points[l+j]];
+                    convex_hull_facets_drop_shadow_TEX_ss << getPlotPointContentPDF(point, true, true);
+                  }
+                  // end line for connecting facet lines
+                  convex_hull_facets_drop_shadow_TEX_ss << "};" << endl;
+                } else {
+                  if(LDEBUG) {
+                    cerr << soliloquy << " skipping drop shadow l=" << l << " and l=" << l + 1 << endl;
+                    cerr << soliloquy << " l=" << l << " is " << m_points[chull_points[l]].m_coords << endl;
+                    cerr << soliloquy << " l=" << l+1 << " is " << m_points[chull_points[l+1]].m_coords << endl;
+                  }
+                }
+              }
             }
           }
         }
-      }
 
-      //////////////////////////////////////////////////////////////////////////
-      // END 3D Heat maps and facet lines
-      //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        // END 3D Heat maps and facet lines
+        //////////////////////////////////////////////////////////////////////////
 
-      // hullPoints only, so they don't repeat
-      added_header=false;
-      for(uint i=0,fl_size_i=hull_points.size();i<fl_size_i;i++) {
-        const ChullPoint& point = m_points[hull_points[i]];
-        if(!point.m_has_entry) {continue;}
-        if(!plot_unaries && point.isUnary()) {continue;}
-        if(!added_header){
-          convex_hull_vertices_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
-          added_header=true;
-        }
-        convex_hull_vertices_TEX_ss << getPlotPointContentPDF(point, false, true);
-      }
-      if(plot_unaries){
-        for(uint i=0;i<dimension;i++) {
-          g_state=getUnaryGState(i);
-          if(g_state>m_points.size()-1){continue;}
-          const ChullPoint& point = m_points[g_state];
+        // hullPoints only, so they don't repeat
+        added_header=false;
+        for(uint i=0,fl_size_i=hull_points.size();i<fl_size_i;i++) {
+          const ChullPoint& point = m_points[hull_points[i]];
           if(!point.m_has_entry) {continue;}
+          if(!plot_unaries && point.isUnary()) {continue;}
           if(!added_header){
             convex_hull_vertices_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
             added_header=true;
           }
           convex_hull_vertices_TEX_ss << getPlotPointContentPDF(point, false, true);
         }
+        if(plot_unaries){
+          for(uint i=0;i<dimension;i++) {
+            g_state=getUnaryGState(i);
+            if(g_state>m_points.size()-1){continue;}
+            const ChullPoint& point = m_points[g_state];
+            if(!point.m_has_entry) {continue;}
+            if(!added_header){
+              convex_hull_vertices_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
+              added_header=true;
+            }
+            convex_hull_vertices_TEX_ss << getPlotPointContentPDF(point, false, true);
+          }
+        }
+        if(added_header){convex_hull_vertices_TEX_ss << "};" << endl;}
+
+        // big merge
+        // white lines first, then black
+        if(hull_drop_shadow) {tikzpic_TEX_ss << convex_hull_facets_drop_shadow_TEX_ss.str();}
+        tikzpic_TEX_ss << convex_hull_facets_TEX_ss.str();
+        tikzpic_TEX_ss << convex_hull_vertices_TEX_ss.str();
+        convex_hull_facets_TEX_ss.str("");
+        convex_hull_vertices_TEX_ss.str("");
+        convex_hull_facets_drop_shadow_TEX_ss.str("");
       }
-      if(added_header){convex_hull_vertices_TEX_ss << "};" << endl;}
 
-      // big merge
-      // white lines first, then black
-      if(hull_drop_shadow) {tikzpic_TEX_ss << convex_hull_facets_drop_shadow_TEX_ss.str();}
-      tikzpic_TEX_ss << convex_hull_facets_TEX_ss.str();
-      tikzpic_TEX_ss << convex_hull_vertices_TEX_ss.str();
-      convex_hull_facets_TEX_ss.str("");
-      convex_hull_vertices_TEX_ss.str("");
-      convex_hull_facets_drop_shadow_TEX_ss.str("");
-    }
+      ////////////////////////////////////////////////////////////////////////////
+      // END Plotting everything on the hull (facet lines, colors, etc.)
+      ////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////
-    // END Plotting everything on the hull (facet lines, colors, etc.)
-    ////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////
+      // START Plotting off hull points
+      ////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////
-    // START Plotting off hull points
-    ////////////////////////////////////////////////////////////////////////////
-
-    if(LDEBUG) {cerr << soliloquy << " start plotting off hull points" << endl;}
-    if(plot_off_hull || !no_labels || internal_links_graph2report || no_doc) {
-      string compound_label;
-      bool found_icsd_label=false;
-      for(uint i=0,fl_size_i=plot_points.size();i<fl_size_i;i++){
-        const ChullPoint& point=m_points[plot_points[i]];
-        const aflowlib::_aflowlib_entry& entry = point.m_entry;
-        // get coords for table
-        if(plot_off_hull) {
-          if(!point.m_is_g_state) {  // we already plotted these points
-            points_data_ss << getPlotPointContentPDF(point, false, false);
-          }
-        }
-        if(!plot_off_hull && !point.m_is_g_state) {continue;}
-
-        //////////////////////////////////////////////////////////////////////
-        // START Creating clickable links at points
-        //////////////////////////////////////////////////////////////////////
-
-        if(internal_links_graph2report || (no_doc && external_links)) {
-          node_option_ss << "opacity=0.0";// get node option
-          node_position_ss << getNodeCoordPosition(point); // get node position
-          // get node content
-          node_content_ss << "\\tiny";
-          node_content_ss << "{";
-          if(no_doc && external_links) {node_content_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << entry.auid << "}";}
-          else {
-            //uint i_coord_group;
-            if(getCoordGroupIndex(point,i_coord_group)){
-              uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
-              if(isViablePoint(ref_state)){
-                node_content_ss << "\\hyperref[" << input << "_" << m_points[ref_state].m_entry.auid << "]";  // for hyperref to right part of document
-              }
+      if(LDEBUG) {cerr << soliloquy << " start plotting off hull points" << endl;}
+      if(plot_off_hull || !no_labels || internal_links_graph2report || no_doc) {
+        string compound_label;
+        bool found_icsd_label=false;
+        for(uint i=0,fl_size_i=plot_points.size();i<fl_size_i;i++){
+          const ChullPoint& point=m_points[plot_points[i]];
+          const aflowlib::_aflowlib_entry& entry = point.m_entry;
+          // get coords for table
+          if(plot_off_hull) {
+            if(!point.m_is_g_state) {  // we already plotted these points
+              points_data_ss << getPlotPointContentPDF(point, false, false);
             }
           }
-          node_content_ss << "{O}";
-          node_content_ss << "}";
-          labels_data_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss); // create node
-        }
+          if(!plot_off_hull && !point.m_is_g_state) {continue;}
 
-        //////////////////////////////////////////////////////////////////////
-        // END Creating clickable links at points
-        //////////////////////////////////////////////////////////////////////
+          //////////////////////////////////////////////////////////////////////
+          // START Creating clickable links at points
+          //////////////////////////////////////////////////////////////////////
 
-        // now we create labels
-        // do not create another node for unaries unless metalabels or
-        // protolables
-        if(!no_labels && !(!labels_off_hull && !point.m_is_g_state) && !(point.isUnary() && !(meta_labels || prototype_labels))) {
-          ////////////////////////////////////////////////////////////////////
-          // START Meta-labels (lots of info)
-          ////////////////////////////////////////////////////////////////////
-
-          if(meta_labels) {
-            uint tmp_precision=0;
-            double tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
-            // no node option
-
-            // get node position
-            node_position_ss << getNodeCoordPosition(point);
-
+          if(internal_links_graph2report || (no_doc && external_links)) {
+            node_option_ss << "opacity=0.0";// get node option
+            node_position_ss << getNodeCoordPosition(point); // get node position
             // get node content
-            if(dimension == 3 && entry.vspecies.size() == 3) {node_content_ss << "\\color{" << ternary_label_color << "}";}
-
-            node_content_ss << "\\tiny{";   //these are sort of "special" font settings meant to reduce clutter, no need to add to aflowrc
-            node_content_ss << "\\shortstack{";
-            compound_label = prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);  // don't print prototype if not
-            node_content_ss << compound_label;
-            // equal to compound
-            output_name=prettyPrintPrototype(point,false,false);  // only one backslash needed
-            if(compound_label != output_name) {
-              node_content_ss << "::";
-              node_content_ss << output_name;
-            }
-            // shortstack newline
-            node_content_ss << "\\\\";
-            // enthalpy of formation, row 4
-            // no need for precision for next few columns, leave it same way
-            // as received from AFLOW
-            node_content_ss << "$H_{\\mathrm{f}}$=" << aurostd::utype2string(chull::H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";
-            //num_ss << chull::H_f_atom(point,_m_);
-            //node_content_ss << "$H_{\\mathrm{f}}$=" << num_ss.str() << " meV/atom";
-            //num_ss.str("");
-            // shortstack newline
-            node_content_ss << "\\\\";
-            // entropic temperature, row 5
-            node_content_ss << "$T_{\\mathrm{S}}$=" << aurostd::utype2string(chull::T_S(point),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K";
-            //num_ss << chull::T_S(point);
-            //node_content_ss << "$T_{\\mathrm{S}}$=" << num_ss.str() << " K";
-            //num_ss.str("");
-            // dist_2_hull, row 6
-            if(!point.isGState()) {
-              // shortstack newline
-              node_content_ss << "\\\\";
-              if(m_formation_energy_hull) {
-                node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
-              } else {
-                node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
+            node_content_ss << "\\tiny";
+            node_content_ss << "{";
+            if(no_doc && external_links) {node_content_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << entry.auid << "}";}
+            else {
+              //uint i_coord_group;
+              if(getCoordGroupIndex(point,i_coord_group)){
+                uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
+                if(isViablePoint(ref_state)){
+                  node_content_ss << "\\hyperref[" << input << "_" << m_points[ref_state].m_entry.auid << "]";  // for hyperref to right part of document
+                }
               }
             }
+            node_content_ss << "{O}";
             node_content_ss << "}";
-            node_content_ss << "}";
-            // create node
-            labels_data_ss << nodeCreator(node_option_ss, node_position_ss,node_content_ss);
+            labels_data_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss); // create node
+          }
 
-            //////////////////////////////////////////////////////////////////
-            // END Meta-labels (lots of info)
-            //////////////////////////////////////////////////////////////////
+          //////////////////////////////////////////////////////////////////////
+          // END Creating clickable links at points
+          //////////////////////////////////////////////////////////////////////
 
-          } else {  // no metadata
-            // special case
-            // create two nodes, one with compound name below ground-state
-            // node, another with prototype above each node
+          // now we create labels
+          // do not create another node for unaries unless metalabels or
+          // protolables
+          if(!no_labels && !(!labels_off_hull && !point.m_is_g_state) && !(point.isUnary() && !(meta_labels || prototype_labels))) {
+            ////////////////////////////////////////////////////////////////////
+            // START Meta-labels (lots of info)
+            ////////////////////////////////////////////////////////////////////
 
-            //////////////////////////////////////////////////////////////////
-            // START Special case labels (2D with prototypes)
-            //////////////////////////////////////////////////////////////////
+            if(meta_labels) {
+              uint tmp_precision=0;
+              double tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+              // no node option
 
-            if(dimension == 2 && !plot_labels && prototype_labels && rotate_labels) {
-              if(point.m_is_g_state && !point.isUnary()) {
-                // get node option
-                node_option_ss << "rotate=90,anchor=" << (m_formation_energy_hull?"east":"west");
-                // get node position
-                node_position_ss << getNodeCoordPosition(point);
-                // get node content
-                node_content_ss << "\\" << font_size << "{";  //leave g-states as default font
-                if(bold_labels/* && !helvetica_font*/) {node_content_ss << "\\textbf{";}
-                if(!m_formation_energy_hull){node_content_ss << "~~";}   //pre - 1
-                node_content_ss << prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);
-                if(m_formation_energy_hull){node_content_ss << "~~";}  //post - 2: only works if we put two?
-                if(bold_labels/* && !helvetica_font*/) {node_content_ss << "}";}
-                node_content_ss << "}";
-                // create node
-                labels_data_ss << nodeCreator(node_option_ss, node_position_ss,node_content_ss);
-              }
-              // prototype label
-              // get node option
-              if(point.isUnary()) {
-                if(entry.vspecies[0] == m_velements[0]) {node_option_ss << "anchor=east";}
-                else {node_option_ss << "anchor=west";}
-              } else {node_option_ss << "anchor=" << (m_formation_energy_hull?"south,above=0.1cm":"north,below=0.1cm");}
               // get node position
               node_position_ss << getNodeCoordPosition(point);
+
               // get node content
-              node_content_ss << "\\scriptsize{"; //these are sort of "special" font settings meant to reduce clutter, no need to add to aflowrc
+              if(dimension == 3 && entry.vspecies.size() == 3) {node_content_ss << "\\color{" << ternary_label_color << "}";}
+
+              node_content_ss << "\\tiny{";   //these are sort of "special" font settings meant to reduce clutter, no need to add to aflowrc
+              node_content_ss << "\\shortstack{";
+              compound_label = prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);  // don't print prototype if not
+              node_content_ss << compound_label;
+              // equal to compound
               output_name=prettyPrintPrototype(point,false,false);  // only one backslash needed
-              if(point.isUnary() && entry.vspecies[0] == m_velements[1]) {node_content_ss << "~~";}
-              node_content_ss << output_name;
-              if(point.isUnary() && entry.vspecies[0] == m_velements[0]) {node_content_ss << "~~";}
-              // enclose brackets
+              if(compound_label != output_name) {
+                node_content_ss << "::";
+                node_content_ss << output_name;
+              }
+              // shortstack newline
+              node_content_ss << "\\\\";
+              // enthalpy of formation, row 4
+              // no need for precision for next few columns, leave it same way
+              // as received from AFLOW
+              node_content_ss << "$H_{\\mathrm{f}}$=" << aurostd::utype2string(chull::H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";
+              //num_ss << chull::H_f_atom(point,_m_);
+              //node_content_ss << "$H_{\\mathrm{f}}$=" << num_ss.str() << " meV/atom";
+              //num_ss.str("");
+              // shortstack newline
+              node_content_ss << "\\\\";
+              // entropic temperature, row 5
+              node_content_ss << "$T_{\\mathrm{S}}$=" << aurostd::utype2string(chull::T_S(point),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K";
+              //num_ss << chull::T_S(point);
+              //node_content_ss << "$T_{\\mathrm{S}}$=" << num_ss.str() << " K";
+              //num_ss.str("");
+              // dist_2_hull, row 6
+              if(!point.isGState()) {
+                // shortstack newline
+                node_content_ss << "\\\\";
+                if(m_formation_energy_hull) {
+                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
+                } else {
+                  node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
+                }
+              }
+              node_content_ss << "}";
               node_content_ss << "}";
               // create node
               labels_data_ss << nodeCreator(node_option_ss, node_position_ss,node_content_ss);
 
-              ////////////////////////////////////////////////////////////////
-              // END Special case labels (2D with prototypes)
-              ////////////////////////////////////////////////////////////////
+              //////////////////////////////////////////////////////////////////
+              // END Meta-labels (lots of info)
+              //////////////////////////////////////////////////////////////////
 
-            } else {  // normal case
+            } else {  // no metadata
+              // special case
+              // create two nodes, one with compound name below ground-state
+              // node, another with prototype above each node
 
-              ////////////////////////////////////////////////////////////////
-              // START Normal labels
-              ////////////////////////////////////////////////////////////////
+              //////////////////////////////////////////////////////////////////
+              // START Special case labels (2D with prototypes)
+              //////////////////////////////////////////////////////////////////
 
-              // get node option
-              if(rotate_labels) {
-                if(dimension == 2) {
-                  if(!point.isUnary()) {  //deal with unaries later
-                    if(point.m_is_g_state) {node_option_ss << "rotate=90,anchor=" << (m_formation_energy_hull?"east":"west");}
-                    else {node_option_ss << "anchor=" << (m_formation_energy_hull?"south,above=0.1cm":"north,below=0.1cm");}
-                  }
-                } else {  // dimension==3
-                  // ordered to optimize speed (binaries are bulk, then
-                  // ternaries, then unaries)
-                  if(entry.vspecies.size() == 2) {
-                    // / side of triangle
-                    if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[1]) {
-                      node_option_ss << "rotate=-30,anchor=east";
-                      // \ side of triangle
-                    } else if(entry.vspecies[0] == m_velements[1] && entry.vspecies[1] == m_velements[2]) {
-                      node_option_ss << "rotate=30,anchor=west";
-                      // _ side of triangle
-                    } else if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[2]) {
-                      node_option_ss << "rotate=90,anchor=east";
-                    }
-                  } else if(entry.vspecies.size() == 3) {
-                    if(!show_heat_map) {node_option_ss << "anchor=south,above=0.1cm";}
-                  } else if(entry.vspecies.size() == 1) {
-                    // bottom two edges of triangle
-                    if(entry.vspecies[0] == m_velements[0] || entry.vspecies[0] == m_velements[2]) {
-                      node_option_ss << "anchor=north,below=0.1cm";
-                      // top of triangle
-                    } else {node_option_ss << "anchor=south,above=0.1cm";}
-                  }
+              if(dimension == 2 && !plot_labels && prototype_labels && rotate_labels) {
+                if(point.m_is_g_state && !point.isUnary()) {
+                  // get node option
+                  node_option_ss << "rotate=90,anchor=" << (m_formation_energy_hull?"east":"west");
+                  // get node position
+                  node_position_ss << getNodeCoordPosition(point);
+                  // get node content
+                  node_content_ss << "\\" << font_size << "{";  //leave g-states as default font
+                  if(bold_labels/* && !helvetica_font*/) {node_content_ss << "\\textbf{";}
+                  if(!m_formation_energy_hull){node_content_ss << "~~";}   //pre - 1
+                  node_content_ss << prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);
+                  if(m_formation_energy_hull){node_content_ss << "~~";}  //post - 2: only works if we put two?
+                  if(bold_labels/* && !helvetica_font*/) {node_content_ss << "}";}
+                  node_content_ss << "}";
+                  // create node
+                  labels_data_ss << nodeCreator(node_option_ss, node_position_ss,node_content_ss);
                 }
-              }
-              if(dimension == 2) {  //deal with unaries separately
+                // prototype label
+                // get node option
                 if(point.isUnary()) {
                   if(entry.vspecies[0] == m_velements[0]) {node_option_ss << "anchor=east";}
                   else {node_option_ss << "anchor=west";}
-                }
-              }
-              // get node position
-              node_position_ss << getNodeCoordPosition(point);
-              // get node content
-              if(dimension == 3 && entry.vspecies.size() == 3) {node_content_ss << "\\color{" << ternary_label_color << "}";}
-              if(compound_labels && prototype_labels) {node_content_ss << "\\scriptsize{";} //these are sort of "special" font settings meant to reduce clutter, no need to add to aflowrc
-              else {node_content_ss << "\\" << font_size << "{";}  //already gets wrapped with {} in nodeCreator(), just leave alone so you mitigate spaces
-              if(bold_labels || (entry.vspecies.size() == 3 && bold_labels_ternaries)/* && !helvetica_font*/) {node_content_ss << "\\textbf{";}
+                } else {node_option_ss << "anchor=" << (m_formation_energy_hull?"south,above=0.1cm":"north,below=0.1cm");}
+                // get node position
+                node_position_ss << getNodeCoordPosition(point);
+                // get node content
+                node_content_ss << "\\scriptsize{"; //these are sort of "special" font settings meant to reduce clutter, no need to add to aflowrc
+                output_name=prettyPrintPrototype(point,false,false);  // only one backslash needed
+                if(point.isUnary() && entry.vspecies[0] == m_velements[1]) {node_content_ss << "~~";}
+                node_content_ss << output_name;
+                if(point.isUnary() && entry.vspecies[0] == m_velements[0]) {node_content_ss << "~~";}
+                // enclose brackets
+                node_content_ss << "}";
+                // create node
+                labels_data_ss << nodeCreator(node_option_ss, node_position_ss,node_content_ss);
 
-              // add space for rotation
-              if(rotate_labels) {
+                ////////////////////////////////////////////////////////////////
+                // END Special case labels (2D with prototypes)
+                ////////////////////////////////////////////////////////////////
+
+              } else {  // normal case
+
+                ////////////////////////////////////////////////////////////////
+                // START Normal labels
+                ////////////////////////////////////////////////////////////////
+
+                // get node option
+                if(rotate_labels) {
+                  if(dimension == 2) {
+                    if(!point.isUnary()) {  //deal with unaries later
+                      if(point.m_is_g_state) {node_option_ss << "rotate=90,anchor=" << (m_formation_energy_hull?"east":"west");}
+                      else {node_option_ss << "anchor=" << (m_formation_energy_hull?"south,above=0.1cm":"north,below=0.1cm");}
+                    }
+                  } else {  // dimension==3
+                    // ordered to optimize speed (binaries are bulk, then ternaries, then unaries)
+                    if(entry.vspecies.size() == 2) {
+                      // / side of triangle
+                      if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[1]) {
+                        node_option_ss << "rotate=-30,anchor=east";
+                        // \ side of triangle
+                      } else if(entry.vspecies[0] == m_velements[1] && entry.vspecies[1] == m_velements[2]) {
+                        node_option_ss << "rotate=30,anchor=west";
+                        // _ side of triangle
+                      } else if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[2]) {
+                        node_option_ss << "rotate=90,anchor=east";
+                      }
+                    } else if(entry.vspecies.size() == 3) {
+                      if(!show_heat_map) {node_option_ss << "anchor=south,above=0.1cm";}
+                    } else if(entry.vspecies.size() == 1) {
+                      // bottom two edges of triangle
+                      if(entry.vspecies[0] == m_velements[0] || entry.vspecies[0] == m_velements[2]) {
+                        node_option_ss << "anchor=north,below=0.1cm";
+                        // top of triangle
+                      } else {node_option_ss << "anchor=south,above=0.1cm";}
+                    }
+                  }
+                }
+                if(dimension == 2) {  //deal with unaries separately
+                  if(point.isUnary()) {
+                    if(entry.vspecies[0] == m_velements[0]) {node_option_ss << "anchor=east";}
+                    else {node_option_ss << "anchor=west";}
+                  }
+                }
+                // get node position
+                node_position_ss << getNodeCoordPosition(point);
+                // get node content
+                if(dimension == 3 && entry.vspecies.size() == 3) {node_content_ss << "\\color{" << ternary_label_color << "}";}
+                if(compound_labels && prototype_labels) {node_content_ss << "\\scriptsize{";} //these are sort of "special" font settings meant to reduce clutter, no need to add to aflowrc
+                else {node_content_ss << "\\" << font_size << "{";}  //already gets wrapped with brackets in nodeCreator(), just leave alone so you mitigate spaces
+                if(bold_labels || (entry.vspecies.size() == 3 && bold_labels_ternaries)/* && !helvetica_font*/) {node_content_ss << "\\textbf{";}
+
+                // add space for rotation
+                if(rotate_labels) {
+                  if(dimension == 2) {
+                    if(!point.isUnary()){ //handle unaries later
+                      if(!m_formation_energy_hull && point.m_is_g_state){node_content_ss << "~";}
+                    }
+                  } else {  // dimension==3
+                    if(entry.vspecies.size() == 2) {
+                      // \ side of triangle
+                      if(entry.vspecies[0] == m_velements[1] && entry.vspecies[1] == m_velements[2]) {
+                        node_content_ss << "~";
+                      }
+                    }
+                  }
+                }
                 if(dimension == 2) {
-                  if(!point.isUnary()){ //handle unaries later
-                    if(!m_formation_energy_hull && point.m_is_g_state){node_content_ss << "~";}
-                  }
-                } else {  // dimension==3
-                  if(entry.vspecies.size() == 2) {
-                    // \ side of triangle
-                    if(entry.vspecies[0] == m_velements[1] && entry.vspecies[1] == m_velements[2]) {
-                      node_content_ss << "~";
-                    }
+                  if(point.isUnary()){  //unaries
+                    if(entry.vspecies[0] == m_velements[1]) {node_content_ss << "~";}
                   }
                 }
-              }
-              if(dimension == 2) {
-                if(point.isUnary()){  //unaries
-                  if(entry.vspecies[0] == m_velements[1]) {node_content_ss << "~";}
-                }
-              }
 
-              found_icsd_label=false;
-              if(icsd_labels){  //icsd_labels mutually exclusive with compound/prototype
-                //uint i_coord_group;
-                if(getCoordGroupIndex(point,i_coord_group)){
-                  uint canonical_icsd=m_coord_groups[i_coord_group].m_i_canonical_icsd;
-                  if(isViablePoint(canonical_icsd)){
-                    compound_label = prettyPrintPrototype(m_points[canonical_icsd],false,true);  // only one backslash needed  //icsd_skim_label=true
-                    if(!compound_label.empty()){
-                      node_content_ss << compound_label;
-                      found_icsd_label=true;
+                found_icsd_label=false;
+                if(icsd_labels){  //icsd_labels mutually exclusive with compound/prototype
+                  //uint i_coord_group;
+                  if(getCoordGroupIndex(point,i_coord_group)){
+                    uint canonical_icsd=m_coord_groups[i_coord_group].m_i_canonical_icsd;
+                    if(isViablePoint(canonical_icsd)){
+                      compound_label = prettyPrintPrototype(m_points[canonical_icsd],false,true);  // only one backslash needed  //icsd_skim_label=true
+                      if(!compound_label.empty()){
+                        node_content_ss << compound_label;
+                        found_icsd_label=true;
+                      }
                     }
                   }
                 }
-              }
-              if(!(icsd_labels&&found_icsd_label)){
-                if(compound_labels) {
-                  compound_label = prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);  // don't print prototype if
-                  node_content_ss << compound_label;
-                  // equal to compound
-                }
-                if(prototype_labels) {
-                  output_name=prettyPrintPrototype(point,false,false);  // only one backslash needed
+                if(!(icsd_labels&&found_icsd_label)){
                   if(compound_labels) {
-                    if(compound_label != output_name) {
-                      node_content_ss << "::";
-                      node_content_ss << output_name;
-                    }
-                  } else {node_content_ss << output_name;}
+                    compound_label = prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);  // don't print prototype if
+                    node_content_ss << compound_label;
+                    // equal to compound
+                  }
+                  if(prototype_labels) {
+                    output_name=prettyPrintPrototype(point,false,false);  // only one backslash needed
+                    if(compound_labels) {
+                      if(compound_label != output_name) {
+                        node_content_ss << "::";
+                        node_content_ss << output_name;
+                      }
+                    } else {node_content_ss << output_name;}
+                  }
                 }
-              }
 
-              if(rotate_labels) {
+                if(rotate_labels) {
+                  if(dimension == 2) {
+                    if(!point.isUnary()){ //handle unaries later
+                      if(m_formation_energy_hull && point.m_is_g_state){node_content_ss << "~~";} // only works if we put two?
+                    }
+                  } else {  // dimension==3
+                    if(entry.vspecies.size() == 2) {
+                      // / side of triangle
+                      if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[1]) {
+                        node_content_ss << "~~";  // only works if we put two?
+                        // _ side of triangle
+                      } else if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[2]) {
+                        node_content_ss << "~~";  // only works if we put two?
+                      }
+                    }
+                  }
+                }
                 if(dimension == 2) {
-                  if(!point.isUnary()){ //handle unaries later
-                    if(m_formation_energy_hull && point.m_is_g_state){node_content_ss << "~~";} // only works if we put two?
-                  }
-                } else {  // dimension==3
-                  if(entry.vspecies.size() == 2) {
-                    // / side of triangle
-                    if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[1]) {
-                      node_content_ss << "~~";  // only works if we put two?
-                      // _ side of triangle
-                    } else if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[2]) {
-                      node_content_ss << "~~";  // only works if we put two?
-                    }
+                  if(point.isUnary()){ //unaries
+                    if(entry.vspecies[0] == m_velements[0]) {node_content_ss << "~~";}
                   }
                 }
-              }
-              if(dimension == 2) {
-                if(point.isUnary()){ //unaries
-                  if(entry.vspecies[0] == m_velements[0]) {node_content_ss << "~~";}
-                }
-              }
 
-              // enclose brackets
-              if(bold_labels || (entry.vspecies.size() == 3 && bold_labels_ternaries)/* && !helvetica_font*/) {node_content_ss << "}";}
-              node_content_ss << "}";
-              // create node
-              labels_data_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+                // enclose brackets
+                if(bold_labels || (entry.vspecies.size() == 3 && bold_labels_ternaries)/* && !helvetica_font*/) {node_content_ss << "}";}
+                node_content_ss << "}";
+                // create node
+                labels_data_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
 
-              ////////////////////////////////////////////////////////////////
-              // END Normal labels
-              ////////////////////////////////////////////////////////////////
+                ////////////////////////////////////////////////////////////////
+                // END Normal labels
+                ////////////////////////////////////////////////////////////////
+              }
             }
           }
         }
-      }
-      // merge labels data
-      if(plot_off_hull && !points_data_ss.str().empty()) {
-        tikzpic_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_OFF_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient); // header for points off hull
-        tikzpic_TEX_ss << points_data_ss.str();
-        tikzpic_TEX_ss << "};" << endl;
-      }
-      //add isomax data
-      if(plot_iso_max_latent_heat){
-        string color;
-        uint g_point;
-        vector<string> latex_colors=grabAcceptableLatexColors(LATEX_COLORS_TO_AVOID,true,true,g_states.size());
-        if(latex_colors.size()!=g_states.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Issue grabbing latex colors");}
-        for(uint gi=0,fl_size_gi=g_states.size();gi<fl_size_gi;gi++){
-          color=latex_colors[gi];
-          //add curves
-          tikzpic_TEX_ss << "\\addplot[domain=0.001:0.999,smooth,variable=\\x," << color << "] {";
-          g_point=g_states[gi];
-          tikzpic_TEX_ss << ((double)KBOLTZEV) << "*" << 1.0e3 << "*" << T_S(m_points[g_point]) << "*(\\x*ln(\\x)+(1-\\x)*ln(1-\\x))};" << endl;
-          //add labels
-          labels_data_ss << "\\node [fill=white] at (axis cs:0.5," << isoMaxLatentHeat(m_points[g_point],0.5,_m_);
-          labels_data_ss << ") {\\" << font_size << "{$T_{\\mathrm{S}}=" << int(T_S(m_points[g_point])+0.5) << "~\\mathrm{K}$}};" << endl;
+        // merge labels data
+        if(plot_off_hull && !points_data_ss.str().empty()) {
+          tikzpic_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_OFF_HULL_POINTS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient); // header for points off hull
+          tikzpic_TEX_ss << points_data_ss.str();
+          tikzpic_TEX_ss << "};" << endl;
+        }
+        //add isomax data
+        if(plot_iso_max_latent_heat){
+          string color;
+          uint g_point;
+          vector<string> latex_colors=grabAcceptableLatexColors(LATEX_COLORS_TO_AVOID,true,true,g_states.size());
+          if(latex_colors.size()!=g_states.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Issue grabbing latex colors");}
+          for(uint gi=0,fl_size_gi=g_states.size();gi<fl_size_gi;gi++){
+            color=latex_colors[gi];
+            //add curves
+            tikzpic_TEX_ss << "\\addplot[domain=0.001:0.999,smooth,variable=\\x," << color << "] {";
+            g_point=g_states[gi];
+            tikzpic_TEX_ss << ((double)KBOLTZEV) << "*" << 1.0e3 << "*" << T_S(m_points[g_point]) << "*(\\x*ln(\\x)+(1-\\x)*ln(1-\\x))};" << endl;
+            //add labels
+            labels_data_ss << "\\node [fill=white] at (axis cs:0.5," << isoMaxLatentHeat(m_points[g_point],0.5,_m_);
+            labels_data_ss << ") {\\" << font_size << "{$T_{\\mathrm{S}}=" << int(T_S(m_points[g_point])+0.5) << "~\\mathrm{K}$}};" << endl;
+          }
+        }
+        if(!labels_data_ss.str().empty()) {
+          tikzpic_TEX_ss << "\\begin{pgfonlayer}{foreground}" << endl;  // for overlap
+          tikzpic_TEX_ss << labels_data_ss.str();
+          tikzpic_TEX_ss << "\\end{pgfonlayer}{foreground}" << endl;
         }
       }
-      if(!labels_data_ss.str().empty()) {
-        tikzpic_TEX_ss << "\\begin{pgfonlayer}{foreground}" << endl;  // for overlap
-        tikzpic_TEX_ss << labels_data_ss.str();
-        tikzpic_TEX_ss << "\\end{pgfonlayer}{foreground}" << endl;
-      }
-    }
-    if(LDEBUG) {cerr << soliloquy << " start plotting logos" << endl;}
-    if(1){
-      //add node with logo inside first
-      tikzpic_TEX_ss << "\\begin{pgfonlayer}{background}" << endl;  // for overlap
-      //tikzpic_TEX_ss << "\\begin{scope}[overlay,on background layer]" << endl;
-      if(dimension==2){
-        ////top left
-        //node_option_ss << "opacity=" << opacity_watermark;
-        //node_position_ss << "axis cs:0.1," << ymin*0.05;
-        //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
-        //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        ////top right
-        //node_option_ss << "opacity=" << opacity_watermark;
-        //node_position_ss << "axis cs:0.9," << ymin*0.05;
-        //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
-        //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        ////bottom left
-        //node_option_ss << "opacity=" << opacity_watermark;
-        //node_position_ss << "axis cs:0.1," << ymin*0.95;
-        //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
-        //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        //bottom right
-        //node_option_ss << "opacity=" << opacity_watermark;
-        //node_position_ss << "axis cs:0.9," << ymin*0.95;
-        //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
-        //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        ////center
-        //node_option_ss << "opacity=" << opacity_watermark;
-        //node_position_ss << "axis cs:0.5," << ymin*0.5;
-        //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
-        //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        //node_position_ss << "axis cs:0.125," << ymin*0.95;
-        node_option_ss << "opacity=" << opacity_watermark << ",anchor=south west";
-        node_position_ss << "axis cs:0," << ymin;
-        node_content_ss << "\\includegraphics[scale=0.25]{" << aflow_logo_skinny_file << "}";
-        tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-      } else {  //dimension==3
-        //// / side
-        //node_option_ss << "opacity=" << opacity_watermark << ",rotate=60,anchor=south";
-        //node_position_ss << "axis cs:0.5,0.5,0";
-        //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
-        //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        //// \ side
-        //node_option_ss << "opacity=" << opacity_watermark << ",rotate=-60,anchor=south";
-        //node_position_ss << "axis cs:0.5,0,0.5";
-        //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
-        //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        //// _ side
-        //node_option_ss << "opacity=" << opacity_watermark << ",anchor=north";
-        //node_position_ss << "axis cs:0,0.5,0.5";
-        //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
-        //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        //node_position_ss << "axis cs:0,0.5,0.5";
-        //node_option_ss << ",shift={(0in,-1in)}";
-        if(!small_banner){ //&& include_color_bar){
-          node_option_ss << "opacity=" << opacity_watermark << ",shift={(" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
-          //if(include_color_bar){node_position_ss << "axis cs:0.75,0.125,0.125";}  //more complicated than necessary
-          //} else {
-          node_position_ss << "axis cs:1,0,0";
-          //}
-        } else {
-          node_option_ss << "opacity=" << opacity_watermark << ",shift={(-" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
-          node_position_ss << "axis cs:1,0,0";
-        }
-        node_content_ss << "\\includegraphics[scale=0.25]{" << aflow_logo_skinny_file << "}";
-        tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-      }
-      if(small_banner){//image_only){ //note: this must also be added to pseudo_preliminary_axes_TEX_ss for proper padding (color bar), ONLY AFFECTS 3D
+      if(LDEBUG) {cerr << soliloquy << " start plotting logos" << endl;}
+      if(1){
+        //add node with logo inside first
+        tikzpic_TEX_ss << "\\begin{pgfonlayer}{background}" << endl;  // for overlap
+        //tikzpic_TEX_ss << "\\begin{scope}[overlay,on background layer]" << endl;
         if(dimension==2){
-          node_option_ss << "anchor=south west";
-          node_position_ss << "axis cs:0," << ymax;
-          node_content_ss << general_image_font_size << " " << count_total_entries << " entries"; // doesn't work with externalizing images printCountTotalEntries
-          tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-
-          node_option_ss << "anchor=south east";
-          node_position_ss << "axis cs:1," << ymax;
-          node_content_ss << general_image_font_size << " \\today";
+          ////top left
+          //node_option_ss << "opacity=" << opacity_watermark;
+          //node_position_ss << "axis cs:0.1," << ymin*0.05;
+          //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
+          //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          ////top right
+          //node_option_ss << "opacity=" << opacity_watermark;
+          //node_position_ss << "axis cs:0.9," << ymin*0.05;
+          //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
+          //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          ////bottom left
+          //node_option_ss << "opacity=" << opacity_watermark;
+          //node_position_ss << "axis cs:0.1," << ymin*0.95;
+          //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
+          //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          //bottom right
+          //node_option_ss << "opacity=" << opacity_watermark;
+          //node_position_ss << "axis cs:0.9," << ymin*0.95;
+          //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
+          //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          ////center
+          //node_option_ss << "opacity=" << opacity_watermark;
+          //node_position_ss << "axis cs:0.5," << ymin*0.5;
+          //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
+          //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          //node_position_ss << "axis cs:0.125," << ymin*0.95;
+          node_option_ss << "opacity=" << opacity_watermark << ",anchor=south west";
+          node_position_ss << "axis cs:0," << ymin;
+          node_content_ss << "\\includegraphics[scale=0.25]{" << aflow_logo_skinny_file << "}";
           tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
         } else {  //dimension==3
-          //node_option_ss << "shift={(0in,5in)}";
-          //node_position_ss << "axis cs:0,1,0";
-          node_option_ss << "anchor=south,shift={(-" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
-          node_position_ss << "axis cs:1,0,0";
-          node_content_ss << general_image_font_size << " " << count_total_entries << " entries"; // doesn't work with externalizing images printCountTotalEntries
-          tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-
-          //node_option_ss << "shift={(0in,5in)}";
-          //node_position_ss << "axis cs:0,0,1";
-          node_option_ss << "anchor=south,shift={(" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
-          node_position_ss << "axis cs:1,0,0";
-          node_content_ss << general_image_font_size << " \\today";
+          //// / side
+          //node_option_ss << "opacity=" << opacity_watermark << ",rotate=60,anchor=south";
+          //node_position_ss << "axis cs:0.5,0.5,0";
+          //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
+          //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          //// \ side
+          //node_option_ss << "opacity=" << opacity_watermark << ",rotate=-60,anchor=south";
+          //node_position_ss << "axis cs:0.5,0,0.5";
+          //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
+          //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          //// _ side
+          //node_option_ss << "opacity=" << opacity_watermark << ",anchor=north";
+          //node_position_ss << "axis cs:0,0.5,0.5";
+          //node_content_ss << "\\includegraphics[scale=0.15]{" << aflow_logo_skinny_file << "}";
+          //tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          //node_position_ss << "axis cs:0,0.5,0.5";
+          //node_option_ss << ",shift={(0in,-1in)}";
+          if(!small_banner) //&& include_color_bar)
+          { //CO200106 - patching for auto-indenting
+            node_option_ss << "opacity=" << opacity_watermark << ",shift={(" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
+            //if(include_color_bar){node_position_ss << "axis cs:0.75,0.125,0.125";}  //more complicated than necessary
+            //else {
+            node_position_ss << "axis cs:1,0,0";
+            //}
+          } else {
+            node_option_ss << "opacity=" << opacity_watermark << ",shift={(-" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
+            node_position_ss << "axis cs:1,0,0";
+          }
+          node_content_ss << "\\includegraphics[scale=0.25]{" << aflow_logo_skinny_file << "}";
           tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
         }
-      }
-      tikzpic_TEX_ss << "\\end{pgfonlayer}{background}" << endl;
-      //tikzpic_TEX_ss << "\\end{scope}" << endl;
+        if(small_banner) //image_only) //note: this must also be added to pseudo_preliminary_axes_TEX_ss for proper padding (color bar), ONLY AFFECTS 3D
+        { //CO200106 - patching for auto-indenting
+          if(dimension==2){
+            node_option_ss << "anchor=south west";
+            node_position_ss << "axis cs:0," << ymax;
+            node_content_ss << general_image_font_size << " " << count_total_entries << " entries"; // doesn't work with externalizing images printCountTotalEntries
+            tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+
+            node_option_ss << "anchor=south east";
+            node_position_ss << "axis cs:1," << ymax;
+            node_content_ss << general_image_font_size << " \\today";
+            tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          } else {  //dimension==3
+            //node_option_ss << "shift={(0in,5in)}";
+            //node_position_ss << "axis cs:0,1,0";
+            node_option_ss << "anchor=south,shift={(-" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
+            node_position_ss << "axis cs:1,0,0";
+            node_content_ss << general_image_font_size << " " << count_total_entries << " entries"; // doesn't work with externalizing images printCountTotalEntries
+            tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+
+            //node_option_ss << "shift={(0in,5in)}";
+            //node_position_ss << "axis cs:0,0,1";
+            node_option_ss << "anchor=south,shift={(" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
+            node_position_ss << "axis cs:1,0,0";
+            node_content_ss << general_image_font_size << " \\today";
+            tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
+          }
+        }
+        tikzpic_TEX_ss << "\\end{pgfonlayer}{background}" << endl;
+        //tikzpic_TEX_ss << "\\end{scope}" << endl;
       }
 
       ////////////////////////////////////////////////////////////////////////////
@@ -10136,7 +10143,7 @@ namespace chull {
       command << main_TEX_file << " ";
       clean_command << main_TEX_file << " ";
 
-      //if(doc_only && no internal_links) {
+      //if(doc_only && no internal_links) { //[CO200106 - close bracket for indenting]}
       if(!internal_links) {num_compile = 1;}
       else {num_compile = 2;}
     }
@@ -10230,1344 +10237,1344 @@ namespace chull {
     //////////////////////////////////////////////////////////////////////////////
     // END Create tmp directory for compilation of .tex document
     //////////////////////////////////////////////////////////////////////////////
+  }
+
+  string ConvexHull::getPlainTextHeader() const {
+    stringstream main_text_ss;main_text_ss.str("");
+    stringstream misc_ss;misc_ss.str("");
+    const uint width_page_txt = 130;   // helps with formatting of output
+    //misc_ss << aurostd::joinWDelimiter(m_velements,"") << " summary"; //Materials Snapshot
+    //main_text_ss << aurostd::PaddedCENTER(misc_ss.str(), width_page_txt+2); misc_ss.str("");  //CENTER is off from PRE/POST by 2 spaces (see where i starts)
+    //main_text_ss << endl;
+    if(0){
+      misc_ss << aurostd::joinWDelimiter(m_velements,"-") << " summary"; // (V" << string(AFLOW_VERSION) << ")";
+      main_text_ss << aurostd::PaddedPOST(misc_ss.str(), width_page_txt / 2); misc_ss.str("");
+      misc_ss << AFLOW_WEB;
+      main_text_ss << aurostd::PaddedPRE(misc_ss.str(), width_page_txt / 2); misc_ss.str("");
+      main_text_ss << endl;
+
+      //misc_ss << "count=" << getEntriesCount(m_half_hull) << "/" << getEntriesCount(false);
+      misc_ss << "count_entries_total=" << getEntriesCount(false);
+      main_text_ss << aurostd::PaddedPOST(misc_ss.str(), width_page_txt / 2); misc_ss.str("");
+      main_text_ss << aurostd::PaddedPRE(aurostd::get_datetime_formatted("-",false), width_page_txt / 2); //CO 180819 - we don't need minute/second precision, date is fine
+      main_text_ss << endl;
     }
 
-    string ConvexHull::getPlainTextHeader() const {
-      stringstream main_text_ss;main_text_ss.str("");
-      stringstream misc_ss;misc_ss.str("");
-      const uint width_page_txt = 130;   // helps with formatting of output
-      //misc_ss << aurostd::joinWDelimiter(m_velements,"") << " summary"; //Materials Snapshot
-      //main_text_ss << aurostd::PaddedCENTER(misc_ss.str(), width_page_txt+2); misc_ss.str("");  //CENTER is off from PRE/POST by 2 spaces (see where i starts)
-      //main_text_ss << endl;
-      if(0){
-        misc_ss << aurostd::joinWDelimiter(m_velements,"-") << " summary"; // (V" << string(AFLOW_VERSION) << ")";
-        main_text_ss << aurostd::PaddedPOST(misc_ss.str(), width_page_txt / 2); misc_ss.str("");
-        misc_ss << AFLOW_WEB;
-        main_text_ss << aurostd::PaddedPRE(misc_ss.str(), width_page_txt / 2); misc_ss.str("");
-        main_text_ss << endl;
+    main_text_ss << aurostd::joinWDelimiter(m_velements,"-") << " summary" << " (" << AFLOWLIB_MATERIALS_SERVER << ")" << endl;
+    main_text_ss << aurostd::get_datetime_formatted("-",false) << endl;
 
-        //misc_ss << "count=" << getEntriesCount(m_half_hull) << "/" << getEntriesCount(false);
-        misc_ss << "count_entries_total=" << getEntriesCount(false);
-        main_text_ss << aurostd::PaddedPOST(misc_ss.str(), width_page_txt / 2); misc_ss.str("");
-        main_text_ss << aurostd::PaddedPRE(aurostd::get_datetime_formatted("-",false), width_page_txt / 2); //CO 180819 - we don't need minute/second precision, date is fine
-        main_text_ss << endl;
+    //cite as
+    main_text_ss << endl;
+    main_text_ss << CHULL_CITE << endl;
+    main_text_ss << "    " << CHULL_AUTHORS << "," << endl;
+    main_text_ss << "    " << CHULL_TITLE << "," << endl;
+    main_text_ss << "    " << CHULL_JOURNAL_TXT << "." << endl;
+    main_text_ss << endl;
+
+    main_text_ss << endl;
+    main_text_ss << "HULL DATA" << endl;
+    //gstate_counts
+    if(m_has_stoich_coords){
+      uint gstate_count=0,total_gstate_count=0;
+      for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+        gstate_count=getGStateCount(i_nary);total_gstate_count+=gstate_count;
+        main_text_ss << "Count ground-state " << pflow::arity_string(i_nary+1,false,true) << " = " << gstate_count << endl;
       }
-
-      main_text_ss << aurostd::joinWDelimiter(m_velements,"-") << " summary" << " (" << AFLOWLIB_MATERIALS_SERVER << ")" << endl;
-      main_text_ss << aurostd::get_datetime_formatted("-",false) << endl;
-
-      //cite as
+      main_text_ss << "Count ground-state total = " << total_gstate_count;
       main_text_ss << endl;
-      main_text_ss << CHULL_CITE << endl;
-      main_text_ss << "    " << CHULL_AUTHORS << "," << endl;
-      main_text_ss << "    " << CHULL_TITLE << "," << endl;
-      main_text_ss << "    " << CHULL_JOURNAL_TXT << "." << endl;
-      main_text_ss << endl;
-
-      main_text_ss << endl;
-      main_text_ss << "HULL DATA" << endl;
-      //gstate_counts
-      if(m_has_stoich_coords){
-        uint gstate_count=0,total_gstate_count=0;
-        for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-          gstate_count=getGStateCount(i_nary);total_gstate_count+=gstate_count;
-          main_text_ss << "Count ground-state " << pflow::arity_string(i_nary+1,false,true) << " = " << gstate_count << endl;
-        }
-        main_text_ss << "Count ground-state total = " << total_gstate_count;
-        main_text_ss << endl;
-      }
-      main_text_ss << "Count entries total = " << getEntriesCount(false) << endl;
-      main_text_ss << endl;
-
-      return main_text_ss.str();
     }
+    main_text_ss << "Count entries total = " << getEntriesCount(false) << endl;
+    main_text_ss << endl;
 
-    string ConvexHull::getJSONHeader() const {
-      vector<string> vout;
-      stringstream misc_ss;misc_ss.str("");
+    return main_text_ss.str();
+  }
 
-      misc_ss << "\"alloy\":\"" << aurostd::joinWDelimiter(m_velements,"") << "\"";
-      vout.push_back(misc_ss.str()); misc_ss.str("");
+  string ConvexHull::getJSONHeader() const {
+    vector<string> vout;
+    stringstream misc_ss;misc_ss.str("");
 
-      misc_ss << "\"aflow_version\":\"aflow" << string(AFLOW_VERSION) << "\"";
-      vout.push_back(misc_ss.str()); misc_ss.str("");
+    misc_ss << "\"alloy\":\"" << aurostd::joinWDelimiter(m_velements,"") << "\"";
+    vout.push_back(misc_ss.str()); misc_ss.str("");
 
-      misc_ss << "\"aflow_website\":\"" << AFLOW_WEB << "\"";
-      vout.push_back(misc_ss.str()); misc_ss.str("");
+    misc_ss << "\"aflow_version\":\"aflow" << string(AFLOW_VERSION) << "\"";
+    vout.push_back(misc_ss.str()); misc_ss.str("");
 
-      misc_ss << "\"date\":\"" << aurostd::get_datetime_formatted("-",false) << "\""; //CO 180819 - we don't need minute/second precision, date is fine //previously datetime
-      vout.push_back(misc_ss.str()); misc_ss.str("");
+    misc_ss << "\"aflow_website\":\"" << AFLOW_WEB << "\"";
+    vout.push_back(misc_ss.str()); misc_ss.str("");
 
-      //misc_ss << "\"count_hull\":\"" << getEntriesCount(m_half_hull) << "\"";
-      //vout.push_back(misc_ss.str()); misc_ss.str("");
-      //misc_ss << "\"count_total\":\"" << getEntriesCount(false) << "\"";
+    misc_ss << "\"date\":\"" << aurostd::get_datetime_formatted("-",false) << "\""; //CO 180819 - we don't need minute/second precision, date is fine //previously datetime
+    vout.push_back(misc_ss.str()); misc_ss.str("");
 
-      if(m_has_stoich_coords){
-        uint gstate_count=0,total_gstate_count=0;
-        for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-          gstate_count=getGStateCount(i_nary);total_gstate_count+=gstate_count;
-          misc_ss << "\"count_gstate_" << pflow::arity_string(i_nary+1,false,false) << "\":" << gstate_count;
-          vout.push_back(misc_ss.str()); misc_ss.str("");
-        }
-        misc_ss << "\"count_gstate_total\":" << total_gstate_count;
+    //misc_ss << "\"count_hull\":\"" << getEntriesCount(m_half_hull) << "\"";
+    //vout.push_back(misc_ss.str()); misc_ss.str("");
+    //misc_ss << "\"count_total\":\"" << getEntriesCount(false) << "\"";
+
+    if(m_has_stoich_coords){
+      uint gstate_count=0,total_gstate_count=0;
+      for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+        gstate_count=getGStateCount(i_nary);total_gstate_count+=gstate_count;
+        misc_ss << "\"count_gstate_" << pflow::arity_string(i_nary+1,false,false) << "\":" << gstate_count;
         vout.push_back(misc_ss.str()); misc_ss.str("");
       }
-
-      misc_ss << "\"count_entries_total\":" << getEntriesCount(false);
+      misc_ss << "\"count_gstate_total\":" << total_gstate_count;
       vout.push_back(misc_ss.str()); misc_ss.str("");
-
-      misc_ss << "\"publication\":\"";
-      misc_ss << CHULL_AUTHORS << ", ";
-      misc_ss << CHULL_TITLE << ", ";
-      misc_ss << CHULL_JOURNAL_TXT;
-      misc_ss << "\"";
-      vout.push_back(misc_ss.str()); misc_ss.str("");
-
-      return aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"{","}");
     }
 
-    string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& property,filetype ftype) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::grabCHPointProperty():";
-      if(LDEBUG) {cerr << soliloquy << " start" << endl;}
-      uint precision,tmp_precision;
-      precision=tmp_precision=COEF_PRECISION;
-      double tmp_roundoff_tol=5.0*pow(10,-((int)precision)-1);
-      string value="";
-      string equilibrium_phases_delimiter="-";
-      string string_wrapper="";
-      string list_prefix="";
-      string list_suffix="";
-      string null_value="-";
-      uint padding=30;  //latex only
-      if(ftype==json_ft){
-        equilibrium_phases_delimiter=",";
-        string_wrapper="\"";
-        list_prefix="[";
-        list_suffix="]";
-        null_value="null";
-      }
-      string string_wrapper_math_mode="$";  //latex only
-      bool compounds_column_report=false;
-      bool external_links=false;
-      if(ftype==latex_ft){
-        null_value="N/A";
-        compounds_column_report=DEFAULT_CHULL_LATEX_COMPOUNDS_COLUMN; //only grab if necessary, not an inexpensive string search
-        external_links=addExternalHyperlinks(); //only grab if necessary, not an inexpensive string search
-      }
-      if(LDEBUG) {cerr << soliloquy << " starting property=" << property << endl;}
-      bool latex_property=false;
-      bool math_mode=false;
-      //[OBSOLETE]bool reduced=false;
-      if(property=="compound"||property=="compound_latex"||property=="reduced_compound"||property=="reduced_compound_latex"||property=="fractional_compound"||property=="fractional_compound_latex"){
-        math_mode=false;  //do not wrap these, they are automatically wrapped inside prettyPrint
-        latex_property=(property=="compound_latex"||property=="reduced_compound_latex"||property=="fractional_compound_latex");
-        vector_reduction_type vred=no_vrt;
-        if(property=="reduced_compound"||property=="reduced_compound_latex"){vred=gcd_vrt;}
-        if(property=="fractional_compound"||property=="fractional_compound_latex"){vred=frac_vrt;}
-        //[OBSOLETE]reduced=(property=="reduced_compound"||property=="reduced_compound_latex");
-        value=prettyPrintCompound(point,vred,(ftype==latex_ft||latex_property||vred==gcd_vrt||vred==frac_vrt),(latex_property?latex_ft:ftype));
-        if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
-        value=aurostd::wrapString(value,string_wrapper);
-      }
-      else if(property=="prototype"||property=="prototype_latex"){
-        latex_property=(property=="prototype_latex");
-        if(ftype==latex_ft||latex_property){value=prettyPrintPrototype(point,ftype==json_ft,false);}  //JSON needs double backslash
-        else {value=point.m_entry.prototype;}
-        value=aurostd::wrapString(value,string_wrapper);
-        padding=100;  //latex only
-      }
-      else if(property=="auid"){
-        if(ftype==latex_ft){value="\\texttt{"+aurostd::wrapString(point.m_entry.auid,string_wrapper)+"}";}
-        else {value=aurostd::wrapString(point.m_entry.auid,string_wrapper);}
-      }
-      else if(property=="aurl"){value=aurostd::wrapString(point.m_entry.aurl,string_wrapper);}
-      else if(property=="url_entry_page"){value=aurostd::wrapString(ENTRY_PAGE_URL_PREFIX+point.m_entry.auid,string_wrapper);}
-      else if(property=="space_group_orig"||property=="space_group_orig_latex"){
-        math_mode=true;
-        latex_property=(property=="space_group_orig_latex");
-        string sg=point.getVSG().front();
-        if(ftype==latex_ft||latex_property){sg=aurostd::fixStringLatex(sg,ftype==json_ft,true);}
-        value=sg;
-        if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
-        value=aurostd::wrapString(value,string_wrapper);
-      }
-      else if(property=="space_group_relax"||property=="space_group_relax_latex"){
-        math_mode=true;
-        latex_property=(property=="space_group_relax_latex");
-        string sg=point.getVSG().back();
-        if(ftype==latex_ft||latex_property){sg=aurostd::fixStringLatex(sg,ftype==json_ft,true);}
-        value=sg;
-        if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
-        value=aurostd::wrapString(value,string_wrapper);
-      }
-      else if(property=="spin_atom"){
-        tmp_precision=precision;
-        if(ftype==latex_ft){tmp_precision=2;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string(point.m_entry.spin_atom,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
-      }
-      else if(property=="enthalpy_formation_atom"){
-        tmp_precision=precision;
-        if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string(H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
-      }
-      else if(property=="entropic_temperature"){
-        tmp_precision=precision;
-        if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string(point.m_entry.entropic_temperature,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
-      }
-      else if(property=="ground_state"){value=(point.isGState()?"true":"false");}
-      else if(property=="equivalent_structures_auid"){
-        if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-        if(point.isGState()){
-          //need to grab from coord_group
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-          if(m_coord_groups[i_coord_group].m_is_on_hull){
-            vector<string> auids;
-            uint i_point=AUROSTD_MAX_UINT;
-            const vector<uint>& equivalent_g_states=m_coord_groups[i_coord_group].m_equivalent_g_states;
-            if(equivalent_g_states.size()){
-              for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){
-                i_point=artificialMap(equivalent_g_states[i]);
-                if(m_points[i_point].m_has_entry){
-                  auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
-                } else {auids.push_back(null_value);}
-              }
-              value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
-            }
-          }
-        }
-      }
-      else if(property=="icsd_ground_state"){
-        bool icsd_g_state=false;
-        if(point.isGState()){
-          //need to grab from coord_group
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-          if(m_coord_groups[i_coord_group].m_is_on_hull){
-            icsd_g_state=m_coord_groups[i_coord_group].m_icsd_g_state;
-          }
-        }
-        value=(icsd_g_state?"true":"false");
-      }
-      else if(property=="icsd_canonical_auid"){
-        if(point.isGState()){
-          //need to grab from coord_group
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-          if(m_coord_groups[i_coord_group].m_is_on_hull){
-            if(m_coord_groups[i_coord_group].m_icsd_g_state){
-              uint i_point=m_coord_groups[i_coord_group].m_i_canonical_icsd;
-              if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
-              if(m_points[i_point].m_has_entry){value=aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper);}
-            }
-          }
-        }
-      }
-      else if(property=="phases_equilibrium_compound"){
-        if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-        if(point.isGState()&&!point.isUnary()){ //unaries are always gstates, but do NOT have any mixture context
-          //need to grab from coord_group
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-          if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
-          vector<string> compounds,_compounds;
+    misc_ss << "\"count_entries_total\":" << getEntriesCount(false);
+    vout.push_back(misc_ss.str()); misc_ss.str("");
+
+    misc_ss << "\"publication\":\"";
+    misc_ss << CHULL_AUTHORS << ", ";
+    misc_ss << CHULL_TITLE << ", ";
+    misc_ss << CHULL_JOURNAL_TXT;
+    misc_ss << "\"";
+    vout.push_back(misc_ss.str()); misc_ss.str("");
+
+    return aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"{","}");
+  }
+
+  string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& property,filetype ftype) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::grabCHPointProperty():";
+    if(LDEBUG) {cerr << soliloquy << " start" << endl;}
+    uint precision,tmp_precision;
+    precision=tmp_precision=COEF_PRECISION;
+    double tmp_roundoff_tol=5.0*pow(10,-((int)precision)-1);
+    string value="";
+    string equilibrium_phases_delimiter="-";
+    string string_wrapper="";
+    string list_prefix="";
+    string list_suffix="";
+    string null_value="-";
+    uint padding=30;  //latex only
+    if(ftype==json_ft){
+      equilibrium_phases_delimiter=",";
+      string_wrapper="\"";
+      list_prefix="[";
+      list_suffix="]";
+      null_value="null";
+    }
+    string string_wrapper_math_mode="$";  //latex only
+    bool compounds_column_report=false;
+    bool external_links=false;
+    if(ftype==latex_ft){
+      null_value="N/A";
+      compounds_column_report=DEFAULT_CHULL_LATEX_COMPOUNDS_COLUMN; //only grab if necessary, not an inexpensive string search
+      external_links=addExternalHyperlinks(); //only grab if necessary, not an inexpensive string search
+    }
+    if(LDEBUG) {cerr << soliloquy << " starting property=" << property << endl;}
+    bool latex_property=false;
+    bool math_mode=false;
+    //[OBSOLETE]bool reduced=false;
+    if(property=="compound"||property=="compound_latex"||property=="reduced_compound"||property=="reduced_compound_latex"||property=="fractional_compound"||property=="fractional_compound_latex"){
+      math_mode=false;  //do not wrap these, they are automatically wrapped inside prettyPrint
+      latex_property=(property=="compound_latex"||property=="reduced_compound_latex"||property=="fractional_compound_latex");
+      vector_reduction_type vred=no_vrt;
+      if(property=="reduced_compound"||property=="reduced_compound_latex"){vred=gcd_vrt;}
+      if(property=="fractional_compound"||property=="fractional_compound_latex"){vred=frac_vrt;}
+      //[OBSOLETE]reduced=(property=="reduced_compound"||property=="reduced_compound_latex");
+      value=prettyPrintCompound(point,vred,(ftype==latex_ft||latex_property||vred==gcd_vrt||vred==frac_vrt),(latex_property?latex_ft:ftype));
+      if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
+      value=aurostd::wrapString(value,string_wrapper);
+    }
+    else if(property=="prototype"||property=="prototype_latex"){
+      latex_property=(property=="prototype_latex");
+      if(ftype==latex_ft||latex_property){value=prettyPrintPrototype(point,ftype==json_ft,false);}  //JSON needs double backslash
+      else {value=point.m_entry.prototype;}
+      value=aurostd::wrapString(value,string_wrapper);
+      padding=100;  //latex only
+    }
+    else if(property=="auid"){
+      if(ftype==latex_ft){value="\\texttt{"+aurostd::wrapString(point.m_entry.auid,string_wrapper)+"}";}
+      else {value=aurostd::wrapString(point.m_entry.auid,string_wrapper);}
+    }
+    else if(property=="aurl"){value=aurostd::wrapString(point.m_entry.aurl,string_wrapper);}
+    else if(property=="url_entry_page"){value=aurostd::wrapString(ENTRY_PAGE_URL_PREFIX+point.m_entry.auid,string_wrapper);}
+    else if(property=="space_group_orig"||property=="space_group_orig_latex"){
+      math_mode=true;
+      latex_property=(property=="space_group_orig_latex");
+      string sg=point.getVSG().front();
+      if(ftype==latex_ft||latex_property){sg=aurostd::fixStringLatex(sg,ftype==json_ft,true);}
+      value=sg;
+      if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
+      value=aurostd::wrapString(value,string_wrapper);
+    }
+    else if(property=="space_group_relax"||property=="space_group_relax_latex"){
+      math_mode=true;
+      latex_property=(property=="space_group_relax_latex");
+      string sg=point.getVSG().back();
+      if(ftype==latex_ft||latex_property){sg=aurostd::fixStringLatex(sg,ftype==json_ft,true);}
+      value=sg;
+      if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
+      value=aurostd::wrapString(value,string_wrapper);
+    }
+    else if(property=="spin_atom"){
+      tmp_precision=precision;
+      if(ftype==latex_ft){tmp_precision=2;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+      value=aurostd::utype2string(point.m_entry.spin_atom,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+    }
+    else if(property=="enthalpy_formation_atom"){
+      tmp_precision=precision;
+      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+      value=aurostd::utype2string(H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+    }
+    else if(property=="entropic_temperature"){
+      tmp_precision=precision;
+      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+      value=aurostd::utype2string(point.m_entry.entropic_temperature,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+    }
+    else if(property=="ground_state"){value=(point.isGState()?"true":"false");}
+    else if(property=="equivalent_structures_auid"){
+      if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
+      if(point.isGState()){
+        //need to grab from coord_group
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+        if(m_coord_groups[i_coord_group].m_is_on_hull){
+          vector<string> auids;
           uint i_point=AUROSTD_MAX_UINT;
-          const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
-          if(equilibrium_phases.size()){
-            for(uint i=0,fl_size_i=equilibrium_phases.size();i<fl_size_i;i++){
-              if(equilibrium_phases[i].size()==0){compounds.push_back(null_value);continue;}
-              _compounds.clear();
-              for(uint j=0,fl_size_j=equilibrium_phases[i].size();j<fl_size_j;j++){
-                i_point=artificialMap(equilibrium_phases[i][j]);
-                if(m_points[i_point].m_has_entry){
-                  _compounds.push_back(aurostd::wrapString(m_points[i_point].m_entry.compound,string_wrapper));
-                } else {_compounds.push_back(null_value);}
-              }
-              compounds.push_back(aurostd::wrapString(aurostd::joinWDelimiter(_compounds,equilibrium_phases_delimiter),list_prefix,list_suffix));
-            }
-            value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
-          }
-        }
-      }
-      else if(property=="phases_equilibrium_auid"){
-        if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-        if(point.isGState()&&!point.isUnary()){
-          //need to grab from coord_group
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-          if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
-          vector<string> auids,_auids;
-          uint i_point=AUROSTD_MAX_UINT;
-          const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
-          if(equilibrium_phases.size()){
-            for(uint i=0,fl_size_i=equilibrium_phases.size();i<fl_size_i;i++){
-              if(equilibrium_phases[i].size()==0){auids.push_back(null_value);continue;}
-              _auids.clear();
-              for(uint j=0,fl_size_j=equilibrium_phases[i].size();j<fl_size_j;j++){
-                i_point=artificialMap(equilibrium_phases[i][j]);
-                if(m_points[i_point].m_has_entry){
-                  _auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
-                } else {_auids.push_back(null_value);}
-              }
-              auids.push_back(aurostd::wrapString(aurostd::joinWDelimiter(_auids,equilibrium_phases_delimiter),list_prefix,list_suffix));
+          const vector<uint>& equivalent_g_states=m_coord_groups[i_coord_group].m_equivalent_g_states;
+          if(equivalent_g_states.size()){
+            for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){
+              i_point=artificialMap(equivalent_g_states[i]);
+              if(m_points[i_point].m_has_entry){
+                auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
+              } else {auids.push_back(null_value);}
             }
             value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
           }
         }
       }
-      else if(property=="phases_decomposition_compound"){
-        if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-        if(!point.isGState()){
-          //need to grab from coord_group
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-          if(!m_coord_groups[i_coord_group].m_is_on_hull){
-            if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
-              vector<string> compounds;
-              uint i_point=AUROSTD_MAX_UINT;
-              for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_decomp_phases.size();i<fl_size_i;i++){
-                i_point=artificialMap(m_coord_groups[i_coord_group].m_decomp_phases[i]);
-                const xvector<double>& decomposition_coefficients=m_coord_groups[i_coord_group].m_decomp_coefs;
-                //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
-                if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1]))){
-                  if(m_points[i_point].m_has_entry){
-                    compounds.push_back(aurostd::wrapString(m_points[i_point].m_entry.compound,string_wrapper));
-                  } else {compounds.push_back(null_value);} //already did artificialMap()
-                } //else {compounds.push_back(null_value);}
-              }
-              value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
+    }
+    else if(property=="icsd_ground_state"){
+      bool icsd_g_state=false;
+      if(point.isGState()){
+        //need to grab from coord_group
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+        if(m_coord_groups[i_coord_group].m_is_on_hull){
+          icsd_g_state=m_coord_groups[i_coord_group].m_icsd_g_state;
+        }
+      }
+      value=(icsd_g_state?"true":"false");
+    }
+    else if(property=="icsd_canonical_auid"){
+      if(point.isGState()){
+        //need to grab from coord_group
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+        if(m_coord_groups[i_coord_group].m_is_on_hull){
+          if(m_coord_groups[i_coord_group].m_icsd_g_state){
+            uint i_point=m_coord_groups[i_coord_group].m_i_canonical_icsd;
+            if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+            if(m_points[i_point].m_has_entry){value=aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper);}
+          }
+        }
+      }
+    }
+    else if(property=="phases_equilibrium_compound"){
+      if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
+      if(point.isGState()&&!point.isUnary()){ //unaries are always gstates, but do NOT have any mixture context
+        //need to grab from coord_group
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+        if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        vector<string> compounds,_compounds;
+        uint i_point=AUROSTD_MAX_UINT;
+        const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
+        if(equilibrium_phases.size()){
+          for(uint i=0,fl_size_i=equilibrium_phases.size();i<fl_size_i;i++){
+            if(equilibrium_phases[i].size()==0){compounds.push_back(null_value);continue;}
+            _compounds.clear();
+            for(uint j=0,fl_size_j=equilibrium_phases[i].size();j<fl_size_j;j++){
+              i_point=artificialMap(equilibrium_phases[i][j]);
+              if(m_points[i_point].m_has_entry){
+                _compounds.push_back(aurostd::wrapString(m_points[i_point].m_entry.compound,string_wrapper));
+              } else {_compounds.push_back(null_value);}
             }
+            compounds.push_back(aurostd::wrapString(aurostd::joinWDelimiter(_compounds,equilibrium_phases_delimiter),list_prefix,list_suffix));
           }
+          value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
         }
       }
-      else if(property=="phases_decomposition_auid"){
-        if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-        if(!point.isGState()){
-          //need to grab from coord_group
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-          if(!m_coord_groups[i_coord_group].m_is_on_hull){
-            if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
-              vector<string> auids;
-              uint i_point=AUROSTD_MAX_UINT;
-              for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_decomp_phases.size();i<fl_size_i;i++){
-                i_point=artificialMap(m_coord_groups[i_coord_group].m_decomp_phases[i]);
-                const xvector<double>& decomposition_coefficients=m_coord_groups[i_coord_group].m_decomp_coefs;
-                //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
-                if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1]))){
-                  if(m_points[i_point].m_has_entry){
-                    auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
-                  } else {auids.push_back(null_value);} //already did artificialMap()
-                } //else {auids.push_back(null_value);}
-              }
-              value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
+    }
+    else if(property=="phases_equilibrium_auid"){
+      if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
+      if(point.isGState()&&!point.isUnary()){
+        //need to grab from coord_group
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+        if(m_coord_groups[i_coord_group].m_equilibrium_phases.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Equilibrium phases not set");}
+        vector<string> auids,_auids;
+        uint i_point=AUROSTD_MAX_UINT;
+        const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
+        if(equilibrium_phases.size()){
+          for(uint i=0,fl_size_i=equilibrium_phases.size();i<fl_size_i;i++){
+            if(equilibrium_phases[i].size()==0){auids.push_back(null_value);continue;}
+            _auids.clear();
+            for(uint j=0,fl_size_j=equilibrium_phases[i].size();j<fl_size_j;j++){
+              i_point=artificialMap(equilibrium_phases[i][j]);
+              if(m_points[i_point].m_has_entry){
+                _auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
+              } else {_auids.push_back(null_value);}
             }
+            auids.push_back(aurostd::wrapString(aurostd::joinWDelimiter(_auids,equilibrium_phases_delimiter),list_prefix,list_suffix));
           }
+          value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
         }
       }
-      else if(property=="phases_decomposition_coefficient"){
-        if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
-        if(!point.isGState()){
-          //need to grab from coord_group
-          uint i_coord_group=AUROSTD_MAX_UINT;
-          if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
-          if(!m_coord_groups[i_coord_group].m_is_on_hull){
-            if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
-              vector<double> nonzero_coefs;
-              //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(int i=point.m_decomp_coefs.lrows;i<=point.m_decomp_coefs.urows;i++){
-              //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  if(nonZeroWithinTol(point.m_decomp_coefs[i])){nonzero_coefs.push_back(point.m_decomp_coefs[i]);}
-              //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]}
-              for(int i=m_coord_groups[i_coord_group].m_decomp_coefs.lrows;i<=m_coord_groups[i_coord_group].m_decomp_coefs.urows;i++){
-                if(nonZeroWithinTol(m_coord_groups[i_coord_group].m_decomp_coefs[i])){nonzero_coefs.push_back(m_coord_groups[i_coord_group].m_decomp_coefs[i]);}
-              }
-              tmp_precision=precision;
-              tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
-              value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nonzero_coefs,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM),","),list_prefix,list_suffix);
+    }
+    else if(property=="phases_decomposition_compound"){
+      if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
+      if(!point.isGState()){
+        //need to grab from coord_group
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+          if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
+            vector<string> compounds;
+            uint i_point=AUROSTD_MAX_UINT;
+            for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_decomp_phases.size();i<fl_size_i;i++){
+              i_point=artificialMap(m_coord_groups[i_coord_group].m_decomp_phases[i]);
+              const xvector<double>& decomposition_coefficients=m_coord_groups[i_coord_group].m_decomp_coefs;
+              //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
+              if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1]))){
+                if(m_points[i_point].m_has_entry){
+                  compounds.push_back(aurostd::wrapString(m_points[i_point].m_entry.compound,string_wrapper));
+                } else {compounds.push_back(null_value);} //already did artificialMap()
+              } //else {compounds.push_back(null_value);}
             }
+            value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
           }
         }
       }
-      else if(property=="nspecies"){
-        uint i_nary=point.m_i_nary;
-        if(i_nary!=AUROSTD_MAX_UINT){i_nary+=1;}  //m_i_nary is just index, increment by count to get nspecies
-        else {i_nary=0;}  //set to something reasonable
-        if(i_nary==0){    //potential other ways of defining nspecies
-          if(point.m_has_entry){i_nary=point.m_entry.nspecies;}
+    }
+    else if(property=="phases_decomposition_auid"){
+      if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
+      if(!point.isGState()){
+        //need to grab from coord_group
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+          if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
+            vector<string> auids;
+            uint i_point=AUROSTD_MAX_UINT;
+            for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_decomp_phases.size();i<fl_size_i;i++){
+              i_point=artificialMap(m_coord_groups[i_coord_group].m_decomp_phases[i]);
+              const xvector<double>& decomposition_coefficients=m_coord_groups[i_coord_group].m_decomp_coefs;
+              //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
+              if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1]))){
+                if(m_points[i_point].m_has_entry){
+                  auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
+                } else {auids.push_back(null_value);} //already did artificialMap()
+              } //else {auids.push_back(null_value);}
+            }
+            value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
+          }
         }
-        value=aurostd::utype2string(i_nary);  //no precision needed here, simple uint
       }
-      else if(property=="enthalpy_formation_atom_difference"){
-        tmp_precision=precision;
-        if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
-      }
-      else if(property=="entropic_temperature_difference"){
-        tmp_precision=precision;
-        if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-        value=aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
-      }
-      else if(property=="stability_criterion"){
-        if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getStabilityCriterion(_m_)>=AUROSTD_NAN){value=null_value;}
-        else {
-          if(point.isGState()){
+    }
+    else if(property=="phases_decomposition_coefficient"){
+      if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No latex rule defined for "+property);}
+      if(!point.isGState()){
+        //need to grab from coord_group
+        uint i_coord_group=AUROSTD_MAX_UINT;
+        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup index not set");}
+        if(!m_coord_groups[i_coord_group].m_is_on_hull){
+          if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
+            vector<double> nonzero_coefs;
+            //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(int i=point.m_decomp_coefs.lrows;i<=point.m_decomp_coefs.urows;i++){
+            //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  if(nonZeroWithinTol(point.m_decomp_coefs[i])){nonzero_coefs.push_back(point.m_decomp_coefs[i]);}
+            //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]}
+            for(int i=m_coord_groups[i_coord_group].m_decomp_coefs.lrows;i<=m_coord_groups[i_coord_group].m_decomp_coefs.urows;i++){
+              if(nonZeroWithinTol(m_coord_groups[i_coord_group].m_decomp_coefs[i])){nonzero_coefs.push_back(m_coord_groups[i_coord_group].m_decomp_coefs[i]);}
+            }
             tmp_precision=precision;
-            if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-            value=aurostd::utype2string(point.getStabilityCriterion(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
+            tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+            value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nonzero_coefs,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM),","),list_prefix,list_suffix);
           }
         }
       }
-      else if(property=="relative_stability_criterion"){
-        if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getRelativeStabilityCriterion()>=AUROSTD_NAN){value=null_value;}
-        else {
-          if(point.isGState()){
-            tmp_precision=precision;
-            if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-            value=aurostd::utype2string(point.getRelativeStabilityCriterion(),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  // CO 180409 - not showing as fraction anymore, not necessarily out of 100%
-          }
+    }
+    else if(property=="nspecies"){
+      uint i_nary=point.m_i_nary;
+      if(i_nary!=AUROSTD_MAX_UINT){i_nary+=1;}  //m_i_nary is just index, increment by count to get nspecies
+      else {i_nary=0;}  //set to something reasonable
+      if(i_nary==0){    //potential other ways of defining nspecies
+        if(point.m_has_entry){i_nary=point.m_entry.nspecies;}
+      }
+      value=aurostd::utype2string(i_nary);  //no precision needed here, simple uint
+    }
+    else if(property=="enthalpy_formation_atom_difference"){
+      tmp_precision=precision;
+      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+      value=aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+    }
+    else if(property=="entropic_temperature_difference"){
+      tmp_precision=precision;
+      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+      value=aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
+    }
+    else if(property=="stability_criterion"){
+      if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getStabilityCriterion(_m_)>=AUROSTD_NAN){value=null_value;}
+      else {
+        if(point.isGState()){
+          tmp_precision=precision;
+          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+          value=aurostd::utype2string(point.getStabilityCriterion(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
         }
       }
-      else if(property=="N+1_energy_gain"){
-        if(m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS")||point.getNPlus1EnergyGain(_m_)>=AUROSTD_NAN){value=null_value;}
-        else {
-          if(point.isGState()){
-            tmp_precision=precision;
-            if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-            value=aurostd::utype2string(point.getNPlus1EnergyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  // CO 180409 - not showing as fraction anymore, not necessarily out of 100%
-          }
+    }
+    else if(property=="relative_stability_criterion"){
+      if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getRelativeStabilityCriterion()>=AUROSTD_NAN){value=null_value;}
+      else {
+        if(point.isGState()){
+          tmp_precision=precision;
+          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+          value=aurostd::utype2string(point.getRelativeStabilityCriterion(),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  // CO 180409 - not showing as fraction anymore, not necessarily out of 100%
         }
       }
-      else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
-      if(value.empty()){value=null_value;}
-      if(ftype==latex_ft){
-        if(external_links && (property=="compound"||(!compounds_column_report&&property=="prototype"))){
-          value="\\href{"+ENTRY_PAGE_URL_PREFIX+point.m_entry.auid+"}{"+value+"}";
+    }
+    else if(property=="N+1_energy_gain"){
+      if(m_cflags.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS")||point.getNPlus1EnergyGain(_m_)>=AUROSTD_NAN){value=null_value;}
+      else {
+        if(point.isGState()){
+          tmp_precision=precision;
+          if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+          value=aurostd::utype2string(point.getNPlus1EnergyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  // CO 180409 - not showing as fraction anymore, not necessarily out of 100%
         }
-        value=aurostd::PaddedPOST(value,padding);
       }
-      if(LDEBUG) {cerr << soliloquy << " done" << endl;}
-      return value;
+    }
+    else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
+    if(value.empty()){value=null_value;}
+    if(ftype==latex_ft){
+      if(external_links && (property=="compound"||(!compounds_column_report&&property=="prototype"))){
+        value="\\href{"+ENTRY_PAGE_URL_PREFIX+point.m_entry.auid+"}{"+value+"}";
+      }
+      value=aurostd::PaddedPOST(value,padding);
+    }
+    if(LDEBUG) {cerr << soliloquy << " done" << endl;}
+    return value;
+  }
+
+  string ConvexHull::grabCHFacetProperty(const ChullFacet& facet,const string& property,filetype ftype) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::grabCHFacetProperty():";
+    uint precision=COEF_PRECISION;
+    double roundoff_tol=5.0*pow(10,-((int)precision)-1);
+    string value="";
+    string vector_delimiter=";";
+    string string_wrapper="";
+    string list_prefix="";
+    string list_suffix="";
+    string null_value="-";
+    if(ftype==json_ft){
+      vector_delimiter=",";
+      string_wrapper="\"";
+      list_prefix="[";
+      list_suffix="]";
+      null_value="null";
+    }
+    if(LDEBUG) {cerr << soliloquy << " starting property=" << property << endl;}
+    if(property=="vertices_position"){
+      vector<string> vstr;
+      for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
+        vstr.push_back(aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_vertices[i].ch_point.h_coords,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter));
+      }
+      value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::wrapVecEntries(vstr,"[","]"),","),list_prefix,list_suffix);
+    }
+    else if(property=="vertices_compound"){
+      vector<string> compounds;
+      for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
+        if(facet.m_vertices[i].ch_point.m_has_entry){
+          if(!m_points[facet.m_vertices[i].ch_index].m_entry.compound.empty()){
+            compounds.push_back(aurostd::wrapString(m_points[facet.m_vertices[i].ch_index].m_entry.compound,string_wrapper));
+          } else {compounds.push_back(null_value);}
+        }
+        else if(facet.m_vertices[i].ch_point.m_is_artificial){
+          uint i_nary=facet.m_vertices[i].ch_point.m_i_nary;
+          uint i_alloy=facet.m_vertices[i].ch_point.m_i_alloy;
+          string elements=aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"");  //unary, so "" delimiter doesn't play a role
+          compounds.push_back(aurostd::wrapString("artificial:"+elements,string_wrapper));
+        } else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown print setting");}
+      }
+      value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
+    }
+    else if(property=="vertices_auid"){
+      vector<string> auids;
+      for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
+        if(facet.m_vertices[i].ch_point.m_has_entry){
+          if(!m_points[facet.m_vertices[i].ch_index].m_entry.auid.empty()){
+            auids.push_back(aurostd::wrapString(m_points[facet.m_vertices[i].ch_index].m_entry.auid,string_wrapper));
+          } else {auids.push_back(null_value);}
+        }
+        else if(facet.m_vertices[i].ch_point.m_is_artificial){
+          uint i_nary=facet.m_vertices[i].ch_point.m_i_nary;
+          uint i_alloy=facet.m_vertices[i].ch_point.m_i_alloy;
+          string elements=aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"");  //unary, so "" delimiter doesn't play a role
+          auids.push_back(aurostd::wrapString("artificial:"+elements,string_wrapper));
+        } else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown print setting");}
+      }
+      value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
+    }
+    else if(property=="content"){value=aurostd::utype2string(facet.m_content,precision,true,roundoff_tol,FIXED_STREAM);}
+    else if(property=="normal"){value="["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_normal,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter)+"]";}
+    else if(property=="offset"){value=aurostd::utype2string(facet.m_offset,precision,true,roundoff_tol,FIXED_STREAM);}
+    else if(property=="centroid"){value="["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_facet_centroid,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter)+"]";}
+    else if(property=="hypercollinear"){value=(facet.m_hypercollinear?"true":"false");}
+    else if(property=="vertical"){value=(facet.m_is_vertical?"true":"false");}
+    else if(property=="artificial"){value=(facet.m_is_artificial?"true":"false");}
+    else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
+    if(value.empty()){value=null_value;}
+    return value;
+  }
+
+  vector<vector<string> > ConvexHull::getPointsData(const string& properties_str,vector<string>& headers,filetype ftype) const {
+    string soliloquy="ConvexHull::getPointsData():";
+    stringstream message;
+
+    vector<string> vproperties;
+    uint i_point=AUROSTD_MAX_UINT;
+    string value;
+
+    vector<vector<string> > ventries;
+    aurostd::string2tokens(properties_str,vproperties,",");
+    for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
+      if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
+      if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] is not initialized");}
+      for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+        i_point=m_coord_groups[i_coord_group].m_points[i];
+        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+        const ChullPoint& point=m_points[i_point];
+        if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+        if(!point.m_has_entry){continue;}
+        ventries.push_back(vector<string>(0));
+        for(uint j=0,fl_size_j=vproperties.size();j<fl_size_j;j++){
+          value=grabCHPointProperty(point,vproperties[j],ftype);
+          ventries.back().push_back(value);
+        }
+      }
     }
 
-    string ConvexHull::grabCHFacetProperty(const ChullFacet& facet,const string& property,filetype ftype) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::grabCHFacetProperty():";
-      uint precision=COEF_PRECISION;
-      double roundoff_tol=5.0*pow(10,-((int)precision)-1);
-      string value="";
-      string vector_delimiter=";";
-      string string_wrapper="";
-      string list_prefix="";
-      string list_suffix="";
-      string null_value="-";
-      if(ftype==json_ft){
-        vector_delimiter=",";
-        string_wrapper="\"";
-        list_prefix="[";
-        list_suffix="]";
-        null_value="null";
+    string header;
+    headers.clear();
+    if(ftype==json_ft){
+      //for json response, we want TRUE keywords as they would appear in aflowlib.out
+      for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
+        header=vproperties[i];
+        //add any processing here
+        headers.push_back(header);
       }
-      if(LDEBUG) {cerr << soliloquy << " starting property=" << property << endl;}
-      if(property=="vertices_position"){
-        vector<string> vstr;
-        for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
-          vstr.push_back(aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_vertices[i].ch_point.h_coords,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter));
-        }
-        value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::wrapVecEntries(vstr,"[","]"),","),list_prefix,list_suffix);
+    } else {
+      //for text response, we decorate nicely by replacing _atom with _[/atom]
+      for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
+        header=vproperties[i];
+        //while this is "pretty", it's NON-STANDARD
+        //define in the paper, and leave it be
+        //if(vproperties[i]=="url_entry_page"){header="entry_page_url";}
+        //if(vproperties[i]=="enthalpy_formation_atom"){header="formation_enthalpy";}
+        //if(vproperties[i]=="spin_atom"){header="spin";}
+        //if(vproperties[i]=="phases_equilibrium_compound"){header="equilibrium_phases";}
+        //if(vproperties[i]=="phases_equilibrium_auid"){header="equilibrium_phases_auids";}
+        //if(vproperties[i]=="phases_decomposition_compound"){header="decomposition_phases";}
+        //if(vproperties[i]=="phases_decomposition_auid"){header="decomposition_phases_auids";}
+        //if(vproperties[i]=="phases_decomposition_coefficient"){header="decomposition_coefficients";}
+        //if(vproperties[i]=="enthalpy_formation_atom_difference"){header="formation_enthalpy_difference";}
+        //add any processing here before upper
+        header=aurostd::toupper(header);
+        //units are nice, but again, NON-STANDARD
+        //define in the ppaer, and leave it be
+        //add any processing here after upper
+        //if(vproperties[i]=="enthalpy_formation_atom"){header+="_[meV/atom]";}
+        //if(vproperties[i]=="entropic_temperature"){header+="_[K]";}
+        //if(vproperties[i]=="spin_atom"){header+="_[mu_B/atom]";}
+        //if(vproperties[i]=="enthalpy_formation_atom_difference"){header+="_[meV/atom]";}
+        //if(vproperties[i]=="entropic_temperature_difference"){header+="_[K]";}
+        headers.push_back(header);
       }
-      else if(property=="vertices_compound"){
-        vector<string> compounds;
-        for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
-          if(facet.m_vertices[i].ch_point.m_has_entry){
-            if(!m_points[facet.m_vertices[i].ch_index].m_entry.compound.empty()){
-              compounds.push_back(aurostd::wrapString(m_points[facet.m_vertices[i].ch_index].m_entry.compound,string_wrapper));
-            } else {compounds.push_back(null_value);}
-          }
-          else if(facet.m_vertices[i].ch_point.m_is_artificial){
-            uint i_nary=facet.m_vertices[i].ch_point.m_i_nary;
-            uint i_alloy=facet.m_vertices[i].ch_point.m_i_alloy;
-            string elements=aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"");  //unary, so "" delimiter doesn't play a role
-            compounds.push_back(aurostd::wrapString("artificial:"+elements,string_wrapper));
-          } else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown print setting");}
-        }
-        value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
-      }
-      else if(property=="vertices_auid"){
-        vector<string> auids;
-        for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
-          if(facet.m_vertices[i].ch_point.m_has_entry){
-            if(!m_points[facet.m_vertices[i].ch_index].m_entry.auid.empty()){
-              auids.push_back(aurostd::wrapString(m_points[facet.m_vertices[i].ch_index].m_entry.auid,string_wrapper));
-            } else {auids.push_back(null_value);}
-          }
-          else if(facet.m_vertices[i].ch_point.m_is_artificial){
-            uint i_nary=facet.m_vertices[i].ch_point.m_i_nary;
-            uint i_alloy=facet.m_vertices[i].ch_point.m_i_alloy;
-            string elements=aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"");  //unary, so "" delimiter doesn't play a role
-            auids.push_back(aurostd::wrapString("artificial:"+elements,string_wrapper));
-          } else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown print setting");}
-        }
-        value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
-      }
-      else if(property=="content"){value=aurostd::utype2string(facet.m_content,precision,true,roundoff_tol,FIXED_STREAM);}
-      else if(property=="normal"){value="["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_normal,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter)+"]";}
-      else if(property=="offset"){value=aurostd::utype2string(facet.m_offset,precision,true,roundoff_tol,FIXED_STREAM);}
-      else if(property=="centroid"){value="["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_facet_centroid,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter)+"]";}
-      else if(property=="hypercollinear"){value=(facet.m_hypercollinear?"true":"false");}
-      else if(property=="vertical"){value=(facet.m_is_vertical?"true":"false");}
-      else if(property=="artificial"){value=(facet.m_is_artificial?"true":"false");}
-      else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
-      if(value.empty()){value=null_value;}
-      return value;
     }
+    return ventries;
+  }
 
-    vector<vector<string> > ConvexHull::getPointsData(const string& properties_str,vector<string>& headers,filetype ftype) const {
-      string soliloquy="ConvexHull::getPointsData():";
-      stringstream message;
+  vector<vector<vector<vector<string> > > > ConvexHull::getFacetsData(const string& facet_properties_str,vector<string>& headers,filetype ftype) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getFacetsData():";
+    stringstream message;
 
-      vector<string> vproperties;
-      uint i_point=AUROSTD_MAX_UINT;
-      string value;
+    if(m_naries.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No naries (larger than 1) found");}
 
-      vector<vector<string> > ventries;
-      aurostd::string2tokens(properties_str,vproperties,",");
-      for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
-        if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
-        if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] is not initialized");}
-        for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-          i_point=m_coord_groups[i_coord_group].m_points[i];
-          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-          const ChullPoint& point=m_points[i_point];
-          if(!point.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-          if(!point.m_has_entry){continue;}
-          ventries.push_back(vector<string>(0));
+    vector<string> vproperties;
+    string value;
+    vector<vector<vector<vector<string> > > > ventries;
+
+    aurostd::string2tokens(facet_properties_str,vproperties,",");
+    uint i_facet;
+    for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
+      if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary["+aurostd::utype2string(i_nary)+"]");}
+      if(m_naries[i_nary].m_alloys.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No alloys found in nary["+aurostd::utype2string(i_nary)+"]");}
+      if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << endl;}
+      ventries.push_back(vector<vector<vector<string> > >(0));
+      for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
+        if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
+        if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
+        if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;}
+        ventries.back().push_back(vector<vector<string> >(0));
+        for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_facets.size();i<fl_size_i;i++){
+          i_facet=m_naries[i_nary].m_alloys[i_alloy].m_facets[i];
+          const ChullFacet& facet=m_facets[i_facet];
+          if(!facet.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+",i_facet="+aurostd::utype2string(i_facet)+"] is not initialized");}
+          if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_facet=" << i_facet << endl;}
+          ventries.back().back().push_back(vector<string>(0));
           for(uint j=0,fl_size_j=vproperties.size();j<fl_size_j;j++){
-            value=grabCHPointProperty(point,vproperties[j],ftype);
-            ventries.back().push_back(value);
+            value=grabCHFacetProperty(facet,vproperties[j],ftype);
+            ventries.back().back().back().push_back(value);
           }
         }
       }
-
-      string header;
-      headers.clear();
-      if(ftype==json_ft){
-        //for json response, we want TRUE keywords as they would appear in aflowlib.out
-        for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
-          header=vproperties[i];
-          //add any processing here
-          headers.push_back(header);
-        }
-      } else {
-        //for text response, we decorate nicely by replacing _atom with _[/atom]
-        for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
-          header=vproperties[i];
-          //while this is "pretty", it's NON-STANDARD
-          //define in the paper, and leave it be
-          //if(vproperties[i]=="url_entry_page"){header="entry_page_url";}
-          //if(vproperties[i]=="enthalpy_formation_atom"){header="formation_enthalpy";}
-          //if(vproperties[i]=="spin_atom"){header="spin";}
-          //if(vproperties[i]=="phases_equilibrium_compound"){header="equilibrium_phases";}
-          //if(vproperties[i]=="phases_equilibrium_auid"){header="equilibrium_phases_auids";}
-          //if(vproperties[i]=="phases_decomposition_compound"){header="decomposition_phases";}
-          //if(vproperties[i]=="phases_decomposition_auid"){header="decomposition_phases_auids";}
-          //if(vproperties[i]=="phases_decomposition_coefficient"){header="decomposition_coefficients";}
-          //if(vproperties[i]=="enthalpy_formation_atom_difference"){header="formation_enthalpy_difference";}
-          //add any processing here before upper
-          header=aurostd::toupper(header);
-          //units are nice, but again, NON-STANDARD
-          //define in the ppaer, and leave it be
-          //add any processing here after upper
-          //if(vproperties[i]=="enthalpy_formation_atom"){header+="_[meV/atom]";}
-          //if(vproperties[i]=="entropic_temperature"){header+="_[K]";}
-          //if(vproperties[i]=="spin_atom"){header+="_[mu_B/atom]";}
-          //if(vproperties[i]=="enthalpy_formation_atom_difference"){header+="_[meV/atom]";}
-          //if(vproperties[i]=="entropic_temperature_difference"){header+="_[K]";}
-          headers.push_back(header);
-        }
-      }
-      return ventries;
     }
+    if(LDEBUG) {cerr << soliloquy << " created ventries" << endl;}
 
-    vector<vector<vector<vector<string> > > > ConvexHull::getFacetsData(const string& facet_properties_str,vector<string>& headers,filetype ftype) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::getFacetsData():";
-      stringstream message;
-
-      if(m_naries.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No naries (larger than 1) found");}
-
-      vector<string> vproperties;
-      string value;
-      vector<vector<vector<vector<string> > > > ventries;
-
-      aurostd::string2tokens(facet_properties_str,vproperties,",");
-      uint i_facet;
-      for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
-        if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary["+aurostd::utype2string(i_nary)+"]");}
-        if(m_naries[i_nary].m_alloys.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No alloys found in nary["+aurostd::utype2string(i_nary)+"]");}
-        if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << endl;}
-        ventries.push_back(vector<vector<vector<string> > >(0));
-        for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
-          if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
-          if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
-          if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;}
-          ventries.back().push_back(vector<vector<string> >(0));
-          for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_facets.size();i<fl_size_i;i++){
-            i_facet=m_naries[i_nary].m_alloys[i_alloy].m_facets[i];
-            const ChullFacet& facet=m_facets[i_facet];
-            if(!facet.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+",i_facet="+aurostd::utype2string(i_facet)+"] is not initialized");}
-            if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_facet=" << i_facet << endl;}
-            ventries.back().back().push_back(vector<string>(0));
-            for(uint j=0,fl_size_j=vproperties.size();j<fl_size_j;j++){
-              value=grabCHFacetProperty(facet,vproperties[j],ftype);
-              ventries.back().back().back().push_back(value);
-            }
-          }
-        }
+    string header;
+    headers.clear();
+    if(ftype==json_ft){
+      //for json response, we want TRUE keywords as they would appear in aflowlib.out
+      for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
+        header=vproperties[i];
+        //add any processing here
+        headers.push_back(header);
       }
-      if(LDEBUG) {cerr << soliloquy << " created ventries" << endl;}
-
-      string header;
-      headers.clear();
-      if(ftype==json_ft){
-        //for json response, we want TRUE keywords as they would appear in aflowlib.out
-        for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
-          header=vproperties[i];
-          //add any processing here
-          headers.push_back(header);
-        }
-      } else {
-        //for text response, we decorate nicely by replacing _atom with _[/atom]
-        for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
-          header=vproperties[i];
-          //add any processing here before upper
-          header=aurostd::toupper(header);
-          //add any processing here after upper
-          headers.push_back(header);
-        }
-      }
-      if(LDEBUG) {cerr << soliloquy << " created headers" << endl;}
-      return ventries;
-    }
-
-    void ConvexHull::getPlainTextColumnSizes(const vector<string>& headers,const vector<vector<string> >& ventries,vector<uint>& sizes) const {
-      string soliloquy="ConvexHull::getPlainTextColumnSizes():";
-      for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
-        if(headers.size()!=ventries[i].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between headers and ventries");}
-      }
-      if(sizes.size()==0){  //initialize
-        sizes.resize(headers.size());
-        for(uint i=0,fl_size_i=headers.size();i<fl_size_i;i++){sizes[i]=headers[i].size();}
-      }
-      if(sizes.size()!=headers.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between sizes and headers");}
-      uint p_size;
-      for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
-        for(uint j=0,fl_size_j=ventries[i].size();j<fl_size_j;j++){
-          p_size=ventries[i][j].size();
-          sizes[j]=std::max(sizes[j],p_size);
-        }
+    } else {
+      //for text response, we decorate nicely by replacing _atom with _[/atom]
+      for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
+        header=vproperties[i];
+        //add any processing here before upper
+        header=aurostd::toupper(header);
+        //add any processing here after upper
+        headers.push_back(header);
       }
     }
+    if(LDEBUG) {cerr << soliloquy << " created headers" << endl;}
+    return ventries;
+  }
 
-    void ConvexHull::getPlainTextColumnSizesPoints(const vector<string>& headers,const vector<vector<string> >& ventries,vector<uint>& sizes) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::getPlainTextColumnSizesPoints():";
-      stringstream message;
-      sizes.clear();
-      getPlainTextColumnSizes(headers,ventries,sizes);
-      if(LDEBUG) {cerr << soliloquy << " sizes=" << sizes.size() << endl;}
-      if(LDEBUG) {cerr << soliloquy << " determined sizes" << endl;}
+  void ConvexHull::getPlainTextColumnSizes(const vector<string>& headers,const vector<vector<string> >& ventries,vector<uint>& sizes) const {
+    string soliloquy="ConvexHull::getPlainTextColumnSizes():";
+    for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
+      if(headers.size()!=ventries[i].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between headers and ventries");}
     }
-
-    void ConvexHull::getPlainTextColumnSizesFacets(const vector<string>& headers,const vector<vector<vector<vector<string> > > >& ventries,vector<uint>& sizes) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::getPlainTextColumnSizesFacets():";
-      stringstream message;
-      sizes.clear();
-      for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
-        for(uint j=0,fl_size_j=ventries[i].size();j<fl_size_j;j++){
-          getPlainTextColumnSizes(headers,ventries[i][j],sizes);
-        }
+    if(sizes.size()==0){  //initialize
+      sizes.resize(headers.size());
+      for(uint i=0,fl_size_i=headers.size();i<fl_size_i;i++){sizes[i]=headers[i].size();}
+    }
+    if(sizes.size()!=headers.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between sizes and headers");}
+    uint p_size;
+    for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
+      for(uint j=0,fl_size_j=ventries[i].size();j<fl_size_j;j++){
+        p_size=ventries[i][j].size();
+        sizes[j]=std::max(sizes[j],p_size);
       }
-      if(LDEBUG) {cerr << soliloquy << " sizes=" << sizes.size() << endl;}
-      if(LDEBUG) {cerr << soliloquy << " determined sizes" << endl;}
     }
+  }
 
-    string ConvexHull::getPlainTextTable(const vector<string>& headers,const vector<vector<string> >& ventries,const vector<uint>& sizes) const {
-      stringstream out_ss;
-      for(uint i=0,fl_size_i=headers.size();i<fl_size_i;i++){out_ss << aurostd::PaddedPOST(headers[i],sizes[i]+5);}
+  void ConvexHull::getPlainTextColumnSizesPoints(const vector<string>& headers,const vector<vector<string> >& ventries,vector<uint>& sizes) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getPlainTextColumnSizesPoints():";
+    stringstream message;
+    sizes.clear();
+    getPlainTextColumnSizes(headers,ventries,sizes);
+    if(LDEBUG) {cerr << soliloquy << " sizes=" << sizes.size() << endl;}
+    if(LDEBUG) {cerr << soliloquy << " determined sizes" << endl;}
+  }
+
+  void ConvexHull::getPlainTextColumnSizesFacets(const vector<string>& headers,const vector<vector<vector<vector<string> > > >& ventries,vector<uint>& sizes) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::getPlainTextColumnSizesFacets():";
+    stringstream message;
+    sizes.clear();
+    for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
+      for(uint j=0,fl_size_j=ventries[i].size();j<fl_size_j;j++){
+        getPlainTextColumnSizes(headers,ventries[i][j],sizes);
+      }
+    }
+    if(LDEBUG) {cerr << soliloquy << " sizes=" << sizes.size() << endl;}
+    if(LDEBUG) {cerr << soliloquy << " determined sizes" << endl;}
+  }
+
+  string ConvexHull::getPlainTextTable(const vector<string>& headers,const vector<vector<string> >& ventries,const vector<uint>& sizes) const {
+    stringstream out_ss;
+    for(uint i=0,fl_size_i=headers.size();i<fl_size_i;i++){out_ss << aurostd::PaddedPOST(headers[i],sizes[i]+5);}
+    out_ss << endl;
+    for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
+      for(uint j=0,fl_size_j=ventries[i].size();j<fl_size_j;j++){
+        out_ss << aurostd::PaddedPOST(ventries[i][j],sizes[j]+5);
+      }
       out_ss << endl;
-      for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
-        for(uint j=0,fl_size_j=ventries[i].size();j<fl_size_j;j++){
-          out_ss << aurostd::PaddedPOST(ventries[i][j],sizes[j]+5);
-        }
-        out_ss << endl;
-      }
-      return out_ss.str();
     }
+    return out_ss.str();
+  }
 
-    string ConvexHull::getJSONTable(const vector<string>& headers,const vector<vector<string> >& ventries) const {
+  string ConvexHull::getJSONTable(const vector<string>& headers,const vector<vector<string> >& ventries) const {
+    stringstream misc_ss;misc_ss.str("");
+    vector<string> _vout;_vout.clear();
+    vector<string> vout;vout.clear();
+    for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
+      for(uint j=0,fl_size_j=ventries[i].size();j<fl_size_j;j++){
+        misc_ss << aurostd::wrapString(headers[j],"\"") << ":" << ventries[i][j];
+        _vout.push_back(misc_ss.str()); misc_ss.str("");
+      }
+      vout.push_back(aurostd::wrapString(aurostd::joinWDelimiter(_vout,","),"{","}")); _vout.clear();
+    }
+    return aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"[","]");
+  }
+
+  void ConvexHull::writeText(filetype ftype) const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::writeText():";
+    stringstream message;
+
+    if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown mode");}
+
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+
+    if(ftype==txt_ft){message << "Starting plain text generator";}
+    else {message << "Starting JSON generator";}
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+
+    string properties_str_points=getPointsPropertyHeaderList(ftype);
+
+    bool terse_output=false;
+    string facet_properties_str="vertices_position";
+    if(!terse_output){facet_properties_str+=",vertices_compound";}
+    facet_properties_str+=",vertices_auid";
+    facet_properties_str+=",content";
+    facet_properties_str+=",normal";
+    facet_properties_str+=",offset";
+    facet_properties_str+=",centroid";
+    facet_properties_str+=",hypercollinear";
+    facet_properties_str+=",vertical";
+    facet_properties_str+=",artificial";
+
+    stringstream main_text_ss;main_text_ss.str("");
+    vector<string> vout;        //json only
+    vector<uint> column_sizes;  //plain text only
+
+    //POINTS DATA
+    vector<string> headers_points;
+    vector<vector<string> > ventries_points=getPointsData(properties_str_points,headers_points,ftype);
+    if(LDEBUG) {cerr << soliloquy << " got points data" << endl;}
+
+    //FACETS DATA
+    vector<string> headers_facets;
+    //first layer=nary, second=alloy, third=facet, fourth=properties
+    vector<vector<vector<vector<string> > > > ventries_facets=getFacetsData(facet_properties_str,headers_facets,ftype);
+    if(LDEBUG) {cerr << soliloquy << " got facets data" << endl;}
+
+    //HEADER
+    if(ftype==json_ft){vout.push_back("\"hull_data\":"+getJSONHeader());}
+    else {main_text_ss << getPlainTextHeader();}
+    if(LDEBUG) {cerr << soliloquy << " created doc header" << endl;}
+
+    //points data
+    if(ftype==json_ft){vout.push_back("\"points_data\":"+getJSONTable(headers_points,ventries_points));}
+    else {
+      getPlainTextColumnSizesPoints(headers_points,ventries_points,column_sizes);
+      main_text_ss << endl;
+      main_text_ss << "POINTS DATA" << endl;
+      main_text_ss << getPlainTextTable(headers_points,ventries_points,column_sizes);
+      main_text_ss << endl;
+    }
+    if(LDEBUG) {cerr << soliloquy << " added points data" << endl;}
+
+    //facets data
+    if(ftype==json_ft){
       stringstream misc_ss;misc_ss.str("");
-      vector<string> _vout;_vout.clear();
-      vector<string> vout;vout.clear();
-      for(uint i=0,fl_size_i=ventries.size();i<fl_size_i;i++){
-        for(uint j=0,fl_size_j=ventries[i].size();j<fl_size_j;j++){
-          misc_ss << aurostd::wrapString(headers[j],"\"") << ":" << ventries[i][j];
+      vector<string> _vout;
+      for(uint i=0,fl_size_i=ventries_facets.size();i<fl_size_i;i++){
+        for(uint j=0,fl_size_j=ventries_facets[i].size();j<fl_size_j;j++){
+          misc_ss << "\"" << i+2 << "-nary:";
+          if(m_velements.size()){misc_ss << aurostd::joinWDelimiter(alloyToElements(i+1,j),"-");}
+          else {misc_ss << j+1;}
+          misc_ss << "\":" << getJSONTable(headers_facets,ventries_facets[i][j]);
           _vout.push_back(misc_ss.str()); misc_ss.str("");
         }
-        vout.push_back(aurostd::wrapString(aurostd::joinWDelimiter(_vout,","),"{","}")); _vout.clear();
       }
-      return aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"[","]");
+      vout.push_back("\"facets_data\":"+aurostd::wrapString(aurostd::joinWDelimiter(_vout,","),"{","}"));
+    } else {
+      getPlainTextColumnSizesFacets(headers_facets,ventries_facets,column_sizes);
+      main_text_ss << endl;
+      for(uint i=0,fl_size_i=ventries_facets.size();i<fl_size_i;i++){
+        for(uint j=0,fl_size_j=ventries_facets[i].size();j<fl_size_j;j++){
+          main_text_ss << "FACETS DATA " << i+2 << "-nary ";
+          if(m_velements.size()){main_text_ss << "(" << aurostd::joinWDelimiter(alloyToElements(i+1,j),"-") << ")";}
+          else {main_text_ss << "(" << j+1 << ")";}
+          main_text_ss << endl;
+          main_text_ss << getPlainTextTable(headers_facets,ventries_facets[i][j],column_sizes);
+          if(!(i==ventries_facets.size()-1 && j==ventries_facets[i].size()-1)){main_text_ss << endl;}
+        }
+        if(i!=ventries_facets.size()-1){main_text_ss << endl;}
+      }
+    }
+    if(LDEBUG) {cerr << soliloquy << " added facets data" << endl;}
+
+    if(ftype==json_ft){main_text_ss << aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"{","}");}
+
+    string file_name="aflow_"+aurostd::joinWDelimiter(m_velements,"")+"_hull";
+    if(ftype==json_ft){file_name+=".json";}
+    else {file_name+=".txt";}
+
+    if(m_cflags.flag("CHULL::SCREEN_ONLY")){
+      *p_oss << main_text_ss.str();
+      return;
     }
 
-    void ConvexHull::writeText(filetype ftype) const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::writeText():";
-      stringstream message;
+    if(LDEBUG) {cerr << soliloquy << " now writting to file" << endl;}
+    string path = getPath(m_cflags, *p_FileMESSAGE, *p_oss);
+    string destination = path + file_name;
+    aurostd::stringstream2file(main_text_ss,destination);
+    if(!aurostd::FileExist(destination)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unable to write "+file_name+" to "+path);}
+    message << file_name << " was created successfully, see destination=" << path;
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+  }
 
-      if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown mode");}
+  void ConvexHull::writeWebApp() const {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="ConvexHull::writeWebApp():";
+    stringstream message;
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Starting web-specific JSONifier", m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-      if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
+    // initializing stringstreams to use
+    stringstream main_JSON_ss;
+    stringstream id_data_JSON_ss;
+    stringstream species_data_JSON_ss;
+    vector<string> points_data_JSON_vs;
+    vector<string> distances_data_JSON_vs;
+    stringstream distances_data_JSON_ss;
+    vector<string> stoich_comp_JSON_vs;
+    stringstream stoich_comp_JSON_ss;
+    vector<string> stoich_data_JSON_vs;
+    stringstream stoich_data_JSON_ss;
+    vector<string> stoich_points_data_JSON_vs;
+    vector<string> vertices_data_JSON_vs;
+    stringstream vertices_data_JSON_ss;
+    vector<string> hull_points_data_JSON_vs;
+    stringstream hull_points_data_JSON_ss;
+    vector<string> planes_data_JSON_vs;
+    vector<string> decomp_data_JSON_vs;
+    stringstream decomp_data_JSON_ss;
+    stringstream data_helper_ss;
+    stringstream num_ss;  // no precision, for properties calculated by AFLOW
 
-      if(ftype==txt_ft){message << "Starting plain text generator";}
-      else {message << "Starting JSON generator";}
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    // initializing some strings
+    string main_JSON_file;
+    string input;//,input_hyphened;
 
-      string properties_str_points=getPointsPropertyHeaderList(ftype);
+    // creating name of output file
+    input=aurostd::joinWDelimiter(m_velements,"");
+    //input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
+    main_JSON_file="aflow_"+input+"_hull_web.json"; //WS190620
+    species_data_JSON_ss << aurostd::joinWDelimiter(aurostd::wrapVecEntries(m_velements,"\""),",");
+    //for (uint i = 0; i < m_velements.size(); i++) {
+    //  main_JSON_file.append(m_velements[i]);
+    //  species_data_JSON_ss << "\"" << m_velements[i] << "\"";
+    //  if(i != m_velements.size() - 1) {
+    //    species_data_JSON_ss << ",";
+    //  }
+    //}
+    //input = main_JSON_file;
+    //main_JSON_file.append("_hull.json");
 
-      bool terse_output=false;
-      string facet_properties_str="vertices_position";
-      if(!terse_output){facet_properties_str+=",vertices_compound";}
-      facet_properties_str+=",vertices_auid";
-      facet_properties_str+=",content";
-      facet_properties_str+=",normal";
-      facet_properties_str+=",offset";
-      facet_properties_str+=",centroid";
-      facet_properties_str+=",hypercollinear";
-      facet_properties_str+=",vertical";
-      facet_properties_str+=",artificial";
+    // other initializations
+    bool stoich_groups_set;
+    xvector<double> coord;
+    xvector<double> normal;
 
-      stringstream main_text_ss;main_text_ss.str("");
-      vector<string> vout;        //json only
-      vector<uint> column_sizes;  //plain text only
+    //////////////////////////////////////////////////////////////////////////////
+    // START Stoichiometry group loop
+    //////////////////////////////////////////////////////////////////////////////
 
-      //POINTS DATA
-      vector<string> headers_points;
-      vector<vector<string> > ventries_points=getPointsData(properties_str_points,headers_points,ftype);
-      if(LDEBUG) {cerr << soliloquy << " got points data" << endl;}
+    uint i_point=AUROSTD_MAX_UINT,i_phase=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=m_coord_groups.size();i<fl_size_i;i++) {
+      stoich_groups_set = false;
 
-      //FACETS DATA
-      vector<string> headers_facets;
-      //first layer=nary, second=alloy, third=facet, fourth=properties
-      vector<vector<vector<vector<string> > > > ventries_facets=getFacetsData(facet_properties_str,headers_facets,ftype);
-      if(LDEBUG) {cerr << soliloquy << " got facets data" << endl;}
+      ////////////////////////////////////////////////////////////////////////////
+      // START Stoichiometry group points loop
+      ////////////////////////////////////////////////////////////////////////////
 
-      //HEADER
-      if(ftype==json_ft){vout.push_back("\"hull_data\":"+getJSONHeader());}
-      else {main_text_ss << getPlainTextHeader();}
-      if(LDEBUG) {cerr << soliloquy << " created doc header" << endl;}
-
-      //points data
-      if(ftype==json_ft){vout.push_back("\"points_data\":"+getJSONTable(headers_points,ventries_points));}
-      else {
-        getPlainTextColumnSizesPoints(headers_points,ventries_points,column_sizes);
-        main_text_ss << endl;
-        main_text_ss << "POINTS DATA" << endl;
-        main_text_ss << getPlainTextTable(headers_points,ventries_points,column_sizes);
-        main_text_ss << endl;
-      }
-      if(LDEBUG) {cerr << soliloquy << " added points data" << endl;}
-
-      //facets data
-      if(ftype==json_ft){
-        stringstream misc_ss;misc_ss.str("");
-        vector<string> _vout;
-        for(uint i=0,fl_size_i=ventries_facets.size();i<fl_size_i;i++){
-          for(uint j=0,fl_size_j=ventries_facets[i].size();j<fl_size_j;j++){
-            misc_ss << "\"" << i+2 << "-nary:";
-            if(m_velements.size()){misc_ss << aurostd::joinWDelimiter(alloyToElements(i+1,j),"-");}
-            else {misc_ss << j+1;}
-            misc_ss << "\":" << getJSONTable(headers_facets,ventries_facets[i][j]);
-            _vout.push_back(misc_ss.str()); misc_ss.str("");
-          }
-        }
-        vout.push_back("\"facets_data\":"+aurostd::wrapString(aurostd::joinWDelimiter(_vout,","),"{","}"));
-      } else {
-        getPlainTextColumnSizesFacets(headers_facets,ventries_facets,column_sizes);
-        main_text_ss << endl;
-        for(uint i=0,fl_size_i=ventries_facets.size();i<fl_size_i;i++){
-          for(uint j=0,fl_size_j=ventries_facets[i].size();j<fl_size_j;j++){
-            main_text_ss << "FACETS DATA " << i+2 << "-nary ";
-            if(m_velements.size()){main_text_ss << "(" << aurostd::joinWDelimiter(alloyToElements(i+1,j),"-") << ")";}
-            else {main_text_ss << "(" << j+1 << ")";}
-            main_text_ss << endl;
-            main_text_ss << getPlainTextTable(headers_facets,ventries_facets[i][j],column_sizes);
-            if(!(i==ventries_facets.size()-1 && j==ventries_facets[i].size()-1)){main_text_ss << endl;}
-          }
-          if(i!=ventries_facets.size()-1){main_text_ss << endl;}
-        }
-      }
-      if(LDEBUG) {cerr << soliloquy << " added facets data" << endl;}
-
-      if(ftype==json_ft){main_text_ss << aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"{","}");}
-
-      string file_name="aflow_"+aurostd::joinWDelimiter(m_velements,"")+"_hull";
-      if(ftype==json_ft){file_name+=".json";}
-      else {file_name+=".txt";}
-
-      if(m_cflags.flag("CHULL::SCREEN_ONLY")){
-        *p_oss << main_text_ss.str();
-        return;
-      }
-
-      if(LDEBUG) {cerr << soliloquy << " now writting to file" << endl;}
-      string path = getPath(m_cflags, *p_FileMESSAGE, *p_oss);
-      string destination = path + file_name;
-      aurostd::stringstream2file(main_text_ss,destination);
-      if(!aurostd::FileExist(destination)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unable to write "+file_name+" to "+path);}
-      message << file_name << " was created successfully, see destination=" << path;
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
-    }
-
-    void ConvexHull::writeWebApp() const {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      string soliloquy="ConvexHull::writeWebApp():";
-      stringstream message;
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Starting web-specific JSONifier", m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-
-      // initializing stringstreams to use
-      stringstream main_JSON_ss;
-      stringstream id_data_JSON_ss;
-      stringstream species_data_JSON_ss;
-      vector<string> points_data_JSON_vs;
-      vector<string> distances_data_JSON_vs;
-      stringstream distances_data_JSON_ss;
-      vector<string> stoich_comp_JSON_vs;
-      stringstream stoich_comp_JSON_ss;
-      vector<string> stoich_data_JSON_vs;
-      stringstream stoich_data_JSON_ss;
-      vector<string> stoich_points_data_JSON_vs;
-      vector<string> vertices_data_JSON_vs;
-      stringstream vertices_data_JSON_ss;
-      vector<string> hull_points_data_JSON_vs;
-      stringstream hull_points_data_JSON_ss;
-      vector<string> planes_data_JSON_vs;
-      vector<string> decomp_data_JSON_vs;
-      stringstream decomp_data_JSON_ss;
-      stringstream data_helper_ss;
-      stringstream num_ss;  // no precision, for properties calculated by AFLOW
-
-      // initializing some strings
-      string main_JSON_file;
-      string input;//,input_hyphened;
-
-      // creating name of output file
-      input=aurostd::joinWDelimiter(m_velements,"");
-      //input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
-      main_JSON_file="aflow_"+input+"_hull_web.json"; //WS190620
-      species_data_JSON_ss << aurostd::joinWDelimiter(aurostd::wrapVecEntries(m_velements,"\""),",");
-      //for (uint i = 0; i < m_velements.size(); i++) {
-      //  main_JSON_file.append(m_velements[i]);
-      //  species_data_JSON_ss << "\"" << m_velements[i] << "\"";
-      //  if(i != m_velements.size() - 1) {
-      //    species_data_JSON_ss << ",";
-      //  }
-      //}
-      //input = main_JSON_file;
-      //main_JSON_file.append("_hull.json");
-
-      // other initializations
-      bool stoich_groups_set;
-      xvector<double> coord;
-      xvector<double> normal;
-
-      //////////////////////////////////////////////////////////////////////////////
-      // START Stoichiometry group loop
-      //////////////////////////////////////////////////////////////////////////////
-
-      uint i_point=AUROSTD_MAX_UINT,i_phase=AUROSTD_MAX_UINT;
-      for(uint i=0,fl_size_i=m_coord_groups.size();i<fl_size_i;i++) {
-        stoich_groups_set = false;
-
-        ////////////////////////////////////////////////////////////////////////////
-        // START Stoichiometry group points loop
-        ////////////////////////////////////////////////////////////////////////////
-
-        for(uint j=0,fl_size_j=m_coord_groups[i].m_points.size();j<fl_size_j;j++) {
-          //////////////////////////////////////////////////////////////////////////
-          // START Entries filter
-          //////////////////////////////////////////////////////////////////////////
-          i_point=m_coord_groups[i].m_points[j];
-          if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-          const ChullPoint& point = m_points[i_point];
-          const aflowlib::_aflowlib_entry& entry = point.m_entry;
-
-          //////////////////////////////////////////////////////////////////////////
-          // END Entries filter
-          //////////////////////////////////////////////////////////////////////////
-
-          if(!stoich_groups_set) {
-            ////////////////////////////////////////////////////////////////////////
-            // START Stoichiometry group properties output
-            ////////////////////////////////////////////////////////////////////////
-
-            stoich_data_JSON_ss << "{";
-            // get stoich id and stoichiometries at the same time
-            // id_data_JSON_ss will take care of id
-            for(int j=point.m_elements_present.lrows;j<=point.m_elements_present.urows;j++) {
-              if(point.m_elements_present[j]==1){
-                stoich_comp_JSON_ss << "{";
-                stoich_comp_JSON_ss << "\"element\":\"" << m_velements[j-point.m_elements_present.lrows] << "\",";
-                id_data_JSON_ss << m_velements[j-point.m_elements_present.lrows] << aurostd::utype2string(point.s_coords[j],CHULL_PRECISION); // make id out of nonzero components
-                stoich_comp_JSON_ss << "\"stoichiometry\":" << aurostd::utype2string(point.s_coords[j],CHULL_PRECISION) << "}";
-                stoich_comp_JSON_vs.push_back(stoich_comp_JSON_ss.str());
-                stoich_comp_JSON_ss.str("");
-              }
-            }
-            stoich_data_JSON_ss << "\"stoichiometries\":[" << aurostd::joinWDelimiter(stoich_comp_JSON_vs, ',') << "],";
-            stoich_data_JSON_ss << "\"id\":\"" << id_data_JSON_ss.str() << "\",";
-            id_data_JSON_ss.str("");
-            // get is_hull
-            stoich_data_JSON_ss << "\"isGroundState\":" << (m_coord_groups[i].m_is_on_hull?"true":"false") << ",";
-            // get endPoint
-            stoich_data_JSON_ss << "\"endPoint\":" << (m_coord_groups[i].m_i_nary==0?"true":"false") << ",";
-            // get decomposition information for all phases
-            const vector<uint>& decomposition_phases = m_coord_groups[i].m_decomp_phases;
-            const xvector<double>& decomposition_coefficients = m_coord_groups[i].m_decomp_coefs;
-
-            ////////////////////////////////////////////////////////////////////////
-            // START Gathering info about decomposition reaction (equilibrium phase
-            // stuff handled by javascript with FACES)
-            ////////////////////////////////////////////////////////////////////////
-
-            if(!decomposition_phases.empty() && scalar_product(decomposition_coefficients, decomposition_coefficients) >= ZERO_TOL) {
-              if(decomposition_phases.size() != (uint)decomposition_coefficients.rows-1) {
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Size of decomposition phases != size of decomposition coefficients for coordgroup["+aurostd::utype2string(i)+"]");
-              }
-              for(uint k=0,fl_size_k=decomposition_phases.size();k<fl_size_k;k++) {
-                if(abs(decomposition_coefficients[decomposition_coefficients.lrows+k+1]) < ZERO_TOL) {continue;}
-                decomp_data_JSON_ss << "{";
-                i_phase=artificialMap(decomposition_phases[k]);
-                const ChullPoint& dc_phase=m_points[i_phase];
-                if(!dc_phase.m_has_entry) {
-                  // we need to adjust for missing unaries
-                  // look for coords
-                  decomp_data_JSON_ss << "\"entry\":\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(dc_phase),"") << "\","; //unary, so "" delimiter doesn't play a role
-                } else {
-                  const aflowlib::_aflowlib_entry& equation_entry = dc_phase.m_entry;
-                  decomp_data_JSON_ss << "\"entry\":\"" << equation_entry.auid << "\",";
-                }
-                decomp_data_JSON_ss << "\"coefficient\":" << aurostd::utype2string(decomposition_coefficients[decomposition_coefficients.lrows+k+1],CHULL_PRECISION);
-                decomp_data_JSON_ss << "}";
-                decomp_data_JSON_vs.push_back(decomp_data_JSON_ss.str());
-                decomp_data_JSON_ss.str("");
-              }
-            }
-            // print even if empty
-            stoich_data_JSON_ss << "\"decomposition_phases\":[" << aurostd::joinWDelimiter(decomp_data_JSON_vs, ',') << "],";
-            decomp_data_JSON_vs.clear();
-            // filling in "points" is last
-            stoich_groups_set = true;
-
-            ////////////////////////////////////////////////////////////////////////
-            // END Gathering info about decomposition reaction
-            ////////////////////////////////////////////////////////////////////////
-
-            ////////////////////////////////////////////////////////////////////////
-            // END Stoichiometry group properties output
-            ////////////////////////////////////////////////////////////////////////
-          }
-
-          //////////////////////////////////////////////////////////////////////////
-          // START Entry properties output
-          //////////////////////////////////////////////////////////////////////////
-
-          if(point.m_has_entry) {
-            data_helper_ss << "\"" << entry.auid << "\"";
-            stoich_points_data_JSON_vs.push_back(data_helper_ss.str());
-            data_helper_ss.str("");
-            // remove artificial points from distances
-            distances_data_JSON_ss << "{";
-            distances_data_JSON_ss << "\"auid\":";
-          }
-          // get points, distances, vertices
-          if(point.m_is_g_state) {
-            hull_points_data_JSON_ss << "{";
-            hull_points_data_JSON_ss << "\"auid\":";  // why not entry? or all auid? why two different names?
-          }
-          if(!point.m_has_entry) {
-            data_helper_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\"";  //unary, so "" delimiter doesn't play a role
-            if(point.m_is_g_state) {hull_points_data_JSON_ss << data_helper_ss.str();}
-            data_helper_ss.str(""); //WS190731 - patching quaternary hull writer issues
-          } else {
-            data_helper_ss << "\"" << entry.auid << "\"";
-            points_data_JSON_vs.push_back(data_helper_ss.str());
-            distances_data_JSON_ss << data_helper_ss.str();
-            if(point.m_is_g_state) {hull_points_data_JSON_ss << data_helper_ss.str();}
-            data_helper_ss.str("");
-            // wrap up distances data
-            distances_data_JSON_ss << ",";
-            distances_data_JSON_ss << "\"distanceToHull\":" << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
-            // ADDED BY EGOSS
-            //
-            // Changed distances_data to be points data. I believe 
-            // points_data_JSON may be removed and replaced with this.
-            //
-            distances_data_JSON_ss << ",";
-            distances_data_JSON_ss << "\"compound\": \""<< entry.compound << "\"";
-            distances_data_JSON_ss << ",";
-            distances_data_JSON_ss << "\"composition\":[";
-            // explicit dimensions
-            const xvector<double>& coord = point.s_coords;
-            distances_data_JSON_ss << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(coord,CHULL_PRECISION,false),",");
-            //[CO190423 - OBSOLETE]for(int k=coord.lrows;k<=coord.urows;k++) {
-            //[CO190423 - OBSOLETE] distances_data_JSON_ss << aurostd::utype2string(coord(k),CHULL_PRECISION);  // is 3 digits okay? I normally do 15
-            //[CO190423 - OBSOLETE] if(k!=coord.urows){distances_data_JSON_ss << ",";}
-            //[CO190423 - OBSOLETE]}
-            distances_data_JSON_ss << "],";
-            // fix for unaries, set to 0
-            if(!point.m_has_entry) {  // these are only hull_members, so they only happen to
-              // endpoints
-              // enthalpy of formation, row 4
-              // no need for precision for next few columns, leave it same way as
-              // received from AFLOW
-              distances_data_JSON_ss << "\"enthalpyFormationAtom\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-              distances_data_JSON_ss << ",";
-              // entropic temperature, row 5
-              distances_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-              //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
-              distances_data_JSON_ss << ",";
-              distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-              distances_data_JSON_ss << ",";
-              distances_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-              //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
-            } else {
-              // enthalpy of formation, row 4
-              // no need for precision for next few columns, leave it same way as
-              // received from AFLOW
-              num_ss << chull::H_f_atom(entry, _std_);
-              distances_data_JSON_ss << "\"enthalpyFormationAtom\":" << num_ss.str();
-              distances_data_JSON_ss << ",";
-              num_ss.str("");
-              // entropic temperature, row 5
-              num_ss << chull::T_S(entry);
-              distances_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
-              num_ss.str("");
-
-              //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
-              distances_data_JSON_ss << ",";
-
-              num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
-              distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
-              distances_data_JSON_ss << ",";
-              num_ss.str("");
-
-              num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
-              distances_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
-              num_ss.str("");
-              //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
-            }
-            distances_data_JSON_ss << "}";
-            distances_data_JSON_vs.push_back(distances_data_JSON_ss.str());
-            distances_data_JSON_ss.str("");
-          }
-          // distances
-          // vertices
-          if(point.m_is_g_state) {
-            hull_points_data_JSON_ss << ",";
-            hull_points_data_JSON_ss << "\"compound\": \""<< entry.compound << "\"";
-            hull_points_data_JSON_ss << ",";
-            hull_points_data_JSON_ss << "\"composition\":[";
-            // explicit dimensions
-            const xvector<double>& coord = point.s_coords;
-            hull_points_data_JSON_ss << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(coord,CHULL_PRECISION,false),",");
-            //[CO190423 - OBSOLETE]for(int k=coord.lrows;k<=coord.urows;k++) {
-            //[CO190423 - OBSOLETE]  hull_points_data_JSON_ss << aurostd::utype2string(coord(k),CHULL_PRECISION);  // is 3 digits okay? I normally do 15
-            //[CO190423 - OBSOLETE]  if(k!=coord.urows){hull_points_data_JSON_ss << ",";}
-            //[CO190423 - OBSOLETE]}
-            // implicit dimension
-            hull_points_data_JSON_ss << "],";
-            // fix for unaries, set to 0
-            if(!point.m_has_entry) {  // these are only hull_members, so they only happen to
-              // endpoints
-              // enthalpy of formation, row 4
-              // no need for precision for next few columns, leave it same way as
-              // received from AFLOW
-              hull_points_data_JSON_ss << "\"enthalpyFormationAtom\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-              hull_points_data_JSON_ss << ",";
-              // entropic temperature, row 5
-              hull_points_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-              //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
-              hull_points_data_JSON_ss << ",";
-              hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-              hull_points_data_JSON_ss << ",";
-              hull_points_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-              //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
-            } else {
-              // enthalpy of formation, row 4
-              // no need for precision for next few columns, leave it same way as
-              // received from AFLOW
-              num_ss << chull::H_f_atom(entry, _std_);
-              hull_points_data_JSON_ss << "\"enthalpyFormationAtom\":" << num_ss.str();
-              hull_points_data_JSON_ss << ",";
-              num_ss.str("");
-              // entropic temperature, row 5
-              num_ss << chull::T_S(entry);
-              hull_points_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
-              num_ss.str("");
-
-              //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
-              hull_points_data_JSON_ss << ",";
-
-              num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
-              hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
-              hull_points_data_JSON_ss << ",";
-              num_ss.str("");
-
-              num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
-              hull_points_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
-              num_ss.str("");
-              //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
-            }
-            hull_points_data_JSON_ss << "}";
-            hull_points_data_JSON_vs.push_back(hull_points_data_JSON_ss.str());
-            hull_points_data_JSON_ss.str("");
-          }
-
-          //////////////////////////////////////////////////////////////////////////
-          // END Entry properties output
-          //////////////////////////////////////////////////////////////////////////
-        }
-        if(stoich_groups_set) {
-          stoich_data_JSON_ss << "\"points\":[" << aurostd::joinWDelimiter(stoich_points_data_JSON_vs, ',') << "]";
-          stoich_data_JSON_ss << "}";
-          stoich_data_JSON_vs.push_back(stoich_data_JSON_ss.str());
-          stoich_points_data_JSON_vs.clear();
-          stoich_data_JSON_ss.str("");
-        }
-
-        ////////////////////////////////////////////////////////////////////////////
-        // END Stoichiometry group points loop
-        ////////////////////////////////////////////////////////////////////////////
-      }
-
-      //////////////////////////////////////////////////////////////////////////////
-      // END Stoichiometry group loop
-      //////////////////////////////////////////////////////////////////////////////
-
-      //////////////////////////////////////////////////////////////////////////////
-      // START Grabbing planes data
-      //////////////////////////////////////////////////////////////////////////////
-      // index specific, so we can't loop through stoichGroups
-
-      vector<uint> vertices=getHullPoints(false); //moved up for faces
-      if(LDEBUG) {cerr << soliloquy << " vertices=" << aurostd::joinWDelimiter(vertices,",") << endl;}
-
-      vector<uint> v_ch_indices,v_vertices_indices;
-      bool found=false;
-      for(uint i=0,fl_size_i=m_facets.size();i<fl_size_i;i++) {
-        //const xvector<double> normal = m_facets[i].m_normal;
-        if(!(/*m_facets[i].m_hypercollinear||*/m_facets[i].m_is_vertical||m_facets[i].m_is_artificial)&&m_facets[i].m_dim==m_dim){  //keep hypercollinear, might create small gaps in visualization otherwise //CO190423 - eric needs three-dimensional only for 3D
-          v_ch_indices=m_facets[i].getCHIndices();
-          if(LDEBUG) {cerr << soliloquy << " v_ch_indices=" << aurostd::joinWDelimiter(v_ch_indices,",") << endl;}
-          v_vertices_indices.clear();
-          for(uint j=0,fl_size_j=v_ch_indices.size();j<fl_size_j;j++){
-            found=false;
-            for(uint k=0,fl_size_k=vertices.size();k<fl_size_k&&!found;k++){
-              if(v_ch_indices[j]==vertices[k]){
-                v_vertices_indices.push_back(k);
-                found=true;
-              }
-            }
-            if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ChullPoint["+aurostd::utype2string(v_ch_indices[j])+"] could not be found in getHullPoints()",_INDEX_ILLEGAL_);}
-          }
-          //data_helper_ss << "[" << aurostd::joinWDelimiter(m_facets[i].getCHIndices(), ',') << "]";
-          data_helper_ss << "[" << aurostd::joinWDelimiter(v_vertices_indices, ',') << "]"; //CO190423 - eric needs references to vertices, not points
-          planes_data_JSON_vs.push_back(data_helper_ss.str());
-          data_helper_ss.str("");
-        }
-      }
-      //////////////////////////////////////////////////////////////////////////////
-      // END Grabbing planes data
-      //////////////////////////////////////////////////////////////////////////////
-
-      //////////////////////////////////////////////////////////////////////////////
-      // START Grabbing vertex data (for 3-D visualization of hull)
-      //////////////////////////////////////////////////////////////////////////////
-      // index specific, so we can't loop through stoichGroups
-
-      //[CO190423 - moving up for faces]vector<uint> vertices=getHullPoints(false);
-      for(uint i=0,fl_size_i=vertices.size();i<fl_size_i;i++) {
-        vertices_data_JSON_ss << "{";
-        vertices_data_JSON_ss << "\"auid\":";  // why not entry? or all auid? why two different names?
-
-        const ChullPoint& point = m_points[vertices[i]];
+      for(uint j=0,fl_size_j=m_coord_groups[i].m_points.size();j<fl_size_j;j++) {
+        //////////////////////////////////////////////////////////////////////////
+        // START Entries filter
+        //////////////////////////////////////////////////////////////////////////
+        i_point=m_coord_groups[i].m_points[j];
+        if(!m_points[i_point].m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+        const ChullPoint& point = m_points[i_point];
         const aflowlib::_aflowlib_entry& entry = point.m_entry;
-        const xvector<double>& coord = point.s_coords;
 
-        if(!point.m_has_entry) {
-          vertices_data_JSON_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\""; //unary, so "" delimiter doesn't play a role
-        } else {vertices_data_JSON_ss << "\"" << entry.auid << "\"";}
+        //////////////////////////////////////////////////////////////////////////
+        // END Entries filter
+        //////////////////////////////////////////////////////////////////////////
 
-        vertices_data_JSON_ss << ",";
-        vertices_data_JSON_ss << "\"compound\": \"" << entry.compound << "\","; 
-        vertices_data_JSON_ss << "\"composition\":[";
-        // explicit dimensions
-        vertices_data_JSON_ss << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(coord,CHULL_PRECISION,false),",");
-        //[CO190423 - OBSOLETE]for(int k=coord.lrows;k<=coord.urows;k++) {
-        //[CO190423 - OBSOLETE] vertices_data_JSON_ss << aurostd::utype2string(coord(k),CHULL_PRECISION); // is 3 digits okay? I normally do 15
-        //[CO190423 - OBSOLETE] if(k!=coord.rows-1){vertices_data_JSON_ss << ",";}
-        //[CO190423 - OBSOLETE]}
-        vertices_data_JSON_ss << "],";
-        // fix for unaries, set to 0
-        if(!point.m_has_entry) {  // these are only hull_members, so they only happen to
-          // endpoints
-          // enthalpy of formation, row 4
-          // no need for precision for next few columns, leave it same way as
-          // received from AFLOW
-          vertices_data_JSON_ss << "\"enthalpyFormationAtom\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-          vertices_data_JSON_ss << ",";
-          // entropic temperature, row 5
-          vertices_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
-          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
-          vertices_data_JSON_ss << ",";
-          vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-          vertices_data_JSON_ss << ",";
-          vertices_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
-          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
-        } else {
-          // enthalpy of formation, row 4
-          // no need for precision for next few columns, leave it same way as
-          // received from AFLOW
-          num_ss << chull::H_f_atom(entry, _std_);
-          vertices_data_JSON_ss << "\"enthalpyFormationAtom\":" << num_ss.str();
-          vertices_data_JSON_ss << ",";
-          num_ss.str("");
-          // entropic temperature, row 5
-          num_ss << chull::T_S(entry);
-          vertices_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
-          num_ss.str("");
+        if(!stoich_groups_set) {
+          ////////////////////////////////////////////////////////////////////////
+          // START Stoichiometry group properties output
+          ////////////////////////////////////////////////////////////////////////
 
-          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
-          vertices_data_JSON_ss << ",";
+          stoich_data_JSON_ss << "{";
+          // get stoich id and stoichiometries at the same time
+          // id_data_JSON_ss will take care of id
+          for(int j=point.m_elements_present.lrows;j<=point.m_elements_present.urows;j++) {
+            if(point.m_elements_present[j]==1){
+              stoich_comp_JSON_ss << "{";
+              stoich_comp_JSON_ss << "\"element\":\"" << m_velements[j-point.m_elements_present.lrows] << "\",";
+              id_data_JSON_ss << m_velements[j-point.m_elements_present.lrows] << aurostd::utype2string(point.s_coords[j],CHULL_PRECISION); // make id out of nonzero components
+              stoich_comp_JSON_ss << "\"stoichiometry\":" << aurostd::utype2string(point.s_coords[j],CHULL_PRECISION) << "}";
+              stoich_comp_JSON_vs.push_back(stoich_comp_JSON_ss.str());
+              stoich_comp_JSON_ss.str("");
+            }
+          }
+          stoich_data_JSON_ss << "\"stoichiometries\":[" << aurostd::joinWDelimiter(stoich_comp_JSON_vs, ',') << "],";
+          stoich_data_JSON_ss << "\"id\":\"" << id_data_JSON_ss.str() << "\",";
+          id_data_JSON_ss.str("");
+          // get is_hull
+          stoich_data_JSON_ss << "\"isGroundState\":" << (m_coord_groups[i].m_is_on_hull?"true":"false") << ",";
+          // get endPoint
+          stoich_data_JSON_ss << "\"endPoint\":" << (m_coord_groups[i].m_i_nary==0?"true":"false") << ",";
+          // get decomposition information for all phases
+          const vector<uint>& decomposition_phases = m_coord_groups[i].m_decomp_phases;
+          const xvector<double>& decomposition_coefficients = m_coord_groups[i].m_decomp_coefs;
 
-          num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
-          vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
-          vertices_data_JSON_ss << ",";
-          num_ss.str("");
+          ////////////////////////////////////////////////////////////////////////
+          // START Gathering info about decomposition reaction (equilibrium phase
+          // stuff handled by javascript with FACES)
+          ////////////////////////////////////////////////////////////////////////
 
-          num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
-          vertices_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
-          num_ss.str("");
-          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
+          if(!decomposition_phases.empty() && scalar_product(decomposition_coefficients, decomposition_coefficients) >= ZERO_TOL) {
+            if(decomposition_phases.size() != (uint)decomposition_coefficients.rows-1) {
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Size of decomposition phases != size of decomposition coefficients for coordgroup["+aurostd::utype2string(i)+"]");
+            }
+            for(uint k=0,fl_size_k=decomposition_phases.size();k<fl_size_k;k++) {
+              if(abs(decomposition_coefficients[decomposition_coefficients.lrows+k+1]) < ZERO_TOL) {continue;}
+              decomp_data_JSON_ss << "{";
+              i_phase=artificialMap(decomposition_phases[k]);
+              const ChullPoint& dc_phase=m_points[i_phase];
+              if(!dc_phase.m_has_entry) {
+                // we need to adjust for missing unaries
+                // look for coords
+                decomp_data_JSON_ss << "\"entry\":\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(dc_phase),"") << "\","; //unary, so "" delimiter doesn't play a role
+              } else {
+                const aflowlib::_aflowlib_entry& equation_entry = dc_phase.m_entry;
+                decomp_data_JSON_ss << "\"entry\":\"" << equation_entry.auid << "\",";
+              }
+              decomp_data_JSON_ss << "\"coefficient\":" << aurostd::utype2string(decomposition_coefficients[decomposition_coefficients.lrows+k+1],CHULL_PRECISION);
+              decomp_data_JSON_ss << "}";
+              decomp_data_JSON_vs.push_back(decomp_data_JSON_ss.str());
+              decomp_data_JSON_ss.str("");
+            }
+          }
+          // print even if empty
+          stoich_data_JSON_ss << "\"decomposition_phases\":[" << aurostd::joinWDelimiter(decomp_data_JSON_vs, ',') << "],";
+          decomp_data_JSON_vs.clear();
+          // filling in "points" is last
+          stoich_groups_set = true;
+
+          ////////////////////////////////////////////////////////////////////////
+          // END Gathering info about decomposition reaction
+          ////////////////////////////////////////////////////////////////////////
+
+          ////////////////////////////////////////////////////////////////////////
+          // END Stoichiometry group properties output
+          ////////////////////////////////////////////////////////////////////////
         }
-        vertices_data_JSON_ss << "}";
-        vertices_data_JSON_vs.push_back(vertices_data_JSON_ss.str());
-        vertices_data_JSON_ss.str("");
+
+        //////////////////////////////////////////////////////////////////////////
+        // START Entry properties output
+        //////////////////////////////////////////////////////////////////////////
+
+        if(point.m_has_entry) {
+          data_helper_ss << "\"" << entry.auid << "\"";
+          stoich_points_data_JSON_vs.push_back(data_helper_ss.str());
+          data_helper_ss.str("");
+          // remove artificial points from distances
+          distances_data_JSON_ss << "{";
+          distances_data_JSON_ss << "\"auid\":";
+        }
+        // get points, distances, vertices
+        if(point.m_is_g_state) {
+          hull_points_data_JSON_ss << "{";
+          hull_points_data_JSON_ss << "\"auid\":";  // why not entry? or all auid? why two different names?
+        }
+        if(!point.m_has_entry) {
+          data_helper_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\"";  //unary, so "" delimiter doesn't play a role
+          if(point.m_is_g_state) {hull_points_data_JSON_ss << data_helper_ss.str();}
+          data_helper_ss.str(""); //WS190731 - patching quaternary hull writer issues
+        } else {
+          data_helper_ss << "\"" << entry.auid << "\"";
+          points_data_JSON_vs.push_back(data_helper_ss.str());
+          distances_data_JSON_ss << data_helper_ss.str();
+          if(point.m_is_g_state) {hull_points_data_JSON_ss << data_helper_ss.str();}
+          data_helper_ss.str("");
+          // wrap up distances data
+          distances_data_JSON_ss << ",";
+          distances_data_JSON_ss << "\"distanceToHull\":" << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
+          // ADDED BY EGOSS
+          //
+          // Changed distances_data to be points data. I believe 
+          // points_data_JSON may be removed and replaced with this.
+          //
+          distances_data_JSON_ss << ",";
+          distances_data_JSON_ss << "\"compound\": \""<< entry.compound << "\"";
+          distances_data_JSON_ss << ",";
+          distances_data_JSON_ss << "\"composition\":[";
+          // explicit dimensions
+          const xvector<double>& coord = point.s_coords;
+          distances_data_JSON_ss << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(coord,CHULL_PRECISION,false),",");
+          //[CO190423 - OBSOLETE]for(int k=coord.lrows;k<=coord.urows;k++) {
+          //[CO190423 - OBSOLETE] distances_data_JSON_ss << aurostd::utype2string(coord(k),CHULL_PRECISION);  // is 3 digits okay? I normally do 15
+          //[CO190423 - OBSOLETE] if(k!=coord.urows){distances_data_JSON_ss << ",";}
+          //[CO190423 - OBSOLETE]}
+          distances_data_JSON_ss << "],";
+          // fix for unaries, set to 0
+          if(!point.m_has_entry) {  // these are only hull_members, so they only happen to
+            // endpoints
+            // enthalpy of formation, row 4
+            // no need for precision for next few columns, leave it same way as
+            // received from AFLOW
+            distances_data_JSON_ss << "\"enthalpyFormationAtom\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+            distances_data_JSON_ss << ",";
+            // entropic temperature, row 5
+            distances_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+            distances_data_JSON_ss << ",";
+            distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+            distances_data_JSON_ss << ",";
+            distances_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
+          } else {
+            // enthalpy of formation, row 4
+            // no need for precision for next few columns, leave it same way as
+            // received from AFLOW
+            num_ss << chull::H_f_atom(entry, _std_);
+            distances_data_JSON_ss << "\"enthalpyFormationAtom\":" << num_ss.str();
+            distances_data_JSON_ss << ",";
+            num_ss.str("");
+            // entropic temperature, row 5
+            num_ss << chull::T_S(entry);
+            distances_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
+            num_ss.str("");
+
+            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
+            distances_data_JSON_ss << ",";
+
+            num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+            distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+            distances_data_JSON_ss << ",";
+            num_ss.str("");
+
+            num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
+            distances_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+            num_ss.str("");
+            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
+          }
+          distances_data_JSON_ss << "}";
+          distances_data_JSON_vs.push_back(distances_data_JSON_ss.str());
+          distances_data_JSON_ss.str("");
+        }
+        // distances
+        // vertices
+        if(point.m_is_g_state) {
+          hull_points_data_JSON_ss << ",";
+          hull_points_data_JSON_ss << "\"compound\": \""<< entry.compound << "\"";
+          hull_points_data_JSON_ss << ",";
+          hull_points_data_JSON_ss << "\"composition\":[";
+          // explicit dimensions
+          const xvector<double>& coord = point.s_coords;
+          hull_points_data_JSON_ss << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(coord,CHULL_PRECISION,false),",");
+          //[CO190423 - OBSOLETE]for(int k=coord.lrows;k<=coord.urows;k++) {
+          //[CO190423 - OBSOLETE]  hull_points_data_JSON_ss << aurostd::utype2string(coord(k),CHULL_PRECISION);  // is 3 digits okay? I normally do 15
+          //[CO190423 - OBSOLETE]  if(k!=coord.urows){hull_points_data_JSON_ss << ",";}
+          //[CO190423 - OBSOLETE]}
+          // implicit dimension
+          hull_points_data_JSON_ss << "],";
+          // fix for unaries, set to 0
+          if(!point.m_has_entry) {  // these are only hull_members, so they only happen to
+            // endpoints
+            // enthalpy of formation, row 4
+            // no need for precision for next few columns, leave it same way as
+            // received from AFLOW
+            hull_points_data_JSON_ss << "\"enthalpyFormationAtom\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+            hull_points_data_JSON_ss << ",";
+            // entropic temperature, row 5
+            hull_points_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+            hull_points_data_JSON_ss << ",";
+            hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+            hull_points_data_JSON_ss << ",";
+            hull_points_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
+          } else {
+            // enthalpy of formation, row 4
+            // no need for precision for next few columns, leave it same way as
+            // received from AFLOW
+            num_ss << chull::H_f_atom(entry, _std_);
+            hull_points_data_JSON_ss << "\"enthalpyFormationAtom\":" << num_ss.str();
+            hull_points_data_JSON_ss << ",";
+            num_ss.str("");
+            // entropic temperature, row 5
+            num_ss << chull::T_S(entry);
+            hull_points_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
+            num_ss.str("");
+
+            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+            hull_points_data_JSON_ss << ",";
+
+            num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+            hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+            hull_points_data_JSON_ss << ",";
+            num_ss.str("");
+
+            num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
+            hull_points_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+            num_ss.str("");
+            //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
+          }
+          hull_points_data_JSON_ss << "}";
+          hull_points_data_JSON_vs.push_back(hull_points_data_JSON_ss.str());
+          hull_points_data_JSON_ss.str("");
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+        // END Entry properties output
+        //////////////////////////////////////////////////////////////////////////
       }
-      //////////////////////////////////////////////////////////////////////////////
-      // END Grabbing vertex data
-      //////////////////////////////////////////////////////////////////////////////
-
-      //////////////////////////////////////////////////////////////////////////////
-      // START Output amalgamation and writing
-      //////////////////////////////////////////////////////////////////////////////
-
-      main_JSON_ss << "{";
-      main_JSON_ss << "\"name\":\"" << input << "\","; //input_hyphened
-      main_JSON_ss << "\"species\":[" << species_data_JSON_ss.str() << "],";
-      species_data_JSON_ss.str("");
-      // CHANGE BY EGOSS 
-      // replaced points_data_JSON_vs with distance_data_JSON_vs
-      //
-      // OLD
-      //main_JSON_ss << "\"points\":[" << aurostd::joinWDelimiter(points_data_JSON_vs, ',')
-      //             << "],";
-      //points_data_JSON_vs.clear();
-      main_JSON_ss << "\"points\":[" << aurostd::joinWDelimiter(distances_data_JSON_vs, ',') << "],";
-      distances_data_JSON_vs.clear();
-      main_JSON_ss << "\"groundStates\":[" << aurostd::joinWDelimiter(hull_points_data_JSON_vs, ',') << "],";
-      hull_points_data_JSON_vs.clear();
-      main_JSON_ss << "\"vertices\":[" << aurostd::joinWDelimiter(vertices_data_JSON_vs, ',') << "],";
-      vertices_data_JSON_vs.clear();
-      // CHANGE BY EGOSS
-      // distanceToHull is removed. Now distances are contained within the entries 
-      // of points
-      //
-      //main_JSON_ss << "\"distanceToHull\":["
-      //             << aurostd::joinWDelimiter(distances_data_JSON_vs, ',') << "],";
-      //distances_data_JSON_vs.clear();
-
-      // CHANGE BY EGOSS
-      // At this time I do not require stoichiometryGroups for the visualization. 
-      // It should be hidden behind a flag for now.
-
-      if(false) {
-        main_JSON_ss << "\"stoichiometryGroups\":[" << aurostd::joinWDelimiter(stoich_data_JSON_vs, ',') << "],";
-        stoich_data_JSON_vs.clear();
+      if(stoich_groups_set) {
+        stoich_data_JSON_ss << "\"points\":[" << aurostd::joinWDelimiter(stoich_points_data_JSON_vs, ',') << "]";
+        stoich_data_JSON_ss << "}";
+        stoich_data_JSON_vs.push_back(stoich_data_JSON_ss.str());
+        stoich_points_data_JSON_vs.clear();
+        stoich_data_JSON_ss.str("");
       }
 
-      main_JSON_ss << "\"faces\":[" << aurostd::joinWDelimiter(planes_data_JSON_vs, ',') << "]";
-      planes_data_JSON_vs.clear();  // no comma
-      main_JSON_ss << "}";
+      ////////////////////////////////////////////////////////////////////////////
+      // END Stoichiometry group points loop
+      ////////////////////////////////////////////////////////////////////////////
+    }
 
-      if(m_cflags.flag("CHULL::SCREEN_ONLY")){
-        *p_oss << main_JSON_ss.str();
-        return;
+    //////////////////////////////////////////////////////////////////////////////
+    // END Stoichiometry group loop
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // START Grabbing planes data
+    //////////////////////////////////////////////////////////////////////////////
+    // index specific, so we can't loop through stoichGroups
+
+    vector<uint> vertices=getHullPoints(false); //moved up for faces
+    if(LDEBUG) {cerr << soliloquy << " vertices=" << aurostd::joinWDelimiter(vertices,",") << endl;}
+
+    vector<uint> v_ch_indices,v_vertices_indices;
+    bool found=false;
+    for(uint i=0,fl_size_i=m_facets.size();i<fl_size_i;i++) {
+      //const xvector<double> normal = m_facets[i].m_normal;
+      if(!(/*m_facets[i].m_hypercollinear||*/m_facets[i].m_is_vertical||m_facets[i].m_is_artificial)&&m_facets[i].m_dim==m_dim){  //keep hypercollinear, might create small gaps in visualization otherwise //CO190423 - eric needs three-dimensional only for 3D
+        v_ch_indices=m_facets[i].getCHIndices();
+        if(LDEBUG) {cerr << soliloquy << " v_ch_indices=" << aurostd::joinWDelimiter(v_ch_indices,",") << endl;}
+        v_vertices_indices.clear();
+        for(uint j=0,fl_size_j=v_ch_indices.size();j<fl_size_j;j++){
+          found=false;
+          for(uint k=0,fl_size_k=vertices.size();k<fl_size_k&&!found;k++){
+            if(v_ch_indices[j]==vertices[k]){
+              v_vertices_indices.push_back(k);
+              found=true;
+            }
+          }
+          if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ChullPoint["+aurostd::utype2string(v_ch_indices[j])+"] could not be found in getHullPoints()",_INDEX_ILLEGAL_);}
+        }
+        //data_helper_ss << "[" << aurostd::joinWDelimiter(m_facets[i].getCHIndices(), ',') << "]";
+        data_helper_ss << "[" << aurostd::joinWDelimiter(v_vertices_indices, ',') << "]"; //CO190423 - eric needs references to vertices, not points
+        planes_data_JSON_vs.push_back(data_helper_ss.str());
+        data_helper_ss.str("");
       }
+    }
+    //////////////////////////////////////////////////////////////////////////////
+    // END Grabbing planes data
+    //////////////////////////////////////////////////////////////////////////////
 
-      string path = getPath(m_cflags, *p_FileMESSAGE, *p_oss);
-      string destination = path + main_JSON_file;
-      aurostd::stringstream2file(main_JSON_ss, destination);
-      if(!aurostd::FileExist(destination)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not write "+main_JSON_file+" to "+path);}
+    //////////////////////////////////////////////////////////////////////////////
+    // START Grabbing vertex data (for 3-D visualization of hull)
+    //////////////////////////////////////////////////////////////////////////////
+    // index specific, so we can't loop through stoichGroups
 
-      //////////////////////////////////////////////////////////////////////////////
-      // END Output amalgamation and writing
-      //////////////////////////////////////////////////////////////////////////////
+    //[CO190423 - moving up for faces]vector<uint> vertices=getHullPoints(false);
+    for(uint i=0,fl_size_i=vertices.size();i<fl_size_i;i++) {
+      vertices_data_JSON_ss << "{";
+      vertices_data_JSON_ss << "\"auid\":";  // why not entry? or all auid? why two different names?
 
-      message << main_JSON_file << " was created successfully, see destination=" << path;
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+      const ChullPoint& point = m_points[vertices[i]];
+      const aflowlib::_aflowlib_entry& entry = point.m_entry;
+      const xvector<double>& coord = point.s_coords;
+
+      if(!point.m_has_entry) {
+        vertices_data_JSON_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\""; //unary, so "" delimiter doesn't play a role
+      } else {vertices_data_JSON_ss << "\"" << entry.auid << "\"";}
+
+      vertices_data_JSON_ss << ",";
+      vertices_data_JSON_ss << "\"compound\": \"" << entry.compound << "\","; 
+      vertices_data_JSON_ss << "\"composition\":[";
+      // explicit dimensions
+      vertices_data_JSON_ss << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(coord,CHULL_PRECISION,false),",");
+      //[CO190423 - OBSOLETE]for(int k=coord.lrows;k<=coord.urows;k++) {
+      //[CO190423 - OBSOLETE] vertices_data_JSON_ss << aurostd::utype2string(coord(k),CHULL_PRECISION); // is 3 digits okay? I normally do 15
+      //[CO190423 - OBSOLETE] if(k!=coord.rows-1){vertices_data_JSON_ss << ",";}
+      //[CO190423 - OBSOLETE]}
+      vertices_data_JSON_ss << "],";
+      // fix for unaries, set to 0
+      if(!point.m_has_entry) {  // these are only hull_members, so they only happen to
+        // endpoints
+        // enthalpy of formation, row 4
+        // no need for precision for next few columns, leave it same way as
+        // received from AFLOW
+        vertices_data_JSON_ss << "\"enthalpyFormationAtom\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+        vertices_data_JSON_ss << ",";
+        // entropic temperature, row 5
+        vertices_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+        //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+        vertices_data_JSON_ss << ",";
+        vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+        vertices_data_JSON_ss << ",";
+        vertices_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+        //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
+      } else {
+        // enthalpy of formation, row 4
+        // no need for precision for next few columns, leave it same way as
+        // received from AFLOW
+        num_ss << chull::H_f_atom(entry, _std_);
+        vertices_data_JSON_ss << "\"enthalpyFormationAtom\":" << num_ss.str();
+        vertices_data_JSON_ss << ",";
+        num_ss.str("");
+        // entropic temperature, row 5
+        num_ss << chull::T_S(entry);
+        vertices_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
+        num_ss.str("");
+
+        //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
+        vertices_data_JSON_ss << ",";
+
+        num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+        vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+        vertices_data_JSON_ss << ",";
+        num_ss.str("");
+
+        num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
+        vertices_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+        num_ss.str("");
+        //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
+      }
+      vertices_data_JSON_ss << "}";
+      vertices_data_JSON_vs.push_back(vertices_data_JSON_ss.str());
+      vertices_data_JSON_ss.str("");
+    }
+    //////////////////////////////////////////////////////////////////////////////
+    // END Grabbing vertex data
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // START Output amalgamation and writing
+    //////////////////////////////////////////////////////////////////////////////
+
+    main_JSON_ss << "{";
+    main_JSON_ss << "\"name\":\"" << input << "\","; //input_hyphened
+    main_JSON_ss << "\"species\":[" << species_data_JSON_ss.str() << "],";
+    species_data_JSON_ss.str("");
+    // CHANGE BY EGOSS 
+    // replaced points_data_JSON_vs with distance_data_JSON_vs
+    //
+    // OLD
+    //main_JSON_ss << "\"points\":[" << aurostd::joinWDelimiter(points_data_JSON_vs, ',')
+    //             << "],";
+    //points_data_JSON_vs.clear();
+    main_JSON_ss << "\"points\":[" << aurostd::joinWDelimiter(distances_data_JSON_vs, ',') << "],";
+    distances_data_JSON_vs.clear();
+    main_JSON_ss << "\"groundStates\":[" << aurostd::joinWDelimiter(hull_points_data_JSON_vs, ',') << "],";
+    hull_points_data_JSON_vs.clear();
+    main_JSON_ss << "\"vertices\":[" << aurostd::joinWDelimiter(vertices_data_JSON_vs, ',') << "],";
+    vertices_data_JSON_vs.clear();
+    // CHANGE BY EGOSS
+    // distanceToHull is removed. Now distances are contained within the entries 
+    // of points
+    //
+    //main_JSON_ss << "\"distanceToHull\":["
+    //             << aurostd::joinWDelimiter(distances_data_JSON_vs, ',') << "],";
+    //distances_data_JSON_vs.clear();
+
+    // CHANGE BY EGOSS
+    // At this time I do not require stoichiometryGroups for the visualization. 
+    // It should be hidden behind a flag for now.
+
+    if(false) {
+      main_JSON_ss << "\"stoichiometryGroups\":[" << aurostd::joinWDelimiter(stoich_data_JSON_vs, ',') << "],";
+      stoich_data_JSON_vs.clear();
     }
 
-    void ConvexHull::writeAPool() const {
+    main_JSON_ss << "\"faces\":[" << aurostd::joinWDelimiter(planes_data_JSON_vs, ',') << "]";
+    planes_data_JSON_vs.clear();  // no comma
+    main_JSON_ss << "}";
+
+    if(m_cflags.flag("CHULL::SCREEN_ONLY")){
+      *p_oss << main_JSON_ss.str();
+      return;
     }
 
-    bool ConvexHull::sortWithinCoordGroup::operator() (uint i,uint j) {
-      //ascending order
-      string soliloquy="ConvexHull::sortWithinCoordGroup::operator():";
-      if( (i>m_points.size()-1) || (j>m_points.size()-1) ) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within CoordGroup");}  //safety
-      const ChullPoint& ci=m_points[i];
-      const ChullPoint& cj=m_points[j];
-      if(ci.isGState()!=cj.isGState()){return ci.isGState()>cj.isGState();}
-      //always sort by last coord first
-      bool energy_sort=(m_sort_energy_ascending ? (ci.getLastCoord()<cj.getLastCoord()) : (ci.getLastCoord()>cj.getLastCoord()));
-      if(ci.m_has_entry && cj.m_has_entry){
-        //if entry, then we also sort by proto, compound, and then aurl to make final print out pretty
-        return ( energy_sort ||
-            ((ci.getLastCoord() == cj.getLastCoord()) && 
-             (ci.m_entry.prototype<cj.m_entry.prototype)) ||
-            ((ci.getLastCoord() == cj.getLastCoord()) &&
-             (ci.m_entry.prototype == cj.m_entry.prototype) && 
-             (ci.m_entry.compound<cj.m_entry.compound)) ||
-            ((ci.getLastCoord() == cj.getLastCoord()) &&
-             (ci.m_entry.prototype == cj.m_entry.prototype) && 
-             (ci.m_entry.compound == cj.m_entry.compound) && 
-             (ci.m_entry.aurl<cj.m_entry.aurl)) );  //aurl is guaranteed to be unique (more so than auid)
-      } else {return energy_sort;}
-    }
+    string path = getPath(m_cflags, *p_FileMESSAGE, *p_oss);
+    string destination = path + main_JSON_file;
+    aurostd::stringstream2file(main_JSON_ss, destination);
+    if(!aurostd::FileExist(destination)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not write "+main_JSON_file+" to "+path);}
 
-    bool ConvexHull::sortCHullPoints::operator() (uint i,uint j) const{
-      string soliloquy="ConvexHull::sortCHullPoints::operator():";
-      if(i>m_points.size()-1 || j>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index for m_points");}
-      const ChullPoint& ci=m_points[i];
-      const ChullPoint& cj=m_points[j];
-      sortThermoPoints stp(m_sort_stoich_ascending,m_sort_energy_ascending);
-      return stp.operator()(ci,cj);
-    }
+    //////////////////////////////////////////////////////////////////////////////
+    // END Output amalgamation and writing
+    //////////////////////////////////////////////////////////////////////////////
 
-    bool ConvexHull::sortFacetsByPoints::operator() (const ChullFacet& fi,const ChullFacet& fj) const {
-      string soliloquy="ConvexHull::sortFacetsByPoints::operator():";
-      if(fi.m_vertices.size()!=fj.m_vertices.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch among facets");} //return m_ascending_order ? fi.m_vertices.size()<rj.m_vertices.size() : fi.m_vertices.size()>rj.m_vertices.size();}
+    message << main_JSON_file << " was created successfully, see destination=" << path;
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  }
+
+  void ConvexHull::writeAPool() const {
+  }
+
+  bool ConvexHull::sortWithinCoordGroup::operator() (uint i,uint j) {
+    //ascending order
+    string soliloquy="ConvexHull::sortWithinCoordGroup::operator():";
+    if( (i>m_points.size()-1) || (j>m_points.size()-1) ) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within CoordGroup");}  //safety
+    const ChullPoint& ci=m_points[i];
+    const ChullPoint& cj=m_points[j];
+    if(ci.isGState()!=cj.isGState()){return ci.isGState()>cj.isGState();}
+    //always sort by last coord first
+    bool energy_sort=(m_sort_energy_ascending ? (ci.getLastCoord()<cj.getLastCoord()) : (ci.getLastCoord()>cj.getLastCoord()));
+    if(ci.m_has_entry && cj.m_has_entry){
+      //if entry, then we also sort by proto, compound, and then aurl to make final print out pretty
+      return ( energy_sort ||
+          ((ci.getLastCoord() == cj.getLastCoord()) && 
+           (ci.m_entry.prototype<cj.m_entry.prototype)) ||
+          ((ci.getLastCoord() == cj.getLastCoord()) &&
+           (ci.m_entry.prototype == cj.m_entry.prototype) && 
+           (ci.m_entry.compound<cj.m_entry.compound)) ||
+          ((ci.getLastCoord() == cj.getLastCoord()) &&
+           (ci.m_entry.prototype == cj.m_entry.prototype) && 
+           (ci.m_entry.compound == cj.m_entry.compound) && 
+           (ci.m_entry.aurl<cj.m_entry.aurl)) );  //aurl is guaranteed to be unique (more so than auid)
+    } else {return energy_sort;}
+  }
+
+  bool ConvexHull::sortCHullPoints::operator() (uint i,uint j) const{
+    string soliloquy="ConvexHull::sortCHullPoints::operator():";
+    if(i>m_points.size()-1 || j>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index for m_points");}
+    const ChullPoint& ci=m_points[i];
+    const ChullPoint& cj=m_points[j];
+    sortThermoPoints stp(m_sort_stoich_ascending,m_sort_energy_ascending);
+    return stp.operator()(ci,cj);
+  }
+
+  bool ConvexHull::sortFacetsByPoints::operator() (const ChullFacet& fi,const ChullFacet& fj) const {
+    string soliloquy="ConvexHull::sortFacetsByPoints::operator():";
+    if(fi.m_vertices.size()!=fj.m_vertices.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch among facets");} //return m_ascending_order ? fi.m_vertices.size()<rj.m_vertices.size() : fi.m_vertices.size()>rj.m_vertices.size();
     if(fi.m_normal.rows!=fj.m_normal.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between facet normals");}
     if(!(fi.m_initialized&&fj.m_initialized)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Uninitialized facet");}       //ensure we have inward pointing normal and angle
 
