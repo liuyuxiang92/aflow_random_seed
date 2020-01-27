@@ -31,7 +31,7 @@
 //   * Check if the database needs to be rebuild. This can be triggered either
 //     by the user, by new entries in the schema, or by new/updated dat files.
 //     The dat files are collections of aflowlib.json files for a set of
-//     AUIDs (i.e. aflow:00.dat, aflow:01.dat, etc.).
+//     AUIDs (i.e. aflow:00.jsonl, aflow:01.jsonl, etc.).
 //   * Create a temporary database file and populate with data from these JSONs.
 //     Rebuilding from scratch instead of incrementally adding into the existing
 //     database protects the database from corruption and injection attacks.
@@ -162,7 +162,7 @@ namespace aflowlib {
     }
   }
 
-} // namespace aflowlib
+}  // namespace aflowlib
 
 /********************************* TMP FILE **********************************/
 
@@ -461,8 +461,8 @@ namespace aflowlib {
       for (int i = 0; i < _N_AUID_TABLES_; i++) {
         stringstream t;
         t << std::setfill('0') << std::setw(2) << std::hex << i;
-        json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
-        if (!aurostd::EFileExist(json_files[i])) {
+        json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
+        if (!aurostd::EFileExist(json_files[i]) && !aurostd::FileExist(json_files[i])) {
           string message = data_path + " is not a valid data path. Missing file for aflow:" + t.str() + ".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
         }
@@ -532,7 +532,7 @@ namespace aflowlib {
   }
 
   //buildTables/////////////////////////////////////////////////////////////////
-  // Reads the .dat files and processes the JSONs for the database writer.
+  // Reads the .jsonl files and processes the JSONs for the database writer.
   void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& columns, const vector<string>& types) {
     for (int i = startIndex; i < endIndex; i++) {
       stringstream t;
@@ -540,7 +540,7 @@ namespace aflowlib {
       string table = "auid_" + t.str();
       createTable(table, columns, types);
 
-      string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
+      string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
       vector<string> data;
       aurostd::efile2vectorstring(jsonfile, data);
       uint ndata = data.size();
@@ -688,7 +688,7 @@ namespace aflowlib {
     return value;
   }
 
-} // namespace aflowlib
+}  // namespace aflowlib
 
 /**************************** DATABASE ANALYSIS *****************************/
 
