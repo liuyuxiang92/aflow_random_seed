@@ -828,9 +828,10 @@ namespace apl {
       _inStructure = _pcStructure;
       calculatePhaseVectors();
     } else {
-      _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could "
-              << " map the primitive cell to the supercell. Phonon dispersions "
-              << " will be calculated using the original structure instead." << apl::endl;
+      _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could"
+              << " not map the AFLOW standard primitive cell to the supercell."
+              << " Phonon dispersions will be calculated using the original"
+              << " structure instead." << apl::endl;
     }
   }
 
@@ -853,12 +854,9 @@ namespace apl {
   // Returns true when mapping is successful.
   bool Supercell::getMaps(const xstructure& pcell, const xstructure& scell) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    _pc2scMap.clear();
-    _sc2pcMap.clear();
     uint natoms_pc = pcell.atoms.size();
     uint natoms_sc = scell.atoms.size();
-    _pc2scMap.resize(natoms_pc);
-    _sc2pcMap.resize(natoms_sc);
+    vector<int> pc2sc(natoms_pc), sc2pc(natoms_sc);
     xvector<double> fpos(3);
 
     // sc2pcMap
@@ -867,7 +865,7 @@ namespace apl {
       uint j = 0;
       for (j = 0; j < natoms_pc; j++) {
         if (SYM::FPOSMatch(fpos, pcell.atoms[j].fpos, pcell.lattice, pcell.f2c, false, pcell.sym_eps)) {
-          _sc2pcMap[i] = j;
+          sc2pc[i] = j;
           break;
         }
       }
@@ -884,7 +882,7 @@ namespace apl {
       uint j = 0;
       for (j = 0; j < natoms_sc; j++) {
         if (aurostd::isequal(pcell.atoms[i].cpos, scell.atoms[j].cpos)) {
-          _pc2scMap[i] = j;
+          pc2sc[i] = j;
           break;
         }
       }
@@ -895,6 +893,10 @@ namespace apl {
         return false;
       }
     }
+
+    // Mapping successful - now it's safe to overwrite the Supercell maps
+    _sc2pcMap = sc2pc;
+    _pc2scMap = pc2sc;
     return true;
   }
 
