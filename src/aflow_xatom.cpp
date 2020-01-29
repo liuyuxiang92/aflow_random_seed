@@ -1241,7 +1241,7 @@ void _sym_op::free() {
   flag_inversion=FALSE;            // clear stuff
   is_pgroup=FALSE;                 // clear stuff
   is_pgroup_xtal=FALSE;            // clear stuff
-  is_pgroup_Patterson=FALSE;       // clear stuff //DX 20200129
+  is_pgroupk_Patterson=FALSE;       // clear stuff //DX 20200129
   is_pgroupk=FALSE;                // clear stuff
   is_pgroupk_xtal=FALSE;           // clear stuff       // DX 12/5/17
   ctau.clear();ftau.clear();       // clear stuff
@@ -1272,7 +1272,7 @@ void _sym_op::copy(const _sym_op& b){
   flag_inversion=b.flag_inversion;
   is_pgroup=b.is_pgroup;
   is_pgroup_xtal=b.is_pgroup_xtal;
-  is_pgroup_Patterson=b.is_pgroup_Patterson; //DX 20200129
+  is_pgroupk_Patterson=b.is_pgroupk_Patterson; //DX 20200129
   is_pgroupk=b.is_pgroupk;
   is_pgroupk_xtal=b.is_pgroupk_xtal;  // DX 12/5/17
   ctau=b.ctau;
@@ -1299,7 +1299,7 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   // oss.precision(10);
   if(symop.is_pgroup==TRUE) oss << " pgroup" << endl;
   if(symop.is_pgroup_xtal==TRUE) oss << " pgroup_xtal" << endl;
-  if(symop.is_pgroup_Patterson==TRUE) oss << " pgroup_Patterson" << endl; //DX 20200129
+  if(symop.is_pgroupk_Patterson==TRUE) oss << " pgroupk_Patterson" << endl; //DX 20200129
   if(symop.is_fgroup==TRUE) oss << " fgroup" << endl;
   if(symop.is_sgroup==TRUE) oss << " sgroup" << endl;
   if(symop.is_agroup==TRUE) oss << " agroup" << endl;
@@ -2132,9 +2132,9 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   crystal_family="";crystal_system="";point_group_crystal_class="";
   point_group_Shoenflies="";point_group_Hermann_Mauguin="";point_group_orbifold="";
   point_group_type="";point_group_order="";point_group_structure="";
-  // PGROUP_PATTERSON ---------------------------- //DX 20200129
-  pgroup_Patterson.clear();        // just initialize
-  pgroup_Patterson_calculated=FALSE;
+  // PGROUPK_PATTERSON ---------------------------- //DX 20200129
+  pgroupk_Patterson.clear();        // just initialize
+  pgroupk_Patterson_calculated=FALSE;
   // PGROUPK ----------------------------
   pgroupk.clear();            // just initialize
   pgroupk_calculated=FALSE;
@@ -2445,11 +2445,11 @@ void xstructure::copy(const xstructure& bstr) {
   point_group_type=bstr.point_group_type;
   point_group_order=bstr.point_group_order;
   point_group_structure=bstr.point_group_structure;
-  // PGROUP_PATTERSON ---------------------------- //DX 20200129
-  pgroup_Patterson.clear();
-  for(uint i=0;i<bstr.pgroup_Patterson.size();i++)
-    pgroup_Patterson.push_back(bstr.pgroup_Patterson.at(i));
-  pgroup_Patterson_calculated=bstr.pgroup_Patterson_calculated;
+  // PGROUPK_PATTERSON ---------------------------- //DX 20200129
+  pgroupk_Patterson.clear();
+  for(uint i=0;i<bstr.pgroupk_Patterson.size();i++)
+    pgroupk_Patterson.push_back(bstr.pgroupk_Patterson.at(i));
+  pgroupk_Patterson_calculated=bstr.pgroupk_Patterson_calculated;
   // PGROUPK ----------------------------
   pgroupk.clear();
   for(uint i=0;i<bstr.pgroupk.size();i++)
@@ -5291,7 +5291,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.iatoms_calculated=FALSE;
   a.pgroup_calculated=FALSE;
   a.pgroup_xtal_calculated=FALSE;
-  a.pgroup_Patterson_calculated=FALSE; //DX 20200129
+  a.pgroupk_Patterson_calculated=FALSE; //DX 20200129
   a.pgroupk_calculated=FALSE;
   a.pgroupk_xtal_calculated=FALSE; // DX 12/5/17 - Added pgroupk_xtal
   a.fgroup_calculated=FALSE;
@@ -13238,9 +13238,9 @@ void xstructure::ClearSymmetry(void) {
   crystal_family="";crystal_system="";point_group_crystal_class="";
   point_group_Shoenflies="";point_group_Hermann_Mauguin="";point_group_orbifold="";
   point_group_type="";point_group_order="";point_group_structure="";
-  // PGROUP_PATTERSON ---------------------------- //DX 20200129
-  pgroup_Patterson.clear();        // just initialize
-  pgroup_Patterson_calculated=FALSE;
+  // PGROUPK_PATTERSON ---------------------------- //DX 20200129
+  pgroupk_Patterson.clear();        // just initialize
+  pgroupk_Patterson_calculated=FALSE;
   // PGROUPK ----------------------------
   pgroupk.clear();            // just initialize
   pgroupk_calculated=FALSE;
