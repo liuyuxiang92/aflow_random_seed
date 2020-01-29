@@ -737,7 +737,6 @@ class _kflags {
     bool  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL;  // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL; // DX 12/5/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON;  // DX 20200129 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON; // DX 20200129 - Specify what to calculate/verify 
     bool  KBIN_SYMMETRY_CALCULATE_IATOMS;       // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_AGROUP;       // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_SGROUP;       // DX 8/14/17 - Specify what to calculate/verify
@@ -747,7 +746,6 @@ class _kflags {
     bool  KBIN_SYMMETRY_PGROUP_XTAL_WRITE; // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE;// DX 12/5/17 - Added pgroupk_xtal
     bool  KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE;// DX 20200129 - taken TRUE by default
-    bool  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE;// DX 20200129 - taken TRUE by default
     bool  KBIN_SYMMETRY_FGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_SGROUP_WRITE;
     bool  KBIN_SYMMETRY_AGROUP_WRITE;      // taken TRUE by default
@@ -1077,7 +1075,6 @@ uint ApennsyARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vfl
 #define _PGROUP_XTAL_ 6        // for point group crystal
 #define _PGROUPK_XTAL_ 7       // for point group kcrystal
 #define _PGROUP_PATTERSON_ 8   // for point group Patterson //DX 20200129
-#define _PGROUPK_PATTERSON_ 9  // for point group Patterson (reciprocal) //DX 20200129
 #define _FGROUP_ 1             // for factor group
 #define _SGROUP_ 2             // for space group
 #define _AGROUP_ 3             // for site positions point group
@@ -1277,8 +1274,6 @@ class _sym_op {
     bool             is_pgroupk;                                  // bool is_pgroupk
     // for _PGROUPK_XTAL_                  
     bool             is_pgroupk_xtal;                             // bool is_pgroupk_xtal // DX 12/5/17 - Added pgroupk_xtal
-    // for _PGROUPK_PATTERSON_
-    bool             is_pgroupk_Patterson;                        // bool is_pgroupk_Patterson //DX 20200129
     // for _FGROUP_
     xvector<double>  ctau;          // 3                          // translation in CARTESIAN       // FACTOR GROUP only, [0,1[
     xvector<double>  ftau;          // 3                          // translation in FRACTIONAL      // FACTOR GROUP only, [0,1[
@@ -1700,9 +1695,6 @@ class xstructure {
     // POINT GROUP KCRYSTAL                                       // POINT GROUP
     std::vector<_sym_op> pgroupk_xtal;                            // rotations/inversions operations
     bool pgroupk_xtal_calculated;                                 // WARNING: we use starting from 0
-    // POINT GROUP KCRYSTAL PATTERSON                             // POINT GROUP KCRYSTAL PATTERSON //DX 20200129
-    std::vector<_sym_op> pgroupk_Patterson;                        // rotations/inversions operations
-    bool pgroupk_Patterson_calculated;                             // WARNING: we use starting from 0
     // FACTOR GROUP                                               // FACTOR GROUP
     std::vector<_sym_op> fgroup;                                  // rotations/inversions + incell_translations operations
     bool fgroup_calculated;                                       // WARNING: we use starting from 0

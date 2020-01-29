@@ -1244,7 +1244,6 @@ void _sym_op::free() {
   is_pgroup_Patterson=FALSE;       // clear stuff //DX 20200129
   is_pgroupk=FALSE;                // clear stuff
   is_pgroupk_xtal=FALSE;           // clear stuff       // DX 12/5/17
-  is_pgroupk_Patterson=FALSE;      // clear stuff //DX 20200129
   ctau.clear();ftau.clear();       // clear stuff
   basis_atoms_map.clear();         // clear stuff
   basis_types_map.clear();         // clear stuff
@@ -1276,7 +1275,6 @@ void _sym_op::copy(const _sym_op& b){
   is_pgroup_Patterson=b.is_pgroup_Patterson; //DX 20200129
   is_pgroupk=b.is_pgroupk;
   is_pgroupk_xtal=b.is_pgroupk_xtal;  // DX 12/5/17
-  is_pgroupk_Patterson=b.is_pgroupk_Patterson; //DX 20200129
   ctau=b.ctau;
   ftau=b.ftau;
   basis_atoms_map.clear();for(uint i=0;i<b.basis_atoms_map.size();i++){basis_atoms_map.push_back(b.basis_atoms_map.at(i));}
@@ -1307,7 +1305,6 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   if(symop.is_agroup==TRUE) oss << " agroup" << endl;
   if(symop.is_pgroupk==TRUE) oss << " pgroupk" << endl;
   if(symop.is_pgroupk_xtal==TRUE) oss << " pgroupk_xtal" << endl;  // DX 12/5/17
-  if(symop.is_pgroupk_Patterson==TRUE) oss << " pgroupk_Patterson" << endl; //DX 20200129
   if(symop.is_agroup==TRUE) oss << " site:" << symop.site << endl; // DX 8/3/17
   oss << " type: "<< symop.str_type << endl;
   oss << " Hermann_Mauguin: "<< symop.str_Hermann_Mauguin << endl;
@@ -2144,9 +2141,6 @@ void xstructure::free() { //DX 20191220 - moved all initializations from constuc
   // PGROUPK_XTAL ----------------------------
   pgroupk_xtal.clear();            // just initialize // DX 12/5/17 - Added pgroupk_xtal
   pgroupk_xtal_calculated=FALSE;                      // DX 12/5/17 - Added pgroupk_xtal
-  // PGROUPK_PATTERSON ---------------------------- //DX 20200129
-  pgroupk_Patterson.clear();        // just initialize
-  pgroupk_Patterson_calculated=FALSE;
   // FGROUP ----------------------------
   fgroup.clear();            // just initialize
   fgroup_calculated=FALSE;
@@ -2466,11 +2460,6 @@ void xstructure::copy(const xstructure& bstr) {
   for(uint i=0;i<bstr.pgroupk_xtal.size();i++)             // DX 12/5/17 - Added pgroupk_xtal
     pgroupk_xtal.push_back(bstr.pgroupk_xtal.at(i));       // DX 12/5/17 - Added pgroupk_xtal
   pgroupk_xtal_calculated=bstr.pgroupk_xtal_calculated;    // DX 12/5/17 - Added pgroupk_xtal
-  // PGROUPK_PATTERSON ---------------------------- //DX 20200129
-  pgroupk_Patterson.clear();
-  for(uint i=0;i<bstr.pgroupk_Patterson.size();i++)
-    pgroupk_Patterson.push_back(bstr.pgroupk_Patterson.at(i));
-  pgroupk_Patterson_calculated=bstr.pgroupk_Patterson_calculated;
   // FGROUP ----------------------------
   fgroup.clear();
   for(uint i=0;i<bstr.fgroup.size();i++)
@@ -5305,7 +5294,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.pgroup_Patterson_calculated=FALSE; //DX 20200129
   a.pgroupk_calculated=FALSE;
   a.pgroupk_xtal_calculated=FALSE; // DX 12/5/17 - Added pgroupk_xtal
-  a.pgroupk_Patterson_calculated=FALSE; //DX 20200129
   a.fgroup_calculated=FALSE;
   a.sgroup_calculated=FALSE;
   a.grid_atoms_calculated=FALSE;
@@ -13259,9 +13247,6 @@ void xstructure::ClearSymmetry(void) {
   // PGROUPK_XTAL ----------------------------
   pgroupk_xtal.clear();            // just initialize // DX 12/5/17 - Added pgroupk_xtal
   pgroupk_xtal_calculated=FALSE;                      // DX 12/5/17 - Added pgroupk_xtal
-  // PGROUPK_PATTERSON ---------------------------- //DX 20200129
-  pgroupk_Patterson.clear();        // just initialize
-  pgroupk_Patterson_calculated=FALSE;
   // FGROUP ----------------------------
   fgroup.clear();            // just initialize
   fgroup_calculated=FALSE;
