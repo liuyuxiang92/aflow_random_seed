@@ -824,8 +824,11 @@ namespace apl {
 
   // ME200116 - rebase to primitive
   void Supercell::projectToPrimitive() {
-    if (getMaps(_pcStructure, _scStructure)) {
+    vector<int> pc2sc, sc2pc;
+    if (getMaps(_pcStructure, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
       _inStructure = _pcStructure;
+      _sc2pcMap = sc2pc;
+      _pc2scMap = pc2sc;
       calculatePhaseVectors();
     } else {
       _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could"
@@ -837,8 +840,11 @@ namespace apl {
 
   // ME200116 - rebase to original
   void Supercell::projectToOriginal() {
-    if (getMaps(_inStructure_original, _scStructure)) {
+    vector<int> pc2sc, sc2pc;
+    if (getMaps(_inStructure_original, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
       _inStructure = _inStructure_original;
+      _pc2scMap = pc2sc;
+      _sc2pcMap = sc2pc;
       calculatePhaseVectors();
     } else {
       // If the mapping fails for the original structure,
@@ -850,53 +856,84 @@ namespace apl {
     }
   }
 
-  // ME200116 - calculate sc2pcMap and pc2scMap
+  // ME200116
+  // Recalculates _sc2pcMap and _pc2scMap based on the projected cell (pcell)
+  // using the original cell (ocell).
   // Returns true when mapping is successful.
-  bool Supercell::getMaps(const xstructure& pcell, const xstructure& scell) {
+  bool Supercell::getMaps(const xstructure& pcell, const xstructure& ocell, const xstructure& scell,
+      vector<int>& pc2sc, vector<int>& sc2pc) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string function = "apl::Supercell::getMaps()";
     uint natoms_pc = pcell.atoms.size();
+    uint natoms_oc = ocell.atoms.size();
     uint natoms_sc = scell.atoms.size();
-    vector<int> pc2sc(natoms_pc), sc2pc(natoms_sc);
+
+    // Check that the cell sizes make sense
+    if ((natoms_pc > natoms_oc) || (natoms_oc > natoms_sc)) {
+      if (LDEBUG) {
+        std::cerr << function << ": cannot map a smaller cell to a larger cell." << std::endl;
+      }
+      return false;
+    }
+
+    pc2sc.clear(); pc2sc.resize(natoms_pc);
+    sc2pc.clear(); sc2pc.resize(natoms_sc);
     xvector<double> fpos(3);
 
-    // sc2pcMap
+    // sc2pcMap - convert scell positions into primitive coordinates
+    // and do straightforward fpos matching
     for (uint i = 0; i < natoms_sc; i++) {
       fpos = pcell.c2f * _scStructure.atoms[i].cpos;
       uint j = 0;
       for (j = 0; j < natoms_pc; j++) {
-        if (SYM::FPOSMatch(fpos, pcell.atoms[j].fpos, pcell.lattice, pcell.f2c, false, pcell.sym_eps)) {
+        if (SYM::FPOSMatch(fpos, pcell.atoms[j].fpos, pcell.lattice, pcell.f2c, _skew, _sym_eps)) {
           sc2pc[i] = j;
           break;
         }
       }
       if (j == natoms_pc) {
         if (LDEBUG) {
-          std::cerr << "apl::Supercell::getMaps(): sc2pcMap failed for atom " << i << "." << std::endl;
+          std::cerr << function << ": sc2pcMap failed for atom " << i << "." << std::endl;
         }
         return false;
       }
     }
 
-    // pc2scMap
+    // pc2scMap - more complex. Since the projected cell may not be fully
+    // inside original cell, the primitive atoms need to be mapped to the
+    // original cell first. Then, pc2scMap can be built using simple cpos
+    // matching. Since _pc2scMap may not represent the original structure
+    // anymore, it cannot be used to speed up the process.
     for (uint i = 0; i < natoms_pc; i++) {
       uint j = 0;
-      for (j = 0; j < natoms_sc; j++) {
-        if (aurostd::isequal(pcell.atoms[i].cpos, scell.atoms[j].cpos)) {
-          pc2sc[i] = j;
+      fpos = ocell.c2f * pcell.atoms[i].cpos;
+      for (j = 0; j < natoms_oc; j++) {
+        if (SYM::FPOSMatch(fpos, ocell.atoms[j].fpos, ocell.lattice, ocell.f2c, _skew, _sym_eps)) {
+          uint k = 0;
+          for (k = 0; k < natoms_sc; k++) {
+            if (aurostd::isequal(ocell.atoms[j].cpos, scell.atoms[k].cpos)) break;
+          }
+          // If scell was created from ocell, this should never happen
+          if (k == natoms_sc) {
+            if (LDEBUG) {
+              std::cerr << function << ": pc2scMap failed for atom " << i << "."
+                        << " Could not map original atom " << j << " to supercell." << std::endl;
+            }
+            return false;
+          }
+          pc2sc[i] = k;
           break;
         }
       }
-      if (j == natoms_sc) {
+      if (j == natoms_oc) {
         if (LDEBUG) {
-          std::cerr << "apl::Supercell::getMaps(): pc2scMap failed for atom " << i << "." << std::endl;
+          std::cerr << function << ": pc2scMap failed for atom " << i << "." << std::endl;
         }
         return false;
       }
     }
 
-    // Mapping successful - now it's safe to overwrite the Supercell maps
-    _sc2pcMap = sc2pc;
-    _pc2scMap = pc2sc;
+    // Mapping successful
     return true;
   }
 

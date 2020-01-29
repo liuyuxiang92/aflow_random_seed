@@ -593,7 +593,7 @@ namespace apl {
     private:
       void calculateWholeSymmetry(xstructure&);
       xstructure calculatePrimitiveStructure() const;
-      bool getMaps(const xstructure&, const xstructure&);  // ME200117
+      bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME200117
 
     public:
       Supercell(const xstructure&, const _aflags& aflags, Logger&); //CO181226
