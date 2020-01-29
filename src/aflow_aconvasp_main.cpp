@@ -2771,6 +2771,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
@@ -2779,6 +2781,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=TRUE;
@@ -2794,6 +2798,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       // DX 8/15/17 - Add in consistency checks
@@ -2802,6 +2808,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
@@ -2816,6 +2824,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=FALSE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       // DX 8/15/17 - Add in consistency checks
@@ -2824,6 +2834,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
@@ -2838,6 +2850,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=FALSE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       // DX 8/15/17 - Add in consistency checks
@@ -2846,6 +2860,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
@@ -2861,6 +2877,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       // DX 8/15/17 - Add in consistency checks
@@ -2869,6 +2887,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
@@ -2884,6 +2904,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       // DX 8/15/17 - Add in consistency checks
@@ -2892,6 +2914,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=TRUE;
+      kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
@@ -2911,6 +2935,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=FALSE;  // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=TRUE;      // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;       // DX 8/15/17 - Add in consistency checks
       kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;       // DX 8/15/17 - Add in consistency checks
@@ -2919,6 +2945,8 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE=FALSE; //DX 20200129
+      kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=FALSE; //DX 20200129
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=TRUE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
@@ -3032,8 +3060,10 @@ namespace pflow {
       for(uint i=0;i<vext.size();i++) {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+vext.at(i)) ||
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT+vext.at(i)) || //DX 20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+vext.at(i)) || // DX 1/18/18 - added pgroupk_xtal
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+vext.at(i)) || //DX 20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+vext.at(i)) ||
@@ -3042,8 +3072,10 @@ namespace pflow {
       for(uint i=0;i<vext.size();i++) {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+"*");}
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT+"*");} //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+"*");} // DX 1/18/18 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+"*");} //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+"*");}
@@ -3052,8 +3084,10 @@ namespace pflow {
       for(uint i=0;i<vext.size();i++) {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+vext.at(i)) ||
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON+vext.at(i)) || //DX 20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+vext.at(i)) || // DX 1/18/18 - added pgroupk_xtal
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+vext.at(i)) || //DX 20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+vext.at(i)) ||
@@ -3062,8 +3096,10 @@ namespace pflow {
       for(uint i=0;i<vext.size();i++) {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+"*");}
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON+"*");} //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+"*");} // DX 1/18/18 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+"*");} //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+"*");}
@@ -3083,8 +3119,10 @@ namespace pflow {
       if(format == "txt"){ // DX 8/3/17 - FORMAT
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT,DEFAULT_KZIP_BIN);
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT,DEFAULT_KZIP_BIN); //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,DEFAULT_KZIP_BIN); // DX 1/18/18 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,DEFAULT_KZIP_BIN); //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT,DEFAULT_KZIP_BIN);
@@ -3093,8 +3131,10 @@ namespace pflow {
       else if(format == "json"){ // DX 8/3/17 - FORMAT
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON,DEFAULT_KZIP_BIN);
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON,DEFAULT_KZIP_BIN); //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,DEFAULT_KZIP_BIN); // DX 1/18/18 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,DEFAULT_KZIP_BIN); //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON,DEFAULT_KZIP_BIN);
@@ -3128,6 +3168,8 @@ namespace pflow {
     kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE;//DX 20200129
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE;//DX 20200129
     kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;       // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
@@ -5662,6 +5704,8 @@ namespace pflow {
     kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;  // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE;// DX 8/15/17 - Add in consistency checks // DX 12/5/17 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=FALSE;//DX 20200129
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=FALSE;//DX 20200129
     kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;       // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;      // DX 8/15/17 - Add in consistency checks
@@ -6187,6 +6231,28 @@ namespace pflow {
       //[DX OBSOLETE]  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL WARNING: Point Group Crystal of Original Cell: " << a.point_group_Hermann_Mauguin << " | Space Group of Primitive Cell: " << GetSpaceGroupName(a.space_group_ITC) << " -- This is a derivative structure." << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       //[DX OBSOLETE]  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       //[DX OBSOLETE]}
+      // Calculate Patterson Point Group 
+      if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON){ //DX 20200129
+        if(!SYM::CalculatePointGroupPatterson(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE,osswrite,oss,format)){
+          if(!no_scan){
+            a.ClearSymmetry();
+            // DX 9/5/17 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
+            if(!SYM::change_tolerance(a,a.sym_eps,min_dist,no_scan))
+            { //CO200106 - patching for auto-indenting
+              a=b;  //pretty printing, unmodified structure
+              if(force_perform){
+                cerr << "pflow::PerformFullSymmetry: Scan failed [0]. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << print_directory << endl;
+                PerformFullSymmetry(a,orig_tolerance,true,false,FileMESSAGE,aflags,kflags,osswrite,oss,format);
+              } else {
+                return FALSE;
+              }
+            }
+            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_PATTERSON Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            continue;
+          }
+        }
+      } //DX 20200129
       if(kflags.KBIN_SYMMETRY_CALCULATE_SGROUP){ // DX 8/14/17
         if(kflags.KBIN_SYMMETRY_SGROUP_RADIUS>0.0) {
           if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: found RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -6307,6 +6373,8 @@ namespace pflow {
     kflags.KBIN_SYMMETRY_FGROUP_WRITE=write;
     kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=write;
     kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=write; // DX 12/5/17 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE=write;//DX 20200129
+    kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=write;//DX 20200129
     kflags.KBIN_SYMMETRY_IATOMS_WRITE=write;
     kflags.KBIN_SYMMETRY_AGROUP_WRITE=write;
     kflags.KBIN_SYMMETRY_SGROUP_WRITE=write;
@@ -6317,6 +6385,8 @@ namespace pflow {
     kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=calc;
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=calc;
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=calc; // DX 12/5/17 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON=calc;//DX 20200129
+    kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=calc;//DX 20200129
     kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=calc;
     kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=calc;
     kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=calc;
@@ -6456,8 +6526,10 @@ namespace pflow {
       for(uint i=0;i<vext.size();i++) {	
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+vext.at(i)) ||
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT+vext.at(i)) || //DX 20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+vext.at(i)) || // DX 12/5/17 - Added pgroupk_xtal
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+vext.at(i)) || //DX 20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+vext.at(i)) ||
@@ -6466,8 +6538,10 @@ namespace pflow {
       for(uint i=0;i<vext.size();i++) {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+"*");}
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT+"*");} //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+"*");} // DX 12/5/17 - Added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+"*");} //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+"*");}
@@ -6476,8 +6550,10 @@ namespace pflow {
       for(uint i=0;i<vext.size();i++) {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+vext.at(i)) ||
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON+vext.at(i)) || //DX 20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+vext.at(i)) || // DX 12/5/17 - Added pgroupk_xtal
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+vext.at(i)) || //DX 20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+vext.at(i)) ||
@@ -6486,8 +6562,10 @@ namespace pflow {
       for(uint i=0;i<vext.size();i++) {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+"*");}
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON+"*");} //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+"*");} //DX 5/16/18 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+"*");} //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+"*");}
@@ -6510,8 +6588,10 @@ namespace pflow {
       if(format == "txt"){ // DX 8/3/17 - FORMAT
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT,DEFAULT_KZIP_BIN);
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_OUT,DEFAULT_KZIP_BIN); //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,DEFAULT_KZIP_BIN); // DX 12/5/17 - Added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,DEFAULT_KZIP_BIN); //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT,DEFAULT_KZIP_BIN);
@@ -6520,8 +6600,10 @@ namespace pflow {
       else if(format == "json"){ // DX 8/3/17 - FORMAT
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON,DEFAULT_KZIP_BIN);
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_PATTERSON_JSON,DEFAULT_KZIP_BIN); //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,DEFAULT_KZIP_BIN); // DX 12/5/17 - Added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,DEFAULT_KZIP_BIN); //DX 20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON,DEFAULT_KZIP_BIN);
