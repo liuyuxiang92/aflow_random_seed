@@ -6211,7 +6211,7 @@ namespace pflow {
       //[DX OBSOLETE]}
       // Calculate Patterson Point Group 
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON){ //DX 20200129
-        if(!SYM::CalculatePointGroupPatterson(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE,osswrite,oss,format)){
+        if(!SYM::CalculatePointGroupKPatterson(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE,osswrite,oss,format)){
           if(!no_scan){
             a.ClearSymmetry();
             // DX 9/5/17 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
