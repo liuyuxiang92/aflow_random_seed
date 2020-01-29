@@ -736,7 +736,7 @@ class _kflags {
     bool  KBIN_SYMMETRY_CALCULATE_FGROUP;       // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL;  // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL; // DX 12/5/17 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_PGROUP_PATTERSON;  // DX 20200129 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON;  // DX 20200129 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_IATOMS;       // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_AGROUP;       // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_SGROUP;       // DX 8/14/17 - Specify what to calculate/verify
@@ -745,7 +745,7 @@ class _kflags {
     bool  KBIN_SYMMETRY_PGROUPK_WRITE;     // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUP_XTAL_WRITE; // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE;// DX 12/5/17 - Added pgroupk_xtal
-    bool  KBIN_SYMMETRY_PGROUP_PATTERSON_WRITE;// DX 20200129 - taken TRUE by default
+    bool  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE;// DX 20200129 - taken TRUE by default
     bool  KBIN_SYMMETRY_FGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_SGROUP_WRITE;
     bool  KBIN_SYMMETRY_AGROUP_WRITE;      // taken TRUE by default
@@ -1074,7 +1074,7 @@ uint ApennsyARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vfl
 #define _PGROUPK_ 5            // for point group klattice
 #define _PGROUP_XTAL_ 6        // for point group crystal
 #define _PGROUPK_XTAL_ 7       // for point group kcrystal
-#define _PGROUP_PATTERSON_ 8   // for point group Patterson //DX 20200129
+#define _PGROUPK_PATTERSON_ 8   // for point group Patterson //DX 20200129
 #define _FGROUP_ 1             // for factor group
 #define _SGROUP_ 2             // for space group
 #define _AGROUP_ 3             // for site positions point group
@@ -1268,8 +1268,8 @@ class _sym_op {
     bool             is_pgroup;                                   // bool is_pgroup
     // for _PGROUP_XTAL_
     bool             is_pgroup_xtal;                              // bool is_pgroup_xtal
-    // for _PGROUP_PATTERSON_
-    bool             is_pgroup_Patterson;                         // bool is_pgroup_Patterson //DX 20200129
+    // for _PGROUPK_PATTERSON_
+    bool             is_pgroupk_Patterson;                        // bool is_pgroup_Patterson //DX 20200129
     // for _PGROUPK_
     bool             is_pgroupk;                                  // bool is_pgroupk
     // for _PGROUPK_XTAL_                  
@@ -1689,8 +1689,8 @@ class xstructure {
     string point_group_order;                                     // crystal and point group properties
     string point_group_structure;                                 // crystal and point group properties
     // POINT GROUP PATTERSON                                      // POINT GROUP PATTERSON //DX 20200129
-    std::vector<_sym_op> pgroup_Patterson;                        // rotations/inversions operations
-    bool pgroup_Patterson_calculated;                             // WARNING: we use starting from 0
+    std::vector<_sym_op> pgroupk_Patterson;                       // rotations/inversions operations
+    bool pgroupk_Patterson_calculated;                            // WARNING: we use starting from 0
     // POINT GROUP KLATTICE                                       // POINT GROUP
     std::vector<_sym_op> pgroupk;                                 // rotations/inversions operations
     bool pgroupk_calculated;                                      // WARNING: we use starting from 0
@@ -3776,8 +3776,8 @@ namespace SYM {
   bool CalculatePointGroupCrystal_20170814(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");      // POINT GROUP      _PGROUP_ // DX
   bool CalculatePointGroupCrystal_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");      // POINT GROUP      _PGROUP_ // DX
   bool CalculatePointGroupCrystal_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_);      // POINT GROUP      _PGROUP_ // DX
-  bool CalculatePointGroupPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");     // POINT GROUP PATTERSON     _PGROUP_PATTERSON_ //DX 20200129 
-  bool CalculatePointGroupPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");      // POINT GROUP PATTERSON     _PGROUP_PATTERSON_ //DX 20200129
+  bool CalculatePointGroupPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");     // POINT GROUP PATTERSON     _PGROUPK_PATTERSON_ //DX 20200129 
+  bool CalculatePointGroupPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");      // POINT GROUP PATTERSON     _PGROUPK_PATTERSON_ //DX 20200129
   bool PointGroupMap(xstructure& a, string& pgname, string& operations, char group); // DX 9/6/17
   bool PointGroupLookUpTable(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format);
   // DX and CO -END
