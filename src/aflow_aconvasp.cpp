@@ -531,7 +531,7 @@ _atom ConvertAtomToLat(const _atom& in_at, const xmatrix<double>& lattice) {
 // [OBSOLETE] 	    _atom a;
 // [OBSOLETE] 	    a=sstr.atoms.at(iat);
 // [OBSOLETE] 	    a.name=sstr.atoms.at(iat).name;
-// [OBSOLETE] 	    a.number=iat;
+// [OBSOLETE] 	    a.basis=iat;  //[CO200130 - number->basis]a.number=iat;
 // [OBSOLETE] 	    a.ijk=ijk;
 // [OBSOLETE] 	    for(int ic=1;ic<=3;ic++)
 // [OBSOLETE] 	      ctpos(ic)=sstr.atoms.at(iat).cpos(ic)+ijk(1)*lat(1,ic)+ijk(2)*lat(2,ic)+ijk(3)*lat(3,ic);
@@ -604,7 +604,7 @@ namespace pflow {
     for(uint iat=0;iat<sstr.atoms.size();iat++) {
       _atom a=sstr.atoms.at(iat);
       a.name=sstr.atoms.at(iat).name;
-      a.number=iat;
+      a.basis=iat; //[CO200130 - number->basis]a.number=iat;
       a.ijk=sstr.atoms.at(iat).ijk;
       a.cpos=sstr.atoms.at(iat).cpos;
       a.fpos=sstr.atoms.at(iat).fpos;//cerr << sstr.atoms.at(iat).fpos << endl;
@@ -776,7 +776,7 @@ namespace pflow {
 namespace pflow {
   _atom SetNum(const _atom& a,const int in_num) {
     _atom b;b=a;
-    b.number=in_num;
+    b.basis=in_num;  //[CO200130 - number->basis]b.number=in_num;
     return b;
   }
 }
@@ -1019,7 +1019,7 @@ namespace pflow {
       }
       return b;
     }
-    cerr << "Must specity as many names as types/numbers: in.size()=" << (int) in.size()
+    cerr << "Must specity as many names as types/bases: in.size()=" << (int) in.size()
       << "   =a.num_each_type.size()=" << (int) a.num_each_type.size()
       << "   =a.atoms.size()=" << (int) a.atoms.size() << endl;
     exit(0);
@@ -1045,7 +1045,7 @@ namespace pflow {
       }
       return b;
     }
-    cerr << "Must specity as many names as types/numbers: in.size()=" << (uint) in.size()
+    cerr << "Must specity as many names as types/bases: in.size()=" << (uint) in.size()
       << "   =a.num_each_type.size()=" << (uint) a.num_each_type.size()
       << "   =a.atoms.size()=" << (uint) a.atoms.size() << endl;
     exit(0);

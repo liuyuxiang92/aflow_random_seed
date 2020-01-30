@@ -971,7 +971,7 @@ namespace surface {
                 // grid_atoms_fpos_ptr = new xvector<double>(3);  / /USELESS
                 // *grid_atoms_fpos_ptr=ddd;                       //USELESS
                 // grid_atoms_fpos.push_back(grid_atoms_fpos_ptr); //USELESS
-                grid_atoms_number.push_back(str.atoms.at(iat).number);
+                grid_atoms_number.push_back(str.atoms.at(iat).basis);  //[CO200130 - number->basis]grid_atoms_number.push_back(str.atoms.at(iat).number);
               }
             }
           }

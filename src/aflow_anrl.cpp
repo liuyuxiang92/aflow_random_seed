@@ -3514,7 +3514,7 @@ namespace anrl {
 
     for(uint iat=0;iat<str.atoms.size();iat++) {
       str.atoms.at(iat).name_is_given=TRUE;
-      str.atoms.at(iat).number=iat;//iat;    // reference position for convasp
+      //[CO200130 - number->basis]str.atoms.at(iat).number=iat;//iat;    // reference position for convasp
       str.atoms.at(iat).basis=iat;//iat;     // position in the basis
       if(print_mode!=1){ //equations only //DX 20180618
         str.atoms.at(iat).cpos=F2C(str.lattice,str.atoms.at(iat).fpos);

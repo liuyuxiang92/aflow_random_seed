@@ -803,7 +803,7 @@ namespace apl {
           cout << "SHELL " << ishell << " " << isubshell << std::endl;
 
           for (uint ai = 0; ai < atomsAtSameShell.size(); ai++) {
-            int nb = atomsAtSameShell[ai].number;
+            int nb = atomsAtSameShell[ai].basis; //[CO200130 - number->basis]int nb = atomsAtSameShell[ai].number;
             cout << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
             cout << setprecision(4);
             cout << "- MATRIX: " << i << "/" << nb << " " << nb << "/" << i << std::endl;

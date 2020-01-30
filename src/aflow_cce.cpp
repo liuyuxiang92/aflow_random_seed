@@ -434,7 +434,7 @@ namespace pflow {
           const _atom& atom=neigh_mat[i][j];
           if (0.1 < AtomDist(a.atoms[i],atom) && AtomDist(a.atoms[i],atom) <= cutoffs[a.atoms[i].type] ){ // distance must be larger than 0.1 Ang to savely exclude the cation itself having distance zero to itself
             //cout << atom.name << " cpos=" << atom.cpos << " ijk=" << aurostd::joinWDelimiter(atom.ijk,",") << " dist=" << AtomDist(a,a.atoms[i],atom) <<  " dist_check=" << aurostd::modulus(a.atoms[i].cpos-atom.cpos) << endl; // the first argument to AtomDist function here seems to be unneccesary and might even lead to wrong results since rescaling was performed before; therefore it is omitted in the next line
-            //cout << atom.name << " number=" << atom.number << " type=" << atom.type << " cpos=" << atom.cpos << " ijk=" << aurostd::joinWDelimiter(atom.ijk,",") << " dist=" << AtomDist(a.atoms[i],atom) <<  " dist_check=" << aurostd::modulus(a.atoms[i].cpos-atom.cpos) << endl; // ijk should yield the unit cell within which the neighbor is found with respect to the central unit cell
+            //cout << atom.name << " basis=" << atom.basis << " type=" << atom.type << " cpos=" << atom.cpos << " ijk=" << aurostd::joinWDelimiter(atom.ijk,",") << " dist=" << AtomDist(a.atoms[i],atom) <<  " dist_check=" << aurostd::modulus(a.atoms[i].cpos-atom.cpos) << endl; // ijk should yield the unit cell within which the neighbor is found with respect to the central unit cell //[CO200130 - number->basis]
             if (atom.name == "O"){
               neighbors_count+=1;
             } else if (atom.name != "O"){  

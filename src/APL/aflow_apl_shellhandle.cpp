@@ -265,7 +265,7 @@ namespace apl {
                 //atom.cpos = atom.cpos + cshift;
                 atom.fpos = C2F(_initStructure.lattice, atom.cpos);
                 //atom.fpos = C2F(sclattice,atom.cpos);
-                atom.number = id++;
+                atom.basis = id++; //[CO200130 - number->basis]atom.number = id++;
 
                 // Which shell?
                 //atom.fpos = getFPositionItsNearestImage(atom.fpos,zero,sclattice);
@@ -359,7 +359,7 @@ namespace apl {
         for (; k < store.size(); k++) {
           uint l = 0;
           for (; l < store[k].size(); l++)
-            if (atomsAtSameShell[i].number == store[k][l].number) break;
+            if (atomsAtSameShell[i].basis == store[k][l].basis) break;  //[CO200130 - number->basis]if (atomsAtSameShell[i].number == store[k][l].number) break;
           if (l != store[k].size()) break;
         }
         if (k != store.size()) continue;
@@ -368,7 +368,7 @@ namespace apl {
           // Is it already stored?
           uint k = 0;
           for (; k < storeRow.size(); k++)
-            if (atomsAtSameShell[j].number == storeRow[k].number) break;
+            if (atomsAtSameShell[j].basis == storeRow[k].basis) break;  //[CO200130 - number->basis]if (atomsAtSameShell[j].number == storeRow[k].number) break;
           if (k != storeRow.size()) continue;
 
           // Rotate atom and check if it coincides with the first atom of this group
@@ -401,7 +401,7 @@ namespace apl {
       //{
       //for(uint n = 0; n < store[m].size(); n++)
       //{
-      //cout << "  - ATOM ID    : " << setw(3) << setfill('0') << store[m][n].number << " " << setfill(' ');
+      //cout << "  - ATOM ID    : " << setw(3) << setfill('0') << store[m][n].basis << " " << setfill(' ');  //[CO200130 - number->basis]//cout << "  - ATOM ID    : " << setw(3) << setfill('0') << store[m][n].number << " " << setfill(' ');
       //printXVector(store[m][n].cpos,false);
       //double r = aurostd::modulus(store[m][n].cpos);
       //cout << " (" << r << ", dev = " << ( r - _shells[ishell].radius ) << ")" << std::endl;
@@ -699,7 +699,7 @@ namespace apl {
       try {
         int shellID = getShell(aurostd::modulus(cpos));
         _atom atom = xstr.atoms[i];
-        atom.number = i;
+        atom.basis = i;  //[CO200130 - number->basis]atom.number = i;
         atom.fpos = xmin;
         atom.cpos = cpos;
         addAtomToShell(shellID, atom, useSplittedShells);
@@ -794,7 +794,7 @@ namespace apl {
     os << "- The inserted supercell is safely mapped up to shell " << _idSafeMappedShell << "." << std::endl;
     os << "- The regular shell is " << regShell << ", the last shell is " << lastShell << "." << std::endl;
     os << std::endl;
-    os << "- The shell table with the center in the atom no. " << _shells[0].atoms[0][0].number << " is:" << std::endl;
+    os << "- The shell table with the center in the atom no. " << _shells[0].atoms[0][0].basis << " is:" << std::endl; //[CO200130 - number->basis]os << "- The shell table with the center in the atom no. " << _shells[0].atoms[0][0].number << " is:" << std::endl;
     os << std::endl;
     string tab = "  ";
     os << tab << " SHELL  INDEX  OCC  MAX    Radius (Angs.)               Presented atoms               " << std::endl;
@@ -832,7 +832,7 @@ namespace apl {
         os << "     ";
         os << fixed << setfill(' ') << setw(6) << setprecision(3) << _shells[i].radius << "         ";
         for (uint k = 1; k <= _shells[i].atoms[j].size(); k++) {
-          os << setfill('0') << setw(3) << _shells[i].atoms[j][k - 1].number << " ";
+          os << setfill('0') << setw(3) << _shells[i].atoms[j][k - 1].basis << " ";  //[CO200130 - number->basis]os << setfill('0') << setw(3) << _shells[i].atoms[j][k - 1].number << " ";
           if (k % 10 == 0 && k != _shells[i].atoms[j].size())
             os << std::endl
               << tab << "                                             ";

@@ -1,3 +1,6 @@
+3.1.229 - 2020/01/30
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+        -- number->basis (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
