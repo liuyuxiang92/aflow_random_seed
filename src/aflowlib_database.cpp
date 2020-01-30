@@ -910,7 +910,7 @@ namespace aflowlib {
     }
   }
 
-  //getUniqueFromJsonrrays////////////////////////////////////////////////////
+  //getUniqueFromJsonArrays///////////////////////////////////////////////////
   // Determines the unique array elements in a set of 1D-array strings.
   vector<string> AflowDB::getUniqueFromJsonArrays(const vector<string>& arrays) {
     vector<string> unique, tokens;
