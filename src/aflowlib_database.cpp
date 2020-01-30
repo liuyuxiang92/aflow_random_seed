@@ -321,7 +321,7 @@ namespace aflowlib {
     } else {
       if (!aurostd::FileEmpty(database_file)) {
         if (LDEBUG) std::cerr << "Old database file found. "
-          << " Determining number of entries and " << std::endl;
+          << " Determining number of entries and properties." << std::endl;
         open();
         vector<string> props, tables;
         tables = getTables();
