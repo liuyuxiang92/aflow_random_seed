@@ -259,6 +259,7 @@ namespace aflowlib {
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
+
     is_tmp = true;
     aurostd::RemoveFile(lock_link);
   }
