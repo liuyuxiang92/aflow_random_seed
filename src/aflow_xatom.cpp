@@ -13594,6 +13594,47 @@ void CalculateSymmetryPointGroupKCrystal(xstructure& str) {
   CalculateSymmetryPointGroupKCrystal(str,FALSE,cout,FALSE);
 }
 
+// ME200129
+// ***************************************************************************
+// Function CalculateSymmetryPointGroupKPatterson
+// ***************************************************************************
+
+void xstructure::CalculateSymmetryPointGroupKPatterson(bool ossverbose) {
+  ofstream FileDevNull("/dev/null");
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  SYM::CalculatePointGroupKPatterson(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
+}
+
+void xstructure::CalculateSymmetryPointGroupKPatterson(void) {
+  CalculateSymmetryPointGroupKPatterson(FALSE);
+}
+
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
+  ofstream FileDevNull("/dev/null");
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  SYM::CalculatePointGroupKPatterson(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
+}
+
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKPatterson(str,ossverbose,oss,FALSE);
+}
+
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKPatterson(str,ossverbose,cout,FALSE);
+}
+
+void CalculateSymmetryPointGroupKPatterson(xstructure& str) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKPatterson(str,FALSE,cout,FALSE);
+}
+
 // ***************************************************************************
 // Function buildGenericTitle()
 // ***************************************************************************

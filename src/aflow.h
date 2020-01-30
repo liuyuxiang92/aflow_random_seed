@@ -1517,8 +1517,10 @@ class xstructure {
     void CalculateSymmetryPointGroupCrystal(void);                // Calculate the symmetry
     void CalculateSymmetryPointGroupKLattice(bool);               // Calculate the symmetry
     void CalculateSymmetryPointGroupKLattice(void);               // Calculate the symmetry
-    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  // ME20014
-    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  // ME20014
+    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  // ME200114
+    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  // ME200114
+    void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  // ME200129
+    void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  // ME200129
     int  GenerateGridAtoms(int,int,int,int,int,int);              // generate grid of atoms
     int  GenerateGridAtoms(int,int,int);                          // generate grid of atoms
     int  GenerateGridAtoms(int);                                  // generate grid of atoms
@@ -2364,6 +2366,10 @@ void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream
 void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  // ME200114
 void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  // ME200114
 void CalculateSymmetryPointGroupKCrystal(xstructure& str);  // ME200114
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss);  // ME200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose);  // ME200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str);  // ME200129
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);
