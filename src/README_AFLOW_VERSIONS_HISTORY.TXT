@@ -1,3 +1,6 @@
+3.1.229 - 2020/03/01
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+        -- Changed database file name conventions. (ME)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
