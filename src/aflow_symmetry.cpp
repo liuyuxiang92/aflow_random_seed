@@ -2811,9 +2811,9 @@ namespace SYM {
 } 
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
-// Function SYM::CalculatePointGroupPatterson()
+// Function SYM::CalculatePointGroupKPatterson()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
-// Returns the PointGroup of the Patterson function (i.e., Patterson symmetry)
+// Returns the point group (in reciprocal space) of the Patterson function (i.e., Patterson symmetry)
 // Patterson symmetry represents the vector set symmetry of a crystal (see ITC-A pg. 19)
 // The Patterson symmetry is 
 //   1) symmorphic : only point group symmetries, no translations and
@@ -2825,7 +2825,7 @@ namespace SYM {
 //   2) adding inversion symmetry to pgroupk_xtal
 // NOTE: This analysis is for reciprocal space only, so Uf is with respect to the klattice (reciprocal lattice)
 namespace SYM {  
-  bool CalculatePointGroupPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {
+  bool CalculatePointGroupKPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {
     double _eps_=AUROSTD_NAN;// DX =_EPS_;
     if(a.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
       _eps_=a.sym_eps;
@@ -2833,15 +2833,15 @@ namespace SYM {
     else {
       _eps_=defaultTolerance(a);
     }
-    return SYM::CalculatePointGroupPatterson(FileMESSAGE,a,aflags,_write_,osswrite,oss,_eps_,format);}
+    return SYM::CalculatePointGroupKPatterson(FileMESSAGE,a,aflags,_write_,osswrite,oss,_eps_,format);}
 } // namespace SYM
 
 namespace SYM {  
-  bool CalculatePointGroupPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_, string format) {
+  bool CalculatePointGroupKPatterson(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_, string format) {
     
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=(DEBUG_SYMMETRY || LDEBUG);    
-    string function_name = "SYM::CalculatePointGroupPatterson()";
+    string function_name = "SYM::CalculatePointGroupKPatterson()";
 
     ostringstream aus;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -2851,7 +2851,7 @@ namespace SYM {
     // obtain the structure tolerance
     a.sym_eps=_eps_; 
 
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [0]" << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [0]" << endl;
 
     bool Krun=TRUE;
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);        // translation
@@ -2860,15 +2860,15 @@ namespace SYM {
     std::vector<int> basis_atoms_map(a.atoms.size());           // will map each on each
     for(uint i=0;i<a.atoms.size();i++) basis_atoms_map[i]=i;    // identically map each over each
     std::vector<int> basis_types_map(a.atoms.size());           // will map each on each
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [0d]" << endl;
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson a.atoms.size()=" << a.atoms.size() << endl;
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson a.species.size()=" << a.species.size() << endl;
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson basis_types_map.size()=" << basis_types_map.size() << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [0d]" << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " a.atoms.size()=" << a.atoms.size() << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " a.species.size()=" << a.species.size() << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " basis_types_map.size()=" << basis_types_map.size() << endl;
     for(uint i=0;i<a.atoms.size();i++) basis_types_map[i]=a.atoms[i].type;    // identically map each over each
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [0e]" << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [0e]" << endl;
     string message="PGROUPK_PATTERSON";
 
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [1]" << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [1]" << endl;
 
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);        // NEED POINT GROUP
     if(a.fgroup_calculated==FALSE) Krun=Krun && SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);       // NEED FACTOR GROUP
@@ -2882,7 +2882,7 @@ namespace SYM {
       
     // ---------------------------------------------------------------------------
     // check if pgroup_xtal contains inversion symmetry already
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [2a] Check if pgroup_xtal contains inverison symmetry (i.e., centrosymmetric) " << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [2a] Check if pgroup_xtal contains inverison symmetry (i.e., centrosymmetric) " << endl;
     bool contains_inversion = false;
     for(uint ip=0;ip<a.pgroupk_xtal.size()&&!contains_inversion;ip++) {
       if(aurostd::identical(inversion_symmetry_matrix,a.pgroupk_xtal[ip].Uc)){
@@ -2893,7 +2893,7 @@ namespace SYM {
     // ---------------------------------------------------------------------------
     // copy pgroup_xtal to pgroupk_Patterson; equivalent 
     if(contains_inversion){
-      if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [3a] point group is already centrosymmetric, same as POINT GROUP CRYSTAL " << endl;
+      if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [3a] point group is already centrosymmetric, same as POINT GROUP CRYSTAL " << endl;
       _sym_op symop;
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
         symop=a.pgroupk_xtal.at(k);
@@ -2910,7 +2910,7 @@ namespace SYM {
       // ---------------------------------------------------------------------------
       // add inversion symmetry to pgroup_xtal
       if(calculation_mode==1){
-        if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [3b] calculation_mode: add inversion symmetry to pgroup_xtal (fast, default) " << endl;
+        if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [3b] calculation_mode: add inversion symmetry to pgroup_xtal (fast, default) " << endl;
         std::vector<_sym_op> pgroupk_Patterson;                             // rotations/inversions operations
         for(uint ip=0;ip<a.pgroupk_xtal.size();ip++) {  // I shift of 1 so I use the same [kk-1]...
           Uf=a.pgroupk_xtal[ip].Uf;Uc=a.pgroupk_xtal[ip].Uc;
@@ -2935,11 +2935,11 @@ namespace SYM {
       // ---------------------------------------------------------------------------
       // calculate symmetry of vector set [TO-DO]
       else if(calculation_mode==2){
-        if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [3c] calculation_mode: explicitly calculate symmetry of vector set " << endl;
+        if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [3c] calculation_mode: explicitly calculate symmetry of vector set " << endl;
         // TO-DO
       }
     }
-    if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupPatterson [4]" << endl;
+    if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [4]" << endl;
 
     // ---------------------------------------------------------------------------
     // PGROUPK_PATTERSON
@@ -8429,7 +8429,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       }
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
-      FileOUTPUT << SymmetryToJson(a.pgroup_xtal,mode);     // DX 8/2/17
+      FileOUTPUT << SymmetryToJson(a.pgroupk_Patterson,mode);     // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
