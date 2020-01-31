@@ -1337,7 +1337,7 @@ namespace KBIN {
           string vaspVersion;
           vaspVersion = getVASPVersionString( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
           if (!vaspVersion.empty()) {
-            logger << "[" << (vaspVersion[0] - '0') << "]";  // ME200115 - to remove non-printable characters
+            logger << "[" << vaspVersion[0] << "]";
             if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
               logger << apl::warning << "." << apl::endl;
               // if(_WITHIN_DUKE_){ OBSOLETE - ME 190108
