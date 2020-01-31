@@ -823,6 +823,8 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME200116 - rebase to primitive
+  // Does not capture rotated primitive cells yet, but does work for AFLOW's
+  // standard conventional unit cell.
   void Supercell::projectToPrimitive() {
     vector<int> pc2sc, sc2pc;
     if (getMaps(_pcStructure, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
