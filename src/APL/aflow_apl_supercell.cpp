@@ -1513,7 +1513,7 @@ namespace apl {
   //[CO190218 - OBSOLETE]/******************************************************************************/
   //[CO190218 - OBSOLETE]#if !GETFULLSYMBASIS
   //[CO190218 - OBSOLETE]/******************************************************************************/
-   int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO190218
+  int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, bool translate) { //CO190218
     //corey
     //this function does the opposite (to above)
     //in basis_atoms_map, return the index of the atom that is atomID
