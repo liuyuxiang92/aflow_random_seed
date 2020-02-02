@@ -22,13 +22,14 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
+  // ME200102 - Refactored
   Supercell::Supercell(const xstructure& _xstr, const _aflags& aflags, Logger& l) : _aflowFlags(aflags), _logger(l) {  //CO181226
     initialize(_xstr);
   }
 
   void Supercell::initialize(const xstructure& _xstr) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="apl::Supercell::Supercell():";
+    string soliloquy="apl::Supercell::initialize():";
 
     //CO190121 - need to sort by equivalent atoms
     //Discovered with help from Xiaoyu Wang of Eva Zurek's group (UBuffalo)
@@ -824,7 +825,7 @@ namespace apl {
 
   // ME200116 - rebase to primitive
   // Does not capture rotated primitive cells yet, but does work for AFLOW's
-  // standard conventional unit cell.
+  // standard conventional unit cells.
   void Supercell::projectToPrimitive() {
     vector<int> pc2sc, sc2pc;
     if (getMaps(_pcStructure, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
