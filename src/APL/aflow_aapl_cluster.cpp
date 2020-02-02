@@ -218,8 +218,7 @@ namespace apl {
           if (!mapped) {
             string message = "At least one atom of the supercell could not be mapped.";
             if (LDEBUG) {
-              std::cerr << "ClusterSet::getSymmetryMap: Failed to map atom " << atsc
-                << " using fgroup number " << fg << "." << std::endl;
+              std::cerr << function << " Failed to map atom " << atsc << " using fgroup number " << fg << "." << std::endl;
             }
             throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
           }
