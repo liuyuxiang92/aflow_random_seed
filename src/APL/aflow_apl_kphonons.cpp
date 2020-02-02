@@ -1413,15 +1413,17 @@ namespace KBIN {
     if (USER_MAXSHELL > 0) supercell.setupShellRestrictions(USER_MAXSHELL);
 
     // Write supercell input structure into PHPOSCAR to save state
-    xstructure xstr = supercell.getInputStructure();
-    xstr.is_vasp5_poscar_format = true;
-    stringstream poscar;
-    poscar << xstr;
-    aurostd::stringstream2file(poscar, phposcar_file);
-    if (!aurostd::FileExist(phposcar_file)) {
-      string function = "KBIN::RunPhonons_APL()";
-      string message = "Cannot open output file " + phposcar_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    // unless it has been read before.
+    if (!aurostd::EFileExist(phposcar_file)) {
+      xstructure xstr = supercell.getInputStructureLight();
+      xstr.is_vasp5_poscar_format = true;
+      stringstream poscar;
+      poscar << xstr;
+      aurostd::stringstream2file(poscar, phposcar_file);
+      if (!aurostd::FileExist(phposcar_file)) {
+        string message = "Cannot open output file " + phposcar_file + ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      }
     }
     // ME200102 - END
 
