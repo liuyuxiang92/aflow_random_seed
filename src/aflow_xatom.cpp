@@ -11296,19 +11296,26 @@ void *_threaded_GetTvectors(void *ptr) {
 
 xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // APRIL 2009 JUNE 2012 added tolerance
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  if(LDEBUG) cerr << "GetPrimitiveMULTITHREAD: BEGIN " << endl;
+  string soliloquy="GetPrimitiveMULTITHREAD():"; //CO200201
+  if(LDEBUG) cerr << soliloquy << " BEGIN " << endl; //CO200201
+  if(LDEBUG){cerr << soliloquy << " _a=" << endl;cerr << _a << endl;} //CO200201
   cout.setf(std::ios::fixed,std::ios::floatfield);
   cout.precision(10);
   xstructure a(_a);
   xstructure sstr=a;
+  if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO200201
+  if(LDEBUG){cerr << soliloquy << " sstr.atoms.size()=" << sstr.atoms.size() << endl;}  //CO200201
   sstr.SetVolume(sstr.atoms.size());
+  if(LDEBUG){cerr << soliloquy << " sstr(post Vol)=" << endl;cerr << sstr << endl;} //CO200201
   sstr=ReScale(sstr,1.0);
+  if(LDEBUG){cerr << soliloquy << " sstr(pre BringInCell)=" << endl;cerr << sstr << endl;} //CO200201
   sstr=BringInCell(sstr);
+  if(LDEBUG){cerr << soliloquy << " sstr(post BringInCell)=" << endl;cerr << sstr << endl;} //CO200201
   //  sstr.CalculateSymmetry();
   if(tolerance<=0.0) a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; else a.equiv_fpos_epsilon=tolerance;
   double sstr_volume=sstr.Volume();
 
-  if(LDEBUG) cerr << "GetPrimitiveMULTITHREAD: [1] " << endl;
+  if(LDEBUG) cerr << soliloquy << " [1] " << endl; //CO200201
 
   _aflags aflags;
   // identify the minimum set of atoms
@@ -11324,7 +11331,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   xvector<double> fdisp(3),cdisp(3);
   std::vector<xvector<double> > candidate_lattice_vector;
 
-  if(LDEBUG) cerr << "GetPrimitiveMULTITHREAD: [2] " << endl;
+  if(LDEBUG) cerr << soliloquy << " [2] " << endl; //CO200201
 
   int specie_min=sstr.num_each_type.at(0),ispecie_min=0,specie_min_threshold=_PRIM_MULTITHREAD_MIN_ATOMS_THRESHOLD_; // seems a good threshold
   for(uint ispecie=0;ispecie<sstr.num_each_type.size();ispecie++)
@@ -11341,7 +11348,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   candidate_lattice_vector.push_back(sstr.lattice(3));  // lattice is made of good vectors
   // no threads
 
-  if(LDEBUG) cerr << "GetPrimitiveMULTITHREAD: [3] " << endl;
+  if(LDEBUG) cerr << soliloquy << " [3] " << endl; //CO200201
 
   if(!AFLOW_PTHREADS::FLAG || specie_min<=specie_min_threshold) {
     //   cerr << "NO PTHREADS" << endl;
@@ -11442,13 +11449,14 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
     // collect
     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
       pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
-    if(LDEBUG) cerr << "GetPrimitiveMULTITHREAD: END THREADS " << endl;
+    if(LDEBUG) cerr << soliloquy << " END THREADS " << endl; //CO200201
   }
 
   plattice=olattice;
 
   // done
-
+  
+  if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO200201
   xstructure b=sstr;
   b.lattice=plattice;//b.lattice=roundoff(b.lattice,_EPS_FPOS_EQUAL_);
   b.FixLattices();
@@ -11499,7 +11507,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
     exit(0);
   }
   // everything ok
-  if(LDEBUG) cerr << "GetPrimitiveMULTITHREAD: END [ok]=" << fraction_atoms << endl;
+  if(LDEBUG) cerr << soliloquy << " END [ok]=" << fraction_atoms << endl;  //CO200201
   b.ClearSymmetry();  //CO181226 - new structure, symmetry not calculated
   return b;
 
@@ -12197,14 +12205,26 @@ xstructure SetScale(const xstructure& a,const double &in_scale) {
 // Function SetVolume
 // ***************************************************************************
 void xstructure::SetVolume(const double &in_volume) {
-  if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_scale must be non zero" << endl;exit(0);}
+  //[CO200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_scale must be non zero" << endl;exit(0);}
+  if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO200201
+  if(det(lattice)<0.0){
+    stringstream message;
+    message << "Found negative determinant for lattice (det()=" << det(lattice) << "). Flip your basis.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_);
+  }
   scale=std::pow((double) in_volume/det(lattice),(double) 1.0/3.0);
   FixLattices();  // touched scale, then fix the lattices
 }
 
 xstructure SetVolume(const xstructure& a,const double &in_volume) {
-  if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_volume must be non zero" << endl;exit(0);}
+  //[CO200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_volume must be non zero" << endl;exit(0);}
+  if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO200201
   xstructure b;b=a;
+  if(det(b.lattice)<0.0){ //CO200201
+    stringstream message;
+    message << "Found negative determinant for lattice (det()=" << det(b.lattice) << "). Flip your basis.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_);
+  }
   b.scale=std::pow((double) in_volume/det(b.lattice),(double) 1.0/3.0);
   b.FixLattices(); // touched scale, need to fix the lattices
   return b;
@@ -12310,7 +12330,7 @@ xstructure InflateVolume(const xstructure& a,const double &coefficient) {
 // ***************************************************************************
 // Function GetVolume
 // ***************************************************************************
-double xstructure::GetVolume(void) {
+double xstructure::GetVolume(void) const {  //CO200201
   return scale*scale*scale*det(lattice);
 }
 
@@ -12321,12 +12341,14 @@ double GetVolume(const xstructure& a) {
 // ***************************************************************************
 // Function Volume
 // ***************************************************************************
-double xstructure::Volume(void) {
-  return scale*scale*scale*det(lattice);
+double xstructure::Volume(void) const { //CO200201
+  return GetVolume(); //CO200201
+  //[CO200201]return scale*scale*scale*det(lattice);
 }
 
 double Volume(const xstructure& a) {
-  return a.scale*a.scale*a.scale*det(a.lattice);
+  return a.GetVolume(); //CO200201
+  //[CO200201]return a.scale*a.scale*a.scale*det(a.lattice);
 }
 
 _atom BringCloseToOrigin(_atom& atom, xmatrix<double>& f2c){
