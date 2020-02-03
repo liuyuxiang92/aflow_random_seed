@@ -558,7 +558,7 @@ namespace pocc {
   }
 
   void POccCalculator::StructuresAllFile2SupercellSets(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="pocc::StructuresAllFile2SupercellSets():";
 
     vector<string> vlines,vtokens,vtokens2;
@@ -644,7 +644,7 @@ namespace pocc {
   }
 
   void POccCalculator::StructuresUniqueFile2SupercellSets(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="pocc::StructuresUniqueFile2SupercellSets():";
 
     vector<string> vlines,vtokens,vtokens2;
@@ -715,7 +715,7 @@ namespace pocc {
   }
 
   void POccCalculator::setDFTEnergies() {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="setDFTEnergies():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -752,7 +752,7 @@ namespace pocc {
   }
 
   void POccCalculator::setPOccStructureProbabilities(double temperature) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="setPOccStructureProbabilities():";
     stringstream message;
 
@@ -784,7 +784,7 @@ namespace pocc {
   }
 
   void POccCalculator::setEFA(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::getEFA():";
 
     if(l_supercell_sets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
@@ -804,7 +804,7 @@ namespace pocc {
   }
 
   string POccCalculator::getTemperatureString(double temperature) const {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::getTemperatureString():";
 
     stringstream t_ss;
@@ -824,7 +824,7 @@ namespace pocc {
   }
 
   void POccCalculator::setAvgDOSCAR(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::setAvgDOSCAR():";
     stringstream message;
 
@@ -986,7 +986,7 @@ namespace pocc {
   }
 
   void POccCalculator::calculateSTATICProperties(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::calculateSTATICProperties():";
 
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
@@ -1006,7 +1006,7 @@ namespace pocc {
   }
 
   void POccCalculator::plotAvgDOSCAR(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::plotAvgDOSCAR():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1059,7 +1059,7 @@ namespace pocc {
 #define pocc_precision 12
 #define pocc_roundoff_tol 5.0*pow(10,-((int)pocc_precision)-1)
   void POccCalculator::writeResults() const { //TEMPERATURE-INDEPENDENT
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::writeResults():";
     stringstream message;
 
@@ -1088,7 +1088,7 @@ namespace pocc {
   }
 
   void POccCalculator::writeResults(double temperature) const { //TEMPERATURE-DEPENDENT
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::writeResults():";
     stringstream message;
 
@@ -1139,7 +1139,7 @@ namespace pocc {
   }
 
   bool POccCalculator::QMVASPsFound() const{
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="QMVASPsFound():";
     stringstream message;
 
@@ -1165,7 +1165,7 @@ namespace pocc {
   }
 
   vector<double> getVTemperatures(const string& temp_string){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::getVTemperatures():";
 
     if(LDEBUG){cerr << soliloquy << " temp_string=" << temp_string << endl;}
@@ -1206,7 +1206,7 @@ namespace pocc {
   }
 
   void POccCalculator::postProcessing(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::postProcessing():";
     stringstream message;
 
@@ -6618,7 +6618,7 @@ namespace pocc {
   void POccStructuresFile::setAFlags(const _aflags& aflags) {m_aflags=aflags;}
 
   void POccStructuresFile::readFile(const string& fileIn) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccStructuresFile::readFile():";
 
     m_filename="";
@@ -6636,7 +6636,7 @@ namespace pocc {
   }
 
   void POccStructuresFile::processFile() {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccStructuresFile::processFile():";
 
     //get poscar_start_tag and poscar_stop_tag
@@ -6834,7 +6834,7 @@ namespace pocc {
   }
 
   bool POccStructuresFile::getARUNDirectories(vector<string>& ARUN_directories,bool tryDirectoryLS){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccStructuresFile::getARUNDirectories():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccStructuresFile not initialized",_RUNTIME_ERROR_);}
 
@@ -6901,7 +6901,7 @@ namespace pocc {
   }
 
   bool POccStructuresFile::loadDataIntoCalculator(POccCalculator& pcalc,bool tryDirectoryLS) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccStructuresFile::loadDataIntoCalculator():";
 
     //copy over l_supercell_sets
