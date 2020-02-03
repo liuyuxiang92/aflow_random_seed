@@ -4045,8 +4045,8 @@ namespace KBIN {
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
   string getVASPVersionString(const string& binfile) {
-    // Get the full path to the binary
     if (XHOST.is_command(binfile)) {
+      // Get the full path to the binary
       string fullPathBinaryName = XHOST.command(binfile);
       if (fullPathBinaryName.empty()) return "";
 
