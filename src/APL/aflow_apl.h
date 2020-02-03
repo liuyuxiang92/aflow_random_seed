@@ -1480,6 +1480,7 @@ namespace apl {
       // ME190423 - END
       void calc(int);
       void calc(int, double);
+      void calc(int, double, double, double);  // ME200203
       void clear();
       void writePDOS(const string&);
       void writePDOS(string, string);  //[PINKU]

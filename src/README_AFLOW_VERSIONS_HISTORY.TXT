@@ -1,8 +1,9 @@
-3.1.229 - 2020/02/01
+3.1.229 - 2020/02/03
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
         -- Sped up determination of irreducible tetrahedra for the tetrahedron method. (ME)
         -- Sped up APL force constant matrix calculation. (ME)
         -- Sped up the calculation of the dynamical matrix. (ME)
+        -- Phonon DOS calculations can now be perfomed over an arbitrary frequency range. (ME)
         -- Phonon dispersions are now projected to the primitive cell when using DCPATH=LATTICE. (ME)
         -- APL now saves the state for phonon calculation using PHPOSCAR. (ME)
         -- APL now always uses a commensurate k-point grid for relaxations. (ME)

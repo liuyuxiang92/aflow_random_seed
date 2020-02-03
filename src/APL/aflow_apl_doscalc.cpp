@@ -229,17 +229,34 @@ namespace apl {
     gauss.clear();
   }
 
+  // ME200203 - DOS can now be calculated within any frequency range
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calc(int USER_DOS_NPOINTS) {
-    calc(USER_DOS_NPOINTS, 0.0);
+    calc(USER_DOS_NPOINTS, 0.0, _minFreq, _maxFreq);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
+    calc(USER_DOS_NPOINTS, USER_DOS_SMEAR, _minFreq, _maxFreq);
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+  void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR,
+      double fmin, double fmax) {
+    // Check parameters
+    if (aurostd::isequal(fmax, fmin, _AFLOW_APL_EPS_)) {
+      string function = "apl::DOSCalculator::calc()";
+      string message = "Frequency range of phonon DOS is nearly zero.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    } else if (fmin > fmax) {
+      double tmp = fmax;
+      fmax = fmin;
+      fmin = tmp;
+    }
     // Calculate steps
-    _stepDOS = (_maxFreq - _minFreq) / (double)USER_DOS_NPOINTS;
+    _stepDOS = (fmax - fmin) / (double)USER_DOS_NPOINTS;
     _halfStepDOS = 0.5 * _stepDOS;
 
     // Clear old stuff
@@ -251,7 +268,7 @@ namespace apl {
     for (int k = 0; k < USER_DOS_NPOINTS; k++) {
       _dos.push_back(0);
       _idos.push_back(0);  // ME190614
-      _bins.push_back(_minFreq + k * _stepDOS + _halfStepDOS);
+      _bins.push_back(fmin + k * _stepDOS + _halfStepDOS);
     }
     // ME190624
     if (_projections.size() > 0)
@@ -385,7 +402,8 @@ namespace apl {
         double fbin, dos, part;
         int br = ibranch - _freqs[0].lrows;
         for (int k = kstart; k <= kstop; k++) {
-          fbin = _minFreq + k * _stepDOS + _halfStepDOS;
+          // ME200203 - Use bins to accommodate different frequency range
+          fbin = _bins[k]; // _minFreq + k * _stepDOS + _halfStepDOS;
           dos = 0.0;
           if ((f[0] <= fbin) && (fbin <= f[1])) {
             double df = fbin - f[0];
@@ -511,8 +529,10 @@ namespace apl {
     double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
     double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
     double conv = factorTHz2Raw * factorRaw2meV/1000;
-    xdos.energy_max = _maxFreq * conv;
-    xdos.energy_min = _minFreq * conv;
+    // ME200203 - use _bins instead of _minFreq in case the DOS was calculated
+    // using different frequency ranges
+    xdos.energy_max = _bins.back() * conv;
+    xdos.energy_min = _bins[0] * conv;
     xdos.number_energies = _dos.size();
     xdos.Efermi = 0.0;  // phonon DOS have no Fermi energy
     xdos.venergy = aurostd::vector2deque(_bins);
