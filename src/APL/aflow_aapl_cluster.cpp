@@ -28,7 +28,7 @@ static const string _AAPL_CLUSTER_ERR_PREFIX_ = "apl::ClusterSet::";
 
 namespace apl {
 
-  //Constructors////////////////////////////////////////////////////////////////
+  //Constructors//////////////////////////////////////////////////////////////
   ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
       double& cut_rad, Logger& l, _aflags& a) : _logger(l), aflags(a) {
     free();  // Clear old vectors
@@ -87,7 +87,7 @@ namespace apl {
     free();
   }
 
-  //Copy Constructors///////////////////////////////////////////////////////////
+  //Copy Constructors/////////////////////////////////////////////////////////
   ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger), aflags(that.aflags) {
     copy(that);
   }
@@ -119,12 +119,12 @@ namespace apl {
     symmetry_map = that.symmetry_map;
   }
 
-  //Destructor//////////////////////////////////////////////////////////////////
+  //Destructor////////////////////////////////////////////////////////////////
   ClusterSet::~ClusterSet() {
     free();
   }
 
-  //free////////////////////////////////////////////////////////////////////////
+  //free//////////////////////////////////////////////////////////////////////
   // Clears all vectors and resets all values.
   void ClusterSet::free() {
     coordination_shells.clear();
@@ -143,7 +143,7 @@ namespace apl {
   }
 
 
-  //clear////////////////////////////////////////////////////////////////////////
+  //clear/////////////////////////////////////////////////////////////////////
   // Creates an empty ClusterSet object.
   void ClusterSet::clear(Logger& l, _aflags& a) {
     ClusterSet that(l, a);
@@ -156,7 +156,7 @@ namespace apl {
 
 namespace apl {
 
-  //getSymmetryMap//////////////////////////////////////////////////////////////
+  //getSymmetryMap////////////////////////////////////////////////////////////
   // Creates a symmetry map for a list of atoms in the supercell using scaled
   // symmetry operations. Note that the supercell and the primtive cell must
   // have the same symmetry.
@@ -236,7 +236,7 @@ namespace apl {
     }
   }
 
-  ///getMaxRad//////////////////////////////////////////////////////////////////
+  ///getMaxRad////////////////////////////////////////////////////////////////
   // Returns the largest coordination shell for all inequivalent atoms using
   // cut_shell coordination shells.
   double ClusterSet::getMaxRad(const xstructure& cell, const int& cut_shell){
@@ -282,7 +282,7 @@ namespace apl {
     }
   }
 
-  //buildShells/////////////////////////////////////////////////////////////////
+  //buildShells///////////////////////////////////////////////////////////////
   // Creates coordination shells around the atoms of the primitive cell.
   void ClusterSet::buildShells() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
@@ -327,13 +327,13 @@ namespace apl {
 
 namespace apl {
 
-  //getCluster//////////////////////////////////////////////////////////////////
+  //getCluster////////////////////////////////////////////////////////////////
   // Returns a cluster from the list of clusters
   const _cluster& ClusterSet::getCluster(const int& i) const {
     return clusters[i];
   }
 
-  //build///////////////////////////////////////////////////////////////////////
+  //build/////////////////////////////////////////////////////////////////////
   // Builds the inequivalent clusters.
   void ClusterSet::build(int _order) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
@@ -367,7 +367,7 @@ namespace apl {
     }
   }
 
-  //getPermutations/////////////////////////////////////////////////////////////
+  //getPermutations///////////////////////////////////////////////////////////
   // Initialize permutations.
   vector<vector<int> > ClusterSet::getPermutations(const int& order) {
     vector<int> permut_base(order);
@@ -382,7 +382,7 @@ namespace apl {
     return permuts;
   }
 
-  //buildClusters///////////////////////////////////////////////////////////////
+  //buildClusters/////////////////////////////////////////////////////////////
   // Builds a list of clusters around the central atoms. No symmetry reduction
   // is performed here.
   vector<_cluster> ClusterSet::buildClusters() {
@@ -432,14 +432,15 @@ namespace apl {
   }
 
   // BEGIN getInequivalentClusters functions
-  //getInequivalentClusters/////////////////////////////////////////////////////
+  //getInequivalentClusters///////////////////////////////////////////////////
   // Builds a list of inequivalent clusters and their transformations. This is
   // done in two steps: First, equivalenceCluster determines if the cluster in
-  // question can be transformed into an inequivalent cluster. However, for the
-  // force constants, it is important to know how the inequivalent cluster
+  // question can be transformed into an inequivalent cluster. However, for
+  // the force constants, it is important to know how the inequivalent cluster
   // transforms into the equivalent cluster, which is determined by getSymOp.
-  // While it is possible to determine this in one step, the two-step procedure
-  // is significantly faster, especially with many coordination shells.
+  // While it is possible to determine this in one step, the two-step
+  // procedure is significantly faster, especially with many coordination
+  // shells.
   void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
       vector<vector<int> > & ineq_clst) {
     _logger << "CLUSTER: Determining inequivalent clusters." << apl::endl;
@@ -473,7 +474,7 @@ namespace apl {
     }
   }
 
-  //getNumUniqueAtoms///////////////////////////////////////////////////////////
+  //getNumUniqueAtoms/////////////////////////////////////////////////////////
   // Gets the number of unique atoms in a cluster. This greatly speeds up the
   // determination of inequivalent clusters because clusters with different
   // numbers of unique atoms cannot be equivalent and thus do not need to be
@@ -495,11 +496,11 @@ namespace apl {
     return unique;
   }
 
-  //getComposition//////////////////////////////////////////////////////////////
+  //getComposition////////////////////////////////////////////////////////////
   // Determines the composition of a cluster. This greatly speeds up the
   // determination of inequivalent clusters because clusters with different
-  // compoistion cannot be equivalent and thus do not need to be compared with
-  // each other.
+  // compoistion cannot be equivalent and thus do not need to be compared
+  // with each other.
   vector<int> ClusterSet::getComposition(const vector<int>& atoms) {
     vector<int> composition(scell.species.size());
     int type = -1;
@@ -510,7 +511,7 @@ namespace apl {
     return composition;
   }
 
-  //sameCompositions////////////////////////////////////////////////////////////
+  //sameCompositions//////////////////////////////////////////////////////////
   // Compares the compositions of two clusters. If they are not the same, the
   // symmetry check can be skipped.
   bool ClusterSet::sameComposition(const vector<int>& comp1,
@@ -523,10 +524,10 @@ namespace apl {
     return true;
   }
 
-  //equivalenceCluster//////////////////////////////////////////////////////////
-  // Determines whether a cluster is equivalent to another inequivalent cluster.
-  // The output is the index of the inequivalent cluster the cluster it is
-  // equivalent to (-1 if none).
+  //equivalenceCluster////////////////////////////////////////////////////////
+  // Determines whether a cluster is equivalent to another inequivalent
+  // cluster. The output is the index of the inequivalent cluster the cluster
+  // it is equivalent to (-1 if none).
   int ClusterSet::equivalenceCluster(const vector<int>& atoms,
       const vector<int>& unique_atoms,
       const vector<vector<int> >& compositions,
@@ -574,7 +575,7 @@ namespace apl {
     return -1;
   }
 
-  //translateToPcell//////////////////////////////////////////////////////////////
+  //translateToPcell//////////////////////////////////////////////////////////
   // Translates the cluster so that the atom with index "at" is inside the
   // primitive cell.
   vector<int> ClusterSet::translateToPcell(const vector<int>& atoms, int at) {
@@ -604,10 +605,10 @@ namespace apl {
     return atoms_translated;
   }
 
-  //comparePermutations/////////////////////////////////////////////////////////
-  // Compares if clusters are equivalent by permutation and returns the index of
-  // the permutation (-1 if none). The algorithm requires the permutations to be
-  // in lexicographical order, which is done by xcombos.
+  //comparePermutations///////////////////////////////////////////////////////
+  // Compares if clusters are equivalent by permutation and returns the index
+  // of the permutation (-1 if none). The algorithm requires the permutations
+  // to be in lexicographical order, which is done by xcombos.
   int ClusterSet::comparePermutations(const vector<int>& cluster_ineq,
       const vector<int>& cluster_compare) {
     int index = 0, iper = 0;
@@ -632,20 +633,16 @@ namespace apl {
     }
   }
 
-  //atomsMatch//////////////////////////////////////////////////////////////////
-  // Auxilliary function for comparePermutations to make the code more legible.
-  // Returns true if the indices after permutation are the same.
+  //atomsMatch////////////////////////////////////////////////////////////////
+  // Auxilliary function for comparePermutations to make the code more
+  // legible. Returns true if the indices after permutation are the same.
   bool ClusterSet::atomsMatch(const vector<int>& permutation, const vector<int>& cluster_perm,
       const vector<int>& cluster_orig, const int& depth) {
-    if (cluster_perm[permutation[depth]] == cluster_orig[depth]) {
-      return true;
-    } else {
-      return false;
-    }
+    return (cluster_perm[permutation[depth]] == cluster_orig[depth]);
   }
 
-  //getSymOp////////////////////////////////////////////////////////////////////
-  // Determines the factor group and the permutation index that transforms the
+  //getSymOp//////////////////////////////////////////////////////////////////
+  // Determines the factor group and the permutation index that transforms
   // the inequivalent cluster into the equivalent cluster.
   void ClusterSet::getSymOp(_cluster& cluster, const vector<int>& atoms_orig) {
     vector<int> cluster_transformed(order), cluster_transl(order);
@@ -674,7 +671,7 @@ namespace apl {
 
 namespace apl {
 
-  //buildDistortions////////////////////////////////////////////////////////////
+  //buildDistortions//////////////////////////////////////////////////////////
   // Builds the inequivalent distortions for the AAPL calculations.
   void ClusterSet::buildDistortions() {
     _logger << "CLUSTER: Getting inequivalent distortions." << apl::endl;
@@ -691,7 +688,7 @@ namespace apl {
     }
   }
 
-  //getCartesianDistortionVectors///////////////////////////////////////////////
+  //getCartesianDistortionVectors/////////////////////////////////////////////
   // Builds vectors along the plus and minus direction of the Cartesian axes.
   vector<xvector<double> > ClusterSet::getCartesianDistortionVectors() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
@@ -723,9 +720,9 @@ namespace apl {
     return dist_vecs;
   }
 
-  //initializeIneqDists/////////////////////////////////////////////////////////
-  // Initializes the inequivalent distortion objects and groups all inequivalent
-  // clusters that require the same distortions.
+  //initializeIneqDists///////////////////////////////////////////////////////
+  // Initializes the inequivalent distortion objects and groups all
+  // inequivalent clusters that require the same distortions.
   vector<_ineq_distortions> ClusterSet::initializeIneqDists() {
     vector<_ineq_distortions> ineq_dists;
     for (uint ineq = 0; ineq < ineq_clusters.size(); ineq++) {
@@ -746,7 +743,7 @@ namespace apl {
     return ineq_dists;
   }
 
-  //sameDistortions/////////////////////////////////////////////////////////////
+  //sameDistortions///////////////////////////////////////////////////////////
   // Checks if the atoms that would be distorted for the inequivalent cluster
   // are already distorted by another cluster. Returns -1 if none are found.
   int ClusterSet::sameDistortions(const _cluster& clst,
@@ -771,7 +768,7 @@ namespace apl {
     return same;
   }
 
-  //getTestDistortions//////////////////////////////////////////////////////////
+  //getTestDistortions////////////////////////////////////////////////////////
   // Gets the test distortions from the linear dependences of the interatomic
   // force constants. Only the distortions that belong to linearly independent
   // force constants are kept.
@@ -825,9 +822,9 @@ namespace apl {
   }
 
   // BEGIN Inequivalent distortions functions
-  //getInequivalentDistortions//////////////////////////////////////////////////
-  // Determines a set of inequivalent distortions and the distortions that are
-  // equivalent by symmetry.
+  //getInequivalentDistortions////////////////////////////////////////////////
+  // Determines a set of inequivalent distortions and the distortions that
+  // are equivalent by symmetry.
   void ClusterSet::getInequivalentDistortions(const vector<vector<int> >& dists,
       _ineq_distortions& ineq_dists) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
@@ -873,9 +870,9 @@ namespace apl {
     }
   }
 
-  //appendDistortion////////////////////////////////////////////////////////////
-  // Append the distortion either to its equivalent distortion or creates a new
-  // inequivalent distortion.
+  //appendDistortion//////////////////////////////////////////////////////////
+  // Append the distortion either to its equivalent distortion or creates a
+  // new inequivalent distortion.
   void ClusterSet::appendDistortion(_ineq_distortions& ineq_dists, vector<int> dist,
       const int& eq, const int& fg) {
     vector<int> transformation_map;
@@ -898,12 +895,12 @@ namespace apl {
     }
   }
 
-  //allZeroDistortions///////////////////////////////////////////////////////////
-  // Returns whether the set of distortions cancel each other out (i.e. the total
-  // distortions are all zero vectors) since the force constant is then zero and
-  // does not need to be considered. This algorithm assumes that atoms are in
-  // lexicographical order, which is true when the clusters were created using
-  // xcombos.
+  //allZeroDistortions////////////////////////////////////////////////////////
+  // Returns whether the set of distortions cancel each other out (i.e. the
+  // total distortions are all zero vectors) since the force constant is then
+  // zero and does not need to be considered. This algorithm assumes that
+  // atoms are in lexicographical order, which is true when the clusters were
+  // created using xcombos.
   bool ClusterSet::allZeroDistortions(const vector<int>& atoms, const vector<int>& dist) {
     int atom = 0, at_count = 0;
     uint natoms = atoms.size();
@@ -930,7 +927,7 @@ namespace apl {
     return true;
   }
 
-  //allAtomsMatch///////////////////////////////////////////////////////////////
+  //allAtomsMatch/////////////////////////////////////////////////////////////
   // Tests whether all atoms transform into themselves under factor group fg.
   bool ClusterSet::allAtomsMatch(const int& fg, const vector<int>& atoms) {
     vector<int> atoms_transformed(order -1);
@@ -946,7 +943,7 @@ namespace apl {
     return true;
   }
 
-  //equivalenceDistortions//////////////////////////////////////////////////////
+  //equivalenceDistortions////////////////////////////////////////////////////
   // Determines whether a distortion is equivalent to another inequivalent
   // distortion and returns the index of that distortion (-1 if not equivalent
   // to any).
@@ -998,7 +995,7 @@ namespace apl {
     return eq;
   }
 
-  //getTransformationMap////////////////////////////////////////////////////////
+  //getTransformationMap//////////////////////////////////////////////////////
   // Obtains the transformation map for the equivalent distortion.
   vector<int> ClusterSet::getTransformationMap(const int& fg, const int& atom) {
     uint natoms = scell.atoms.size();
@@ -1030,7 +1027,7 @@ namespace apl {
   }
   // END Inequivalent distortions functions
 
-  //getHigherOrderDistortions///////////////////////////////////////////////////
+  //getHigherOrderDistortions/////////////////////////////////////////////////
   vector<_ineq_distortions> ClusterSet::getHigherOrderDistortions() {
     vector<_ineq_distortions> ineq_dists;
     if (order != 4) return ineq_dists;  // Not implemented for higher order and not necessary for lower
@@ -1073,7 +1070,7 @@ namespace apl {
 
 namespace apl {
 
-  //getLinearCombinations///////////////////////////////////////////////////////
+  //getLinearCombinations/////////////////////////////////////////////////////
   // Obtains the linear combinations of the IFCs. See aflow.apl.h for a
   // description of the _linearCombinations struct.
   vector<_linearCombinations> ClusterSet::getLinearCombinations() {
@@ -1141,7 +1138,7 @@ namespace apl {
     return lincombs;
   }
 
-  //getSymOps///////////////////////////////////////////////////////////////////
+  //getSymOps/////////////////////////////////////////////////////////////////
   // Gets all the symmetry operations permutation that transform a cluster of
   // atoms into itself or a permutation of itself. This algorithm cannot use
   // ClusterSet::comparePermutations because it needs to find all permutations
@@ -1185,7 +1182,7 @@ namespace apl {
     return sym;
   }
 
-  //buildCoefficientMatrix//////////////////////////////////////////////////////
+  //buildCoefficientMatrix////////////////////////////////////////////////////
   // Builds the coefficient matrix that will be used to obtain the RREF.
   vector<vector<double> > ClusterSet::buildCoefficientMatrix(const vector<vector<int> >& symops) {
     vector<vector<double> > coeff_mat;
@@ -1235,7 +1232,7 @@ namespace apl {
     return coeff_mat;
   }
 
-  //getRREF/////////////////////////////////////////////////////////////////////
+  //getRREF///////////////////////////////////////////////////////////////////
   // Obtains the reduced row echelon form (RREF) of the coefficient matrix
   // using Gaussian elimination.
   vector<vector<double> > ClusterSet::getRREF(vector<vector<double> > mat) {
@@ -1287,7 +1284,7 @@ namespace apl {
 namespace apl {
 
   // BEGIN Write files
-  //writeClusterSetToFile///////////////////////////////////////////////////////
+  //writeClusterSetToFile/////////////////////////////////////////////////////
   // Writes the ClusterSet object to an XML file.
   void ClusterSet::writeClusterSetToFile(const string& filename) {
     _logger << "Writing ClusterSet to file " << filename << apl::endl;
@@ -1310,9 +1307,9 @@ namespace apl {
     }
   }
 
-  //writeParameters/////////////////////////////////////////////////////////////
-  // Writes the calculation parameters and minimal structure information of the
-  // XML file.
+  //writeParameters///////////////////////////////////////////////////////////
+  // Writes the calculation parameters and minimal structure information of
+  // the XML file.
   string ClusterSet::writeParameters() {
     std::stringstream parameters;
     string tab = " ";
@@ -1368,7 +1365,7 @@ namespace apl {
     return parameters.str();
   }
 
-  //writeClusters///////////////////////////////////////////////////////////////
+  //writeClusters/////////////////////////////////////////////////////////////
   // Writes the _cluster objects inside a set of clusters.
   string ClusterSet::writeClusters(const vector<_cluster>& clusters) {
     string tab = " ";
@@ -1391,7 +1388,7 @@ namespace apl {
     return clst.str();
   }
 
-  //writeInequivalentClusters///////////////////////////////////////////////////
+  //writeInequivalentClusters/////////////////////////////////////////////////
   // Writes the inequivalent clusters and the linear combinations.
   string ClusterSet::writeInequivalentClusters() {
     string tab = " ";
@@ -1409,7 +1406,7 @@ namespace apl {
     return clusters.str();
   }
 
-  //writeLinearCombinations/////////////////////////////////////////////////////
+  //writeLinearCombinations///////////////////////////////////////////////////
   // Writes the _linearCombinations object.
   string ClusterSet::writeLinearCombinations(const _linearCombinations& lcombs) {
     string tab = " ";
@@ -1463,7 +1460,7 @@ namespace apl {
     return lc.str();
   }
 
-  //writeInequivalentDistortions////////////////////////////////////////////////
+  //writeInequivalentDistortions//////////////////////////////////////////////
   // Writes the inequivalent distortions.
   string ClusterSet::writeInequivalentDistortions() {
     string tab = " ";
@@ -1478,7 +1475,7 @@ namespace apl {
     return distortions.str();
   }
 
-  //writeIneqDist///////////////////////////////////////////////////////////////
+  //writeIneqDist/////////////////////////////////////////////////////////////
   // Writes a single _ineq_distortions object.
   string ClusterSet::writeIneqDist(const _ineq_distortions& ineq_dist) {
     string tab = " ";
@@ -1557,7 +1554,7 @@ namespace apl {
 
   // BEGIN Read files
 
-  //readClusterSetFromFile//////////////////////////////////////////////////////
+  //readClusterSetFromFile////////////////////////////////////////////////////
   // Reads a ClusterSet from an XML file.
   void ClusterSet::readClusterSetFromFile(const string& filename) {
     // Open file and handle exceptions
@@ -1597,13 +1594,13 @@ namespace apl {
     }
   }
 
-  //checkCompatibility//////////////////////////////////////////////////////////
-  // Checks if the hibernate XML file is compatible with the aflow.in file. If
-  // the checksum in the XML file is the same as the checksum of the aflow.in
-  // file, then the parameters are the same. If not, the function checks if the
-  // parameters relevant for the ClusterSet (supercell, order, cutoff) are the
-  // same. This prevents the ClusterSet from being recalculated when only
-  // post-processing parameters are changed.
+  //checkCompatibility////////////////////////////////////////////////////////
+  // Checks if the hibernate XML file is compatible with the aflow.in file.
+  // If the checksum in the XML file is the same as the checksum of the
+  // aflow.in file, then the parameters are the same. If not, the function
+  // checks if the parameters relevant for the ClusterSet (supercell, order,
+  // cutoff) are the same. This prevents the ClusterSet from being
+  // recalculated when only post-processing parameters are changed.
   bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlines) {
     string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility";
     string line = "";
@@ -1825,7 +1822,7 @@ namespace apl {
   }
 
 
-  //readInequivalentClusters////////////////////////////////////////////////////
+  //readInequivalentClusters//////////////////////////////////////////////////
   // Reads the inequivalent clusters.
   void ClusterSet::readInequivalentClusters(uint& line_count,
       const vector<string>& vlines) {
@@ -1875,7 +1872,7 @@ namespace apl {
     }
   }
 
-  //readClusters////////////////////////////////////////////////////////////////
+  //readClusters//////////////////////////////////////////////////////////////
   // Reads a set of _cluster objects for the inequivalent clusters.
   vector<_cluster> ClusterSet::readClusters(uint& line_count,
       const vector<string>& vlines) {
@@ -1926,7 +1923,7 @@ namespace apl {
     return clusters;
   }
 
-  //readLinearCombinations//////////////////////////////////////////////////////
+  //readLinearCombinations////////////////////////////////////////////////////
   // Reads a single _linearCombinations object.
   _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
       const vector<string>& vlines) {
@@ -2023,7 +2020,7 @@ namespace apl {
     return lcombs;
   }
 
-  //readInequivalentDistortions/////////////////////////////////////////////////
+  //readInequivalentDistortions///////////////////////////////////////////////
   // Reads the inequivalent distortions.
   void ClusterSet::readInequivalentDistortions(uint& line_count,
       const vector<string>& vlines) {

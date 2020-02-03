@@ -21,7 +21,7 @@ static const string _AAPL_FORCES_ERR_PREFIX_ = "apl::PhononCalculator::";
 
 namespace apl {
 
-  //setAnharmonicOptions////////////////////////////////////////////////////////
+  //setAnharmonicOptions//////////////////////////////////////////////////////
   // Sets the calculation options for the calculations of the anharmonic IFCs.
   void PhononCalculator::setAnharmonicOptions(int iter, double mix, double threshold) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_SETUP_);
@@ -43,7 +43,7 @@ namespace apl {
     }
   }
 
-  //buildVaspAAPL///////////////////////////////////////////////////////////////
+  //buildVaspAAPL/////////////////////////////////////////////////////////////
   // Creates the folders for the VASP calculations.
   bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst, bool zerostate_chgcar) {
     bool stagebreak = false;
@@ -152,7 +152,7 @@ namespace apl {
     return stagebreak;
   }
 
-  //buildRunNameAAPL////////////////////////////////////////////////////////////
+  //buildRunNameAAPL//////////////////////////////////////////////////////////
   // Creates the name of the folder for the VASP calculation.
   string PhononCalculator::buildRunNameAAPL(const vector<int>& distortions,
       const vector<int>& atoms, const int& ord,
@@ -175,10 +175,10 @@ namespace apl {
     return runname.str();
   }
 
-  //applyDistortionsAAPL////////////////////////////////////////////////////////
-  // Applies the inequivalent distortions to the supercell structures. scale is
-  // a scaling factor for the distortion magnitude (necessary for higher order
-  // derivatives).
+  //applyDistortionsAAPL//////////////////////////////////////////////////////
+  // Applies the inequivalent distortions to the supercell structures. scale
+  // is a scaling factor for the distortion magnitude (necessary for higher
+  // order derivatives).
   void PhononCalculator::applyDistortionsAAPL(_xinput& xinp,
       const vector<xvector<double> >& distortion_vectors,
       const vector<int>& distortions,
@@ -217,7 +217,7 @@ namespace apl {
     }
   }
 
-  //calculateAnharmonicIFCs/////////////////////////////////////////////////////
+  //calculateAnharmonicIFCs///////////////////////////////////////////////////
   // Calculates the anharmonic IFCs.
   void PhononCalculator::calculateAnharmonicIFCs(ClusterSet& clst) {
     _logger << "Checking file integrity for anharmonic IFCs." << apl::endl;
