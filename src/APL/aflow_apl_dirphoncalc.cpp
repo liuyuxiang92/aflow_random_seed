@@ -504,7 +504,7 @@ namespace apl {
     bool generate_plus_minus = false;  // ME190129
 
     int idxRun = 0;
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) {
       vector<vector<xvector<double> > > forcesForOneAtomAndAllDistortions;
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         generate_plus_minus = vvgenerate_plus_minus[i][j];  //CO181226
