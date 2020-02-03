@@ -685,6 +685,74 @@ namespace pflow {
   }
 }
 
+// ***************************************************************************
+// pflow::getIsopointalPrototypes - returns corresponding prototype label
+// ***************************************************************************
+namespace pflow {
+  string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow){ 
+    
+    string function_name = "pflow::IsopointalPrototypes()";
+    string usage="aflow --isopointal_prototypes|--get_isopointal_prototypes < POSCAR";
+    string options="";
+    
+    // ---------------------------------------------------------------------------
+    // load input structure
+    xstructure xstr(input,IOAFLOW_AUTO);
+
+    // ---------------------------------------------------------------------------
+    // FLAG: catalog (htqc, anrl, or all)
+    string catalog="all";
+    if(vpflow.flag("ISOPOINTAL_PROTOTYPES::CATALOG")) {
+      catalog=aurostd::tolower(vpflow.getattachedscheme("ISOPOINTAL_PROTOTYPES::CATALOG"));
+      if(catalog!="htqc" && catalog!="anrl" && catalog!="all"){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Catalog/library can only be htqc, anrl, or all.",_INPUT_ILLEGAL_);
+      }
+    }
+    
+    // ---------------------------------------------------------------------------
+    // get isopointal structures 
+    // (calculates symmetry of input structure and grabs symmetrically similar prototypes)
+    vector<string> isopointal_prototypes = pflow::getIsopointalPrototypes(xstr, catalog);
+
+    if(isopointal_prototypes.size()==0){
+      return "no isopointal prototypes in AFLOW";
+    }
+    
+    return aurostd::joinWDelimiter(isopointal_prototypes,",");
+  }
+}
+
+// ***************************************************************************
+// pflow::getIsopointalPrototypes - returns corresponding prototype label
+// ***************************************************************************
+namespace pflow {
+  vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog){ 
+    
+    string function_name = "pflow::getIsopointalPrototypes()";
+    
+    // ---------------------------------------------------------------------------
+    // stoichiometry
+    vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
+    
+    // ---------------------------------------------------------------------------
+    // symmetry
+    if(xstr.space_group_ITC<1 || xstr.space_group_ITC>230){ // don't recalculate symmetry if already calculated 
+      xstr.SpaceGroup_ITC();
+    }
+    vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
+    compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions);
+    
+    // ---------------------------------------------------------------------------
+    // extract isopointal prototypes from AFLOW 
+    vector<string> vlabel;
+    vector<uint> prototype_space_groups;
+    vlabel = aflowlib::GetPrototypesBySymmetry(stoichiometry, xstr.space_group_ITC, grouped_Wyckoff_positions, prototype_space_groups, SG_SETTING_ANRL, catalog);
+
+    return vlabel;
+
+  }
+}
+
 //DX 20190314 - added new function - START
 // ***************************************************************************
 // pflow::getMatchingPrototype - returns corresponding prototype label
