@@ -828,16 +828,43 @@ namespace apl {
   // standard conventional unit cells.
   void Supercell::projectToPrimitive() {
     vector<int> pc2sc, sc2pc;
-    if (getMaps(_pcStructure, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
-      _inStructure = _pcStructure;
+    xstructure pcell;
+    LightCopy(_pcStructure, pcell);  // No need for symmetry
+
+    // The original structure may be a rotated primitive cell. Transform the
+    // primitive cell so that they overlap or else the mapping will not work
+    if (_inStructure_original.atoms.size() == _pcStructure.atoms.size()) {
+      xmatrix<double> U = trasp(_inStructure_original.lattice) * inverse(trasp(_pcStructure.lattice));
+      // For a rotation matrix, trasp(U) * U = I
+      if (aurostd::isidentity(trasp(U) * U)) {
+        pcell = Rotate(pcell, U);
+      }
+    }
+
+    if (getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
+      _inStructure = pcell;
       _sc2pcMap = sc2pc;
       _pc2scMap = pc2sc;
       calculatePhaseVectors();
     } else {
-      _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could"
-              << " not map the AFLOW standard primitive cell to the supercell."
-              << " Phonon dispersions will be calculated using the original"
-              << " structure instead." << apl::endl;
+      // When calculating the primitive cell, the positions of the atoms
+      // may alternate between x and 1 - x. Test if this is the case here.
+      xvector<double> ones(3); ones.set(1.0);
+      for (uint at = 0; at < pcell.atoms.size(); at++) {
+        pcell.atoms[at].fpos = ones - pcell.atoms[at].fpos;
+        pcell.atoms[at].cpos = pcell.f2c * pcell.atoms[at].fpos;
+      }
+      if (getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
+        _inStructure = pcell;
+        _sc2pcMap = sc2pc;
+        _pc2scMap = pc2sc;
+        calculatePhaseVectors();
+      } else {
+        _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could"
+          << " not map the AFLOW standard primitive cell to the supercell."
+          << " Phonon dispersions will be calculated using the original"
+          << " structure instead." << apl::endl;
+      }
     }
   }
 

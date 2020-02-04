@@ -13993,7 +13993,9 @@ xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
   if(LDEBUG) { //CO190520
     cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO190520
     cerr << soliloquy << " a.origin=" << a.origin << endl; //CO190520
+    cerr << soliloquy << " rm=" << endl;cerr << rm << endl; // ME200204
   }
+  if (aurostd::isidentity(rm)) return a;  // ME200204 - no need to go through all the motions for identity matrix
   // Get R_0(p) for all cartesian positions.
   xstructure b(a);
   xmatrix<double> nlattice(3,3);

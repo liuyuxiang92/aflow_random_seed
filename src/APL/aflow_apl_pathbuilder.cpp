@@ -552,7 +552,13 @@ namespace apl {
       addPoint(vlabels[i],3,coordinate[0],coordinate[1],coordinate[2]);
     }
 
-    if(!CARTESIAN_COORDS){transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) );} //must be reciprocal
+    if(!CARTESIAN_COORDS){
+      // ME200203 - these are custom points, i.e. they are user generated based
+      // on a user-defined input structure. AFLOW should not switch the basis
+      // behind the scenes. Assume that the user knows what they are doing.
+      //transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) ); //must be reciprocal
+      transform( trasp(ReciprocalLattice(sc.getInputStructure().lattice)) );
+    }
 
     //set lattices
     cartesianLattice = sc.getSupercellStructure().lattice;
