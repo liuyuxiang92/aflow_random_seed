@@ -1075,6 +1075,11 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       xvasp.aopts.flag("AFLOWIN_FLAG::KPOINTS", TRUE); //CO181226
       xvasp.aopts.push_attached("AFLOWIN_FLAG::KPOINTS", scheme);
     }
+    // ME200205 - set to implicit
+    xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT", false);
+    xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", false);
+    xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
+    xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT", true);
 
     // Setup run
     setStatic(xvasp);
