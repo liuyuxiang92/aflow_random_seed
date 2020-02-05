@@ -18,6 +18,7 @@
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
         -- Added missing function CalculateSymmetryPointGroupKCrystal. (ME)
         -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
+        -- Fixed bug that did not set k-point mode to implicit for APL runs. (ME)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
