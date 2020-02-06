@@ -2759,6 +2759,8 @@ namespace SYM {
     bool Krun=TRUE;
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);  // translation
     xmatrix<double> Uf(3,3),Uc(3,3);                      // matrices
+    // ---------------------------------------------------------------------------
+    // create placeholder for atoms_map for AddSymmetryToStructure() (no atom mappings for pgroups)
     std::vector<int> basis_atoms_map(a.atoms.size());           // will map each on each
     for(uint i=0;i<a.atoms.size();i++) basis_atoms_map[i]=i;    // identically map each over each
     std::vector<int> basis_types_map(a.atoms.size());           // will map each on each
@@ -2776,7 +2778,7 @@ namespace SYM {
     if(a.fgroup_calculated==FALSE) Krun=Krun && SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);       // NEED FACTOR GROUP
 
     // this one removes the double matrices so it takes care of non primitive systems
-    for(uint ip=0;ip<a.fgroup.size();ip++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint ip=0;ip<a.fgroup.size();ip++) {
       clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
       Uf=a.fgroup[ip].Uf;Uc=a.fgroup[ip].Uc;ftau=a.fgroup[ip].ftau;ctau=a.fgroup[ip].ctau;
       bool sym_found=FALSE;
@@ -2795,7 +2797,7 @@ namespace SYM {
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     //cerr << "********************************************************" << endl;
     //cerr << "a.pgroup_xtal.size(): " << a.pgroup_xtal.size() << endl;
-    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
       aus << a.pgroup_xtal[kk-1].str_type << " theta=";
       if(a.pgroup_xtal[kk-1].angle<100) aus << " ";
@@ -2819,7 +2821,7 @@ namespace SYM {
 //   1) symmorphic : only point group symmetries, no translations and
 //   2) centrosymmetric : contains inversion center
 // The Patterson symmetry is the same as the Laue symmetry (see GetLaueLabel() in aflow_xatom.cpp), 
-// but this function the explicity symmetry operators (matrices, axis-angle, etc.) for this particular crystal.
+// but this function explicity calculates the symmetry operators (matrices, axis-angle, etc.) for the particular representation.
 // In the AFLOW symmetry workflow, this analysis is calculated by 
 //   1) removing translations from the factor group and adding inversion symmetry or
 //   2) adding inversion symmetry to pgroupk_xtal
@@ -2857,6 +2859,8 @@ namespace SYM {
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);        // translation
     clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
     xmatrix<double> Uf(3,3),Uc(3,3);                            // matrices
+    // ---------------------------------------------------------------------------
+    // create placeholder for atoms_map for AddSymmetryToStructure() (no atom mappings for pgroups)
     std::vector<int> basis_atoms_map(a.atoms.size());           // will map each on each
     for(uint i=0;i<a.atoms.size();i++) basis_atoms_map[i]=i;    // identically map each over each
     std::vector<int> basis_types_map(a.atoms.size());           // will map each on each
@@ -2875,10 +2879,7 @@ namespace SYM {
     if(a.pgroup_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP CRYSTAL
     if(a.pgroupk_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupKCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP KCRYSTAL
       
-    xmatrix<double> inversion_symmetry_matrix(3,3); 
-    inversion_symmetry_matrix(1,1)=-1.0; inversion_symmetry_matrix(2,2)=-1.0; inversion_symmetry_matrix(3,3)=-1.0;
-    xmatrix<double> Uc_inv=inversion_symmetry_matrix;
-    xmatrix<double> Uf_inv=inverse(trasp(a.klattice))*Uc_inv*trasp(a.klattice); // i.e., c2f*Uc_inv*f2c for klattice
+    xmatrix<double> inversion_symmetry_matrix = -aurostd::identity((double)0,3,3);
       
     // ---------------------------------------------------------------------------
     // check if pgroup_xtal contains inversion symmetry already
@@ -2896,8 +2897,18 @@ namespace SYM {
       if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [3a] point group is already centrosymmetric, same as POINT GROUP CRYSTAL " << endl;
       _sym_op symop;
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
-        symop=a.pgroupk_xtal.at(k);
-        SYM::AddSymmetryToStructure(a,symop.Uc,symop.Uf,symop.ctau,symop.ftau,symop.ctrasl,symop.ftrasl,symop.basis_atoms_map,symop.basis_types_map,false,_PGROUPK_PATTERSON_);
+        SYM::AddSymmetryToStructure(
+            a,
+            a.pgroupk_xtal[k].Uc,
+            a.pgroupk_xtal[k].Uf,
+            a.pgroupk_xtal[k].ctau,
+            a.pgroupk_xtal[k].ftau,
+            a.pgroupk_xtal[k].ctrasl,
+            a.pgroupk_xtal[k].ftrasl,
+            a.pgroupk_xtal[k].basis_atoms_map,
+            a.pgroupk_xtal[k].basis_types_map,
+            false,
+            _PGROUPK_PATTERSON_);
       }
     }
     else{
@@ -2912,7 +2923,13 @@ namespace SYM {
       if(calculation_mode==1){
         if(DEBUG_SYMMETRY) cerr << "DEBUG: " << function_name << " [3b] calculation_mode: add inversion symmetry to pgroup_xtal (fast, default) " << endl;
         std::vector<_sym_op> pgroupk_Patterson;                             // rotations/inversions operations
-        for(uint ip=0;ip<a.pgroupk_xtal.size();ip++) {  // I shift of 1 so I use the same [kk-1]...
+        
+        // ---------------------------------------------------------------------------
+        // create Uc and Uf versions of inverse
+        xmatrix<double> Uc_inv=inversion_symmetry_matrix;
+        xmatrix<double> Uf_inv=inverse(trasp(a.klattice))*Uc_inv*trasp(a.klattice); // i.e., c2f*Uc_inv*f2c for klattice
+        
+        for(uint ip=0;ip<a.pgroupk_xtal.size();ip++) {
           Uf=a.pgroupk_xtal[ip].Uf;Uc=a.pgroupk_xtal[ip].Uc;
           bool sym_found=FALSE;
           for(uint ii=0;ii<a.pgroupk_Patterson.size()&&!sym_found;ii++){
@@ -2945,7 +2962,7 @@ namespace SYM {
     // PGROUPK_PATTERSON
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    for(uint kk=1;kk<=a.pgroupk_Patterson.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint kk=1;kk<=a.pgroupk_Patterson.size();kk++) {  // shift by 1 to use [kk-1]...
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
       aus << a.pgroupk_Patterson[kk-1].str_type << " theta=";
       if(a.pgroupk_Patterson[kk-1].angle<100) aus << " ";
@@ -2983,21 +3000,21 @@ namespace SYM {
     // LOOK up table for the point group operations of the crystal
     vector<string> vops;vops.clear();
     if(group==_PGROUP_){
-      for(uint kk=1;kk<=a.pgroup.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+      for(uint kk=1;kk<=a.pgroup.size();kk++) {  // shift by 1 to use [kk-1]...
         vops.push_back(a.pgroup[kk-1].str_Hermann_Mauguin);
         operations=operations+a.pgroup[kk-1].str_Hermann_Mauguin;
         if(kk<a.pgroup.size()) operations=operations+" ";
       }
     }
     if(group==_PGROUP_XTAL_){
-      for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+      for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
         vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
         operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
         if(kk<a.pgroup_xtal.size()) operations=operations+" ";
       }
     }
     if(group==_PGROUPK_PATTERSON_){
-      for(uint kk=1;kk<=a.pgroupk_Patterson.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+      for(uint kk=1;kk<=a.pgroupk_Patterson.size();kk++) {  // shift by 1 to use [kk-1]...
         vops.push_back(a.pgroupk_Patterson[kk-1].str_Hermann_Mauguin);
         operations=operations+a.pgroupk_Patterson[kk-1].str_Hermann_Mauguin;
         if(kk<a.pgroupk_Patterson.size()) operations=operations+" ";
@@ -3073,7 +3090,7 @@ namespace SYM {
     // LOOK up table for the point group operations of the crystal
     // DX 9/16/17 [OBSOLETE]    vector<string> vops;vops.clear();
     // DX 9/16/17 [OBSOLETE]   string operations="";
-    // DX 9/16/17 [OBSOLETE]    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+    // DX 9/16/17 [OBSOLETE]    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
     // DX 9/16/17 [OBSOLETE]      vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
     // DX 9/16/17 [OBSOLETE]      operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
     // DX 9/16/17 [OBSOLETE]      if(kk<a.pgroup_xtal.size()) operations=operations+" ";
@@ -3409,7 +3426,7 @@ namespace SYM {
     if(a.fgroup_calculated==FALSE) Krun=Krun && SYM::CalculateFactorGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);       // NEED FACTOR GROUP
 
     // this one removes the double matrices so it takes care of non primitive systems
-    for(uint ip=0;ip<a.fgroup.size();ip++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint ip=0;ip<a.fgroup.size();ip++) {
       clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
       Uf=a.fgroup[ip].Uf;Uc=a.fgroup[ip].Uc;ftau=a.fgroup[ip].ftau;ctau=a.fgroup[ip].ctau;
       bool sym_found=FALSE;
@@ -3428,7 +3445,7 @@ namespace SYM {
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     //cerr << "********************************************************" << endl;
     //cerr << "a.pgroup_xtal.size(): " << a.pgroup_xtal.size() << endl;
-    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
       aus << a.pgroup_xtal[kk-1].str_type << " theta=";
       if(a.pgroup_xtal[kk-1].angle<100) aus << " ";
@@ -3445,7 +3462,7 @@ namespace SYM {
     // LOOK up table for the point group operations of the crystal
     vector<string> vops;vops.clear();
     string operations="";
-    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
       vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
       operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
       if(kk<a.pgroup_xtal.size()) operations=operations+" ";
@@ -3784,7 +3801,7 @@ namespace SYM {
     // if(a.iatoms_calculated==FALSE) Krun=Krun && SYM::CalculateSitePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);    // NEED EQUIV ATOMS
 
     // this one removes the double matrices so it takes care of non primitive systems
-    for(uint ip=0;ip<a.fgroup.size();ip++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint ip=0;ip<a.fgroup.size();ip++) {
       clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
       // if(modulus(a.fgroup[kk].ftau)<0.1)
       Uf=a.fgroup[ip].Uf;Uc=a.fgroup[ip].Uc;ftau=a.fgroup[ip].ftau;ctau=a.fgroup[ip].ctau;
@@ -3812,7 +3829,7 @@ namespace SYM {
     // PGROUP_XTAL
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " ;
       aus << a.pgroup_xtal[kk-1].str_type << " theta=";
       if(a.pgroup_xtal[kk-1].angle<100) aus << " ";
@@ -3829,7 +3846,7 @@ namespace SYM {
     // LOOK up tabe for the point group operations of the crystal
     vector<string> vops;vops.clear();
     string operations="";
-    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
       vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
       operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
       if(kk<a.pgroup_xtal.size()) operations=operations+" ";
@@ -4351,6 +4368,8 @@ namespace SYM {
     double _eps_vol_;
     bool sym_found;
     xvector<double> rrr(3),ddd(3);                    	     // for printing
+    // ---------------------------------------------------------------------------
+    // create placeholder for atoms_map for AddSymmetryToStructure() (no atom mappings for pgroups)
     std::vector<int> basis_atoms_map(a.atoms.size());        // will map each on each
     for(uint i=0;i<a.atoms.size();i++) basis_atoms_map[i]=i; // identically map each over each
     std::vector<int> basis_types_map(a.atoms.size());        // will map each on each
@@ -5059,6 +5078,8 @@ namespace SYM {
     ostringstream aus;
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);                    // translation
     clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
+    // ---------------------------------------------------------------------------
+    // create placeholder for atoms_map for AddSymmetryToStructure() (no atom mappings for pgroups)
     std::vector<int> basis_atoms_map(reciprocal_xstr.atoms.size());        // will map each on each
     for(uint i=0;i<reciprocal_xstr.atoms.size();i++) basis_atoms_map[i]=i; // identically map each over each
     std::vector<int> basis_types_map(reciprocal_xstr.atoms.size());        // will map each on each
@@ -7541,6 +7562,8 @@ namespace SYM {
     double _eps_=_EPS_,_eps_angle_=10.0*_EPS_,_eps_abc_,_eps_vol_;
     bool sym_found;
     xvector<double> rrr(3),ddd(3);                    // for printing
+    // ---------------------------------------------------------------------------
+    // create placeholder for atoms_map for AddSymmetryToStructure() (no atom mappings for pgroups)
     std::vector<int> basis_atoms_map(a.atoms.size());       // will map each on each
     for(uint i=0;i<a.atoms.size();i++) basis_atoms_map[i]=i; // identically map each over each
     std::vector<int> basis_types_map(a.atoms.size());       // will map each on each
@@ -8300,7 +8323,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   if(mode==_PGROUPK_XTAL_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // DX 12/5/17 - Added pgroupk_xtal
   if(mode==_PGROUPK_PATTERSON_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //DX 20200129
   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-  if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
     if(mode==_PGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_OUT;
     if(mode==_PGROUPK_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT;
     if(mode==_FGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_FGROUP_OUT;
@@ -8311,7 +8334,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     if(mode==_PGROUPK_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT; // DX 12/5/17 - Added pgroupk_xtal
     if(mode==_PGROUPK_PATTERSON_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT; //DX 20200129
   }
-  if(format=="json" || format=="Json" || format=="JSON"){
+  if(aurostd::toupper(format)=="JSON"){ // DX 20200206
     if(mode==_PGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_JSON;
     if(mode==_PGROUPK_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON;
     if(mode==_FGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_FGROUP_JSON;
@@ -8324,11 +8347,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   string _lines_="------------------------------------------------------------------------------------------------";
   FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-  if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
     FileOUTPUT << _lines_ << endl;
   } // DX 8/2/17
   if(mode==_PGROUP_) {
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroup.size() << "    point group operations " << endl;
       for(uint k=0;k<a.pgroup.size();k++) {
@@ -8341,7 +8364,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT.flush();
       }
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << SymmetryToJson(a.pgroup,mode);          // DX 8/2/17
       FileOUTPUT.flush();
     }                                                       // DX 8/2/17
@@ -8349,7 +8372,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_PGROUP_XTAL_) {
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroup_xtal.size() << "    crystal point group operations " << endl;
       for(uint k=0;k<a.pgroup_xtal.size();k++) {
@@ -8362,7 +8385,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT.flush();
       }
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << SymmetryToJson(a.pgroup_xtal,mode);     // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
@@ -8371,7 +8394,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   // DX 12/5/17 - Added pgroupk_xtal - START
   if(mode==_PGROUPK_XTAL_) {
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW dual of crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
@@ -8384,7 +8407,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT.flush();
       }
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << SymmetryToJson(a.pgroupk_xtal,mode);     // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
@@ -8393,7 +8416,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   // DX 12/5/17 - Added pgroupk_xtal - END
   if(mode==_PGROUPK_) {
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW point group klattice file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk.size() << "    point group operations " << endl;
       for(uint k=0;k<a.pgroupk.size();k++) {
@@ -8406,7 +8429,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT.flush();
       }
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << SymmetryToJson(a.pgroupk,mode);         // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
@@ -8414,7 +8437,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_PGROUPK_PATTERSON_) { //DX 20200129
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW Patterson point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk_Patterson.size() << "    Patterson point group operations " << endl;
       for(uint k=0;k<a.pgroupk_Patterson.size();k++) {
@@ -8427,7 +8450,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT.flush();
       }
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << SymmetryToJson(a.pgroupk_Patterson,mode);     // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
@@ -8435,7 +8458,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_FGROUP_) {
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW factor group file, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
       FileOUTPUT << a.fgroup.size() << "    factor group operations " << endl;
       for(uint k=0;k<a.fgroup.size();k++) {
@@ -8448,7 +8471,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT.flush();
       }
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << SymmetryToJson(a.fgroup,mode);          // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
@@ -8456,7 +8479,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_SGROUP_) {
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW space group file, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
       FileOUTPUT << a.sgroup.size() << "    space group operations " << endl;
       FileOUTPUT << a.sgroup_radius << "    radius of space group " << endl;
@@ -8471,7 +8494,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT.flush();
       }
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << SymmetryToJson(a.sgroup,mode);          // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
@@ -8479,7 +8502,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_AGROUP_) {
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW site point group file centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       for(uint iat=0;iat<a.atoms.size();iat++) {
         FileOUTPUT << " Site="  << iat << endl;
@@ -8496,7 +8519,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         }
       }
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << AgroupSymmetryToJson(a.agroup,mode);    // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
@@ -8504,7 +8527,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_IATOMS_) {
-    if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "Equivalent atoms file " << endl;
       FileOUTPUT << _lines_ << endl;
       for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
@@ -8521,7 +8544,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       FileOUTPUT << _lines_ << endl;
       FileOUTPUT.flush();
     }                                                       // DX 8/2/17
-    if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
       FileOUTPUT << EquivalentAtomsToJson(a.iatoms);   // DX 8/2/17
       FileOUTPUT.flush();                                   // DX 8/2/17
     }                                                       // DX 8/2/17
@@ -8542,7 +8565,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
 // This function prints to screen all the symmetry elements for a given structure 
 bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode){
   // OUT format
-  if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
+  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
     xvector<double> aux_rrr(9),aux_ijk(9);
     string _lines_="------------------------------------------------------------------------------------------------";
     if(mode == '\0' || mode == _PGROUP_){
@@ -8676,7 +8699,7 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
   }
 
   // JSON format
-  if(format=="json" || format=="Json" || format=="JSON"){
+  if(aurostd::toupper(format)=="JSON"){ // DX 20200206
     stringstream sscontent_json;
     vector<string> vcontent_json;
     if(mode == '\0' || mode == _PGROUP_){

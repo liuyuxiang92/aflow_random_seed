@@ -829,6 +829,16 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); // DX 8/3/17
   }
   // DX 8/18/17 - Added tolerance and no_scan options to Xgroups - END
+  // DX 20200206 - add Patterson symmetry - START 
+  vpflow.args2addattachedscheme(argv,cmds,"PGROUPK_PATTERSON","--pointgroupk_Patterson=|--pgroupk_Patterson=","");
+  if(vpflow.flag("PGROUPK_PATTERSON")){
+    vpflow.flag("SYMMETRY::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
+    if(aurostd::args2attachedflag(argv,"--pointgroupk_Patterson=|--pgroupk_Patterson=")){ // DX 8/3/17
+      vpflow.args2addattachedscheme(argv,cmds,"SYMMETRY::TOLERANCE","--pointgroupk_Patterson=|--pgroupk_Patterson=","1");
+    }
+    vpflow.flag("SYMMETRY::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); // DX 8/3/17
+  }
+  // DX 20200206 - add Patterson symmetry - END 
   // DX 12/5/17 - Added pgroupk_xtal - START
   vpflow.args2addattachedscheme(argv,cmds,"PGROUPK_XTAL","--pointgroupkcrystal=|--pgroupk_xtal=","");
   if(vpflow.flag("PGROUPK_XTAL")){
@@ -1792,6 +1802,7 @@ namespace pflow {
       if(vpflow.flag("PGROUPX")) {pflow::SYMMETRY_GROUPS(aflags,cin,vpflow,cout); _PROGRAMRUN=true;} // DX 8/18/17
       // DX 8/18/17 [OBSOLETE] if(vpflow.flag("PGROUPK")) {pflow::PGROUPK(aflags,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("PGROUPK")) {pflow::SYMMETRY_GROUPS(aflags,cin,vpflow,cout); _PROGRAMRUN=true;} // DX 8/18/17
+      if(vpflow.flag("PGROUPK_PATTERSON")) {pflow::SYMMETRY_GROUPS(aflags,cin,vpflow,cout); _PROGRAMRUN=true;} // DX 20200206
       if(vpflow.flag("PGROUPK_XTAL")) {pflow::SYMMETRY_GROUPS(aflags,cin,vpflow,cout); _PROGRAMRUN=true;} // DX 12/5/17
       if(vpflow.flag("POSCAR")) {cout << pflow::POSCAR(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("POSCAR2AFLOWIN")) {cout << pflow::POSCAR2AFLOWIN(cin, vpflow.getattachedscheme("AFLOW_PROTO::MODULE")); _PROGRAMRUN=true;}  // Modified - ME 181113//ME 190112
@@ -2374,6 +2385,7 @@ namespace pflow {
     strstream << tab << x << " --spacegroup|--sgroup[=tolerance|=tight|=loose] [--no_scan] [--print=txt|=json] [--screen_only] [--radius] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR" << endl;
     strstream << tab << x << " --pointgroupklattice|--pgroupk[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] < POSCAR" << endl;
     strstream << tab << x << " --pointgroupkcrystal|--pgroupk_xtal[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR" << endl;
+    strstream << tab << x << " --pointgroupk_Patterson|--pgroupk_Patterson[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR" << endl;
     strstream << endl;
     strstream << " Prototypes HTQC" << endl;
     strstream << tab << x << " --prototypes|--protos" << endl;
@@ -2908,6 +2920,33 @@ namespace pflow {
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
     }
+    // DX 20200206 - add Patterson symmetry - START
+    // PGROUPK_PATTERSON
+    else if(vpflow.flag("PGROUPK_PATTERSON")){
+      mode = _PGROUPK_PATTERSON_;
+      aliases = "--pointgroupk_Patterson|--pgroupk_Patterson";
+      sym_specific_options = "[--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]";
+      options = vpflow.getattachedscheme("PGROUPK_PATTERSON");
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;
+      kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE;
+      kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON=TRUE;
+      kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;
+      kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;
+      kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;
+      kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
+      kflags.KBIN_SYMMETRY_PGROUPK_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
+      kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=TRUE;
+      kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=TRUE;
+      kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=TRUE;
+      kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
+      kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
+    }
+    // DX 20200206 - add Patterson symmetry - END
     // SGROUP
     else if(vpflow.flag("SGROUP")){
       mode = _SGROUP_;
@@ -2976,10 +3015,10 @@ namespace pflow {
     double tolerance = AUROSTD_NAN;
     if(vpflow.flag("SYMMETRY::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("SYMMETRY::TOLERANCE");
-      if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
         tolerance=default_tolerance;
       }
-      else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
         tolerance=default_tolerance*10.0;
       }
       else {
@@ -5098,10 +5137,10 @@ namespace pflow {
       double tolerance = AUROSTD_NAN;
       if(vpflow.flag("CIF::TOLERANCE")){
         string tolerance_string = vpflow.getattachedscheme("CIF::TOLERANCE");
-        if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+        if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
           tolerance=default_tolerance;
         }
-        else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+        else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
           tolerance=default_tolerance*10.0;
         }
         else {
@@ -5321,10 +5360,10 @@ namespace pflow {
     double tolerance = AUROSTD_NAN;
     if(vpflow.flag("DATA::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("DATA::TOLERANCE");
-      if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
         tolerance=default_tolerance;
       }
-      else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
         tolerance=default_tolerance*10.0;
       }
       else {
@@ -5722,10 +5761,10 @@ namespace pflow {
     double tolerance = AUROSTD_NAN;
     if(vpflow.flag("SYMMETRY::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("SYMMETRY::TOLERANCE");
-      if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
         tolerance=default_tolerance;
       }
-      else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
         tolerance=default_tolerance*10.0;
       }
       else {
@@ -6417,10 +6456,10 @@ namespace pflow {
     double tolerance = AUROSTD_NAN;
     if(vpflow.flag("FULLSYMMETRY::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("FULLSYMMETRY::TOLERANCE");
-      if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
         tolerance=default_tolerance;
       }
-      else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
         tolerance=default_tolerance*10.0;
       }
       else {
@@ -13817,10 +13856,10 @@ namespace pflow {
       double tolerance = AUROSTD_NAN;
       if(vpflow.flag("SG::TOLERANCE")){
         string tolerance_string = vpflow.getattachedscheme("SG::TOLERANCE");
-        if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+        if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
           tolerance=default_tolerance;
         }
-        else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+        else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
           tolerance=default_tolerance*10.0;
         }
         else {
@@ -14046,10 +14085,10 @@ namespace pflow {
     double tolerance = AUROSTD_NAN;
     if(vpflow.flag("SGDATA::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("SGDATA::TOLERANCE");
-      if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
         tolerance=default_tolerance;
       }
-      else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
         tolerance=default_tolerance*10.0;
       }
       else {
@@ -14378,10 +14417,10 @@ namespace pflow {
     double tolerance = AUROSTD_NAN;
     if(vpflow.flag("WYCCAR::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("WYCCAR::TOLERANCE");
-      if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+      if(aurostd::toupper(tolerance_string[0]) == 'T'){ //Tight
         tolerance=default_tolerance;
       }
-      else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+      else if(aurostd::toupper(tolerance_string[0]) == 'L'){ //Loose
         tolerance=default_tolerance*10.0;
       }
       else {

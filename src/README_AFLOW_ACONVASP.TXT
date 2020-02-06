@@ -2488,6 +2488,32 @@ LATTICES = (the ones with "")
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
+  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
+        Calculates the dual of the crystal point group symmetry operations and writes
+        it in the aflow.pgroupk_xtal.out file. See documentation of aflow.
+        This routine consists of symmetry consistency checks. If symmetry rules are broken,
+        the code automatically changes tolerance and recalculates from the beginning.
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must not be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
+        Magnetic analysis:
+          The magnetic tag specifies the magnetic moment on each of the atoms.  The
+          two input formats are a comma separated string of the magnetic moments -
+          in the same order as the input file, the location of the INCAR, or the location
+          of the OUTCAR, which is then read and the magnetic moment for each atom is found
+          (must be a static calculation, otherwise this information isn't specified).
+          Works for both collinear and non-collinear systems (AFLOW autodetects
+          collinear/non-collinear based on the input).
+        Options:
+          [--no_scan] : Will not perform tolerance scan.
+          [--print=txt | --print=json] : Specify output format.
+          [--screen_only] : Prints symmetry elements to string and does not write to a file.
+          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+        Check aflow --readme=symmetry
   aflow --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR
         Calculates the point group symmetry of the klattice {K} and writes
         it in the aflow.pgroupk.out file. See documentation of aflow.
@@ -2505,9 +2531,9 @@ LATTICES = (the ones with "")
           [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
-        Calculates the dual of the crystal point group symmetry operations and writes
-        it in the aflow.pgroupk_xtal.out file. See documentation of aflow.
+  aflow --pointgroupk_Patterson | --pgroupk_Patterson[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
+        Calculates the Patterson point group symmetry operations and writes
+        it in the aflow.pgroupk_Patterson.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
         the code automatically changes tolerance and recalculates from the beginning.
         Tolerance:
