@@ -879,7 +879,7 @@ namespace aflowlib {
     sqlite3* cursor;
     int sql_code = sqlite3_open_v2(database_file.c_str(), &cursor, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, nullptr);
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
+      string function = _AFLOW_DB_ERR_PREFIX_ + "getColStats()";
       string message = "Could not open cursor on database file " + database_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -904,7 +904,7 @@ namespace aflowlib {
 
     sql_code = sqlite3_close(cursor);
     if (sql_code != SQLITE_OK) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
+      string function = _AFLOW_DB_ERR_PREFIX_ + "getColStats()";
       string message = "Could not close cursor on database file " + database_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
