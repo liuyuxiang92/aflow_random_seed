@@ -107,7 +107,7 @@ namespace anrl {
     vproto.push_back("A_oP8_62_2c;1;8;62;3;7;oP8;a,b/a,c/a,x1,z1,x2,z2;A_c;alphaNp;alphaNp");
     vproto.push_back("AB2C_oC16_63_c_2c_c;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,y3,y4;-;SrCuO2;SrCuO2");
     vproto.push_back("A2B_oC12_63_2c_c;2;6;63;4;6;oC12;a,b/a,c/a,y1,y2,y3;C49;ZrSi2;ZrSi2");
-    vproto.push_back("AB_oC8_63_c_c;2;4;63;4;5;oC8;a,b/a,c/a,y1,y2;B33;CrB;CrB");
+    vproto.push_back("AB_oC8_63_c_c;2;4;63;4;5;oC8;a,b/a,c/a,y1,y2;B33/-;CrB/-;CrB/-");
     vproto.push_back("A_oC4_63_c;1;2;63;3;4;oC4;a,b/a,c/a,y1;A20;alpha-U;alpha-Uranium");
     vproto.push_back("A_oC8_64_f;1;4;64;3;5;oC8;a,b/a,c/a,y1,z1;A11/A17/A14;alphaGa/P/I2;alphaGallium/Black Phosphorus/Molecular Iodine");
     vproto.push_back("A2B2C_oC80_64_efg_efg_df;3;40;64;5;18;oC80;a,b/a,c/a,x1,y2,y3,y4,z4,y5,z5,y6,z6,x7,y7,z7,x8,y8,z8;-;MgB2C2;MgB2C2");
@@ -143,7 +143,7 @@ namespace anrl {
     vproto.push_back("ABC_tP6_129_c_a_c;3;6;129;5;4;tP6;a,c/a,z2,z3;E0_1;PbFCl;Matlockite");
     vproto.push_back("A2B_tP6_129_ac_c;2;6;129;4;4;tP6;a,c/a,z2,z3;C38;Cu2Sb;Cu2Sb");
     vproto.push_back("AB_tP4_129_a_c;2;4;129;4;3;tP4;a,c/a,z2;B10;PbO;PbO");
-    vproto.push_back("AB_tP4_129_c_c;2;4;129;4;4;tP4;a,c/a,z1,z2;B11;gammaCuTi;gammaCuTi");
+    vproto.push_back("AB_tP4_129_c_c;2;4;129;4;4;tP4;a,c/a,z1,z2;B11/-;gammaCuTi/-;gammaCuTi/-");
     vproto.push_back("AB_tP4_131_c_e;2;4;131;4;2;tP4;a,c/a;B17;PtS;PtS");
     vproto.push_back("A_tP50_134_b2m2n;1;50;134;3;12;tP50;a,c/a,x2,z2,x3,z3,x4,y4,z4,x5,y5,z5;A_g;B;T-50 Boron");
     vproto.push_back("A_tP30_136_bf2ij;1;30;136;3;9;tP30;a,c/a,x2,x3,y3,x4,y4,x5,z5;A_b;betaU;betaU");
@@ -160,7 +160,7 @@ namespace anrl {
     vproto.push_back("A_tI2_139_a;1;1;139;3;2;tI2;a,c/a;A6/A_a;In/Pa;In/alphaPa");
     vproto.push_back("A_tI8_139_h;1;4;139;3;3;tI8;a,c/a,x1;-;C;Hypothetical Tetrahedrally Bonded Carbon with 4-Member Rings");
     vproto.push_back("A3B_tI8_139_bd_a;2;4;139;4;2;tI8;a,c/a;D0_22;Al3Ti;Al3Ti");
-    vproto.push_back("AB2_tI6_139_a_e;2;3;139;4;3;tI6;a,c/a,z2;C11_b;MoSi2;MoSi2");
+    vproto.push_back("AB2_tI6_139_a_e;2;3;139;4;3;tI6;a,c/a,z2;C11_b/-;MoSi2/-;MoSi2/-");
     vproto.push_back("A4B5_tI18_139_i_ah;2;9;139;4;4;tI18;a,c/a,x2,x3;-;V4Zn5;V4Zn5");
     vproto.push_back("A4B_tI10_139_de_a;2;5;139;4;3;tI10;a,c/a,z3;D1_3;Al4Ba;Al4Ba");
     vproto.push_back("A8B_tI18_139_hi_a;2;9;139;4;4;tI18;a,c/a,x2,x3;-;Pt8Ti;Pt8Ti");
@@ -174,7 +174,7 @@ namespace anrl {
     vproto.push_back("A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C5/C_{c};TiO2/alpha-ThSi2;Anatase/alpha-ThSi2"); // added info from part 2 - A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C_{c};alpha-ThSi2;alpha-ThSi2
     vproto.push_back("AB_tI16_141_e_e;2;8;141;4;4;tI16;a,c/a,z1,z2;B_g;MoB;MoB");
     vproto.push_back("A2B_tI24_141_2e_e;2;12;141;4;5;tI28;a,c/a,z1,z2,z3;-;Ga2Hf;Ga2Hf");
-    vproto.push_back("AB_tI8_141_a_b;2;4;141;4;2;tI8;a,c/a;\"40\";NbP;NbP");
+    vproto.push_back("AB_tI8_141_a_b;2;4;141;4;2;tI8;a,c/a;\"40\"/-;NbP/-;NbP/-");
     vproto.push_back("A2B3_tI80_141_ceh_3h;2;40;141;4;11;tI80;a,c/a,z2,y3,z3,y4,z4,y5,z5,y6,z6;-;In2S3;betaIn2S3");
     vproto.push_back("ABC4_tI96_142_e_ab_2g;3;48;142;5;9;tI96;a,c/a,x3,x4,y4,z4,x5,y5,z5;-;PPrS4;PPrS4");
     vproto.push_back("A2B_hP9_147_g_ad;2;9;147;4;6;hP9;a,c/a,z2,x3,y3,z3;B_b;AgZn;zetaAgZn");
@@ -205,7 +205,7 @@ namespace anrl {
     vproto.push_back("A2B3_hR5_166_c_ac;2;5;166;4;4;hR5;a,c/a,x2,x3;C33;Bi2Te3;Bi2Te3");
     vproto.push_back("A5B2_hR7_166_a2c_c;2;7;166;4;5;hR7;a,c/a,x2,x3,x4;D8_i;B5Mo2;Mo2B5");
     vproto.push_back("A_hR12_166_2h;1;12;166;3;6;hR12;a,c/a,x1,z1,x2,z2;-;B;alphaBoron");
-    vproto.push_back("ABC2_hR4_166_a_b_c;3;4;166;5;3;hR4;a,c/a,x3;F5_1;CrNiS2;Caswellsilverite");
+    vproto.push_back("ABC2_hR4_166_a_b_c;3;4;166;5;3;hR4;a,c/a,x3;F5_1/-;CrNiS2/-;Caswellsilverite/-");
     vproto.push_back("A_hR105_166_bc9h4i;1;105;166;3;33;hR105;a,c/a,x2,x3,z3,x4,z4,x5,z5,x6,z6,x7,z7,x8,z8,x9,z9,x10,z10,x11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14,x15,y15,z15;-;B;betaBoron");
     vproto.push_back("A6B_hR7_166_g_a;2;7;166;4;3;hR7;a,c/a,x2;-;CaC6;CaC6");
     vproto.push_back("ABC3_hR10_167_a_b_e;3;10;167;5;3;hR10;a,c/a,x3;-/G0_1;LiNbO3/CaCO3;Paraelectric LiNbO3/Calcite");
@@ -500,7 +500,7 @@ namespace anrl {
     vproto.push_back("A4BC4_tP18_137_g_b_g;3;18;137;5;6;tP18;a,c/a,y2,z2,y3,z3;-;CeCo4B4;CeCo4B4");
     vproto.push_back("AB2_tP6_137_a_d;2;6;137;4;3;tP6;a,c/a,z2;C13;HgI2;HgI2");
     vproto.push_back("A_tP12_138_bi;1;12;138;3;4;tP12;a,c/a,x2,z2;-;C;C");
-    vproto.push_back("AB_tI8_139_e_e;2;4;139;4;4;tI8;a,c/a,z1,z2;D3_{1};Hg2Cl2;Calomel");
+    vproto.push_back("AB_tI8_139_e_e;2;4;139;4;4;tI8;a,c/a,z1,z2;D3_{1}/-;Hg2Cl2/-;Calomel/-");
     vproto.push_back("A3B5_tI32_140_ah_bk;2;16;140;4;5;tI32;a,c/a,x3,x4,y4;D8_{m};W5Si3;W5Si3");
     vproto.push_back("A3B5_tI32_140_ah_cl;2;16;140;4;5;tI32;a,c/a,x3,x4,z4;D8_{l};Cr5B3;Cr5B3");
     //DX 20180619 - added info to label in part 1 vproto.push_back("A2B_tI12_141_e_a;2;6;141;4;3;tI12;a,c/a,z2;C_{c};alpha-ThSi2;alpha-ThSi2");
@@ -638,6 +638,67 @@ namespace anrl {
     //DX 20181211 - add Corey's kesterite structure - START
     vproto.push_back("A2BCD4_tI16_82_ac_b_d_g;4;8;82;6;5;tI16;a,c/a,x5,y5,z5;-;Cu2(Zn,Fe)SnS4;Kesterite");
     //DX 20181211 - add Corey's kesterite structure - END
+    // -------------------------------------------------------------------------
+    // misc prototypes (from Y. Lederer) //DX 20200203
+    // -------------------------------------------------------------------------
+    vproto.push_back("AB3_mC8_12_a_di;2;4;12;4;6;mC8;a,b/a,c/a,beta,x3,z3;-;-;-");
+    vproto.push_back("AB_mC8_12_i_i;2;4;12;4;8;mC8;a,b/a,c/a,beta,x1,z1,x2,z2;-;-;-");
+    vproto.push_back("AB3C4_mC16_12_a_di_2i;3;8;12;5;10;mC16;a,b/a,c/a,beta,x3,z3,x4,z4,x5,z5;-;-;-");
+    vproto.push_back("ABC2_mC16_12_i_i_adi;3;8;12;5;10;mC16;a,b/a,c/a,beta,x3,z3,x4,z4,x5,z5;-;-;-");
+    vproto.push_back("AB3_oP4_47_a_ct;2;4;47;4;4;oP4;a,b/a,c/a,z3;-;-;-");
+    vproto.push_back("A3B_oP4_47_cr_a;2;4;47;4;4;oP4;a,b/a,c/a,z3;-;-;-");
+    vproto.push_back("AB3C4_oP8_47_a_ct_egs;3;8;47;5;5;oP8;a,b/a,c/a,z5,z6;-;-;-");
+    vproto.push_back("A3BC4_oP8_47_eq_g_bdt;3;8;47;5;5;oP8;a,b/a,c/a,z5,z6;-;-;-");
+    vproto.push_back("AB_oP4_51_e_e;2;4;51;4;5;oP4;a,b/a,c/a,z1,z2;-;-;-");
+    vproto.push_back("ABC2_oP8_51_e_e_2f;3;8;51;5;7;oP8;a,b/a,c/a,z1,z2,z3,z4;-;-;-");
+    vproto.push_back("AB_oP4_59_a_a;2;4;59;4;5;oP4;a,b/a,c/a,z1,z2;-;-;-");
+    vproto.push_back("ABC2_oP8_59_a_a_2b;3;8;59;5;7;oP8;a,b/a,c/a,z1,z2,z3,z4;-;-;-");
+    vproto.push_back("ABC2_oC16_63_c_c_g;3;8;63;5;7;oC16;a,b/a,c/a,y1,y2,x3,y3;-;-;-");
+    vproto.push_back("AB2C3_oC12_65_a_i_cj;3;6;65;5;5;oC12;a,b/a,c/a,y3,y4;-;-;-");
+    vproto.push_back("A3BC4_oC16_65_ai_b_q;3;8;65;5;6;oC16;a,b/a,c/a,y3,x4,y4;-;-;-");
+    vproto.push_back("A3BC4_oC16_65_bj_a_eh;3;8;65;5;5;oC16;a,b/a,c/a,x4,y5;-;-;-");
+    vproto.push_back("AB3C4_oC16_65_a_bf_hi;3;8;65;5;5;oC16;a,b/a,c/a,x4,y5;-;-;-");
+    vproto.push_back("AB2_oC6_65_a_i;2;3;65;4;4;oC6;a,b/a,c/a,y2;-;-2;-2");
+    vproto.push_back("A3B_oC8_65_ai_b;2;4;65;4;4;oC8;a,b/a,c/a,y3;-;-;-");
+    vproto.push_back("A3B_oC8_65_bj_a;2;4;65;4;4;oC8;a,b/a,c/a,y3;-;-;-");
+    vproto.push_back("AB_oC8_65_i_i;2;4;65;4;5;oC8;a,b/a,c/a,y1,y2;-;-;-");
+    vproto.push_back("ABC2_oC16_65_i_i_fh;3;8;65;5;6;oC16;a,b/a,c/a,x2,y3,y4;-;-;-");
+    vproto.push_back("AB2C3_oI12_71_a_e_df;3;6;71;5;5;oI12;a,b/a,c/a,x3,x4;-;-;-");
+    vproto.push_back("AB_tP2_123_a_b;2;2;123;4;2;tP2;a,c/a;-;-;-");
+    vproto.push_back("AB_tP2_123_a_c;2;2;123;4;2;tP2;a,c/a;-;-;-");
+    vproto.push_back("A2B_tP3_123_g_a;2;3;123;4;3;tP3;a,c/a,z2;-;-;-");
+    vproto.push_back("A3B_tP4_123_abc_d;2;4;123;4;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("A3B_tP4_123_ag_b;2;4;123;4;3;tP4;a,c/a,z3;-;-;-");
+    vproto.push_back("A3B_tP4_123_cf_a;2;4;123;4;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("AB3_tP4_123_a_bh;2;4;123;4;3;tP4;a,c/a,z3;-;-;-");
+    vproto.push_back("ABC2_tP4_123_a_b_h;3;4;123;5;3;tP4;a,c/a,z3;-;-;-");
+    vproto.push_back("ABC2_tP4_123_a_c_e;3;4;123;5;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("ABC2_tP4_123_a_d_bc;3;4;123;5;2;tP4;a,c/a;-;-;-");
+    vproto.push_back("AB_tP4_123_g_g;2;4;123;4;4;tP4;a,c/a,z1,z2;-;-;-");
+    vproto.push_back("A2BC3_tP6_123_g_b_ch;3;6;123;5;4;tP6;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A3BC4_tP8_123_abc_d_i;3;8;123;5;3;tP8;a,c/a,z5;-;-;-");
+    vproto.push_back("A3BC4_tP8_123_ag_b_2h;3;8;123;5;5;tP8;a,c/a,z3,z4,z5;-;-;-");
+    vproto.push_back("A3BC4_tP8_123_cf_a_k;3;8;123;5;3;tP8;a,c/a,x4;-;-;-");
+    vproto.push_back("AB3C4_tP8_123_a_bh_cdg;3;8;123;5;4;tP8;a,c/a,z5,z6;-;-;-");
+    vproto.push_back("ABC2_tP8_123_h_h_abg;3;8;123;5;5;tP8;a,c/a,z3,z4,z5;-;-;-");
+    vproto.push_back("ABC2_tP8_129_c_c_2c;3;8;129;5;6;tP8;a,c/a,z1,z2,z3,z4;-;-;-");
+    vproto.push_back("A3B_tI8_139_ae_b;2;4;139;4;3;tI8;a,c/a,z3;-;-;-");
+    vproto.push_back("AB3_tI8_139_a_bd;2;4;139;4;2;tI8;a,c/a;-;-;-");
+    vproto.push_back("AB2C3_tI12_139_a_e_be;3;6;139;5;4;tI12;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A3BC4_tI16_139_ae_b_g;3;8;139;5;4;tI16;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("AB3C4_tI16_139_a_bd_ce;3;8;139;5;3;tI16;a,c/a,z5;-;-;-");
+    vproto.push_back("ABC2_tI16_139_e_e_cd;3;8;139;5;4;tI16;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("ABC2_tI16_141_a_b_e;3;8;141;5;3;tI16;a,c/a,z3;-;-;-");
+    vproto.push_back("A2B_hP3_164_d_a;2;3;164;4;3;hP3;a,c/a,z2;-;-;-");
+    vproto.push_back("A2BC3_hP6_164_d_a_bd;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A2BC3_hP6_164_d_b_ad;3;6;164;5;4;hP6;a,c/a,z3,z4;-;-;-");
+    vproto.push_back("A3B_hR4_166_bc_a;2;4;166;4;3;hR4;a,c/a,x3;-;-;-");
+    vproto.push_back("AB3_hR4_166_a_bc;2;4;166;4;3;hR4;a,c/a,x3;-;-;-");
+    vproto.push_back("AB_hR4_166_c_c;2;4;166;4;4;hR4;a,c/a,x1,x2;-;-;-");
+    vproto.push_back("A3BC4_hR8_166_bc_a_2c;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
+    vproto.push_back("AB3C4_hR8_166_a_bc_2c;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
+    vproto.push_back("ABC2_hR8_166_c_c_abc;3;8;166;5;5;hR8;a,c/a,x3,x4,x5;-;-;-");
+    vproto.push_back("AB3C4_cP8_221_a_c_bd;3;8;221;5;1;cP8;a;-;-;-");
     // done now produce
 
     // FROM PROTO LIST
@@ -971,6 +1032,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_oC8_63_c_c"){
         vparameters.push_back("2.9782,2.64253575985,0.985360284736,0.436,0.14525");
+        vparameters.push_back("1.0.0185797325,1.41421356236,0.707106781182,0.625,0.125"); // Lederer-13
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_oC4_63_c"){
@@ -1117,6 +1179,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tP4_129_c_c"){
         vparameters.push_back("3.107,1.90505310589,0.1,0.65");
+        vparameters.push_back("1.0,2.82842712472,0.875,0.375"); // Lederer-42
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tP4_131_c_e"){
@@ -1179,10 +1242,12 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B_tI8_139_bd_a"){
         vparameters.push_back("3.8537,2.22744375535");
+        vparameters.push_back("1.0,2.0"); // Lederer-46
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB2_tI6_139_a_e"){
         vparameters.push_back("3.2064,2.44754241517,0.3353");
+        vparameters.push_back("1.0,4.24264068707,0.3333333333"); // Lederer-44
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A4B5_tI18_139_i_ah"){
@@ -1239,6 +1304,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tI8_141_a_b"){
         vparameters.push_back("3.325,3.42255639098");
+        vparameters.push_back("1.0,1.99999999997"); // Lederer-53
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2B3_tI80_141_ceh_3h"){
@@ -1366,6 +1432,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="ABC2_hR4_166_a_b_c"){
         vparameters.push_back("3.5561,5.44557239673,0.2667");
+        vparameters.push_back("1.0,4.89897948553,0.25"); //Lederer-59
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_hR105_166_bc9h4i"){
@@ -2535,6 +2602,7 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tI8_139_e_e"){
         vparameters.push_back("4.4795,2.43451278044,0.3356,0.119");
+        vparameters.push_back("1.0,2.82842712475,0.125,0.625"); // Lederer-47
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A3B5_tI32_140_ah_bk"){
@@ -3058,6 +3126,238 @@ namespace anrl {
       // ---------------------------------------------------------------------------
       if(anrl_label=="A2BCD4_tI16_82_ac_b_d_g"){
         vparameters.push_back("5.427,2.00313248572,0.7434,0.256,0.6278");
+      }
+      // misc structures (Y. Lederer)
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_mC8_12_a_di"){
+        vparameters.push_back("1.0,0.301511344577,0.522232967868,100.024987862,0.75,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_mC8_12_i_i"){
+        vparameters.push_back("1.0,0.301511344581,0.522232967872,100.024987862,0.625,0.875,0.875,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_mC16_12_a_di_2i"){
+        vparameters.push_back("1.0,0.301511344577,0.522232967868,100.024987862,0.75,0.25,0.125,0.375,0.625,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_mC16_12_i_i_adi"){
+        vparameters.push_back("1.0,0.301511344581,0.522232967872,100.024987862,0.625,0.875,0.875,0.625,0.75,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_oP4_47_a_ct"){
+        vparameters.push_back("1.0,1.41421356239,2.0,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_oP4_47_cr_a"){
+        vparameters.push_back("1.0,1.41421356238,2.82842712476,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_oP8_47_a_ct_egs"){
+        vparameters.push_back("1.0,1.41421356239,2.0,0.25,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_oP8_47_eq_g_bdt"){
+        vparameters.push_back("1.0,1.41421356238,2.82842712476,0.75,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oP4_51_e_e"){
+        vparameters.push_back("1.0,0.707106781182,2.0,0.125,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oP8_51_e_e_2f"){
+        vparameters.push_back("1.0,0.707106781182,2.0,0.125,0.625,0.375,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oP4_59_a_a"){
+        vparameters.push_back("1.0,1.41421356238,2.0,0.875,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oP8_59_a_a_2b"){
+        vparameters.push_back("1.0,1.41421356238,2.0,0.875,0.375,0.875,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC16_63_c_c_g"){
+        vparameters.push_back("1.0,1.41421356236,0.707106781182,0.625,0.125,0.25,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C3_oC12_65_a_i_cj"){
+        vparameters.push_back("1.0,2.99999999998,0.707106781176,0.3333333333,0.8333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_oC16_65_ai_b_q"){
+        vparameters.push_back("1.0,1.99999999999,0.499999999994,0.75,0.75,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_oC16_65_bj_a_eh"){
+        vparameters.push_back("1.0,1.41421356236,0.707106781182,0.75,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_oC16_65_a_bf_hi"){
+        vparameters.push_back("1.0,1.41421356239,0.5,0.75,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2_oC6_65_a_i"){
+        vparameters.push_back("1.0,2.99999999998,0.707106781176,0.3333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_oC8_65_ai_b"){
+        vparameters.push_back("1.0,1.99999999999,0.499999999994,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_oC8_65_bj_a"){
+        vparameters.push_back("1.0,1.41421356236,0.707106781182,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_oC8_65_i_i"){
+        vparameters.push_back("1.0,1.99999999999,0.499999999994,0.875,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_oC16_65_i_i_fh"){
+        vparameters.push_back("1.0,1.99999999999,0.499999999994,0.75,0.875,0.375");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C3_oI12_71_a_e_df"){
+        vparameters.push_back("1.0,0.471404520797,0.333333333338,0.6666666667,0.6666666667");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tP2_123_a_b"){
+        vparameters.push_back("1.0,2.00000000002");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tP2_123_a_c"){
+        vparameters.push_back("1.0,0.707106781182");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_tP3_123_g_a"){
+        vparameters.push_back("1.0,3.00000000002,0.6666666667");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tP4_123_abc_d"){
+        vparameters.push_back("1.0,1.41421356238");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tP4_123_ag_b"){
+        vparameters.push_back("1.0,4.00000000002,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tP4_123_cf_a"){
+        vparameters.push_back("1.0,0.499999999994");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_tP4_123_a_bh"){
+        vparameters.push_back("1.0,2.82842712477,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP4_123_a_b_h"){
+        vparameters.push_back("1.0,2.00000000002,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP4_123_a_c_e"){
+        vparameters.push_back("1.0,0.707106781182");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP4_123_a_d_bc"){
+        vparameters.push_back("1.0,1.41421356238");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_tP4_123_g_g"){
+        vparameters.push_back("1.0,4.00000000002,0.125,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_tP6_123_g_b_ch"){
+        vparameters.push_back("1.0,3.00000000002,0.1666666667,0.6666666667");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_tP8_123_abc_d_i"){
+        vparameters.push_back("1.0,1.41421356238,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_tP8_123_ag_b_2h"){
+        vparameters.push_back("1.0,4.00000000002,0.25,0.625,0.125");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_tP8_123_cf_a_k"){
+        vparameters.push_back("1.0,0.499999999994,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_tP8_123_a_bh_cdg"){
+        vparameters.push_back("1.0,2.82842712477,0.25,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP8_123_h_h_abg"){
+        vparameters.push_back("1.0,4.00000000002,0.25,0.625,0.125");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tP8_129_c_c_2c"){
+        vparameters.push_back("1.0,2.82842712472,0.875,0.375,0.125,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_tI8_139_ae_b"){
+        vparameters.push_back("1.0,2.82842712475,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB2C3_tI12_139_a_e_be"){
+        vparameters.push_back("1.0,4.24264068707,0.3333333333,0.8333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_tI16_139_ae_b_g"){
+        vparameters.push_back("1.0,2.82842712475,0.25,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_tI16_139_a_bd_ce"){
+        vparameters.push_back("1.0,2.0,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tI16_139_e_e_cd"){
+        vparameters.push_back("1.0,2.82842712475,0.125,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_tI16_141_a_b_e"){
+        vparameters.push_back("1.0,1.99999999997,0.625");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2B_hP3_164_d_a"){
+        vparameters.push_back("1.0,2.44948974278,0.3333333333");
+        vparameters.push_back("1.0,1.22474487139,0.3333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_hP6_164_d_a_bd"){
+        vparameters.push_back("1.0,2.44948974278,0.3333333333,0.8333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A2BC3_hP6_164_d_b_ad"){
+        vparameters.push_back("1.0,1.22474487139,0.8333333333,0.3333333333");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B_hR4_166_bc_a"){
+        vparameters.push_back("1.0,4.89897948557,0.25");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3_hR4_166_a_bc"){
+        vparameters.push_back("1.0,9.79795897119,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB_hR4_166_c_c"){
+        vparameters.push_back("1.0,9.79795897107,0.625,0.125");
+        vparameters.push_back("1.0,4.89897948557,0.375,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="A3BC4_hR8_166_bc_a_2c"){
+        vparameters.push_back("1.0,4.89897948557,0.25,0.625,0.875");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_hR8_166_a_bc_2c"){
+        vparameters.push_back("1.0,9.79795897119,0.75,0.375,0.125");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="ABC2_hR8_166_c_c_abc"){
+        vparameters.push_back("1.0,9.79795897107,0.625,0.125,0.75");
+        vparameters.push_back("1.0,4.89897948557,0.375,0.875,0.75");
+      }
+      // ---------------------------------------------------------------------------
+      if(anrl_label=="AB3C4_cP8_221_a_c_bd"){
+        vparameters.push_back("1.0");
       }
     }
     if(library=="" && !keep_original_lattice_parameter){

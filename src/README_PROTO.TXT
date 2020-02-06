@@ -837,7 +837,7 @@ A_cI58_217_ac2g-001                              cI58      I-43m               A
 A_cI16_220_c-001                                 cI16      I-43d               -         Li                  #220      High Pressure cI16 Li (part 1)
 A_cP1_221_a                                      cP1       Pm-3m               A_h       Po                  #221      alpha-Po (part 1)    
 A_cP46_223_dik-001                               cP46      Pm-3n               -         Si                  #223      Si46 Clathrate (part 1)
-A_cF4_225_a                                      cF4       Fm-3m               A1        Cu                  #225      Face-Centered Cubic (part 1)
+A_cF4_225_a                                      cF4       Fm-3m               A1        Cu                  #225      Face-Centered Cubic (part 1), equivalent to 1,2,1.cub,2.cub [HTQC]
 A_cF136_227_aeg-001                              cF136     Fd-3m               -         Si                  #227      Si34 Clathrate (part 1)
 A_cF8_227_a                                      cF8       Fd-3m               A4        C                   #227      Diamond (part 1)    
 A_cI2_229_a                                      cI2       Im-3m               A2        W                   #229      Body-Centered Cubic (part 1)
@@ -943,9 +943,10 @@ AB_oP8_62_c_c-005.{AB}                           oP8       Pnma                B
 A2B_oC12_63_2c_c-001.{AB}                        oC12      Cmcm                C49       ZrSi2               #63       ZrSi2 (part 1)      
 A6B_oC28_63_efg_c-001.{AB}                       oC28      Cmcm                D2_{h}    MnAl6               #63       MnAl6 (part 2)      
 AB_oC8_63_c_c-001.{AB}                           oC8       Cmcm                B33       CrB                 #63       CrB (part 1)        
+AB_oC8_63_c_c-002.AB                             oC8       Cmcm                -         AB                  #63       sc derivative (Y. Lederer)
 A2B_oC24_64_2f_f-001.{AB}                        oC24      Cmce                -         H2S                 #64       H2S (part 2)        
 A3B5_oC16_65_ah_bej-001.{AB}                     oC16      Cmmm                -         Ga3Pt5              #65       Ga3Pt5 (part 1)     
-AB3_oC8_65_a_bf-001.{AB}                         oC8       Cmmm                L1_3      CdPt3               #65       Predicted CdPt3 (part 1)
+AB3_oC8_65_a_bf-001.{AB}                         oC8       Cmmm                L1_3      CdPt3               #65       Predicted CdPt3 (part 1), fcc derivative (Y. Lederer), equivalent to 11,12 [HTQC]
 AB_oC8_65_j_g-001.{AB}                           oC8       Cmmm                -         alpha-IrV           #65       alpha-IrV (part 1)   
 A3B_oC64_66_gi2lm_2l-001.{AB}                    oC64      Cccm                -         H3S                 #66       H3S (part 2)        
 A3B_oC64_66_kl2m_bdl-001.{AB}                    oC64      Cccm                -         beta-ThI3           #66       beta-ThI3 (part 2)  
@@ -956,7 +957,7 @@ AB_oF8_69_a_b-001.AB                             oF8       Fmmm                B
 A2B_oF24_70_e_a-001.{AB}                         oF24      Fddd                C54       TiSi2               #70       TiSi2 (part 1)      
 AB2_oF48_70_f_fg-001.{AB}                        oF48      Fddd                D1_{f}    Mn2B                #70       Mn2B (part 2)       
 A4B3_oI14_71_gh_cg-001.{AB}                      oI14      Immm                D7_{b}    Ta3B4               #71       Ta3B4 (part 2)      
-AB2_oI6_71_a_g-001.{AB}                          oI6       Immm                -         MoPt2               #71       MoPt2 (part 1)      
+AB2_oI6_71_a_g-001.{AB}                          oI6       Immm                -         MoPt2               #71       MoPt2 (part 1), fcc derivative (Y. Lederer), equivalent to 7,8 [HTQC]     
 AB2_oI6_71_a_i-001.{AB}                          oI6       Immm                -         ReSi2               #71       ReSi2 (part 1)      
 A2B_oI12_72_j_a-001.{AB}                         oI12      Ibam                C42       SiS2                #72       SiS2 (part 1)       
 A2B_oI12_74_h_e-001.{AB}                         oI12      Imma                -         KHg2                #74       KHg2 (part 2)       
@@ -997,7 +998,7 @@ A5B3_tP32_118_g2i_aceh-001.{AB}                  tP32      P-4n2               -
 A3B_tI24_119_b2i_af-001.{AB}                     tI24      I-4m2               -         RbGa3               #119      RbGa3 (part 2)      
 AB_tI4_119_c_a-001.AB                            tI4       I-4m2               -         GaSb                #119      GaSb (part 2)       
 AB3_tP4_123_a_ce-001.{AB}                        tP4       P4/mmm              L6_0      CuTi3               #123      CuTi3 (part 1)      
-AB_tP2_123_a_d-001.AB                            tP2       P4/mmm              L1_0      CuAu                #123      CuAu (part 1)       
+AB_tP2_123_a_d-001.AB                            tP2       P4/mmm              L1_0      CuAu                #123      CuAu (part 1), fcc derivative (Y. Lederer), equivalent to 3 [HTQC] 
 AB4_tP10_124_a_m-001.{AB}                        tP10      P4/mcc              -         NbTe4               #124      NbTe4 (part 2)      
 A4B_tP10_125_m_a-001.{AB}                        tP10      P4/nbm              -         PtPb4               #125      PtPb4 (part 2)      
 A2B3_tP10_127_g_ah-001.{AB}                      tP10      P4/mbm              D5_a      Si2U3               #127      Si2U3 (part 1)      
@@ -1005,6 +1006,7 @@ A4B_tP20_127_ehj_g-001.{AB}                      tP20      P4/mbm              D
 A2B_tP6_129_ac_c-001.{AB}                        tP6       P4/nmm              C38       Cu2Sb               #129      Cu2Sb (part 1)      
 AB_tP4_129_a_c-001.{AB}                          tP4       P4/nmm              B10       PbO                 #129      PbO (part 1)        
 AB_tP4_129_c_c-001.{AB}                          tP4       P4/nmm              B11       gamma-CuTi          #129      gamma-CuTi (part 1)  
+AB_tP4_129_c_c-002.AB                            tP4       P4/nmm              -         AB                  #129      fcc derivative (Y. Lederer), equivalent to 14 [HTQC]
 A5B3_tP32_130_cg_cf-001.{AB}                     tP32      P4/ncc              -         Ba5Si3              #130      Ba5Si3 (part 2)     
 AB_tP4_131_c_e-001.{AB}                          tP4       P4_{2}/mmc          B17       PtS                 #131      PtS (part 1)        
 AB3_tP32_133_h_i2j-001.{AB}                      tP32      P4_{2}/nbc          -         beta-V3S            #133      beta-V3S (part 2)   
@@ -1018,11 +1020,14 @@ A12B_tI26_139_fij_a-001.{AB}                     tI26      I4/mmm              D
 A2B_tI6_139_d_a-001.{AB}                         tI6       I4/mmm              L\'2      ThH2                #139      ThH2 (part 1)       
 A3B_tI16_139_cde_e-001.{AB}                      tI16      I4/mmm              D0_23     Al3Zr               #139      Al3Zr (part 1)      
 A3B_tI8_139_bd_a-001.{AB}                        tI8       I4/mmm              D0_22     Al3Ti               #139      Al3Ti (part 1)      
+A3B_tI8_139_bd_a-002.{AB}                        tI8       I4/mmm              -         AB3                 #139      fcc derivative (Y. Lederer) equivalent to 22,24 [HTQC]
 A4B5_tI18_139_i_ah-001.{AB}                      tI18      I4/mmm              -         V4Zn5               #139      V4Zn5 (part 1)      
 A4B_tI10_139_de_a-001.{AB}                       tI10      I4/mmm              D1_3      Al4Ba               #139      Al4Ba (part 1)      
 A8B_tI18_139_hi_a-001.{AB}                       tI18      I4/mmm              -         Pt8Ti               #139      Pt8Ti (part 1)      
 AB2_tI6_139_a_e-001.{AB}                         tI6       I4/mmm              C11_b     MoSi2               #139      MoSi2 (part 1)      
+AB2_tI6_139_a_e-002.{AB}                         tI6       I4/mmm              -         AB2                 #139      fcc derivative (Y. Lederer), equivalent to 5,6,6b [HTQC]
 AB_tI8_139_e_e-001.{AB}                          tI8       I4/mmm              D3_{1}    Hg2Cl2              #139      Calomel (part 2)    
+AB_tI8_139_e_e-002.AB                            tI8       I4/mmm              -         AB                  #139      sc derivative (Y. Lederer)
 A2B_tI12_140_h_a-001.{AB}                        tI12      I4/mcm              C16       Al2Cu               #140      Khatyrkite (part 1) 
 A3B5_tI32_140_ah_bk-001.{AB}                     tI32      I4/mcm              D8_{m}    W5Si3               #140      W5Si3 (part 2)      
 A3B5_tI32_140_ah_cl-001.{AB}                     tI32      I4/mcm              D8_{l}    Cr5B3               #140      Cr5B3 (part 2)      
@@ -1035,6 +1040,7 @@ A2B_tI24_141_2e_e-001.{AB}                       tI28      I4_{1}/amd          -
 A3B4_tI28_141_ad_h-001.{AB}                      tI28      I4_{1}/amd          -         Mn3O4               #141      Hausmannite (part 1)
 AB_tI16_141_e_e-001.{AB}                         tI16      I4_{1}/amd          B_g       MoB                 #141      MoB (part 1)        
 AB_tI8_141_a_b-001.AB                            tI8       I4_{1}/amd          "40"      NbP                 #141      NbP (part 1)        
+AB_tI8_141_a_b-002.AB                            tI8       I4_{1}/amd          -         AB                  #141      fcc derivative (Y. Lederer), equivalent to 23 [HTQC]
 AB2_hP12_143_cd_ab2d-001.{AB}                    hP12      P3                  -         MoS2                #143      MoS2 (part 2)       
 A4B_hP15_144_4a_a-001.{AB}                       hP15      P3_{1}              -         IrGe4               #144      IrGe4 (part 2)      
 AB_hP6_144_a_a-001.AB                            hP6       P3_{1}              -         ZnTe                #144      ZnTe (part 2)
@@ -1074,7 +1080,7 @@ A4B3_hR7_166_2c_ac-001.{AB}                      hR7       R-3m                D
 A5B2_hR7_166_a2c_c-001.{AB}                      hR7       R-3m                D8_i      B5Mo2               #166      Mo2B5 (part 1)      
 A6B_hR7_166_g_a-001.{AB}                         hR7       R-3m                -         CaC6                #166      CaC6 (part 1)       
 A7B6_hR13_166_ah_3c-001.{AB}                     hR13      R-3m                D8_5      Fe7W6               #166      Fe7W6 mu-phase (part 1)
-AB_hR2_166_a_b-001.AB                            hR2       R-3m                L1_1      CuPt                #166      CuPt (part 1)       
+AB_hR2_166_a_b-001.AB                            hR2       R-3m                L1_1      CuPt                #166      CuPt (part 1), fcc derivative (Y. Lederer), equivalent to 4 [HTQC] 
 A2B3_hR10_167_c_e-001.{AB}                       hR10      R-3c                D5_1      Al2O3               #167      Corundum (part 1)   
 A2B3_hP30_169_2a_3a-001.{AB}                     hP30      P6_{1}              -         alpha-Al2S3         #169      alpha-Al2S3 (part 2)
 A2B3_hP30_170_2a_3a-001.{AB}                     hP30      P6_{5}              -         Al2S3               #170      Al2S3 (part 2)      
@@ -1132,7 +1138,7 @@ A4B_cI40_197_cde_c-001.{AB}                      cI40      I23                 -
 A3B_cP16_198_b_a-001.{AB}                        cP16      P2_{1}3             D1        NH3                 #198      Ammonia (part 1)    
 AB_cP8_198_a_a-001.{AB}                          cP8       P2_{1}3             B21       CO                  #198      alphaCO (part 1)    
 AB_cP8_198_a_a-002.AB                            cP8       P2_{1}3             B20       FeSi                #198      FeSi (part 1)       
-AB_cI16_199_a_a-001.AB                          cI16      I2_{1}3             B_a       CoU                 #199      CoU (part 1)        
+AB_cI16_199_a_a-001.AB                           cI16      I2_{1}3             B_a       CoU                 #199      CoU (part 1)        
 A2B11_cP39_200_f_aghij-001.{AB}                  cP39      Pm-3                D8_{c}    Mg2Zn11             #200      Mg2Zn11 (part 2)    
 A12B_cI26_204_g_a-001.{AB}                       cI26      Im-3                -         Al12W               #204      Al12W (part 1)      
 A3B_cI32_204_g_c-001.{AB}                        cI32      Im-3                D0_2      CoAs3               #204      Skutterudite (part 1)
@@ -1154,8 +1160,8 @@ A4B3_cI28_220_c_a-001.{AB}                       cI28      I-43d               D
 A3B_cP4_221_d_a.{AB}                             cP4       Pm-3m               D0_9      ReO3                #221      alpha-ReO3 (part 1)  
 A6B_cP7_221_f_a-001.{AB}                         cP7       Pm-3m               D2_1      CaB6                #221      CaB6 (part 1)       
 AB11_cP36_221_c_agij-001.{AB}                    cP36      Pm-3m               D2_e      BaHg11              #221      BaHg11 (part 1)     
-AB3_cP4_221_a_c.{AB}                             cP4       Pm-3m               L1_2      Cu3Au               #221      Cu3Au (part 1)      
-AB_cP2_221_b_a.AB                                cP2       Pm-3m               B2        CsCl                #221      CsCl (part 1)       
+AB3_cP4_221_a_c.{AB}                             cP4       Pm-3m               L1_2      Cu3Au               #221      Cu3Au (part 1), fcc derivative (Y. Lederer), equivalent to 25,26 [HTQC] 
+AB_cP2_221_b_a.AB                                cP2       Pm-3m               B2        CsCl                #221      CsCl (part 1), equivalent to 61,1026.AB,1205.AB [HTQC]
 AB_cP6_221_c_d.AB                                cP6       Pm-3m               -         NbO                 #221      NbO (part 1)        
 A3B_cP8_223_c_a.{AB}                             cP8       Pm-3n               A15       Cr3Si               #223      Cr3Si (part 1)      
 A2B_cP6_224_b_a.{AB}                             cP6       Pn-3m               C3        Cu2O                #224      Cuprite (part 1)    
@@ -1165,7 +1171,7 @@ A6B23_cF116_225_e_acfh-001.{AB}                  cF116     Fm-3m               D
 A7B_cF32_225_bd_a.{AB}                           cF32      Fm-3m               -         Ca7Ge               #225      Ca7Ge (part 1)      
 AB2_cF12_225_a_c.{AB}                            cF12      Fm-3m               C1        CaF2                #225      CaF2 (part 1)
 AB3_cF16_225_a_bc.{AB}                           cF16      Fm-3m               D0_3      BiF3                #225      BiF3 (part 1)       
-AB_cF8_225_a_b.AB                                cF8       Fm-3m               B1        NaCl                #225      Rock Salt (part 1)  
+AB_cF8_225_a_b.AB                                cF8       Fm-3m               B1        NaCl                #225      Rock Salt (part 1), equivalent to 201,720.AB,720.BA,1009.AB,1200.AB [HTQC] 
 AB13_cF112_226_a_bi-001.{AB}                     cF112     Fm-3c               D2_{3}    NaZn13              #226      NaZn13 (part 2)     
 A2B_cF24_227_c_a.{AB}                            cF24      Fd-3m               C9        SiO2                #227      Ideal beta-Cristobalite (part 1)
 A2B_cF24_227_d_a.{AB}                            cF24      Fd-3m               C15       Cu2Mg               #227      Cu2Mg Cubic Laves (part 1)
@@ -1281,6 +1287,7 @@ ABC_hR3_160_a_a_a-001.ABC/BAC/CAB                hR3       R3m                 F
 ABC3_hR10_161_a_a_b-001.{ABC}                    hR10      R3c                 -         LiNbO3              #161      Ferroelectric LiNbO3 (part 1)
 ABC2_hP4_164_a_b_d-001.{ABC/BCA/CAB              hP4       P-3m1               -         CuNiSb2             #164      CuNiSb2 (part 2)    
 ABC2_hR4_166_a_b_c-001.{ABC}                     hR4       R-3m                F5_1      CrNiS2              #166      Caswellsilverite (part 1)
+ABC2_hR4_166_a_b_c-002.ABC/BCA/CAB               hR4       R-3m                -         ABC2                #166      fcc derivative (Y. Lederer)
 ABC_hR6_166_c_c_c-001.{ABC}                      hR6       R-3m                -         SmSI                #166      SmSI (part 2)       
 AB3C_hR10_167_b_e_a-001.{ABC}                    hR10      R-3c                -         PrNiO3              #167      PrNiO3 (part 2)     
 ABC2_hR24_167_e_e_2e-001.{ABC}                   hR24      R-3c                F5_{13}   KBO2                #167      KBO2 (part 2)       
@@ -1332,7 +1339,7 @@ A5B3C16_cP96_222_ce_d_fi-001.{ABC}               cP96      Pn-3n               -
 A6B2C_cF36_225_e_c_a-001.{ABC}                   cF36      Fm-3m               J1_{1}    K2PtCl6             #225      K2PtCl6 (part 2)    
 A9B16C7_cF128_225_acd_2f_be-001.{ABC}            cF128     Fm-3m               -         Cr9Fe16Ni7          #225      Model of Ferrite (part 1)
 AB18C8_cF108_225_a_eh_f-001.{ABC}                cF108     Fm-3m               -         CrFe18Ni8           #225      Model of Austenite (part 1)
-AB2C_cF16_225_a_c_b.ABC/BCA/CAB                  cF16      Fm-3m               L2_1      AlCu2Mn             #225      Heusler (part 1)    
+AB2C_cF16_225_a_c_b.ABC/BCA/CAB                  cF16      Fm-3m               L2_1      AlCu2Mn             #225      Heusler (part 1), rocksalt derivative (Y. Lederer), equivalent to T0001 [HTQC] 
 A2B2C7_cF88_227_c_d_af-001.{ABC}                 cF88      Fd-3m               -         Eu2Ir2O7            #227      Pyrochlore Iridate (part 2)
 A2BC4_cF56_227_d_a_e-001.{ABC}                   cF56      Fd-3m               H1_1      Al2MgO4             #227      Spinel (part 1)     
 AB3C3_cF112_227_c_de_f-001.{ABC}                 cF112     Fd-3m               E9_3      Fe3W3C              #227      Fe3W3C (part 1)     
@@ -1414,6 +1421,77 @@ A2BCD4_tI16_82_ac_b_d_g-001.ABCD/BCAD/           tI16      I-4                 -
 CABD/DBAC/BADC/ADBC/ACDB/CDAB/DACB/
 DCBA/CBDA/BDCA   
 
+*****************************************************************************************************************************************************
+ANRL - fcc/sc derivative structures - BINARIES (Y. Lederer)
+
+ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+AB3_mC8_12_a_di-001.{AB}                         mC8       C2/m                -         AB3                 #12       fcc derivative, equivalent to 16,18 [HTQC] 
+AB_mC8_12_i_i-001.AB                             mC8       C2/m                -         AB                  #12       fcc derivative, equivalent to 17 [HTQC]
+AB3_oP4_47_a_ct-001.{AB}                         oP4       Pmmm                -         AB3                 #47       fcc derivative, equivalent to 19,21 [HTQC]
+A3B_oP4_47_cr_a-001.{AB}                         oP4       Pmmm                -         A3B                 #47       sc derivative
+AB_oP4_51_e_e-001.AB                             oP4       Pmma                -         AB                  #51       sc derivative
+AB_oP4_59_a_a-001.AB                             oP4       Pmmn                -         AB                  #59       fcc derivative, equivalent to 20 [HTQC]
+AB2_oC6_65_a_i-001.{AB}                          oC6       Cmmm                -         AB2                 #65       sc derivative
+A3B_oC8_65_ai_b-001.{AB}                         oC8       Cmmm                -         A3B                 #65       sc derivative
+A3B_oC8_65_bj_a-001.{AB}                         oC8       Cmmm                -         A3B                 #65       sc derivative
+AB_oC8_65_i_i-001.AB                             oC8       Cmmm                -         AB                  #65       sc derivative
+AB_tP2_123_a_b-001.AB                            tP2       P4/mmm              -         AB                  #123      sc derivative
+AB_tP2_123_a_c-001.AB                            tP2       P4/mmm              -         AB                  #123      sc derivative 
+A2B_tP3_123_g_a-001.{AB}                         tP3       P4/mmm              -         A2B                 #123      sc derivative 
+A3B_tP4_123_abc_d-001.{AB}                       tP4       P4/mmm              -         A3B                 #123      sc derivative 
+A3B_tP4_123_ag_b-001.{AB}                        tP4       P4/mmm              -         A3B                 #123      sc derivative
+A3B_tP4_123_cf_a-001.{AB}                        tP4       P4/mmm              -         A3B                 #123      sc derivative 
+AB3_tP4_123_a_bh-001.{AB}                        tP4       P4/mmm              -         AB3                 #123      fcc derivative, equivalent to 13,15 [HTQC]
+AB_tP4_123_g_g-001.AB                            tP4       P4/mmm              -         AB                  #123      sc derivative
+A3B_tI8_139_ae_b-001.{AB}                        tI8       I4/mmm              -         A3B                 #139      sc derivative 
+A2B_hP3_164_d_a-001.{AB}                         hP3       P-3m1               -         A2B                 #164      fcc derivative, equivalent to 9,10 [HTQC]
+A2B_hP3_164_d_a-002.{AB}                         hP3       P-3m1               -         A2B                 #164      sc derivative 
+A3B_hR4_166_bc_a-001.{AB}                        hR4       R-3m                -         A3B                 #166      sc derivative 
+AB3_hR4_166_a_bc-001.{AB}                        hR4       R-3m                -         AB3                 #166      fcc derivative, equivalent to 27,29 [HTQC]
+AB_hR4_166_c_c-001.AB                            hR4       R-3m                -         AB                  #166      fcc derivative, equivalent to 28 [HTQC]
+AB_hR4_166_c_c-002.AB                            hR4       R-3m                -         AB                  #166      sc derivative
+
+*****************************************************************************************************************************************************
+ANRL - rocksalt/B2 derivative structures - TERNARIES (Y. Lederer)
+
+ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
+----------------------------------------------------------------------------------------------------------------------------------------------------
+AB3C4_mC16_12_a_di_2i-001.{ABC}                  mC16      C2/m                -         AB3C4               #12       rocksalt derivative, AB3_mC8_12_a_di-001 with C "in between"
+ABC2_mC16_12_i_i_adi-001.ABC/BCA/CAB             mC16      C2/m                -         ABC2                #12       rocksalt derivative, AB_mC8_12_i_i-001 with C "in between"
+AB3C4_oP8_47_a_ct_egs-001.{ABC}                  oP8       Pmmm                -         AB3C4               #47       rocksalt derivative, AB3_oP4_47_a_ct-001 with C "in between"
+A3BC4_oP8_47_eq_g_bdt-001.{ABC}                  oP8       Pmmm                -         A3BC4               #47       B2 derivative, A3B_oP4_47_cr_a-001 with C "in between", shifted origin
+ABC2_oP8_51_e_e_2f-001.ABC/BCA/CAB               oP8       Pmma                -         ABC2                #51       B2 derivative, AB_oP4_51_e_e-001 with C "in between"
+ABC2_oP8_59_a_a_2b-001.ABC/BCA/CAB               oP8       Pmmn                -         ABC2                #59       rocksalt derivative, AB_oP4_59_a_a-001 with C "in between"
+ABC2_oC16_63_c_c_g-001.ABC/BCA/CAB               oC16      Cmcm                -         ABC2                #63       B2 derivative, AB_oC8_63_c_c-002 with C "in between" 
+AB2C3_oC12_65_a_i_cj-001.{ABC}                   oC12      Cmmm                -         AB2C3               #65       B2 derivative, AB2_oC6_65_a_i-001 with C "in between" 
+A3BC4_oC16_65_ai_b_q-001.{ABC}                   oC16      Cmmm                -         A3BC4               #65       B2 derivative, A3B_oC8_65_ai_b-001 with C "in between"
+A3BC4_oC16_65_bj_a_eh-001.{ABC}                  oC16      Cmmm                -         A3BC4               #65       B2 derivative, A3B_oC8_65_bj_a-001 with C "in between"
+AB3C4_oC16_65_a_bf_hi-001.{ABC}                  oC16      Cmmm                -         AB3C4               #65       rocksalt derivative, AB3_oC8_65_a_bf-001 with C "in between" 
+ABC2_oC16_65_i_i_fh-001.ABC/BCA/CAB              oC16      Cmmm                -         ABC2                #65       B2 derivative, AB_oC8_65_i_i-001 with C "in between"
+AB2C3_oI12_71_a_e_df-001.{ABC}                   oI12      Immm                -         AB2C3               #71       rocksalt derivative, AB2_oI6_71_a_g-001 with C "in between", shifted origin 
+ABC2_tP4_123_a_b_h-001.ABC/BCA/CAB               tP4       P4/mmm              -         ABC2                #123      B2 derivative, AB_tP2_123_a_b with C "in between"; equivalent to TBCC011 [HTQC]
+ABC2_tP4_123_a_c_e-001.ABC/BCA/CAB               tP4       P4/mmm              -         ABC2                #123      B2 derivative, AB_tP2_123_a_c-001 with C "in between"; equivalent to TBCC016 [HTQC]
+ABC2_tP4_123_a_d_bc-001.ABC/BCA/CAB              tP4       P4/mmm              -         ABC2                #123      rocksalt derivative, AB_tP2_123_a_d-001 with C "in between" 
+A2BC3_tP6_123_g_b_ch-001.{ABC}                   tP6       P4/mmm              -         A2BC3               #123      B2 derivative, A2B_tP3_123_g_a-001 with C "in between", shifted origin
+A3BC4_tP8_123_abc_d_i-001.{ABC}                  tP8       P4/mmm              -         A3BC4               #123      B2 derivative, A3B_tP4_123_abc_d-001 with C "in between"
+A3BC4_tP8_123_ag_b_2h-001.{ABC}                  tP8       P4/mmm              -         A3BC4               #123      B2 derivative, A3B_tP4_123_ag_b-001 with C "in between" 
+A3BC4_tP8_123_cf_a_k-001.{ABC}                   tP8       P4/mmm              -         A3BC4               #123      B2 derivative, A3B_tP4_123_cf_a-001 with C "in between"
+AB3C4_tP8_123_a_bh_cdg-001.{ABC}                 tP8       P4/mmm              -         AB3C4               #123      rocksalt derivative, AB3_tP4_123_a_bh-001 with C "in between"
+ABC2_tP8_123_h_h_abg-001.ABC/BCA/CAB             tP8       P4/mmm              -         ABC2                #123      B2 derivative, AB_tP4_123_g_g-001 with C "in between", shifted origin
+ABC2_tP8_129_c_c_2c-001.ABC/BCA/CAB              tP8       P4/nmm              -         ABC2                #129      rocksalt derivative, AB_tP4_129_c_c-002 with C "in between" 
+AB2C3_tI12_139_a_e_be-001.{ABC}                  tI12      I4/mmm              -         AB2C3               #139      rocksalt derivative, AB_tI8_139_e_e-002 with C "in between"
+A3BC4_tI16_139_ae_b_g-001.{ABC}                  tI16      I4/mmm              -         A3BC4               #139      B2 derivative, A3B_tI8_139_ae_b-001 with C "in between" 
+AB3C4_tI16_139_a_bd_ce-001.{ABC}                 tI16      I4/mmm              -         AB3C4               #139      rocksalt derivative, A3B_tI8_139_bd_a-002.BA (swap A and B) with C "in between" 
+ABC2_tI16_139_e_e_cd-001.ABC/BCA/CAB             tI16      I4/mmm              -         ABC2                #139      B2 derivative, AB_tI8_139_e_e-002 with C "in between" 
+ABC2_tI16_141_a_b_e-001.ABC/BCA/CAB              tI16      I4_{1}/amd          -         ABC2                #141      rocksalt derivative, AB_tI8_141_a_b-002 with C "in between"
+A2BC3_hP6_164_d_a_bd-001.{ABC}                   hP6       P-3m1               -         A2BC3               #164      rocksalt derivative, A2B_hP3_164_d_a-001 with C "in between"
+A2BC3_hP6_164_d_b_ad-001.{ABC}                   hP6       P-3m1               -         A2BC3               #164      B2 derivative, A2B_hP3_164_d_a-002 with C "in between", shifted origin 
+A3BC4_hR8_166_bc_a_2c-001.{ABC}                  hR8       R-3m                -         A3BC4               #166      B2 derivative, A3B_hR4_166_bc_a-001 with C "in between"
+AB3C4_hR8_166_a_bc_2c-001.{ABC}                  hR8       R-3m                -         AB3C4               #166      rocksalt derivative, AB3_hR4_166_a_bc-001 with C "in between"
+ABC2_hR8_166_c_c_abc-001.ABC/BCA/CAB             hR8       R-3m                -         ABC2                #166      rocksalt derivative, AB_hR4_166_c_c-001 with C "in between"
+ABC2_hR8_166_c_c_abc-002.ABC/BCA/CAB             hR8       R-3m                -         ABC2                #166      B2 derivative, AB_hR4_166_c_c-002 with C "in between"
+AB3C4_cP8_221_a_c_bd.{ABC}                       cP8       Pm-3m               -         AB3C4               #221      rocksalt derivative, AB3_cP4_221_a_c with C "in between" 
 
 ****************************************************************************************************
 ****************************************************************************************************

@@ -615,6 +615,66 @@ namespace anrl { // put them in order
   //DX 20181211 - add Corey's kesterite structure - START
   uint PrototypeANRL_A2BCD4_tI16_82_ac_b_d_g(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 1
   //DX 20181211 - add Corey's kesterite structure - END
+  // -------------------------------------------------------------------------
+  // misc prototypes (from Y. Lederer)
+  // -------------------------------------------------------------------------
+  uint PrototypeANRL_AB3_mC8_12_a_di(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-1
+  uint PrototypeANRL_AB_mC8_12_i_i(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-2
+  uint PrototypeANRL_AB3C4_mC16_12_a_di_2i(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-3
+  uint PrototypeANRL_ABC2_mC16_12_i_i_adi(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-4
+  uint PrototypeANRL_AB3_oP4_47_a_ct(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-5
+  uint PrototypeANRL_A3B_oP4_47_cr_a(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-6
+  uint PrototypeANRL_AB3C4_oP8_47_a_ct_egs(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-7
+  uint PrototypeANRL_A3BC4_oP8_47_eq_g_bdt(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-8
+  uint PrototypeANRL_AB_oP4_51_e_e(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-9
+  uint PrototypeANRL_ABC2_oP8_51_e_e_2f(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-10
+  uint PrototypeANRL_AB_oP4_59_a_a(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-11
+  uint PrototypeANRL_ABC2_oP8_59_a_a_2b(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-12
+  uint PrototypeANRL_ABC2_oC16_63_c_c_g(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-14
+  uint PrototypeANRL_AB2C3_oC12_65_a_i_cj(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-15
+  uint PrototypeANRL_A3BC4_oC16_65_ai_b_q(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-16
+  uint PrototypeANRL_A3BC4_oC16_65_bj_a_eh(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-17
+  uint PrototypeANRL_AB3C4_oC16_65_a_bf_hi(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-18
+  uint PrototypeANRL_AB2_oC6_65_a_i(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-19
+  uint PrototypeANRL_A3B_oC8_65_ai_b(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-20
+  uint PrototypeANRL_A3B_oC8_65_bj_a(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-21
+  uint PrototypeANRL_AB_oC8_65_i_i(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-22
+  uint PrototypeANRL_ABC2_oC16_65_i_i_fh(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-23
+  uint PrototypeANRL_AB2C3_oI12_71_a_e_df(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-24
+  uint PrototypeANRL_AB_tP2_123_a_b(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-25
+  uint PrototypeANRL_AB_tP2_123_a_c(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-26
+  uint PrototypeANRL_A2B_tP3_123_g_a(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-27
+  uint PrototypeANRL_A3B_tP4_123_abc_d(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-28
+  uint PrototypeANRL_A3B_tP4_123_ag_b(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-29
+  uint PrototypeANRL_A3B_tP4_123_cf_a(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-30
+  uint PrototypeANRL_AB3_tP4_123_a_bh(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-31
+  uint PrototypeANRL_ABC2_tP4_123_a_b_h(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-32
+  uint PrototypeANRL_ABC2_tP4_123_a_c_e(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-33
+  uint PrototypeANRL_ABC2_tP4_123_a_d_bc(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-34
+  uint PrototypeANRL_AB_tP4_123_g_g(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-35
+  uint PrototypeANRL_A2BC3_tP6_123_g_b_ch(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-36
+  uint PrototypeANRL_A3BC4_tP8_123_abc_d_i(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-37
+  uint PrototypeANRL_A3BC4_tP8_123_ag_b_2h(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-38
+  uint PrototypeANRL_A3BC4_tP8_123_cf_a_k(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-39
+  uint PrototypeANRL_AB3C4_tP8_123_a_bh_cdg(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-40
+  uint PrototypeANRL_ABC2_tP8_123_h_h_abg(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-41
+  uint PrototypeANRL_ABC2_tP8_129_c_c_2c(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-43
+  uint PrototypeANRL_A3B_tI8_139_ae_b(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-45
+  uint PrototypeANRL_AB2C3_tI12_139_a_e_be(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-48
+  uint PrototypeANRL_A3BC4_tI16_139_ae_b_g(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-49
+  uint PrototypeANRL_AB3C4_tI16_139_a_bd_ce(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-50
+  uint PrototypeANRL_ABC2_tI16_139_e_e_cd(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-51
+  uint PrototypeANRL_ABC2_tI16_141_a_b_e(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-52
+  uint PrototypeANRL_A2B_hP3_164_d_a(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-54
+  uint PrototypeANRL_A2BC3_hP6_164_d_a_bd(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-55
+  uint PrototypeANRL_A2BC3_hP6_164_d_b_ad(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-56
+  uint PrototypeANRL_A3B_hR4_166_bc_a(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-57
+  uint PrototypeANRL_AB3_hR4_166_a_bc(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-58
+  uint PrototypeANRL_AB_hR4_166_c_c(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-60
+  uint PrototypeANRL_A3BC4_hR8_166_bc_a_2c(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-61
+  uint PrototypeANRL_AB3C4_hR8_166_a_bc_2c(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-62
+  uint PrototypeANRL_ABC2_hR8_166_c_c_abc(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-63
+  uint PrototypeANRL_AB3C4_cP8_221_a_c_bd(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // Lederer-64
 }
 
 // *************************************************************************** 
@@ -1142,6 +1202,7 @@ namespace anrl {
     }
     // ---------------------------------------------------------------------------
     // 72 // ./aflow --proto=AB_oC8_63_c_c --params=2.9782,2.64253575985,0.985360284736,0.436,0.14525
+    // Lederer-13 // ./aflow --proto=AB_oC8_63_c_c --params=1.0.0185797325,1.41421356236,0.707106781182,0.625,0.125
     if(vlabel.at(ifound)=="AB_oC8_63_c_c") {
       PrototypeANRL_AB_oC8_63_c_c(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
@@ -1324,6 +1385,7 @@ namespace anrl {
     }
     // ---------------------------------------------------------------------------
     // 110 // ./aflow --proto=AB_tP4_129_c_c --params=3.107,1.90505310589,0.1,0.65
+    // Lederer-42 // ./aflow --proto=AB_tP4_129_c_c --params=1.0,2.82842712472,0.875,0.375
     if(vlabel.at(ifound)=="AB_tP4_129_c_c") {
       PrototypeANRL_AB_tP4_129_c_c(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
@@ -1400,11 +1462,13 @@ namespace anrl {
     }
     // ---------------------------------------------------------------------------
     // 125 // ./aflow --proto=A3B_tI8_139_bd_a --params=3.8537,2.22744375535
+    // Lederer-46 // ./aflow --proto=A3B_tI8_139_a_bd --params=1.0,2.0
     if(vlabel.at(ifound)=="A3B_tI8_139_bd_a") {
       PrototypeANRL_A3B_tI8_139_bd_a(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
     // ---------------------------------------------------------------------------
     // 126 // ./aflow --proto=AB2_tI6_139_a_e --params=3.2064,2.44754241517,0.3353
+    // Lederer-44 // ./aflow --proto=AB2_tI6_139_a_e --params=1.0,4.24264068707,0.3333333333
     if(vlabel.at(ifound)=="AB2_tI6_139_a_e") {
       PrototypeANRL_AB2_tI6_139_a_e(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
@@ -1476,6 +1540,7 @@ namespace anrl {
     }
     // ---------------------------------------------------------------------------
     // 141 // ./aflow --proto=AB_tI8_141_a_b --params=3.325,3.42255639098
+    // Lederer-53 // ./aflow --proto=AB_tI8_141_a_b --params=1.0,1.99999999997
     if(vlabel.at(ifound)=="AB_tI8_141_a_b") {
       PrototypeANRL_AB_tI8_141_a_b(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
@@ -1655,6 +1720,8 @@ namespace anrl {
     // ---------------------------------------------------------------------------
     // 174 // RHL: ./aflow --proto=ABC2_hR4_166_a_b_c --params=3.5561,5.44557239673,0.2667
     // 174 // HEX: ./aflow --proto=ABC2_hR4_166_a_b_c --params=3.5561,5.44557239673,0.2667 --hex
+    // Lederer-59 //RHL ./aflow --proto=ABC2_hR4_166_a_b_c --params=1.0,4.89897948553,0.25
+    // Lederer-59 //HEX ./aflow --proto=ABC2_hR4_166_a_b_c --params=1.0,4.89897948553,0.25 --hex
     if(vlabel.at(ifound)=="ABC2_hR4_166_a_b_c") {
       PrototypeANRL_ABC2_hR4_166_a_b_c(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     }
@@ -2941,6 +3008,7 @@ namespace anrl {
       PrototypeANRL_A_tP12_138_bi(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
     // 181 // ./aflow --proto=AB_tI8_139_e_e --params=4.4795,2.43451278044,0.3356,0.119
+    // Lederer-47 // ./aflow --proto=AB_tI8_139_e_e --params=1.0,2.82842712475,0.125,0.625
     if(vlabel.at(ifound)=="AB_tI8_139_e_e")
       PrototypeANRL_AB_tI8_139_e_e(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
@@ -3490,6 +3558,250 @@ namespace anrl {
       PrototypeANRL_A2BCD4_tI16_82_ac_b_d_g(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     //DX 20181211 - add Corey's kesterite structure - END
 
+    // -------------------------------------------------------------------------
+    // misc prototypes (from Y. Lederer)
+    // -------------------------------------------------------------------------
+    // NOTE: lattice parameters are all 1.0 since these are fictitious prototype structures (no elements)
+    // We will rely on Vegard's law to appropriately scale the structures
+    // ---------------------------------------------------------------------------
+    // Lederer-1 // ./aflow --proto=AB3_mC8_12_a_di --params=1.0,0.301511344577,0.522232967868,100.024987862,0.75,0.25
+    if(found && vlabel.at(ifound)=="AB3_mC8_12_a_di")
+      PrototypeANRL_AB3_mC8_12_a_di(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-2 // ./aflow --proto=AB_mC8_12_i_i --params=1.0,0.301511344581,0.522232967872,100.024987862,0.625,0.875,0.875,0.625
+    if(found && vlabel.at(ifound)=="AB_mC8_12_i_i")
+      PrototypeANRL_AB_mC8_12_i_i(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-3 // ./aflow --proto=AB3C4_mC16_12_a_di_2i --params=1.0,0.301511344577,0.522232967868,100.024987862,0.75,0.25,0.125,0.375,0.625,0.875
+    if(found && vlabel.at(ifound)=="AB3C4_mC16_12_a_di_2i")
+      PrototypeANRL_AB3C4_mC16_12_a_di_2i(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-4 // ./aflow --proto=ABC2_mC16_12_i_i_adi --params=1.0,0.301511344581,0.522232967872,100.024987862,0.625,0.875,0.875,0.625,0.75,0.25
+    if(found && vlabel.at(ifound)=="ABC2_mC16_12_i_i_adi")
+      PrototypeANRL_ABC2_mC16_12_i_i_adi(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-5 // ./aflow --proto=AB3_oP4_47_a_ct --params=1.0,1.41421356239,2.0,0.25
+    if(found && vlabel.at(ifound)=="AB3_oP4_47_a_ct")
+      PrototypeANRL_AB3_oP4_47_a_ct(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-6 // ./aflow --proto=A3B_oP4_47_cr_a --params=1.0,1.41421356238,2.82842712476,0.25
+    if(found && vlabel.at(ifound)=="A3B_oP4_47_cr_a")
+      PrototypeANRL_A3B_oP4_47_cr_a(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-7 // ./aflow --proto=AB3C4_oP8_47_a_ct_egs --params=1.0,1.41421356239,2.0,0.25,0.25
+    if(found && vlabel.at(ifound)=="AB3C4_oP8_47_a_ct_egs")
+      PrototypeANRL_AB3C4_oP8_47_a_ct_egs(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-8 // ./aflow --proto=A3BC4_oP8_47_eq_g_bdt --params=1.0,1.41421356238,2.82842712476,0.75,0.75
+    if(found && vlabel.at(ifound)=="A3BC4_oP8_47_eq_g_bdt")
+      PrototypeANRL_A3BC4_oP8_47_eq_g_bdt(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-9 // ./aflow --proto=AB_oP4_51_e_e --params=1.0,0.707106781182,2.0,0.125,0.625
+    if(found && vlabel.at(ifound)=="AB_oP4_51_e_e")
+      PrototypeANRL_AB_oP4_51_e_e(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-10 // ./aflow --proto=ABC2_oP8_51_e_e_2f --params=1.0,0.707106781182,2.0,0.125,0.625,0.375,0.875
+    if(found && vlabel.at(ifound)=="ABC2_oP8_51_e_e_2f")
+      PrototypeANRL_ABC2_oP8_51_e_e_2f(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-11 // ./aflow --proto=AB_oP4_59_a_a --params=1.0,1.41421356238,2.0,0.875,0.375
+    if(found && vlabel.at(ifound)=="AB_oP4_59_a_a")
+      PrototypeANRL_AB_oP4_59_a_a(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-12 // ./aflow --proto=ABC2_oP8_59_a_a_2b --params=1.0,1.41421356238,2.0,0.875,0.375,0.875,0.375
+    if(found && vlabel.at(ifound)=="ABC2_oP8_59_a_a_2b")
+      PrototypeANRL_ABC2_oP8_59_a_a_2b(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-14 // ./aflow --proto=ABC2_oC16_63_c_c_g --params=1.0,1.41421356236,0.707106781182,0.625,0.125,0.25,0.375
+    if(found && vlabel.at(ifound)=="ABC2_oC16_63_c_c_g")
+      PrototypeANRL_ABC2_oC16_63_c_c_g(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-15 // ./aflow --proto=AB2C3_oC12_65_a_i_cj --params=1.0,2.99999999998,0.707106781176,0.3333333333,0.8333333333
+    if(found && vlabel.at(ifound)=="AB2C3_oC12_65_a_i_cj")
+      PrototypeANRL_AB2C3_oC12_65_a_i_cj(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-16 // ./aflow --proto=A3BC4_oC16_65_ai_b_q --params=1.0,1.99999999999,0.499999999994,0.75,0.75,0.875
+    if(found && vlabel.at(ifound)=="A3BC4_oC16_65_ai_b_q")
+      PrototypeANRL_A3BC4_oC16_65_ai_b_q(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-17 // ./aflow --proto=A3BC4_oC16_65_bj_a_eh --params=1.0,1.41421356236,0.707106781182,0.75,0.25
+    if(found && vlabel.at(ifound)=="A3BC4_oC16_65_bj_a_eh")
+      PrototypeANRL_A3BC4_oC16_65_bj_a_eh(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-18 // ./aflow --proto=AB3C4_oC16_65_a_bf_hi --params=1.0,1.41421356239,0.5,0.75,0.75
+    if(found && vlabel.at(ifound)=="AB3C4_oC16_65_a_bf_hi")
+      PrototypeANRL_AB3C4_oC16_65_a_bf_hi(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-19 // ./aflow --proto=AB2_oC6_65_a_i --params=1.0,2.99999999998,0.707106781176,0.3333333333
+    if(found && vlabel.at(ifound)=="AB2_oC6_65_a_i")
+      PrototypeANRL_AB2_oC6_65_a_i(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-20 // ./aflow --proto=A3B_oC8_65_ai_b --params=1.0,1.99999999999,0.499999999994,0.75
+    if(found && vlabel.at(ifound)=="A3B_oC8_65_ai_b")
+      PrototypeANRL_A3B_oC8_65_ai_b(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-21 // ./aflow --proto=A3B_oC8_65_bj_a --params=1.0,1.41421356236,0.707106781182,0.25
+    if(found && vlabel.at(ifound)=="A3B_oC8_65_bj_a")
+      PrototypeANRL_A3B_oC8_65_bj_a(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-22 // ./aflow --proto=AB_oC8_65_i_i --params=1.0,1.99999999999,0.499999999994,0.875,0.375
+    if(found && vlabel.at(ifound)=="AB_oC8_65_i_i")
+      PrototypeANRL_AB_oC8_65_i_i(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-23 // ./aflow --proto=ABC2_oC16_65_i_i_fh --params=1.0,1.99999999999,0.499999999994,0.75,0.875,0.375
+    if(found && vlabel.at(ifound)=="ABC2_oC16_65_i_i_fh")
+      PrototypeANRL_ABC2_oC16_65_i_i_fh(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-24 // ./aflow --proto=AB2C3_oI12_71_a_e_df --params=1.0,0.471404520797,0.333333333338,0.6666666667,0.6666666667
+    if(found && vlabel.at(ifound)=="AB2C3_oI12_71_a_e_df")
+      PrototypeANRL_AB2C3_oI12_71_a_e_df(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-25 // ./aflow --proto=AB_tP2_123_a_b --params=1.0,2.00000000002
+    if(found && vlabel.at(ifound)=="AB_tP2_123_a_b")
+      PrototypeANRL_AB_tP2_123_a_b(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-26 // ./aflow --proto=AB_tP2_123_a_c --params=1.0,0.707106781182
+    if(found && vlabel.at(ifound)=="AB_tP2_123_a_c")
+      PrototypeANRL_AB_tP2_123_a_c(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-27 // ./aflow --proto=A2B_tP3_123_g_a --params=1.0,3.00000000002,0.6666666667
+    if(found && vlabel.at(ifound)=="A2B_tP3_123_g_a")
+      PrototypeANRL_A2B_tP3_123_g_a(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-28 // ./aflow --proto=A3B_tP4_123_abc_d --params=1.0,1.41421356238
+    if(found && vlabel.at(ifound)=="A3B_tP4_123_abc_d")
+      PrototypeANRL_A3B_tP4_123_abc_d(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-29 // ./aflow --proto=A3B_tP4_123_ag_b --params=1.0,4.00000000002,0.25
+    if(found && vlabel.at(ifound)=="A3B_tP4_123_ag_b")
+      PrototypeANRL_A3B_tP4_123_ag_b(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-30 // ./aflow --proto=A3B_tP4_123_cf_a --params=1.0,0.499999999994
+    if(found && vlabel.at(ifound)=="A3B_tP4_123_cf_a")
+      PrototypeANRL_A3B_tP4_123_cf_a(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-31 // ./aflow --proto=AB3_tP4_123_a_bh --params=1.0,2.82842712477,0.25
+    if(found && vlabel.at(ifound)=="AB3_tP4_123_a_bh")
+      PrototypeANRL_AB3_tP4_123_a_bh(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-32 // ./aflow --proto=ABC2_tP4_123_a_b_h --params=1.0,2.00000000002,0.75
+    if(found && vlabel.at(ifound)=="ABC2_tP4_123_a_b_h")
+      PrototypeANRL_ABC2_tP4_123_a_b_h(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-33 // ./aflow --proto=ABC2_tP4_123_a_c_e --params=1.0,0.707106781182
+    if(found && vlabel.at(ifound)=="ABC2_tP4_123_a_c_e")
+      PrototypeANRL_ABC2_tP4_123_a_c_e(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-34 // ./aflow --proto=ABC2_tP4_123_a_d_bc --params=1.0,1.41421356238
+    if(found && vlabel.at(ifound)=="ABC2_tP4_123_a_d_bc")
+      PrototypeANRL_ABC2_tP4_123_a_d_bc(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-35 // ./aflow --proto=AB_tP4_123_g_g --params=1.0,4.00000000002,0.125,0.625
+    if(found && vlabel.at(ifound)=="AB_tP4_123_g_g")
+      PrototypeANRL_AB_tP4_123_g_g(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-36 // ./aflow --proto=A2BC3_tP6_123_g_b_ch --params=1.0,3.00000000002,0.1666666667,0.6666666667
+    if(found && vlabel.at(ifound)=="A2BC3_tP6_123_g_b_ch")
+      PrototypeANRL_A2BC3_tP6_123_g_b_ch(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-37 // ./aflow --proto=A3BC4_tP8_123_abc_d_i --params=1.0,1.41421356238,0.75
+    if(found && vlabel.at(ifound)=="A3BC4_tP8_123_abc_d_i")
+      PrototypeANRL_A3BC4_tP8_123_abc_d_i(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-38 // ./aflow --proto=A3BC4_tP8_123_ag_b_2h --params=1.0,4.00000000002,0.25,0.625,0.125
+    if(found && vlabel.at(ifound)=="A3BC4_tP8_123_ag_b_2h")
+      PrototypeANRL_A3BC4_tP8_123_ag_b_2h(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-39 // ./aflow --proto=A3BC4_tP8_123_cf_a_k --params=1.0,0.499999999994,0.75
+    if(found && vlabel.at(ifound)=="A3BC4_tP8_123_cf_a_k")
+      PrototypeANRL_A3BC4_tP8_123_cf_a_k(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-40 // ./aflow --proto=AB3C4_tP8_123_a_bh_cdg --params=1.0,2.82842712477,0.25,0.25
+    if(found && vlabel.at(ifound)=="AB3C4_tP8_123_a_bh_cdg")
+      PrototypeANRL_AB3C4_tP8_123_a_bh_cdg(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-41 // ./aflow --proto=ABC2_tP8_123_h_h_abg --params=1.0,4.00000000002,0.25,0.625,0.125
+    if(found && vlabel.at(ifound)=="ABC2_tP8_123_h_h_abg")
+      PrototypeANRL_ABC2_tP8_123_h_h_abg(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-43 // ./aflow --proto=ABC2_tP8_129_c_c_2c --params=1.0,2.82842712472,0.875,0.375,0.125,0.625
+    if(found && vlabel.at(ifound)=="ABC2_tP8_129_c_c_2c")
+      PrototypeANRL_ABC2_tP8_129_c_c_2c(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-45 // ./aflow --proto=A3B_tI8_139_ae_b --params=1.0,2.82842712475,0.25
+    if(found && vlabel.at(ifound)=="A3B_tI8_139_ae_b")
+      PrototypeANRL_A3B_tI8_139_ae_b(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-48 // ./aflow --proto=AB2C3_tI12_139_a_e_be --params=1.0,4.24264068707,0.3333333333,0.8333333333
+    if(found && vlabel.at(ifound)=="AB2C3_tI12_139_a_e_be")
+      PrototypeANRL_AB2C3_tI12_139_a_e_be(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-49 // ./aflow --proto=A3BC4_tI16_139_ae_b_g --params=1.0,2.82842712475,0.25,0.625
+    if(found && vlabel.at(ifound)=="A3BC4_tI16_139_ae_b_g")
+      PrototypeANRL_A3BC4_tI16_139_ae_b_g(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-50 // ./aflow --proto=AB3C4_tI16_139_a_bd_ce --params=1.0,2.0,0.75
+    if(found && vlabel.at(ifound)=="AB3C4_tI16_139_a_bd_ce")
+      PrototypeANRL_AB3C4_tI16_139_a_bd_ce(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-51 // ./aflow --proto=ABC2_tI16_139_e_e_cd --params=1.0,2.82842712475,0.125,0.625
+    if(found && vlabel.at(ifound)=="ABC2_tI16_139_e_e_cd")
+      PrototypeANRL_ABC2_tI16_139_e_e_cd(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-52 // ./aflow --proto=ABC2_tI16_141_a_b_e --params=1.0,1.99999999997,0.625
+    if(found && vlabel.at(ifound)=="ABC2_tI16_141_a_b_e")
+      PrototypeANRL_ABC2_tI16_141_a_b_e(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-54 // ./aflow --proto=A2B_hP3_164_d_a --params=1.0,2.44948974278,0.3333333333
+    // Lederer-65 // ./aflow --proto=A2B_hP3_164_d_a --params=1.0,1.22474487139,0.3333333333
+    if(found && vlabel.at(ifound)=="A2B_hP3_164_d_a")
+      PrototypeANRL_A2B_hP3_164_d_a(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-55 // ./aflow --proto=A2BC3_hP6_164_d_a_bd --params=1.0,2.44948974278,0.3333333333,0.8333333333
+    if(found && vlabel.at(ifound)=="A2BC3_hP6_164_d_a_bd")
+      PrototypeANRL_A2BC3_hP6_164_d_a_bd(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-56 // ./aflow --proto=A2BC3_hP6_164_d_b_ad --params=1.0,1.22474487139,0.8333333333,0.3333333333
+    if(found && vlabel.at(ifound)=="A2BC3_hP6_164_d_b_ad")
+      PrototypeANRL_A2BC3_hP6_164_d_b_ad(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-57 //RHL ./aflow --proto=A3B_hR4_166_bc_a --params=1.0,4.89897948557,0.25
+    // Lederer-57 //HEX ./aflow --proto=A3B_hR4_166_bc_a --params=1.0,4.89897948557,0.25 --hex
+    if(found && vlabel.at(ifound)=="A3B_hR4_166_bc_a")
+      PrototypeANRL_A3B_hR4_166_bc_a(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-58 //RHL ./aflow --proto=AB3_hR4_166_a_bc --params=1.0,9.79795897119,0.75
+    // Lederer-58 //HEX ./aflow --proto=AB3_hR4_166_a_bc --params=1.0,9.79795897119,0.75 --hex
+    if(found && vlabel.at(ifound)=="AB3_hR4_166_a_bc")
+      PrototypeANRL_AB3_hR4_166_a_bc(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-60 //RHL ./aflow --proto=AB_hR4_166_c_c --params=1.0,9.79795897107,0.625,0.125
+    // Lederer-60 //HEX ./aflow --proto=AB_hR4_166_c_c --params=1.0,9.79795897107,0.625,0.125 --hex
+    // Lederer-67 //RHL ./aflow --proto=AB_hR4_166_c_c --params=1.0,4.89897948557,0.375,0.875
+    // Lederer-67 //HEX ./aflow --proto=AB_hR4_166_c_c --params=1.0,4.89897948557,0.375,0.875 --hex
+    if(found && vlabel.at(ifound)=="AB_hR4_166_c_c")
+      PrototypeANRL_AB_hR4_166_c_c(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-61 //RHL ./aflow --proto=A3BC4_hR8_166_bc_a_2c --params=1.0,4.89897948557,0.25,0.625,0.875
+    // Lederer-61 //HEX ./aflow --proto=A3BC4_hR8_166_bc_a_2c --params=1.0,4.89897948557,0.25,0.625,0.875 --hex
+    if(found && vlabel.at(ifound)=="A3BC4_hR8_166_bc_a_2c")
+      PrototypeANRL_A3BC4_hR8_166_bc_a_2c(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-62 //RHL ./aflow --proto=AB3C4_hR8_166_a_bc_2c --params=1.0,9.79795897119,0.75,0.375,0.125
+    // Lederer-62 //HEX ./aflow --proto=AB3C4_hR8_166_a_bc_2c --params=1.0,9.79795897119,0.75,0.375,0.125 --hex
+    if(found && vlabel.at(ifound)=="AB3C4_hR8_166_a_bc_2c")
+      PrototypeANRL_AB3C4_hR8_166_a_bc_2c(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-63 //RHL ./aflow --proto=ABC2_hR8_166_c_c_abc --params=1.0,9.79795897107,0.625,0.125,0.75
+    // Lederer-63 //HEX ./aflow --proto=ABC2_hR8_166_c_c_abc --params=1.0,9.79795897107,0.625,0.125,0.75 --hex
+    // Lederer-66 //RHL ./aflow --proto=ABC2_hR8_166_c_c_abc --params=1.0,4.89897948557,0.375,0.875,0.75
+    // Lederer-66 //HEX ./aflow --proto=ABC2_hR8_166_c_c_abc --params=1.0,4.89897948557,0.375,0.875,0.75 --hex
+    if(found && vlabel.at(ifound)=="ABC2_hR8_166_c_c_abc")
+      PrototypeANRL_ABC2_hR8_166_c_c_abc(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
+    // ----------------------------------------------------------------------------
+    // Lederer-64 // ./aflow --proto=AB3C4_cP8_221_a_c_bd --params=1.0
+    if(found && vlabel.at(ifound)=="AB3C4_cP8_221_a_c_bd")
+      PrototypeANRL_AB3C4_cP8_221_a_c_bd(oss,web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
     // ---------------------------------------------------------------------------
 
 
