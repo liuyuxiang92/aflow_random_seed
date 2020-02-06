@@ -735,7 +735,7 @@ class _kflags {
     bool  KBIN_SYMMETRY_CALCULATE_PGROUPK;      // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_FGROUP;       // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL;  // DX 8/14/17 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL; // DX 12/5/17 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL; // DX 12/5/17 - Specify what to calculate/verify; Added pgroupk_xtal
     bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON;  // DX 20200129 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_IATOMS;       // DX 8/14/17 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_AGROUP;       // DX 8/14/17 - Specify what to calculate/verify
@@ -4355,4 +4355,3 @@ xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
 // *                                                                         *
 // ***************************************************************************
-
