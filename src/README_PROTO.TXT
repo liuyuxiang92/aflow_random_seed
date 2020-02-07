@@ -1287,7 +1287,7 @@ ABC_hR3_160_a_a_a-001.ABC/BAC/CAB                hR3       R3m                 F
 ABC3_hR10_161_a_a_b-001.{ABC}                    hR10      R3c                 -         LiNbO3              #161      Ferroelectric LiNbO3 (part 1)
 ABC2_hP4_164_a_b_d-001.{ABC/BCA/CAB              hP4       P-3m1               -         CuNiSb2             #164      CuNiSb2 (part 2)    
 ABC2_hR4_166_a_b_c-001.{ABC}                     hR4       R-3m                F5_1      CrNiS2              #166      Caswellsilverite (part 1)
-ABC2_hR4_166_a_b_c-002.ABC/BCA/CAB               hR4       R-3m                -         ABC2                #166      fcc derivative (Y. Lederer)
+ABC2_hR4_166_a_b_c-002.ABC/BCA/CAB               hR4       R-3m                -         ABC2                #166      rocksalt derivative (Y. Lederer)
 ABC_hR6_166_c_c_c-001.{ABC}                      hR6       R-3m                -         SmSI                #166      SmSI (part 2)       
 AB3C_hR10_167_b_e_a-001.{ABC}                    hR10      R-3c                -         PrNiO3              #167      PrNiO3 (part 2)     
 ABC2_hR24_167_e_e_2e-001.{ABC}                   hR24      R-3c                F5_{13}   KBO2                #167      KBO2 (part 2)       
@@ -1339,7 +1339,7 @@ A5B3C16_cP96_222_ce_d_fi-001.{ABC}               cP96      Pn-3n               -
 A6B2C_cF36_225_e_c_a-001.{ABC}                   cF36      Fm-3m               J1_{1}    K2PtCl6             #225      K2PtCl6 (part 2)    
 A9B16C7_cF128_225_acd_2f_be-001.{ABC}            cF128     Fm-3m               -         Cr9Fe16Ni7          #225      Model of Ferrite (part 1)
 AB18C8_cF108_225_a_eh_f-001.{ABC}                cF108     Fm-3m               -         CrFe18Ni8           #225      Model of Austenite (part 1)
-AB2C_cF16_225_a_c_b.ABC/BCA/CAB                  cF16      Fm-3m               L2_1      AlCu2Mn             #225      Heusler (part 1), rocksalt derivative (Y. Lederer), equivalent to T0001 [HTQC] 
+AB2C_cF16_225_a_c_b.ABC/BCA/CAB                  cF16      Fm-3m               L2_1      AlCu2Mn             #225      Heusler (part 1), B2 derivative (Y. Lederer), equivalent to T0001 [HTQC] 
 A2B2C7_cF88_227_c_d_af-001.{ABC}                 cF88      Fd-3m               -         Eu2Ir2O7            #227      Pyrochlore Iridate (part 2)
 A2BC4_cF56_227_d_a_e-001.{ABC}                   cF56      Fd-3m               H1_1      Al2MgO4             #227      Spinel (part 1)     
 AB3C3_cF112_227_c_de_f-001.{ABC}                 cF112     Fd-3m               E9_3      Fe3W3C              #227      Fe3W3C (part 1)     
