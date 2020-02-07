@@ -74,6 +74,7 @@ namespace apl {
     //#endif
     _skew = SYM::isLatticeSkewed(_inStructure.lattice, _inStructure.dist_nn_min, _inStructure.sym_eps);
     _sym_eps = _inStructure.sym_eps;
+
     clear();
   }
   //[CO190218 - OBSOLETE]#else
@@ -827,8 +828,11 @@ namespace apl {
   // Does not capture rotated primitive cells yet, but does work for AFLOW's
   // standard conventional unit cells.
   void Supercell::projectToPrimitive() {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string function = "apl::Supercell::projectToPrimitive()";
     vector<int> pc2sc, sc2pc;
     xstructure pcell;
+    if (_pcStructure.iatoms_calculated) SYM::CalculateInequivalentAtoms(_pcStructure);
     LightCopy(_pcStructure, pcell);  // No need for symmetry
 
     // The original structure may be a rotated primitive cell. Transform the
@@ -841,30 +845,61 @@ namespace apl {
       }
     }
 
-    if (getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
-      _inStructure = pcell;
-      _sc2pcMap = sc2pc;
-      _pc2scMap = pc2sc;
-      calculatePhaseVectors();
-    } else {
+    bool mapped = getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc);
+    if (!mapped) {
       // When calculating the primitive cell, the positions of the atoms
       // may alternate between x and 1 - x. Test if this is the case here.
+      if (LDEBUG) std::cout << function << " Not mapped succesfully. Try shifting atoms." << std::endl;
       xvector<double> ones(3); ones.set(1.0);
       for (uint at = 0; at < pcell.atoms.size(); at++) {
         pcell.atoms[at].fpos = ones - pcell.atoms[at].fpos;
         pcell.atoms[at].cpos = pcell.f2c * pcell.atoms[at].fpos;
       }
-      if (getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
-        _inStructure = pcell;
-        _sc2pcMap = sc2pc;
-        _pc2scMap = pc2sc;
-        calculatePhaseVectors();
-      } else {
-        _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could"
-          << " not map the AFLOW standard primitive cell to the supercell."
-          << " Phonon dispersions will be calculated using the original"
-          << " structure instead." << apl::endl;
+      mapped = getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc);
+    }
+    if (mapped) {
+      // Sort the iatoms correctly or the non-analytical correction will not work
+      // This needs to be done from scratch because the sequence of the atoms may
+      // have shifted between the original and the primitive cell.
+      xvector<double> fpos(3);
+      const vector<vector<int> >& iatoms_pc = _pcStructure.iatoms;
+      const vector<vector<int> >& iatoms_oc = _inStructure_original.iatoms;
+      uint niatoms_pc = iatoms_pc.size();
+      uint niatoms_oc = iatoms_oc.size();
+      pcell.iatoms.clear();
+      pcell.iatoms.resize(niatoms_pc);
+      for (uint iatpc = 0; ((iatpc < niatoms_pc) && mapped); iatpc++) {
+        fpos = _inStructure_original.c2f * _pcStructure.atoms[iatoms_pc[iatpc][0]].cpos;
+        uint iatoc = 0;
+        for (iatoc = 0; iatoc < niatoms_oc; iatoc++) {
+          uint i = 0;
+          for (i = 0; i < iatoms_oc[iatoc].size(); i++) {
+            if (SYM::FPOSMatch(fpos, _inStructure_original.atoms[iatoms_oc[iatoc][i]].fpos,
+                _inStructure_original.lattice, _inStructure_original.f2c, _skew, _sym_eps)) {
+              pcell.iatoms[iatoc] = _pcStructure.iatoms[iatpc];
+              for (uint j = 0; j < iatoms_pc[iatpc].size(); j++) pcell.atoms[iatoms_pc[iatpc][j]].index_iatoms = iatoc;
+              break;
+            }
+          }
+          if (i < iatoms_oc[iatoc].size()) break;
+        }
+        if (iatoc == niatoms_oc) {
+          if (LDEBUG) std::cerr << function << " Did not map iatoms of primitive cell (failed for " << iatpc << ")." << std::endl;
+          mapped = false;
+        }
       }
+    }
+
+    if (mapped) {
+      _inStructure = pcell;
+      _sc2pcMap = sc2pc;
+      _pc2scMap = pc2sc;
+      calculatePhaseVectors();
+    } else {
+      _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could"
+        << " not map the AFLOW standard primitive cell to the supercell."
+        << " Phonon dispersions will be calculated using the original"
+        << " structure instead." << apl::endl;
     }
   }
 

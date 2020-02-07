@@ -844,6 +844,8 @@ namespace apl {
   // DOI: 10.1088/0953-8984/22/20/202201
 
   // ME180827 - Overloaded to calculate derivative for AAPL
+  // ME200207 - This function assummed that Born charges were stored for each type,
+  // but it is actually stored for each iatom.
   xmatrix<xcomplex<double> > PhononCalculator::getNonanalyticalTermWang(const xvector<double>& _q) {
     vector<xmatrix<xcomplex<double> > > placeholder;
     return getNonanalyticalTermWang(_q, placeholder, false);
@@ -853,7 +855,7 @@ namespace apl {
       vector<xmatrix<xcomplex<double> > >& derivative,
       bool calc_derivative) {
     const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
-    const xstructure& pc = _supercell.getInputStructureLight();  //CO
+    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME200207 - grab input structure (need iatoms)
 
     // to correct the q=\Gamma as a limit
     xvector<double> q(_q);
@@ -862,6 +864,7 @@ namespace apl {
     }
 
     uint pcAtomsSize = pc.atoms.size();
+    uint pcIAtomsSize = pc.iatoms.size();
     uint nBranches = 3 * pcAtomsSize;
 
     xmatrix<xcomplex<double> > dynamicalMatrix(nBranches, nBranches);
@@ -878,31 +881,34 @@ namespace apl {
     double fac1 = 4.0 * PI / volume;
     double nbCells = det(sc.lattice) / volume;
 
-    // Precompute product of q-point with charge tensor
-    vector<xvector<double> > qZ(pcAtomsSize);
-    for (uint at = 0; at < pcAtomsSize; at++) qZ[at] = q * _bornEffectiveChargeTensor[at];
 
     if (aurostd::modulus(q) > _AFLOW_APL_EPS_) {
+      // Precompute product of q-point with charge tensor
+      vector<xvector<double> > qZ(pcIAtomsSize);
+      for (uint at = 0; at < pcIAtomsSize; at++) qZ[at] = q * _bornEffectiveChargeTensor[at];
+
       double dotprod = scalar_product(q, _dielectricTensor * q);
       double prefactor = fac0 * fac1/(dotprod * nbCells);
       for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
+        int iat1 = pc.atoms[ipc1].index_iatoms;
         for (uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
+          int iat2 = pc.atoms[ipc2].index_iatoms;
           for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
             for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
-              // ME200207 - Born charge tensors are stored for each atom, not each type.
-              // Also, calculating the dot product each time is wasteful
               //int typei = pc.atoms[ipc1].type;
               //int typej = pc.atoms[ipc2].type;
               //double borni = (q * _bornEffectiveChargeTensor[typei])(ix);
               //double bornj = (q * _bornEffectiveChargeTensor[typej])(iy);
-              double borni = qZ[ipc1][ix];
-              double bornj = qZ[ipc2][iy];
+              double borni = qZ[iat1][ix];
+              double bornj = qZ[iat2][iy];
               dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) = prefactor * borni * bornj;
               if (calc_derivative) {
                 for (int d = 0; d < 3; d++) {
                   xcomplex<double> coeff(0, 0);
-                  coeff += borni * _bornEffectiveChargeTensor[ipc1](iy, d + 1);
-                  coeff += bornj * _bornEffectiveChargeTensor[ipc2](ix, d + 1);
+                  //coeff += borni * _bornEffectiveChargeTensor[ipc1](iy, d + 1);
+                  //coeff += bornj * _bornEffectiveChargeTensor[ipc2](ix, d + 1);
+                  coeff += borni * _bornEffectiveChargeTensor[iat1](iy, d + 1);
+                  coeff += bornj * _bornEffectiveChargeTensor[iat2](ix, d + 1);
                   coeff -= 2 * borni * bornj * scalar_product(_dielectricTensor(d + 1), q)/dotprod;
                   derivative[d](3 * ipc1 + ix, 3 * ipc2 + iy) = prefactor * coeff;
                 }
@@ -959,10 +965,12 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
+  // ME200207 - This function assummed that Born charges were stored for each type,
+  // but it is actually stored for each iatom.
   xmatrix<xcomplex<double> > PhononCalculator::getEwaldSumDipolDipolContribution(const xvector<double> qpoint, bool includeTerm1) {
     // Definitions
     const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
-    const xstructure& pc = _supercell.getInputStructureLight();  //CO
+    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME200207 - grab input structure (need iatoms)
 
     uint pcAtomsSize = pc.atoms.size();
     uint nBranches = 3 * pcAtomsSize;
@@ -1004,13 +1012,14 @@ namespace apl {
               double fac2 = fac * exp(-geg / lambda2 / 4.0) / geg;
 
               for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-                // ME200207 - Born charge tensors are stored for each atom, not each type.
                 //xvector<double> zag = g * _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
-                xvector<double> zag = g * _bornEffectiveChargeTensor[ipc1];
+                int iat1 = pc.atoms[ipc1].index_iatoms;
+                xvector<double> zag = g * _bornEffectiveChargeTensor[iat1];
 
                 for (uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
                   //xvector<double> zbg = g * _bornEffectiveChargeTensor[pc.atoms[ipc2].type];
-                  xvector<double> zbg = g * _bornEffectiveChargeTensor[ipc2];
+                  int iat2 = pc.atoms[ipc2].index_iatoms;
+                  xvector<double> zbg = g * _bornEffectiveChargeTensor[iat2];
 
                   //xcomplex<double> e;
                   //(void)_supercell.calcShellPhaseFactor(ipc2,ipc1,g,e);
@@ -1115,8 +1124,10 @@ namespace apl {
 
         //xmatrix<double> za = _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
         //xmatrix<double> zb = _bornEffectiveChargeTensor[pc.atoms[ipc2].type];
-        xmatrix<double> za = _bornEffectiveChargeTensor[ipc1];
-        xmatrix<double> zb = _bornEffectiveChargeTensor[ipc2];
+        int iat1 = pc.atoms[ipc1].index_iatoms;
+        int iat2 = pc.atoms[ipc2].index_iatoms;
+        xmatrix<double> za = _bornEffectiveChargeTensor[iat1];
+        xmatrix<double> zb = _bornEffectiveChargeTensor[iat2];
         xmatrix<double> zhz = za * H * zb;
 
         //
@@ -1136,7 +1147,8 @@ namespace apl {
     double facterm3 = fac0 * 4.0 * lambda3 * _recsqrtDielectricTensorDeterminant / (3.0 * SQRTPI);
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
       //xmatrix<double> z = _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
-      xmatrix<double> z = _bornEffectiveChargeTensor[ipc1];
+      int iat1 = pc.atoms[ipc1].index_iatoms;
+      xmatrix<double> z = _bornEffectiveChargeTensor[iat1];
       xmatrix<double> zez = z * _inverseDielectricTensor * z;
 
       for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)

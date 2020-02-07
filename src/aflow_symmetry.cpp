@@ -6762,6 +6762,13 @@ namespace SYM {
 // DX AND COREY - START
 // return the number of inequivalent atoms
 namespace SYM {
+  // ME200207
+  bool CalculateInequivalentAtoms(xstructure& a) {
+    ofstream FileMessage;
+    _aflags aflags;
+    return CalculateInequivalentAtoms(FileMessage, a, aflags, false, false, std::cout, "");
+  }
+
   bool CalculateInequivalentAtoms(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool rely_on_basis=TRUE; //HUGE SPEED UP
     return CalculateInequivalentAtoms(FileMESSAGE,a,rely_on_basis,aflags,_write_,osswrite,oss,format);
@@ -6856,6 +6863,8 @@ namespace SYM {
         for(uint iat2=0;iat2<a.iatoms.size();iat2++)
           if(a.atoms.at(iat1).equivalent==a.iatoms.at(iat2).at(0)) {
             a.iatoms.at(iat2).push_back(iat1);
+            // ME200207 - all atoms should be mapped with index_iatoms
+            a.atoms[iat1].index_iatoms = iat2;
           }
       }
     }

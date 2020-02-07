@@ -3877,6 +3877,7 @@ namespace SYM {
   // DX - END
   bool CalculateSpaceGroup(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");      // SPACE GROUP      _SGROUP_
 
+  bool CalculateInequivalentAtoms(xstructure&);
   bool CalculateInequivalentAtoms(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt"); // EQUIVALENT ATOMS _IATOMS_
   // DX and CO - START
   bool CalculateInequivalentAtoms(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); // EQUIVALENT ATOMS _IATOMS_ // DX
