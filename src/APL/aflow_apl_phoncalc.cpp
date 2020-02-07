@@ -873,10 +873,14 @@ namespace apl {
     }
 
     // Calculation
-    double fac0 = 13.605826 * 2.0 * 0.529177249;  // from a.u. to eV/A
+    double fac0 = hartree2eV * bohr2angst;  // from a.u. to eV/A  // ME200206 - replaced with xscalar constants
     double volume = det(pc.lattice);
     double fac1 = 4.0 * PI / volume;
     double nbCells = det(sc.lattice) / volume;
+
+    // Precompute product of q-point with charge tensor
+    vector<xvector<double> > qZ(pcAtomsSize);
+    for (uint at = 0; at < pcAtomsSize; at++) qZ[at] = q * _bornEffectiveChargeTensor[at];
 
     if (aurostd::modulus(q) > _AFLOW_APL_EPS_) {
       double dotprod = scalar_product(q, _dielectricTensor * q);
@@ -885,16 +889,20 @@ namespace apl {
         for (uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
           for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
             for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
-              int typei = pc.atoms[ipc1].type;
-              int typej = pc.atoms[ipc2].type;
-              double borni = (q * _bornEffectiveChargeTensor[typei])(ix);
-              double bornj = (q * _bornEffectiveChargeTensor[typej])(iy);
+              // ME200207 - Born charge tensors are stored for each atom, not each type.
+              // Also, calculating the dot product each time is wasteful
+              //int typei = pc.atoms[ipc1].type;
+              //int typej = pc.atoms[ipc2].type;
+              //double borni = (q * _bornEffectiveChargeTensor[typei])(ix);
+              //double bornj = (q * _bornEffectiveChargeTensor[typej])(iy);
+              double borni = qZ[ipc1][ix];
+              double bornj = qZ[ipc2][iy];
               dynamicalMatrix(3 * ipc1 + ix, 3 * ipc2 + iy) = prefactor * borni * bornj;
               if (calc_derivative) {
                 for (int d = 0; d < 3; d++) {
                   xcomplex<double> coeff(0, 0);
-                  coeff += borni * _bornEffectiveChargeTensor[typej](iy, d + 1);
-                  coeff += bornj * _bornEffectiveChargeTensor[typei](ix, d + 1);
+                  coeff += borni * _bornEffectiveChargeTensor[ipc1](iy, d + 1);
+                  coeff += bornj * _bornEffectiveChargeTensor[ipc2](ix, d + 1);
                   coeff -= 2 * borni * bornj * scalar_product(_dielectricTensor(d + 1), q)/dotprod;
                   derivative[d](3 * ipc1 + ix, 3 * ipc2 + iy) = prefactor * coeff;
                 }
@@ -976,7 +984,7 @@ namespace apl {
     int n3 = (int)(sqrt(geg) / aurostd::modulus(klattice(3))) + 1;
 
     // Calculation
-    double fac0 = 13.605826 * 2.0 * 0.529177249;  // from a.u. to eV/A
+    double fac0 = hartree2eV * bohr2angst;  // from a.u. to eV/A  // ME200207 - replaced with xscalar constants
     double SQRTPI = sqrt(PI);
     double volume = det(pc.lattice);
     double fac = 4.0 * PI / volume;
@@ -996,10 +1004,13 @@ namespace apl {
               double fac2 = fac * exp(-geg / lambda2 / 4.0) / geg;
 
               for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-                xvector<double> zag = g * _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
+                // ME200207 - Born charge tensors are stored for each atom, not each type.
+                //xvector<double> zag = g * _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
+                xvector<double> zag = g * _bornEffectiveChargeTensor[ipc1];
 
                 for (uint ipc2 = 0; ipc2 < pcAtomsSize; ipc2++) {
-                  xvector<double> zbg = g * _bornEffectiveChargeTensor[pc.atoms[ipc2].type];
+                  //xvector<double> zbg = g * _bornEffectiveChargeTensor[pc.atoms[ipc2].type];
+                  xvector<double> zbg = g * _bornEffectiveChargeTensor[ipc2];
 
                   //xcomplex<double> e;
                   //(void)_supercell.calcShellPhaseFactor(ipc2,ipc1,g,e);
@@ -1102,8 +1113,10 @@ namespace apl {
           }
         }
 
-        xmatrix<double> za = _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
-        xmatrix<double> zb = _bornEffectiveChargeTensor[pc.atoms[ipc2].type];
+        //xmatrix<double> za = _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
+        //xmatrix<double> zb = _bornEffectiveChargeTensor[pc.atoms[ipc2].type];
+        xmatrix<double> za = _bornEffectiveChargeTensor[ipc1];
+        xmatrix<double> zb = _bornEffectiveChargeTensor[ipc2];
         xmatrix<double> zhz = za * H * zb;
 
         //
@@ -1122,7 +1135,8 @@ namespace apl {
 
     double facterm3 = fac0 * 4.0 * lambda3 * _recsqrtDielectricTensorDeterminant / (3.0 * SQRTPI);
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-      xmatrix<double> z = _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
+      //xmatrix<double> z = _bornEffectiveChargeTensor[pc.atoms[ipc1].type];
+      xmatrix<double> z = _bornEffectiveChargeTensor[ipc1];
       xmatrix<double> zez = z * _inverseDielectricTensor * z;
 
       for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++)
@@ -1136,12 +1150,20 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
   // ME180827 - Overloaded to calculate derivative for AAPL
+  // ME200206 - Added variants for the case near the Gamma point where the
+  // non-analytical correction also needs a direction. While dynamical matrices
+  // are not used directly, these functions are helpful debugging tools.
   xmatrix<xcomplex<double> > PhononCalculator::getDynamicalMatrix(const xvector<double>& kpoint) {
+    return getDynamicalMatrix(kpoint, kpoint);
+  }
+
+  xmatrix<xcomplex<double> > PhononCalculator::getDynamicalMatrix(const xvector<double>& kpoint, const xvector<double>& kpoint_nac) {
     vector<xmatrix<xcomplex<double> > > placeholder;
-    return getDynamicalMatrix(kpoint, placeholder, false);
+    return getDynamicalMatrix(kpoint, kpoint_nac, placeholder, false);
   }
 
   xmatrix<xcomplex<double> > PhononCalculator::getDynamicalMatrix(const xvector<double>& kpoint,
+      const xvector<double>& kpoint_nac,
       vector<xmatrix<xcomplex<double> > >& dDynMat,
       bool calc_derivative) {
     uint scAtomsSize = _supercell.getSupercellStructure().atoms.size();
@@ -1170,7 +1192,7 @@ namespace apl {
     // Calculate nonanalytical contribution
     xmatrix<xcomplex<double> > dynamicalMatrixNA(nBranches, nBranches, 1, 1);
     if (_isPolarMaterial)
-      dynamicalMatrixNA = getNonanalyticalTermWang(kpoint, dDynMat_NAC, calc_derivative);
+      dynamicalMatrixNA = getNonanalyticalTermWang(kpoint_nac, dDynMat_NAC, calc_derivative);
 
     // Loop over primitive cell
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
@@ -1264,20 +1286,22 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME180827 - Overloaded to calculate derivative and eigenvectors for AAPL
-  xvector<double> PhononCalculator::getEigenvalues(const xvector<double>& kpoint) {
-    const xstructure& pc = _supercell.getInputStructureLight();  //CO
-    uint nBranches = 3 * pc.atoms.size();
-    xmatrix<xcomplex<double> > placeholder_eigen(nBranches, nBranches, 1, 1);
-    vector<xmatrix<xcomplex<double> > > placeholder_mat;
-    return getEigenvalues(kpoint, placeholder_eigen, placeholder_mat, false);
-  }
+  // OBSOLETE ME200206 - not used anywhere and notuseful for debugging (use get Frequency)
+  //[OBSOLETE] xvector<double> PhononCalculator::getEigenvalues(const xvector<double>& kpoint) {
+  //[OBSOLETE]   const xstructure& pc = _supercell.getInputStructureLight();  //CO
+  //[OBSOLETE]   uint nBranches = 3 * pc.atoms.size();
+  //[OBSOLETE]   xmatrix<xcomplex<double> > placeholder_eigen(nBranches, nBranches, 1, 1);
+  //[OBSOLETE]   vector<xmatrix<xcomplex<double> > > placeholder_mat;
+  //[OBSOLETE]   return getEigenvalues(kpoint, kpoint, placeholder_eigen, placeholder_mat, false);
+  //[OBSOLETE] }
 
   xvector<double> PhononCalculator::getEigenvalues(const xvector<double>& kpoint,
+      const xvector<double>& kpoint_nac,
       xmatrix<xcomplex<double> >& eigenvectors,
       vector<xmatrix<xcomplex<double> > >& dDynMat,
       bool calc_derivative) {
     // Get dynamical matrix
-    xmatrix<xcomplex<double> > dynamicalMatrix = getDynamicalMatrix(kpoint, dDynMat, calc_derivative);
+    xmatrix<xcomplex<double> > dynamicalMatrix = getDynamicalMatrix(kpoint, kpoint_nac, dDynMat, calc_derivative);
 
     // Diagonalize
     xvector<double> eigenvalues(dynamicalMatrix.rows, 1);
@@ -1305,27 +1329,42 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME180827 - Overloaded to calculate derivative and eigenvectors for AAPL
+  // ME200206 - Added variants for the case near the Gamma point where the
+  // non-analytical correction also needs a direction.
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const IPCFreqFlags& flags) {
+    return getFrequency(kpoint, kpoint, flags);
+  }
+
+  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const xvector<double>& kpoint_nac, const IPCFreqFlags& flags) {
     const xstructure& pc = _supercell.getInputStructureLight();  //CO
     uint nBranches = 3 * pc.atoms.size();
     xmatrix<xcomplex<double> > placeholder_eigen(nBranches, nBranches, 1, 1);
-    vector<xmatrix<xcomplex<double> > > placeholder_mat;
-    return getFrequency(kpoint, flags, placeholder_eigen, placeholder_mat, false);
+    return getFrequency(kpoint, kpoint_nac, flags, placeholder_eigen);
   }
 
   // ME190624 - get eigenvectors and frequencies
-  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, IPCFreqFlags flags,
+  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const IPCFreqFlags& flags,
       xmatrix<xcomplex<double> >& eigenvectors) {
-    vector<xmatrix<xcomplex<double> > > placeholder_mat;
-    return getFrequency(kpoint, flags, eigenvectors, placeholder_mat, false);
+    return getFrequency(kpoint, kpoint, flags, eigenvectors);
   }
 
-  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, IPCFreqFlags flags,
-      xmatrix<xcomplex<double> >& eigenvectors,
-      vector<xmatrix<xcomplex<double> > >& dDynMat,
-      bool calc_derivative) {
+  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const xvector<double>& kpoint_nac,
+      const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors) {
+    vector<xmatrix<xcomplex<double> > > placeholder_mat;
+    return getFrequency(kpoint, kpoint_nac, flags, eigenvectors, placeholder_mat, false);
+  }
+
+  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint,
+      const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors,
+      vector<xmatrix<xcomplex<double> > >& dDynMat, bool calc_derivative) {
+    return getFrequency(kpoint, kpoint, flags, eigenvectors, dDynMat, calc_derivative);
+  }
+
+  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const xvector<double>& kpoint_nac,
+      const IPCFreqFlags& flags, xmatrix<xcomplex<double> >& eigenvectors,
+      vector<xmatrix<xcomplex<double> > >& dDynMat, bool calc_derivative) {
     // Compute frequency(omega) from eigenvalues [in eV/A/A/atomic_mass_unit]
-    xvector<double> omega = getEigenvalues(kpoint, eigenvectors, dDynMat, calc_derivative);
+    xvector<double> omega = getEigenvalues(kpoint, kpoint_nac, eigenvectors, dDynMat, calc_derivative);
 
     // Get value of conversion factor
     double conversionFactor = getFrequencyConversionFactor(apl::RAW | apl::OMEGA, flags);
@@ -2282,6 +2321,11 @@ namespace apl {
   // ME190614
   string PhononCalculator::getSystemName() {
     return _system;
+  }
+
+  // ME200206
+  bool PhononCalculator::isPolarMaterial() {
+    return _isPolarMaterial;
   }
 
   // ///////////////////////////////////////////////////////////////////////////

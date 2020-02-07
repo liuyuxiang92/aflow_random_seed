@@ -702,9 +702,13 @@ namespace apl {
     public:
       virtual ~IPhononCalculator() {}
       virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&) = 0;
-      virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &) = 0;  // ME190624
-      virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &,
+      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&) = 0;  // ME200206
+      virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> > &) = 0;  // ME190624
+      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&) = 0;  // ME200206
+      virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> > &,
           vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  // ME 180827
+      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  // ME200206
       virtual double getEPS() = 0;  //CO
       virtual double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags) = 0;
       virtual const Supercell& getSupercell() = 0;
@@ -712,9 +716,11 @@ namespace apl {
       virtual const xstructure& getSuperCellStructure() = 0;
       virtual uint getNumberOfBranches() = 0;
       virtual string getSystemName() = 0;  // ME190614
+      virtual bool isPolarMaterial() = 0;  // ME200206
       // **** BEGIN PINKU ******
       virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&) = 0;
-      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&,
+      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&) = 0;  // ME200206
+      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
           vector<xmatrix<xcomplex<double> > >&,
           bool=true) = 0;  // ME 180827
       virtual vector<double> get_ATOMIC_MASSES_AMU() = 0;
@@ -797,7 +803,8 @@ namespace apl {
       void printForceConstantMatrices(ostream&);
       void printFCShellInfo(ostream&);
       xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&);
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&,
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&);  // ME200206
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
           vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
       xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&);
       xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&,
@@ -817,9 +824,9 @@ namespace apl {
       virtual ~PhononCalculator();
       void clear();
       void run();  // ME191029
-      xvector<double> getEigenvalues(const xvector<double>&);
-      xvector<double> getEigenvalues(const xvector<double>&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
+      //xvector<double> getEigenvalues(const xvector<double>&);  // OBSOLETE ME200206
+      xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
+          xmatrix<xcomplex<double> >&, vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
       void isPolarMaterial(bool b) { _isPolarMaterial = b; }
       void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
       void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO190108
@@ -846,9 +853,13 @@ namespace apl {
       bool _stagebreak;  // ME191029
       // Interface
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
-      xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&);  // ME190624
-      xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&, 
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  // ME200206
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME190624
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME200206
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
           vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME200206
       double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
       const Supercell& getSupercell();
       const xstructure& getInputCellStructure();
@@ -856,6 +867,7 @@ namespace apl {
       double getEPS();  //CO
       uint getNumberOfBranches();
       string getSystemName();  // ME190614
+      bool isPolarMaterial();  // ME200206
       /* friend void runVASPCalculationsBE(apl::PhononCalculator*); */
       /* friend void readBornEffectiveChargesFromOUTCAR(apl::PhononCalculator *pcalculator); */
       /* friend void symmetrizeBornEffectiveChargeTensors(apl::PhononCalculator *pcalculator); */
