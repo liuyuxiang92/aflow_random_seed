@@ -21,7 +21,7 @@
 #include "aflow_pocc.h"
 #include "aflow_compare_structure.h"
 
-#define _DEBUG_POCC_ false  //CO190116
+#define _DEBUG_POCC_ true  //CO190116
 #define _DEBUG_POCC_CLUSTER_ANALYSIS_ false && _DEBUG_POCC_  //CO190116
 
 const string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
@@ -2257,7 +2257,7 @@ namespace pocc {
   }
 
   bool POccCalculator::iterateHNFMatrix(){
-    bool LDEBUG=(FALSE || ENUMERATE_ALL_HNF || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ ||  ENUMERATE_ALL_HNF || XHOST.DEBUG);
     string soliloquy="POccCalculator::iterateHNFMatrix()";
 
     xmatrix<double> _hnf_mat(3,3),duplicate_mat(3,3);
@@ -2266,6 +2266,8 @@ namespace pocc {
     //int n_hnf=p_str.n_hnf;
     const xmatrix<double>& lattice=getLattice();
     const vector<_sym_op>& pgroup=getPGroup();
+
+    bool eliminate_by_pgroup=true;
 
     //this allows us to reset completely everytime (SAFE but inefficient)
     //int a_start=1;int c_start=1;int f_start=1;
@@ -2336,7 +2338,7 @@ namespace pocc {
                       cerr << "SUPERLATTICES OLD " << endl;
                       cerr << v_unique_superlattices[i] << endl;
                     }
-                    for(uint pg=0;pg<pgroup.size() && !duplicate_H;pg++){
+                    for(uint pg=0;pg<(eliminate_by_pgroup==true ? pgroup.size() : 1) && !duplicate_H;pg++){ //identity is ALWAYS the first pgroup by construction (see TRICK)
                       if(LDEBUG) {
                         cerr << "POINT GROUP " << endl;
                         cerr << pgroup[pg].Uc << endl;
@@ -2384,33 +2386,9 @@ namespace pocc {
                     d_start=d;e_start=e;f_start=f;
                     hnf_mat=_hnf_mat;
                     v_unique_superlattices.push_back(superlattice);
-                    //cerr << hnf_mat << endl;
-                    //cerr << endl;
-                    //max_superlattice_radius=max(max_superlattice_radius,RadiusSphereLattice(superlattice));
-
-                    //cerr << "n_hnf " << n_hnf << endl;
-                    //cerr << "lattice " << endl;
-                    //cerr << lattice << endl;
-                    //cerr << "hnf_mat" << endl;
-                    //cerr << _hnf_mat << endl;
-                    //cerr << "superlattice " << endl;
-                    //cerr << superlattice << endl;
-                    //cerr << "max_radius " << max_superlattice_radius << endl;
-                    //cerr << "SEE " << max_superlattice_radius << endl;
-
-                    //cerr << endl;
                     return true;
-                    //} else {
-                    //  cerr << "DUPLICATE " << endl;
-                    //cerr << "n_hnf " << n_hnf << endl;
-                    //cerr << "lattice " << endl;
-                    //cerr << lattice << endl;
-                    //cerr << "hnf_mat" << endl;
-                    //cerr << _hnf_mat << endl;
-                    //cerr << "superlattice " << endl;
-                    //cerr << superlattice << endl;
 
-                }
+                  }
                 }
               }
             }
@@ -3426,8 +3404,9 @@ namespace pocc {
       }
     }else{  //ENUM
       
-      uint i=0,j=0,site=0,occ=0,k=0,permut=0;
-      
+      uint i=0,j=0,k=0,site=0,occ=0,permut=0;
+      int gi=0;
+
       vector<xmatrix<double> > vhnf_mats;
       vector<vector<vector<int> > > vv_types_config;
       resetHNFMatrices();
@@ -3435,21 +3414,44 @@ namespace pocc {
       if(LDEBUG){cerr << soliloquy << " vhnf_mats.size()=" << vhnf_mats.size() << endl;}
 
       xmatrix<long long int> H,U,V,S;
-      //for(i=0;i<vhnf_mats.size();i++){
-      //  H=aurostd::xmatrixdouble2utype<long long int>(vhnf_mats[i]);
-      //  getSmithNormalForm(H,U,V,S);
-      //  if(LDEBUG){
-      //    cerr << soliloquy << " H=" << endl;cerr << H << endl;
-      //    cerr << soliloquy << " S=" << endl;cerr << S << endl;
-      //  }
-      //}
+      xmatrix<double> V_double;
+      vector<xmatrix<long long int> > vS_uniq;
+      vector<uint> viH_uniqSmith;
+      bool match=false;
+      for(i=0;i<vhnf_mats.size();i++){
+        H=aurostd::xmatrixdouble2utype<long long int>(vhnf_mats[i]);
+        getSmithNormalForm(H,U,V,S);
+        if(LDEBUG){
+          cerr << soliloquy << " H=" << endl;cerr << H << endl;
+          cerr << soliloquy << " S=" << endl;cerr << S << endl;
+        }
+        match=false;
+        for(j=0;j<vS_uniq.size() && match==false;j++){
+          if(aurostd::isequal(S,vS_uniq[j])){match=true;}
+        }
+        if(match==false){
+          vS_uniq.push_back(S);
+          viH_uniqSmith.push_back(i);
+        }
+      }
+
+      if(LDEBUG){
+        cerr << soliloquy << " vS_uniq.size()=" << vS_uniq.size() << endl;
+        cerr << soliloquy << " viH_uniqSmith.size()=" << viH_uniqSmith.size() << endl;
+        for(i=0;i<vS_uniq.size();i++){
+          cerr << soliloquy << " viH_uniqSmith[i=" << i <<"]=" << endl;cerr << viH_uniqSmith[i] << endl;
+          cerr << soliloquy << " vS_uniq[i=" << i <<"]=" << endl;cerr << vS_uniq[i] << endl;
+        }
+      }
 
       xstructure xstr_ss;
       vector<int> sc2pc_map,pc2sc_map;
-      uint iatom=0;
+      xvector<double> fpos,d,x;
+      vector<EnumGroupMember> vg;
       if(LDEBUG){cerr << soliloquy << " xstr_nopocc.lattice=" << endl;cerr << xstr_nopocc.lattice << endl;}
       for(i=0;i<vhnf_mats.size();i++){
         H=aurostd::xmatrixdouble2utype<long long int>(vhnf_mats[i]);
+        V_double=aurostd::xmatrixutype2double(V);
         getSmithNormalForm(H,U,V,S);
         if(LDEBUG){
           cerr << soliloquy << " hnf_mat=" << endl;cerr << vhnf_mats[i] << endl;
@@ -3463,17 +3465,41 @@ namespace pocc {
           cerr << soliloquy << " sc2pc_map=" << aurostd::joinWDelimiter(sc2pc_map,",") << endl;
           cerr << soliloquy << " pc2sc_map=" << aurostd::joinWDelimiter(pc2sc_map,",") << endl;
         }
+        vg.clear();
         for(j=0;j<sc2pc_map.size();j++){
+          vg.push_back(EnumGroupMember());
+          //create map h from parent lattice onto the group (g are elements of group)
+          //h(x)=[UA^{-1}x]_S:
+          //c2f is A^{-1} (done for fpos)
+          vg.back().basis=xstr_nopocc.atoms[sc2pc_map[j]].basis;
+          fpos=xstr_nopocc.c2f*xstr_ss.atoms[j].cpos; //coordinates of sc_atom[j] in basis of primitive lattice
+          //fpos=x+d
+          //where d is fraction part and x is integer
+          //x is the lattice
+          //d is the basis
+          x=aurostd::floor(fpos); //int only
+          d=aurostd::mod(fpos,1.0); //between 0 and 1
           if(LDEBUG){
-            cerr << soliloquy << " atom[pc=" << sc2pc_map[j] << ",sc=" << j << "].ijk=" << xstr_ss.atoms[j].ijk << endl;
-            cerr << soliloquy << " atom[pc=" << sc2pc_map[j] << "].cpos=" << xstr_nopocc.atoms[sc2pc_map[j]].cpos << endl;
-            cerr << soliloquy << " atom[sc=" << j << "].cpos=" << xstr_ss.atoms[j].cpos << endl;
-            cerr << soliloquy << " atom[sc=" << j << "].fpos=" << xstr_nopocc.c2f*xstr_ss.atoms[j].cpos << endl;
+            //cerr << soliloquy << " atom[pc=" << sc2pc_map[j] << ",sc=" << j << "].ijk=" << xstr_ss.atoms[j].ijk << endl;
+            //cerr << soliloquy << " atom[pc=" << sc2pc_map[j] << "].cpos=" << xstr_nopocc.atoms[sc2pc_map[j]].cpos << endl;
+            //cerr << soliloquy << " atom[sc=" << j << "].cpos=" << xstr_ss.atoms[j].cpos << endl;
+            cerr << soliloquy << " fpos=" << fpos << endl;
+            cerr << soliloquy << " d=" << d << endl;
+            cerr << soliloquy << " x=" << x << endl;
+          }
+          //g is the group element
+          vg.back().cpos=x*V_double;
+          //mod: translation symmetry (next cell)
+          for(gi=vg.back().cpos.lrows;gi<=vg.back().cpos.urows;gi++){
+            vg.back().cpos[gi]=aurostd::mod(vg.back().cpos[gi],(double)S[gi][gi]);
+          }
+          if(LDEBUG){
+            cerr << soliloquy << " g.basis=" << vg.back().basis << endl;
+            cerr << soliloquy << " g.cpos=" << vg.back().cpos << endl;
           }
         }
       }
       
-
       exit(0);
 
       resetSiteConfigurations();

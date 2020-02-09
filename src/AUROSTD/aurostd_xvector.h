@@ -158,7 +158,7 @@ namespace aurostd {
 
   template<class utype> utype                        
     operator*(const xvector<utype>&,const xvector<utype>&) __xprototype;
-
+  
   template<class utype> utype                        
     scalar_product(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
@@ -179,7 +179,7 @@ namespace aurostd {
 
   template<class utype> xvector<char>                    // is xvector < xvector ?
     operator<(const xvector<utype>&,const xvector<utype>&) __xprototype;
-
+  
   template<class utype> bool
     identical(const xvector<utype>&,const xvector<utype>&,const utype&) __xprototype;
 
@@ -249,6 +249,9 @@ namespace aurostd {
   template<class utype> xvector<double>
     xdouble(const xvector<utype>&) __xprototype;
 
+  template<class utype> xvector<utype>
+    mod(const xvector<utype>&,utype d) __xprototype;  //CO200127
+  
   template<class utype> xvector<double>
     floor(const xvector<utype>&) __xprototype;
 

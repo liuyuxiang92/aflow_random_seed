@@ -412,6 +412,13 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
+  struct EnumGroupMember {
+    int basis;  //basis is int in xatom
+    xvector<double> cpos;
+  };
+}
+
+namespace pocc {
   class POccCalculator : public POccCalculatorTemplate, public xStream {
     public:
       //NECESSARY PUBLIC CLASS METHODS - START
