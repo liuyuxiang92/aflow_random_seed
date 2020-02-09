@@ -1,6 +1,7 @@
-3.1.229 - 2020/01/30
+3.1.229 - 2020/02/10
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
         -- number->basis (CO)
+        -- throw error when lattice gives negative determinant (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
