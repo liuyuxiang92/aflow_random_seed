@@ -21,6 +21,7 @@
         -- Changed the determination of the irreducible Brillouin zone in APL. (ME)
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
         -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
+        -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)

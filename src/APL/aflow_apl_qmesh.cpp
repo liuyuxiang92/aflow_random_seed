@@ -368,7 +368,7 @@ namespace apl {
   }
 
   vector<xvector<double> > QMesh::getIrredQPointsFPOS() const {
-    vector<xvector<double> > fpos(_nQPs, xvector<double>(3));
+    vector<xvector<double> > fpos(_nIQPs, xvector<double>(3));
     for (int q = 0; q < _nIQPs; q++) {
       fpos[q] = _qpoints[_ibzqpts[q]].fpos;
     }
