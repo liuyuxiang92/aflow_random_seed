@@ -328,7 +328,8 @@ namespace apl {
       // Loop over inequivalent atoms
       vector<xvector<double> > uniqueDistortionsOfAtom;
       vector<xvector<double> > allDistortionsOfAtom;
-      for (uint i = 0; i < (DISTORTION_INEQUIVONLY ? xstr.iatoms.size() : xstr.atoms.size()); i++) { //CO190218
+      uint natoms = DISTORTION_INEQUIVONLY ? xstr.iatoms.size() : xstr.atoms.size();
+      for (uint i = 0; i < natoms; i++) {
         int atomID = (DISTORTION_INEQUIVONLY ? xstr.iatoms[i][0] : i); //CO190218
         //cout << "atomID = " << atomID << std::endl; //CO190218
         if (xstr.agroup[atomID].size() == 0) { //CO190218
@@ -399,7 +400,8 @@ namespace apl {
       dof += _uniqueDistortions[i].size();
     }
     _logger << "Found " << dof << " degree(s) of freedom." << apl::endl;
-    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) { //CO190218
+    uint natoms = DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms();
+    for (int i = 0; i < natoms; i++) {
       int id = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         _logger << "Atom [" << sf("%03d") << id << "] (" << sf("%f")
@@ -504,7 +506,8 @@ namespace apl {
     bool generate_plus_minus = false;  // ME190129
 
     int idxRun = 0;
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+    uint natoms = DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms();
+    for (int i = 0; i < natoms; i++) {
       vector<vector<xvector<double> > > forcesForOneAtomAndAllDistortions;
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         generate_plus_minus = vvgenerate_plus_minus[i][j];  //CO181226

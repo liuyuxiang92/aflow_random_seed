@@ -1,3 +1,6 @@
+3.1.229 - 2020/02/03
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+        -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
