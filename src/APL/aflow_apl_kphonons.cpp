@@ -2020,7 +2020,7 @@ namespace KBIN {
 
         // Calculate thermal properties
         if (USER_TP) {
-          if (!dosc.hasNegativeFrequencies()) {  // ME190423
+          //if (!dosc.hasNegativeFrequencies()) // ME200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
             apl::ThermalPropertiesCalculator tpc(dosc, logger);  // ME190423
             // ME200108 - new ThermalPropertiesCalculator format
             tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
@@ -2034,6 +2034,7 @@ namespace KBIN {
             //apl::UniformMesh umesh(logger);
             //calculate group velocities
             //umesh.create_uniform_mesh(sc_size[0],sc_size[1],sc_size[2],phcalc->getInputCellStructure());
+          if (!dosc.hasNegativeFrequencies()) {  // ME200210
             if(CALCULATE_GROUPVELOCITY_OPTION.option){
               //apl::GroupVelocity vg(*phcalc, umesh, logger);
               apl::GroupVelocity vg(*phcalc, qmesh, logger);
@@ -2239,7 +2240,20 @@ namespace KBIN {
             //QHA/SCQHA/QHA3P END
             tpc.clear(logger);  // ME200108
           } else {
-            logger << apl::warning << "There are negative frequencies in DOS. The calculation of thermal properties has been skipped." << apl::endl;
+            // ME200210 - changed warning
+            const vector<double>& freqs = dosc.getBins();
+            const vector<double>& idos = dosc.getIDOS();
+            uint i = 0;
+            for (i = 0; i < freqs.size(); i++) {
+              if (freqs[i] > -_AFLOW_APL_EPS_) break;
+            }
+            double idos_percent = 100.0 * idos[i]/idos.back();
+            // Cannot use std::setprecision with apl:logger, so use this workaround.
+            stringstream percent;
+            percent << std::dec << std::setprecision(1) << idos_percent;
+            logger << apl::warning << "There are negative frequencies in the phonon DOS, covering "
+              << percent.str() << "\% of the integrated DOS. These frequencies were omitted in the "
+              << "calculation of thermodynamic properties." << apl::endl;
           }
         }
 

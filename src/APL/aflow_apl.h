@@ -1499,8 +1499,9 @@ namespace apl {
       xDOSCAR createDOSCAR();  // ME190614
       void writePHDOSCAR(const string&);  // ME190614
       // Interface IDOSCalculator
-      std::vector<double> getBins() const;  // ME200108 - added const
-      std::vector<double> getDOS() const;   // ME200108 - added const
+      const std::vector<double>& getBins() const;  // ME200108 - added const
+      const std::vector<double>& getDOS() const;   // ME200108 - added const
+      const std::vector<double>& getIDOS() const;  // ME200210
       bool hasNegativeFrequencies() const;  // ME200108 - added const
       string _system;  // ME190614
   };

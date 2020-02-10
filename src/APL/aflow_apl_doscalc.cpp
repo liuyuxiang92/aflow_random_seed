@@ -565,12 +565,17 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME200108 - added const
-  vector<double> DOSCalculator::getBins() const {
+  const vector<double>& DOSCalculator::getBins() const {
     return _bins;
   }
 
-  vector<double> DOSCalculator::getDOS() const {
+  const vector<double>& DOSCalculator::getDOS() const {
     return _dos;
+  }
+
+  // ME200210
+  const vector<double>& DOSCalculator::getIDOS() const {
+    return _idos;
   }
 
   bool DOSCalculator::hasNegativeFrequencies() const {
