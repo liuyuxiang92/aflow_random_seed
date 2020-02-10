@@ -2879,7 +2879,7 @@ namespace SYM {
     if(a.pgroup_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP CRYSTAL
     if(a.pgroupk_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupKCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP KCRYSTAL
       
-    xmatrix<double> inversion_symmetry_matrix = -aurostd::identity((double)0,3,3);
+    xmatrix<double> inversion_symmetry_matrix = -aurostd::identity((double)0,3);
       
     // ---------------------------------------------------------------------------
     // check if pgroup_xtal contains inversion symmetry already
