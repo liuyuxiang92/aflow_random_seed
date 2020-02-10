@@ -1,5 +1,6 @@
-3.1.229 - 2020/03/01
+3.1.229 - 2020/02/03
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+        -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- Changed database file name conventions. (ME)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
