@@ -1,5 +1,6 @@
-3.1.228 - 2020/02/06
+3.1.229 - 2020/02/03
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+        -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- added Patterson symmetry analysis; denoted "pgroupk_Patterson" (applies to reciprocal space only) (DX)
         -- compare Patterson point symmetry to Laue point group as consistency check (DX)
         -- added Patterson symmetry to full symmetry command (DX)
