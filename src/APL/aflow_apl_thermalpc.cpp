@@ -297,7 +297,7 @@ namespace apl {
       ebhni = exp(bhni);
       cv += dos[i] * (KBOLTZEV * bhni * bhni / ((1.0 - 1.0 / ebhni) * (ebhni - 1.0)));
     }
-    if (isnan(cv)) return 0.0;
+    if (std::isnan(cv)) return 0.0;
     cv *= 1000.0 * stepDOS;  // Convert to meV
     return getScalingFactor(unit) * cv;
   }
