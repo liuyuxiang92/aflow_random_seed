@@ -869,7 +869,7 @@ namespace apl {
       pcell.iatoms.clear();
       pcell.iatoms.resize(niatoms_pc);
       for (uint iatpc = 0; ((iatpc < niatoms_pc) && mapped); iatpc++) {
-        fpos = _inStructure_original.c2f * _pcStructure.atoms[iatoms_pc[iatpc][0]].cpos;
+        fpos = _inStructure_original.c2f * pcell.atoms[iatoms_pc[iatpc][0]].cpos;
         uint iatoc = 0;
         for (iatoc = 0; iatoc < niatoms_oc; iatoc++) {
           uint i = 0;
