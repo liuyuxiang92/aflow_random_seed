@@ -163,7 +163,7 @@ namespace apl {
         while ((++iline != nlines) && !aurostd::substring2bool(vlines[iline], "</varray>")) {
           aurostd::string2tokens(vlines[iline], line);
           row.clear();
-          for (uint i = 1; i < (row.size() - 1); i++) {
+          for (uint i = 1; i < (line.size() - 1); i++) {
             row.push_back(aurostd::string2utype<double>(line[i]));
           }
           hessian.push_back(row);
@@ -182,7 +182,7 @@ namespace apl {
     if (nhessian != 3 * natoms) {
       stringstream message;
       message << "Hessian matrix does not have the correct number of rows (has "
-        << nhessian << ", should have << " << (3 * nhessian) << ")." << std::endl;
+        << nhessian << ", should have " << (3 * natoms) << ")." << std::endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
     uint i = 0;
@@ -191,8 +191,8 @@ namespace apl {
     }
     if (i != nhessian) {
       stringstream message;
-      message << "Row " << i << " of the Hessian matrix does not have the correct number of columns"
-        << " (has " << hessian[i].size() << ", should have << " << (3 * nhessian) << ")." << std::endl;
+      message << "Row " << (i + 1) << " of the Hessian matrix does not have the correct number of columns"
+        << " (has " << hessian[i].size() << ", should have " << (3 * natoms) << ")." << std::endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
 

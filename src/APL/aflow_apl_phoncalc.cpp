@@ -813,52 +813,54 @@ namespace apl {
     outfile.unsetf(std::ios::hex); //CO190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
 
-    // Unique distortions
-    outfile << tab << "<distortions units=\"Angstrom\" cs=\"cartesian\">" << std::endl;
+    if (_uniqueDistortions.size() > 0) {  // ME200211 - linear response has no distortions
+      // Unique distortions
+      outfile << tab << "<distortions units=\"Angstrom\" cs=\"cartesian\">" << std::endl;
 
-    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-    outfile << setprecision(8);
-    outfile << tab << tab << "<i name=\"magnitude\">" << setw(15) << DISTORTION_MAGNITUDE << "</i>" << std::endl;
+      outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+      outfile << setprecision(8);
+      outfile << tab << tab << "<i name=\"magnitude\">" << setw(15) << DISTORTION_MAGNITUDE << "</i>" << std::endl;
 
-    outfile << tab << tab << "<varray>" << std::endl;
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
-      outfile << tab << tab << tab << "<varray atomID=\"" << _supercell.getUniqueAtomID(i) << "\">" << std::endl;
-      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        outfile << tab << tab << tab << tab << "<v>";
-        outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-        outfile << setprecision(8);
-        outfile << setw(15) << _uniqueDistortions[i][j](1) << " ";
-        outfile << setw(15) << _uniqueDistortions[i][j](2) << " ";
-        outfile << setw(15) << _uniqueDistortions[i][j](3);
-        outfile << "</v>" << std::endl;
-      }
-      outfile << tab << tab << tab << "</varray>" << std::endl;
-    }
-    outfile << tab << tab << "</varray>" << std::endl;
-    outfile << tab << "</distortions>" << std::endl;
-
-    // Forces
-    outfile << tab << "<forcefields units=\"eV/Angstrom\" cs=\"cartesian\">" << std::endl;
-    outfile << tab << tab << "<varray>" << std::endl;
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
-      outfile << tab << tab << tab << "<varray atomID=\"" << _supercell.getUniqueAtomID(i) << "\">" << std::endl;
-      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        outfile << tab << tab << tab << tab << "<varray distortion=\"" << j << "\">" << std::endl;
-        for (int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
-          outfile << tab << tab << tab << tab << tab << "<v>";
+      outfile << tab << tab << "<varray>" << std::endl;
+      for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+        outfile << tab << tab << tab << "<varray atomID=\"" << _supercell.getUniqueAtomID(i) << "\">" << std::endl;
+        for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+          outfile << tab << tab << tab << tab << "<v>";
           outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-          outfile << setprecision(15);
-          outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](1) << " ";
-          outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](2) << " ";
-          outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](3);
+          outfile << setprecision(8);
+          outfile << setw(15) << _uniqueDistortions[i][j](1) << " ";
+          outfile << setw(15) << _uniqueDistortions[i][j](2) << " ";
+          outfile << setw(15) << _uniqueDistortions[i][j](3);
           outfile << "</v>" << std::endl;
         }
-        outfile << tab << tab << tab << tab << "</varray>" << std::endl;
+        outfile << tab << tab << tab << "</varray>" << std::endl;
       }
-      outfile << tab << tab << tab << "</varray>" << std::endl;
+      outfile << tab << tab << "</varray>" << std::endl;
+      outfile << tab << "</distortions>" << std::endl;
+
+      // Forces
+      outfile << tab << "<forcefields units=\"eV/Angstrom\" cs=\"cartesian\">" << std::endl;
+      outfile << tab << tab << "<varray>" << std::endl;
+      for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+        outfile << tab << tab << tab << "<varray atomID=\"" << _supercell.getUniqueAtomID(i) << "\">" << std::endl;
+        for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+          outfile << tab << tab << tab << tab << "<varray distortion=\"" << j << "\">" << std::endl;
+          for (int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
+            outfile << tab << tab << tab << tab << tab << "<v>";
+            outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+            outfile << setprecision(15);
+            outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](1) << " ";
+            outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](2) << " ";
+            outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](3);
+            outfile << "</v>" << std::endl;
+          }
+          outfile << tab << tab << tab << tab << "</varray>" << std::endl;
+        }
+        outfile << tab << tab << tab << "</varray>" << std::endl;
+      }
+      outfile << tab << tab << "</varray>" << std::endl;
+      outfile << tab << "</forcefields>" << std::endl;
     }
-    outfile << tab << tab << "</varray>" << std::endl;
-    outfile << tab << "</forcefields>" << std::endl;
 
     // Force constant matrices
     outfile << tab << "<fcms units=\"eV/Angstrom^2\" cs=\"cartesian\" rows=\""
