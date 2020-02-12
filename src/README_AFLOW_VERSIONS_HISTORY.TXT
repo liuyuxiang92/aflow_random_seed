@@ -1,5 +1,7 @@
 3.1.229 - 2020/02/03
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+        -- Fixed force constant reader for linear response calculations. (ME)
+        -- Fixed signs of second order force constants. (ME)
         -- Sped up determination of irreducible tetrahedra for the tetrahedron method. (ME)
         -- Sped up APL force constant matrix calculation. (ME)
         -- Sped up the calculation of the dynamical matrix. (ME)
