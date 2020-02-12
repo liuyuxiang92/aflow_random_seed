@@ -794,10 +794,7 @@ namespace apl {
 
     private:
       void copy(const PhononCalculator&);  // ME191228
-      virtual void calculateForceFields() {}  // ME190412  // ME191029
-      void completeForceFields();
-      void projectToCartesianDirections();
-      void buildForceConstantMatrices();
+      virtual void calculateForceConstants() {} // ME200211
       void symmetrizeForceConstantMatrices();
       void correctSumRules();
       void printForceConstantMatrices(ostream&);
@@ -834,9 +831,6 @@ namespace apl {
       void setTCOND(bool b) { TCOND = b; }
       void hibernate();
       void awake();
-      void writeFORCES();
-      void writeDYNMAT();
-      void writeXCrysDenForces();
       //****** BEGIN ME ***********
       vector<ClusterSet>& _clusters;
       vector<AnharmonicIFCs> _anharmonicIFCs;
@@ -938,9 +932,16 @@ namespace apl {
       }  //CO
       void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO190108
+      void calculateForceConstants();  // ME200211
+      void writeFORCES();
+      void writeDYNMAT();
+      void writeXCrysDenForces();
 
     private:
       vector<vector<bool> > vvgenerate_plus_minus;  // ME191029
+      void completeForceFields();
+      void projectToCartesianDirections();
+      void buildForceConstantMatrices();
   };
 }  // namespace apl
 
@@ -1072,14 +1073,14 @@ namespace apl {
       /* void readBornEffectiveChargesFromOUTCAR(); */
       /* void symmetrizeBornEffectiveChargeTensors(); */
       /* void readDielectricTensorFromOUTCAR(); */
-      void readForceFieldsFromDYNMAT(const _xinput&);  // ME190113
+      void readForceConstantsFromVasprun(_xinput&);  // ME200211
 
     public:
       LinearResponsePC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
       ~LinearResponsePC();
       void clear();
       void runVASPCalculations(bool);  // ME191029
-      void calculateForceFields();  // ME190412  // ME191029
+      void calculateForceConstants();  // ME200211
   };
 }  // namespace apl
 

@@ -485,6 +485,29 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
 
+  void DirectMethodPC::calculateForceConstants() {
+    // Get all forces required for the construction of force-constant matrices
+    calculateForceFields();
+
+    calculateForceFields();
+    if (!_supercell.fullBasisCalculatedAGROUP()) _supercell.getFullBasisAGROUP();
+
+    // For construction of the force-constant matrices we need three
+    // independent distortions. Hence, calculate the remaining distortions and
+    // forces by the symmetry (if necessary).
+    completeForceFields();
+
+    // Ensure that all distortion vectors are along the cartesian directions
+    projectToCartesianDirections();
+
+    // Construct the matrix of force-constant matrices for all atoms based
+    // on the force fields for the inequivalent atoms
+    buildForceConstantMatrices();
+
+    // Store data into DYNMAT file format - vasp like
+    writeDYNMAT();
+  }
+
   void DirectMethodPC::calculateForceFields() {
     bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
     string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO190218
@@ -568,6 +591,487 @@ namespace apl {
     //****** END JJPR *******
   }
 
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void DirectMethodPC::completeForceFields() {
+    //CO - START
+    // Test of stupidity...
+    if (_supercell.getEPS() == AUROSTD_NAN) {
+      string function = "apl::DirectMethodPC::completeForceFields()";
+      string message = "Need to define symmetry tolerance.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
+    }
+    //CO - END
+    // Show info
+    _logger << "Calculating the missing force fields by symmetry." << apl::endl;
+
+    // Let's go
+    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) { //CO190218
+      // We need to have 3 linearly independent distortions
+      if (_uniqueDistortions[i].size() != 3) {
+        vector<xvector<double> > allDistortionsOfAtom;
+        vector<xvector<double> > testForce;
+        vector<vector<xvector<double> > > forcePool;
+        xvector<double> testVec(3), testVec0(3);
+
+        int atomID = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
+        const vector<_sym_op>& agroup = _supercell.getAGROUP(atomID); //CO190218
+
+        // Generate next independent distortion by symmetry operations...
+        uint currentSizeDistortions = _uniqueDistortions[i].size(); //CO190218
+        for (uint idistor = 0; idistor < currentSizeDistortions; idistor++) { //CO190218
+          // Apply all symmetry operations and check if it is independent
+          for (uint symOpID = 0; symOpID < agroup.size(); symOpID++) {
+            const _sym_op& symOp = agroup[symOpID];
+
+            testForce.clear();
+            for (_AFLOW_APL_REGISTER_ int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
+              try {
+                // ME191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
+                // the basis has not been calculated for some reason
+                _AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, atomID, true); //CO190218
+                testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
+              } catch (aurostd::xerror& e) {
+                _logger << error << "Mapping problem ? <-> " << k << "." << apl::endl;
+                string function = "apl::DirectMethodPC::completeForceFields()";
+                string message = "Mapping failed.";
+                throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+              }
+            }
+
+            // Get distortion vector (it is in the cartesian form) and apply symmetry rotation
+            testVec = symOp.Uc * _uniqueDistortions[i][idistor];
+
+            // Orthogonalize new rotated distortion vector on all accepted distortion vectors
+            for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
+              for (_AFLOW_APL_REGISTER_ int l = 0; l < _supercell.getNumberOfAtoms(); l++) {
+                testForce[l] = testForce[l] - getModeratedVectorProjection(forcePool[k][l], testVec, allDistortionsOfAtom[k]);
+              }
+              testVec = testVec - getVectorProjection(testVec, allDistortionsOfAtom[k]);
+            }
+
+            // If the remaining vector is non-zero length, it is new independent direction, hence store it...
+            if (aurostd::modulus(testVec) > _AFLOW_APL_EPS_) {
+              // Normalize to unit length
+              double testVectorLength = aurostd::modulus(testVec);
+              for (int l = 0; l < _supercell.getNumberOfAtoms(); l++) {
+                testForce[l] = testForce[l] / testVectorLength;
+              }
+              testVec = testVec / testVectorLength;
+              allDistortionsOfAtom.push_back(testVec);
+
+              // We suppose the symOpID == 0 is E (Identity) operation, hence the first
+              // independent vector is already the calculated vector, hence new forces are not need to store
+              if (allDistortionsOfAtom.size() > 1) {
+                // Store new distortion
+                _uniqueDistortions[i].push_back(testVec);
+                // Store new force field
+                _uniqueForces[i].push_back(testForce);
+              }
+
+              // Store for next ortogonalization procedure
+              forcePool.push_back(testForce);
+            }
+            if (_uniqueDistortions[i].size() == 3) break;
+          }
+          if (_uniqueDistortions[i].size() == 3) break;
+        }
+        allDistortionsOfAtom.clear();
+        for (uint ii = 0; ii < forcePool.size(); ii++) forcePool[ii].clear();
+        forcePool.clear();
+      }
+
+      // I hope this will never happen...
+      if (_uniqueDistortions[i].size() != 3) {
+        string function = "apl::DirectMethodPC::completeForceFields()";
+        string message = "Cannot complete force fields by symmetry.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      }
+    }
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void DirectMethodPC::projectToCartesianDirections() {
+    bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
+    string soliloquy="apl::DirectMethodPC::projectToCartesianDirections():"; //CO190218
+    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) { //CO190218
+      if(LDEBUG) {cerr << soliloquy << " looking at distorted atom[idistortion=" << i << "]" << std::endl;} //CO190218
+      // Construct transformation matrix A
+      xmatrix<double> A(3, 3), U(3, 3);
+      for (uint j = 0; j < 3; j++) {
+        // Ensure it is unit length
+        _uniqueDistortions[i][j] = _uniqueDistortions[i][j] / aurostd::modulus(_uniqueDistortions[i][j]);
+        if(LDEBUG){ //CO190218
+          cerr << soliloquy << " checking if uniqueDistortion[" << i << "][" << j << "] is unit length: ";
+          cerr << "modulus(" << _uniqueDistortions[i][j] << ")=" << aurostd::modulus(_uniqueDistortions[i][j]) << std::endl;
+        }
+
+        // Copy to rows of U^T matrix
+        for (uint k = 1; k <= 3; k++) {
+          U(j + 1, k) = _uniqueDistortions[i][j](k);
+        }
+      }
+      A = inverse(U);
+      //CO190116 - I believe U is an orthonormal matrix, as it defines a 3D axis
+      //hence A = trasp(U) as well (faster)
+      //keep for now
+
+      if(LDEBUG){ //CO190218
+        cerr << soliloquy << " distortion matrix U(distortion,direction):" << std::endl;
+        cerr << U << std::endl;
+        cerr << soliloquy << " inverse matrix A:" << std::endl;
+        cerr << A << std::endl;
+      }
+
+      // Update unique distortion vectors
+      // CO190116 - using trasp(A) instead of A because _uniqueDistortions[i][0] is a vector, not a matrix (as m is below)
+      // we are really applying A * U == I,
+      // so use A below (not trasp(A))
+      _uniqueDistortions[i][0] = trasp(A) * _uniqueDistortions[i][0];
+      _uniqueDistortions[i][1] = trasp(A) * _uniqueDistortions[i][1];
+      _uniqueDistortions[i][2] = trasp(A) * _uniqueDistortions[i][2];
+
+      if(LDEBUG){ //CO190218
+        cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][0]=" << _uniqueDistortions[i][0] << std::endl;
+        cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][1]=" << _uniqueDistortions[i][1] << std::endl;
+        cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][2]=" << _uniqueDistortions[i][2] << std::endl;
+        //CO190116 - cerr << soliloquy << " testing: trasp(A) * U should give same as above: trasp(A) * U = " << std::endl;  //U ~ m below
+        //CO190116 - cerr << trasp(A) * U << std::endl;
+        cerr << soliloquy << " testing: A * U should give same as above: A * U = " << std::endl;  //U ~ m below //DUH A = inverse(U), so A*U = I
+        cerr << A * U << std::endl;
+      }
+
+      // Update forces
+      xmatrix<double> m(3, 3);
+      for (int j = 0; j < _supercell.getNumberOfAtoms(); j++) {
+        if(LDEBUG) {cerr << soliloquy << " looking at supercell atom[" << j << "]" << std::endl;} //CO190218
+        for (_AFLOW_APL_REGISTER_ int k = 0; k < 3; k++)
+          for (_AFLOW_APL_REGISTER_ int l = 1; l <= 3; l++)
+            m(k + 1, l) = _uniqueForces[i][k][j](l);
+        if(LDEBUG){ //CO190218
+          cerr << soliloquy << " BEFORE m = " << std::endl;
+          cerr << m << std::endl;
+        }
+        // m = A * m * U; ??? I am not sure...
+        m = A * m;
+        // m = trasp(A) * m;  //CO NEW, treat forces exactly as distortion //CO190116 - wrong, see above, trasp(A) is only for vectors
+        if(LDEBUG){ //CO190218
+          cerr << soliloquy << " AFTER m = " << std::endl;
+          cerr << m << std::endl;
+        }
+        for (_AFLOW_APL_REGISTER_ int k = 0; k < 3; k++)
+          for (_AFLOW_APL_REGISTER_ int l = 1; l <= 3; l++)
+            _uniqueForces[i][k][j](l) = m(k + 1, l);
+      }
+    }
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void DirectMethodPC::buildForceConstantMatrices() {
+    bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
+    string soliloquy="apl::DirectMethodPC::buildForceConstantMatrices():"; //CO190218
+    // Test of stupidity...
+    if (DISTORTION_INEQUIVONLY && !_supercell.getSupercellStructure().fgroup_calculated) { //CO190218
+      string message = "The factor group has not been calculated yet.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
+    }
+    //CO - START
+    if (DISTORTION_INEQUIVONLY && _supercell.getEPS() == AUROSTD_NAN) { //CO190218
+      string message = "Need to define symmetry tolerance.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
+    }
+    //CO - END
+
+    // Clear old matrices
+    for (uint i = 0; i < _forceConstantMatrices.size(); i++)
+      _forceConstantMatrices[i].clear();
+    _forceConstantMatrices.clear();
+
+    //CO190116 - BIG BUG
+    //do NOT push_back() with forceConstantMatrices
+    //Jahnatek assumed that iatoms structure was [0 1 2 3] [4 5 6] (in order)
+    //therefore, pushing back meant keeping forceConstantMatrices in order of supercell atoms
+    //this is not necessarily true, as the mappings could be out of order
+    //therefore, we create the vector of the necessary dimensions, and put the row in the right place
+    //CO190131 UPDATE - this is NOT the only part of the code for which this dependency (iatoms sorted) exists
+
+    for (_AFLOW_APL_REGISTER_ int i = 0; i < _supercell.getNumberOfAtoms(); i++) {
+      _forceConstantMatrices.push_back(vector<xmatrix<double> >(0));
+      for (_AFLOW_APL_REGISTER_ int j = 0; j < _supercell.getNumberOfAtoms(); j++) {
+        _forceConstantMatrices.back().push_back(xmatrix<double>(3,3,1,1));
+      }
+    }
+
+
+    //
+    _logger << "Calculating the force constant matrices." << apl::endl;
+
+    // We have a party. Let's fun with us...
+    //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO190218
+    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) { //CO190218
+      // Get the number of this atom in the whole list
+      int basedAtomID = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
+
+      // This is easy. We know everything. Just construct a set of matrices.
+      xmatrix<double> m(3, 3, 1, 1);
+      for (int j = 0; j < _supercell.getNumberOfAtoms(); j++) {
+        for (uint k = 0; k < _uniqueDistortions[i].size(); k++) {
+          double distortionLength = aurostd::modulus(DISTORTION_MAGNITUDE * _uniqueDistortions[i][k]);
+          // FCM element = -F/d, but we will omit minus, because next force transformations are better
+          // done without it, and in construction of dyn. matrix we will add it to the sum
+          m(k + 1, 1) = _uniqueForces[i][k][j](1) / distortionLength;
+          m(k + 1, 2) = _uniqueForces[i][k][j](2) / distortionLength;
+          m(k + 1, 3) = _uniqueForces[i][k][j](3) / distortionLength;
+          //cout << i << " " << k << " " << j << " "; printXVector(_uniqueForces[i][k][j]);
+        }
+        //printXMatrix(m);
+        //row.push_back(m); //JAHNATEK ORIGINAL //CO190218
+        _forceConstantMatrices[basedAtomID][j] = m;  //CO NEW //CO190218
+        if(LDEBUG){ //CO190218
+          cerr << soliloquy << " adding m to forceConstantMatrices[" << basedAtomID << "][" << j << "]=" << std::endl;
+          cerr << m << std::endl;
+        }
+      }
+      //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO190218
+      //row.clear();  //JAHNATEK ORIGINAL //CO190218
+
+      if(DISTORTION_INEQUIVONLY){ //CO190218
+        _sym_op symOp;  //CO
+        // Calculate rows for next equivalent atoms starting 1 (structure of iatoms)... //CO190218
+        for (int j = 1; j < _supercell.getNumberOfEquivalentAtomsOfType(i); j++) { //CO190218
+          try {
+            //CO190116 - we want to map the forces of the inequivalent atoms (for which we ran vasp) onto the equivalent ones
+            //hence, we need the FGROUP that takes us from the inequivalent atom to the equivalent
+            //then, we need to find the atom which, upon application of that symop, becomes k (below)
+            //symOp = _supercell.getSymOpWhichMatchAtoms(basedAtomID, _supercell.getUniqueAtomID(i, j), _FGROUP_);  //CO NEW //CO190218
+            symOp = _supercell.getSymOpWhichMatchAtoms(_supercell.getUniqueAtomID(i, j), basedAtomID, _FGROUP_);  //JAHNATEK ORIGINAL //CO190218
+            //const _sym_op& symOp = _supercell.getSymOpWhichMatchAtoms(_supercell.getUniqueAtomID(i,j),basedAtomID,_FGROUP_); //JAHNATEK ORIGINAL
+            //cout << basedAtomID << " -> " << _supercell.getUniqueAtomID(i,j) << " " << symOp.str_type << " shift:"; printXVector(symOp.ftau);
+            //printXVector(_supercell.getSupercellStructure().atoms[basedAtomID].fpos);
+            //printXVector(_supercell.getSupercellStructure().atoms[_supercell.getUniqueAtomID(i,j)].fpos);
+            // ME191031 - use xerror
+          } catch (aurostd::xerror& e) {
+            _logger << error << "Mapping problem " << _supercell.getUniqueAtomID(i, j) << " <-> " << basedAtomID << "?" << apl::endl; //CO190218
+            string message = "Mapping failed.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+          }
+
+          for (_AFLOW_APL_REGISTER_ int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
+            try {
+              //CO190116 - read atomComesFrom() as: applying symOp to l makes k
+              //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, _supercell.getUniqueAtomID(i, j));  //CO NEW //CO190218
+              _AFLOW_APL_REGISTER_ int l = _supercell.atomGoesTo(symOp, k, _supercell.getUniqueAtomID(i, j)); //JAHNATEK ORIGINAL //CO190218
+              //cout << "MAP " << k << " <-> " << l << std::endl;
+              //row.push_back(inverse(symOp.Uc) * _forceConstantMatrices[basedAtomID][l] * symOp.Uc); //JAHNATEK ORIGINAL //CO190218
+              //row.push_back(symOp.Uc * _forceConstantMatrices[basedAtomID][l] * inverse(symOp.Uc)); //CO NEW  //JAHNATEK ORIGINAL //CO190218
+              //m = symOp.Uc * _forceConstantMatrices[basedAtomID][l] * inverse(symOp.Uc);  //CO NEW //CO190218
+              m = inverse(symOp.Uc) * _forceConstantMatrices[basedAtomID][l] * symOp.Uc;  //JAHNATEK ORIGINAL //CO190218
+              _forceConstantMatrices[_supercell.getUniqueAtomID(i, j)][k] = m;  //CO NEW //CO190218
+              if(LDEBUG){ //CO190218
+                cerr << soliloquy << " adding m to forceConstantMatrices[" << _supercell.getUniqueAtomID(i, j) << "][" << k << "]=" << std::endl;
+                cerr << m << std::endl;
+              }
+            } catch (aurostd::xerror& e) {
+              _logger << error << "Mapping problem " << k << " <-> ?." << apl::endl;
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Mapping failed.");
+            }
+          }
+          //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO190218
+          //row.clear();  //JAHNATEK ORIGINAL //CO190218
+        }
+      }
+      //row.clear();  //JAHNATEK ORIGINAL //CO190218
+    }
+
+    // Test of correctness
+    if ((int)_forceConstantMatrices.size() != _supercell.getNumberOfAtoms()) {
+      string message = "Some problem with the application of factor group operations.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+    }
+  }
+
   //////////////////////////////////////////////////////////////////////////////
+
+  void DirectMethodPC::writeDYNMAT() {
+    string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME181226
+    _logger << "Writing forces into file " << filename << "." << apl::endl; //ME181226
+
+    stringstream outfile;
+
+    // 1st line
+    outfile << _supercell.getNumberOfUniqueAtoms() << " ";
+    outfile << _supercell.getNumberOfAtoms() << " ";
+    int dof = 0;
+    for (uint i = 0; i < _uniqueDistortions.size(); i++)
+      dof += _uniqueDistortions[i].size();
+    outfile << dof << std::endl;
+
+    // 2nd line
+    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+    outfile << setprecision(3);
+    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+      if (i != 0) outfile << " ";
+      outfile << _supercell.getUniqueAtomMass(i);
+    }
+    outfile << std::endl;
+
+    // forces + 1 line info about distortion
+    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+        // line info
+        outfile << (_supercell.getUniqueAtomID(i) + 1) << " ";
+        outfile << (j + 1) << " ";
+        xvector<double> shift(3);
+        shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
+        outfile << setprecision(3);
+        outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
+        // forces
+        outfile << setprecision(6);
+        for (int k = 0; k < _supercell.getNumberOfAtoms(); k++)
+          outfile << setw(15) << _uniqueForces[i][j][k](1)
+            << setw(15) << _uniqueForces[i][j][k](2)
+            << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
+      }
+    }
+
+    aurostd::stringstream2file(outfile, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "DirectMethodPC::writeDYNMAT()";
+      string message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
+  }
+
+   //////////////////////////////////////////////////////////////////////////////
+
+  // This is the interface to phonopy code
+
+  void DirectMethodPC::writeFORCES() {
+    _logger << "Writing forces into file FORCES." << apl::endl;
+
+    xstructure ix;
+    string filename = "SPOSCAR";
+    if (!aurostd::FileEmpty(filename)) {
+      _logger << "Reading " << filename << apl::endl;
+      stringstream SPOSCAR;
+      aurostd::efile2stringstream(filename, SPOSCAR);
+      SPOSCAR >> ix;
+    } else {
+      ix = _supercell.getSupercellStructure();
+    }
+
+    stringstream outfile;
+
+    // 1st line
+    int dof = 0;
+    for (uint i = 0; i < _uniqueDistortions.size(); i++)
+      dof += _uniqueDistortions[i].size();
+    outfile << dof << std::endl;
+
+    // forces + 1 line info about distortion
+    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+        // line info
+        outfile << (_supercell.getUniqueAtomID(i) + 1) << " ";
+        xvector<double> shift(3);
+        shift = C2F(_supercell.getSupercellStructure().lattice, DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
+        outfile << setprecision(6);
+        outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
+        // forces
+        outfile << setprecision(6);
+        for (int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
+          int l = 0;
+          for (; l < _supercell.getNumberOfAtoms(); l++)
+            if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell.getSupercellStructure().atoms[l].cpos(1)) < _AFLOW_APL_EPS_) &&
+                (aurostd::abs(ix.atoms[k].cpos(2) - _supercell.getSupercellStructure().atoms[l].cpos(2)) < _AFLOW_APL_EPS_) &&
+                (aurostd::abs(ix.atoms[k].cpos(3) - _supercell.getSupercellStructure().atoms[l].cpos(3)) < _AFLOW_APL_EPS_))
+              break;
+          //CO, not really mapping error, just mismatch between structure read in (ix) and current supercell structure (should be exact)
+          if (l == _supercell.getNumberOfAtoms()) {
+            cout << k << std::endl;
+            cout << ix.atoms[k].fpos << std::endl;
+            cout << ix.atoms[k].cpos << std::endl;
+            string function = "apl::DirectMethodPC::writeFORCES()";
+            string message = "Mapping error.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+          }
+
+          outfile << setw(15) << _uniqueForces[i][j][l](1) << " "
+            << setw(15) << _uniqueForces[i][j][l](2) << " "
+            << setw(15) << _uniqueForces[i][j][l](3) << std::endl;
+        }
+      }
+    }
+
+    filename = "FORCES";
+    aurostd::stringstream2file(outfile, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "DirectMethodPC::writeFORCES()";
+      string message = "Cannot open output file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+    }
+
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void DirectMethodPC::writeXCrysDenForces() {
+    _logger << "Writing forces into file XCrysDenForces." << apl::endl;
+    _supercell.center_original();  //COREY
+
+    stringstream outfile;  //CO
+    // forces + 1 line info about distortion
+    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+        //string s = "FORCES_A" + stringify(_supercell.getUniqueAtomID(i)) + "D" + stringify(j) + ".xsf"; //CO
+        outfile.str("");  //CO
+        //ofstream outfile(s.c_str(), ios_base::out); //CO
+
+        outfile << "CRYSTAL" << std::endl;
+        outfile << "PRIMVEC 1" << std::endl;
+        outfile << _supercell.getSupercellStructure().lattice << std::endl;
+        outfile << "CONVEC 1" << std::endl;
+        outfile << _supercell.getSupercellStructure().lattice << std::endl;
+        outfile << "PRIMCOORD 1" << std::endl;
+        outfile << _supercell.getNumberOfAtoms() << " 1" << std::endl;
+
+        xvector<double> shift(3);
+        shift = C2F(_supercell.getSupercellStructure().lattice, DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
+
+        outfile << setprecision(6);
+        for (int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
+          outfile << _supercell.getAtomNumber(k) << " ";
+          outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+          outfile << setprecision(8);
+          xvector<double> r = F2C(_supercell.getSupercellStructure().lattice,
+              _supercell.getSupercellStructure().atoms[k].fpos);
+          outfile << setw(15) << r(1) << setw(15) << r(2) << setw(15) << r(3) << " ";
+          // this is strange...
+          //outfile << setw(15) << _superCellStructure.atoms[k].cpos << " ";
+
+          // Scale force, it is expected in Hartree/Angs.
+          xvector<double> f = 27.212 * _uniqueForces[i][j][k];
+
+          outfile << setw(15) << f(1)
+            << setw(15) << f(2)
+            << setw(15) << f(3) << std::endl;
+        }
+
+        string filename = "FORCES_A" + stringify(_supercell.getUniqueAtomID(i)) + "D" + stringify(j) + ".xsf";
+        aurostd::stringstream2file(outfile, filename);
+        if (!aurostd::FileExist(filename)) {
+          string function = "apl::DirectMethodPC::writeXCrysDenForces()";
+          string message = "Cannot create " + filename + " file.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+        }
+
+      }
+    }
+  }
+
+//////////////////////////////////////////////////////////////////////////////
 
 }  // namespace apl

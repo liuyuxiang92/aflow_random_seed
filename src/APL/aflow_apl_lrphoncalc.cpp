@@ -120,7 +120,7 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void LinearResponsePC::calculateForceFields() {
+  void LinearResponsePC::calculateForceConstants() {
     // Check if supercell is already built
     if (!_supercell.isConstructed()) {
       // ME191031 - use xerror
@@ -130,8 +130,89 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
 
-    readForceFieldsFromDYNMAT(xInputs[0]);
+    readForceConstantsFromVasprun(xInputs[0]);
     if (_isPolarMaterial) calculateDielectricTensor(xInputs[1]);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // ME200211
+  void LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
+    _logger << "Reading force constants from vasprun.xml" << apl::endl;
+    string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
+
+    // Read vasprun.xml
+    string filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml.static");
+    if (!aurostd::EFileExist(filename)) {
+      filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
+      if (aurostd::EFileExist(filename)) {
+        string message = "Could not find vasprun.xml file for linear response calculations.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+      }
+    }
+    vector<string> vlines;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+
+    // Read Hessian
+    vector<vector<double> > hessian;
+    vector<double> row;
+    vector<string> line;
+    uint iline = 0;
+    for (iline = 0; iline < nlines; iline++) {
+      if (aurostd::substring2bool(vlines[iline], "hessian")) {
+        while ((++iline != nlines) && !aurostd::substring2bool(vlines[iline], "</varray>")) {
+          aurostd::string2tokens(vlines[iline], line);
+          row.clear();
+          for (uint i = 1; i < (row.size() - 1); i++) {
+            row.push_back(aurostd::string2utype<double>(line[i]));
+          }
+          hessian.push_back(row);
+        }
+        if (iline < nlines) break;
+      }
+    }
+
+    // Check that the file was read successfully.
+    if (iline == nlines) {
+      string message = "Hessian tag not found or incomplete.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+    uint natoms = _supercell.getSupercellStructure().atoms.size();
+    uint nhessian = hessian.size();
+    if (nhessian != 3 * natoms) {
+      stringstream message;
+      message << "Hessian matrix does not have the correct number of rows (has "
+        << nhessian << ", should have << " << (3 * nhessian) << ")." << std::endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+    uint i = 0;
+    for (i = 0; i < nhessian; i++) {
+      if (hessian[i].size() != 3 * natoms) break;
+    }
+    if (i != nhessian) {
+      stringstream message;
+      message << "Row " << i << " of the Hessian matrix does not have the correct number of columns"
+        << " (has " << hessian[i].size() << ", should have << " << (3 * nhessian) << ")." << std::endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    _forceConstantMatrices.clear();
+    _forceConstantMatrices.resize(natoms, vector<xmatrix<double> >(natoms, xmatrix<double>(3, 3)));
+    double mass = 0.0;
+    // Convert Hessian matrix into force constants
+    for (uint i = 0; i < natoms; i++) {
+      for (uint j = 0; j < natoms; j++) {
+        // Hessian matrix is normalized by masses, so multiply to get FCs
+        mass = std::sqrt(_supercell.getAtomMass(i) * _supercell.getAtomMass(j));
+        for (int k = 0; k < 3; k++) {
+          for (int l = 0; l < 3; l++) {
+            // AFLOW stores the force constants as F/d instead of -F/d, so
+            // take the Hessian matrix elements directly.
+            _forceConstantMatrices[i][j][k+1][l+1] = mass * hessian[3 * i + k][3 * j + l];
+          }
+        }
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -533,157 +614,6 @@ namespace apl {
     //sum = sum + ( inverse(symOp.Uc) * _dielectricTensor * symOp.Uc );
     //}
     //_dielectricTensor = ( 1.0 / pgroup.size() ) * sum;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  void LinearResponsePC::readForceFieldsFromDYNMAT(const _xinput& xinp) { // ME190113
-    // string directory = string("./") + _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_; ME190113
-    string directory = xinp.xvasp.Directory; // ME190113
-
-    //if (!aurostd::FileExist(directory + string("/") + _AFLOWLOCK_))  //CO
-    //  throw APLStageBreak();
-
-    string infilename = directory + string("/DYNMAT");
-    if (!aurostd::EFileExist(infilename, infilename)) {  //CO
-      infilename = directory + string("/DYNMAT.static");
-      if (!aurostd::EFileExist(infilename, infilename))  //CO
-      {
-        throw APLStageBreak(); //ME181226
-        //      _logger << apl::warning << "The DYNMAT file in " << directory << " directory is missing." << apl::endl;  OBSOLETE - ME181024
-        //      throw APLLogicError("apl::LinearResponsePC::readForceFieldsFromDYNMAT(); Missing data from one job.");  OBSOLETE - ME181024
-      }
-    }
-
-    // Clear old lists
-    clear();
-
-    // Open our file
-    //CO - START
-    vector<string> vlines;
-    aurostd::efile2vectorstring(infilename, vlines);
-    //ifstream infile(infilename.c_str());
-    //if( !infile.is_open() )
-    if (!vlines.size())
-    { //CO200106 - patching for auto-indenting
-      // ME191029 - use xerror
-      //throw apl::APLRuntimeError("LinearResponsePC::readForceFieldsFromDYNMAT(); Cannot open input DYNMAT file.");
-      string function = "apl::LinearResponsePC::readForceFieldsFromDYNMAT()";
-      string message = "Cannot open input file DYNMAT.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
-    }
-
-    // Header
-    vector<int> values;
-    uint line_count = 0;
-    aurostd::string2tokens<int>(vlines[line_count++], values);
-    //int ntypes=values[0]; //not used
-    //int ntypes;
-    //infile >> ntypes;
-
-    int natoms = values[1];
-    int nfree = values[2];
-    //int natoms;
-    //infile >> natoms;
-    //int nfree;
-    //infile >> nfree;
-    //for(int i = 0; i < ntypes; i++) {
-    //  double dtemp;
-    //  infile >> dtemp;
-    //}
-    line_count++;
-    //CO - END
-
-    // Get forces
-    vector<xvector<double> > distortionsOfOneAtom;
-    vector<vector<xvector<double> > > forceFieldsOfOneAtom;
-    int old_atom_id = 0;
-    aurostd::string2tokens<int>(vlines[line_count++], values);  //CO
-    for (int i = 0; i < nfree; i++) {
-      int atom_id = values[0];  //CO
-      //int atom_id;  //CO
-      //infile >> atom_id;  //CO
-      if (i == 0) old_atom_id = atom_id;
-
-      //if(infile.eof()) break; //CO
-      if (line_count == vlines.size()) break;  //CO
-
-      // Distortion ID
-      //CO - START
-      //int idir=values[1]; //not used
-      //int idir;
-      //infile >> idir;
-
-      // Distortion vector
-      xvector<double> distortion(3);
-      distortion(1) = values[2];
-      distortion(2) = values[3];
-      distortion(3) = values[4];
-      //infile >> distortion(1);
-      //infile >> distortion(2);
-      //infile >> distortion(3);
-      //CO - END
-      double distortionLength = aurostd::modulus(distortion);
-      DISTORTION_MAGNITUDE = distortionLength;
-      distortion(1) = distortion(1) / distortionLength;
-      distortion(2) = distortion(2) / distortionLength;
-      distortion(3) = distortion(3) / distortionLength;
-
-      // Get forces and calculate drift
-      vector<xvector<double> > qm_forces;
-      xvector<double> force(3);
-      xvector<double> drift(3);
-      for (int k = 0; k < natoms; k++) {
-        //CO - START
-        aurostd::string2tokens(vlines[line_count++], values);
-        force(1) = values[0];
-        force(2) = values[1];
-        force(3) = values[2];
-        //infile >> force(1);
-        //infile >> force(2);
-        //infile >> force(3);
-        //CO - END
-        qm_forces.push_back(force);
-        drift = drift + force;
-      }
-      drift(1) = drift(1) / natoms;
-      drift(2) = drift(2) / natoms;
-      drift(3) = drift(3) / natoms;
-      for (int k = 0; k < natoms; k++)
-        qm_forces[k] = qm_forces[k] - drift;
-
-      // Finish this atoms list and stasrt new one
-      if (atom_id != old_atom_id) {
-        _uniqueForces.push_back(forceFieldsOfOneAtom);
-        _uniqueDistortions.push_back(distortionsOfOneAtom);
-        old_atom_id = atom_id;
-        for (uint i = 0; i < distortionsOfOneAtom.size(); i++)
-          distortionsOfOneAtom[i].clear();
-        distortionsOfOneAtom.clear();
-        for (uint i = 0; i < forceFieldsOfOneAtom.size(); i++)
-          forceFieldsOfOneAtom[i].clear();
-        forceFieldsOfOneAtom.clear();
-      }
-
-      // Store distortions and forces
-      distortionsOfOneAtom.push_back(distortion);
-      forceFieldsOfOneAtom.push_back(qm_forces);
-
-      // Final store ....
-      if (i == nfree - 1) {
-        _uniqueForces.push_back(forceFieldsOfOneAtom);
-        _uniqueDistortions.push_back(distortionsOfOneAtom);
-        for (uint i = 0; i < distortionsOfOneAtom.size(); i++)
-          distortionsOfOneAtom[i].clear();
-        distortionsOfOneAtom.clear();
-        for (uint i = 0; i < forceFieldsOfOneAtom.size(); i++)
-          forceFieldsOfOneAtom[i].clear();
-        forceFieldsOfOneAtom.clear();
-      }
-    }
-
-    // Clear used stuff
-    //infile.clear(); //CO
-    //infile.close(); //CO
   }
 
   //////////////////////////////////////////////////////////////////////////////
