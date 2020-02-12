@@ -2742,13 +2742,13 @@ namespace aurostd {
 
 
 //OBSOLETE - ME190815 - moved to aurostd::xmatrix
-namespace apl {
-  //void tred2(xmatrix<xcomplex<double> >&);
-  void zheevByJacobiRotation(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
-#ifdef USE_MKL
-  void zheevMKL(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
-#endif
-}
+//[OBSOLETE] namespace apl {
+//[OBSOLETE]   //void tred2(xmatrix<xcomplex<double> >&);
+//[OBSOLETE]   void zheevByJacobiRotation(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
+//[OBSOLETE] #ifdef USE_MKL
+//[OBSOLETE]   void zheevMKL(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
+//[OBSOLETE] #endif
+//[OBSOLETE] }
 
 // ***************************************************************************
 // cursor.h
