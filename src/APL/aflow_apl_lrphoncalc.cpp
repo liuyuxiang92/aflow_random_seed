@@ -206,9 +206,7 @@ namespace apl {
         mass = std::sqrt(_supercell.getAtomMass(i) * _supercell.getAtomMass(j));
         for (int k = 0; k < 3; k++) {
           for (int l = 0; l < 3; l++) {
-            // AFLOW stores the force constants as F/d instead of -F/d, so
-            // take the Hessian matrix elements directly.
-            _forceConstantMatrices[i][j][k+1][l+1] = mass * hessian[3 * i + k][3 * j + l];
+            _forceConstantMatrices[i][j][k+1][l+1] = -mass * hessian[3 * i + k][3 * j + l];
           }
         }
       }

@@ -489,7 +489,9 @@ namespace apl {
     // Get all forces required for the construction of force-constant matrices
     calculateForceFields();
 
-    calculateForceFields();
+    // ME191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
+    // Calculating the full basis ahead of time is much faster than calculating all
+    // symmetry operations on-the-fly.
     if (!_supercell.fullBasisCalculatedAGROUP()) _supercell.getFullBasisAGROUP();
 
     // For construction of the force-constant matrices we need three
@@ -821,6 +823,8 @@ namespace apl {
           double distortionLength = aurostd::modulus(DISTORTION_MAGNITUDE * _uniqueDistortions[i][k]);
           // FCM element = -F/d, but we will omit minus, because next force transformations are better
           // done without it, and in construction of dyn. matrix we will add it to the sum
+          // ME200212 - we store force constants in a human-readable file, which should represent
+          // the actual force constants, not an AFLOW-customized construction
           m(k + 1, 1) = _uniqueForces[i][k][j](1) / distortionLength;
           m(k + 1, 2) = _uniqueForces[i][k][j](2) / distortionLength;
           m(k + 1, 3) = _uniqueForces[i][k][j](3) / distortionLength;
@@ -889,6 +893,13 @@ namespace apl {
     if ((int)_forceConstantMatrices.size() != _supercell.getNumberOfAtoms()) {
       string message = "Some problem with the application of factor group operations.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+    }
+
+    // ME200211 - force constants are -F/d, not F/d
+    for (uint i = 0; i < _forceConstantMatrices.size(); i++) {
+      for (uint j = 0; j < _forceConstantMatrices.size(); j++) {
+        _forceConstantMatrices[i][j] = -_forceConstantMatrices[i][j];
+      }
     }
   }
 

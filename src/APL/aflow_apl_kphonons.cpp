@@ -146,7 +146,7 @@ namespace KBIN {
     str_fin.species_pp_vLDAU = xvasp.str.species_pp_vLDAU; // ME190109
 
     xvasp.str = str_fin; // ME190109
-    if(LDEBUG){std::cout << xvasp.str << std::endl;} // ME190308
+    if(LDEBUG){std::cerr << xvasp.str << std::endl;} // ME190308
     pflow::fixEmptyAtomNames(xvasp.str,true);  // ME190308
 
     // Safeguard for when CONVERT is set in the aflow.in file

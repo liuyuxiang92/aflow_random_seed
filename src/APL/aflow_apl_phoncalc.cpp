@@ -150,12 +150,12 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
 
+    calculateForceConstants();
+
     // ME191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
     // symmetry operations on-the-fly.
     if (!_supercell.fullBasisCalculatedAGROUP()) _supercell.getFullBasisAGROUP();
-
-    calculateForceConstants();
 
     //cout << "NON-SYMMETRIZED:" << std::endl;
     //printForceConstantMatrices(cout);
