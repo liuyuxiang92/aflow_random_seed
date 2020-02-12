@@ -93,6 +93,10 @@
 #define         DEFAULT_AFLOW_PGROUP_XTAL_OUT           XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_XTAL_OUT")
 #define AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON          string("aflow.pgroup_xtal.json") // DX 8/2/17 - Add JSON
 #define         DEFAULT_AFLOW_PGROUP_XTAL_JSON          XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_XTAL_JSON")
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT     string("aflow.pgroupk_Patterson.out") //DX 20200129
+#define         DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT     XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT") //DX 20200129
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON    string("aflow.pgroupk_Patterson.json") //DX 20200129
+#define         DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON    XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON") //DX 20200129
 #define AFLOWRC_DEFAULT_AFLOW_PGROUPK_OUT               string("aflow.pgroupk.out")
 #define         DEFAULT_AFLOW_PGROUPK_OUT               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_OUT")
 #define AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON              string("aflow.pgroupk.json")     // DX 8/2/17 - Add JSON
@@ -1021,6 +1025,8 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AFLOW_PGROUP_JSON",AFLOWRC_DEFAULT_AFLOW_PGROUP_JSON);
     aflowrc::load_default("DEFAULT_AFLOW_PGROUP_XTAL_OUT",AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_PGROUP_XTAL_JSON",AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON);
+    aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT",AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT); //DX 20200129
+    aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON",AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON); //DX 20200129
     aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_OUT",AFLOWRC_DEFAULT_AFLOW_PGROUPK_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_JSON",AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON);
     aflowrc::load_default("DEFAULT_AFLOW_PGROUPK_XTAL_OUT",AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_OUT);
@@ -1515,6 +1521,8 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AFLOW_PGROUP_JSON=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUP_JSON << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PGROUP_XTAL_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PGROUP_XTAL_JSON=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT << "\"" << endl; //DX 20200129
+    aflowrc << "DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON << "\"" << endl; //DX 20200129
     aflowrc << "DEFAULT_AFLOW_PGROUPK_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PGROUPK_JSON=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PGROUPK_XTAL_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_OUT << "\"" << endl;
@@ -2001,6 +2009,8 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUP_JSON\")=\"" << DEFAULT_AFLOW_PGROUP_JSON << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUP_XTAL_OUT\")=\"" << DEFAULT_AFLOW_PGROUP_XTAL_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUP_XTAL_JSON\")=\"" << DEFAULT_AFLOW_PGROUP_XTAL_JSON << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT\")=\"" << DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT << "\"" << endl; //DX 20200129
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON\")=\"" << DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON << "\"" << endl; //DX 20200129
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_OUT\")=\"" << DEFAULT_AFLOW_PGROUPK_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_JSON\")=\"" << DEFAULT_AFLOW_PGROUPK_JSON << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PGROUPK_XTAL_OUT\")=\"" << DEFAULT_AFLOW_PGROUPK_XTAL_OUT << "\"" << endl;
