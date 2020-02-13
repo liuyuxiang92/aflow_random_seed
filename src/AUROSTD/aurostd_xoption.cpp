@@ -302,17 +302,6 @@ namespace aurostd {
         return TRUE;
       }
     }
-    // check attached schemes list going through vxsghost 2 by 2  // SC 20191227
-    for(uint i=0;i<vxsghost.size();i+=2) {
-      //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;  
-      a=aurostd::toupper(vxsghost.at(i));                         // shortcuts
-      b=aurostd::toupper(check);                                  // shortcuts
-      if(a==b) {
-        //	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;  
-        return TRUE;
-      }
-    }
-    // nor in scheme nor in attached scheme... exit
     return FALSE;
   }
 
