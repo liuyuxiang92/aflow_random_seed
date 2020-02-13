@@ -509,6 +509,8 @@
 #define         DEFAULT_APL_DOSPOINTS                         XHOST.adefault.getattachedutype<int>("DEFAULT_APL_DOSPOINTS")
 #define AFLOWRC_DEFAULT_APL_DOSSMEAR                          0.0
 #define         DEFAULT_APL_DOSSMEAR                          XHOST.adefault.getattachedutype<double>("DEFAULT_APL_DOSSMEAR")
+#define AFLOWRC_DEFAULT_APL_DOS_PROJECT                       FALSE  // ME200213
+#define         DEFAULT_APL_DOS_PROJECT                       XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DOS_PROJECT")  // ME200213
 #define AFLOWRC_DEFAULT_APL_TP                                TRUE
 #define         DEFAULT_APL_TP                                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_TP")
 #define AFLOWRC_DEFAULT_APL_TPT                               string("0:2000:10")
@@ -1249,6 +1251,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DOSMESH",AFLOWRC_DEFAULT_APL_DOSMESH);
     aflowrc::load_default("DEFAULT_APL_DOSPOINTS",AFLOWRC_DEFAULT_APL_DOSPOINTS);
     aflowrc::load_default("DEFAULT_APL_DOSSMEAR",AFLOWRC_DEFAULT_APL_DOSSMEAR);
+    aflowrc::load_default("DEFAULT_APL_DOS_PROJECT",AFLOWRC_DEFAULT_APL_DOS_PROJECT);  // ME200213
     aflowrc::load_default("DEFAULT_APL_TP",AFLOWRC_DEFAULT_APL_TP);
     aflowrc::load_default("DEFAULT_APL_TPT",AFLOWRC_DEFAULT_APL_TPT);
 
@@ -1756,6 +1759,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DOSMESH=\"" << AFLOWRC_DEFAULT_APL_DOSMESH << "\"" << endl;
     aflowrc << "DEFAULT_APL_DOSPOINTS=" << AFLOWRC_DEFAULT_APL_DOSPOINTS << endl;
     aflowrc << "DEFAULT_APL_DOSSMEAR=" << AFLOWRC_DEFAULT_APL_DOSSMEAR << endl;
+    aflowrc << "DEFAULT_APL_DOS_PROJECT=" << AFLOWRC_DEFAULT_APL_DOS_PROJECT << endl;
     aflowrc << "DEFAULT_APL_TP=" << AFLOWRC_DEFAULT_APL_TP << endl;
     aflowrc << "DEFAULT_APL_TPT=\"" << AFLOWRC_DEFAULT_APL_TPT << "\"" << endl;
     aflowrc << "DEFAULT_APL_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_APL_FILE_PREFIX << "\"" << endl;
@@ -2229,6 +2233,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSMESH\")=\"" << DEFAULT_APL_DOSMESH << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSPOINTS\")=" << DEFAULT_APL_DOSPOINTS << endl;  // ME190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSSMEAR\")=" << DEFAULT_APL_DOSSMEAR << endl;  // ME190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOS_PROJECT\")=" << DEFAULT_APL_DOS_PROJECT << endl;  // ME200213
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TP\")=" << DEFAULT_APL_TP << endl;  // ME190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TPT\")=\"" << DEFAULT_APL_TPT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_FILE_PREFIX\")=\"" << DEFAULT_APL_FILE_PREFIX << "\"" << endl;

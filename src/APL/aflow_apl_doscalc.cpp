@@ -325,6 +325,7 @@ namespace apl {
 
   // ME190614 - added integrated DOS
   // ME190625 - rearranged and added projected DOS
+  // ME200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
     _logger << "Calculating phonon DOS using the linear tetrahedron method." << apl::endl;
     // Procompute projections for each q-point and branch to save time
@@ -345,10 +346,16 @@ namespace apl {
           int ibranch = br + _freqs[0].lrows;
           for (uint p = 0; p < nproj; p++) {
             for (uint at = 0; at < natoms; at++) {
-              eig.re = 0.0;
-              eig.im = 0.0;
-              for (int i = 1; i < 4; i++) eig += proj_norm[p][i] * _eigen[q][3*at + i][ibranch];
-              parts[q][br][p][at] = aurostd::magsqr(eig);
+              if (aurostd::iszero(proj_norm[p])) {  // zero-vector = atom-projected DOS
+                for (int i = 1; i < 4; i++) {
+                  parts[q][br][p][at] += aurostd::magsqr(_eigen[q][3*at + i][ibranch]);
+                }
+              } else {
+                eig.re = 0.0;
+                eig.im = 0.0;
+                for (int i = 1; i < 4; i++) eig += proj_norm[p][i] * _eigen[q][3*at + i][ibranch];
+                parts[q][br][p][at] = aurostd::magsqr(eig);
+              }
             }
           }
         }
