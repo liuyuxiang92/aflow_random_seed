@@ -31,7 +31,7 @@ namespace apl {
     _xInput.xvasp.AVASP_arun_mode = "APL";
     xInputs.clear();
     xInputs.push_back(_xInput);
-    runVASPCalculationsFF(xInputs[0]);
+    runVASPCalculationsDFPT(xInputs[0]);
     if (_isPolarMaterial) {
       xInputs.push_back(_xInput);
       runVASPCalculationsBE(xInputs[1]);
@@ -40,7 +40,7 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
   // Wrapper function to run the linear response (force fields) calculation.
-  void LinearResponsePC::runVASPCalculationsFF(_xinput& xinp) {  // ME190113
+  void LinearResponsePC::runVASPCalculationsDFPT(_xinput& xinp) {  // ME200213
     runVASPCalculationsLRBE(xinp, false);
   }
 
@@ -91,7 +91,7 @@ namespace apl {
         xInput.xvasp.aopts.flag("APL_FLAG::AVASP_LR", false);
         xInput.xvasp.aopts.flag("APL_FLAG::AVASP_BORN", true);
       } else {
-        xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_;
+        xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;  // ME200213
         xInput.xvasp.aopts.flag("APL_FLAG::AVASP_BORN", false);
         xInput.xvasp.aopts.flag("APL_FLAG::AVASP_LR", true);
       }
@@ -109,7 +109,7 @@ namespace apl {
       if (born) {
         runname = _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_;
       } else {
-        runname = _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_;
+        runname = _AFLOW_APL_DFPT_DIRECTORY_NAME_;  // ME200213
       }
       xInput.setDirectory( _xInput.getDirectory() + "/" + runname );
       if (!filesExistPhonons(xInput)) {

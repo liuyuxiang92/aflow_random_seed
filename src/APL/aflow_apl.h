@@ -735,8 +735,10 @@ namespace apl {
 // "phoncalc.h"
 #define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  // ME190108
 #define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) // ME190108
-#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME190108
-#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME190108
+//#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME190108  // OBSOLETE ME200213 - the calculation does not use force fields
+//#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME190108  // OBSOLETE ME200213
+#define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  // ME200213
+#define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME200213
 
 namespace apl {
   class PhononCalculator : virtual public IPhononCalculator {
@@ -1069,7 +1071,7 @@ namespace apl {
   class LinearResponsePC : public PhononCalculator {
     private:
       /* void runVASPCalculationsBE(); */
-      void runVASPCalculationsFF(_xinput&);  // ME190113
+      void runVASPCalculationsDFPT(_xinput&);  // ME190113  // ME200213 - changed name
       /* void readBornEffectiveChargesFromOUTCAR(); */
       /* void symmetrizeBornEffectiveChargeTensors(); */
       /* void readDielectricTensorFromOUTCAR(); */
