@@ -606,7 +606,6 @@ namespace aflowlib {
     // XHOST.DEBUG=TRUE;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aflowlib::PrototypeLibraries():"; //CO181128
-    stringstream message; //CO+DX200213
     if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option)" << endl; }
     if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: label=" << label << endl; }
     if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: parameters=" << parameters << endl; }
@@ -2025,6 +2024,7 @@ namespace aflowlib {
             if(isTET) aflowlib::PrototypeFixTET(*voss,str_flipped,optionsTET);
             return str_flipped;
           }
+          stringstream message; //CO+DX200213
           message << "atoms are too close (nn_dist=" << nn_dist << " Angstroms) and there is NO flip option"; //CO+DX200213
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}  //CO+DX200213
       }
