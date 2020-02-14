@@ -466,7 +466,11 @@ mesh, the number of energy points, and the smearing width.
       This is especially important for the RS method. The default is 0.05 for the RS method and
       0.0 for the LT method (i.e. no smearing).
 
-Projected DOS can also be calculted using the keyword DOSPROJECTIONS:
+Projected DOS can be calculted using the keyword DOS_PROJECT:
+
+         [AFLOW_APL]DOS_PROJECT=ON
+
+The default is OFF. Projections along specific directions can be added using DOSPROJECTIONS:
 
         [AFLOW_APL]DOSPROJECTIONS_CART=1,0,0;0,1,0;0,0,1
                                  or
@@ -474,7 +478,7 @@ Projected DOS can also be calculted using the keyword DOSPROJECTIONS:
 
 Where DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC give the projection directions in Cartesian and
 fractional coordinates, respectively. It is not possible to choose both options. If neither option
-is populated, projected DOS will not be calculated.
+is populated, atom-projected DOS will be calculated.
 
 Each projection vector triplet needs to be separated by a semicolon, and the coordinates inside the
 triplets must be separated by commas. The projection vectors have to be given in Cartesian

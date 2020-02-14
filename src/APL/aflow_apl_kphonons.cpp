@@ -355,6 +355,7 @@ namespace KBIN {
     string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO190114 - initialize everything
     bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false, USER_ZEROSTATE_CHGCAR = false; //CO190114 - initialize everything
     bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO190114 - initialize everything
+    bool USER_DOS_PROJECT = false;  // ME200213
     double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO190114 - initialize everything  
     int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO190114 - initialize everything
     vector<int> USER_DOS_MESH(3);
@@ -395,6 +396,7 @@ namespace KBIN {
       if (key == "DOSMETHOD") {USER_DOS_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
       if (key == "DOSSMEAR") {USER_DOS_SMEAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
       if (key == "DOSPOINTS") {USER_DOS_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
+      if (key == "DOS_PROJECT") {USER_DOS_PROJECT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME200213
       if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME190625
       if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME190625
       if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
@@ -560,30 +562,36 @@ namespace KBIN {
         USER_DOS_MESH[2] = aurostd::string2utype<int>(tokens[2]);
       }
       // ME190625 - projected DOS
-      if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() || !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
-        if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
-          message = "Ambiguous input in APL DOS projections. ";
-          message += "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
-          //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
-        } else {
-          string projscheme;
-          if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty()) projscheme = USER_DOS_PROJECTIONS_CART_SCHEME;
-          else projscheme = USER_DOS_PROJECTIONS_FRAC_SCHEME;
-          aurostd::string2tokens(projscheme, tokens, "; ");
-          for (uint i = 0; i < tokens.size(); i++) {
-            vector<double> proj;
-            aurostd::string2tokens(tokens[i], proj, ", ");
-            if (proj.size() == 3) {
-              USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
-            } else {
-              message = "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
-              message += string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
-              message += "See README_AFLOW_APL.TXT for the correct format.";
-              //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      // ME200213 - now has fully atom projected DOS (use zero vector to indicate)
+      if (USER_DOS_PROJECT) {
+        if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() || !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
+          if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
+            message = "Ambiguous input in APL DOS projections. ";
+            message += "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
+            //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
+          } else {
+            string projscheme;
+            if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty()) projscheme = USER_DOS_PROJECTIONS_CART_SCHEME;
+            else projscheme = USER_DOS_PROJECTIONS_FRAC_SCHEME;
+            aurostd::string2tokens(projscheme, tokens, "; ");
+            for (uint i = 0; i < tokens.size(); i++) {
+              vector<double> proj;
+              aurostd::string2tokens(tokens[i], proj, ", ");
+              if (proj.size() == 3) {
+                USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
+              } else {
+                message = "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
+                message += string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
+                message += "See README_AFLOW_APL.TXT for the correct format.";
+                //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+                throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+              }
             }
           }
+        } else {
+          xvector<double> proj(3);
+          USER_DOS_PROJECTIONS.push_back(proj);
         }
       }
     }
