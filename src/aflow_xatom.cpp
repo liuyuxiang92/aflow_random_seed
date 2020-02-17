@@ -5330,6 +5330,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
   }
+  if(det(a.lattice)<0.0){ //CO200201
+    message << "Found negative determinant for lattice (det()=" << det(a.lattice) << "). Flip your basis."; //CO200201
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO200201
+  } //CO200201
 
   // ---------------------------------------------------------------
   if(LDEBUG) cerr << soliloquy << " DONE [99]" << endl;
@@ -12207,11 +12211,11 @@ xstructure SetScale(const xstructure& a,const double &in_scale) {
 void xstructure::SetVolume(const double &in_volume) {
   //[CO200201]if(in_volume==0.0) { cerr << _AUROSTD_XLIBS_ERROR_ << "structure::SetVolume in_scale must be non zero" << endl;exit(0);}
   if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO200201
-  if(det(lattice)<0.0){
-    stringstream message;
-    message << "Found negative determinant for lattice (det()=" << det(lattice) << "). Flip your basis.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_);
-  }
+  if(det(lattice)<0.0){ //CO200201
+    stringstream message; //CO200201
+    message << "Found negative determinant for lattice (det()=" << det(lattice) << "). Flip your basis."; //CO200201
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_); //CO200201
+  } //CO200201
   scale=std::pow((double) in_volume/det(lattice),(double) 1.0/3.0);
   FixLattices();  // touched scale, then fix the lattices
 }
@@ -12221,10 +12225,10 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
   if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO200201
   xstructure b;b=a;
   if(det(b.lattice)<0.0){ //CO200201
-    stringstream message;
-    message << "Found negative determinant for lattice (det()=" << det(b.lattice) << "). Flip your basis.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_);
-  }
+    stringstream message; //CO200201
+    message << "Found negative determinant for lattice (det()=" << det(b.lattice) << "). Flip your basis."; //CO200201
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_); //CO200201
+  } //CO200201
   b.scale=std::pow((double) in_volume/det(b.lattice),(double) 1.0/3.0);
   b.FixLattices(); // touched scale, need to fix the lattices
   return b;
