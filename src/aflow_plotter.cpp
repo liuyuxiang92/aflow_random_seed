@@ -921,6 +921,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    patchDefaultTitleAFLOWIN(plotoptions);  // ME200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
@@ -974,6 +975,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    patchDefaultTitleAFLOWIN(plotoptions);  // ME200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
