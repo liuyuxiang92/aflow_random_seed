@@ -1,6 +1,5 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
-        Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
         -- Sped up determination of irreducible tetrahedra for the tetrahedron method. (ME)
         -- Sped up APL force constant matrix calculation. (ME)
         -- Sped up the calculation of the dynamical matrix. (ME)
