@@ -1,6 +1,7 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- added error for non-standard prototypes that create structures with atoms too close (CO+DX)
+        -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
