@@ -2011,17 +2011,22 @@ namespace aflowlib {
         }
       }
       if(mode==LIBRARY_MODE_ICSD) {
-        if(NearestNeighbour(str)<_XPROTO_TOO_CLOSE_ERROR_ && flip_option==FALSE && SpaceGroupOptionRequired(str.spacegroupnumber)==TRUE) {
-          // *voss << "AFLOW WARNING (aflow_xproto.cpp): label=" << label << " WRONG NNdist too close =" << NearestNeighbour(str) << "   *************"  << endl;
-          *voss << "AFLOW WARNING (aflow_xproto.cpp): Too close NNdist(" << NearestNeighbour(str) << "), Spacegroup=" << str.spacegroupnumber << " option=" << str.spacegroupnumberoption << " not enough, try flip_option " << endl;
-          xstructure str_flipped;
-          str_flipped=aflowlib::PrototypeLibraries(*voss,label,parameters,vatomX,vvolumeX,volume_in,mode,TRUE);
-          str_flipped.title+=" (sg.opt flipped)";
-          str_flipped.species_pp=str_flipped.species;
-          *voss << "AFLOW WARNING (aflow_xproto.cpp): Spacegroup=" << str.spacegroupnumber << " option=" << str.spacegroupnumberoption <<" flipped to option=" << str_flipped.spacegroupnumberoption << endl;
-          if(isTET) aflowlib::PrototypeFixTET(*voss,str_flipped,optionsTET);
-          return str_flipped;
-        }
+        double nn_dist=NearestNeighbour(str); //CO+DX200213
+        if(nn_dist<_XPROTO_TOO_CLOSE_ERROR_){ //CO+DX200213
+          if(flip_option==FALSE && SpaceGroupOptionRequired(str.spacegroupnumber)==TRUE) {  //CO+DX200213
+            // *voss << "AFLOW WARNING (aflow_xproto.cpp): label=" << label << " WRONG NNdist too close =" << nn_dist << "   *************"  << endl;
+            *voss << "AFLOW WARNING (aflow_xproto.cpp): Too close NNdist(" << nn_dist << "), Spacegroup=" << str.spacegroupnumber << " option=" << str.spacegroupnumberoption << " not enough, trying flip_option " << endl;
+            xstructure str_flipped;
+            str_flipped=aflowlib::PrototypeLibraries(*voss,label,parameters,vatomX,vvolumeX,volume_in,mode,TRUE);
+            str_flipped.title+=" (sg.opt flipped)";
+            str_flipped.species_pp=str_flipped.species;
+            *voss << "AFLOW WARNING (aflow_xproto.cpp): Spacegroup=" << str.spacegroupnumber << " option=" << str.spacegroupnumberoption <<" flipped to option=" << str_flipped.spacegroupnumberoption << endl;
+            if(isTET) aflowlib::PrototypeFixTET(*voss,str_flipped,optionsTET);
+            return str_flipped;
+          }
+          stringstream message; //CO+DX200213
+          message << "atoms are too close (nn_dist=" << nn_dist << " Angstroms) and there is NO flip option"; //CO+DX200213
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}  //CO+DX200213
       }
       if(mode==LIBRARY_MODE_ICSD) {
         if(DEBUG_ICSD) {
