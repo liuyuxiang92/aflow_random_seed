@@ -1576,7 +1576,7 @@ namespace KBIN {
       if (USER_ENGINE == string("DM")) {
         apl::DirectMethodPC* phcalcdm = new apl::DirectMethodPC(supercell, clusters, xinput, aflags,
             kflags, xflags, AflowIn, logger);
-        phcalcdm->isPolarMaterial(USER_POLAR);                                                       // TRY POLAR [STEFANO]
+        phcalcdm->setPolarMaterial(USER_POLAR);  // ME200218
         phcalcdm->setTCOND(USER_TCOND);
         //phcalcdm->setGeneratePlusMinus(USER_DISTORTIONS_PLUS_MINUS_OPTION.option); //CO auto
         phcalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
@@ -1604,7 +1604,7 @@ namespace KBIN {
         phcalc.reset(new apl::LinearResponsePC(supercell, clusters, xinput, aflags,
               kflags, xflags, AflowIn, logger));
         phcalc->setTCOND(USER_TCOND);
-        phcalc->isPolarMaterial(USER_POLAR);
+        phcalc->setPolarMaterial(USER_POLAR);  // ME200218
         //phcalcdm->setCalculateZeroStateForces(USER_ZEROSTATE_OPTION.option);
       }
 
