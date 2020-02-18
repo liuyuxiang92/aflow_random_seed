@@ -826,7 +826,7 @@ namespace apl {
       //xvector<double> getEigenvalues(const xvector<double>&);  // OBSOLETE ME200206
       xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
           xmatrix<xcomplex<double> >&, vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
-      void isPolarMaterial(bool b) { _isPolarMaterial = b; }
+      void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME200218
       void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
       void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO190108
       void setCalculateZeroStateForces(bool b) { _calculateZeroStateForces = b; }
