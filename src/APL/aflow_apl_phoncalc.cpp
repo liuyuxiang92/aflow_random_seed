@@ -1403,7 +1403,7 @@ namespace apl {
     //[CO191112 - OBSOLETE]}
     //[CO191112 - OBSOLETE]return forces;
   }
-  
+
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME180827 - Overloaded to calculate derivative and eigenvectors for AAPL
