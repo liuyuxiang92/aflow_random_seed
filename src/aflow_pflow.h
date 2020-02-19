@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -9,6 +9,7 @@
 
 #include "aflow.h"
 #include "aflow_compare_structure.h" //DX 20190314
+#include "aflow_cce.h" //RF 20200203
 
 // pflow prototypes
 // aflow_pflow.cpp
@@ -371,7 +372,6 @@ namespace pflow {
   // [OBSOLETE] string PLATON(vector<string>,istream& input);
   string PLATON(string options,istream& input);
   // DX 9/26/17 [OBSOLETE] string SG(string options,istream& input,string mode,string print);
-  void CCE(aurostd::xoption& flags);	//RF190603
   string SG(aurostd::xoption& vpflow,istream& input,string mode,string print);
   // [OBSOLETE]  string SG(string mode,string print,vector<string>,istream& input);
   void STATDIEL(vector<string>& argv); // CAMILO
@@ -905,7 +905,7 @@ namespace pflow {
 #endif
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

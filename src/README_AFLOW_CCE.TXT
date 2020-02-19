@@ -1,13 +1,13 @@
 ********************************************************************************
 *                                                                              *
-*             Aflow STEFANO CURTAROLO - Duke University 2003-2019              *
+*             Aflow STEFANO CURTAROLO - Duke University 2003-2020              *
 *                High-Throughput ab-initio Materials Discovery                 *
 *                                                                              *
 ********************************************************************************
 LATEST VERSION OF THE FILE:        materials.duke.edu/AFLOW/README_AFLOW_CCE.TXT
 ********************************************************************************
 
-Written by Rico Friedrich and Corey Oses, 2019
+Written by Rico Friedrich, Corey Oses, and Marco Esters, 2019-2020
 
 USER INSTRUCTIONS:
 
@@ -15,7 +15,7 @@ USER INSTRUCTIONS:
 Implementation to obtain corrected DFT formation enthalpies is based on the coordination corrected 
 enthalpies (CCE) methodology described in:
 Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);
-https://doi.org/10.1038/s41524-019-0192-1.
+https://doi.org/10.1038/s41524-019-0192-1
 Please cite this article when using this method and/or this implementation.
 The corrections depend on the number of cation-anion bonds and on the cation oxidation state.
 The current implementation requires a structure file in VASP5 POSCAR format as input and will 
@@ -45,7 +45,7 @@ Details for the options available are explained in the following.
 --dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies, 
                             they are assumed to be: (i) negative for compounds lower in energy 
                             than the elements, (ii) in eV/cell. Currently, corrections are available 
-                            for PBE, LDA and SCAN (no DFT+U yet).
+                            for PBE, LDA and SCAN.
 --functionals=              Provide a comma separated list with the functionals in the same sequence 
                             as the DFT formation energies they correspond to. These can be:
                             (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation 
