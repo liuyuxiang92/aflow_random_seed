@@ -1161,7 +1161,7 @@ namespace cce {
     // sort species, electronegativities, number of preferred/all oxidation states, and preferred/all oxidation states strings ascending by electronegativity
     // the anion species should always be the last one with the highest electronegativity
     CCE_sort_species_pref_all_ox_states_by_electronegativity(structure, cce_vars);
-    // ME Nov. 2020 for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
+    // ME Nov. 2019 for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
     uint natoms = structure.atoms.size();
     cce_vars.cations_map.resize(num_cation_species);
     uint i = 0;
@@ -2028,7 +2028,7 @@ namespace cce {
   }
 
   //CCE_determine_cation_oxidation_states////////////////////////////////////////////////////////
-  // ME Nov. 2020
+  // ME Nov. 2019
   // for avoiding recursion algorithm to determine cation oxidation_numbers
   // determine the cation oxidation numbers by using possible oxidation states for each species 
   // which can be either the preferred or all known oxidation numbers

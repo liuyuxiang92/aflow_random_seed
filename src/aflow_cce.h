@@ -88,7 +88,7 @@ namespace cce {
   void CCE_treat_Co3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   void CCE_treat_alkali_sesquioxide_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   void CCE_try_all_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
-  void CCE_determine_cation_oxidation_states(const vector<vector<double> >& possible_ox_states, const xstructure& structure, CCE_Variables& cce_vars); // ME Nov. 2020
+  void CCE_determine_cation_oxidation_states(const vector<vector<double> >& possible_ox_states, const xstructure& structure, CCE_Variables& cce_vars); // ME Nov. 2019
   void CCE_print_oxidation_states_and_sum(CCE_Variables& cce_vars, const xstructure& structure);
   double CCE_print_oxidation_states_and_get_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   double CCE_get_oxidation_states_sum(CCE_Variables& cce_vars);
