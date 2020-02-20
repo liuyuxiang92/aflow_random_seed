@@ -855,7 +855,6 @@ namespace apl {
       void calculateAnharmonicIFCs(ClusterSet&);
       void readAnharmonicIFCs(const string&, ClusterSet&);
       //******* END ME ************
-      bool _stagebreak;  // ME191029
       // Interface
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
       xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  // ME200206
@@ -877,8 +876,8 @@ namespace apl {
       /* friend void readBornEffectiveChargesFromOUTCAR(apl::PhononCalculator *pcalculator); */
       /* friend void symmetrizeBornEffectiveChargeTensors(apl::PhononCalculator *pcalculator); */
       /* friend void readDielectricTensorFromOUTCAR(apl::PhononCalculator *pcalculator); */
-      void runVASPCalculationsBE(_xinput&, uint=0); // ME190113
-      void runVASPCalculationsLRBE(_xinput&, bool, uint=0);  // ME181024 // ME190113
+      bool runVASPCalculationsBE(_xinput&, uint=0); // ME190113
+      bool runVASPCalculationsLRBE(_xinput&, bool, uint=0);  // ME181024 // ME190113
       void calculateDielectricTensor(const _xinput&);  // ME191029
       void readBornEffectiveChargesFromAIMSOUT(void);
       void readBornEffectiveChargesFromOUTCAR(const _xinput&);  // ME190113
@@ -888,7 +887,7 @@ namespace apl {
       void get_special_inputs(string& AflowIn);                                    //PINKU
       void get_NCPUS(string& ncpus);  //CO 180214
       void get_NCPUS(int& ncpus);     //CO 180214
-      virtual void runVASPCalculations(bool) {}  // ME191029
+      virtual bool runVASPCalculations(bool) = 0;  // ME191029
       string zerostate_dir;  // ME191030
   };
 }  // namespace apl
@@ -914,7 +913,7 @@ namespace apl {
           vector<xvector<double> >&,
           bool integrate_equivalent_distortions=true);  //CO190114
       bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO190218
-      void runVASPCalculations(bool);  // ME190412
+      bool runVASPCalculations(bool);  // ME190412
       // BORN
       /* void runVASPCalculationsBE(); */
       /* void readBornEffectiveChargesFromOUTCAR(); */
@@ -1071,7 +1070,7 @@ namespace apl {
   class LinearResponsePC : public PhononCalculator {
     private:
       /* void runVASPCalculationsBE(); */
-      void runVASPCalculationsDFPT(_xinput&);  // ME190113  // ME200213 - changed name
+      bool runVASPCalculationsDFPT(_xinput&);  // ME190113  // ME200213 - changed name
       /* void readBornEffectiveChargesFromOUTCAR(); */
       /* void symmetrizeBornEffectiveChargeTensors(); */
       /* void readDielectricTensorFromOUTCAR(); */
@@ -1081,7 +1080,7 @@ namespace apl {
       LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
       ~LinearResponsePC();
       void clear();
-      void runVASPCalculations(bool);  // ME191029
+      bool runVASPCalculations(bool);  // ME191029
       void calculateForceConstants();  // ME200211
   };
 }  // namespace apl

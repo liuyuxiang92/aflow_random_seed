@@ -25,7 +25,6 @@ namespace apl {
       } else {
         _system = _supercell.getInputStructure().title;
       }
-      _stagebreak = false;  // ME191029
       zerostate_dir = "";  // ME191030
     }
 
@@ -65,7 +64,6 @@ namespace apl {
     _isGammaEwaldPrecomputed = that._isGammaEwaldPrecomputed;
     _gammaEwaldCorr = that._gammaEwaldCorr;
     _anharmonicIFCs = that._anharmonicIFCs;
-    _stagebreak = that._stagebreak;
     zerostate_dir = that.zerostate_dir;
   }
   // ME191228 - END
@@ -98,7 +96,6 @@ namespace apl {
     _gammaEwaldCorr.clear();
 
     _bornEffectiveChargeTensor.clear();
-    _stagebreak = false;  // ME191029
     zerostate_dir = "";  // ME191030
   }
 

@@ -34,8 +34,9 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
 
-  void DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
+  bool DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
     string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO190218
+    bool stagebreak = false;
 
     // Check if supercell is already built
     if (!_supercell.isConstructed()) {
@@ -162,7 +163,7 @@ namespace apl {
             // [OBSOLETE - 190228]    (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
             // [OBSOLETE - 190228]  xInputs[idxRun].getXStr().is_vasp5_poscar_format = false;
             // [OBSOLETE - 190228] }
-            _stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || _stagebreak);
+            stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || _stagebreak);
           }
           // For AIMS, use the old method until we have AVASP_populateXAIMS
           if (_kbinFlags.AFLOW_MODE_AIMS) {
@@ -171,6 +172,7 @@ namespace apl {
             if (!filesExistPhonons(xInputs[idxRun])) {
               _logger << "Creating " << xInputs[idxRun].getDirectory() << apl::endl;
               createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], _logger.getOutputStream());
+              stagebreak = true;
             }
           }
         }
@@ -197,7 +199,7 @@ namespace apl {
       // For VASP, use the standardized aflow.in creator
       if(_kbinFlags.AFLOW_MODE_VASP){
         xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
-        _stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || _stagebreak); //ME181226
+        stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || _stagebreak); //ME181226
       }
       // For AIMS, use the old method until we have AVASP_populateXAIMS //ME181226
       if(_kbinFlags.AFLOW_MODE_AIMS){
@@ -206,6 +208,7 @@ namespace apl {
         if (!filesExistPhonons(xInputs[idxRun])) {
           _logger << "Creating " << xInputs[idxRun].getDirectory() << apl::endl;
           createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], _logger.getOutputStream());
+          stagebreak = true;
         }
       }
     }
@@ -215,9 +218,10 @@ namespace apl {
     if (_isPolarMaterial) {
       // Calc. Born effective charge tensors and dielectric constant matrix
       _xinput xinpBE(_xInput);  // ME190113
-      runVASPCalculationsBE(xinpBE, xInputs.size());  // ME190113
+      stagebreak = (runVASPCalculationsBE(xinpBE, xInputs.size()) || stagebreak);  // ME190113
       xInputs.push_back(xinpBE);
     }
+    return stagebreak;
     // END STEFANO
   }
 

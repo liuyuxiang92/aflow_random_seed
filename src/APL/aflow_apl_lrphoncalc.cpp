@@ -21,27 +21,29 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
+  bool LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
     if (zerostate_chgcar) {
       _logger << apl::warning << "ZEROSTATE_CHGCAR not implemented for"
         << " linear response calculations." << apl::endl;
     }
+    bool stagebreak = false;
 
     // Call VASP to calculate forces by LR
     _xInput.xvasp.AVASP_arun_mode = "APL";
     xInputs.clear();
     xInputs.push_back(_xInput);
-    runVASPCalculationsDFPT(xInputs[0]);
+    stagebreak = runVASPCalculationsDFPT(xInputs[0]);
     if (_isPolarMaterial) {
       xInputs.push_back(_xInput);
-      runVASPCalculationsBE(xInputs[1]);
+      stagebreak = (runVASPCalculationsBE(xInputs[1]) || stagebreak);
     }
+    return stagebreak;
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // Wrapper function to run the linear response (force fields) calculation.
-  void LinearResponsePC::runVASPCalculationsDFPT(_xinput& xinp) {  // ME200213
-    runVASPCalculationsLRBE(xinp, false);
+  bool LinearResponsePC::runVASPCalculationsDFPT(_xinput& xinp) {  // ME200213
+    return runVASPCalculationsLRBE(xinp, false);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -53,15 +55,16 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
   // Wrapper function to calculate the Born effective charge tensor and the
   // dilectric tensor.
-  void PhononCalculator::runVASPCalculationsBE(_xinput& xinp, uint ncalcs) { // ME190113
-    runVASPCalculationsLRBE(xinp, true, ncalcs);
+  bool PhononCalculator::runVASPCalculationsBE(_xinput& xinp, uint ncalcs) { // ME190113
+    return runVASPCalculationsLRBE(xinp, true, ncalcs);
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // A unified function to handle Born effective charge and force fields
   // calculations. Both methods require similar treatment, so it is cleaner to
   // use only one function for both methods.
-  void PhononCalculator::runVASPCalculationsLRBE(_xinput& xInput, bool born, uint ncalcs) { // ME190112
+  bool PhononCalculator::runVASPCalculationsLRBE(_xinput& xInput, bool born, uint ncalcs) { // ME190112
+    bool stagebreak = false;
 
     //_xinput xInput(_xInput); OBSOLETE ME190113
     if (born) {
@@ -101,7 +104,7 @@ namespace apl {
       // Set POSCAR to VASP5 format
       xInput.getXStr().is_vasp4_poscar_format = false;
       xInput.getXStr().is_vasp5_poscar_format = true;
-      _stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInput) || _stagebreak);
+      stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInput) || stagebreak);
     }
     // For AIMS, use the old method until we have AVASP_populateXAIMS
     if(xInput.AFLOW_MODE_AIMS) {
@@ -115,8 +118,10 @@ namespace apl {
       if (!filesExistPhonons(xInput)) {
         _logger << "Creating " << xInput.getDirectory() << apl::endl;
         createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, _logger.getOutputStream());
+        stagebreak = true;
       }
     }
+    return stagebreak;
   }
 
   //////////////////////////////////////////////////////////////////////////////

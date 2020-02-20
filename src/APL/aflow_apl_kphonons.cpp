@@ -1648,7 +1648,7 @@ namespace KBIN {
       //QHA/SCQHA/QHA3P END
 
       // ME191029 - Reordered APL workflow to accommodate ZEROSTATE CHGCAR
-      phcalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
+      bool stagebreak = phcalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
 
       // ME180820 - set up VASP calculations for thermal conductivity calculations
       bool aapl_stagebreak = false;
@@ -1661,7 +1661,7 @@ namespace KBIN {
         aapl_stagebreak = false;
       }
       // ME1901029 - BEGIN
-      phcalc->_stagebreak = (phcalc->_stagebreak || aapl_stagebreak);
+      stagebreak = (stagebreak || aapl_stagebreak);
 
       // Run ZEROSTATE calculation if ZEROSTATE CHGCAR
       if (USER_ZEROSTATE_CHGCAR && !XHOST.GENERATE_AFLOWIN_ONLY) {
@@ -1678,7 +1678,7 @@ namespace KBIN {
         }
       }
 
-      if (phcalc->_stagebreak) {
+      if (stagebreak) {
         throw apl::APLStageBreak();
       }
       // ME1901029 - END
