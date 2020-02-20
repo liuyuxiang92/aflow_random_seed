@@ -112,7 +112,7 @@ namespace apl {
 
         // Create aflow.in files if they don't exist. Stagebreak is true as soon
         // as one aflow.in file was created.
-        stagebreak = (createAflowInPhonons(xinp[idxRun]) || stagebreak);
+        stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xinp[idxRun]) || stagebreak);
         idxRun++;
       }
     }
@@ -144,7 +144,7 @@ namespace apl {
 
           // Create aflow.in files if they don't exist. Stagebreak is true as soon
           // as one aflow.in file was created.
-          stagebreak = (createAflowInPhonons(xinp[idxRun]) || stagebreak);
+          stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xinp[idxRun]) || stagebreak);
           idxRun++;
         }
       }
@@ -225,7 +225,7 @@ namespace apl {
     if (!outfileFoundAnywherePhonons(xInputsAAPL[o])) {
       throw APLStageBreak();
     }
-    outfileFoundEverywherePhonons(xInputsAAPL[o]);
+    outfileFoundEverywherePhonons(xInputsAAPL[o], _logger.getOutputStream());
     if (_calculateZeroStateForces) {
       // xInputs is empty if APL awakes, so generate the ZEROSTATE input
       if (xInputs.size() == 0) {
@@ -246,7 +246,7 @@ namespace apl {
       }
       uint zeroindex = xInputs.size() - 1;
       if (_isPolarMaterial) zeroindex--;
-      subtractZeroStateForcesAAPL(xInputsAAPL[o], xInputs[zeroindex]);
+      subtractZeroStateForces(xInputsAAPL[o], xInputs[zeroindex]);
     }
     AnharmonicIFCs ifcs(xInputsAAPL[o], clst, DISTORTION_MAGNITUDE,
         anharmonic_IFC_options, _logger, _aflowFlags);
@@ -264,46 +264,6 @@ namespace apl {
     _anharmonicIFCs.push_back(ifcs);
     // Clear runs from memory because they are no longer needed
     xInputsAAPL[o].clear();
-  }
-
-  // ME190114
-  // Cannot use const reference for zerostate because of getXStr()
-  void PhononCalculator::subtractZeroStateForcesAAPL(vector<_xinput>& xinps, _xinput& zerostate) {
-    string function = _AAPL_FORCES_ERR_PREFIX_ + "subtractZeroStateForcesAAPL()";
-    if (!zerostate.getXStr().qm_calculated) {
-      if (_kbinFlags.AFLOW_MODE_VASP) {
-        string vasprunxml_file = zerostate.getDirectory() + string("/vasprun.xml.static");
-        if (!aurostd::EFileExist(vasprunxml_file)) {
-          vasprunxml_file = zerostate.getDirectory() + string("/vasprun.xml");
-          if (!aurostd::EFileExist(vasprunxml_file)) {
-            _logger << apl::warning << "The output file in the directory " << zerostate.getDirectory() << " is missing." << apl::endl;
-
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Missing data from the ZEROSTATE calculation.", _FILE_NOT_FOUND_);
-          }
-        }
-        xVASPRUNXML vasprunxml;
-        vasprunxml.GetForcesFile(vasprunxml_file);
-        zerostate.getXStr().qm_forces = vasprunxml.vforces;
-      } else if (_kbinFlags.AFLOW_MODE_AIMS) {
-        if (!aurostd::EFileExist(zerostate.getDirectory() + string("/aims.out"))) {
-          _logger << apl::warning << "The aims.out file in " << zerostate.getDirectory() << " directory is missing." << apl::endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Missing data from the ZEROSTATE calculation", _FILE_NOT_FOUND_);
-        }
-        xAIMSOUT xaimsout(zerostate.getDirectory() + "/aims.out");
-        zerostate.getXStr().qm_forces = xaimsout.vforces;
-      }
-      if ((int) zerostate.getXStr().qm_forces.size() != _supercell.getNumberOfAtoms()) {
-        _logger << apl::warning << "The output file in " << zerostate.getDirectory() << " is contains less entries than atoms in the supercell." << apl::endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Missing data from one job.", _RUNTIME_ERROR_);
-      }
-    }
-    for (uint idxRun = 0; idxRun < xinps.size(); idxRun++) {
-      for (int at = 0; at < _supercell.getNumberOfAtoms(); at++) {
-        xinps[idxRun].getXStr().qm_forces[at](1) = xinps[idxRun].getXStr().qm_forces[at](1) - zerostate.getXStr().qm_forces[at](1);
-        xinps[idxRun].getXStr().qm_forces[at](2) = xinps[idxRun].getXStr().qm_forces[at](2) - zerostate.getXStr().qm_forces[at](2);
-        xinps[idxRun].getXStr().qm_forces[at](3) = xinps[idxRun].getXStr().qm_forces[at](3) - zerostate.getXStr().qm_forces[at](3);
-      }
-    }
   }
 
 } // namespace apl

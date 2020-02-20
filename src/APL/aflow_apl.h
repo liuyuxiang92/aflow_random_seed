@@ -741,6 +741,17 @@ namespace apl {
 #define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME200213
 
 namespace apl {
+  bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME190108
+  void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
+  bool filesExistPhonons(_xinput&);
+  bool outfileFoundAnywherePhonons(vector<_xinput>&);
+  void outfileFoundEverywherePhonons(vector<_xinput>&, ofstream&, bool=false);  // ME191029
+  void readForcesFromDirectory(_xinput&);  // ME200219
+  void subtractZeroStateForces(vector<_xinput>&, bool);
+  void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME190114
+}
+
+namespace apl {
   class PhononCalculator : virtual public IPhononCalculator {
     protected:
       // USER PARAMETERS
@@ -818,7 +829,7 @@ namespace apl {
       //void createAFLOWIN(const _xvasp&);    //CO 180406 - obsolete
 
     public:
-      PhononCalculator(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
+      PhononCalculator(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
       PhononCalculator& operator=(const PhononCalculator&);
       virtual ~PhononCalculator();
       void clear();
@@ -834,7 +845,6 @@ namespace apl {
       void hibernate();
       void awake();
       //****** BEGIN ME ***********
-      vector<ClusterSet>& _clusters;
       vector<AnharmonicIFCs> _anharmonicIFCs;
       void setAnharmonicOptions(int, double, double);
       bool buildVaspAAPL(const ClusterSet&, bool);
@@ -844,7 +854,6 @@ namespace apl {
           const vector<int>&, const vector<int>&, double scale=1.0);
       void calculateAnharmonicIFCs(ClusterSet&);
       void readAnharmonicIFCs(const string&, ClusterSet&);
-      void subtractZeroStateForcesAAPL(vector<_xinput>&, _xinput&);  // ME190114
       //******* END ME ************
       bool _stagebreak;  // ME191029
       // Interface
@@ -879,15 +888,6 @@ namespace apl {
       void get_special_inputs(string& AflowIn);                                    //PINKU
       void get_NCPUS(string& ncpus);  //CO 180214
       void get_NCPUS(int& ncpus);     //CO 180214
-      // BEGIN ME 180518
-      bool filesExistPhonons(_xinput&);
-      bool createAflowInPhonons(_xinput&); // ME190108
-      void createAflowInPhonons(_xinput&, const string&);
-      bool outfileFoundAnywherePhonons(vector<_xinput>&);
-      void outfileFoundEverywherePhonons(vector<_xinput>&, bool=false);  // ME191029
-      void subtractZeroStateForces(vector<_xinput>&);
-      // END ME 180518
-      vector<xvector<double> > readForcesFromQmvasp(const string&); // ME190607
       virtual void runVASPCalculations(bool) {}  // ME191029
       string zerostate_dir;  // ME191030
   };
@@ -922,7 +922,7 @@ namespace apl {
       /* void readDielectricTensorFromOUTCAR(); */
 
     public:
-      DirectMethodPC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
+      DirectMethodPC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
       ~DirectMethodPC();
       void clear();
       void calculateForceFields();  // ME190412  // ME191029
@@ -997,7 +997,7 @@ namespace apl {
       int _EOS_STATIC_KPPRA;
 
     public:
-      QHA_AFLOWIN_CREATOR(Supercell& sc, vector<ClusterSet>&, _xinput& xinput,
+      QHA_AFLOWIN_CREATOR(Supercell& sc, _xinput& xinput,
           _aflags& aflags, _kflags& kflags,
           _xflags& xflags,
           string&,
@@ -1078,7 +1078,7 @@ namespace apl {
       void readForceConstantsFromVasprun(_xinput&);  // ME200211
 
     public:
-      LinearResponsePC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
+      LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
       ~LinearResponsePC();
       void clear();
       void runVASPCalculations(bool);  // ME191029
@@ -1093,7 +1093,7 @@ namespace apl {
 namespace apl {
   class GeneralizedSupercellApproach : public DirectMethodPC {
     public:
-      GeneralizedSupercellApproach(Supercell&, vector<ClusterSet>&, _xinput&,
+      GeneralizedSupercellApproach(Supercell&, _xinput&,
           _aflags&, _kflags&, _xflags&, //_vflags&, 
           string&, Logger&);
       ~GeneralizedSupercellApproach();
@@ -1625,11 +1625,11 @@ namespace apl {
   class TCONDCalculator {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
-      TCONDCalculator(PhononCalculator&, QMesh&, Logger&, _aflags&);
+      TCONDCalculator(PhononCalculator&, QMesh&, ClusterSet&, Logger&, _aflags&);
       TCONDCalculator(const TCONDCalculator&);
 
       ~TCONDCalculator();
-      void clear(PhononCalculator&, QMesh&, Logger&, _aflags&);
+      void clear(PhononCalculator&, QMesh&, ClusterSet&, Logger&, _aflags&);
 
       aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
       vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
@@ -1652,6 +1652,7 @@ namespace apl {
     private:
       PhononCalculator& _pc;  // Reference to the phonon calculator
       QMesh& _qm;  // Reference to the q-point mesh
+      ClusterSet& _clusters;  // Reference to cluster set
       Logger& _logger;  // The APL logger
       _aflags& aflags;
 

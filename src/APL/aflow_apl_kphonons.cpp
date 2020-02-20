@@ -1574,7 +1574,7 @@ namespace KBIN {
 
       auto_ptr<apl::PhononCalculator> phcalc;
       if (USER_ENGINE == string("DM")) {
-        apl::DirectMethodPC* phcalcdm = new apl::DirectMethodPC(supercell, clusters, xinput, aflags,
+        apl::DirectMethodPC* phcalcdm = new apl::DirectMethodPC(supercell, xinput, aflags,
             kflags, xflags, AflowIn, logger);
         phcalcdm->setPolarMaterial(USER_POLAR);  // ME200218
         phcalcdm->setTCOND(USER_TCOND);
@@ -1601,7 +1601,7 @@ namespace KBIN {
       //  phcalc.reset(gsa);
       //  } //CO200106 - patching for auto-indenting
       else {
-        phcalc.reset(new apl::LinearResponsePC(supercell, clusters, xinput, aflags,
+        phcalc.reset(new apl::LinearResponsePC(supercell, xinput, aflags,
               kflags, xflags, AflowIn, logger));
         phcalc->setTCOND(USER_TCOND);
         phcalc->setPolarMaterial(USER_POLAR);  // ME200218
@@ -1617,7 +1617,7 @@ namespace KBIN {
           CALCULATE_QHA3P_OPTION.option || CALCULATE_QHA3P_A_OPTION.option || CALCULATE_QHA3P_B_OPTION.option || CALCULATE_QHA3P_C_OPTION.option)
       {
 
-        pheos.reset(new apl::QHA_AFLOWIN_CREATOR(supercell, clusters, xinput, aflags,
+        pheos.reset(new apl::QHA_AFLOWIN_CREATOR(supercell, xinput, aflags,
               kflags, xflags, AflowIn, logger));
 
         pheos->setGP(CALCULATE_GRUNEISEN_OPTION.option, CALCULATE_GRUNEISEN_A_OPTION.option, CALCULATE_GRUNEISEN_B_OPTION.option, CALCULATE_GRUNEISEN_C_OPTION.option);
@@ -1653,9 +1653,9 @@ namespace KBIN {
       // ME180820 - set up VASP calculations for thermal conductivity calculations
       bool aapl_stagebreak = false;
       if (USER_TCOND) {
-        aapl_stagebreak = phcalc->buildVaspAAPL(phcalc->_clusters[0], USER_ZEROSTATE_CHGCAR);
+        aapl_stagebreak = phcalc->buildVaspAAPL(clusters[0], USER_ZEROSTATE_CHGCAR);
         if (USER_AAPL_FOURTH_ORDER) {
-          aapl_stagebreak = (phcalc->buildVaspAAPL(phcalc->_clusters[1], USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
+          aapl_stagebreak = (phcalc->buildVaspAAPL(clusters[1], USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
         }
       } else {
         aapl_stagebreak = false;
@@ -2281,7 +2281,7 @@ namespace KBIN {
         // Get anharmonic force constants
         phcalc->setAnharmonicOptions(USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM);
         bool awakeAnharmIFCs;
-        for (uint i = 0; i < phcalc->_clusters.size(); i++) {
+        for (uint i = 0; i < clusters.size(); i++) {
           string ifcs_hib_file = aflags.Directory + "/" +  DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[i];
           if (USER_HIBERNATE) {
             awakeAnharmIFCs = (aurostd::EFileExist(ifcs_hib_file) ||
@@ -2292,7 +2292,7 @@ namespace KBIN {
 
           if (awakeAnharmIFCs) {
             try {
-              phcalc->readAnharmonicIFCs(ifcs_hib_file, phcalc->_clusters[i]);
+              phcalc->readAnharmonicIFCs(ifcs_hib_file, clusters[i]);
             } catch (aurostd::xerror excpt) {
               logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
               logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
@@ -2301,7 +2301,7 @@ namespace KBIN {
           }
 
           if (!awakeAnharmIFCs) {
-            phcalc->calculateAnharmonicIFCs(phcalc->_clusters[i]);
+            phcalc->calculateAnharmonicIFCs(clusters[i]);
             if (USER_HIBERNATE) {
               phcalc->_anharmonicIFCs[i].writeIFCsToFile(ifcs_hib_file);
             }
@@ -2317,7 +2317,7 @@ namespace KBIN {
 
         // Do the thermal conductivity calculation
         logger << "Starting thermal conductivity calculations." << apl::endl;
-        apl::TCONDCalculator tcond(*phcalc, qmtcond, logger, aflags);
+        apl::TCONDCalculator tcond(*phcalc, qmtcond, clusters[0], logger, aflags);
 
         // Set calculation options
         tcond.calc_options.flag("RTA", (USER_BTE == "RTA"));

@@ -3,11 +3,11 @@
 namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
-  LinearResponsePC::LinearResponsePC(Supercell& sc, vector<ClusterSet>& clst,
+  LinearResponsePC::LinearResponsePC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
       _xflags& xflags, //_vflags& vflags, 
       string& AflowIn, Logger& l)
-    : PhononCalculator(sc, clst, xinput, aflags, kflags, xflags, AflowIn, l) {
+    : PhononCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, l) {
       _isPolarMaterial = false;
     }
 
@@ -101,7 +101,7 @@ namespace apl {
       // Set POSCAR to VASP5 format
       xInput.getXStr().is_vasp4_poscar_format = false;
       xInput.getXStr().is_vasp5_poscar_format = true;
-      _stagebreak = (createAflowInPhonons(xInput) || _stagebreak);
+      _stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInput) || _stagebreak);
     }
     // For AIMS, use the old method until we have AVASP_populateXAIMS
     if(xInput.AFLOW_MODE_AIMS) {
@@ -114,7 +114,7 @@ namespace apl {
       xInput.setDirectory( _xInput.getDirectory() + "/" + runname );
       if (!filesExistPhonons(xInput)) {
         _logger << "Creating " << xInput.getDirectory() << apl::endl;
-        createAflowInPhonons(xInput, runname);
+        createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, _logger.getOutputStream());
       }
     }
   }

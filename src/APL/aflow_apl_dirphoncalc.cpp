@@ -6,12 +6,12 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  DirectMethodPC::DirectMethodPC(Supercell& sc, vector<ClusterSet>& clst,
+  DirectMethodPC::DirectMethodPC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
       _xflags& xflags, //_vflags& vflags, 
       string& AflowIn, //this is the file CONTENTS, not the file path
       Logger& l)
-    : PhononCalculator(sc, clst, xinput, aflags, kflags, xflags, AflowIn, l) {
+    : PhononCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, l) {
       //GENERATE_PLUS_MINUS = false; //JAHNATEK ORIGINAL
       AUTO_GENERATE_PLUS_MINUS = true;   //CO
       USER_GENERATE_PLUS_MINUS = false;  //CO
@@ -162,7 +162,7 @@ namespace apl {
             // [OBSOLETE - 190228]    (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
             // [OBSOLETE - 190228]  xInputs[idxRun].getXStr().is_vasp5_poscar_format = false;
             // [OBSOLETE - 190228] }
-            _stagebreak = (createAflowInPhonons(xInputs[idxRun]) || _stagebreak);
+            _stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || _stagebreak);
           }
           // For AIMS, use the old method until we have AVASP_populateXAIMS
           if (_kbinFlags.AFLOW_MODE_AIMS) {
@@ -170,7 +170,7 @@ namespace apl {
             xInputs[idxRun].setDirectory(_xInput.getDirectory() + "/" + runname);
             if (!filesExistPhonons(xInputs[idxRun])) {
               _logger << "Creating " << xInputs[idxRun].getDirectory() << apl::endl;
-              createAflowInPhonons(xInputs[idxRun], runname);
+              createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], _logger.getOutputStream());
             }
           }
         }
@@ -197,7 +197,7 @@ namespace apl {
       // For VASP, use the standardized aflow.in creator
       if(_kbinFlags.AFLOW_MODE_VASP){
         xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
-        _stagebreak = (createAflowInPhonons(xInputs[idxRun]) || _stagebreak); //ME181226
+        _stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || _stagebreak); //ME181226
       }
       // For AIMS, use the old method until we have AVASP_populateXAIMS //ME181226
       if(_kbinFlags.AFLOW_MODE_AIMS){
@@ -205,7 +205,7 @@ namespace apl {
         xInputs[idxRun].setDirectory(_xInput.getDirectory() + "/" + runname);
         if (!filesExistPhonons(xInputs[idxRun])) {
           _logger << "Creating " << xInputs[idxRun].getDirectory() << apl::endl;
-          createAflowInPhonons(xInputs[idxRun], runname);
+          createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], _logger.getOutputStream());
         }
       }
     }
@@ -519,11 +519,11 @@ namespace apl {
     if(!outfileFoundAnywherePhonons(xInputs)){throw APLStageBreak();}
 
     //second pass, make sure it's everywhere!
-    outfileFoundEverywherePhonons(xInputs, _isPolarMaterial);
+    outfileFoundEverywherePhonons(xInputs, _logger.getOutputStream(), _isPolarMaterial);
 
     // Remove zero state forces if necessary
     if (_calculateZeroStateForces) {
-      subtractZeroStateForces(xInputs);
+      subtractZeroStateForces(xInputs, _isPolarMaterial);
     }
 
     // Store forces //////////////////////////////////////////////////////////

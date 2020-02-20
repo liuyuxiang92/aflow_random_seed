@@ -74,8 +74,8 @@ namespace apl {
 namespace apl {
 
   //Constructor///////////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, 
-      Logger& l, _aflags& a) : _pc(pc), _qm(qm), _logger(l), aflags(a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, ClusterSet& clst,
+      Logger& l, _aflags& a) : _pc(pc), _qm(qm), _clusters(clst), _logger(l), aflags(a) {
     free();
     nBranches = _pc.getNumberOfBranches();
     nQPs = _qm.getnQPs();
@@ -83,7 +83,7 @@ namespace apl {
   }
 
   //Copy Constructor//////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _qm(that._qm), _logger(that._logger), aflags(that.aflags) {
+  TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _qm(that._qm), _clusters(that._clusters), _logger(that._logger), aflags(that.aflags) {
     copy(that);
   }
 
@@ -133,8 +133,8 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) {
-    TCONDCalculator that(pc, qm, l, a);
+  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, ClusterSet& clst, Logger& l, _aflags& a) {
+    TCONDCalculator that(pc, qm, clst, l, a);
     copy(that);
   }
 
@@ -290,7 +290,7 @@ namespace apl {
     const Supercell& scell = _pc.getSupercell();
 
     // Inverse masses
-    const vector<_cluster>& clusters = _pc._clusters[0].clusters;
+    const vector<_cluster>& clusters = _clusters.clusters;
     uint nclusters = clusters.size();
     vector<double> invmasses(nclusters);
     for (uint c = 0; c < nclusters; c++) {
@@ -542,7 +542,7 @@ namespace apl {
       const vector<vector<vector<xcomplex<double> > > >& phases) {
     // Prepare and precompute
     const Supercell& scell = _pc.getSupercell();
-    const vector<_cluster>& clusters = _pc._clusters[0].clusters;
+    const vector<_cluster>& clusters = _clusters.clusters;
     uint nclusters = clusters.size();
 
     // Inverse masses

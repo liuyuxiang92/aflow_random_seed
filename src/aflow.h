@@ -2675,6 +2675,8 @@ namespace KBIN {
   bool Legitimate_aflowin(string aflowindir);
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO191110
+  int get_NCPUS();  // ME200219
+  int get_NCPUS(const _kflags&);  // ME200219
 }
 
 // ----------------------------------------------------------------------------
