@@ -81,10 +81,10 @@ matrix:
     #addons homebrew update is NOT a good approach: need the output to prevent timeout
     #multiple env variables must be on the same line: https://docs.travis-ci.com/user/environment-variables/
     #do NOT run brew upgrade: takes longer than 2 hrs (times out)
-    - os: osx
-      osx_image: xcode8
-      env:
-        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew tap && brew untap homebrew/versions && brew update && brew install xz"                                                               MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+    #[homebrew/versions doesn't work]- os: osx
+    #[homebrew/versions doesn't work]  osx_image: xcode8
+    #[homebrew/versions doesn't work]  env:
+    #[homebrew/versions doesn't work]    - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew tap && brew untap homebrew/versions && brew update && brew install xz"                                                               MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
     #    - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz"                                                               MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
     #- os: osx
     #  osx_image: xcode8
