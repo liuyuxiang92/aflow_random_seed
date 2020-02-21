@@ -1186,7 +1186,7 @@ namespace apl {
     xmatrix<xcomplex<double> > dynamicalMatrix0(nBranches, nBranches, 1, 1);
 
     xcomplex<double> phase;
-    double value;
+    double value = 0.0;
     // ME 180828 - Prepare derivative calculation
     xvector<xcomplex<double> > derivative(3);
     // OBSOLETE ME200115 - not used

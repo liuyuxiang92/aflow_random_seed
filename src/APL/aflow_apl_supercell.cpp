@@ -297,7 +297,7 @@ namespace apl {
   // Determine the supercell dimensions of the supercell for different methods
   xvector<int> Supercell::determineSupercellDimensions(const aurostd::xoption& opts) {
     string function = "apl::Supercell::determineSupercellDimensions()";
-    string message;
+    string message = "";
   
     xvector<int> dims(3);
     string method = opts.getattachedscheme("SUPERCELL::METHOD");
@@ -838,7 +838,7 @@ namespace apl {
     // The original structure may be a rotated primitive cell. Transform the
     // primitive cell so that they overlap or else the mapping will not work
     if (_inStructure_original.atoms.size() == _pcStructure.atoms.size()) {
-      xmatrix<double> U = trasp(_inStructure_original.lattice) * inverse(trasp(_pcStructure.lattice));
+      xmatrix<double> U = trasp(_inStructure_original.scale*_inStructure_original.lattice) * inverse(trasp(_pcStructure.scale*_pcStructure.lattice));
       // For a rotation matrix, trasp(U) * U = I
       if (aurostd::isidentity(trasp(U) * U)) {
         pcell = Rotate(pcell, U);
