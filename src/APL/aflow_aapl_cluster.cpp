@@ -184,7 +184,7 @@ namespace apl {
       // Make sure that the factor group is calculated
       if (!pcell.fgroup_calculated) {
         pcell.CalculateSymmetryFactorGroup(false);
-        if (!pcell.pgroup_xtal_calculated) {
+        if (!pcell.fgroup_calculated) {
           string message = "Could not calculate the factor group of the primitive cell.";
           throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
         }
