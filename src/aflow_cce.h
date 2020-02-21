@@ -14,6 +14,7 @@ namespace cce {
   struct CCE_Variables {
     vector<double> dft_energies;
     vector<string> vfunctionals; // should be needed as long as output for corrected dft formation energies is based on vfunctionals
+    vector<uint> offset; // needed for reading corrections from lookup table for different functionals
     double standard_anion_charge;
     vector<double> electronegativities;
     vector<uint> multi_anion_atoms; // vector in which elements will be 1 for multi_anion atoms and 0 otherwise
@@ -23,8 +24,8 @@ namespace cce {
     vector<string> multi_anion_species; // vector storing all the multi anion species
     uint num_perox_bonds;
     uint num_superox_bonds;
-    vector<uint> perox_indices; // array in which elements will be 1 for peroxide O atoms and 0 otherwise; needed for correct setting of oxidation numbers below
-    vector<uint> superox_indices; // array in which elements will be 1 for superoxide O atoms and 0 otherwise; needed for correct setting of oxidation numbers below
+    vector<uint> perox_indices; // vector in which elements will be 1 for peroxide O atoms and 0 otherwise; needed for correct setting of oxidation numbers below
+    vector<uint> superox_indices; // vector in which elements will be 1 for superoxide O atoms and 0 otherwise; needed for correct setting of oxidation numbers below
     vector<uint> num_neighbors;
     vector<int> num_pref_ox_states;
     vector<string> pref_ox_states_strings;
@@ -38,12 +39,12 @@ namespace cce {
     vector<vector<int> > cations_map;
     double oxidation_sum; // double because for superoxides O ox. number is -0.5
     vector<double> Bader_charges;
-    vector<vector<double> > corrections_atom; // corrections for each atom (2nd dimension); rows 0 & 1 for PBE for 0 & 298.15K, 2 & 3 for LDA, 4 & 5 for SCAN, 6 & 7 for PBE+U_ICSD, and 8 for exp (only 298.15K)
+    vector<vector<double> > corrections_atom; // 1st dim. is number of functionals*2 (vfunctionals.size()*2) i.e. 298.15 & 0K corrections for each functional; 2nd dimension for corrections for each atom
     vector<vector<vector<double> > > multi_anion_corrections_atom; // 1st dim. for multi_anion_species, 2nd dim. for functionals and temperatures as above, 3rd dim. for corrections for each atom
-    vector<double> perox_correction; // peroxide correction per cell, rows 0 & 1 for PBE for 0 & 298.15K, 2 & 3 for LDA, 4 & 5 for SCAN, 6 & 7 for PBE+U_ICSD, and 8 for exp (only 298.15K)
-    vector<double> superox_correction; // superoxide correction per cell, rows 0 & 1 for PBE for 0 & 298.15K, 2 & 3 for LDA, 4 & 5 for SCAN, 6 & 7 for PBE+U_ICSD, and 8 for exp (only 298.15K)
-    vector<double> cce_correction; // total correction per cell, rows 0 & 1 for PBE for 0 & 298.15K, 2 & 3 for LDA, 4 & 5 for SCAN, 6 & 7 for PBE+U_ICSD, and 8 for exp (only 298.15K)
-    vector<double> cce_form_energy_cell; // CCE formation enthalpy per cell, rows 0 & 1 for PBE for 0 & 298.15K, 2 & 3 for LDA, 4 & 5 for SCAN, 6 & 7 for PBE+U_ICSD, and 8 for exp (only 298.15K)
+    vector<double> perox_correction; // peroxide correction per cell for functionals and temperatures as above
+    vector<double> superox_correction; // superoxide correction per cell for functionals and temperatures as above
+    vector<double> cce_correction; // total correction per cell for functionals and temperatures as above
+    vector<double> cce_form_energy_cell; // CCE formation enthalpy per cell for functionals and temperatures as above
   };
 
   // main CCE functions
@@ -60,6 +61,7 @@ namespace cce {
   // read user input (from command line)
   xstructure CCE_read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   void CCE_get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
+  string CCE_get_offset(const string& functional);
   vector<double> CCE_get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   // initialise flags and variables
   aurostd::xoption CCE_init_flags(); // ME 200213
