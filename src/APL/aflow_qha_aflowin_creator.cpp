@@ -81,6 +81,7 @@ namespace apl {
     _EOS_VOL_END=0.0;
     _EOS_VOL_INC=0.0;
     _lattice_index=-1;
+    _PSTRESS = ""; // ME200220
   }
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::run_qha()

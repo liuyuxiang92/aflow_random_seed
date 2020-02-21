@@ -1812,6 +1812,8 @@ class xstructure {
     void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
 
+void LightCopy(const xstructure&, xstructure&);  // ME200220
+
 // CO 180420
 //for stream management with objects
 class xStream {

@@ -74,8 +74,7 @@ namespace apl {
 namespace apl {
 
   //Constructor///////////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, ClusterSet& clst,
-      Logger& l, _aflags& a) : _pc(pc), _qm(qm), _clusters(clst), _logger(l), aflags(a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) : _pc(pc), _qm(qm), _logger(l), aflags(a) {
     free();
     nBranches = _pc.getNumberOfBranches();
     nQPs = _qm.getnQPs();
@@ -83,7 +82,7 @@ namespace apl {
   }
 
   //Copy Constructor//////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _qm(that._qm), _clusters(that._clusters), _logger(that._logger), aflags(that.aflags) {
+  TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _qm(that._qm), _logger(that._logger), aflags(that.aflags) {
     copy(that);
   }
 
@@ -133,8 +132,8 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, ClusterSet& clst, Logger& l, _aflags& a) {
-    TCONDCalculator that(pc, qm, clst, l, a);
+  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) {
+    TCONDCalculator that(pc, qm, l, a);
     copy(that);
   }
 
@@ -286,16 +285,16 @@ namespace apl {
     // Prepare and precompute
     vector<vector<double> > grueneisen(nIQPs, vector<double>(nBranches));
 
-    const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[0].force_constants;
+    const vector<vector<double> >& ifcs = _pc.anharmonicIFCs[0];
     const Supercell& scell = _pc.getSupercell();
 
     // Inverse masses
-    const vector<_cluster>& clusters = _clusters.clusters;
+    const vector<vector<int> >& clusters = _pc.clusters[0];
     uint nclusters = clusters.size();
     vector<double> invmasses(nclusters);
     for (uint c = 0; c < nclusters; c++) {
       double mass = 1.0;
-      for (int i = 0; i < 2; i++) mass *= scell.getAtomMass(clusters[c].atoms[i]);
+      for (int i = 0; i < 2; i++) mass *= scell.getAtomMass(clusters[c][i]);
       invmasses[c] = 1/sqrt(mass);
     }
 
@@ -351,10 +350,10 @@ namespace apl {
           }
 
           for (c = 0; c < nclusters; c++) {
-            at1_pc = scell.sc2pcMap(clusters[c].atoms[0]);
-            at2_sc = clusters[c].atoms[1];
+            at1_pc = scell.sc2pcMap(clusters[c][0]);
+            at2_sc = clusters[c][1];
             at2_pc = scell.sc2pcMap(at2_sc);
-            at3_sc = clusters[c].atoms[2];
+            at3_sc = clusters[c][2];
             prefactor = invmasses[c] * phases[at1_pc][at2_sc][q];
             e = at1_pc * natoms + at2_pc;
             for (crt = 0; crt < ncart; crt++) {
@@ -542,19 +541,19 @@ namespace apl {
       const vector<vector<vector<xcomplex<double> > > >& phases) {
     // Prepare and precompute
     const Supercell& scell = _pc.getSupercell();
-    const vector<_cluster>& clusters = _clusters.clusters;
+    const vector<vector<int> >& clusters = _pc.clusters[0];
     uint nclusters = clusters.size();
 
     // Inverse masses
     vector<double> invmasses(nclusters);
     for (uint c = 0; c < nclusters; c++) {
       double mass = 1.0;
-      for (int o = 0; o < 3; o++) mass *= scell.getAtomMass(clusters[c].atoms[o]);
+      for (int o = 0; o < 3; o++) mass *= scell.getAtomMass(clusters[c][o]);
       invmasses[c] = 1/sqrt(mass);
     }
 
     // Cartesian indices to avoid running xcombos multiple times
-    const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[0].force_constants;
+    const vector<vector<double> >& ifcs = _pc.anharmonicIFCs[0];
     vector<vector<int> > cart_indices;
     aurostd::xcombos cart(3, 3, 'E', true);
     while (cart.increment()) cart_indices.push_back(cart.getCombo());
@@ -669,13 +668,12 @@ namespace apl {
             matrix.re = 0.0;
             matrix.im = 0.0;
             for (c = 0; c < nclusters; c++) {
-              const vector<int>& atoms = clusters[c].atoms;
-              iat = scell.sc2pcMap(atoms[0]);
+              iat = scell.sc2pcMap(clusters[c][0]);
               prefactor.re = invmasses[c];
               prefactor.im = 0.0;
-              for (j = 1; j < 3; j++) prefactor *= phases[iat][atoms[j]][qpts[j]];
+              for (j = 1; j < 3; j++) prefactor *= phases[iat][clusters[c][j]][qpts[j]];
               e = 0;
-              for (j = 0; j < 3; j++) e += scell.sc2pcMap(atoms[j]) * atpowers[j];
+              for (j = 0; j < 3; j++) e += scell.sc2pcMap(clusters[c][j]) * atpowers[j];
               for (crt = 0; crt < ncart; crt++) {
                 // Perform multiplication explicitly in place instead of using xcomplex.
                 // This is three times faster because constructors and destructors are not called.

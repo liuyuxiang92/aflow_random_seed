@@ -163,7 +163,7 @@ namespace apl {
             // [OBSOLETE - 190228]    (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
             // [OBSOLETE - 190228]  xInputs[idxRun].getXStr().is_vasp5_poscar_format = false;
             // [OBSOLETE - 190228] }
-            stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || _stagebreak);
+            stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || stagebreak);
           }
           // For AIMS, use the old method until we have AVASP_populateXAIMS
           if (_kbinFlags.AFLOW_MODE_AIMS) {
@@ -199,7 +199,7 @@ namespace apl {
       // For VASP, use the standardized aflow.in creator
       if(_kbinFlags.AFLOW_MODE_VASP){
         xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
-        stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || _stagebreak); //ME181226
+        stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || stagebreak); //ME181226
       }
       // For AIMS, use the old method until we have AVASP_populateXAIMS //ME181226
       if(_kbinFlags.AFLOW_MODE_AIMS){
@@ -523,7 +523,7 @@ namespace apl {
     if(!outfileFoundAnywherePhonons(xInputs)){throw APLStageBreak();}
 
     //second pass, make sure it's everywhere!
-    outfileFoundEverywherePhonons(xInputs, _logger.getOutputStream(), _isPolarMaterial);
+    outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, _logger.getOutputStream(), _isPolarMaterial);
 
     // Remove zero state forces if necessary
     if (_calculateZeroStateForces) {

@@ -166,43 +166,44 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //CO - START
-  void Supercell::LightCopy(const xstructure& a, xstructure& b) {
-#if COPY_XSTRUCTURE_FULL
-    b = a;
-    b.pgroup.clear();
-    b.pgroupk.clear();
-    b.pgroupk_xtal.clear();
-    b.fgroup.clear();
-    for (uint i = 0; i < b.agroup.size(); i++) {
-      b.agroup[i].clear();
-    }
-    b.agroup.clear();
-#else
-    b.clear(); //DX 20191220 - uppercase to lowercase clear
-    stringstream POSCAR;
-    POSCAR.str("");
-    if(0){cerr << a << std::endl;}
-    POSCAR << a;
-    POSCAR >> b;
-    //enable inequivalent flag to work
-    for (uint i = 0; i < b.atoms.size(); i++) {
-      b.atoms[i].equivalent = a.atoms[i].equivalent;
-      b.atoms[i].is_inequivalent = a.atoms[i].is_inequivalent;
-      b.atoms[i].num_equivalents = a.atoms[i].num_equivalents;
-    }
-    //[OBSOLETE] pseudo-potential stuff
-    //for(uint i=0;i<b.species.size();i++){
-    //  b.species[i]=a.species[i];
-    //  b.species_pp[i]=a.species_pp[i]; //VERY IMPORTANT
-    //}
-    //enable inequivalent flag to work
-    b.write_inequivalent_flag = a.write_inequivalent_flag;
-    b.info = a.info;
-    if(0){cerr << b << std::endl;}
-#endif
-  }
-  // CO - END
+// ME200220 - moved to xatom
+//[OBSOLETE]  //CO - START
+//[OBSOLETE]  void Supercell::LightCopy(const xstructure& a, xstructure& b) {
+//[OBSOLETE]#if COPY_XSTRUCTURE_FULL
+//[OBSOLETE]    b = a;
+//[OBSOLETE]    b.pgroup.clear();
+//[OBSOLETE]    b.pgroupk.clear();
+//[OBSOLETE]    b.pgroupk_xtal.clear();
+//[OBSOLETE]    b.fgroup.clear();
+//[OBSOLETE]    for (uint i = 0; i < b.agroup.size(); i++) {
+//[OBSOLETE]      b.agroup[i].clear();
+//[OBSOLETE]    }
+//[OBSOLETE]    b.agroup.clear();
+//[OBSOLETE]#else
+//[OBSOLETE]    b.clear(); //DX 20191220 - uppercase to lowercase clear
+//[OBSOLETE]    stringstream POSCAR;
+//[OBSOLETE]    POSCAR.str("");
+//[OBSOLETE]    if(0){cerr << a << std::endl;}
+//[OBSOLETE]    POSCAR << a;
+//[OBSOLETE]    POSCAR >> b;
+//[OBSOLETE]    //enable inequivalent flag to work
+//[OBSOLETE]    for (uint i = 0; i < b.atoms.size(); i++) {
+//[OBSOLETE]      b.atoms[i].equivalent = a.atoms[i].equivalent;
+//[OBSOLETE]      b.atoms[i].is_inequivalent = a.atoms[i].is_inequivalent;
+//[OBSOLETE]      b.atoms[i].num_equivalents = a.atoms[i].num_equivalents;
+//[OBSOLETE]    }
+//[OBSOLETE]    //[OBSOLETE] pseudo-potential stuff
+//[OBSOLETE]    //for(uint i=0;i<b.species.size();i++){
+//[OBSOLETE]    //  b.species[i]=a.species[i];
+//[OBSOLETE]    //  b.species_pp[i]=a.species_pp[i]; //VERY IMPORTANT
+//[OBSOLETE]    //}
+//[OBSOLETE]    //enable inequivalent flag to work
+//[OBSOLETE]    b.write_inequivalent_flag = a.write_inequivalent_flag;
+//[OBSOLETE]    b.info = a.info;
+//[OBSOLETE]    if(0){cerr << b << std::endl;}
+//[OBSOLETE]#endif
+//[OBSOLETE]  }
+//[OBSOLETE]  // CO - END
 
   // ///////////////////////////////////////////////////////////////////////////
 

@@ -226,7 +226,7 @@ namespace KBIN {
     try {
       return RunPhonons_APL_181216(xinput,AflowIn,aflags,kflags,xflags,messageFile);
     } catch (aurostd::xerror e) {
-      pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, std::cout, _LOGGER_ERROR_);
+      pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, aflags.Directory, messageFile, std::cout, _LOGGER_ERROR_);
     }
   }
   void RunPhonons_APL_181216(_xinput& xinput,
@@ -284,9 +284,11 @@ namespace KBIN {
     apl::Logger logger(messageFile, aflags);
     //logger.setModuleName("PHONONS");  //will rename later
 
-    string _ASTROPT_; //CO 170601
+    string _ASTROPT_ = ""; //CO 170601
+    string modulename = "";  // ME200220 - for pflow::logger
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
       logger.setModuleName("AAPL");  //CO 170601
+      modulename = "AAPL";  // ME200220
       _ASTROPT_ = _ASTROPT_AAPL_;    //CO 170601
     } else if (kflags.KBIN_PHONONS_CALCULATION_QHA || 
         kflags.KBIN_PHONONS_CALCULATION_QHA_A || 
@@ -301,9 +303,11 @@ namespace KBIN {
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_B ||
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_C) { //PN180705
       logger.setModuleName("QHA");  //CO 170601
+      modulename = "QHA";  // ME200220
       _ASTROPT_ = _ASTROPT_QHA_;    //CO 170601
     } else {
       logger.setModuleName("APL");  //CO 170601
+      modulename = "APL";  // ME200220
       _ASTROPT_ = _ASTROPT_APL_;    //CO 170601
     }
 
@@ -1518,54 +1522,6 @@ namespace KBIN {
       //[OBSOLETE] //    else {  OBSOLETE ME181026 //[CO200106 - close bracket for indenting]}
       //[OBSOLETE] //      throw apl::APLRuntimeError("The settings for supercell construction are confusing.");
 
-      // CLUSTERS ---------------------------------------------------------
-
-      // ME 180925
-      // Calculate the clusters for thermal conductivity calculations
-      vector<apl::ClusterSet> clusters;  // ME, default, only allocates to be passed into functions
-      if (USER_TCOND) {
-        int max_order;
-        if (USER_AAPL_FOURTH_ORDER) {
-          max_order = 4;
-        } else {
-          max_order = 3;
-        }
-
-        for (int o = 3; o <= max_order; o++) {
-          apl::ClusterSet clst(logger, aflags);
-          bool awakeClusterSet;
-          string clust_hib_file = aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[o-3];
-          if (USER_HIBERNATE) {
-            awakeClusterSet = (aurostd::EFileExist(clust_hib_file) ||
-                aurostd::FileExist(clust_hib_file));
-          } else {
-            awakeClusterSet = false;
-          }
-
-          if (awakeClusterSet) {
-            try {
-              clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
-                  USER_CUTOFF_DISTANCE[o-3], o, logger, aflags);
-            } catch (aurostd::xerror excpt) {
-              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
-              logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
-              awakeClusterSet = false;
-            }
-          }
-
-          if (!awakeClusterSet) {
-            clst = apl::ClusterSet(supercell, USER_CUTOFF_SHELL[o-3],
-                USER_CUTOFF_DISTANCE[o-3], logger, aflags);
-            clst.build(o);
-            clst.buildDistortions();
-            if (USER_HIBERNATE) {
-              clst.writeClusterSetToFile(clust_hib_file);
-            }
-          }
-          clusters.push_back(clst);
-        }
-      }
-
       /////////////////////////////////////////////////////////////////////////////
       //                                                                         //
       //                           CALCULATE PHONONS                             //
@@ -1585,7 +1541,7 @@ namespace KBIN {
         phcalcdm->setDistortionINEQUIVONLY(USER_DISTORTIONS_INEQUIVONLY); //CO190131
         phcalcdm->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
         phcalcdm->setCalculateZeroStateForces(USER_ZEROSTATE);
-        phcalcdm->get_special_inputs(AflowIn);  //PINKU, to include PSTRESS and LDAU_PARAMETERS in the SUPERCELL files
+        //phcalcdm->get_special_inputs(AflowIn);  //PINKU, to include PSTRESS and LDAU_PARAMETERS in the SUPERCELL files
         phcalc.reset(phcalcdm);
       } //CO200106 - patching for auto-indenting
       //CO generally redirects to DM, the distinction between DM and GSA is obsolete
@@ -1650,15 +1606,74 @@ namespace KBIN {
       // ME191029 - Reordered APL workflow to accommodate ZEROSTATE CHGCAR
       bool stagebreak = phcalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
 
-      // ME180820 - set up VASP calculations for thermal conductivity calculations
+      // ME200220 - Redesigned AAPL workflow
       bool aapl_stagebreak = false;
       if (USER_TCOND) {
-        aapl_stagebreak = phcalc->buildVaspAAPL(clusters[0], USER_ZEROSTATE_CHGCAR);
-        if (USER_AAPL_FOURTH_ORDER) {
-          aapl_stagebreak = (phcalc->buildVaspAAPL(clusters[1], USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
+        int max_order = (USER_AAPL_FOURTH_ORDER ? 4 : 3);
+        phcalc->clusters.clear();
+        phcalc->anharmonicIFCs.clear();
+        for (int o = 3; o <= max_order; o++) {
+          // Try and load IFCs from file
+          string ifcs_hib_file = aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[o-3];
+          bool awakeAnharmIFCs = (USER_HIBERNATE && aurostd::EFileExist(ifcs_hib_file));
+          if (awakeAnharmIFCs) {
+            try {
+              phcalc->readAnharmonicIFCs(ifcs_hib_file, false);
+            } catch (aurostd::xerror& excpt) {
+              message = excpt.error_message + " Skipping awakening of ";
+              if (o == 3) message += "3rd";
+              else message += aurostd::utype2string<int>(o) + "th";
+              message = excpt.error_message + " order anharmonic IFCs.";
+              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
+              awakeAnharmIFCs = false;
+            }
+          }
+
+          // Reading failed - calculate
+
+          if (!awakeAnharmIFCs) {
+            // Clusters
+            apl::ClusterSet clst(logger, aflags);
+            string clust_hib_file = aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[o-3];
+            bool awakeClusterSet = (USER_HIBERNATE && aurostd::EFileExist(clust_hib_file));
+            if (awakeClusterSet) {
+              try {
+                clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
+                    USER_CUTOFF_DISTANCE[o-3], o, logger, aflags);
+              } catch (aurostd::xerror excpt) {
+                message = excpt.error_message;
+                pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
+                awakeClusterSet = false;
+              }
+            }
+            // Reading clusters failed - determine
+            if (!awakeClusterSet) {
+              clst = apl::ClusterSet(supercell, USER_CUTOFF_SHELL[o-3],
+                  USER_CUTOFF_DISTANCE[o-3], logger, aflags);
+              clst.build(o);
+              clst.buildDistortions();
+              if (USER_HIBERNATE) {
+                clst.writeClusterSetToFile(clust_hib_file);
+              }
+            }
+            // Setup calculations
+            apl::AnharmonicIFCs anharm(xinput, aflags, kflags, xflags, clst, messageFile);
+            anharm.setOptions(USER_DISTORTION_MAGNITUDE, USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM, USER_ZEROSTATE);
+            aapl_stagebreak = (anharm.runVASPCalculations(USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
+            // Calculate IFCs
+            if (!aapl_stagebreak) {
+              try {
+                anharm.calculateForceConstants();
+                anharm.writeIFCsToFile(ifcs_hib_file);
+                phcalc->anharmonicIFCs.push_back(anharm.getForceConstants());
+                phcalc->clusters.push_back(anharm.getClusters());
+              } catch (apl::APLStageBreak& stgbrk) {
+                // Could be thrown by outfileFoundAnywhere
+                aapl_stagebreak = true;
+              }
+            }
+          }
         }
-      } else {
-        aapl_stagebreak = false;
       }
       // ME1901029 - BEGIN
       stagebreak = (stagebreak || aapl_stagebreak);
@@ -1684,7 +1699,8 @@ namespace KBIN {
       // ME1901029 - END
 
       // Run or awake
-      bool isHibFileAvailable = aurostd::EFileExist(aflags.Directory +"/"+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE);  //|| //CO
+      string hibfile = aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE;
+      bool isHibFileAvailable = aurostd::EFileExist(hibfile);  //|| //CO
       //aurostd::FileExist(string("apl.xml")); //CO
 
       if (USER_HIBERNATE && isHibFileAvailable) {
@@ -1693,7 +1709,7 @@ namespace KBIN {
         //  throw apl::APLStageBreak();  // ME 180830
         //}
         try {
-          phcalc->awake();
+          phcalc->awake(hibfile);
         } //CO200106 - patching for auto-indenting
         // ME191031 - use xerror
         //catch (apl::APLLogicError& e)
@@ -2278,36 +2294,6 @@ namespace KBIN {
       /////////////////////////////////////////////////////////////////////////////
 
       if (USER_TCOND) {
-        // Get anharmonic force constants
-        phcalc->setAnharmonicOptions(USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM);
-        bool awakeAnharmIFCs;
-        for (uint i = 0; i < clusters.size(); i++) {
-          string ifcs_hib_file = aflags.Directory + "/" +  DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[i];
-          if (USER_HIBERNATE) {
-            awakeAnharmIFCs = (aurostd::EFileExist(ifcs_hib_file) ||
-                aurostd::FileExist(ifcs_hib_file));
-          } else {
-            awakeAnharmIFCs = false;
-          }
-
-          if (awakeAnharmIFCs) {
-            try {
-              phcalc->readAnharmonicIFCs(ifcs_hib_file, clusters[i]);
-            } catch (aurostd::xerror excpt) {
-              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
-              logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
-              awakeAnharmIFCs = false;
-            }
-          }
-
-          if (!awakeAnharmIFCs) {
-            phcalc->calculateAnharmonicIFCs(clusters[i]);
-            if (USER_HIBERNATE) {
-              phcalc->_anharmonicIFCs[i].writeIFCsToFile(ifcs_hib_file);
-            }
-          }
-        }
-
         // Get q-points
         logger << "Preparing a q-mesh of " << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << "." << apl::endl;
         apl::QMesh qmtcond(USER_THERMALGRID, phcalc->getInputCellStructure(), logger, true);
@@ -2317,7 +2303,7 @@ namespace KBIN {
 
         // Do the thermal conductivity calculation
         logger << "Starting thermal conductivity calculations." << apl::endl;
-        apl::TCONDCalculator tcond(*phcalc, qmtcond, clusters[0], logger, aflags);
+        apl::TCONDCalculator tcond(*phcalc, qmtcond, logger, aflags);
 
         // Set calculation options
         tcond.calc_options.flag("RTA", (USER_BTE == "RTA"));

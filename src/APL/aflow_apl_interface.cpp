@@ -180,16 +180,17 @@ namespace apl {
   }
 
   //outfileFoundEverywherePhonons/////////////////////////////////////////////
-  void outfileFoundEverywherePhonons(vector<_xinput>& xinps, ofstream& fileMessage, bool contains_born) {
+  void outfileFoundEverywherePhonons(vector<_xinput>& xinps, const string& directory, ofstream& fileMessage, bool contains_born) {
     string function = "apl::outfileFoundEverywherePhonons()";
+    string mode = xinps[0].xvasp.AVASP_arun_mode;
     stringstream _logger;
     _logger << "Reading force files";
-    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", _logger, fileMessage, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, fileMessage, std::cout);
     uint ninps = xinps.size();
     if (contains_born) ninps--;
     for (uint idxRun = 0; idxRun < ninps; idxRun++) {
       _logger << "Reading force file " << (idxRun + 1) << "/" << ninps << "."; //CO190116  // ME190607
-      pflow::logger(_AFLOW_FILE_NAME_, "AAPL", _logger, fileMessage, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, xinps[idxRun].getDirectory(), fileMessage, std::cout);
       string directory = xinps[idxRun].getDirectory();
       readForcesFromDirectory(xinps[idxRun]);
 
@@ -200,7 +201,7 @@ namespace apl {
       }
     }
     _logger << "No errors caught, all force files read successfully."; //CO190116  // ME190607
-    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", _logger, fileMessage, std::cout, 'C');
+    pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, fileMessage, std::cout, 'C');
   }
 
   void readForcesFromDirectory(_xinput& xinp) {

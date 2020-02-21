@@ -2567,6 +2567,24 @@ void xstructure::copy(const xstructure& bstr) {
   // ----------------------------------
 }
 
+// ME200220
+void LightCopy(const xstructure& a, xstructure& b) {
+  b.clear();
+  stringstream POSCAR;
+  POSCAR.str("");
+  POSCAR << a;
+  POSCAR >> b;
+  //enable inequivalent flag to work
+  for (uint i = 0; i < b.atoms.size(); i++) {
+    b.atoms[i].equivalent = a.atoms[i].equivalent;
+    b.atoms[i].is_inequivalent = a.atoms[i].is_inequivalent;
+    b.atoms[i].num_equivalents = a.atoms[i].num_equivalents;
+  }
+  //enable inequivalent flag to work
+  b.write_inequivalent_flag = a.write_inequivalent_flag;
+  b.info = a.info;
+}
+
 // copy
 xstructure::xstructure(const xstructure& b) {
   //  free();

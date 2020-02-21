@@ -18,7 +18,6 @@ namespace apl {
       DISTORTION_MAGNITUDE = 0.015;
       _isGammaEwaldPrecomputed = false;
       //    DOtar = false;  OBSOLETE - ME 181024
-      xInputsAAPL.clear();
       // ME190614 - Add system for VASP-style output files
       if ((_xFlags.AFLOW_MODE_VASP) && (!_xFlags.vflags.AFLOW_SYSTEM.content_string.empty())) {
         _system = _xFlags.vflags.AFLOW_SYSTEM.content_string;
@@ -47,23 +46,17 @@ namespace apl {
     _system = that._system;
     _logger = that._logger;
     _supercell = that._supercell;
-    xInputsAAPL = that.xInputsAAPL;
     xInputs = that.xInputs;
     _uniqueDistortions = that._uniqueDistortions;
     _uniqueForces = that._uniqueForces;
     _forceConstantMatrices = that._forceConstantMatrices;
     _calculateZeroStateForces = that._calculateZeroStateForces;
-    ATOMIC_MASSES_AMU = that.ATOMIC_MASSES_AMU;
-    _check_LDAU2_ON = that._check_LDAU2_ON;
-    _LDAU_PARAMETERS = that._LDAU_PARAMETERS;
-    _PSTRESS = that._PSTRESS;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
     _inverseDielectricTensor = that._inverseDielectricTensor;
     _recsqrtDielectricTensorDeterminant = that._recsqrtDielectricTensorDeterminant;
     _isGammaEwaldPrecomputed = that._isGammaEwaldPrecomputed;
     _gammaEwaldCorr = that._gammaEwaldCorr;
-    _anharmonicIFCs = that._anharmonicIFCs;
     zerostate_dir = that.zerostate_dir;
   }
   // ME191228 - END
@@ -164,9 +157,6 @@ namespace apl {
 
     // Force the force-constant matrices to obey the sum-rule conditions
     correctSumRules();
-
-    //store masses for later uses
-    store_masses();  //[PINKU]
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -639,13 +629,13 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void PhononCalculator::awake() {
+  void PhononCalculator::awake(string hibfile, bool compare_checksum) {
     _logger << "Awakening..." << apl::endl;
 
     //CO, we already checked that it exists before, just open
 
+    hibfile = aurostd::CleanFileName(hibfile); //ME200220
     vector<string> vlines;                           //CO
-    string hibfile = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
     aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME181226
     // Decompress
     //bool isXMLCompressed = aurostd::FileExist(string("apl.xml.EXT")); //CO
@@ -680,26 +670,28 @@ namespace apl {
     }
     //CO - END
 
-    // Get _AFLOWIN_ checksum and compare it to current
-    while (true) {
-      //getline(infile, line); //CO
-      //if (infile.eof()) //CO
-      if (line_count == vlines.size())  //CO
+    if (compare_checksum) {
+      // Get _AFLOWIN_ checksum and compare it to current
+      while (true) {
+        //getline(infile, line); //CO
+        //if (infile.eof()) //CO
+        if (line_count == vlines.size())  //CO
+          // ME191031 - use xerror
+          //throw APLLogicError("apl::PhononCalculator::awake(); Can not find <i name=\"checksum\" ...> tag.");
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::PhononCalculator::awake()", "Can not find <i name=\"checksum\" ...> tag.", _FILE_CORRUPT_);
+        line = vlines[line_count++];  //CO
+        if (line.find("checksum") != string::npos)
+          break;
+      }
+      int t = line.find_first_of(">") + 1;
+      tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+      if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_aflowFlags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME190219
         // ME191031 - use xerror
-        //throw APLLogicError("apl::PhononCalculator::awake(); Can not find <i name=\"checksum\" ...> tag.");
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::PhononCalculator::awake()", "Can not find <i name=\"checksum\" ...> tag.", _FILE_CORRUPT_);
-      line = vlines[line_count++];  //CO
-      if (line.find("checksum") != string::npos)
-        break;
-    }
-    int t = line.find_first_of(">") + 1;
-    tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_aflowFlags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME190219
-      // ME191031 - use xerror
-      //throw APLLogicError("apl::PhononCalculator::awake(); The " + _AFLOWIN_ + " file has been changed from the hibernated state.");
-      string function = "apl::PhononCalculator::awake()";
-      string message = "The " + _AFLOWIN_ + " file has been changed from the hibernated state.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        //throw APLLogicError("apl::PhononCalculator::awake(); The " + _AFLOWIN_ + " file has been changed from the hibernated state.");
+        string function = "apl::PhononCalculator::awake()";
+        string message = "The " + _AFLOWIN_ + " file has been changed from the hibernated state.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      }
     }
     tokens.clear();
 
@@ -864,51 +856,6 @@ namespace apl {
     //CO - END
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
-  void PhononCalculator::store_masses()  //[PINKU]
-  {
-    ATOMIC_MASSES_AMU.clear();
-    uint pcAtomsSize = _supercell.getInputStructure().atoms.size();
-    for (uint i = 0; i != pcAtomsSize; i++)
-      ATOMIC_MASSES_AMU.push_back(_supercell.getAtomMass(_supercell.pc2scMap(i)));
-  }
-  // ///////////////////////////////////////////////////////////////////////////
-  void PhononCalculator::get_special_inputs(string& AflowIn)  //[PINKU]
-  {
-    _check_LDAU2_ON = "";
-    _LDAU_PARAMETERS = "";
-    _PSTRESS = "";
-    string line;
-    vector<string> vlines;
-    uint line_count = 0;
-    aurostd::string2vectorstring(AflowIn,vlines);
-    //aurostd::efile2vectorstring(_AFLOWIN_, vlines); //CO 171003
-    //ifstream myfile(_AFLOWIN_.c_str());
-
-    //CO - START
-    //if (!myfile.is_open())
-    if (!vlines.size()) 
-    {  //CO200106 - patching for auto-indenting
-      // ME191031 - use xerror
-      //throw apl::APLRuntimeError("apl::PhononCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
-      string function = "apl::PhononCalculator::get_special_inputs()";
-      string message = "Cannot read ["+_AFLOWIN_+"] file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
-    }
-    //while (getline(myfile, line))
-    while (line_count < vlines.size())
-    { //CO200106 - patching for auto-indenting
-      line = vlines[line_count++];
-      if (line == "") continue;
-      if (line[0] == '#') continue;
-      if ((line.find("LDAU2=ON") != std::string::npos)) _check_LDAU2_ON = line;
-      if ((line.find("LDAU_PARAMETERS") != std::string::npos)) _LDAU_PARAMETERS = line;
-      if ((line.find("PSTRESS") != std::string::npos)) _PSTRESS = line;
-    }
-    //myfile.clear();
-    //myfile.close();
-    //CO - END
-  }
   // ///////////////////////////////////////////////////////////////////////////
 
   //CO 180214 - START
@@ -1554,6 +1501,129 @@ namespace apl {
 
     //
     return dynamicalMatrix;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+
+  void PhononCalculator::readAnharmonicIFCs(string filename, bool compare_checksum) {
+    filename = aurostd::CleanFileName(filename);
+    string message = "Reading anharmonic IFCs from " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", message, _logger.getOutputStream(), std::cout);
+    string function = "apl::PhononCalculator::readAnharmonicIFCs()";
+    if (!aurostd::EFileExist(filename)) {
+      message = "Could not open file " + filename + ". File not found.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    }
+
+    vector<string> vlines;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+    if (nlines == 0) {
+      message = "Cannot open file " + filename + ". File empty or corrupt.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    uint line_count = 0;
+    string line = vlines[line_count++];
+
+    // Check that this is a valid xml file
+    if (line.find("xml") == string::npos) {
+      message = "File is not a valid xml file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
+    }
+
+    int t = 0;
+    vector<string> tokens;
+
+    // Checksum
+    if (compare_checksum) {
+      while (true) {
+        if (line_count == nlines) {
+          message = "Checksum not found in hibernate file.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        line = vlines[line_count++];
+        if (line.find("checksum") != string::npos) {
+          t = line.find_first_of(">") + 1;
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, " ");
+          if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_aflowFlags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {
+            message = "The " + _AFLOWIN_ + " file has been changed from the hibernated state.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+          }
+          break;
+        }
+      }
+    }
+
+    // Read order
+    uint order = 0;
+    while (true) {
+      if (line_count == nlines) {
+        message = "order tag not found.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      }
+      line = vlines[line_count++];
+      if (line.find("order") != string::npos) {
+        t = line.find_first_of(">") + 1;
+        order = aurostd::string2utype<uint>(line.substr(t, line.find_last_of("<") - t));
+      }
+    }
+
+    // Read IFCs
+    while (true) {
+      if (line_count == nlines) {
+        message = "force_constants tag not found.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      }
+      line = vlines[line_count++];
+      if (line.find("force_constants") != string::npos) break;
+    }
+
+    vector<vector<double> > ifcs;
+    vector<vector<int> > clst;
+    uint nanharm = anharmonicIFCs.size();
+    for (uint i = nanharm; i < order - 2; i++) {
+      anharmonicIFCs.push_back(ifcs);
+      clusters.push_back(clst);
+    }
+    vector<double> fc;
+    vector<int> cl;
+    while (line.find("/force_constants") == string::npos) {
+      if (line_count == nlines) {
+        message = "force_constants tag incomplete.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      }
+      line = vlines[line_count++];
+      if (line.find("atoms") != string::npos) {
+        // New tensor and cluster
+        fc.clear();
+        cl.clear();
+        t = line.find_first_of("\"") + 1;
+        aurostd::string2tokens(line.substr(t, line.find_last_of("\"") - t), cl, " ");
+        clst.push_back(cl);
+      } else if (line.find("slice") != string::npos) {
+        // Populate tensor
+        for (int i = 0; i < 3; i++) {
+          tokens.clear();
+          line = vlines[line_count++];
+          t = line.find_first_of(">") + 1;
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, " ");
+          for (int j = 0; j < 3; j++) fc.push_back(aurostd::string2utype<double>(tokens[j]));
+        }
+        line_count++;  // Skip /varray
+      } else if (line.find("</varray>") != string::npos) {
+        ifcs.push_back(fc);
+      }
+    }
+
+    if (ifcs.size() != clst.size()) {
+      message = "Number of IFCs is different from the number of clusters.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    // Populate
+    anharmonicIFCs[order - 2] = ifcs;
+    clusters[order - 2] = clst;
   }
 
 }  // namespace apl

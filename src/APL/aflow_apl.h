@@ -329,17 +329,30 @@ namespace apl {
   class AnharmonicIFCs {
     // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
     public:
-      AnharmonicIFCs(ClusterSet&, Logger&, _aflags&);
-      AnharmonicIFCs(vector<_xinput>&, ClusterSet&, const double&,  // ME190529
-          const aurostd::xoption&, Logger&, _aflags&);  // ME190501
-      AnharmonicIFCs(const string&, ClusterSet&, const double&,
-          const aurostd::xoption&, Logger&, _aflags&);  // ME190501
+      AnharmonicIFCs(_xinput&, _aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&);
       AnharmonicIFCs(const AnharmonicIFCs&);
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
       ~AnharmonicIFCs();
-      void clear(ClusterSet&, Logger&, _aflags&);
+      void clear(_xinput&,_aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&);
 
-      ClusterSet& clst;  // Reference to the corresponding ClusterSet
+      void setOptions(double, int, double, double, bool);
+      bool runVASPCalculations(bool);
+      void calculateForceConstants();
+      const vector<vector<double> >& getForceConstants() const;
+      vector<vector<int> > getClusters() const;
+      void writeIFCsToFile(const string&);
+
+    private:
+      _xinput& _xInput;
+      _aflags& _aflowFlags;
+      _kflags& _kbinFlags;
+      _xflags& _xFlags;
+      ClusterSet& clst;
+      ofstream& fileMessage;
+      bool new_ofstream;
+
+      vector<_xinput> xInputs;
+      bool _useZeroStateForces;
       vector<vector<int> > cart_indices;  // A list of all Cartesian indices
       double distortion_magnitude;  // The magnitude of the distortions in Angstroms
       vector<vector<double> > force_constants;  // Symmetrized IFCs - ME190520
@@ -348,15 +361,11 @@ namespace apl {
       int order;  // The order of the IFCs
       double sumrule_threshold;  // Convergence threshold for the sum rules
 
-      void writeIFCsToFile(const string&);
-      void readIFCsFromFile(const string&);
-
-    private:
-      Logger& _logger;  // The AFLOW logger
-      _aflags& aflags;
-
       void free();
       void copy(const AnharmonicIFCs&);
+
+      string buildRunName(const vector<int>&, const vector<int>&, int, int);
+      void applyDistortions(_xinput&, const vector<xvector<double> >&, const vector<int>&, const vector<int>&, double=1.0);
 
       vector<vector<int> > getCartesianIndices();
 
@@ -600,7 +609,7 @@ namespace apl {
       Supercell(const Supercell&);
       ~Supercell();
       void initialize(const xstructure&);  // ME191225
-      void LightCopy(const xstructure& a, xstructure& b);
+      //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME200220
       void clear();
       Supercell& operator=(const Supercell&);
       bool isConstructed();
@@ -723,8 +732,6 @@ namespace apl {
       virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
           vector<xmatrix<xcomplex<double> > >&,
           bool=true) = 0;  // ME 180827
-      virtual vector<double> get_ATOMIC_MASSES_AMU() = 0;
-      virtual void get_special_inputs(string& AflowIn) = 0;
       virtual void get_NCPUS(string& ncpus) = 0;  //CO 180214
       virtual void get_NCPUS(int& ncpus) = 0;     //CO 180214
       // **** END   PINKU ******
@@ -745,7 +752,7 @@ namespace apl {
   void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
   bool filesExistPhonons(_xinput&);
   bool outfileFoundAnywherePhonons(vector<_xinput>&);
-  void outfileFoundEverywherePhonons(vector<_xinput>&, ofstream&, bool=false);  // ME191029
+  void outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, bool=false);  // ME191029
   void readForcesFromDirectory(_xinput&);  // ME200219
   void subtractZeroStateForces(vector<_xinput>&, bool);
   void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME190114
@@ -773,7 +780,6 @@ namespace apl {
       //  bool DOtar;  OBSOLETE - ME181024
       // The computational model, supercell (now used by both implementations)
       Supercell& _supercell;
-      vector<vector<_xinput> > xInputsAAPL; //vector<_xvasp> vaspRuns for AAPL;
       vector<_xinput> xInputs; //vector<_xvasp> vaspRuns;
       // For each inequivalent atom, there is a set of unique distortions
       vector<vector<xvector<double> > > _uniqueDistortions;
@@ -786,11 +792,6 @@ namespace apl {
       // (not well relaxed, or with other problems) these forces have to be
       // known and substracted from the calculated forces with distortion
       bool _calculateZeroStateForces;
-
-      vector<double> ATOMIC_MASSES_AMU;  //[PINKU]
-      string _check_LDAU2_ON;            //PINKU
-      string _LDAU_PARAMETERS;           //PINKU
-      string _PSTRESS;                   //PINKU
 
       // Stuff for polar materials
       bool _isPolarMaterial;
@@ -821,8 +822,6 @@ namespace apl {
           vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180829
       xmatrix<xcomplex<double> > getNonanalyticalTermGonze(const xvector<double>);
       xmatrix<xcomplex<double> > getEwaldSumDipolDipolContribution(const xvector<double>, bool = true);
-      vector<double> get_ATOMIC_MASSES_AMU() { return ATOMIC_MASSES_AMU; }  //[PINKU]
-      void store_masses();                                                  //[PINKU]
     protected:
       void writeOUTPUT(_xinput&);
       //void createAIMSOUTPUT(const _xaims&); //CO 180406 - obsolete
@@ -843,17 +842,11 @@ namespace apl {
       void setCalculateZeroStateForces(bool b) { _calculateZeroStateForces = b; }
       void setTCOND(bool b) { TCOND = b; }
       void hibernate();
-      void awake();
+      void awake(string, bool=false);
       //****** BEGIN ME ***********
-      vector<AnharmonicIFCs> _anharmonicIFCs;
-      void setAnharmonicOptions(int, double, double);
-      bool buildVaspAAPL(const ClusterSet&, bool);
-      string buildRunNameAAPL(const vector<int>&, const vector<int>&,
-          const int&, const int&, const int&);// ME190108
-      void applyDistortionsAAPL(_xinput&, const vector<aurostd::xvector<double> >&,
-          const vector<int>&, const vector<int>&, double scale=1.0);
-      void calculateAnharmonicIFCs(ClusterSet&);
-      void readAnharmonicIFCs(const string&, ClusterSet&);
+      void readAnharmonicIFCs(string, bool=false);
+      vector<vector<vector<double> > > anharmonicIFCs;
+      vector<vector<vector<int> > > clusters;
       //******* END ME ************
       // Interface
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
@@ -884,10 +877,9 @@ namespace apl {
       void symmetrizeBornEffectiveChargeTensors(void);
       void readDielectricTensorFromAIMSOUT(void);
       void readDielectricTensorFromOUTCAR(const _xinput&);  // ME190113
-      void get_special_inputs(string& AflowIn);                                    //PINKU
       void get_NCPUS(string& ncpus);  //CO 180214
       void get_NCPUS(int& ncpus);     //CO 180214
-      virtual bool runVASPCalculations(bool) = 0;  // ME191029
+      virtual bool runVASPCalculations(bool) {return false;};  // ME191029
       string zerostate_dir;  // ME191030
   };
 }  // namespace apl
@@ -994,6 +986,7 @@ namespace apl {
       string _EOS_KSCHEME;
       string _EOS_STATIC_KSCHEME;
       int _EOS_STATIC_KPPRA;
+      string _PSTRESS;  // ME200220
 
     public:
       QHA_AFLOWIN_CREATOR(Supercell& sc, _xinput& xinput,
@@ -1624,11 +1617,11 @@ namespace apl {
   class TCONDCalculator {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
-      TCONDCalculator(PhononCalculator&, QMesh&, ClusterSet&, Logger&, _aflags&);
+      TCONDCalculator(PhononCalculator&, QMesh&, Logger&, _aflags&);
       TCONDCalculator(const TCONDCalculator&);
 
       ~TCONDCalculator();
-      void clear(PhononCalculator&, QMesh&, ClusterSet&, Logger&, _aflags&);
+      void clear(PhononCalculator&, QMesh&, Logger&, _aflags&);
 
       aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
       vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
@@ -1651,7 +1644,6 @@ namespace apl {
     private:
       PhononCalculator& _pc;  // Reference to the phonon calculator
       QMesh& _qm;  // Reference to the q-point mesh
-      ClusterSet& _clusters;  // Reference to cluster set
       Logger& _logger;  // The APL logger
       _aflags& aflags;
 

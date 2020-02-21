@@ -24,13 +24,13 @@
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
         -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
+        -- added error for non-standard prototypes that create structures with atoms too close (CO+DX)
         -- added Patterson symmetry analysis; denoted "pgroupk_Patterson" (applies to reciprocal space only) (DX)
         -- compare Patterson point symmetry to Laue point group as consistency check (DX)
         -- added Patterson symmetry to full symmetry command (DX)
         -- added stand-alone Patterson symmetry command (DX)
         -- cleaned text/json if-statements in symmetry writing functions (DX)
         -- added Patterson symmetry usage to README_AFLOW_SYM.TXT and README_AFLOW_ACONVASP.TXT (DX)
-        -- added error for non-standard prototypes that create structures with atoms too close (CO+DX)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
