@@ -401,8 +401,8 @@ namespace apl {
     }
     _logger << "Found " << dof << " degree(s) of freedom." << apl::endl;
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms();
-    for (int i = 0; i < natoms; i++) {
-      int id = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
+    for (uint i = 0; i < natoms; i++) {  //CO200212 - int->uint
+      uint id = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         _logger << "Atom [" << sf("%03d") << id << "] (" << sf("%f")
           << sw(2) << _supercell.getSupercellStructure().atoms[id].cleanname
@@ -507,7 +507,7 @@ namespace apl {
 
     int idxRun = 0;
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms();
-    for (int i = 0; i < natoms; i++) {
+    for (uint i = 0; i < natoms; i++) {  //CO200212 - int->uint
       vector<vector<xvector<double> > > forcesForOneAtomAndAllDistortions;
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         generate_plus_minus = vvgenerate_plus_minus[i][j];  //CO181226
