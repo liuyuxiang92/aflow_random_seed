@@ -56,6 +56,7 @@ namespace apl {
 
   // Copy constructors
   ThermalPropertiesCalculator::ThermalPropertiesCalculator(const ThermalPropertiesCalculator& that) : _logger(that._logger) {
+    free();
     copy(that);
   }
 

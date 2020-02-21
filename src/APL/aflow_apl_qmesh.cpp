@@ -44,6 +44,7 @@ namespace apl {
 
   // Copy constructors
   QMesh::QMesh(const QMesh& that) : _logger(that._logger) {
+    free();
     copy(that);
   }
 

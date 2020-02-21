@@ -39,6 +39,7 @@ namespace apl {
 
   // Copy constructors
   LTMethod::LTMethod(const LTMethod& that) : _qm(that._qm), _logger(that._logger) {
+    free();
     copy(that);
   }
 
