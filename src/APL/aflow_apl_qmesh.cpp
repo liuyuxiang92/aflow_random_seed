@@ -48,7 +48,10 @@ namespace apl {
   }
 
   QMesh& QMesh::operator=(const QMesh& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 

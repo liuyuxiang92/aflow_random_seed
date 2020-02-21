@@ -825,7 +825,7 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME200116 - rebase to primitive
-  // Does not capture rotated primitive cells yet, but does work for AFLOW's
+  // Does not capture rotated conventional cells yet, but does work for AFLOW's
   // standard conventional unit cells.
   void Supercell::projectToPrimitive() {
     bool LDEBUG = (FALSE || XHOST.DEBUG);

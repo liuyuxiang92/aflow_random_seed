@@ -60,7 +60,10 @@ namespace apl {
   }
 
   ThermalPropertiesCalculator& ThermalPropertiesCalculator::operator=(const ThermalPropertiesCalculator& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 

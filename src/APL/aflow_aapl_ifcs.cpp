@@ -96,7 +96,10 @@ namespace apl {
   }
 
   const AnharmonicIFCs& AnharmonicIFCs::operator=(const AnharmonicIFCs& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 

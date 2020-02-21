@@ -2255,7 +2255,8 @@ namespace KBIN {
             for (i = 0; i < freqs.size(); i++) {
               if (freqs[i] > -_AFLOW_APL_EPS_) break;
             }
-            double idos_percent = 100.0 * idos[i]/idos.back();
+            double idos_percent = 0.0;
+            if (i > 0) idos_percent = 100.0 * idos[i-1]/idos.back();
             // Cannot use std::setprecision with apl:logger, so use this workaround.
             stringstream percent;
             percent << std::dec << std::setprecision(1) << idos_percent;

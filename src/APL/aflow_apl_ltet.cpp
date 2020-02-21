@@ -43,7 +43,10 @@ namespace apl {
   }
 
   LTMethod& LTMethod::operator=(const LTMethod& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 

@@ -93,7 +93,10 @@ namespace apl {
   }
 
   const ClusterSet& ClusterSet::operator=(const ClusterSet& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 
