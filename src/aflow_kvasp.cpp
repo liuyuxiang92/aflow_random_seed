@@ -4057,7 +4057,7 @@ namespace KBIN {
       // Read bytes...
       int bufferSize = 1024;
       char buffer[bufferSize];
-      string versionString;
+      string versionString = "";
       while (true) {
         if (!infile.read(buffer, bufferSize))
           bufferSize = infile.gcount();
