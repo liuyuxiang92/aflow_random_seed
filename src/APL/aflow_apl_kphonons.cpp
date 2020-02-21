@@ -571,7 +571,7 @@ namespace KBIN {
             //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
           } else {
-            string projscheme;
+            string projscheme = "";
             if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty()) projscheme = USER_DOS_PROJECTIONS_CART_SCHEME;
             else projscheme = USER_DOS_PROJECTIONS_FRAC_SCHEME;
             aurostd::string2tokens(projscheme, tokens, "; ");
