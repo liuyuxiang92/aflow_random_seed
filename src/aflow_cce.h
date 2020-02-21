@@ -58,11 +58,12 @@ namespace cce {
   void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
   // write user instructions
   void CCE_print_usage(ostream& oss);
-  // read user input (from command line)
+  // read user input (from command line or directory path)
   xstructure CCE_read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   void CCE_get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
   string CCE_get_offset(const string& functional);
   vector<double> CCE_get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
+  string CCE_get_functional_from_aflow_in(const xstructure& structure, string& directory_path);
   // initialise flags and variables
   aurostd::xoption CCE_init_flags(); // ME 200213
   CCE_Variables CCE_init_variables(const xstructure&); // ME 200213

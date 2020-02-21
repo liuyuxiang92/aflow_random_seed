@@ -131,114 +131,7 @@ namespace cce {
     string poscar_path=directory_path + "/POSCAR.static";
     xstructure structure=CCE_read_structure(poscar_path); // AFLOW seems to automatically unzip and rezip zipped files so that only the file name without zipping extension needs to be given
     // get functional from aflow.in in directory
-    string functional = "PBE"; // plain PBE calculation is default
-    string aflow_in_path=directory_path + "/aflow.in";
-    string aflowIn = aurostd::RemoveComments(aurostd::file2string(aflow_in_path));
-    vector<string> vlines = aurostd::string2vectorstring(aflowIn);
-    string line_a;
-    bool ldau = false;
-    bool ldau2 = false;
-    // check whether it is a DFT+U calculation with parameters as for the ICSD (PBE+U_ICSD calculation)
-    // first check whether it is an LDAU2 calculation
-    for (uint i = 0; i < vlines.size(); i++) { 
-      line_a = aurostd::RemoveSpaces(vlines[i]);
-      if (line_a.find("LDAU2=ON") != string::npos){ // string::npos is returned if string is not found
-        ldau2 = true;
-      }
-    }
-    // then read and check U parameters
-    for (uint i = 0; i < vlines.size(); i++) { 
-      line_a = aurostd::RemoveSpaces(vlines[i]);
-      // new implementation checking Us explicitly
-      if (line_a.find("LDAU_PARAMETERS=") != string::npos && ldau2){ // string::npos is returned if string is not found
-        vector<string> ldau_line_vector;
-        aurostd::string2tokens(line_a, ldau_line_vector, ";"); 
-        // get species
-        string species_part_1 = ldau_line_vector[0];
-        vector<string> species_part_vector;
-        aurostd::string2tokens(species_part_1, species_part_vector, "="); 
-        string species_part = species_part_vector[1];
-        vector<string> species_vector;
-        aurostd::string2tokens(species_part, species_vector, ","); 
-        if (species_vector.size() != structure.species.size()){
-          message << "BAD NEWS: The number of species in the DFT+U settings differs from the total number of species for this structure. Please adapt and rerun.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-        }
-        // get Us
-        string Us_part = ldau_line_vector[2];
-        vector<string> Us_string_vector;
-        vector<double> Us_vector;
-        aurostd::string2tokens(Us_part, Us_string_vector, ","); 
-        for (uint k = 0; k < Us_string_vector.size(); k++) { 
-          Us_vector.push_back(aurostd::string2utype<double>(Us_string_vector[k]));
-        }
-        if (species_vector.size() != Us_vector.size()){
-          message << "BAD NEWS: The number of species in the DFT+U settings differs from the number of provided U values. Please adapt and rerun.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-        }
-        // get standard Us for PBE+U_ICSD
-        vector<double> standard_ICSD_Us_vector;
-        bool LDAU=true;
-        vector<string> vLDAUspecies;
-        vector<uint> vLDAUtype;
-        vector<int> vLDAUL;
-        vector<double> vLDAUU;
-        vector<double> vLDAUJ;
-        for (uint k = 0; k < species_vector.size(); k++) { 
-          AVASP_Get_LDAU_Parameters(species_vector[k],LDAU,vLDAUspecies,vLDAUtype,vLDAUL,vLDAUU,vLDAUJ);
-          if (vLDAUtype[k] != 2 && vLDAUU[k] !=0){
-            ostream& oss = cerr;
-            ofstream FileMESSAGE;
-            _aflags aflags;aflags.Directory=".";
-            message << "BAD NEWS: It seems the standard DFT+U method for " << species_vector[k] << " was changed from Dudarev's approach (LDAU2=ON, vLDAUtype[" << k << "]=2) as used for the AFLOW ICSD database when obtaining the corrections to vLDAUtype[" << k << "]=" << vLDAUtype[k] << " now. If the standard U values have also been changed, then the corrections might have been constructed for other U values than used in this calculation and should not be applied. Please check this carefully!";
-            pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-          }
-          standard_ICSD_Us_vector.push_back(vLDAUU[k]);
-        }
-        // compare read and standard Us
-        bool Us_disagree=false;
-        for (uint k = 0; k < species_vector.size(); k++) { 
-          if (Us_vector[k] != standard_ICSD_Us_vector[k]){
-            Us_disagree=true;
-            message << "BAD NEWS: For this DFT+U calculation with Dudarev's method the provided U value of " << Us_vector[k] << " eV for " << species_vector[k] << " does not match the standard value of " << standard_ICSD_Us_vector[k] << " eV. There are no corrections for this case.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-          }
-        }
-        if (!Us_disagree){
-          functional = "PBE+U_ICSD";
-        }
-      }
-    }
-    // check whether it is a DFT+U calculation with different parameters than for PBE+U_ICSD
-    for (uint i = 0; i < vlines.size(); i++) { 
-      line_a = aurostd::RemoveSpaces(vlines[i]);
-      if ((line_a.find("LDAU") != string::npos && line_a.find("=ON") != string::npos) || (line_a.find("LDAU") != string::npos && line_a.find("=ADIABATIC") != string::npos)){
-        ldau = true;
-        if (functional != "PBE+U_ICSD"){
-          message << "BAD NEWS: It seems you are providing an aflow.in for a DFT+U calculation with different parameters than for the AFLOW ICSD database (Dudarev's approach, LDAU2=ON). There are no corrections for this case.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-        }
-      }
-    }
-    // check whether it is an LDA or SCAN calculation
-    if (functional != "PBE+U_ICSD"){
-      if (!ldau){
-        for (uint i = 0; i < vlines.size(); i++) {
-          line_a = aurostd::RemoveSpaces(vlines[i]);
-          if (line_a.find("=potpaw_LDA") != string::npos || line_a.find("/potpaw_LDA/") != string::npos){ // the first criterion seems to not find "=potpaw_LDA" when the line is commented by # due to RemoveComments above
-            functional = "LDA";
-            for (uint k = 0; k < vlines.size(); k++) { // it could still be a SCAN calculation with LDA PPs; allowing for that since to my experience right now the SCAN corrections from calculations with PBE PPs should be good for SCAN calculations with LDA PPs
-              string line_b = aurostd::RemoveSpaces(vlines[k]);
-              if (line_b.find("METAGGA=SCAN") != string::npos){
-                functional = "SCAN";
-              }
-            }
-          } else if (line_a.find("METAGGA=SCAN") != string::npos){
-            functional = "SCAN";
-          }
-        }
-      }
-    }
+    string functional=CCE_get_functional_from_aflow_in(structure, directory_path);
     return CCE(structure, functional);
   } // main CCE function for calling inside AFLOW with directory path
 
@@ -377,10 +270,9 @@ namespace cce {
 
     // DETERMINE CORRECTION FOR EACH CATION: OXIDATION STATE DEPENDENT PART OF COORECTION ##############################################################################################################
     /********************************************************/
-    // Assign oxidation numbers from Bader analysis if not provided on command line
+    // Assign oxidation numbers
     /********************************************************/
-    // try to assign oxidation numbers from Bader charges only if no input oxidation numbers are provided 
-    // and deal with known exceptional cases
+    // determine oxidation numbers automatically from structure and Allen electronegativities if not provided on command line
     if(!cce_flags.flag("OX_NUMS_PROVIDED")) {
       cce_vars.oxidation_states=CCE_get_oxidation_states_from_electronegativities(structure, cce_vars, cce_flags);
       if(0) { // obtaining oxidation states from Bader charges is outdated but the functionality is kept mainly for test purposes
@@ -688,6 +580,120 @@ namespace cce {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     return cce_vars.oxidation_states;
+  }
+
+  //CCE_get_functional_from_aflow_in////////////////////////////////////////////////////////
+  // determine the functional from the aflow_in
+  string CCE_get_functional_from_aflow_in(const xstructure& structure, string& directory_path) {
+    string functional = "PBE"; // plain PBE calculation is default
+    string aflow_in_path=directory_path + "/aflow.in";
+    string aflowIn = aurostd::RemoveComments(aurostd::file2string(aflow_in_path));
+    vector<string> vlines = aurostd::string2vectorstring(aflowIn);
+    string line_a;
+    bool ldau = false;
+    bool ldau2 = false;
+    // check whether it is a DFT+U calculation with parameters as for the ICSD (PBE+U_ICSD calculation)
+    // first check whether it is an LDAU2 calculation
+    for (uint i = 0; i < vlines.size(); i++) { 
+      line_a = aurostd::RemoveSpaces(vlines[i]);
+      if (line_a.find("LDAU2=ON") != string::npos){ // string::npos is returned if string is not found
+        ldau2 = true;
+      }
+    }
+    // then read and check U parameters
+    for (uint i = 0; i < vlines.size(); i++) { 
+      line_a = aurostd::RemoveSpaces(vlines[i]);
+      // new implementation checking Us explicitly
+      if (line_a.find("LDAU_PARAMETERS=") != string::npos && ldau2){ // string::npos is returned if string is not found
+        vector<string> ldau_line_vector;
+        aurostd::string2tokens(line_a, ldau_line_vector, ";"); 
+        // get species
+        string species_part_1 = ldau_line_vector[0];
+        vector<string> species_part_vector;
+        aurostd::string2tokens(species_part_1, species_part_vector, "="); 
+        string species_part = species_part_vector[1];
+        vector<string> species_vector;
+        aurostd::string2tokens(species_part, species_vector, ","); 
+        if (species_vector.size() != structure.species.size()){
+          message << "BAD NEWS: The number of species in the DFT+U settings differs from the total number of species for this structure. Please adapt and rerun.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+        }
+        // get Us
+        string Us_part = ldau_line_vector[2];
+        vector<string> Us_string_vector;
+        vector<double> Us_vector;
+        aurostd::string2tokens(Us_part, Us_string_vector, ","); 
+        for (uint k = 0; k < Us_string_vector.size(); k++) { 
+          Us_vector.push_back(aurostd::string2utype<double>(Us_string_vector[k]));
+        }
+        if (species_vector.size() != Us_vector.size()){
+          message << "BAD NEWS: The number of species in the DFT+U settings differs from the number of provided U values. Please adapt and rerun.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+        }
+        // get standard Us for PBE+U_ICSD
+        vector<double> standard_ICSD_Us_vector;
+        bool LDAU=true;
+        vector<string> vLDAUspecies;
+        vector<uint> vLDAUtype;
+        vector<int> vLDAUL;
+        vector<double> vLDAUU;
+        vector<double> vLDAUJ;
+        for (uint k = 0; k < species_vector.size(); k++) { 
+          AVASP_Get_LDAU_Parameters(species_vector[k],LDAU,vLDAUspecies,vLDAUtype,vLDAUL,vLDAUU,vLDAUJ);
+          if (vLDAUtype[k] != 2 && vLDAUU[k] !=0){
+            ostream& oss = cerr;
+            ofstream FileMESSAGE;
+            _aflags aflags;aflags.Directory=".";
+            message << "BAD NEWS: It seems the standard DFT+U method for " << species_vector[k] << " was changed from Dudarev's approach (LDAU2=ON, vLDAUtype[" << k << "]=2) as used for the AFLOW ICSD database when obtaining the corrections to vLDAUtype[" << k << "]=" << vLDAUtype[k] << " now. If the standard U values have also been changed, then the corrections might have been constructed for other U values than used in this calculation and should not be applied. Please check this carefully!";
+            pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          }
+          standard_ICSD_Us_vector.push_back(vLDAUU[k]);
+        }
+        // compare read and standard Us
+        bool Us_disagree=false;
+        for (uint k = 0; k < species_vector.size(); k++) { 
+          if (Us_vector[k] != standard_ICSD_Us_vector[k]){
+            Us_disagree=true;
+            message << "BAD NEWS: For this DFT+U calculation with Dudarev's method the provided U value of " << Us_vector[k] << " eV for " << species_vector[k] << " does not match the standard value of " << standard_ICSD_Us_vector[k] << " eV. There are no corrections for this case.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+          }
+        }
+        if (!Us_disagree){
+          functional = "PBE+U_ICSD";
+        }
+      }
+    }
+    // check whether it is a DFT+U calculation with different parameters than for PBE+U_ICSD
+    for (uint i = 0; i < vlines.size(); i++) { 
+      line_a = aurostd::RemoveSpaces(vlines[i]);
+      if ((line_a.find("LDAU") != string::npos && line_a.find("=ON") != string::npos) || (line_a.find("LDAU") != string::npos && line_a.find("=ADIABATIC") != string::npos)){
+        ldau = true;
+        if (functional != "PBE+U_ICSD"){
+          message << "BAD NEWS: It seems you are providing an aflow.in for a DFT+U calculation with different parameters than for the AFLOW ICSD database (Dudarev's approach, LDAU2=ON). There are no corrections for this case.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+        }
+      }
+    }
+    // check whether it is an LDA or SCAN calculation
+    if (functional != "PBE+U_ICSD"){
+      if (!ldau){
+        for (uint i = 0; i < vlines.size(); i++) {
+          line_a = aurostd::RemoveSpaces(vlines[i]);
+          if (line_a.find("=potpaw_LDA") != string::npos || line_a.find("/potpaw_LDA/") != string::npos){ // the first criterion seems to not find "=potpaw_LDA" when the line is commented by # due to RemoveComments above
+            functional = "LDA";
+            for (uint k = 0; k < vlines.size(); k++) { // it could still be a SCAN calculation with LDA PPs; allowing for that since to my experience right now the SCAN corrections from calculations with PBE PPs should be good for SCAN calculations with LDA PPs
+              string line_b = aurostd::RemoveSpaces(vlines[k]);
+              if (line_b.find("METAGGA=SCAN") != string::npos){
+                functional = "SCAN";
+              }
+            }
+          } else if (line_a.find("METAGGA=SCAN") != string::npos){
+            functional = "SCAN";
+          }
+        }
+      }
+    }
+    return functional;
   }
 
   /////////////////////////////////////////////////////////////////////////////
