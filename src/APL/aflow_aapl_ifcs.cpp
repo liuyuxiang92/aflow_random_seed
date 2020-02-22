@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2017                    *
+// *                  Marco Esters - Duke University 2018                    *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
@@ -311,12 +311,16 @@ namespace apl {
 
 namespace apl {
 
-  void AnharmonicIFCs::calculateForceConstants() {
+  bool AnharmonicIFCs::calculateForceConstants() {
     cart_indices = getCartesianIndices();
 
     // Read forces
-    if (!outfileFoundAnywherePhonons(xInputs)) throw APLStageBreak();
-    outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, *messageFile);
+    // outfileFoundAnywherePhonons detects whether no calculations have been
+    // run (no error message) whereas outfileFounEverywherePhonons tries to
+    // read the force files. The latter outputs messages, which is not desired
+    // when directories have just been created.
+    if (!outfileFoundAnywherePhonons(xInputs)) return false;
+    if (!outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, *messageFile)) return false;
     if (_useZeroStateForces) {
       vector<string> directory;
       aurostd::DirectoryLS(_aflowFlags.Directory, directory);
@@ -345,6 +349,7 @@ namespace apl {
 
     pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "Symmetrizing IFCs.", _aflowFlags, *messageFile, std::cout);
     force_constants = symmetrizeIFCs(ifcs_unsym);
+    return true;
   }
 
   const vector<vector<double> >& AnharmonicIFCs::getForceConstants() const {

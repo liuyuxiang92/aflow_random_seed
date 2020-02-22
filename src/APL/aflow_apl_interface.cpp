@@ -180,7 +180,7 @@ namespace apl {
   }
 
   //outfileFoundEverywherePhonons/////////////////////////////////////////////
-  void outfileFoundEverywherePhonons(vector<_xinput>& xinps, const string& directory, ofstream& messageFile, bool contains_born) {
+  bool outfileFoundEverywherePhonons(vector<_xinput>& xinps, const string& directory, ofstream& messageFile, bool contains_born) {
     string function = "apl::outfileFoundEverywherePhonons()";
     string mode = xinps[0].xvasp.AVASP_arun_mode;
     stringstream _logger;
@@ -192,7 +192,11 @@ namespace apl {
       _logger << "Reading force file " << (idxRun + 1) << "/" << ninps << "."; //CO190116  // ME190607
       pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, xinps[idxRun].getDirectory(), messageFile, std::cout);
       string directory = xinps[idxRun].getDirectory();
-      readForcesFromDirectory(xinps[idxRun]);
+      if (!readForcesFromDirectory(xinps[idxRun])) {
+        _logger << "The force file in " << xinps[idxRun].getDirectory() << " directory is missing.";
+        pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, xinps[idxRun].getDirectory(), messageFile, std::cout);
+        return false;
+      }
 
       // Was it all right?
       if (!xinps[idxRun].getXStr().qm_calculated) {
@@ -202,9 +206,10 @@ namespace apl {
     }
     _logger << "No errors caught, all force files read successfully."; //CO190116  // ME190607
     pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, messageFile, std::cout, 'C');
+    return true;
   }
 
-  void readForcesFromDirectory(_xinput& xinp) {
+  bool readForcesFromDirectory(_xinput& xinp) {
     string function = "apl::readForcesFromDirectory()";
     uint natoms = xinp.getXStr().atoms.size();
     xinp.getXStr().qm_forces.clear();
@@ -213,8 +218,7 @@ namespace apl {
       if (!aurostd::EFileExist(xinp.getDirectory() + "/" + DEFAULT_AFLOW_QMVASP_OUT)
         && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml.static")
         && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml")) {
-        string message = "The force file in " + xinp.getDirectory() + " is missing.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+        return false;
       }
       // ME 190607 - BEGIN
       // Read forces from aflow qmvasp file - much faster
@@ -222,32 +226,26 @@ namespace apl {
       if (aurostd::EFileExist(file)) {
         xQMVASP qmvasp(file);
         xinp.getXStr().qm_forces = qmvasp.vforces;
-      }
-      if (xinp.getXStr().qm_forces.size() != natoms) {
-        xinp.getXStr().qm_forces.clear();
+      } else {
         file = xinp.getDirectory() + string("/vasprun.xml.static");
-        if(!aurostd::EFileExist(file)) {
-          file = xinp.getDirectory() + string("/vasprun.xml");
-          if(!aurostd::EFileExist(file)) {
-            string message = "The force file in " + xinp.getDirectory() + " directory is missing.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
-          }
-        }
+        if(!aurostd::EFileExist(file)) file = xinp.getDirectory() + string("/vasprun.xml");
         //xVASPRUNXML vasprunxml(file); OBSOLETE ME 190204 - far too slow
         xVASPRUNXML vasprunxml;
         vasprunxml.GetForcesFile(file);
         for (uint i = 0; i < vasprunxml.vforces.size(); i++) xinp.getXStr().qm_forces.push_back(vasprunxml.vforces[i]);
       }
       if (xinp.getXStr().qm_forces.size() == natoms) xinp.getXStr().qm_calculated = true;
-    }
-    if(xinp.AFLOW_MODE_AIMS){
+      return true;
+    } else if (xinp.AFLOW_MODE_AIMS){
       if(!aurostd::EFileExist(xinp.getDirectory() + string("/aims.out"))) {
-        string message = "The aims.out file in " + xinp.getDirectory() + " is missing.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+        return false;
       }
       xAIMSOUT xaimsout(xinp.getDirectory() + "/aims.out");
       for (uint i = 0; i < xaimsout.vforces.size(); i++) xinp.getXStr().qm_forces.push_back(xaimsout.vforces[i]);
       if (xinp.getXStr().qm_forces.size() == natoms) xinp.getXStr().qm_calculated = true;
+      return true;
+    } else {
+      return false;
     }
   }
 

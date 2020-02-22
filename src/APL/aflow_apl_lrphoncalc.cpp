@@ -118,7 +118,7 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void LinearResponsePC::calculateForceConstants() {
+  bool LinearResponsePC::calculateForceConstants() {
     // Check if supercell is already built
     if (!_supercell.isConstructed()) {
       // ME191031 - use xerror
@@ -128,13 +128,19 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
 
-    readForceConstantsFromVasprun(xInputs[0]);
-    if (_isPolarMaterial) calculateDielectricTensor(xInputs[1]);
+    // First pass - check if any of the calculations ran (gives no error message,
+    // similar to DirectMethodPC).
+    if (!outfileFoundAnywherePhonons(xInputs)) return false;
+    if (!readForceConstantsFromVasprun(xInputs[0])) return false;
+    if (_isPolarMaterial) {
+      if (!calculateDielectricTensor(xInputs[1])) return false;
+    }
+    return true;
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // ME200211
-  void LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
+  bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
     pflow::logger(_AFLOW_FILE_NAME_, xinp.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
@@ -146,7 +152,8 @@ namespace apl {
       filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
       if (aurostd::EFileExist(filename)) {
         message << "Could not find vasprun.xml file for linear response calculations.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+        pflow::logger(_AFLOW_FILE_NAME_, xinp.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+        return false;
       }
     }
     vector<string> vlines;
@@ -209,6 +216,7 @@ namespace apl {
         }
       }
     }
+    return true;
   }
 
   //////////////////////////////////////////////////////////////////////////////

@@ -1451,7 +1451,6 @@ namespace KBIN {
     // Construct the working supercell ////////////////////////////////////
 
     //apl::Supercell supercell(xvasp.str,logger),supercell_test(xvasp.str,logger);    //corey, slow
-    try {
 
     //ME200102 - Moved into apl::Supercell
       //[OBSOLETE]  apl::Supercell supercell(xinput.getXStr(),aflags,logger); //xvasp.str, logger);  //CO  //CO181226
@@ -1528,6 +1527,7 @@ namespace KBIN {
       //                                                                         //
       /////////////////////////////////////////////////////////////////////////////
 
+      // Set up the phonon calculator
       apl::PhononCalculator phcalc(supercell, messageFile);
       if (xflags.vflags.AFLOW_SYSTEM.content_string.empty()) {
         phcalc.setSystem(supercell.getInputStructure().title);
@@ -1537,36 +1537,66 @@ namespace KBIN {
       phcalc.setDirectory(aflags.Directory);
       phcalc.setNCPUs(kflags);
 
-      auto_ptr<apl::ForceConstantCalculator> fccalc;
-      if (USER_ENGINE == string("DM")) {
-        apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, xinput, aflags,
-            kflags, xflags, AflowIn, messageFile);
-        fccalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
-        fccalcdm->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY);
-        fccalcdm->setDistortionSYMMETRIZE(USER_DISTORTIONS_SYMMETRIZE);
-        fccalcdm->setDistortionINEQUIVONLY(USER_DISTORTIONS_INEQUIVONLY); //CO190131
-        fccalcdm->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
-        fccalcdm->setCalculateZeroStateForces(USER_ZEROSTATE);
-        fccalc.reset(fccalcdm);
-        fccalc->setPolarMaterial(USER_POLAR);  // ME200218
-      } //CO200106 - patching for auto-indenting
-      //CO generally redirects to DM, the distinction between DM and GSA is obsolete
-      //else if (USER_ENGINE == string("GSA")) {
-      //  apl::GeneralizedSupercellApproach* gsa = new apl::GeneralizedSupercellApproach(supercell, strPair, xinput, aflags, kflags, xflags, logger);//xvasp, aflags, kflags, vflags, logger);  //Modified JJPR
-      //  //gsa->setGeneratePlusMinus(USER_DISTORTIONS_PLUS_MINUS_OPTION.option); //CO auto
-      //  gsa->setGeneratePlusMinus(AUTO_DISTORTIONS_PLUS_MINUS_OPTION.option, USER_DISTORTIONS_PLUS_MINUS_OPTION.option);  //CO auto
-      //  gsa->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY_OPTION.option);
-      //  gsa->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
-      //  gsa->setTensor(CALCULATE_TCOND_OPTION.option);  // TCOND JJPR
-      //  gsa->setSumRule(USER_EPS_SUM);           // TCOND JJPR
-      //  //phcalcdm->setCalculateZeroStateForces(USER_ZEROSTATE_OPTION.option);
-      //  phcalc.reset(gsa);
-      //  } //CO200106 - patching for auto-indenting
-      else {
-        fccalc.reset(new apl::LinearResponsePC(supercell, xinput, aflags,
-              kflags, xflags, AflowIn, messageFile));
-        fccalc->setPolarMaterial(USER_POLAR);  // ME200218
+      bool stagebreak = false;
+
+      string hibfile = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE);
+      bool awakeHarmIFCs = (USER_HIBERNATE && aurostd::EFileExist(hibfile));
+      bool apl_stagebreak = false;
+      if (awakeHarmIFCs) {
+        try {
+          pflow::logger(_AFLOW_FILE_NAME_, modulename, "Awakening...", aflags, messageFile, std::cout);
+          phcalc.awake(hibfile);
+        } catch (aurostd::xerror& e) {
+          message = e.error_message + " Skipping awakening...";
+          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
+          awakeHarmIFCs = false;
+        }
       }
+
+      // Reading failed - calculate
+      if (!awakeHarmIFCs) {
+        // Calculate harmonic IFCs
+        auto_ptr<apl::ForceConstantCalculator> fccalc;
+        if (USER_ENGINE == string("DM")) {
+          apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, xinput, aflags,
+              kflags, xflags, AflowIn, messageFile);
+          fccalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
+          fccalcdm->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY);
+          fccalcdm->setDistortionSYMMETRIZE(USER_DISTORTIONS_SYMMETRIZE);
+          fccalcdm->setDistortionINEQUIVONLY(USER_DISTORTIONS_INEQUIVONLY); //CO190131
+          fccalcdm->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
+          fccalcdm->setCalculateZeroStateForces(USER_ZEROSTATE);
+          fccalc.reset(fccalcdm);
+          fccalc->setPolarMaterial(USER_POLAR);  // ME200218
+        } //CO200106 - patching for auto-indenting
+        //CO generally redirects to DM, the distinction between DM and GSA is obsolete
+        //else if (USER_ENGINE == string("GSA")) {
+        //  apl::GeneralizedSupercellApproach* gsa = new apl::GeneralizedSupercellApproach(supercell, strPair, xinput, aflags, kflags, xflags, logger);//xvasp, aflags, kflags, vflags, logger);  //Modified JJPR
+        //  //gsa->setGeneratePlusMinus(USER_DISTORTIONS_PLUS_MINUS_OPTION.option); //CO auto
+        //  gsa->setGeneratePlusMinus(AUTO_DISTORTIONS_PLUS_MINUS_OPTION.option, USER_DISTORTIONS_PLUS_MINUS_OPTION.option);  //CO auto
+        //  gsa->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY_OPTION.option);
+        //  gsa->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
+        //  gsa->setTensor(CALCULATE_TCOND_OPTION.option);  // TCOND JJPR
+        //  gsa->setSumRule(USER_EPS_SUM);           // TCOND JJPR
+        //  //phcalcdm->setCalculateZeroStateForces(USER_ZEROSTATE_OPTION.option);
+        //  phcalc.reset(gsa);
+        //  } //CO200106 - patching for auto-indenting
+        else {
+          fccalc.reset(new apl::LinearResponsePC(supercell, xinput, aflags,
+                kflags, xflags, AflowIn, messageFile));
+          fccalc->setPolarMaterial(USER_POLAR);  // ME200218
+        }
+        apl_stagebreak = fccalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
+        if (!apl_stagebreak) {
+          apl_stagebreak = fccalc->run();
+          if (!apl_stagebreak) {
+            if (USER_HIBERNATE) fccalc->hibernate(hibfile);
+            phcalc.setHarmonicForceConstants(*fccalc);
+          }
+        }
+      }
+
+      stagebreak = (stagebreak || apl_stagebreak);
 
       //QHA/SCQHA/QHA3P  START //PN180705
       // Create directories for QHA/SCQHA/QHA3P
@@ -1607,9 +1637,6 @@ namespace KBIN {
       }
       //QHA/SCQHA/QHA3P END
 
-      // ME191029 - Reordered APL workflow to accommodate ZEROSTATE CHGCAR
-      bool stagebreak = fccalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
-
       // ME200220 - Redesigned AAPL workflow
       bool aapl_stagebreak = false;
       if (USER_TCOND) {
@@ -1634,7 +1661,6 @@ namespace KBIN {
           }
 
           // Reading failed - calculate
-
           if (!awakeAnharmIFCs) {
             // Clusters
             apl::ClusterSet clst(logger, aflags);
@@ -1666,13 +1692,10 @@ namespace KBIN {
             aapl_stagebreak = (anharm.runVASPCalculations(USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
             // Calculate IFCs
             if (!aapl_stagebreak) {
-              try {
-                anharm.calculateForceConstants();
-                anharm.writeIFCsToFile(ifcs_hib_file);
+              aapl_stagebreak = !(anharm.calculateForceConstants());
+              if (!aapl_stagebreak) {
+                if (USER_HIBERNATE) anharm.writeIFCsToFile(ifcs_hib_file);
                 phcalc.setAnharmonicForceConstants(anharm);
-              } catch (apl::APLStageBreak& stgbrk) {
-                // Could be thrown by outfileFoundAnywhere
-                aapl_stagebreak = true;
               }
             }
           }
@@ -1683,45 +1706,40 @@ namespace KBIN {
 
       // Run ZEROSTATE calculation if ZEROSTATE CHGCAR
       if (USER_ZEROSTATE_CHGCAR && !XHOST.GENERATE_AFLOWIN_ONLY) {
-        string chgcar_file = fccalc->zerostate_dir + "/CHGCAR.static";
-        if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
-        if (!aurostd::FileExist(chgcar_file)) {
-          logger << "Executing ZEROSTATE directory." << apl::endl;
-          stringstream cmd;
-          cmd << "aflow --use_aflow.in=" << _AFLOWIN_
-            << " --use_LOCK=" << _AFLOWLOCK_
-            << " --quiet -D ./" << fccalc->zerostate_dir;
-          aurostd::execute(cmd.str());
-          logger << "Finished executing ZEROSTATE directory." << apl::endl;
+        // Find ZEROSTATE directory
+        vector<string> directory;
+        aurostd::DirectoryLS(aflags.Directory, directory);
+        uint ndir = directory.size();
+        uint d = 0;
+        for (d = 0; d < ndir; d++) {
+          if (aurostd::IsDirectory(aflags.Directory + "/" + directory[d]) && aurostd::substring2bool(directory[d], "ZEROSTATE")) {
+            break;
+          }
+        }
+        if (d == ndir) {
+          string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
+          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
+          USER_ZEROSTATE_CHGCAR = false;
+        } else {
+          string chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
+          if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
+          if (!aurostd::FileExist(chgcar_file)) {
+            logger << "Executing ZEROSTATE directory." << apl::endl;
+            stringstream cmd;
+            cmd << "aflow --use_aflow.in=" << _AFLOWIN_
+              << " --use_LOCK=" << _AFLOWLOCK_
+              << " --quiet -D ./" << directory[d];
+            aurostd::execute(cmd.str());
+            logger << "Finished executing ZEROSTATE directory." << apl::endl;
+          }
         }
       }
 
       if (stagebreak) {
-        throw apl::APLStageBreak();
+        logger << apl::notice << "Stopped. Waiting for required calculations..." << apl::endl;  //CO181226
+        return;
       }
       // ME1901029 - END
-
-      // Run or awake
-      string hibfile = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE);
-      bool isHibFileAvailable = aurostd::EFileExist(hibfile);  //|| //CO
-
-      if (USER_HIBERNATE && isHibFileAvailable) {
-        try {
-          pflow::logger(_AFLOW_FILE_NAME_, modulename, "Awakening...", aflags, messageFile, std::cout);
-          phcalc.awake(hibfile);
-        } catch (aurostd::xerror& e) {
-          message = e.error_message + " Skipping awakening...";
-          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
-          isHibFileAvailable = false;
-        }
-      }
-
-      if (!isHibFileAvailable) {
-        fccalc->run();
-        phcalc.setHarmonicForceConstants(*fccalc);
-        if (USER_HIBERNATE)
-          fccalc->hibernate(hibfile);
-      }
 
       /////////////////////////////////////////////////////////////////////////////
       //                                                                         //
@@ -2314,9 +2332,6 @@ namespace KBIN {
       }
       /*************** End Thermal Conductivity Calculations ****************/
 
-    } catch (apl::APLStageBreak& e) {
-      logger << apl::notice << "Stopped. Waiting for required calculations..." << apl::endl;  //CO181226
-    }
   }
 }
 

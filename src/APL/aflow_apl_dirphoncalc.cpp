@@ -82,8 +82,6 @@ namespace apl {
 
     // Check if supercell is already built
     if (!_supercell.isConstructed()) {
-      // ME191029 - use xerror
-      //throw APLRuntimeError("apl::DirectMethodPC::calculateForceFields(); The supercell structure has not been initialized yet.");
       message << "The supercell structure has not been initialized yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
@@ -123,6 +121,7 @@ namespace apl {
     // ME 181022 - START
     // Generate calculation directories
     string chgcar_file = "";
+    string zerostate_dir = "";
     if (zerostate_chgcar) {  // ME191029 - for ZEROSTATE CHGCAR
       zerostate_dir = "ARUN.APL_";
       int index = ncalcs;
@@ -529,9 +528,9 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
 
-  void DirectMethodPC::calculateForceConstants() {
+  bool DirectMethodPC::calculateForceConstants() {
     // Get all forces required for the construction of force-constant matrices
-    calculateForceFields();
+    if (!calculateForceFields()) return true;
 
     // ME191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
@@ -552,18 +551,19 @@ namespace apl {
 
     // Store data into DYNMAT file format - vasp like
     writeDYNMAT();
+    return true;
   }
 
-  void DirectMethodPC::calculateForceFields() {
+  bool DirectMethodPC::calculateForceFields() {
     bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
     string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO190218
     // Extract all forces ////////////////////////////////////////////////////
 
     //first pass, just find if outfile is found ANYWHERE
-    if(!outfileFoundAnywherePhonons(xInputs)){throw APLStageBreak();}
+    if(!outfileFoundAnywherePhonons(xInputs)) return false;
 
     //second pass, make sure it's everywhere!
-    outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, *messageFile, _isPolarMaterial);
+    if (outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, *messageFile, _isPolarMaterial)) return false;
 
     // Remove zero state forces if necessary
     if (_calculateZeroStateForces) {
@@ -624,7 +624,10 @@ namespace apl {
       forcesForOneAtomAndAllDistortions.clear();
     }
 
-    if (_isPolarMaterial) calculateDielectricTensor(xInputs.back());
+    if (_isPolarMaterial) {
+      if (calculateDielectricTensor(xInputs.back())) return false;
+    }
+    return true;
   }
 
   // ///////////////////////////////////////////////////////////////////////////

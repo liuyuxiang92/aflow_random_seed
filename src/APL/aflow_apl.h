@@ -41,24 +41,25 @@ extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 // ***************************************************************************
 // "aplexcept.h"
 // in aurostd.h // [OBSOLETE]
-#include <stdexcept>
-namespace apl {
-  //
-  // OBSOLETE ME191031 - use xerror
-  //class APLRuntimeError : public std::runtime_error {
-  // public:
-  //  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
-  //};
-  //class APLLogicError : public std::logic_error {
-  // public:
-  //  APLLogicError(const std::string& s) : std::logic_error(s) {}
-  //};
-  //
-  class APLStageBreak : public std::exception {
-    public:
-      APLStageBreak() {}
-  };
-}
+// ME200222 - APLStageBreak obsolete
+//[OBSOLETE] #include <stdexcept>
+//[OBSOLETE] namespace apl {
+//[OBSOLETE]   //
+//[OBSOLETE]   // OBSOLETE ME191031 - use xerror
+//[OBSOLETE]   //class APLRuntimeError : public std::runtime_error {
+//[OBSOLETE]   // public:
+//[OBSOLETE]   //  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
+//[OBSOLETE]   //};
+//[OBSOLETE]   //class APLLogicError : public std::logic_error {
+//[OBSOLETE]   // public:
+//[OBSOLETE]   //  APLLogicError(const std::string& s) : std::logic_error(s) {}
+//[OBSOLETE]   //};
+//[OBSOLETE]   //
+//[OBSOLETE]   class APLStageBreak : public std::exception {
+//[OBSOLETE]     public:
+//[OBSOLETE]       APLStageBreak() {}
+//[OBSOLETE]   };
+//[OBSOLETE] }
 
 // ***************************************************************************
 // "logger.h"
@@ -339,7 +340,7 @@ namespace apl {
       int getOrder() const;
 
       bool runVASPCalculations(bool);
-      void calculateForceConstants();
+      bool calculateForceConstants();
       const vector<vector<double> >& getForceConstants() const;
       vector<vector<int> > getClusters() const;
       void writeIFCsToFile(const string&);
@@ -725,8 +726,8 @@ namespace apl {
   void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
   bool filesExistPhonons(_xinput&);
   bool outfileFoundAnywherePhonons(vector<_xinput>&);
-  void outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, bool=false);  // ME191029
-  void readForcesFromDirectory(_xinput&);  // ME200219
+  bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, bool=false);  // ME191029
+  bool readForcesFromDirectory(_xinput&);  // ME200219
   void subtractZeroStateForces(vector<_xinput>&, bool);
   void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME190114
 }
@@ -763,7 +764,7 @@ namespace apl {
       void free();
       void copy(const ForceConstantCalculator&);
 
-      virtual void calculateForceConstants() {} // ME200211
+      virtual bool calculateForceConstants() {return false;} // ME200211
 
       void symmetrizeForceConstantMatrices();
       void correctSumRules();
@@ -782,7 +783,7 @@ namespace apl {
       bool runVASPCalculationsBE(_xinput&, uint);
       void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME200218
 
-      void run();  // ME191029
+      bool run();  // ME191029
       virtual void hibernate(const string&) {};
       void writeHibernateHeader(stringstream&);
       void writeForceConstants(stringstream&);
@@ -794,14 +795,12 @@ namespace apl {
       bool isPolarMaterial() const;
 
       // Born charges + dielectric tensor
-      void calculateDielectricTensor(const _xinput&);  // ME191029
+      bool calculateDielectricTensor(const _xinput&);  // ME191029
       void readBornEffectiveChargesFromAIMSOUT(void);
       void readBornEffectiveChargesFromOUTCAR(const _xinput&);  // ME190113
       void symmetrizeBornEffectiveChargeTensors(void);
       void readDielectricTensorFromAIMSOUT(void);
       void readDielectricTensorFromOUTCAR(const _xinput&);  // ME190113
-
-      string zerostate_dir;
   };
 }
 
@@ -843,7 +842,7 @@ namespace apl {
       ~DirectMethodPC();
       void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
 
-      void calculateForceFields();  // ME190412  // ME191029
+      bool calculateForceFields();  // ME190412  // ME191029
       // Easy access to global parameters
       //void setGeneratePlusMinus(bool b) { GENERATE_PLUS_MINUS = b; } //JAHNATEK ORIGINAL
       void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
@@ -855,7 +854,7 @@ namespace apl {
       }  //CO
       void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO190108
-      void calculateForceConstants();  // ME200211
+      bool calculateForceConstants();  // ME200211
 
       void hibernate(const string&);
       void writeFORCES();
@@ -1001,7 +1000,7 @@ namespace apl {
       void free();
       void copy(const LinearResponsePC&);
       bool runVASPCalculationsDFPT(_xinput&);  // ME190113  // ME200213 - changed name
-      void readForceConstantsFromVasprun(_xinput&);  // ME200211
+      bool readForceConstantsFromVasprun(_xinput&);  // ME200211
 
     public:
       LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
@@ -1011,7 +1010,7 @@ namespace apl {
       void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
 
       bool runVASPCalculations(bool);  // ME191029
-      void calculateForceConstants();  // ME200211
+      bool calculateForceConstants();  // ME200211
 
       void hibernate(const string&);
   };
@@ -1101,9 +1100,9 @@ namespace apl {
 
       // IFCs
       void setHarmonicForceConstants(const ForceConstantCalculator&);
-      void awake(const string&, bool=false);
+      void awake(const string&, bool=true);
       void setAnharmonicForceConstants(const AnharmonicIFCs&);
-      void readAnharmonicIFCs(string, bool=false);
+      void readAnharmonicIFCs(string, bool=true);
 
       // Dynamical Matrix/Frequencies
       xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
