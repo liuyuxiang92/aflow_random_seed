@@ -27,8 +27,7 @@
 namespace apl
 {
   // ***************************************************************************************
-  //GroupVelocity::GroupVelocity(IPhononCalculator& pc,  UniformMesh& umesh, Logger& l):_pc(pc),_umesh(umesh), _logger(l)  OBSOLETE ME190428
-  GroupVelocity::GroupVelocity(IPhononCalculator& pc,  QMesh& umesh, Logger& l):_pc(pc),_umesh(umesh), _logger(l)
+  GroupVelocity::GroupVelocity(PhononCalculator& pc,  QMesh& umesh, Logger& l):_pc(pc),_umesh(umesh), _logger(l)
   {
     _logger<<"Setting variables to calculate group velocities "<<apl::endl;
     clear();

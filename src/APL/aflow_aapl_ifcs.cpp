@@ -46,22 +46,27 @@ namespace apl {
   //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
   AnharmonicIFCs::AnharmonicIFCs(_xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, ClusterSet& _clst, ofstream& fm)
+      _xflags& xflags, ClusterSet& _clst, ofstream& mf)
     : _xInput(xinput), _aflowFlags(aflags), _kbinFlags(kflags), _xFlags(xflags),
-      clst(_clst), fileMessage(fm) {
+      clst(_clst) {
       free();
+      messageFile = &mf;
       order = clst.order;
   }
 
   //Copy constructors
   AnharmonicIFCs::AnharmonicIFCs(const AnharmonicIFCs& that)
     : _xInput(that._xInput), _aflowFlags(that._aflowFlags), _kbinFlags(that._kbinFlags),
-      _xFlags(that._xFlags), clst(that.clst), fileMessage(that.fileMessage) {
+      _xFlags(that._xFlags), clst(that.clst) {
+      free();
       copy(that);
   }
 
   const AnharmonicIFCs& AnharmonicIFCs::operator=(const AnharmonicIFCs& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 
@@ -74,7 +79,7 @@ namespace apl {
     cart_indices = that.cart_indices;
     clst = that.clst;
     distortion_magnitude = that.distortion_magnitude;
-    //fileMessage = that.fileMessage;
+    messageFile = that.messageFile;
     force_constants = that.force_constants;
     max_iter = that.max_iter;
     mixing_coefficient = that.mixing_coefficient;
@@ -109,12 +114,18 @@ namespace apl {
   }
 
 
+  //setOptions////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::setOptions(double dmag, int iter, double mix, double threshold, bool zero) {
     distortion_magnitude = dmag;
     max_iter = iter;
     mixing_coefficient = mix;
     sumrule_threshold = threshold;
     _useZeroStateForces = zero;
+  }
+
+  //getOrder//////////////////////////////////////////////////////////////////
+  int AnharmonicIFCs::getOrder() const {
+    return order;
   }
 
 }  // namespace apl
@@ -133,7 +144,7 @@ namespace apl {
       _logger << "4th";
     }
     _logger << " order IFCs.";
-    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", _logger, _aflowFlags, fileMessage, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", _logger, _aflowFlags, *messageFile, std::cout);
 
     // Determine the number of runs so the run ID in the folder name can be
     // padded with the appropriate number of zeros.
@@ -163,7 +174,7 @@ namespace apl {
       }
       if (d == ndir) {
         string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, "AAPL", message, _aflowFlags, fileMessage, std::cout, 'W');
+        pflow::logger(_AFLOW_FILE_NAME_, "AAPL", message, _aflowFlags, *messageFile, std::cout, 'W');
         zerostate_chgcar = false;
       } else {
         chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
@@ -305,7 +316,7 @@ namespace apl {
 
     // Read forces
     if (!outfileFoundAnywherePhonons(xInputs)) throw APLStageBreak();
-    outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, fileMessage);
+    outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, *messageFile);
     if (_useZeroStateForces) {
       vector<string> directory;
       aurostd::DirectoryLS(_aflowFlags.Directory, directory);
@@ -328,11 +339,11 @@ namespace apl {
     }
     vector<vector<vector<xvector<double> > > > force_tensors = storeForces(xInputs);
 
-    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "Calculating anharmonic IFCs.", _aflowFlags, fileMessage, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "Calculating anharmonic IFCs.", _aflowFlags, *messageFile, std::cout);
     vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst.ineq_distortions, force_tensors);
     force_tensors.clear();
 
-    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "Symmetrizing IFCs.", _aflowFlags, fileMessage, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "Symmetrizing IFCs.", _aflowFlags, *messageFile, std::cout);
     force_constants = symmetrizeIFCs(ifcs_unsym);
   }
 
@@ -608,7 +619,7 @@ namespace apl {
     // Do iterations
     int num_iter = 0;
     double max_err = 0.0;
-    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "Begin SCF for anharmonic force constants.", _aflowFlags, fileMessage, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "Begin SCF for anharmonic force constants.", _aflowFlags, *messageFile, std::cout);
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
     std::cout << std::setw(15) << "Iteration";
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -641,7 +652,7 @@ namespace apl {
       }
       num_iter++;
     } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
-    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "End SCF for anharmonic force constants.", _aflowFlags, fileMessage, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "AAPL", "End SCF for anharmonic force constants.", _aflowFlags, *messageFile, std::cout);
     if (num_iter > max_iter) {
       string function = _AAPL_IFCS_ERR_PREFIX_ + "symmetrizeIFCs";
       stringstream message;

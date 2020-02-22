@@ -18,7 +18,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  PhononDispersionCalculator::PhononDispersionCalculator(IPhononCalculator& pc, Logger& l) : _pc(pc), _logger(l) {
+  PhononDispersionCalculator::PhononDispersionCalculator(PhononCalculator& pc, Logger& l) : _pc(pc), _logger(l) {
     _system = _pc.getSystemName();  // ME190614
   }
 
@@ -171,10 +171,7 @@ namespace apl {
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
 
     // Get the number of CPUS
-    int ncpus; //= sysconf(_SC_NPROCESSORS_ONLN);  // AFLOW_MachineNCPUs;  //CO 180214
-    _pc.get_NCPUS(ncpus);  //CO 180214
-    if (ncpus < 1) ncpus = 1;
-    //  int qpointsPerCPU = _qpoints.size() / ncpus;  OBSOLETE ME180801
+    int ncpus = _pc.getNCPUs();
 
     // Show info
     if (ncpus == 1)

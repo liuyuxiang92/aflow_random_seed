@@ -226,8 +226,7 @@ namespace apl {
 
     // Calculate frequencies and group velocities
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = 1;
-    _pc.get_NCPUS(ncpus);
+    int ncpus = _pc.getNCPUs();
     vector<vector<int> > thread_dist = setupMPI(message, _logger, nQPs, ncpus);
     vector<std::thread*> threads;
     threads.clear();
@@ -285,11 +284,11 @@ namespace apl {
     // Prepare and precompute
     vector<vector<double> > grueneisen(nIQPs, vector<double>(nBranches));
 
-    const vector<vector<double> >& ifcs = _pc.anharmonicIFCs[0];
+    const vector<vector<double> >& ifcs = _pc.getAnharmonicForceConstants(3);
     const Supercell& scell = _pc.getSupercell();
 
     // Inverse masses
-    const vector<vector<int> >& clusters = _pc.clusters[0];
+    const vector<vector<int> >& clusters = _pc.getClusters(3);
     uint nclusters = clusters.size();
     vector<double> invmasses(nclusters);
     for (uint c = 0; c < nclusters; c++) {
@@ -414,8 +413,7 @@ namespace apl {
   void TCONDCalculator::calculateTransitionProbabilities() {
     _logger << "Calculating transition probabilities." << apl::endl;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = 1;
-    _pc.get_NCPUS(ncpus);
+    int ncpus = _pc.getNCPUs();
     vector<std::thread*> threads;
     vector<vector<int> > thread_dist;
 #endif
@@ -541,7 +539,7 @@ namespace apl {
       const vector<vector<vector<xcomplex<double> > > >& phases) {
     // Prepare and precompute
     const Supercell& scell = _pc.getSupercell();
-    const vector<vector<int> >& clusters = _pc.clusters[0];
+    const vector<vector<int> >& clusters = _pc.getClusters(3);
     uint nclusters = clusters.size();
 
     // Inverse masses
@@ -553,7 +551,7 @@ namespace apl {
     }
 
     // Cartesian indices to avoid running xcombos multiple times
-    const vector<vector<double> >& ifcs = _pc.anharmonicIFCs[0];
+    const vector<vector<double> >& ifcs = _pc.getAnharmonicForceConstants(3);
     vector<vector<int> > cart_indices;
     aurostd::xcombos cart(3, 3, 'E', true);
     while (cart.increment()) cart_indices.push_back(cart.getCombo());
@@ -1067,8 +1065,7 @@ namespace apl {
   vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<vector<double> >& occ) {
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = 1;
-    _pc.get_NCPUS(ncpus);
+    int ncpus = _pc.getNCPUs();
     vector<std::thread*> threads;
     vector<vector<int> > thread_dist = getThreadDistribution(nIQPs, ncpus);
     threads.clear();
@@ -1159,8 +1156,7 @@ namespace apl {
       vector<vector<xvector<double> > >& mfd) {
     // MPI variables
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = 1;
-    _pc.get_NCPUS(ncpus);
+    int ncpus = _pc.getNCPUs();
     vector<vector<int> > thread_dist;
     vector<std::thread*> threads;
 #endif

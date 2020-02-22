@@ -47,15 +47,15 @@ namespace apl {
   }
 
   // ME181022 - Old method to create aflow.in files for AIMS
-  void createAflowInPhononsAIMS(_aflags& _aflowFlags, _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, _xinput& xinp, ofstream& fileMessage) {
+  void createAflowInPhononsAIMS(_aflags& _aflowFlags, _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, _xinput& xinp, ofstream& messageFile) {
     if (!xinp.AFLOW_MODE_AIMS) {
       string function = "apl::createAflowInPhononsAIMS()";
       string message = "This function only works with AIMS.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     xinp.xaims.CONTROL.str(std::string());
-    KBIN::AIMS_Produce_CONTROL(xinp.xaims,_AflowIn,fileMessage,_aflowFlags,_kbinFlags,_xFlags.aimsflags);  //DEFAULT
-    KBIN::AIMS_Modify_CONTROL(xinp.xaims,fileMessage,_aflowFlags,_kbinFlags,_xFlags.aimsflags);            //DEFAULT
+    KBIN::AIMS_Produce_CONTROL(xinp.xaims,_AflowIn,messageFile,_aflowFlags,_kbinFlags,_xFlags.aimsflags);  //DEFAULT
+    KBIN::AIMS_Modify_CONTROL(xinp.xaims,messageFile,_aflowFlags,_kbinFlags,_xFlags.aimsflags);            //DEFAULT
 
     // Write aflow.in
 
@@ -180,17 +180,17 @@ namespace apl {
   }
 
   //outfileFoundEverywherePhonons/////////////////////////////////////////////
-  void outfileFoundEverywherePhonons(vector<_xinput>& xinps, const string& directory, ofstream& fileMessage, bool contains_born) {
+  void outfileFoundEverywherePhonons(vector<_xinput>& xinps, const string& directory, ofstream& messageFile, bool contains_born) {
     string function = "apl::outfileFoundEverywherePhonons()";
     string mode = xinps[0].xvasp.AVASP_arun_mode;
     stringstream _logger;
     _logger << "Reading force files";
-    pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, fileMessage, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, messageFile, std::cout);
     uint ninps = xinps.size();
     if (contains_born) ninps--;
     for (uint idxRun = 0; idxRun < ninps; idxRun++) {
       _logger << "Reading force file " << (idxRun + 1) << "/" << ninps << "."; //CO190116  // ME190607
-      pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, xinps[idxRun].getDirectory(), fileMessage, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, xinps[idxRun].getDirectory(), messageFile, std::cout);
       string directory = xinps[idxRun].getDirectory();
       readForcesFromDirectory(xinps[idxRun]);
 
@@ -201,7 +201,7 @@ namespace apl {
       }
     }
     _logger << "No errors caught, all force files read successfully."; //CO190116  // ME190607
-    pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, fileMessage, std::cout, 'C');
+    pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, messageFile, std::cout, 'C');
   }
 
   void readForcesFromDirectory(_xinput& xinp) {

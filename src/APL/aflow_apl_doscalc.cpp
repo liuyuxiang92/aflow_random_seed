@@ -25,8 +25,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //DOSCalculator::DOSCalculator(IPhononCalculator& pc, IReciprocalPointGrid& rg, Logger& l)  OBSOLETE ME190423
-  DOSCalculator::DOSCalculator(IPhononCalculator& pc, QMesh& rg, Logger& l, string method,
+  DOSCalculator::DOSCalculator(PhononCalculator& pc, QMesh& rg, Logger& l, string method,
       const vector<xvector<double> >& projections)  // ME190624
     : _pc(pc), _rg(rg), _logger(l) {
       clear();
@@ -91,10 +90,7 @@ namespace apl {
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
 
     // Get the number of CPUS
-    int ncpus; //= sysconf(_SC_NPROCESSORS_ONLN);  // AFLOW_MachineNCPUs;  //CO 180214
-    _pc.get_NCPUS(ncpus);  //CO 180214
-    if (ncpus < 1) ncpus = 1;
-    //  int qpointsPerCPU = _qpoints.size() / ncpus;  OBSOLETE ME 180801
+    int ncpus = _pc.getNCPUs();
 
     // Show info
     if (ncpus == 1)
@@ -595,12 +591,7 @@ namespace apl {
   {
     //CO - START
     // Write PHDOS file
-    //ofstream outfile(file.c_str(),ios_base::out);
     stringstream outfile;
-    //if( !outfile.is_open() )
-    //{
-    //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
-    //}
     //CO - END
 
     double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
@@ -627,10 +618,7 @@ namespace apl {
       string function = "DOSCalculator::writePDOS()";
       string message = "Cannot open output file " + filename + "."; //ME181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-      //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
     }
-    //outfile.clear();
-    //outfile.close();
     //CO - END
   }
   //PINKU - END
