@@ -18,7 +18,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  PhononDispersionCalculator::PhononDispersionCalculator(PhononCalculator& pc, Logger& l) : _pc(pc), _logger(l) {
+  PhononDispersionCalculator::PhononDispersionCalculator(PhononCalculator& pc) : _pc(pc) {
     _system = _pc.getSystemName();  // ME190614
   }
 
@@ -83,8 +83,11 @@ namespace apl {
         //lattice = LATTICE_Lattice_Variation_SpaceGroup(spacegroupNumber,_pc.getInputCellStructure());
         //lattice = LATTICE::SpaceGroup2LatticeVariation(spacegroupNumber,_pc.getInputCellStructure());
         lattice = LATTICE::SpaceGroup2LatticeVariation(a.space_group_ITC, a);
-      } else {lattice = a.bravais_lattice_variation_type;}
-      _logger << "The phonon dispersion curves will be generated for lattice variation " << lattice << "." << apl::endl;
+      } else {
+        lattice = a.bravais_lattice_variation_type;
+      }
+      string message = "The phonon dispersion curves will be generated for lattice variation " + lattice + ".";
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
     }
     //CO - END
 
@@ -137,7 +140,6 @@ namespace apl {
   void PhononDispersionCalculator::calculateInOneThread(int startIndex, int endIndex) {
     //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
     for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      _logger.updateProgressBar(iqp, _qpoints.size());
       // ME200206 - get direction for q-points near Gamma for non-analytical correction
       // or the discontinuity due to LO-TO splitting is not accurately captured.
       if (_pc.isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
@@ -167,17 +169,13 @@ namespace apl {
     }
 
     // Compute frequencies for each q-point
+    string message = "Calculating frequencies for the phonon dispersion.";
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
 
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
 
     // Get the number of CPUS
     int ncpus = _pc.getNCPUs();
-
-    // Show info
-    if (ncpus == 1)
-      _logger.initProgressBar("Calculating frequencies for PDIS");
-    else
-      _logger.initProgressBar("Calculating frequencies for PDIS (" + stringify(ncpus) + " threads)");
 
     // Prepare storage
     _freqs.clear();
@@ -212,19 +210,14 @@ namespace apl {
     }
     threads.clear();
 
-    // Done
-    _logger.finishProgressBar();
-
 #else
 
-    _logger.initProgressBar("Calculating frequencies for PDIS");
     // ME200206 - use calculateInOneThread so changes only need to be made in one place
     //[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
     //[OBSOLETE]  _logger.updateProgressBar(iqp, _qpoints.size());
     //[OBSOLETE]  _freqs.push_back(_pc.getFrequency(_qpoints[iqp], _frequencyFormat));
     //[OBSOLETE]}
     calculateInOneThread(0, (int) _qpoints.size());
-    _logger.finishProgressBar();
 
 #endif
   }
@@ -233,7 +226,8 @@ namespace apl {
 
   void PhononDispersionCalculator::writePDIS(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE); //ME181226
-    _logger << "Writing dispersion curves into file " << filename << "." << apl::endl; //ME181226
+    string message = "Writing dispersion curves into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
 
     //CO - START
     //ofstream outfile("PDIS",ios_base::out);
@@ -363,7 +357,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename); //ME181226
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "PhononDispersionCalculator::writePDIS()";
-      string message = "Cannot open output file " + filename + "."; //ME181226
+      message = "Cannot open output file " + filename + "."; //ME181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("Cannot open output PDIS file.");
     }
@@ -377,7 +371,7 @@ namespace apl {
     aurostd::stringstream2file(ouths, hskptsfile); //ME181226
     if (!aurostd::FileExist(hskptsfile)) { //ME181226
       string function = "PhononDispersionCalculator::writePDIS()";
-      string message = "Cannot open output file " + hskptsfile + "."; //ME181226
+      message = "Cannot open output file " + hskptsfile + "."; //ME181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("Cannot open output aflow.apl_hskpoints.out file.");
     }
@@ -418,13 +412,14 @@ namespace apl {
   // Write the eigenvalues into a VASP EIGENVAL-formatted file
   void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHEIGENVAL_FILE);
-    _logger << "Writing phonon eigenvalues into file " << filename << "." << apl::endl;
+    string message = "Writing phonon eigenvalues into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
     stringstream eigenval;
     eigenval << createEIGENVAL();
     aurostd::stringstream2file(eigenval, filename);
     if (!aurostd::FileExist(filename)) {
       string function = "PhononDispersionCalculator::writePHEIGENVAL()";
-      string message = "Cannot open output file " + filename + ".";
+      message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
 

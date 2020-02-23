@@ -1,10 +1,14 @@
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+//****************************************************************************
+
 #include "aflow_apl.h"
 
 #define _DEBUG_APL_DIRPHONCALC_ false  //CO190116
 
 namespace apl {
-
-  // ///////////////////////////////////////////////////////////////////////////
 
   DirectMethodPC::DirectMethodPC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
@@ -73,7 +77,9 @@ namespace apl {
     _isPolarMaterial = false;
   }
 
-  //////////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+namespace apl {
 
   bool DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
     string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO190218
@@ -526,7 +532,9 @@ namespace apl {
   }
   //CO - END
 
-  //////////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+namespace apl {
 
   bool DirectMethodPC::calculateForceConstants() {
     // Get all forces required for the construction of force-constant matrices
@@ -939,7 +947,9 @@ namespace apl {
     }
   }
 
-  //////////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+namespace apl {
 
   void DirectMethodPC::hibernate(const string& filename) {
     stringstream outfile;
@@ -1194,3 +1204,9 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
 
 }  // namespace apl
+
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+//****************************************************************************

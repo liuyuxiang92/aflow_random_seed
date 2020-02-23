@@ -55,6 +55,7 @@ namespace KBIN {
       ofstream& fileMessage) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     ostringstream aus;
+    stringstream message;
 
     // Store original settings
     string prec = vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme;
@@ -68,8 +69,7 @@ namespace KBIN {
 
     // ME200102
     // Determine k-point grid that is commensurate with the grid of the supercell
-    apl::Logger l(fileMessage, aflags);
-    apl::Supercell scell(xvasp.str, aflags, l);
+    apl::Supercell scell(xvasp.str, aflags, fileMessage);
     scell.build(scell_dims, false);
     int kppra_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KPPRA.content_int;
     string scheme_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KSCHEME.content_string;
@@ -78,9 +78,10 @@ namespace KBIN {
     if (NK < 1) NK = 1;
     KPPRA(kpts_sc[1], kpts_sc[2], kpts_sc[3], scell.getSupercellStructure().lattice, NK);
     for (int i = 1; i < 4; i++) kpts_pc[i] = scell_dims[i] * kpts_sc[i];
-    l << "APL will use a " << aurostd::joinWDelimiter(kpts_sc, "x") << " k-point grid (KPPRA = " << kppra_phonons << ")"
+    message << "APL will use a " << aurostd::joinWDelimiter(kpts_sc, "x") << " k-point grid (KPPRA = " << kppra_phonons << ")"
       << " for a " << aurostd::joinWDelimiter(scell_dims, "x") << " supercell. To keep k-point grids commensurate,"
-      << " relaxations will be performed on a " << aurostd::joinWDelimiter(kpts_pc, "x") << " k-point grid." << apl::endl;
+      << " relaxations will be performed on a " << aurostd::joinWDelimiter(kpts_pc, "x") << " k-point grid.";
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags.Directory, fileMessage, std::cout);
 
     // Create k-points file
     stringstream kpts_file;
@@ -171,7 +172,6 @@ namespace KBIN {
     xvector<int> scell_dims_new = scell.determineSupercellDimensions(supercell_opts);
     if (scell_dims != scell_dims_new) {
       string function = "KBIN::relaxStructureAPL_VASP()";
-      stringstream message;
       message << "Supercell dimensions of input structure (" << aurostd::joinWDelimiter(scell_dims, "x") << ")"
               << " and relaxed structure (" << aurostd::joinWDelimiter(scell_dims_new, "x") << ")"
               << " do not agree. This is likely due to different symmetries in these structures. Use"
@@ -184,7 +184,6 @@ namespace KBIN {
     KPPRA(kpts_sc_new[1], kpts_sc_new[2], kpts_sc_new[3], scell.getSupercellStructure().lattice, NK);
     if (kpts_sc != kpts_sc_new) {
       string function = "KBIN::relaxStructureAPL_VASP()";
-      stringstream message;
       message << "k-point grids  of the supercells of the input structure (" << aurostd::joinWDelimiter(kpts_sc, "x") << ")"
               << " and the relaxed structure (" << aurostd::joinWDelimiter(kpts_sc_new, "x") <<  ")"
               << " do not agree. This is likely due to different symmetries in these structures. Use"
@@ -1396,7 +1395,7 @@ namespace KBIN {
       xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
     }
 
-    apl::Supercell supercell(xinput.getXStr(), aflags, logger);
+    apl::Supercell supercell(xinput.getXStr(), aflags, messageFile);
     // Determine the supercell dimensions
     xvector<int> scell_dims = supercell.determineSupercellDimensions(supercell_opts);
 
@@ -1537,11 +1536,14 @@ namespace KBIN {
       phcalc.setDirectory(aflags.Directory);
       phcalc.setNCPUs(kflags);
 
+      // FORCE CONSTANTS ----------------------------------------------------------
       bool stagebreak = false;
 
+      // Harmonic force constants
       string hibfile = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE);
       bool awakeHarmIFCs = (USER_HIBERNATE && aurostd::EFileExist(hibfile));
       bool apl_stagebreak = false;
+      // Try to read first
       if (awakeHarmIFCs) {
         try {
           pflow::logger(_AFLOW_FILE_NAME_, modulename, "Awakening...", aflags, messageFile, std::cout);
@@ -1555,7 +1557,7 @@ namespace KBIN {
 
       // Reading failed - calculate
       if (!awakeHarmIFCs) {
-        // Calculate harmonic IFCs
+        // Set up calculator
         auto_ptr<apl::ForceConstantCalculator> fccalc;
         if (USER_ENGINE == string("DM")) {
           apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, xinput, aflags,
@@ -1586,6 +1588,7 @@ namespace KBIN {
                 kflags, xflags, AflowIn, messageFile));
           fccalc->setPolarMaterial(USER_POLAR);  // ME200218
         }
+        // Run calculations
         apl_stagebreak = fccalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
         if (!apl_stagebreak) {
           apl_stagebreak = !(fccalc->run());
@@ -1637,7 +1640,7 @@ namespace KBIN {
       }
       //QHA/SCQHA/QHA3P END
 
-      // ME200220 - Redesigned AAPL workflow
+      // Anharmonic force constants
       bool aapl_stagebreak = false;
       if (USER_TCOND) {
         int max_order = (USER_AAPL_FOURTH_ORDER ? 4 : 3);
@@ -1735,6 +1738,7 @@ namespace KBIN {
         }
       }
 
+      // At least one calculation has not finished - return
       if (stagebreak) {
         logger << apl::notice << "Stopped. Waiting for required calculations..." << apl::endl;  //CO181226
         return;
@@ -1766,7 +1770,7 @@ namespace KBIN {
         if(store.check_GP()){ //PN180705
           //store dynamical matrices //PN180705
           store.create_dm(); //PN180705
-          apl::PhononDispersionCalculator pdisc(phcalc, logger);
+          apl::PhononDispersionCalculator pdisc(phcalc);
 
           // Init path according to the aflow's definition for elec. struc.
           // ME 181029 - Restructured
@@ -1803,7 +1807,9 @@ namespace KBIN {
         // MonkhorstPackMesh replaced by qmesh
         //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
         //  phcalc->getInputCellStructure(), logger);
-        apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), logger);
+        apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
+        qmesh.setDirectory(aflags.Directory);
+        qmesh.setModule("QHA");
         if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
 
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -1818,14 +1824,13 @@ namespace KBIN {
         //  dosc.reset(new apl::DOSRootSamplingMethod(*phcalc, qmesh, logger));
         //}
 
-        apl::DOSCalculator dosc(phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
+        apl::DOSCalculator dosc(phcalc, qmesh, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
 
         // ME190428 - END
         // Calculate DOS
         dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
         if (USER_DOS) dosc.writePDOS(_TMPDIR_, dirname);
         dosc.clear();
-        qmesh.clear(logger);  // ME191223
         store.clear();
         return;
       }
@@ -1848,7 +1853,7 @@ namespace KBIN {
           if(store.check_SCQHA())
           {
             store.create_dm();
-            apl::PhononDispersionCalculator pdisc(phcalc,logger);
+            apl::PhononDispersionCalculator pdisc(phcalc);
 
             // Init path according to the aflow's definition for elec. struc.
             // ME 181029 - Restructured
@@ -1876,7 +1881,9 @@ namespace KBIN {
             // MonkhorstPackMesh replaced by qmesh
             //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
             //                             phcalc->getInputCellStructure(),logger);
-            apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), logger);
+            apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
+            qmesh.setDirectory(aflags.Directory);
+            qmesh.setModule("QHA");
             if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
 
             // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -1890,13 +1897,12 @@ namespace KBIN {
             //  dosc.reset( new apl::DOSRootSamplingMethod(*phcalc,qmesh,logger) );
             //}
 
-            apl::DOSCalculator dosc(phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
+            apl::DOSCalculator dosc(phcalc, qmesh, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
             // ME190428 - END
             // Calculate DOS
             dosc.calc(USER_DOS_NPOINTS,USER_DOS_SMEAR);
             if(USER_DOS)dosc.writePDOS(_TMPDIR_, dirname);
             dosc.clear();
-            qmesh.clear(logger);  // ME191223
           }
           store.clear();
         }
@@ -1964,7 +1970,7 @@ namespace KBIN {
       // PHONON DISPERSIONS ---------------------------------------------------------
 
       if (USER_DC) {
-        apl::PhononDispersionCalculator pdisc(phcalc, logger);
+        apl::PhononDispersionCalculator pdisc(phcalc);
 
         // Init path according to the aflow's definition for elec. struc.
         // ME 181029 - Restructured
@@ -2030,7 +2036,9 @@ namespace KBIN {
         //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
         //                             phcalc->getInputCellStructure(), logger);
 
-        apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), logger);
+        apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
+        qmesh.setDirectory(aflags.Directory);
+        qmesh.setModule("APL");
         if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
         // Setup the DOS engine which is used also for thermodynamic properties
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -2045,7 +2053,7 @@ namespace KBIN {
         //}
 
         // Calculate DOS
-        apl::DOSCalculator dosc(phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
+        apl::DOSCalculator dosc(phcalc, qmesh, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
         // ME190428 - END
         dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
         if (USER_DOS) {
@@ -2295,7 +2303,6 @@ namespace KBIN {
         // Clear old stuff
         dosc.clear();  // ME190423
         //delete dosc; //auto_ptr will do
-        qmesh.clear(logger);  // ME191223
       }
 
       /////////////////////////////////////////////////////////////////////////////
@@ -2307,7 +2314,9 @@ namespace KBIN {
       if (USER_TCOND) {
         // Get q-points
         logger << "Preparing a q-mesh of " << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << "." << apl::endl;
-        apl::QMesh qmtcond(USER_THERMALGRID, phcalc.getInputCellStructure(), logger, true);
+        apl::QMesh qmtcond(USER_THERMALGRID, phcalc.getInputCellStructure(), messageFile, true);
+        qmtcond.setDirectory(aflags.Directory);
+        qmtcond.setModule("AAPL");
         qmtcond.makeIrreducible();
         qmtcond.writeQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE);
         qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);

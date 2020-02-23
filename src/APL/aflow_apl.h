@@ -581,7 +581,7 @@ namespace apl {
   class Supercell {
     private:
       _aflags _aflowFlags;  //CO181226
-      Logger& _logger;
+      ofstream* messageFile;
       xstructure _inStructure;
       xstructure _inStructure_original;  //CO
       xstructure _inStructure_light;     //CO, does not include HEAVY symmetry stuff
@@ -608,7 +608,7 @@ namespace apl {
       bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME200117
 
     public:
-      Supercell(const xstructure&, const _aflags& aflags, Logger&); //CO181226
+      Supercell(const xstructure&, const _aflags& aflags, ofstream&); //CO181226
       Supercell(const Supercell&);
       ~Supercell();
       void initialize(const xstructure&);  // ME191225
@@ -1199,7 +1199,6 @@ namespace apl {
   class PhononDispersionCalculator {
     private:
       PhononCalculator& _pc;
-      Logger& _logger;
       PathBuilder _pb;
       std::vector<xvector<double> > _qpoints;
       std::vector<xvector<double> > _freqs;
@@ -1211,7 +1210,7 @@ namespace apl {
       void calculateInOneThread(int, int);
 
     public:
-      PhononDispersionCalculator(PhononCalculator&, Logger&);
+      PhononDispersionCalculator(PhononCalculator&);
       ~PhononDispersionCalculator();
       void clear();
       void initPathCoords(const string&,const string&,int,bool=false);  //CO 180406
@@ -1329,14 +1328,20 @@ namespace apl {
 
   class QMesh {
     public:
-      QMesh(Logger&);
-      QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true, bool=true);
-      QMesh(const vector<int>&, const xstructure&, Logger&, bool=true, bool=true);
+      QMesh(ofstream&);
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool=true, bool=true);
+      QMesh(const vector<int>&, const xstructure&, ofstream&, bool=true, bool=true);
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
-      void clear(Logger&);
+      void clear(ofstream&);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
+
+      void setDirectory(const string& dir);
+      void setModule(const string&);
+      const string& getDirectory() const;
+      const string& getModule() const;
+      ofstream& getOutputStream();
 
       void makeIrreducible();
       void calculateLittleGroups();  // ME200109
@@ -1377,7 +1382,9 @@ namespace apl {
       void free();
       void copy(const QMesh&);
 
-      Logger& _logger;  // The APL logger
+      ofstream* messageFile;
+      string _directory;
+      string _module;
 
       vector<int> _ibzqpts;  // The indices of the irreducible q-points
       bool _isGammaCentered;  // Indicates whether the includes the Gamma point
@@ -1405,11 +1412,11 @@ namespace apl {
 namespace apl {
   class LTMethod {
     public:
-      LTMethod(QMesh&, Logger&);
+      LTMethod(QMesh&);
       LTMethod(const LTMethod&);
       LTMethod& operator=(const LTMethod&);
       ~LTMethod();
-      void clear(QMesh&, Logger&);
+      void clear(QMesh&);
 
       void makeIrreducible();  // ME190625
 
@@ -1432,7 +1439,6 @@ namespace apl {
       void copy(const LTMethod&);
 
       QMesh& _qm;
-      Logger& _logger;  // The APL logger
 
       vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra - ME190625
       vector<int> _irredTetrahedra;  // List of irreducible tetrahedra - ME190625
@@ -1453,37 +1459,18 @@ namespace apl {
 // ME 190417 - END
 // ***************************************************************************
 // ***************************************************************************
-// OBSOLETE ME190417 - There is no need for a virtual parent class with only
-// one child class
-// "idosc.h"
-//
-//namespace apl {
-//class IDOSCalculator {
-// public:
-//  virtual std::vector<double> getBins() = 0;
-//  virtual std::vector<double> getDOS() = 0;
-//  virtual bool hasNegativeFrequencies() = 0;
-//
-// public:
-//  virtual ~IDOSCalculator() {}
-//};
-//}  // namespace apl
-
-// ***************************************************************************
 // "doscalc.h"
 namespace apl {
 #define MIN_FREQ_TRESHOLD -0.1  //in AMU
 #define RAW2Hz 15.6333046177
 #define AMU2Kg 1.66053904
 #define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue treshold in AMU
-  //class DOSCalculator : virtual public IDOSCalculator  OBSOLETE ME190424
   class DOSCalculator  // ME190424
   { //CO200106 - patching for auto-indenting
     protected:
       PhononCalculator& _pc;
       //  IReciprocalPointGrid& _rg;  OBSOLETE ME 190417
       QMesh& _rg;
-      Logger& _logger;
       string _bzmethod;  // ME190423
       std::vector<aurostd::xvector<double> > _qpoints;
       //std::vector<int> _qweights;  OBSOLETE ME190423
@@ -1508,7 +1495,7 @@ namespace apl {
       void smearWithGaussian(vector<double>&, vector<double>&, double, double);  // ME190614
 
     public:
-      DOSCalculator(PhononCalculator&, QMesh&, Logger&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
+      DOSCalculator(PhononCalculator&, QMesh&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
       virtual ~DOSCalculator();
       // ME190423 - START
       //virtual void rawCalc(int) {} OBSOLETE ME190419

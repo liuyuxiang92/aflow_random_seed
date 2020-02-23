@@ -2,7 +2,6 @@
 
 namespace apl {
 
-  // ///////////////////////////////////////////////////////////////////////////
   LinearResponsePC::LinearResponsePC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
       _xflags& xflags, string& AflowIn, ofstream& mf)
@@ -58,7 +57,10 @@ namespace apl {
     _isPolarMaterial = false;
   }
 
-  //////////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+namespace apl {
+
   bool LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
     if (zerostate_chgcar) {
       string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
@@ -117,7 +119,10 @@ namespace apl {
     return stagebreak;
   }
 
-  //////////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+namespace apl {
+
   bool LinearResponsePC::calculateForceConstants() {
     // Check if supercell is already built
     if (!_supercell.isConstructed()) {
@@ -219,7 +224,9 @@ namespace apl {
     return true;
   }
 
-  //////////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+namespace apl {
 
   void LinearResponsePC::hibernate(const string& filename) {
     stringstream outfile;
@@ -236,6 +243,5 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }
-
 
 }  // namespace apl

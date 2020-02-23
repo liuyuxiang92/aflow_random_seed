@@ -418,7 +418,7 @@ namespace apl {
     vector<vector<int> > thread_dist;
 #endif
     string message = "";
-    LTMethod _lt(_qm, _logger);
+    LTMethod _lt(_qm);
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
     vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);

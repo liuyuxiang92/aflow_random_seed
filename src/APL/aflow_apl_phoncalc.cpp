@@ -8,9 +8,19 @@
 
 #define _DEBUG_APL_PHONCALC_ false  //CO190116
 
-namespace apl {
+using std::string;
+using std::vector;
+using aurostd::xvector;
 
-  // ///////////////////////////////////////////////////////////////////////////
+static const string _APL_PHCALC_ERR_PREFIX_ = "apl::PhononCalculator::";
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                         CONSTRUCTORS/DESTRUCTORS                         //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
 
   PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf) : _supercell(sc) {
     free();
@@ -26,7 +36,6 @@ namespace apl {
     copy(that);
   }
 
-  // ME191228 - BEGIN
   // Copy constructors
   PhononCalculator& PhononCalculator::operator=(const PhononCalculator& that) {
     if (this != &that) {
@@ -51,7 +60,6 @@ namespace apl {
     _system = that._system;
     messageFile = that.messageFile;
   }
-  // ME191228 - END
 
   PhononCalculator::~PhononCalculator() {
     free();
@@ -72,14 +80,21 @@ namespace apl {
     _system = "";
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
 
   void PhononCalculator::clear(Supercell& sc, ofstream& mf) {
     PhononCalculator pc(sc, mf);
     copy(pc);
   }
 
-  // INTERFACE /////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                               INTERFACE                                  //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
 
   const Supercell& PhononCalculator::getSupercell() const { //CO 180409
     return _supercell;
@@ -131,7 +146,11 @@ namespace apl {
     return clusters[order - 3];
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+// ///////////////////////////////////////////////////////////////////////////
+
+namespace apl {
 
   void PhononCalculator::setSystem(const string& sys) {
     _system = sys;
@@ -145,7 +164,15 @@ namespace apl {
     _ncpus = KBIN::get_NCPUS(kfl);
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                            FORCE CONSTANTS                               //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
 
   void PhononCalculator::setHarmonicForceConstants(const ForceConstantCalculator& fc) {
     _forceConstantMatrices = fc.getForceConstants();
@@ -162,10 +189,10 @@ namespace apl {
     //CO, we already checked that it exists before, just open
     vector<string> vlines;                           //CO
     aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME181226
+    string function = _APL_PHCALC_ERR_PREFIX_ + "awake()";
 
     //CO - START
     if (!vlines.size()) {
-      string function = "PhononCalculator::awake()";
       string message = "Cannot open output file " + hibfile + "."; //ME181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
@@ -178,7 +205,6 @@ namespace apl {
     line = vlines[line_count++];
     //getline(infile, line);
     if (line.find("xml") == string::npos) {
-      string function = "apl::PhononCalculator::awake()";
       string message = "Not an xml file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
     }
@@ -188,7 +214,7 @@ namespace apl {
       // Get _AFLOWIN_ checksum and compare it to current
       while (true) {
         if (line_count == vlines.size())  //CO
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::PhononCalculator::awake()", "Can not find <i name=\"checksum\" ...> tag.", _FILE_CORRUPT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Can not find <i name=\"checksum\" ...> tag.", _FILE_CORRUPT_);
         line = vlines[line_count++];  //CO
         if (line.find("checksum") != string::npos)
           break;
@@ -196,7 +222,6 @@ namespace apl {
       int t = line.find_first_of(">") + 1;
       tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
       if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME190219
-        string function = "apl::PhononCalculator::awake()";
         string message = "The " + _AFLOWIN_ + " file has been changed from the hibernated state.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
@@ -206,7 +231,6 @@ namespace apl {
     // Get force constant matrices
     while (true) {
       if (line_count == vlines.size()) { //CO
-        string function = "apl::PhononCalculator::awake()";
         string message = "Cannot find <fcms> tag.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
@@ -222,7 +246,6 @@ namespace apl {
     xmatrix<double> m(3, 3);
     while (true) {
       if (line_count == vlines.size()) { //CO
-        string function = "apl::PhononCalculator::awake()";
         string message = "Incomplete <fcms> tag.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
@@ -257,7 +280,6 @@ namespace apl {
         if (line_count == vlines.size())  //CO
         {  //CO200106 - patching for auto-indenting
           _isPolarMaterial = false;
-          string function = "apl::PhononCalculator::awake()";
           string message = "Cannot find <born> tag.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
@@ -268,7 +290,6 @@ namespace apl {
       line = vlines[line_count++];  //CO
       while (true) {
         if (line_count == vlines.size()) { //CO
-          string function = "apl::PhononCalculator::awake()";
           string message = "Incomplete <born> tag.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
@@ -292,7 +313,6 @@ namespace apl {
       while (true) {
         if (line_count == vlines.size()) {
           _isPolarMaterial = false;
-          string function = "apl::PhononCalculator::awake()";
           string message = "Can not find <epsilon> tag.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
@@ -316,8 +336,6 @@ namespace apl {
     catch (aurostd::xerror& e) {}
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
-
   void PhononCalculator::setAnharmonicForceConstants(const AnharmonicIFCs& fc) {
     int order = fc.getOrder();
     int nifcs = (int) anharmonicIFCs.size();
@@ -333,7 +351,7 @@ namespace apl {
 
   void PhononCalculator::readAnharmonicIFCs(string filename, bool compare_checksum) {
     filename = aurostd::CleanFileName(filename);
-    string function = "apl::PhononCalculator::readAnharmonicIFCs()";
+    string function = _APL_PHCALC_ERR_PREFIX_ + "readAnharmonicIFCs()";
     if (!aurostd::EFileExist(filename)) {
       string message = "Could not open file " + filename + ". File not found.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
@@ -451,8 +469,15 @@ namespace apl {
     clusters[order - 3] = clst;
   }
 
+}  // namespace apl
 
-  // ///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                           DYNAMICAL MATRIX                               //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
 
   // ME180827 - Overloaded to calculate derivative and eigenvectors for AAPL
   // ME200206 - Added variants for the case near the Gamma point where the
@@ -536,9 +561,7 @@ namespace apl {
         // Transform to meV; E(eV) = h(eV.s) * freq(s-1); h[(from J.s) -> (eV.s)] = 4.1356673310E-15
         conversionFactor = 1000 * au2eV;
       } else {
-        // ME191031 - use xerror
-        //throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
-        string function = "apl::PhononCalculator:convertFrequencyUnit()";
+        string function = _APL_PHCALC_ERR_PREFIX_ + "convertFrequencyUnit()";
         string message = "Not implemented conversion.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
@@ -554,9 +577,7 @@ namespace apl {
       } else if (outFlags & apl::MEV) {
         conversionFactor = 1000 * PLANCKSCONSTANTEV_h * THz2Hz;
       } else {
-        // ME191031 - use xerror
-        //throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
-        string function = "apl::PhononCalculator:convertFrequencyUnit()";
+        string function = _APL_PHCALC_ERR_PREFIX_ + "convertFrequencyUnit()";
         string message = "Not implemented conversion.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
@@ -564,9 +585,7 @@ namespace apl {
 
     // Nothing suits?
     else {
-      // ME191031 - use xerror
-      //throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
-      string function = "apl::PhononCalculator:convertFrequencyUnit()";
+      string function = _APL_PHCALC_ERR_PREFIX_ + "convertFrequencyUnit()";
       string message = "Not implemented conversion.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
@@ -1054,3 +1073,9 @@ namespace apl {
   }
 
 }  // namespace apl
+
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+//****************************************************************************
