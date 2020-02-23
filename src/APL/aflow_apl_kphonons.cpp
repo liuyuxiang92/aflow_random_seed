@@ -1588,7 +1588,7 @@ namespace KBIN {
         }
         apl_stagebreak = fccalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
         if (!apl_stagebreak) {
-          apl_stagebreak = fccalc->run();
+          apl_stagebreak = !(fccalc->run());
           if (!apl_stagebreak) {
             if (USER_HIBERNATE) fccalc->hibernate(hibfile);
             phcalc.setHarmonicForceConstants(*fccalc);

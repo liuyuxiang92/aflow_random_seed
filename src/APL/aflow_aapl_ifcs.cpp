@@ -136,6 +136,7 @@ namespace apl {
 
   bool AnharmonicIFCs::runVASPCalculations(bool zerostate_chgcar) {
     bool stagebreak = false;
+    _xInput.xvasp.AVASP_arun_mode = "AAPL";
     stringstream _logger;
     _logger << "Managing directories for ";
     if (order == 3) {
@@ -337,7 +338,9 @@ namespace apl {
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
       } else {
         _xinput zerostate(_xInput);
-        zerostate.setDirectory(_aflowFlags.Directory + "/" + directory[d]);
+        xstructure& xstr = zerostate.getXStr();
+        LightCopy(clst.scell, xstr);
+        zerostate.setDirectory(aurostd::CleanFileName(_aflowFlags.Directory + "/" + directory[d]));
         subtractZeroStateForces(xInputs, zerostate);
       }
     }

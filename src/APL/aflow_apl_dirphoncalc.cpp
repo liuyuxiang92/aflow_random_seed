@@ -183,9 +183,9 @@ namespace apl {
           std::stringstream distortion; // ME190112 - need stringstream for nicer formatting
           xvector<double> dist_cart = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];  // ME190112
           distortion << " distortion=["
-            << std::setprecision(3) << dist_cart[1] << ","
-            << std::setprecision(3) << dist_cart[2] << ","
-            << std::setprecision(3) << dist_cart[3] << "]"; // ME190112
+            << std::fixed << std::setprecision(3) << dist_cart[1] << ","
+            << std::fixed << std::setprecision(3) << dist_cart[2] << ","
+            << std::fixed << std::setprecision(3) << dist_cart[3] << "]"; // ME190112
           xstr.title += distortion.str();
 
           // For VASP, use the standardized aflow.in creator
@@ -262,7 +262,7 @@ namespace apl {
     if (_isPolarMaterial) {
       // Calc. Born effective charge tensors and dielectric constant matrix
       _xinput xinpBE(_xInput);  // ME190113
-      stagebreak = (runVASPCalculationsBE(xinpBE, xInputs.size()) || stagebreak);  // ME190113
+      stagebreak = (runVASPCalculationsBE(xinpBE, ncalcs) || stagebreak);  // ME190113
       xInputs.push_back(xinpBE);
     }
     return stagebreak;
@@ -530,7 +530,7 @@ namespace apl {
 
   bool DirectMethodPC::calculateForceConstants() {
     // Get all forces required for the construction of force-constant matrices
-    if (!calculateForceFields()) return true;
+    if (!calculateForceFields()) return false;
 
     // ME191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
@@ -563,7 +563,7 @@ namespace apl {
     if(!outfileFoundAnywherePhonons(xInputs)) return false;
 
     //second pass, make sure it's everywhere!
-    if (outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, *messageFile, _isPolarMaterial)) return false;
+    if (!outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, *messageFile, _isPolarMaterial)) return false;
 
     // Remove zero state forces if necessary
     if (_calculateZeroStateForces) {
@@ -625,7 +625,7 @@ namespace apl {
     }
 
     if (_isPolarMaterial) {
-      if (calculateDielectricTensor(xInputs.back())) return false;
+      if (!calculateDielectricTensor(xInputs.back())) return false;
     }
     return true;
   }
