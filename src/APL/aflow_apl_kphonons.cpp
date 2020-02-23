@@ -1649,7 +1649,7 @@ namespace KBIN {
             try {
               message = "Reading anharmonic IFCs from " + ifcs_hib_file + ".";
               pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout);
-              phcalc.readAnharmonicIFCs(ifcs_hib_file, false);
+              phcalc.readAnharmonicIFCs(ifcs_hib_file, true);
             } catch (aurostd::xerror& excpt) {
               message = excpt.error_message + " Skipping awakening of ";
               if (o == 3) message += "3rd";

@@ -390,6 +390,7 @@ namespace apl {
       if (line.find("order") != string::npos) {
         t = line.find_first_of(">") + 1;
         order = aurostd::string2utype<uint>(line.substr(t, line.find_last_of("<") - t));
+        break;
       }
     }
 
@@ -446,8 +447,8 @@ namespace apl {
     }
 
     // Populate
-    anharmonicIFCs[order - 2] = ifcs;
-    clusters[order - 2] = clst;
+    anharmonicIFCs[order - 3] = ifcs;
+    clusters[order - 3] = clst;
   }
 
 
