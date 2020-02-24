@@ -580,7 +580,7 @@ namespace apl {
 namespace apl {
   class Supercell {
     private:
-      _aflags _aflowFlags;  //CO181226
+      string _directory;  // for the logger
       ofstream* messageFile;
       xstructure _inStructure;
       xstructure _inStructure_original;  //CO
@@ -608,9 +608,11 @@ namespace apl {
       bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME200117
 
     public:
-      Supercell(const xstructure&, const _aflags& aflags, ofstream&); //CO181226
+      Supercell(const xstructure&, ofstream&); //CO181226
       Supercell(const Supercell&);
       ~Supercell();
+      void setDirectory(const string&);
+      string getDirectory() const;
       void initialize(const xstructure&);  // ME191225
       //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME200220
       void clear();

@@ -5945,6 +5945,13 @@ namespace pflow {
     return sym_done;
   }
 
+  // ME200224
+  bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format){
+    _aflags aflags;
+    aflags.Directory = directory;
+    return PerformFullSymmetry(a, FileMESSAGE, aflags, kflags, osswrite, oss, format);
+  }
+
   bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format){
     double tolerance = a.sym_eps;
     bool no_scan = false;

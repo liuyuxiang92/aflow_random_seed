@@ -69,7 +69,8 @@ namespace KBIN {
 
     // ME200102
     // Determine k-point grid that is commensurate with the grid of the supercell
-    apl::Supercell scell(xvasp.str, aflags, fileMessage);
+    apl::Supercell scell(xvasp.str, fileMessage);
+    scell.setDirectory(aflags.Directory);
     scell.build(scell_dims, false);
     int kppra_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KPPRA.content_int;
     string scheme_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KSCHEME.content_string;
@@ -1395,7 +1396,8 @@ namespace KBIN {
       xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
     }
 
-    apl::Supercell supercell(xinput.getXStr(), aflags, messageFile);
+    apl::Supercell supercell(xinput.getXStr(), messageFile);
+    supercell.setDirectory(aflags.Directory);
     // Determine the supercell dimensions
     xvector<int> scell_dims = supercell.determineSupercellDimensions(supercell_opts);
 
