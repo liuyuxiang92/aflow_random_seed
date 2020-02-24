@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - David Hicks - 2018
@@ -15,7 +15,7 @@ namespace anrl {
 }
 
 namespace anrl {
-  uint PrototypeANRL_A12B36CD12_cF488_196_2h_6h_ac_fgh(ostream &oss,stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
+  uint PrototypeANRL_A12B36CD12_cF488_196_2h_6h_ac_fgh(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG) {
     // system A12B36CD12_cF488_196_2h_6h_ac_fgh
 
     if(XHOST.vflag_control.flag("WWW")) {
@@ -36,8 +36,8 @@ namespace anrl {
 
     anrl::vproto2tokens(proto_line,label,nspecies,natoms,spacegroup,nunderscores,nparameters,Pearson_symbol,params,Strukturbericht,prototype,dialect);
 
-    if(!anrl::PrototypeANRL_Consistency(oss,vparameters.size(),nparameters,prototype,label,
-                 Strukturbericht,Pearson_symbol,spacegroup, params, print_mode) && print_mode!=1) { exit(0);}    
+    anrl::PrototypeANRL_Consistency(vparameters.size(),nparameters,prototype,label,
+        Strukturbericht,Pearson_symbol,spacegroup,params,print_mode);    
 
     if(LDEBUG) { cerr << "anrl::PrototypeANRL_A12B36CD12_cF488_196_2h_6h_ac_fgh: FOUND" << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL_A12B36CD12_cF488_196_2h_6h_ac_fgh: label=" << label << endl;}
@@ -57,8 +57,6 @@ namespace anrl {
     xvector<double> yn(3);   yn(1)=0.0;yn(2)=1.0;yn(3)=0.0;
     xvector<double> zn(3);   zn(1)=0.0;zn(2)=0.0;zn(3)=1.0;
     xvector<double> a1(3),a2(3),a3(3);
-
-    _atom atom;
 
     if(print_mode==1 && vparameters.size()==0){
       for(uint n=0;n<nparameters;n++){
@@ -130,6 +128,8 @@ namespace anrl {
     if(print_mode!=1){
       str.FixLattices(); // Reciprocal/f2c/c2f
     }
+
+    _atom atom;
     
     atom.name="A"; atom.type=0;                                       // atom B15
     atom.fpos(1)=(-x5+y5+z5);atom.fpos(2)=(x5-y5+z5);atom.fpos(3)=(x5+y5-z5);                     // atom B15
@@ -883,6 +883,6 @@ namespace anrl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

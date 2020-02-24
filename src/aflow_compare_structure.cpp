@@ -685,6 +685,74 @@ namespace pflow {
   }
 }
 
+// ***************************************************************************
+// pflow::getIsopointalPrototypes - returns corresponding prototype label
+// ***************************************************************************
+namespace pflow {
+  string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow){ 
+    
+    string function_name = "pflow::IsopointalPrototypes()";
+    string usage="aflow --isopointal_prototypes|--get_isopointal_prototypes < POSCAR";
+    string options="";
+    
+    // ---------------------------------------------------------------------------
+    // load input structure
+    xstructure xstr(input,IOAFLOW_AUTO);
+
+    // ---------------------------------------------------------------------------
+    // FLAG: catalog (htqc, anrl, or all)
+    string catalog="all";
+    if(vpflow.flag("ISOPOINTAL_PROTOTYPES::CATALOG")) {
+      catalog=aurostd::tolower(vpflow.getattachedscheme("ISOPOINTAL_PROTOTYPES::CATALOG"));
+      if(catalog!="htqc" && catalog!="anrl" && catalog!="all"){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Catalog/library can only be htqc, anrl, or all.",_INPUT_ILLEGAL_);
+      }
+    }
+    
+    // ---------------------------------------------------------------------------
+    // get isopointal structures 
+    // (calculates symmetry of input structure and grabs symmetrically similar prototypes)
+    vector<string> isopointal_prototypes = pflow::getIsopointalPrototypes(xstr, catalog);
+
+    if(isopointal_prototypes.size()==0){
+      return "no isopointal prototypes in AFLOW";
+    }
+    
+    return aurostd::joinWDelimiter(isopointal_prototypes,",");
+  }
+}
+
+// ***************************************************************************
+// pflow::getIsopointalPrototypes - returns corresponding prototype label
+// ***************************************************************************
+namespace pflow {
+  vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog){ 
+    
+    string function_name = "pflow::getIsopointalPrototypes()";
+    
+    // ---------------------------------------------------------------------------
+    // stoichiometry
+    vector<uint> stoichiometry = compare::getStoichiometry(xstr,true);
+    
+    // ---------------------------------------------------------------------------
+    // symmetry
+    if(xstr.space_group_ITC<1 || xstr.space_group_ITC>230){ // don't recalculate symmetry if already calculated 
+      xstr.SpaceGroup_ITC();
+    }
+    vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
+    compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions);
+    
+    // ---------------------------------------------------------------------------
+    // extract isopointal prototypes from AFLOW 
+    vector<string> vlabel;
+    vector<uint> prototype_space_groups;
+    vlabel = aflowlib::GetPrototypesBySymmetry(stoichiometry, xstr.space_group_ITC, grouped_Wyckoff_positions, prototype_space_groups, SG_SETTING_ANRL, catalog);
+
+    return vlabel;
+
+  }
+}
+
 //DX 20190314 - added new function - START
 // ***************************************************************************
 // pflow::getMatchingPrototype - returns corresponding prototype label
@@ -1076,7 +1144,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     string function_name = "pflow::compare2database()";
     string directory = "";
@@ -1232,9 +1300,17 @@ namespace pflow {
     // load input structure
     xstructure xstr(input,IOAFLOW_AUTO);
 
+    // ---------------------------------------------------------------------------
+    // fix species (remove pseudopotntials, etc.) 
+    string species_str = aurostd::joinWDelimiter(xstr.species, ""); //DX 20200212 
+    vector<string> vspecies = pflow::stringElements2VectorElements(species_str); //DX 20200212
+    xstr.species = aurostd::vector2deque(vspecies); //DX 20200212 - needed to perform material comparisons with database entries
+    xstr.SetSpecies(xstr.species);
+    
     //DX 20190329 - added species check - START
     // check if fake names for same species comparison
-    if(xstr.species[0]=="A" && !structure_comparison){
+    if(LDEBUG){cerr << function_name << " input structure species=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
+    if(vspecies[0]=="A" && !structure_comparison){
       message << "Atomic species are missing for the input structure. Cannot compare to database materials without species.";     
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
       return "";
@@ -1280,7 +1356,7 @@ namespace pflow {
     // AFLUX matchbook preparations: get species and number of species
     string species_summons = "";
     if(!structure_comparison){
-      species_summons = "species(" + aurostd::joinWDelimiter(xstr.species,",") + ")";
+      species_summons = "species(" + aurostd::joinWDelimiter(vspecies,",") + ")"; //DX 20200212
     }
     string nspecies_summons = "nspecies(" + aurostd::utype2string<uint>(xstr.num_each_type.size()) + ")";
     matchbook.push_back(species_summons);
@@ -1411,6 +1487,7 @@ namespace pflow {
       //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
       vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
+      if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
       vector<uint> tmp_stoich;
       //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
       for(uint j=0;j<vcomposition.size();j++) //DX 20191106
