@@ -694,6 +694,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"INTPOL","--intpol=","");
 
   vpflow.flag("INWS",aurostd::args2flag(argv,cmds,"--inwignerseitz|--inws"));
+  
+  //DX 20200131 - add isopointal prototype function - START
+  vpflow.flag("ISOPOINTAL_PROTOTYPES",aurostd::args2attachedflag(argv,cmds,"--isopointal_prototypes|--get_isopointal_prototypes"));
+  if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {
+    vpflow.args2addattachedscheme(argv,cmds,"ISOPOINTAL_PROTOTYPES::CATALOG","--catalog=|--library=","");
+  }
+  //DX 20200131 - add isopointal prototype function - END
 
   // [OBSOLETE] vpflow.flag("INFLATE_LATTICE",aurostd::args2flag(argv,cmds,"--inflate_lattice|--ilattice"));
   vpflow.args2addattachedscheme(argv,cmds,"INFLATE_LATTICE","--inflate_lattice=|--ilattice=","");
@@ -1713,6 +1720,7 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(cin,aurostd::args2utype(argv,"--inflate_volume|--ivolume",1.0)); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(vpflow.getattachedscheme("INFLATE_LATTICE"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(vpflow.getattachedscheme("INFLATE_VOLUME"),cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << pflow::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX 20200131
       // L
       if(vpflow.flag("LATTICEREDUCTION")) {cout << pflow::LATTICEREDUCTION(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}

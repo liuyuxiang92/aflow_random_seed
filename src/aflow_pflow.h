@@ -167,6 +167,8 @@ namespace pflow {
   string LATTICE_TYPE(istream& input);
   string LATTICE_LATTICE_TYPE(istream& input);
   string listPrototypeLabels(aurostd::xoption& vpflow); //DX 20181004
+  string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX 20200131 
+  vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX 20200131 
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
   //START - all relevent functions for loading entries here
