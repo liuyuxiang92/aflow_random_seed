@@ -1,9 +1,9 @@
-3.2.1 -   2020/02/03
+3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
         -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
         -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
-        -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- added Patterson symmetry analysis; denoted "pgroupk_Patterson" (applies to reciprocal space only) (DX)
         -- compare Patterson point symmetry to Laue point group as consistency check (DX)
         -- added Patterson symmetry to full symmetry command (DX)
@@ -12,6 +12,8 @@
         -- added Patterson symmetry usage to README_AFLOW_SYM.TXT and README_AFLOW_ACONVASP.TXT (DX)
         -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- throw error when lattice gives negative determinant (CO)
+        -- added error for non-standard prototypes that create structures with atoms too close (CO+DX)
+        -- fixed --kppra=XX collision with aflow_proto (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
