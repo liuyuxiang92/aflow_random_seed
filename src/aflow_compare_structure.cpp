@@ -1253,6 +1253,25 @@ namespace pflow {
     }
 
     // ---------------------------------------------------------------------------
+    // FLAG: specify the relaxation step to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
+    // DX TODO 
+    string relaxation_step = "most_relaxed";
+    bool load_most_relaxed_structure_only = true; 
+    if(vpflow.flag("COMPARE2DATABASE::RELAXATION_STEP")) {
+      relaxation_step = aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP"));
+      if(relaxation_step!="most_relaxed"){ load_most_relaxed_structure_only = false; }
+      message << "OPTIONS: Relaxation step (orig, relax1, most_relaxed): " << relaxation_step << endl; 
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // should not grab properties and compare structures other than the most relaxed structure 
+    if(property_list.size() && relaxation_step != "most_relaxed"){
+      message << "The " << relaxation_step << " structures will be extracted; the properties will not correspond to these structures.  Proceed with caution."; 
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+    }
+
+    // ---------------------------------------------------------------------------
     // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
     string catalog = "";
     string catalog_summons = "";
@@ -1336,11 +1355,29 @@ namespace pflow {
       int enantiomorph_space_group_number = SYM::getEnantiomorphSpaceGroupNumber(space_group_number);
       if(space_group_number == enantiomorph_space_group_number){
         // relaxed: need to match last in string, i.e., "*,<sg_symbol> <sg_number>" (comma necessary or we may grab the orig symmetry)
-        space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27)";
+        if(relaxation_step=="orig"){
+          space_group_summons = "sg2(%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*)";
+        }
+        else if(relaxation_step=="relax1"){
+          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*)";
+        }
+        else if(relaxation_step=="most_relaxed"){
+          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27)";
+        }
       }
       else { // need to get enantiomorph too
-        space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
-        space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27)";
+        if(relaxation_step=="orig"){
+          space_group_summons = "sg2(%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+          space_group_summons += ":%27" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*)";
+        }
+        else if(relaxation_step=="relax1"){
+          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+          space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*)";
+        }
+        else if(relaxation_step=="most_relaxed"){
+          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+          space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27)";
+        }
       }
       matchbook.push_back(space_group_summons);
     }
@@ -1515,24 +1552,47 @@ namespace pflow {
       // instead: filter on stoichiometry after recieving AFLUX response
       if(compare::sameStoichiometry(stoichiometry,tmp_reduced_stoich)){
         aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i]; 
-        if(!loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;}
-        if(entry.vstr.size()==1){
+        vector<string> structure_files;
+        if(!loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;}
+        bool found_structure = false;
+        uint structure_index = 0;
+        if(load_most_relaxed_structure_only && entry.vstr.size()==1){
+          found_structure = true;
+          structure_index = 0;
+        }
+        else if(!load_most_relaxed_structure_only){
+          if(entry.vstr.size()==3 && structure_files.size()==3){
+            if(relaxation_step == "orig" && 
+                (structure_files[0] == "POSCAR.orig" || 
+                 structure_files[0] == "POSCAR.relax1")){ 
+              structure_index = 0; 
+              found_structure = true; 
+            }
+            else if(relaxation_step == "relax1" && 
+                (structure_files[0] == "POSCAR.relax2" || 
+                 structure_files[0] == "CONTCAR.relax1")){ 
+              structure_index = 1; 
+              found_structure = true; 
+            }
+          }
+        }
+        if(found_structure){
           // store entry from database
           StructurePrototype str_proto_tmp;
           deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
-          entry.vstr[0].SetSpecies(deque_species);
-          str_proto_tmp.structure_representative = entry.vstr[0];
+          entry.vstr[structure_index].SetSpecies(deque_species);
+          str_proto_tmp.structure_representative = entry.vstr[structure_index];
           str_proto_tmp.structure_representative.ReScale(1.0); //DX 20191105
           str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
           str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX 20190718 - update xstructure.directoryr
           str_proto_tmp.structure_representative_generated=true;
           str_proto_tmp.structure_representative_from="aurl";
           str_proto_tmp.stoichiometry=tmp_reduced_stoich;
-          str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]); //DX 20190430 - added
+          str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]); //DX 20190430 - added
           //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX 20190711
           str_proto_tmp.elements=species;
-          str_proto_tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX 20191031
-          str_proto_tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX 20191031
+          str_proto_tmp.number_of_atoms = entry.vstr[structure_index].atoms.size(); //DX 20191031
+          str_proto_tmp.number_of_types = entry.vstr[structure_index].num_each_type.size(); //DX 20191031
           // store any properties 
           for(uint l=0;l<properties_response[i].size();l++){
             bool property_requested = false;

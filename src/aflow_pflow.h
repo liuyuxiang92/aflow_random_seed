@@ -293,6 +293,7 @@ namespace pflow {
   // loads xstructures
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
+  bool loadXstructures(aflowlib::_aflowlib_entry& entry, vector<string>& structure_files, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false); //DX 20200224
   ////////////////////////////////////////////////////////////////////////////////
   vector<string> getElements(const string& _input); //CO190712
   void elementsFromCompositionString(const string& input);  //CO190712
