@@ -26,7 +26,7 @@ namespace apl {
     free();
     messageFile = &mf;
     _nBranches = 3 * _supercell.getInputStructure().atoms.size();
-    _directory = ".";
+    _directory = "./";
     _ncpus = 1;
   }
 
