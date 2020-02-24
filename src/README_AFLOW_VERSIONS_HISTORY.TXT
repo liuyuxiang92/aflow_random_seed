@@ -14,6 +14,7 @@
         -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- throw error when lattice gives negative determinant (CO)
         -- fixed --kppra=XX collision with aflow_proto (CO)
+        -- xaus.POTCAR_TYPE_PRINT_flag==FALSE for lib2 and lib3 even for pocc structures (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
