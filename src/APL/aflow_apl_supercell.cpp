@@ -22,16 +22,20 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
+  Supercell::Supercell(ofstream& mf) {
+    messageFile = &mf;
+  }
+
   //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
   // ME200102 - Refactored
-  Supercell::Supercell(const xstructure& _xstr, ofstream& mf) {  //CO181226
+  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, string directory) {  //CO181226
     messageFile = &mf;
-    _directory = "./";
+    _directory = directory;
     initialize(_xstr);
   }
 
-  void Supercell::setDirectory(const string& dir) {
-    _directory = dir;
+  void Supercell::setDirectory(const string& directory) {
+    _directory = directory;
   }
 
   string Supercell::getDirectory() const {
@@ -165,7 +169,6 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   void Supercell::clear() {
-    _directory = "";
     _scStructure.info = "not constructed";
     _isConstructed = FALSE;
     _isShellRestricted = FALSE;

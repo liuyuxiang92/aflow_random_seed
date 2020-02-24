@@ -30,20 +30,21 @@ namespace apl {
   QMesh::QMesh(ofstream& mf) {
     free();
     messageFile = &mf;
-    _directory = "./";
   }
 
   QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf,
-      bool include_inversions, bool gamma_centered) {
+      bool include_inversions, bool gamma_centered, string directory) {
     free();
     messageFile = &mf;
+    _directory = directory;
     initialize(grid, xs, include_inversions, gamma_centered);
   }
 
   QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf,
-      bool include_inversions, bool gamma_centered) {
+      bool include_inversions, bool gamma_centered, string directory) {
     free();
     messageFile = &mf;
+    _directory = directory;
     initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
   }
 
@@ -63,6 +64,7 @@ namespace apl {
     _littleGroups = that._littleGroups;
     _littleGroupsCalculated = that._littleGroupsCalculated;
     messageFile = that.messageFile;
+    _directory = that._directory;
     _nIQPs = that._nIQPs;
     _nQPs = that._nQPs;
     _qptGrid = that._qptGrid;
@@ -146,6 +148,11 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the q-point grid
+  void QMesh::initialize(const vector<int>& vgrid, const xstructure& xs,
+      bool include_inversions, bool gamma_centered) {
+    initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
+  }
+
   void QMesh::initialize(const xvector<int>& grid, const xstructure& xs,
       bool include_inversions, bool gamma_centered) {
     setGrid(grid);

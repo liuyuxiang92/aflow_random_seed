@@ -69,8 +69,7 @@ namespace KBIN {
 
     // ME200102
     // Determine k-point grid that is commensurate with the grid of the supercell
-    apl::Supercell scell(xvasp.str, fileMessage);
-    scell.setDirectory(aflags.Directory);
+    apl::Supercell scell(xvasp.str, fileMessage, aflags.Directory);
     scell.build(scell_dims, false);
     int kppra_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KPPRA.content_int;
     string scheme_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KSCHEME.content_string;
@@ -1396,8 +1395,7 @@ namespace KBIN {
       xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
     }
 
-    apl::Supercell supercell(xinput.getXStr(), messageFile);
-    supercell.setDirectory(aflags.Directory);
+    apl::Supercell supercell(xinput.getXStr(), messageFile, aflags.Directory);
     // Determine the supercell dimensions
     xvector<int> scell_dims = supercell.determineSupercellDimensions(supercell_opts);
 
@@ -1809,8 +1807,9 @@ namespace KBIN {
         // MonkhorstPackMesh replaced by qmesh
         //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
         //  phcalc->getInputCellStructure(), logger);
-        apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
+        apl::QMesh qmesh(messageFile);
         qmesh.setDirectory(aflags.Directory);
+        qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
         if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
 
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -1882,8 +1881,9 @@ namespace KBIN {
             // MonkhorstPackMesh replaced by qmesh
             //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
             //                             phcalc->getInputCellStructure(),logger);
-            apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
+            apl::QMesh qmesh(messageFile);
             qmesh.setDirectory(aflags.Directory);
+            qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
             if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
 
             // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -2036,8 +2036,9 @@ namespace KBIN {
         //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
         //                             phcalc->getInputCellStructure(), logger);
 
-        apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
+        apl::QMesh qmesh(messageFile);
         qmesh.setDirectory(aflags.Directory);
+        qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
         if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
         // Setup the DOS engine which is used also for thermodynamic properties
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -2312,8 +2313,9 @@ namespace KBIN {
 
       if (USER_TCOND) {
         // Get q-points
-        apl::QMesh qmtcond(USER_THERMALGRID, phcalc.getInputCellStructure(), messageFile, true, true);
+        apl::QMesh qmtcond(messageFile);
         qmtcond.setDirectory(aflags.Directory);
+        qmtcond.initialize(USER_DOS_MESH, phcalc.getInputCellStructure(), true, true);
         qmtcond.makeIrreducible();
         qmtcond.writeQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE);
         qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);

@@ -608,7 +608,8 @@ namespace apl {
       bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME200117
 
     public:
-      Supercell(const xstructure&, ofstream&); //CO181226
+      Supercell(ofstream&);
+      Supercell(const xstructure&, ofstream&, string="./"); //CO181226
       Supercell(const Supercell&);
       ~Supercell();
       void setDirectory(const string&);
@@ -1331,12 +1332,13 @@ namespace apl {
   class QMesh {
     public:
       QMesh(ofstream&);
-      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool=true, bool=true);
-      QMesh(const vector<int>&, const xstructure&, ofstream&, bool=true, bool=true);
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool=true, bool=true, string="./");
+      QMesh(const vector<int>&, const xstructure&, ofstream&, bool=true, bool=true, string="./");
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
       void clear(ofstream&);
+      void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
 
       void setDirectory(const string& dir);
