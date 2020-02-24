@@ -1002,6 +1002,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::KSCHEME_STATIC")) vlist+="--kscheme_static="+vpflow.getattachedscheme("PROTO_AFLOW::KSCHEME_STATIC")+" ";   // recursion is GNU's pleasure (SC2017)  //CO181226
 
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::KPPRA","--kppra=|--KPPRA=","");
+    if(vpflow.flag("PROTO_AFLOW::KPPRA") && vpflow.flag("KPOINTS")){vpflow.flag("KPOINTS",FALSE);}  //CO200223 - --kppra collision
     if(vpflow.flag("PROTO_AFLOW::KPPRA")) vlist+="--kppra="+vpflow.getattachedscheme("PROTO_AFLOW::KPPRA")+" ";   // recursion is GNU's pleasure (SC2017)
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::KPPRA_STATIC","--kppra_static=|--KPPRA_STATIC=","");
     if(vpflow.flag("PROTO_AFLOW::KPPRA_STATIC")) vlist+="--kppra_static="+vpflow.getattachedscheme("PROTO_AFLOW::KPPRA_STATIC")+" ";   // recursion is GNU's pleasure (SC2017)
