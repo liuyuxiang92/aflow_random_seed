@@ -86,13 +86,8 @@ namespace apl {
     //    _qpoints[t] = trasp(ReciprocalLattice(_pc.getPrimitiveCellStructure().lattice)) * _qpoints[t];
 
     //CO - START
-    string message = "Calculating frequencies for phonon DOS.";
+    string message = "Calculating frequencies for the phonon DOS.";
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
-
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-
-    // Get the number of CPUS
-    int ncpus = _pc.getNCPUs();
 
     // Prepare storage
     _freqs.clear();
@@ -100,6 +95,11 @@ namespace apl {
     for (uint i = 0; i < _qpoints.size(); i++)
       _freqs.push_back(zero);
     _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc.getNumberOfBranches(), _pc.getNumberOfBranches()));  // ME190624
+
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+
+    // Get the number of CPUS
+    int ncpus = _pc.getNCPUs();
 
     // Distribute the calculation
     int startIndex, endIndex;

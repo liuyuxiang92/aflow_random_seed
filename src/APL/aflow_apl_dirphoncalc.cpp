@@ -8,6 +8,14 @@
 
 #define _DEBUG_APL_DIRPHONCALC_ false  //CO190116
 
+static const string _APL_DMPC_MODULE_ = "APL";  // for the logger
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                         CONSTRUCTORS/DESTRUCTORS                         //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
 namespace apl {
 
   DirectMethodPC::DirectMethodPC(Supercell& sc,
@@ -79,6 +87,12 @@ namespace apl {
 
 }  // namespace apl
 
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                            VASP CALCULATIONS                             //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
 namespace apl {
 
   bool DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
@@ -149,7 +163,7 @@ namespace apl {
         generate_plus_minus = vvgenerate_plus_minus[i][j];
         if (AUTO_GENERATE_PLUS_MINUS && !generate_plus_minus) {
           message << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "].";
-          pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
         }
         for (uint k = 0; k < (generate_plus_minus ? 2 : 1); k++) {
           //CO - END
@@ -219,7 +233,7 @@ namespace apl {
             xInputs[idxRun].setDirectory(_xInput.getDirectory() + "/" + runname);
             if (!filesExistPhonons(xInputs[idxRun])) {
               message << "Creating " << xInputs[idxRun].getDirectory();
-              pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+              pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
               createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], *messageFile);
               stagebreak = true;
             }
@@ -256,7 +270,7 @@ namespace apl {
         xInputs[idxRun].setDirectory(_xInput.getDirectory() + "/" + runname);
         if (!filesExistPhonons(xInputs[idxRun])) {
           message << "Creating " << xInputs[idxRun].getDirectory();
-          pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
           createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], *messageFile);
           stagebreak = true;
         }
@@ -447,7 +461,7 @@ namespace apl {
       dof += _uniqueDistortions[i].size();
     }
     message << "Found " << dof << " degree(s) of freedom.";
-    pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms();
     for (uint i = 0; i < natoms; i++) {  //CO200212 - int->uint
       uint id = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
@@ -458,7 +472,7 @@ namespace apl {
           << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](1) << ","
           << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](2) << ","
           << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](3) << "].";
-        pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
       }
     }
   }
@@ -533,6 +547,12 @@ namespace apl {
   //CO - END
 
 }  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                             FORCE CONSTANTS                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
 namespace apl {
 
@@ -652,7 +672,7 @@ namespace apl {
     //CO - END
     // Show info
     message << "Calculating the missing force fields by symmetry.";
-    pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
 
     // Let's go
     for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) { //CO190218
@@ -854,7 +874,7 @@ namespace apl {
 
     //
     message << "Calculating the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
 
     // We have a party. Let's fun with us...
     //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO190218
@@ -949,6 +969,12 @@ namespace apl {
 
 }  // namespace apl
 
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                               FILE OUTPUT                                //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
 namespace apl {
 
   void DirectMethodPC::hibernate(const string& filename) {
@@ -1023,7 +1049,7 @@ namespace apl {
   void DirectMethodPC::writeDYNMAT() {
     string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME181226
     string message = "Writing forces into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
 
     stringstream outfile;
 
@@ -1078,13 +1104,13 @@ namespace apl {
   void DirectMethodPC::writeFORCES() {
     string function = "apl::DirectMethodPC::writeFORCES()";
     string message = "Writing forces into file FORCES.";
-    pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
 
     xstructure ix;
     string filename = "SPOSCAR";
     if (!aurostd::FileEmpty(filename)) {
       message = "Reading " + filename;
-      pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
       stringstream SPOSCAR;
       aurostd::efile2stringstream(filename, SPOSCAR);
       SPOSCAR >> ix;
@@ -1149,7 +1175,7 @@ namespace apl {
   void DirectMethodPC::writeXCrysDenForces() {
     string function = "apl::DirectMethodPC::writeXCrysDenForces()";
     string message = "Writing forces into file XCrysDenForces.";
-    pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
     _supercell.center_original();  //COREY
 
     stringstream outfile;  //CO

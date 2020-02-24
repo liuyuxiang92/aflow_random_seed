@@ -16,6 +16,7 @@ using std::vector;
 using std::string;
 
 static const string _APL_QMESH_ERR_PREFIX_ = "apl::QMesh::";
+static const string _APL_QMESH_MODULE_ = "QMESH";  // for the logger
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -89,7 +90,6 @@ namespace apl {
     _littleGroups.clear();
     _littleGroupsCalculated = false;
     _reduced = false;
-    _module = "";
     _nIQPs = 0;
     _nQPs = 0;
     _qpoints.clear();
@@ -126,16 +126,8 @@ namespace apl {
     _directory = dir;
   }
 
-  void QMesh::setModule(const string& mod) {
-    _module = mod;
-  }
-
   const string& QMesh::getDirectory() const {
     return _directory;
-  }
-
-  const string& QMesh::getModule() const {
-    return _module;
   }
 
   ofstream& QMesh::getOutputStream() {
@@ -222,7 +214,7 @@ namespace apl {
   void QMesh::generateGridPoints(bool force_gamma) {
     stringstream message;
     message << "Generating a " << _qptGrid[1] << "x" << _qptGrid[2] << "x" << _qptGrid[3] << " q-point mesh.";
-    pflow::logger(_AFLOW_FILE_NAME_, _module, message, _directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, std::cout);
     _qpoints.resize(_nQPs);
     _ibzqpts.resize(_nQPs);  // Before making the mesh irreducible, treat all q-points as irreducible q-points
     _weights.assign(_nQPs, 1);
@@ -339,7 +331,7 @@ namespace apl {
     }
     _reduced = true;
     message << "Found " << _nIQPs << " irreducible qpoints.";
-    pflow::logger(_AFLOW_FILE_NAME_, _module, message, _directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, std::cout);
   }
 
   // ME200109

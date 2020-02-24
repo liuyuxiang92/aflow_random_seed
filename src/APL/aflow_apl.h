@@ -1384,7 +1384,6 @@ namespace apl {
 
       ofstream* messageFile;
       string _directory;
-      string _module;
 
       vector<int> _ibzqpts;  // The indices of the irreducible q-points
       bool _isGammaCentered;  // Indicates whether the includes the Gamma point

@@ -16,6 +16,7 @@
 using namespace std;
 
 static const xcomplex<double> iONE(0.0, 1.0);  // ME200116
+static const string _APL_SUPERCELL_MODULE_ = "SUPERCELL";  // for the logger
 
 namespace apl {
 
@@ -57,7 +58,7 @@ namespace apl {
     //COREY, DO NOT MODIFY THE STRUCTURE BELOW HERE, THIS INCLUDES RESCALE(), BRINGINCELL(), SHIFORIGINATOM(), etc.
     stringstream message;
     message << "Estimating the symmetry of structure and calculating the input structure. Please be patient."; //primitive cell." << apl::endl; //CO 180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
     calculateWholeSymmetry(_inStructure);
     if(LDEBUG){ //CO190218
       bool write_inequivalent_flag=_inStructure.write_inequivalent_flag;
@@ -330,7 +331,7 @@ namespace apl {
         message << "Radius=" << aurostd::PaddedPOST(aurostd::utype2string<double>(radius, 3), 4)
                 << " supercell=" << dims[1] << "x" << dims[2] << "x" << dims[3]
                 << " natoms=" << natoms;
-        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
       }
     } else if (method == "MINATOMS_RESTRICTED") {
       int minatoms = aurostd::string2utype<int>(value);
@@ -344,7 +345,7 @@ namespace apl {
         message << "Ni=" << Ni
                 << " supercell=" << Ni << "x" << Ni << "x" << Ni
                 << " natoms=" << natoms;
-        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
       }
     } else if (method == "SHELLS") {
       int shells = aurostd::string2utype<int>(value);
@@ -354,7 +355,7 @@ namespace apl {
       bool full_shell = false;
       if (opts.flag("SUPERCELL::VERBOSE")) {
         message << "Searching for suitable cell to handle " << shells << " shells...";
-        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
       }
       dims = buildSuitableForShell(shells, full_shell, opts.flag("SUPERCELL::VERBOSE"));
     } else {
@@ -393,12 +394,12 @@ namespace apl {
     if (VERBOSE) {
       message << "The supercell is going to build as " << nx << " x " << ny << " x " << nz
         << " (" << (uint)(nx * ny * nz * _inStructure.atoms.size()) << " atoms).";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
     }
 
     if (VERBOSE && _derivative_structure) {
       message << "Derivative structure detected, be patient as we calculate symmetry of the supercell.";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
     }
     // Create lattice of the supercell
     xmatrix<double> scale(3, 3);
@@ -454,7 +455,7 @@ namespace apl {
     // OK.
     if (VERBOSE) {
       message << "Supercell successfully created.";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
     }
     _isConstructed = TRUE;
 
@@ -914,7 +915,7 @@ namespace apl {
         << " not map the AFLOW standard primitive cell to the supercell."
         << " Phonon dispersions will be calculated using the original"
         << " structure instead.";
-        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout, 'W');
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout, 'W');
     }
   }
 
@@ -1050,7 +1051,7 @@ namespace apl {
         stringstream message;
         message << e.error_message;
         message << " The splitting of shells by symmetry has failed [" << i << "]. Continuing without this...";
-        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout, 'W');
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout, 'W');
         useSplitShells = false;
         for (uint j = 0; j < sh.size(); j++) {
           sh[j].removeSplitBySymmetry();
@@ -1146,7 +1147,7 @@ namespace apl {
     // Set flag to shell restriction
     _isShellRestricted = true;
     message << "Setting shell restrictions up to " << MAX_NN_SHELLS << ".";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
 
     // Calculate the truncate radius for each atom
     _maxShellRadius.clear();
@@ -2023,7 +2024,7 @@ namespace apl {
   void Supercell::getFullBasisAGROUP() {
     stringstream message;
     message << "Calculating the full basis for the site point groups of the supercell.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _aflowFlags.Directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _aflowFlags.Directory, *messageFile, std::cout);
     if (!SYM::CalculateSitePointGroup_EquivalentSites(_scStructure, _sym_eps)) {
       string function = "apl::Supercell::getFullBasisAGROUP()";
       message << "Could not calculate the bases of the site point groups.";

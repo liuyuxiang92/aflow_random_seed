@@ -1546,11 +1546,11 @@ namespace KBIN {
       // Try to read first
       if (awakeHarmIFCs) {
         try {
-          pflow::logger(_AFLOW_FILE_NAME_, modulename, "Awakening...", aflags, messageFile, std::cout);
+          pflow::logger(_AFLOW_FILE_NAME_, "APL", "Awakening...", aflags, messageFile, std::cout);
           phcalc.awake(hibfile);
         } catch (aurostd::xerror& e) {
           message = e.error_message + " Skipping awakening...";
-          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
+          pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, std::cout, 'W');
           awakeHarmIFCs = false;
         }
       }
@@ -1809,7 +1809,6 @@ namespace KBIN {
         //  phcalc->getInputCellStructure(), logger);
         apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
         qmesh.setDirectory(aflags.Directory);
-        qmesh.setModule("QHA");
         if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
 
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -1883,7 +1882,6 @@ namespace KBIN {
             //                             phcalc->getInputCellStructure(),logger);
             apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
             qmesh.setDirectory(aflags.Directory);
-            qmesh.setModule("QHA");
             if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
 
             // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -2038,7 +2036,6 @@ namespace KBIN {
 
         apl::QMesh qmesh(USER_DOS_MESH, phcalc.getInputCellStructure(), messageFile);
         qmesh.setDirectory(aflags.Directory);
-        qmesh.setModule("APL");
         if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
         // Setup the DOS engine which is used also for thermodynamic properties
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
@@ -2313,10 +2310,8 @@ namespace KBIN {
 
       if (USER_TCOND) {
         // Get q-points
-        logger << "Preparing a q-mesh of " << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << "." << apl::endl;
-        apl::QMesh qmtcond(USER_THERMALGRID, phcalc.getInputCellStructure(), messageFile, true);
+        apl::QMesh qmtcond(USER_THERMALGRID, phcalc.getInputCellStructure(), messageFile, true, true);
         qmtcond.setDirectory(aflags.Directory);
-        qmtcond.setModule("AAPL");
         qmtcond.makeIrreducible();
         qmtcond.writeQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE);
         qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);

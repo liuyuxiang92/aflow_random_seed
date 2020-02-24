@@ -1,4 +1,18 @@
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+//****************************************************************************
+
 #include "aflow_apl.h"
+
+static const string _APL_LRPC_MODULE_ = "APL";  // for the logger
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                         CONSTRUCTORS/DESTRUCTORS                         //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
 namespace apl {
 
@@ -59,12 +73,18 @@ namespace apl {
 
 }  // namespace apl
 
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                            VASP CALCULATIONS                             //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
 namespace apl {
 
   bool LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
     if (zerostate_chgcar) {
       string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, _xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout, 'W');
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout, 'W');
     }
     bool stagebreak = false;
 
@@ -111,7 +131,7 @@ namespace apl {
       xInput.setDirectory( _xInput.getDirectory() + "/" + runname );
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, xInput.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
         createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *messageFile);
         stagebreak = true;
       }
@@ -120,6 +140,12 @@ namespace apl {
   }
 
 }  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                             FORCE CONSTANTS                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
 namespace apl {
 
@@ -148,7 +174,7 @@ namespace apl {
   bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
-    pflow::logger(_AFLOW_FILE_NAME_, xinp.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
     string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
 
     // Read vasprun.xml
@@ -157,7 +183,7 @@ namespace apl {
       filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
       if (aurostd::EFileExist(filename)) {
         message << "Could not find vasprun.xml file for linear response calculations.";
-        pflow::logger(_AFLOW_FILE_NAME_, xinp.xvasp.AVASP_arun_mode, message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
         return false;
       }
     }
@@ -226,6 +252,12 @@ namespace apl {
 
 }  // namespace apl
 
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                               FILE OUTPUT                                //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
 namespace apl {
 
   void LinearResponsePC::hibernate(const string& filename) {
@@ -245,3 +277,9 @@ namespace apl {
   }
 
 }  // namespace apl
+
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                                                                         *
+//****************************************************************************

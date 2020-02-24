@@ -1,5 +1,8 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        -- Refactored apl::PhononCalculator into a force constant and phonon calcuator class. (ME)
+        -- Removed apl::APLStageBreak. (ME)
+        -- Replaced apl::Logger with pflow::logger in some classes. (ME).
         -- Fixed force constant reader for linear response calculations. (ME)
         -- Fixed signs of second order force constants. (ME)
         -- Sped up determination of irreducible tetrahedra for the tetrahedron method. (ME)
