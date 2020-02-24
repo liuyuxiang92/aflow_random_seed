@@ -2568,9 +2568,9 @@ namespace anrl {
       string& prototype,
       string& dialect);
   vector<uint> extractStoichiometry(string& anrl_label);
-  bool PrototypeANRL_Consistency(ostream &oss,uint vparameters_size,uint proto_nparameters,string proto_prototype,
+  bool PrototypeANRL_Consistency(uint vparameters_size,uint proto_nparameters,string proto_prototype,
       string proto_label,string proto_Strukturbericht,string proto_Pearson_symbol,
-      uint proto_spacegroup, string proto_params, uint print_mode); //DX 20180710 - added print_mode
+      uint proto_spacegroup, string proto_params, uint print_mode); //DX 20180710 - added print_mode //DX 20200207 - oss no longer needed
   string groupedWyckoffPosition2ANRLString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize);
   vector<string> getANRLLatticeParameterString(char& lattice_type);
   vector<double> getANRLLatticeParameterValuesFromWyccar(const vector<string>& wyccar_ITC, char lattice_type, char lattice_centering, uint setting); //DX 20191031
