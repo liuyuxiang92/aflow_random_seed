@@ -26,6 +26,7 @@ using std::vector;
 using std::string;
 
 static const string _APL_THERMO_ERR_PREFIX_ = "apl::ThermalPropertiesCalculator::";
+static const string _APL_TPC_MODULE_ = "APL";
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -36,17 +37,22 @@ static const string _APL_THERMO_ERR_PREFIX_ = "apl::ThermalPropertiesCalculator:
 namespace apl {
 
   // Default Constructor
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(Logger& l) : _logger(l) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf) {
     free();
+    messageFile = &mf;
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, Logger& l) : _logger(l) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, string directory) {
     free();
+    messageFile = &mf;
+    _directory = directory;
     initialize(dosc.getBins(), dosc.getDOS(), dosc._system);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, Logger& l) : _logger(l) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, string directory) {
     free();
+    messageFile = &mf;
+    _directory = directory;
     vector<double> freq = aurostd::deque2vector(xdos.venergy);
     // Convert to THz
     for (uint i = 0; i < freq.size(); i++) freq[i] *= eV2Hz * Hz2THz;
@@ -55,7 +61,7 @@ namespace apl {
   }
 
   // Copy constructors
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const ThermalPropertiesCalculator& that) : _logger(that._logger) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const ThermalPropertiesCalculator& that) {
     copy(that);
   }
 
@@ -72,6 +78,8 @@ namespace apl {
   void ThermalPropertiesCalculator::copy(const ThermalPropertiesCalculator& that) {
     _freqs_0K = that._freqs_0K;
     _dos_0K = that._dos_0K;
+    _directory = that._directory;
+    messageFile = that.messageFile;
     system = that.system;
     temperatures = that.temperatures;
     Cv = that.Cv;
@@ -85,6 +93,7 @@ namespace apl {
   void ThermalPropertiesCalculator::free() {
     _freqs_0K.clear();
     _dos_0K.clear();
+    _directory = "";
     system = "";
     temperatures.clear();
     Cv.clear();
@@ -94,9 +103,17 @@ namespace apl {
     U0 = 0.0;
   }
 
-  void ThermalPropertiesCalculator::clear(Logger& l) {
-    ThermalPropertiesCalculator that(l);
+  void ThermalPropertiesCalculator::clear(ofstream& mf) {
+    ThermalPropertiesCalculator that(mf);
     copy(that);
+  }
+
+  void ThermalPropertiesCalculator::setDirectory(const string& directory) {
+    _directory = directory;
+  }
+
+  string ThermalPropertiesCalculator::getDirectory() const {
+    return _directory;
   }
 
 }  // namespace apl
@@ -126,10 +143,11 @@ namespace apl {
   void ThermalPropertiesCalculator::calculateThermalProperties(double Tstart,
       double Tend,
       double Tstep) {
-    _logger << "Calculating thermal properties." << apl::endl;
+    string message = "Calculating thermal properties.";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *messageFile, std::cout);
     if (Tstart > Tend) {
       string function = _APL_THERMO_ERR_PREFIX_ + "calculateThermalProperties()";
-      string message = "Tstart cannot be higher than Tend.";
+      message = "Tstart cannot be higher than Tend.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
 
@@ -352,7 +370,8 @@ namespace apl {
   // AFLOW plotter.
   void ThermalPropertiesCalculator::writePropertiesToFile(string filename) {
     filename = aurostd::CleanFileName(filename);
-    _logger << "Writing thermal properties into file " << filename << "." << apl::endl;
+    string message = "Writing thermal properties into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *messageFile, std::cout);
 
     stringstream outfile;
 
@@ -386,7 +405,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
       string function = "ThermalPropertiesCalculator::writePropertiesToFile()";
-      string message = "Cannot open output file " + filename + ".";
+      message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }

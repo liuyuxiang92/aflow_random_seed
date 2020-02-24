@@ -2064,7 +2064,7 @@ namespace KBIN {
         // Calculate thermal properties
         if (USER_TP) {
           //if (!dosc.hasNegativeFrequencies()) // ME200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
-            apl::ThermalPropertiesCalculator tpc(dosc, logger);  // ME190423
+            apl::ThermalPropertiesCalculator tpc(dosc, messageFile, aflags.Directory);  // ME190423
             // ME200108 - new ThermalPropertiesCalculator format
             tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
             tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
@@ -2281,7 +2281,6 @@ namespace KBIN {
             if(ptr_hsq.get()) ptr_hsq->clear();  // ME190423
             // umesh.clear();  OBSOLETE ME190428
             //QHA/SCQHA/QHA3P END
-            tpc.clear(logger);  // ME200108
           } else {
             // ME200210 - changed warning
             const vector<double>& freqs = dosc.getBins();

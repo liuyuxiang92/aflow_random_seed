@@ -1568,7 +1568,8 @@ namespace apl {
 
   class ThermalPropertiesCalculator {
     private:
-      Logger& _logger;
+      ofstream* messageFile;
+      string _directory;
       std::vector<double> _freqs_0K;
       std::vector<double> _dos_0K;
       string system;
@@ -1580,13 +1581,16 @@ namespace apl {
       double getScalingFactor(const ThermalPropertiesUnits&);
 
     public:
-      ThermalPropertiesCalculator(Logger&);
-      ThermalPropertiesCalculator(const DOSCalculator&, Logger&);
-      ThermalPropertiesCalculator(const xDOSCAR&, Logger&);
+      ThermalPropertiesCalculator(ofstream&);
+      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, string="./");
+      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, string="./");
       ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
       ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
       ~ThermalPropertiesCalculator();
-      void clear(Logger&);
+      void clear(ofstream&);
+
+      void setDirectory(const string&);
+      string getDirectory() const;
 
       vector<double> temperatures;
       vector<double> Cv;
