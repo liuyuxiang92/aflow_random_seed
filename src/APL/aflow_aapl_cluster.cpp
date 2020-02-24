@@ -89,6 +89,7 @@ namespace apl {
 
   //Copy Constructors/////////////////////////////////////////////////////////
   ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger), aflags(that.aflags) {
+    free();
     copy(that);
   }
 

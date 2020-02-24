@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2017                    *
+// *                  Marco Esters - Duke University 2018                    *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
@@ -26,6 +26,7 @@ using aurostd::xcombos;
 using aurostd::xerror;
 
 static const string _AAPL_IFCS_ERR_PREFIX_ = "apl::AnharmonicIFCs::";
+static const string _AAPL_IFCS_MODULE_ = "AAPL";  // for the logger
 
 // tform represents a tensor transformation containing the index and the
 // coefficients. vector<vector<int> > holds the indices, vector<double>
@@ -45,73 +46,47 @@ namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
-  AnharmonicIFCs::AnharmonicIFCs(ClusterSet& _clst,
-      Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
-    free();
-  }
-
-  // Constructor from a set of AAPL calculations
-  AnharmonicIFCs::AnharmonicIFCs(vector<_xinput>& xInp,
-      ClusterSet& _clst,
-      const double& dist_mag, 
-      const aurostd::xoption& options,  // ME190501
-      Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
-    free();
-    distortion_magnitude = dist_mag;
-    max_iter = aurostd::string2utype<int>(options.getattachedscheme("MAX_ITER"));  // ME190501
-    order = clst.order;
-    mixing_coefficient = aurostd::string2utype<double>(options.getattachedscheme("MIXING_COEFFICIENT"));  // ME190501
-    sumrule_threshold = aurostd::string2utype<double>(options.getattachedscheme("THRESHOLD"));  // ME190501
-    cart_indices = getCartesianIndices();
-
-    vector<vector<vector<xvector<double> > > > force_tensors;
-    force_tensors = storeForces(xInp);
-
-    _logger << "Caulating anharmonic IFCs." << apl::endl;
-    vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst.ineq_distortions, force_tensors);
-    force_tensors.clear();
-
-    _logger << "Symmetrizing IFCs." << apl::endl;
-    force_constants = symmetrizeIFCs(ifcs_unsym);
-  }
-
-  // From file
-  AnharmonicIFCs::AnharmonicIFCs(const string& filename,
-      ClusterSet& _clst,
-      const double& dist_mag,
-      const aurostd::xoption& options,  // ME190501
-      Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
-    free();
-    distortion_magnitude = dist_mag;
-    max_iter = aurostd::string2utype<int>(options.getattachedscheme("MAX_ITER"));  // ME190501
-    order = clst.order;
-    mixing_coefficient = aurostd::string2utype<double>(options.getattachedscheme("MIXING_COEFFICIENT"));  // ME190501
-    sumrule_threshold = aurostd::string2utype<double>(options.getattachedscheme("THRESHOLD"));  // ME190501
-    readIFCsFromFile(filename);
+  AnharmonicIFCs::AnharmonicIFCs(_xinput& xinput, _aflags& aflags, _kflags& kflags,
+      _xflags& xflags, ClusterSet& _clst, ofstream& mf)
+    : _xInput(xinput), _aflowFlags(aflags), _kbinFlags(kflags), _xFlags(xflags),
+      clst(_clst) {
+      free();
+      messageFile = &mf;
+      order = clst.order;
   }
 
   //Copy constructors
-  AnharmonicIFCs::AnharmonicIFCs(const AnharmonicIFCs& that) : clst(that.clst), _logger(that._logger), aflags(that.aflags) {
-    copy(that);
+  AnharmonicIFCs::AnharmonicIFCs(const AnharmonicIFCs& that)
+    : _xInput(that._xInput), _aflowFlags(that._aflowFlags), _kbinFlags(that._kbinFlags),
+      _xFlags(that._xFlags), clst(that.clst) {
+      free();
+      copy(that);
   }
 
   const AnharmonicIFCs& AnharmonicIFCs::operator=(const AnharmonicIFCs& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 
   //copy//////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::copy(const AnharmonicIFCs& that) {
-    _logger = that._logger;
-    aflags = that.aflags;
+    _aflowFlags = that._aflowFlags;
+    _kbinFlags = that._kbinFlags;
+    _xFlags = that._xFlags;
+    _xInput = that._xInput;
     cart_indices = that.cart_indices;
     clst = that.clst;
     distortion_magnitude = that.distortion_magnitude;
+    messageFile = that.messageFile;
     force_constants = that.force_constants;
     max_iter = that.max_iter;
     mixing_coefficient = that.mixing_coefficient;
     order = that.order;
     sumrule_threshold = that.sumrule_threshold;
+    xInputs = that.xInputs;
   }
 
   //Destructor////////////////////////////////////////////////////////////////
@@ -129,12 +104,271 @@ namespace apl {
     mixing_coefficient = 0.0;
     order = 0;
     sumrule_threshold = 0.0;
+    xInputs.clear();
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void AnharmonicIFCs::clear(ClusterSet& clst, Logger& l, _aflags& a) {
-    AnharmonicIFCs that(clst, l, a);
+  void AnharmonicIFCs::clear(_xinput& xinput, _aflags& aflags, _kflags& kflags,
+      _xflags& xflags, ClusterSet& _clst, ofstream& fm) {
+    AnharmonicIFCs that(xinput, aflags, kflags, xflags, _clst, fm);
     copy(that); 
+  }
+
+
+  //setOptions////////////////////////////////////////////////////////////////
+  void AnharmonicIFCs::setOptions(double dmag, int iter, double mix, double threshold, bool zero) {
+    distortion_magnitude = dmag;
+    max_iter = iter;
+    mixing_coefficient = mix;
+    sumrule_threshold = threshold;
+    _useZeroStateForces = zero;
+  }
+
+  //getOrder//////////////////////////////////////////////////////////////////
+  int AnharmonicIFCs::getOrder() const {
+    return order;
+  }
+
+}  // namespace apl
+
+/***************************** DFT CALCULATIONS *****************************/
+
+namespace apl {
+
+  bool AnharmonicIFCs::runVASPCalculations(bool zerostate_chgcar) {
+    bool stagebreak = false;
+    _xInput.xvasp.AVASP_arun_mode = _AAPL_IFCS_MODULE_;
+    stringstream _logger;
+    _logger << "Managing directories for ";
+    if (order == 3) {
+      _logger << "3rd";
+    } else {
+      _logger << "4th";
+    }
+    _logger << " order IFCs.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, _aflowFlags, *messageFile, std::cout);
+
+    // Determine the number of runs so the run ID in the folder name can be
+    // padded with the appropriate number of zeros.
+    int nruns = 0;
+    for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
+      nruns += clst.ineq_distortions[ineq].distortions.size();
+    }
+    if (order == 4) {
+      for (uint ineq = 0; ineq < clst.higher_order_ineq_distortions.size(); ineq++) {
+        nruns += clst.higher_order_ineq_distortions[ineq].distortions.size();
+      }
+    }
+
+    xInputs.assign(nruns, _xInput);
+
+    string chgcar_file = "";
+    if (zerostate_chgcar) {  // ME191029 - for ZEROSTATE CHGCAR
+      // Find ZEROSTATE directory
+      vector<string> directory;
+      aurostd::DirectoryLS(_aflowFlags.Directory, directory);
+      uint ndir = directory.size();
+      uint d = 0;
+      for (d = 0; d < ndir; d++) {
+        if (aurostd::IsDirectory(_aflowFlags.Directory + "/" + directory[d]) && aurostd::substring2bool(directory[d], "ZEROSTATE")) {
+          break;
+        }
+      }
+      if (d == ndir) {
+        string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, _aflowFlags, *messageFile, std::cout, 'W');
+        zerostate_chgcar = false;
+      } else {
+        chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
+        if (_kbinFlags.KZIP_COMPRESS) chgcar_file += "." + _kbinFlags.KZIP_BIN;
+      }
+    }
+
+    int idxRun = 0;
+    for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
+      const vector<int>& atoms = clst.ineq_distortions[ineq].atoms;
+      const _ineq_distortions& idist = clst.ineq_distortions[ineq];
+      for (uint dist = 0; dist < idist.distortions.size(); dist++) {
+        const vector<int>& distortions = idist.distortions[dist][0];
+
+        // ME 190109 - add title
+        xstructure& xstr = xInputs[idxRun].getXStr();
+        LightCopy(clst.scell, xstr);
+        xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title);
+        if (xstr.title.empty()) {
+          xstr.buildGenericTitle(true, false);
+        }
+        xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
+
+        xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
+        if (zerostate_chgcar) {
+          xInputs[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
+        }
+
+        // Set up runname and generate distorted structure
+        xInputs[idxRun].xvasp.AVASP_arun_runname = buildRunName(distortions, atoms, idxRun, nruns);
+        applyDistortions(xInputs[idxRun], clst.distortion_vectors, distortions, atoms);
+
+        // Create aflow.in files if they don't exist. Stagebreak is true as soon
+        // as one aflow.in file was created.
+        stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || stagebreak);
+        idxRun++;
+      }
+    }
+    if (order == 4) {
+      for (uint ineq = 0; ineq < clst.higher_order_ineq_distortions.size(); ineq++) {
+        const _ineq_distortions& idist = clst.higher_order_ineq_distortions[ineq];
+        const vector<int>& atoms = idist.atoms;
+        for (uint dist = 0; dist < idist.distortions.size(); dist++) {
+          xInputs[idxRun] = _xInput;
+          const vector<int>& distortions = idist.distortions[dist][0];
+          xstructure& xstr = xInputs[idxRun].getXStr();
+          xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title);
+
+          if (xstr.title.empty()) {
+            xstr.buildGenericTitle(true, false);
+          }
+          xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
+
+          // ME 190113 - make sure that POSCAR has the correct format
+          if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
+              (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
+            xstr.is_vasp5_poscar_format = false;
+          }
+
+          // Set up runname and generate distorted structure
+          xInputs[idxRun].xvasp.AVASP_arun_runname = buildRunName(distortions, atoms, idxRun, nruns);
+          xInputs[idxRun].xvasp.AVASP_arun_runname += "_3rd";
+          applyDistortions(xInputs[idxRun], clst.distortion_vectors, distortions, atoms, 2.0);
+
+          // Create aflow.in files if they don't exist. Stagebreak is true as soon
+          // as one aflow.in file was created.
+          stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || stagebreak);
+          idxRun++;
+        }
+      }
+    }
+
+    return stagebreak;
+  }
+
+  string AnharmonicIFCs::buildRunName(const vector<int>& distortions,
+      const vector<int>& atoms, int run, int nruns) {
+    stringstream runname;
+    runname << order << "_";
+
+    // Run ID with padding
+    runname << aurostd::PaddedNumString(run + 1, aurostd::getZeroPadding(nruns)) << "_";
+
+    // Atom and distortion IDs
+    for (int at = 0; at < order - 1; at++) {
+      if (at > 0) runname << "-";
+      runname << "A" << atoms[at] << "D" << distortions[at];
+    }
+
+    return runname.str();
+  }
+
+  void AnharmonicIFCs::applyDistortions(_xinput& xinp,
+      const vector<xvector<double> >& distortion_vectors,
+      const vector<int>& distortions,
+      const vector<int>& atoms, double scale) {
+    xstructure& xstr = xinp.getXStr();  // ME 190109
+    for (uint at = 0; at < atoms.size(); at++) {
+      int atsc = atoms[at];
+      int dist_index = distortions[at];
+      xvector<double> dist_cart = distortion_vectors[dist_index];
+      while (((at + 1) < atoms.size()) && (atoms[at] == atoms[at+1])) {
+        at++;
+        dist_index = distortions[at];
+        dist_cart += distortion_vectors[dist_index];
+      }
+      // Normalize dist_cart coordinates to 1 so that distortions have the same magnitude
+      for (int i = 1; i < 4; i++) {
+        if (abs(dist_cart(i)) < _ZERO_TOL_) {
+          dist_cart(i) = 0.0;
+        } else {
+          dist_cart(i) *= (scale/std::abs(dist_cart(i)));
+        }
+      }
+      dist_cart *= distortion_magnitude;
+      // ME 190109 - Add to title
+      xstr.title += " atom=" + stringify(atoms[at]);
+      //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(dist_cart)) + "]"; OBSOLETE ME190112
+      std::stringstream distortion; // ME190112 - need stringstream for nicer formatting
+      distortion << " distortion=["
+        << std::setprecision(3) << dist_cart[1] << ","
+        << std::setprecision(3) << dist_cart[2] << ","
+        << std::setprecision(3) << dist_cart[3] << "]"; // ME190112
+      xstr.title += distortion.str();
+      xstr.atoms[atsc].cpos += dist_cart;
+      xstr.atoms[atsc].fpos = C2F(xstr.lattice, xstr.atoms[atsc].cpos);
+    }
+  }
+
+
+}  // namespace apl
+
+/****************************** CALCULATE IFCs ******************************/
+
+namespace apl {
+
+  bool AnharmonicIFCs::calculateForceConstants() {
+    cart_indices = getCartesianIndices();
+
+    // Read forces
+    // outfileFoundAnywherePhonons detects whether no calculations have been
+    // run (no error message) whereas outfileFounEverywherePhonons tries to
+    // read the force files. The latter outputs messages, which is not desired
+    // when directories have just been created.
+    if (!outfileFoundAnywherePhonons(xInputs)) return false;
+    if (!outfileFoundEverywherePhonons(xInputs, _aflowFlags.Directory, *messageFile)) return false;
+    if (_useZeroStateForces) {
+      vector<string> directory;
+      aurostd::DirectoryLS(_aflowFlags.Directory, directory);
+      uint ndir = directory.size();
+      uint d = 0;
+      for (d = 0; d < ndir; d++) {
+        if (aurostd::IsDirectory(_aflowFlags.Directory + "/" + directory[d]) && aurostd::substring2bool(directory[d], "ZEROSTATE")) {
+          break;
+        }
+      }
+      if (d == ndir) {
+        string function = "apl::AnharmonicIFCs::calculateForceConstants()";
+        string message = "Could not find ZEROSTATE directory.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+      } else {
+        _xinput zerostate(_xInput);
+        xstructure& xstr = zerostate.getXStr();
+        LightCopy(clst.scell, xstr);
+        zerostate.setDirectory(aurostd::CleanFileName(_aflowFlags.Directory + "/" + directory[d]));
+        subtractZeroStateForces(xInputs, zerostate);
+      }
+    }
+    vector<vector<vector<xvector<double> > > > force_tensors = storeForces(xInputs);
+
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", _aflowFlags, *messageFile, std::cout);
+    vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst.ineq_distortions, force_tensors);
+    force_tensors.clear();
+
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", _aflowFlags, *messageFile, std::cout);
+    force_constants = symmetrizeIFCs(ifcs_unsym);
+    return true;
+  }
+
+  const vector<vector<double> >& AnharmonicIFCs::getForceConstants() const {
+    return force_constants;
+  }
+
+  vector<vector<int> > AnharmonicIFCs::getClusters() const {
+    uint nclusters = clst.clusters.size();
+    vector<vector<int> > clusters(nclusters, vector<int>(order));
+    for (uint i = 0; i < nclusters; i++) {
+      for (int j = 0; j < order; j++) {
+        clusters[i][j] = clst.clusters[i].atoms[j];
+      }
+    }
+    return clusters;
   }
 
 }  // namespace apl
@@ -165,7 +399,7 @@ namespace apl {
     for (uint id = 0; id < clst.ineq_distortions.size(); id++) {
       force_tensors[id] = getForces(id, idxRun, xInp);
     }
-    if (clst.order == 4) addHigherOrderForces(force_tensors, idxRun, xInp);
+    if (order == 4) addHigherOrderForces(force_tensors, idxRun, xInp);
     return force_tensors;
   }
 
@@ -227,10 +461,10 @@ namespace apl {
       int at = ineq_dists[ineq].atoms[0];
       for (idist = 0; idist < clst.ineq_distortions.size(); idist++) {
         int a;
-        for (a = 0; a < clst.order - 1; a++) {
+        for (a = 0; a < order - 1; a++) {
           if (clst.ineq_distortions[idist].atoms[a] != at) break;
         }
-        if (a == clst.order - 1) break;
+        if (a == order - 1) break;
       }
       for (int i = 0; i < 6; i++) force_tensor[idist].push_back(forces);
 
@@ -394,7 +628,7 @@ namespace apl {
     // Do iterations
     int num_iter = 0;
     double max_err = 0.0;
-    _logger << "Begin SCF for anharmonic force constants." << apl::endl;
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", _aflowFlags, *messageFile, std::cout);
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
     std::cout << std::setw(15) << "Iteration";
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -427,7 +661,7 @@ namespace apl {
       }
       num_iter++;
     } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
-    _logger << "End SCF for anharmonic force constants." << apl::endl;
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", _aflowFlags, *messageFile, std::cout);
     if (num_iter > max_iter) {
       string function = _AAPL_IFCS_ERR_PREFIX_ + "symmetrizeIFCs";
       stringstream message;
@@ -724,7 +958,7 @@ namespace apl {
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME190219
+    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(_aflowFlags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME190219
     parameters.unsetf(std::ios::hex);  // ME190125 - Remove hexadecimal formatting
     parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
@@ -834,400 +1068,6 @@ namespace apl {
   }
 
   // END Write files
-
-  // BEGIN Read files
-  //readIFCsFromFile//////////////////////////////////////////////////////////
-  // Reads an AnharmonicIFCs object from an XML file.
-  void AnharmonicIFCs::readIFCsFromFile(const string& filename) {
-    // Open file and handle exceptions
-    string function = _AAPL_IFCS_ERR_PREFIX_ + "readIFCsFromFile";
-    stringstream message;
-
-    if (!aurostd::EFileExist(filename) && !aurostd::FileExist(filename)) {
-      message << "Could not open file " << filename << ". File not found.";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
-    }
-    vector<string> vlines;
-    aurostd::efile2vectorstring(filename, vlines);
-    if (vlines.size() == 0) {
-      message << "Cannot open file " << filename << ". File empty or corrupt.";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
-    }
-
-    // Start reading
-    uint line_count = 0;
-    string line = vlines[line_count++];
-
-    // Check that this is a valid xml file
-    if (line.find("xml") == string::npos) {
-      message << "File is not a valid xml file.";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
-    }
-
-    // Check if xml file can be used to read anharmonic IFCs
-    if (checkCompatibility(line_count, vlines)) {
-      force_constants = readIFCs(line_count, vlines);
-    } else {
-      message << "The settings in the hibernate file and the aflow.in file are incompatible.";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
-    }
-  }
-
-  //checkCompatibility////////////////////////////////////////////////////////
-  // Checks if the hibernate XML file is compatible with the aflow.in file.
-  // If the checksum in the XML file is the same as the checksum of the
-  // aflow.in file, then the parameters are the same. If not, the function
-  // checks if the parameters relevant for the IFC calculation (supercell,
-  // order, calculation parameters) are the same. This prevents the anharmonic
-  // IFCs from being recalculated when only post-processing parameters are
-  // changed.
-  bool AnharmonicIFCs::checkCompatibility(uint& line_count, 
-      const vector<string>& vlines) {
-    string function = _AAPL_IFCS_ERR_PREFIX_ + "checkCompatibility";
-    string line = "";
-    stringstream message;
-    bool compatible = true;
-    int t = 0;
-    vector<string> tokens;
-    uint vsize = vlines.size();
-
-    // Compare checksum
-    while (true) {
-      if (line_count == vsize) {
-        message << "Checksum not found in hibernate file.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
-      }
-      line = vlines[line_count++];
-      if (line.find("checksum") != string::npos) {
-        break;
-      }
-    }
-
-    t = line.find_first_of(">") + 1;
-    tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME190219
-      message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
-
-      tokens.clear();
-      // Compare calculation parameters
-      //// distortion_magnitude
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find distortion_magnitude tag. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("distortion_magnitude") != string::npos) {
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          double dist_mag = aurostd::string2utype<double>(tokens[0]);
-          tokens.clear();
-          if (dist_mag != distortion_magnitude) {
-            message << "Hibernate file and aflow.in have different distortion magnitudes. ";
-            compatible = false;
-          }
-          break;
-        }
-      }
-
-      //// order
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find order tag. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("order") != string::npos) {
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          int ord = aurostd::string2utype<int>(tokens[0]);
-          tokens.clear();
-          if (ord != order) {
-            message << "Hibernate file and aflow.in have different IFC order. ";
-            compatible = false;
-          }
-          break;
-        }
-      }
-
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find iteration tag. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("iteration") != string::npos) {
-          break;
-        }
-      }
-      //// max_iter
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find max_iter tag. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("max_iter") != string::npos) {
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          int iter = aurostd::string2utype<int>(tokens[0]);
-          tokens.clear();
-          if (iter != max_iter) {
-            message << "Hibernate file and aflow.in have different max. number of iterations. ";
-            compatible = false;
-          }
-          break;
-        }
-      }
-
-      //// mixing_coefficient
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find mixing_coefficient tag. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("mixing_coefficient") != string::npos) {
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          double mix = aurostd::string2utype<bool>(tokens[0]);
-          tokens.clear();
-          if (mix != mixing_coefficient) {
-            message << "Hibernate file and aflow.in have different mixing coefficients. ";
-            compatible = false;
-          }
-          break;
-        }
-      }
-
-      //// sumrule_threshold
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find sumrule_threshold tag. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("sumrule_threshold") != string::npos) {
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          double thresh = aurostd::string2utype<double>(tokens[0]);
-          tokens.clear();
-          if (thresh != sumrule_threshold) {
-            message << "Hibernate file and aflow.in have different convergence criteria. ";
-            compatible = false;
-          }
-          break;
-        }
-      }
-
-      // Compare supercells
-      //// Lattice
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find structure tag. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("structure") != string::npos) {
-          break;
-        }
-      }
-
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find primitive lattice vectors. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("varray name=\"pcell lattice\"") != string::npos) {
-          xmatrix<double> latt(3, 3);
-          for (int i = 1; i < 4; i++) {
-            line = vlines[line_count++];
-            if (line_count == vsize) {
-              message << "pcell lattice tag is corrupt. ";
-            }
-            t = line.find_first_of(">") + 1;
-            tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-            for (int j = 1; j < 3; j++) {
-              latt(i, j) = aurostd::string2utype<double>(tokens[j - 1]);
-            }
-            tokens.clear();
-          }
-          line = vlines[line_count++];
-          if (line.find("</varray>") == string::npos) {
-            message << "pcell lattice tag is corrupt. ";
-            compatible = false;
-          } else {
-            break;
-          }
-          if (latt != clst.pcell.lattice) {
-            message << "Hibernate file and aflow.in do not have the same lattice. ";
-            compatible = false;
-          }
-        }
-      }
-
-      //// Atomic positions
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find atomic positions. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("varray name=\"positions\"") != string::npos) {
-          // First check for tag corruption and extract everything
-          vector<string> species;
-          vector<xvector<double> > positions;
-          while (compatible) {
-            if (line_count == vsize) {
-              message << "positions tag is corrupt. ";
-              compatible = false;
-            }
-            line = vlines[line_count++];
-            if (line.find("species=\"") != string::npos) {
-              // Extract species
-              t = line.find_first_of("\"") + 1;
-              tokenize(line.substr(t, line.find_last_of("\"") - t), tokens, string(" "));
-              species.push_back(tokens[0]);
-              tokens.clear();
-              // Extract positions
-              t = line.find_first_of(">") + 1;
-              tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-              xvector<double> fpos(3);
-              for (int i = 1; i < 4; i++) {
-                fpos(i) = aurostd::string2utype<double>(tokens[i-1]);
-              }
-              positions.push_back(fpos);
-              tokens.clear();
-            } else if (line.find("/varray") != string::npos) {
-              break;
-            } else {
-              message << "positions tag is corrupt. ";
-              compatible = false;
-            }
-          }
-          // Now compare with the primitive cell from the aflow.in file
-          uint nspecies = species.size();
-          if (nspecies == clst.pcell.atoms.size()) {
-            for (uint sp = 0; sp < nspecies; sp++) {
-              int type = clst.pcell.atoms[sp].type;
-              string spec = clst.pcell.species[type];
-              xvector<double> pos = clst.pcell.atoms[sp].fpos;
-              if (species[sp] != spec) {
-                message << "The structures in the hibernate file and aflow.in ";
-                message << "have different species. ";
-                compatible = false;
-                sp = nspecies;
-              } else if (positions[sp] != pos) {
-                message << "The structures in the hibernate file and aflow.in ";
-                message << "have different atomic positions.";
-                compatible = false;
-                sp = nspecies;
-              }
-            }
-          } else {
-            message << "The structures in the hibernate file and in aflow.in ";
-            message << "do not have the same number of atoms. ";
-            compatible = false;
-          }
-          break;
-        }
-      }
-
-      //// Supercell dimensions
-      while (compatible) {
-        if (line_count == vsize) {
-          message << "Could not find supercell dimensions. ";
-          compatible = false;
-        }
-        line = vlines[line_count++];
-        if (line.find("varray name=\"supercell\"") != string::npos) {
-          line = vlines[line_count++];
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          xvector<int> sc(3);
-          for (int i = 1; i < 4; i++) {
-            sc(i) = aurostd::string2utype<double>(tokens[i-1]);
-          }
-          if (sc == clst.sc_dim) {
-            break;
-          } else {
-            message << "The supercells in the hibernate file and in aflow.in ";
-            message << "have different dimensions. ";
-            compatible = false;
-          }
-        }
-      }
-
-      if (compatible) {
-        message << "The relevant settings appear to be the same, ";
-        message << "so the anharmonic IFCs will not be recalculated. ";
-        message << "Make sure that the changes do not impact the IFCs.";
-      } else {
-        message << "Anharmonic IFCs need to be recalculated.";
-      }
-      _logger << apl::warning << "apl::AnharmonicIFCs::readIFCsfromFile(); ";
-      _logger << message.str() << apl::endl;
-    }
-    return compatible;
-  }
-
-  //readIFCs//////////////////////////////////////////////////////////////////
-  // Reads the IFCs from the hibernate file.
-  vector<vector<double> > AnharmonicIFCs::readIFCs(uint& line_count,
-      const vector<string>& vlines) {
-    string function = _AAPL_IFCS_ERR_PREFIX_ + "readIFCs";
-    string line = "", message = "";
-    vector<int> atoms(order), slice(order - 2);
-    vector<string> tokens;
-    int t = 0;
-    uint vsize = vlines.size();
-    vector<vector<double> > ifcs;
-
-    // Find force_constants tag
-    while (true) {
-      if (line_count == vsize) {
-        message = "force_constants tag not found.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
-      }
-      line = vlines[line_count++];
-      if (line.find("force_constants") != string::npos) {
-        break;
-      }
-    }
-
-    // Read IFCs
-    vector<double> ifc;
-    while (line.find("/force_constants") == string::npos) {
-      if (line_count == vsize) {
-        message = "force_constants tag incomplete.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
-      }
-      line = vlines[line_count++];
-      if (line.find("atoms") != string::npos) {
-        ifc.clear();
-      } else if (line.find("slice") != string::npos) {
-        // If a slice is found, populate tensor
-        for (int i = 0; i < 3; i++) {
-          line = vlines[line_count++];
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          for (int j = 0; j < 3; j++) {
-            double val = aurostd::string2utype<double>(tokens[j]);
-            ifc.push_back(val);
-          }
-          tokens.clear();
-        }
-        line_count++;
-      } else if (line.find("</varray>") != string::npos) {
-        ifcs.push_back(ifc);
-      }
-    }
-
-    return ifcs;
-  }
-
-  // END Read files
 
 } // namespace apl
 

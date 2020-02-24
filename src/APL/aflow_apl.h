@@ -41,24 +41,25 @@ extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 // ***************************************************************************
 // "aplexcept.h"
 // in aurostd.h // [OBSOLETE]
-#include <stdexcept>
-namespace apl {
-  //
-  // OBSOLETE ME191031 - use xerror
-  //class APLRuntimeError : public std::runtime_error {
-  // public:
-  //  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
-  //};
-  //class APLLogicError : public std::logic_error {
-  // public:
-  //  APLLogicError(const std::string& s) : std::logic_error(s) {}
-  //};
-  //
-  class APLStageBreak : public std::exception {
-    public:
-      APLStageBreak() {}
-  };
-}
+// ME200222 - APLStageBreak obsolete
+//[OBSOLETE] #include <stdexcept>
+//[OBSOLETE] namespace apl {
+//[OBSOLETE]   //
+//[OBSOLETE]   // OBSOLETE ME191031 - use xerror
+//[OBSOLETE]   //class APLRuntimeError : public std::runtime_error {
+//[OBSOLETE]   // public:
+//[OBSOLETE]   //  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
+//[OBSOLETE]   //};
+//[OBSOLETE]   //class APLLogicError : public std::logic_error {
+//[OBSOLETE]   // public:
+//[OBSOLETE]   //  APLLogicError(const std::string& s) : std::logic_error(s) {}
+//[OBSOLETE]   //};
+//[OBSOLETE]   //
+//[OBSOLETE]   class APLStageBreak : public std::exception {
+//[OBSOLETE]     public:
+//[OBSOLETE]       APLStageBreak() {}
+//[OBSOLETE]   };
+//[OBSOLETE] }
 
 // ***************************************************************************
 // "logger.h"
@@ -329,17 +330,32 @@ namespace apl {
   class AnharmonicIFCs {
     // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
     public:
-      AnharmonicIFCs(ClusterSet&, Logger&, _aflags&);
-      AnharmonicIFCs(vector<_xinput>&, ClusterSet&, const double&,  // ME190529
-          const aurostd::xoption&, Logger&, _aflags&);  // ME190501
-      AnharmonicIFCs(const string&, ClusterSet&, const double&,
-          const aurostd::xoption&, Logger&, _aflags&);  // ME190501
+      AnharmonicIFCs(_xinput&, _aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&);
       AnharmonicIFCs(const AnharmonicIFCs&);
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
       ~AnharmonicIFCs();
-      void clear(ClusterSet&, Logger&, _aflags&);
+      void clear(_xinput&,_aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&);
 
-      ClusterSet& clst;  // Reference to the corresponding ClusterSet
+      void setOptions(double, int, double, double, bool);
+      int getOrder() const;
+
+      bool runVASPCalculations(bool);
+      bool calculateForceConstants();
+      const vector<vector<double> >& getForceConstants() const;
+      vector<vector<int> > getClusters() const;
+      void writeIFCsToFile(const string&);
+
+    private:
+      _xinput& _xInput;
+      _aflags& _aflowFlags;
+      _kflags& _kbinFlags;
+      _xflags& _xFlags;
+      ClusterSet& clst;
+      ofstream* messageFile;
+      bool new_ofstream;
+
+      vector<_xinput> xInputs;
+      bool _useZeroStateForces;
       vector<vector<int> > cart_indices;  // A list of all Cartesian indices
       double distortion_magnitude;  // The magnitude of the distortions in Angstroms
       vector<vector<double> > force_constants;  // Symmetrized IFCs - ME190520
@@ -348,15 +364,11 @@ namespace apl {
       int order;  // The order of the IFCs
       double sumrule_threshold;  // Convergence threshold for the sum rules
 
-      void writeIFCsToFile(const string&);
-      void readIFCsFromFile(const string&);
-
-    private:
-      Logger& _logger;  // The AFLOW logger
-      _aflags& aflags;
-
       void free();
       void copy(const AnharmonicIFCs&);
+
+      string buildRunName(const vector<int>&, const vector<int>&, int, int);
+      void applyDistortions(_xinput&, const vector<xvector<double> >&, const vector<int>&, const vector<int>&, double=1.0);
 
       vector<vector<int> > getCartesianIndices();
 
@@ -569,7 +581,7 @@ namespace apl {
   class Supercell {
     private:
       _aflags _aflowFlags;  //CO181226
-      Logger& _logger;
+      ofstream* messageFile;
       xstructure _inStructure;
       xstructure _inStructure_original;  //CO
       xstructure _inStructure_light;     //CO, does not include HEAVY symmetry stuff
@@ -596,11 +608,11 @@ namespace apl {
       bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME200117
 
     public:
-      Supercell(const xstructure&, const _aflags& aflags, Logger&); //CO181226
+      Supercell(const xstructure&, const _aflags& aflags, ofstream&); //CO181226
       Supercell(const Supercell&);
       ~Supercell();
       void initialize(const xstructure&);  // ME191225
-      void LightCopy(const xstructure& a, xstructure& b);
+      //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME200220
       void clear();
       Supercell& operator=(const Supercell&);
       bool isConstructed();
@@ -698,37 +710,6 @@ namespace apl {
   }
   // //////////////////////////////////////////////////////////////////////////
 
-  class IPhononCalculator {
-    public:
-      virtual ~IPhononCalculator() {}
-      virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&) = 0;
-      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&) = 0;  // ME200206
-      virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> > &) = 0;  // ME190624
-      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&) = 0;  // ME200206
-      virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> > &,
-          vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  // ME 180827
-      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  // ME200206
-      virtual double getEPS() = 0;  //CO
-      virtual double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags) = 0;
-      virtual const Supercell& getSupercell() = 0;
-      virtual const xstructure& getInputCellStructure() = 0;
-      virtual const xstructure& getSuperCellStructure() = 0;
-      virtual uint getNumberOfBranches() = 0;
-      virtual string getSystemName() = 0;  // ME190614
-      virtual bool isPolarMaterial() = 0;  // ME200206
-      // **** BEGIN PINKU ******
-      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&) = 0;
-      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&) = 0;  // ME200206
-      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
-          vector<xmatrix<xcomplex<double> > >&,
-          bool=true) = 0;  // ME 180827
-      virtual vector<double> get_ATOMIC_MASSES_AMU() = 0;
-      virtual void get_special_inputs(string& AflowIn) = 0;
-      virtual void get_NCPUS(string& ncpus) = 0;  //CO 180214
-      virtual void get_NCPUS(int& ncpus) = 0;     //CO 180214
-      // **** END   PINKU ******
-  };
 }  // namespace apl
 
 // ***************************************************************************
@@ -741,162 +722,92 @@ namespace apl {
 #define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME200213
 
 namespace apl {
-  class PhononCalculator : virtual public IPhononCalculator {
+  bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME190108
+  void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
+  bool filesExistPhonons(_xinput&);
+  bool outfileFoundAnywherePhonons(vector<_xinput>&);
+  bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, bool=false);  // ME191029
+  bool readForcesFromDirectory(_xinput&);  // ME200219
+  void subtractZeroStateForces(vector<_xinput>&, bool);
+  void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME190114
+}
+
+namespace apl {
+  class ForceConstantCalculator {
     protected:
-      // USER PARAMETERS
-      double DISTORTION_MAGNITUDE;
-      bool DISTORTION_INEQUIVONLY; //CO190108
-      bool TCOND; // ME180821
-      aurostd::xoption anharmonic_IFC_options;  // ME180821  // ME190501
       // Aflow's stuff required for running some routines
+      Supercell& _supercell;
       _xinput& _xInput; //_xvasp& _vaspRun;
       _aflags& _aflowFlags;
       _kflags& _kbinFlags;
       _xflags& _xFlags; //_vflags& _vaspFlags;
       string& _AflowIn;
-      string _system;  // ME190614 - for VASP-style output files
+      ofstream* messageFile;
 
-      // Our standard and common output system
-      Logger& _logger;
-      // To tar or not to tar
-      //  bool DOtar;  OBSOLETE - ME181024
-      // The computational model, supercell (now used by both implementations)
-      Supercell& _supercell;
-      vector<vector<_xinput> > xInputsAAPL; //vector<_xvasp> vaspRuns for AAPL;
-      vector<_xinput> xInputs; //vector<_xvasp> vaspRuns;
-      // For each inequivalent atom, there is a set of unique distortions
-      vector<vector<xvector<double> > > _uniqueDistortions;
-      // For each inequivalent atom and unique distortion, there is a field
-      // of forces (for each atom of the supercell)
-      vector<vector<vector<xvector<double> > > > _uniqueForces;
-      // For each atom of supercell, there is a full force field
-      vector<vector<xmatrix<double> > > _forceConstantMatrices;
+      vector<_xinput> xInputs;
+
       // Calculate forces at no distortion - since for some structure
       // (not well relaxed, or with other problems) these forces have to be
       // known and substracted from the calculated forces with distortion
       bool _calculateZeroStateForces;
 
-      vector<double> ATOMIC_MASSES_AMU;  //[PINKU]
-      string _check_LDAU2_ON;            //PINKU
-      string _LDAU_PARAMETERS;           //PINKU
-      string _PSTRESS;                   //PINKU
-
+      // For each atom of supercell, there is a full force field
+      vector<vector<xmatrix<double> > > _forceConstantMatrices;
       // Stuff for polar materials
       bool _isPolarMaterial;
       // For each atom there is a matrix 3x3 of Born effective charge
       vector<xmatrix<double> > _bornEffectiveChargeTensor;
       // Dielectric tensor
       xmatrix<double> _dielectricTensor;
-      // Precomputed values used in non-analytical term
-      xmatrix<double> _inverseDielectricTensor;
-      double _recsqrtDielectricTensorDeterminant;
-      // Precomputed Ewald sum at Gamma point
-      bool _isGammaEwaldPrecomputed;
-      vector<xmatrix<xcomplex<double> > > _gammaEwaldCorr;
 
     private:
-      void copy(const PhononCalculator&);  // ME191228
-      virtual void calculateForceConstants() {} // ME200211
+      void free();
+      void copy(const ForceConstantCalculator&);
+
+      virtual bool calculateForceConstants() {return false;} // ME200211
+
       void symmetrizeForceConstantMatrices();
       void correctSumRules();
+
       void printForceConstantMatrices(ostream&);
       void printFCShellInfo(ostream&);
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&);
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&);  // ME200206
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
-      xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&);
-      xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180829
-      xmatrix<xcomplex<double> > getNonanalyticalTermGonze(const xvector<double>);
-      xmatrix<xcomplex<double> > getEwaldSumDipolDipolContribution(const xvector<double>, bool = true);
-      vector<double> get_ATOMIC_MASSES_AMU() { return ATOMIC_MASSES_AMU; }  //[PINKU]
-      void store_masses();                                                  //[PINKU]
-    protected:
-      void writeOUTPUT(_xinput&);
-      //void createAIMSOUTPUT(const _xaims&); //CO 180406 - obsolete
-      //void createAFLOWIN(const _xvasp&);    //CO 180406 - obsolete
 
     public:
-      PhononCalculator(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
-      PhononCalculator& operator=(const PhononCalculator&);
-      virtual ~PhononCalculator();
-      void clear();
-      void run();  // ME191029
-      //xvector<double> getEigenvalues(const xvector<double>&);  // OBSOLETE ME200206
-      xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
-          xmatrix<xcomplex<double> >&, vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
+      ForceConstantCalculator(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      ForceConstantCalculator(const ForceConstantCalculator&);
+      ForceConstantCalculator& operator=(const ForceConstantCalculator&);
+      virtual ~ForceConstantCalculator() {};
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+
+      virtual bool runVASPCalculations(bool) {return false;};  // ME191029
+      bool runVASPCalculationsBE(_xinput&, uint);
       void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME200218
-      void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
-      void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO190108
-      void setCalculateZeroStateForces(bool b) { _calculateZeroStateForces = b; }
-      void setTCOND(bool b) { TCOND = b; }
-      void hibernate();
-      void awake();
-      //****** BEGIN ME ***********
-      vector<ClusterSet>& _clusters;
-      vector<AnharmonicIFCs> _anharmonicIFCs;
-      void setAnharmonicOptions(int, double, double);
-      bool buildVaspAAPL(const ClusterSet&, bool);
-      string buildRunNameAAPL(const vector<int>&, const vector<int>&,
-          const int&, const int&, const int&);// ME190108
-      void applyDistortionsAAPL(_xinput&, const vector<aurostd::xvector<double> >&,
-          const vector<int>&, const vector<int>&, double scale=1.0);
-      void calculateAnharmonicIFCs(ClusterSet&);
-      void readAnharmonicIFCs(const string&, ClusterSet&);
-      void subtractZeroStateForcesAAPL(vector<_xinput>&, _xinput&);  // ME190114
-      //******* END ME ************
-      bool _stagebreak;  // ME191029
-      // Interface
-      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
-      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  // ME200206
-      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME190624
-      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME200206
-      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
-      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME200206
-      double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
-      const Supercell& getSupercell();
-      const xstructure& getInputCellStructure();
-      const xstructure& getSuperCellStructure();
-      double getEPS();  //CO
-      uint getNumberOfBranches();
-      string getSystemName();  // ME190614
-      bool isPolarMaterial();  // ME200206
-      /* friend void runVASPCalculationsBE(apl::PhononCalculator*); */
-      /* friend void readBornEffectiveChargesFromOUTCAR(apl::PhononCalculator *pcalculator); */
-      /* friend void symmetrizeBornEffectiveChargeTensors(apl::PhononCalculator *pcalculator); */
-      /* friend void readDielectricTensorFromOUTCAR(apl::PhononCalculator *pcalculator); */
-      void runVASPCalculationsBE(_xinput&, uint=0); // ME190113
-      void runVASPCalculationsLRBE(_xinput&, bool, uint=0);  // ME181024 // ME190113
-      void calculateDielectricTensor(const _xinput&);  // ME191029
+
+      bool run();  // ME191029
+      virtual void hibernate(const string&) {};
+      void writeHibernateHeader(stringstream&);
+      void writeForceConstants(stringstream&);
+      void writePolar(stringstream&);
+
+      const vector<vector<xmatrix<double> > >& getForceConstants() const;
+      const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
+      const xmatrix<double>& getDielectricTensor() const;
+      bool isPolarMaterial() const;
+
+      // Born charges + dielectric tensor
+      bool calculateDielectricTensor(const _xinput&);  // ME191029
       void readBornEffectiveChargesFromAIMSOUT(void);
       void readBornEffectiveChargesFromOUTCAR(const _xinput&);  // ME190113
       void symmetrizeBornEffectiveChargeTensors(void);
       void readDielectricTensorFromAIMSOUT(void);
       void readDielectricTensorFromOUTCAR(const _xinput&);  // ME190113
-      void get_special_inputs(string& AflowIn);                                    //PINKU
-      void get_NCPUS(string& ncpus);  //CO 180214
-      void get_NCPUS(int& ncpus);     //CO 180214
-      // BEGIN ME 180518
-      bool filesExistPhonons(_xinput&);
-      bool createAflowInPhonons(_xinput&); // ME190108
-      void createAflowInPhonons(_xinput&, const string&);
-      bool outfileFoundAnywherePhonons(vector<_xinput>&);
-      void outfileFoundEverywherePhonons(vector<_xinput>&, bool=false);  // ME191029
-      void subtractZeroStateForces(vector<_xinput>&);
-      // END ME 180518
-      vector<xvector<double> > readForcesFromQmvasp(const string&); // ME190607
-      virtual void runVASPCalculations(bool) {}  // ME191029
-      string zerostate_dir;  // ME191030
   };
-}  // namespace apl
+}
 
 // ***************************************************************************
 // "dirphoncalc.h"
 namespace apl {
-  class DirectMethodPC : public PhononCalculator {
+  class DirectMethodPC : public ForceConstantCalculator {
     protected:
       //bool GENERATE_PLUS_MINUS;  //JAHNATEK ORIGINAL
       //CO - START
@@ -905,6 +816,14 @@ namespace apl {
       //CO - END
       bool GENERATE_ONLY_XYZ;
       bool DISTORTION_SYMMETRIZE; //CO190108
+      double DISTORTION_MAGNITUDE;
+      bool DISTORTION_INEQUIVONLY; //CO190108
+      string zerostate_dir;  // ME191030
+      // For each inequivalent atom, there is a set of unique distortions
+      vector<vector<xvector<double> > > _uniqueDistortions;
+      // For each inequivalent atom and unique distortion, there is a field
+      // of forces (for each atom of the supercell)
+      vector<vector<vector<xvector<double> > > > _uniqueForces;
 
     protected:
       void estimateUniqueDistortions(const xstructure&,
@@ -914,36 +833,43 @@ namespace apl {
           vector<xvector<double> >&,
           bool integrate_equivalent_distortions=true);  //CO190114
       bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO190218
-      void runVASPCalculations(bool);  // ME190412
-      // BORN
-      /* void runVASPCalculationsBE(); */
-      /* void readBornEffectiveChargesFromOUTCAR(); */
-      /* void symmetrizeBornEffectiveChargeTensors(); */
-      /* void readDielectricTensorFromOUTCAR(); */
+      bool runVASPCalculations(bool);  // ME190412
 
     public:
-      DirectMethodPC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
+      DirectMethodPC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      DirectMethodPC(const DirectMethodPC&);
+      DirectMethodPC& operator=(const DirectMethodPC&);
       ~DirectMethodPC();
-      void clear();
-      void calculateForceFields();  // ME190412  // ME191029
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+
+      bool calculateForceFields();  // ME190412  // ME191029
       // Easy access to global parameters
       //void setGeneratePlusMinus(bool b) { GENERATE_PLUS_MINUS = b; } //JAHNATEK ORIGINAL
+      void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
+      void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO190108
+      void setCalculateZeroStateForces(bool b) { _calculateZeroStateForces = b; }
       void setGeneratePlusMinus(bool _auto_, bool _user_) {
         AUTO_GENERATE_PLUS_MINUS = _auto_;
         USER_GENERATE_PLUS_MINUS = _user_;
       }  //CO
       void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO190108
-      void calculateForceConstants();  // ME200211
+      bool calculateForceConstants();  // ME200211
+
+      void hibernate(const string&);
       void writeFORCES();
       void writeDYNMAT();
       void writeXCrysDenForces();
 
     private:
+      void copy(const DirectMethodPC&);
+      void free();
       vector<vector<bool> > vvgenerate_plus_minus;  // ME191029
       void completeForceFields();
       void projectToCartesianDirections();
       void buildForceConstantMatrices();
+
+      void writeForceField(stringstream&);
   };
 }  // namespace apl
 
@@ -966,7 +892,7 @@ namespace apl {
 
 // ***************************************************************************
 namespace apl {
-  class QHA_AFLOWIN_CREATOR : public PhononCalculator
+  class QHA_AFLOWIN_CREATOR : public ForceConstantCalculator
   {
     private:
       ofstream _log;
@@ -995,13 +921,14 @@ namespace apl {
       string _EOS_KSCHEME;
       string _EOS_STATIC_KSCHEME;
       int _EOS_STATIC_KPPRA;
+      string _PSTRESS;  // ME200220
 
     public:
-      QHA_AFLOWIN_CREATOR(Supercell& sc, vector<ClusterSet>&, _xinput& xinput,
+      QHA_AFLOWIN_CREATOR(Supercell& sc, _xinput& xinput,
           _aflags& aflags, _kflags& kflags,
           _xflags& xflags,
           string&,
-          Logger& l);
+          ofstream& mf);
       ~QHA_AFLOWIN_CREATOR();
       void clear();
     public:
@@ -1068,21 +995,24 @@ namespace apl {
 // ***************************************************************************
 // "lrphoncalc.h"
 namespace apl {
-  class LinearResponsePC : public PhononCalculator {
+  class LinearResponsePC : public ForceConstantCalculator {
     private:
-      /* void runVASPCalculationsBE(); */
-      void runVASPCalculationsDFPT(_xinput&);  // ME190113  // ME200213 - changed name
-      /* void readBornEffectiveChargesFromOUTCAR(); */
-      /* void symmetrizeBornEffectiveChargeTensors(); */
-      /* void readDielectricTensorFromOUTCAR(); */
-      void readForceConstantsFromVasprun(_xinput&);  // ME200211
+      void free();
+      void copy(const LinearResponsePC&);
+      bool runVASPCalculationsDFPT(_xinput&);  // ME190113  // ME200213 - changed name
+      bool readForceConstantsFromVasprun(_xinput&);  // ME200211
 
     public:
-      LinearResponsePC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
+      LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      LinearResponsePC(const LinearResponsePC&);
+      LinearResponsePC& operator=(const LinearResponsePC&);
       ~LinearResponsePC();
-      void clear();
-      void runVASPCalculations(bool);  // ME191029
-      void calculateForceConstants();  // ME200211
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+
+      bool runVASPCalculations(bool);  // ME191029
+      bool calculateForceConstants();  // ME200211
+
+      void hibernate(const string&);
   };
 }  // namespace apl
 
@@ -1093,13 +1023,106 @@ namespace apl {
 namespace apl {
   class GeneralizedSupercellApproach : public DirectMethodPC {
     public:
-      GeneralizedSupercellApproach(Supercell&, vector<ClusterSet>&, _xinput&,
+      GeneralizedSupercellApproach(Supercell&, _xinput&,
           _aflags&, _kflags&, _xflags&, //_vflags&, 
-          string&, Logger&);
+          string&, ofstream&);
       ~GeneralizedSupercellApproach();
       void clear();
   };
 }  // namespace apl
+
+namespace apl {
+  class PhononCalculator {
+    protected:
+      // USER PARAMETERS
+      string _system;  // ME190614 - for VASP-style output files
+      string _directory;  // for loggers
+      int _ncpus;
+
+      Supercell& _supercell;
+
+      uint _nBranches;
+      // harmonic IFCs
+      vector<vector<xmatrix<double> > > _forceConstantMatrices;
+
+      // Stuff for polar materials
+      bool _isPolarMaterial;
+      // For each atom there is a matrix 3x3 of Born effective charge
+      vector<xmatrix<double> > _bornEffectiveChargeTensor;
+      // Dielectric tensor
+      xmatrix<double> _dielectricTensor;
+      // Precomputed values used in non-analytical term (Gonze)
+      xmatrix<double> _inverseDielectricTensor;
+      double _recsqrtDielectricTensorDeterminant;
+      // Precomputed Ewald sum at Gamma point
+      bool _isGammaEwaldPrecomputed;
+      vector<xmatrix<xcomplex<double> > > _gammaEwaldCorr;
+      // Anharmonic IFCs
+      vector<vector<vector<double> > > anharmonicIFCs;
+      vector<vector<vector<int> > > clusters;
+      ofstream* messageFile;
+
+
+    private:
+      void copy(const PhononCalculator&);  // ME191228
+      void free();
+      xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&);
+      xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180829
+      xmatrix<xcomplex<double> > getNonanalyticalTermGonze(const xvector<double>);
+      xmatrix<xcomplex<double> > getEwaldSumDipoleDipoleContribution(const xvector<double>, bool = true);
+
+    public:
+      PhononCalculator(Supercell&, ofstream&);
+      PhononCalculator(const PhononCalculator&);
+      PhononCalculator& operator=(const PhononCalculator&);
+      virtual ~PhononCalculator();
+      void clear(Supercell&, ofstream&);
+
+      // Getter functions
+      const Supercell& getSupercell() const;
+      const xstructure& getInputCellStructure() const;
+      const xstructure& getSuperCellStructure() const;
+      uint getNumberOfBranches() const;
+      string getSystemName() const;  // ME190614
+      string getDirectory() const;
+      int getNCPUs() const;
+      ofstream& getOutputStream();
+      bool isPolarMaterial() const;  // ME200206
+      const vector<vector<xmatrix<double> > >& getHarmonicForceConstants() const;
+      const vector<vector<double> >& getAnharmonicForceConstants(int) const;
+      const vector<vector<int> >& getClusters(int) const;
+
+      // Set functions
+      void setSystem(const string&);
+      void setDirectory(const string&);
+      void setNCPUs(const _kflags&);
+
+      // IFCs
+      void setHarmonicForceConstants(const ForceConstantCalculator&);
+      void awake(const string&, bool=true);
+      void setAnharmonicForceConstants(const AnharmonicIFCs&);
+      void readAnharmonicIFCs(string, bool=true);
+
+      // Dynamical Matrix/Frequencies
+      xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
+          xmatrix<xcomplex<double> >&, vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&);
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&);  // ME200206
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  // ME200206
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME190624
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME200206
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME200206
+      double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
+  };
+}  // namespace apl
+
 
 // ***************************************************************************
 
@@ -1175,8 +1198,7 @@ namespace apl {
 namespace apl {
   class PhononDispersionCalculator {
     private:
-      IPhononCalculator& _pc;
-      Logger& _logger;
+      PhononCalculator& _pc;
       PathBuilder _pb;
       std::vector<xvector<double> > _qpoints;
       std::vector<xvector<double> > _freqs;
@@ -1188,7 +1210,7 @@ namespace apl {
       void calculateInOneThread(int, int);
 
     public:
-      PhononDispersionCalculator(IPhononCalculator&, Logger&);
+      PhononDispersionCalculator(PhononCalculator&);
       ~PhononDispersionCalculator();
       void clear();
       void initPathCoords(const string&,const string&,int,bool=false);  //CO 180406
@@ -1306,14 +1328,20 @@ namespace apl {
 
   class QMesh {
     public:
-      QMesh(Logger&);
-      QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true, bool=true);
-      QMesh(const vector<int>&, const xstructure&, Logger&, bool=true, bool=true);
+      QMesh(ofstream&);
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool=true, bool=true);
+      QMesh(const vector<int>&, const xstructure&, ofstream&, bool=true, bool=true);
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
-      void clear(Logger&);
+      void clear(ofstream&);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
+
+      void setDirectory(const string& dir);
+      void setModule(const string&);
+      const string& getDirectory() const;
+      const string& getModule() const;
+      ofstream& getOutputStream();
 
       void makeIrreducible();
       void calculateLittleGroups();  // ME200109
@@ -1354,7 +1382,8 @@ namespace apl {
       void free();
       void copy(const QMesh&);
 
-      Logger& _logger;  // The APL logger
+      ofstream* messageFile;
+      string _directory;
 
       vector<int> _ibzqpts;  // The indices of the irreducible q-points
       bool _isGammaCentered;  // Indicates whether the includes the Gamma point
@@ -1382,11 +1411,11 @@ namespace apl {
 namespace apl {
   class LTMethod {
     public:
-      LTMethod(QMesh&, Logger&);
+      LTMethod(QMesh&);
       LTMethod(const LTMethod&);
       LTMethod& operator=(const LTMethod&);
       ~LTMethod();
-      void clear(QMesh&, Logger&);
+      void clear(QMesh&);
 
       void makeIrreducible();  // ME190625
 
@@ -1409,7 +1438,6 @@ namespace apl {
       void copy(const LTMethod&);
 
       QMesh& _qm;
-      Logger& _logger;  // The APL logger
 
       vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra - ME190625
       vector<int> _irredTetrahedra;  // List of irreducible tetrahedra - ME190625
@@ -1430,37 +1458,18 @@ namespace apl {
 // ME 190417 - END
 // ***************************************************************************
 // ***************************************************************************
-// OBSOLETE ME190417 - There is no need for a virtual parent class with only
-// one child class
-// "idosc.h"
-//
-//namespace apl {
-//class IDOSCalculator {
-// public:
-//  virtual std::vector<double> getBins() = 0;
-//  virtual std::vector<double> getDOS() = 0;
-//  virtual bool hasNegativeFrequencies() = 0;
-//
-// public:
-//  virtual ~IDOSCalculator() {}
-//};
-//}  // namespace apl
-
-// ***************************************************************************
 // "doscalc.h"
 namespace apl {
 #define MIN_FREQ_TRESHOLD -0.1  //in AMU
 #define RAW2Hz 15.6333046177
 #define AMU2Kg 1.66053904
 #define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue treshold in AMU
-  //class DOSCalculator : virtual public IDOSCalculator  OBSOLETE ME190424
   class DOSCalculator  // ME190424
   { //CO200106 - patching for auto-indenting
     protected:
-      IPhononCalculator& _pc;
+      PhononCalculator& _pc;
       //  IReciprocalPointGrid& _rg;  OBSOLETE ME 190417
       QMesh& _rg;
-      Logger& _logger;
       string _bzmethod;  // ME190423
       std::vector<aurostd::xvector<double> > _qpoints;
       //std::vector<int> _qweights;  OBSOLETE ME190423
@@ -1485,8 +1494,7 @@ namespace apl {
       void smearWithGaussian(vector<double>&, vector<double>&, double, double);  // ME190614
 
     public:
-      //  DOSCalculator(IPhononCalculator&, IReciprocalPointGrid&, Logger&);  OBSOLETE ME190417
-      DOSCalculator(IPhononCalculator&, QMesh&, Logger&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
+      DOSCalculator(PhononCalculator&, QMesh&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
       virtual ~DOSCalculator();
       // ME190423 - START
       //virtual void rawCalc(int) {} OBSOLETE ME190419
@@ -1739,7 +1747,7 @@ namespace apl
   class GroupVelocity
   { //PN180705
     private:
-      IPhononCalculator& _pc;
+      PhononCalculator& _pc;
       //UniformMesh& _umesh;  OBSOLETE ME190428
       QMesh& _umesh;  // ME190428
       Logger& _logger;
@@ -1770,8 +1778,7 @@ namespace apl
       void clear_auxiliary_variables();
 
     public:
-      //GroupVelocity(IPhononCalculator&, UniformMesh&, Logger&);  OBSOLETE ME190428
-      GroupVelocity(IPhononCalculator&, QMesh&, Logger&);  // ME190428
+      GroupVelocity(PhononCalculator&, QMesh&, Logger&);  // ME190428
       ~GroupVelocity();
       void clear();
 
@@ -1789,7 +1796,7 @@ namespace apl {
   class AtomicDisplacements
   { //PN180705
     private:
-      IPhononCalculator& _pc;
+      PhononCalculator& _pc;
       //MonkhorstPackMesh& _mp;
       //UniformMesh& _mp; OBSOLETE ME190428
       QMesh& _mp;  // ME190428
@@ -1826,9 +1833,7 @@ namespace apl {
       void solve_eigenvalues_in_threads_path(int startIndex, int endIndex, int cpuid);
       double apl_inner_product(const vector<double> &a, const vector<double> &b);
     public:
-      //AtomicDisplacements(IPhononCalculator&, MonkhorstPackMesh&, Logger&);
-      //AtomicDisplacements(IPhononCalculator&, UniformMesh&, Logger&);  OBSOLETE ME190428
-      AtomicDisplacements(IPhononCalculator&, QMesh&, Logger&);  // ME190428
+      AtomicDisplacements(PhononCalculator&, QMesh&, Logger&);  // ME190428
       ~AtomicDisplacements();
       void clear();
       void populate_variables(const xstructure& xs);
@@ -1852,11 +1857,11 @@ namespace apl
   class QHA:public MVops
   { //PN180705
     protected:
-      IPhononCalculator& _pc;
+      PhononCalculator& _pc;
       QHA_AFLOWIN_CREATOR&  _runeos;
       Logger& _logger;
     public:
-      QHA(IPhononCalculator&, QHA_AFLOWIN_CREATOR&, Logger&);
+      QHA(PhononCalculator&, QHA_AFLOWIN_CREATOR&, Logger&);
       ~QHA();
       void clear();
 
@@ -1959,11 +1964,11 @@ namespace apl
   class SCQHA_QHA3P:public MVops
   { //PN180705
     protected:
-      IPhononCalculator& _pc;
+      PhononCalculator& _pc;
       QHA_AFLOWIN_CREATOR&  _runeos;
       Logger& _logger;
     public:
-      SCQHA_QHA3P(IPhononCalculator&, QHA_AFLOWIN_CREATOR&, Logger&);
+      SCQHA_QHA3P(PhononCalculator&, QHA_AFLOWIN_CREATOR&, Logger&);
       ~SCQHA_QHA3P();
       void clear();
     private:
@@ -2081,11 +2086,11 @@ namespace apl
   class T_spectra_SCQHA_QHA3P:public MVops
   { //PN180705
     protected:
-      IPhononCalculator& _pc;
+      PhononCalculator& _pc;
       QHA_AFLOWIN_CREATOR&  _runeos;
       Logger& _logger;
     public:
-      T_spectra_SCQHA_QHA3P(IPhononCalculator&, QHA_AFLOWIN_CREATOR&, Logger&);
+      T_spectra_SCQHA_QHA3P(PhononCalculator&, QHA_AFLOWIN_CREATOR&, Logger&);
       ~T_spectra_SCQHA_QHA3P();
       void clear();
     private:
@@ -2580,7 +2585,7 @@ namespace apl
   class QHAsubdirectoryData
   { //PN180705
     private:
-      IPhononCalculator& _pc;
+      PhononCalculator& _pc;
       Logger& _logger;
       string   _running_dir;
       string   _tmpdirfrefix;
@@ -2595,7 +2600,7 @@ namespace apl
       aurostd::xmatrix<double> _klattice;
 
     public:
-      QHAsubdirectoryData( IPhononCalculator&, Logger&);
+      QHAsubdirectoryData( PhononCalculator&, Logger&);
       ~QHAsubdirectoryData();
       void clear();
       void createMPmesh(int, int, int, const xstructure&);

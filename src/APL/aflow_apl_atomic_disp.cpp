@@ -27,8 +27,7 @@
 namespace apl
 {
   // ***************************************************************************************
-  //AtomicDisplacements::AtomicDisplacements(IPhononCalculator& pc, UniformMesh& mp, Logger& l):_pc(pc), _mp(mp), _logger(l) OBSOLETE ME190428
-  AtomicDisplacements::AtomicDisplacements(IPhononCalculator& pc, QMesh& mp, Logger& l):_pc(pc), _mp(mp), _logger(l)
+  AtomicDisplacements::AtomicDisplacements(PhononCalculator& pc, QMesh& mp, Logger& l):_pc(pc), _mp(mp), _logger(l)
   {
     _logger<<"Preparing setup for Quasi-harmonic Gruneisen calculation "<<apl::endl;
     clear();
@@ -62,7 +61,14 @@ namespace apl
 
     _atomic_masses_amu.clear();
     _atomic_species.clear();
-    _atomic_masses_amu=_pc.get_ATOMIC_MASSES_AMU();
+    // ME200220 - BEGIN
+    const Supercell& scell = _pc.getSupercell();
+    uint pcAtomsSize = scell.getInputStructure().atoms.size();
+    for (uint i = 0; i < pcAtomsSize; i++) {
+      _atomic_masses_amu.push_back(scell.getAtomMass(scell.pc2scMap(i)));
+    }
+    //[OBSOLETE]_atomic_masses_amu=_pc.get_ATOMIC_MASSES_AMU();
+    // ME200220 - END
     for(uint i=0; i!=xstr.atoms.size(); i++){
       _atomic_species.push_back(xstr.atoms[i].name);
     }

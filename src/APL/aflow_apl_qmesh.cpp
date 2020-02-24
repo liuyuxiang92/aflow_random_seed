@@ -16,6 +16,7 @@ using std::vector;
 using std::string;
 
 static const string _APL_QMESH_ERR_PREFIX_ = "apl::QMesh::";
+static const string _APL_QMESH_MODULE_ = "QMESH";  // for the logger
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -26,24 +27,28 @@ static const string _APL_QMESH_ERR_PREFIX_ = "apl::QMesh::";
 namespace apl {
 
   // Default Constructor
-  QMesh::QMesh(Logger& l) : _logger(l) {
+  QMesh::QMesh(ofstream& mf) {
     free();
+    messageFile = &mf;
+    _directory = "./";
   }
 
-  QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, Logger& l,
-      bool include_inversions, bool gamma_centered) : _logger(l) {
+  QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf,
+      bool include_inversions, bool gamma_centered) {
     free();
+    messageFile = &mf;
     initialize(grid, xs, include_inversions, gamma_centered);
   }
 
-  QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, Logger& l,
-      bool include_inversions, bool gamma_centered) : _logger(l) {
+  QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf,
+      bool include_inversions, bool gamma_centered) {
     free();
+    messageFile = &mf;
     initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
   }
 
   // Copy constructors
-  QMesh::QMesh(const QMesh& that) : _logger(that._logger) {
+  QMesh::QMesh(const QMesh& that) {
     copy(that);
   }
 
@@ -57,7 +62,7 @@ namespace apl {
     _isGammaCentered = that._isGammaCentered;
     _littleGroups = that._littleGroups;
     _littleGroupsCalculated = that._littleGroupsCalculated;
-    _logger = that._logger;
+    messageFile = that.messageFile;
     _nIQPs = that._nIQPs;
     _nQPs = that._nQPs;
     _qptGrid = that._qptGrid;
@@ -79,6 +84,7 @@ namespace apl {
     xvector<int> zeroint(3);
     xvector<double> zerodbl(3);
     xmatrix<double> zeroMatrix(3, 3);
+    _directory = "";
     _ibzqpts.clear();
     _isGammaCentered = false;
     _littleGroups.clear();
@@ -100,12 +106,35 @@ namespace apl {
     _weights.clear();
   }
 
-  void QMesh::clear(Logger& l) {
-    QMesh that(l);
+  void QMesh::clear(ofstream& mf) {
+    QMesh that(mf);
     copy(that);
   }
 
 }  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                              INTERFACE                                   //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+// For the logger
+namespace apl {
+
+  void QMesh::setDirectory(const string& dir) {
+    _directory = dir;
+  }
+
+  const string& QMesh::getDirectory() const {
+    return _directory;
+  }
+
+  ofstream& QMesh::getOutputStream() {
+    return *messageFile;
+  }
+
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -183,7 +212,9 @@ namespace apl {
   // Generates all the grid points. No reductions is performed yet since not
   // every purpose requires the irreducible q-points.
   void QMesh::generateGridPoints(bool force_gamma) {
-    _logger << "Generating a " << _qptGrid[1] << "x" << _qptGrid[2] << "x" << _qptGrid[3] << " q-point mesh." << apl::endl;
+    stringstream message;
+    message << "Generating a " << _qptGrid[1] << "x" << _qptGrid[2] << "x" << _qptGrid[3] << " q-point mesh.";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, std::cout);
     _qpoints.resize(_nQPs);
     _ibzqpts.resize(_nQPs);  // Before making the mesh irreducible, treat all q-points as irreducible q-points
     _weights.assign(_nQPs, 1);
@@ -262,6 +293,7 @@ namespace apl {
   // ME190813 - Changed algorithm to be much faster
   void QMesh::makeIrreducible() {
     if (_reduced) return;  // ME190701 - don't reduce if it's already reduced
+    stringstream message;
 
     _ibzqpts.clear();
     _weights.clear();
@@ -298,7 +330,8 @@ namespace apl {
       }
     }
     _reduced = true;
-    _logger << "Found " << _nIQPs << " irreducible qpoints." << apl::endl;
+    message << "Found " << _nIQPs << " irreducible qpoints.";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, std::cout);
   }
 
   // ME200109

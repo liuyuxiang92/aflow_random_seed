@@ -74,8 +74,7 @@ namespace apl {
 namespace apl {
 
   //Constructor///////////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, 
-      Logger& l, _aflags& a) : _pc(pc), _qm(qm), _logger(l), aflags(a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) : _pc(pc), _qm(qm), _logger(l), aflags(a) {
     free();
     nBranches = _pc.getNumberOfBranches();
     nQPs = _qm.getnQPs();
@@ -227,8 +226,7 @@ namespace apl {
 
     // Calculate frequencies and group velocities
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = 1;
-    _pc.get_NCPUS(ncpus);
+    int ncpus = _pc.getNCPUs();
     vector<vector<int> > thread_dist = setupMPI(message, _logger, nQPs, ncpus);
     vector<std::thread*> threads;
     threads.clear();
@@ -286,16 +284,16 @@ namespace apl {
     // Prepare and precompute
     vector<vector<double> > grueneisen(nIQPs, vector<double>(nBranches));
 
-    const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[0].force_constants;
+    const vector<vector<double> >& ifcs = _pc.getAnharmonicForceConstants(3);
     const Supercell& scell = _pc.getSupercell();
 
     // Inverse masses
-    const vector<_cluster>& clusters = _pc._clusters[0].clusters;
+    const vector<vector<int> >& clusters = _pc.getClusters(3);
     uint nclusters = clusters.size();
     vector<double> invmasses(nclusters);
     for (uint c = 0; c < nclusters; c++) {
       double mass = 1.0;
-      for (int i = 0; i < 2; i++) mass *= scell.getAtomMass(clusters[c].atoms[i]);
+      for (int i = 0; i < 2; i++) mass *= scell.getAtomMass(clusters[c][i]);
       invmasses[c] = 1/sqrt(mass);
     }
 
@@ -351,10 +349,10 @@ namespace apl {
           }
 
           for (c = 0; c < nclusters; c++) {
-            at1_pc = scell.sc2pcMap(clusters[c].atoms[0]);
-            at2_sc = clusters[c].atoms[1];
+            at1_pc = scell.sc2pcMap(clusters[c][0]);
+            at2_sc = clusters[c][1];
             at2_pc = scell.sc2pcMap(at2_sc);
-            at3_sc = clusters[c].atoms[2];
+            at3_sc = clusters[c][2];
             prefactor = invmasses[c] * phases[at1_pc][at2_sc][q];
             e = at1_pc * natoms + at2_pc;
             for (crt = 0; crt < ncart; crt++) {
@@ -415,13 +413,12 @@ namespace apl {
   void TCONDCalculator::calculateTransitionProbabilities() {
     _logger << "Calculating transition probabilities." << apl::endl;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = 1;
-    _pc.get_NCPUS(ncpus);
+    int ncpus = _pc.getNCPUs();
     vector<std::thread*> threads;
     vector<vector<int> > thread_dist;
 #endif
     string message = "";
-    LTMethod _lt(_qm, _logger);
+    LTMethod _lt(_qm);
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
     vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);
@@ -542,19 +539,19 @@ namespace apl {
       const vector<vector<vector<xcomplex<double> > > >& phases) {
     // Prepare and precompute
     const Supercell& scell = _pc.getSupercell();
-    const vector<_cluster>& clusters = _pc._clusters[0].clusters;
+    const vector<vector<int> >& clusters = _pc.getClusters(3);
     uint nclusters = clusters.size();
 
     // Inverse masses
     vector<double> invmasses(nclusters);
     for (uint c = 0; c < nclusters; c++) {
       double mass = 1.0;
-      for (int o = 0; o < 3; o++) mass *= scell.getAtomMass(clusters[c].atoms[o]);
+      for (int o = 0; o < 3; o++) mass *= scell.getAtomMass(clusters[c][o]);
       invmasses[c] = 1/sqrt(mass);
     }
 
     // Cartesian indices to avoid running xcombos multiple times
-    const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[0].force_constants;
+    const vector<vector<double> >& ifcs = _pc.getAnharmonicForceConstants(3);
     vector<vector<int> > cart_indices;
     aurostd::xcombos cart(3, 3, 'E', true);
     while (cart.increment()) cart_indices.push_back(cart.getCombo());
@@ -669,13 +666,12 @@ namespace apl {
             matrix.re = 0.0;
             matrix.im = 0.0;
             for (c = 0; c < nclusters; c++) {
-              const vector<int>& atoms = clusters[c].atoms;
-              iat = scell.sc2pcMap(atoms[0]);
+              iat = scell.sc2pcMap(clusters[c][0]);
               prefactor.re = invmasses[c];
               prefactor.im = 0.0;
-              for (j = 1; j < 3; j++) prefactor *= phases[iat][atoms[j]][qpts[j]];
+              for (j = 1; j < 3; j++) prefactor *= phases[iat][clusters[c][j]][qpts[j]];
               e = 0;
-              for (j = 0; j < 3; j++) e += scell.sc2pcMap(atoms[j]) * atpowers[j];
+              for (j = 0; j < 3; j++) e += scell.sc2pcMap(clusters[c][j]) * atpowers[j];
               for (crt = 0; crt < ncart; crt++) {
                 // Perform multiplication explicitly in place instead of using xcomplex.
                 // This is three times faster because constructors and destructors are not called.
@@ -1069,8 +1065,7 @@ namespace apl {
   vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<vector<double> >& occ) {
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = 1;
-    _pc.get_NCPUS(ncpus);
+    int ncpus = _pc.getNCPUs();
     vector<std::thread*> threads;
     vector<vector<int> > thread_dist = getThreadDistribution(nIQPs, ncpus);
     threads.clear();
@@ -1161,8 +1156,7 @@ namespace apl {
       vector<vector<xvector<double> > >& mfd) {
     // MPI variables
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = 1;
-    _pc.get_NCPUS(ncpus);
+    int ncpus = _pc.getNCPUs();
     vector<vector<int> > thread_dist;
     vector<std::thread*> threads;
 #endif

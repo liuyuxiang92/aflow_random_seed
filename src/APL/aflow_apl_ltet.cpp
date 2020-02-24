@@ -17,6 +17,7 @@ using std::vector;
 using std::string;
 
 static const string _APL_LTET_ERR_PREFIX_ = "apl::LTMethod::";
+static const string _APL_LTET_MODULE_ = "LTET";  // for the logger
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -26,7 +27,7 @@ static const string _APL_LTET_ERR_PREFIX_ = "apl::LTMethod::";
 
 namespace apl {
 
-  LTMethod::LTMethod(QMesh& qm, Logger& l) : _qm(qm), _logger(l) {
+  LTMethod::LTMethod(QMesh& qm) : _qm(qm) {
     if (_qm.getnQPs() < 4) {
       string function = _APL_LTET_ERR_PREFIX_ + "LTMethod()";
       string message = "At least four q-points are required for the linear tetrahedron method.";
@@ -38,7 +39,7 @@ namespace apl {
   }
 
   // Copy constructors
-  LTMethod::LTMethod(const LTMethod& that) : _qm(that._qm), _logger(that._logger) {
+  LTMethod::LTMethod(const LTMethod& that) : _qm(that._qm) {
     copy(that);
   }
 
@@ -50,7 +51,6 @@ namespace apl {
   void LTMethod::copy(const LTMethod& that) {
     _tetrahedra = that._tetrahedra;
     _irredTetrahedra = that._irredTetrahedra;
-    _logger = that._logger;
     _nIrredTetra = that._nIrredTetra;
     _nTetra = that._nTetra;
     _qm = that._qm;
@@ -74,8 +74,8 @@ namespace apl {
     _weights.clear();
   }
 
-  void LTMethod::clear(QMesh& qm, Logger& l) {
-    LTMethod that(qm, l);
+  void LTMethod::clear(QMesh& qm) {
+    LTMethod that(qm);
     copy(that);
   }
 
@@ -230,8 +230,9 @@ namespace apl {
       int it, m;
       vector<int> compare; //, irred;  OBSOLETE - ME191213
       vector<vector<int> > irred;
-      _logger << "Determining irreducible tetrahedra." << apl::endl;
-      _logger.initProgressBar("Irreducible Tetrahedra");
+      stringstream message;
+      message << "Determining irreducible tetrahedra.";
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LTET_MODULE_, message, _qm.getDirectory(), _qm.getOutputStream(), std::cout);
       for (int t = 0; t < _nTetra; t++) {
         compare = getTetrahedron(t);
         for (int i = 0; i < 4; i++) compare[i] = _qm.getIrredQPointIndex(compare[i]);
@@ -254,10 +255,9 @@ namespace apl {
         } else {
           _weights[it]++;
         }
-        _logger.updateProgressBar(t, _nTetra);
       }
-      _logger.finishProgressBar();
-      _logger << "Found " << _nIrredTetra << " irreducible tetrahedra." << apl::endl;
+      message << "Found " << _nIrredTetra << " irreducible tetrahedra.";
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LTET_MODULE_, message, _qm.getDirectory(), _qm.getOutputStream(), std::cout);
       _reduced = true;
     }
   }

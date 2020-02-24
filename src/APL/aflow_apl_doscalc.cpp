@@ -25,10 +25,9 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //DOSCalculator::DOSCalculator(IPhononCalculator& pc, IReciprocalPointGrid& rg, Logger& l)  OBSOLETE ME190423
-  DOSCalculator::DOSCalculator(IPhononCalculator& pc, QMesh& rg, Logger& l, string method,
+  DOSCalculator::DOSCalculator(PhononCalculator& pc, QMesh& rg, string method,
       const vector<xvector<double> >& projections)  // ME190624
-    : _pc(pc), _rg(rg), _logger(l) {
+    : _pc(pc), _rg(rg) {
       clear();
       _bzmethod = method;
       _system = _pc.getSystemName();  // ME190614
@@ -64,7 +63,6 @@ namespace apl {
   void DOSCalculator::calculateInOneThread(int startIndex, int endIndex) {
     //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
     for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      _logger.updateProgressBar(iqp, _qpoints.size());
       _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  // ME190624
       //std::this_thread::yield();
     }
@@ -88,19 +86,8 @@ namespace apl {
     //    _qpoints[t] = trasp(ReciprocalLattice(_pc.getPrimitiveCellStructure().lattice)) * _qpoints[t];
 
     //CO - START
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-
-    // Get the number of CPUS
-    int ncpus; //= sysconf(_SC_NPROCESSORS_ONLN);  // AFLOW_MachineNCPUs;  //CO 180214
-    _pc.get_NCPUS(ncpus);  //CO 180214
-    if (ncpus < 1) ncpus = 1;
-    //  int qpointsPerCPU = _qpoints.size() / ncpus;  OBSOLETE ME 180801
-
-    // Show info
-    if (ncpus == 1)
-      _logger.initProgressBar("Calculating frequencies for DOS");
-    else
-      _logger.initProgressBar("Calculating frequencies for DOS (" + stringify(ncpus) + " threads)");
+    string message = "Calculating frequencies for the phonon DOS.";
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
 
     // Prepare storage
     _freqs.clear();
@@ -108,6 +95,11 @@ namespace apl {
     for (uint i = 0; i < _qpoints.size(); i++)
       _freqs.push_back(zero);
     _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc.getNumberOfBranches(), _pc.getNumberOfBranches()));  // ME190624
+
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+
+    // Get the number of CPUS
+    int ncpus = _pc.getNCPUs();
 
     // Distribute the calculation
     int startIndex, endIndex;
@@ -136,21 +128,17 @@ namespace apl {
     }
     threads.clear();
 
-    // Done
-    _logger.finishProgressBar();
-
 #else
 
     // Calculate frequencies
     // ME190624 - added eigenvectors for projected DOS
-    xmatrix<xcomplex<double> > xmtrx(_pc.getNumberOfBranches(), _pc.getNumberOfBranches());
-    _logger.initProgressBar("Calculating frequencies for DOS");
-    for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
-      _logger.updateProgressBar(iqp, _qpoints.size());
-      _freqs.push_back(_pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
-      _eigen.push_back(xmtrx);
-    }
-    _logger.finishProgressBar();
+    // ME200206 - use calculateInOneThread so changes only need to be made in one place
+    //[[OBSOLETE]xmatrix<xcomplex<double> > xmtrx(_pc.getNumberOfBranches(), _pc.getNumberOfBranches());
+    //[[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
+    //[[OBSOLETE]  _freqs.push_back(_pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
+    //[[OBSOLETE]  _eigen.push_back(xmtrx);
+    //[[OBSOLETE]}
+    calculateInOneThread(0, (int) _qpoints.size());
 
 #endif
     //CO - END
@@ -303,7 +291,8 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calcDosRS() {
-    _logger << "Calculating phonon DOS using the root sampling method." << apl::endl;
+    string message = "Calculating phonon DOS using the root sampling method.";
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
     for (uint k = 0; k < _bins.size(); k++) {
       for (uint i = 0; i < _freqs.size(); i++) {
         for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
@@ -327,7 +316,8 @@ namespace apl {
   // ME190625 - rearranged and added projected DOS
   // ME200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
-    _logger << "Calculating phonon DOS using the linear tetrahedron method." << apl::endl;
+    string message = "Calculating phonon DOS using the linear tetrahedron method.";
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
     // Procompute projections for each q-point and branch to save time
     uint nproj = _projections.size();
     vector<xvector<double> > proj_norm(nproj, xvector<double>(3));
@@ -366,7 +356,7 @@ namespace apl {
     double max_freq = _bins.back() + _halfStepDOS;
     double min_freq = _bins.front() - _halfStepDOS;
     vector<vector<int> > tet_corners;
-    LTMethod _lt(_rg, _logger);
+    LTMethod _lt(_rg);
     if (nproj == 0) {
       _lt.makeIrreducible();
       tet_corners = _lt.getIrreducibleTetrahedraIbzqpt();
@@ -462,7 +452,8 @@ namespace apl {
     double factorRaw2rcm = _pc.getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
     double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
-    _logger << "Writing phonon density of states into file " << aurostd::CleanFileName(filename) << "." << apl::endl; //ME181226
+    string message = "Writing phonon density of states into file " + aurostd::CleanFileName(filename) + "."; //ME181226
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
@@ -478,7 +469,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename); //ME181226
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "DOSCalculator::writePDOS()";
-      string message = "Cannot open output file " + filename + "."; //ME181226
+      message = "Cannot open output file " + filename + "."; //ME181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
     }
@@ -490,14 +481,15 @@ namespace apl {
   // ME190614 - writes phonon DOS in DOSCAR format
   void DOSCalculator::writePHDOSCAR(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
-    _logger << "Writing phonon density of states into file " << filename << "." << apl::endl;
+    string message = "Writing phonon density of states into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
     stringstream doscar;
     xDOSCAR xdos = createDOSCAR();
     doscar << xdos;
     aurostd::stringstream2file(doscar, filename);
     if (!aurostd::FileExist(filename)) {
       string function = "PhononDispersionCalculator::writePHDOSCAR()";
-      string message = "Cannot open output file " + filename + ".";
+      message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
     // OBSOLETE ME191219 - PHPOSCAR is already written in KBIN::RunPhonons_APL
@@ -595,12 +587,7 @@ namespace apl {
   {
     //CO - START
     // Write PHDOS file
-    //ofstream outfile(file.c_str(),ios_base::out);
     stringstream outfile;
-    //if( !outfile.is_open() )
-    //{
-    //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
-    //}
     //CO - END
 
     double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
@@ -608,7 +595,8 @@ namespace apl {
     double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
     string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE; //ME181226
-    _logger << "Writing phonon density of states into file " << filename << "." << apl::endl; //ME181226
+    string message = "Writing phonon density of states into file " + filename + "."; //ME181226
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
@@ -625,12 +613,9 @@ namespace apl {
     aurostd::stringstream2file(outfile, file);
     if (!aurostd::FileExist(file)) {
       string function = "DOSCalculator::writePDOS()";
-      string message = "Cannot open output file " + filename + "."; //ME181226
+      message = "Cannot open output file " + filename + "."; //ME181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-      //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
     }
-    //outfile.clear();
-    //outfile.close();
     //CO - END
   }
   //PINKU - END
