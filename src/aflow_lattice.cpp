@@ -728,11 +728,6 @@ namespace LATTICE {
   bool Standard_Lattice_Structure_20170718(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {//**************************JUNKAI EDITED*****************
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    double eps = 0.001;
-    if(str_in.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
-      eps=str_in.sym_eps;
-    }
-
     bool is_deg = true; // DX
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
     // cerr << "eps=" << eps << " " << "epsang=" << epsang << endl;
@@ -742,6 +737,16 @@ namespace LATTICE {
     if(str_in.Standard_Lattice_avoid==TRUE) return FALSE; // if you do not want to calculate
     // preparation
     str_sp=str_in; // copy it
+
+    //DX 20200217 - move tolerance info after copying, otherwise we may overwrite
+    double eps = 0.001;
+    if(str_sp.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
+      eps=str_sp.sym_eps;
+    }
+    else if(str_sp.sym_eps==AUROSTD_NAN){ //DX 20200217 - calculate if not done so already
+      eps=SYM::defaultTolerance(str_sp);
+      str_sp.sym_eps = eps;
+    }
 
     //DX 20190304 - moved above GetPrimitive - START
     str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX 20181024  //CO190520
@@ -1915,6 +1920,9 @@ namespace LATTICE {
       str_sp.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
       str_sc=str_in; // copy it
       str_sc.MinkowskiBasisReduction(); // shorten the vectors as much as possible and as perpendicular as possible
+
+      // copy eps information despite failure (for tolerance scan)
+      str_sp.sym_eps = str_sc.sym_eps = eps; //DX 20200217
 
       //    if(str_in.title!="NO_RECURSION")
       /*
