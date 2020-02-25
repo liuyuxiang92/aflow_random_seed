@@ -1255,19 +1255,31 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // FLAG: specify the relaxation step to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
     // DX TODO 
-    string relaxation_step = "most_relaxed";
+    uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
     bool load_most_relaxed_structure_only = true; 
     if(vpflow.flag("COMPARE2DATABASE::RELAXATION_STEP")) {
-      relaxation_step = aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP"));
-      if(relaxation_step!="most_relaxed"){ load_most_relaxed_structure_only = false; }
-      message << "OPTIONS: Relaxation step (orig, relax1, most_relaxed): " << relaxation_step << endl; 
+      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "orig") || 
+          aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")) == 0){
+        relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
+        load_most_relaxed_structure_only = false;
+      }
+      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "relax1") || 
+          aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "middle_relax") || 
+          aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")) == 1){
+        relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
+        load_most_relaxed_structure_only = false;
+      }
+      message << "OPTIONS: Relaxation step (0=original, 1=relax1, 2=most_relaxed): " << relaxation_step << endl; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
     // should not grab properties and compare structures other than the most relaxed structure 
-    if(property_list.size() && relaxation_step != "most_relaxed"){
-      message << "The " << relaxation_step << " structures will be extracted; the properties will not correspond to these structures.  Proceed with caution."; 
+    if(property_list.size() && relaxation_step != _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
+      string relaxation_name = "";
+      if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ relaxation_name = "original"; }
+      else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_){ relaxation_name = "relax1"; }
+      message << "The " << relaxation_name << " structures will be extracted; the properties will not correspond to these structures.  Proceed with caution."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
     }
 
@@ -1355,26 +1367,26 @@ namespace pflow {
       int enantiomorph_space_group_number = SYM::getEnantiomorphSpaceGroupNumber(space_group_number);
       if(space_group_number == enantiomorph_space_group_number){
         // relaxed: need to match last in string, i.e., "*,<sg_symbol> <sg_number>" (comma necessary or we may grab the orig symmetry)
-        if(relaxation_step=="orig"){
+        if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
           space_group_summons = "sg2(%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*)";
         }
-        else if(relaxation_step=="relax1"){
+        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
           space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*)";
         }
-        else if(relaxation_step=="most_relaxed"){
+        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
           space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27)";
         }
       }
       else { // need to get enantiomorph too
-        if(relaxation_step=="orig"){
+        if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
           space_group_summons = "sg2(%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
           space_group_summons += ":%27" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*)";
         }
-        else if(relaxation_step=="relax1"){
+        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
           space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
           space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*)";
         }
-        else if(relaxation_step=="most_relaxed"){
+        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
           space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
           space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27)";
         }
@@ -1562,17 +1574,19 @@ namespace pflow {
         }
         else if(!load_most_relaxed_structure_only){
           if(entry.vstr.size()==3 && structure_files.size()==3){
-            if(relaxation_step == "orig" && 
+            if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_ && 
                 (structure_files[0] == "POSCAR.orig" || 
                  structure_files[0] == "POSCAR.relax1")){ 
               structure_index = 0; 
               found_structure = true; 
+              cerr << "orig geoms" << endl;
             }
-            else if(relaxation_step == "relax1" && 
-                (structure_files[0] == "POSCAR.relax2" || 
-                 structure_files[0] == "CONTCAR.relax1")){ 
+            else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_ && 
+                (structure_files[1] == "POSCAR.relax2" || 
+                 structure_files[1] == "CONTCAR.relax1")){ 
               structure_index = 1; 
               found_structure = true; 
+              cerr << "relax geoms" << endl;
             }
           }
         }
@@ -1609,7 +1623,7 @@ namespace pflow {
           all_structures.push_back(str_proto_tmp);
         }
         else {
-          message << "More structures loaded than anticipated for auid=" << auids[i] << ".";     
+          message << "More structures loaded than anticipated for auid=" << auids[i] << " (# structures=" << entry.vstr.size() << ").";     
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
         }
       }

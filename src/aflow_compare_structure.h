@@ -35,6 +35,10 @@
 #define _CALCULATE_MAGNETIC_MISFIT_ false
 #define _SPIN_TOL_ 0.1
 
+#define _COMPARE_DATABASE_GEOMETRY_ORIGINAL_ 0
+#define _COMPARE_DATABASE_GEOMETRY_RELAX1_ 1
+#define _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_ 2
+
 //// ===== GroupedWyckoffPosition Class ===== //
 //class GroupedWyckoffPosition{
 //  public:
