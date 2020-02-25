@@ -271,18 +271,23 @@ namespace apl {
     // ME190423 - END
 
     // Smooth DOS by gaussians
-    if (USER_DOS_SMEAR > 1E-6)
+    if (USER_DOS_SMEAR > 1E-6) {
       smearWithGaussian(_dos, _idos, _stepDOS, USER_DOS_SMEAR);  // ME190614
 
-    // Normalize to number of branches
-    double sum = 0.0;
-    for (int k = 0; k < USER_DOS_NPOINTS; k++)
-      sum += _dos[k];
-    sum /= _pc.getNumberOfBranches();
+      // Normalize to number of branches
+      // ME200225 - not necessary for LT method without smearing (makes
+      // DOS and iDOS less accurate)
+      if (_bzmethod == "LT") {
+        double sum = 0.0;
+        for (int k = 0; k < USER_DOS_NPOINTS; k++)
+          sum += _dos[k];
+        sum /= _pc.getNumberOfBranches();
 
-    for (int k = 0; k < USER_DOS_NPOINTS; k++) {
-      _dos[k] /= (sum * _stepDOS);
-      _idos[k] /= (sum * _stepDOS);  // ME190614
+        for (int k = 0; k < USER_DOS_NPOINTS; k++) {
+          _dos[k] /= (sum * _stepDOS);
+          _idos[k] /= (sum * _stepDOS);  // ME190614
+        }
+      }
     }
   }
 
