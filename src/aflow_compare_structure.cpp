@@ -1259,13 +1259,13 @@ namespace pflow {
     bool load_most_relaxed_structure_only = true; 
     if(vpflow.flag("COMPARE2DATABASE::RELAXATION_STEP")) {
       if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "orig") || 
-          aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")) == 0){
+          vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP") == "0"){
         relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
         load_most_relaxed_structure_only = false;
       }
       if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "relax1") || 
           aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "middle_relax") || 
-          aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")) == 1){
+          vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP") == "1"){
         relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
         load_most_relaxed_structure_only = false;
       }
@@ -1959,13 +1959,13 @@ namespace pflow {
     bool load_most_relaxed_structure_only = true; 
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")) {
       if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "orig") || 
-          aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")) == 0){
+          vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP") == "0" ){
         relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
         load_most_relaxed_structure_only = false;
       }
       if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "relax1") || 
           aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "middle_relax") || 
-          aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")) == 1){
+          vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP") == "1"){
         relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
         load_most_relaxed_structure_only = false;
       }
