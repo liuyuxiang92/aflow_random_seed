@@ -9736,7 +9736,7 @@ namespace pflow {
     return loadXstructures(entry,structure_files,FileMESSAGE,oss,relaxed_only,path,is_url_path); //DX 20200224
   }
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, vector<string>& structure_files, ofstream& FileMESSAGE, ostream& oss, bool relaxed_only, string path, bool is_url_path) { //DX 20200224 - added structure_files as input
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = "pflow::loadXstructures():";
     stringstream message;
 
@@ -9766,15 +9766,13 @@ namespace pflow {
           !aurostd::EWithinList(files,"POSCAR.orig",efile) && !relaxed_only) ||
         (!aurostd::EWithinList(files,"POSCAR.relax2",efile) &&
          !aurostd::EWithinList(files,"CONTCAR.relax1",efile) && !relaxed_only) ||
-        
         (!aurostd::EWithinList(files,"POSCAR.bands",efile) &&
          !aurostd::EWithinList(files,"CONTCAR.bands",efile) &&
          !aurostd::EWithinList(files,"POSCAR.static",efile) &&
          !aurostd::EWithinList(files,"CONTCAR.static",efile) &&
          !aurostd::EWithinList(files,"CONTCAR.relax2",efile) &&
          !aurostd::EWithinList(files,"CONTCAR.relax",efile) &&
-         TRUE
-         )
+         TRUE)
         ) {
       message << "path=" << path << " missing structure files. Ignoring entry";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
