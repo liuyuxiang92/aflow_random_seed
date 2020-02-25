@@ -296,7 +296,7 @@ namespace chull {
       vector<string> _vinputs=vinputs;vinputs.clear();
       if(_vinputs.size()){vinputs.push_back(_vinputs[0]);}
       for(uint i=1,fl_size_i=_vinputs.size();i<fl_size_i;i++){ //VERBOSE
-        if(aurostd::withinList(vinputs,_vinputs[i])){
+        if(aurostd::WithinList(vinputs,_vinputs[i])){
           message << "Ignoring duplicate input (" << _vinputs[i] << ")";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);  
           continue;
@@ -3355,7 +3355,7 @@ namespace chull {
     //}
     //filters must be wide to narrow
     if(!m_allow_all_formation_energies){
-      if(!aurostd::withinList(m_allowed_dft_types,entry.dft_type)){
+      if(!aurostd::WithinList(m_allowed_dft_types,entry.dft_type)){
         reason="not calculated with allowed DFT-type: dft_type=="+entry.dft_type+" (allowed="+aurostd::joinWDelimiter(m_allowed_dft_types,",")+")";
         return false;
       }
@@ -3965,7 +3965,7 @@ namespace chull {
     }
 
     //quick add in of PAW_GGA if not already included in allowed list
-    if(m_cflags.flag("CHULL::INCLUDE_PAW_GGA")&&(!aurostd::withinList(m_allowed_dft_types,"PAW_GGA"))){m_allowed_dft_types.push_back("PAW_GGA");}
+    if(m_cflags.flag("CHULL::INCLUDE_PAW_GGA")&&(!aurostd::WithinList(m_allowed_dft_types,"PAW_GGA"))){m_allowed_dft_types.push_back("PAW_GGA");}
 
     //ignore bad database
     bool ignore_bad_database=(DEFAULT_CHULL_IGNORE_KNOWN_ILL_CONVERGED && !m_cflags.flag("CHULL::INCLUDE_ILL_CONVERGED"));
@@ -4001,7 +4001,7 @@ namespace chull {
           continue;
         }
         unique_entries.push_back(i);
-        if(aurostd::withinList(points_neglect,entry.auid)){
+        if(aurostd::WithinList(points_neglect,entry.auid)){
           message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: as requested";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
           continue;
@@ -6152,7 +6152,7 @@ namespace chull {
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
       for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
         i_point=m_coord_groups[i_coord_group].m_points[i];
-        if(aurostd::withinList(points_to_neglect,i_point)){
+        if(aurostd::WithinList(points_to_neglect,i_point)){
           if(LDEBUG) {cerr << soliloquy << " Removing point from fake hull (i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << ")" << endl;}
           continue;
         }
@@ -7172,7 +7172,7 @@ namespace chull {
       for(uint i=0,fl_size_i=_latex_colors.size();i<fl_size_i;i++){
         color=_latex_colors[i];
         lower_color=aurostd::tolower(color);
-        if(aurostd::withinList(banned_colors,lower_color)){continue;}
+        if(aurostd::WithinList(banned_colors,lower_color)){continue;}
         if(replace_pranab_standard&&(lower_color=="green"||lower_color=="red")){color="pranab_"+lower_color;}  //now in pranab standard!
         latex_colors.push_back(color);
         if(latex_colors.size()==count){return latex_colors;}

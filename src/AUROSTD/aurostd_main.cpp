@@ -3675,10 +3675,38 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function eurl2string
+  // ***************************************************************************
+  // CO200223
+  bool eurl2string(const string& url,string& stringIN,bool verbose) {
+    stringIN="";
+    if(aurostd::substring2bool(url,".bz2")){
+      string temp_file=aurostd::TmpFileCreate("eurl2string")+".bz2";
+      url2file(url,temp_file,verbose);
+      bz2file2string(temp_file,stringIN);
+      return stringIN.length()>0;
+    }
+    if(aurostd::substring2bool(url,".gz")){
+      string temp_file=aurostd::TmpFileCreate("eurl2string")+".gz";
+      url2file(url,temp_file,verbose);
+      gzfile2string(temp_file,stringIN);
+      return stringIN.length()>0;
+    }
+    if(aurostd::substring2bool(url,".xz")){
+      string temp_file=aurostd::TmpFileCreate("eurl2string")+".xz";
+      url2file(url,temp_file,verbose);
+      xzfile2string(temp_file,stringIN);
+      return stringIN.length()>0;
+    }
+    url2string(url,stringIN,verbose);
+    return stringIN.length()>0;
+  }
+
+  // ***************************************************************************
   // Function url2string
   // ***************************************************************************
   // wget URL to string - Stefano Curtarolo
-  bool url2string(string url,string& stringIN,bool verbose) {
+  bool url2string(const string& url,string& stringIN,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(!aurostd::IsCommandAvailable("wget")) {
       cerr << "ERROR - aurostd::url2string(): command \"wget\" is necessary !" << endl;
@@ -3710,29 +3738,75 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function url2stringstream
+  // Function eurl2stringstream
   // ***************************************************************************
-  // wget URL to stringstream - Stefano Curtarolo
-  bool url2stringstream(string url,stringstream& stringstreamIN,bool verbose) {
+  // CO200223
+  bool eurl2stringstream(const string& url,stringstream& stringstreamIN,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "aurostd::url2stringstream() Loading url=" << url << endl;
-    if(verbose) cout << "aurostd::url2stringstream() Loading url=" << url << endl;
+    string soliloquy="aurostd::eurl2stringstream():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
     string stringIN;
-    bool out=url2string(url,stringIN,verbose);
-    stringstreamIN.clear(); stringstreamIN << stringIN;
+    bool out=eurl2string(url,stringIN,verbose);
+    stringstreamIN.str(""); stringstreamIN << stringIN;
     return out;
   }
 
   // ***************************************************************************
+  // Function url2stringstream
+  // ***************************************************************************
+  // wget URL to stringstream - Stefano Curtarolo
+  bool url2stringstream(const string& url,stringstream& stringstreamIN,bool verbose) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::url2stringstream():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN;
+    bool out=url2string(url,stringIN,verbose);
+    stringstreamIN.str(""); stringstreamIN << stringIN;
+    return out;
+  }
+
+  // ***************************************************************************
+  // Function eurl2vectorstring
+  // ***************************************************************************
+  // CO200223
+  bool eurl2vectorstring(const string& url,vector<string>& vlines,bool verbose) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::eurl2vectorstring():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN;
+    bool out=eurl2string(url,stringIN,verbose);
+    aurostd::string2tokens(stringIN,vlines);
+    return out;
+  }
+  // ***************************************************************************
   // Function url2vectorstring
   // ***************************************************************************
   // wget URL to vectorstring - Stefano Curtarolo
-  bool url2vectorstring(string url,vector<string>& vlines,bool verbose) {
+  bool url2vectorstring(const string& url,vector<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "aurostd::url2vectorstring() Loading url=" << url << endl;
-    if(verbose) cout << "aurostd::url2vectorstring() Loading url=" << url << endl;
+    string soliloquy="aurostd::url2vectorstring():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
     string stringIN;
     bool out=url2string(url,stringIN,verbose);
+    aurostd::string2tokens(stringIN,vlines);
+    return out;
+  }
+
+  // ***************************************************************************
+  // Function eurl2dequestring
+  // ***************************************************************************
+  // CO200223
+  bool eurl2dequestring(const string& url,deque<string>& vlines,bool verbose) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::eurl2dequestring():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN;
+    bool out=eurl2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
     return out;
   }
@@ -3741,10 +3815,11 @@ namespace aurostd {
   // Function url2dequestring
   // ***************************************************************************
   // wget URL to dequestring - Stefano Curtarolo
-  bool url2dequestring(string url,deque<string>& vlines,bool verbose) {
+  bool url2dequestring(const string& url,deque<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "aurostd::url2dequestring() Loading url=" << url << endl;
-    if(verbose) cout << "aurostd::url2dequestring() Loading url=" << url << endl;
+    string soliloquy="aurostd::url2dequestring():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
     string stringIN;
     bool out=url2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
@@ -3752,29 +3827,69 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function url2tokens
+  // Function eurl2tokens
   // ***************************************************************************
-  // wget URL to vector of tokens - Stefano Curtarolo
-  template<typename utype> uint url2tokens(string url,vector<utype>& tokens,const string& delimiters) {
+  // CO200223
+  template<typename utype> uint eurl2tokens(const string& url,vector<utype>& tokens,const string& delimiters) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "aurostd::url2tokens<utype>(vector) Loading url=" << url << endl;
+    string soliloquy="aurostd::url2tokens<utype>(vector):";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - aurostd::url2tokens<utype>(vector): command \"wget\" is necessary !" << endl;
+      cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
       return 0;}	
     tokens.clear(); 
     string content;
-    aurostd::url2string(url,content);
+    aurostd::eurl2string(url,content);
     if(LDEBUG) { //CO 180627
-      cerr << "aurostd::url2tokens<utype>(vector) content=" << endl;
+      cerr << soliloquy << " content=" << endl;
       cerr << content << endl;
     }
-    if(content=="") {cerr << "ERROR - aurostd::url2tokens<utype>(vector): URL empty http://" << url << endl;return 0;}
+    if(content=="") {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
     for(uint i=0;i<stokens.size();i++)
       if(stokens.at(i)!="") 
         tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
-    if(LDEBUG) cerr << "aurostd::url2tokens() [5] tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
+    return tokens.size();
+  }
+
+  // ***************************************************************************
+  // Function url2tokens
+  // ***************************************************************************
+  // wget URL to vector of tokens - Stefano Curtarolo
+  template<typename utype> uint url2tokens(const string& url,vector<utype>& tokens,const string& delimiters) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::url2tokens<utype>(vector):";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(!aurostd::IsCommandAvailable("wget")) {
+      cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
+      return 0;}	
+    tokens.clear(); 
+    string content;
+    aurostd::url2string(url,content);
+    if(LDEBUG) { //CO 180627
+      cerr << soliloquy << " content=" << endl;
+      cerr << content << endl;
+    }
+    if(content=="") {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+    vector<string> stokens;
+    aurostd::string2tokens(content,stokens,delimiters);
+    for(uint i=0;i<stokens.size();i++)
+      if(stokens.at(i)!="") 
+        tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
+    if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
+    return tokens.size();
+  }
+
+  // ***************************************************************************
+  // Function eurl2tokens
+  // ***************************************************************************
+  // CO200223
+  template<typename utype> uint eurl2tokens(const string& url,deque<utype>& tokens,const string& delimiters) {
+    vector<utype> vtokens;
+    aurostd::eurl2tokens(url,vtokens,delimiters);
+    for(uint i=0;i<vtokens.size();i++) tokens.push_back(vtokens.at(i));
     return tokens.size();
   }
 
@@ -3782,7 +3897,7 @@ namespace aurostd {
   // Function url2tokens
   // ***************************************************************************
   // wget URL to deque of tokens - Stefano Curtarolo
-  template<typename utype> uint url2tokens(string url,deque<utype>& tokens,const string& delimiters) {
+  template<typename utype> uint url2tokens(const string& url,deque<utype>& tokens,const string& delimiters) {
     vector<utype> vtokens;
     aurostd::url2tokens(url,vtokens,delimiters);
     for(uint i=0;i<vtokens.size();i++) tokens.push_back(vtokens.at(i));
@@ -3790,10 +3905,20 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function eurl2string
+  // ***************************************************************************
+  // CO200223
+  string eurl2string(const string& url) {
+    string stringIN;
+    eurl2string(url,stringIN);
+    return stringIN;
+  }
+
+  // ***************************************************************************
   // Function url2string
   // ***************************************************************************
   // wget URL to stringstream - Stefano Curtarolo
-  string url2string(string url) {
+  string url2string(const string& url) {
     string stringIN;
     url2string(url,stringIN);
     return stringIN;
@@ -4446,27 +4571,27 @@ namespace aurostd {
     return (bool) substring_present_file_FAST(FileName,strsub1,FALSE);
   }
 
-  bool withinList(const vector<string>& list,const string& input) { //CO181010
+  bool WithinList(const vector<string>& list,const string& input) { //CO181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
     //return false;  OBSOLETE ME190905
     int index;
-    return withinList(list, input, index);
+    return WithinList(list, input, index);
   }
-  bool withinList(const vector<int>& list,int input) {  //CO181010
+  bool WithinList(const vector<int>& list,int input) {  //CO181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
     //return false;  OBSOLETE ME190905
     int index;
-    return withinList(list, input, index);
+    return WithinList(list, input, index);
   }
-  bool withinList(const vector<uint>& list,uint input) {  //CO181010
+  bool WithinList(const vector<uint>& list,uint input) {  //CO181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
     //return false;  OBSOLETE ME190905
     int index;
-    return withinList(list, input, index);
+    return WithinList(list, input, index);
   }
 
   // ME190813 - added versions that also determine the index of the item in the list
-  bool withinList(const vector<string>& list, const string& input, int& index) {
+  bool WithinList(const vector<string>& list, const string& input, int& index) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input) {
         index = i;
@@ -4477,7 +4602,7 @@ namespace aurostd {
     return false;
   }
 
-  bool withinList(const vector<int>& list, int input, int& index) {
+  bool WithinList(const vector<int>& list, int input, int& index) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input) {
         index = i;
@@ -4488,7 +4613,7 @@ namespace aurostd {
     return false;
   }
 
-  bool withinList(const vector<uint>& list, uint input, int& index) {
+  bool WithinList(const vector<uint>& list, uint input, int& index) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input) {
         index = i;
@@ -4496,6 +4621,21 @@ namespace aurostd {
       }
     }
     index = -1;
+    return false;
+  }
+
+  bool EWithinList(const vector<string>& list,const string& input) { //CO200223
+    string output="";
+    return EWithinList(list, input, output);
+  }
+  bool EWithinList(const vector<string>& list, const string& input, string& output) { //CO200223
+    output="";
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(list[i]==input){output=input;return true;}
+      if(list[i]==input+".xz"){output=input+".xz";return true;}
+      if(list[i]==input+".gz"){output=input+".gz";return true;}
+      if(list[i]==input+".bz2"){output=input+".bz2";return true;}
+    }
     return false;
   }
 

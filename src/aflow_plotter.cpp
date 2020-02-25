@@ -302,7 +302,7 @@ namespace plotter {
         string proto = tokens[1];
         vector<string> protos;
         aflowlib::GetAllPrototypeLabels(protos, "anrl");
-        if (aurostd::withinList(protos, proto)) {
+        if (aurostd::WithinList(protos, proto)) {
           if (tokens.size() == 3) proto += "." + tokens[2];
           vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
           vector<double> composition = getCompositionFromANRLPrototype(proto);
@@ -314,7 +314,7 @@ namespace plotter {
           protos.clear();
           aflowlib::GetAllPrototypeLabels(protos, comp, "htqc");
           int index;
-          if (aurostd::withinList(protos, proto, index)) {
+          if (aurostd::WithinList(protos, proto, index)) {
             proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
             vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
             vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);

@@ -1689,7 +1689,7 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
   if(mode==ATOM_ENVIRONMENT_MODE_1){
     for(uint i=0;i<xstr.species.size();i++){
       // check if types are restricted, otherwise get closest neighbors by type
-      if(aurostd::withinList(neighbor_elements, xstr.species[i]) || neighbor_elements.empty()){
+      if(aurostd::WithinList(neighbor_elements, xstr.species[i]) || neighbor_elements.empty()){
         uint frequency = 0;
         double min_dist = AUROSTD_MAX_DOUBLE;
         vector<xvector<double> > coordinates;

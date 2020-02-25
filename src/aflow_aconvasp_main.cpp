@@ -9736,7 +9736,7 @@ namespace pflow {
     return loadXstructures(entry,structure_files,FileMESSAGE,oss,relaxed_only,path,is_url_path); //DX 20200224
   }
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, vector<string>& structure_files, ofstream& FileMESSAGE, ostream& oss, bool relaxed_only, string path, bool is_url_path) { //DX 20200224 - added structure_files as input
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy = "pflow::loadXstructures():";
     stringstream message;
 
@@ -9756,14 +9756,26 @@ namespace pflow {
     stringstream ss;
     vector<string> files;
     if(LDEBUG) {cerr << soliloquy << " path=" << path << endl;}
+
     if(is_url_path){aurostd::url2tokens(path + "/?files", files, ",");}
     else {aurostd::DirectoryLS(path,files);}
-    if((!aurostd::substring2bool(files, "POSCAR.relax1") &&
-          !aurostd::substring2bool(files, "POSCAR.orig") && !relaxed_only) ||
-        (!aurostd::substring2bool(files, "POSCAR.relax2") &&
-         !aurostd::substring2bool(files, "CONTCAR.relax1") && !relaxed_only) ||
-        (!aurostd::substring2bool(files, "CONTCAR.relax") &&
-         !aurostd::substring2bool(files, "CONTCAR.relax2"))) {
+
+    //CO200223 - substring2bool - > EWithinList()
+    string efile="";
+    if((!aurostd::EWithinList(files,"POSCAR.relax1",efile) &&
+          !aurostd::EWithinList(files,"POSCAR.orig",efile) && !relaxed_only) ||
+        (!aurostd::EWithinList(files,"POSCAR.relax2",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.relax1",efile) && !relaxed_only) ||
+        
+        (!aurostd::EWithinList(files,"POSCAR.bands",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.bands",efile) &&
+         !aurostd::EWithinList(files,"POSCAR.static",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.static",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.relax2",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.relax",efile) &&
+         TRUE
+         )
+        ) {
       message << "path=" << path << " missing structure files. Ignoring entry";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
@@ -9773,11 +9785,12 @@ namespace pflow {
         // START Loading original structures
         //////////////////////////////////////////////////////////////////////////
 
-        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.orig")) {
+        if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"POSCAR.orig",efile)) {
+          if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
           ss.str("");
           if ( (is_url_path ? 
-                aurostd::url2stringstream(path + "/POSCAR.orig",ss,false) : 
-                aurostd::file2stringstream(path + "/POSCAR.orig",ss)) ) {
+                aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
+                aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
             try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("POSCAR.orig"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) { 
               xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
@@ -9786,11 +9799,12 @@ namespace pflow {
             } //DX 20191210
           }
         }
-        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax1")) {
+        if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"POSCAR.relax1",efile)) {
+          if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
           ss.str("");
           if ( (is_url_path ? 
-                aurostd::url2stringstream(path + "/POSCAR.relax1",ss,false) :
-                aurostd::file2stringstream(path + "/POSCAR.relax1",ss)) ) {
+                aurostd::eurl2stringstream(path+"/"+efile,ss,false) :
+                aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
             try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("POSCAR.relax1"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) {
               xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
@@ -9815,11 +9829,12 @@ namespace pflow {
         // START Loading singularly-relaxed structures
         //////////////////////////////////////////////////////////////////////////
 
-        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax2")) {
+        if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"POSCAR.relax2",efile)) {
+          if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
           ss.str("");
           if ( (is_url_path ? 
-                aurostd::url2stringstream(path + "/POSCAR.relax2",ss,false) :
-                aurostd::file2stringstream(path + "/POSCAR.relax2",ss)) ) {
+                aurostd::eurl2stringstream(path+"/"+efile,ss,false) :
+                aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
             try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("POSCAR.relax2"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) {
               xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
@@ -9828,11 +9843,12 @@ namespace pflow {
             } //DX 20191210
           }
         }
-        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax1")) {
+        if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"CONTCAR.relax1",efile)) {
+          if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
           ss.str("");
           if ( (is_url_path ? 
-                aurostd::url2stringstream(path + "/CONTCAR.relax1",ss,false) :
-                aurostd::file2stringstream(path + "/CONTCAR.relax1",ss)) ) {
+                aurostd::eurl2stringstream(path+"/"+efile,ss,false) :
+                aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
             try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("CONTCAR.relax1"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) {
               xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
@@ -9858,11 +9874,12 @@ namespace pflow {
       // START Loading fully-relaxed structures
       ////////////////////////////////////////////////////////////////////////////
 
-      if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax")) {
+      if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"CONTCAR.relax",efile)) {
+        if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
         ss.str("");
         if ( (is_url_path ? 
-              aurostd::url2stringstream(path + "/CONTCAR.relax",ss,false): 
-              aurostd::file2stringstream(path + "/CONTCAR.relax",ss)) ) {
+              aurostd::eurl2stringstream(path+"/"+efile,ss,false): 
+              aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
           try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("CONTCAR.relax"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
           catch(aurostd::xerror& excpt) {
             xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
@@ -9871,15 +9888,72 @@ namespace pflow {
           } //DX 20191210
         }
       }
-      if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax2")) {
+      if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"CONTCAR.relax2",efile)) {
+        if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
         ss.str("");
         if ( (is_url_path ? 
-              aurostd::url2stringstream(path + "/CONTCAR.relax2",ss,false) :
-              aurostd::file2stringstream(path + "/CONTCAR.relax2",ss)) ) {
+              aurostd::eurl2stringstream(path+"/"+efile,ss,false) :
+              aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
           try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("CONTCAR.relax2"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
           catch(aurostd::xerror& excpt) {
             xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
             message << "CONTCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX 20191210
+        }
+      }
+      if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"CONTCAR.static",efile)) {
+        if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
+        ss.str("");
+        if ( (is_url_path ? 
+              aurostd::eurl2stringstream(path+"/"+efile,ss,false) :
+              aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("CONTCAR.static"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
+          catch(aurostd::xerror& excpt) {
+            xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+            message << "CONTCAR.static: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX 20191210
+        }
+      }
+      if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"POSCAR.static",efile)) {
+        if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
+        ss.str("");
+        if ( (is_url_path ? 
+              aurostd::eurl2stringstream(path+"/"+efile,ss,false) :
+              aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("POSCAR.static"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
+          catch(aurostd::xerror& excpt) {
+            xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+            message << "POSCAR.static: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX 20191210
+        }
+      }
+      if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"CONTCAR.bands",efile)) {
+        if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
+        ss.str("");
+        if ( (is_url_path ? 
+              aurostd::eurl2stringstream(path+"/"+efile,ss,false) :
+              aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("CONTCAR.bands"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
+          catch(aurostd::xerror& excpt) {
+            xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+            message << "CONTCAR.bands: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX 20191210
+        }
+      }
+      if(!xstrAux.atoms.size() && aurostd::EWithinList(files,"POSCAR.bands",efile)) {
+        if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
+        ss.str("");
+        if ( (is_url_path ? 
+              aurostd::eurl2stringstream(path+"/"+efile,ss,false) :
+              aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back("POSCAR.bands"); } //DX 20191210 - added try-catch //DX 20200224 - added structure_files tag
+          catch(aurostd::xerror& excpt) {
+            xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+            message << "POSCAR.bands: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
           } //DX 20191210
         }
@@ -11966,7 +12040,7 @@ namespace pflow {
         message << "No mode specified [designation=" << ps << "]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      if(aurostd::withinList(pocc_designations,designation)){
+      if(aurostd::WithinList(pocc_designations,designation)){
         message << "Duplicate POCC designation: " << designation;
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
@@ -12030,10 +12104,10 @@ namespace pflow {
     uint position2=p2.positions[0];
     if(p1.mode!=p2.mode){
       if(p1.mode=='S' && p2.mode=='P'){
-        if(aurostd::withinList(p1.positions,position2)){return false;} //put p2 first
+        if(aurostd::WithinList(p1.positions,position2)){return false;} //put p2 first
       }
       else if(p1.mode=='P' && p2.mode=='S'){
-        if(aurostd::withinList(p2.positions,position1)){return true;} //put p1 first
+        if(aurostd::WithinList(p2.positions,position1)){return true;} //put p1 first
       }
       else {
         message << "Unknown modes: p1.mode=" << p1.mode << ", p2.mode=" << p2.mode;
@@ -12192,7 +12266,7 @@ namespace pflow {
           cerr << soliloquy << " positions_already_added=" << aurostd::joinWDelimiter(positions_already_added,",") << endl;
         }
         if(mode=='P'){
-          if(!aurostd::withinList(positions_already_added,site)){ //do NOT over add, each position should be specified exactly once
+          if(!aurostd::WithinList(positions_already_added,site)){ //do NOT over add, each position should be specified exactly once
             atom=xstr_orig.atoms[site];
             positions_already_added_tmp.push_back(site);  //do NOT over add, each position should be specified exactly once
             atom.type=occupant;
@@ -12211,7 +12285,7 @@ namespace pflow {
           for(uint ii=0;ii<xstr_orig.num_each_type.size();ii++){
             for(uint jj=0;jj<(uint)xstr_orig.num_each_type[ii];jj++){
               if(ii==site){
-                if(!aurostd::withinList(positions_already_added,iatom)){ //do NOT over add, each position should be specified exactly once
+                if(!aurostd::WithinList(positions_already_added,iatom)){ //do NOT over add, each position should be specified exactly once
                   atom=xstr_orig.atoms[iatom];
                   positions_already_added_tmp.push_back(iatom);  //do NOT over add, each position should be specified exactly once
                   atom.type=occupant;

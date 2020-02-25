@@ -1579,14 +1579,14 @@ namespace pflow {
                  structure_files[0] == "POSCAR.relax1")){ 
               structure_index = 0; 
               found_structure = true; 
-              cerr << "orig geoms" << endl;
+              if(LDEBUG){cerr << function_name << << " orig geoms" << endl;}
             }
             else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_ && 
                 (structure_files[1] == "POSCAR.relax2" || 
                  structure_files[1] == "CONTCAR.relax1")){ 
               structure_index = 1; 
               found_structure = true; 
-              cerr << "relax geoms" << endl;
+              if(LDEBUG){cerr << function_name << " relax geoms" << endl;}
             }
           }
         }

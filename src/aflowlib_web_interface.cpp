@@ -3570,6 +3570,7 @@ namespace aflowlib {
     return getPathAURL(FileMESSAGE, oss, load_from_common);
   }
   string _aflowlib_entry::getPathAURL(ofstream& FileMESSAGE,ostream& oss, bool load_from_common){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = "_aflowlib_entry::getPathAURL():";
     stringstream message;
     string path = "";
@@ -3589,16 +3590,42 @@ namespace aflowlib {
     tokens.erase(tokens.begin());
     path=aurostd::joinWDelimiter(tokens,":");
 
-    if(load_from_common){return "/www/"+path;}//tokens.at(1); //CO200106 - patching for auto-indenting
-    else {
-      string server;
-      if (XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
-        server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
-      } else {
-        server = "aflowlib.duke.edu";
+    string server="",path_full="";
+    if(1&&load_from_common){
+      //attempt 1: try replacing _RAW with _LIB
+      if(1){
+        server="/www";
+        path_full=path;
+        aurostd::StringSubst(path_full,"_RAW","_LIB");
+        path_full=server+"/"+path_full;
+        if(LDEBUG){cerr << soliloquy << " attempt 1 path=" << path_full << endl;}
+        if(aurostd::IsDirectory(path_full)){return path_full;}
       }
-      return server+"/"+path;//tokens.at(1);
+
+      //attempt 2: try finding LIB directory
+      if(1){
+        server="/common";
+        path_full=path;
+        aurostd::StringSubst(path_full,"AFLOWDATA/","");
+        aurostd::StringSubst(path_full,"_RAW","/LIB");
+        path_full=server+"/"+path_full;
+        if(LDEBUG){cerr << soliloquy << " attempt 2 path=" << path_full << endl;}
+        if(aurostd::IsDirectory(path_full)){return path_full;}
+      }
+
+      //attempt 3: try no replacement (RAW)
+      if(1){
+        server="/www";
+        path_full=server+"/"+path;
+        if(LDEBUG){cerr << soliloquy << " attempt 3 path=" << path_full << endl;}
+        if(aurostd::IsDirectory(path_full)){return path_full;}
+      }
     }
+    if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")){server=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");}
+    else{server="aflowlib.duke.edu";}
+    
+    path_full=server+"/"+path;
+    return path_full;
   }
 }
 

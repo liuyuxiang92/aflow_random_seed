@@ -447,7 +447,7 @@ namespace aflowlib {
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
           key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
-          if (!aurostd::withinList(columns, key, index)) break;
+          if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
         }
         rebuild_db = (k != nkeys);
@@ -829,7 +829,7 @@ namespace aflowlib {
                   nset = n;
                 } else {
                   for (uint i = 0; i < n; i++) {
-                    if (!aurostd::withinList(set, sets[t][c][i])) {
+                    if (!aurostd::WithinList(set, sets[t][c][i])) {
                       set.push_back(sets[t][c][i]);
                       nset++;
                     }

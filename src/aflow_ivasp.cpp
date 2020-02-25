@@ -355,8 +355,8 @@ namespace KBIN {
           if(!aurostd::RemoveWhiteSpacesFromTheBack(potcar_paths[j]).empty()){
             const string& potcar_path=potcar_paths[j];
             aurostd::string2tokens(potcar_path,path_parts,"/");
-            if(aurostd::withinList(path_parts,"TESTS")){continue;}  //skip VASP/TESTS
-            if(aurostd::withinList(path_parts,"BENCHS")){continue;}  //skip VASP/BENCHS
+            if(aurostd::WithinList(path_parts,"TESTS")){continue;}  //skip VASP/TESTS
+            if(aurostd::WithinList(path_parts,"BENCHS")){continue;}  //skip VASP/BENCHS
             if(path_parts.size()<2){continue;}
             element_raw=path_parts[path_parts.size()-2];
             if(aurostd::substring2bool(element_raw,"runelements")){continue;} //garbage pp
