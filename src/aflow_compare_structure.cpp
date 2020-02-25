@@ -1143,10 +1143,12 @@ namespace pflow {
 // pflow::compare2database - compares database 
 // ***************************************************************************
 namespace pflow {
-  string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){
+  // load input structure
+  string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO);return compare2database(xstr,vpflow,logstream);}  //CO200225
+  string compare2database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    string function_name = "pflow::compare2database()";
+    string function_name = "pflow::compare2database():";
     string directory = "";
     ostringstream oss;
     //DX 20200103 ostream& logstream = cout;
@@ -1326,10 +1328,6 @@ namespace pflow {
       screen_only=true;
     }
     //DX 20190425 - added screen only flag - END
-
-    // ---------------------------------------------------------------------------
-    // load input structure
-    xstructure xstr(input,IOAFLOW_AUTO);
 
     // ---------------------------------------------------------------------------
     // fix species (remove pseudopotntials, etc.) 
