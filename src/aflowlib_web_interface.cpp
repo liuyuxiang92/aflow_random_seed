@@ -3607,6 +3607,7 @@ namespace aflowlib {
         server="/common";
         path_full=path;
         aurostd::StringSubst(path_full,"AFLOWDATA/","");
+        aurostd::StringSubst(path_full,"ICSD_WEB","ICSD/LIB"); //CO200223
         aurostd::StringSubst(path_full,"_RAW","/LIB");
         path_full=server+"/"+path_full;
         if(LDEBUG){cerr << soliloquy << " attempt 2 path=" << path_full << endl;}

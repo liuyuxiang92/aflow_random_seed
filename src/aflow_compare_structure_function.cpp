@@ -1275,13 +1275,48 @@ namespace compare {
     }
     // ---------------------------------------------------------------------------
     // load from AURL
-    else if(structure_from=="aurl"){
+    else if(aurostd::substring2bool(structure_from, "aurl")){
+      //DX 20200225 - check if relaxation_step is appended 
+      uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_; //default
+      bool load_most_relaxed_structure_only = true;
+      vector<string> tmp_tokens; 
+      if(aurostd::string2tokens(structure_from,tokens,",") == 2){
+        relaxation_step = aurostd::string2utype<uint>(tokens[1]);
+        if(relaxation_step != _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ load_most_relaxed_structure_only = false; }
+      }
       aflowlib::_aflowlib_entry entry; entry.aurl = structure_name; 
+      vector<string> structure_files;
       //DX 20190326 - need to put url path, i.e., structure name, [OBSOLETE] if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;}
       //DX ORIG B4 20191105 - if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX 20190326
-      if(!pflow::loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (aurl=" << entry.aurl << ") ... skipping..." << endl; return false;} //DX 20191105
-      if(entry.vstr.size()==1){
-        structure = entry.vstr[0];
+      if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){ cerr << "WARNING::Could not load structure (aurl=" << entry.aurl << ") ... skipping..." << endl; return false;} //DX 20191105
+      //DX 20200225 - added compare to particular geometry files - START
+      bool found_structure = false;
+      uint structure_index = 0;
+      if(load_most_relaxed_structure_only && entry.vstr.size()==1){
+        found_structure = true;
+        structure_index = 0;
+      }
+      else if(!load_most_relaxed_structure_only){
+        if(entry.vstr.size()==3 && structure_files.size()==3){
+          if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_ && 
+              (structure_files[0] == "POSCAR.orig" || 
+               structure_files[0] == "POSCAR.relax1")){ 
+            structure_index = 0; 
+            found_structure = true; 
+            if(LDEBUG){cerr << function_name << " loaded original structure: " << structure_files[0] << endl;}
+          }
+          else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_ && 
+              (structure_files[1] == "POSCAR.relax2" || 
+               structure_files[1] == "CONTCAR.relax1")){ 
+            structure_index = 1; 
+            found_structure = true; 
+            if(LDEBUG){cerr << function_name << " loaded relax1 structure: " << structure_files[1] << endl;}
+          }
+        }
+      }
+      //DX 20200225 - added compare to particular geometry files - END
+      if(found_structure){
+        structure = entry.vstr[structure_index];
       }
       else {
         cerr << function_name << "::WARNING: More structures loaded than anticipated." << endl;
@@ -5596,7 +5631,7 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // absolute
     else{
-      double tol_length=1.0, tol_angle=5; // 1 Angstrom; 5 degrees
+      double tol_length=1.0, tol_angle=5.0; // 1 Angstrom; 5 degrees
 
       if( abs(d1(1)-d2(1)) < tol_length &&
           abs(d1(2)-d2(2)) < tol_length &&
@@ -8212,7 +8247,7 @@ namespace compare{
     vector<double> D1,F1;
     cellDiagonal(q1,D1,F1,1);
 
-    double tol_vol=0.1;
+    double tol_vol=(1.0/3.0); //DX 20200225 - used to be 0.1 (perhaps this should change depending on if we have scale volume or not)
     double det_tol=tol_vol*abs_det_q1;
 
     // ---------------------------------------------------------------------------

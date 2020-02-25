@@ -5,6 +5,7 @@
         -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
         -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
+        -- added --relaxation_step flag to --compare2database and --compare_database_entries to compare original/relax1/most_relaxed geometry files (DX)
         -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- added Patterson symmetry analysis; denoted "pgroupk_Patterson" (applies to reciprocal space only) (DX)
         -- compare Patterson point symmetry to Laue point group as consistency check (DX)

@@ -1579,14 +1579,14 @@ namespace pflow {
                  structure_files[0] == "POSCAR.relax1")){ 
               structure_index = 0; 
               found_structure = true; 
-              if(LDEBUG){cerr << function_name << " orig geoms" << endl;}
+              if(LDEBUG){cerr << function_name << " loaded original structure: " << structure_files[0] << endl;}
             }
             else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_ && 
                 (structure_files[1] == "POSCAR.relax2" || 
                  structure_files[1] == "CONTCAR.relax1")){ 
               structure_index = 1; 
               found_structure = true; 
-              if(LDEBUG){cerr << function_name << " relax geoms" << endl;}
+              if(LDEBUG){cerr << function_name << " loaded relax1 structure: " << structure_files[1] << endl;}
             }
           }
         }
@@ -1952,6 +1952,26 @@ namespace pflow {
       message << "OPTIONS: Structure type (POSCAR.orig, POSCAR.relax1, POSCAR.relax2, CONTCAR.relax1, ...): " << geometry_file << endl; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
+    
+    // ---------------------------------------------------------------------------
+    // FLAG: specify the relaxation step to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
+    uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
+    bool load_most_relaxed_structure_only = true; 
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")) {
+      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "orig") || 
+          aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")) == 0){
+        relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
+        load_most_relaxed_structure_only = false;
+      }
+      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "relax1") || 
+          aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "middle_relax") || 
+          aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")) == 1){
+        relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
+        load_most_relaxed_structure_only = false;
+      }
+      message << "OPTIONS: Relaxation step (0=original, 1=relax1, 2=most_relaxed): " << relaxation_step << endl; 
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
 
     // ---------------------------------------------------------------------------
     // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
@@ -2136,7 +2156,7 @@ namespace pflow {
       str_proto_tmp.stoichiometry=tmp_reduced_stoich;
       str_proto_tmp.elements=species;
       str_proto_tmp.structure_representative_name=aurls[i];
-      str_proto_tmp.structure_representative_from="aurl";
+      str_proto_tmp.structure_representative_from="aurl,"+aurostd::utype2string<uint>(relaxation_step); //DX 20200225 - hack, perhaps make more robust
       all_structures.push_back(str_proto_tmp);
     }
     message << "Finished initializing StructurePrototype object, now spawn threads.";     
@@ -2147,7 +2167,7 @@ namespace pflow {
     vector<std::thread*> threads;
     for(uint n=0; n<num_threads; n++){
       //DX 20191107 [OBOSLETE - switch to getThreadDistribution convention] threads.push_back(std::thread(compare::generateStructures,std::ref(all_structures),std::ref(oss),start_indices[n],end_indices[n]));
-      threads.push_back(new std::thread(&compare::generateStructures, std::ref(all_structures),std::ref(oss),thread_distribution[n][0],thread_distribution[n][1])); //DX 20191107
+      threads.push_back(new std::thread(&compare::generateStructures, std::ref(all_structures),std::ref(logstream),thread_distribution[n][0],thread_distribution[n][1])); //DX 20191107 //DX 20200225 - oss to logstream
     }
     // ---------------------------------------------------------------------------
     // Join threads
@@ -2158,7 +2178,9 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // try to regenerate via one thread; sometimes multithreading does not load 
     // all structures (timeout issue)
-    compare::generateStructures(all_structures);
+    if(num_threads!=1){
+      compare::generateStructures(all_structures);
+    }
     message << "Threads complete. " << all_structures.size() << " structures. Adding properties.";     
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
@@ -2234,13 +2256,39 @@ namespace pflow {
       // instead: filter on stoichiometry after recieving AFLUX response
       //if(compare::sameStoichiometry(stoichiometry,tmp_reduced_stoich)){
       aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i]; 
-      if(!loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;}
-      if(entry.vstr.size()==1){
+      if(!loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;} //DX 20200225 - added load_most_relaxed_structure_only
+      //DX 20200225 - added compare to particular geometry files - START
+      bool found_structure = false;
+      uint structure_index = 0;
+      if(load_most_relaxed_structure_only && entry.vstr.size()==1){
+        found_structure = true;
+        structure_index = 0;
+      }
+      else if(!load_most_relaxed_structure_only){
+        if(entry.vstr.size()==3 && structure_files.size()==3){
+          if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_ && 
+              (structure_files[0] == "POSCAR.orig" || 
+               structure_files[0] == "POSCAR.relax1")){ 
+            structure_index = 0; 
+            found_structure = true; 
+            if(LDEBUG){cerr << function_name << " loaded original structure: " << structure_files[0] << endl;}
+          }
+          else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_ && 
+              (structure_files[1] == "POSCAR.relax2" || 
+               structure_files[1] == "CONTCAR.relax1")){ 
+            structure_index = 1; 
+            found_structure = true; 
+            if(LDEBUG){cerr << function_name << " loaded relax1 structure: " << structure_files[1] << endl;}
+          }
+        }
+      }
+      //DX 20200225 - added compare to particular geometry files - END
+      if(found_structure){
         // store entry from database
         StructurePrototype str_proto_tmp;
         deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
-        entry.vstr[0].SetSpecies(deque_species);
-        str_proto_tmp.structure_representative = entry.vstr[0];
+        entry.vstr[structure_index].SetSpecies(deque_species);
+        str_proto_tmp.structure_representative = entry.vstr[structure_index];
         str_proto_tmp.structure_representative.ReScale(1.0); //DX 20191105
         str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
         str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX 20190718 - update xstructure.directoryr
@@ -2248,9 +2296,9 @@ namespace pflow {
         str_proto_tmp.structure_representative_from="aurl";
         str_proto_tmp.stoichiometry=tmp_reduced_stoich;
         str_proto_tmp.elements=species;
-        str_proto_tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX 20191031
-        str_proto_tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX 20191031
-        str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]);
+        str_proto_tmp.number_of_atoms = entry.vstr[structure_index].atoms.size(); //DX 20191031
+        str_proto_tmp.number_of_types = entry.vstr[structure_index].num_each_type.size(); //DX 20191031
+        str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]);
         //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX 20190711
         str_proto_tmp.property_names = property_list; //DX 20190326
         str_proto_tmp.property_units = property_units; //DX 20190326
