@@ -1516,26 +1516,26 @@ namespace pflow {
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX 20190425 - START
-      if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << pflow::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << compare::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){
         if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST").empty()) {
           //vector<string> vinput;
           //if(aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),vinput,",")==2){cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
           //else {cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
-          cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;
+          cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;
         } //CO200106 - patching for auto-indenting
-        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty()) {cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
-        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty()) {cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
+        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
+        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
       }
       //DX 20190425 - END
-      if(vpflow.flag("COMPARE_PERMUTATION")) {cout << pflow::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX 20190201
+      if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX 20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF190329 - GFA
       // DX AND COREY - START
       if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
       // DX AND COREY - END
       if(vpflow.flag("STRUCTURE2ANRL")) {cout << anrl::structure2anrl(cin,vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("COMPARE2PROTOTYPES")) {cout << pflow::printMatchingPrototypes(cin,vpflow); _PROGRAMRUN=true;} //DX 20190314
-      if(vpflow.flag("COMPARE2DATABASE")) {cout << pflow::compare2database(cin, vpflow); _PROGRAMRUN=true;} //DX 20190201
+      if(vpflow.flag("COMPARE2PROTOTYPES")) {cout << compare::printMatchingPrototypes(cin,vpflow); _PROGRAMRUN=true;} //DX 20190314
+      if(vpflow.flag("COMPARE2DATABASE")) {cout << compare::printCompare2Database(cin, vpflow); _PROGRAMRUN=true;} //DX 20190201
       if(vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY")) {pflow::GeneralizedStackingFaultEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO190520
       if(vpflow.flag("PREPARE_CHGCAR_4_JMOL")) {cout << bader_functions::prepare_CHGCAR_4_Jmol(vpflow); _PROGRAMRUN=true;}
       //DAVID
@@ -1720,7 +1720,7 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(cin,aurostd::args2utype(argv,"--inflate_volume|--ivolume",1.0)); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(vpflow.getattachedscheme("INFLATE_LATTICE"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(vpflow.getattachedscheme("INFLATE_VOLUME"),cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << pflow::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX 20200131
+      if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << compare::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX 20200131
       // L
       if(vpflow.flag("LATTICEREDUCTION")) {cout << pflow::LATTICEREDUCTION(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}

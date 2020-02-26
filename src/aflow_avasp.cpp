@@ -1829,7 +1829,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     vector<string> parameters; aurostd::string2tokens(xvasp.AVASP_parameters,parameters,",");
     if(aurostd::string2utype<double>(parameters[0])<=0.0){
       string catalog = "anrl";
-      vector<string> existing_prototype_labels = pflow::getMatchingPrototypes(xstr_orig,catalog); //DX 20190326 - use unpocc'd structure
+      vector<string> existing_prototype_labels = compare::getMatchingPrototypes(xstr_orig,catalog); //DX 20190326 - use unpocc'd structure //DX 20200226 - update namespace to compare
       if(existing_prototype_labels.size()){
         //DX 20190326 - added if-statement cases - START
         // contains degrees of freedom

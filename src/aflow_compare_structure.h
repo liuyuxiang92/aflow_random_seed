@@ -75,6 +75,12 @@ namespace compare{
   structure_misfit initialize_misfit_struct(bool magnetic=false);
 }
 
+//DX 20200225 - temp struct; working on more robust scheme
+struct matching_structure {
+  string name;
+  double misfit;
+};
+
 // ===== StructurePrototype Class ===== //
 class StructurePrototype{
   public:
@@ -152,11 +158,12 @@ class StructurePrototype{
 namespace compare{
 
   // ===== Main functions ===== //
+  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20190425
   vector<StructurePrototype> compareStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX 20200103 - condensed bools to xoptions
   vector<StructurePrototype> compareStructuresFromDirectory(string& directory, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX 20200103 - condensed bools to xoptions
   vector<StructurePrototype> compareStructuresFromFile(string& filename, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX 20200103 - condensed bools to xoptions
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory); //DX 20190319 - added FileMESSAGE
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options); //DX 20200103 - condensed bools to xoptions 
+  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, ostream& logstream=cout); //DX 20190319 - added FileMESSAGE
+  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options, ostream& logstream=cout); //DX 20200103 - condensed bools to xoptions 
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
       bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, ostream& oss); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
@@ -164,12 +171,46 @@ namespace compare{
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overco, returns true (match), false (no match) //DX 20191108 - remove const & from bools
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match);  //DX 20191108 - remove const & from bools
   double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match); //Overloaded, returns misfit value //DX 20191108 - remove const & from bools
+  
+  // ---------------------------------------------------------------------------
+  // comparisons to AFLOW database 
+  vector<StructurePrototype> compare2database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20200225
+  vector<StructurePrototype> compare2database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20200225
+  bool isMatchingStructureInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20200225
+  bool isMatchingStructureInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20200225
+  vector<matching_structure> matchingStructuresInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20200225
+  vector<matching_structure> matchingStructuresInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20200225
+  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20200225
+  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout);  //CO200225
+  string printCompare2Database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20200225
+  
+  // ---------------------------------------------------------------------------
+  // comparisons between entries in AFLOW database 
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20191125
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20191125
+  
+  // ---------------------------------------------------------------------------
+  // comparisons to AFLOW prototype library 
+  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20181004 //DX 20190314 - changed return value
+  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20181004 //DX 20190314 - changed return value
+  vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20190314 - overloaded 
+  vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190314 - overloaded 
+  string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX 20190314 
+  string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX 20190314 
+  vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX 20190314 
 
+  // ---------------------------------------------------------------------------
   // permutaion comparisons
+  string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
   vector<string> getUniquePermutations(xstructure& xstr);
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc); // add number of threads
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc, bool& optimize_match); // add number of threads and optimize matches
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc, bool& optimize_match, bool& print_misfit, ostream& oss, ofstream& FileMESSAGE); // full function //DX 20190319 - added FileMESSAGE
+  
+  // ---------------------------------------------------------------------------
+  // isopointal AFLOW prototype functions 
+  string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX 20200131 
+  vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX 20200131 
 
   //  string CompareStructures(aurostd::xoption& vpflow);
   //  string CompareStructureDirectory(aurostd::xoption& vpflow);
