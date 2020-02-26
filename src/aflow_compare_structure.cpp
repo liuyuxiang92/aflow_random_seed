@@ -1387,7 +1387,8 @@ namespace compare {
     //DX 20190508 - added keep unmatched - END
 
     // ---------------------------------------------------------------------------
-    // fix species (remove pseudopotntials, etc.) 
+    // fix species (remove pseudopotntials, etc.)
+    xstructure xstr(xstrIN);
     string species_str = aurostd::joinWDelimiter(xstr.species, ""); //DX 20200212 
     vector<string> vspecies = pflow::stringElements2VectorElements(species_str); //DX 20200212
     xstr.species = aurostd::vector2deque(vspecies); //DX 20200212 - needed to perform material comparisons with database entries
