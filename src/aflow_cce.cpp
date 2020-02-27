@@ -190,15 +190,17 @@ namespace cce {
 
     // Run correction
     CCE_core(structure, cce_vars, cce_flags);
-    if (cce_flags.flag("CORRECTABLE")) cce_vars.cce_form_energy_cell = CCE_get_formation_enthalpies(cce_vars.cce_correction, cce_vars);
+    if (cce_flags.flag("CORRECTABLE")) {
+      cce_vars.cce_form_energy_cell = CCE_get_formation_enthalpies(cce_vars.cce_correction, cce_vars);
 
-    if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-      std::cout << CCE_get_JSON(structure, cce_vars) << std::endl;
-    } else {
-      // write CCE corrections & corrected formation enthalpies per cell and atom
-      CCE_write_output(structure, cce_vars, cce_vars.cce_form_energy_cell);
-      // write CCE citation
-      CCE_write_citation(std::cout);
+      if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
+        std::cout << CCE_get_JSON(structure, cce_vars) << std::endl;
+      } else {
+        // write CCE corrections & corrected formation enthalpies per cell and atom
+        CCE_write_output(structure, cce_vars, cce_vars.cce_form_energy_cell);
+        // write CCE citation
+        CCE_write_citation(std::cout);
+      }
     }
   }
 
