@@ -2,6 +2,8 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
+        -- Fixed broken system name for aflow_proto. (ME)
+        -- Fixed plotter title and file names when ANRL parameters are present. (ME)
         -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
         -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
         -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
