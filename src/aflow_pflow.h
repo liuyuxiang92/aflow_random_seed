@@ -99,15 +99,19 @@ namespace pflow {
   void CLEANALL(istream& input);
   void CMPSTR(vector<string>);
   void COMPARE(string options);
-  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20191125
-  string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20191125
-  string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
-  //DX 20190425 [OBSOLETE] string compareStructureDirectory(aurostd::xoption& vpflow); //DAVID
-  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20190425
-  string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20181004
-  string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20181004 //CO200225
-  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow); //DX 20181004 //DX 20190314 - changed return value
-  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20190314 - overloaded 
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20191125
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20191125
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
+  //DX 20190425 [OBSOLETE - moved to XtalMatch header] string compareStructureDirectory(aurostd::xoption& vpflow); //DAVID
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20190425
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20181004
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20200225
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20181004 //CO200225
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DAVID //DX 20200225
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20181004 //DX 20190314 - changed return value
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20181004 //DX 20190314 - changed return value
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20190314 - overloaded 
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190314 - overloaded 
   // DX 9/1/17 [OBSOLETE] void DATA(string smode,istream& input);
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss=cout); // DX 9/1/17 - SGDATA + JSON
   void DATA1(string options,istream& input);
@@ -136,7 +140,7 @@ namespace pflow {
   string GEOMETRY(istream& input); //CO191110
   bool GetCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry //DX 20191107 - int to uint
   bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear //DX 20191107 - int to uint
-  vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX 20190314 
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX 20190314 
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF190329
   void GULP(istream& input);
   void HKL(string options,_aflags &aflags,istream& input);
@@ -167,8 +171,8 @@ namespace pflow {
   string LATTICE_TYPE(istream& input);
   string LATTICE_LATTICE_TYPE(istream& input);
   string listPrototypeLabels(aurostd::xoption& vpflow); //DX 20181004
-  string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX 20200131 
-  vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX 20200131 
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX 20200131 
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX 20200131 
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
   //START - all relevent functions for loading entries here
@@ -383,8 +387,8 @@ namespace pflow {
   void POCC(vector<string>);
   string POSCAR2AFLOWIN(istream& input, const string& ="");  // Modified ME 181113
   void POSCAR2WYCKOFF(istream& input);
-  string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX 20190314 
-  string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX 20190314 
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX 20190314 
+  //DX 20200225 [OBSOLETE - moved to XtalMatch header] string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX 20190314 
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO 180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); // DX 1/23/18 - added more robust QE reader

@@ -1633,7 +1633,7 @@ namespace compare{
 
       // ---------------------------------------------------------------------------
       // compare permutations
-      final_permutations = compare::runComparisonScheme(permutation_comparisons, same_species, num_proc, permutation_options, oss,FileMESSAGE,quiet); //DX 20200103 - condensed booleans to xoptions 
+      final_permutations = compare::runComparisonScheme(permutation_comparisons, same_species, num_proc, permutation_options, oss,FileMESSAGE,quiet,logstream); //DX 20200103 - condensed booleans to xoptions 
 
       // ---------------------------------------------------------------------------
       // check if matched permutations are physically possible
@@ -3936,7 +3936,7 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // compare structures 
-    vector<StructurePrototype> other_matches_schemes = compare::runComparisonScheme(comparison_groups, same_species, num_proc, check_better_matches_options, oss, FileMESSAGE, quiet); //DX 20200103 - condensed booleans to xoptions
+    vector<StructurePrototype> other_matches_schemes = compare::runComparisonScheme(comparison_groups, same_species, num_proc, check_better_matches_options, oss, FileMESSAGE, quiet,logstream); //DX 20200103 - condensed booleans to xoptions
 
     // ---------------------------------------------------------------------------
     // check if there are any better matches and reorganize if necessary
@@ -4001,6 +4001,7 @@ namespace compare{
       bool& ICSD_comparison, ostringstream& oss){
     string function_name = "compare::compareDuplicateCompounds()";
     ostream& logstream = cout;
+    bool quiet = false;
     stringstream message;
     ofstream FileMESSAGE;
 
@@ -4027,7 +4028,7 @@ namespace compare{
 
     message << "Running comparisons to remove duplicate compounds ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    vector<StructurePrototype> final_prototypes_reduced = compare::runComparisonScheme(duplicate_check_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE); //DX 20200103 - condensed booleans to xoptions
+    vector<StructurePrototype> final_prototypes_reduced = compare::runComparisonScheme(duplicate_check_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE, quiet, logstream); //DX 20200103 - condensed booleans to xoptions
 
     return final_prototypes_reduced;
 
@@ -4475,13 +4476,13 @@ namespace compare{
 
     // regroup comparisons based on misfit value
     if(num_mismatches==0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){
-      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX 20200103
+      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet, logstream); //DX 20200103
     }
 
     // Loop: continue comparison until all strucutures are matched or all comparisons schemes exhaused
     while(num_mismatches!=0){
       // regroup comparisons based on misfit value
-      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX 20200103
+      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet, logstream); //DX 20200103
 
       // return if only one round of comparison is requested
       if(comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){return final_prototypes;}
@@ -4563,7 +4564,7 @@ namespace compare{
     // end of while loop
 
     // append new prototype groupings
-    compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX 20200103
+    compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet, logstream); //DX 20200103
     //DX ORIG 20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
     return final_prototypes;
   }
