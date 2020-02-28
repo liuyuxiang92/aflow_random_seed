@@ -239,6 +239,12 @@ namespace plotter {
     if (filename.empty()) {
       string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
       if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
+      // ME200228 - Remove ANRL parameters
+      string::size_type t = default_title.find(":ANRL=");
+      if (t != string::npos) {
+        default_title = default_title.substr(0, t);
+        if(LDEBUG){std::cerr << soliloquy << " default_title (post ANRL)=" << default_title << std::endl;}
+      }
       filename = default_title;
       // Get filename
       string ext = plotoptions.getattachedscheme("EXTENSION");
@@ -298,6 +304,14 @@ namespace plotter {
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, ".");
+      // ME200228 - title may contain ANRL parameters
+      if ((tokens.size() > 2) && aurostd::substring2bool(tokens[2], "ANRL")) {
+        string::size_type t = tokens[2].find_first_of(":");
+        if (t != string::npos) {
+          tokens[2] = tokens[2].substr(0, t);
+          tokens.erase(tokens.begin() + 3, tokens.end());
+        }
+      }
       if ((tokens.size() == 2) || (tokens.size() == 3)) {
         string proto = tokens[1];
         vector<string> protos;
