@@ -404,7 +404,7 @@ namespace KBIN {
         if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1") || aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")){
           stringstream message;
           ostream& oss = cout;
-          message << "SPIN is not ON. REMOVE_RELAX_1/2 will be switched off.";
+          message << "SPIN is OFF. REMOVE_RELAX_1/2 will be switched off.";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE;
           vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
