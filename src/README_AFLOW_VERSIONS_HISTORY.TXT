@@ -1,5 +1,6 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME & RF)
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
         -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
