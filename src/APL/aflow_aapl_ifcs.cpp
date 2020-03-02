@@ -176,7 +176,7 @@ namespace apl {
       }
       if (d == ndir) {
         string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, _aflowFlags, *messageFile, std::cout, 'W');
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, _aflowFlags, *messageFile, std::cout, _LOGGER_WARNING_);
         zerostate_chgcar = false;
       } else {
         chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");

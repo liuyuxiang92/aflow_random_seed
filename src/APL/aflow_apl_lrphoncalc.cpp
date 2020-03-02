@@ -84,7 +84,7 @@ namespace apl {
   bool LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
     if (zerostate_chgcar) {
       string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout, 'W');
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout, _LOGGER_WARNING_);
     }
     bool stagebreak = false;
 

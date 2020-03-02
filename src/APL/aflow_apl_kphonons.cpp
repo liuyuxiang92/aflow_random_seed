@@ -1550,7 +1550,7 @@ namespace KBIN {
         phcalc.awake(hibfile);
       } catch (aurostd::xerror& e) {
         message = e.error_message + " Skipping awakening...";
-        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, std::cout, 'W');
+        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
         awakeHarmIFCs = false;
       }
     }
@@ -1658,7 +1658,7 @@ namespace KBIN {
             if (o == 3) message += "3rd";
             else message += aurostd::utype2string<int>(o) + "th";
             message = excpt.error_message + " order anharmonic IFCs.";
-            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
+            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
             awakeAnharmIFCs = false;
           }
         }
@@ -1675,7 +1675,7 @@ namespace KBIN {
                   USER_CUTOFF_DISTANCE[o-3], o, logger, aflags);
             } catch (aurostd::xerror excpt) {
               message = excpt.error_message;
-              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
+              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
               awakeClusterSet = false;
             }
           }
@@ -1721,7 +1721,7 @@ namespace KBIN {
       }
       if (d == ndir) {
         string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, 'W');
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
         USER_ZEROSTATE_CHGCAR = false;
       } else {
         string chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");

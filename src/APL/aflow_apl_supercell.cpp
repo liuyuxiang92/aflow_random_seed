@@ -929,7 +929,7 @@ namespace apl {
         << " not map the AFLOW standard primitive cell to the supercell."
         << " Phonon dispersions will be calculated using the original"
         << " structure instead.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *messageFile, std::cout, 'W');
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *messageFile, std::cout, _LOGGER_WARNING_);
     }
   }
 
@@ -1065,7 +1065,7 @@ namespace apl {
         stringstream message;
         message << e.error_message;
         message << " The splitting of shells by symmetry has failed [" << i << "]. Continuing without this...";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *messageFile, std::cout, 'W');
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *messageFile, std::cout, _LOGGER_WARNING_);
         useSplitShells = false;
         for (uint j = 0; j < sh.size(); j++) {
           sh[j].removeSplitBySymmetry();
