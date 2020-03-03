@@ -52,12 +52,12 @@ namespace cce {
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
   void CCE_command_line(aurostd::xoption& flags);
-  vector<double> CCE(string directory_path);
-  vector<double> CCE(xstructure& structure, string functional);
+  vector<double> CCE_correct(string directory_path);
+  vector<double> CCE_correct(xstructure& structure, string functional);
   void CCE_web(aurostd::xoption& flags, istream&); // ME 200213
   void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
   // write user instructions
-  void CCE_print_usage(ostream& oss);
+  string CCE_print_usage();
   // read user input (from command line or directory path)
   xstructure CCE_read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   void CCE_get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
@@ -115,8 +115,8 @@ namespace cce {
   vector<double> CCE_get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME 200213
   // write output and citation
   string CCE_get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME 200213
-  void CCE_write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
-  void CCE_write_citation(ostream& oss);
+  string CCE_write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
+  string CCE_write_citation();
   // aflow_cce_data.cpp load corrections and other data
   string CCE_get_corrections_line(const string& cor_identifier);
   string CCE_get_electronegativities_ox_nums(const string& element);

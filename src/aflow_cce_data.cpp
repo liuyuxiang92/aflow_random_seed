@@ -14,11 +14,6 @@
 #include "aflow_pflow.h"
 #include "aflow_cce.h"
 
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::abs;
-
 namespace cce {
   //CCE_get_corrections_line////////////////////////////////////////////////////////
   // function to get corrections
@@ -153,8 +148,8 @@ namespace cce {
   // this is confirmed by the Allred and Rochow electronegativities that are all very similar for all lanthanides
   string CCE_get_electronegativities_ox_nums(const string& element) {
   //Allen electronegativities of the elements
-  //element                  electro- #pref.     #ox.     pref.      all ox.                       unpref.
-  //                         neg.     ox. stat.  stat.    ox. stat.  stat.                         ox. stat.
+  //element                  electro- #pref.     #ox.     pref.      all ox.
+  //                         neg.     ox. stat.  stat.    ox. stat.  stat.
   if (element=="H")   {return "2.300  1          2        +1         +1,-1";}
   if (element=="Li")  {return "0.912  1          1        +1         +1";}
   if (element=="Na")  {return "0.869  1          1        +1         +1";}

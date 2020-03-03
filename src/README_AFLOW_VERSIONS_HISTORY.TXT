@@ -2,7 +2,7 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- updated and restructured CCE for PBE, LDA and SCAN (RF)
         -- added CCE functions for command line, web tool, and internal AFLOW use (RF)
-        -- CCE now based on determining oxidation numbers automatically from structure and Allen electronegativities (RF)
+        -- CCE can now determine oxidation numbers automatically from structure and Allen electronegativities (RF)
         -- added CCE function to determine oxidation numbers from Allen electronegativities (RF)
         -- added CCE function to get number of neighbors for all atoms (RF)
         -- added CCE function to get number of neighbors of a certain type for all atoms (RF)
