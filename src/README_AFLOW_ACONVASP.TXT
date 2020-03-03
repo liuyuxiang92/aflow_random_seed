@@ -746,7 +746,7 @@ LATTICES = (the ones with "")
         Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
         It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
         same sequence as the corresponding atoms in the provided POSCAR file.
-        A json file with the correction data can be obtained using the option --print=json
+        Output in json format can be obtained using the option --print=json
 
   aflow --chgcar2jvxl=|--c2j=CHGCAR11[,CHGCAR2,...]::CUTOFF1,CUTOFF2...[::DOWNSAMPLE1,DOWNSAMPLE2,...]
                               |CHGCAR1,CUTOFF1[,DOWNSAMPLE1:CHGCAR2,CUTOFF2[,DOWNSAMPLE2:...]]
@@ -2643,7 +2643,7 @@ LATTICES = (the ones with "")
         Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
         It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
         same sequence as the corresponding atoms in the provided POSCAR file.
-        A json file with the correction data can be obtained using the option --print=json
+        Output in json format can be obtained using the option --print=json
 
   aflow --poscar2enum < POSCAR
         Convert a POSCAR into an input format for MULTIENUM (partial occupation).

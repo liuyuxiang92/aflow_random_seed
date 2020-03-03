@@ -21,12 +21,10 @@ The corrections depend on the number of cation-anion bonds and on the cation oxi
 The current implementation requires a structure file in VASP5 POSCAR format as input and will 
 return the CCE corrections for the DFT formation energies for PBE, LDA and SCAN if the oxidation 
 numbers can be determined.
-The oxidation numbers can be determined in two ways:
-- automatically based on the structure and Allen electronegativities (if no oxidation numbers 
-are given as input) or
-- as specified by the user as an input option
+The oxidation numbers can be provided by the user or can be automatically determined from the
+structure using Allen electronegativities.
 In addition, the user can provide precalculated DFT formation energies for PBE, LDA and SCAN and the 
-implementation will directly calculate and return the CCE formation enthalpies at both 298.15 and 0K.
+implementation will directly calculate and return the CCE formation enthalpies at both 298.15 and 0 K.
 If DFT formation energies are provided as additional input, the functionals corresponding to those 
 energies are required. They need to be given in the same sequence as the precalculated DFT formation 
 energies they correspond to.
@@ -35,7 +33,7 @@ be PBE (default).
 Details for the options available are explained in the following.
 
 (ii) AVAILABLE OPTIONS:
---cce                       Prints these user instructions.
+--cce                       Prints user instructions.
 --cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP5 POSCAR format.
 --dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies, 
                             they are assumed to be: (i) negative for compounds lower in energy 
@@ -51,6 +49,8 @@ Details for the options available are explained in the following.
                             assumed that: (i) one is provided for each atom of the structure and 
                             (ii) they are in the same sequence as the corresponding atoms in the 
                             provided POSCAR file.
+--poscar2cce < POSCAR       Determines the CCE corrections for the structure in file POSCAR (must
+                            be in VASP5 POSCAR format).
 
 (iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
 Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)

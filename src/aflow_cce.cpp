@@ -399,6 +399,8 @@ namespace cce {
     oss << "                            assumed that: (i) one is provided for each atom of the structure and" << endl; 
     oss << "                            (ii) they are in the same sequence as the corresponding atoms in the" << endl;
     oss << "                            provided POSCAR file." << endl;
+    oss << "--poscar2cce < POSCAR       Determines the CCE corrections for the structure in file POSCAR (must" << endl;
+    oss << "                            be in VASP5 POSCAR format)." << endl;
     oss << endl;
     oss << "(iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:" << endl;
     oss << "Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)" << endl;
