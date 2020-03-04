@@ -14,7 +14,7 @@ namespace cce {
   struct CCE_Variables {
     vector<double> dft_energies;
     vector<string> vfunctionals; // should be needed as long as output for corrected dft formation energies is based on vfunctionals
-    vector<uint> offset; // needed for reading corrections from lookup table for different functionals
+    vector<int> offset; // needed for reading corrections from lookup table for different functionals
     double standard_anion_charge;
     vector<double> electronegativities;
     vector<uint> multi_anion_atoms; // vector in which elements will be 1 for multi_anion atoms and 0 otherwise
@@ -51,19 +51,17 @@ namespace cce {
   // for command line use, 
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
-  void CCE_command_line(aurostd::xoption& flags);
+  void CCE(aurostd::xoption& flags);
   vector<double> CCE_correct(string directory_path);
   vector<double> CCE_correct(xstructure& structure, string functional);
-  void CCE_web(aurostd::xoption& flags, istream&); // ME 200213
+  void CCE(aurostd::xoption& flags, std::istream& ist); // ME 200213
   void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
-  // write user instructions
-  string CCE_print_usage();
   // read user input (from command line or directory path)
   xstructure CCE_read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   void CCE_get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
-  string CCE_get_offset(const string& functional);
+  int CCE_get_offset(const string& functional);
   vector<double> CCE_get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
-  string CCE_get_functional_from_aflow_in(const xstructure& structure, string& directory_path);
+  string CCE_get_functional_from_aflow_in(const xstructure& structure, string& aflowin_file);
   // initialise flags and variables
   aurostd::xoption CCE_init_flags(); // ME 200213
   CCE_Variables CCE_init_variables(const xstructure&); // ME 200213
@@ -117,6 +115,8 @@ namespace cce {
   string CCE_get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME 200213
   string CCE_write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string CCE_write_citation();
+  // write user instructions
+  string CCE_print_usage();
   // aflow_cce_data.cpp load corrections and other data
   string CCE_get_corrections_line(const string& cor_identifier);
   string CCE_get_electronegativities_ox_nums(const string& element);

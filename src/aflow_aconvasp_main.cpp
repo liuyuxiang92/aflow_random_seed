@@ -1843,8 +1843,8 @@ namespace pflow {
       if(vpflow.flag("RMCOPIES")) {cout << pflow::RMCOPIES(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RASMOL")) {pflow::RASMOL(vpflow.getattachedscheme("RASMOL"),cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION")) {cce::CCE_command_line(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::CCE_web(vpflow, std::cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION")) {cce::CCE(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::CCE(vpflow, std::cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RMATOM")) {cout << pflow::RMATOM(cin,aurostd::args2utype(argv,"--rm_atom",(int) (0))); _PROGRAMRUN=true;}
       // S
       if(vpflow.flag("SHELL")) {pflow::SHELL(vpflow.getattachedscheme("SHELL"),cin); _PROGRAMRUN=true;}

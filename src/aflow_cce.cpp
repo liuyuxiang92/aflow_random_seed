@@ -19,8 +19,8 @@ using std::cerr;
 using std::endl;
 
 #define CCE_DEBUG false
-static string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U_ICSD,exp"; // when adding a new functional also introduce new 'offset' in CCE_get_offset function needed for reading corrections from lookup table
-static string CCE_default_output_functionals = "PBE,LDA,SCAN,exp"; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
+static const string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U_ICSD,exp"; // when adding a new functional also introduce new 'offset' in CCE_get_offset function needed for reading corrections from lookup table
+static const string CCE_default_output_functionals = "PBE,LDA,SCAN,exp"; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
 static const double _CCE_NN_DIST_TOL_ = 0.5; // 0.5 Ang tolerance between shortest and longest bonds for each cation-anion pair; works best up to now; in future maybe bonding could be explicitly determined via Bader analysis
 static const double _CCE_NN_DIST_TOL_MULTI_ANION_ = 0.4; // 0.4 Ang tolerance between shortest and longest bonds for each bond when testing for multi-anion compound; it was found that the standard 0.5 Ang tol. is too large such that different anions appear to be bonded, which would prevent anions to be detected as such
 static const double _CCE_OX_TOL_ = 0.001; // choose small finite value since sum of oxidation states might not be exactly zero due to numerics
@@ -41,7 +41,7 @@ namespace cce {
   // main CCE function for command line use 
   // for reading input, analyzing structure, determining oxidation numbers, assigning corrections, 
   // calculating total corrections and corrected formation enthalpies, and writing output
-  void CCE_command_line(aurostd::xoption& flags){
+  void CCE(aurostd::xoption& flags) {
     //bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
 
     /************************************/
@@ -86,7 +86,7 @@ namespace cce {
     cce_flags.flag("CORRECTABLE",TRUE); // first assuming that formation energy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
     CCE_core(structure, cce_vars, cce_flags);
 
-    // CALCULATE CORRECTED FORMATION ENTHALPIES AT 298.15 AND 0K #########################################################################################################################################
+    // CALCULATE CORRECTED FORMATION ENTHALPIES AT 298.15 AND 0K ###################################
     if (cce_flags.flag("CORRECTABLE")){
       //calculate CCE corrected DFT formation enthalpies if precalculated DFT formation energies are provided
       for(uint k=0,ksize=cce_vars.vfunctionals.size();k<ksize;k++){ // looping over and checking of vfunctionals is necessary to ensure correct correspondence between given formation energies [k] and corrections with respect to the functional
@@ -120,11 +120,18 @@ namespace cce {
   // for setting parameters, analyzing structure, determining oxidation numbers, assigning corrections,
   // calculating total corrections, converting correction vector, and returning corrections
   vector<double> CCE_correct(string directory_path) { 
+    string soliloquy="cce::CCE_correct():";
+    stringstream message;
     // get structure from POSCAR.static in directory
     string poscar_path=directory_path + "/CONTCAR.relax2";
     xstructure structure=CCE_read_structure(poscar_path); // AFLOW seems to automatically unzip and rezip zipped files so that only the file name without zipping extension needs to be given
     // get functional from aflow.in in directory
-    string functional=CCE_get_functional_from_aflow_in(structure, directory_path);
+    string aflowin_file= directory_path + "/" + _AFLOWIN_;
+    string functional=CCE_get_functional_from_aflow_in(structure, aflowin_file);
+    if (functional.empty()) {
+      message << "Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U_ICSD.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
     return CCE_correct(structure, functional);
   } // main CCE function for calling inside AFLOW with directory path
 
@@ -136,7 +143,7 @@ namespace cce {
   // calculating total corrections, converting correction vector, and returning corrections
   //vector<double> CCE(xstructure& structure) { // OLD: functional will be automatically determined during Bader charge analysis for the current implementation, later when using e.g. electronegativities, it might be needed as input
   vector<double> CCE_correct(xstructure& structure, string functional) { // functional needed as input when determining oxidation numbers from electronegativities
-    string soliloquy="cce::CCE():";
+    string soliloquy="cce::CCE_correct():";
     stringstream message;
     CCE_Variables cce_vars = CCE_init_variables(structure);
     aurostd::xoption cce_flags = CCE_init_flags();
@@ -146,12 +153,12 @@ namespace cce {
     if(functional!="exp"){
       functional=aurostd::toupper(functional);
     }
-    if (!aurostd::withinList(vallowed_functionals, functional)) {
+    if (!aurostd::withinList(vallowed_functionals, functional) || CCE_get_offset(functional) == -1) {
       message << "Unknown functional " << functional << ". Please choose PBE, LDA, or SCAN.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     cce_vars.vfunctionals.push_back(functional);
-    cce_vars.offset.push_back(aurostd::string2utype<uint>(CCE_get_offset(functional)));
+    cce_vars.offset.push_back(CCE_get_offset(functional));
     // run correction
     CCE_core(structure, cce_vars, cce_flags);
     // cce_vars.cce_corrections can be returned directly since there is always only one functional for this CCE function
@@ -160,10 +167,10 @@ namespace cce {
 
 
 
-  //CCE_web///////////////////////////////////////////////////////////////////////
+  //CCE///////////////////////////////////////////////////////////////////////
   // ME 200213
   // For poscar2cce
-  void CCE_web(aurostd::xoption& flags, std::istream& ist) {
+  void CCE(aurostd::xoption& flags, std::istream& ist) {
     // initialize
     aurostd::xoption cce_flags = CCE_init_flags();
     if (!(aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON")) {
@@ -220,7 +227,7 @@ namespace cce {
     cce_vars.cce_form_energy_cell.clear();
     cce_vars.cce_form_energy_cell.resize(cce_vars.vfunctionals.size()*2);
 
-    // DETERMINE NUMBER OF NEAREST ANION NEIGHBORS FOR EACH CATION: STRUCTURAL PART OF CORRECTION ######################################################################################################
+    // DETERMINE NUMBER OF NEAREST ANION NEIGHBORS FOR EACH CATION: STRUCTURAL PART OF CORRECTION ##
     /********************************************************/
     // Determine anion species
     /********************************************************/
@@ -265,7 +272,7 @@ namespace cce {
     }
 
 
-    // DETERMINE CORRECTION FOR EACH CATION: OXIDATION STATE DEPENDENT PART OF COORECTION ##############################################################################################################
+    // DETERMINE CORRECTION FOR EACH CATION: OXIDATION STATE DEPENDENT PART OF COORECTION ##########
     /********************************************************/
     // Assign oxidation numbers
     /********************************************************/
@@ -300,7 +307,7 @@ namespace cce {
     }
 
 
-    // CALCULATE CCE CORRECTIONS AT 298.15 AND 0K ######################################################################################################################################################
+    // CALCULATE CCE CORRECTIONS AT 298.15 AND 0K ##################################################
     // calculate CCE correction if the system is correctable
     if (cce_flags.flag("CORRECTABLE")){
       // calculate total correction per cell only using cations although 
@@ -352,87 +359,6 @@ namespace cce {
   } // main CCE function core
 
 
-
-  /////////////////////////////////////////////////////////////////////////////
-  //                                                                         //
-  //                         WRITE USER INSTRUCTIONS                         //
-  //                                                                         //
-  /////////////////////////////////////////////////////////////////////////////
-
-  //CCE_print_usage////////////////////////////////////////////////////////
-  // For printing user instructions if no additional input is provided.
-  string CCE_print_usage() {
-    stringstream oss;
-    oss << endl;
-    oss << "Written by Rico Friedrich, Corey Oses, and Marco Esters, 2019-2020" << endl;
-    oss << endl;
-    oss << "USER INSTRUCTIONS:" << endl;
-    oss << endl;
-    oss << "(i) GENERAL INFORMATION:" << endl;
-    oss << "Implementation to obtain corrected DFT formation enthalpies based on the coordination corrected" << endl; 
-    oss << "enthalpies (CCE) methodology described in:" << endl; 
-    oss << "Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);" << endl;
-    oss << "https://doi.org/10.1038/s41524-019-0192-1" << endl;
-    oss << "Please cite this article when using this method and/or this implementation." << endl;
-    oss << "The corrections depend on the number of cation-anion bonds and on the cation oxidation state." << endl;
-    oss << "More general information and a list of elements and oxidation states for which corrections are available" << endl; 
-    oss << "can be found in README_AFLOW_CCE.TXT." << endl;
-    oss << endl;
-    oss << "(ii) AVAILABLE OPTIONS:" << endl;
-    oss << "--cce                       Prints these user instructions." << endl;
-    oss << "--cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP5 POSCAR format." << endl; 
-    oss << "--dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies," << endl; 
-    oss << "                            they are assumed to be: (i) negative for compounds lower in energy" << endl; 
-    oss << "                            than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
-    oss << "                            for PBE, LDA and SCAN." << endl;
-    oss << "--functionals=              Provide a comma separated list of functionals for which corrections" << endl;
-    oss << "                            should be returned. If used together with --dft_formation energies," << endl;
-    oss << "                            the functionals must be in the same sequence as the DFT formation" << endl;
-    oss << "                            energies they correspond to. Available functionals are:" << endl;
-    oss << "                            (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation" << endl; 
-    oss << "                            energy is provided)." << endl;
-    oss << "--oxidation_numbers=        Provide as a comma separated list the oxidation numbers. It is" << endl;
-    oss << "                            assumed that: (i) one is provided for each atom of the structure and" << endl; 
-    oss << "                            (ii) they are in the same sequence as the corresponding atoms in the" << endl;
-    oss << "                            provided POSCAR file." << endl;
-    oss << "--poscar2cce < POSCAR       Determines the CCE corrections for the structure in file POSCAR (must" << endl;
-    oss << "                            be in VASP5 POSCAR format)." << endl;
-    oss << endl;
-    oss << "(iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:" << endl;
-    oss << "Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)" << endl;
-    oss << "1.224745" << endl;
-    oss << "   0.00000000000000   1.73568248770103   1.73568248770103" << endl;
-    oss << "   1.73568248770103   0.00000000000000   1.73568248770103" << endl;
-    oss << "   1.73568248770103   1.73568248770103   0.00000000000000" << endl;
-    oss << "Mg O" << endl;
-    oss << "1 1" << endl;
-    oss << "Direct(2) [A1B1]" << endl;
-    oss << "   0.00000000000000   0.00000000000000   0.00000000000000  Mg" << endl;
-    oss << "   0.50000000000000   0.50000000000000   0.50000000000000  O" << endl;
-    oss << endl;
-    oss << "(iv) EXAMPLE COMMANDS:" << endl;
-    oss << "Assuming that AFLOW is in your PATH and you saved the above example structure file for MgO" << endl; 
-    oss << "in the current directory as POSCAR, the following commands can be executed:" << endl;
-    oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN" << endl;
-    oss << "This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA, and SCAN for MgO." << endl;
-    oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_energies=-6.220 --functionals=LDA" << endl;
-    oss << "This gives you only the CCE corrections and CCE formation enthalpies for LDA." << endl;
-    oss << endl;
-    oss << "aflow --cce=POSCAR --dft_formation_energies=-5.434" << endl;
-    oss << "This gives you the CCE corrections and CCE formation enthalpies for PBE with a warning that" << endl; 
-    oss << "PBE is assumed as functional." << endl;
-    oss << endl;
-    oss << "aflow --cce=POSCAR" << endl;
-    oss << "This gives you the CCE corrections for PBE, LDA, and SCAN and a rough guess of the formation" << endl;
-    oss << "enthalpy based on experimental formation enthalpies per bond." << endl;
-    oss << endl;
-    oss << "aflow --cce=POSCAR --oxidation_numbers=2,-2" << endl;
-    oss << "Oxidation numbers for each atom can also be provided as input." << endl;
-    oss << endl;
-    return oss.str();
-  }
 
   /////////////////////////////////////////////////////////////////////////////
   //                                                                         //
@@ -513,11 +439,11 @@ namespace cce {
       if(LDEBUG){
         cerr << "cce_vars.vfunctionals[" << k << "]: " << cce_vars.vfunctionals[k] << endl;
       }
-      if (!aurostd::withinList(vallowed_functionals, cce_vars.vfunctionals[k])) {
+      if (!aurostd::withinList(vallowed_functionals, cce_vars.vfunctionals[k]) || CCE_get_offset(cce_vars.vfunctionals[k]) == -1) {
         message << "Unknown functional " << cce_vars.vfunctionals[k] << ". Please choose PBE, LDA, or SCAN.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      cce_vars.offset.push_back(aurostd::string2utype<uint>(CCE_get_offset(cce_vars.vfunctionals[k])));
+      cce_vars.offset.push_back(CCE_get_offset(cce_vars.vfunctionals[k]));
     }
     // if only structure (and oxidation numbers) are provided, corrections should be given for PBE, LDA, and SCAN 
     // and the CCE@exp formation enthalpy from the exp. formation enthalpies per bond
@@ -526,7 +452,11 @@ namespace cce {
       vector<string> vdefault_functionals;
       aurostd::string2tokens(CCE_default_output_functionals, vdefault_functionals, ",");
       for(uint k=0,ksize=vdefault_functionals.size();k<ksize;k++){
-        cce_vars.vfunctionals.push_back(vdefault_functionals[k]); cce_vars.offset.push_back(aurostd::string2utype<uint>(CCE_get_offset(vdefault_functionals[k])));
+        if (CCE_get_offset(vdefault_functionals[k]) == -1) {
+          message << "Unknown functional " << cce_vars.vfunctionals[k] << ". Please choose PBE, LDA, or SCAN.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+        }
+        cce_vars.vfunctionals.push_back(vdefault_functionals[k]); cce_vars.offset.push_back(CCE_get_offset(vdefault_functionals[k]));
       }
     }
     if(LDEBUG){
@@ -541,13 +471,13 @@ namespace cce {
 
   //CCE_get_offset////////////////////////////////////////////////////////
   // get offset needed for reading corrections from lookup table for different functionals
-  string CCE_get_offset(const string& functional) {
-  if (functional=="PBE")          {return "0";}
-  if (functional=="LDA")          {return "2";}
-  if (functional=="SCAN")         {return "4";}
-  if (functional=="PBE+U_ICSD")   {return "6";}
-  if (functional=="exp")          {return "8";}
-  else {return "";}
+  int CCE_get_offset(const string& functional) {
+  if (functional=="PBE")          {return 0;}
+  if (functional=="LDA")          {return 2;}
+  if (functional=="SCAN")         {return 4;}
+  if (functional=="PBE+U_ICSD")   {return 6;}
+  if (functional=="exp")          {return 8;}
+  else {return -1;}
   }
 
   //CCE_get_oxidation_states////////////////////////////////////////////////////////
@@ -591,16 +521,22 @@ namespace cce {
 
   //CCE_get_functional_from_aflow_in////////////////////////////////////////////////////////
   // determine the functional from the aflow_in
-  string CCE_get_functional_from_aflow_in(const xstructure& structure, string& directory_path) {
+  string CCE_get_functional_from_aflow_in(const xstructure& structure, string& aflowin_file) {
     string soliloquy="cce::CCE_get_functional_from_aflow_in():";
     stringstream message;
-    string functional = "PBE"; // plain PBE calculation is default
-    string aflow_in_path=directory_path + "/aflow.in";
-    string aflowIn = aurostd::RemoveComments(aurostd::file2string(aflow_in_path));
+    string functional = "";
+    string aflowIn = aurostd::RemoveComments(aurostd::file2string(aflowin_file));
     vector<string> vlines = aurostd::string2vectorstring(aflowIn);
     string line_a;
     bool ldau = false;
     bool ldau2 = false;
+    // check whether it is a PBE calculation; PBE+U will be checked later
+    for (uint i = 0; i < vlines.size(); i++) {
+      line_a = aurostd::RemoveSpaces(vlines[i]);
+      if (line_a.find("=potpaw_PBE") != string::npos || line_a.find("/potpaw_PBE") != string::npos){
+        functional = "PBE";
+      }
+    }
     // check whether it is a DFT+U calculation with parameters as for the ICSD (PBE+U_ICSD calculation)
     // first check whether it is an LDAU2 calculation
     for (uint i = 0; i < vlines.size(); i++) { 
@@ -2341,6 +2277,8 @@ namespace cce {
   // compare Bader charges to template values from fitting set and set oxidation numbers accordingly
   vector<double> CCE_Bader_charges_to_oxidation_states(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars, string& functional) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy="cce::CCE_Bader_charges_to_oxidation_states():";
+    stringstream message;
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if (structure.atoms[i].name != cce_vars.anion_species){
         string Bader_templ_line;
@@ -2368,7 +2306,11 @@ namespace cce {
             // here the functional determined from the aflow.in is decisive; exp should not occur
             vector<string> vfunctional_aflow_in;
             vfunctional_aflow_in.push_back(functional);
-            uint offset=aurostd::string2utype<uint>(CCE_get_offset(functional)); // define also local offset variable since offset must correspond to functional detected from aflow.in
+            if (CCE_get_offset(functional) == -1) {
+              message << "Unknown functional " << functional << ". Please choose PBE, LDA, or SCAN.";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+            }
+            int offset=CCE_get_offset(functional); // define also local offset variable since offset must correspond to functional detected from aflow.in
             for (uint i = 0; i < vfunctional_aflow_in.size(); i++) {
               Bader_template = aurostd::string2utype<double>(Bader_tokens[offset/2+2+5*n]);
               if(LDEBUG){
@@ -2987,6 +2929,81 @@ namespace cce {
     oss << "Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);" << endl; 
     oss << "https://doi.org/10.1038/s41524-019-0192-1" << endl;
     oss << "#########################################################################################################" << endl;
+    oss << endl;
+    return oss.str();
+  }
+
+  //CCE_print_usage////////////////////////////////////////////////////////
+  // For printing user instructions if no additional input is provided.
+  string CCE_print_usage() {
+    stringstream oss;
+    oss << endl;
+    oss << "Written by Rico Friedrich, Corey Oses, and Marco Esters, 2019-2020" << endl;
+    oss << endl;
+    oss << "USER INSTRUCTIONS:" << endl;
+    oss << endl;
+    oss << "(i) GENERAL INFORMATION:" << endl;
+    oss << "Implementation to obtain corrected DFT formation enthalpies based on the coordination corrected" << endl; 
+    oss << "enthalpies (CCE) methodology described in:" << endl; 
+    oss << "Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);" << endl;
+    oss << "https://doi.org/10.1038/s41524-019-0192-1" << endl;
+    oss << "Please cite this article when using this method and/or this implementation." << endl;
+    oss << "The corrections depend on the number of cation-anion bonds and on the cation oxidation state." << endl;
+    oss << "More general information and a list of elements and oxidation states for which corrections are available" << endl; 
+    oss << "can be found in README_AFLOW_CCE.TXT." << endl;
+    oss << endl;
+    oss << "(ii) AVAILABLE OPTIONS:" << endl;
+    oss << "--cce                       Prints these user instructions." << endl;
+    oss << "--cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP5 POSCAR format." << endl; 
+    oss << "--dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies," << endl; 
+    oss << "                            they are assumed to be: (i) negative for compounds lower in energy" << endl; 
+    oss << "                            than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
+    oss << "                            for PBE, LDA and SCAN." << endl;
+    oss << "--functionals=              Provide a comma separated list of functionals for which corrections" << endl;
+    oss << "                            should be returned. If used together with --dft_formation energies," << endl;
+    oss << "                            the functionals must be in the same sequence as the DFT formation" << endl;
+    oss << "                            energies they correspond to. Available functionals are:" << endl;
+    oss << "                            (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation" << endl; 
+    oss << "                            energy is provided)." << endl;
+    oss << "--oxidation_numbers=        Provide as a comma separated list the oxidation numbers. It is" << endl;
+    oss << "                            assumed that: (i) one is provided for each atom of the structure and" << endl; 
+    oss << "                            (ii) they are in the same sequence as the corresponding atoms in the" << endl;
+    oss << "                            provided POSCAR file." << endl;
+    oss << "--poscar2cce < POSCAR       Determines the CCE corrections for the structure in file POSCAR (must" << endl;
+    oss << "                            be in VASP5 POSCAR format)." << endl;
+    oss << endl;
+    oss << "(iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:" << endl;
+    oss << "Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)" << endl;
+    oss << "1.224745" << endl;
+    oss << "   0.00000000000000   1.73568248770103   1.73568248770103" << endl;
+    oss << "   1.73568248770103   0.00000000000000   1.73568248770103" << endl;
+    oss << "   1.73568248770103   1.73568248770103   0.00000000000000" << endl;
+    oss << "Mg O" << endl;
+    oss << "1 1" << endl;
+    oss << "Direct(2) [A1B1]" << endl;
+    oss << "   0.00000000000000   0.00000000000000   0.00000000000000  Mg" << endl;
+    oss << "   0.50000000000000   0.50000000000000   0.50000000000000  O" << endl;
+    oss << endl;
+    oss << "(iv) EXAMPLE COMMANDS:" << endl;
+    oss << "Assuming that AFLOW is in your PATH and you saved the above example structure file for MgO" << endl; 
+    oss << "in the current directory as POSCAR, the following commands can be executed:" << endl;
+    oss << endl;
+    oss << "aflow --cce=POSCAR --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN" << endl;
+    oss << "This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA, and SCAN for MgO." << endl;
+    oss << endl;
+    oss << "aflow --cce=POSCAR --dft_formation_energies=-6.220 --functionals=LDA" << endl;
+    oss << "This gives you only the CCE corrections and CCE formation enthalpies for LDA." << endl;
+    oss << endl;
+    oss << "aflow --cce=POSCAR --dft_formation_energies=-5.434" << endl;
+    oss << "This gives you the CCE corrections and CCE formation enthalpies for PBE with a warning that" << endl; 
+    oss << "PBE is assumed as functional." << endl;
+    oss << endl;
+    oss << "aflow --cce=POSCAR" << endl;
+    oss << "This gives you the CCE corrections for PBE, LDA, and SCAN and a rough guess of the formation" << endl;
+    oss << "enthalpy based on experimental formation enthalpies per bond." << endl;
+    oss << endl;
+    oss << "aflow --cce=POSCAR --oxidation_numbers=2,-2" << endl;
+    oss << "Oxidation numbers for each atom can also be provided as input." << endl;
     oss << endl;
     return oss.str();
   }
