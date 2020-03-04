@@ -46,8 +46,14 @@ namespace apl {
 
   void DirectMethodPC::clear(Supercell& sc, _xinput& xinput,
       _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
-    DirectMethodPC that(sc, xinput, aflags, kflags, xflags, AflowIn, mf);
-    copy(that);
+    free();
+    _supercell = sc;
+    _xInput = xinput;
+    _aflowFlags =  aflags;
+    _kbinFlags = kflags;
+    _xFlags = xflags;
+    _AflowIn = AflowIn;
+    messageFile = &mf;
   }
 
   void DirectMethodPC::copy(const DirectMethodPC& that) {

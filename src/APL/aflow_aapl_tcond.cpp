@@ -76,9 +76,7 @@ namespace apl {
   //Constructor///////////////////////////////////////////////////////////////
   TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) : _pc(pc), _qm(qm), _logger(l), aflags(a) {
     free();
-    nBranches = _pc.getNumberOfBranches();
-    nQPs = _qm.getnQPs();
-    nIQPs = _qm.getnIQPs();
+    initialize();
   }
 
   //Copy Constructor//////////////////////////////////////////////////////////
@@ -133,8 +131,18 @@ namespace apl {
 
   //clear/////////////////////////////////////////////////////////////////////
   void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) {
-    TCONDCalculator that(pc, qm, l, a);
-    copy(that);
+    free();
+    _pc = pc;
+    _qm = qm;
+    _logger = l;
+    aflags = a;
+    initialize();
+  }
+
+  void TCONDCalculator::initialize() {
+    nBranches = _pc.getNumberOfBranches();
+    nQPs = _qm.getnQPs();
+    nIQPs = _qm.getnIQPs();
   }
 
 }  // namespace apl

@@ -109,9 +109,14 @@ namespace apl {
 
   //clear/////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::clear(_xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, ClusterSet& _clst, ofstream& fm) {
-    AnharmonicIFCs that(xinput, aflags, kflags, xflags, _clst, fm);
-    copy(that); 
+      _xflags& xflags, ClusterSet& _clst, ofstream& mf) {
+    free();
+    _xInput = xinput;
+    _aflowFlags = aflags;
+    _kbinFlags = kflags;
+    _xFlags = xflags;
+    clst = _clst;
+    messageFile = &mf;
   }
 
 

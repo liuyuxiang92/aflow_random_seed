@@ -75,8 +75,8 @@ namespace apl {
   }
 
   void LTMethod::clear(QMesh& qm) {
-    LTMethod that(qm);
-    copy(that);
+    free();
+    _qm = qm;
   }
 
 }  // namespace apl

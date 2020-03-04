@@ -231,13 +231,14 @@ namespace apl {
     // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
     public:
       ClusterSet();
-      ClusterSet(const Supercell&, const int&, double&, Logger&, _aflags&);  // Constructor
-      ClusterSet(const string&, const Supercell&, const int&, double&, int, Logger&, _aflags&);  // From file
+      ClusterSet(const Supercell&, int, double, Logger&, _aflags&);  // Constructor
+      ClusterSet(const string&, const Supercell&, int, double, int, Logger&, _aflags&);  // From file
       ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
       ClusterSet(Logger&, _aflags&);  // Does nothing - used as a placeholder for non-AAPL calculations
       ~ClusterSet();  // Destructor
       const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
       void clear(Logger&, _aflags&);
+      void initialize(const Supercell&, int, double);
 
       vector<_cluster> clusters;
       vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
@@ -269,11 +270,11 @@ namespace apl {
       void free();
       void copy(const ClusterSet&);
 
-      double getMaxRad(const xstructure&, const int&);
+      double getMaxRad(const xstructure&, int);
       void buildShells();
       vector<_cluster> buildClusters();
       vector<vector<int> > getSymmetryMap();
-      vector<vector<int> > getPermutations(const int&);
+      vector<vector<int> > getPermutations(int);
 
       // Clusters
       void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
@@ -1646,6 +1647,7 @@ namespace apl {
 
       ~TCONDCalculator();
       void clear(PhononCalculator&, QMesh&, Logger&, _aflags&);
+      void initialize();
 
       aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
       vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point

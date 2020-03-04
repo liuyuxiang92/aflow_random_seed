@@ -29,51 +29,20 @@ static const string _AAPL_CLUSTER_ERR_PREFIX_ = "apl::ClusterSet::";
 namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
-  ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
-      double& cut_rad, Logger& l, _aflags& a) : _logger(l), aflags(a) {
-    free();  // Clear old vectors
-    _logger << "CLUSTER: Building coordination shells." << apl::endl;
-
-    scell = supercell.getSupercellStructure();
-    pcell = supercell.getInputStructure();
-    sc_dim = supercell.scell;
-    pc2scMap = supercell._pc2scMap;
-    sc2pcMap = supercell._sc2pcMap;
-    symmetry_map = getSymmetryMap();
-
-    if (cut_shell > 0) {
-      double max_rad = getMaxRad(scell, cut_shell);
-      if (max_rad > cut_rad) {
-        // globally changes CUT_RAD
-        _logger << "Cutoff has been modified to " << max_rad << " Angstroms." << apl::endl;
-        cut_rad = max_rad;
-      }
-    }
-    cutoff = cut_rad;
-    buildShells();
+  ClusterSet::ClusterSet(const Supercell& supercell, int cut_shell,
+      double cut_rad, Logger& l, _aflags& a) : _logger(l), aflags(a) {
+    free();
+    initialize(supercell, cut_shell, cut_rad);
   }
 
   //From file
   ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
-      const int& cut_shell, double& cut_rad,
-      int _order, Logger& l, _aflags& a) : _logger(l), aflags(a) {
+      int cut_shell, double cut_rad, int _order, Logger& l, _aflags& a) : _logger(l), aflags(a) {
     free();  // Clear old vectors
+    initialize(supercell, cut_shell, cut_rad);
     _logger << "Reading ClusterSet from file " << aurostd::CleanFileName(filename) << apl::endl;
 
     order = _order;
-    scell = supercell.getSupercellStructure();
-    pcell = supercell.getInputStructure();
-    sc_dim = supercell.scell;
-    pc2scMap = supercell._pc2scMap;
-    sc2pcMap = supercell._sc2pcMap;
-    if (cut_shell > 0) {
-      double max_rad = getMaxRad(scell, cut_shell);
-      if (max_rad > cut_rad) {
-        // globally changes CUT_RAD
-        cut_rad = max_rad;
-      }
-    }
-    cutoff = cut_rad;
     readClusterSetFromFile(filename);
     // Necessary for AAPL calculations; since these calculations are
     // quick, they are not stored in the output file
@@ -128,16 +97,20 @@ namespace apl {
   //free//////////////////////////////////////////////////////////////////////
   // Clears all vectors and resets all values.
   void ClusterSet::free() {
+    clusters.clear();
     coordination_shells.clear();
     cutoff = 0.0;
     distortion_vectors.clear();
     higher_order_ineq_distortions.clear();
     ineq_clusters.clear();
     ineq_distortions.clear();
+    linear_combinations.clear();
     nifcs = 0;
     order = 0;
     pc2scMap.clear();
+    pcell.clear();
     permutations.clear();
+    scell.clear();
     sc_dim.clear();
     sc2pcMap.clear();
     symmetry_map.clear();
@@ -147,8 +120,26 @@ namespace apl {
   //clear/////////////////////////////////////////////////////////////////////
   // Creates an empty ClusterSet object.
   void ClusterSet::clear(Logger& l, _aflags& a) {
-    ClusterSet that(l, a);
-    copy(that);
+    free();
+    _logger = l;
+    aflags = a;
+  }
+
+  void ClusterSet::initialize(const Supercell& supercell, int cut_shell, double cut_rad) {
+    scell = supercell.getSupercellStructure();
+    pcell = supercell.getInputStructure();
+    sc_dim = supercell.scell;
+    pc2scMap = supercell._pc2scMap;
+    sc2pcMap = supercell._sc2pcMap;
+    if (cut_shell > 0) {
+      double max_rad = getMaxRad(scell, cut_shell);
+      if (max_rad > cut_rad) {
+        // globally changes CUT_RAD
+        _logger << "Cutoff has been modified to " << max_rad << " Angstroms." << apl::endl;
+        cut_rad = max_rad;
+      }
+    }
+    cutoff = cut_rad;
   }
 
 }  // namespace apl
@@ -240,7 +231,7 @@ namespace apl {
   ///getMaxRad////////////////////////////////////////////////////////////////
   // Returns the largest coordination shell for all inequivalent atoms using
   // cut_shell coordination shells.
-  double ClusterSet::getMaxRad(const xstructure& cell, const int& cut_shell){
+  double ClusterSet::getMaxRad(const xstructure& cell, int cut_shell){
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_) || _DEBUG_AAPL_CLUSTERS_;
     if (cut_shell > 0) {
       int countshell = 0;
@@ -287,6 +278,7 @@ namespace apl {
   // Creates coordination shells around the atoms of the primitive cell.
   void ClusterSet::buildShells() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
+    _logger << "CLUSTER: Building coordination shells." << apl::endl;
     int at1sc = 0;
     vector<int> shell;
     coordination_shells.clear();
@@ -347,6 +339,7 @@ namespace apl {
       throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
     }
     _logger << "CLUSTER: Building clusters of order " << order << "." << apl::endl;
+    buildShells();
     nifcs = aurostd::powint(3, order);
 
     permutations = getPermutations(order);
@@ -370,7 +363,7 @@ namespace apl {
 
   //getPermutations///////////////////////////////////////////////////////////
   // Initialize permutations.
-  vector<vector<int> > ClusterSet::getPermutations(const int& order) {
+  vector<vector<int> > ClusterSet::getPermutations(int order) {
     vector<int> permut_base(order);
     vector<vector<int> > permuts;
     for (int i = 0; i < order; i++) {

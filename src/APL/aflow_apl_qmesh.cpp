@@ -109,8 +109,8 @@ namespace apl {
   }
 
   void QMesh::clear(ofstream& mf) {
-    QMesh that(mf);
-    copy(that);
+    free();
+    messageFile = &mf;
   }
 
 }  // namespace apl

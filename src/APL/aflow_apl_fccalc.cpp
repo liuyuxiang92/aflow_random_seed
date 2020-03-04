@@ -45,7 +45,13 @@ namespace apl {
 
   void ForceConstantCalculator::clear(Supercell& sc, _xinput& xinput,
       _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
-    ForceConstantCalculator that(sc, xinput, aflags, kflags, xflags, AflowIn, mf);
+    free();
+    _supercell = sc;
+    _xInput = xinput;
+    _aflowFlags =  aflags;
+    _kbinFlags = kflags;
+    _xFlags = xflags;
+    _AflowIn = AflowIn;
     messageFile = &mf;
   }
 
