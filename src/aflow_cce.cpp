@@ -89,18 +89,15 @@ namespace cce {
     // CALCULATE CORRECTED FORMATION ENTHALPIES AT 298.15 AND 0K #########################################################################################################################################
     if (cce_flags.flag("CORRECTABLE")){
       //calculate CCE corrected DFT formation enthalpies if precalculated DFT formation energies are provided
-      if(cce_vars.dft_energies.size()!=0){ // only when precalculated DFT formation energies are provided, calculate corrected values
-        for(uint k=0,ksize=cce_vars.vfunctionals.size();k<ksize;k++){ // looping over and checking of vfunctionals is necessary to ensure correct correspondence between given formation energies [k] and corrections with respect to the functional
-          if (cce_vars.vfunctionals[k] != "exp") {
+      for(uint k=0,ksize=cce_vars.vfunctionals.size();k<ksize;k++){ // looping over and checking of vfunctionals is necessary to ensure correct correspondence between given formation energies [k] and corrections with respect to the functional
+        if (cce_vars.vfunctionals[k] != "exp") {
+          if(cce_vars.dft_energies.size()!=0){ // only when precalculated DFT formation energies are provided, calculate corrected values
             // for 298.15 K
             cce_vars.cce_form_energy_cell[2*k] = cce_vars.dft_energies[k] - cce_vars.cce_correction[2*k] ;
             // for 0 K
             cce_vars.cce_form_energy_cell[2*k+1] = cce_vars.dft_energies[k] - cce_vars.cce_correction[2*k+1] ;
           }
-        }
-      } 
-      for(uint k=0,ksize=cce_vars.vfunctionals.size();k<ksize;k++){
-        if (cce_vars.vfunctionals[k] == "exp"){ // for CCE@exp the formation enthalpy (only at 298.15 K) is directly calculated from the exp. formation enthalpies per bond times the number of cation-anion bonds and is not subtracted from a given value
+        } else { // for CCE@exp the formation enthalpy (only at 298.15 K) is directly calculated from the exp. formation enthalpies per bond times the number of cation-anion bonds and is not subtracted from a given value
           cce_vars.cce_form_energy_cell[2*k] = cce_vars.cce_correction[2*k] ;
         }
       }
@@ -124,7 +121,7 @@ namespace cce {
   // calculating total corrections, converting correction vector, and returning corrections
   vector<double> CCE_correct(string directory_path) { 
     // get structure from POSCAR.static in directory
-    string poscar_path=directory_path + "/POSCAR.static";
+    string poscar_path=directory_path + "/CONTCAR.relax2";
     xstructure structure=CCE_read_structure(poscar_path); // AFLOW seems to automatically unzip and rezip zipped files so that only the file name without zipping extension needs to be given
     // get functional from aflow.in in directory
     string functional=CCE_get_functional_from_aflow_in(structure, directory_path);
