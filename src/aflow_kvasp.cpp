@@ -2895,6 +2895,8 @@ namespace KBIN {
               //2. SYMPREC
               //3. KMAX
               //4. ISYM=0
+              // ME200304 - Do not fix when SYM=OFF
+              if (!vflags.KBIN_VASP_FORCE_OPTION_SYM.option) xfixed.flag("KKSYM_ISYM", true);
               if(apply_new_kksym_fix==true && xwarning.flag("KKSYM")){
                 if(xfixed.flag("KKSYM_ISYM")==false){xfixed.flag("KKSYM",FALSE);} //CO181226 last step, and xwarning.flag("KKSYM") can be ignored if xfixed.flag("KKSYM_ISYM") applied
                 //aus << "WWWWW  APPLYING NEW FIXES FOR KKSYM - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
