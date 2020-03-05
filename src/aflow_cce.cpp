@@ -779,7 +779,7 @@ namespace cce {
       cce_vars.multi_anion_atoms[i] = 0; 
     }
     cce_vars.cutoffs=CCE_get_dist_cutoffs(tolerance, structure);
-    double cutoffs_max=CCE_get_dist_cutoffs_max(cce_vars.cutoffs, structure);
+    double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
     structure.GetStrNeighData(cutoffs_max,neigh_mat);
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
@@ -896,7 +896,7 @@ namespace cce {
       cerr << "STRUCTURAL ANALYSIS:" << endl;
     }
     cce_vars.cutoffs=CCE_get_dist_cutoffs(tolerance, structure);
-    double cutoffs_max=CCE_get_dist_cutoffs_max(cce_vars.cutoffs, structure);
+    double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     vector<uint> num_neighbors(structure.atoms.size());
     deque<deque<_atom> > neigh_mat;
     structure.GetStrNeighData(cutoffs_max,neigh_mat);
@@ -971,23 +971,6 @@ namespace cce {
     return cutoffs;
   }
 
-  //CCE_get_dist_cutoffs_max////////////////////////////////////////////////////////
-  // determine the maximum cutoff between all species
-  double CCE_get_dist_cutoffs_max(const vector<double>& cutoffs, const xstructure& structure) {
-    bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    double cutoffs_max=0;
-    for (uint i=0,isize=structure.species.size();i<isize;i++){
-      //cout << "cutoffs[" << i << "]= " << cutoffs[i] << endl;
-      if (cutoffs[i]>cutoffs_max){
-        cutoffs_max=cutoffs[i];
-      }
-    }
-    if(LDEBUG){
-      cerr << "cutoffs_max= " << cutoffs_max << " Ang." << endl;
-    }
-    return cutoffs_max;
-  }
-
   //CCE_check_per_super_oxides////////////////////////////////////////////////////////
   // check whether the system contains per- or superoxide ions based on the O-O bond length and set variables accordingly
   void CCE_check_per_super_oxides(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags) {
@@ -1007,7 +990,7 @@ namespace cce {
       cce_vars.superox_indices[i] = 0; 
     }
     cce_vars.cutoffs=CCE_get_dist_cutoffs(_CCE_NN_DIST_TOL_, structure);
-    double cutoffs_max=CCE_get_dist_cutoffs_max(cce_vars.cutoffs, structure);
+    double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
     structure.GetStrNeighData(cutoffs_max,neigh_mat);
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
@@ -1132,10 +1115,8 @@ namespace cce {
       CCE_treat_Co3O4_special_case(cce_vars, structure, cce_flags);
       // alkali metal sesquioxides need to be treated specially since oxidation numbers and number of per- and superoxide bonds are not recognized appropriately
       CCE_treat_alkali_sesquioxide_special_case(cce_vars, structure, cce_flags);
-      if(cce_flags.flag("OX_STATES_DETERMINED")){
-        if(cce_flags.flag("COMMAND_LINE")){
-          cout << endl;
-        }
+      if(cce_flags.flag("OX_STATES_DETERMINED") && cce_flags.flag("COMMAND_LINE")){
+        cout << endl;
       }
     }
     // if preferred oxidation states approach and mixed valence doesn't work, try to find proper oxidation states (making oxidation sum zero) by using all known oxidation states
@@ -1180,24 +1161,20 @@ namespace cce {
     if(LDEBUG){
       cerr << "ANION PART:" << endl;
     }
-    double total_anion_charge;
+    double total_anion_charge=0;
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if (structure.atoms[i].name == cce_vars.anion_species || cce_vars.multi_anion_atoms[i] == 1){
         if (structure.atoms[i].name == cce_vars.anion_species){ // for multi-anion atoms oxidation states have been assigned previously
           cce_vars.oxidation_states[i] = cce_vars.standard_anion_charge; // oxidation numbers for O are assumed to be -2 (other anions accordingly) and are corrected below if it is a per- or superoxide O atom as identified from the structural analysis in other functions
         }
         if (cce_vars.num_perox_bonds > 0){
-          for (uint j=0,jsize=structure.atoms.size();j<jsize;j++){
-            if (cce_vars.perox_indices[j]==1 && j == i){
-              cce_vars.oxidation_states[i]=-1;
-            }
+          if (cce_vars.perox_indices[i]==1){
+            cce_vars.oxidation_states[i]=-1;
           }
         }
         if (cce_vars.num_superox_bonds > 0){
-          for (uint j=0,jsize=structure.atoms.size();j<jsize;j++){
-            if (cce_vars.superox_indices[j]==1 && j == i){
-              cce_vars.oxidation_states[i]=-0.5;
-            }
+          if (cce_vars.superox_indices[i]==1){
+            cce_vars.oxidation_states[i]=-0.5;
           }
         }
         if(LDEBUG){
@@ -1272,6 +1249,7 @@ namespace cce {
     cce_vars.pref_ox_states_strings_electronegativity_sorted = cce_vars.pref_ox_states_strings;
     cce_vars.num_all_ox_states_electronegativity_sorted = cce_vars.num_all_ox_states;
     cce_vars.all_ox_states_strings_electronegativity_sorted = cce_vars.all_ox_states_strings;
+    // for the oxidation state algorithm the species, preferred and all known oxidation states of all species must be sorted by electronegativity
     aurostd::sort(electronegativities_sorted,cce_vars.species_electronegativity_sorted);
     electronegativities_sorted = cce_vars.electronegativities;
     aurostd::sort(electronegativities_sorted,cce_vars.num_pref_ox_states_electronegativity_sorted);
@@ -1330,6 +1308,8 @@ namespace cce {
   // with the actual formula Sb2O4 it is a mixed valence oxide with one Sb+3 with 4 Sb-O bonds and one Sb+5 with 6 Sb-O bonds
   void CCE_treat_SbO2_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy="cce::CCE_treat_SbO2_special_case():";
+    stringstream message;
     if ( structure.species.size() == 2 && ((structure.species[0] == "O" && structure.species[1] == "Sb") || (structure.species[0] == "Sb" && structure.species[1] == "O")) ) {
       uint num_O_before_Sb;
       if ( structure.species[0] == "O" && structure.species[1] == "Sb" ) {
@@ -1350,7 +1330,13 @@ namespace cce {
         cerr << "number of Sb ions= " << amount_Sb << endl;
         cerr << "number of O ions= " << amount_O << endl;
       }
-      double Sb_O_ratio=amount_Sb/amount_O;
+      double Sb_O_ratio;
+      if ( amount_O != 0 ){
+        Sb_O_ratio=amount_Sb/amount_O;
+      } else {
+        message << "Amount O determined to be ZERO. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+      }
       if ( Sb_O_ratio == 0.5 ){
         if(cce_flags.flag("COMMAND_LINE")){
           cout << endl;

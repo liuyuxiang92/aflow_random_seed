@@ -69,7 +69,6 @@ namespace cce {
   string CCE_determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
   vector<uint> CCE_check_for_multi_anion_system(CCE_Variables& cce_vars, double tolerance, xstructure& structure, xoption& cce_flags);
   vector<double> CCE_get_dist_cutoffs(double tolerance, const xstructure& structure);
-  double CCE_get_dist_cutoffs_max(const vector<double>& cutoffs, const xstructure& structure);
   vector<uint> CCE_get_num_neighbors(double tolerance, xstructure& structure);
   vector<uint> CCE_get_num_neighbors(const string& anion_species, double tolerance, xstructure& structure);
   vector<uint> CCE_get_num_neighbors(const string& anion_species, double tolerance, xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
