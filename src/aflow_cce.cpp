@@ -818,7 +818,7 @@ namespace cce {
           cce_flags.flag("MULTI_ANION_SYSTEM",TRUE);
           if(cce_flags.flag("COMMAND_LINE")){
             cout << endl;
-            cout << "WARNING: This system has been detected to be a multi-anion compound!" << endl;
+            cout << "This system has been detected to be a multi-anion compound!" << endl;
           }
         }
         // set multi anion atoms
