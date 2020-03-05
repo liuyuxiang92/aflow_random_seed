@@ -1365,7 +1365,7 @@ namespace cce {
                 cout << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+3: " << cce_vars.num_neighbors[i] << endl;
               }
             } else {
-              cce_vars.oxidation_states[i]=+5;
+              cce_vars.oxidation_states[i]=5;
               if(cce_flags.flag("COMMAND_LINE")){
                 cout << "setting oxidation state of " << structure.atoms[i].name << " (atom[" << i << "]) to Sb+5 " << endl;
               }
