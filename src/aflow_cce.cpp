@@ -19,8 +19,8 @@ using std::cerr;
 using std::endl;
 
 #define CCE_DEBUG false
-static const string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U_ICSD,exp"; // when adding a new functional also introduce new 'offset' in CCE_get_offset function needed for reading corrections from lookup table
-static const string CCE_default_output_functionals = "PBE,LDA,SCAN,exp"; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
+static const vector<string> CCE_vallowed_functionals={"PBE","LDA","SCAN","PBE+U_ICSD","exp"}; // when adding a new functional also introduce new 'offset' in CCE_get_offset function needed for reading corrections from lookup table
+static const vector<string> CCE_vdefault_output_functionals={"PBE","LDA","SCAN","exp"}; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
 static const double _CCE_NN_DIST_TOL_ = 0.5; // 0.5 Ang tolerance between shortest and longest bonds for each cation-anion pair; works best up to now; in future maybe bonding could be explicitly determined via Bader analysis
 static const double _CCE_NN_DIST_TOL_MULTI_ANION_ = 0.4; // 0.4 Ang tolerance between shortest and longest bonds for each bond when testing for multi-anion compound; it was found that the standard 0.5 Ang tol. is too large such that different anions appear to be bonded, which would prevent anions to be detected as such
 static const double _CCE_OX_TOL_ = 0.001; // choose small finite value since sum of oxidation states might not be exactly zero due to numerics
@@ -141,19 +141,17 @@ namespace cce {
   // main CCE function for calling inside AFLOW providing only structure (and functional) assuming that oxidation numbers will be obtained from Bader charges or electronegativities
   // for setting parameters, analyzing structure, determining oxidation numbers, assigning corrections,
   // calculating total corrections, converting correction vector, and returning corrections
-  //vector<double> CCE(xstructure& structure) { // OLD: functional will be automatically determined during Bader charge analysis for the current implementation, later when using e.g. electronegativities, it might be needed as input
+  //vector<double> CCE(xstructure& structure) // OLD: functional will be automatically determined during Bader charge analysis for the current implementation, later when using e.g. electronegativities, it might be needed as input
   vector<double> CCE_correct(xstructure& structure, string functional) { // functional needed as input when determining oxidation numbers from electronegativities
     string soliloquy="cce::CCE_correct():";
     stringstream message;
     CCE_Variables cce_vars = CCE_init_variables(structure);
     aurostd::xoption cce_flags = CCE_init_flags();
     // determine functional
-    vector<string> vallowed_functionals;
-    aurostd::string2tokens(CCE_allowed_functionals, vallowed_functionals, ",");
     if(functional!="exp"){
       functional=aurostd::toupper(functional);
     }
-    if (!aurostd::withinList(vallowed_functionals, functional) || CCE_get_offset(functional) == -1) {
+    if (!aurostd::withinList(CCE_vallowed_functionals, functional) || CCE_get_offset(functional) == -1) {
       message << "Unknown functional " << functional << ". Please choose PBE, LDA, or SCAN.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
@@ -380,12 +378,19 @@ namespace cce {
       cerr << soliloquy << endl << "INPUT STRUCTURE:" << endl;
       cerr << structure << endl;
     }
-    // if species of atoms are not known like in VASP4 format, throw error
-    if (structure.atoms[0].name == ""){
-      message << "BAD NEWS: It seems you are providing a POSCAR without species information as input. This implementation requires a POSCAR in VASP5 format with the species information included. Please adjust the structure file and rerun.";
+    // check whether there are any atoms in the structure
+    if (structure.atoms.size() == 0){
+      message << "BAD NEWS: It seems there are no atoms in the structure file. Please adjust the structure file and rerun.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
-    // if there is only one specie, it must be an elemental phase and is hence not correctable
+    // if species of atoms are not known like in VASP4 format, throw error
+    for(uint k=0,ksize=structure.atoms.size();k<ksize;k++){
+      if (structure.atoms[k].name == ""){
+        message << "BAD NEWS: It seems you are providing a POSCAR without complete species information as input. This implementation requires a POSCAR in VASP5 format with the species information included. Please adjust the structure file and rerun.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+      }
+    }
+    // if there is only one species, it must be an elemental phase and is hence not correctable
     if (structure.species.size() == 1){
       message << "BAD NEWS: There is only one species in this system. Hence it is an elemental phase whose enthalpy cannot be corrected based on the CCE methodology.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
@@ -414,8 +419,8 @@ namespace cce {
     if(functionals_input_str.empty() && cce_vars.dft_energies.size() == 1){
       message << "Setting functionals=PBE since only 1 DFT formation energy is provided and PBE is the default functional!";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-      string functionals="PBE";
-      aurostd::string2tokens(functionals,cce_vars.vfunctionals,","); // if functionals input string is not empty, convert it to vector of strings
+      cce_vars.vfunctionals.clear();
+      cce_vars.vfunctionals.push_back("PBE");
     // otherwise if sizes of provided DFT formation energies and functionals do not match, throw error
     // if only functional argument is set corrections should only be returned for desired functional
     } else if(cce_vars.dft_energies.size()!=cce_vars.vfunctionals.size() && !dft_energies_input_str.empty() ){ 
@@ -430,8 +435,6 @@ namespace cce {
       cerr << soliloquy << " input functionals=" << functionals_input_str << endl;
     }
     // determine whether it is a functional for which corrections are available
-    vector<string> vallowed_functionals;
-    aurostd::string2tokens(CCE_allowed_functionals, vallowed_functionals, ",");
     for(uint k=0,ksize=cce_vars.vfunctionals.size();k<ksize;k++){
       if(cce_vars.vfunctionals[k]!="exp"){
         cce_vars.vfunctionals[k]=aurostd::toupper(cce_vars.vfunctionals[k]);
@@ -439,7 +442,7 @@ namespace cce {
       if(LDEBUG){
         cerr << "cce_vars.vfunctionals[" << k << "]: " << cce_vars.vfunctionals[k] << endl;
       }
-      if (!aurostd::withinList(vallowed_functionals, cce_vars.vfunctionals[k]) || CCE_get_offset(cce_vars.vfunctionals[k]) == -1) {
+      if (!aurostd::withinList(CCE_vallowed_functionals, cce_vars.vfunctionals[k]) || CCE_get_offset(cce_vars.vfunctionals[k]) == -1) {
         message << "Unknown functional " << cce_vars.vfunctionals[k] << ". Please choose PBE, LDA, or SCAN.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
@@ -449,14 +452,12 @@ namespace cce {
     // and the CCE@exp formation enthalpy from the exp. formation enthalpies per bond
     // ICSD correction should only be returned when explicitly asked for
     if(functionals_input_str.empty() && dft_energies_input_str.empty()){
-      vector<string> vdefault_functionals;
-      aurostd::string2tokens(CCE_default_output_functionals, vdefault_functionals, ",");
-      for(uint k=0,ksize=vdefault_functionals.size();k<ksize;k++){
-        if (CCE_get_offset(vdefault_functionals[k]) == -1) {
+      for(uint k=0,ksize=CCE_vdefault_output_functionals.size();k<ksize;k++){
+        if (CCE_get_offset(CCE_vdefault_output_functionals[k]) == -1) {
           message << "Unknown functional " << cce_vars.vfunctionals[k] << ". Please choose PBE, LDA, or SCAN.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
-        cce_vars.vfunctionals.push_back(vdefault_functionals[k]); cce_vars.offset.push_back(CCE_get_offset(vdefault_functionals[k]));
+        cce_vars.vfunctionals.push_back(CCE_vdefault_output_functionals[k]); cce_vars.offset.push_back(CCE_get_offset(CCE_vdefault_output_functionals[k]));
       }
     }
     if(LDEBUG){
