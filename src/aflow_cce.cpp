@@ -392,7 +392,7 @@ namespace cce {
     }
     // if there is only one species, it must be an elemental phase and is hence not correctable
     if (structure.species.size() == 1){
-      message << "BAD NEWS: There is only one species in this system. Hence it is an elemental phase whose enthalpy cannot be corrected based on the CCE methodology.";
+      message << "BAD NEWS: Only one species found. Enthalpies of elemental systems cannot be corrected with the CCE methodology.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     return structure;
