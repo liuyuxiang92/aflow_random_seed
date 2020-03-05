@@ -2029,7 +2029,7 @@ namespace cce {
     }
 
     // Cycle through oxidation states
-    if (!iszero) { // maybe the oxidation numbers from the initialization work already, then nothing else needs to be tried
+    if (!iszero) { // maybe the oxidation numbers from the initialization work already, then nothing else needs to be done
       uint maxsize = 0; // maximum number of preferred or all oxidation states for a cation species in the system
       for (uint j = 0; j < num_cation_species; j++) {
         if (possible_ox_states[j].size() > maxsize) maxsize = possible_ox_states[j].size();
