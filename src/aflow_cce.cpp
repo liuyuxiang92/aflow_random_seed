@@ -1397,6 +1397,8 @@ namespace cce {
   // for Pb3O4 the oxidation states are not identified properly
   // https://en.wikipedia.org/wiki/Lead(II,IV)_oxide
   void CCE_treat_Pb3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags) {
+    string soliloquy="cce::CCE_treat_Pb3O4_special_case():";
+    stringstream message;
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     if ( structure.species.size() == 2 && ((structure.species[0] == "O" && structure.species[1] == "Pb") || (structure.species[0] == "Pb" && structure.species[1] == "O")) ) {
       uint num_O_before_Pb;
@@ -1418,7 +1420,13 @@ namespace cce {
         cerr << "number of Pb ions= " << amount_Pb << endl;
         cerr << "number of O ions= " << amount_O << endl;
       }
-      double Pb_O_ratio=amount_Pb/amount_O;
+      double Pb_O_ratio;
+      if ( amount_O != 0 ){
+        Pb_O_ratio=amount_Pb/amount_O;
+      } else {
+        message << "Amount O determined to be ZERO. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+      }
       if ( Pb_O_ratio == 0.75 ){
         if(cce_flags.flag("COMMAND_LINE")){
           cout << endl;
@@ -1481,6 +1489,8 @@ namespace cce {
   // of the respective oxidation state there are, not which one is which
   void CCE_treat_Ti_O_Magneli_phase_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy="cce::CCE_treat_Ti_O_Magneli_phase_special_case():";
+    stringstream message;
     if ( structure.species.size() == 2 && ((structure.species[0] == "O" && structure.species[1] == "Ti") || (structure.species[0] == "Ti" && structure.species[1] == "O")) ) {
       uint num_O_before_Ti;
       if ( structure.species[0] == "O" && structure.species[1] == "Ti" ) {
@@ -1504,11 +1514,17 @@ namespace cce {
         cerr << "number of O ions= " << amount_O << endl;
         cerr << "number of Ti ions= " << amount_Ti << endl;
       }
-      double Ti_O_ratio=amount_Ti/amount_O;
+      double Ti_O_ratio;
+      if ( amount_O != 0 ){
+        Ti_O_ratio=amount_Ti/amount_O;
+      } else {
+        message << "Amount O determined to be ZERO. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+      }
       if(LDEBUG){
         cerr << "ratio of Ti/O= " << Ti_O_ratio << endl;
       }
-      double num_formula_units_in_cell;
+      uint num_formula_units_in_cell;
       // check for Magneli composition Ti_(n)O_(2n-1)
       double n;
       bool magneli = false;
@@ -1582,6 +1598,8 @@ namespace cce {
   // https://en.wikipedia.org/wiki/Manganese(II,III)_oxide
   void CCE_treat_Fe3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy="cce::CCE_treat_Fe3O4_special_case():";
+    stringstream message;
     if ( structure.species.size() == 2 && ((structure.species[0] == "O" && structure.species[1] == "Fe") || (structure.species[0] == "Fe" && structure.species[1] == "O")) ) {
       uint num_O_before_Fe;
       if ( structure.species[0] == "O" && structure.species[1] == "Fe" ) {
@@ -1602,7 +1620,13 @@ namespace cce {
         cerr << "number of Fe ions= " << amount_Fe << endl;
         cerr << "number of O ions= " << amount_O << endl;
       }
-      double Fe_O_ratio=amount_Fe/amount_O;
+      double Fe_O_ratio;
+      if ( amount_O != 0 ){
+        Fe_O_ratio=amount_Fe/amount_O;
+      } else {
+        message << "Amount O determined to be ZERO. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+      }
       if ( Fe_O_ratio == 0.75 ){
         if(cce_flags.flag("COMMAND_LINE")){
           cout << endl;
@@ -1667,6 +1691,8 @@ namespace cce {
   // https://en.wikipedia.org/wiki/Manganese(II,III)_oxide
   void CCE_treat_Mn3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy="cce::CCE_treat_Mn3O4_special_case():";
+    stringstream message;
     if ( structure.species.size() == 2 && ((structure.species[0] == "O" && structure.species[1] == "Mn") || (structure.species[0] == "Mn" && structure.species[1] == "O")) ) {
       uint num_O_before_Mn;
       if ( structure.species[0] == "O" && structure.species[1] == "Mn" ) {
@@ -1687,7 +1713,13 @@ namespace cce {
         cerr << "number of Mn ions= " << amount_Mn << endl;
         cerr << "number of O ions= " << amount_O << endl;
       }
-      double Mn_O_ratio=amount_Mn/amount_O;
+      double Mn_O_ratio;
+      if ( amount_O != 0 ){
+        Mn_O_ratio=amount_Mn/amount_O;
+      } else {
+        message << "Amount O determined to be ZERO. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+      }
       if ( Mn_O_ratio == 0.75 ){
         if(cce_flags.flag("COMMAND_LINE")){
           cout << endl;
@@ -1752,6 +1784,8 @@ namespace cce {
   // https://en.wikipedia.org/wiki/Manganese(II,III)_oxide
   void CCE_treat_Co3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy="cce::CCE_treat_Co3O4_special_case():";
+    stringstream message;
     if ( structure.species.size() == 2 && ((structure.species[0] == "O" && structure.species[1] == "Co") || (structure.species[0] == "Co" && structure.species[1] == "O")) ) {
       uint num_O_before_Co;
       if ( structure.species[0] == "O" && structure.species[1] == "Co" ) {
