@@ -787,19 +787,18 @@ namespace cce {
       uint multi_anion_count=0;
       for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
         const _atom& atom=neigh_mat[i][j]; // the atom object stands for the neighbors of each atom of the structure
-        if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type] ){ // distance must be larger than _CCE_SELF_DIST_TOL_ to savely exclude the cation itself having distance zero to itself
+        if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type] ){ // distance must be larger than _CCE_SELF_DIST_TOL_ since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
           if (atom.name == cce_vars.anion_species){
             neighbors_count+=1;
           } else if (atom.name != cce_vars.anion_species && structure.atoms[i].name != cce_vars.anion_species){ // second condition set since the anion_species cannot be set as a multi-anion species again
             neighbors_count+=1;
             string electroneg_line_atom = CCE_get_electronegativities_ox_nums(structure.atoms[i].name);
             string electroneg_line_neighbor = CCE_get_electronegativities_ox_nums(atom.name);
-            vector<string> electroneg_tokens_atom;
-            vector<string> electroneg_tokens_neighbor;
-            aurostd::string2tokens(electroneg_line_atom, electroneg_tokens_atom, " "); // seems to automatically reduce the number of multiple spaces in a row to one
-            aurostd::string2tokens(electroneg_line_neighbor, electroneg_tokens_neighbor, " "); // seems to automatically reduce the number of multiple spaces in a row to one
-            double electronegativity_atom = aurostd::string2utype<double>(electroneg_tokens_atom[0]);
-            double electronegativity_neighbor = aurostd::string2utype<double>(electroneg_tokens_neighbor[0]);
+            vector<string> electroneg_tokens;
+            aurostd::string2tokens(electroneg_line_atom, electroneg_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one
+            double electronegativity_atom = aurostd::string2utype<double>(electroneg_tokens[0]);
+            aurostd::string2tokens(electroneg_line_neighbor, electroneg_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one
+            double electronegativity_neighbor = aurostd::string2utype<double>(electroneg_tokens[0]);
             if(LDEBUG){
               cerr << "electronegativity of atom " << i << ": " << electronegativity_atom << endl;
               cerr << "electronegativity of neighbor " << j << ": " << electronegativity_neighbor << endl;
@@ -907,7 +906,7 @@ namespace cce {
       uint empty_line_count=0;
       for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
         const _atom& atom=neigh_mat[i][j];
-        if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type] ){ // distance must be larger than _CCE_SELF_DIST_TOL_ to savely exclude the cation itself having distance zero to itself
+        if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type] ){ // distance must be larger than _CCE_SELF_DIST_TOL_ since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
           if (anion_species != ""){ // variable called anion type since function was developed for CCE for polar materials but it can be used to check for any atom type and only include those as neighbors
             // implement check whether each nearest neighbor is of the anion_species, otherwise throw warning; 
             if (atom.name == anion_species){
