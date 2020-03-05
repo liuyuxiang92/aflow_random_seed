@@ -489,7 +489,7 @@ namespace cce {
     if(!oxidation_numbers_input_str.empty()){
       aurostd::string2tokens<double>(oxidation_numbers_input_str,cce_vars.oxidation_states,","); //if the oxidation numbers input string is not empty, convert it to vector of doubles
       //sizes of oxidation numbers and atoms must match
-      if(!cce_vars.oxidation_states.empty() && cce_vars.oxidation_states.size()!=structure.atoms.size()){ 
+      if(cce_vars.oxidation_states.size()!=structure.atoms.size()){ 
         message << "BAD NEWS: The number of provided oxidation numbers does not match the number of atoms in the structure! Please correct and rerun.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
