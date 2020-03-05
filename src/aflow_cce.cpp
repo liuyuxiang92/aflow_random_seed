@@ -907,7 +907,7 @@ namespace cce {
       for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
         const _atom& atom=neigh_mat[i][j];
         if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type] ){ // distance must be larger than _CCE_SELF_DIST_TOL_ since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
-          if (anion_species != ""){ // variable called anion type since function was developed for CCE for polar materials but it can be used to check for any atom type and only include those as neighbors
+          if (!anion_species.empty()){ // variable called anion type since function was developed for CCE for polar materials but it can be used to check for any atom type and only include those as neighbors
             // implement check whether each nearest neighbor is of the anion_species, otherwise throw warning; 
             if (atom.name == anion_species){
               neighbors_count+=1;
