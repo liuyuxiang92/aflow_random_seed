@@ -751,7 +751,7 @@ namespace cce {
     vector<string> ox_nums_tokens_1;
     vector<string> ox_nums_tokens_2;
     aurostd::string2tokens(ox_nums_line, ox_nums_tokens_1, " "); // anion charge should be among all known oxidation states (last element of the line separated by spaces)
-    aurostd::string2tokens(ox_nums_tokens_1[ox_nums_tokens_1.size()-1], ox_nums_tokens_2, ","); // anion charge should be last (most negative) oxidation number separated by commas
+    aurostd::string2tokens(ox_nums_tokens_1.back(), ox_nums_tokens_2, ","); // anion charge should be last (most negative) oxidation number separated by commas
     cce_vars.standard_anion_charge = aurostd::string2utype<double>(ox_nums_tokens_2[ox_nums_tokens_2.size()-1]);
     if (cce_vars.standard_anion_charge > 0) {
       message << "VERY BAD NEWS: There is no known negative oxidation number for " << cce_vars.anion_species << " detected as anion species.";
