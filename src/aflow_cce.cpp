@@ -850,7 +850,7 @@ namespace cce {
         vector<string> ox_nums_tokens_1;
         vector<string> ox_nums_tokens_2;
         aurostd::string2tokens(ox_nums_line, ox_nums_tokens_1, " "); // anion charge should be among all known oxidation states (last element of the line separated by spaces)
-        aurostd::string2tokens(ox_nums_tokens_1[ox_nums_tokens_1.size()-1], ox_nums_tokens_2, ","); // anion charge should be last (most negative) oxidation number separated by commas
+        aurostd::string2tokens(ox_nums_tokens_1.back(), ox_nums_tokens_2, ","); // anion charge should be last (most negative) oxidation number separated by commas
         cce_vars.oxidation_states[i] = aurostd::string2utype<double>(ox_nums_tokens_2[ox_nums_tokens_2.size()-1]);
         if(LDEBUG){
           cerr << "Oxidation state for atom " << i << " (" << structure.atoms[i].name << ") has been set to: " << cce_vars.oxidation_states[i] << endl;
