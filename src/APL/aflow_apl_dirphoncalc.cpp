@@ -475,9 +475,9 @@ namespace apl {
         message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
           << std::setw(2) << _supercell.getSupercellStructure().atoms[id].cleanname
           << ") will be distorted in direction ["
-          << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](1) << ","
-          << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](2) << ","
-          << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](3) << "].";
+          << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](1) << ","
+          << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](2) << ","
+          << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](3) << "].";
         pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
       }
     }

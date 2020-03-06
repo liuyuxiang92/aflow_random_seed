@@ -32,6 +32,7 @@ static const string _ANHARMONIC_IFCS_FILE_[2] = {"anharmonicIFCs_3rd.xml", "anha
 static const string _CLUSTER_SET_FILE_[2] = {"clusterSet_3rd.xml", "clusterSet_4th.xml"};
 static const int _NUM_RELAX_ = 2; //ME181226
 static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME181226  // ME190125
+static const string _APL_STATIC_PREFIX_ = "static_apl";  // ME200302
 
 namespace apl {
   // ME190119
@@ -60,6 +61,14 @@ namespace KBIN {
     // Store original settings
     string prec = vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme;
     bool prec_entry = vflags.KBIN_VASP_FORCE_OPTION_PREC.isentry;
+    aurostd::xoption kbin_vasp_run = vflags.KBIN_VASP_RUN;
+
+    // Change to RELAX
+    vflags.KBIN_VASP_RUN.flag("RELAX", true);
+    vflags.KBIN_VASP_RUN.flag("STATIC", false);
+    vflags.KBIN_VASP_RUN.flag("RELAX_STATIC", false);
+    vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS", false);
+    vflags.KBIN_VASP_RUN.flag("STATIC_BANDS", false);
 
     // Change to phonon settings
     string prec_phonons = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_PREC");
@@ -201,7 +210,75 @@ namespace KBIN {
     vflags.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str("");
     vflags.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP << kbin_vasp_kpoints_explicit_start_stop_back;
     xvasp.NRELAX = nrelax;
+    vflags.KBIN_VASP_RUN = kbin_vasp_run;
 
+    return Krun;
+  }
+
+  // ME200203
+  bool staticCalculationAPL_VASP(_xvasp& xvasp,
+      _aflags& aflags,
+      _kflags& kflags,
+      _vflags& vflags,
+      const string& AflowIn,
+      ofstream& fileMESSAGE) {
+    string function = "KBIN::staticCalculationAPL_VASP()";
+    bool Krun = true;
+    // Check if qmvasp contains static information (indicator that static calculation was run)
+    string qmvaspfile = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AFLOW_QMVASP_OUT);
+    bool calc_static = !(aurostd::EFileExist(qmvaspfile) || aurostd::FileExist(qmvaspfile));
+    if (!calc_static) {
+      // Check if it contains the static keyword
+      bool found = false;
+      vector<string> vlines;
+      aurostd::efile2vectorstring(qmvaspfile, vlines);
+      uint nlines = vlines.size();
+      uint iline = 0;
+      for (iline = 0; iline < nlines && !found; iline++) {
+        found = aurostd::substring2bool(vlines[iline], "START_" + _APL_STATIC_PREFIX_);
+      }
+      if (iline == nlines) {  // Not found
+        calc_static = true;
+      } else { // Check that START and STOP are found
+        found = false;
+        for (; iline < nlines && !found; iline++) {
+          found = aurostd::substring2bool(vlines[iline], "STOP_" + _APL_STATIC_PREFIX_);
+        }
+        if (iline == nlines) {
+          pflow::logger(_AFLOW_FILE_NAME_, function, "qmvasp file broken", aflags, fileMESSAGE, std::cout, _LOGGER_ERROR_);
+          Krun = false;
+        } else {
+          calc_static = false;
+        }
+      }
+    }
+    // Perform static calculation
+    if (Krun && calc_static) {
+      ostringstream aus;
+      // Store original settings
+      aurostd::xoption kbin_vasp_run = vflags.KBIN_VASP_RUN;
+      bool poscar_preserved = xvasp.aopts.flag("FLAG::POSCAR_PRESERVED");
+      // Set to static
+      vflags.KBIN_VASP_RUN.flag("STATIC", true);
+      vflags.KBIN_VASP_RUN.flag("RELAX", false);
+      vflags.KBIN_VASP_RUN.flag("RELAX_STATIC", false);
+      vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS", false);
+      vflags.KBIN_VASP_RUN.flag("STATIC_BANDS", false);
+      xvasp.aopts.flag("FLAG::POSCAR_PRESERVED", true);
+      xvasp.NRELAX = -1;
+
+      Krun = (Krun && VASP_Produce_and_Modify_INPUT(xvasp, AflowIn, fileMESSAGE, aflags, kflags, vflags, true));
+      XVASP_INCAR_Relax_Static_ON(xvasp, vflags);  // Sets good DOS parameters
+      if (Krun) Krun = (Krun && VASP_Write_INPUT(xvasp, vflags));
+      if (Krun) {
+        aus << 11111 << "  STATIC - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << std::endl;
+        aurostd::PrintMessageStream(fileMESSAGE, aus, XHOST.QUIET);
+        Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_STATIC_PREFIX_, true, fileMESSAGE);
+      }
+      // Restore
+      vflags.KBIN_VASP_RUN = kbin_vasp_run;
+      xvasp.aopts.flag("FLAG::POSCAR_PRESERVED", poscar_preserved);
+    }
     return Krun;
   }
 
@@ -405,6 +482,7 @@ namespace KBIN {
       if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "TPT") {USER_TPT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
     }
+    bool USER_STATIC = USER_RELAX;  // ME200302
 
     /***************************** CHECK PARAMETERS *****************************/
 
@@ -415,6 +493,7 @@ namespace KBIN {
     // Do not relax with --generate_aflowin_only option
     if (XHOST.GENERATE_AFLOWIN_ONLY && USER_RELAX) {
       USER_RELAX = false;
+      USER_STATIC = false;  // ME200302
       logger << apl::warning << "RELAX will be switched OFF for generate_aflowin_only." << apl::endl;
     }
     // ME 190313 - END
@@ -1419,6 +1498,41 @@ namespace KBIN {
       supercell.initialize(xinput.getXStr());
     }
 
+    // ME200302 - Static calculation
+    if (USER_STATIC) {
+      bool Krun = true;
+      string function;
+      if (xinput.AFLOW_MODE_VASP) {
+        function = "KBIN::staticCalculationAPL_VASP()";
+        Krun = staticCalculationAPL_VASP(xinput.xvasp, aflags, kflags, xflags.vflags, AflowIn, messageFile);
+      }
+      if (!Krun) {
+        string message = "Static calculation did not run successfully.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      }
+      // Detect appropriate smearing method for TYPE=DEFAULT
+      if (xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme[0] == 'D') {
+        message = "[VASP_FORCE_OPTION]TYPE=DEFAULT. Attempting to determine best smearing method for force calculations.";
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags.Directory, messageFile, std::cout);
+        string doscarfile = aurostd::CleanFileName(aflags.Directory + "/DOSCAR." + _APL_STATIC_PREFIX_);
+        if (aurostd::FileExist(doscarfile) || aurostd::FileExist(doscarfile)) {
+          xDOSCAR xdos;
+          xdos.GetPropertiesFile(doscarfile, true);
+          if (xdos.GetBandGap()) {
+            if (xdos.Egap_type_net == "insulator") xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme = "INSULATOR";
+            else xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme = "METAL";
+            xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.content_string = xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme;
+          } else {
+            message = "Could not determine band gap. Smearing method cannot be determined automatically.";
+            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags.Directory, messageFile, std::cout, _LOGGER_WARNING_);
+          }
+        } else {
+          message = "Could not find file " + doscarfile + ". Smearing method cannot be determined automatically.";
+          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags.Directory, messageFile, std::cout, _LOGGER_WARNING_);
+        }
+      }
+    }
+
     // Build after relaxations are done
     supercell.build(scell_dims);
     if (USER_MAXSHELL > 0) supercell.setupShellRestrictions(USER_MAXSHELL);
@@ -1909,7 +2023,6 @@ namespace KBIN {
       return;
     }
     //PINKU QHA/SCQHA/QHA3P  END
-
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //

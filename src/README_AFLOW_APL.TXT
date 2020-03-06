@@ -79,8 +79,10 @@ forces. This can be achieved in one of two ways:
 
     These are also the default values. Setting RELAX=ON makes APL run two relaxation calculations
     with the precision given in PREC. This method is especially useful when a relaxed structure
-    already exists. The input and output files are saved in XXXCAR.relax_phononsN with N = 1,2.
-    For more information on the PREC option, see Section 2.1.1.
+    already exists. The input and output files are saved in XXXCAR.relax_aplN with N = 1,2.
+    For more information on the PREC option, see Section 2.1.1. APL will also perform a static
+    calculation, which can be used by POCC. The static calculation will also determine whether to
+    use Gaussian or Methfessel-Paxton smearing when TYPE=DEFAULT.
 
     APL automatically chooses the k-point grid for the relaxation to be commensurate with the
     k-point grid for the supercell. For example, if a 3x2x1 supercell uses a 2x2x3 k-point gird,
