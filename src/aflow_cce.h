@@ -87,21 +87,21 @@ namespace cce {
   void CCE_treat_Mn3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   void CCE_treat_Co3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   void CCE_treat_alkali_sesquioxide_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  // following special cases only needed when determining oxidation states from Bader charges
+  void CCE_treat_MnMoO4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void CCE_treat_Ca2Fe2O5_CaFe2O4_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void CCE_treat_FeTiO3_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   void CCE_try_all_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
   void CCE_determine_cation_oxidation_states(const vector<vector<double> >& possible_ox_states, const xstructure& structure, CCE_Variables& cce_vars); // ME Nov. 2019
-  void CCE_print_oxidation_states_and_sum(CCE_Variables& cce_vars, const xstructure& structure);
+  double CCE_print_oxidation_states_and_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   double CCE_print_oxidation_states_and_get_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   double CCE_get_oxidation_states_sum(CCE_Variables& cce_vars);
   double CCE_get_oxidation_states_sum(CCE_Variables& cce_vars, xoption& cce_flags);
   // determine oxidation numbers from Bader charges (outdated)
   vector<double> CCE_get_oxidation_states_from_Bader(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars);
-  void CCE_get_system_name_functional_from_aflow_in(string& system_name, xoption& cce_flags, string& functional, CCE_Variables& cce_vars);
+  void CCE_get_system_name_functional_from_aflow_in(const xstructure& structure, string& system_name, xoption& cce_flags, string& functional, CCE_Variables& cce_vars);
   vector<double> CCE_get_Bader_charges_from_Bader_file(const string& Bader_file, const xstructure& structure, CCE_Variables& cce_vars);
   vector<double> CCE_Bader_charges_to_oxidation_states(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars, string& functional);
-  // following special cases only needed when determining oxidation states from Bader charges
-  void CCE_treat_MnMoO4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_Ca2Fe2O5_CaFe2O4_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_FeTiO3_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   void CCE_general_attempt_fixing_oxidation_states(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   // assign corrections
   void CCE_get_corrections(xoption& cce_flags, const xstructure& structure, vector<vector<double> >& corrections_atom, CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species);
