@@ -2405,6 +2405,8 @@ namespace cce {
     return cce_vars.oxidation_states;
   }
 
+  // following special cases only needed when determining oxidation states from Bader charges
+
   //CCE_treat_MnMoO4_special_case////////////////////////////////////////////////////////
   // for MnMoO4 the oxidation numbers are determined to be +4 for both Mn and Mo from the Bader charges; 
   // it should be Mn+2 & Mo+6; however since the sum of the falsely determined oxidation numbers 
