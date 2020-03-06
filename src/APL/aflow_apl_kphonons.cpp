@@ -143,7 +143,7 @@ namespace KBIN {
     // Update structure - do not set xvasp.str = str_fin or all other
     // information (species, PPs) will be deleted!
     stringstream xstr;
-    string filename = "CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(_NUM_RELAX_);  // ME190308
+    string filename = aflags.Directory + "/CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(_NUM_RELAX_);  // ME190308
     if (!aurostd::FileExist(filename)) return false;
     aurostd::file2stringstream(filename, xstr);
     xstructure str_fin(xstr, IOVASP_AUTO);
