@@ -1149,6 +1149,9 @@ void setStatic(_xvasp& xvasp) {
 // ME181102 - Do not convert unit cell
 void setPreserveUnitCell(_xvasp& xvasp) {
   xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL", false);
+  // ME200307 - Safety, in case the flag get re-activated somewhere else
+  xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
+  xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_PRESERVE", true);
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_STANDARD_PRIMITIVE", false);
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_STANDARD_CONVENTIONAL", false);
