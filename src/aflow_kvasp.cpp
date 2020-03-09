@@ -3544,9 +3544,12 @@ namespace KBIN {
     if(qmwrite) {
       string FileNameXVASP=xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT;
       stringstream FileXVASPout;
-      if(aurostd::FileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT)) { //RECYCLE PREVIOUS STUFF
+      // ME200304 - do not overwrite prior runs
+      string FileNameXVASPfull = "";
+      if (aurostd::EFileExist(FileNameXVASP, FileNameXVASPfull)) aurostd::UncompressFile(FileNameXVASPfull);
+      if(aurostd::FileExist(FileNameXVASP)) { //RECYCLE PREVIOUS STUFF
         stringstream FileXVASPin;
-        aurostd::file2stringstream(xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT,FileXVASPin);
+        aurostd::file2stringstream(FileNameXVASP, FileXVASPin);
         FileXVASPout << FileXVASPin.str();
       }
       FileXVASPout << strstream.str();
