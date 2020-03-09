@@ -5737,7 +5737,7 @@ namespace KBIN {
 // ***************************************************************************
 namespace KBIN {
   // ME200217 - the old ExtractSystemName function (now ExtractSystemNameVASP)
-  // breaks for long system names since VASP them off. The system in the
+  // breaks for long system names since VASP cuts them off. The system in the
   // aflow.in file should be the canonical system name since all VASP output
   // ultimately depends on it.
   string ExtractSystemName(const string& directory) {
