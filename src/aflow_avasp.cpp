@@ -2079,8 +2079,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
 
   if(!xvasp.aopts.flag("FLAG::AVASP_QHA=OFF")) {
     aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    string _ASTROPT_, key, scheme, xvaspflag;
-    _ASTROPT_ = "[AFLOW_QHA]";
+    string _ASTROPT_ = "[AFLOW_QHA]", key="", scheme="", xvaspflag="";
 
     std::sort(xvasp.qhaopts.vxscheme.begin(), xvasp.qhaopts.vxscheme.end());
     const vector<string>& vkeys=xvasp.qhaopts.vxscheme;
