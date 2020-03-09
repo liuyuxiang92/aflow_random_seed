@@ -558,7 +558,7 @@ namespace KBIN {
       _moduleOptions& module_opts, _xinput& xinput) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
     string soliloquy="readParametersQHA():";
-    string key, entry, xvaspflag;
+    string key="", entry="", xvaspflag="";
     for (uint i = 0; i < module_opts.qhaflags.size(); i++) {
       key = module_opts.qhaflags[i].keyword;
       entry = _ASTROPT_QHA_ + key + "=";
