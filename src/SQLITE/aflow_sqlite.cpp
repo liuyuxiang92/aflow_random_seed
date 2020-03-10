@@ -19,11 +19,11 @@ using std::vector;
 
 namespace sql {
 
-  // Execute command functions -------------------------------------------------
+  // Execute command functions -----------------------------------------------
   // These functions provide a framework to execute SQLite commands (including
-  // exception handling). The return types should all be void or string-typed to
-  // keep the number of functions to a minimum. Conversion to other data types
-  // should be handled outside these functions.
+  // exception handling). The return types should all be void or string-typed
+  // to keep the number of functions to a minimum. Conversion to other data
+  // types should be handled outside these functions.
 
   void SQLexecuteCommand(sqlite3* cursor, const string& command) {
     bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
@@ -85,9 +85,10 @@ namespace sql {
     }
   }
 
-  // Callback functions --------------------------------------------------------
-  // The following functions are the callback functions passed into sqlite_exec.
-  // Each executeCommand function should have its own callback function.
+  // Callback functions ------------------------------------------------------
+  // The following functions are the callback functions passed into
+  // sqlite_exec. Each executeCommand function should have its own callback
+  // function.
 
   int SQLcallback(void* data, int argc, char** argv, char** col) {
     bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);

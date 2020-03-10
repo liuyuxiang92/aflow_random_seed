@@ -6,6 +6,7 @@
         -- Fixed plotter title and file names when ANRL parameters are present. (ME)
         -- Fixed bug that deleted qmvasp files from previous runs instead of appending to them. (ME)
         -- Removed VASP k-mesh symmetry fixes when SYM=OFF. (ME)
+        -- Changed database file name conventions. (ME)
         -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
         -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
         -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
