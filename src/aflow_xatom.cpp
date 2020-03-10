@@ -5317,6 +5317,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.write_klattice_flag=TRUE;
   a.write_DEBUG_flag=TRUE;
 #endif
+  // RF 200310 BEGIN
+  for(int i=0;i<(int)a.atoms.size();i++) {
+    if (a.atoms.at(i).cleanname.empty()) a.atoms.at(i).cleanname=(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(i).name));
+  }
+  // RF 200310 END
   // CHECKS
   if(a.atoms.size()!=a.qm_atoms.size())     {
     //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
@@ -6035,45 +6040,46 @@ xstructure SetSDTypes(const xstructure& a, const vector<string>& in_sd) {
   return b;
 }
 
-// **************************************************************************
-// GetTypes
-// **************************************************************************
-vector<int> GetTypes(const xstructure& a) {
-  vector<int> out_type;
-  for(int i=0;i<(int)a.atoms.size();i++)
-    out_type.push_back(a.atoms.at(i).type);
-  return out_type;
-}
-
-// **************************************************************************
-// GetNames
-// **************************************************************************
-vector<string> GetNames(const xstructure& a) {
-  vector<string> out_name;
-  for(int i=0;i<(int)a.atoms.size();i++)
-    out_name.push_back(a.atoms.at(i).name);
-  return out_name;
-}
-
-// **************************************************************************
-// GetCleanNames
-// **************************************************************************
-vector<string> GetCleanNames(const xstructure& a) {
-  vector<string> out_cleanname;
-  for(int i=0;i<(int)a.atoms.size();i++)
-    out_cleanname.push_back(a.atoms.at(i).cleanname);
-  return out_cleanname;
-}
-
-// **************************************************************************
-// GetSpins
-// **************************************************************************
-vector<double> GetSpins(const xstructure& a) {
-  vector<double> out_spin;
-  for(int i=0;i<(int)a.atoms.size();i++)
-    out_spin.push_back(a.atoms.at(i).spin);
-  return out_spin;
-}
+// RF 200310 following uncommented functions are already in pflow
+//// **************************************************************************
+//// GetTypes
+//// **************************************************************************
+//vector<int> GetTypes(const xstructure& a) {
+//  vector<int> out_type;
+//  for(int i=0;i<(int)a.atoms.size();i++)
+//    out_type.push_back(a.atoms.at(i).type);
+//  return out_type;
+//}
+//
+//// **************************************************************************
+//// GetNames
+//// **************************************************************************
+//vector<string> GetNames(const xstructure& a) {
+//  vector<string> out_name;
+//  for(int i=0;i<(int)a.atoms.size();i++)
+//    out_name.push_back(a.atoms.at(i).name);
+//  return out_name;
+//}
+//
+//// **************************************************************************
+//// GetCleanNames
+//// **************************************************************************
+//vector<string> GetCleanNames(const xstructure& a) {
+//  vector<string> out_cleanname;
+//  for(int i=0;i<(int)a.atoms.size();i++)
+//    out_cleanname.push_back(a.atoms.at(i).cleanname);
+//  return out_cleanname;
+//}
+//
+//// **************************************************************************
+//// GetSpins
+//// **************************************************************************
+//vector<double> GetSpins(const xstructure& a) {
+//  vector<double> out_spin;
+//  for(int i=0;i<(int)a.atoms.size();i++)
+//    out_spin.push_back(a.atoms.at(i).spin);
+//  return out_spin;
+//}
 
 // ***************************************************************************
 // GetElementName

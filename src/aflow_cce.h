@@ -52,8 +52,8 @@ namespace cce {
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
   void CCE(aurostd::xoption& flags);
-  vector<double> CCE_correct(string directory_path);
-  vector<double> CCE_correct(xstructure& structure, string functional);
+  vector<double> CCE_correct(const string& directory_path);
+  vector<double> CCE_correct(xstructure& structure, string& functional);
   void CCE(aurostd::xoption& flags, std::istream& ist); // ME 200213
   void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
   // read user input (from command line or directory path)
