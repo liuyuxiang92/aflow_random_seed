@@ -2,6 +2,7 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- Added QHA to modules. (AS)
+        -- Changed database file name conventions. (ME)
         -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
         -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
         -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
