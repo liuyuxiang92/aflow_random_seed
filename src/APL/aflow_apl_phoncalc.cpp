@@ -25,7 +25,6 @@ namespace apl {
   PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf) : _supercell(sc) {
     free();
     messageFile = &mf;
-    _nBranches = 3 * _supercell.getInputStructure().atoms.size();
     _directory = "./";
     _ncpus = 1;
   }
@@ -53,7 +52,6 @@ namespace apl {
     _gammaEwaldCorr = that._gammaEwaldCorr;
     _inverseDielectricTensor = that._inverseDielectricTensor;
     _isGammaEwaldPrecomputed = that._isGammaEwaldPrecomputed;
-    _nBranches = that._nBranches;
     _ncpus = that._ncpus;
     _recsqrtDielectricTensorDeterminant = that._recsqrtDielectricTensorDeterminant;
     _supercell = that._supercell;
@@ -74,7 +72,6 @@ namespace apl {
     _inverseDielectricTensor.clear();
     _isGammaEwaldPrecomputed = false;
     _isPolarMaterial = false;
-    _nBranches = 0;
     _ncpus = 0;
     _recsqrtDielectricTensorDeterminant = 0.0;
     _system = "";
@@ -109,7 +106,7 @@ namespace apl {
   }
 
   uint PhononCalculator::getNumberOfBranches() const {
-    return _nBranches;
+    return 3 * _supercell.getInputStructure().atoms.size();
   }
 
   // ME190614
@@ -487,6 +484,7 @@ namespace apl {
   }
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const xvector<double>& kpoint_nac, const IPCFreqFlags& flags) {
+    uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > placeholder_eigen(_nBranches, _nBranches, 1, 1);
     return getFrequency(kpoint, kpoint_nac, flags, placeholder_eigen);
   }
@@ -644,6 +642,7 @@ namespace apl {
     uint scAtomsSize = _supercell.getSupercellStructure().atoms.size();
     uint pcAtomsSize = _supercell.getInputStructure().atoms.size();
 
+    uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches, 1, 1);
     xmatrix<xcomplex<double> > dynamicalMatrix0(_nBranches, _nBranches, 1, 1);
 
@@ -781,6 +780,7 @@ namespace apl {
     uint pcAtomsSize = pc.atoms.size();
     uint pcIAtomsSize = pc.iatoms.size();
 
+    uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches);
 
     if (calc_derivative) {  // reset derivative
@@ -887,6 +887,7 @@ namespace apl {
 
     uint pcAtomsSize = pc.atoms.size();
 
+    uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches);
 
     double gmax = 14.0;

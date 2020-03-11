@@ -1045,7 +1045,6 @@ namespace apl {
 
       Supercell& _supercell;
 
-      uint _nBranches;
       // harmonic IFCs
       vector<vector<xmatrix<double> > > _forceConstantMatrices;
 
