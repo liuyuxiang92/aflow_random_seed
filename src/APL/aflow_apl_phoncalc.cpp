@@ -1298,7 +1298,7 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME180827 - Overloaded to calculate derivative and eigenvectors for AAPL
-  // OBSOLETE ME200206 - not used anywhere and notuseful for debugging (use get Frequency)
+  // OBSOLETE ME200206 - not used anywhere and not useful for debugging (use get Frequency)
   //[OBSOLETE] xvector<double> PhononCalculator::getEigenvalues(const xvector<double>& kpoint) {
   //[OBSOLETE]   const xstructure& pc = _supercell.getInputStructureLight();  //CO
   //[OBSOLETE]   uint nBranches = 3 * pc.atoms.size();
