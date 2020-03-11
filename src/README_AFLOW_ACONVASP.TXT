@@ -855,6 +855,8 @@ LATTICES = (the ones with "")
             (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
           [--geometry_file=POSCAR.relax1] : Compare geometries from a particular step in the DFT relaxation 
             (e.g., `POSCAR.relax1', `POSCAR.relax2', `POSCAR.static', etc.).
+          [--relaxation_step=original|relax1|most_relaxed] : Compare geometries from a particular step in the DFT relaxation.
+            Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
       [GENERAL_COMPARISON_OPTIONS] :
         [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
         [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.

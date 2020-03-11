@@ -3465,6 +3465,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
   if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  // CO 171008
   if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  // CO 171008
+  if(LDEBUG) if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  // DX 20200310
+  if(LDEBUG) if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  // DX 20200310
   if(LDEBUG) if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX 20180723
 
   if(LDEBUG) cerr << soliloquy << " definitions" << endl;
@@ -3530,6 +3532,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
       tokens.clear();
     }
   }
+  
+  // ----------------------------------------------------------------------
   // QUANTUM ESPRESSO FINDER
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR" << endl;
@@ -3569,6 +3573,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
   }
 
+  // ----------------------------------------------------------------------
   //for CIF input //DX 20180723 - add cif reader - START
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " CIF DETECTOR" << endl;
@@ -3591,6 +3596,53 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
   //DX 20180723 - add cif reader - END
 
+  // ----------------------------------------------------------------------
+  // ABINIT input - START (DX 20200310)
+	// based on documentation found at https://docs.abinit.org/variables/basic/
+  if(!IOMODE_found) {
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR" << endl;
+    uint ABINIT=0;
+		// find cell lattice vector scaling (acell; given in Angstroms or Bohr)
+		for(uint i=0;i<vinput.size();i++){ 
+      if(aurostd::substring2bool(vinput[i],"acell",true)){ ABINIT+=1; break;} 
+    }
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (acell)=" << ABINIT << endl;
+		// find real space primitive translations (rprim)
+		for(uint i=0;i<vinput.size();i++){ 
+      if(aurostd::substring2bool(vinput[i],"rprim",true)){ ABINIT+=1; break;} 
+    }
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (rprim)=" << ABINIT << endl;
+		// find number of atoms (natom)
+		for(uint i=0;i<vinput.size();i++){ 
+      if(aurostd::substring2bool(vinput[i],"natom",true)){ ABINIT+=1; break;} 
+    }
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (natom)=" << ABINIT << endl;
+		// find types of atoms (typat)
+		for(uint i=0;i<vinput.size();i++){ 
+      if(aurostd::substring2bool(vinput[i],"typat",true)){ ABINIT+=1; break;} 
+    }
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (typat)=" << ABINIT << endl;
+		// find atom positions (xred, xcart, xangst)
+		for(uint i=0;i<vinput.size();i++){ 
+			if(aurostd::substring2bool(vinput[i],"xred",true) || 
+					aurostd::substring2bool(vinput[i],"xcart",true) || 
+					aurostd::substring2bool(vinput[i],"xangst",true)){ ABINIT+=1; break;} 
+    }
+    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (xred,xcart,xangst)=" << ABINIT << endl;
+ 
+		if(ABINIT==5){
+			a.iomode = IOABINIT_GEOM;
+    	if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR = TRUE" << endl;
+			IOMODE_found = TRUE;
+		}
+  }
+  // ABINIT input - END (DX 20200310)
+
+  // ----------------------------------------------------------------------
+  // ELK input - START (DX 20200310)
+  // ELK input - END (DX 20200310)
+  
+  // ----------------------------------------------------------------------
   //for AIMS input - unfortunately, it's very generic so leave for last
   if(!IOMODE_found) {
     vector<string> tokens_line;
@@ -3698,7 +3750,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     else {if(LDEBUG) {cerr << soliloquy << " AIMS GEOM DETECTOR = FALSE" << endl;}}
   }
-
+  
   // DESPERATE FINDING => VASP
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " VASP DETECTOR" << endl;
@@ -4623,6 +4675,66 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.is_vasp5_poscar_format=FALSE;
     // DONE ?
   } // QE INPUT
+  
+  // ----------------------------------------------------------------------
+  // ABINIT INPUT (DX 20200310)
+  if(a.iomode==IOABINIT_AUTO || a.iomode==IOABINIT_GEOM) { // ABINIT
+    if(LDEBUG){ cerr << soliloquy << " ABINIT" << endl; }
+    message << "Development in progress (DX)...";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,message,_GENERIC_ERROR_);
+    
+    //// get lattice
+    //a.scale=1.0; // standard
+    //a.neg_scale=FALSE; // standard
+    //
+    //// get lattice scaling (optional keyword)
+    //vector<double> acell; acell(1)=1.0; acell(2)=1.0; acell(3)=1.0;
+    //for(uint i=0;i<vinput.size();i++){
+    //  if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ACELL",true)){
+    //    string acell_line = aurostd::toupper(vinput[i]);
+
+    //    // get units first (then remove from temp string for easy parsing)
+    //    string lattice_vec_unit = "Bohr"; // default is Bohr
+    //    if(aurostd::substring2bool(acell_line,"ANGST",true)){ 
+    //      lattice_vec_unit = "Angstrom"; 
+    //      aurostd::StringSubst(acell_line,"ANGSTROM","");
+    //      aurostd::StringSubst(acell_line,"ANGSTR","");
+    //      aurostd::StringSubst(acell_line,"ANGST","");
+    //    }
+    //    if(aurostd::substring2bool(acell_line,"BOHR",true)){
+    //      lattice_vec_unit = "Bohr";
+    //      aurostd::StringSubst(acell_line,"BOHR")
+    //    }
+    //    
+    //    // check if explicitly given or uses multiplication
+    //    // explicit : e.g., "acell 1.0 1.0 1.0"
+    //    // multiplication : e.g., "acell 3*1.0"
+    //    bool multiplication_variant = false;
+    //    if(aurostd::substring2bool(acell_line,"*",true)){ multiplication_variant=true; }
+    //    
+    //    if(multiplication_variant){
+    //      vector<string> tokens;
+    //      aurostd::string2tokens(vinput[i],tokens,"*");
+    //      double factor = aurostd::string2utype<double>(aurostd::RemoveWhiteSpaces(tokens[1]));
+    //      acell_vec = factor*acell_vec;
+    //    }
+    //    else{
+    //      vector<string> tokens;
+    //      uint number_tokens = aurostd::string2tokens(vinput[i],tokens," ");
+    //      if(number_tokens==3){
+
+    //      }
+    //      else{
+
+    //      }
+    //    }
+    //  }
+    //}
+
+
+
+
+  }
 
   // ----------------------------------------------------------------------
   // CIF INPUT
