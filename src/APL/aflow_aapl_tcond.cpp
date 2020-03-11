@@ -172,7 +172,7 @@ namespace apl {
 
     // Grueneisen parameters
     _logger << "Calculating Grueneisen parameters." << apl::endl;
-    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);
+    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);  // false: not conjugate
     vector<vector<double> > grueneisen_modes = calculateModeGrueneisen(phases);
     phases.clear();
     vector<double> grueneisen_avg(temperatures.size());
@@ -424,7 +424,7 @@ namespace apl {
     LTMethod _lt(_qm, _logger);
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
-    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);
+    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);  // true: conjugate
 
     // Three-phonon transition probabilities
     message = "Transition Probabilities";
