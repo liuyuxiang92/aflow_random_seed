@@ -4680,60 +4680,404 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ABINIT INPUT (DX 20200310)
   if(a.iomode==IOABINIT_AUTO || a.iomode==IOABINIT_GEOM) { // ABINIT
     if(LDEBUG){ cerr << soliloquy << " ABINIT" << endl; }
-    message << "Development in progress (DX)...";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,message,_GENERIC_ERROR_);
     
-    //// get lattice
-    //a.scale=1.0; // standard
-    //a.neg_scale=FALSE; // standard
-    //
-    //// get lattice scaling (optional keyword)
-    //vector<double> acell; acell(1)=1.0; acell(2)=1.0; acell(3)=1.0;
-    //for(uint i=0;i<vinput.size();i++){
-    //  if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ACELL",true)){
-    //    string acell_line = aurostd::toupper(vinput[i]);
+    // get lattice
+    a.scale=1.0; // standard
+    a.neg_scale=FALSE; // standard
+    
+    // get lattice scaling (optional keyword)
+    xvector<double> acell; acell(1)=1.0; acell(2)=1.0; acell(3)=1.0;
+    for(uint i=0;i<vinput.size();i++){
+        cerr << "all lines: " << vinput[i] << endl;
+    }
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ACELL",true)){
+        cerr << "acell_line: " << vinput[i] << endl;
+        //string acell_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::RemoveComments(aurostd::toupper(vinput[i])));
+        string acell_line = aurostd::toupper(vinput[i]);
+        cerr << "acell_line: " << acell_line << endl;
+        aurostd::StringSubst(acell_line,"ACELL","");
 
-    //    // get units first (then remove from temp string for easy parsing)
-    //    string lattice_vec_unit = "Bohr"; // default is Bohr
-    //    if(aurostd::substring2bool(acell_line,"ANGST",true)){ 
-    //      lattice_vec_unit = "Angstrom"; 
-    //      aurostd::StringSubst(acell_line,"ANGSTROM","");
-    //      aurostd::StringSubst(acell_line,"ANGSTR","");
-    //      aurostd::StringSubst(acell_line,"ANGST","");
-    //    }
-    //    if(aurostd::substring2bool(acell_line,"BOHR",true)){
-    //      lattice_vec_unit = "Bohr";
-    //      aurostd::StringSubst(acell_line,"BOHR")
-    //    }
-    //    
-    //    // check if explicitly given or uses multiplication
-    //    // explicit : e.g., "acell 1.0 1.0 1.0"
-    //    // multiplication : e.g., "acell 3*1.0"
-    //    bool multiplication_variant = false;
-    //    if(aurostd::substring2bool(acell_line,"*",true)){ multiplication_variant=true; }
-    //    
-    //    if(multiplication_variant){
-    //      vector<string> tokens;
-    //      aurostd::string2tokens(vinput[i],tokens,"*");
-    //      double factor = aurostd::string2utype<double>(aurostd::RemoveWhiteSpaces(tokens[1]));
-    //      acell_vec = factor*acell_vec;
-    //    }
-    //    else{
-    //      vector<string> tokens;
-    //      uint number_tokens = aurostd::string2tokens(vinput[i],tokens," ");
-    //      if(number_tokens==3){
+        // get units first (then remove from temp string for easy parsing)
+        string lattice_vec_unit = "Bohr"; // default is Bohr
+        if(aurostd::substring2bool(acell_line,"ANGST",true)){ 
+          lattice_vec_unit = "Angstrom"; 
+          aurostd::StringSubst(acell_line,"ANGSTROM","");
+          aurostd::StringSubst(acell_line,"ANGSTR","");
+          aurostd::StringSubst(acell_line,"ANGST","");
+        }
+        if(aurostd::substring2bool(acell_line,"BOHR",true)){
+          lattice_vec_unit = "Bohr";
+          aurostd::StringSubst(acell_line,"BOHR","");
+        }
+      
+        // clean-up
+        acell_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(acell_line);
 
-    //      }
-    //      else{
+        // check if explicitly given or uses multiplication
+        // explicit : e.g., "acell 1.0 1.0 1.0"
+        // multiplication : e.g., "acell 3*1.0"
+        bool multiplication_variant = false;
+        if(aurostd::substring2bool(acell_line,"*",true)){ multiplication_variant=true; }
+        
+        if(multiplication_variant){
+          vector<string> tokens;
+          aurostd::string2tokens(acell_line,tokens,"*");
+          double factor = aurostd::string2utype<double>(aurostd::RemoveWhiteSpaces(tokens[1]));
+          acell= factor*acell;
+        }
+        else{
+          vector<string> tokens;
+          uint number_tokens = aurostd::string2tokens(acell_line,tokens," ");
+          if(number_tokens==3){
+            acell(1) = aurostd::string2utype<double>(tokens[0]);
+            acell(2) = aurostd::string2utype<double>(tokens[1]);
+            acell(3) = aurostd::string2utype<double>(tokens[2]);
+          }
+          else{
+            cerr << "number_tokens:" << number_tokens << endl;
+            message << "Unable to parse the acell line; unexpected format. acell_line = " << acell_line << " tokens: " << aurostd::joinWDelimiter(tokens,",");
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          }
+        }
+      }
+    }
+    
+    // ----------------------------------------------------------------------
+    // get lattice (rprim) : given column-wise
+    // supported formats:
+    //   1) single line 9 fields
+    //   2) three lines 3 fields per line
+    bool is_lattice_line = false;
+    uint lattice_line_count = 0;
+    a.lattice = aurostd::identity((double)0,3,3);; //abinit default
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"RPRIM",true)){
+        is_lattice_line = true;
+      }
+      if(is_lattice_line){
+        string rprim_line = aurostd::RemoveComments(aurostd::toupper(vinput[i]));
+        aurostd::StringSubst(rprim_line,"RPRIM","");
+        vector<string> tokens;
+        uint number_tokens = aurostd::string2tokens(rprim_line,tokens," ");
+        if(number_tokens==9){
+          //column-wise
+          a.lattice(1,1) = aurostd::string2utype<double>(tokens[0])*acell(1);
+          a.lattice(2,1) = aurostd::string2utype<double>(tokens[1])*acell(1);
+          a.lattice(3,1) = aurostd::string2utype<double>(tokens[2])*acell(1);
+          a.lattice(1,2) = aurostd::string2utype<double>(tokens[3])*acell(2);
+          a.lattice(2,2) = aurostd::string2utype<double>(tokens[4])*acell(2);
+          a.lattice(3,2) = aurostd::string2utype<double>(tokens[5])*acell(2);
+          a.lattice(1,3) = aurostd::string2utype<double>(tokens[6])*acell(3);
+          a.lattice(2,3) = aurostd::string2utype<double>(tokens[7])*acell(3);
+          a.lattice(3,3) = aurostd::string2utype<double>(tokens[8])*acell(3);
+          is_lattice_line = false;
+          break;
+        }
+        else if(number_tokens==3){
+          lattice_line_count += 1;
+          a.lattice(1,lattice_line_count) = aurostd::string2utype<double>(tokens[0])*acell(lattice_line_count);
+          a.lattice(2,lattice_line_count) = aurostd::string2utype<double>(tokens[1])*acell(lattice_line_count);
+          a.lattice(3,lattice_line_count) = aurostd::string2utype<double>(tokens[2])*acell(lattice_line_count);
+          if(lattice_line_count == 3){ is_lattice_line=false; break; }
+        }
+        else if(number_tokens==0){ continue; }
+        else{
+          message << "Unable to parse the rprim line; unexpected format.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+      }
+    }
 
-    //      }
-    //    }
-    //  }
-    //}
+    cerr << "a.lattice: " << a.lattice << endl;
 
+    // ----------------------------------------------------------------------
+    // get number of atoms
+    // NOTE: sometimes multiple keywords can be in the same line
+    // natom : number of atoms in unit cell
+    // natrd : number of atoms to read in file (useful for symmetry reduced files, e.g., iatom representations)
+    uint number_of_atoms = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATOM",true)){
+        string natom_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(natom_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        for(uint t=0;t<tokens.size();t++){
+          if(tokens[t]=="NATOM"){ number_of_atoms = aurostd::string2utype<uint>(tokens[t+1]); break; }
+        }
+        if(number_of_atoms == 0){ 
+          message << "Unable to parse the natom line; unexpected format. vinput[i] = \"" << natom_line << "\".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+      }
+    }
+    
+    // natrd (optional)
+    bool found_natrd = false;
+    uint number_of_atoms_to_read = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATRD",true)){
+        found_natrd = true;
+        string natrd_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(natrd_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        for(uint t=0;t<tokens.size();t++){
+          if(tokens[t]=="NATRD"){ number_of_atoms_to_read = aurostd::string2utype<uint>(tokens[t+1]); break; }
+        }
+        if(number_of_atoms_to_read == 0){ 
+          message << "Unable to parse the natrd line; unexpected format. natrd_line = \"" << natrd_line << "\".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+      }
+    }
+    if(!found_natrd){ number_of_atoms_to_read = number_of_atoms; } // if natrd not specified set to natom
 
+    if(number_of_atoms != number_of_atoms_to_read){
+      message << "The natoms != natrd, i.e., unit cell requires atoms (iatoms) to be expanded by symmetry. Functionality not yet supported.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+    }
+    
+    // ----------------------------------------------------------------------
+    // get number of types (optional)
+    bool found_ntypat = false;
+    uint number_of_atom_types = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NTYPAT",true)){
+        found_ntypat = true;
+        string ntypat_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(ntypat_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        for(uint t=0;t<tokens.size();t++){
+          if(tokens[t]=="NTYPAT"){ number_of_atom_types = aurostd::string2utype<uint>(tokens[t+1]); break; }
+        }
+        if(number_of_atoms_to_read == 0){ 
+          message << "Unable to parse the ntypat line; unexpected format. ntypat_line = \"" << ntypat_line << "\".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+      }
+    }
 
+    // ----------------------------------------------------------------------
+    // get atom type index
+    // in same order as xred, xcart, or xangst
+    vector<uint> atom_types; //follows order of atoms
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"TYPAT",true)){
+        string typat_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(typat_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        bool found_typat = false;
+        bool is_field_attribute = false;
+        for(uint t=0;t<tokens.size();t++){
+          cerr << "tokens: " << tokens[t] << endl;
 
+          if(tokens[t]=="TYPAT"){ found_typat = true; is_field_attribute = true; continue; }
+          if(is_field_attribute){
+            cerr << "is field attribute: " << tokens[t] << endl;
+            if(aurostd::substring2bool("*",tokens[t])){ 
+              vector<string> sub_tokens; aurostd::string2tokens(tokens[t],sub_tokens,"*");
+              uint multiplier = aurostd::string2utype<uint>(sub_tokens[0]);
+              uint type_index = aurostd::string2utype<uint>(sub_tokens[1]);
+              for(uint i=0;i<multiplier;i++){ atom_types.push_back(type_index); }
+            }
+            else if(tokens[t][0]>='0' && tokens[t][0]<='9'){ //is digit
+              atom_types.push_back(aurostd::string2utype<uint>(tokens[t]));
+            }
+            else{
+              // signals a new keyword in the same line
+              is_field_attribute = false;
+              break;
+            }
+          }
+        }
+        if(!found_typat){ continue; } //found ntypat not typat, try another line
+      }
+    }
+    if(found_ntypat && (atom_types.size() != number_of_atom_types)){ 
+      message << "Number of atom types does not match ntypat variable. typat=" << aurostd::joinWDelimiter(atom_types,",") << " | ntypat=" << number_of_atom_types;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+    }
+    if(atom_types.size() != number_of_atoms_to_read){ 
+      message << "Number of atom types does not match the number of atoms to read. typat=" << aurostd::joinWDelimiter(atom_types,",") << " | natom=" << number_of_atoms;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+    }
+    cerr << "number_of_atoms: " << number_of_atoms << endl;
+    cerr << "typat : " << aurostd::joinWDelimiter(atom_types,",") << endl;
+    
+    // ----------------------------------------------------------------------
+    // get atom type; element (znucl)
+    vector<uint> nuclear_charge;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ZNUCL",true)){
+        string znucl_line = aurostd::toupper(vinput[i]);
+        vector<string> tokens; 
+        aurostd::string2tokens(znucl_line,tokens," ");
+        // the loop method protects against multiple keywords per line
+        bool is_field_attribute = false;
+        for(uint t=0;t<tokens.size();t++){
+          cerr << "tokens: " << tokens[t] << endl;
+          if(tokens[t]=="ZNUCL"){ is_field_attribute = true; continue; }
+          if(is_field_attribute){
+            cerr << "is field attribute: " << tokens[t] << endl;
+            if(tokens[t][0]>='0' && tokens[t][0]<='9'){ //is digit
+              nuclear_charge.push_back(aurostd::string2utype<uint>(tokens[t]));
+              cerr << "nuclear_charge: " << aurostd::joinWDelimiter(nuclear_charge,",") << endl;
+            }
+            else{
+              // signals a new keyword in the same line
+              is_field_attribute = false;
+              break;
+            }
+          }
+        }
+      }
+    }
+    
+    // ----------------------------------------------------------------------
+    // normally a mandatory keyword, but the AFLOW-ABINIT writer has not been printing this keyword
+    // for backwards compatability, we will throw a warning (for now)
+    if(nuclear_charge.size()==0){ 
+      message << "The atom elements/types (znucl) are not specified. Using fictious atoms.";
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_WARNING_);
+    }
+    
+    // ----------------------------------------------------------------------
+    // get atom positions
+    deque<_atom> atoms_temp;
+    bool is_atom_line = false;
+    bool is_Bohr_units = false;
+    uint atom_line_count = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XRED",true)){
+        a.coord_flag = _COORDS_FRACTIONAL_;
+        is_atom_line = true;
+      }
+      else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XCART",true)){
+        a.coord_flag = _COORDS_CARTESIAN_;
+        is_Bohr_units = true;
+        is_atom_line = true;
+      }
+      else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XANGST",true)){
+        a.coord_flag = _COORDS_CARTESIAN_;
+        is_atom_line = true;
+      }
+      if(is_atom_line){
+        string atom_line = aurostd::toupper(vinput[i]);
+        aurostd::StringSubst(atom_line,"XRED",""); //for easier parsing
+        aurostd::StringSubst(atom_line,"XCART",""); //for easier parsing 
+        aurostd::StringSubst(atom_line,"XANGST",""); //for easier parsing
+        vector<string> tokens;
+        uint number_tokens = aurostd::string2tokens(atom_line,tokens," ");
+        if(number_tokens==3){
+          atom_line_count += 1;
+          xvector<double> coordinate;
+          coordinate(1) = aurostd::string2utype<double>(tokens[0]);
+          coordinate(2) = aurostd::string2utype<double>(tokens[1]);
+          coordinate(3) = aurostd::string2utype<double>(tokens[2]);
+
+          _atom atom;
+          if(a.coord_flag == _COORDS_FRACTIONAL_){ 
+            atom.fpos = coordinate; 
+            atom.cpos = F2C(a.lattice,atom.fpos); 
+          }
+          else if(a.coord_flag == _COORDS_CARTESIAN_){ 
+            atom.cpos = coordinate; 
+            if(is_Bohr_units){ atom.cpos *= bohr2angstrom; } // AFLOW expects Angstroms
+            atom.fpos = C2F(a.lattice,atom.cpos); 
+          }
+          atoms_temp.push_back(atom);
+        }
+        else if(number_tokens==(3*number_of_atoms_to_read)){
+          for(uint t=0;t<tokens.size();t+=3){
+            atom_line_count += 1;
+            xvector<double> coordinate;
+            coordinate(1) = aurostd::string2utype<double>(tokens[t]);
+            coordinate(2) = aurostd::string2utype<double>(tokens[t+1]);
+            coordinate(3) = aurostd::string2utype<double>(tokens[t+2]);
+          
+            _atom atom;
+            if(a.coord_flag == _COORDS_FRACTIONAL_){ 
+              atom.fpos = coordinate; 
+              atom.cpos = F2C(a.lattice,atom.fpos); 
+            }
+            else if(a.coord_flag == _COORDS_CARTESIAN_){ 
+              atom.cpos = coordinate; 
+              if(is_Bohr_units){ atom.cpos *= bohr2angstrom; } // AFLOW expects Angstroms
+              atom.fpos = C2F(a.lattice,atom.cpos); 
+            }
+            cerr << "atom.cpos: " << atom.cpos << endl;
+            atoms_temp.push_back(atom);
+          }
+        }
+        else if(number_tokens==0){ continue; }
+        else{
+          message << "Unable to parse the atom line; unexpected format. vinput[i] = " << atom_line;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+        if(atom_line_count == number_of_atoms_to_read){ break;}
+      }
+    }
+
+    cerr << "atoms : " << atoms_temp.size() << endl;
+    // ----------------------------------------------------------------------
+    // ensure correct number of atoms
+    if(atoms_temp.size() != number_of_atoms_to_read){ 
+      message << "The number of atoms is not commensurate: number of atom positions found = " << atoms_temp.size() << " vs natom/natrd = " << number_of_atoms_to_read;
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_RUNTIME_ERROR_);
+    }
+
+    // ----------------------------------------------------------------------
+    // add atoms to xstructure 
+    // add name/type info as well
+    for(uint i=0;i<atoms_temp.size();i++){
+      cerr << atoms_temp[i].cpos << endl;
+      xelement element;
+      // use nuclear charge associated atom index
+      if(nuclear_charge.size()){ element = xelement(nuclear_charge[atom_types[i]-1]); } //i-1 since index doesn't start at zero
+      // use arbitrary element names (in order of increasing Z)
+      else{ element = xelement(atom_types[i]); }
+      cerr << "element.symbol: " << element.symbol << endl;
+      atoms_temp[i].name=element.symbol;
+      atoms_temp[i].CleanName();
+      atoms_temp[i].CleanSpin();
+      atoms_temp[i].name_is_given=TRUE;
+
+      atoms_temp[i].number=atoms_temp.size();    // reference position for convasp
+      atoms_temp[i].basis=atoms_temp.size();     // position in the basis
+      atoms_temp[i].ijk(1)=0;atoms_temp[i].ijk(2)=0;atoms_temp[i].ijk(3)=0; // inside the zero cell...
+      atoms_temp[i].corigin(1)=0.0;atoms_temp[i].corigin(2)=0.0;atoms_temp[i].corigin(3)=0.0; // inside the zero cell
+      atoms_temp[i].coord(1)=0.0;atoms_temp[i].coord(2)=0.0;atoms_temp[i].coord(3)=0.0; // inside the zero cell
+      atoms_temp[i].spin=0.0;
+      atoms_temp[i].noncoll_spin.clear(); // DX 12/5/17 - non-collinear spin
+      // FIXED BELOW atom.type=itype;                // CONVASP_MODE if I want type 0,1,2,3,...
+      atoms_temp[i].order_parameter_value=0;
+      atoms_temp[i].order_parameter_atom=FALSE;
+      atoms_temp[i].partial_occupation_value=1.0;
+      atoms_temp[i].partial_occupation_flag=FALSE;
+      // DONE
+      a.AddAtom(atoms_temp[i]);
+      // NO PARTIAL OCCUPATION
+      a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+      
+    }
+    a.SpeciesPutAlphabetic(); // fight analphabetization
+    std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
+    a.MakeBasis();
+    a.MakeTypes(); //DX 20190508 - otherwise types are not created
+    uint iat=0;
+    for(uint itype=0;itype<a.num_each_type.size();itype++) 
+      for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
+        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+        a.atoms.at(iat++).type=itype;
+      }
+    a.partial_occupation_flag=FALSE;
+    a.is_vasp4_poscar_format=FALSE;
+    a.is_vasp5_poscar_format=FALSE;
+    
   }
 
   // ----------------------------------------------------------------------
@@ -5032,6 +5376,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.MakeBasis();
     a.MakeTypes(); //DX 20190508 - otherwise types are not created
     a.SpeciesPutAlphabetic(); //DX 20190508 - put alphabetic, needed for many AFLOW functions to work properly
+    std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames); //DX 20200312
     //DX 20191010 - moved this loop - START
     for(uint i=0;i<a.atoms.size();i++){
       if(a.atoms[i].partial_occupation_flag==TRUE){
