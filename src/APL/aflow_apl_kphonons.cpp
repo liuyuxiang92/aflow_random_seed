@@ -1512,16 +1512,18 @@ namespace KBIN {
       }
       // Detect appropriate smearing method for TYPE=DEFAULT
       if (xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme[0] == 'D') {
-        message = "[VASP_FORCE_OPTION]TYPE=DEFAULT. Attempting to determine best smearing method for force calculations.";
+        message = "TYPE=DEFAULT - Determining best smearing method for APL calculations.";
         pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags.Directory, messageFile, std::cout);
         string doscarfile = aurostd::CleanFileName(aflags.Directory + "/DOSCAR." + _APL_STATIC_PREFIX_);
-        if (aurostd::FileExist(doscarfile) || aurostd::FileExist(doscarfile)) {
+        if (aurostd::FileExist(doscarfile) || aurostd::EFileExist(doscarfile)) {
           xDOSCAR xdos;
           xdos.GetPropertiesFile(doscarfile, true);
           if (xdos.GetBandGap()) {
             if (xdos.Egap_type_net == "insulator") xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme = "INSULATOR";
             else xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme = "METAL";
             xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.content_string = xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme;
+            message = "Changed TYPE to " + xflags.vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme + ".";
+            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags.Directory, messageFile, std::cout);
           } else {
             message = "Could not determine band gap. Smearing method cannot be determined automatically.";
             pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags.Directory, messageFile, std::cout, _LOGGER_WARNING_);
