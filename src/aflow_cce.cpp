@@ -61,7 +61,7 @@ namespace cce {
     //read structural data from structure file provided on command line
     xstructure structure=CCE_read_structure(flags.getattachedscheme("CCE_CORRECTION::POSCAR_PATH"));
     aurostd::xoption cce_flags = CCE_init_flags();
-    if(!flags.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty()){ // when POSCAR_PATH is provided the command line must have called the function instead of another part of AFLOW
+    if(!flags.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty() && !aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))){ // when POSCAR_PATH is provided the command line must have called the function instead of another part of AFLOW
       cce_flags.flag("COMMAND_LINE",TRUE);
     }
     CCE_Variables cce_vars = CCE_init_variables(structure);
@@ -107,6 +107,8 @@ namespace cce {
 
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         std::cout << CCE_get_JSON(structure, cce_vars) << std::endl;
+      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
+        std::cout << CCE_write_test_output(cce_vars, cce_vars.cce_form_energy_cell) << std::endl;
       } else {
         // write CCE corrections & corrected formation enthalpies per cell and atom
         std::cout << CCE_write_output(structure, cce_vars, cce_vars.cce_form_energy_cell);
@@ -205,6 +207,8 @@ namespace cce {
 
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         std::cout << CCE_get_JSON(structure, cce_vars) << std::endl;
+      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
+        std::cout << CCE_write_test_output(cce_vars, cce_vars.cce_form_energy_cell) << std::endl;
       } else {
         // write CCE corrections & corrected formation enthalpies per cell and atom
         std::cout << CCE_write_output(structure, cce_vars, cce_vars.cce_form_energy_cell);
@@ -2948,10 +2952,10 @@ namespace cce {
       uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
         if (cce_vars.vfunctionals[k] != "exp") {
-          output << cce_form_energy_cell[2*k] << " eV/cell //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 298.15K." << endl;
-          output << cce_form_energy_cell[2*k+1] << " eV/cell //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 0K." << endl;
-          output << cce_form_energy_cell[2*k]/structure.atoms.size() << " eV/atom //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 298.15K." << endl;
-          output << cce_form_energy_cell[2*k+1]/structure.atoms.size() << " eV/atom //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 0K." << endl;
+          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << " eV/cell //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 298.15K." << endl;
+          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k+1] << " eV/cell //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 0K." << endl;
+          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k]/structure.atoms.size() << " eV/atom //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 298.15K." << endl;
+          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k+1]/structure.atoms.size() << " eV/atom //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 0K." << endl;
           output << endl;
         } else if (cce_vars.vfunctionals[k] == "exp") {
           output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << " eV/cell //" << "CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
@@ -2959,6 +2963,52 @@ namespace cce {
           output << "Note that this provides A ROUGH GUESS with an estimated average accuracy of only about 250 meV/atom (from test for ternary oxides)!" << endl;
           output << endl;
         } 
+      }
+    }
+    return output.str();
+  }
+
+  //CCE_write_test_output////////////////////////////////////////////////////////
+  // write CCE corrections and corrected formation enthalpies for testing
+  string CCE_write_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell) {
+    stringstream output;
+    uint num_funcs=cce_vars.vfunctionals.size();
+    for (uint k = 0; k < num_funcs; k++) {
+      if (cce_vars.vfunctionals[k] != "exp") {
+        if (k<num_funcs-1 || cce_vars.dft_energies.size()!=0) {
+          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k] << ",";
+          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k+1] << ",";
+        } else {
+          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k] << ",";
+          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k+1];
+        }
+      }
+    }
+    // exp part
+    for (uint k = 0; k < num_funcs; k++) {
+      if (cce_vars.vfunctionals[k] == "exp" && cce_vars.dft_energies.size()==0) { // second condition for that if precalc. form. energies are given and asking for exp., exp. result is not written twice
+        output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k];
+      }
+    }
+    // corrected DFT formation energies
+    if(cce_vars.dft_energies.size()!=0){
+      uint num_funcs=cce_vars.vfunctionals.size();
+      for (uint k = 0; k < num_funcs; k++) {
+        if (cce_vars.vfunctionals[k] != "exp") {
+          if (k<num_funcs-1) {
+            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << ",";
+            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k+1] << ",";
+          } else {
+            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << ",";
+            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k+1];
+          }
+        } else if (cce_vars.vfunctionals[k] == "exp") {
+          if (k<num_funcs-1) {
+            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << ",";
+          } else {
+            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k];
+          }
+        }
       }
     }
     return output.str();

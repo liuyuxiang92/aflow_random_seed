@@ -114,6 +114,7 @@ namespace cce {
   // write output and citation
   string CCE_get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME 200213
   string CCE_write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
+  string CCE_write_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string CCE_write_citation();
   // write user instructions
   string CCE_print_usage();

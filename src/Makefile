@@ -1197,120 +1197,46 @@ aflow_xtal_match_check:
 #RF200302 - START
 cce_check:
 	@echo "Performing 'aflow --cce' test"
-	@echo "Running CCE test 1"
-	@echo '1. MgO #####################################################################################################' > DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Mg1O1_ICSD_159378/POSCAR.static --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,-2 >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 2"
-	@echo '2. Ti3O5 ###################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/O5Ti3_ICSD_75193_LDA/POSCAR.static --dft_formation_energies=-53.964,-47.596,-54.004 --functionals=LDA,PBE,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 3"
-	@echo '3. Mg2SiO4 #################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Mg2O4Si1_ICSD_83793_SCAN/POSCAR.static --dft_formation_energies=-79.46,-90.112,-90.444 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,2,2,2,2,2,2,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,4,4,4,4 >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 4"
-	@echo '4. BaTiO3 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Ba1O3Ti1_ICSD_187292/POSCAR.static --dft_formation_energies=-15.450,-17.641,-17.702 --functionals=PBE,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 5"
-	@echo '5. Na2WO4 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Na2O4W1_ICSD_44524_SCAN/POSCAR.static --dft_formation_energies=-30.456,-33.592,-33.872 --functionals=PBE,LDA,SCAN --oxidation_numbers=1,1,1,1,-2,-2,-2,-2,-2,-2,-2,-2,6,6 >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 6"
-	@echo '6. PbMoO4 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Mo1O4Pb1_ICSD_89034_LDA/POSCAR.static --dft_formation_energies=-24.754,-22.662,-25.572 --functionals=SCAN,PBE,LDA >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 7"
-	@echo '7. Fe3O4 ###################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Fe3O4_ICSD_263007/POSCAR.static --dft_formation_energies=-18.194,-21.236,-25.404 --functionals=PBE,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 8"
-	@echo '8. Ca2V2O7 #################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Ca2O7V2_ICSD_421266_LDA/POSCAR.static --dft_formation_energies=-61.822,-68.788,-69.51 --functionals=PBE,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 9"
-	@echo '9. CuFeO2 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Cu1Fe1O2_ICSD_246912_SCAN/POSCAR.static >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 10"
-	@echo '10. MnMoO4 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Mn1Mo1O4_ICSD_61078/POSCAR.static --dft_formation_energies=-21.938,-26.31,-28.35 --functionals=PBE,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 11"
-	@echo '11. KO2 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/K1O2_ICSD_38245_LDA/POSCAR.static --dft_formation_energies=-2.664,-3.481,-3.033 --functionals=PBE,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 12"
-	@echo '12. Li2O ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Li2O1_ICSD_642216_SCAN/POSCAR.static --dft_formation_energies=-5.584,-6.320,-6.291 --functionals=PBE,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 13"
-	@echo '13. Li2O2 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Li2O2_ICSD_152183/POSCAR.static --dft_formation_energies=-11.486,-13.742,-12.942 --functionals=PBE,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 14"
-	@echo '14. CaFe2O4 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Ca1Fe2O4_ICSD_159751_SCAN/POSCAR.static >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 15"
-	@echo '15. Ca2Fe2O5 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Ca2Fe2O5_ICSD_161509_LDA/POSCAR.static >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 16"
-	@echo '16. FeTiO3 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Fe1O3Ti1_ICSD_187688/POSCAR.static --dft_formation_energies=-22.384,-25.198,-27.066 --functionals=PBE,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 17"
-	@echo '17. LiNbO3 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Li1Nb1O3_ICSD_28297_LDA/POSCAR.static >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG 2>&1 ## redirecting stderr to stdout
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 18"
-	@echo '18. LiTaO3 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Li1O3Ta1_ICSD_9537_SCAN/POSCAR.static >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG 2>&1 ## redirecting stderr to stdout
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 19"
-	@echo '19. CuFeO2 with PBE+U_ICSD ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Cu1Fe1O2_ICSD_246912_PBE_U_ICSD/POSCAR.static --dft_formation_energies=-3.700,-5.466,-5.125,-5.298 --functionals=PBE,PBE+U_ICSD,LDA,SCAN >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 20"
-	@echo '20. BaO2 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Ba1O2_ICSD_24248_PBE_U_ICSD/POSCAR.static --dft_formation_energies=-5.583,0 --functionals=PBE+U_ICSD,exp >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 21"
-	@echo '21. NaO2 ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Na1O2_ICSD_87178_PBE_U_ICSD/POSCAR.static --dft_formation_energies=-9.568,0 --functionals=PBE+U_ICSD,exp >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 22"
-	@echo '22. HfN ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Hf1N1_ICSD_53025_SCAN/POSCAR.static --dft_formation_energies=-3.513,-4.429,-3.958,-3.516,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo '' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@echo "Running CCE test 23"
-	@echo '23. LiCaN ##################################################################################################' >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@./aflow --cce=DATA_CCE_TEST_CASES/Ca1Li1N1_ICSD_107304/POSCAR.static --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp >> DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG
-	@if [ "$$(diff DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG DATA_CCE_TEST_CASES/test_cases_template_results_for_checking_long)" != "" ]; then echo 'The test results do NOT match the template results! Please check the files TEST_CASES_RESULTS_FROM_TEST_LONG and test_cases_template_results_for_checking_long in 'DATA_CCE_TEST_CASES' for differences.'; else echo 'CCE LONG TEST OKAY!'; rm -f DATA_CCE_TEST_CASES/TEST_CASES_RESULTS_FROM_TEST_LONG; fi
+	@echo "Running CCE test 1: MgO"
+	@./aflow --proto=AB_cF8_225_a_b:Mg:O --params=4.253 > POSCAR_proto_Mg1O1_ICSD_159378; ANSWER=0.801,0.763,0.015,-0.025,-0.014,-0.054,-6.235,-6.197,-6.235,-6.195,-6.235,-6.195; RESULT=$$(./aflow --cce=POSCAR_proto_Mg1O1_ICSD_159378 --cce_test --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,-2); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 1 failed!, check CCE on POSCAR_proto_Mg1O1_ICSD_159378"; else echo "CCE test 1 passed!"; rm -f POSCAR_proto_Mg1O1_ICSD_159378 ; fi
+	@echo "Running CCE test 2: Ti3O5"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/MCLC/O5Ti3_ICSD_75193/CONTCAR.relax.vasp; ANSWER=-3.210,-3.532,3.638,3.338,-3.134,-3.454,-50.754,-50.432,-51.234,-50.934,-50.870,-50.550; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_O5Ti3_ICSD_75193; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_O5Ti3_ICSD_75193 --cce_test --dft_formation_energies=-53.964,-47.596,-54.004 --functionals=LDA,PBE,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 2 failed!, check CCE on CONTCAR.relax.vasp_O5Ti3_ICSD_75193"; else echo "CCE test 2 passed!"; rm -f CONTCAR.relax.vasp_O5Ti3_ICSD_75193 ; fi
+	@echo "Running CCE test 3: Mg2SiO4"
+	@./aflow --proto=A2B4C_oP28_62_ac_2cd_c:Mg:O:Si --params=10.193,0.586382811734,0.466202295693,0.2774,-0.0085,0.0913,0.7657,0.4474,0.2215,0.094,0.4262,0.1628,0.0331,0.2777 > POSCAR_proto_Mg2O4Si1_ICSD_83793; ANSWER=10.456,9.912,-0.252,-0.824,-0.444,-1.020,-89.916,-89.372,-89.860,-89.288,-90.000,-89.424; RESULT=$$(./aflow --cce=POSCAR_proto_Mg2O4Si1_ICSD_83793 --cce_test --dft_formation_energies=-79.46,-90.112,-90.444 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,2,2,2,2,2,2,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,4,4,4,4); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 3 failed!, check CCE on POSCAR_proto_Mg2O4Si1_ICSD_83793"; else echo "CCE test 3 passed!"; rm -f POSCAR_proto_Mg2O4Si1_ICSD_83793 ; fi
+	@echo "Running CCE test 4: BaTiO3"
+	@./aflow --proto=AB3C_cP5_221_a_c_b:Ba:O:Ti --params=4.033 > POSCAR_proto_Ba1O3Ti1_ICSD_187292; ANSWER=2.063,1.981,-0.461,-0.553,-0.692,-0.783,-17.513,-17.431,-17.180,-17.088,-17.010,-16.919; RESULT=$$(./aflow --cce=POSCAR_proto_Ba1O3Ti1_ICSD_187292 --cce_test --dft_formation_energies=-15.450,-17.641,-17.702 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 4 failed!, check CCE on POSCAR_proto_Ba1O3Ti1_ICSD_187292"; else echo "CCE test 4 passed!"; rm -f POSCAR_proto_Ba1O3Ti1_ICSD_187292 ; fi
+	@echo "Running CCE test 5: Na2WO4"
+	@./aflow --proto=A2BC4_cF56_227_d_a_e:Na:W:O --params=9.0433,0.260612 > POSCAR_proto_Na2O4W1_ICSD_44524; ANSWER=2.014,1.843,-1.765,-1.963,-1.359,-1.561,-32.470,-32.299,-31.827,-31.629,-32.513,-32.311; RESULT=$$(./aflow --cce=POSCAR_proto_Na2O4W1_ICSD_44524 --cce_test --dft_formation_energies=-30.456,-33.592,-33.872 --functionals=PBE,LDA,SCAN --oxidation_numbers=1,1,1,1,-2,-2,-2,-2,-2,-2,-2,-2,6,6); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 5 failed!, check CCE on POSCAR_proto_Na2O4W1_ICSD_44524"; else echo "CCE test 5 passed!"; rm -f POSCAR_proto_Na2O4W1_ICSD_44524 ; fi
+	@echo "Running CCE test 6: PbMoO4"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/Mo1O4Pb1_ICSD_89034/CONTCAR.relax.vasp; ANSWER=-2.922,-3.054,-0.332,-0.430,-4.468,-4.608,-21.832,-21.700,-22.330,-22.232,-21.104,-20.964; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034 --cce_test --dft_formation_energies=-24.754,-22.662,-25.572 --functionals=SCAN,PBE,LDA); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 6 failed!, check CCE on CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034"; else echo "CCE test 6 passed!"; rm -f CONTCAR.relax.vasp_Mo1O4Pb1_ICSD_89034 ; fi
+	@echo "Running CCE test 7: Fe3O4"
+	@./aflow --proto=A3B4_cF56_227_ad_e:Fe:O --params=8.3886,0.745448 > POSCAR_proto_Fe3O4_ICSD_263007; ANSWER=5.381,5.246,1.832,1.654,-1.084,-1.263,-23.575,-23.440,-23.068,-22.890,-24.320,-24.141; RESULT=$$(./aflow --cce=POSCAR_proto_Fe3O4_ICSD_263007 --cce_test --dft_formation_energies=-18.194,-21.236,-25.404 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 7 failed!, check CCE on POSCAR_proto_Fe3O4_ICSD_263007"; else echo "CCE test 7 passed!"; rm -f POSCAR_proto_Fe3O4_ICSD_263007 ; fi
+	@echo "Running CCE test 8: Ca2V2O7"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/TRI/Ca2O7V2_ICSD_421266/CONTCAR.relax.vasp; ANSWER=2.600,2.264,-4.675,-5.073,-4.499,-4.881,-64.422,-64.086,-64.113,-63.715,-65.011,-64.629; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266 --cce_test --dft_formation_energies=-61.822,-68.788,-69.51 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 8 failed!, check CCE on CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266"; else echo "CCE test 8 passed!"; rm -f CONTCAR.relax.vasp_Ca2O7V2_ICSD_421266 ; fi
+	@echo "Running CCE test 9: CuFeO2"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/RHL/Cu1Fe1O2_ICSD_246912/CONTCAR.relax.vasp; ANSWER=1.242,1.210,0.146,0.097,-0.266,-0.307,-5.152; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 9 failed!, check CCE on CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912"; else echo "CCE test 9 passed!"; rm -f CONTCAR.relax.vasp_Cu1Fe1O2_ICSD_246912 ; fi
+	@echo "Running CCE test 10: MnMoO4"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/MCL/Mn1Mo1O4_ICSD_61078/CONTCAR.relax.vasp; ANSWER=2.452,2.293,-0.852,-1.058,-3.459,-3.669,-24.390,-24.231,-25.458,-25.252,-24.891,-24.681; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078 --cce_test --dft_formation_energies=-21.938,-26.31,-28.35 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 10 failed!, check CCE on CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078"; else echo "CCE test 10 passed!"; rm -f CONTCAR.relax.vasp_Mn1Mo1O4_ICSD_61078 ; fi
+	@echo "Running CCE test 11: KO2"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/K1O2_ICSD_38245/CONTCAR.relax.vasp; ANSWER=0.285,0.259,-0.532,-0.571,-0.084,-0.118,-2.949,-2.923,-2.949,-2.910,-2.949,-2.915; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_K1O2_ICSD_38245; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_K1O2_ICSD_38245 --cce_test --dft_formation_energies=-2.664,-3.481,-3.033 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 11 failed!, check CCE on CONTCAR.relax.vasp_K1O2_ICSD_38245"; else echo "CCE test 11 passed!"; rm -f CONTCAR.relax.vasp_K1O2_ICSD_38245 ; fi
+	@echo "Running CCE test 12: Li2O"
+	@./aflow --proto=AB2_cF12_225_a_c:O:Li --params=4.5709 > POSCAR_proto_Li2O1_ICSD_642216; ANSWER=0.613,0.563,-0.123,-0.178,-0.094,-0.149,-6.197,-6.147,-6.197,-6.142,-6.197,-6.142; RESULT=$$(./aflow --cce=POSCAR_proto_Li2O1_ICSD_642216 --cce_test --dft_formation_energies=-5.584,-6.320,-6.291 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 12 failed!, check CCE on POSCAR_proto_Li2O1_ICSD_642216"; else echo "CCE test 12 passed!"; rm -f POSCAR_proto_Li2O1_ICSD_642216 ; fi
+	@echo "Running CCE test 13: Li2O2"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/HEX/Li2O2_ICSD_152183/CONTCAR.relax.vasp; ANSWER=1.653,1.518,-0.601,-0.756,0.198,0.048,-13.139,-13.004,-13.141,-12.986,-13.140,-12.990; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Li2O2_ICSD_152183; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Li2O2_ICSD_152183 --cce_test --dft_formation_energies=-11.486,-13.742,-12.942 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 13 failed!, check CCE on CONTCAR.relax.vasp_Li2O2_ICSD_152183"; else echo "CCE test 13 passed!"; rm -f CONTCAR.relax.vasp_Li2O2_ICSD_152183 ; fi
+	@echo "Running CCE test 14: CaFe2O4"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Fe2O4_ICSD_159751/CONTCAR.relax.vasp; ANSWER=11.217,10.817,-0.437,-1.000,-3.853,-4.340,-69.230; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 14 failed!, check CCE on CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751"; else echo "CCE test 14 passed!"; rm -f CONTCAR.relax.vasp_Ca1Fe2O4_ICSD_159751 ; fi
+	@echo "Running CCE test 15: Ca2Fe2O5"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca2Fe2O5_ICSD_161509/CONTCAR.relax.vasp; ANSWER=11.602,11.151,-1.072,-1.676,-3.684,-4.214,-81.087; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509 --cce_test); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 15 failed!, check CCE on CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509"; else echo "CCE test 15 passed!"; rm -f CONTCAR.relax.vasp_Ca2Fe2O5_ICSD_161509 ; fi
+	@echo "Running CCE test 16: FeTiO3"
+	@./aflow --proto=AB3C_hR10_148_c_f_c:Fe:O:Ti --params=5.08264,2.77119,0.648852,0.852345,0.436666,0.768665,0.0556432 > POSCAR_proto_Fe1O3Ti1_ICSD_187688; ANSWER=3.402,3.240,0.414,0.258,-1.258,-1.442,-25.786,-25.624,-25.612,-25.456,-25.808,-25.624; RESULT=$$(./aflow --cce=POSCAR_proto_Fe1O3Ti1_ICSD_187688 --cce_test --dft_formation_energies=-22.384,-25.198,-27.066 --functionals=PBE,LDA,SCAN); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 16 failed!, check CCE on POSCAR_proto_Fe1O3Ti1_ICSD_187688"; else echo "CCE test 16 passed!"; rm -f POSCAR_proto_Fe1O3Ti1_ICSD_187688 ; fi
+	@echo "Running CCE test 17: BaO2"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/BCT/Ba1O2_ICSD_24248/CONTCAR.relax.vasp; ANSWER=1.055,1.043,-6.638,-6.626,-6.743; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ba1O2_ICSD_24248; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ba1O2_ICSD_24248 --cce_test --dft_formation_energies=-5.583,0 --functionals=PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 17 failed!, check CCE on CONTCAR.relax.vasp_Ba1O2_ICSD_24248"; else echo "CCE test 17 passed!"; rm -f CONTCAR.relax.vasp_Ba1O2_ICSD_24248 ; fi
+	@echo "Running CCE test 18: NaO2"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/CUB/Na1O2_ICSD_87178/CONTCAR.relax.vasp; ANSWER=-0.205,-0.310,-9.363,-9.258,-5.972; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Na1O2_ICSD_87178; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Na1O2_ICSD_87178 --cce_test --dft_formation_energies=-9.568,0 --functionals=PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 18 failed!, check CCE on CONTCAR.relax.vasp_Na1O2_ICSD_87178"; else echo "CCE test 18 passed!"; rm -f CONTCAR.relax.vasp_Na1O2_ICSD_87178 ; fi
+	@echo "Running CCE test 19: HfN"
+	@./aflow --proto=AB_cF8_225_a_b:Hf:N --params=4.4938 > POSCAR_proto_Hf1N1_ICSD_53025; ANSWER=0.359,0.338,-0.557,-0.581,-0.086,-0.109,0.356,0.335,-3.872,-3.851,-3.872,-3.848,-3.872,-3.849,-3.872,-3.851,-3.872; RESULT=$$(./aflow --cce=POSCAR_proto_Hf1N1_ICSD_53025 --cce_test --dft_formation_energies=-3.513,-4.429,-3.958,-3.516,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 19 failed!, check CCE on POSCAR_proto_Hf1N1_ICSD_53025"; else echo "CCE test 19 passed!"; rm -f POSCAR_proto_Hf1N1_ICSD_53025 ; fi
+	@echo "Running CCE test 20: LiCaN"
+	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Li1N1_ICSD_107304/CONTCAR.relax.vasp; ANSWER=0.834,0.653,-2.298,-2.474,-1.133,-1.311,0.960,0.792,-8.794,-8.613,-8.814,-8.638,-8.787,-8.609,-8.840,-8.672,-8.518; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 --cce_test --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U_ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 20 failed!, check CCE on CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304"; else echo "CCE test 20 passed!"; rm -f CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 ; fi
 #RF200302 - STOP
 www:	web
 clean:
