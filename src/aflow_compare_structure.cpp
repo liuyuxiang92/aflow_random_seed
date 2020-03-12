@@ -2327,7 +2327,7 @@ namespace compare {
       //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
       //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
       vector<double> vcomposition;
-      vector<string> species = compare::stringElements2VectorElements(compounds[i], vcomposition);
+      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
       //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++){
       for(uint j=0;j<vcomposition.size();j++){ //DX 20191106
@@ -2354,7 +2354,8 @@ namespace compare {
       // instead: filter on stoichiometry after recieving AFLUX response
       //if(compare::sameStoichiometry(stoichiometry,tmp_reduced_stoich)){
       aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i]; 
-      if(!compare::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;} //DX 20200225 - added load_most_relaxed_structure_only
+      vector<string> structure_files;
+      if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;} //DX 20200225 - added load_most_relaxed_structure_only
       //DX 20200225 - added compare to particular geometry files - START
       bool found_structure = false;
       uint structure_index = 0;
