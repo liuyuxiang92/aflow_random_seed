@@ -987,8 +987,8 @@ namespace apl {
     stringstream outfile;
 
     writeHibernateHeader(outfile);
-    writeForceConstants(outfile);
     writeForceField(outfile);
+    writeForceConstants(outfile);
     if (_isPolarMaterial) writePolar(outfile);
     outfile << "</apl>" << std::endl;
 
