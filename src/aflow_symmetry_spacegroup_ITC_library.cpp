@@ -180,7 +180,8 @@ namespace SYM {
     vector<string> vs = splitstring(tstring.str());
 
     for (uint i = 0; i < vs.size(); i++)
-      out(i + 1) = frac2dbl(vs[i]);
+      // DX 20200313 [OBSOLETE] out(i + 1) = frac2dbl(vs[i]);
+      out(i + 1) = aurostd::frac2dbl(vs[i]); // DX 20200313
 
     return out;
   }
@@ -201,7 +202,7 @@ namespace SYM {
 //vector<string> tmpvec = splitstring(ITCstring);
 //
 //for (uint i = 0; i < tmpvec.size(); i++) {
-//outpoint[i + 1] = frac2dbl(tmpvec[i]);
+//outpoint[i + 1] = aurostd::frac2dbl(tmpvec[i]);
 //}
 //inversion_point = outpoint;
 //}
@@ -234,7 +235,7 @@ namespace SYM {
 //}
 //vector<string> vecstring = splitstring(oss.str());
 //for (uint i = 0; i < vecstring.size(); i++) {
-//translation_vec[i + 1] = frac2dbl(vecstring[i]);
+//translation_vec[i + 1] = aurostd::frac2dbl(vecstring[i]);
 //}
 ////cerr << translation_vec << endl;
 //}

@@ -3598,50 +3598,41 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
   // ----------------------------------------------------------------------
   // ABINIT input - START (DX 20200310)
-	// based on documentation found at https://docs.abinit.org/variables/basic/
+  // based on documentation found at https://docs.abinit.org/variables/basic/
+  // NOTE: originally had acell and rprim as keywords, but they are not mandatory
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR" << endl;
     uint ABINIT=0;
-		// find cell lattice vector scaling (acell; given in Angstroms or Bohr)
-		for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(vinput[i],"acell",true)){ ABINIT+=1; break;} 
-    }
-    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (acell)=" << ABINIT << endl;
-		// find real space primitive translations (rprim)
-		for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(vinput[i],"rprim",true)){ ABINIT+=1; break;} 
-    }
-    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (rprim)=" << ABINIT << endl;
-		// find number of atoms (natom)
-		for(uint i=0;i<vinput.size();i++){ 
+    // find number of atoms (natom)
+    for(uint i=0;i<vinput.size();i++){ 
       if(aurostd::substring2bool(vinput[i],"natom",true)){ ABINIT+=1; break;} 
     }
     if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (natom)=" << ABINIT << endl;
-		// find types of atoms (typat)
-		for(uint i=0;i<vinput.size();i++){ 
+    // find types of atoms (typat)
+    for(uint i=0;i<vinput.size();i++){ 
       if(aurostd::substring2bool(vinput[i],"typat",true)){ ABINIT+=1; break;} 
     }
     if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (typat)=" << ABINIT << endl;
-		// find atom positions (xred, xcart, xangst)
-		for(uint i=0;i<vinput.size();i++){ 
-			if(aurostd::substring2bool(vinput[i],"xred",true) || 
-					aurostd::substring2bool(vinput[i],"xcart",true) || 
-					aurostd::substring2bool(vinput[i],"xangst",true)){ ABINIT+=1; break;} 
+    // find atom positions (xred, xcart, xangst)
+    for(uint i=0;i<vinput.size();i++){ 
+      if(aurostd::substring2bool(vinput[i],"xred",true) || 
+          aurostd::substring2bool(vinput[i],"xcart",true) || 
+          aurostd::substring2bool(vinput[i],"xangst",true)){ ABINIT+=1; break;} 
     }
     if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (xred,xcart,xangst)=" << ABINIT << endl;
- 
-		if(ABINIT==5){
-			a.iomode = IOABINIT_GEOM;
-    	if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR = TRUE" << endl;
-			IOMODE_found = TRUE;
-		}
+
+    if(ABINIT==3){
+      a.iomode = IOABINIT_GEOM;
+      if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR = TRUE" << endl;
+      IOMODE_found = TRUE;
+    }
   }
   // ABINIT input - END (DX 20200310)
 
   // ----------------------------------------------------------------------
   // ELK input - START (DX 20200310)
   // ELK input - END (DX 20200310)
-  
+
   // ----------------------------------------------------------------------
   //for AIMS input - unfortunately, it's very generic so leave for last
   if(!IOMODE_found) {
@@ -4679,23 +4670,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
   // ABINIT INPUT (DX 20200310)
   if(a.iomode==IOABINIT_AUTO || a.iomode==IOABINIT_GEOM) { // ABINIT
-    if(LDEBUG){ cerr << soliloquy << " ABINIT" << endl; }
-    
-    // get lattice
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER begin" << endl; }
+
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
-    
-    // get lattice scaling (optional keyword)
+
+    // ----------------------------------------------------------------------
+    // get lattice scaling: acell (optional keyword)
     xvector<double> acell; acell(1)=1.0; acell(2)=1.0; acell(3)=1.0;
     for(uint i=0;i<vinput.size();i++){
-        cerr << "all lines: " << vinput[i] << endl;
-    }
-    for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ACELL",true)){
-        cerr << "acell_line: " << vinput[i] << endl;
-        //string acell_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::RemoveComments(aurostd::toupper(vinput[i])));
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER acell line=" << vinput[i] << endl; }
         string acell_line = aurostd::toupper(vinput[i]);
-        cerr << "acell_line: " << acell_line << endl;
         aurostd::StringSubst(acell_line,"ACELL","");
 
         // get units first (then remove from temp string for easy parsing)
@@ -4710,7 +4696,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           lattice_vec_unit = "Bohr";
           aurostd::StringSubst(acell_line,"BOHR","");
         }
-      
+
         // clean-up
         acell_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(acell_line);
 
@@ -4719,7 +4705,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         // multiplication : e.g., "acell 3*1.0"
         bool multiplication_variant = false;
         if(aurostd::substring2bool(acell_line,"*",true)){ multiplication_variant=true; }
-        
+
         if(multiplication_variant){
           vector<string> tokens;
           aurostd::string2tokens(acell_line,tokens,"*");
@@ -4740,11 +4726,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
           }
         }
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER extracted acell = " << acell << endl; }
       }
     }
-    
+
     // ----------------------------------------------------------------------
-    // get lattice (rprim) : given column-wise
+    // get lattice (rprim) : given column-wise (optional)
+    // default: identity (i.e., cube)
     // supported formats:
     //   1) single line 9 fields
     //   2) three lines 3 fields per line
@@ -4753,32 +4741,34 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.lattice = aurostd::identity((double)0,3,3);; //abinit default
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"RPRIM",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER rprim line found = " << vinput[i] << endl; }
         is_lattice_line = true;
       }
       if(is_lattice_line){
-        string rprim_line = aurostd::RemoveComments(aurostd::toupper(vinput[i]));
+        string rprim_line = aurostd::toupper(vinput[i]);
         aurostd::StringSubst(rprim_line,"RPRIM","");
         vector<string> tokens;
         uint number_tokens = aurostd::string2tokens(rprim_line,tokens," ");
         if(number_tokens==9){
           //column-wise
-          a.lattice(1,1) = aurostd::string2utype<double>(tokens[0])*acell(1);
-          a.lattice(2,1) = aurostd::string2utype<double>(tokens[1])*acell(1);
-          a.lattice(3,1) = aurostd::string2utype<double>(tokens[2])*acell(1);
-          a.lattice(1,2) = aurostd::string2utype<double>(tokens[3])*acell(2);
-          a.lattice(2,2) = aurostd::string2utype<double>(tokens[4])*acell(2);
-          a.lattice(3,2) = aurostd::string2utype<double>(tokens[5])*acell(2);
-          a.lattice(1,3) = aurostd::string2utype<double>(tokens[6])*acell(3);
-          a.lattice(2,3) = aurostd::string2utype<double>(tokens[7])*acell(3);
-          a.lattice(3,3) = aurostd::string2utype<double>(tokens[8])*acell(3);
+          a.lattice(1,1) = aurostd::frac2dbl(tokens[0])*acell(1);
+          a.lattice(2,1) = aurostd::frac2dbl(tokens[1])*acell(1);
+          a.lattice(3,1) = aurostd::frac2dbl(tokens[2])*acell(1);
+          a.lattice(1,2) = aurostd::frac2dbl(tokens[3])*acell(2);
+          a.lattice(2,2) = aurostd::frac2dbl(tokens[4])*acell(2);
+          a.lattice(3,2) = aurostd::frac2dbl(tokens[5])*acell(2);
+          a.lattice(1,3) = aurostd::frac2dbl(tokens[6])*acell(3);
+          a.lattice(2,3) = aurostd::frac2dbl(tokens[7])*acell(3);
+          a.lattice(3,3) = aurostd::frac2dbl(tokens[8])*acell(3);
           is_lattice_line = false;
           break;
         }
         else if(number_tokens==3){
           lattice_line_count += 1;
-          a.lattice(1,lattice_line_count) = aurostd::string2utype<double>(tokens[0])*acell(lattice_line_count);
-          a.lattice(2,lattice_line_count) = aurostd::string2utype<double>(tokens[1])*acell(lattice_line_count);
-          a.lattice(3,lattice_line_count) = aurostd::string2utype<double>(tokens[2])*acell(lattice_line_count);
+          //column-wise
+          a.lattice(1,lattice_line_count) = aurostd::frac2dbl(tokens[0])*acell(lattice_line_count);
+          a.lattice(2,lattice_line_count) = aurostd::frac2dbl(tokens[1])*acell(lattice_line_count);
+          a.lattice(3,lattice_line_count) = aurostd::frac2dbl(tokens[2])*acell(lattice_line_count);
           if(lattice_line_count == 3){ is_lattice_line=false; break; }
         }
         else if(number_tokens==0){ continue; }
@@ -4788,8 +4778,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
     }
-
-    cerr << "a.lattice: " << a.lattice << endl;
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER lattice (row-major; AFLOW convention) = " << endl << a.lattice << endl; }
 
     // ----------------------------------------------------------------------
     // get number of atoms
@@ -4799,6 +4788,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     uint number_of_atoms = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATOM",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER natom line = " << vinput[i] << endl; }
         string natom_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
         aurostd::string2tokens(natom_line,tokens," ");
@@ -4812,12 +4802,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
     }
-    
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atoms; natom = " << number_of_atoms << endl; }
+
     // natrd (optional)
     bool found_natrd = false;
     uint number_of_atoms_to_read = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATRD",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER natrd line = " << vinput[i] << endl; }
         found_natrd = true;
         string natrd_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
@@ -4830,6 +4822,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           message << "Unable to parse the natrd line; unexpected format. natrd_line = \"" << natrd_line << "\".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
         }
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atoms to read; natrd = " << number_of_atoms_to_read << endl; }
       }
     }
     if(!found_natrd){ number_of_atoms_to_read = number_of_atoms; } // if natrd not specified set to natom
@@ -4838,13 +4831,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
       message << "The natoms != natrd, i.e., unit cell requires atoms (iatoms) to be expanded by symmetry. Functionality not yet supported.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
     }
-    
+
     // ----------------------------------------------------------------------
     // get number of types (optional)
     bool found_ntypat = false;
     uint number_of_atom_types = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NTYPAT",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER ntypat line = " << vinput[i] << endl; }
         found_ntypat = true;
         string ntypat_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
@@ -4857,6 +4851,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           message << "Unable to parse the ntypat line; unexpected format. ntypat_line = \"" << ntypat_line << "\".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
         }
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atom types; ntypat = " << number_of_atom_types << endl; }
       }
     }
 
@@ -4866,6 +4861,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     vector<uint> atom_types; //follows order of atoms
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"TYPAT",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER typat line = " << vinput[i] << endl; }
         string typat_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
         aurostd::string2tokens(typat_line,tokens," ");
@@ -4873,16 +4869,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
         bool found_typat = false;
         bool is_field_attribute = false;
         for(uint t=0;t<tokens.size();t++){
-          cerr << "tokens: " << tokens[t] << endl;
-
           if(tokens[t]=="TYPAT"){ found_typat = true; is_field_attribute = true; continue; }
           if(is_field_attribute){
-            cerr << "is field attribute: " << tokens[t] << endl;
-            if(aurostd::substring2bool("*",tokens[t])){ 
+            if(aurostd::substring2bool(tokens[t],"*")){
               vector<string> sub_tokens; aurostd::string2tokens(tokens[t],sub_tokens,"*");
               uint multiplier = aurostd::string2utype<uint>(sub_tokens[0]);
               uint type_index = aurostd::string2utype<uint>(sub_tokens[1]);
-              for(uint i=0;i<multiplier;i++){ atom_types.push_back(type_index); }
+              for(uint m=0;m<multiplier;m++){ atom_types.push_back(type_index); }
             }
             else if(tokens[t][0]>='0' && tokens[t][0]<='9'){ //is digit
               atom_types.push_back(aurostd::string2utype<uint>(tokens[t]));
@@ -4897,35 +4890,37 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(!found_typat){ continue; } //found ntypat not typat, try another line
       }
     }
-    if(found_ntypat && (atom_types.size() != number_of_atom_types)){ 
-      message << "Number of atom types does not match ntypat variable. typat=" << aurostd::joinWDelimiter(atom_types,",") << " | ntypat=" << number_of_atom_types;
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER atom type sequence (matches order of atom positions); typat = " << aurostd::joinWDelimiter(atom_types,",") << endl; }
+
+    // check the number of unique types matches ntypat
+    vector<uint> unique_types = atom_types;
+    std::stable_sort(unique_types.begin(),unique_types.end());
+    unique_types.erase(std::unique(unique_types.begin(),unique_types.end()),unique_types.end());
+    if(found_ntypat && (unique_types.size() != number_of_atom_types)){
+      message << "Number of atom types does not match ntypat variable. typat=" << aurostd::joinWDelimiter(unique_types,",") << " | ntypat=" << number_of_atom_types;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
     }
     if(atom_types.size() != number_of_atoms_to_read){ 
       message << "Number of atom types does not match the number of atoms to read. typat=" << aurostd::joinWDelimiter(atom_types,",") << " | natom=" << number_of_atoms;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
     }
-    cerr << "number_of_atoms: " << number_of_atoms << endl;
-    cerr << "typat : " << aurostd::joinWDelimiter(atom_types,",") << endl;
-    
+
     // ----------------------------------------------------------------------
     // get atom type; element (znucl)
     vector<uint> nuclear_charge;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ZNUCL",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER znucl line = " << vinput[i] << endl; }
         string znucl_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
         aurostd::string2tokens(znucl_line,tokens," ");
         // the loop method protects against multiple keywords per line
         bool is_field_attribute = false;
         for(uint t=0;t<tokens.size();t++){
-          cerr << "tokens: " << tokens[t] << endl;
           if(tokens[t]=="ZNUCL"){ is_field_attribute = true; continue; }
           if(is_field_attribute){
-            cerr << "is field attribute: " << tokens[t] << endl;
             if(tokens[t][0]>='0' && tokens[t][0]<='9'){ //is digit
               nuclear_charge.push_back(aurostd::string2utype<uint>(tokens[t]));
-              cerr << "nuclear_charge: " << aurostd::joinWDelimiter(nuclear_charge,",") << endl;
             }
             else{
               // signals a new keyword in the same line
@@ -4936,7 +4931,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
     }
-    
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER nuclear charge of each atom type (order corresponds to typat index); znucl = " << aurostd::joinWDelimiter(nuclear_charge,",") << endl; }
+
     // ----------------------------------------------------------------------
     // normally a mandatory keyword, but the AFLOW-ABINIT writer has not been printing this keyword
     // for backwards compatability, we will throw a warning (for now)
@@ -4944,24 +4940,28 @@ istream& operator>>(istream& cinput, xstructure& a) {
       message << "The atom elements/types (znucl) are not specified. Using fictious atoms.";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_WARNING_);
     }
-    
+
     // ----------------------------------------------------------------------
     // get atom positions
+    if(LDEBUG){ cerr << soliloquy << " ABINIT READER reading atom positions" << endl; }
     deque<_atom> atoms_temp;
     bool is_atom_line = false;
     bool is_Bohr_units = false;
     uint atom_line_count = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XRED",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xred (fractional) line = " << vinput[i] << endl; }
         a.coord_flag = _COORDS_FRACTIONAL_;
         is_atom_line = true;
       }
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XCART",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xcart (Cartesian, unit=Bohr) line = " << vinput[i] << endl; }
         a.coord_flag = _COORDS_CARTESIAN_;
         is_Bohr_units = true;
         is_atom_line = true;
       }
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XANGST",true)){
+        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xangst (Cartesian, unit=Angstrom) line = " << vinput[i] << endl; }
         a.coord_flag = _COORDS_CARTESIAN_;
         is_atom_line = true;
       }
@@ -4975,9 +4975,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(number_tokens==3){
           atom_line_count += 1;
           xvector<double> coordinate;
-          coordinate(1) = aurostd::string2utype<double>(tokens[0]);
-          coordinate(2) = aurostd::string2utype<double>(tokens[1]);
-          coordinate(3) = aurostd::string2utype<double>(tokens[2]);
+          coordinate(1) = aurostd::frac2dbl(tokens[0]);
+          coordinate(2) = aurostd::frac2dbl(tokens[1]);
+          coordinate(3) = aurostd::frac2dbl(tokens[2]);
 
           _atom atom;
           if(a.coord_flag == _COORDS_FRACTIONAL_){ 
@@ -4995,10 +4995,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
           for(uint t=0;t<tokens.size();t+=3){
             atom_line_count += 1;
             xvector<double> coordinate;
-            coordinate(1) = aurostd::string2utype<double>(tokens[t]);
-            coordinate(2) = aurostd::string2utype<double>(tokens[t+1]);
-            coordinate(3) = aurostd::string2utype<double>(tokens[t+2]);
-          
+            coordinate(1) = aurostd::frac2dbl(tokens[t]);
+            coordinate(2) = aurostd::frac2dbl(tokens[t+1]);
+            coordinate(3) = aurostd::frac2dbl(tokens[t+2]);
+
             _atom atom;
             if(a.coord_flag == _COORDS_FRACTIONAL_){ 
               atom.fpos = coordinate; 
@@ -5009,7 +5009,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
               if(is_Bohr_units){ atom.cpos *= bohr2angstrom; } // AFLOW expects Angstroms
               atom.fpos = C2F(a.lattice,atom.cpos); 
             }
-            cerr << "atom.cpos: " << atom.cpos << endl;
             atoms_temp.push_back(atom);
           }
         }
@@ -5022,7 +5021,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
 
-    cerr << "atoms : " << atoms_temp.size() << endl;
+    if(LDEBUG){ 
+      for(uint a=0;a<atoms_temp.size();a++){
+        cerr << soliloquy << " ABINIT READER atom position [" << a << "] = " << atoms_temp[a] << endl;
+      }
+    }
+
     // ----------------------------------------------------------------------
     // ensure correct number of atoms
     if(atoms_temp.size() != number_of_atoms_to_read){ 
@@ -5034,13 +5038,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // add atoms to xstructure 
     // add name/type info as well
     for(uint i=0;i<atoms_temp.size();i++){
-      cerr << atoms_temp[i].cpos << endl;
+      if(LDEBUG) {cerr << soliloquy << " ABINIT READER finding element/type for atom [" << a << "]" << endl; }
       xelement element;
       // use nuclear charge associated atom index
       if(nuclear_charge.size()){ element = xelement(nuclear_charge[atom_types[i]-1]); } //i-1 since index doesn't start at zero
       // use arbitrary element names (in order of increasing Z)
       else{ element = xelement(atom_types[i]); }
-      cerr << "element.symbol: " << element.symbol << endl;
+      if(LDEBUG) {cerr << soliloquy << " ABINIT READER element/type for atom [" << a << "] = " << element.symbol << endl; }
       atoms_temp[i].name=element.symbol;
       atoms_temp[i].CleanName();
       atoms_temp[i].CleanSpin();
@@ -5062,8 +5066,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
       a.AddAtom(atoms_temp[i]);
       // NO PARTIAL OCCUPATION
       a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
-      
+
     }
+    if(LDEBUG) {cerr << soliloquy << " ABINIT READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
     a.SpeciesPutAlphabetic(); // fight analphabetization
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
     a.MakeBasis();
@@ -5077,7 +5082,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.partial_occupation_flag=FALSE;
     a.is_vasp4_poscar_format=FALSE;
     a.is_vasp5_poscar_format=FALSE;
-    
+
+    if(LDEBUG) {cerr << soliloquy << " ABINIT READER - Finished" << endl; }
+
   }
 
   // ----------------------------------------------------------------------

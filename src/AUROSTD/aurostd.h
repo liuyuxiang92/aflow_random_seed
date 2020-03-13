@@ -760,6 +760,7 @@ namespace aurostd {
   string latex2txt(const string& str) __xprototype;
   string fixStringLatex(const string& input, bool double_back_slash=false,bool symmetry_string=false);  //CO190419
   string dbl2frac(double a, bool sign_prefix=true); //DX 20190724
+  double frac2dbl(const string& str); //DX 20200313
 }
 
 

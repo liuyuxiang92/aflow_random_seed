@@ -5253,6 +5253,45 @@ namespace aurostd {
   }
 } //namespace SYM
 
+// ******************************************************************************
+// dbl2frac Double to Fraction //DX 20200313
+// ******************************************************************************
+namespace aurostd {
+  double frac2dbl(const string& str) {
+
+    // converts fraction to double
+
+    // --------------------------------------------------------------------------
+    // parse tokens
+    vector<string> tokens;
+    uint field_count = aurostd::string2tokens(str,tokens,"/");
+
+    // --------------------------------------------------------------------------
+    // expects two fields
+    if(field_count == 1){ // not slash
+      return aurostd::string2utype<double>(str);
+    }
+    else if(field_count != 2){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "Expect two fields, i.e., numerator and denominator: str = " << str;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
+    double numerator = aurostd::string2utype<double>(tokens[0]);
+    double denominator = aurostd::string2utype<double>(tokens[1]);
+
+    // --------------------------------------------------------------------------
+    // protect against division by zero
+    if(aurostd::isequal(denominator,_ZERO_TOL_)){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "Denominator is zero: " << denominator;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
+    return numerator/denominator;
+  }
+}
+
 // ***************************************************************************
 // SORT WORLD
 // ----------------------------------------------------------------------------
