@@ -3042,6 +3042,18 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss << endl;
     }
     oss << "natom " << a.atoms.size() << endl;
+    //DX 20200313 - add atom type info via znucl - START
+    oss << "znucl ";
+    for(uint i=0;i<a.species.size();i++){
+      for(uint e=0;e<velement.size();e++){ //external variable (see aflow_xelement.h)
+        if(velement[e].symbol == KBIN::VASP_PseudoPotential_CleanName(a.species[i])){
+          oss << e << " "; // index corresponds to Z value 
+          break;
+        }
+      }
+    }
+    oss << endl;
+    //DX 20200313 - add atom type info via znucl - END
     oss << "typat ";
     //   for(uint i=0;i<a.num_each_type.size();i++) oss << a.num_each_type.at(i) << " ";  oss << endl;
     for(uint i=0;i<a.atoms.size();i++)

@@ -8,6 +8,7 @@
         -- updated README_AFLOW_COMPARE.TXT and README_AFLOW_ACONVASP.TXT with "relaxation_step" and "isopointal" comparison functionality (DX)
         -- added --relaxation_step flag to --compare2database and --compare_database_entries to compare original/relax1/most_relaxed geometry files (DX)
         -- added ABINIT detector and reader (DX)
+        -- added atom type/element to ABINIT writer (via nuclear charge, i.e., znucl) (DX)
         -- moved frac2dbl from SYM to AUROSTD, and reformatted in more consistent style to AFLOW (DX)
         -- added overloads for running database comparison functions internally: compare2dabase(), isMatchingStructureInDatabase(), matchingStructuresInDatabase(), printCompare2Database()  (DX)
         -- added FileMESSAGE and logstream to more comparison functions (DX)
