@@ -41,6 +41,7 @@ Table of Contents:
 3.1.    Phonon Dispersion Curves
 3.2.    Phonon Density of States
 3.3.    Thermodynamic Properties
+3.4.    Plotting Phonon Properties
 
 4.    Saving and Loading APL Results (Hibernation)
 
@@ -55,7 +56,8 @@ Table of Contents:
 7.2.2.    Sum Rule Parameters
 7.2.3.    k-Point Parameters
 7.3.    Lattice Thermal Conductivity Calculations
-7.4.    Example AAPL Input File
+7.4.    Plotting Thermal Conductivity
+7.5.    Example AAPL Input File
 
 ----------------------------------------------------------------------------------------------------
 
@@ -501,6 +503,61 @@ Where TSTART and TEND are the initial and final temperature, respectively, and T
 temperature step size. The default setting is 0:2000:10, i.e. it calculates the properties from 0 K
 to 2000 K in 10 K steps.
 
+3.4. Plotting Phonon Properties
+
+AFLOW can plot phonon dispersions, phonon DOS, and thermodynamic properties using the command line.
+This feature requires gnuplot version 5 and pdflatex.
+
+To plot phonon dispersions, use:
+
+  aflow --plotphdisp | --plotphonondispersion | --pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+    Defaults.
+     Directory: default = ./
+     Emin: The minimum value of the plot. Default value: minimum frequency
+     Emax: The maximum value of the plot. Default value: maximum frequency
+    Optional arguments:
+     --keep=gpl: keep the gnuplot script
+     --print: specify the format of the output image (default: pdf)
+     --title: the title of the plot in LaTeX format (default: title in PHEIGENVAL file)
+     --unit: the unit of the phonon frequencies/energies (default: THz)
+    Example:
+     aflow --plotphdisp=./  --print=png --unit=cm-1
+
+The files PHEIGENVAL, PHKPOINTS, and PHPOSCAR must reside in the directory.
+
+Phonon DOS can be plotted in a similar fashion:
+
+  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+    Defaults.
+     DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
+    Other options: same as plotphdisp
+
+The file PHDOSCAR must be present in the directory. To plot projected DOS, --projection=atom needs
+to be added to the command and PHPOSCAR needs to be in the directory.
+
+A combined dispersion-DOS plot can be created using:
+
+  aflow --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+
+Thermodynamic properties can be plotted using:
+
+  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+    Defaults.
+     Directory: default = ./
+     Tmin: The minimum temperature of the plot. Default value: 0 K
+     Tmax: The maximum temperature of the plot. Default value: maximum temperature
+    Optional arguments:
+     --keep=gpl: keep the gnuplot script
+     --print: specify the format of the output image (default: pdf)
+     --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+    Example:
+     aflow --plotthermo=./,100,300
+
+This command outputs four separate files for the internal energy, vibrational free energy,
+vibrational entropy, and isochoral heat capacity. The file aflow.apl.thermal_properties.out must be
+present in the directory.
+
+
 4. Saving and Loading APL Results APL Calculations (Hibernation)
 
 In order to avoid recalculating the force constant matrix with every run, APL has implemented a
@@ -787,7 +844,28 @@ scattering.
 
         Which corresponds to the grain size/mean free path threshold in nm. The default is 100 nm.
 
-7.4. Example AAPL Input File
+7.4. Plotting Thermal Conductivity
+
+Thermal conductivity can be plotted using the command line:
+
+  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+
+aflow.apl.thermal_properties.out must be present in the directory.
+
+        Defaults.
+         Directory: default = ./
+         Tmin: The minimum temperature of the plot. Default value: 0 K
+         Tmax: The maximum temperature of the plot. Default value: maximum temperature
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+        Example:
+         aflow --plotthermo=./,100,300
+
+This feature requires gnuplot version 5 and pdflatex.
+
+7.5. Example AAPL Input File
 
 The following is an example AAPL input file for NaF. Four-phonon processes are included.
 
