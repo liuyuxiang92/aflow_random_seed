@@ -30,6 +30,7 @@ static const string BANDDOS_SIZE = "8, 4.5";
 static const string POCC_TAG=":POCC_";
 static const string ARUN_TAG=":ARUN.";
 static const string POCC_ARUN_TAG=ARUN_TAG+"POCC_";
+static const string DEFAULT_IMAGE_FORMAT = "pdf";
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -79,9 +80,28 @@ namespace plotter {
     scheme = xopt.getattachedscheme("PLOTTER::TITLE");
     if (!scheme.empty()) plotoptions.push_attached("TITLE", scheme);
 
+
     // Get image format
     scheme = xopt.getattachedscheme("PLOTTER::PRINT");
     if (!scheme.empty()) plotoptions.push_attached("IMAGE_FORMAT", aurostd::tolower(scheme));
+
+    // ME200313 - Get user-defined output file name
+    string outfile = xopt.getattachedscheme("PLOTTER::OUTFILE");
+    // Remove extension from user-defined file name (extensions will be handled later)
+    if (!outfile.empty()) {
+      if (scheme.empty()) scheme = "." + DEFAULT_IMAGE_FORMAT;
+      else scheme = "." + aurostd::tolower(scheme);
+      uint nchar_scheme = scheme.size();
+      uint nchar_outfile = outfile.size();
+      if (nchar_outfile > nchar_scheme) {
+        uint i = 0;
+        for (i = 0; i < nchar_scheme; i++) {
+          if (scheme[i] != aurostd::tolower(outfile)[nchar_outfile - nchar_scheme + i]) break;
+        }
+        if (i == nchar_scheme) outfile = outfile.substr(0, nchar_outfile - nchar_scheme);
+      }
+      plotoptions.push_attached("FILE_NAME_USER", outfile);
+    }
 
     // Set standard background color
     plotoptions.push_attached("BACKGROUND_COLOR", "#FFFFFF");
@@ -169,7 +189,7 @@ namespace plotter {
         << " size " << plotoptions.getattachedscheme("PLOT_SIZE") << " linewidth 2" << std::endl;
       out << "set output " << "'" << plotoptions.getattachedscheme("FILE_NAME_LATEX") << ".tex'" << std::endl;
       if (!plottitle.empty())
-        out << "set " << (multiplot?"multiplot ":"")
+        out << "set " << (multiplot?"multiplot layout 1,2 ":"")
           << "title '" << plottitle << "' offset 0, -0.5" << std::endl;
       if (plotoptions.flag("NOBORDER")) out << "unset border" << std::endl;
       out << "set object 1 rectangle from graph 0,0 to graph 1,1 fc"
@@ -199,7 +219,7 @@ namespace plotter {
     string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
     // PDF is default since we use pdflatex to compile
     string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
-    if (format.empty()) format = "pdf";
+    if (format.empty()) format = DEFAULT_IMAGE_FORMAT;
     string current_dir = aurostd::getPWD();  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     // Create temp directory
     string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
@@ -237,20 +257,23 @@ namespace plotter {
     string soliloquy="plotter::setFileName():";
     if(LDEBUG){cerr << soliloquy << " filename_in=" << filename << endl;}
     if (filename.empty()) {
-      string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
-      if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
-      filename = default_title;
-      // Get filename
-      string ext = plotoptions.getattachedscheme("EXTENSION");
-      if (!ext.empty()) {
-        if (filename.empty()) filename = ext;
-        else filename += "_" + ext;
-      }
-      filename = aurostd::StringSubst(filename, " ", "_");
-      string set = plotoptions.getattachedscheme("DATASET");
-      if (aurostd::string2utype<int>(set) > 0) {
-        filename += "_" + plotoptions.getattachedscheme("DATALABEL");
-        filename += "_" + set;
+      filename = plotoptions.getattachedscheme("FILE_NAME_USER");  // ME200313 - user-defined output file
+      if (filename.empty()) {
+        string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
+        if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
+        filename = default_title;
+        // Get filename
+        string ext = plotoptions.getattachedscheme("EXTENSION");
+        if (!ext.empty()) {
+          if (filename.empty()) filename = ext;
+          else filename += "_" + ext;
+        }
+        filename = aurostd::StringSubst(filename, " ", "_");
+        string set = plotoptions.getattachedscheme("DATASET");
+        if (aurostd::string2utype<int>(set) > 0) {
+          filename += "_" + plotoptions.getattachedscheme("DATALABEL");
+          filename += "_" + set;
+        }
       }
     }
     plotoptions.push_attached("FILE_NAME", filename);

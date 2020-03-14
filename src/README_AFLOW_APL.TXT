@@ -510,7 +510,7 @@ This feature requires gnuplot version 5 and pdflatex.
 
 To plot phonon dispersions, use:
 
-  aflow --plotphdisp | --plotphonondispersion | --pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+  aflow --plotphdisp|--plotphonondispersion|--pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
     Defaults.
      Directory: default = ./
      Emin: The minimum value of the plot. Default value: minimum frequency
@@ -520,14 +520,15 @@ To plot phonon dispersions, use:
      --print: specify the format of the output image (default: pdf)
      --title: the title of the plot in LaTeX format (default: title in PHEIGENVAL file)
      --unit: the unit of the phonon frequencies/energies (default: THz)
+     --outfile: the name of the output image file.
     Example:
-     aflow --plotphdisp=./  --print=png --unit=cm-1
+     aflow --plotphdisp=./ --print=png --unit=cm-1
 
 The files PHEIGENVAL, PHKPOINTS, and PHPOSCAR must reside in the directory.
 
 Phonon DOS can be plotted in a similar fashion:
 
-  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
     Defaults.
      DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
     Other options: same as plotphdisp
@@ -537,7 +538,7 @@ to be added to the command and PHPOSCAR needs to be in the directory.
 
 A combined dispersion-DOS plot can be created using:
 
-  aflow --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+  aflow --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
 
 Thermodynamic properties can be plotted using:
 
@@ -550,6 +551,7 @@ Thermodynamic properties can be plotted using:
      --keep=gpl: keep the gnuplot script
      --print: specify the format of the output image (default: pdf)
      --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+     --outfile: the name of the output image file.
     Example:
      aflow --plotthermo=./,100,300
 
@@ -848,20 +850,21 @@ scattering.
 
 Thermal conductivity can be plotted using the command line:
 
-  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
+
+  Defaults.
+   Directory: default = ./
+   Tmin: The minimum temperature of the plot. Default value: 0 K
+   Tmax: The maximum temperature of the plot. Default value: maximum temperature
+  Optional arguments:
+   --keep=gpl: keep the gnuplot script
+   --print: specify the format of the output image (default: pdf)
+   --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+   --outfile: the name of the output image file.
+  Example:
+   aflow --plottcond=./,100,300
 
 aflow.apl.thermal_properties.out must be present in the directory.
-
-        Defaults.
-         Directory: default = ./
-         Tmin: The minimum temperature of the plot. Default value: 0 K
-         Tmax: The maximum temperature of the plot. Default value: maximum temperature
-        Optional arguments:
-         --keep=gpl: keep the gnuplot script
-         --print: specify the format of the output image (default: pdf)
-         --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
-        Example:
-         aflow --plotthermo=./,100,300
 
 This feature requires gnuplot version 5 and pdflatex.
 
