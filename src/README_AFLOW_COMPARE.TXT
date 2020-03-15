@@ -60,6 +60,7 @@ The supported formats are:
   - FHI-AIMS
   - ABINIT
   - CIF
+  - ELK
 
 ----------------------------------------------------------------------
 COMPARE TO ESTABLISHED STRUCTURES 

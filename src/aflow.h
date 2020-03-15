@@ -1531,6 +1531,7 @@ class xstructure {
     void xstructure2aims(void);                                   // some wrap up IOs to convert format to AIMS
     void xstructure2cif(void);                                    // some wrap up IOs to convert format to CIF //DX 20190123
     void xstructure2abccar(void);                                 // some wrap up IOs to convert format to ABCCAR //DX 20190123
+    void xstructure2elk(void);                                    // some wrap up IOs to convert format to ELK //DX 20200313
     //[CO 180420 - moved outside of xstructure]bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
     //[CO 180420 - moved outside of xstructure]bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
     // OPERATORS                                                  // --------------------------------------
@@ -2397,6 +2398,7 @@ xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input);
+xstructure input2ELKxstr(istream& input); //DX 20200313
 
 // ----------------------------------------------------------------------------
 // functions related to AtomEnvironment - DX 20191122

@@ -933,12 +933,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW","--aflow_proto=|--aflow_proto_icsd=","");      // --aflow_proto=123:A:B:C  --aflow_proto_icsd=Gd1Mn2Si2_ICSD_54947 
   if(vpflow.flag("PROTO")||vpflow.flag("PROTO_AFLOW")) {  //CO 180622 - set these flags if structure is downloaded from web
-    vpflow.flag("PROTO::VASP",aurostd::args2flag(argv,cmds,"--vasp") || (!aurostd::args2flag(argv,cmds,"--qe") && !aurostd::args2flag(argv,cmds,"--abinit") && !aurostd::args2flag(argv,cmds,"--aims")  && !aurostd::args2flag(argv,cmds,"--cif"))); //DX190131
+    vpflow.flag("PROTO::VASP",aurostd::args2flag(argv,cmds,"--vasp") || (!aurostd::args2flag(argv,cmds,"--qe") && !aurostd::args2flag(argv,cmds,"--abinit") && !aurostd::args2flag(argv,cmds,"--aims")  && !aurostd::args2flag(argv,cmds,"--cif") && !aurostd::args2flag(argv,cmds,"--elk"))); //DX190131 //DX 20200313 - added elk
     vpflow.flag("PROTO::QE",aurostd::args2flag(argv,cmds,"--qe"));
     vpflow.flag("PROTO::ABCCAR",aurostd::args2flag(argv,cmds,"--abccar")); //DX 20190123 - add abccar output
     vpflow.flag("PROTO::ABINIT",aurostd::args2flag(argv,cmds,"--abinit"));
     vpflow.flag("PROTO::AIMS",aurostd::args2flag(argv,cmds,"--aims"));
     vpflow.flag("PROTO::CIF",aurostd::args2flag(argv,cmds,"--cif")); //DX 20190123 - add cif output
+    vpflow.flag("PROTO::ELK",aurostd::args2flag(argv,cmds,"--elk")); //DX 20200313 - add elk output
     vpflow.flag("PROTO::HEX",aurostd::args2flag(argv,cmds,"--hex"));
     vpflow.flag("PROTO::RHL",aurostd::args2flag(argv,cmds,"--rhl"));
     vpflow.flag("PROTO::ADD_EQUATIONS",aurostd::args2flag(argv,cmds,"--add_equations")); //DX 20180615 - add equation info
@@ -1049,6 +1050,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::AIMS")) vlist+="--aims ";                                                   // recursion is GNU's pleasure (SC2016)
     vpflow.flag("PROTO_AFLOW::CIF",aurostd::args2flag(argv,cmds,"--cif"));  //DX190131                                                                           //DX 20190123 - added CIF
     if(vpflow.flag("PROTO_AFLOW::CIF")) vlist+="--cif ";  //DX190131                                                    // recursion is GNU's pleasure (SC2016)  //DX 20190123 - added CIF
+    vpflow.flag("PROTO_AFLOW::ELK",aurostd::args2flag(argv,cmds,"--elk"));                                                                           //DX 2020031 - added ELK3
+    if(vpflow.flag("PROTO_AFLOW::ELK")) vlist+="--elk ";                                                     // recursion is GNU's pleasure (SC2016) //DX 20200313 - added ELK
     vpflow.flag("PROTO_AFLOW::HEX",aurostd::args2flag(argv,cmds,"--hex"));
     if(vpflow.flag("PROTO_AFLOW::HEX")) vlist+="--hex ";                                                     // recursion is GNU's pleasure (SC2016)
     vpflow.flag("PROTO_AFLOW::RHL",aurostd::args2flag(argv,cmds,"--rhl"));
@@ -1066,6 +1069,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("ABINIT",FALSE);    // PRIORITIES
     vpflow.flag("AIMS",FALSE);      // PRIORITIES
     vpflow.flag("CIF",FALSE);       // PRIORITIES //DX 20190123 - add CIF
+    vpflow.flag("ELK",FALSE);       // PRIORITIES //DX 20200313 - add ELK
   }  
 
   // [OBSOLETE]  vpflow.flag("PROTOCLASSIFY",aurostd::args2flag(argv,cmds,"--protoclassify|--PROTOCLASSIFY"));
@@ -1082,6 +1086,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("ABCCAR",aurostd::args2flag(argv,cmds,"--abccar") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX 20190123 - moved ABCCAR to here
   vpflow.flag("ABINIT",aurostd::args2flag(argv,cmds,"--abinit") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("AIMS",aurostd::args2flag(argv,cmds,"--aims") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
+  vpflow.flag("ELK",aurostd::args2flag(argv,cmds,"--elk") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX 20200313
 
   //DX 20190123 - CIF to work with PROTO - START 
   vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif") && (vpflow.flag("PROTO_AFLOW") || vpflow.flag("PROTO"))); //DX 20190123 - to differentiate between proto and istream 
@@ -1655,6 +1660,7 @@ namespace pflow {
       //  if(vpflow.flag("EFFECTIVEMASS")) {pflow::EffectiveMass(argv,aurostd::args2string(argv,"--em","./"),cout); _PROGRAMRUN=true;}
       if(vpflow.flag("EIGCURV")) {pflow::EIGCURV(vpflow.getattachedscheme("EIGCURV"),cout) ; _PROGRAMRUN=true ;} // CAMILO
       // DX 8/18/17 [OBSOLETE] if(vpflow.flag("EQUIVALENT")) {cout << pflow::EQUIVALENT(aflags,cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("ELK")) {cout << input2ELKxstr(cin); _PROGRAMRUN=true;} //DX 20200313
       if(vpflow.flag("EQUIVALENT")) {cout << pflow::EQUIVALENT(aflags,cin,vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("EWALD")) {pflow::EWALD(vpflow.getattachedscheme("EWALD"),cin); _PROGRAMRUN=true;}
       // F
@@ -12714,6 +12720,9 @@ namespace pflow {
       if(vpflow.flag("PROTO::ABCCAR")) str.xstructure2abccar();
       //DX 20190123 - add CIF/ABCCAR - END
 
+      // now checking ELK //DX 20200313
+      if(vpflow.flag("PROTO::ELK")) str.xstructure2elk();
+
     }
 
     if(LDEBUG) cerr << soliloquy << " END" << endl;  
@@ -13048,19 +13057,21 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ENMAX_MULTIPLY\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY") << endl;
 
     // check ABINIT QE VASP AIMS
-    if(LDEBUG) cerr << soliloquy << " CHECK VASP/ABCCAR/QE/ABINIT/AIMS/CIF" << endl; //DX 20190123 - add CIF
+    if(LDEBUG) cerr << soliloquy << " CHECK VASP/ABCCAR/QE/ABINIT/AIMS/CIF/ELK" << endl; //DX 20190123 - add CIF //DX 20200313 - add ELK
     PARAMS.vparams.flag("AFLOWIN_FLAG::VASP",TRUE); // default
     PARAMS.vparams.flag("AFLOWIN_FLAG::QE",vpflow.flag("PROTO_AFLOW::QE"));
     PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",vpflow.flag("PROTO_AFLOW::ABCCAR")); //DX 20190123 - add ABCCAR
     PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",vpflow.flag("PROTO_AFLOW::ABINIT"));
     PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",vpflow.flag("PROTO_AFLOW::AIMS"));
     PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",vpflow.flag("PROTO_AFLOW::CIF")); //DX 20190123 - add CIF
+    PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",vpflow.flag("PROTO_AFLOW::ELK")); //DX 20200313 - add ELK
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS")) {
       PARAMS.vparams.flag("AFLOWIN_FLAG::QE",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::VASP",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX 20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX 20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX 20200313 - add ELK
     }
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT")) {
       PARAMS.vparams.flag("AFLOWIN_FLAG::QE",FALSE);
@@ -13068,6 +13079,7 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX 20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX 20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX 20200313 - add ELK
     }
     //DX 20190123 - add ABCCAR - START
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR")) {
@@ -13076,6 +13088,7 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE); 
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX 20200313 - add ELK
     }
     //DX 20190123 - add ABCCAR - END
     //DX 20190123 - add CIF - START
@@ -13085,6 +13098,7 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE); 
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX 20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX 201200313 - add ELK
     }
     //DX 20190123 - add CIF - END
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::QE"))     {
@@ -13093,6 +13107,7 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX 20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX 20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX 201200313 - add ELK
     }
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::VASP"))   {
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
@@ -13100,13 +13115,25 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX 20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX 20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX 201200313 - add ELK
     }
+    //DX 20200313 - add ELK - START
+    if(PARAMS.vparams.flag("AFLOWIN_FLAG::ELK")) {
+      PARAMS.vparams.flag("AFLOWIN_FLAG::QE",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::VASP",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE); 
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE);
+    }
+    //DX 20200313 - add ELK - END
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::AIMS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABINIT\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::QE\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::QE") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::VASP\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::VASP") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::CIF\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::CIF") << endl; //DX 20190123 - add CIF
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABCCAR\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR") << endl; //DX 20190123 - add ABCCAR
+    if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ELK\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ELK") << endl; //DX 20200313 - add ELK
 
     // check stdout
     if(LDEBUG) cerr << soliloquy << " CHECK STDOUT" << endl; 
@@ -13235,6 +13262,7 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::QE\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::QE") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::CIF\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::CIF") << endl; //DX 20190123 - add CIF
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABCCAR\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR") << endl; //DX 20190123 - add ABCCAR
+    if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ELK\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ELK") << endl; //DX 202003133 - add ELK
 
     //    if(LDEBUG) exit(0);
 

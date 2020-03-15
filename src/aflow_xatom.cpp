@@ -3094,6 +3094,67 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     oss << "# AFLOW::ABINIT END " << endl;
     return oss;
   } 
+  
+  // ----------------------------------------------------------------------
+  //  ELK OUTPUT //DX 20200315
+  if(a_iomode==IOELK_AUTO || a_iomode==IOELK_GEOM) { // ELK
+    oss << "# AFLOW::ELK BEGIN " << endl;
+    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 stefano 10 dane //CO 180515
+    oss.precision(_precision_);
+    oss.setf(std::ios::fixed,std::ios::floatfield);
+    oss << "# " << a.title <<endl;
+    oss << endl;
+    //scaling factors
+    oss << "scale" << endl << " " << a.scale << endl << endl;
+    oss << "scale1" << endl << " 1.0" << endl << endl; // returns unscaled (for now)
+    oss << "scale2" << endl << " 1.0" << endl << endl; // returns unscaled (for now) 
+    oss << "scale3" << endl << " 1.0" << endl << endl; // returns unscaled (for now)
+
+    //lattice, note: convert to atomic units (Bohr)
+    oss << "avec" << endl;
+    oss << " " << a.lattice(1)*angstrom2bohr << endl;
+    oss << " " << a.lattice(2)*angstrom2bohr << endl;
+    oss << " " << a.lattice(3)*angstrom2bohr << endl;
+    oss << endl;
+
+    // atom info
+    oss << "atoms" << endl;
+    oss << " " << setw(49) << std::left << a.species.size();
+    oss << ": nspecies" << endl;
+    xvector<double> magnetic_field; // not currently supported; zero vector for now
+    for(uint i=0;i<a.num_each_type.size();i++){
+      oss << setw(50) << std::left << "\'" + a.species[i] + ".in\'";
+      oss << ": spfname" << endl;
+      oss << " " << setw(49) << std::left << a.num_each_type[i];
+      oss << ": natoms; atpos, bfcmt below" << endl;
+      for(uint iat=0;iat<a.atoms.size();iat++){
+        if(a.atoms[iat].name == a.species[i]){
+          // atom coordinates
+          for(uint j=1;j<=3;j++) {
+            if(a.coord_flag==_COORDS_CARTESIAN_) {
+              if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
+              if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
+              oss << a.atoms.at(iat).fpos(j) << " ";
+            }
+            if(a.coord_flag==_COORDS_FRACTIONAL_) {
+              if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
+              if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
+              oss << a.atoms.at(iat).fpos(j) << " ";
+            }
+          }
+          // magnetic field
+          for(uint j=1;j<=3;j++) {
+            if(abs(magnetic_field(j))<10.0) oss << " ";
+            if(!std::signbit(magnetic_field(j))) oss << " ";
+            oss << magnetic_field(j) << " ";
+          }
+          oss << endl;
+        }
+      }
+    }
+    oss << "# AFLOW::ELK END " << endl;
+    return oss;
+  }
 
   // ----------------------------------------------------------------------
   //  AIMS OUTPUT
@@ -3643,6 +3704,26 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
   // ----------------------------------------------------------------------
   // ELK input - START (DX 20200310)
+  if(!IOMODE_found) {
+    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR" << endl;
+    uint ELK=0;
+    // find atoms keyword (atoms)
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(vinput[i],"atoms",true)){ ELK+=1; break;}
+    }
+    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR (atoms)=" << ELK << endl;
+    // find lattice keyword (avec)
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(vinput[i],"avec",true)){ ELK+=1; break;}
+    }
+    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR (avec)=" << ELK << endl;
+
+    if(ELK==2){
+      a.iomode = IOELK_GEOM;
+      if(LDEBUG) cerr << soliloquy << " ELK DETECTOR = TRUE" << endl;
+      IOMODE_found = TRUE;
+    }
+  }
   // ELK input - END (DX 20200310)
 
   // ----------------------------------------------------------------------
@@ -4733,7 +4814,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
             acell(3) = aurostd::string2utype<double>(tokens[2]);
           }
           else{
-            cerr << "number_tokens:" << number_tokens << endl;
             message << "Unable to parse the acell line; unexpected format. acell_line = " << acell_line << " tokens: " << aurostd::joinWDelimiter(tokens,",");
             throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
           }
@@ -4743,14 +4823,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
 
     // ----------------------------------------------------------------------
-    // get lattice (rprim) : given column-wise (optional)
+    // get lattice (rprim) : given column-major (optional)
     // default: identity (i.e., cube)
     // supported formats:
     //   1) single line 9 fields
     //   2) three lines 3 fields per line
     bool is_lattice_line = false;
     uint lattice_line_count = 0;
-    a.lattice = aurostd::identity((double)0,3,3);; //abinit default
+    a.lattice = aurostd::identity((double)0,3,3); //abinit default
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"RPRIM",true)){
         if(LDEBUG){ cerr << soliloquy << " ABINIT READER rprim line found = " << vinput[i] << endl; }
@@ -4762,7 +4842,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         vector<string> tokens;
         uint number_tokens = aurostd::string2tokens(rprim_line,tokens," ");
         if(number_tokens==9){
-          //column-wise
+          //column-major
           a.lattice(1,1) = aurostd::frac2dbl(tokens[0])*acell(1);
           a.lattice(2,1) = aurostd::frac2dbl(tokens[1])*acell(1);
           a.lattice(3,1) = aurostd::frac2dbl(tokens[2])*acell(1);
@@ -4777,7 +4857,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         else if(number_tokens==3){
           lattice_line_count += 1;
-          //column-wise
+          //column-major
           a.lattice(1,lattice_line_count) = aurostd::frac2dbl(tokens[0])*acell(lattice_line_count);
           a.lattice(2,lattice_line_count) = aurostd::frac2dbl(tokens[1])*acell(lattice_line_count);
           a.lattice(3,lattice_line_count) = aurostd::frac2dbl(tokens[2])*acell(lattice_line_count);
@@ -5034,8 +5114,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
 
     if(LDEBUG){ 
-      for(uint a=0;a<atoms_temp.size();a++){
-        cerr << soliloquy << " ABINIT READER atom position [" << a << "] = " << atoms_temp[a] << endl;
+      for(uint iat=0;iat<atoms_temp.size();iat++){
+        cerr << soliloquy << " ABINIT READER atom position [" << iat << "] = " << atoms_temp[iat] << endl;
       }
     }
 
@@ -5081,11 +5161,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
     }
     if(LDEBUG) {cerr << soliloquy << " ABINIT READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
-    a.SpeciesPutAlphabetic(); // fight analphabetization
+    a.SpeciesPutAlphabetic();
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
     a.MakeBasis();
     a.MakeTypes(); //DX 20190508 - otherwise types are not created
     uint iat=0;
+    // add system name to title
+    a.title += " "; // add space between existing title
     for(uint itype=0;itype<a.num_each_type.size();itype++) 
       for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
         if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
@@ -5097,6 +5179,242 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
     if(LDEBUG) {cerr << soliloquy << " ABINIT READER - Finished" << endl; }
 
+  }
+
+  // ----------------------------------------------------------------------
+  // ELK INPUT - START (DX 20200310)
+  // based on information from http://elk.sourceforge.net/elk.pdf
+  if(a.iomode==IOELK_AUTO || a.iomode==IOELK_GEOM) { // ELK
+    if(LDEBUG){ cerr << soliloquy << " ELK READER begin" << endl; }
+
+    a.scale=1.0; // standard
+    a.neg_scale=FALSE; // standard
+    a.coord_flag = _COORDS_FRACTIONAL_; // always for ELK
+
+    // ----------------------------------------------------------------------
+    // get isotropic lattice scaling; two types
+    //   1) scale : isotropic scaling
+    //   2) scale1/2/3 : anisotropic scaling
+    double isotropic_scaling = 1.0;
+    xvector<double> anisotropic_scaling;
+    anisotropic_scaling(1) = 1.0; anisotropic_scaling(2) = 1.0; anisotropic_scaling(3) = 1.0;
+
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"SCALE",true)){
+
+        string scaling_title_line = aurostd::toupper(vinput[i]);
+        // ----------------------------------------------------------------------
+        // anisotropic
+        if(aurostd::substring2bool(scaling_title_line,"SCALE1",true) ||
+            aurostd::substring2bool(scaling_title_line,"SCALE2",true) ||
+            aurostd::substring2bool(scaling_title_line,"SCALE3",true)){
+          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling line found = " << vinput[i] << endl; }
+          uint vector_index = aurostd::string2utype<uint>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::StringSubst(scaling_title_line,"SCALE","")));
+          string scaling_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vinput[i+1]); // scaling value is in the next line
+          anisotropic_scaling(vector_index) = aurostd::string2utype<double>(scaling_line);
+
+          if(anisotropic_scaling(vector_index)<_ZERO_TOL_){
+            message << "Anisotropic scaling factor is zero or negative for " << vector_index << " component;; unable to parse the scale line; unexpected format. scaling_line = " << scaling_line;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          }
+          if(LDEBUG){ cerr << soliloquy << " ELK READER anisotropic scaling for vector " << vector_index << " = " << anisotropic_scaling(vector_index) << endl; }
+        }
+        // ----------------------------------------------------------------------
+        // isotropic
+        else{
+          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling line found = " << vinput[i] << endl; }
+          string scaling_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vinput[i+1]); // scaling is the next line
+          isotropic_scaling = aurostd::string2utype<double>(scaling_line);
+          if(isotropic_scaling<_ZERO_TOL_){
+            message << "Isotropic scaling factor is zero or negative; unable to parse the scale line; unexpected format. scaling_line = " << scaling_line;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          }
+          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling = " << isotropic_scaling << endl; }
+        }
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // get lattice (avec) : row-major
+    bool is_lattice_line = false;
+    uint lattice_line_count = 0;
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"AVEC",true)){
+        if(LDEBUG){ cerr << soliloquy << " ELK READER avec line found = " << vinput[i] << endl; }
+        is_lattice_line = true;
+      }
+      if(is_lattice_line){
+        string avec_line = aurostd::toupper(vinput[i]);
+        aurostd::StringSubst(avec_line,"AVEC","");
+        vector<string> tokens;
+        uint number_tokens = aurostd::string2tokens(rprim_line,tokens," ");
+        if(number_tokens==9){
+          //row-major
+          a.lattice(1,1) = aurostd::frac2dbl(tokens[0])*isotropic_scaling*anisotropic_scaling(1);
+          a.lattice(1,2) = aurostd::frac2dbl(tokens[1])*isotropic_scaling*anisotropic_scaling(1);
+          a.lattice(1,3) = aurostd::frac2dbl(tokens[2])*isotropic_scaling*anisotropic_scaling(1);
+          a.lattice(2,1) = aurostd::frac2dbl(tokens[3])*isotropic_scaling*anisotropic_scaling(2);
+          a.lattice(2,2) = aurostd::frac2dbl(tokens[4])*isotropic_scaling*anisotropic_scaling(2);
+          a.lattice(2,3) = aurostd::frac2dbl(tokens[5])*isotropic_scaling*anisotropic_scaling(2);
+          a.lattice(3,1) = aurostd::frac2dbl(tokens[6])*isotropic_scaling*anisotropic_scaling(3);
+          a.lattice(3,2) = aurostd::frac2dbl(tokens[7])*isotropic_scaling*anisotropic_scaling(3);
+          a.lattice(3,3) = aurostd::frac2dbl(tokens[8])*isotropic_scaling*anisotropic_scaling(3);
+          is_lattice_line = false;
+          break;
+        }
+        else if(number_tokens==3){
+          lattice_line_count += 1;
+          //row-major
+          a.lattice(lattice_line_count,1) = aurostd::frac2dbl(tokens[0])*isotropic_scaling*anisotropic_scaling(lattice_line_count);
+          a.lattice(lattice_line_count,2) = aurostd::frac2dbl(tokens[1])*isotropic_scaling*anisotropic_scaling(lattice_line_count);
+          a.lattice(lattice_line_count,3) = aurostd::frac2dbl(tokens[2])*isotropic_scaling*anisotropic_scaling(lattice_line_count);
+          if(lattice_line_count == 3){ is_lattice_line=false; break; }
+        }
+        else if(number_tokens==0){ continue; }
+        else{
+          message << "Unable to parse the avec line; unexpected format.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+      }
+    }
+    a.lattice = a.lattice*bohr2angstrom; // convert to Angstroms
+    if(LDEBUG){ cerr << soliloquy << " ELK READER lattice (row-major; AFLOW convention) = " << endl << a.lattice << endl; }
+
+    // ----------------------------------------------------------------------
+    // get number of atom types (atoms)
+    double number_of_atom_types = 0;
+
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMS",true) &&
+          !aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATOMS",true)){
+        vector<string> tokens;
+        aurostd::string2tokens(vinput[i+1],tokens," "); // scaling value is in the next line
+        number_of_atom_types = aurostd::string2utype<uint>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]));
+
+        if(number_of_atom_types == 0){
+          message << "Unable to parse the atoms line; unexpected format. atoms_line = \"" << tokens[0] << "\".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+        }
+        if(LDEBUG){ cerr << soliloquy << " ELK READER number of atom types atoms = " << number_of_atom_types << endl; }
+        break;
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // get atoms (elements, positions, etc.)
+    uint number_of_element_dot_in_files = 0;
+    vector<uint> num_each_type;
+
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),".IN",true)){
+        number_of_element_dot_in_files++;
+        if(LDEBUG){ cerr << soliloquy << " ELK READER \"ELEMENT.in\" file line found = " << vinput[i] << endl; }
+
+        vector<string> tokens;
+        // ----------------------------------------------------------------------
+        // get element
+        aurostd::string2tokens(vinput[i],tokens,".");
+        string element_symbol = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[0],'\''); //clean
+        element_symbol = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(element_symbol); //clean
+        tokens.clear();
+        if(LDEBUG){ cerr << soliloquy << " ELK READER element extracted = " << element_symbol << endl; }
+
+        // ----------------------------------------------------------------------
+        // get number of that element (+1 line down)
+        aurostd::string2tokens(vinput[i+1],tokens," "); // note: +1 line down
+        uint num_of_this_type = aurostd::string2utype<uint>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0])); //clean
+        num_each_type.push_back(num_of_this_type);
+        if(LDEBUG){ cerr << soliloquy << " ELK READER number of " << element_symbol << " atoms = " << num_of_this_type << endl; }
+        tokens.clear();
+
+        // ----------------------------------------------------------------------
+        // get subsequent atom positions
+        for(uint iat=1;iat<=num_of_this_type;iat++){
+          uint line_index = i+1+iat; // keep track of line index
+          _atom atom;
+
+          string atom_line = vinput[line_index];
+          uint number_of_tokens = aurostd::string2tokens(atom_line,tokens," ");
+
+          // first three fields are atom positions (fractional)
+          if(number_of_tokens >= 3){
+            atom.fpos(1) = aurostd::string2utype<double>(tokens[0]);
+            atom.fpos(2) = aurostd::string2utype<double>(tokens[1]);
+            atom.fpos(3) = aurostd::string2utype<double>(tokens[2]);
+
+            if(number_of_tokens == 6){
+              // subsequent are external magnetic field in Cartesian coords
+              // not stored beyond here (for now)
+              xvector<double> magnetic_field;
+              magnetic_field(1) = aurostd::string2utype<double>(tokens[3]);
+              magnetic_field(2) = aurostd::string2utype<double>(tokens[4]);
+              magnetic_field(3) = aurostd::string2utype<double>(tokens[5]);
+              if(LDEBUG){ cerr << soliloquy << " ELK READER magnetic field found : " << magnetic_field << " [CURRENTLY NOT USED]" << endl; }
+            }
+          }
+          // F2C
+          atom.cpos = F2C(a.lattice,atom.fpos);
+
+          atom.name=element_symbol;
+          atom.CleanName();
+          atom.CleanSpin();
+          atom.name_is_given=TRUE;
+
+          atom.number=a.atoms.size();    // reference position for convasp
+          atom.basis=a.atoms.size();     // position in the basis
+          atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
+          atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
+          atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
+          atom.spin=0.0;
+          atom.noncoll_spin.clear();
+          atom.order_parameter_value=0;
+          atom.order_parameter_atom=FALSE;
+          atom.partial_occupation_value=1.0;
+          atom.partial_occupation_flag=FALSE;
+
+          if(LDEBUG){ cerr << soliloquy << " ELK READER atom added = " << atom << endl; }
+          // DONE
+          a.AddAtom(atom);
+          // NO PARTIAL OCCUPATION
+          a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+        }
+        i += num_of_this_type+1; // no need to read over the same lines
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // check number of element types is consistent
+    if(number_of_atom_types == 0 || number_of_atom_types != number_of_element_dot_in_files){
+      message << "The number of atom types do not match the number of \"ELEMENT.in\" files: atom = " << number_of_atom_types << " vs # .in files = " << number_of_element_dot_in_files;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+    }
+    // ----------------------------------------------------------------------
+    // check number of total atoms is consistent
+    uint sum_each_type = aurostd::sum(num_each_type);
+    if(sum_each_type != a.atoms.size()){
+      message << "The total number of atoms does not match the sum of each atom type: a.atoms.size() = " << a.atoms.size() << " vs sum(num_each_type) = " << sum_each_type;;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+    }
+
+    if(LDEBUG) {cerr << soliloquy << " ELK READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
+    a.SpeciesPutAlphabetic();
+    std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
+    a.MakeBasis();
+    a.MakeTypes();
+    uint iat=0;
+    // add system name to title
+    a.title += " "; // add space between existing title
+    for(uint itype=0;itype<a.num_each_type.size();itype++)
+      for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
+        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+        a.atoms.at(iat++).type=itype;
+      }
+    // NO PARTIAL OCCUPATION
+    a.partial_occupation_flag=FALSE;
+    a.is_vasp4_poscar_format=FALSE;
+    a.is_vasp5_poscar_format=FALSE;
+
+    if(LDEBUG) {cerr << soliloquy << " ELK READER - Finished" << endl; }
   }
 
   // ----------------------------------------------------------------------
@@ -14131,6 +14449,17 @@ void xstructure::xstructure2abccar(void) { //DX190131
 }
 
 // ***************************************************************************
+// Function xstructure2abinit
+// ***************************************************************************
+void xstructure::xstructure2elk(void) { //DX 20200313
+  ReScale(1.0);
+  neg_scale=FALSE;
+  coord_flag=_COORDS_FRACTIONAL_; 
+  iomode=IOELK_GEOM;
+  return;
+}
+
+// ***************************************************************************
 // Function platon2print
 // ***************************************************************************
 string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3) {
@@ -15069,6 +15398,12 @@ xstructure input2VASPxstr(istream& input) {
   //  if(a.iomode==IOQE_AUTO || a.iomode==IOQE_GEOM)
   a.xstructure2vasp();
   //  cerr << a.title << endl;
+  return a;
+}
+
+xstructure input2ELKxstr(istream& input) { //DX 20200313
+  xstructure a(input,IOAFLOW_AUTO);
+  a.xstructure2elk();
   return a;
 }
 
