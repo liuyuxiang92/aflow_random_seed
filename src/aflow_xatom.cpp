@@ -5247,7 +5247,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         string avec_line = aurostd::toupper(vinput[i]);
         aurostd::StringSubst(avec_line,"AVEC","");
         vector<string> tokens;
-        uint number_tokens = aurostd::string2tokens(rprim_line,tokens," ");
+        uint number_tokens = aurostd::string2tokens(avec_line,tokens," ");
         if(number_tokens==9){
           //row-major
           a.lattice(1,1) = aurostd::frac2dbl(tokens[0])*isotropic_scaling*anisotropic_scaling(1);
