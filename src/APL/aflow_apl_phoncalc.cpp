@@ -779,20 +779,19 @@ namespace apl {
     uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches);
 
-    if (calc_derivative) {  // reset derivative
-      derivative.clear();
-      xmatrix<xcomplex<double> > mat(_nBranches, _nBranches, 1, 1);
-      derivative.assign(3, mat);
-    }
-
-    // Calculation
-    double fac0 = hartree2eV * bohr2angst;  // from a.u. to eV/A  // ME200206 - replaced with xscalar constants
-    double volume = det(pc.lattice);
-    double fac1 = 4.0 * PI / volume;
-    double nbCells = det(sc.lattice) / volume;
-
-
     if (aurostd::modulus(q) > _AFLOW_APL_EPS_) {
+      if (calc_derivative) {  // reset derivative
+        derivative.clear();
+        xmatrix<xcomplex<double> > mat(_nBranches, _nBranches, 1, 1);
+        derivative.assign(3, mat);
+      }
+
+      // Calculation
+      double fac0 = hartree2eV * bohr2angst;  // from a.u. to eV/A  // ME200206 - replaced with xscalar constants
+      double volume = det(pc.lattice);
+      double fac1 = 4.0 * PI / volume;
+      double nbCells = det(sc.lattice) / volume;
+
       // Precompute product of q-point with charge tensor
       vector<xvector<double> > qZ(pcIAtomsSize);
       for (uint at = 0; at < pcIAtomsSize; at++) qZ[at] = q * _bornEffectiveChargeTensor[at];
@@ -817,8 +816,8 @@ namespace apl {
                   xcomplex<double> coeff(0, 0);
                   //coeff += borni * _bornEffectiveChargeTensor[ipc1](iy, d + 1);
                   //coeff += bornj * _bornEffectiveChargeTensor[ipc2](ix, d + 1);
-                  coeff += borni * _bornEffectiveChargeTensor[iat1](iy, d + 1);
-                  coeff += bornj * _bornEffectiveChargeTensor[iat2](ix, d + 1);
+                  coeff += borni * _bornEffectiveChargeTensor[iat2](iy, d + 1);
+                  coeff += bornj * _bornEffectiveChargeTensor[iat1](ix, d + 1);
                   coeff -= 2 * borni * bornj * scalar_product(_dielectricTensor(d + 1), q)/dotprod;
                   derivative[d](3 * ipc1 + ix, 3 * ipc2 + iy) = prefactor * coeff;
                 }
