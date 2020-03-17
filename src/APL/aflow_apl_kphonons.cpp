@@ -1675,13 +1675,13 @@ namespace KBIN {
         // Reading failed - calculate
         if (!awakeAnharmIFCs) {
           // Clusters
-          apl::ClusterSet clst(logger, aflags);
+          apl::ClusterSet clst(messageFile, aflags);
           string clust_hib_file = aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[o-3];
           bool awakeClusterSet = (USER_HIBERNATE && aurostd::EFileExist(clust_hib_file));
           if (awakeClusterSet) {
             try {
               clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
-                  USER_CUTOFF_DISTANCE[o-3], o, logger, aflags);
+                  USER_CUTOFF_DISTANCE[o-3], o, messageFile, aflags);
             } catch (aurostd::xerror excpt) {
               message = excpt.error_message;
               pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
@@ -1691,7 +1691,7 @@ namespace KBIN {
           // Reading clusters failed - determine
           if (!awakeClusterSet) {
             clst = apl::ClusterSet(supercell, USER_CUTOFF_SHELL[o-3],
-                USER_CUTOFF_DISTANCE[o-3], logger, aflags);
+                USER_CUTOFF_DISTANCE[o-3], messageFile, aflags);
             clst.build(o);
             clst.buildDistortions();
             if (USER_HIBERNATE) {
@@ -1801,7 +1801,6 @@ namespace KBIN {
         //store dynamical matrices along path //PN180705
         store.create_pdispath(qpoints);
         qpoints.clear();
-        pdisc.clear();
       }
       store.clear(); //PN180705
       return; //PN180705
@@ -1839,7 +1838,6 @@ namespace KBIN {
       // Calculate DOS
       dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
       if (USER_DOS) dosc.writePDOS(_TMPDIR_, dirname);
-      dosc.clear();
       store.clear();
       return;
     }
@@ -1883,7 +1881,6 @@ namespace KBIN {
           std::vector< xvector<double> > qpoints=pdisc.get_qpoints();
           store.create_pdispath(qpoints);
           qpoints.clear();
-          pdisc.clear();
         }
         {
           // ME190428 - START
@@ -1911,7 +1908,6 @@ namespace KBIN {
           // Calculate DOS
           dosc.calc(USER_DOS_NPOINTS,USER_DOS_SMEAR);
           if(USER_DOS)dosc.writePDOS(_TMPDIR_, dirname);
-          dosc.clear();
         }
         store.clear();
       }
@@ -2308,7 +2304,6 @@ namespace KBIN {
       }
 
       // Clear old stuff
-      dosc.clear();  // ME190423
       //delete dosc; //auto_ptr will do
     }
 

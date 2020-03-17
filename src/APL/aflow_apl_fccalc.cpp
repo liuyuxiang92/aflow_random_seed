@@ -21,16 +21,18 @@ static const string _APL_FCCALC_MODULE_ = "APL";  // for the logger
 namespace apl {
 
   ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf)
-    : _supercell(sc), _xInput(xinput), _aflowFlags(aflags), _kbinFlags(kflags),
-      _xFlags(xflags), _AflowIn(AflowIn) {
-      free();
-      messageFile = &mf;
-    }
+      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
+    free();
+    _supercell = &sc;
+    _xInput = &xinput;
+    _aflowFlags = &aflags;
+    _kbinFlags = &kflags;
+    _xFlags = &xflags;
+    _AflowIn = &AflowIn;
+    messageFile = &mf;
+  }
 
-  ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that)
-    : _supercell(that._supercell), _xInput(that._xInput), _aflowFlags(that._aflowFlags),
-      _kbinFlags(that._kbinFlags), _xFlags(that._xFlags), _AflowIn(that._AflowIn) {
+  ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) {
     free();
     copy(that);
   }
@@ -46,12 +48,12 @@ namespace apl {
   void ForceConstantCalculator::clear(Supercell& sc, _xinput& xinput,
       _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
     free();
-    _supercell = sc;
-    _xInput = xinput;
-    _aflowFlags =  aflags;
-    _kbinFlags = kflags;
-    _xFlags = xflags;
-    _AflowIn = AflowIn;
+    _supercell = &sc;
+    _xInput = &xinput;
+    _aflowFlags =  &aflags;
+    _kbinFlags = &kflags;
+    _xFlags = &xflags;
+    _AflowIn = &AflowIn;
     messageFile = &mf;
   }
 
@@ -110,7 +112,7 @@ namespace apl {
 
   bool ForceConstantCalculator::run() {
     // Check if supercell is already built
-    if (!_supercell.isConstructed()) {
+    if (!_supercell->isConstructed()) {
       string function = "apl::ForceConstantCalculator::run()";
       string message = "The supercell structure has not been initialized yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
@@ -121,7 +123,7 @@ namespace apl {
     // ME191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
     // symmetry operations on-the-fly.
-    if (!_supercell.fullBasisCalculatedAGROUP()) _supercell.getFullBasisAGROUP();
+    if (!_supercell->fullBasisCalculatedAGROUP()) _supercell->getFullBasisAGROUP();
 
     // Symmetrization of the force-constant matrices
     symmetrizeForceConstantMatrices();
@@ -135,13 +137,13 @@ namespace apl {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
     string soliloquy="apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()"; //CO190218
     // Test of stupidity...
-    if (!_supercell.getSupercellStructure().agroup_calculated) {
+    if (!_supercell->getSupercellStructure().agroup_calculated) {
       string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
       string message = "The site groups have not been calculated yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     //CO - START
-    if (_supercell.getEPS() == AUROSTD_NAN) {
+    if (_supercell->getEPS() == AUROSTD_NAN) {
       string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
       string message = "Need to define symmetry tolerance.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
@@ -149,18 +151,18 @@ namespace apl {
     //CO - END
 
     string message = "Symmetrizing the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
 
     vector<xmatrix<double> > row;
-    for (int i = 0; i < _supercell.getNumberOfAtoms(); i++) {
-      const vector<_sym_op>& agroup = _supercell.getAGROUP(i);  //CO //CO190218
+    for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
+      const vector<_sym_op>& agroup = _supercell->getAGROUP(i);  //CO //CO190218
       if (agroup.size() == 0) {
         string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
         string message = "Site point group operations are missing.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
       }
 
-      for (int j = 0; j < _supercell.getNumberOfAtoms(); j++) {
+      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if(LDEBUG){ //CO190218
           cerr << soliloquy << " compare original m=" << std::endl;
           cerr << _forceConstantMatrices[i][j] << std::endl;
@@ -173,12 +175,12 @@ namespace apl {
             //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, j, i, FALSE);  //CO NEW //CO190218
             // ME191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
             // the basis has not been calculated for some reason
-            _AFLOW_APL_REGISTER_ int l = _supercell.atomGoesTo(symOp, j, i, true); //JAHNATEK ORIGINAL //CO190218
+            _AFLOW_APL_REGISTER_ int l = _supercell->atomGoesTo(symOp, j, i, true); //JAHNATEK ORIGINAL //CO190218
             m = m + (inverse(symOp.Uc) * _forceConstantMatrices[i][l] * symOp.Uc);  //JAHNATEK ORIGINAL //CO190218
             //m = m + (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc));  //CO NEW //CO190218
             if(LDEBUG){ //CO190218
-              std::cerr << soliloquy << " atom[" << l << "].cpos=" << _supercell.getSupercellStructure().atoms[l].cpos << std::endl;
-              std::cerr << soliloquy << " atom[" << j << "].cpos=" << _supercell.getSupercellStructure().atoms[j].cpos << std::endl;
+              std::cerr << soliloquy << " atom[" << l << "].cpos=" << _supercell->getSupercellStructure().atoms[l].cpos << std::endl;
+              std::cerr << soliloquy << " atom[" << j << "].cpos=" << _supercell->getSupercellStructure().atoms[j].cpos << std::endl;
               std::cerr << soliloquy << " agroup(" << l << " -> " << j << ")=" << std::endl;
               std::cerr << symOp.Uc << std::endl;
               std::cerr << soliloquy << " forceConstantMatrices[i=" << i << "][l=" << l << "]=" << std::endl;
@@ -205,9 +207,9 @@ namespace apl {
   void ForceConstantCalculator::correctSumRules() {
     xmatrix<double> sum(3, 3), sum2(3, 3);
 
-    for (int i = 0; i < _supercell.getNumberOfAtoms(); i++) {
+    for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       // Get SUMs
-      for (int j = 0; j < _supercell.getNumberOfAtoms(); j++) {
+      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i != j) {
           sum = sum + _forceConstantMatrices[i][j];
           sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);
@@ -215,7 +217,7 @@ namespace apl {
       }
 
       // Correct SUM2
-      for (int j = 0; j < _supercell.getNumberOfAtoms(); j++) {
+      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i == j) continue;
         _forceConstantMatrices[i][j] = 0.5 * (_forceConstantMatrices[i][j] + trasp(_forceConstantMatrices[j][i]));
         _forceConstantMatrices[j][i] = trasp(_forceConstantMatrices[i][j]);
@@ -224,7 +226,7 @@ namespace apl {
       // Get SUMs again
       sum.clear();
       sum2.clear();
-      for (int j = 0; j < _supercell.getNumberOfAtoms(); j++) {
+      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i != j) {
           sum = sum + _forceConstantMatrices[i][j];
           sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);
@@ -249,7 +251,7 @@ namespace apl {
   bool ForceConstantCalculator::runVASPCalculationsBE(_xinput& xInput, uint ncalcs) {
     bool stagebreak = false;
 
-    xInput.setXStr(_supercell.getInputStructure());
+    xInput.setXStr(_supercell->getInputStructure());
     xInput.getXStr().title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInput.getXStr().title);
     if(xInput.getXStr().title.empty()){xInput.getXStr().buildGenericTitle(true,false);}
     xInput.getXStr().title+=" Born effective charges/dielectric tensor";
@@ -260,18 +262,18 @@ namespace apl {
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_LR", false);
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_BORN", true);
       // Switch off autotune
-      _kbinFlags.KBIN_MPI_AUTOTUNE = false;
+      _kbinFlags->KBIN_MPI_AUTOTUNE = false;
       // Set POSCAR to VASP5 format
       xInput.getXStr().is_vasp4_poscar_format = false;
       xInput.getXStr().is_vasp5_poscar_format = true;
-      stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInput) || stagebreak);
+      stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInput) || stagebreak);
     } else if (xInput.AFLOW_MODE_AIMS) {
       string runname = _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_;
-      xInput.setDirectory( _xInput.getDirectory() + "/" + runname );
+      xInput.setDirectory( _xInput->getDirectory() + "/" + runname );
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
-        createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *messageFile);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+        createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *messageFile);
         stagebreak = true;
       }
     }
@@ -283,7 +285,7 @@ namespace apl {
   bool ForceConstantCalculator::calculateDielectricTensor(const _xinput& xinpBE) {
     stringstream message;
     // Parse effective charges from OUTCAR
-    if (_kbinFlags.AFLOW_MODE_VASP) {
+    if (_kbinFlags->AFLOW_MODE_VASP) {
       string directory = xinpBE.xvasp.Directory;
       string infilename = directory + "/OUTCAR.static";
 
@@ -291,11 +293,11 @@ namespace apl {
         infilename = directory + string("/OUTCAR");
         if (!aurostd::EFileExist(infilename, infilename)) {
           message << "The OUTCAR file in " << directory << " is missing.";
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
           return false;
         }
       }
-    } else if (_kbinFlags.AFLOW_MODE_AIMS) {
+    } else if (_kbinFlags->AFLOW_MODE_AIMS) {
       string function = "ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT()";
       message << "This functionality has not been implemented yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
@@ -303,22 +305,22 @@ namespace apl {
       return false;
     }
 
-    if(_kbinFlags.AFLOW_MODE_VASP) readBornEffectiveChargesFromOUTCAR(xinpBE);
-    else if(_kbinFlags.AFLOW_MODE_AIMS) readBornEffectiveChargesFromAIMSOUT();
+    if(_kbinFlags->AFLOW_MODE_VASP) readBornEffectiveChargesFromOUTCAR(xinpBE);
+    else if(_kbinFlags->AFLOW_MODE_AIMS) readBornEffectiveChargesFromAIMSOUT();
 
     // Enforce ASR (Acoustic sum rules)
     symmetrizeBornEffectiveChargeTensors();
 
     // Parse epsilon from OUTCAR
-    if(_kbinFlags.AFLOW_MODE_VASP) readDielectricTensorFromOUTCAR(xinpBE);
-    if(_kbinFlags.AFLOW_MODE_AIMS) readDielectricTensorFromAIMSOUT();
+    if(_kbinFlags->AFLOW_MODE_VASP) readDielectricTensorFromOUTCAR(xinpBE);
+    if(_kbinFlags->AFLOW_MODE_AIMS) readDielectricTensorFromAIMSOUT();
 
     message << "Dielectric tensor: ";
     for (int a = 1; a <= 3; a++)
       for (int b = 1; b <= 3; b++)
         message << std::fixed << std::setw(5) << std::setprecision(3) << _dielectricTensor(a, b) << " ";
 
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
     return true;
   }
 
@@ -380,7 +382,7 @@ namespace apl {
     vector<string> tokens;
     //CO - START
     line = vlines[line_count++]; // Skip line "----------------...."
-    for (uint i = 0; i < _supercell.getInputStructure().atoms.size(); i++) {
+    for (uint i = 0; i < _supercell->getInputStructure().atoms.size(); i++) {
       // Get atom ID but not use it...
       line = vlines[line_count++];
 
@@ -405,7 +407,7 @@ namespace apl {
     //CO - START
     // Test of stupidity...
     stringstream message;
-    if (_supercell.getEPS() == AUROSTD_NAN) {
+    if (_supercell->getEPS() == AUROSTD_NAN) {
       string function = "apl::ForceConstantCalculator::symmetrizeEffectiveChargeTensors()";
       message << "Symmetry tolerance not defined.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
@@ -413,61 +415,61 @@ namespace apl {
     //CO - END
     // Show charges
     message << "Input born effective charge tensors (for primitive cell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++) {
       int id = i;
       message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
-        << std::setw(2) << _supercell.getInputStructure().atoms[id].cleanname
+        << std::setw(2) << _supercell->getInputStructure().atoms[id].cleanname
         << ") Born effective charge = ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
     }
 
     // Step1
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
-      int basedUniqueAtomID = _supercell.getUniqueAtomID(i);
+    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+      int basedUniqueAtomID = _supercell->getUniqueAtomID(i);
 
       xmatrix<double> sum(3, 3);
-      for (int j = 0; j < _supercell.getNumberOfEquivalentAtomsOfType(i); j++) { //CO190218
+      for (int j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO190218
         try {  //CO
-          const _sym_op& symOp = _supercell.getSymOpWhichMatchAtoms(_supercell.getUniqueAtomID(i, j), basedUniqueAtomID, _FGROUP_);
-          sum += inverse(symOp.Uc) * _bornEffectiveChargeTensor[_supercell.sc2pcMap(_supercell.getUniqueAtomID(i, j))] * symOp.Uc;
+          const _sym_op& symOp = _supercell->getSymOpWhichMatchAtoms(_supercell->getUniqueAtomID(i, j), basedUniqueAtomID, _FGROUP_);
+          sum += inverse(symOp.Uc) * _bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i, j))] * symOp.Uc;
         }
         //CO - START
         catch (aurostd::xerror& e) {
           string function = "apl::ForceConstantCalculator::symmetrizeBornEffectiveChargeTensors()";
           stringstream message;
-          message << "Mapping problem " << _supercell.getUniqueAtomID(i, j) << " <-> " << basedUniqueAtomID << "?";
+          message << "Mapping problem " << _supercell->getUniqueAtomID(i, j) << " <-> " << basedUniqueAtomID << "?";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }
         //CO - END
       }
 
-      sum = (1.0 / _supercell.getNumberOfEquivalentAtomsOfType(i)) * sum; //CO190218
+      sum = (1.0 / _supercell->getNumberOfEquivalentAtomsOfType(i)) * sum; //CO190218
 
-      for (int j = 0; j < _supercell.getNumberOfEquivalentAtomsOfType(i); j++) //CO190218
-        _bornEffectiveChargeTensor[_supercell.sc2pcMap(_supercell.getUniqueAtomID(i, j))] = sum;
+      for (int j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) //CO190218
+        _bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i, j))] = sum;
     }
 
     // Step2
     vector<xmatrix<double> > newbe = _bornEffectiveChargeTensor;
-    const vector<vector<_sym_op> >& agroup = _supercell.getAGROUP();  //CO
-    for (int i = 0; i < _supercell.getNumberOfAtoms(); i++) {
+    const vector<vector<_sym_op> >& agroup = _supercell->getAGROUP();  //CO
+    for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       // Translate the center to this atom
-      _supercell.center(i);
+      _supercell->center(i);
 
       xmatrix<double> sum(3, 3);
       for (uint symOpID = 0; symOpID < agroup[i].size(); symOpID++) {
         const _sym_op& symOp = agroup[i][symOpID];
-        sum = sum + (inverse(symOp.Uc) * _bornEffectiveChargeTensor[_supercell.sc2pcMap(i)] * symOp.Uc);
+        sum = sum + (inverse(symOp.Uc) * _bornEffectiveChargeTensor[_supercell->sc2pcMap(i)] * symOp.Uc);
       }
-      newbe[_supercell.sc2pcMap(i)] = (1.0 / agroup[i].size()) * sum;
+      newbe[_supercell->sc2pcMap(i)] = (1.0 / agroup[i].size()) * sum;
     }
     // Translate the center back
-    _supercell.center_original();  //CO
+    _supercell->center_original();  //CO
 
     _bornEffectiveChargeTensor.clear();
     _bornEffectiveChargeTensor = newbe;
@@ -475,7 +477,7 @@ namespace apl {
 
     // Step 3
     message << "Forcing the acoustic sum rule (ASR). Resulting born effective charges (for the supercell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
 
     xmatrix<double> sum(3, 3);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++)
@@ -485,22 +487,22 @@ namespace apl {
       _bornEffectiveChargeTensor[i] -= sum;
 
     // Make list only for unique atoms
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++)
-      newbe.push_back(_bornEffectiveChargeTensor[_supercell.sc2pcMap(_supercell.getUniqueAtomID(i))]);
+    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++)
+      newbe.push_back(_bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i))]);
     _bornEffectiveChargeTensor.clear();
     _bornEffectiveChargeTensor = newbe;
     newbe.clear();
 
     // Show charges
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
-      int id = _supercell.getUniqueAtomID(i);
+    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+      int id = _supercell->getUniqueAtomID(i);
       message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
-        << std::setw(2) << _supercell.getSupercellStructure().atoms[id].cleanname
+        << std::setw(2) << _supercell->getSupercellStructure().atoms[id].cleanname
         << ") Born effective charge = ";
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
     }
   }
 
@@ -599,7 +601,7 @@ namespace apl {
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-      << std::hex << aurostd::getFileCheckSum(_aflowFlags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME190219
+      << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME190219
     outfile.unsetf(std::ios::hex); //CO190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
   }
@@ -639,8 +641,8 @@ namespace apl {
     outfile << tab << "<born units=\"a.u.\" cs=\"cartesian\">" << std::endl;
     outfile << tab << tab << "<varray>" << std::endl;
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++) {
-      int id = _supercell.getUniqueAtomID(i);
-      outfile << tab << tab << tab << "<matrix type=\"" << _supercell.getSupercellStructure().atoms[id].cleanname << "\">" << std::endl;
+      int id = _supercell->getUniqueAtomID(i);
+      outfile << tab << tab << tab << "<matrix type=\"" << _supercell->getSupercellStructure().atoms[id].cleanname << "\">" << std::endl;
       for (int k = 1; k <= 3; k++) {
         outfile << tab << tab << tab << tab << "<v>";
         for (int l = 1; l <= 3; l++) {
@@ -695,8 +697,8 @@ namespace apl {
     }
     os << std::endl;
 
-    for (int i = 0; i < _supercell.getNumberOfAtoms(); i++) {
-      for (int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
+    for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
+      for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
         os << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
         os << setprecision(4);
         os << "- MATRIX: " << i + 1 << "/" << k + 1 << " " << k + 1 << "/" << i + 1 << std::endl;
@@ -739,21 +741,21 @@ namespace apl {
     }
     os << std::endl;
 
-    int maxshell = _supercell.getMaxShellID();
+    int maxshell = _supercell->getMaxShellID();
     if (maxshell == -1) maxshell = 25;
     std::vector<ShellHandle> sh;
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
       ShellHandle s;
       sh.push_back(s);
-      sh.back().init(_supercell.getInputStructure(),
-          _supercell.getInputStructure().iatoms[i][0],
+      sh.back().init(_supercell->getInputStructure(),
+          _supercell->getInputStructure().iatoms[i][0],
           maxshell);
       sh[i].splitBySymmetry();
-      sh[i].mapStructure(_supercell.getSupercellStructure(), _supercell.getUniqueAtomID(i));
+      sh[i].mapStructure(_supercell->getSupercellStructure(), _supercell->getUniqueAtomID(i));
     }
 
     //
-    for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
+    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
       sh[i].printReport(cout);
       for (int ishell = 0; ishell <= sh[i].getLastOccupiedShell(); ishell++) {
         for (int isubshell = 0; isubshell < sh[i].getNumberOfSubshells(ishell); isubshell++) {

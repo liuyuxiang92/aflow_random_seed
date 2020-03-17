@@ -18,22 +18,50 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  PhononDispersionCalculator::PhononDispersionCalculator(PhononCalculator& pc) : _pc(pc) {
-    _system = _pc.getSystemName();  // ME190614
+  PhononDispersionCalculator::PhononDispersionCalculator(PhononCalculator& pc) {
+    _pc = &pc;
+    _system = _pc->getSystemName();  // ME190614
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
+  PhononDispersionCalculator::PhononDispersionCalculator(const PhononDispersionCalculator& that) {
+    free();
+    copy(that);
+  }
+
+  PhononDispersionCalculator& PhononDispersionCalculator::operator=(const PhononDispersionCalculator& that) {
+    if (this != &that) {
+      free();
+      copy(that);
+    }
+    return *this;
+  }
+
+  void PhononDispersionCalculator::copy(const PhononDispersionCalculator& that) {
+    _frequencyFormat = that._frequencyFormat;
+    _freqs = that._freqs;
+    _pc = that._pc;
+    _pb = that._pb;
+    _qpoints = that._qpoints;
+    _system = that._system;
+    _temperature = that._temperature;
+  }
 
   PhononDispersionCalculator::~PhononDispersionCalculator() {
-    clear();
+    free();
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
-
-  void PhononDispersionCalculator::clear() {
+  void PhononDispersionCalculator::free() {
     _qpoints.clear();
     _freqs.clear();
+    _frequencyFormat = apl::NONE;
+    _pb.clear();
+    _system = "";
     _temperature = 0.0;  // ME190614
+  }
+
+  void PhononDispersionCalculator::clear(PhononCalculator& pc) {
+    free();
+    _pc = &pc;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -50,7 +78,7 @@ namespace apl {
       string message = "Inputs are empty.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
-    _pb.defineCustomPoints(USER_DC_INITCOORDS,USER_DC_INITLABELS,_pc.getSupercell(),CARTESIAN_COORDS);
+    _pb.defineCustomPoints(USER_DC_INITCOORDS,USER_DC_INITLABELS,_pc->getSupercell(),CARTESIAN_COORDS);
     _pb.setDensity(USER_DC_NPOINTS);
     //_qpoints = _pb.getPath(); // Get points // OBSOLETE ME190429 - this function should just define points; there is no path to set or get
   }
@@ -58,7 +86,7 @@ namespace apl {
   void PhononDispersionCalculator::initPathLattice(const string& USER_DC_INITLATTICE,int USER_DC_NPOINTS){
     string lattice = USER_DC_INITLATTICE;
     if (lattice.empty()) {
-      xstructure a(_pc.getInputCellStructure());
+      xstructure a(_pc->getInputCellStructure());
       //CO - START
       if (a.bravais_lattice_variation_type == "") {
         if (a.spacegroup == "") {
@@ -80,22 +108,22 @@ namespace apl {
         //int spacegroupNumber = aurostd::string2utype<int>(tokens[1]);
         //tokens.clear();
 
-        //lattice = LATTICE_Lattice_Variation_SpaceGroup(spacegroupNumber,_pc.getInputCellStructure());
-        //lattice = LATTICE::SpaceGroup2LatticeVariation(spacegroupNumber,_pc.getInputCellStructure());
+        //lattice = LATTICE_Lattice_Variation_SpaceGroup(spacegroupNumber,_pc->getInputCellStructure());
+        //lattice = LATTICE::SpaceGroup2LatticeVariation(spacegroupNumber,_pc->getInputCellStructure());
         lattice = LATTICE::SpaceGroup2LatticeVariation(a.space_group_ITC, a);
       } else {
         lattice = a.bravais_lattice_variation_type;
       }
       string message = "The phonon dispersion curves will be generated for lattice variation " + lattice + ".";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     }
     //CO - END
 
     // cerr << "LATTICE=" << lattice << std::endl;
     // Suck point definition from the electronic structure part of AFLOW...
-    _pb.takeAflowElectronicPath(lattice,_pc.getSupercell());             //CO 180406
-    //_pc.getInputCellStructure(),        //CO 180406
-    //_pc.getSuperCellStructure());       //CO 180406
+    _pb.takeAflowElectronicPath(lattice,_pc->getSupercell());             //CO 180406
+    //_pc->getInputCellStructure(),        //CO 180406
+    //_pc->getSuperCellStructure());       //CO 180406
 
     _pb.setDensity(USER_DC_NPOINTS);
     _qpoints = _pb.getPath(); // Get points
@@ -142,13 +170,13 @@ namespace apl {
     for (int iqp = startIndex; iqp < endIndex; iqp++) {
       // ME200206 - get direction for q-points near Gamma for non-analytical correction
       // or the discontinuity due to LO-TO splitting is not accurately captured.
-      if (_pc.isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
+      if (_pc->isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
         int npts = _pb.getDensity() + 1;
         int i = iqp/npts;
         xvector<double> qpoint_nac = _qpoints[i * npts] - _qpoints[(i + 1) * npts - 1];
-        _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], qpoint_nac, _frequencyFormat);
+        _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], qpoint_nac, _frequencyFormat);
       } else {
-        _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], _frequencyFormat);
+        _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], _frequencyFormat);
       }
       //std::this_thread::yield();
     }
@@ -170,16 +198,16 @@ namespace apl {
 
     // Compute frequencies for each q-point
     string message = "Calculating frequencies for the phonon dispersion.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
 
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
 
     // Get the number of CPUS
-    int ncpus = _pc.getNCPUs();
+    int ncpus = _pc->getNCPUs();
 
     // Prepare storage
     _freqs.clear();
-    xvector<double> zero(_pc.getNumberOfBranches());
+    xvector<double> zero(_pc->getNumberOfBranches());
     for (uint i = 0; i < _qpoints.size(); i++)
       _freqs.push_back(zero);
 
@@ -215,7 +243,7 @@ namespace apl {
     // ME200206 - use calculateInOneThread so changes only need to be made in one place
     //[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
     //[OBSOLETE]  _logger.updateProgressBar(iqp, _qpoints.size());
-    //[OBSOLETE]  _freqs.push_back(_pc.getFrequency(_qpoints[iqp], _frequencyFormat));
+    //[OBSOLETE]  _freqs.push_back(_pc->getFrequency(_qpoints[iqp], _frequencyFormat));
     //[OBSOLETE]}
     calculateInOneThread(0, (int) _qpoints.size());
 
@@ -227,7 +255,7 @@ namespace apl {
   void PhononDispersionCalculator::writePDIS(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE); //ME181226
     string message = "Writing dispersion curves into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
 
     //CO - START
     //ofstream outfile("PDIS",ios_base::out);
@@ -243,7 +271,7 @@ namespace apl {
     outfile << "# <system>    \"" << _system << "\"" << std::endl;  // ME190614 - use system name, not structure title
     outfile << "#" << std::endl;
     outfile << "# <units>     " << _frequencyFormat << std::endl;
-    outfile << "# <nbranches> " << _pc.getNumberOfBranches() << std::endl;
+    outfile << "# <nbranches> " << _pc->getNumberOfBranches() << std::endl;
     outfile << "# <npoints>   " << _freqs.size() << std::endl;
     outfile << "# <nsubpathp> " << _pb.getDensity() + 1 << std::endl;
     outfile << "#" << std::endl;
@@ -278,7 +306,7 @@ namespace apl {
     vector<double> exactPointPositions;
     for (uint i = 0; i < _qpoints.size(); i++) {
       // Check it
-      if (isExactQPoint(_qpoints[i], _pc.getSuperCellStructure().lattice)) {
+      if (isExactQPoint(_qpoints[i], _pc->getSuperCellStructure().lattice)) {
         // Is it new exact points
         uint j = 0;
         for (; j < exactPointPositions.size(); j++)
@@ -336,7 +364,7 @@ namespace apl {
       //[OBSOLETE PN180705]path_segment.push_back(p);  //[PINKU]
       outfile << setw(15) << x << " ";
       //[OBSOLETE PN180705]path.push_back(x);  //[PINKU]
-      for (uint j = 1; j <= _pc.getNumberOfBranches(); j++)
+      for (uint j = 1; j <= _pc->getNumberOfBranches(); j++)
         outfile << setw(15) << _freqs[i](j) << " ";
       outfile << std::endl;
 
@@ -413,7 +441,7 @@ namespace apl {
   void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHEIGENVAL_FILE);
     string message = "Writing phonon eigenvalues into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     stringstream eigenval;
     eigenval << createEIGENVAL();
     aurostd::stringstream2file(eigenval, filename);
@@ -427,7 +455,7 @@ namespace apl {
     writePHKPOINTS(directory);
     // OBSOLETE ME191219 - PHPOSCAR is already written in KBIN::RunPhonons_APL
     // filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
-    // xstructure xstr = _pc.getInputCellStructure();
+    // xstructure xstr = _pc->getInputCellStructure();
     // xstr.is_vasp5_poscar_format = true;
     // stringstream poscar;
     // poscar << xstr;
@@ -443,33 +471,33 @@ namespace apl {
     xEIGENVAL xeigen;
     stringstream outfile;
     // Header values
-    xeigen.number_atoms = _pc.getInputCellStructure().atoms.size();
+    xeigen.number_atoms = _pc->getInputCellStructure().atoms.size();
     xeigen.number_loops = 0;
     xeigen.spin = 0;
-    xeigen.Vol = GetVolume(_pc.getInputCellStructure())/xeigen.number_atoms;
+    xeigen.Vol = GetVolume(_pc->getInputCellStructure())/xeigen.number_atoms;
     xvector<double> lattice(3);
-    lattice[1] = _pc.getInputCellStructure().a * 1E-10;
-    lattice[2] = _pc.getInputCellStructure().b * 1E-10;
-    lattice[3] = _pc.getInputCellStructure().c * 1E-10;
+    lattice[1] = _pc->getInputCellStructure().a * 1E-10;
+    lattice[2] = _pc->getInputCellStructure().b * 1E-10;
+    lattice[3] = _pc->getInputCellStructure().c * 1E-10;
     xeigen.lattice = lattice;
     xeigen.POTIM = 0.5E-15;
     xeigen.temperature = _temperature;
     xeigen.carstring = "PHON";
-    xeigen.title = _pc.getSystemName();
+    xeigen.title = _pc->getSystemName();
     xeigen.number_electrons = 0;
     for (uint at = 0; at < xeigen.number_atoms; at++) {
-      xeigen.number_electrons += _pc.getInputCellStructure().species_pp_ZVAL[at];
+      xeigen.number_electrons += _pc->getInputCellStructure().species_pp_ZVAL[at];
     }
     xeigen.number_kpoints = _freqs.size();
-    xeigen.number_bands = _pc.getNumberOfBranches();
+    xeigen.number_bands = _pc->getNumberOfBranches();
 
     // Data
     double weight = 1.0/_freqs.size();
-    double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
-    double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
+    double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
+    double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
     double conv = factorTHz2Raw * factorRaw2meV/1000;
     apl::PathBuilder::StoreEnumType store = _pb.getStore();
-    xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(_pc.getInputCellStructure().lattice)));
+    xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(_pc->getInputCellStructure().lattice)));
 
     xeigen.vweight.assign(xeigen.number_kpoints, weight);
     xeigen.vkpoint.resize(xeigen.number_kpoints, xvector<double>(3));
@@ -492,7 +520,7 @@ namespace apl {
   void PhononDispersionCalculator::writePHKPOINTS(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHKPOINTS_FILE);
     stringstream kpoints;
-    kpoints << _pb.createKPOINTS(_pc.getSupercell());
+    kpoints << _pb.createKPOINTS(_pc->getSupercell());
     aurostd::stringstream2file(kpoints, filename);
     if (!aurostd::FileExist(filename)) {
       string function = "PhononDispersionCalculator::writePHKPOINTS()";

@@ -86,7 +86,7 @@ namespace apl {
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::run_qha()
   {
-    pflow::logger(_AFLOW_FILE_NAME_, "QHA", "Arranging all qha-options ", _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "QHA", "Arranging all qha-options ", *_aflowFlags, *messageFile, std::cout);
 
     //options are mutually exclusive
     if((_is_gp_on) && (_is_eos)){
@@ -208,16 +208,16 @@ namespace apl {
     string message = "";
     if(phonon_option==0){
       message = "Creating distorted configurations to calculate QHA properties ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
     } else if(phonon_option==1){
       message = "Creating distorted configurations to calculate SCQHA/QHA3P properties ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
     } else if(phonon_option==2){
       message = "Creating distorted configurations to calculate QHA EOS ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
     } else if(phonon_option==3){
       message = "Creating distorted configurations to calculate QHA static energies ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
     }
 
     if(phonon_option==0){
@@ -254,14 +254,14 @@ namespace apl {
     }
 
     int idxRun=0;
-    string APL_DIR=ForceConstantCalculator::_xInput.getDirectory();
+    string APL_DIR=ForceConstantCalculator::_xInput->getDirectory();
     vector<_xinput> vaspRuns; 
     for(double i=Start; i<=End; i+=Inc){
 
-      vaspRuns.push_back(_xInput);
+      vaspRuns.push_back(*_xInput);
       idxRun = vaspRuns.size()-1;
       double scale=0.00;
-      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell.getPrimitiveStructure());
+      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell->getPrimitiveStructure());
       xmatrix<double> m(3,3,1,1);
       scale=vaspRuns[idxRun].getXStr().scale;
       m= vaspRuns[idxRun].getXStr().lattice;
@@ -323,7 +323,7 @@ namespace apl {
       // new scale factor calulation end
       _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<newscale<<setw(15)<<newvolume<<'\n';
 
-      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       m.clear();
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
@@ -333,7 +333,7 @@ namespace apl {
             ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
       message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       if(phonon_option<3){ 
         write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==3){ 
@@ -353,46 +353,46 @@ namespace apl {
     if(phonon_option==4){
       if(_is_gp_A_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       } else if(_is_gp_B_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       } else if(_is_gp_C_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       }
     } else if(phonon_option==5){
       if(_is_sc_gp_A_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       } else if(_is_sc_gp_B_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       } else if(_is_sc_gp_C_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       }
     } else if(phonon_option==6){
       if(_is_eos_A){ 
         message = "Creating distorted configurations to calculate EOS-phonon-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       } else if(_is_eos_B){ 
         message = "Creating distorted configurations to calculate EOS-phonon-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       } else if(_is_eos_C){ 
         message = "Creating distorted configurations to calculate EOS-phonon-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       }
     } else if(phonon_option==7){
       if(_is_eos_A){ 
         message = "Creating distorted configurations to calculate EOS-static-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       } else if(_is_eos_B){ 
         message ="Creating distorted configurations to calculate EOS-static-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       } else if(_is_eos_C){ 
         message = "Creating distorted configurations to calculate EOS-static-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       }
     }
 
@@ -427,18 +427,18 @@ namespace apl {
     }
 
     int idxRun=0;
-    string APL_DIR=ForceConstantCalculator::_xInput.getDirectory();
+    string APL_DIR=ForceConstantCalculator::_xInput->getDirectory();
     vector<_xinput> vaspRuns; vaspRuns.clear();
 
     for(double i=Start; i<=End; i+=Inc)
     { 
-      vaspRuns.push_back(_xInput);
+      vaspRuns.push_back(*_xInput);
       idxRun = vaspRuns.size()-1;
-      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell.getPrimitiveStructure());
+      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell->getPrimitiveStructure());
       xmatrix<double> m=vaspRuns[idxRun].getXStr().lattice;
       xvector<double> lattice_X(3,1);
       for(int j=1; j<=3; j++)lattice_X[j]=m[_lattice_index][j];
-      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       double mod_X=aurostd::modulus(lattice_X);
 
 
@@ -498,7 +498,7 @@ namespace apl {
       }
 
       _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<mod_X<<'\n';
-      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       m.clear();
 
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
@@ -508,7 +508,7 @@ namespace apl {
             ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
       message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       if(phonon_option<7){
         write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==7){
@@ -816,14 +816,14 @@ namespace apl {
   void QHA_AFLOWIN_CREATOR::create_aflowin_static_zero()
   {
     int idxRun=0;
-    string APL_DIR=ForceConstantCalculator::_xInput.getDirectory();
+    string APL_DIR=ForceConstantCalculator::_xInput->getDirectory();
     vector<_xinput> vaspRuns; 
     for(double i=0; i<=0; i++)
     {
-      vaspRuns.push_back(_xInput);
+      vaspRuns.push_back(*_xInput);
       idxRun = vaspRuns.size()-1;
       double scale=0.00;
-      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell.getPrimitiveStructure());
+      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell->getPrimitiveStructure());
       xmatrix<double> m(3,3,1,1);
       scale=vaspRuns[idxRun].getXStr().scale;
       m= vaspRuns[idxRun].getXStr().lattice;
@@ -838,12 +838,12 @@ namespace apl {
       _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<scale<<setw(15)<<volume<<'\n';
       // new scale factor calulation end
 
-      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       m.clear();
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
       string message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       write_static_OUTPUT(vaspRuns[idxRun]);
     }
     vaspRuns.clear();
@@ -852,18 +852,18 @@ namespace apl {
   void QHA_AFLOWIN_CREATOR::create_aflowin_static_zero_X()
   {
     int idxRun=0;
-    string APL_DIR=ForceConstantCalculator::_xInput.getDirectory();
+    string APL_DIR=ForceConstantCalculator::_xInput->getDirectory();
     vector<_xinput> vaspRuns; vaspRuns.clear();
 
     for(double i=0; i<=0; i++)
     { 
-      vaspRuns.push_back(_xInput);
+      vaspRuns.push_back(*_xInput);
       idxRun = vaspRuns.size()-1;
-      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell.getPrimitiveStructure());
+      vaspRuns[idxRun].setXStr(ForceConstantCalculator::_supercell->getPrimitiveStructure());
       xmatrix<double> m=vaspRuns[idxRun].getXStr().lattice;
       xvector<double> lattice_X(3,1);
       for(int j=1; j<=3; j++)lattice_X[j]=m[_lattice_index][j];
-      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       double mod_X=aurostd::modulus(lattice_X);
 
       string runname=get_static_runname(i);
@@ -873,14 +873,14 @@ namespace apl {
       _eos_volumes.push_back(mod_X);
 
       _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<mod_X<<'\n';
-      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell.getPrimitiveStructure().atoms;
+      vaspRuns[idxRun].getXStr().atoms = ForceConstantCalculator::_supercell->getPrimitiveStructure().atoms;
       m.clear();
 
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
 
       string message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, _aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, std::cout);
       write_static_OUTPUT(vaspRuns[idxRun]);
     }
     vaspRuns.clear();
@@ -890,7 +890,7 @@ namespace apl {
   void  QHA_AFLOWIN_CREATOR::write_static_AFLOWIN(const _xvasp& xvasp_input) 
   {
     _xvasp xvasp(xvasp_input);
-    _vflags vflags(_xFlags.vflags);
+    _vflags vflags(_xFlags->vflags);
     using aurostd::PaddedPOST;
     if (!aurostd::FileExist(xvasp.Directory)) aurostd::DirectoryMake(xvasp.Directory);
     aurostd::DirectoryChmod("777", xvasp.Directory);
@@ -928,28 +928,28 @@ namespace apl {
       aflowin << "[AFLOW]FORMULA=" << formula << std::endl;
     aflowin << "[AFLOW_MODE=VASP]" << std::endl;
     //aflowin << "[AFLOW_MODE_ZIP=bzip]" << std::endl; //CO
-    aflowin << "[AFLOW_MODE_ZIP=" << _kbinFlags.KZIP_BIN << "]" << std::endl;  //CO
+    aflowin << "[AFLOW_MODE_ZIP=" << _kbinFlags->KZIP_BIN << "]" << std::endl;  //CO
     if (xvasp.str.species.size() == 1)
       aflowin << "#[AFLOW] single element calculation" << std::endl;
     aflowin << AFLOWIN_SEPARATION_LINE << std::endl;  // [AFLOW] **************************************************
-    if (_kbinFlags.KBIN_MPI) {
+    if (_kbinFlags->KBIN_MPI) {
       aflowin << AFLOWIN_SEPARATION_LINE << std::endl;
       // michal outfile << "#[AFLOW_MODE_BINARY=" << _kbinFlags.KBIN_BIN << "]" << std::endl;
-      aflowin << "[AFLOW_MODE_BINARY=" << _kbinFlags.KBIN_BIN << "]" << std::endl;
+      aflowin << "[AFLOW_MODE_BINARY=" << _kbinFlags->KBIN_BIN << "]" << std::endl;
       aflowin << AFLOWIN_SEPARATION_LINE << std::endl;
       aflowin << "[AFLOW_MODE_MPI]" << std::endl;
-      if (_kbinFlags.KBIN_MPI_AUTOTUNE) {
+      if (_kbinFlags->KBIN_MPI_AUTOTUNE) {
         aflowin << "[AFLOW_MODE_MPI_MODE]AUTOTUNE" << std::endl;
       } else {
         aflowin << "[AFLOW_MODE_MPI_MODE]NCPUS=MAX" << std::endl;
       }
-      aflowin << "[AFLOW_MODE_MPI_MODE]BINARY=" << _kbinFlags.KBIN_MPI_BIN << std::endl;
+      aflowin << "[AFLOW_MODE_MPI_MODE]BINARY=" << _kbinFlags->KBIN_MPI_BIN << std::endl;
     } else {
       aflowin << AFLOWIN_SEPARATION_LINE << std::endl;
-      aflowin << "[AFLOW_MODE_BINARY=" << _kbinFlags.KBIN_BIN << "]" << std::endl;
+      aflowin << "[AFLOW_MODE_BINARY=" << _kbinFlags->KBIN_BIN << "]" << std::endl;
       aflowin << AFLOWIN_SEPARATION_LINE << std::endl;
       // michal outfile << "#[AFLOW_MODE_MPI_MODE]BINARY=\"mpi" << _kbinFlags.KBIN_BIN << "\"" << std::endl;
-      aflowin << "[AFLOW_MODE_MPI_MODE]BINARY=\"mpi" << _kbinFlags.KBIN_BIN << "\"" << std::endl;
+      aflowin << "[AFLOW_MODE_MPI_MODE]BINARY=\"mpi" << _kbinFlags->KBIN_BIN << "\"" << std::endl;
       aflowin << "[AFLOW_MODE_MPI_MODE]NCPUS=MAX" << std::endl;
       aflowin << "[AFLOW_MODE_MPI_MODE]COMMAND=\"mpirun -np\" " << std::endl;
       aflowin << "[AFLOW_MODE_MPI_MODE]AUTOTUNE" << std::endl;

@@ -26,24 +26,54 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   DOSCalculator::DOSCalculator(PhononCalculator& pc, QMesh& rg, string method,
-      const vector<xvector<double> >& projections)  // ME190624
-    : _pc(pc), _rg(rg) {
-      clear();
-      _bzmethod = method;
-      _system = _pc.getSystemName();  // ME190614
-      _projections = projections;  // ME190626
-      calculateFrequencies();
-    }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  DOSCalculator::~DOSCalculator() {
-    clear();
+      const vector<xvector<double> >& projections) {  // ME190624
+    free();
+    _pc = &pc;
+    _rg = &rg;
+    _bzmethod = method;
+    _system = _pc->getSystemName();  // ME190614
+    _projections = projections;  // ME190626
+    calculateFrequencies();
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
+  DOSCalculator::DOSCalculator(const DOSCalculator& that) {
+    free();
+    copy(that);
+  }
 
-  void DOSCalculator::clear() {
+  DOSCalculator& DOSCalculator::operator=(const DOSCalculator& that) {
+    if (this != &that) {
+      free();
+      copy(that);
+    }
+    return *this;
+  }
+
+  void DOSCalculator::copy(const DOSCalculator& that) {
+    _pc = that._pc;
+    _rg = that._rg;
+    _bzmethod = that._bzmethod;
+    _qpoints = that._qpoints;
+    _freqs = that._freqs;
+    _minFreq = that._minFreq;
+    _maxFreq = that._maxFreq;
+    _stepDOS = that._stepDOS;
+    _halfStepDOS = that._halfStepDOS;
+    _bins = that._bins;
+    _dos = that._dos;
+    _idos = that._idos;
+    _eigen = that._eigen;
+    _projectedDOS = that._projectedDOS;
+    _projections = that._projections;
+    _temperature = that._temperature;
+    _system = that._system;
+  }
+
+  DOSCalculator::~DOSCalculator() {
+    free();
+  }
+
+  void DOSCalculator::free() {
     _qpoints.clear();
     //_qweights.clear();  OBSOLETE ME190423
     _freqs.clear();
@@ -55,6 +85,16 @@ namespace apl {
     _projections.clear();  // ME190624
     _bzmethod = "";
     _temperature = 0.0;  // ME190614
+    _minFreq = AUROSTD_NAN;
+    _maxFreq = AUROSTD_NAN;
+    _stepDOS = 0.0;
+    _halfStepDOS = 0.0;
+  }
+
+  void DOSCalculator::clear(PhononCalculator& pc, QMesh& rg) {
+    free();
+    _pc = &pc;
+    _rg = &rg;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -63,7 +103,7 @@ namespace apl {
   void DOSCalculator::calculateInOneThread(int startIndex, int endIndex) {
     //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
     for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  // ME190624
+      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  // ME190624
       //std::this_thread::yield();
     }
   }
@@ -74,32 +114,32 @@ namespace apl {
   void DOSCalculator::calculateFrequencies() {
     // Get q-points for which to calculate the frequencies
     // ME190419 - BEGIN
-    //_qpoints = _rg.getPoints();
-    //_qweights = _rg.getWeights();
-    _qpoints = _rg.getIrredQPointsCPOS();
+    //_qpoints = _rg->getPoints();
+    //_qweights = _rg->getWeights();
+    _qpoints = _rg->getIrredQPointsCPOS();
     // ME190419 - END
 
     // 07-08-2010 We do not need it anymore, since mpmesh has all points in catesian coords now
     // Transform points to the form as it is expected by CPC:
     // Transform from the reciprocal lattice of the primitive cell to cartesian coordinates
     // for(uint t = 0; t < _qpoints.size(); t++)
-    //    _qpoints[t] = trasp(ReciprocalLattice(_pc.getPrimitiveCellStructure().lattice)) * _qpoints[t];
+    //    _qpoints[t] = trasp(ReciprocalLattice(_pc->getPrimitiveCellStructure().lattice)) * _qpoints[t];
 
     //CO - START
     string message = "Calculating frequencies for the phonon DOS.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
 
     // Prepare storage
     _freqs.clear();
-    xvector<double> zero(_pc.getNumberOfBranches());
+    xvector<double> zero(_pc->getNumberOfBranches());
     for (uint i = 0; i < _qpoints.size(); i++)
       _freqs.push_back(zero);
-    _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc.getNumberOfBranches(), _pc.getNumberOfBranches()));  // ME190624
+    _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc->getNumberOfBranches(), _pc->getNumberOfBranches()));  // ME190624
 
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
 
     // Get the number of CPUS
-    int ncpus = _pc.getNCPUs();
+    int ncpus = _pc->getNCPUs();
 
     // Distribute the calculation
     int startIndex, endIndex;
@@ -133,9 +173,9 @@ namespace apl {
     // Calculate frequencies
     // ME190624 - added eigenvectors for projected DOS
     // ME200206 - use calculateInOneThread so changes only need to be made in one place
-    //[[OBSOLETE]xmatrix<xcomplex<double> > xmtrx(_pc.getNumberOfBranches(), _pc.getNumberOfBranches());
+    //[[OBSOLETE]xmatrix<xcomplex<double> > xmtrx(_pc->getNumberOfBranches(), _pc->getNumberOfBranches());
     //[[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
-    //[[OBSOLETE]  _freqs.push_back(_pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
+    //[[OBSOLETE]  _freqs.push_back(_pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
     //[[OBSOLETE]  _eigen.push_back(xmtrx);
     //[[OBSOLETE]}
     calculateInOneThread(0, (int) _qpoints.size());
@@ -260,7 +300,7 @@ namespace apl {
     }
     // ME190624
     if (_projections.size() > 0)
-      _projectedDOS.resize(_pc.getInputCellStructure().atoms.size(),
+      _projectedDOS.resize(_pc->getInputCellStructure().atoms.size(),
           vector<vector<double> >(_projections.size(), vector<double>(USER_DOS_NPOINTS)));
 
     // Perform the raw specific calculation by method
@@ -278,7 +318,7 @@ namespace apl {
     double sum = 0.0;
     for (int k = 0; k < USER_DOS_NPOINTS; k++)
       sum += _dos[k];
-    sum /= _pc.getNumberOfBranches();
+    sum /= _pc->getNumberOfBranches();
 
     for (int k = 0; k < USER_DOS_NPOINTS; k++) {
       _dos[k] /= (sum * _stepDOS);
@@ -292,13 +332,13 @@ namespace apl {
 
   void DOSCalculator::calcDosRS() {
     string message = "Calculating phonon DOS using the root sampling method.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     for (uint k = 0; k < _bins.size(); k++) {
       for (uint i = 0; i < _freqs.size(); i++) {
         for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
           if ((_freqs[i][j] > (_bins[k] - _halfStepDOS)) &&
               (_freqs[i][j] < (_bins[k] + _halfStepDOS))) {
-            _dos[k] += (double) _rg.getWeights()[i];
+            _dos[k] += (double) _rg->getWeights()[i];
           }
         }
       }
@@ -317,22 +357,22 @@ namespace apl {
   // ME200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
     string message = "Calculating phonon DOS using the linear tetrahedron method.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     // Procompute projections for each q-point and branch to save time
     uint nproj = _projections.size();
     vector<xvector<double> > proj_norm(nproj, xvector<double>(3));
     for (uint p = 0; p < nproj; p++) {
       proj_norm[p] = _projections[p]/aurostd::modulus(_projections[p]);
     }
-    const xstructure& xstr = _pc.getInputCellStructure();
+    const xstructure& xstr = _pc->getInputCellStructure();
     uint natoms = xstr.atoms.size();
     vector<vector<vector<vector<double> > > > parts;
     if (nproj > 0) {
       // Precompute eigenvector projections
       xcomplex<double> eig;
-      parts.assign(_rg.getnQPs(), vector<vector<vector<double> > >(_pc.getNumberOfBranches(), vector<vector<double> >(nproj, vector<double>(natoms, 0))));
-      for (int q = 0; q < _rg.getnQPs(); q++) {
-        for (uint br = 0; br < _pc.getNumberOfBranches(); br++) {
+      parts.assign(_rg->getnQPs(), vector<vector<vector<double> > >(_pc->getNumberOfBranches(), vector<vector<double> >(nproj, vector<double>(natoms, 0))));
+      for (int q = 0; q < _rg->getnQPs(); q++) {
+        for (uint br = 0; br < _pc->getNumberOfBranches(); br++) {
           int ibranch = br + _freqs[0].lrows;
           for (uint p = 0; p < nproj; p++) {
             for (uint at = 0; at < natoms; at++) {
@@ -356,7 +396,7 @@ namespace apl {
     double max_freq = _bins.back() + _halfStepDOS;
     double min_freq = _bins.front() - _halfStepDOS;
     vector<vector<int> > tet_corners;
-    LTMethod _lt(_rg);
+    LTMethod _lt(*_rg);
     if (nproj == 0) {
       _lt.makeIrreducible();
       tet_corners = _lt.getIrreducibleTetrahedraIbzqpt();
@@ -448,12 +488,12 @@ namespace apl {
     //CO - END
 
     string filename = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE;
-    double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
-    double factorRaw2rcm = _pc.getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
-    double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
+    double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
+    double factorRaw2rcm = _pc->getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
+    double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
     string message = "Writing phonon density of states into file " + aurostd::CleanFileName(filename) + "."; //ME181226
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
@@ -482,7 +522,7 @@ namespace apl {
   void DOSCalculator::writePHDOSCAR(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
     string message = "Writing phonon density of states into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     stringstream doscar;
     xDOSCAR xdos = createDOSCAR();
     doscar << xdos;
@@ -495,7 +535,7 @@ namespace apl {
     // OBSOLETE ME191219 - PHPOSCAR is already written in KBIN::RunPhonons_APL
     // if (xdos.partial) {  // Write PHPOSCAR if there are projected DOS
     //   filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
-    //   xstructure xstr = _pc.getInputCellStructure();
+    //   xstructure xstr = _pc->getInputCellStructure();
     //   xstr.is_vasp5_poscar_format = true;
     //   stringstream poscar;
     //   poscar << xstr;
@@ -511,13 +551,13 @@ namespace apl {
     xDOSCAR xdos;
     xdos.spin = 0;
     // Header values
-    xdos.number_atoms = _pc.getInputCellStructure().atoms.size();
+    xdos.number_atoms = _pc->getInputCellStructure().atoms.size();
     xdos.partial = (_projectedDOS.size() > 0);
-    xdos.Vol = GetVolume(_pc.getInputCellStructure())/xdos.number_atoms;
+    xdos.Vol = GetVolume(_pc->getInputCellStructure())/xdos.number_atoms;
     xvector<double> lattice;
-    lattice[1] = _pc.getInputCellStructure().a * 1E-10;
-    lattice[2] = _pc.getInputCellStructure().b * 1E-10;
-    lattice[3] = _pc.getInputCellStructure().c * 1E-10;
+    lattice[1] = _pc->getInputCellStructure().a * 1E-10;
+    lattice[2] = _pc->getInputCellStructure().b * 1E-10;
+    lattice[3] = _pc->getInputCellStructure().c * 1E-10;
     xdos.lattice = lattice;
     xdos.POTIM = 0.5E-15;
     xdos.temperature = _temperature;
@@ -525,8 +565,8 @@ namespace apl {
     xdos.title = _system;
 
     // Data
-    double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
-    double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
+    double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
+    double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
     double conv = factorTHz2Raw * factorRaw2meV/1000;
     // ME200203 - use _bins instead of _minFreq in case the DOS was calculated
     // using different frequency ranges
@@ -590,13 +630,13 @@ namespace apl {
     stringstream outfile;
     //CO - END
 
-    double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
-    double factorRaw2rcm = _pc.getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
-    double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
+    double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
+    double factorRaw2rcm = _pc->getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
+    double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
     string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE; //ME181226
     string message = "Writing phonon density of states into file " + filename + "."; //ME181226
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc.getDirectory(), _pc.getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);

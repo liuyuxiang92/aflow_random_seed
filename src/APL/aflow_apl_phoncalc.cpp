@@ -22,15 +22,16 @@ static const string _APL_PHCALC_ERR_PREFIX_ = "apl::PhononCalculator::";
 
 namespace apl {
 
-  PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf) : _supercell(sc) {
+  PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf) {
     free();
     messageFile = &mf;
+    _supercell = &sc;
     _directory = "./";
     _ncpus = 1;
   }
 
 
-  PhononCalculator::PhononCalculator(const PhononCalculator& that) : _supercell(that._supercell) {
+  PhononCalculator::PhononCalculator(const PhononCalculator& that) {
     free();
     copy(that);
   }
@@ -79,8 +80,9 @@ namespace apl {
 
 
   void PhononCalculator::clear(Supercell& sc, ofstream& mf) {
-    PhononCalculator pc(sc, mf);
-    copy(pc);
+    free();
+    _supercell = &sc;
+    messageFile = &mf;
   }
 
 }  // namespace apl
@@ -94,19 +96,19 @@ namespace apl {
 namespace apl {
 
   const Supercell& PhononCalculator::getSupercell() const { //CO 180409
-    return _supercell;
+    return *_supercell;
   }
 
   const xstructure& PhononCalculator::getInputCellStructure() const {
-    return _supercell.getInputStructure();
+    return _supercell->getInputStructure();
   }
 
   const xstructure& PhononCalculator::getSuperCellStructure() const {
-    return _supercell.getSupercellStructure();
+    return _supercell->getSupercellStructure();
   }
 
   uint PhononCalculator::getNumberOfBranches() const {
-    return 3 * _supercell.getInputStructure().atoms.size();
+    return 3 * _supercell->getInputStructure().atoms.size();
   }
 
   // ME190614
@@ -270,21 +272,16 @@ namespace apl {
     }
 
     // Try to read born effective charges and dielectric constant
-    try {  //CO
-      //cerr << "APL-DEBUG Get born effective charge tensors" << std::endl; //CO
-      // Get born effective charge tensors
-      while (true) {
-        if (line_count == vlines.size())  //CO
-        {  //CO200106 - patching for auto-indenting
-          _isPolarMaterial = false;
-          string message = "Cannot find <born> tag.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
-        }
-        line = vlines[line_count++];  //CO
-        if (line.find("born") != string::npos)
-          break;
-      }
+    //cerr << "APL-DEBUG Get born effective charge tensors" << std::endl; //CO
+    // Get born effective charge tensors
+    _isPolarMaterial = true;
+    while (_isPolarMaterial) {
+      if (line_count == vlines.size()) _isPolarMaterial = false;
       line = vlines[line_count++];  //CO
+      if (line.find("born") != string::npos) break;
+    }
+    line = vlines[line_count++];  //CO
+    if (_isPolarMaterial) {
       while (true) {
         if (line_count == vlines.size()) { //CO
           string message = "Incomplete <born> tag.";
@@ -330,7 +327,6 @@ namespace apl {
       _inverseDielectricTensor = inverse(_dielectricTensor);
       _recsqrtDielectricTensorDeterminant = 1.0 / sqrt(determinant(_dielectricTensor));
     }
-    catch (aurostd::xerror& e) {}
   }
 
   void PhononCalculator::setAnharmonicForceConstants(const AnharmonicIFCs& fc) {
@@ -639,8 +635,8 @@ namespace apl {
       const xvector<double>& kpoint_nac,
       vector<xmatrix<xcomplex<double> > >& dDynMat,
       bool calc_derivative) {
-    uint scAtomsSize = _supercell.getSupercellStructure().atoms.size();
-    uint pcAtomsSize = _supercell.getInputStructure().atoms.size();
+    uint scAtomsSize = _supercell->getSupercellStructure().atoms.size();
+    uint pcAtomsSize = _supercell->getInputStructure().atoms.size();
 
     uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches, 1, 1);
@@ -665,12 +661,12 @@ namespace apl {
     // Loop over primitive cell
     xcomplex<double> nac;
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-      uint isc1 = _supercell.pc2scMap(ipc1);
+      uint isc1 = _supercell->pc2scMap(ipc1);
 
       for (uint isc2 = 0; isc2 < scAtomsSize; isc2++) {
-        uint ipc2 = _supercell.sc2pcMap(isc2);
+        uint ipc2 = _supercell->sc2pcMap(isc2);
         int neq;  // Important for NAC derivative
-        if (_supercell.calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  // ME180827
+        if (_supercell->calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  // ME180827
           for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
             for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
               value = 0.5 * (_forceConstantMatrices[isc1][isc2](ix, iy) + _forceConstantMatrices[isc2][isc1](iy, ix));
@@ -733,9 +729,9 @@ namespace apl {
 
     // Divide by masses
     for (uint i = 0; i < pcAtomsSize; i++) {
-      double mass_i = _supercell.getAtomMass(_supercell.pc2scMap(i));
+      double mass_i = _supercell->getAtomMass(_supercell->pc2scMap(i));
       for (uint j = 0; j < pcAtomsSize; j++) {
-        double mass_j = _supercell.getAtomMass(_supercell.pc2scMap(j));
+        double mass_j = _supercell->getAtomMass(_supercell->pc2scMap(j));
         for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
           for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
             dynamicalMatrix(3 * i + ix, 3 * j + iy) *= 1.0 / sqrt(mass_i * mass_j);
@@ -768,8 +764,8 @@ namespace apl {
   xmatrix<xcomplex<double> > PhononCalculator::getNonanalyticalTermWang(const xvector<double>& _q,
       vector<xmatrix<xcomplex<double> > >& derivative,
       bool calc_derivative) {
-    const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
-    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME200207 - grab input structure (need iatoms)
+    const xstructure& sc = _supercell->getSupercellStructureLight();           //CO
+    const xstructure& pc = _supercell->getInputStructure();  //CO  // ME200207 - grab input structure (need iatoms)
 
     // to correct the q=\Gamma as a limit
     xvector<double> q(_q);
@@ -843,7 +839,7 @@ namespace apl {
   // X. Gonze and Ch. Lee, Phys. Rev. B 55, 10355 (1997)
 
   xmatrix<xcomplex<double> > PhononCalculator::getNonanalyticalTermGonze(const xvector<double> kpoint) {
-    uint pcAtomsSize = _supercell.getInputStructure().atoms.size();
+    uint pcAtomsSize = _supercell->getInputStructure().atoms.size();
 
     if (!_isGammaEwaldPrecomputed) {
       xvector<double> zero(3);
@@ -882,8 +878,8 @@ namespace apl {
   // but it is actually stored for each iatom.
   xmatrix<xcomplex<double> > PhononCalculator::getEwaldSumDipoleDipoleContribution(const xvector<double> qpoint, bool includeTerm1) {
     // Definitions
-    const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
-    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME200207 - grab input structure (need iatoms)
+    const xstructure& sc = _supercell->getSupercellStructureLight();           //CO
+    const xstructure& pc = _supercell->getInputStructure();  //CO  // ME200207 - grab input structure (need iatoms)
 
     uint pcAtomsSize = pc.atoms.size();
 
@@ -1005,12 +1001,12 @@ namespace apl {
     // Term 2
     uint scAtomsSize = sc.atoms.size();
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-      uint isc1 = _supercell.pc2scMap(ipc1);
+      uint isc1 = _supercell->pc2scMap(ipc1);
 
       for (uint isc2 = 0; isc2 < scAtomsSize; isc2++) {
-        uint ipc2 = _supercell.sc2pcMap(isc2);
+        uint ipc2 = _supercell->sc2pcMap(isc2);
 
-        xvector<double> rf = _supercell.getFPositionItsNearestImage(isc2, isc1);
+        xvector<double> rf = _supercell->getFPositionItsNearestImage(isc2, isc1);
         xvector<double> rc = F2C(sc.lattice, rf);
 
         if (aurostd::modulus(rc) < _AFLOW_APL_EPS_) continue;
@@ -1045,7 +1041,7 @@ namespace apl {
 
         //
         xcomplex<double> e;  // = exp( iONE * scalar_product(qpoint,rc) );
-        (void)_supercell.calcShellPhaseFactor(isc2, isc1, qpoint, e);
+        (void)_supercell->calcShellPhaseFactor(isc2, isc1, qpoint, e);
 
         //
         xcomplex<double> fac = fac0 * lambda3 * _recsqrtDielectricTensorDeterminant * e;

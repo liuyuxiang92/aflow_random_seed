@@ -50,11 +50,15 @@ namespace apl {
 
   // Copy constructors
   QMesh::QMesh(const QMesh& that) {
+    free();
     copy(that);
   }
 
   QMesh& QMesh::operator=(const QMesh& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 
@@ -345,6 +349,7 @@ namespace apl {
   //calculateLittleGroups/////////////////////////////////////////////////////
   // Calculates little/small groups for each irreducible q-point.
   void QMesh::calculateLittleGroups() {
+    if (_littleGroupsCalculated) return;
     _littleGroups.resize(_nIQPs, vector<int>(1, 0));  // Identity is always invariant
     uint nsymops = _recCell.pgroup.size();
     int q = -1;

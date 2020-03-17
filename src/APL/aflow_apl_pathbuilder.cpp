@@ -7,29 +7,59 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   PathBuilder::PathBuilder() {
-    this->clear();
+    free();
   }
 
   PathBuilder::PathBuilder(ModeEnumType mode) {
-    this->clear();
+    free();
     setMode(mode);
   }
 
-  PathBuilder::~PathBuilder() {
-    this->clear();
+  PathBuilder::PathBuilder(const PathBuilder& that) {
+    free();
+    copy(that);
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
+  PathBuilder& PathBuilder::operator=(const PathBuilder& that) {
+    if (this != &that) {
+      free();
+      copy(that);
+    }
+    return *this;
+  }
 
-  void PathBuilder::clear() {
+  void PathBuilder::copy(const PathBuilder& that) {
+    _mode = that._mode;
+    _store = that._store;
+    _path = that._path;
+    _points = that._points;
+    _labels = that._labels;
+    reciprocalLattice = that.reciprocalLattice;
+    cartesianLattice = that.cartesianLattice;
+    _pointsVectorDimension = that._pointsVectorDimension;
+    _pointsVectorStartingIndex = that._pointsVectorStartingIndex;
+    _nPointsPerSubPath = that._nPointsPerSubPath;
+  }
+
+  PathBuilder::~PathBuilder() {
+    free();
+  }
+
+  void PathBuilder::free() {
     _mode = SINGLE_POINT_MODE;
     _store = CARTESIAN_LATTICE;
     _path.clear();
     _points.clear();
     _labels.clear();
+    reciprocalLattice.clear();
+    cartesianLattice.clear();
     _pointsVectorDimension = 0;
     _pointsVectorStartingIndex = 0;
     _nPointsPerSubPath = 0;
+  }
+
+  void PathBuilder::clear() {
+    free();
   }
 
   // ///////////////////////////////////////////////////////////////////////////

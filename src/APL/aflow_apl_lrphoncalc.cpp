@@ -24,8 +24,8 @@ namespace apl {
     }
 
   LinearResponsePC::LinearResponsePC(const LinearResponsePC& that)
-    : ForceConstantCalculator(that._supercell, that._xInput, that._aflowFlags, that._kbinFlags,
-      that._xFlags, that._AflowIn, *that.messageFile) {
+    : ForceConstantCalculator(*that._supercell, *that._xInput, *that._aflowFlags, *that._kbinFlags,
+      *that._xFlags, *that._AflowIn, *that.messageFile) {
     free();
     copy(that);
   }
@@ -45,12 +45,12 @@ namespace apl {
   void LinearResponsePC::clear(Supercell& sc, _xinput& xinput,
       _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
     free();
-    _supercell = sc;
-    _xInput = xinput;
-    _aflowFlags =  aflags;
-    _kbinFlags = kflags;
-    _xFlags = xflags;
-    _AflowIn = AflowIn;
+    _supercell = &sc;
+    _xInput = &xinput;
+    _aflowFlags = &aflags;
+    _kbinFlags = &kflags;
+    _xFlags = &xflags;
+    _AflowIn = &AflowIn;
     messageFile = &mf;
   }
 
@@ -90,17 +90,17 @@ namespace apl {
   bool LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
     if (zerostate_chgcar) {
       string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout, _LOGGER_WARNING_);
     }
     bool stagebreak = false;
 
     // Call VASP to calculate forces by LR
-    _xInput.xvasp.AVASP_arun_mode = "APL";
+    _xInput->xvasp.AVASP_arun_mode = "APL";
     xInputs.clear();
-    xInputs.push_back(_xInput);
+    xInputs.push_back(*_xInput);
     stagebreak = runVASPCalculationsDFPT(xInputs[0]);
     if (_isPolarMaterial) {
-      xInputs.push_back(_xInput);
+      xInputs.push_back(*_xInput);
       stagebreak = (runVASPCalculationsBE(xInputs[1], 2) || stagebreak);
     }
     return stagebreak;
@@ -114,7 +114,7 @@ namespace apl {
   bool LinearResponsePC::runVASPCalculationsDFPT(_xinput& xInput) {
     bool stagebreak = false;
 
-    xInput.setXStr(_supercell.getSupercellStructureLight());
+    xInput.setXStr(_supercell->getSupercellStructureLight());
     xInput.getXStr().title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInput.getXStr().title);
     if(xInput.getXStr().title.empty()){xInput.getXStr().buildGenericTitle(true,false);}
     xInput.getXStr().title+=" linear response";
@@ -124,21 +124,21 @@ namespace apl {
       xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;  // ME200213
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_BORN", false);
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_LR", true);
-      _kbinFlags.KBIN_MPI_AUTOTUNE = false;
+      _kbinFlags->KBIN_MPI_AUTOTUNE = false;
 
       // Set POSCAR to VASP5 format
       xInput.getXStr().is_vasp4_poscar_format = false;
       xInput.getXStr().is_vasp5_poscar_format = true;
-      stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInput) || stagebreak);
+      stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInput) || stagebreak);
     }
     // For AIMS, use the old method until we have AVASP_populateXAIMS
     if(xInput.AFLOW_MODE_AIMS) {
       string runname = _AFLOW_APL_DFPT_DIRECTORY_NAME_;  // ME200213
-      xInput.setDirectory( _xInput.getDirectory() + "/" + runname );
+      xInput.setDirectory(_xInput->getDirectory() + "/" + runname);
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
-        createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *messageFile);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+        createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *messageFile);
         stagebreak = true;
       }
     }
@@ -157,7 +157,7 @@ namespace apl {
 
   bool LinearResponsePC::calculateForceConstants() {
     // Check if supercell is already built
-    if (!_supercell.isConstructed()) {
+    if (!_supercell->isConstructed()) {
       // ME191031 - use xerror
       //throw APLRuntimeError("apl::LinearResponsePC::calculateForceFields(); The supercell structure has not been initialized yet.");
       string function = "apl::LinearResponsePC::calculateForceFields()";
@@ -180,7 +180,7 @@ namespace apl {
   bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
     string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
 
     // Read vasprun.xml
@@ -189,7 +189,7 @@ namespace apl {
       filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
       if (aurostd::EFileExist(filename)) {
         message << "Could not find vasprun.xml file for linear response calculations.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
         return false;
       }
     }
@@ -221,7 +221,7 @@ namespace apl {
       message << "Hessian tag not found or incomplete.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
-    uint natoms = _supercell.getSupercellStructure().atoms.size();
+    uint natoms = _supercell->getSupercellStructure().atoms.size();
     uint nhessian = hessian.size();
     if (nhessian != 3 * natoms) {
       message << "Hessian matrix does not have the correct number of rows (has "
@@ -245,7 +245,7 @@ namespace apl {
     for (uint i = 0; i < natoms; i++) {
       for (uint j = 0; j < natoms; j++) {
         // Hessian matrix is normalized by masses, so multiply to get FCs
-        mass = std::sqrt(_supercell.getAtomMass(i) * _supercell.getAtomMass(j));
+        mass = std::sqrt(_supercell->getAtomMass(i) * _supercell->getAtomMass(j));
         for (int k = 0; k < 3; k++) {
           for (int l = 0; l < 3; l++) {
             _forceConstantMatrices[i][j][k+1][l+1] = -mass * hessian[3 * i + k][3 * j + l];

@@ -23,6 +23,7 @@ using aurostd::xerror;
 
 #define _DEBUG_AAPL_CLUSTERS_ false
 static const string _AAPL_CLUSTER_ERR_PREFIX_ = "apl::ClusterSet::";
+static const string _AAPL_CLUSTER_MODULE_ = "CLUSTER";
 
 /************************** CONSTRUCTORS/DESTRUCTOR *************************/
 
@@ -30,17 +31,22 @@ namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
   ClusterSet::ClusterSet(const Supercell& supercell, int cut_shell,
-      double cut_rad, Logger& l, _aflags& a) : _logger(l), aflags(a) {
+      double cut_rad, ofstream& mf, _aflags& a) {
     free();
+    messageFile = &mf;
+    aflags = &a;
     initialize(supercell, cut_shell, cut_rad);
   }
 
   //From file
   ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
-      int cut_shell, double cut_rad, int _order, Logger& l, _aflags& a) : _logger(l), aflags(a) {
+      int cut_shell, double cut_rad, int _order, ofstream& mf, _aflags& a) {
     free();  // Clear old vectors
+    messageFile = &mf;
+    aflags = &a;
     initialize(supercell, cut_shell, cut_rad);
-    _logger << "Reading ClusterSet from file " << aurostd::CleanFileName(filename) << apl::endl;
+    string message = "Reading ClusterSet from file " + aurostd::CleanFileName(filename) + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, std::cout);
 
     order = _order;
     readClusterSetFromFile(filename);
@@ -52,12 +58,14 @@ namespace apl {
   }
 
   // Default constructor
-  ClusterSet::ClusterSet(Logger& l, _aflags& a) : _logger(l), aflags(a) {
+  ClusterSet::ClusterSet(ofstream& mf, _aflags& a) {
     free();
+    messageFile = &mf;
+    aflags = &a;
   }
 
   //Copy Constructors/////////////////////////////////////////////////////////
-  ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger), aflags(that.aflags) {
+  ClusterSet::ClusterSet(const ClusterSet& that) {
     free();
     copy(that);
   }
@@ -68,7 +76,6 @@ namespace apl {
   }
 
   void ClusterSet::copy(const ClusterSet& that) {
-    _logger = that._logger;
     aflags = that.aflags;
     clusters = that.clusters;
     coordination_shells = that.coordination_shells;
@@ -78,6 +85,7 @@ namespace apl {
     ineq_clusters = that.ineq_clusters;
     ineq_distortions = that.ineq_distortions;
     linear_combinations = that.linear_combinations;
+    messageFile = that.messageFile;
     nifcs = that.nifcs;
     order = that.order;
     pcell = that.pcell;
@@ -119,10 +127,10 @@ namespace apl {
 
   //clear/////////////////////////////////////////////////////////////////////
   // Creates an empty ClusterSet object.
-  void ClusterSet::clear(Logger& l, _aflags& a) {
+  void ClusterSet::clear(ofstream& mf, _aflags& a) {
     free();
-    _logger = l;
-    aflags = a;
+    messageFile = &mf;
+    aflags = &a;
   }
 
   void ClusterSet::initialize(const Supercell& supercell, int cut_shell, double cut_rad) {
@@ -135,7 +143,9 @@ namespace apl {
       double max_rad = getMaxRad(scell, cut_shell);
       if (max_rad > cut_rad) {
         // globally changes CUT_RAD
-        _logger << "Cutoff has been modified to " << max_rad << " Angstroms." << apl::endl;
+        stringstream message;
+        message << "Cutoff has been modified to " << max_rad << " Angstroms.";
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, std::cout);
         cut_rad = max_rad;
       }
     }
@@ -278,7 +288,8 @@ namespace apl {
   // Creates coordination shells around the atoms of the primitive cell.
   void ClusterSet::buildShells() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
-    _logger << "CLUSTER: Building coordination shells." << apl::endl;
+    string message = "Building coordination shells.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, std::cout);
     int at1sc = 0;
     vector<int> shell;
     coordination_shells.clear();
@@ -330,17 +341,19 @@ namespace apl {
   // Builds the inequivalent clusters.
   void ClusterSet::build(int _order) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
+    stringstream message;
     if (_order > 1) {
       order = _order;
     } else {
       string function = _AAPL_CLUSTER_ERR_PREFIX_ + "build";
-      stringstream message;
       message << "Cluster order must be larger than 1 (is " << _order << ").";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
     }
-    _logger << "CLUSTER: Building clusters of order " << order << "." << apl::endl;
+    message << "Building clusters of order " << order << ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, std::cout);
     buildShells();
     nifcs = aurostd::powint(3, order);
+    symmetry_map = getSymmetryMap();
 
     permutations = getPermutations(order);
     clusters = buildClusters();
@@ -437,7 +450,8 @@ namespace apl {
   // shells.
   void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
       vector<vector<int> > & ineq_clst) {
-    _logger << "CLUSTER: Determining inequivalent clusters." << apl::endl;
+    string message = "Determining inequivalent clusters.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, std::cout);
     int equivalent_clst = -1;
     vector<int> unique_atoms;
     vector<vector<int> > compositions;
@@ -668,7 +682,8 @@ namespace apl {
   //buildDistortions//////////////////////////////////////////////////////////
   // Builds the inequivalent distortions for the AAPL calculations.
   void ClusterSet::buildDistortions() {
-    _logger << "CLUSTER: Getting inequivalent distortions." << apl::endl;
+    string message = "Getting inequivalent distortions.";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, std::cout);
     distortion_vectors = getCartesianDistortionVectors();
     linear_combinations = getLinearCombinations();
     ineq_distortions = initializeIneqDists();
@@ -1281,7 +1296,8 @@ namespace apl {
   //writeClusterSetToFile/////////////////////////////////////////////////////
   // Writes the ClusterSet object to an XML file.
   void ClusterSet::writeClusterSetToFile(const string& filename) {
-    _logger << "Writing ClusterSet to file " << filename << apl::endl;
+    string message = "Writing ClusterSet to file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, std::cout);
     std::stringstream output;
     // Header
     output << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
@@ -1296,7 +1312,7 @@ namespace apl {
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
       string function = _AAPL_CLUSTER_ERR_PREFIX_ + "writeClusterSetToFile";
-      string message = "Could not write ClusterSet to file.";
+      message = "Could not write ClusterSet to file.";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }
@@ -1314,7 +1330,7 @@ namespace apl {
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
+    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags->Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
     parameters.unsetf(std::ios::hex);  // ME190125 - Remove hexadecimal formatting
     parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
@@ -1618,7 +1634,7 @@ namespace apl {
 
     t = line.find_first_of(">") + 1;
     tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME190219
+    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags->Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME190219
       message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
       tokens.clear();
@@ -1809,8 +1825,7 @@ namespace apl {
       } else {
         message << "The ClusterSet needs to be determined again.";
       }
-      _logger << apl::warning << "apl::ClusterSet::readClusterSetFromFile(); ";
-      _logger << message.str() << apl::endl;
+      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, std::cout, _LOGGER_WARNING_);
     }
     return compatible;
   }

@@ -2214,10 +2214,10 @@ namespace apl {
     return calcShellPhaseFactor(atomID, centerID, qpoint, phase, i, placeholder, false);
   }
 
-// ME200116 - rewritten to accommodate new phase vectors
-bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
-                                     xcomplex<double>& phase, int& multiplicity,
-                                     xvector<xcomplex<double> >& derivative, bool calc_derivative) {
+  // ME200116 - rewritten to accommodate new phase vectors
+  bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
+                                       xcomplex<double>& phase, int& multiplicity,
+                                       xvector<xcomplex<double> >& derivative, bool calc_derivative) {
     centerID = sc2pcMap(centerID);
     const vector<xvector<double> >& vec = phase_vectors[centerID][atomID];
     multiplicity = (int) vec.size();

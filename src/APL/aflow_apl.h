@@ -231,13 +231,13 @@ namespace apl {
     // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
     public:
       ClusterSet();
-      ClusterSet(const Supercell&, int, double, Logger&, _aflags&);  // Constructor
-      ClusterSet(const string&, const Supercell&, int, double, int, Logger&, _aflags&);  // From file
+      ClusterSet(const Supercell&, int, double, ofstream&, _aflags&);  // Constructor
+      ClusterSet(const string&, const Supercell&, int, double, int, ofstream&, _aflags&);  // From file
       ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
-      ClusterSet(Logger&, _aflags&);  // Does nothing - used as a placeholder for non-AAPL calculations
+      ClusterSet(ofstream&, _aflags&);  // Does nothing - used as a placeholder for non-AAPL calculations
       ~ClusterSet();  // Destructor
       const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
-      void clear(Logger&, _aflags&);
+      void clear(ofstream&, _aflags&);
       void initialize(const Supercell&, int, double);
 
       vector<_cluster> clusters;
@@ -264,8 +264,8 @@ namespace apl {
       void writeClusterSetToFile(const string&);
 
     private:
-      Logger& _logger;  // The AFLOW logger
-      _aflags& aflags;
+      ofstream* messageFile;
+      _aflags* aflags;
 
       void free();
       void copy(const ClusterSet&);
@@ -347,11 +347,11 @@ namespace apl {
       void writeIFCsToFile(const string&);
 
     private:
-      _xinput& _xInput;
-      _aflags& _aflowFlags;
-      _kflags& _kbinFlags;
-      _xflags& _xFlags;
-      ClusterSet& clst;
+      _xinput* _xInput;
+      _aflags* _aflowFlags;
+      _kflags* _kbinFlags;
+      _xflags* _xFlags;
+      ClusterSet* clst;
       ofstream* messageFile;
       bool new_ofstream;
 
@@ -740,12 +740,12 @@ namespace apl {
   class ForceConstantCalculator {
     protected:
       // Aflow's stuff required for running some routines
-      Supercell& _supercell;
-      _xinput& _xInput; //_xvasp& _vaspRun;
-      _aflags& _aflowFlags;
-      _kflags& _kbinFlags;
-      _xflags& _xFlags; //_vflags& _vaspFlags;
-      string& _AflowIn;
+      Supercell* _supercell;
+      _xinput* _xInput; //_xvasp& _vaspRun;
+      _aflags* _aflowFlags;
+      _kflags* _kbinFlags;
+      _xflags* _xFlags; //_vflags& _vaspFlags;
+      string* _AflowIn;
       ofstream* messageFile;
 
       vector<_xinput> xInputs;
@@ -1043,7 +1043,7 @@ namespace apl {
       string _directory;  // for loggers
       int _ncpus;
 
-      Supercell& _supercell;
+      Supercell* _supercell;
 
       // harmonic IFCs
       vector<vector<xmatrix<double> > > _forceConstantMatrices;
@@ -1164,11 +1164,15 @@ namespace apl {
 
     private:
       void buildPath();
+      void free();
+      void copy(const PathBuilder&);
       // [OBSOLETE ME190219] void tokenize(const string&, vector<string>&, string);
 
     public:
       PathBuilder();
       PathBuilder(ModeEnumType);
+      PathBuilder(const PathBuilder&);
+      PathBuilder& operator=(const PathBuilder&);
       ~PathBuilder();
       void clear();
       void addPoint(const std::string& l, int dim, ...);
@@ -1201,21 +1205,25 @@ namespace apl {
 namespace apl {
   class PhononDispersionCalculator {
     private:
-      PhononCalculator& _pc;
+      PhononCalculator* _pc;
       PathBuilder _pb;
+      void copy(const PhononDispersionCalculator&);
+      void free();
       std::vector<xvector<double> > _qpoints;
       std::vector<xvector<double> > _freqs;
       IPCFreqFlags _frequencyFormat;
       double _temperature;  // ME190614
       //[OBSOLETE PN180705]vector<double> path;       //[PINKU]
       //[OBSOLETE PN180705]vector<int> path_segment;  //[PINKU]
-    private:
       void calculateInOneThread(int, int);
 
     public:
       PhononDispersionCalculator(PhononCalculator&);
+      PhononDispersionCalculator(const PhononDispersionCalculator&);
+      PhononDispersionCalculator& operator=(const PhononDispersionCalculator&);
       ~PhononDispersionCalculator();
-      void clear();
+      void clear(PhononCalculator&);
+      void clear(PhononDispersionCalculator&);
       void initPathCoords(const string&,const string&,int,bool=false);  //CO 180406
       void initPathLattice(const string&, int);
       void setPath(const string&);
@@ -1441,7 +1449,7 @@ namespace apl {
       void free();
       void copy(const LTMethod&);
 
-      QMesh& _qm;
+      QMesh* _qm;
 
       vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra - ME190625
       vector<int> _irredTetrahedra;  // List of irreducible tetrahedra - ME190625
@@ -1471,9 +1479,9 @@ namespace apl {
   class DOSCalculator  // ME190424
   { //CO200106 - patching for auto-indenting
     protected:
-      PhononCalculator& _pc;
+      PhononCalculator* _pc;
       //  IReciprocalPointGrid& _rg;  OBSOLETE ME 190417
-      QMesh& _rg;
+      QMesh* _rg;
       string _bzmethod;  // ME190423
       std::vector<aurostd::xvector<double> > _qpoints;
       //std::vector<int> _qweights;  OBSOLETE ME190423
@@ -1491,15 +1499,18 @@ namespace apl {
       double _temperature;  // ME190614
       //CO - START
       //private:
+      void copy(const DOSCalculator&);
       void calculateInOneThread(int, int);
       //CO - END
-    protected:
       void calculateFrequencies();
       void smearWithGaussian(vector<double>&, vector<double>&, double, double);  // ME190614
 
     public:
       DOSCalculator(PhononCalculator&, QMesh&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
-      virtual ~DOSCalculator();
+      DOSCalculator(const DOSCalculator&);
+      DOSCalculator& operator=(const DOSCalculator&);
+      ~DOSCalculator();
+      void clear(PhononCalculator&, QMesh&);
       // ME190423 - START
       //virtual void rawCalc(int) {} OBSOLETE ME190419
       void calcDosRS();
@@ -1508,7 +1519,6 @@ namespace apl {
       void calc(int);
       void calc(int, double);
       void calc(int, double, double, double);  // ME200203
-      void clear();
       void writePDOS(const string&);
       void writePDOS(string, string);  //[PINKU]
       xDOSCAR createDOSCAR();  // ME190614
@@ -1519,6 +1529,8 @@ namespace apl {
       const std::vector<double>& getIDOS() const;  // ME200210
       bool hasNegativeFrequencies() const;  // ME200108 - added const
       string _system;  // ME190614
+    private:
+      void free();
   };
 }  // namespace apl
 
@@ -1643,7 +1655,7 @@ namespace apl {
     public:
       TCONDCalculator(PhononCalculator&, QMesh&, Logger&, _aflags&);
       TCONDCalculator(const TCONDCalculator&);
-
+      TCONDCalculator& operator=(const TCONDCalculator&);
       ~TCONDCalculator();
       void clear(PhononCalculator&, QMesh&, Logger&, _aflags&);
       void initialize();
@@ -1667,10 +1679,10 @@ namespace apl {
       void calculateThermalConductivity();
 
     private:
-      PhononCalculator& _pc;  // Reference to the phonon calculator
-      QMesh& _qm;  // Reference to the q-point mesh
+      PhononCalculator* _pc;  // Reference to the phonon calculator
+      QMesh* _qm;  // Reference to the q-point mesh
       Logger& _logger;  // The APL logger
-      _aflags& aflags;
+      _aflags* aflags;
 
       void free();
       void copy(const TCONDCalculator&);

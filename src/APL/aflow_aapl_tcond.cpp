@@ -74,20 +74,31 @@ namespace apl {
 namespace apl {
 
   //Constructor///////////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) : _pc(pc), _qm(qm), _logger(l), aflags(a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) : _logger(l) {
     free();
+    _pc = &pc;
+    _qm = &qm;
+    aflags = &a;
     initialize();
   }
 
   //Copy Constructor//////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _qm(that._qm), _logger(that._logger), aflags(that.aflags) {
+  TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _logger(that._logger) {
+    free();
     copy(that);
+  }
+
+  TCONDCalculator& TCONDCalculator::operator=(const TCONDCalculator& that) {
+    if (this != &that) {
+      free();
+      copy(that);
+    }
+    return *this;
   }
 
   void TCONDCalculator::copy(const TCONDCalculator& that) {
     _pc = that._pc;
     _qm = that._qm;
-    _logger = that._logger;
     aflags = that.aflags;
     calc_options = that.calc_options;
     eigenvectors = that.eigenvectors;
@@ -132,17 +143,17 @@ namespace apl {
   //clear/////////////////////////////////////////////////////////////////////
   void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) {
     free();
-    _pc = pc;
-    _qm = qm;
+    _pc = &pc;
+    _qm = &qm;
     _logger = l;
-    aflags = a;
+    aflags = &a;
     initialize();
   }
 
   void TCONDCalculator::initialize() {
-    nBranches = _pc.getNumberOfBranches();
-    nQPs = _qm.getnQPs();
-    nIQPs = _qm.getnIQPs();
+    nBranches = _pc->getNumberOfBranches();
+    nQPs = _qm->getnQPs();
+    nIQPs = _qm->getnIQPs();
   }
 
 }  // namespace apl
@@ -171,10 +182,10 @@ namespace apl {
     // Frequencies and group velocities
     calculateFrequenciesGroupVelocities();
 
-    string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE);
+    string filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE);
     writeTempIndepOutput(filename, "Frequency", "THz", freq);
 
-    filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
+    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
     writeGroupVelocities(filename);
 
     // Grueneisen parameters
@@ -186,7 +197,7 @@ namespace apl {
     for (uint t = 0; t < temperatures.size(); t++) {
       grueneisen_avg[t] = calculateAverageGrueneisen(temperatures[t], grueneisen_modes);
     }
-    filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GRUENEISEN_FILE);
+    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GRUENEISEN_FILE);
     writeGrueneisen(filename, grueneisen_avg, grueneisen_modes);
 
     // Transition probabilities
@@ -196,18 +207,18 @@ namespace apl {
     thermal_conductivity.assign(temperatures.size(), xmatrix<double>(3, 3));
     vector<vector<vector<double> > > rates_total, rates_anharm;
     // Only need little groups for full BTE
-    if (!calc_options.flag("RTA") && !_qm.littleGroupsCalculated()) _qm.calculateLittleGroups();
+    if (!calc_options.flag("RTA") && !_qm->littleGroupsCalculated()) _qm->calculateLittleGroups();
 
     for (uint t = 0; t < temperatures.size(); t++) {
       thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], rates_total, rates_anharm);
     }
 
-    filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
+    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
     writeTempDepOutput(filename, "SCATTERING_RATES", "1/ps", temperatures, rates_total);
-    filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_3RD_FILE);
+    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_3RD_FILE);
     writeTempDepOutput(filename, "SCATTERING_RATES_ANHARMONIC", "1/ps", temperatures, rates_anharm);
 
-    filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE);
+    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE);
     writeThermalConductivity(filename);
   }
 
@@ -234,7 +245,7 @@ namespace apl {
 
     // Calculate frequencies and group velocities
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = _pc.getNCPUs();
+    int ncpus = _pc->getNCPUs();
     vector<vector<int> > thread_dist = setupMPI(message, _logger, nQPs, ncpus);
     vector<std::thread*> threads;
     threads.clear();
@@ -258,7 +269,7 @@ namespace apl {
     vector<xmatrix<xcomplex<double> > > dDynMat(3, eigen);
     for (int q = startIndex; q < endIndex; q++) {
       // Frequency
-      xvector<double> f = _pc.getFrequency(_qm.getQPoint(q).cpos, apl::THZ | apl::OMEGA,
+      xvector<double> f = _pc->getFrequency(_qm->getQPoint(q).cpos, apl::THZ | apl::OMEGA,
           eigenvectors[q], dDynMat);
       freq[q] = aurostd::xvector2vector(f);  // Convert to vector to have same indexing as gvel
       // Group velocity
@@ -292,11 +303,11 @@ namespace apl {
     // Prepare and precompute
     vector<vector<double> > grueneisen(nIQPs, vector<double>(nBranches));
 
-    const vector<vector<double> >& ifcs = _pc.getAnharmonicForceConstants(3);
-    const Supercell& scell = _pc.getSupercell();
+    const vector<vector<double> >& ifcs = _pc->getAnharmonicForceConstants(3);
+    const Supercell& scell = _pc->getSupercell();
 
     // Inverse masses
-    const vector<vector<int> >& clusters = _pc.getClusters(3);
+    const vector<vector<int> >& clusters = _pc->getClusters(3);
     uint nclusters = clusters.size();
     vector<double> invmasses(nclusters);
     for (uint c = 0; c < nclusters; c++) {
@@ -312,7 +323,7 @@ namespace apl {
     uint ncart = cart_indices.size();
 
     // Prepare precomputation of eigenvalue products
-    int natoms = (int) _pc.getInputCellStructure().atoms.size();
+    int natoms = (int) _pc->getInputCellStructure().atoms.size();
     vector<int> atpowers(2, 1);
     vector<vector<int> > at_eigen;
     aurostd::xcombos at_combos(natoms, 2, 'E' , true);
@@ -339,7 +350,7 @@ namespace apl {
 
     // Start calculation
     for (int iq = 0; iq < nIQPs; iq++) {
-      q = _qm.getIbzqpts()[iq];
+      q = _qm->getIbzqpts()[iq];
       for (int br = 0; br < nBranches; br++) {
         if (freq[q][br] > _AFLOW_APL_EPS_) {
           g_mode.re = 0.0;
@@ -396,7 +407,7 @@ namespace apl {
     double c, c_tot = 0, g_tot = 0;
     double prefactor = 1E24 * std::pow(PLANCKSCONSTANT_hbar_THz, 2)/(KBOLTZ * std::pow(T, 2));
     for (int q = 0; q < nQPs; q++) {
-      iq = _qm.getIbzqpt(q);
+      iq = _qm->getIbzqpt(q);
       for (int br = 0; br < nBranches; br++) {
         if (freq[q][br] > _AFLOW_APL_EPS_) {
           c = prefactor * occ[q][br] * (1.0 + occ[q][br]) * std::pow(freq[q][br], 2);
@@ -421,12 +432,12 @@ namespace apl {
   void TCONDCalculator::calculateTransitionProbabilities() {
     _logger << "Calculating transition probabilities." << apl::endl;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = _pc.getNCPUs();
+    int ncpus = _pc->getNCPUs();
     vector<std::thread*> threads;
     vector<vector<int> > thread_dist;
 #endif
     string message = "";
-    LTMethod _lt(_qm);
+    LTMethod _lt(*_qm);
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
     vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);
@@ -454,14 +465,14 @@ namespace apl {
 #endif
 
     // Output phase space
-    string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_PS_FILE);
+    string filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_PS_FILE);
     writePhaseSpace(filename, phase_space);
 
     if (calc_options.flag("ISOTOPE")) {
       _logger << "Calculating isotope transition probabilities." << apl::endl;
 
       // Test if isotope scattering is possible
-      const xstructure& pcell = _pc.getInputCellStructure();
+      const xstructure& pcell = _pc->getInputCellStructure();
       uint natoms = pcell.atoms.size();
       uint at = 0;
       for (at = 0; at < natoms; at++) {
@@ -492,13 +503,13 @@ namespace apl {
         _logger.finishProgressBar();
 #endif
       }
-      string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_ISOTOPE_FILE);
+      string filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_ISOTOPE_FILE);
       writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_isotope);
     }
 
     if (calc_options.flag("BOUNDARY")) {
       rates_boundary = calculateTransitionProbabilitiesBoundary();
-      string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
+      string filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
       writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_boundary);
     }
   }
@@ -509,10 +520,10 @@ namespace apl {
   // is used for the Grueneisen parameters. Calculating the phases ahead of
   // time decreases runtime considerably.
   vector<vector<vector<xcomplex<double> > > > TCONDCalculator::calculatePhases(bool conjugate) {
-    const xstructure& scell = _pc.getSuperCellStructure();
-    const xstructure& pcell = _pc.getInputCellStructure();
-    const vector<int>& sc2pcMap = _pc.getSupercell()._sc2pcMap;
-    const vector<int>& pc2scMap = _pc.getSupercell()._pc2scMap;
+    const xstructure& scell = _pc->getSuperCellStructure();
+    const xstructure& pcell = _pc->getInputCellStructure();
+    const vector<int>& sc2pcMap = _pc->getSupercell()._sc2pcMap;
+    const vector<int>& pc2scMap = _pc->getSupercell()._pc2scMap;
     uint niatoms = pcell.atoms.size();
     uint natoms = scell.atoms.size();
     vector<vector<vector<xcomplex<double> > > > phases(niatoms, vector<vector<xcomplex<double> > >(natoms, vector<xcomplex<double> >(nQPs)));
@@ -529,8 +540,8 @@ namespace apl {
         min_vec += iat_cpos;
         min_vec -= scell.atoms[at_eq_sc].cpos;
         for (int q = 0; q < nQPs; q++) {
-          if (conjugate) phases[iat][at][q] = exp(-iONE * scalar_product(_qm.getQPoint(q).cpos, min_vec));
-          else phases[iat][at][q] = exp(iONE * scalar_product(_qm.getQPoint(q).cpos, min_vec));
+          if (conjugate) phases[iat][at][q] = exp(-iONE * scalar_product(_qm->getQPoint(q).cpos, min_vec));
+          else phases[iat][at][q] = exp(iONE * scalar_product(_qm->getQPoint(q).cpos, min_vec));
         }
       }
     }
@@ -546,8 +557,8 @@ namespace apl {
       vector<vector<vector<vector<double> > > >& phase_space,
       const vector<vector<vector<xcomplex<double> > > >& phases) {
     // Prepare and precompute
-    const Supercell& scell = _pc.getSupercell();
-    const vector<vector<int> >& clusters = _pc.getClusters(3);
+    const Supercell& scell = _pc->getSupercell();
+    const vector<vector<int> >& clusters = _pc->getClusters(3);
     uint nclusters = clusters.size();
 
     // Inverse masses
@@ -559,7 +570,7 @@ namespace apl {
     }
 
     // Cartesian indices to avoid running xcombos multiple times
-    const vector<vector<double> >& ifcs = _pc.getAnharmonicForceConstants(3);
+    const vector<vector<double> >& ifcs = _pc->getAnharmonicForceConstants(3);
     vector<vector<int> > cart_indices;
     aurostd::xcombos cart(3, 3, 'E', true);
     while (cart.increment()) cart_indices.push_back(cart.getCombo());
@@ -576,7 +587,7 @@ namespace apl {
     const double ps_prefactor = 2.0/(3.0 * std::pow(nBranches, 3) * nQPs);
 
     // Prepare precomputation of eigenvalue products
-    int natoms = (int) _pc.getInputCellStructure().atoms.size();
+    int natoms = (int) _pc->getInputCellStructure().atoms.size();
     vector<int> atpowers(3, 1);
     vector<vector<int> > at_eigen;
     aurostd::xcombos at_combos(natoms, 3, 'E' , true);
@@ -587,7 +598,7 @@ namespace apl {
 
     // Precompute the indices of -q to use for inversion symmetry
     vector<int> q_minus(nQPs);
-    for (int q = 0; q < nQPs; q++) q_minus[q] = _qm.getQPointIndex(-_qm.getQPoint(q).fpos);
+    for (int q = 0; q < nQPs; q++) q_minus[q] = _qm->getQPointIndex(-_qm->getQPoint(q).fpos);
 
     // Initialize variables
     xcomplex<double> matrix, prefactor, eigen;
@@ -600,11 +611,11 @@ namespace apl {
 
     // Start calculation
     for (int i = startIndex; i < endIndex; i++) {
-      qpts[0] = _qm.getIbzqpts()[i];
+      qpts[0] = _qm->getIbzqpts()[i];
       // Get the q-point q" that fulfills q - q' - q" = G. Due to the inversion
       // symmetry of the q-point grid, q + q' - q" = G does not need to be
       // evaluated since for each q' there is also a (-q') on the grid.
-      for (q = 0; q < nQPs; q++) lastq[q] = _qm.getQPointIndex(_qm.getQPoint(qpts[0]).fpos - _qm.getQPoint(q).fpos);
+      for (q = 0; q < nQPs; q++) lastq[q] = _qm->getQPointIndex(_qm->getQPoint(qpts[0]).fpos - _qm->getQPoint(q).fpos);
 
       for (br = 0; br < nbr; br++) {
         freq_ref = freq[qpts[0]][branches[br][0]];
@@ -732,7 +743,7 @@ namespace apl {
         }
       }
       // Finish up phase space calculation
-      w = _qm.getWeights()[i];
+      w = _qm->getWeights()[i];
       for (b = 0; b < nBranches; b++) {
         for (p = 0; p < 4; p++) {
           for (j = 0; j < 2; j++) {
@@ -749,7 +760,7 @@ namespace apl {
   // the isotope scattering processes.
   void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, int endIndex, const LTMethod& _lt) {
     // Prepare
-    const xstructure& pcell = _pc.getInputCellStructure();
+    const xstructure& pcell = _pc->getInputCellStructure();
     uint natoms = pcell.atoms.size();
     vector<double> pearson(natoms);
     uint at = 0;
@@ -762,7 +773,7 @@ namespace apl {
     xcomplex<double> eig;
 
     for (int i = startIndex; i < endIndex; i++) {
-      q1 = _qm.getIbzqpts()[i];
+      q1 = _qm->getIbzqpts()[i];
       for (br1 = 0; br1 < nBranches; br1++) {
         prefactor = freq[q1][br1] * freq[q1][br1] * PI/2.0;
         for (br2 = 0; br2 < nBranches; br2++) {
@@ -815,7 +826,7 @@ namespace apl {
     _logger << "Calculating grain boundary transition probabilities with a grain size of " << grain_size << " nm." << apl::endl;
     for (iq = 0; iq < nIQPs; iq++) {
       for (br = 0; br < nBranches; br++) {
-        q = _qm.getIbzqpts()[iq];
+        q = _qm->getIbzqpts()[iq];
         rates[iq][br] = aurostd::modulus(gvel[q][br])/grain_size;
       }
     }
@@ -936,15 +947,15 @@ namespace apl {
       vector<int>& branches, int& sign) {
     // Signs and q-points
     // Signs are stored in the q-index instead of using an extra integer.
-    xvector<double> qsum = _qm.getQPoint(qpts[0]).fpos;
+    xvector<double> qsum = _qm->getQPoint(qpts[0]).fpos;
     if (process[0] < 0) {
       sign = 1;
       qpts[1] = -process[0] - 1;
-      qpts[2] = _qm.getQPointIndex(_qm.getQPoint(qpts[0]).fpos - _qm.getQPoint(qpts[1]).fpos);
+      qpts[2] = _qm->getQPointIndex(_qm->getQPoint(qpts[0]).fpos - _qm->getQPoint(qpts[1]).fpos);
     } else {
       sign = 0;
       qpts[1] = process[0] - 1;
-      qpts[2] = _qm.getQPointIndex(qsum + _qm.getQPoint(qpts[1]).fpos);
+      qpts[2] = _qm->getQPointIndex(qsum + _qm->getQPoint(qpts[1]).fpos);
     }
 
     // Branches
@@ -1073,7 +1084,7 @@ namespace apl {
   vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<vector<double> >& occ) {
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = _pc.getNCPUs();
+    int ncpus = _pc->getNCPUs();
     vector<std::thread*> threads;
     vector<vector<int> > thread_dist = getThreadDistribution(nIQPs, ncpus);
     threads.clear();
@@ -1099,7 +1110,7 @@ namespace apl {
     int sign = -1;
 
     for (int i = startIndex; i < endIndex; i++) {
-      qpts[0] = _qm.getIbzqpts()[i];
+      qpts[0] = _qm->getIbzqpts()[i];
       for (uint p = 0, nprocs = processes[i].size(); p < nprocs; p++) {
         getProcess(processes[i][p], qpts, branches, sign);
         rates[i][branches[0]] += intr_trans_probs[i][p] * getOccupationTerm(occ, sign, qpts, branches);
@@ -1114,7 +1125,7 @@ namespace apl {
     vector<vector<xvector<double> > > mfd(nQPs, vector<xvector<double> >(nBranches, xvec));
     int iq = -1;
     for (int q = 0; q < nQPs; q++) {
-      iq = _qm.getIbzqpt(q);
+      iq = _qm->getIbzqpt(q);
       for (int br = 0; br < nBranches; br++) {
         if (rates[iq][br] > 0.0) {
           mfd[q][br] = gvel[q][br] * freq[q][br]/rates[iq][br];
@@ -1131,7 +1142,7 @@ namespace apl {
     xmatrix<double> tcond(3, 3);
     bool cumulative = calc_options.flag("CUMULATIVEK");
     double grain_size = aurostd::string2utype<double>(calc_options.getattachedscheme("GRAIN_SIZE"));
-    double prefactor = 1E24 * std::pow(PLANCKSCONSTANT_hbar_THz, 2)/(KBOLTZ * std::pow(T, 2) * nQPs * Volume(_pc.getInputCellStructure()));
+    double prefactor = 1E24 * std::pow(PLANCKSCONSTANT_hbar_THz, 2)/(KBOLTZ * std::pow(T, 2) * nQPs * Volume(_pc->getInputCellStructure()));
     for (int q = 0; q < nQPs; q++) {
       for (int br = 0; br < nBranches; br++) {
         bool include = true;
@@ -1164,7 +1175,7 @@ namespace apl {
       vector<vector<xvector<double> > >& mfd) {
     // MPI variables
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = _pc.getNCPUs();
+    int ncpus = _pc->getNCPUs();
     vector<vector<int> > thread_dist;
     vector<std::thread*> threads;
 #endif
@@ -1202,7 +1213,7 @@ namespace apl {
     int sign = -1;
 
     for (int i = startIndex; i < endIndex; i++) {
-      qpts[0] = _qm.getIbzqpts()[i];
+      qpts[0] = _qm->getIbzqpts()[i];
       for (uint p = 0, nprocs = processes[i].size(); p < nprocs; p++) {
         getProcess(processes[i][p], qpts, branches, sign);
         correction = mfd[qpts[2]][branches[2]];
@@ -1224,9 +1235,9 @@ namespace apl {
 
       // Symmetrize
       int symop = 0;
-      const vector<_sym_op>& pgroup = _qm.getReciprocalCell().pgroup;
+      const vector<_sym_op>& pgroup = _qm->getReciprocalCell().pgroup;
       xmatrix<double> Uc(3, 3);
-      const vector<int>& little_group = _qm.getLittleGroup(i);
+      const vector<int>& little_group = _qm->getLittleGroup(i);
       uint nsym = little_group.size();
       for (uint isym = 0; isym < nsym; isym++) {
         symop = little_group[isym];
@@ -1244,12 +1255,12 @@ namespace apl {
   void TCONDCalculator::correctMFD(const vector<vector<double> >& rates,
       const vector<vector<xvector<double> > >& delta,
       vector<vector<xvector<double> > >& mfd) {
-    const vector<_sym_op>& pgroup = _qm.getReciprocalCell().pgroup;
+    const vector<_sym_op>& pgroup = _qm->getReciprocalCell().pgroup;
     xvector<double> xvec(3);
     int iq = -1;
     for (int q = 0; q < nQPs; q++) {
-      const xmatrix<double>& Uc = pgroup[_qm.getQPoint(q).symop].Uc;
-      iq = _qm.getIbzqpt(q);
+      const xmatrix<double>& Uc = pgroup[_qm->getQPoint(q).symop].Uc;
+      iq = _qm->getIbzqpt(q);
       for (int br = 0; br < nBranches; br++) {
         if (rates[iq][br] > 0.0) mfd[q][br] = (freq[q][br] * gvel[q][br] + Uc * delta[iq][br])/rates[iq][br];
         else mfd[q][br] = xvec;
@@ -1267,12 +1278,12 @@ namespace apl {
   // Writes temperature-independent output files.
   void TCONDCalculator::writeTempIndepOutput(const string& filename, string keyword,
       const string& unit, const vector<vector<double> >& data) {
-    string path = aurostd::CleanFileName(aflags.Directory + "/" + filename);
+    string path = aurostd::CleanFileName(aflags->Directory + "/" + filename);
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     string key = "[AAPL_" + aurostd::toupper(aurostd::StringSubst(keyword, " ", "_")) + "]";
-    if (!_pc.getSystemName().empty()) {
-      output << key << "SYSTEM=" << _pc.getSystemName() << std::endl;
+    if (!_pc->getSystemName().empty()) {
+      output << key << "SYSTEM=" << _pc->getSystemName() << std::endl;
     }
     output << key << "START" << std::endl;
     output << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -1298,8 +1309,8 @@ namespace apl {
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     string key = "[AAPL_" + aurostd::toupper(aurostd::StringSubst(keyword, " ", "_")) + "]";
-    if (!_pc.getSystemName().empty()) {
-      output << key << "SYSTEM=" << _pc.getSystemName() << std::endl;
+    if (!_pc->getSystemName().empty()) {
+      output << key << "SYSTEM=" << _pc->getSystemName() << std::endl;
     }
     output << key << "START" << std::endl;
     for (uint t = 0; t < temps.size(); t++) {
@@ -1344,8 +1355,8 @@ namespace apl {
 
     // Header
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    if (!_pc.getSystemName().empty()) {
-      output << "[AAPL_GROUP_VELOCITY]SYSTEM=" << _pc.getSystemName() << std::endl;
+    if (!_pc->getSystemName().empty()) {
+      output << "[AAPL_GROUP_VELOCITY]SYSTEM=" << _pc->getSystemName() << std::endl;
     }
     output << "[AAPL_GROUP_VELOCITY]START" << std::endl;
     output << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -1406,7 +1417,7 @@ namespace apl {
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     output << "# 3-phonon scattering phase space (in fs)" << std::endl;
-    output << "[AAPL_SCATTERING_PHASE_SPACE]SYSTEM=" << _pc.getSystemName() << std::endl;
+    output << "[AAPL_SCATTERING_PHASE_SPACE]SYSTEM=" << _pc->getSystemName() << std::endl;
     output << "[AAPL_TOTAL_SCATTERING_PHASE_SPACE]START" << std::endl;
     output << std::setiosflags(std::ios::left | std::ios::fixed | std::ios::showpoint);
     output << std::setw(15) << "total" << std::setw(10) << std::setprecision(8) << std::dec << ps_total << std::endl;
@@ -1437,7 +1448,7 @@ namespace apl {
       const vector<vector<double> >& grueneisen_modes) {
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    output << "[AAPL_GRUENEISEN]SYSTEM=" << _pc.getSystemName() << std::endl;
+    output << "[AAPL_GRUENEISEN]SYSTEM=" << _pc->getSystemName() << std::endl;
     output << "[AAPL_GRUENEISEN_AVERAGE]START" << std::endl;
     output << std::setiosflags(std::ios::right | std::ios::fixed | std::ios::showpoint);
     output << std::setw(8) << "# T (K)"
@@ -1466,8 +1477,8 @@ namespace apl {
 
     // Header
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    if (!_pc.getSystemName().empty()) {
-      output << "[AAPL_THERMAL_CONDUCTIVITY]SYSTEM=" << _pc.getSystemName() << std::endl;
+    if (!_pc->getSystemName().empty()) {
+      output << "[AAPL_THERMAL_CONDUCTIVITY]SYSTEM=" << _pc->getSystemName() << std::endl;
     }
     output << "[AAPL_THERMAL_CONDUCTIVITY]START" << std::endl;
     output << std::setw(8) << "# T (K)"

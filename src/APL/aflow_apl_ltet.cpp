@@ -27,14 +27,15 @@ static const string _APL_LTET_MODULE_ = "LTET";  // for the logger
 
 namespace apl {
 
-  LTMethod::LTMethod(QMesh& qm) : _qm(qm) {
-    if (_qm.getnQPs() < 4) {
+  LTMethod::LTMethod(QMesh& qm) {
+    _qm = &qm;
+    if (_qm->getnQPs() < 4) {
       string function = _APL_LTET_ERR_PREFIX_ + "LTMethod()";
       string message = "At least four q-points are required for the linear tetrahedron method.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
     free();
-    _volumePerTetrahedron = 1.0/(double)(6 * _qm.getGrid(1) * _qm.getGrid(2) * _qm.getGrid(3));
+    _volumePerTetrahedron = 1.0/(double)(6 * _qm->getGrid(1) * _qm->getGrid(2) * _qm->getGrid(3));
     generateTetrahedra();
   }
 
@@ -76,7 +77,7 @@ namespace apl {
 
   void LTMethod::clear(QMesh& qm) {
     free();
-    _qm = qm;
+    _qm = &qm;
   }
 
 }  // namespace apl
@@ -152,7 +153,7 @@ namespace apl {
             for (int k = 1; k < 4; k++) tet[j][k] = (double) tetrahedra[i][j][k];
             if (lx == 1) tet[j][1] = 1 - tet[j][1];
             if (ly == 1) tet[j][2] = 1 - tet[j][2];
-            tet[j] = F2C(_qm.getReciprocalCell().lattice, tet[j]);
+            tet[j] = F2C(_qm->getReciprocalCell().lattice, tet[j]);
           }
           // Measure tetrahedra sides and determine minimum
           for (int j = 0; j < 3; j++) {
@@ -185,17 +186,17 @@ namespace apl {
     vector<vector<vector<int> > > cornerMap(2, vector<vector<int> >(2, vector<int>(2)));
     vector<int> tet(4);
     int j1 = 0, j2 = 0, j3 = 0, t = 0;
-    for (int q3 = 0; q3 < _qm.getGrid(3); q3++) {
-      for (int q2 = 0; q2 < _qm.getGrid(2); q2++) {
-        for (int q1 = 0; q1 < _qm.getGrid(1); q1++) {
+    for (int q3 = 0; q3 < _qm->getGrid(3); q3++) {
+      for (int q2 = 0; q2 < _qm->getGrid(2); q2++) {
+        for (int q1 = 0; q1 < _qm->getGrid(1); q1++) {
           // Get the corners of the microcell and map them to the q-points
           for (int k3 = 0; k3 <= 1; k3++) {
-            j3 = (q3 + k3) % _qm.getGrid(3);
+            j3 = (q3 + k3) % _qm->getGrid(3);
             for (int k2 = 0; k2 <= 1; k2++) {
-              j2 = (q2 + k2) % _qm.getGrid(2);
+              j2 = (q2 + k2) % _qm->getGrid(2);
               for (int k1 = 0; k1 <= 1; k1++) {
-                j1 = (q1 + k1) % _qm.getGrid(1);
-                cornerMap[k1][k2][k3] = _qm.getQPointIndex(j1, j2, j3);
+                j1 = (q1 + k1) % _qm->getGrid(1);
+                cornerMap[k1][k2][k3] = _qm->getQPointIndex(j1, j2, j3);
               }
             }
           }
@@ -223,7 +224,7 @@ namespace apl {
   // instead of sorting in place.
   void LTMethod::makeIrreducible() {
     // Only makes sense with a reduced q-mesh
-    if (_qm.getnQPs() != _qm.getnIQPs()) {
+    if (_qm->getnQPs() != _qm->getnIQPs()) {
       _weights.clear();
       _irredTetrahedra.clear();
       _nIrredTetra = 0;
@@ -232,15 +233,15 @@ namespace apl {
       vector<vector<int> > irred;
       stringstream message;
       message << "Determining irreducible tetrahedra.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LTET_MODULE_, message, _qm.getDirectory(), _qm.getOutputStream(), std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LTET_MODULE_, message, _qm->getDirectory(), _qm->getOutputStream(), std::cout);
       for (int t = 0; t < _nTetra; t++) {
         compare = getTetrahedron(t);
-        for (int i = 0; i < 4; i++) compare[i] = _qm.getIrredQPointIndex(compare[i]);
+        for (int i = 0; i < 4; i++) compare[i] = _qm->getIrredQPointIndex(compare[i]);
         std::sort(compare.begin(), compare.end());
         for (it = 0; it < _nIrredTetra; it++) {
           // OBSOLETE - ME191213
           //irred = getIrredTetrahedron(it);
-          //for (int i = 0; i < 4; i++) irred[i] = _qm.getIrredQPointIndex(irred[i]);
+          //for (int i = 0; i < 4; i++) irred[i] = _qm->getIrredQPointIndex(irred[i]);
           //std::sort(irred.begin(), irred.end());
           for (m = 0; m < 4; m++) {
             if (compare[m] != irred[it][m]) break;
@@ -257,7 +258,7 @@ namespace apl {
         }
       }
       message << "Found " << _nIrredTetra << " irreducible tetrahedra.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LTET_MODULE_, message, _qm.getDirectory(), _qm.getOutputStream(), std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LTET_MODULE_, message, _qm->getDirectory(), _qm->getOutputStream(), std::cout);
       _reduced = true;
     }
   }
@@ -300,7 +301,7 @@ namespace apl {
     vector<vector<int> > irrtet(_nIrredTetra, vector<int>(4));
     for (int i = 0; i < _nIrredTetra; i++) {
       for (int j = 0; j < 4; j++) {
-        irrtet[i][j] = _qm.getIbzqpt(getCorner(_irredTetrahedra[i], j));
+        irrtet[i][j] = _qm->getIbzqpt(getCorner(_irredTetrahedra[i], j));
       }
     }
     return irrtet;
