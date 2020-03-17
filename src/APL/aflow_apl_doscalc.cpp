@@ -174,6 +174,7 @@ namespace apl {
     }
     _maxFreq += 1.0;
     if (_minFreq < MIN_FREQ_TRESHOLD) _minFreq -= 1.0;
+    else _minFreq = 0.0;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
