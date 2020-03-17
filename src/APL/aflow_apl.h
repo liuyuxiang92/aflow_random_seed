@@ -108,7 +108,9 @@ namespace apl {
       bool _isQuiet;
 
     public:
+      Logger();
       Logger(std::ofstream&, const _aflags&);
+      void initialize(std::ofstream&, const _aflags&);
       Logger(Logger&);
       ~Logger();
       ofstream& getOutputStream();
@@ -1653,11 +1655,11 @@ namespace apl {
   class TCONDCalculator {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
-      TCONDCalculator(PhononCalculator&, QMesh&, Logger&, _aflags&);
+      TCONDCalculator(PhononCalculator&, QMesh&, ofstream&, _aflags&);
       TCONDCalculator(const TCONDCalculator&);
       TCONDCalculator& operator=(const TCONDCalculator&);
       ~TCONDCalculator();
-      void clear(PhononCalculator&, QMesh&, Logger&, _aflags&);
+      void clear(PhononCalculator&, QMesh&, ofstream&, _aflags&);
       void initialize();
 
       aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
@@ -1681,7 +1683,8 @@ namespace apl {
     private:
       PhononCalculator* _pc;  // Reference to the phonon calculator
       QMesh* _qm;  // Reference to the q-point mesh
-      Logger& _logger;  // The APL logger
+      Logger _logger;  // The APL logger
+      ofstream* messageFile;
       _aflags* aflags;
 
       void free();

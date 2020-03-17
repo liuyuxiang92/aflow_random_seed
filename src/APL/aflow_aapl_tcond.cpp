@@ -25,6 +25,7 @@
 
 // String constants for file output and exception handling
 static const string _AAPL_TCOND_ERR_PREFIX_ = "apl::TCONDCalculator::";
+static const string _AAPL_TCOND_MODULE_ = "AAPL";
 
 static const int max_iter = 250;  // Maximum number of iterations for the iterative BTE solution
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
@@ -74,16 +75,16 @@ namespace apl {
 namespace apl {
 
   //Constructor///////////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) : _logger(l) {
-    free();
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, ofstream& mf, _aflags& a) {
     _pc = &pc;
     _qm = &qm;
+    messageFile = &mf;
     aflags = &a;
     initialize();
   }
 
   //Copy Constructor//////////////////////////////////////////////////////////
-  TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _logger(that._logger) {
+  TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) {
     free();
     copy(that);
   }
@@ -106,6 +107,7 @@ namespace apl {
     gvel = that.gvel;
     intr_trans_probs = that.intr_trans_probs;
     intr_trans_probs_iso = that.intr_trans_probs_iso;
+    messageFile = that.messageFile;
     nBranches = that.nBranches;
     nIQPs = that.nIQPs;
     nQPs = that.nQPs;
@@ -141,16 +143,18 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) {
+  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, ofstream& mf, _aflags& a) {
     free();
     _pc = &pc;
     _qm = &qm;
-    _logger = l;
+    messageFile = &mf;
     aflags = &a;
     initialize();
   }
 
   void TCONDCalculator::initialize() {
+    _logger.initialize(*messageFile, *aflags);
+    _logger.setModuleName(_AAPL_TCOND_MODULE_);
     nBranches = _pc->getNumberOfBranches();
     nQPs = _qm->getnQPs();
     nIQPs = _qm->getnIQPs();

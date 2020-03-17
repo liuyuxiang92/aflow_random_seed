@@ -2315,6 +2315,8 @@ namespace KBIN {
 
     if (USER_TCOND) {
       // Get q-points
+      message = "Starting thermal conductivity calculations.";
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout);
       apl::QMesh qmtcond(messageFile);
       qmtcond.setDirectory(aflags.Directory);
       qmtcond.initialize(USER_DOS_MESH, phcalc.getInputCellStructure(), true, true);
@@ -2323,8 +2325,7 @@ namespace KBIN {
       qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);
 
       // Do the thermal conductivity calculation
-      logger << "Starting thermal conductivity calculations." << apl::endl;
-      apl::TCONDCalculator tcond(phcalc, qmtcond, logger, aflags);
+      apl::TCONDCalculator tcond(phcalc, qmtcond, messageFile, aflags);
 
       // Set calculation options
       tcond.calc_options.flag("RTA", (USER_BTE == "RTA"));

@@ -6,7 +6,13 @@ namespace apl {
 
 // ///////////////////////////////////////////////////////////////////////////
 
+Logger::Logger() {}
+
 Logger::Logger(ofstream& os, const _aflags& flags) {
+  initialize(os, flags);
+}
+
+void Logger::initialize(ofstream& os, const _aflags& flags) {
   _os = &os;
   _ss.clear();
   _barCode = "00000";
