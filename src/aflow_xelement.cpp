@@ -70,6 +70,11 @@ double electronegativity_vec;           // Saxena
 double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       // DU 2019/05/17
 double electronegativityPearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      // DU 2019/05/17
 double electronegativityGhosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      // DU 2019/05/17
+
+double electronegativityAllen;
+vector<double> oxstates;
+vector<double> pref_oxstates;
+
 double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       // DU 2019/05/17
 double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
 double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
@@ -279,14 +284,14 @@ std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // 
 std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
 std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
 std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
+std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
 std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE// DX and CO - 9/4/17 
+std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE// DX and CO - 9/4/17
 std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
 std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
 std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
@@ -308,7 +313,7 @@ xelement::xelement() {
   Group=NNN; 
   Series="UNDEFINED";
   Block="nnn";      
- //                                          
+ //
   mass=NNN;//  AMU2KILOGRAM goes inside.
   MolarVolume=NNN;  
   volume=NNN;      
@@ -334,12 +339,15 @@ xelement::xelement() {
   radii_Ghosh08=NNN;         
   radii_Slatter=NNN;         
   radii_Pyykko=NNN;          
- //                                          
+ //
   electrical_conductivity=NNN;
   electronegativity_vec=NNN;    
   hardness_Ghosh=NNN;            
   electronegativityPearson=NNN;           
-  electronegativityGhosh=NNN;             
+  electronegativityGhosh=NNN;
+  electronegativityAllen=NNN;
+  oxstates.push_back(NNN);
+  pref_oxstates.push_back(NNN);
   electron_affinity_PT=NNN;      
   Miedema_phi_star=NNN;         
   Miedema_nws=NNN;              
@@ -355,7 +363,7 @@ xelement::xelement() {
   critical_Temperature_PT=NNN;  
   thermal_expansion=NNN;     
   thermal_conductivity=NNN;  
- //                                         
+ //
   Brinelll_hardness=NNN;
   Mohs_hardness=NNN;    
   Vickers_hardness=NNN; 
@@ -406,7 +414,7 @@ const xelement& xelement::operator=(const xelement& b) {      // operator=
     Group=b.Group; 
     Series=b.Series;
     Block=b.Block;      
-   //                                          
+   //
     mass=b.mass;
     MolarVolume=b.MolarVolume;  
     volume=b.volume;      
@@ -432,12 +440,17 @@ const xelement& xelement::operator=(const xelement& b) {      // operator=
     radii_Ghosh08=b.radii_Ghosh08;         
     radii_Slatter=b.radii_Slatter;         
     radii_Pyykko=b.radii_Pyykko;          
-   //                                          
+   //
     electrical_conductivity=b.electrical_conductivity;
     electronegativity_vec=b.electronegativity_vec;    
     hardness_Ghosh=b.hardness_Ghosh;            
     electronegativityPearson=b.electronegativityPearson;           
-    electronegativityGhosh=b.electronegativityGhosh;             
+    electronegativityGhosh=b.electronegativityGhosh;
+
+    electronegativityAllen=b.electronegativityAllen;
+    oxstates=b.oxstates;
+    pref_oxstates=b.pref_oxstates;
+
     electron_affinity_PT=b.electron_affinity_PT;      
     Miedema_phi_star=b.Miedema_phi_star;         
     Miedema_nws=b.Miedema_nws;              
@@ -453,7 +466,7 @@ const xelement& xelement::operator=(const xelement& b) {      // operator=
     critical_Temperature_PT=b.critical_Temperature_PT;  
     thermal_expansion=b.thermal_expansion;     
     thermal_conductivity=b.thermal_conductivity;  
-   //                                         
+   //
     Brinelll_hardness=b.Brinelll_hardness;
     Mohs_hardness=b.Mohs_hardness;    
     Vickers_hardness=b.Vickers_hardness; 
@@ -554,6 +567,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=6.4299;
     electronegativityPearson=7.18;
     electronegativityGhosh=7.178;
+    electronegativityAllen=2.300;
+    oxstates.push_back(1); oxstates.push_back(-1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=72.8;
     Miedema_phi_star=5.2;
     Miedema_nws=1.5;
@@ -632,6 +648,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=12.5449;
     electronegativityPearson=NNN;
     electronegativityGhosh=12.046;
+    electronegativityAllen=4.160;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -712,6 +731,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.3746;
     electronegativityPearson=3.01;
     electronegativityGhosh=2.860;
+    electronegativityAllen=0.912;
+    oxstates.push_back(1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=59.6;
     Miedema_phi_star=2.85;
     Miedema_nws=0.98;
@@ -790,6 +812,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.4968;
     electronegativityPearson=4.90;
     electronegativityGhosh=3.945;
+    electronegativityAllen=1.576;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=0;
     Miedema_phi_star=4.20;
     Miedema_nws=1.60;
@@ -869,6 +894,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.6190;
     electronegativityPearson=4.29;
     electronegativityGhosh=5.031;
+    electronegativityAllen=2.051;
+    oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=26.7;
     Miedema_phi_star=4.75;
     Miedema_nws=1.55;
@@ -947,6 +975,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.7410;
     electronegativityPearson=6.27;
     electronegativityGhosh=6.116;
+    electronegativityAllen=2.544;
+    oxstates.push_back(4); oxstates.push_back(2); oxstates.push_back(-4);
+    pref_oxstates.push_back(4); pref_oxstates.push_back(-4);
     electron_affinity_PT=153.9;
     Miedema_phi_star=6.20;
     Miedema_nws=1.90;
@@ -1025,6 +1056,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=6.8625;
     electronegativityPearson=7.30;
     electronegativityGhosh=7.209;
+    electronegativityAllen=3.066;
+    oxstates.push_back(5); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(-3);
+    pref_oxstates.push_back(-3);
     electron_affinity_PT=7;
     Miedema_phi_star=7.00;
     Miedema_nws=1.60;
@@ -1103,6 +1137,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=7.9854;
     electronegativityPearson=7.54;
     electronegativityGhosh=8.287;
+    electronegativityAllen=3.610;
+    oxstates.push_back(-0.5); oxstates.push_back(-1); oxstates.push_back(-2);
+    pref_oxstates.push_back(-2);
     electron_affinity_PT=141;
     Miedema_phi_star=6.97;
     Miedema_nws=1.70;
@@ -1181,6 +1218,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=9.1065;
     electronegativityPearson=10.41;
     electronegativityGhosh=9.372;
+    electronegativityAllen=4.193;
+    oxstates.push_back(-1);
+    pref_oxstates.push_back(-1);
     electron_affinity_PT=328;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -1259,6 +1299,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=10.2303;
     electronegativityPearson=NNN;
     electronegativityGhosh=10.459;
+    electronegativityAllen=4.787;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -1339,6 +1382,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.4441;
     electronegativityPearson=2.85;
     electronegativityGhosh=2.536;
+    electronegativityAllen=0.869;
+    oxstates.push_back(1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=52.8;
     Miedema_phi_star=2.70;
     Miedema_nws=0.82;
@@ -1417,6 +1463,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.0146;
     electronegativityPearson=3.75;
     electronegativityGhosh=3.310;
+    electronegativityAllen=1.293;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=0;
     Miedema_phi_star=3.45;
     Miedema_nws=1.17;
@@ -1496,6 +1545,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.5849;
     electronegativityPearson=3.23;
     electronegativityGhosh=4.084;
+    electronegativityAllen=1.613;
+    oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=42.5;
     Miedema_phi_star=4.20;
     Miedema_nws=1.39;
@@ -1574,6 +1626,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.1551;
     electronegativityPearson=4.77;
     electronegativityGhosh=4.857;
+    electronegativityAllen=1.916;
+    oxstates.push_back(4); oxstates.push_back(-4);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=133.6;
     Miedema_phi_star=4.70;
     Miedema_nws=1.50;
@@ -1652,6 +1707,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.7258;
     electronegativityPearson=5.62;
     electronegativityGhosh=5.631;
+    electronegativityAllen=2.253;
+    oxstates.push_back(5); oxstates.push_back(3); oxstates.push_back(-3);
+    pref_oxstates.push_back(5);
     electron_affinity_PT=71;
     Miedema_phi_star=5.5;
     Miedema_nws=1.65;
@@ -1730,6 +1788,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.2960;
     electronegativityPearson=6.22;
     electronegativityGhosh=6.420;
+    electronegativityAllen=2.589;
+    oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(2); oxstates.push_back(-2);
+    pref_oxstates.push_back(6);
     electron_affinity_PT=200;
     Miedema_phi_star=5.6;
     Miedema_nws=1.46;
@@ -1808,6 +1869,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.8662;
     electronegativityPearson=8.30;
     electronegativityGhosh=7.178;
+    electronegativityAllen=2.869;
+    oxstates.push_back(7); oxstates.push_back(5); oxstates.push_back(3); oxstates.push_back(1); oxstates.push_back(-1);
+    pref_oxstates.push_back(-1);
     electron_affinity_PT=349;
     Miedema_phi_star=5.32;
     Miedema_nws=0.34;
@@ -1886,6 +1950,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=6.4366;
     electronegativityPearson=NNN;
     electronegativityGhosh=7.951;
+    electronegativityAllen=3.242;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -1966,6 +2033,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.3273;
     electronegativityPearson=2.42;
     electronegativityGhosh=2.672;
+    electronegativityAllen=0.734;
+    oxstates.push_back(1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=48.4;
     Miedema_phi_star=2.25;
     Miedema_nws=0.65;
@@ -2044,6 +2114,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.7587;
     electronegativityPearson=2.2;
     electronegativityGhosh=3.140;
+    electronegativityAllen=1.034;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=2.37;
     Miedema_phi_star=2.55;
     Miedema_nws=0.91;
@@ -2123,6 +2196,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.8582;
     electronegativityPearson=3.34;
     electronegativityGhosh=3.248;
+    electronegativityAllen=1.190;
+    oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=18.1;
     Miedema_phi_star=3.25;
     Miedema_nws=1.27;
@@ -2201,6 +2277,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.9578;
     electronegativityPearson=3.45;
     electronegativityGhosh=3.357;
+    electronegativityAllen=1.38;
+    oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=7.6;
     Miedema_phi_star=3.65;
     Miedema_nws=1.47;
@@ -2279,6 +2358,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.0573;
     electronegativityPearson=3.6;
     electronegativityGhosh=3.465;
+    electronegativityAllen=1.53;
+    oxstates.push_back(5); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0);
+    pref_oxstates.push_back(5);
     electron_affinity_PT=50.6;
     Miedema_phi_star=4.25;
     Miedema_nws=1.64;
@@ -2357,6 +2439,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.1567;
     electronegativityPearson=3.72;
     electronegativityGhosh=3.573;
+    electronegativityAllen=1.650;
+    oxstates.push_back(6); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0);
+    pref_oxstates.push_back(3); pref_oxstates.push_back(6); //Cr+3 most preferred oxidation number
     electron_affinity_PT=64.3;
     Miedema_phi_star=4.65;
     Miedema_nws=1.74;
@@ -2435,6 +2520,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.2564;
     electronegativityPearson=3.72;
     electronegativityGhosh=3.681;
+    electronegativityAllen=1.75;
+    oxstates.push_back(7); oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0); oxstates.push_back(-1);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=0;
     Miedema_phi_star=4.45;
     Miedema_nws=1.61;
@@ -2513,6 +2601,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.3559;
     electronegativityPearson=4.06;
     electronegativityGhosh=3.789;
+    electronegativityAllen=1.80;
+    oxstates.push_back(6); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0); oxstates.push_back(-2);
+    pref_oxstates.push_back(3); pref_oxstates.push_back(2); //Fe+3 most preferred oxidation number
     electron_affinity_PT=15.7;
     Miedema_phi_star=4.93;
     Miedema_nws=1.77;
@@ -2591,6 +2682,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.4556;
     electronegativityPearson=4.3;
     electronegativityGhosh=3.897;
+    electronegativityAllen=1.84;
+    oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0); oxstates.push_back(-1);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=63.7;
     Miedema_phi_star=5.10;
     Miedema_nws=1.75;
@@ -2669,6 +2763,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.5550;
     electronegativityPearson=4.40;
     electronegativityGhosh=4.005;
+    electronegativityAllen=1.88;
+    oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=112;
     Miedema_phi_star=5.20;
     Miedema_nws=1.75;
@@ -2747,6 +2844,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.6544;
     electronegativityPearson=4.48;
     electronegativityGhosh=4.113;
+    electronegativityAllen=1.85;
+    oxstates.push_back(2); oxstates.push_back(1);
+    pref_oxstates.push_back(2); pref_oxstates.push_back(1); //Cu+2 most preferred oxidation number
     electron_affinity_PT=118.4;
     Miedema_phi_star=4.55;
     Miedema_nws=1.47;
@@ -2825,6 +2925,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.7542;
     electronegativityPearson=4.45;
     electronegativityGhosh=4.222;
+    electronegativityAllen=1.59;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=0;
     Miedema_phi_star=4.10;
     Miedema_nws=1.32;
@@ -2864,7 +2967,7 @@ xelement::xelement(uint Z) {
  // [AFLOW]STOP=Zinc
  // ********************************************************************************************************************************************************
 
- // p-electron systems 
+ // p-electron systems
  // ********************************************************************************************************************************************************
  // [AFLOW]START=Gallium
  // Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium
@@ -2904,6 +3007,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.1855;
     electronegativityPearson=3.2;
     electronegativityGhosh=4.690;
+    electronegativityAllen=1.756;
+    oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=28.9;
     Miedema_phi_star=4.10;
     Miedema_nws=1.31;
@@ -2982,6 +3088,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.6166;
     electronegativityPearson=4.6;
     electronegativityGhosh=5.159;
+    electronegativityAllen=1.994;
+    oxstates.push_back(4);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=119;
     Miedema_phi_star=4.55;
     Miedema_nws=1.37;
@@ -3060,6 +3169,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.0662;
     electronegativityPearson=5.3;
     electronegativityGhosh=5.628;
+    electronegativityAllen=2.211;
+    oxstates.push_back(5); oxstates.push_back(3); oxstates.push_back(-3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=78;
     Miedema_phi_star=4.80;
     Miedema_nws=1.44;
@@ -3138,6 +3250,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.4795;
     electronegativityPearson=5.89;
     electronegativityGhosh=6.096;
+    electronegativityAllen=2.424;
+    oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(-2);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=195;
     Miedema_phi_star=5.17;
     Miedema_nws=1.40;
@@ -3216,6 +3331,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.9111;
     electronegativityPearson=7.59;
     electronegativityGhosh=6.565;
+    electronegativityAllen=2.685;
+    oxstates.push_back(7); oxstates.push_back(5); oxstates.push_back(3); oxstates.push_back(1); oxstates.push_back(-1);
+    pref_oxstates.push_back(-1);
     electron_affinity_PT=324.6;
     Miedema_phi_star=5.20;
     Miedema_nws=1.35;
@@ -3294,6 +3412,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=6.3418;
     electronegativityPearson=NNN;
     electronegativityGhosh=7.033;
+    electronegativityAllen=2.966;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -3374,6 +3495,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.1204;
     electronegativityPearson=2.34;
     electronegativityGhosh=2.849;
+    electronegativityAllen=0.706;
+    oxstates.push_back(1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=46.9;
     Miedema_phi_star=2.10;
     Miedema_nws=0.60;
@@ -3452,6 +3576,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.5374;
     electronegativityPearson=2.0;
     electronegativityGhosh=3.225;
+    electronegativityAllen=0.963;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=5.03;
     Miedema_phi_star=2.40;
     Miedema_nws=0.84;
@@ -3531,6 +3658,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.6335;
     electronegativityPearson=3.19;
     electronegativityGhosh=3.311;
+    electronegativityAllen=1.12;
+    oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=29.6;
     Miedema_phi_star=3.20;
     Miedema_nws=1.21;
@@ -3609,6 +3739,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.7298;
     electronegativityPearson=3.64;
     electronegativityGhosh=3.398;
+    electronegativityAllen=1.32;
+    oxstates.push_back(4); oxstates.push_back(3);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=41.1;
     Miedema_phi_star=3.40;
     Miedema_nws=1.39;
@@ -3687,6 +3820,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.8260;
     electronegativityPearson=4.0;
     electronegativityGhosh=3.485;
+    electronegativityAllen=1.41;
+    oxstates.push_back(5); oxstates.push_back(3); oxstates.push_back(2);
+    pref_oxstates.push_back(5);
     electron_affinity_PT=86.1;
     Miedema_phi_star=4.00;
     Miedema_nws=1.62;
@@ -3765,6 +3901,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.9221;
     electronegativityPearson=3.9;
     electronegativityGhosh=3.572;
+    electronegativityAllen=1.47;
+    oxstates.push_back(6); oxstates.push_back(5); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0);
+    pref_oxstates.push_back(6);
     electron_affinity_PT=71.9;
     Miedema_phi_star=4.65;
     Miedema_nws=1.77;
@@ -3843,6 +3982,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.0184;
     electronegativityPearson=NNN;
     electronegativityGhosh=3.659;
+    electronegativityAllen=1.51;
+    oxstates.push_back(7);
+    pref_oxstates.push_back(7);
     electron_affinity_PT=53;
     Miedema_phi_star=5.30;
     Miedema_nws=1.81;
@@ -3921,6 +4063,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.1146;
     electronegativityPearson=4.5;
     electronegativityGhosh=3.745;
+    electronegativityAllen=1.54;
+    oxstates.push_back(8); oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0); oxstates.push_back(-2);
+    pref_oxstates.push_back(4); pref_oxstates.push_back(3);
     electron_affinity_PT=101.3;
     Miedema_phi_star=5.40;
     Miedema_nws=1.83;
@@ -3999,6 +4144,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.2108;
     electronegativityPearson=4.3;
     electronegativityGhosh=3.832;
+    electronegativityAllen=1.56;
+    oxstates.push_back(5); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(1); oxstates.push_back(0);
+    pref_oxstates.push_back(3); pref_oxstates.push_back(1);
     electron_affinity_PT=109.7;
     Miedema_phi_star=5.40;
     Miedema_nws=1.76;
@@ -4077,6 +4225,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.3069;
     electronegativityPearson=4.45;
     electronegativityGhosh=3.919;
+    electronegativityAllen=1.58;
+    oxstates.push_back(4); oxstates.push_back(2); oxstates.push_back(0);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=53.7;
     Miedema_phi_star=5.45;
     Miedema_nws=1.67;
@@ -4155,6 +4306,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.4032;
     electronegativityPearson=4.44;
     electronegativityGhosh=4.006;
+    electronegativityAllen=1.87;
+    oxstates.push_back(2); oxstates.push_back(1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=125.6;
     Miedema_phi_star=4.45;
     Miedema_nws=1.39;
@@ -4233,6 +4387,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.4994;
     electronegativityPearson=4.33;
     electronegativityGhosh=4.093;
+    electronegativityAllen=1.52;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=0;
     Miedema_phi_star=4.05;
     Miedema_nws=1.24;
@@ -4312,6 +4469,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.9164;
     electronegativityPearson=3.1;
     electronegativityGhosh=4.469;
+    electronegativityAllen=1.656;
+    oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=28.9;
     Miedema_phi_star=3.90;
     Miedema_nws=1.17;
@@ -4390,6 +4550,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.3332;
     electronegativityPearson=4.3;
     electronegativityGhosh=4.845;
+    electronegativityAllen=1.824;
+    oxstates.push_back(4); oxstates.push_back(2);
+    pref_oxstates.push_back(4); pref_oxstates.push_back(2);
     electron_affinity_PT=107.3;
     Miedema_phi_star=4.15;
     Miedema_nws=1.24;
@@ -4468,6 +4631,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.7501;
     electronegativityPearson=4.85;
     electronegativityGhosh=5.221;
+    electronegativityAllen=1.984;
+    oxstates.push_back(5); oxstates.push_back(3); oxstates.push_back(-3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=103.2;
     Miedema_phi_star=4.40;
     Miedema_nws=1.26;
@@ -4546,6 +4712,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.1670;
     electronegativityPearson=5.49;
     electronegativityGhosh=5.597;
+    electronegativityAllen=2.158;
+    oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(-2);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=190.2;
     Miedema_phi_star=4.72;
     Miedema_nws=1.31;
@@ -4624,6 +4793,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.5839;
     electronegativityPearson=6.76;
     electronegativityGhosh=5.973;
+    electronegativityAllen=2.359;
+    oxstates.push_back(7); oxstates.push_back(5); oxstates.push_back(1); oxstates.push_back(-1);
+    pref_oxstates.push_back(-1);
     electron_affinity_PT=295.2;
     Miedema_phi_star=5.33;
     Miedema_nws=0.17;
@@ -4702,6 +4874,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=6.0009;
     electronegativityPearson=NNN;
     electronegativityGhosh=6.349;
+    electronegativityAllen=2.582;
+    oxstates.push_back(8); oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(2);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -4782,6 +4957,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=0.6829;
     electronegativityPearson=2.18;
     electronegativityGhosh=4.196;
+    electronegativityAllen=0.659;
+    oxstates.push_back(1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=45.5;
     Miedema_phi_star=1.95;
     Miedema_nws=0.55;
@@ -4860,6 +5038,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=0.9201;
     electronegativityPearson=2.4;
     electronegativityGhosh=4.318;
+    electronegativityAllen=0.881;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=13.95;
     Miedema_phi_star=2.32;
     Miedema_nws=0.81;
@@ -4939,6 +5120,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.1571;
     electronegativityPearson=3.1;
     electronegativityGhosh=4.439;
+    electronegativityAllen=1.09;
+    oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=48;
     Miedema_phi_star=3.05;
     Miedema_nws=1.09;
@@ -5018,6 +5202,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.3943;
     electronegativityPearson=NNN;
     electronegativityGhosh=4.561;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.18;
     Miedema_nws=1.19;
@@ -5096,6 +5283,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.6315;
     electronegativityPearson=NNN;
     electronegativityGhosh=4.682;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.19;
     Miedema_nws=1.20;
@@ -5174,6 +5364,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.8684;
     electronegativityPearson=NNN;
     electronegativityGhosh=4.804;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.19;
     Miedema_nws=1.20;
@@ -5252,6 +5445,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.1056;
     electronegativityPearson=NNN;
     electronegativityGhosh=4.925;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.19;
     Miedema_nws=1.21;
@@ -5330,6 +5526,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.3427;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.047;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.20;
     Miedema_nws=1.21;
@@ -5408,6 +5607,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.5798;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.168;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.20;
     Miedema_nws=1.21;
@@ -5486,6 +5688,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.8170;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.290;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.20;
     Miedema_nws=1.21;
@@ -5564,6 +5769,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.0540;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.411;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.21;
     Miedema_nws=1.22;
@@ -5642,6 +5850,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.2912;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.533;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.21;
     Miedema_nws=1.22;
@@ -5720,6 +5931,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.5283;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.654;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.22;
@@ -5798,6 +6012,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.7655;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.776;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.23;
@@ -5876,6 +6093,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.0026;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.897;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.23;
@@ -5954,6 +6174,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.2395;
     electronegativityPearson=NNN;
     electronegativityGhosh=6.019;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.23;
@@ -6032,6 +6255,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.4766;
     electronegativityPearson=NNN;
     electronegativityGhosh=6.140;
+    electronegativityAllen=1.09;
+    oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.24;
@@ -6111,6 +6337,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.7065;
     electronegativityPearson=3.8;
     electronegativityGhosh=6.258;
+    electronegativityAllen=1.16;
+    oxstates.push_back(4); oxstates.push_back(3);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=0;
     Miedema_phi_star=3.55;
     Miedema_nws=1.43;
@@ -6189,6 +6418,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.9508;
     electronegativityPearson=4.11;
     electronegativityGhosh=6.383;
+    electronegativityAllen=1.34;
+    oxstates.push_back(5); oxstates.push_back(3);
+    pref_oxstates.push_back(5);
     electron_affinity_PT=31;
     Miedema_phi_star=4.05;
     Miedema_nws=1.63;
@@ -6267,6 +6499,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.1879;
     electronegativityPearson=4.40;
     electronegativityGhosh=6.505;
+    electronegativityAllen=1.47;
+    oxstates.push_back(6); oxstates.push_back(5); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0);
+    pref_oxstates.push_back(6);
     electron_affinity_PT=78.6;
     Miedema_phi_star=4.80;
     Miedema_nws=1.81;
@@ -6345,6 +6580,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.4256;
     electronegativityPearson=4.02;
     electronegativityGhosh=6.626;
+    electronegativityAllen=1.60;
+    oxstates.push_back(7); oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(2); oxstates.push_back(-1);
+    pref_oxstates.push_back(7);
     electron_affinity_PT=14.5;
     Miedema_phi_star=5.40;
     Miedema_nws=1.86;
@@ -6423,6 +6661,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.6619;
     electronegativityPearson=4.9;
     electronegativityGhosh=6.748;
+    electronegativityAllen=1.65;
+    oxstates.push_back(8); oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(0); oxstates.push_back(-2);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=106.1;
     Miedema_phi_star=5.40;
     Miedema_nws=1.85;
@@ -6501,6 +6742,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.9000;
     electronegativityPearson=5.4;
     electronegativityGhosh=6.831;
+    electronegativityAllen=1.68;
+    oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(3); oxstates.push_back(2); oxstates.push_back(1); oxstates.push_back(0); oxstates.push_back(-1);
+    pref_oxstates.push_back(4); pref_oxstates.push_back(1);
     electron_affinity_PT=151;
     Miedema_phi_star=5.55;
     Miedema_nws=1.83;
@@ -6579,6 +6823,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=6.1367;
     electronegativityPearson=5.6;
     electronegativityGhosh=6.991;
+    electronegativityAllen=1.72;
+    oxstates.push_back(4); oxstates.push_back(2); oxstates.push_back(0);
+    pref_oxstates.push_back(4); pref_oxstates.push_back(2);
     electron_affinity_PT=205.3;
     Miedema_phi_star=5.65;
     Miedema_nws=1.78;
@@ -6657,6 +6904,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=6.3741;
     electronegativityPearson=5.77;
     electronegativityGhosh=7.112;
+    electronegativityAllen=1.92;
+    oxstates.push_back(3); oxstates.push_back(1);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=222.8;
     Miedema_phi_star=5.15;
     Miedema_nws=1.57;
@@ -6735,6 +6985,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=6.6103;
     electronegativityPearson=4.91;
     electronegativityGhosh=7.233;
+    electronegativityAllen=1.76;
+    oxstates.push_back(2); oxstates.push_back(1);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=0;
     Miedema_phi_star=4.20;
     Miedema_nws=1.24;
@@ -6814,6 +7067,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.7043;
     electronegativityPearson=3.2;
     electronegativityGhosh=4.719;
+    electronegativityAllen=1.789;
+    oxstates.push_back(3); oxstates.push_back(1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=19.2;
     Miedema_phi_star=3.90;
     Miedema_nws=1.12;
@@ -6892,6 +7148,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.9414;
     electronegativityPearson=3.90;
     electronegativityGhosh=4.841;
+    electronegativityAllen=1.854;
+    oxstates.push_back(4); oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=35.1;
     Miedema_phi_star=4.10;
     Miedema_nws=1.15;
@@ -6970,6 +7229,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.1785;
     electronegativityPearson=4.69;
     electronegativityGhosh=4.962;
+    electronegativityAllen=2.01;
+    oxstates.push_back(5); oxstates.push_back(3);
+    pref_oxstates.push_back(3);
     electron_affinity_PT=91.2;
     Miedema_phi_star=4.15;
     Miedema_nws=1.16;
@@ -7048,6 +7310,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.4158;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.084;
+    electronegativityAllen=2.19;
+    oxstates.push_back(6); oxstates.push_back(4); oxstates.push_back(2);
+    pref_oxstates.push_back(4);
     electron_affinity_PT=183.3;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7126,6 +7391,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.6528;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.206;
+    electronegativityAllen=2.39;
+    oxstates.push_back(7); oxstates.push_back(5); oxstates.push_back(3); oxstates.push_back(1); oxstates.push_back(-1);
+    pref_oxstates.push_back(-1);
     electron_affinity_PT=270.1;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7204,6 +7472,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.8900;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.327;
+    electronegativityAllen=2.60;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7284,6 +7555,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=0.9882;
     electronegativityPearson=NNN;
     electronegativityGhosh=2.376;
+    electronegativityAllen=0.67;
+    oxstates.push_back(1);
+    pref_oxstates.push_back(1);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7362,6 +7636,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.2819;
     electronegativityPearson=NNN;
     electronegativityGhosh=2.664;
+    electronegativityAllen=0.89;
+    oxstates.push_back(2);
+    pref_oxstates.push_back(2);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7441,6 +7718,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.3497;
     electronegativityPearson=NNN;
     electronegativityGhosh=2.730;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7520,6 +7800,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.4175;
     electronegativityPearson=NNN;
     electronegativityGhosh=2.796;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=3.30;
     Miedema_nws=1.28;
@@ -7598,6 +7881,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=1.9369;
     electronegativityPearson=NNN;
     electronegativityGhosh=3.306;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7676,6 +7962,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.2306;
     electronegativityPearson=NNN;
     electronegativityGhosh=3.594;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7754,6 +8043,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=2.5241;
     electronegativityPearson=NNN;
     electronegativityGhosh=3.882;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7832,6 +8124,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.0436;
     electronegativityPearson=NNN;
     electronegativityGhosh=4.391;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7910,6 +8205,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.4169;
     electronegativityPearson=NNN;
     electronegativityGhosh=4.678;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7988,6 +8286,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.4050;
     electronegativityPearson=NNN;
     electronegativityGhosh=4.745;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8066,6 +8367,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=3.9244;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.256;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8144,6 +8448,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.2181;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.542;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8222,6 +8529,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.5116;
     electronegativityPearson=NNN;
     electronegativityGhosh=5.830;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8300,6 +8610,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=4.8051;
     electronegativityPearson=NNN;
     electronegativityGhosh=6.118;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8378,6 +8691,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.0990;
     electronegativityPearson=NNN;
     electronegativityGhosh=6.406;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8456,6 +8772,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.3926;
     electronegativityPearson=NNN;
     electronegativityGhosh=6.694;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8534,6 +8853,9 @@ xelement::xelement(uint Z) {
     hardness_Ghosh=5.4607;
     electronegativityPearson=NNN;
     electronegativityGhosh=6.760;
+    electronegativityAllen=NNN;
+    oxstates.push_back(NNN);
+    pref_oxstates.push_back(NNN);
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;

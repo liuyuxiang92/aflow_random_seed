@@ -20,7 +20,6 @@ using std::cerr;
 using std::endl;
 
 #define CCE_DEBUG false
-//#define CCE_DEBUG true
 static const string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U_ICSD,exp"; // when adding a new functional also introduce new 'offset' in CCE_get_offset function needed for reading corrections from lookup table
 static const string CCE_default_output_functionals= "PBE,LDA,SCAN,exp"; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
 static const double _CCE_NN_DIST_TOL_ = 0.5; // 0.5 Ang tolerance between shortest and longest bonds for each cation-anion pair; works best up to now; in future maybe bonding could be explicitly determined via Bader analysis
@@ -699,24 +698,16 @@ namespace cce {
     cce_vars.superox_indices.resize(structure.atoms.size());
     cce_vars.num_neighbors.clear();
     cce_vars.num_neighbors.resize(structure.atoms.size());
-    cce_vars.num_pref_ox_states.clear();
-    cce_vars.num_pref_ox_states.resize(structure.species.size());
-    cce_vars.pref_ox_states_strings.clear();
-    cce_vars.pref_ox_states_strings.resize(structure.species.size());
-    cce_vars.num_all_ox_states.clear();
-    cce_vars.num_all_ox_states.resize(structure.species.size());
-    cce_vars.all_ox_states_strings.clear();
-    cce_vars.all_ox_states_strings.resize(structure.species.size());
     cce_vars.species_electronegativity_sorted.clear();
     cce_vars.species_electronegativity_sorted.resize(structure.species.size());
     cce_vars.num_pref_ox_states_electronegativity_sorted.clear();
     cce_vars.num_pref_ox_states_electronegativity_sorted.resize(structure.species.size());
-    cce_vars.pref_ox_states_strings_electronegativity_sorted.clear();
-    cce_vars.pref_ox_states_strings_electronegativity_sorted.resize(structure.species.size());
     cce_vars.num_all_ox_states_electronegativity_sorted.clear();
     cce_vars.num_all_ox_states_electronegativity_sorted.resize(structure.species.size());
-    cce_vars.all_ox_states_strings_electronegativity_sorted.clear();
-    cce_vars.all_ox_states_strings_electronegativity_sorted.resize(structure.species.size());
+    cce_vars.pref_ox_states_electronegativity_sorted.clear();
+    cce_vars.pref_ox_states_electronegativity_sorted.resize(structure.species.size());
+    cce_vars.all_ox_states_electronegativity_sorted.clear();
+    cce_vars.all_ox_states_electronegativity_sorted.resize(structure.species.size());
     cce_vars.cations_map.clear();
     cce_vars.Bader_charges.clear();
     cce_vars.corrections_atom.clear();
@@ -744,19 +735,18 @@ namespace cce {
     if(LDEBUG){
       cerr << "ANION SPECIES FROM ALLEN ELECTRONEGATIVITIES:" << endl;
     }
+    _atom atom;
+    uint z;
+
     double anion_electronegativity = 0;
     for(uint k=0,ksize=structure.species.size();k<ksize;k++){
-      if (CCE_get_electronegativities_ox_nums(KBIN::VASP_PseudoPotential_CleanName(structure.species[k])) == "") {
+      z = GetAtomNumber(KBIN::VASP_PseudoPotential_CleanName(structure.species[k]));
+      xelement element(z);
+      if (element.electronegativityAllen == NNN) {
         message << "VERY BAD NEWS: There is no known electronegativity value for " << KBIN::VASP_PseudoPotential_CleanName(structure.species[k]) << ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       } else{
-        string electroneg_line = CCE_get_electronegativities_ox_nums(KBIN::VASP_PseudoPotential_CleanName(structure.species[k]));
-        if(LDEBUG){
-          cerr << "electronegativity line for species " << k << ": " << electroneg_line << endl;
-        }
-        vector<string> electroneg_tokens;
-        aurostd::string2tokens(electroneg_line, electroneg_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one
-        cce_vars.electronegativities[k] = aurostd::string2utype<double>(electroneg_tokens[0]);
+        cce_vars.electronegativities[k] = element.electronegativityAllen;
         if(LDEBUG){
           cerr << "electronegativity of species " << k << " (" << KBIN::VASP_PseudoPotential_CleanName(structure.species[k]) << "): " << cce_vars.electronegativities[k] << endl;
         }
@@ -767,12 +757,9 @@ namespace cce {
       }
     }
     // set anion charge and check whether it is negative
-    string ox_nums_line = CCE_get_electronegativities_ox_nums(cce_vars.anion_species);
-    vector<string> ox_nums_tokens_1;
-    vector<string> ox_nums_tokens_2;
-    aurostd::string2tokens(ox_nums_line, ox_nums_tokens_1, " "); // anion charge should be among all known oxidation states (last element of the line separated by spaces)
-    aurostd::string2tokens(ox_nums_tokens_1.back(), ox_nums_tokens_2, ","); // anion charge should be last (most negative) oxidation number separated by commas
-    cce_vars.standard_anion_charge = aurostd::string2utype<double>(ox_nums_tokens_2[ox_nums_tokens_2.size()-1]);
+    z = GetAtomNumber(cce_vars.anion_species);
+    xelement element(z);
+    cce_vars.standard_anion_charge = element.oxstates[element.oxstates.size()-1];
     if (cce_vars.standard_anion_charge > 0) {
       message << "VERY BAD NEWS: There is no known negative oxidation number for " << cce_vars.anion_species << " detected as anion species.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
@@ -802,6 +789,7 @@ namespace cce {
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
     structure.GetStrNeighData(cutoffs_max,neigh_mat);
+    uint z;
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       uint neighbors_count=0;
       uint multi_anion_count=0;
@@ -812,13 +800,12 @@ namespace cce {
             neighbors_count+=1;
           } else if (atom.cleanname != cce_vars.anion_species && structure.atoms[i].cleanname != cce_vars.anion_species){ // second condition set since the anion_species cannot be set as a multi-anion species again
             neighbors_count+=1;
-            string electroneg_line_atom = CCE_get_electronegativities_ox_nums(structure.atoms[i].cleanname);
-            string electroneg_line_neighbor = CCE_get_electronegativities_ox_nums(atom.cleanname);
-            vector<string> electroneg_tokens;
-            aurostd::string2tokens(electroneg_line_atom, electroneg_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one
-            double electronegativity_atom = aurostd::string2utype<double>(electroneg_tokens[0]);
-            aurostd::string2tokens(electroneg_line_neighbor, electroneg_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one
-            double electronegativity_neighbor = aurostd::string2utype<double>(electroneg_tokens[0]);
+            z = GetAtomNumber(structure.atoms[i].cleanname);
+            xelement atom_element(z);
+            z = GetAtomNumber(atom.cleanname);
+            xelement neigh_element(z);
+            double electronegativity_atom = atom_element.electronegativityAllen;
+            double electronegativity_neighbor = neigh_element.electronegativityAllen;
             if(LDEBUG){
               cerr << "electronegativity of atom " << i << ": " << electronegativity_atom << endl;
               cerr << "electronegativity of neighbor " << j << ": " << electronegativity_neighbor << endl;
@@ -866,12 +853,10 @@ namespace cce {
           }
         }
         // set multi anion oxidation numbers and check whether it is negative
-        string ox_nums_line = CCE_get_electronegativities_ox_nums(structure.atoms[i].cleanname);
-        vector<string> ox_nums_tokens_1;
-        vector<string> ox_nums_tokens_2;
-        aurostd::string2tokens(ox_nums_line, ox_nums_tokens_1, " "); // anion charge should be among all known oxidation states (last element of the line separated by spaces)
-        aurostd::string2tokens(ox_nums_tokens_1.back(), ox_nums_tokens_2, ","); // anion charge should be last (most negative) oxidation number separated by commas
-        cce_vars.oxidation_states[i] = aurostd::string2utype<double>(ox_nums_tokens_2.back());
+        _atom atom;
+        z = GetAtomNumber(structure.atoms[i].cleanname);
+        xelement atom_element(z);
+        cce_vars.oxidation_states[i] = atom_element.oxstates[atom_element.oxstates.size()-1];
         if(LDEBUG){
           cerr << "Oxidation state for atom " << i << " (" << structure.atoms[i].cleanname << ") has been set to: " << cce_vars.oxidation_states[i] << endl;
         }
@@ -1091,14 +1076,15 @@ namespace cce {
     }
     // determine number of cation species (currently just all species minus one anion species, multi-anion atoms are dealt with separately)
     uint num_cation_species = structure.species.size()-1;
-    // load needed info about preferred and all known oxidation states for all species
+    // sort species ascending by electronegativity
+    // preferred and all known oxidation states will be automatically sorted by electronegativity during subsequent loading
+    // the anion species should always be the last one with the highest electronegativity
+    CCE_sort_species_by_electronegativity(structure, cce_vars);
+    // load needed info about preferred and all known oxidation states for all species (sorted by electronegativity)
     cce_flags.flag("NO_PREF_OX_STATES",FALSE);
     cce_flags.flag("NO_OX_STATES",FALSE);
     cce_flags.flag("OX_STATES_DETERMINED",FALSE);
     CCE_load_ox_states_templates_each_species(structure, cce_vars, cce_flags);
-    // sort species, electronegativities, number of preferred/all oxidation states, and preferred/all oxidation states strings ascending by electronegativity
-    // the anion species should always be the last one with the highest electronegativity
-    CCE_sort_species_pref_all_ox_states_by_electronegativity(structure, cce_vars);
     // ME Nov. 2019 for getting cations_map: a vector of vectors that lists for each cation species the atom numbers of the structure that are of this species (for Fe2ZnO4 there might be two Fe atoms at positions 0 and 1 in the structure)
     uint natoms = structure.atoms.size();
     cce_vars.cations_map.resize(num_cation_species);
@@ -1201,86 +1187,76 @@ namespace cce {
     }
   }
 
-  //CCE_load_ox_states_templates_each_species////////////////////////////////////////////////////////
-  // load templates for preferred and other oxidation states
-  void CCE_load_ox_states_templates_each_species(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags) {
-    bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    for(uint i=0,isize=structure.species.size();i<isize;i++){ 
-      string electroneg_line = CCE_get_electronegativities_ox_nums(KBIN::VASP_PseudoPotential_CleanName(structure.species[i]));
-      if(LDEBUG){
-        cerr << "electronegativity line for species " << i << "(" << KBIN::VASP_PseudoPotential_CleanName(structure.species[i]) << "): " << electroneg_line << endl;
-      }
-      vector<string> electroneg_tokens;
-      aurostd::string2tokens(electroneg_line, electroneg_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one
-      // load preferred oxidation states for each species
-      cce_vars.num_pref_ox_states[i] = aurostd::string2utype<uint>(electroneg_tokens[1]);
-      if(cce_vars.num_pref_ox_states[i] > 0){
-        cce_vars.pref_ox_states_strings[i] = electroneg_tokens[3];
-        if(LDEBUG){
-          cerr << "preferred oxidation states string of species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(structure.species[i]) << "): " << cce_vars.pref_ox_states_strings[i] << endl;
-        }
-      } else{
-        cce_flags.flag("NO_PREF_OX_STATES",TRUE);
-        if(LDEBUG){
-          cerr << endl;
-          cerr << "BAD NEWS: There are no preferred oxidation states for species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(structure.species[i]) <<")."  << endl;
-          cerr << "Therefore the oxidation states cannot be determined on this basis." << endl;
-        }
-      }
-      // load all oxidation states for each species
-      cce_vars.num_all_ox_states[i] = aurostd::string2utype<uint>(electroneg_tokens[2]);
-      if(cce_vars.num_all_ox_states[i] > 0){
-        cce_vars.all_ox_states_strings[i] = electroneg_tokens[4];
-        if(LDEBUG){
-          cerr << "all oxidation states string of species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(structure.species[i]) << "): " << cce_vars.all_ox_states_strings[i] << endl;
-          cerr << endl;
-        }
-      } else{
-        cce_flags.flag("NO_OX_STATES",TRUE);
-        cerr << endl;
-        cerr << "BAD NEWS: There are no known oxidation states for species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(structure.species[i]) <<")."  << endl;
-        cerr << "Therefore the oxidation states cannot be determined on this basis." << endl;
-        cerr << endl;
-      }
-    }
-  }
-
-  //CCE_sort_species_pref_all_ox_states_by_electronegativity////////////////////////////////////////////////////////
-  // sort species, electronegativities, number of preferred/all oxidation states, and preferred/all oxidation states strings ascending by electronegativity
-  void CCE_sort_species_pref_all_ox_states_by_electronegativity(const xstructure& structure, CCE_Variables& cce_vars) {
+  //CCE_sort_species_by_electronegativity////////////////////////////////////////////////////////
+  // sort species ascending by electronegativity
+  void CCE_sort_species_by_electronegativity(const xstructure& structure, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     // using aurostd sort functions
     vector<double> electronegativities_sorted = cce_vars.electronegativities;
     for(uint j=0,jsize=structure.species.size();j<jsize;j++){ //loop over all species
      cce_vars.species_electronegativity_sorted[j] = KBIN::VASP_PseudoPotential_CleanName(structure.species[j]);
     }
-    cce_vars.num_pref_ox_states_electronegativity_sorted = cce_vars.num_pref_ox_states;
-    cce_vars.pref_ox_states_strings_electronegativity_sorted = cce_vars.pref_ox_states_strings;
-    cce_vars.num_all_ox_states_electronegativity_sorted = cce_vars.num_all_ox_states;
-    cce_vars.all_ox_states_strings_electronegativity_sorted = cce_vars.all_ox_states_strings;
-    // for the oxidation state algorithm the species, preferred and all known oxidation states of all species must be sorted by electronegativity
+    // for the oxidation state algorithm the species must be sorted by electronegativity and the preferred 
+    // and all known oxidation states will be automatically sorted by electronegativity in the subsequent loading
     // sort species by electronegativity
     aurostd::sort(electronegativities_sorted,cce_vars.species_electronegativity_sorted);
-    electronegativities_sorted = cce_vars.electronegativities;
-    // sort number of preferred oxidation states by electronegativity
-    aurostd::sort(electronegativities_sorted,cce_vars.num_pref_ox_states_electronegativity_sorted);
-    electronegativities_sorted = cce_vars.electronegativities;
-    // sort preferred oxidation states by electronegativity
-    aurostd::sort(electronegativities_sorted,cce_vars.pref_ox_states_strings_electronegativity_sorted);
-    electronegativities_sorted = cce_vars.electronegativities;
-    // sort number of all known oxidation states by electronegativity
-    aurostd::sort(electronegativities_sorted,cce_vars.num_all_ox_states_electronegativity_sorted);
-    electronegativities_sorted = cce_vars.electronegativities;
-    // sort all known oxidation states by electronegativity
-    aurostd::sort(electronegativities_sorted,cce_vars.all_ox_states_strings_electronegativity_sorted);
     for(uint j=0,jsize=structure.species.size();j<jsize;j++){ //loop over all species
       if(LDEBUG){
         cerr << "species_electronegativity_sorted[" << j << "]: " << cce_vars.species_electronegativity_sorted[j] << endl;
         cerr << "electronegativities_sorted[" << j << "]: " << electronegativities_sorted[j] << endl;
-        cerr << "num_pref_ox_states_electronegativity_sorted[" << j << "]: " << cce_vars.num_pref_ox_states_electronegativity_sorted[j] << endl;
-        cerr << "pref_ox_states_strings_electronegativity_sorted[" << j << "]: " << cce_vars.pref_ox_states_strings_electronegativity_sorted[j] << endl;
-        cerr << "num_all_ox_states_electronegativity_sorted[" << j << "]: " << cce_vars.num_all_ox_states_electronegativity_sorted[j] << endl;
-        cerr << "all_ox_states_strings_electronegativity_sorted[" << j << "]: " << cce_vars.all_ox_states_strings_electronegativity_sorted[j] << endl;
+      }
+    }
+  }
+
+  //CCE_load_ox_states_templates_each_species////////////////////////////////////////////////////////
+  // load templates for preferred and other oxidation states
+  void CCE_load_ox_states_templates_each_species(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    _atom atom;
+    uint z;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){ 
+      z = GetAtomNumber(KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]));
+      xelement element(z);
+      // load preferred oxidation states for each species
+      cce_vars.num_pref_ox_states_electronegativity_sorted[i] = element.pref_oxstates.size();
+      if(element.pref_oxstates[0] != NNN){
+        for (uint k=0,ksize=cce_vars.num_pref_ox_states_electronegativity_sorted[i];k<ksize;k++) {
+          cce_vars.pref_ox_states_electronegativity_sorted[i].push_back(element.pref_oxstates[k]);
+        }
+        if(LDEBUG){
+          cerr << "num_pref_ox_states_electronegativity_sorted[" << i << "]: " << cce_vars.num_pref_ox_states_electronegativity_sorted[i] << endl;
+          for (uint k=0,ksize=cce_vars.num_pref_ox_states_electronegativity_sorted[i];k<ksize;k++) {
+            cerr << "preferred oxidation state " << k << " of species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(structure.species[i]) << "): " <<  cce_vars.pref_ox_states_electronegativity_sorted[i][k] << endl;
+          }
+        }
+      } else{
+        cce_vars.num_pref_ox_states_electronegativity_sorted[i] = 0;
+        cce_flags.flag("NO_PREF_OX_STATES",TRUE);
+        if(LDEBUG){
+          cerr << endl;
+          cerr << "BAD NEWS: There are no preferred oxidation states for species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]) << ")."  << endl;
+          cerr << "Therefore the oxidation states cannot be determined on this basis." << endl;
+        }
+      }
+      // load all oxidation states for each species
+      cce_vars.num_all_ox_states_electronegativity_sorted[i] = element.oxstates.size();
+      if(element.oxstates[0] != NNN){
+        for (uint k=0,ksize=cce_vars.num_all_ox_states_electronegativity_sorted[i];k<ksize;k++) {
+          cce_vars.all_ox_states_electronegativity_sorted[i].push_back(element.oxstates[k]);
+        }
+        if(LDEBUG){
+          cerr << "num_all_ox_states_electronegativity_sorted[" << i << "]: " << cce_vars.num_all_ox_states_electronegativity_sorted[i] << endl;
+          for (uint k=0,ksize=cce_vars.num_all_ox_states_electronegativity_sorted[i];k<ksize;k++) {
+            cerr << "all oxidation state " << k << " of species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]) << "): " << cce_vars.all_ox_states_electronegativity_sorted[i][k] << endl;
+          }
+          cerr << endl;
+        }
+      } else{
+        cce_vars.num_all_ox_states_electronegativity_sorted[i] = 0;
+        cce_flags.flag("NO_OX_STATES",TRUE);
+        cerr << endl;
+        cerr << "BAD NEWS: There are no known oxidation states for species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]) << ")."  << endl;
+        cerr << "Therefore the oxidation states cannot be determined on this basis." << endl;
         cerr << endl;
       }
     }
@@ -1293,17 +1269,8 @@ namespace cce {
     if(LDEBUG){
       cerr << "Trying preferred oxidation numbers:" << endl;
     }
-    // determine possible_ox_states vector of vectors of doubles needed for Marco's function of my algorithm to determine oxidation numbers
-    vector<vector<double> > pref_ox_states_electronegativity_sorted(structure.species.size());
-    for(uint i=0,isize=structure.species.size();i<isize;i++){ 
-      vector<string> pref_ox_states_tokens(cce_vars.num_pref_ox_states_electronegativity_sorted[i]);
-      aurostd::string2tokens(cce_vars.pref_ox_states_strings_electronegativity_sorted[i], pref_ox_states_tokens, ",");
-      for(uint j=0,jsize=cce_vars.num_pref_ox_states_electronegativity_sorted[i];j<jsize;j++){ 
-        pref_ox_states_electronegativity_sorted[i].push_back(aurostd::string2utype<double>(pref_ox_states_tokens[j]));
-      }
-    }
     // use Marco's implementation of my algorithm to determine oxidation_numbers
-    CCE_determine_cation_oxidation_states(pref_ox_states_electronegativity_sorted, structure, cce_vars);
+    CCE_determine_cation_oxidation_states(cce_vars.pref_ox_states_electronegativity_sorted, structure, cce_vars);
     // print oxidation numbers and calculate sum
     cce_vars.oxidation_sum = CCE_get_oxidation_states_sum(cce_vars);
     // if sum of oxidation numbers is essentially zero, oxidation states should be regarded as determined correctly
@@ -2195,17 +2162,8 @@ namespace cce {
     if(LDEBUG){
       cerr << "Trying all known oxidation numbers:" << endl;
     }
-    // determine possible_ox_states vector of vectors of doubles needed for Marco's function of my algorithm to determine oxidation numbers
-    vector<vector<double> > all_ox_states_electronegativity_sorted(structure.species.size());
-    for(uint i=0,isize=structure.species.size();i<isize;i++){ 
-      vector<string> all_ox_states_tokens(cce_vars.num_all_ox_states_electronegativity_sorted[i]);
-      aurostd::string2tokens(cce_vars.all_ox_states_strings_electronegativity_sorted[i], all_ox_states_tokens, ",");
-      for(uint j=0,jsize=cce_vars.num_all_ox_states_electronegativity_sorted[i];j<jsize;j++){ 
-        all_ox_states_electronegativity_sorted[i].push_back(aurostd::string2utype<double>(all_ox_states_tokens[j]));
-      }
-    }
     // use Marco's implementation of my algorithm to determine oxidation_numbers
-    CCE_determine_cation_oxidation_states(all_ox_states_electronegativity_sorted, structure, cce_vars);
+    CCE_determine_cation_oxidation_states(cce_vars.all_ox_states_electronegativity_sorted, structure, cce_vars);
   }
 
   //CCE_determine_cation_oxidation_states////////////////////////////////////////////////////////

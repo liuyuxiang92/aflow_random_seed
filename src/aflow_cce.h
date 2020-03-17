@@ -27,15 +27,11 @@ namespace cce {
     vector<uint> perox_indices; // vector in which elements will be 1 for peroxide O atoms and 0 otherwise; needed for correct setting of oxidation numbers below
     vector<uint> superox_indices; // vector in which elements will be 1 for superoxide O atoms and 0 otherwise; needed for correct setting of oxidation numbers below
     vector<uint> num_neighbors;
-    vector<int> num_pref_ox_states;
-    vector<string> pref_ox_states_strings;
-    vector<int> num_all_ox_states;
-    vector<string> all_ox_states_strings;
     vector<string> species_electronegativity_sorted;
     vector<int> num_pref_ox_states_electronegativity_sorted;
-    vector<string> pref_ox_states_strings_electronegativity_sorted;
+    vector< vector<double> > pref_ox_states_electronegativity_sorted;
     vector<int> num_all_ox_states_electronegativity_sorted;
-    vector<string> all_ox_states_strings_electronegativity_sorted;
+    vector< vector<double> > all_ox_states_electronegativity_sorted;
     vector<vector<int> > cations_map;
     double oxidation_sum; // double because for superoxides O ox. number is -0.5
     vector<double> Bader_charges;
@@ -77,8 +73,8 @@ namespace cce {
   vector<double> CCE_get_oxidation_states_from_electronegativities(xstructure& structure);
   vector<double> CCE_get_oxidation_states_from_electronegativities(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
   void CCE_set_anion_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
+  void CCE_sort_species_by_electronegativity(const xstructure& structure, CCE_Variables& cce_vars);
   void CCE_load_ox_states_templates_each_species(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
-  void CCE_sort_species_pref_all_ox_states_by_electronegativity(const xstructure& structure, CCE_Variables& cce_vars);
   void CCE_try_preferred_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   void CCE_treat_SbO2_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   void CCE_treat_Pb3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
@@ -120,7 +116,6 @@ namespace cce {
   string CCE_print_usage();
   // aflow_cce_data.cpp load corrections and other data
   string CCE_get_corrections_line(const string& cor_identifier);
-  string CCE_get_electronegativities_ox_nums(const string& element);
   string CCE_get_Bader_templates(const string& element);
 }
 
