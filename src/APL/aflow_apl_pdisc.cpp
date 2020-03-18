@@ -18,6 +18,10 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
+  PhononDispersionCalculator::PhononDispersionCalculator() {
+    free();
+  }
+
   PhononDispersionCalculator::PhononDispersionCalculator(PhononCalculator& pc) {
     _pc = &pc;
     _system = _pc->getSystemName();  // ME190614

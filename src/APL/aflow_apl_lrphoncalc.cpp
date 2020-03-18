@@ -16,6 +16,10 @@ static const string _APL_LRPC_MODULE_ = "APL";  // for the logger
 
 namespace apl {
 
+  LinearResponsePC::LinearResponsePC() : ForceConstantCalculator() {
+    free();
+  }
+
   LinearResponsePC::LinearResponsePC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
       _xflags& xflags, string& AflowIn, ofstream& mf)

@@ -236,7 +236,6 @@ namespace apl {
       ClusterSet(const Supercell&, int, double, ofstream&, _aflags&);  // Constructor
       ClusterSet(const string&, const Supercell&, int, double, int, ofstream&, _aflags&);  // From file
       ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
-      ClusterSet(ofstream&, _aflags&);  // Does nothing - used as a placeholder for non-AAPL calculations
       ~ClusterSet();  // Destructor
       const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
       void clear(ofstream&, _aflags&);
@@ -333,6 +332,7 @@ namespace apl {
   class AnharmonicIFCs {
     // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
     public:
+      AnharmonicIFCs();
       AnharmonicIFCs(_xinput&, _aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&);
       AnharmonicIFCs(const AnharmonicIFCs&);
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
@@ -779,6 +779,7 @@ namespace apl {
       void printFCShellInfo(ostream&);
 
     public:
+      ForceConstantCalculator();
       ForceConstantCalculator(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
       ForceConstantCalculator(const ForceConstantCalculator&);
       ForceConstantCalculator& operator=(const ForceConstantCalculator&);
@@ -842,6 +843,7 @@ namespace apl {
       bool runVASPCalculations(bool);  // ME190412
 
     public:
+      DirectMethodPC();
       DirectMethodPC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
       DirectMethodPC(const DirectMethodPC&);
       DirectMethodPC& operator=(const DirectMethodPC&);
@@ -1009,6 +1011,7 @@ namespace apl {
       bool readForceConstantsFromVasprun(_xinput&);  // ME200211
 
     public:
+      LinearResponsePC();
       LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
       LinearResponsePC(const LinearResponsePC&);
       LinearResponsePC& operator=(const LinearResponsePC&);
@@ -1078,6 +1081,7 @@ namespace apl {
       xmatrix<xcomplex<double> > getEwaldSumDipoleDipoleContribution(const xvector<double>, bool = true);
 
     public:
+      PhononCalculator();
       PhononCalculator(Supercell&, ofstream&);
       PhononCalculator(const PhononCalculator&);
       PhononCalculator& operator=(const PhononCalculator&);
@@ -1220,6 +1224,7 @@ namespace apl {
       void calculateInOneThread(int, int);
 
     public:
+      PhononDispersionCalculator();
       PhononDispersionCalculator(PhononCalculator&);
       PhononDispersionCalculator(const PhononDispersionCalculator&);
       PhononDispersionCalculator& operator=(const PhononDispersionCalculator&);
@@ -1341,6 +1346,7 @@ namespace apl {
 
   class QMesh {
     public:
+      QMesh();
       QMesh(ofstream&);
       QMesh(const xvector<int>&, const xstructure&, ofstream&, bool=true, bool=true, string="./");
       QMesh(const vector<int>&, const xstructure&, ofstream&, bool=true, bool=true, string="./");
@@ -1425,6 +1431,7 @@ namespace apl {
 namespace apl {
   class LTMethod {
     public:
+      LTMethod();
       LTMethod(QMesh&);
       LTMethod(const LTMethod&);
       LTMethod& operator=(const LTMethod&);
@@ -1508,6 +1515,7 @@ namespace apl {
       void smearWithGaussian(vector<double>&, vector<double>&, double, double);  // ME190614
 
     public:
+      DOSCalculator();
       DOSCalculator(PhononCalculator&, QMesh&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
       DOSCalculator(const DOSCalculator&);
       DOSCalculator& operator=(const DOSCalculator&);
@@ -1595,6 +1603,7 @@ namespace apl {
       double getScalingFactor(const ThermalPropertiesUnits&);
 
     public:
+      ThermalPropertiesCalculator();
       ThermalPropertiesCalculator(ofstream&);
       ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, string="./");
       ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, string="./");
@@ -1655,6 +1664,7 @@ namespace apl {
   class TCONDCalculator {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
+      TCONDCalculator();
       TCONDCalculator(PhononCalculator&, QMesh&, ofstream&, _aflags&);
       TCONDCalculator(const TCONDCalculator&);
       TCONDCalculator& operator=(const TCONDCalculator&);

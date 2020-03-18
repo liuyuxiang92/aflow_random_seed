@@ -18,6 +18,10 @@ static const string _APL_DMPC_MODULE_ = "APL";  // for the logger
 
 namespace apl {
 
+  DirectMethodPC::DirectMethodPC() : ForceConstantCalculator() {
+    free();
+  }
+
   DirectMethodPC::DirectMethodPC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
       _xflags& xflags, string& AflowIn, ofstream& mf)

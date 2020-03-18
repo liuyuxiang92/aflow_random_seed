@@ -75,6 +75,10 @@ namespace apl {
 namespace apl {
 
   //Constructor///////////////////////////////////////////////////////////////
+  TCONDCalculator::TCONDCalculator() {
+    free();
+  }
+
   TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, ofstream& mf, _aflags& a) {
     _pc = &pc;
     _qm = &qm;

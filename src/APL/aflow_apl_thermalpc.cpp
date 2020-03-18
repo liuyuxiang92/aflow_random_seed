@@ -37,6 +37,10 @@ static const string _APL_TPC_MODULE_ = "APL";
 namespace apl {
 
   // Default Constructor
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator() {
+    free();
+  }
+
   ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf) {
     free();
     messageFile = &mf;

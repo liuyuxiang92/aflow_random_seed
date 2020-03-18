@@ -24,6 +24,9 @@ using namespace std;
 namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
+  DOSCalculator::DOSCalculator() {
+    free();
+  }
 
   DOSCalculator::DOSCalculator(PhononCalculator& pc, QMesh& rg, string method,
       const vector<xvector<double> >& projections) {  // ME190624

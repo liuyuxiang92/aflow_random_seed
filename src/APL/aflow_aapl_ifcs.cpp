@@ -46,6 +46,10 @@ namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
+  AnharmonicIFCs::AnharmonicIFCs() {
+    free();
+  }
+
   AnharmonicIFCs::AnharmonicIFCs(_xinput& xinput, _aflags& aflags, _kflags& kflags,
       _xflags& xflags, ClusterSet& _clst, ofstream& mf) {
     free();

@@ -30,6 +30,11 @@ static const string _AAPL_CLUSTER_MODULE_ = "CLUSTER";
 namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
+  // Default constructor
+  ClusterSet::ClusterSet() {
+    free();
+  }
+
   ClusterSet::ClusterSet(const Supercell& supercell, int cut_shell,
       double cut_rad, ofstream& mf, _aflags& a) {
     free();
@@ -55,13 +60,6 @@ namespace apl {
     distortion_vectors = getCartesianDistortionVectors();
     permutations = getPermutations(order);
     nifcs = aurostd::powint(3, order);
-  }
-
-  // Default constructor
-  ClusterSet::ClusterSet(ofstream& mf, _aflags& a) {
-    free();
-    messageFile = &mf;
-    aflags = &a;
   }
 
   //Copy Constructors/////////////////////////////////////////////////////////

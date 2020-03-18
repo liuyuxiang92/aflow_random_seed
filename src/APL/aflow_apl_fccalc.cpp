@@ -20,6 +20,10 @@ static const string _APL_FCCALC_MODULE_ = "APL";  // for the logger
 
 namespace apl {
 
+  ForceConstantCalculator::ForceConstantCalculator() {
+    free();
+  }
+
   ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, _xinput& xinput,
       _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
     free();

@@ -27,6 +27,10 @@ static const string _APL_LTET_MODULE_ = "LTET";  // for the logger
 
 namespace apl {
 
+  LTMethod::LTMethod() {
+    free();
+  }
+
   LTMethod::LTMethod(QMesh& qm) {
     _qm = &qm;
     if (_qm->getnQPs() < 4) {

@@ -27,6 +27,10 @@ static const string _APL_QMESH_MODULE_ = "QMESH";  // for the logger
 namespace apl {
 
   // Default Constructor
+  QMesh::QMesh() {
+    free();
+  }
+
   QMesh::QMesh(ofstream& mf) {
     free();
     messageFile = &mf;

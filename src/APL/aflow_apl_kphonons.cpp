@@ -1675,7 +1675,7 @@ namespace KBIN {
         // Reading failed - calculate
         if (!awakeAnharmIFCs) {
           // Clusters
-          apl::ClusterSet clst(messageFile, aflags);
+          apl::ClusterSet clst;
           string clust_hib_file = aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[o-3];
           bool awakeClusterSet = (USER_HIBERNATE && aurostd::EFileExist(clust_hib_file));
           if (awakeClusterSet) {

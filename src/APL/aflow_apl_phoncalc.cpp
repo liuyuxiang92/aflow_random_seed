@@ -22,6 +22,10 @@ static const string _APL_PHCALC_ERR_PREFIX_ = "apl::PhononCalculator::";
 
 namespace apl {
 
+  PhononCalculator::PhononCalculator() {
+    free();
+  }
+
   PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf) {
     free();
     messageFile = &mf;
