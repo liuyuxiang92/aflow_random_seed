@@ -276,12 +276,15 @@ namespace apl {
     // Get born effective charge tensors
     _isPolarMaterial = true;
     while (_isPolarMaterial) {
-      if (line_count == vlines.size()) _isPolarMaterial = false;
+      if (line_count == vlines.size()) {
+        _isPolarMaterial = false;
+        break;
+      }
       line = vlines[line_count++];  //CO
       if (line.find("born") != string::npos) break;
     }
-    line = vlines[line_count++];  //CO
     if (_isPolarMaterial) {
+      line = vlines[line_count++];  //CO
       while (true) {
         if (line_count == vlines.size()) { //CO
           string message = "Incomplete <born> tag.";
