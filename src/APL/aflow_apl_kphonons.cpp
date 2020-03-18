@@ -174,7 +174,7 @@ namespace KBIN {
     // Consistency check: Determine supercell dimensions and k-point grid again with
     // the new structure. The dimensions have to match or the relaxation was done
     // with an incommensurate k-point grid.
-    scell.clear();
+    scell.clearSupercell();
     scell.initialize(xvasp.str);
     supercell_opts.flag("SCELL::VERBOSE", false);
     xvector<int> scell_dims_new = scell.determineSupercellDimensions(supercell_opts);

@@ -22,17 +22,90 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  Supercell::Supercell(ofstream& mf) {
-    messageFile = &mf;
+  Supercell::Supercell() {
+    free();
   }
 
   //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
   // ME200102 - Refactored
   Supercell::Supercell(const xstructure& _xstr, ofstream& mf, string directory) {  //CO181226
+    free();
     messageFile = &mf;
     _directory = directory;
     initialize(_xstr);
   }
+
+  Supercell::Supercell(const Supercell& that) {
+    free();
+    copy(that);
+  }
+
+  Supercell& Supercell::operator=(const Supercell& that) {
+    if (this != &that) {
+      free();
+      copy(that);
+    }
+    return *this;
+  }
+
+  void Supercell::copy(const Supercell& that) {
+    messageFile = that.messageFile;
+    _directory = that._directory;
+    _inStructure = that._inStructure;
+    _inStructure_original = that._inStructure_original;  //CO
+    _inStructure_light = that._inStructure_light;        //CO
+    _pcStructure = that._pcStructure;                    //CO
+    _scStructure = that._scStructure;                    //CO
+    _scStructure_original = that._scStructure_original;  //CO
+    _scStructure_light = that._scStructure_light;        //CO
+    _pc2scMap.clear();
+    _pc2scMap = that._pc2scMap;
+    _sc2pcMap.clear();
+    _sc2pcMap = that._sc2pcMap;
+    //CO - START
+    _skew = that._skew;
+    _derivative_structure = that._derivative_structure;
+    _sym_eps = that._sym_eps;
+    //CO - END
+    _isShellRestricted = that._isShellRestricted;
+    _maxShellRadius.clear();
+    _maxShellRadius = that._maxShellRadius;
+    _isConstructed = that._isConstructed;  //CO
+    phase_vectors = that.phase_vectors;  // ME200116
+  }
+
+  // Destructor
+  Supercell::~Supercell() {
+    free();
+  }
+
+  void Supercell::free() {
+    _directory = "";
+    _inStructure.clear();
+    _inStructure_original.clear();
+    _inStructure_light.clear();
+    _pcStructure.clear();
+    _scStructure.clear();
+    _scStructure_original.clear();
+    _scStructure_light.clear();
+    _pc2scMap.clear();
+    _sc2pcMap.clear();
+    _skew = false;
+    _derivative_structure = false;
+    _sym_eps = 0.0;
+    _isShellRestricted = false;
+    _maxShellRadius.clear();
+    _isConstructed = false;
+    phase_vectors.clear();
+    _scStructure.clear();
+  }
+
+  void Supercell::clear(ofstream& mf) {
+    free();
+    messageFile = &mf;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
 
   void Supercell::setDirectory(const string& directory) {
     _directory = directory;
@@ -94,81 +167,13 @@ namespace apl {
     _skew = SYM::isLatticeSkewed(_inStructure.lattice, _inStructure.dist_nn_min, _inStructure.sym_eps);
     _sym_eps = _inStructure.sym_eps;
 
-    clear();
+    clearSupercell();
   }
-  //[CO190218 - OBSOLETE]#else
-  //[CO190218 - OBSOLETE]Supercell::Supercell(const xstructure& xstr, const _aflags& aflags, Logger& l) : _aflowFlags(aflags), _logger(l) {  //CO181226
-  //[CO190218 - OBSOLETE]  // Copy
-  //[CO190218 - OBSOLETE]  _inStructure = xstr;
-  //[CO190218 - OBSOLETE]  _inStructure.ReScale(1.0);
-  //[CO190218 - OBSOLETE]  _inStructure.ShifOriginToAtom(0);
-  //[CO190218 - OBSOLETE]  _inStructure.BringInCell();
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  //
-  //[CO190218 - OBSOLETE]  _logger << "Reducing the input structure into a standard primitive form." << apl::endl;
-  //[CO190218 - OBSOLETE]  //_inStructure = GetPrimitive(xstr);
-  //[CO190218 - OBSOLETE]  _inStructure.Standard_Primitive_UnitCellForm();
-  //[CO190218 - OBSOLETE]  _inStructure.ReScale(1.0);
-  //[CO190218 - OBSOLETE]  _inStructure.ShifOriginToAtom(0);
-  //[CO190218 - OBSOLETE]  _inStructure.BringInCell();
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  // Calculate symmetry
-  //[CO190218 - OBSOLETE]  _logger << "Estimating the symmetry of primitive cell." << apl::endl;
-  //[CO190218 - OBSOLETE]  calculateWholeSymmetry(_inStructure);
-  //[CO190218 - OBSOLETE]
-  //[CO190218 - OBSOLETE]  //
-  //[CO190218 - OBSOLETE]  clear();
-  //[CO190218 - OBSOLETE]}
-  //[CO190218 - OBSOLETE]#endif
+
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  Supercell::Supercell(const Supercell& that) {  //CO181226
-    *this = that;
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  Supercell& Supercell::operator=(const Supercell& that) {
-    if (this != &that) {
-      messageFile = that.messageFile;
-      _directory = that._directory;
-
-      _inStructure = that._inStructure;
-      _inStructure_original = that._inStructure_original;  //CO
-      _inStructure_light = that._inStructure_light;        //CO
-      _pcStructure = that._pcStructure;                    //CO
-      _scStructure = that._scStructure;                    //CO
-      _scStructure_original = that._scStructure_original;  //CO
-      _scStructure_light = that._scStructure_light;        //CO
-      _pc2scMap.clear();
-      _pc2scMap = that._pc2scMap;
-      _sc2pcMap.clear();
-      _sc2pcMap = that._sc2pcMap;
-      //CO - START
-      _skew = that._skew;
-      _derivative_structure = that._derivative_structure;
-      _sym_eps = that._sym_eps;
-      //CO - END
-      _isShellRestricted = that._isShellRestricted;
-      _maxShellRadius.clear();
-      _maxShellRadius = that._maxShellRadius;
-      _isConstructed = that._isConstructed;  //CO
-      phase_vectors = that.phase_vectors;  // ME200116
-    }
-
-    return *this;
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  Supercell::~Supercell() {
-    clear();
-  }
-
-  // ///////////////////////////////////////////////////////////////////////////
-
-  void Supercell::clear() {
+  void Supercell::clearSupercell() {
     _scStructure.info = "not constructed";
     _isConstructed = FALSE;
     _isShellRestricted = FALSE;

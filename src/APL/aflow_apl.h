@@ -609,18 +609,21 @@ namespace apl {
       void calculateWholeSymmetry(xstructure&);
       xstructure calculatePrimitiveStructure() const;
       bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME200117
+      void free();
+      void copy(const Supercell&);
 
     public:
-      Supercell(ofstream&);
+      Supercell();
       Supercell(const xstructure&, ofstream&, string="./"); //CO181226
       Supercell(const Supercell&);
+      Supercell& operator=(const Supercell&);
       ~Supercell();
+      void clear(ofstream&);
       void setDirectory(const string&);
       string getDirectory() const;
       void initialize(const xstructure&);  // ME191225
+      void clearSupercell();
       //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME200220
-      void clear();
-      Supercell& operator=(const Supercell&);
       bool isConstructed();
       void reset();
       xvector<int> determineSupercellDimensions(const aurostd::xoption&);  // ME191225
