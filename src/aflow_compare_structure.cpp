@@ -1359,7 +1359,7 @@ namespace compare {
       string relaxation_name = "";
       if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ relaxation_name = "original"; }
       else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_){ relaxation_name = "relax1"; }
-      message << "The " << relaxation_name << " structures will be extracted; the properties will not correspond to these structures.  Proceed with caution."; 
+      message << "The " << relaxation_name << " structures will be extracted; the properties will not correspond to these structures. Proceed with caution."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
     }
 
