@@ -365,7 +365,7 @@ namespace apl {
     uint nproj = _projections.size();
     vector<xvector<double> > proj_norm(nproj, xvector<double>(3));
     for (uint p = 0; p < nproj; p++) {
-      proj_norm[p] = _projections[p]/aurostd::modulus(_projections[p]);
+      if (!aurostd::iszero(_projections[p])) proj_norm[p] = _projections[p]/aurostd::modulus(_projections[p]);
     }
     const xstructure& xstr = _pc->getInputCellStructure();
     uint natoms = xstr.atoms.size();
