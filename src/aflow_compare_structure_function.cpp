@@ -8248,7 +8248,14 @@ namespace compare{
     vector<double> D1,F1;
     cellDiagonal(q1,D1,F1,1);
 
-    double tol_vol=(1.0/3.0); //DX 20200225 - used to be 0.1 (perhaps this should change depending on if we have scale volume or not)
+    // ---------------------------------------------------------------------------
+    // volume of unit cell tolerance
+    // DX 20200225 - tol_vol used to be 0.1;
+    // this was increased to consider a larger volume range when searching for
+    // potential lattice matches; it is necessary for supressing volume scaling
+    // (i.e., --no_scale_volume) since it can find matches in the same family
+    // misfit range (0.1<=misfit<=0.2)
+    double tol_vol=(1.0/3.0);
     double det_tol=tol_vol*abs_det_q1;
 
     // ---------------------------------------------------------------------------

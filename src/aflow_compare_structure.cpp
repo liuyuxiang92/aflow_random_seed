@@ -1164,6 +1164,15 @@ namespace compare {
     vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
    
     // ---------------------------------------------------------------------------
+    // safety against bad input geometry files
+    if(final_prototypes.empty()){
+      string function_name = "compare::isMatchingStructureInDatabase():";
+      stringstream message;
+      message << "The input geometry file is invalid (could not be read, corrupt, etc.); it could not be compared to the database.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_FILE_ERROR_);
+    }
+
+    // ---------------------------------------------------------------------------
     // database contains input structure
     if(final_prototypes[0].structures_duplicate_names.size()){
       return true;
@@ -1200,10 +1209,9 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // return equivalent structures to input
     for(uint i=0;i<final_prototypes[0].structures_duplicate_names.size();i++){
-      matching_structure database_entry = {
-        .name = final_prototypes[0].structures_duplicate_names[i],
-        .misfit = final_prototypes[0].structure_misfits_duplicate[i].misfit
-      };
+      matching_structure database_entry;
+      database_entry.name = final_prototypes[0].structures_duplicate_names[i];
+      database_entry.misfit = final_prototypes[0].structure_misfits_duplicate[i].misfit;
       matched_database_structures.push_back(database_entry);
     }
 
