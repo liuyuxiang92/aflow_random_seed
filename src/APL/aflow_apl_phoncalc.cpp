@@ -794,7 +794,7 @@ namespace apl {
       }
 
       // Calculation
-      double fac0 = hartree2eV * bohr2angst;  // from a.u. to eV/A  // ME200206 - replaced with xscalar constants
+      double fac0 = hartree2eV * bohr2angstrom;  // from a.u. to eV/A  // ME200206 - replaced with xscalar constants
       double volume = det(pc.lattice);
       double fac1 = 4.0 * PI / volume;
       double nbCells = det(sc.lattice) / volume;
@@ -907,7 +907,7 @@ namespace apl {
     int n3 = (int)(sqrt(geg) / aurostd::modulus(klattice(3))) + 1;
 
     // Calculation
-    double fac0 = hartree2eV * bohr2angst;  // from a.u. to eV/A  // ME200207 - replaced with xscalar constants
+    double fac0 = hartree2eV * bohr2angstrom;  // from a.u. to eV/A  // ME200207 - replaced with xscalar constants
     double SQRTPI = sqrt(PI);
     double volume = det(pc.lattice);
     double fac = 4.0 * PI / volume;
