@@ -14449,7 +14449,7 @@ void xstructure::xstructure2abccar(void) { //DX190131
 }
 
 // ***************************************************************************
-// Function xstructure2abinit
+// Function xstructure2elk
 // ***************************************************************************
 void xstructure::xstructure2elk(void) { //DX 20200313
   ReScale(1.0);
