@@ -464,9 +464,15 @@ namespace apl {
           for (uint p = 0; p < nproj; p++) {
             for (uint at = 0; at < natoms; at++) {
               part = 0.0;
-              for (int icorner = 0; icorner < 4; icorner++) {
-                part += parts[corners[icorner]][br][p][at];
-              }
+              // ME200320 - due to the big nesting level, loop unrolling
+              // leads to a huge speed-up (x2 or more)
+              //[OBSOLETE] for (int icorner = 0; icorner < 4; icorner++) {
+              //[OBSOLETE]   part += parts[corners[icorner]][br][p][at];
+              //[OBSOLETE] }
+              part += parts[corners[0]][br][p][at];
+              part += parts[corners[1]][br][p][at];
+              part += parts[corners[2]][br][p][at];
+              part += parts[corners[3]][br][p][at];
               _projectedDOS[at][p][k] += 0.25 * dos * part;
             }
           }
