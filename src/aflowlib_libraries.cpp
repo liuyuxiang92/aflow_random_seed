@@ -5415,11 +5415,13 @@ bool EnthalpyReference(string pp_version,deque<double> vLDAU,string& gs,double& 
       if(ppp=="Mn_pv:PAW_PBE:07Sep2000") { gs="A12";enthalpy_atom=-9.1535;volume_atom=10.6973;spin_atom=0.0;return TRUE; }
       if(ppp=="Mo:PAW_PBE:08Apr2002") { gs="A2";enthalpy_atom=-10.945857;volume_atom=15.5844;spin_atom=0.0;return TRUE; }
       if(ppp=="Mo_pv:PAW_PBE:08Apr2002") { gs="A2";enthalpy_atom=-10.8434;volume_atom=15.8555;spin_atom=0.0;return TRUE; }
+      if(ppp=="N:PAW_PBE:08Apr2002") { gs="diatom";enthalpy_atom=-8.319;volume_atom=NNN;spin_atom=0.0;return TRUE; } // RF 20200319
       if(ppp=="Na_pv:PAW_PBE:05Jan2001") { gs="A2";enthalpy_atom=-1.31096;volume_atom=36.2541;spin_atom=0.0;return TRUE; }
       if(ppp=="Na_sv:PAW_PBE:28Sep2000") { gs="A7*";enthalpy_atom=-1.31537;volume_atom=35.606;spin_atom=0.0;return TRUE; }
       if(ppp=="Nb_sv:PAW_PBE:17Jan2003") { gs="A2";enthalpy_atom=-10.2246;volume_atom=18.0525;spin_atom=0.0;return TRUE; }
       if(ppp=="Ni_pv:PAW_PBE:06Sep2000") { gs="A1";enthalpy_atom=-5.7786;volume_atom=10.8136;spin_atom=0.628888;return TRUE; }
-      if(ppp=="O:PAW_PBE:08Apr2002") { gs="A8";enthalpy_atom=-4.50622;volume_atom=12.5315;spin_atom=0.0;return TRUE; }
+      //OLD if(ppp=="O:PAW_PBE:08Apr2002") { gs="A8";enthalpy_atom=-4.50622;volume_atom=12.5315;spin_atom=0.0;return TRUE; }
+      if(ppp=="O:PAW_PBE:08Apr2002") { gs="diatom";enthalpy_atom=-4.9311;volume_atom=NNN;spin_atom=1.0;return TRUE; } // RF 20200319
       if(ppp=="Os_pv:PAW_PBE:20Jan2003") { gs="A3";enthalpy_atom=-11.2191;volume_atom=14.2979;spin_atom=0.0;return TRUE; }
       if(ppp=="P:PAW_PBE:17Jan2003") { gs="A7";enthalpy_atom=-5.32414;volume_atom=16.0927;spin_atom=0.0;return TRUE; }
       if(ppp=="Pb_d:PAW_PBE:06Sep2000") { gs="A1";enthalpy_atom=-3.70507;volume_atom=31.6585;spin_atom=0.0;return TRUE; }
