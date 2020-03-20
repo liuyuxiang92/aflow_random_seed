@@ -23,10 +23,10 @@ namespace aflowlib {
 namespace aflowlib {
   xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,string atomA,string atomB) {
     double atomvolumeA,atomvolumeB;
-    //[CO181106]atomvolumeA=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomA)); //CO181128
-    //[CO181106]atomvolumeB=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomB)); //CO181128
-    atomvolumeA=GetAtomVolume(atomA); //CO181128
-    atomvolumeB=GetAtomVolume(atomB); //CO181128
+    //[CO20181106]atomvolumeA=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomA)); //CO20181128
+    //[CO20181106]atomvolumeB=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomB)); //CO20181128
+    atomvolumeA=GetAtomVolume(atomA); //CO20181128
+    atomvolumeB=GetAtomVolume(atomB); //CO20181128
     return aflowlib::PrototypeBinaryGUS(FileMESSAGE,label,atomA,atomvolumeA,atomB,atomvolumeB,0.0);
   }
 } // namespace aflowlib
@@ -232,10 +232,10 @@ namespace aflowlib {
     xmatrix<double> aBas(3,nAt*nD);
     xvector<double> ausv(3),aussLVinvXdvec(3);
     int z1, z2, z3, ic,iD;
-    //[CO191201 - OBSOLETE]aurostd::inverse(HNF,Sinv); //**
-    //[CO191201 - OBSOLETE]aurostd::inverse(sLV,sLVinv);
-    Sinv=aurostd::inverse(HNF); //**  //CO191201
-    sLVinv=aurostd::inverse(sLV);  //CO191201
+    //[CO20191201 - OBSOLETE]aurostd::inverse(HNF,Sinv); //**
+    //[CO20191201 - OBSOLETE]aurostd::inverse(sLV,sLVinv);
+    Sinv=aurostd::inverse(HNF); //**  //CO20191201
+    sLVinv=aurostd::inverse(sLV);  //CO20191201
     sLVinvXdvec=sLVinv*dvec; //**
     ic = 0;
     for(iD=1;iD<=(int) nD;iD++) {//**
@@ -373,8 +373,8 @@ namespace aflowlib {
     if(LDEBUG) { cerr << "DEBUG volume=" << volume << endl; }
     // FIX scale
     if(volume_in>0.0) { volume=natoms*volume_in; }
-    //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-    str.SetVolume(volume);  //CO190205 - more robust
+    //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+    str.SetVolume(volume);  //CO20190205 - more robust
     str.neg_scale=TRUE;
     // str.SetCoordinates(_COORDS_CARTESIAN_);
     str.MinkowskiBasisReduction();   // BY DEFINITION MAKE THEM MINKOSKWIAN  GUS DISCUSSION = [Mon Apr  8 11:04:47 EDT 2013]

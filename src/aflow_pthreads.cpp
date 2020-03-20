@@ -936,7 +936,7 @@ namespace sflow {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// getThreadDistribution - ME 180801
+// getThreadDistribution - ME20180801
 // Calculates the start and end indices for each thread for multi-thread
 // calculations. Note that the end index is not included in each thread.
 vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads) {

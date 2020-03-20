@@ -45,15 +45,15 @@
 // #include <linux/kd.h>
 //   0x00004B2F   KIOCSOUND     int
 
-// CO 180729 - OBSOLETE - use xerror
-//[OBSOLETE]// CO 180419 - global exception handling - START
+// CO20180729 - OBSOLETE - use xerror
+//[OBSOLETE]// CO20180419 - global exception handling - START
 //[OBSOLETE]AFLOWRuntimeError::AFLOWRuntimeError(const std::string& function,const std::string& message) : std::runtime_error(message),f_name(function) {}  // I/O or computer type errors (no entries loaded)
 //[OBSOLETE]AFLOWRuntimeError::AFLOWRuntimeError(const std::string& function,std::stringstream& message) : std::runtime_error(message.str()),f_name(function) {message.str("");}  // I/O or computer type errors (no entries loaded)
 //[OBSOLETE]string AFLOWRuntimeError::where(){return f_name;}
 //[OBSOLETE]AFLOWLogicError::AFLOWLogicError(const std::string& function,const std::string& message) : std::logic_error(message),f_name(function) {}    //errors in logic, unintended (and insurmountable) use of functionality
 //[OBSOLETE]AFLOWLogicError::AFLOWLogicError(const std::string& function,std::stringstream& message) : std::logic_error(message.str()),f_name(function) {message.str("");}    //errors in logic, unintended (and insurmountable) use of functionality
 //[OBSOLETE]string AFLOWLogicError::where(){return f_name;}
-//[OBSOLETE]// CO 180419 - global exception handling - STOP
+//[OBSOLETE]// CO20180419 - global exception handling - STOP
 
 namespace aflowlib {
   bool aflowlib2stream(const aflowlib::_aflowlib_entry& data,const string& file,stringstream& stream,bool VERBOSE) {
@@ -374,7 +374,7 @@ namespace aflowlib {
 // will be moved near LIB2AUID
 namespace aflowlib {
   bool LIB2AUID(string entry,bool TEST,bool _VERBOSE) {
-    if(_VERBOSE){;} //CO190906 - keep _VERBOSE busy
+    if(_VERBOSE){;} //CO20190906 - keep _VERBOSE busy
     bool VERBOSE=FALSE;// _VERBOSE;
     if(VERBOSE) cerr << "aflowlib::LIB2AUID BEGIN" << endl;
     string _entry=entry,directory_LIB,directory_RAW,directory_WEB;
@@ -530,8 +530,8 @@ namespace aflowlib {
   }
 }
 
-bool gcdTest(ostream& oss){ofstream FileMESSAGE;return gcdTest(FileMESSAGE,oss);}  //CO190520
-bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
+bool gcdTest(ostream& oss){ofstream FileMESSAGE;return gcdTest(FileMESSAGE,oss);}  //CO20190520
+bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   string soliloquy="gcdTest():";
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
@@ -590,11 +590,11 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   }
 
   message << "gcd test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-  return TRUE; // CO 180419
+  return TRUE; // CO20180419
 }
 
-bool smithTest(ostream& oss){ofstream FileMESSAGE;return smithTest(FileMESSAGE,oss);}  //CO190520
-bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
+bool smithTest(ostream& oss){ofstream FileMESSAGE;return smithTest(FileMESSAGE,oss);}  //CO20190520
+bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   string soliloquy="smithTest():";
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
@@ -629,36 +629,36 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     cerr << soliloquy << " S=" << endl;cerr << S1 << endl;
   }
 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 && 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 && 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  && 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " U1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  && 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 && 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 && 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " V1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 && 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 && 
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[3][1]==0 && S1[3][2]==0 && S1[3][3]==1 &&
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " S1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " U1(1) failed of getSmithNormalForm()" << endl;}
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " V1(1) failed of getSmithNormalForm()" << endl;}
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[3][1]==0 && S1[3][2]==0 && S1[3][3]==1 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " S1(1) failed of getSmithNormalForm()" << endl;}
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
 
   xmatrix<long long int> A2(5,5),U2,V2,S2;  //long long int is CRUCIAL, Matlab actually gets this wrong because it uses long int by default
   A2[1][1]=25;    A2[1][2]=-300;   A2[1][3]=1050;    A2[1][4]=-1400;   A2[1][5]=630;
@@ -677,12 +677,12 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   }
 
   message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-  return TRUE; // CO 180419
+  return TRUE; // CO20180419
 }
 
 int main(int _argc,char **_argv) {
-  string soliloquy="main():"; // CO 180419
-  ostream& oss=cout;  // CO 180419
+  string soliloquy="main():"; // CO20180419
+  ostream& oss=cout;  // CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
     if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
@@ -713,7 +713,7 @@ int main(int _argc,char **_argv) {
       if(KBIN::VASP_PseudoPotential_CleanName_TEST()){return 0;}
       return 1;
     }
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO190911
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO20190911
       string soliloquy="test_xmatrix()::";
       bool LDEBUG=TRUE; // TRUE;
       xmatrix<double> mat;
@@ -775,10 +775,10 @@ int main(int _argc,char **_argv) {
         if(m==0) {y--;m+=12;} 
       }
       //exit(0);
-      return 0; // CO 180419
+      return 0; // CO20180419
     }
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO190601
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
@@ -813,7 +813,7 @@ int main(int _argc,char **_argv) {
         cerr << _tokens[i] << endl;
       }
       //exit(0);
-      return 0; // CO 180419
+      return 0; // CO20180419
       // COREY START 170614 - some SQLITE tests
       //http://zetcode.com/db/sqlitec/ - more tests here
       //this will create test.db file
@@ -885,7 +885,7 @@ int main(int _argc,char **_argv) {
       aus << "************************   00000  MESSAGE KPOINTS KSHIFT=[" << 1 << " " << 2 << " " << 3 << "]" << " ************************ " << endl;
       cout << aus.str() << endl;
       //exit(0);
-      return 0; // CO 180419
+      return 0; // CO20180419
     }
 
     if(!Arun && aurostd::args2attachedflag(argv,"--bin2base64=")) {
@@ -896,21 +896,21 @@ int main(int _argc,char **_argv) {
     }
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=POTCAR|--test=POTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=POTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=POTCAR.static"+DEFAULT_KZIP_EXT+"|--test=POTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=DOSCAR|--test=DOSCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.static"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xDOSCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xDOSCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=EIGENVAL|--test=EIGENVAL.relax1"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.relax2"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.static"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xEIGENVAL(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xEIGENVAL(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=OUTCAR|--test=OUTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.static"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xOUTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xOUTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=KPOINTS|--test=KPOINTS.relax1"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.relax2"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.static"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xKPOINTS(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;}  // CO 180419
+      XHOST.DEBUG=TRUE;xKPOINTS(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;}  // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=vasprun|--test=vasprun.xml.relax1"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.relax2"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.static"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xVASPRUNXML(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xVASPRUNXML(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=IBZKPT|--test=IBZKPT.relax1"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.relax2"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.static"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xIBZKPT(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xIBZKPT(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=CHGCAR|--test=CHGCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.static"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xCHGCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xCHGCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
 
     if(!Arun && (aurostd::args2flag(argv,cmds,"--scrub") || aurostd::args2attachedflag(argv,"--scrub="))) {
       //  XHOST.DEBUG=TRUE;
@@ -968,13 +968,13 @@ int main(int _argc,char **_argv) {
         }
       }
       //exit(0);
-      return 0; // CO 180419
+      return 0; // CO20180419
     }
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test1")) {Arun=TRUE;PERFORM_TEST1(cout);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test3")) {Arun=TRUE;PERFORM_TEST3(cout);}
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {return (slab::slabTest()?0:1);}  //CO190601  //CO190629 if TRUE(==1), return 0 (normal)
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {return (slab::slabTest()?0:1);}  //CO20190601  //CO20190629 if TRUE(==1), return 0 (normal)
     if(!Arun && XHOST.vflag_control.flag("MACHINE"))  {Arun=TRUE;init::InitMachine(TRUE,argv,cmds,cout);}
 
     // **************************************************************
@@ -1003,98 +1003,98 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     // intercept commands
-    if(!Arun && XHOST.vflag_control.flag("MULTI=SH")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_sh(argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bzip2",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BUNZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gzip",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gunzip",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=XZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xz",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=XUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xunzip",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_bz2xz(argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_gz2xz(argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=ZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_zip(argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MONITOR")) {Arun=TRUE;AFLOW_monitor(argv);/*exit(0)*/return 0;} // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("GETTEMP")) {Arun=TRUE;AFLOW_getTEMP(argv);/*exit(0)*/return 0;} // CO 180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=SH")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_sh(argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bzip2",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BUNZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gzip",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gunzip",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=XZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xz",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=XUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xunzip",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_bz2xz(argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_gz2xz(argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=ZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_zip(argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MONITOR")) {Arun=TRUE;AFLOW_monitor(argv);/*exit(0)*/return 0;} // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("GETTEMP")) {Arun=TRUE;AFLOW_getTEMP(argv);/*exit(0)*/return 0;} // CO20180419
 
     // **************************************************************
     // INTERCEPT HELP
     if(XHOST.vflag_control.flag("AFLOW_HELP")) {
       cout << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
       cout << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
       return 0;
-    }  // ME180531
+    }  // ME20180531
     if(XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3"))  {
       cout << aflow::License_Preamble_aflow() << endl;
       cout << " " << endl;
       cout << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
       cout << " " << endl;
       cout << "*************************************************************************** " << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
       cout << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_FROZSL"))  {
       cout << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_APL"))  {
       cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_QHA"))  {
       cout << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AAPL"))  {
       cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AGL"))  {
       cout << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AEL"))  {
       cout << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_ANRL"))  {
       cout << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
-    if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO190401
-      cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO190401
-      /*exit(1)*/return 0;} // << endl; // CO 190401
+      /*exit(1)*/return 0;} // << endl; // CO20180419
+    if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO20190401
+      cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO20190401
+      /*exit(1)*/return 0;} // << endl; // CO20190401
     if(XHOST.vflag_control.flag("README_GFA"))  {
       cout << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
       cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_CCE"))  {
       cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_CHULL"))  {
       cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
       cout << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_APENNSY"))  {
       cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
       cout << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
       cout << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
-      return 0;}  // ME 180531
+      return 0;}  // ME20180531
     if(XHOST.vflag_control.flag("README_XAFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
       cout << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
 
     // **************************************************************
     // PHP-WEB AND CURRICULUM AND HIGH-THROUGHPUT STUFF
@@ -1103,8 +1103,8 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
-    if(!Arun && VVERSION)  {Arun=TRUE; cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY // CO 180419
-    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl; /*exit(0)*/return 0;} // CO 180419
+    if(!Arun && VVERSION)  {Arun=TRUE; cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY // CO20180419
+    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl; /*exit(0)*/return 0;} // CO20180419
 
     // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
     // [OBSOLETE]  Arun=TRUE;AFLOW_main1(argv,cmds);}
@@ -1130,9 +1130,9 @@ int main(int _argc,char **_argv) {
     }
     // **************************************************************
     // END
-    return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO190629 - more explicit return 0
+    return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO20190629 - more explicit return 0
   }
-  // CO 180729 - OBSOLETE - use xerror
+  // CO20180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
   //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
   //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), oss, _LOGGER_ERROR_);
@@ -1157,7 +1157,7 @@ int AFLOW_main(vector<string> &argv) {
   if(!XHOST.QUIET) cout << aflow::Banner("INTRODUCTION");// << endl;
   KBIN::KBIN_Main(argv);
   // if(!XHOST.QUIET) cout << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << "  " << endl;
-  return 0; //1;  // CO 180419 - return 0 is normal
+  return 0; //1;  // CO20180419 - return 0 is normal
 }
 
 // ***************************************************************************
@@ -1503,7 +1503,7 @@ namespace aflow {
     cerr << "aflow::Banner type=" << type << " not found..." << endl;
     oss << "aflow::Banner type=" << type << " not found..." << endl;
     //exit(0);
-    return 0; // CO 180419
+    return 0; // CO20180419
     return oss.str();
   }
 } // namespace aflow
