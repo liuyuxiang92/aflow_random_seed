@@ -136,7 +136,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   x*x;x*r;r*x;x*=y;x*=r; // multiplication	//CO190329 - clang doesn't like x=x, changing to x=y
   x/x;x/r;r/x;x/=y;x/=r; // division		//CO190329 - clang doesn't like x=x, changing to x=y
   x=y;x=r;               // equal		//CO190329 - clang doesn't like x=x, changing to x=y
-  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);// ME200107
+  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);// ME20200107
   x=abs(x)+arg(x)+polar(r,r)+conj(x)+norm(x)+cos(x)+cosh(x)+exp(x)+log(x)+pow(x,x)+pow(x,int(1))+pow(x,r)+pow(r,x)+sin(x)+sinh(x)+sqrt(x); // functions
   r = magsqr(x);  // ME180907
 

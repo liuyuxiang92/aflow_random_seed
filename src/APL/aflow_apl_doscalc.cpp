@@ -230,7 +230,7 @@ namespace apl {
     gauss.clear();
   }
 
-  // ME200203 - DOS can now be calculated within any frequency range
+  // ME20200203 - DOS can now be calculated within any frequency range
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calc(int USER_DOS_NPOINTS) {
@@ -326,7 +326,7 @@ namespace apl {
 
   // ME190614 - added integrated DOS
   // ME190625 - rearranged and added projected DOS
-  // ME200213 - added atom-projected DOS
+  // ME20200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
     _logger << "Calculating phonon DOS using the linear tetrahedron method." << apl::endl;
     // Procompute projections for each q-point and branch to save time
@@ -410,7 +410,7 @@ namespace apl {
         double fbin, dos, part;
         int br = ibranch - _freqs[0].lrows;
         for (int k = kstart; k <= kstop; k++) {
-          // ME200203 - Use bins to accommodate different frequency range
+          // ME20200203 - Use bins to accommodate different frequency range
           fbin = _bins[k]; // _minFreq + k * _stepDOS + _halfStepDOS;
           dos = 0.0;
           if ((f[0] <= fbin) && (fbin <= f[1])) {
@@ -537,7 +537,7 @@ namespace apl {
     double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
     double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
     double conv = factorTHz2Raw * factorRaw2meV/1000;
-    // ME200203 - use _bins instead of _minFreq in case the DOS was calculated
+    // ME20200203 - use _bins instead of _minFreq in case the DOS was calculated
     // using different frequency ranges
     xdos.energy_max = _bins.back() * conv;
     xdos.energy_min = _bins[0] * conv;
@@ -572,7 +572,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME200108 - added const
+  // ME20200108 - added const
   const vector<double>& DOSCalculator::getBins() const {
     return _bins;
   }
@@ -581,7 +581,7 @@ namespace apl {
     return _dos;
   }
 
-  // ME200210
+  // ME20200210
   const vector<double>& DOSCalculator::getIDOS() const {
     return _idos;
   }

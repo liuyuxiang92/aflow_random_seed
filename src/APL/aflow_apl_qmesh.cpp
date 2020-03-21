@@ -305,7 +305,7 @@ namespace apl {
     _logger << "Found " << _nIQPs << " irreducible qpoints." << apl::endl;
   }
 
-  // ME200109
+  // ME20200109
   //calculateLittleGroups/////////////////////////////////////////////////////
   // Calculates little/small groups for each irreducible q-point.
   void QMesh::calculateLittleGroups() {
@@ -466,7 +466,7 @@ namespace apl {
     return _isGammaCentered;
   }
 
-  // ME200109
+  // ME20200109
   bool QMesh::littleGroupsCalculated() const {
     return _littleGroupsCalculated;
   }

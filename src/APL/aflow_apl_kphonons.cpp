@@ -46,8 +46,8 @@ namespace KBIN {
   // ME 200102 - Make k-point grid commensurate with supercell size
   bool relaxStructureAPL_VASP(int start_relax,
       const string& AflowIn,
-      aurostd::xoption supercell_opts,  // ME200102
-      const xvector<int>& scell_dims,  // ME200102
+      aurostd::xoption supercell_opts,  // ME20200102
+      const xvector<int>& scell_dims,  // ME20200102
       _xvasp& xvasp,
       _aflags& aflags,
       _kflags& kflags,
@@ -66,7 +66,7 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_PREC.push(prec_phonons);
     vflags.KBIN_VASP_FORCE_OPTION_PREC.isentry = true;
 
-    // ME200102
+    // ME20200102
     // Determine k-point grid that is commensurate with the k-point grid of
     // the supercell.
     apl::Logger l(fileMessage, aflags);
@@ -106,7 +106,7 @@ namespace KBIN {
     Krun = (Krun && VASP_Write_INPUT(xvasp, vflags));
 
     // Run relaxations
-    // ME200115 - set for SPIN_REMOVE_RELAX
+    // ME20200115 - set for SPIN_REMOVE_RELAX
     int nrelax = xvasp.NRELAX;
     xvasp.NRELAX = _NUM_RELAX_;
 
@@ -121,7 +121,7 @@ namespace KBIN {
           XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, fileMessage);
         } else { 
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
-          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);  // ME200115 - or else SPIN_REMOVE_RELAX_2 does not work
+          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);  // ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work
         }
       }
       if (Krun && (i == _NUM_RELAX_)) {
@@ -152,7 +152,7 @@ namespace KBIN {
     // CONVERT_UNIT_CELL may shift the origin, so not doing it here
     // would lead to inconsistencies when between the supercell creation
     // and the APL/AAPL analysis
-    // ME200102 - should not be necessary anymore when the state is saved,
+    // ME20200102 - should not be necessary anymore when the state is saved,
     // but it's good to convert it anyway to get "nicer" lattice vectors
     if (!vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") &&
         !vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme.empty()) { // ME190109
@@ -222,7 +222,7 @@ namespace KBIN {
       _kflags& kflags,
       _xflags& xflags, 
       ofstream& messageFile) {
-    // ME200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
+    // ME20200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
     try {
       return RunPhonons_APL_181216(xinput,AflowIn,aflags,kflags,xflags,messageFile);
     } catch (aurostd::xerror e) {
@@ -355,7 +355,7 @@ namespace KBIN {
     string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO190114 - initialize everything
     bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false, USER_ZEROSTATE_CHGCAR = false; //CO190114 - initialize everything
     bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO190114 - initialize everything
-    bool USER_DOS_PROJECT = false;  // ME200213
+    bool USER_DOS_PROJECT = false;  // ME20200213
     double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO190114 - initialize everything  
     int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO190114 - initialize everything
     vector<int> USER_DOS_MESH(3);
@@ -396,7 +396,7 @@ namespace KBIN {
       if (key == "DOSMETHOD") {USER_DOS_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
       if (key == "DOSSMEAR") {USER_DOS_SMEAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
       if (key == "DOSPOINTS") {USER_DOS_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
-      if (key == "DOS_PROJECT") {USER_DOS_PROJECT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME200213
+      if (key == "DOS_PROJECT") {USER_DOS_PROJECT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME20200213
       if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME190625
       if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME190625
       if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
@@ -422,7 +422,7 @@ namespace KBIN {
         // Check if the structure has already been relaxed
         for (int i = 1; i <= _NUM_RELAX_; i++) {
           string contcar = aflags.Directory + "/CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i);
-          if (aurostd::EFileExist(contcar) || aurostd::FileExist(contcar)) {  // ME200103 - also look for uncompressed files
+          if (aurostd::EFileExist(contcar) || aurostd::FileExist(contcar)) {  // ME20200103 - also look for uncompressed files
             START_RELAX++;
           } else {
             break;
@@ -480,7 +480,7 @@ namespace KBIN {
       }
     }
 
-    // ME200102 - BEGIN
+    // ME20200102 - BEGIN
     // Store supercell generation parameters in xoption.
     aurostd::xoption supercell_opts;
     if (kflags.KBIN_MODULE_OPTIONS.supercell_method[0]) {
@@ -505,11 +505,11 @@ namespace KBIN {
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
     supercell_opts.flag("SUPERCELL::VERBOSE", true);  // Use verbose output for supercell construction
-    // ME200102 - END
+    // ME20200102 - END
 
     if (USER_DC) {
       if (USER_DC_METHOD == "LATTICE") {
-        //USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_variation_type;  // OBSOLETE ME200117 - this will be determined by the phonon dispersion calculator
+        //USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_variation_type;  // OBSOLETE ME20200117 - this will be determined by the phonon dispersion calculator
       } else if (USER_DC_METHOD == "MANUAL") {
         // Make sure that the number of coordinates and labels agree
         tokens.clear();
@@ -562,7 +562,7 @@ namespace KBIN {
         USER_DOS_MESH[2] = aurostd::string2utype<int>(tokens[2]);
       }
       // ME190625 - projected DOS
-      // ME200213 - now has fully atom projected DOS (use zero vector to indicate)
+      // ME20200213 - now has fully atom projected DOS (use zero vector to indicate)
       if (USER_DOS_PROJECT) {
         if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() || !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
           if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
@@ -1381,7 +1381,7 @@ namespace KBIN {
       }
     }
 
-    // ME200102 - BEGIN
+    // ME20200102 - BEGIN
     // The PHPOSCAR file now also serves as the canonical structure
     // for the phonon calculations. This prevents any changes in symmetry codes,
     // especially the structure conversion codes, from changing the structure
@@ -1433,7 +1433,7 @@ namespace KBIN {
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       }
     }
-    // ME200102 - END
+    // ME20200102 - END
 
     // ME190626 - Convert projection directions for DOS to Cartesian
     if ((USER_DOS_PROJECTIONS.size() > 0) && (!USER_DOS_PROJECTIONS_FRAC_SCHEME.empty())) {
@@ -1449,7 +1449,7 @@ namespace KBIN {
     //apl::Supercell supercell(xvasp.str,logger),supercell_test(xvasp.str,logger);    //corey, slow
     try {
 
-    //ME200102 - Moved into apl::Supercell
+    //ME20200102 - Moved into apl::Supercell
       //[OBSOLETE]  apl::Supercell supercell(xinput.getXStr(),aflags,logger); //xvasp.str, logger);  //CO  //CO181226
       //[OBSOLETE]  apl::Supercell supercell_test = supercell;    //CO
 
@@ -1576,7 +1576,7 @@ namespace KBIN {
       if (USER_ENGINE == string("DM")) {
         apl::DirectMethodPC* phcalcdm = new apl::DirectMethodPC(supercell, clusters, xinput, aflags,
             kflags, xflags, AflowIn, logger);
-        phcalcdm->setPolarMaterial(USER_POLAR);  // ME200218
+        phcalcdm->setPolarMaterial(USER_POLAR);  // ME20200218
         phcalcdm->setTCOND(USER_TCOND);
         //phcalcdm->setGeneratePlusMinus(USER_DISTORTIONS_PLUS_MINUS_OPTION.option); //CO auto
         phcalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
@@ -1604,7 +1604,7 @@ namespace KBIN {
         phcalc.reset(new apl::LinearResponsePC(supercell, clusters, xinput, aflags,
               kflags, xflags, AflowIn, logger));
         phcalc->setTCOND(USER_TCOND);
-        phcalc->setPolarMaterial(USER_POLAR);  // ME200218
+        phcalc->setPolarMaterial(USER_POLAR);  // ME20200218
         //phcalcdm->setCalculateZeroStateForces(USER_ZEROSTATE_OPTION.option);
       }
 
@@ -1942,7 +1942,7 @@ namespace KBIN {
         // Init path according to the aflow's definition for elec. struc.
         // ME 181029 - Restructured
         if (USER_DC_METHOD == "LATTICE") {
-          supercell.projectToPrimitive();  // ME200117 - project to primitive
+          supercell.projectToPrimitive();  // ME20200117 - project to primitive
           pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
         } else {
           if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_FRAC.empty()) {
@@ -1962,7 +1962,7 @@ namespace KBIN {
         // Write results into PDIS file
         pdisc.writePDIS(aflags.Directory);
         pdisc.writePHEIGENVAL(aflags.Directory);  // ME190614
-        if (USER_DC_METHOD == "LATTICE") supercell.projectToOriginal();  // ME200117 - reset to original
+        if (USER_DC_METHOD == "LATTICE") supercell.projectToOriginal();  // ME20200117 - reset to original
         //QHA/SCQHA/QHA3P  START //PN180705
         //////////////////////////////////////////////////////////////////////
         ptr_hsq.reset(new apl::PhononHSQpoints(logger));
@@ -2028,9 +2028,9 @@ namespace KBIN {
 
         // Calculate thermal properties
         if (USER_TP) {
-          //if (!dosc.hasNegativeFrequencies()) // ME200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
+          //if (!dosc.hasNegativeFrequencies()) // ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
             apl::ThermalPropertiesCalculator tpc(dosc, logger);  // ME190423
-            // ME200108 - new ThermalPropertiesCalculator format
+            // ME20200108 - new ThermalPropertiesCalculator format
             tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
             tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
             //QHA/SCQHA/QHA3P START //PN180705
@@ -2042,7 +2042,7 @@ namespace KBIN {
             //apl::UniformMesh umesh(logger);
             //calculate group velocities
             //umesh.create_uniform_mesh(sc_size[0],sc_size[1],sc_size[2],phcalc->getInputCellStructure());
-          if (!dosc.hasNegativeFrequencies()) {  // ME200210
+          if (!dosc.hasNegativeFrequencies()) {  // ME20200210
             if(CALCULATE_GROUPVELOCITY_OPTION.option){
               //apl::GroupVelocity vg(*phcalc, umesh, logger);
               apl::GroupVelocity vg(*phcalc, qmesh, logger);
@@ -2246,9 +2246,9 @@ namespace KBIN {
             if(ptr_hsq.get()) ptr_hsq->clear();  // ME190423
             // umesh.clear();  OBSOLETE ME190428
             //QHA/SCQHA/QHA3P END
-            tpc.clear(logger);  // ME200108
+            tpc.clear(logger);  // ME20200108
           } else {
-            // ME200210 - changed warning
+            // ME20200210 - changed warning
             const vector<double>& freqs = dosc.getBins();
             const vector<double>& idos = dosc.getIDOS();
             uint i = 0;

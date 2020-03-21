@@ -844,7 +844,7 @@ namespace apl {
   // DOI: 10.1088/0953-8984/22/20/202201
 
   // ME180827 - Overloaded to calculate derivative for AAPL
-  // ME200207 - This function assummed that Born charges were stored for each type,
+  // ME20200207 - This function assummed that Born charges were stored for each type,
   // but it is actually stored for each iatom.
   xmatrix<xcomplex<double> > PhononCalculator::getNonanalyticalTermWang(const xvector<double>& _q) {
     vector<xmatrix<xcomplex<double> > > placeholder;
@@ -855,7 +855,7 @@ namespace apl {
       vector<xmatrix<xcomplex<double> > >& derivative,
       bool calc_derivative) {
     const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
-    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME200207 - grab input structure (need iatoms)
+    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME20200207 - grab input structure (need iatoms)
 
     // to correct the q=\Gamma as a limit
     xvector<double> q(_q);
@@ -877,7 +877,7 @@ namespace apl {
       }
 
       // Calculation
-      double fac0 = hartree2eV * bohr2angstrom;  // from a.u. to eV/A  // ME200206 - replaced with xscalar constants
+      double fac0 = hartree2eV * bohr2angstrom;  // from a.u. to eV/A  // ME20200206 - replaced with xscalar constants
       double volume = det(pc.lattice);
       double fac1 = 4.0 * PI / volume;
       double nbCells = det(sc.lattice) / volume;
@@ -964,12 +964,12 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME200207 - This function assummed that Born charges were stored for each type,
+  // ME20200207 - This function assummed that Born charges were stored for each type,
   // but it is actually stored for each iatom.
   xmatrix<xcomplex<double> > PhononCalculator::getEwaldSumDipolDipolContribution(const xvector<double> qpoint, bool includeTerm1) {
     // Definitions
     const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
-    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME200207 - grab input structure (need iatoms)
+    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME20200207 - grab input structure (need iatoms)
 
     uint pcAtomsSize = pc.atoms.size();
     uint nBranches = 3 * pcAtomsSize;
@@ -991,7 +991,7 @@ namespace apl {
     int n3 = (int)(sqrt(geg) / aurostd::modulus(klattice(3))) + 1;
 
     // Calculation
-    double fac0 = hartree2eV * bohr2angstrom;  // from a.u. to eV/A  // ME200207 - replaced with xscalar constants
+    double fac0 = hartree2eV * bohr2angstrom;  // from a.u. to eV/A  // ME20200207 - replaced with xscalar constants
     double SQRTPI = sqrt(PI);
     double volume = det(pc.lattice);
     double fac = 4.0 * PI / volume;
@@ -1161,7 +1161,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
   // ME180827 - Overloaded to calculate derivative for AAPL
-  // ME200206 - Added variants for the case near the Gamma point where the
+  // ME20200206 - Added variants for the case near the Gamma point where the
   // non-analytical correction also needs a direction. While dynamical matrices
   // are not used directly, these functions are helpful debugging tools.
   xmatrix<xcomplex<double> > PhononCalculator::getDynamicalMatrix(const xvector<double>& kpoint) {
@@ -1188,7 +1188,7 @@ namespace apl {
     double value = 0.0;
     // ME 180828 - Prepare derivative calculation
     xvector<xcomplex<double> > derivative(3);
-    // OBSOLETE ME200115 - not used
+    // OBSOLETE ME20200115 - not used
     //double nbCells = 1.0;  // for NAC derivative
     //for (int i = 1; i < 4; i++) {
     //  nbCells *= _supercell.scell[i];
@@ -1297,7 +1297,7 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME180827 - Overloaded to calculate derivative and eigenvectors for AAPL
-  // OBSOLETE ME200206 - not used anywhere and not useful for debugging (use get Frequency)
+  // OBSOLETE ME20200206 - not used anywhere and not useful for debugging (use get Frequency)
   //[OBSOLETE] xvector<double> PhononCalculator::getEigenvalues(const xvector<double>& kpoint) {
   //[OBSOLETE]   const xstructure& pc = _supercell.getInputStructureLight();  //CO
   //[OBSOLETE]   uint nBranches = 3 * pc.atoms.size();
@@ -1340,7 +1340,7 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   // ME180827 - Overloaded to calculate derivative and eigenvectors for AAPL
-  // ME200206 - Added variants for the case near the Gamma point where the
+  // ME20200206 - Added variants for the case near the Gamma point where the
   // non-analytical correction also needs a direction.
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const IPCFreqFlags& flags) {
     return getFrequency(kpoint, kpoint, flags);
@@ -1401,7 +1401,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME200108 - replaced with constants in xscalar
+  // ME20200108 - replaced with constants in xscalar
   double PhononCalculator::getFrequencyConversionFactor(IPCFreqFlags inFlags, IPCFreqFlags outFlags) {
     double conversionFactor = 1.0;
 
@@ -2334,7 +2334,7 @@ namespace apl {
     return _system;
   }
 
-  // ME200206
+  // ME20200206
   bool PhononCalculator::isPolarMaterial() {
     return _isPolarMaterial;
   }
@@ -2414,7 +2414,7 @@ namespace apl {
     if (_kbinFlags.AFLOW_MODE_VASP){
       if(aurostd::EFileExist(dir + string("vasprun.xml.static")) ||
           aurostd::EFileExist(dir + string("vasprun.xml")) ||
-          aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME200203 - Added qmvasp file
+          aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME20200203 - Added qmvasp file
         return true;
       }
     }

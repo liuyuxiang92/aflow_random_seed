@@ -1517,10 +1517,10 @@ class xstructure {
     void CalculateSymmetryPointGroupCrystal(void);                // Calculate the symmetry
     void CalculateSymmetryPointGroupKLattice(bool);               // Calculate the symmetry
     void CalculateSymmetryPointGroupKLattice(void);               // Calculate the symmetry
-    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  // ME200114
-    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  // ME200114
-    void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  // ME200129
-    void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  // ME200129
+    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  // ME20200114
+    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  // ME20200114
+    void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  // ME20200129
+    void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  // ME20200129
     int  GenerateGridAtoms(int,int,int,int,int,int);              // generate grid of atoms
     int  GenerateGridAtoms(int,int,int);                          // generate grid of atoms
     int  GenerateGridAtoms(int);                                  // generate grid of atoms
@@ -2362,14 +2362,14 @@ void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream
 void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss);
 void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose);
 void CalculateSymmetryPointGroupKLattice(xstructure& str);
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  // ME200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  // ME200114
-void CalculateSymmetryPointGroupKCrystal(xstructure& str);  // ME200114
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss);  // ME200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose);  // ME200129
-void CalculateSymmetryPointGroupKPatterson(xstructure& str);  // ME200129
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  // ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  // ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str);  // ME20200114
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss);  // ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose);  // ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str);  // ME20200129
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);

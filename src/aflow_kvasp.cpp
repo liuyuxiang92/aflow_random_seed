@@ -4039,7 +4039,7 @@ namespace KBIN {
   // ME20190219 - getVASPVersionString
   // Retrives the VASP version of a binary file.
   // Taken from old APL/apl_hroutines
-  // ME200114 - Return empty string instead of throwing xerror when the binary
+  // ME20200114 - Return empty string instead of throwing xerror when the binary
   // is not found or not a valid VASP binary. Throwing errors would kill aflow
   // when aflow.in files are moved between machines and the VASP binary files
   // have different names. This is not desirable when VASP does not need to be

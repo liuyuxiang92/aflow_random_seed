@@ -1694,7 +1694,7 @@ namespace KBIN {
 namespace KBIN {
   // ME20190220
   // Convert POSCAR into the format that is consistent with the binary version   
-  // ME200114 - Throw a warning when the version could not be determined and
+  // ME20200114 - Throw a warning when the version could not be determined and
   // leave as is. Aborting is not desirable for instances where VASP does not
   // need to be run (e.g. post-processing).
   void convertPOSCARFormat(_xvasp& xvasp, const _kflags& kflags) {
@@ -4308,7 +4308,7 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
       xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-      if (step < xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+      if (step < xvasp.NRELAX) {  // ME20200107 - do not write when at the last step or there will be an extra INCAR
         aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
       }
       // xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR"); // DID REREAD
@@ -4348,7 +4348,7 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_KPOINTS_generated",TRUE);
       xvasp.KPOINTS_orig.str(std::string()); xvasp.KPOINTS_orig << xvasp.KPOINTS.str();
-      if (step < xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+      if (step < xvasp.NRELAX) {  // ME20200107 - do not write when at the last step or there will be an extra INCAR
         aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
       }
       // xvasp.KPOINTS << aurostd::file2string(xvasp.Directory+"/KPOINTS"); // DID REREAD

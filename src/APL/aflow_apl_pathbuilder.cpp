@@ -553,7 +553,7 @@ namespace apl {
     }
 
     if(!CARTESIAN_COORDS){
-      // ME200203 - these are custom points, i.e. they are user generated based
+      // ME20200203 - these are custom points, i.e. they are user generated based
       // on a user-defined input structure. AFLOW should not switch the basis
       // behind the scenes. Assume that the user knows what they are doing.
       //transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) ); //must be reciprocal
@@ -640,7 +640,7 @@ namespace apl {
       points = _points;
       labels = _labels;
     }
-    // ME200117 - Convert to reciprocal coordinates of the
+    // ME20200117 - Convert to reciprocal coordinates of the
     // original structure or the distances will be wrong
     if (_store == CARTESIAN_LATTICE) {
       xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(sc.getOriginalStructure().lattice)));

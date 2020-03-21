@@ -1829,7 +1829,7 @@ namespace plotter {
   //getEnergyConversionFactor/////////////////////////////////////////////////
   // Returns the factor to convert eV into the desired energy/frequency unit.
   // Supported units are meV, THz, Hz, and reciprocal cm (CM-1/RCM).
-  // ME200121 - Replaced with constants from xscalar.
+  // ME20200121 - Replaced with constants from xscalar.
   double getEnergyConversionFactor(const string& unit) {
     if (unit == "MEV") return 1000.0;
     if (unit == "THZ") return (eV2Hz * Hz2THz);
