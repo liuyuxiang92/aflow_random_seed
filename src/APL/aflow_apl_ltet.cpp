@@ -17,7 +17,6 @@ using std::vector;
 using std::string;
 
 static const string _APL_LTET_ERR_PREFIX_ = "apl::LTMethod::";
-static const string _APL_LTET_MODULE_ = "LTET";  // for the logger
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -235,9 +234,6 @@ namespace apl {
       int it, m;
       vector<int> compare; //, irred;  OBSOLETE - ME20191213
       vector<vector<int> > irred;
-      stringstream message;
-      message << "Determining irreducible tetrahedra.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LTET_MODULE_, message, _qm->getDirectory(), _qm->getOutputStream(), std::cout);
       for (int t = 0; t < _nTetra; t++) {
         compare = getTetrahedron(t);
         for (int i = 0; i < 4; i++) compare[i] = _qm->getIrredQPointIndex(compare[i]);
@@ -261,8 +257,6 @@ namespace apl {
           _weights[it]++;
         }
       }
-      message << "Found " << _nIrredTetra << " irreducible tetrahedra.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LTET_MODULE_, message, _qm->getDirectory(), _qm->getOutputStream(), std::cout);
       _reduced = true;
     }
   }

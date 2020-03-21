@@ -308,9 +308,17 @@ namespace apl {
 
     // Perform the raw specific calculation by method
     // ME20190423 - START
+    // ME20200321 - Added logger output
     //rawCalc(USER_DOS_NPOINTS);  OBSOLETE
-    if (_bzmethod == "LT") calcDosLT();
-    else if (_bzmethod == "RS") calcDosRS();
+    if (_bzmethod == "LT") {
+      string message = "Calculating phonon DOS using the linear tetrahedron method.";
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+      calcDosLT();
+    } else if (_bzmethod == "RS") {
+      string message = "Calculating phonon DOS using the root sampling method.";
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+      calcDosRS();
+    }
     // ME20190423 - END
 
     // Smooth DOS by gaussians
@@ -334,8 +342,6 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calcDosRS() {
-    string message = "Calculating phonon DOS using the root sampling method.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     for (uint k = 0; k < _bins.size(); k++) {
       for (uint i = 0; i < _freqs.size(); i++) {
         for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
@@ -353,14 +359,12 @@ namespace apl {
     }
   }
 
-// ///////////////////////////////////////////////////////////////////////////
+  // ///////////////////////////////////////////////////////////////////////////
 
   // ME20190614 - added integrated DOS
   // ME20190625 - rearranged and added projected DOS
   // ME20200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
-    string message = "Calculating phonon DOS using the linear tetrahedron method.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
     // Procompute projections for each q-point and branch to save time
     uint nproj = _projections.size();
     vector<xvector<double> > proj_norm(nproj, xvector<double>(3));
