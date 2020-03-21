@@ -333,7 +333,7 @@ namespace apl
     out<<"[AFLOW] "<<STAR<<"\n";
     string eos_out =  "aflow.qha.static_energies.out";
     if(!aurostd::stringstream2file(out, eos_out, "WRITE")) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.qha.static_energies.out");
       string function = "QH_ENERGIES::write_energies()";
       string message = "Cannot write " + eos_out;
@@ -378,7 +378,7 @@ namespace apl
       out<< "[APL_STATIC_ENERGIES]END" <<"\n";
       out<<"[AFLOW] "<<STAR<<"\n";
       if(!aurostd::stringstream2file(out, outfile, "WRITE")) {
-        // ME191031 - use xerror
+        // ME20191031 - use xerror
         //throw APLRuntimeError("Cannot write aflow.apl.static_corrected.out");
         string function = "QH_ENERGIES::write_imag_freq_corrected_energies()";
         string message = "Cannot write " + outfile;
@@ -392,7 +392,7 @@ namespace apl
   //read pdos from various distorted directories
   bool QH_ENERGIES::get_pdos()
   {
-    string pdosfile = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE; // ME190428
+    string pdosfile = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE; // ME20190428
     string file="";
     _logger <<"Reading phonon dos files " << apl::endl;
     if(_ele_dirs.size()!=_ph_dirs.size()+1)
@@ -405,11 +405,11 @@ namespace apl
       file="";
       //adding equilibrium directory
       if((int)i==_eqm_ele_dir_index){
-        file=pdosfile;  // ME190428
+        file=pdosfile;  // ME20190428
         if(!exists_test0(file) && !aurostd::EFileExist(file)) return false;
         _pdos.push_back(get_pdos(file));
       }
-      file=_tmp_dir+"/" + pdosfile + "."+_ph_dirs[i];  // ME190428
+      file=_tmp_dir+"/" + pdosfile + "."+_ph_dirs[i];  // ME20190428
       if((!exists_test0(file) && !aurostd::EFileExist(file))) return false;
       _pdos.push_back(get_pdos(file));
 
@@ -455,7 +455,7 @@ namespace apl
   vector<vector<double> > QH_ENERGIES::get_pdos(const string file)
   {
     if(!exists_test0(file) && !aurostd::EFileExist(file)) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_pdos()";
       string message = "Missing file: " + file;
@@ -464,7 +464,7 @@ namespace apl
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_pdos()";
       string message = "Missing file: " + file;
@@ -481,9 +481,9 @@ namespace apl
       vector<string> vstr=split<string>(line);
       if(vstr.size()!=4)
       {
-        // ME190726 - exit clean-up
+        // ME20190726 - exit clean-up
         //_logger << apl::error << file<<" Wrong format." << apl::endl; exit(0);
-        // ME191031 - use xerror
+        // ME20191031 - use xerror
         //throw APLRuntimeError("Wrong format in file " + file + ".");
         string function = "QH_ENERGIES::get_pdos()";
         string message = "Wrong format in file " + file + ".";
@@ -506,7 +506,7 @@ namespace apl
   vector<vector<double> > QH_ENERGIES::get_edos(const string file, double &fermi)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_edos()";
       string message = "Missing file: " + file;
@@ -515,7 +515,7 @@ namespace apl
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_edos()";
       string message = "Missing file: " + file;
@@ -551,7 +551,7 @@ namespace apl
   double QH_ENERGIES::getE0K(const string file, double &pv, double &mag)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_E0K()";
       string message = "Missing file: " + file;
@@ -560,7 +560,7 @@ namespace apl
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_E0K()";
       string message = "Missing file: " + file;

@@ -116,7 +116,7 @@ namespace apl {
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME20180801
 
     // Show info 
     if( ncpus == 1 )
@@ -135,7 +135,7 @@ namespace apl {
       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
     }
 
-    /* OBSOLETE ME180801
+    /* OBSOLETE ME20180801
        for(int icpu = 0; icpu < ncpus; icpu++) {
        startIndex = icpu * qpointsPerCPU;
        endIndex = startIndex + qpointsPerCPU;
@@ -166,10 +166,10 @@ namespace apl {
   //create phonon-dispersion path
   void QHAsubdirectoryData::create_pdispath(std::vector< xvector<double> > &qpoints)
   {
-    // ME190726 - exit clean-up
+    // ME20190726 - exit clean-up
     if(qpoints.size()==0){
       //_logger<<apl::error<<"qpoints.size()==0 in create_pdispath() "<<apl::endl; exit(0);
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw APLRuntimeError("qpoints.size()==0 in create_pdispath()");
       string function = "QHAsubdirectoryData::create_pdispath()";
       string message = "qpoints.size()==0";
@@ -192,7 +192,7 @@ namespace apl {
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-    //    int qpointsPerCPU = _kpoints.size() / ncpus;  ME180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  ME20180801
 
     // Show info 
     if( ncpus == 1 )
@@ -211,7 +211,7 @@ namespace apl {
       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
     }
 
-    /* OBSOLETE ME180801
+    /* OBSOLETE ME20180801
        for(int icpu = 0; icpu < ncpus; icpu++) {
        startIndex = icpu * qpointsPerCPU;
        endIndex = startIndex + qpointsPerCPU;
@@ -314,9 +314,9 @@ namespace apl {
       FILE *in;
       char buff[512];
       if(!(in = popen(path.c_str(), "r"))){
-        // ME190726 - exit clean-up
+        // ME20190726 - exit clean-up
         //_logger<<apl::error<<"bash command can't not able to exacute"<<apl::endl; exit(0);
-        // ME191031 - use xerror
+        // ME20191031 - use xerror
         //throw APLRuntimeError("Cannot execute bash command.");
         string function = "QHAsubdirectoryData::directory_list()";
         string message = "Cannot execute bash command.";
@@ -394,7 +394,7 @@ namespace apl {
   {
     //weight factor
     ofstream kout1(file.c_str());
-    // ME190726 - exit clean-up
+    // ME20190726 - exit clean-up
     if (kout1.is_open()){
       //_logger<<apl::error <<" QHAsubdirectoryData:: unable to create [kweights-file]  "<<apl::endl;exit(0);
       //throw APLRuntimeError("QHAsubdirectoryData:: unable to create [kweights-file]");

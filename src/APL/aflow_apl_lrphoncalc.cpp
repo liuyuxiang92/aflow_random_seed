@@ -162,7 +162,7 @@ namespace apl {
   bool LinearResponsePC::calculateForceConstants() {
     // Check if supercell is already built
     if (!_supercell->isConstructed()) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw APLRuntimeError("apl::LinearResponsePC::calculateForceFields(); The supercell structure has not been initialized yet.");
       string function = "apl::LinearResponsePC::calculateForceFields()";
       string message = "The supercell structure has not been initialized yet.";
@@ -278,10 +278,10 @@ namespace apl {
     if (_isPolarMaterial) writePolar(outfile);
     outfile << "</apl>" << std::endl;
 
-    aurostd::stringstream2file(outfile, filename); //ME181226
-    if (!aurostd::FileExist(filename)) { //ME181226
+    aurostd::stringstream2file(outfile, filename); //ME20181226
+    if (!aurostd::FileExist(filename)) { //ME20181226
       string function = "ForceConstantCalculator::hibernate()";
-      string message = "Cannot open output file " + filename + "."; //ME181226
+      string message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }

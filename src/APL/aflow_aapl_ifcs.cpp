@@ -173,7 +173,7 @@ namespace apl {
     xInputs.assign(nruns, *_xInput);
 
     string chgcar_file = "";
-    if (zerostate_chgcar) {  // ME191029 - for ZEROSTATE CHGCAR
+    if (zerostate_chgcar) {  // ME20191029 - for ZEROSTATE CHGCAR
       // Find ZEROSTATE directory
       vector<string> directory;
       aurostd::DirectoryLS(_aflowFlags->Directory, directory);
@@ -201,7 +201,7 @@ namespace apl {
       for (uint dist = 0; dist < idist.distortions.size(); dist++) {
         const vector<int>& distortions = idist.distortions[dist][0];
 
-        // ME 190109 - add title
+        // ME20190109 - add title
         xstructure& xstr = xInputs[idxRun].getXStr();
         LightCopy(clst->scell, xstr);
         xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title);
@@ -240,7 +240,7 @@ namespace apl {
           }
           xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst->sc_dim, 'x');
 
-          // ME 190113 - make sure that POSCAR has the correct format
+          // ME20190113 - make sure that POSCAR has the correct format
           if ((!_kbinFlags->KBIN_MPI && (_kbinFlags->KBIN_BIN.find("46") != string::npos)) ||
               (_kbinFlags->KBIN_MPI && (_kbinFlags->KBIN_MPI_BIN.find("46") != string::npos))) {
             xstr.is_vasp5_poscar_format = false;
@@ -283,7 +283,7 @@ namespace apl {
       const vector<xvector<double> >& distortion_vectors,
       const vector<int>& distortions,
       const vector<int>& atoms, double scale) {
-    xstructure& xstr = xinp.getXStr();  // ME 190109
+    xstructure& xstr = xinp.getXStr();  // ME20190109
     for (uint at = 0; at < atoms.size(); at++) {
       int atsc = atoms[at];
       int dist_index = distortions[at];
@@ -302,14 +302,14 @@ namespace apl {
         }
       }
       dist_cart *= distortion_magnitude;
-      // ME 190109 - Add to title
+      // ME20190109 - Add to title
       xstr.title += " atom=" + stringify(atoms[at]);
-      //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(dist_cart)) + "]"; OBSOLETE ME190112
-      std::stringstream distortion; // ME190112 - need stringstream for nicer formatting
+      //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(dist_cart)) + "]"; OBSOLETE ME20190112
+      std::stringstream distortion; // ME20190112 - need stringstream for nicer formatting
       distortion << " distortion=["
         << std::setprecision(3) << dist_cart[1] << ","
         << std::setprecision(3) << dist_cart[2] << ","
-        << std::setprecision(3) << dist_cart[3] << "]"; // ME190112
+        << std::setprecision(3) << dist_cart[3] << "]"; // ME20190112
       xstr.title += distortion.str();
       xstr.atoms[atsc].cpos += dist_cart;
       xstr.atoms[atsc].fpos = C2F(xstr.lattice, xstr.atoms[atsc].cpos);
@@ -968,8 +968,8 @@ namespace apl {
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME190219
-    parameters.unsetf(std::ios::hex);  // ME190125 - Remove hexadecimal formatting
+    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME20190219
+    parameters.unsetf(std::ios::hex);  // ME20190125 - Remove hexadecimal formatting
     parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
 

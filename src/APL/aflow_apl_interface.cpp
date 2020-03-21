@@ -18,7 +18,7 @@ using std::vector;
 namespace apl {
 
   //createAflowInPhonons////////////////////////////////////////////////////////
-  // ME 181022 - New method to create the aflow.in files. Uses the aflow.in
+  // ME20181022 - New method to create the aflow.in files. Uses the aflow.in
   // creator in aflow_avasp.cpp
   bool createAflowInPhonons(const _aflags& _aflowFlags, const _kflags& _kbinFlags, const _xflags& _xFlags, _xinput& xinp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -46,7 +46,7 @@ namespace apl {
     return write;
   }
 
-  // ME181022 - Old method to create aflow.in files for AIMS
+  // ME20181022 - Old method to create aflow.in files for AIMS
   void createAflowInPhononsAIMS(_aflags& _aflowFlags, _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, _xinput& xinp, ofstream& messageFile) {
     if (!xinp.AFLOW_MODE_AIMS) {
       string function = "apl::createAflowInPhononsAIMS()";
@@ -87,7 +87,7 @@ namespace apl {
     outfile << "[AFLOW_MODE=AIMS]" << std::endl;
     if(!_kbinFlags.KZIP_BIN.empty()){outfile << "[AFLOW_MODE_ZIP=" << _kbinFlags.KZIP_BIN << "]" << std::endl;}  //CO
 
-    //CO 180130 - START
+    //CO20180130 - START
     //corey - at some point, fix alien mode for aims, for now omit!
     outfile << AFLOWIN_SEPARATION_LINE << std::endl;
     outfile << "[AIMS_CONTROL_MODE_EXPLICIT]START " << std::endl;
@@ -145,7 +145,7 @@ namespace apl {
       if(xinps[idxRun].AFLOW_MODE_VASP) {
         if(aurostd::EFileExist(dir + string("/vasprun.xml.static")) ||
             aurostd::EFileExist(dir + string("/vasprun.xml")) ||
-            aurostd::EFileExist(dir + "/" + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME190607
+            aurostd::EFileExist(dir + "/" + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME20190607
           return true;
         }
       }
@@ -189,7 +189,7 @@ namespace apl {
     uint ninps = xinps.size();
     if (contains_born) ninps--;
     for (uint idxRun = 0; idxRun < ninps; idxRun++) {
-      _logger << "Reading force file " << (idxRun + 1) << "/" << ninps << "."; //CO190116  // ME190607
+      _logger << "Reading force file " << (idxRun + 1) << "/" << ninps << "."; //CO20190116  // ME20190607
       pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, xinps[idxRun].getDirectory(), messageFile, std::cout);
       string directory = xinps[idxRun].getDirectory();
       if (!readForcesFromDirectory(xinps[idxRun])) {
@@ -204,7 +204,7 @@ namespace apl {
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
     }
-    _logger << "No errors caught, all force files read successfully."; //CO190116  // ME190607
+    _logger << "No errors caught, all force files read successfully."; //CO20190116  // ME20190607
     pflow::logger(_AFLOW_FILE_NAME_, mode, _logger, directory, messageFile, std::cout, 'C');
     return true;
   }
@@ -220,7 +220,7 @@ namespace apl {
         && !aurostd::EFileExist(xinp.getDirectory() + "/vasprun.xml")) {
         return false;
       }
-      // ME 190607 - BEGIN
+      // ME20190607 - BEGIN
       // Read forces from aflow qmvasp file - much faster
       string file = xinp.getDirectory() + "/" + DEFAULT_AFLOW_QMVASP_OUT;
       if (aurostd::EFileExist(file)) {
@@ -229,7 +229,7 @@ namespace apl {
       } else {
         file = xinp.getDirectory() + string("/vasprun.xml.static");
         if(!aurostd::EFileExist(file)) file = xinp.getDirectory() + string("/vasprun.xml");
-        //xVASPRUNXML vasprunxml(file); OBSOLETE ME 190204 - far too slow
+        //xVASPRUNXML vasprunxml(file); OBSOLETE ME20190204 - far too slow
         xVASPRUNXML vasprunxml;
         vasprunxml.GetForcesFile(file);
         for (uint i = 0; i < vasprunxml.vforces.size(); i++) xinp.getXStr().qm_forces.push_back(vasprunxml.vforces[i]);
@@ -268,7 +268,7 @@ namespace apl {
     }
   }
 
-  // ME190114
+  // ME20190114
   // Cannot use const reference for zerostate because of getXStr()
   void subtractZeroStateForces(vector<_xinput>& xinps, _xinput& zerostate) {
     string function = "apl::subtractZeroStateForces()";

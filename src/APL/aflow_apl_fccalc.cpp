@@ -124,7 +124,7 @@ namespace apl {
 
     if (!calculateForceConstants()) return false;
 
-    // ME191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
+    // ME20191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
     // symmetry operations on-the-fly.
     if (!_supercell->fullBasisCalculatedAGROUP()) _supercell->getFullBasisAGROUP();
@@ -139,7 +139,7 @@ namespace apl {
 
   void ForceConstantCalculator::symmetrizeForceConstantMatrices() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
-    string soliloquy="apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()"; //CO190218
+    string soliloquy="apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()"; //CO20190218
     // Test of stupidity...
     if (!_supercell->getSupercellStructure().agroup_calculated) {
       string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
@@ -159,7 +159,7 @@ namespace apl {
 
     vector<xmatrix<double> > row;
     for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
-      const vector<_sym_op>& agroup = _supercell->getAGROUP(i);  //CO //CO190218
+      const vector<_sym_op>& agroup = _supercell->getAGROUP(i);  //CO //CO20190218
       if (agroup.size() == 0) {
         string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
         string message = "Site point group operations are missing.";
@@ -167,22 +167,22 @@ namespace apl {
       }
 
       for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
-        if(LDEBUG){ //CO190218
+        if(LDEBUG){ //CO20190218
           cerr << soliloquy << " compare original m=" << std::endl;
           cerr << _forceConstantMatrices[i][j] << std::endl;
         }
-        xmatrix<double> m(3, 3); //CO190218
+        xmatrix<double> m(3, 3); //CO20190218
         for (uint symOpID = 0; symOpID < agroup.size(); symOpID++) {
           const _sym_op& symOp = agroup[symOpID];
 
           try {
-            //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, j, i, FALSE);  //CO NEW //CO190218
-            // ME191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
+            //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, j, i, FALSE);  //CO NEW //CO20190218
+            // ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
             // the basis has not been calculated for some reason
-            _AFLOW_APL_REGISTER_ int l = _supercell->atomGoesTo(symOp, j, i, true); //JAHNATEK ORIGINAL //CO190218
-            m = m + (inverse(symOp.Uc) * _forceConstantMatrices[i][l] * symOp.Uc);  //JAHNATEK ORIGINAL //CO190218
-            //m = m + (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc));  //CO NEW //CO190218
-            if(LDEBUG){ //CO190218
+            _AFLOW_APL_REGISTER_ int l = _supercell->atomGoesTo(symOp, j, i, true); //JAHNATEK ORIGINAL //CO20190218
+            m = m + (inverse(symOp.Uc) * _forceConstantMatrices[i][l] * symOp.Uc);  //JAHNATEK ORIGINAL //CO20190218
+            //m = m + (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc));  //CO NEW //CO20190218
+            if(LDEBUG){ //CO20190218
               std::cerr << soliloquy << " atom[" << l << "].cpos=" << _supercell->getSupercellStructure().atoms[l].cpos << std::endl;
               std::cerr << soliloquy << " atom[" << j << "].cpos=" << _supercell->getSupercellStructure().atoms[j].cpos << std::endl;
               std::cerr << soliloquy << " agroup(" << l << " -> " << j << ")=" << std::endl;
@@ -198,7 +198,7 @@ namespace apl {
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
           }
         }
-        m = ( 1.0 / agroup.size() ) * m; //CO190218
+        m = ( 1.0 / agroup.size() ) * m; //CO20190218
         row.push_back(m);
       }
       _forceConstantMatrices[i] = row;
@@ -335,8 +335,8 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  // ME190113
-    string directory = xinp.xvasp.Directory;  // ME190113
+  void ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  // ME20190113
+    string directory = xinp.xvasp.Directory;  // ME20190113
 
     //CO - START
     string infilename = directory + string("/OUTCAR.static");
@@ -360,12 +360,12 @@ namespace apl {
 
     string line;
     uint line_count = 0;  //CO
-    string KEY; //ME181226
-    if (DEFAULT_APL_USE_LEPSILON) { //ME181226
-      KEY = string("BORN EFFECTIVE CHARGES (in e, cummulative output)");//ME181226
-    } else { //ME181226
-      KEY = string("BORN EFFECTIVE CHARGES (including local field effects)"); //ME181226
-    } //ME181226
+    string KEY; //ME20181226
+    if (DEFAULT_APL_USE_LEPSILON) { //ME20181226
+      KEY = string("BORN EFFECTIVE CHARGES (in e, cummulative output)");//ME20181226
+    } else { //ME20181226
+      KEY = string("BORN EFFECTIVE CHARGES (including local field effects)"); //ME20181226
+    } //ME20181226
 
     while (true) {
       // Get line
@@ -437,7 +437,7 @@ namespace apl {
       int basedUniqueAtomID = _supercell->getUniqueAtomID(i);
 
       xmatrix<double> sum(3, 3);
-      for (int j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO190218
+      for (int j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO20190218
         try {  //CO
           const _sym_op& symOp = _supercell->getSymOpWhichMatchAtoms(_supercell->getUniqueAtomID(i, j), basedUniqueAtomID, _FGROUP_);
           sum += inverse(symOp.Uc) * _bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i, j))] * symOp.Uc;
@@ -452,9 +452,9 @@ namespace apl {
         //CO - END
       }
 
-      sum = (1.0 / _supercell->getNumberOfEquivalentAtomsOfType(i)) * sum; //CO190218
+      sum = (1.0 / _supercell->getNumberOfEquivalentAtomsOfType(i)) * sum; //CO20190218
 
-      for (int j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) //CO190218
+      for (int j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) //CO20190218
         _bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i, j))] = sum;
     }
 
@@ -518,8 +518,8 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void ForceConstantCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  // ME190113
-    string directory = xinp.xvasp.Directory;  // ME190113
+  void ForceConstantCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  // ME20190113
+    string directory = xinp.xvasp.Directory;  // ME20190113
 
     //CO - START
     string infilename = directory + string("/OUTCAR.static");
@@ -542,12 +542,12 @@ namespace apl {
     //CO - END
 
     // Find
-    string KEY; //ME181226
-    if (DEFAULT_APL_USE_LEPSILON) { //ME181226
-      KEY = string("MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects in DFT)"); //ME181226
-    } else { //ME181226
-      KEY = string("MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects)"); //ME181226
-    }//ME181226
+    string KEY; //ME20181226
+    if (DEFAULT_APL_USE_LEPSILON) { //ME20181226
+      KEY = string("MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects in DFT)"); //ME20181226
+    } else { //ME20181226
+      KEY = string("MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects)"); //ME20181226
+    }//ME20181226
 
     while (true) {
       // Get line
@@ -605,8 +605,8 @@ namespace apl {
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-      << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME190219
-    outfile.unsetf(std::ios::hex); //CO190116 - undo hex immediately
+      << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
+    outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
   }
 
@@ -652,7 +652,7 @@ namespace apl {
         for (int l = 1; l <= 3; l++) {
           outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
           outfile << setprecision(8);
-          // ME 181030 - fixed prevents hexadecimal output
+          // ME20181030 - fixed prevents hexadecimal output
           outfile << setw(15) << std::fixed << _bornEffectiveChargeTensor[i](k, l) << " ";
         }
         outfile << "</v>" << std::endl;
@@ -670,7 +670,7 @@ namespace apl {
       for (int l = 1; l <= 3; l++) {
         outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
         outfile << setprecision(8);
-        // ME 181030 - fixed prevents hexadecimal output
+        // ME20181030 - fixed prevents hexadecimal output
         outfile << setw(15) << std::fixed << _dielectricTensor(k, l) << " ";
       }
       outfile << "</v>" << std::endl;

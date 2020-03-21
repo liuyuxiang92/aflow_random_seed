@@ -6,7 +6,7 @@
 
 #include "aflow_apl.h"
 
-#define _DEBUG_APL_PHONCALC_ false  //CO190116
+#define _DEBUG_APL_PHONCALC_ false  //CO20190116
 
 using std::string;
 using std::vector;
@@ -99,7 +99,7 @@ namespace apl {
 
 namespace apl {
 
-  const Supercell& PhononCalculator::getSupercell() const { //CO 180409
+  const Supercell& PhononCalculator::getSupercell() const { //CO20180409
     return *_supercell;
   }
 
@@ -115,7 +115,7 @@ namespace apl {
     return 3 * _supercell->getInputStructure().atoms.size();
   }
 
-  // ME190614
+  // ME20190614
   string PhononCalculator::getSystemName() const {
     return _system;
   }
@@ -191,12 +191,12 @@ namespace apl {
   void PhononCalculator::awake(const string& hibfile, bool compare_checksum) {
     //CO, we already checked that it exists before, just open
     vector<string> vlines;                           //CO
-    aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME181226
+    aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME20181226
     string function = _APL_PHCALC_ERR_PREFIX_ + "awake()";
 
     //CO - START
     if (!vlines.size()) {
-      string message = "Cannot open output file " + hibfile + "."; //ME181226
+      string message = "Cannot open output file " + hibfile + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
 
@@ -224,7 +224,7 @@ namespace apl {
       }
       int t = line.find_first_of(">") + 1;
       tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-      if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME190219
+      if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME20190219
         string message = "The " + _AFLOWIN_ + " file has been changed from the hibernated state.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
@@ -479,7 +479,7 @@ namespace apl {
 
 namespace apl {
 
-  // ME180827 - Overloaded to calculate derivative and eigenvectors for AAPL
+  // ME20180827 - Overloaded to calculate derivative and eigenvectors for AAPL
   // ME20200206 - Added variants for the case near the Gamma point where the
   // non-analytical correction also needs a direction.
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const IPCFreqFlags& flags) {
@@ -492,7 +492,7 @@ namespace apl {
     return getFrequency(kpoint, kpoint_nac, flags, placeholder_eigen);
   }
 
-  // ME190624 - get eigenvectors and frequencies
+  // ME20190624 - get eigenvectors and frequencies
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, const IPCFreqFlags& flags,
       xmatrix<xcomplex<double> >& eigenvectors) {
     return getFrequency(kpoint, kpoint, flags, eigenvectors);
@@ -614,18 +614,18 @@ namespace apl {
     // Diagonalize
     xvector<double> eigenvalues(dynamicalMatrix.rows, 1);
 
-    // ME 180828; OBSOLETE ME190815 - use Jacobi algorithm in aurostd::xmatrix, which
+    // ME20180828; OBSOLETE ME20190815 - use Jacobi algorithm in aurostd::xmatrix, which
     // is much, much faster than aplEigensystems for large systems
     //    apl::aplEigensystems e;
     //    e.eigen_calculation(dynamicalMatrix, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
 
-    eigenvalues = jacobiHermitian(dynamicalMatrix, eigenvectors);  // ME190815
+    eigenvalues = jacobiHermitian(dynamicalMatrix, eigenvectors);  // ME20190815
 
     return eigenvalues;
   }
 
   //  // ///////////////////////////////////////////////////////////////////////////
-  // ME180827 - Overloaded to calculate derivative for AAPL
+  // ME20180827 - Overloaded to calculate derivative for AAPL
   // ME20200206 - Added variants for the case near the Gamma point where the
   // non-analytical correction also needs a direction. While dynamical matrices
   // are not used directly, these functions are helpful debugging tools.
@@ -651,7 +651,7 @@ namespace apl {
 
     xcomplex<double> phase;
     double value;
-    // ME 180828 - Prepare derivative calculation
+    // ME20180828 - Prepare derivative calculation
     xvector<xcomplex<double> > derivative(3);
     vector<xmatrix<xcomplex<double> > > dDynMat_NAC;
     if (calc_derivative) {  // reset dDynMat
@@ -673,7 +673,7 @@ namespace apl {
       for (uint isc2 = 0; isc2 < scAtomsSize; isc2++) {
         uint ipc2 = _supercell->sc2pcMap(isc2);
         int neq;  // Important for NAC derivative
-        if (_supercell->calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  // ME180827
+        if (_supercell->calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  // ME20180827
           for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
             for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
               value = 0.5 * (_forceConstantMatrices[isc1][isc2](ix, iy) + _forceConstantMatrices[isc2][isc1](iy, ix));
@@ -760,7 +760,7 @@ namespace apl {
   // Y. Wang et.al, J. Phys.:Condens. Matter 22, 202201 (2010)
   // DOI: 10.1088/0953-8984/22/20/202201
 
-  // ME180827 - Overloaded to calculate derivative for AAPL
+  // ME20180827 - Overloaded to calculate derivative for AAPL
   // ME20200207 - This function assummed that Born charges were stored for each type,
   // but it is actually stored for each iatom.
   xmatrix<xcomplex<double> > PhononCalculator::getNonanalyticalTermWang(const xvector<double>& _q) {

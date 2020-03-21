@@ -224,7 +224,7 @@ namespace apl {
 
   //makeIrreducible///////////////////////////////////////////////////////////
   // Determines the irreducible tetrahedra.
-  // ME191213 - Improved speed by storing the sorted irreducible tetrahedra
+  // ME20191213 - Improved speed by storing the sorted irreducible tetrahedra
   // instead of sorting in place.
   void LTMethod::makeIrreducible() {
     // Only makes sense with a reduced q-mesh
@@ -233,7 +233,7 @@ namespace apl {
       _irredTetrahedra.clear();
       _nIrredTetra = 0;
       int it, m;
-      vector<int> compare; //, irred;  OBSOLETE - ME191213
+      vector<int> compare; //, irred;  OBSOLETE - ME20191213
       vector<vector<int> > irred;
       stringstream message;
       message << "Determining irreducible tetrahedra.";
@@ -243,7 +243,7 @@ namespace apl {
         for (int i = 0; i < 4; i++) compare[i] = _qm->getIrredQPointIndex(compare[i]);
         std::sort(compare.begin(), compare.end());
         for (it = 0; it < _nIrredTetra; it++) {
-          // OBSOLETE - ME191213
+          // OBSOLETE - ME20191213
           //irred = getIrredTetrahedron(it);
           //for (int i = 0; i < 4; i++) irred[i] = _qm->getIrredQPointIndex(irred[i]);
           //std::sort(irred.begin(), irred.end());
@@ -253,7 +253,7 @@ namespace apl {
           if (m == 4) break;
         }
         if (it == _nIrredTetra) {
-          irred.push_back(compare);  // ME191213
+          irred.push_back(compare);  // ME20191213
           _irredTetrahedra.push_back(t);
           _weights.push_back(1);
           _nIrredTetra++;

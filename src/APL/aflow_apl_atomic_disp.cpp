@@ -44,7 +44,7 @@ namespace apl
     _atomic_species.clear();
     _rlattice.clear();
     _kpoints.clear();
-    //_weights.clear();  ME190428 - not used
+    //_weights.clear();  ME20190428 - not used
     _freq_Thz.clear();
     _DM.clear(); 
     _eigenvectors.clear();
@@ -73,7 +73,7 @@ namespace apl
       _atomic_species.push_back(xstr.atoms[i].name);
     }
     _rlattice.clear();
-    // ME190428 - START
+    // ME20190428 - START
     //_rlattice=_mp.get_rlattice(); OBSOLETE
     //_klattice=_mp.get_klattice(); OBSOLETE
     _rlattice = _mp.getReciprocalCell().rlattice;
@@ -83,7 +83,7 @@ namespace apl
     //_kpoints=_mp.get_kpoints();  OBSOLETE
     //_weights.clear(); OBSOLETE - not used
     //_weights=_mp.get_weights();  OBSOLETE - not used
-    // ME190428 - END
+    // ME20190428 - END
 
     _freq_Thz.clear();
     xvector<double> dv(_nBranches,1);
@@ -133,7 +133,7 @@ namespace apl
       threads.push_back( new std::thread(&AtomicDisplacements::solve_eigenvalues_in_threads,this,startIndex,endIndex, icpu) );
     }
 
-    /* OBSOLETE ME 180801
+    /* OBSOLETE ME20180801
        for(int icpu = 0; icpu < ncpus; icpu++) {
        startIndex = icpu * qpointsPerCPU;
        endIndex = startIndex + qpointsPerCPU;
@@ -296,7 +296,7 @@ namespace apl
 
     string outfile =  "aflow.apl.displacements.out";
     if(!aurostd::stringstream2file(os_disp, outfile, "WRITE")) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.apl.displacements.out");
       string function = "AtomicDisplacements::thermal_displacements()";
       string message = "Cannot write " + outfile;
@@ -447,7 +447,7 @@ namespace apl
 
     string outfile =  "aflow.apl.projected_displacements.out";
     if(!aurostd::stringstream2file(os_disp, outfile, "WRITE")) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.apl.projected_displacements.out");
       string function = "AtomicDisplacements::projected_displacements()";
       string message = "Cannot write " + outfile;
@@ -496,7 +496,7 @@ namespace apl
     std::ofstream ofs_anime("aflow.apl.normal_mode_direction.axsf");
     if (!ofs_anime.is_open())
     {
-      // ME190726 - exit clean-up
+      // ME20190726 - exit clean-up
       //_logger<<apl::error<<"aflow.apl.normal_mode_direction.axsf unable to open"<<apl::endl;
       //exit(0);
       //throw APLRuntimeError("aflow.apl.normal_mode_direction.axsf unable to open");
@@ -776,7 +776,7 @@ namespace apl
       threads.push_back( new std::thread(&AtomicDisplacements::solve_eigenvalues_in_threads_path,this,startIndex,endIndex, icpu) );
     }
 
-    /* OBSOLETE ME180801
+    /* OBSOLETE ME20180801
        for(int icpu = 0; icpu < ncpus; icpu++) {
        startIndex = icpu * qpointsPerCPU;
        endIndex = startIndex + qpointsPerCPU;

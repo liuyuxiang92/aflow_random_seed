@@ -6,7 +6,7 @@
 
 #include "aflow_apl.h"
 
-#define _DEBUG_APL_DIRPHONCALC_ false  //CO190116
+#define _DEBUG_APL_DIRPHONCALC_ false  //CO20190116
 
 static const string _APL_DMPC_MODULE_ = "APL";  // for the logger
 
@@ -84,8 +84,8 @@ namespace apl {
   void DirectMethodPC::free() {
     AUTO_GENERATE_PLUS_MINUS = true;   //CO
     DISTORTION_MAGNITUDE = 0.0;
-    DISTORTION_INEQUIVONLY = true;   //CO190116
-    DISTORTION_SYMMETRIZE = true;   //CO190116
+    DISTORTION_INEQUIVONLY = true;   //CO20190116
+    DISTORTION_SYMMETRIZE = true;   //CO20190116
     GENERATE_ONLY_XYZ = false;
     USER_GENERATE_PLUS_MINUS = false;  //CO
     xInputs.clear();
@@ -106,7 +106,7 @@ namespace apl {
 namespace apl {
 
   bool DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
-    string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO190218
+    string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO20190218
     bool stagebreak = false;
     stringstream message;
 
@@ -121,24 +121,24 @@ namespace apl {
     estimateUniqueDistortions(_supercell->getSupercellStructure(), _uniqueDistortions);
 
     //CO - START
-    vvgenerate_plus_minus.clear();  //CO //CO181226  // ME191029
+    vvgenerate_plus_minus.clear();  //CO //CO20181226  // ME20191029
     bool generate_plus_minus;           //CO
     //bool         check_minus_needed = ( AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS && !_supercell.isDerivativeStructure() );
-    //bool check_minus_needed = (AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS);  OBSOLETE ME 181028 - this overrides DPM=OFF
-    //[CO181212]bool check_minus_needed = AUTO_GENERATE_PLUS_MINUS;  // ME 181028
-    int ncalcs = 0;  // ME 190107 - total number of calculations for padding
-    if (_calculateZeroStateForces) ncalcs++;  // ME190112
-    if (_isPolarMaterial) ncalcs++;  // ME190112
+    //bool check_minus_needed = (AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS);  OBSOLETE ME20181028 - this overrides DPM=OFF
+    //[CO20181212]bool check_minus_needed = AUTO_GENERATE_PLUS_MINUS;  // ME20181028
+    int ncalcs = 0;  // ME20190107 - total number of calculations for padding
+    if (_calculateZeroStateForces) ncalcs++;  // ME20190112
+    if (_isPolarMaterial) ncalcs++;  // ME20190112
 
     for (uint i = 0; i < _uniqueDistortions.size(); i++) {
-      vvgenerate_plus_minus.push_back(vector<bool>(0)); //CO181226
+      vvgenerate_plus_minus.push_back(vector<bool>(0)); //CO20181226
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        //      vvgenerate_plus_minus.push_back(true);  //assume we need plus/minus OBSOLETE ME 181028 - this overrides DPM=OFF
-        // ME 190107 - Calculate "need minus" here
+        //      vvgenerate_plus_minus.push_back(true);  //assume we need plus/minus OBSOLETE ME20181028 - this overrides DPM=OFF
+        // ME20190107 - Calculate "need minus" here
         if (AUTO_GENERATE_PLUS_MINUS) {
-          vvgenerate_plus_minus.back().push_back(needMinus(i, j, DISTORTION_INEQUIVONLY)); //CO190218
+          vvgenerate_plus_minus.back().push_back(needMinus(i, j, DISTORTION_INEQUIVONLY)); //CO20190218
         } else {
-          vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME 181028
+          vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME20181028
         }
         if (vvgenerate_plus_minus[i][j]) {
           ncalcs += 2;
@@ -148,11 +148,11 @@ namespace apl {
       }
     }
     //CO - END
-    // ME 181022 - START
+    // ME20181022 - START
     // Generate calculation directories
     string chgcar_file = "";
     string zerostate_dir = "";
-    if (zerostate_chgcar) {  // ME191029 - for ZEROSTATE CHGCAR
+    if (zerostate_chgcar) {  // ME20191029 - for ZEROSTATE CHGCAR
       zerostate_dir = "ARUN.APL_";
       int index = ncalcs;
       if (_isPolarMaterial) index--;
@@ -164,12 +164,12 @@ namespace apl {
     for (uint i = 0; i < _uniqueDistortions.size(); i++) {
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         //CO - START
-        //[CO181212]if (check_minus_needed)
-        //[ME190107] if(AUTO_GENERATE_PLUS_MINUS)  //CHECK -
-        //[ME190107] {  //CO200106 - patching for auto-indenting
-        //[ME190107]  vvgenerate_plus_minus[i][j] = needMinus(i, j);
-        //[ME190107]  if (!vvgenerate_plus_minus[i][j]) {_logger << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "]." << apl::endl;}
-        //[ME190107]}
+        //[CO20181212]if (check_minus_needed)
+        //[ME20190107] if(AUTO_GENERATE_PLUS_MINUS)  //CHECK -
+        //[ME20190107] {  //CO200106 - patching for auto-indenting
+        //[ME20190107]  vvgenerate_plus_minus[i][j] = needMinus(i, j);
+        //[ME20190107]  if (!vvgenerate_plus_minus[i][j]) {_logger << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "]." << apl::endl;}
+        //[ME20190107]}
         generate_plus_minus = vvgenerate_plus_minus[i][j];
         if (AUTO_GENERATE_PLUS_MINUS && !generate_plus_minus) {
           message << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "].";
@@ -180,12 +180,12 @@ namespace apl {
           // Copy settings from common case
           xInputs.push_back(*_xInput);
           int idxRun = xInputs.size() - 1;
-          int idAtom = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO190218
+          int idAtom = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
 
           // Create run ID
-          // ME190107 - added padding
-          string runname = aurostd::PaddedNumString(idxRun + 1, aurostd::getZeroPadding(ncalcs)) + "_";  // ME190112
-          runname += "A" + stringify(idAtom) + "D" + stringify(j); //CO190218
+          // ME20190107 - added padding
+          string runname = aurostd::PaddedNumString(idxRun + 1, aurostd::getZeroPadding(ncalcs)) + "_";  // ME20190112
+          runname += "A" + stringify(idAtom) + "D" + stringify(j); //CO20190218
 
           if (generate_plus_minus) {  //CO
             runname = runname + ((k == 0) ? "P" : "M");
@@ -194,33 +194,33 @@ namespace apl {
           // Apply the unique distortion to one inequvalent atom
           // This distortion vector is stored in Cartesian form, hence use C2F before applying
           xInputs[idxRun].setXStr(_supercell->getSupercellStructureLight()); //CO faster, only what's necessary here
-          xstructure& xstr = xInputs[idxRun].getXStr(); // ME190109 - Declare to make code more legible
-          //CO190114 - it is very silly to try to add in fpos
+          xstructure& xstr = xInputs[idxRun].getXStr(); // ME20190109 - Declare to make code more legible
+          //CO20190114 - it is very silly to try to add in fpos
           //add to cpos, then convert to fpos
           xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
           xstr.atoms[idAtom].fpos = C2F(xstr.lattice, xstr.atoms[idAtom].cpos);
-          //[CO190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].fpos = xInputs[idxRun].getXStr().atoms[idAtom].fpos + C2F(xInputs[idxRun].getXStr().lattice, ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
-          //[CO190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].cpos = F2C(xInputs[idxRun].getXStr().lattice,
-          //[CO190114 - OBSOLETE]                                                 xInputs[idxRun].getXStr().atoms[idAtom].fpos);
+          //[CO20190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].fpos = xInputs[idxRun].getXStr().atoms[idAtom].fpos + C2F(xInputs[idxRun].getXStr().lattice, ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
+          //[CO20190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].cpos = F2C(xInputs[idxRun].getXStr().lattice,
+          //[CO20190114 - OBSOLETE]                                                 xInputs[idxRun].getXStr().atoms[idAtom].fpos);
 
-          //clean title //CO181226
-          //[CO190131 - moved up]xstructure& xstr = xInputs[idxRun].getXStr(); // ME190109 - Declare to make code more legible
-          xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title); //CO181226, ME 190109
-          if(xstr.title.empty()){xstr.buildGenericTitle(true,false);} //CO181226, ME 190109
-          xstr.title += " APL supercell=" + aurostd::joinWDelimiter(_supercell->scell, 'x'); //ME190109
-          xstr.title += " atom=" + stringify(idAtom); //ME190109
-          //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(DISTORTION_MAGNITUDE*_uniqueDistortions[i][j])) + "]"; //ME190109 - OBSOLETE ME190112
-          std::stringstream distortion; // ME190112 - need stringstream for nicer formatting
-          xvector<double> dist_cart = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];  // ME190112
+          //clean title //CO20181226
+          //[CO20190131 - moved up]xstructure& xstr = xInputs[idxRun].getXStr(); // ME20190109 - Declare to make code more legible
+          xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title); //CO20181226, ME20190109
+          if(xstr.title.empty()){xstr.buildGenericTitle(true,false);} //CO20181226, ME20190109
+          xstr.title += " APL supercell=" + aurostd::joinWDelimiter(_supercell->scell, 'x'); //ME20190109
+          xstr.title += " atom=" + stringify(idAtom); //ME20190109
+          //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(DISTORTION_MAGNITUDE*_uniqueDistortions[i][j])) + "]"; //ME20190109 - OBSOLETE ME20190112
+          std::stringstream distortion; // ME20190112 - need stringstream for nicer formatting
+          xvector<double> dist_cart = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];  // ME20190112
           distortion << " distortion=["
             << std::fixed << std::setprecision(3) << dist_cart[1] << ","
             << std::fixed << std::setprecision(3) << dist_cart[2] << ","
-            << std::fixed << std::setprecision(3) << dist_cart[3] << "]"; // ME190112
+            << std::fixed << std::setprecision(3) << dist_cart[3] << "]"; // ME20190112
           xstr.title += distortion.str();
 
           // For VASP, use the standardized aflow.in creator
           if (_kbinFlags->AFLOW_MODE_VASP){
-            // ME191029
+            // ME20191029
             xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
             if (zerostate_chgcar) {
               xInputs[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
@@ -228,7 +228,7 @@ namespace apl {
 
             _kbinFlags->KBIN_MPI_AUTOTUNE = true;
             // Change format of POSCAR
-            // ME 190228 - OBSOLETE for two reasons:
+            // ME20190228 - OBSOLETE for two reasons:
             // 1. This method is not robust
             // 2. This will be taken care of when the actual POSCAR is generated
             // [OBSOLETE - 190228] if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
@@ -257,24 +257,24 @@ namespace apl {
       // Copy settings from common case
       xInputs.push_back(*_xInput);
       int idxRun = xInputs.size() - 1;
-      // Create run ID //ME181226
-      xInputs[idxRun].xvasp.AVASP_arun_runname = aurostd::PaddedNumString(idxRun+1, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE"; //ME181226, ME190112
+      // Create run ID //ME20181226
+      xInputs[idxRun].xvasp.AVASP_arun_runname = aurostd::PaddedNumString(idxRun+1, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE"; //ME20181226, ME20190112
 
       // Get structure
       xInputs[idxRun].setXStr(_supercell->getSupercellStructureLight()); //CO
 
-      // ME 190108 - Set title
-      xInputs[idxRun].getXStr().title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInputs[idxRun].getXStr().title); //CO181226
-      if(xInputs[idxRun].getXStr().title.empty()){xInputs[idxRun].getXStr().buildGenericTitle(true,false);} //CO181226
-      xInputs[idxRun].getXStr().title += " APL supercell=" + aurostd::joinWDelimiter(_supercell->scell, 'x'); //ME190112
+      // ME20190108 - Set title
+      xInputs[idxRun].getXStr().title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInputs[idxRun].getXStr().title); //CO20181226
+      if(xInputs[idxRun].getXStr().title.empty()){xInputs[idxRun].getXStr().buildGenericTitle(true,false);} //CO20181226
+      xInputs[idxRun].getXStr().title += " APL supercell=" + aurostd::joinWDelimiter(_supercell->scell, 'x'); //ME20190112
       xInputs[idxRun].getXStr().title += " undistorted";
-      xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  // ME191029
+      xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  // ME20191029
       // For VASP, use the standardized aflow.in creator
       if(_kbinFlags->AFLOW_MODE_VASP){
         xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
-        stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInputs[idxRun]) || stagebreak); //ME181226
+        stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInputs[idxRun]) || stagebreak); //ME20181226
       }
-      // For AIMS, use the old method until we have AVASP_populateXAIMS //ME181226
+      // For AIMS, use the old method until we have AVASP_populateXAIMS //ME20181226
       if(_kbinFlags->AFLOW_MODE_AIMS){
         string runname = ARUN_DIRECTORY_PREFIX + "APL_" + stringify(idxRun) + "ZEROSTATE";
         xInputs[idxRun].setDirectory(_xInput->getDirectory() + "/" + runname);
@@ -291,8 +291,8 @@ namespace apl {
     // Do an additional calculation for polar materials
     if (_isPolarMaterial) {
       // Calc. Born effective charge tensors and dielectric constant matrix
-      _xinput xinpBE(*_xInput);  // ME190113
-      stagebreak = (runVASPCalculationsBE(xinpBE, ncalcs) || stagebreak);  // ME190113
+      _xinput xinpBE(*_xInput);  // ME20190113
+      stagebreak = (runVASPCalculationsBE(xinpBE, ncalcs) || stagebreak);  // ME20190113
       xInputs.push_back(xinpBE);
     }
     return stagebreak;
@@ -321,7 +321,7 @@ namespace apl {
     stringstream message;
     string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
     // Is there a list of inequivalent atoms?
-    if (DISTORTION_INEQUIVONLY && !xstr.iatoms_calculated) { //CO190218
+    if (DISTORTION_INEQUIVONLY && !xstr.iatoms_calculated) { //CO20190218
       message << "The list of the inequivalent atoms is missing.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -407,9 +407,9 @@ namespace apl {
       vector<xvector<double> > allDistortionsOfAtom;
       uint natoms = DISTORTION_INEQUIVONLY ? xstr.iatoms.size() : xstr.atoms.size();
       for (uint i = 0; i < natoms; i++) {
-        int atomID = (DISTORTION_INEQUIVONLY ? xstr.iatoms[i][0] : i); //CO190218
-        //cout << "atomID = " << atomID << std::endl; //CO190218
-        if (xstr.agroup[atomID].size() == 0) { //CO190218
+        int atomID = (DISTORTION_INEQUIVONLY ? xstr.iatoms[i][0] : i); //CO20190218
+        //cout << "atomID = " << atomID << std::endl; //CO20190218
+        if (xstr.agroup[atomID].size() == 0) { //CO20190218
           message << "Site point group operations are missing.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }
@@ -421,7 +421,7 @@ namespace apl {
           // Get the list of all equivalent distortions
           testDistortion(testDistortions[idTestVector],
               xstr.agroup[atomID], allDistortionsOfAtom,
-              uniqueDistortionsOfAtom,true); //CO190114 - maximize distortion impact first
+              uniqueDistortionsOfAtom,true); //CO20190114 - maximize distortion impact first
           testVectorDim.push_back(allDistortionsOfAtom.size());
           allDistortionsOfAtom.clear();
           uniqueDistortionsOfAtom.clear();
@@ -447,12 +447,12 @@ namespace apl {
         for (uint idTestVector = 0; idTestVector < testDistortions.size(); idTestVector++) {
           testDistortion(testDistortions[idTestVector],
               xstr.agroup[atomID], allDistortionsOfAtom,
-              uniqueDistortionsOfAtom,DISTORTION_SYMMETRIZE);  //CO190114 - if DISTORTION_SYMMETRIZE==false, we want all 3 directions (don't integrate equivalent distortions into count)
+              uniqueDistortionsOfAtom,DISTORTION_SYMMETRIZE);  //CO20190114 - if DISTORTION_SYMMETRIZE==false, we want all 3 directions (don't integrate equivalent distortions into count)
           if (allDistortionsOfAtom.size() >= 3) break;
         }
 
         //cout << "XXXXX  Number of unique distortion vectors for atom ["
-        //     << atomID << "] = " << uniqueDistortionsOfAtom.size() << std::endl; //CO190218
+        //     << atomID << "] = " << uniqueDistortionsOfAtom.size() << std::endl; //CO20190218
         uniqueDistortions.push_back(uniqueDistortionsOfAtom);
         // Free useless stuff
         allDistortionsOfAtom.clear();
@@ -474,7 +474,7 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms();
     for (uint i = 0; i < natoms; i++) {  //CO200212 - int->uint
-      uint id = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO190218
+      uint id = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
           << std::setw(2) << _supercell->getSupercellStructure().atoms[id].cleanname
@@ -493,7 +493,7 @@ namespace apl {
       const vector<_sym_op>& symPool,
       vector<xvector<double> >& allDistortionsOfAtom,
       vector<xvector<double> >& uniqueDistortionsOfAtom,
-      bool integrate_equivalent_distortions) {  //CO190114
+      bool integrate_equivalent_distortions) {  //CO20190114
     // Test if it is unique direction
     // Use the Gram–Schmidt method for orthogonalizing, if the final vectors
     // is non zero length -> is unique
@@ -510,7 +510,7 @@ namespace apl {
       //cout << "new unique distortion vector: " << testDistortion << std::endl;
     }
 
-    if(integrate_equivalent_distortions) { //CO181226
+    if(integrate_equivalent_distortions) { //CO20181226
       // Apply all symmetry operations on test vector and generate all
       // unique directions and store them for future comparison
       for (uint iSymOp = 0; iSymOp < symPool.size(); iSymOp++) {
@@ -531,11 +531,11 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
 
   //CO - START
-  bool DirectMethodPC::needMinus(uint atom_index, uint distortion_index, bool inequiv_only) { //CO190218
+  bool DirectMethodPC::needMinus(uint atom_index, uint distortion_index, bool inequiv_only) { //CO20190218
     //bool need_minus = true;
-    const vector<_sym_op>& agroup = _supercell->getAGROUP( inequiv_only ? _supercell->getUniqueAtomID(atom_index) : atom_index);  //CO190116
-    //[CO190131 OBSOLETE]uint atom_index = _supercell->getUniqueAtomID(ineq_atom_indx);
-    //[CO190131 OBSOLETE]vector<_sym_op> agroup = _supercell->getAGROUP(atom_index);
+    const vector<_sym_op>& agroup = _supercell->getAGROUP( inequiv_only ? _supercell->getUniqueAtomID(atom_index) : atom_index);  //CO20190116
+    //[CO20190131 OBSOLETE]uint atom_index = _supercell->getUniqueAtomID(ineq_atom_indx);
+    //[CO20190131 OBSOLETE]vector<_sym_op> agroup = _supercell->getAGROUP(atom_index);
 
     xvector<double> rotated_distortion, distortion_sum;
     //cerr << agroup.size() << std::endl;
@@ -570,7 +570,7 @@ namespace apl {
     // Get all forces required for the construction of force-constant matrices
     if (!calculateForceFields()) return false;
 
-    // ME191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
+    // ME20191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
     // Calculating the full basis ahead of time is much faster than calculating all
     // symmetry operations on-the-fly.
     if (!_supercell->fullBasisCalculatedAGROUP()) _supercell->getFullBasisAGROUP();
@@ -594,7 +594,7 @@ namespace apl {
 
   bool DirectMethodPC::calculateForceFields() {
     bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
-    string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO190218
+    string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO20190218
     // Extract all forces ////////////////////////////////////////////////////
 
     //first pass, just find if outfile is found ANYWHERE
@@ -610,14 +610,14 @@ namespace apl {
 
     // Store forces //////////////////////////////////////////////////////////
 
-    bool generate_plus_minus = false;  // ME190129
+    bool generate_plus_minus = false;  // ME20190129
 
     int idxRun = 0;
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms();
     for (uint i = 0; i < natoms; i++) {  //CO200212 - int->uint
       vector<vector<xvector<double> > > forcesForOneAtomAndAllDistortions;
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        generate_plus_minus = vvgenerate_plus_minus[i][j];  //CO181226
+        generate_plus_minus = vvgenerate_plus_minus[i][j];  //CO20181226
         vector<xvector<double> > forcefield;
         xvector<double> drift(3);
         for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
@@ -625,14 +625,14 @@ namespace apl {
           force(1) = xInputs[idxRun].getXStr().qm_forces[k](1);
           force(2) = xInputs[idxRun].getXStr().qm_forces[k](2);
           force(3) = xInputs[idxRun].getXStr().qm_forces[k](3);
-          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",+]=" << xInputs[idxRun].getXStr().qm_forces[k] << std::endl;} //CO190218
+          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",+]=" << xInputs[idxRun].getXStr().qm_forces[k] << std::endl;} //CO20190218
           if (generate_plus_minus) {  //CO
             force(1) = 0.5 * (force(1) - xInputs[idxRun + 1].getXStr().qm_forces[k](1));
             force(2) = 0.5 * (force(2) - xInputs[idxRun + 1].getXStr().qm_forces[k](2));
             force(3) = 0.5 * (force(3) - xInputs[idxRun + 1].getXStr().qm_forces[k](3));
-            if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",-]=" << xInputs[idxRun + 1].getXStr().qm_forces[k] << std::endl;} //CO190218
+            if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",-]=" << xInputs[idxRun + 1].getXStr().qm_forces[k] << std::endl;} //CO20190218
           }
-          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",AVG]=" << force << std::endl;} //CO190218
+          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",AVG]=" << force << std::endl;} //CO20190218
           forcefield.push_back(force);
           drift = drift + force;
         }
@@ -644,14 +644,14 @@ namespace apl {
         }
 
         // Remove drift
-        if(LDEBUG) { cerr << soliloquy << " drift[idistortion=" << i << ",total]=" << drift << std::endl;} //CO190218
+        if(LDEBUG) { cerr << soliloquy << " drift[idistortion=" << i << ",total]=" << drift << std::endl;} //CO20190218
         drift(1) = drift(1) / forcefield.size();
         drift(2) = drift(2) / forcefield.size();
         drift(3) = drift(3) / forcefield.size();
-        if(LDEBUG) { cerr << soliloquy << " drift[idistortion=" << i << ",AVG]=" << drift << std::endl;} //CO190218
+        if(LDEBUG) { cerr << soliloquy << " drift[idistortion=" << i << ",AVG]=" << drift << std::endl;} //CO20190218
         for (_AFLOW_APL_REGISTER_ uint k = 0; k < forcefield.size(); k++) {
           forcefield[k] = forcefield[k] - drift;
-          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",-drift]=" << forcefield[k] << std::endl;} //CO190218
+          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",-drift]=" << forcefield[k] << std::endl;} //CO20190218
         }
 
         // Store
@@ -685,7 +685,7 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
 
     // Let's go
-    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO190218
+    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
       // We need to have 3 linearly independent distortions
       if (_uniqueDistortions[i].size() != 3) {
         vector<xvector<double> > allDistortionsOfAtom;
@@ -693,12 +693,12 @@ namespace apl {
         vector<vector<xvector<double> > > forcePool;
         xvector<double> testVec(3), testVec0(3);
 
-        int atomID = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO190218
-        const vector<_sym_op>& agroup = _supercell->getAGROUP(atomID); //CO190218
+        int atomID = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
+        const vector<_sym_op>& agroup = _supercell->getAGROUP(atomID); //CO20190218
 
         // Generate next independent distortion by symmetry operations...
-        uint currentSizeDistortions = _uniqueDistortions[i].size(); //CO190218
-        for (uint idistor = 0; idistor < currentSizeDistortions; idistor++) { //CO190218
+        uint currentSizeDistortions = _uniqueDistortions[i].size(); //CO20190218
+        for (uint idistor = 0; idistor < currentSizeDistortions; idistor++) { //CO20190218
           // Apply all symmetry operations and check if it is independent
           for (uint symOpID = 0; symOpID < agroup.size(); symOpID++) {
             const _sym_op& symOp = agroup[symOpID];
@@ -706,9 +706,9 @@ namespace apl {
             testForce.clear();
             for (_AFLOW_APL_REGISTER_ int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
               try {
-                // ME191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
+                // ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
                 // the basis has not been calculated for some reason
-                _AFLOW_APL_REGISTER_ int l = _supercell->atomComesFrom(symOp, k, atomID, true); //CO190218
+                _AFLOW_APL_REGISTER_ int l = _supercell->atomComesFrom(symOp, k, atomID, true); //CO20190218
                 testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
               } catch (aurostd::xerror& e) {
                 message << "Mapping problem ? <-> " << k << ".";
@@ -770,15 +770,15 @@ namespace apl {
 
   void DirectMethodPC::projectToCartesianDirections() {
     bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
-    string soliloquy="apl::DirectMethodPC::projectToCartesianDirections():"; //CO190218
-    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO190218
-      if(LDEBUG) {cerr << soliloquy << " looking at distorted atom[idistortion=" << i << "]" << std::endl;} //CO190218
+    string soliloquy="apl::DirectMethodPC::projectToCartesianDirections():"; //CO20190218
+    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
+      if(LDEBUG) {cerr << soliloquy << " looking at distorted atom[idistortion=" << i << "]" << std::endl;} //CO20190218
       // Construct transformation matrix A
       xmatrix<double> A(3, 3), U(3, 3);
       for (uint j = 0; j < 3; j++) {
         // Ensure it is unit length
         _uniqueDistortions[i][j] = _uniqueDistortions[i][j] / aurostd::modulus(_uniqueDistortions[i][j]);
-        if(LDEBUG){ //CO190218
+        if(LDEBUG){ //CO20190218
           cerr << soliloquy << " checking if uniqueDistortion[" << i << "][" << j << "] is unit length: ";
           cerr << "modulus(" << _uniqueDistortions[i][j] << ")=" << aurostd::modulus(_uniqueDistortions[i][j]) << std::endl;
         }
@@ -789,11 +789,11 @@ namespace apl {
         }
       }
       A = inverse(U);
-      //CO190116 - I believe U is an orthonormal matrix, as it defines a 3D axis
+      //CO20190116 - I believe U is an orthonormal matrix, as it defines a 3D axis
       //hence A = trasp(U) as well (faster)
       //keep for now
 
-      if(LDEBUG){ //CO190218
+      if(LDEBUG){ //CO20190218
         cerr << soliloquy << " distortion matrix U(distortion,direction):" << std::endl;
         cerr << U << std::endl;
         cerr << soliloquy << " inverse matrix A:" << std::endl;
@@ -801,19 +801,19 @@ namespace apl {
       }
 
       // Update unique distortion vectors
-      // CO190116 - using trasp(A) instead of A because _uniqueDistortions[i][0] is a vector, not a matrix (as m is below)
+      // CO20190116 - using trasp(A) instead of A because _uniqueDistortions[i][0] is a vector, not a matrix (as m is below)
       // we are really applying A * U == I,
       // so use A below (not trasp(A))
       _uniqueDistortions[i][0] = trasp(A) * _uniqueDistortions[i][0];
       _uniqueDistortions[i][1] = trasp(A) * _uniqueDistortions[i][1];
       _uniqueDistortions[i][2] = trasp(A) * _uniqueDistortions[i][2];
 
-      if(LDEBUG){ //CO190218
+      if(LDEBUG){ //CO20190218
         cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][0]=" << _uniqueDistortions[i][0] << std::endl;
         cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][1]=" << _uniqueDistortions[i][1] << std::endl;
         cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][2]=" << _uniqueDistortions[i][2] << std::endl;
-        //CO190116 - cerr << soliloquy << " testing: trasp(A) * U should give same as above: trasp(A) * U = " << std::endl;  //U ~ m below
-        //CO190116 - cerr << trasp(A) * U << std::endl;
+        //CO20190116 - cerr << soliloquy << " testing: trasp(A) * U should give same as above: trasp(A) * U = " << std::endl;  //U ~ m below
+        //CO20190116 - cerr << trasp(A) * U << std::endl;
         cerr << soliloquy << " testing: A * U should give same as above: A * U = " << std::endl;  //U ~ m below //DUH A = inverse(U), so A*U = I
         cerr << A * U << std::endl;
       }
@@ -821,18 +821,18 @@ namespace apl {
       // Update forces
       xmatrix<double> m(3, 3);
       for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
-        if(LDEBUG) {cerr << soliloquy << " looking at supercell atom[" << j << "]" << std::endl;} //CO190218
+        if(LDEBUG) {cerr << soliloquy << " looking at supercell atom[" << j << "]" << std::endl;} //CO20190218
         for (_AFLOW_APL_REGISTER_ int k = 0; k < 3; k++)
           for (_AFLOW_APL_REGISTER_ int l = 1; l <= 3; l++)
             m(k + 1, l) = _uniqueForces[i][k][j](l);
-        if(LDEBUG){ //CO190218
+        if(LDEBUG){ //CO20190218
           cerr << soliloquy << " BEFORE m = " << std::endl;
           cerr << m << std::endl;
         }
         // m = A * m * U; ??? I am not sure...
         m = A * m;
-        // m = trasp(A) * m;  //CO NEW, treat forces exactly as distortion //CO190116 - wrong, see above, trasp(A) is only for vectors
-        if(LDEBUG){ //CO190218
+        // m = trasp(A) * m;  //CO NEW, treat forces exactly as distortion //CO20190116 - wrong, see above, trasp(A) is only for vectors
+        if(LDEBUG){ //CO20190218
           cerr << soliloquy << " AFTER m = " << std::endl;
           cerr << m << std::endl;
         }
@@ -847,15 +847,15 @@ namespace apl {
 
   void DirectMethodPC::buildForceConstantMatrices() {
     bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
-    string soliloquy="apl::DirectMethodPC::buildForceConstantMatrices():"; //CO190218
+    string soliloquy="apl::DirectMethodPC::buildForceConstantMatrices():"; //CO20190218
     stringstream message;
     // Test of stupidity...
-    if (DISTORTION_INEQUIVONLY && !_supercell->getSupercellStructure().fgroup_calculated) { //CO190218
+    if (DISTORTION_INEQUIVONLY && !_supercell->getSupercellStructure().fgroup_calculated) { //CO20190218
       string message = "The factor group has not been calculated yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
     //CO - START
-    if (DISTORTION_INEQUIVONLY && _supercell->getEPS() == AUROSTD_NAN) { //CO190218
+    if (DISTORTION_INEQUIVONLY && _supercell->getEPS() == AUROSTD_NAN) { //CO20190218
       string message = "Need to define symmetry tolerance.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
     }
@@ -866,13 +866,13 @@ namespace apl {
       _forceConstantMatrices[i].clear();
     _forceConstantMatrices.clear();
 
-    //CO190116 - BIG BUG
+    //CO20190116 - BIG BUG
     //do NOT push_back() with forceConstantMatrices
     //Jahnatek assumed that iatoms structure was [0 1 2 3] [4 5 6] (in order)
     //therefore, pushing back meant keeping forceConstantMatrices in order of supercell atoms
     //this is not necessarily true, as the mappings could be out of order
     //therefore, we create the vector of the necessary dimensions, and put the row in the right place
-    //CO190131 UPDATE - this is NOT the only part of the code for which this dependency (iatoms sorted) exists
+    //CO20190131 UPDATE - this is NOT the only part of the code for which this dependency (iatoms sorted) exists
 
     for (_AFLOW_APL_REGISTER_ int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       _forceConstantMatrices.push_back(vector<xmatrix<double> >(0));
@@ -887,10 +887,10 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
 
     // We have a party. Let's fun with us...
-    //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO190218
-    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO190218
+    //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO20190218
+    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
       // Get the number of this atom in the whole list
-      int basedAtomID = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO190218
+      int basedAtomID = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
 
       // This is easy. We know everything. Just construct a set of matrices.
       xmatrix<double> m(3, 3, 1, 1);
@@ -907,47 +907,47 @@ namespace apl {
           //cout << i << " " << k << " " << j << " "; printXVector(_uniqueForces[i][k][j]);
         }
         //printXMatrix(m);
-        //row.push_back(m); //JAHNATEK ORIGINAL //CO190218
-        _forceConstantMatrices[basedAtomID][j] = m;  //CO NEW //CO190218
-        if(LDEBUG){ //CO190218
+        //row.push_back(m); //JAHNATEK ORIGINAL //CO20190218
+        _forceConstantMatrices[basedAtomID][j] = m;  //CO NEW //CO20190218
+        if(LDEBUG){ //CO20190218
           cerr << soliloquy << " adding m to forceConstantMatrices[" << basedAtomID << "][" << j << "]=" << std::endl;
           cerr << m << std::endl;
         }
       }
-      //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO190218
-      //row.clear();  //JAHNATEK ORIGINAL //CO190218
+      //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO20190218
+      //row.clear();  //JAHNATEK ORIGINAL //CO20190218
 
-      if(DISTORTION_INEQUIVONLY){ //CO190218
+      if(DISTORTION_INEQUIVONLY){ //CO20190218
         _sym_op symOp;  //CO
-        // Calculate rows for next equivalent atoms starting 1 (structure of iatoms)... //CO190218
-        for (int j = 1; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO190218
+        // Calculate rows for next equivalent atoms starting 1 (structure of iatoms)... //CO20190218
+        for (int j = 1; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO20190218
           try {
-            //CO190116 - we want to map the forces of the inequivalent atoms (for which we ran vasp) onto the equivalent ones
+            //CO20190116 - we want to map the forces of the inequivalent atoms (for which we ran vasp) onto the equivalent ones
             //hence, we need the FGROUP that takes us from the inequivalent atom to the equivalent
             //then, we need to find the atom which, upon application of that symop, becomes k (below)
-            //symOp = _supercell->getSymOpWhichMatchAtoms(basedAtomID, _supercell->getUniqueAtomID(i, j), _FGROUP_);  //CO NEW //CO190218
-            symOp = _supercell->getSymOpWhichMatchAtoms(_supercell->getUniqueAtomID(i, j), basedAtomID, _FGROUP_);  //JAHNATEK ORIGINAL //CO190218
+            //symOp = _supercell->getSymOpWhichMatchAtoms(basedAtomID, _supercell->getUniqueAtomID(i, j), _FGROUP_);  //CO NEW //CO20190218
+            symOp = _supercell->getSymOpWhichMatchAtoms(_supercell->getUniqueAtomID(i, j), basedAtomID, _FGROUP_);  //JAHNATEK ORIGINAL //CO20190218
             //const _sym_op& symOp = _supercell->getSymOpWhichMatchAtoms(_supercell->getUniqueAtomID(i,j),basedAtomID,_FGROUP_); //JAHNATEK ORIGINAL
             //cout << basedAtomID << " -> " << _supercell->getUniqueAtomID(i,j) << " " << symOp.str_type << " shift:"; printXVector(symOp.ftau);
             //printXVector(_supercell->getSupercellStructure().atoms[basedAtomID].fpos);
             //printXVector(_supercell->getSupercellStructure().atoms[_supercell->getUniqueAtomID(i,j)].fpos);
           } catch (aurostd::xerror& e) {
-            message << "Mapping problem " << _supercell->getUniqueAtomID(i, j) << " <-> " << basedAtomID << "?"; //CO190218
+            message << "Mapping problem " << _supercell->getUniqueAtomID(i, j) << " <-> " << basedAtomID << "?"; //CO20190218
             throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
           }
 
           for (_AFLOW_APL_REGISTER_ int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
             try {
-              //CO190116 - read atomComesFrom() as: applying symOp to l makes k
-              //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, _supercell->getUniqueAtomID(i, j));  //CO NEW //CO190218
-              _AFLOW_APL_REGISTER_ int l = _supercell->atomGoesTo(symOp, k, _supercell->getUniqueAtomID(i, j)); //JAHNATEK ORIGINAL //CO190218
+              //CO20190116 - read atomComesFrom() as: applying symOp to l makes k
+              //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, _supercell->getUniqueAtomID(i, j));  //CO NEW //CO20190218
+              _AFLOW_APL_REGISTER_ int l = _supercell->atomGoesTo(symOp, k, _supercell->getUniqueAtomID(i, j)); //JAHNATEK ORIGINAL //CO20190218
               //cout << "MAP " << k << " <-> " << l << std::endl;
-              //row.push_back(inverse(symOp.Uc) * _forceConstantMatrices[basedAtomID][l] * symOp.Uc); //JAHNATEK ORIGINAL //CO190218
-              //row.push_back(symOp.Uc * _forceConstantMatrices[basedAtomID][l] * inverse(symOp.Uc)); //CO NEW  //JAHNATEK ORIGINAL //CO190218
-              //m = symOp.Uc * _forceConstantMatrices[basedAtomID][l] * inverse(symOp.Uc);  //CO NEW //CO190218
-              m = inverse(symOp.Uc) * _forceConstantMatrices[basedAtomID][l] * symOp.Uc;  //JAHNATEK ORIGINAL //CO190218
-              _forceConstantMatrices[_supercell->getUniqueAtomID(i, j)][k] = m;  //CO NEW //CO190218
-              if(LDEBUG){ //CO190218
+              //row.push_back(inverse(symOp.Uc) * _forceConstantMatrices[basedAtomID][l] * symOp.Uc); //JAHNATEK ORIGINAL //CO20190218
+              //row.push_back(symOp.Uc * _forceConstantMatrices[basedAtomID][l] * inverse(symOp.Uc)); //CO NEW  //JAHNATEK ORIGINAL //CO20190218
+              //m = symOp.Uc * _forceConstantMatrices[basedAtomID][l] * inverse(symOp.Uc);  //CO NEW //CO20190218
+              m = inverse(symOp.Uc) * _forceConstantMatrices[basedAtomID][l] * symOp.Uc;  //JAHNATEK ORIGINAL //CO20190218
+              _forceConstantMatrices[_supercell->getUniqueAtomID(i, j)][k] = m;  //CO NEW //CO20190218
+              if(LDEBUG){ //CO20190218
                 cerr << soliloquy << " adding m to forceConstantMatrices[" << _supercell->getUniqueAtomID(i, j) << "][" << k << "]=" << std::endl;
                 cerr << m << std::endl;
               }
@@ -956,11 +956,11 @@ namespace apl {
               throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Mapping failed.");
             }
           }
-          //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO190218
-          //row.clear();  //JAHNATEK ORIGINAL //CO190218
+          //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO20190218
+          //row.clear();  //JAHNATEK ORIGINAL //CO20190218
         }
       }
-      //row.clear();  //JAHNATEK ORIGINAL //CO190218
+      //row.clear();  //JAHNATEK ORIGINAL //CO20190218
     }
 
     // Test of correctness
@@ -996,10 +996,10 @@ namespace apl {
     if (_isPolarMaterial) writePolar(outfile);
     outfile << "</apl>" << std::endl;
 
-    aurostd::stringstream2file(outfile, filename); //ME181226
-    if (!aurostd::FileExist(filename)) { //ME181226
+    aurostd::stringstream2file(outfile, filename); //ME20181226
+    if (!aurostd::FileExist(filename)) { //ME20181226
       string function = "ForceConstantCalculator::hibernate()";
-      string message = "Cannot open output file " + filename + "."; //ME181226
+      string message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }
@@ -1057,7 +1057,7 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
 
   void DirectMethodPC::writeDYNMAT() {
-    string filename = aurostd::CleanFileName(_aflowFlags->Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME181226
+    string filename = aurostd::CleanFileName(_aflowFlags->Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
     string message = "Writing forces into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
 
