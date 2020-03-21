@@ -621,8 +621,8 @@ namespace pflow {
 // Function GetXrayScattFactor
 // **************************************************************************
 double GetXrayScattFactor(const string& _name,double lambda,bool clean) {
-  string name=_name;  //CO190322
-  if(clean){name=KBIN::VASP_PseudoPotential_CleanName(name);} //CO190322
+  string name=_name;  //CO20190322
+  if(clean){name=KBIN::VASP_PseudoPotential_CleanName(name);} //CO20190322
   if(lambda) {;} // phony just to keep lambda busy
   // Does not use lambda for now.
   double scatt_fact=0.0;
@@ -1005,7 +1005,7 @@ namespace pflow {
         if(b.atoms.at(iat).name.size()) {
           b.atoms.at(iat).name_is_given=TRUE;
           b.atoms.at(iat).CleanName();
-          // DX 9/21/17 - Need to keep spin info b.atoms.at(iat).CleanSpin();
+          // DX20170921 - Need to keep spin info b.atoms.at(iat).CleanSpin();
         }
       }
       return b;
@@ -1015,7 +1015,7 @@ namespace pflow {
         b.atoms.at(iat).name=in.at(iat);
         b.atoms.at(iat).name_is_given=TRUE;
         b.atoms.at(iat).CleanName();
-        // DX 9/21/17 - Need to keep spin info b.atoms.at(iat).CleanSpin();
+        // DX20170921 - Need to keep spin info b.atoms.at(iat).CleanSpin();
       }
       return b;
     }
