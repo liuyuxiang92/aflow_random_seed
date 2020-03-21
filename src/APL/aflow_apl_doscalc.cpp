@@ -590,9 +590,9 @@ namespace apl {
     deque<deque<deque<deque<double> > > > vDOS;
     // ME190625
     if (_projections.size() > 0) {
-      vDOS.resize(xdos.number_atoms + 1, deque<deque<deque<double> > >(_projections.size() + 1, deque<deque<double> >(1)));
+      vDOS.resize(xdos.number_atoms + 1, deque<deque<deque<double> > >(_projections.size() + 1, deque<deque<double> >(1, deque<double>(xdos.number_energies, 0.0))));
     } else {
-      vDOS.resize(1, deque<deque<deque<double> > >(1, deque<deque<double> >(1)));
+      vDOS.resize(1, deque<deque<deque<double> > >(1, deque<deque<double> >(1, deque<double>(xdos.number_energies, 0.0))));
     }
 
     vDOS[0][0][0] = aurostd::vector2deque<double>(_dos);
@@ -602,6 +602,11 @@ namespace apl {
       for (uint at = 0; at < xdos.number_atoms; at++) {
         for (uint p = 0; p < _projections.size(); p++) {
           vDOS[at + 1][p + 1][0] = aurostd::vector2deque(_projectedDOS[at][p]);
+          // ME20200321 - Add to totals for consistency
+          for (uint e = 0; e < xdos.number_energies; e++) {
+            vDOS[0][p + 1][0][e] += vDOS[at + 1][p + 1][0][e];
+            vDOS[at + 1][0][0][e] += vDOS[at + 1][p + 1][0][e];
+          }
         }
       }
     }
