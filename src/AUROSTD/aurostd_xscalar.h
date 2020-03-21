@@ -63,9 +63,9 @@
 #define meV2K                   (11.604505)                     // 1meV=11.604505 K
 #define atom2mol                6.0221408E23                    //CO 180329
 #define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO 180329
-#define hartree2eV              27.2113862459                   // ME200206
+#define hartree2eV              27.2113862459                   // ME20200206
 
-//ME200107 - (A)APL conversion factors
+//ME20200107 - (A)APL conversion factors
 #define THz2Hz                        1E12
 #define Hz2THz                        1/THz2Hz
 #define au2Hz                         aurostd::sqrt(E_ELECTRON*1E20/AMU2KILOGRAM)  // eV/(A^2 amu) -> Hz

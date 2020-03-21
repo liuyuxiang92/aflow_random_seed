@@ -349,7 +349,7 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, std::cout);
   }
 
-  // ME200109
+  // ME20200109
   //calculateLittleGroups/////////////////////////////////////////////////////
   // Calculates little/small groups for each irreducible q-point.
   void QMesh::calculateLittleGroups() {
@@ -511,7 +511,7 @@ namespace apl {
     return _isGammaCentered;
   }
 
-  // ME200109
+  // ME20200109
   bool QMesh::littleGroupsCalculated() const {
     return _littleGroupsCalculated;
   }

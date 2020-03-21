@@ -15,7 +15,7 @@
 
 using namespace std;
 
-static const xcomplex<double> iONE(0.0, 1.0);  // ME200116
+static const xcomplex<double> iONE(0.0, 1.0);  // ME20200116
 static const string _APL_SUPERCELL_MODULE_ = "SUPERCELL";  // for the logger
 
 namespace apl {
@@ -27,7 +27,7 @@ namespace apl {
   }
 
   //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  // ME200102 - Refactored
+  // ME20200102 - Refactored
   Supercell::Supercell(const xstructure& _xstr, ofstream& mf, string directory) {  //CO181226
     free();
     messageFile = &mf;
@@ -71,7 +71,7 @@ namespace apl {
     _maxShellRadius.clear();
     _maxShellRadius = that._maxShellRadius;
     _isConstructed = that._isConstructed;  //CO
-    phase_vectors = that.phase_vectors;  // ME200116
+    phase_vectors = that.phase_vectors;  // ME20200116
   }
 
   // Destructor
@@ -184,12 +184,12 @@ namespace apl {
     //_sym_eps = AUROSTD_NAN; //CO, same for _sc and _pc (DO NOT RESET)
     _maxShellRadius.clear();
     _maxShellID = -1;
-    phase_vectors.clear();  // ME200116
+    phase_vectors.clear();  // ME20200116
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-// ME200220 - moved to xatom
+// ME20200220 - moved to xatom
 //[OBSOLETE]  //CO - START
 //[OBSOLETE]  void Supercell::LightCopy(const xstructure& a, xstructure& b) {
 //[OBSOLETE]#if COPY_XSTRUCTURE_FULL
@@ -482,7 +482,7 @@ namespace apl {
     LightCopy(_scStructure, _scStructure_light);
     //_scStructure_atoms_original = _scStructure.atoms;
 
-    // ME200116 - calculate phase vectors; significantly speeds up post-processing
+    // ME20200116 - calculate phase vectors; significantly speeds up post-processing
     calculatePhaseVectors();
 
     if(LDEBUG){
@@ -857,7 +857,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME200116 - rebase to primitive
+  // ME20200116 - rebase to primitive
   // Does not capture rotated primitive cells yet, but does work for AFLOW's
   // standard conventional unit cells.
   void Supercell::projectToPrimitive() {
@@ -938,7 +938,7 @@ namespace apl {
     }
   }
 
-  // ME200116 - rebase to original
+  // ME20200116 - rebase to original
   void Supercell::projectToOriginal() {
     vector<int> pc2sc, sc2pc;
     if (getMaps(_inStructure_original, _inStructure_original, _scStructure, pc2sc, sc2pc)) {
@@ -956,7 +956,7 @@ namespace apl {
     }
   }
 
-  // ME200116
+  // ME20200116
   // Recalculates _sc2pcMap and _pc2scMap based on the projected cell (pcell)
   // using the original cell (ocell).
   // Returns true when mapping is successful.
@@ -1039,7 +1039,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME200102 - do not build the supercell here, just retrieve dimensions.
+  // ME20200102 - do not build the supercell here, just retrieve dimensions.
   xvector<int> Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
     // What is the dimension of the supercell ? OK, user wants to have MAX_NN_SHELLS
     // shell occupied for each nonequvalent atom. Try to find it...
@@ -1132,7 +1132,7 @@ namespace apl {
     }
 
     // Build structure
-    //build(i, j, k, VERBOSE);  // OBSOLETE ME200102
+    //build(i, j, k, VERBOSE);  // OBSOLETE ME20200102
 
     // Print info about shells
     for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
@@ -1141,12 +1141,12 @@ namespace apl {
     }
     sh.clear();
 
-     // ME200102 - BEGIN
+     // ME20200102 - BEGIN
     //[OBSOLETE] return i * j * k * _inStructure.atoms.size();
     xvector<int> dims(3);
     dims[1] = i; dims[2] = j; dims[3] = k;
     return dims;
-    // ME200102 - END
+    // ME20200102 - END
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -1293,7 +1293,7 @@ namespace apl {
     return _inStructure;
   }
 
-  // ME200117
+  // ME20200117
   const xstructure& Supercell::getOriginalStructure() const {
     return _inStructure_original;
   }
@@ -2165,7 +2165,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
   
-  // ME200116 - Calculate the real space vectors for the phases once.
+  // ME20200116 - Calculate the real space vectors for the phases once.
   // Calculating them once for all atoms is very quick and significantly speeds
   // up dynamical matrix calculations.
   void Supercell::calculatePhaseVectors() {
@@ -2219,7 +2219,7 @@ namespace apl {
     return calcShellPhaseFactor(atomID, centerID, qpoint, phase, i, placeholder, false);
   }
 
-  // ME200116 - rewritten to accommodate new phase vectors
+  // ME20200116 - rewritten to accommodate new phase vectors
   bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
                                        xcomplex<double>& phase, int& multiplicity,
                                        xvector<xcomplex<double> >& derivative, bool calc_derivative) {

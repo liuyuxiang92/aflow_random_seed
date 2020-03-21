@@ -125,7 +125,7 @@ namespace apl {
 
     // For VASP, use the standardized aflow.in creator
     if(xInput.AFLOW_MODE_VASP) {
-      xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;  // ME200213
+      xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;  // ME20200213
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_BORN", false);
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_LR", true);
       _kbinFlags->KBIN_MPI_AUTOTUNE = false;
@@ -137,7 +137,7 @@ namespace apl {
     }
     // For AIMS, use the old method until we have AVASP_populateXAIMS
     if(xInput.AFLOW_MODE_AIMS) {
-      string runname = _AFLOW_APL_DFPT_DIRECTORY_NAME_;  // ME200213
+      string runname = _AFLOW_APL_DFPT_DIRECTORY_NAME_;  // ME20200213
       xInput.setDirectory(_xInput->getDirectory() + "/" + runname);
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
@@ -180,7 +180,7 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // ME200211
+  // ME20200211
   bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";

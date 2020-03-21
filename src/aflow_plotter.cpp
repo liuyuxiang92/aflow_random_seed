@@ -85,7 +85,7 @@ namespace plotter {
     scheme = xopt.getattachedscheme("PLOTTER::PRINT");
     if (!scheme.empty()) plotoptions.push_attached("IMAGE_FORMAT", aurostd::tolower(scheme));
 
-    // ME200313 - Get user-defined output file name
+    // ME20200313 - Get user-defined output file name
     string outfile = xopt.getattachedscheme("PLOTTER::OUTFILE");
     // Remove extension from user-defined file name (extensions will be handled later)
     if (!outfile.empty()) {
@@ -257,7 +257,7 @@ namespace plotter {
     string soliloquy="plotter::setFileName():";
     if(LDEBUG){cerr << soliloquy << " filename_in=" << filename << endl;}
     if (filename.empty()) {
-      filename = plotoptions.getattachedscheme("FILE_NAME_USER");  // ME200313 - user-defined output file
+      filename = plotoptions.getattachedscheme("FILE_NAME_USER");  // ME20200313 - user-defined output file
       if (filename.empty()) {
         string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
         if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
@@ -1852,7 +1852,7 @@ namespace plotter {
   //getEnergyConversionFactor/////////////////////////////////////////////////
   // Returns the factor to convert eV into the desired energy/frequency unit.
   // Supported units are meV, THz, Hz, and reciprocal cm (CM-1/RCM).
-  // ME200121 - Replaced with constants from xscalar.
+  // ME20200121 - Replaced with constants from xscalar.
   double getEnergyConversionFactor(const string& unit) {
     if (unit == "MEV") return 1000.0;
     if (unit == "THZ") return (eV2Hz * Hz2THz);

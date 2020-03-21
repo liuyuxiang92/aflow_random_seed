@@ -2567,7 +2567,7 @@ void xstructure::copy(const xstructure& bstr) {
   // ----------------------------------
 }
 
-// ME200220
+// ME20200220
 void LightCopy(const xstructure& a, xstructure& b) {
   b.clear();
   stringstream POSCAR;
@@ -13526,7 +13526,7 @@ void CalculateSymmetryFactorGroup(xstructure& str) {
 
 // DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
-// ME200114 - made capitalization more consistent with other functions
+// ME20200114 - made capitalization more consistent with other functions
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupKLattice
 // ***************************************************************************
@@ -13572,7 +13572,7 @@ void CalculateSymmetryPointGroupKLattice(xstructure& str) {
   CalculateSymmetryPointGroupKLattice(str,FALSE,cout,FALSE);
 }
 
-// ME200114 - added missing function
+// ME20200114 - added missing function
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupKCrystal
 // ***************************************************************************
@@ -13612,7 +13612,7 @@ void CalculateSymmetryPointGroupKCrystal(xstructure& str) {
   CalculateSymmetryPointGroupKCrystal(str,FALSE,cout,FALSE);
 }
 
-// ME200129
+// ME20200129
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupKPatterson
 // ***************************************************************************
@@ -14013,7 +14013,7 @@ xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
     cerr << soliloquy << " a.origin=" << a.origin << endl; //CO20190520
     cerr << soliloquy << " rm=" << endl;cerr << rm << endl; // ME20200204
   }
-  if (aurostd::isidentity(rm)) return a;  // ME200204 - no need to go through all the motions for identity matrix
+  if (aurostd::isidentity(rm)) return a;  // ME20200204 - no need to go through all the motions for identity matrix
   // Get R_0(p) for all cartesian positions.
   xstructure b(a);
   xmatrix<double> nlattice(3,3);

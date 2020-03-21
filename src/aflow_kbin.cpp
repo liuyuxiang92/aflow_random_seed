@@ -2143,7 +2143,7 @@ namespace KBIN {
 // KBIN::XClean
 // *******************************************************************************************
 
-// ME200219 - based on CO's code in old PhononCalculator
+// ME20200219 - based on CO's code in old PhononCalculator
 namespace KBIN {
   int get_NCPUS() {
     _kflags kflags;

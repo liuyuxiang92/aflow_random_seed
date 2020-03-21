@@ -167,7 +167,7 @@ namespace apl {
     if (xinp.AFLOW_MODE_VASP){
       if(aurostd::EFileExist(dir + string("vasprun.xml.static")) ||
           aurostd::EFileExist(dir + string("vasprun.xml")) ||
-          aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME200203 - Added qmvasp file
+          aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME20200203 - Added qmvasp file
         return true;
       }
     }

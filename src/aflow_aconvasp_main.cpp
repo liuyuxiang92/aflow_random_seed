@@ -860,7 +860,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE]  vpflow.flag("PLATON",aurostd::args2flag(argv,cmds,"--platon") && argv.at(1)=="--platon");
   vpflow.args2addattachedscheme(argv,cmds,"PLATON","--platon=",""); 
 
-  // ME200313 - Added guards for when plots commands are used without = sign
+  // ME20200313 - Added guards for when plots commands are used without = sign
   if (aurostd::args2flag(argv, cmds, "--plotband|--plotbands")) {
     vpflow.flag("PLOT_BAND", true);
     vpflow.addattachedscheme("PLOT_BAND", "./", true);
@@ -6005,7 +6005,7 @@ namespace pflow {
     return sym_done;
   }
 
-  // ME200224
+  // ME20200224
   bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format){
     _aflags aflags;
     aflags.Directory = directory;

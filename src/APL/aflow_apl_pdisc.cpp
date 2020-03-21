@@ -172,7 +172,7 @@ namespace apl {
   void PhononDispersionCalculator::calculateInOneThread(int startIndex, int endIndex) {
     //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
     for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      // ME200206 - get direction for q-points near Gamma for non-analytical correction
+      // ME20200206 - get direction for q-points near Gamma for non-analytical correction
       // or the discontinuity due to LO-TO splitting is not accurately captured.
       if (_pc->isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
         int npts = _pb.getDensity() + 1;
@@ -244,7 +244,7 @@ namespace apl {
 
 #else
 
-    // ME200206 - use calculateInOneThread so changes only need to be made in one place
+    // ME20200206 - use calculateInOneThread so changes only need to be made in one place
     //[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
     //[OBSOLETE]  _logger.updateProgressBar(iqp, _qpoints.size());
     //[OBSOLETE]  _freqs.push_back(_pc->getFrequency(_qpoints[iqp], _frequencyFormat));

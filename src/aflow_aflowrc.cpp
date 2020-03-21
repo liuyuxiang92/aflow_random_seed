@@ -509,8 +509,8 @@
 #define         DEFAULT_APL_DOSPOINTS                         XHOST.adefault.getattachedutype<int>("DEFAULT_APL_DOSPOINTS")
 #define AFLOWRC_DEFAULT_APL_DOSSMEAR                          0.0
 #define         DEFAULT_APL_DOSSMEAR                          XHOST.adefault.getattachedutype<double>("DEFAULT_APL_DOSSMEAR")
-#define AFLOWRC_DEFAULT_APL_DOS_PROJECT                       FALSE  // ME200213
-#define         DEFAULT_APL_DOS_PROJECT                       XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DOS_PROJECT")  // ME200213
+#define AFLOWRC_DEFAULT_APL_DOS_PROJECT                       FALSE  // ME20200213
+#define         DEFAULT_APL_DOS_PROJECT                       XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DOS_PROJECT")  // ME20200213
 #define AFLOWRC_DEFAULT_APL_TP                                TRUE
 #define         DEFAULT_APL_TP                                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_TP")
 #define AFLOWRC_DEFAULT_APL_TPT                               string("0:2000:10")
@@ -554,7 +554,7 @@
 #define         DEFAULT_AAPL_CUT_RAD                          XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_RAD")
 #define AFLOWRC_DEFAULT_AAPL_CUT_SHELL                        string("6")  // ME20190301  // ME20190408  // ME20191029
 #define         DEFAULT_AAPL_CUT_SHELL                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_SHELL")
-#define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("21x21x21")  // ME200110 - 21x21x21 more than enough for tetrahedron method
+#define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("21x21x21")  // ME20200110 - 21x21x21 more than enough for tetrahedron method
 #define         DEFAULT_AAPL_THERMALGRID                      XHOST.adefault.getattachedscheme("DEFAULT_AAPL_THERMALGRID")
 #define AFLOWRC_DEFAULT_AAPL_TCT                              string("50:550:50")
 #define         DEFAULT_AAPL_TCT                              XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCT")
@@ -1251,7 +1251,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DOSMESH",AFLOWRC_DEFAULT_APL_DOSMESH);
     aflowrc::load_default("DEFAULT_APL_DOSPOINTS",AFLOWRC_DEFAULT_APL_DOSPOINTS);
     aflowrc::load_default("DEFAULT_APL_DOSSMEAR",AFLOWRC_DEFAULT_APL_DOSSMEAR);
-    aflowrc::load_default("DEFAULT_APL_DOS_PROJECT",AFLOWRC_DEFAULT_APL_DOS_PROJECT);  // ME200213
+    aflowrc::load_default("DEFAULT_APL_DOS_PROJECT",AFLOWRC_DEFAULT_APL_DOS_PROJECT);  // ME20200213
     aflowrc::load_default("DEFAULT_APL_TP",AFLOWRC_DEFAULT_APL_TP);
     aflowrc::load_default("DEFAULT_APL_TPT",AFLOWRC_DEFAULT_APL_TPT);
 

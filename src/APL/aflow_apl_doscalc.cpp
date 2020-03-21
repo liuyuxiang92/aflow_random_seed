@@ -175,7 +175,7 @@ namespace apl {
 
     // Calculate frequencies
     // ME190624 - added eigenvectors for projected DOS
-    // ME200206 - use calculateInOneThread so changes only need to be made in one place
+    // ME20200206 - use calculateInOneThread so changes only need to be made in one place
     //[[OBSOLETE]xmatrix<xcomplex<double> > xmtrx(_pc->getNumberOfBranches(), _pc->getNumberOfBranches());
     //[[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
     //[[OBSOLETE]  _freqs.push_back(_pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
@@ -260,7 +260,7 @@ namespace apl {
     gauss.clear();
   }
 
-  // ME200203 - DOS can now be calculated within any frequency range
+  // ME20200203 - DOS can now be calculated within any frequency range
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calc(int USER_DOS_NPOINTS) {
@@ -325,7 +325,7 @@ namespace apl {
 
     for (int k = 0; k < USER_DOS_NPOINTS; k++) {
       _dos[k] /= (sum * _stepDOS);
-      //_idos[k] /= (sum * _stepDOS);  // ME190614  // OBSOLETE - ME200228 - not necessary for iDOS
+      //_idos[k] /= (sum * _stepDOS);  // ME190614  // OBSOLETE - ME20200228 - not necessary for iDOS
     }
   }
 
@@ -357,7 +357,7 @@ namespace apl {
 
   // ME190614 - added integrated DOS
   // ME190625 - rearranged and added projected DOS
-  // ME200213 - added atom-projected DOS
+  // ME20200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
     string message = "Calculating phonon DOS using the linear tetrahedron method.";
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
@@ -442,7 +442,7 @@ namespace apl {
         double fbin, dos, part;
         int br = ibranch - _freqs[0].lrows;
         for (int k = kstart; k <= kstop; k++) {
-          // ME200203 - Use bins to accommodate different frequency range
+          // ME20200203 - Use bins to accommodate different frequency range
           fbin = _bins[k]; // _minFreq + k * _stepDOS + _halfStepDOS;
           dos = 0.0;
           if ((f[0] <= fbin) && (fbin <= f[1])) {
@@ -464,7 +464,7 @@ namespace apl {
           for (uint p = 0; p < nproj; p++) {
             for (uint at = 0; at < natoms; at++) {
               part = 0.0;
-              // ME200320 - due to the big nesting level, loop unrolling
+              // ME20200320 - due to the big nesting level, loop unrolling
               // leads to a huge speed-up (x2 or more)
               //[OBSOLETE] for (int icorner = 0; icorner < 4; icorner++) {
               //[OBSOLETE]   part += parts[corners[icorner]][br][p][at];
@@ -577,7 +577,7 @@ namespace apl {
     double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
     double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
     double conv = factorTHz2Raw * factorRaw2meV/1000;
-    // ME200203 - use _bins instead of _minFreq in case the DOS was calculated
+    // ME20200203 - use _bins instead of _minFreq in case the DOS was calculated
     // using different frequency ranges
     xdos.energy_max = _bins.back() * conv;
     xdos.energy_min = _bins[0] * conv;
@@ -612,7 +612,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME200108 - added const
+  // ME20200108 - added const
   const vector<double>& DOSCalculator::getBins() const {
     return _bins;
   }
@@ -621,7 +621,7 @@ namespace apl {
     return _dos;
   }
 
-  // ME200210
+  // ME20200210
   const vector<double>& DOSCalculator::getIDOS() const {
     return _idos;
   }

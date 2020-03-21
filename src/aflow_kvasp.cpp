@@ -2895,7 +2895,7 @@ namespace KBIN {
               //2. SYMPREC
               //3. KMAX
               //4. ISYM=0
-              // ME200304 - Do not fix when SYM=OFF
+              // ME20200304 - Do not fix when SYM=OFF
               if (!vflags.KBIN_VASP_FORCE_OPTION_SYM.option) xfixed.flag("KKSYM", true);
               if(apply_new_kksym_fix==true && xwarning.flag("KKSYM")){
                 if(xfixed.flag("KKSYM_ISYM")==false){xfixed.flag("KKSYM",FALSE);} //CO20181226 last step, and xwarning.flag("KKSYM") can be ignored if xfixed.flag("KKSYM_ISYM") applied
@@ -3544,7 +3544,7 @@ namespace KBIN {
     if(qmwrite) {
       string FileNameXVASP=xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT;
       stringstream FileXVASPout;
-      // ME200304 - do not overwrite prior runs
+      // ME20200304 - do not overwrite prior runs
       string FileNameXVASPfull = "";
       if (aurostd::EFileExist(FileNameXVASP, FileNameXVASPfull)) aurostd::UncompressFile(FileNameXVASPfull);
       if(aurostd::FileExist(FileNameXVASP)) { //RECYCLE PREVIOUS STUFF
@@ -4044,7 +4044,7 @@ namespace KBIN {
   // ME20190219 - getVASPVersionString
   // Retrives the VASP version of a binary file.
   // Taken from old APL/apl_hroutines
-  // ME200114 - Return empty string instead of throwing xerror when the binary
+  // ME20200114 - Return empty string instead of throwing xerror when the binary
   // is not found or not a valid VASP binary. Throwing errors would kill aflow
   // when aflow.in files are moved between machines and the VASP binary files
   // have different names. This is not desirable when VASP does not need to be

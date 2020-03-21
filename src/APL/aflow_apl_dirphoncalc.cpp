@@ -899,7 +899,7 @@ namespace apl {
           double distortionLength = aurostd::modulus(DISTORTION_MAGNITUDE * _uniqueDistortions[i][k]);
           // FCM element = -F/d, but we will omit minus, because next force transformations are better
           // done without it, and in construction of dyn. matrix we will add it to the sum
-          // ME200212 - we store _forceConstantMatrices in a human-readable file, so they should
+          // ME20200212 - we store _forceConstantMatrices in a human-readable file, so they should
           // represent the actual force constants, not an AFLOW-customized construct
           m(k + 1, 1) = _uniqueForces[i][k][j](1) / distortionLength;
           m(k + 1, 2) = _uniqueForces[i][k][j](2) / distortionLength;
@@ -969,7 +969,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
 
-    // ME200211 - force constants are -F/d, not F/d
+    // ME20200211 - force constants are -F/d, not F/d
     for (uint i = 0; i < _forceConstantMatrices.size(); i++) {
       for (uint j = 0; j < _forceConstantMatrices.size(); j++) {
         _forceConstantMatrices[i][j] = -_forceConstantMatrices[i][j];

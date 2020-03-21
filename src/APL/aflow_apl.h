@@ -41,7 +41,7 @@ extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 // ***************************************************************************
 // "aplexcept.h"
 // in aurostd.h // [OBSOLETE]
-// ME200222 - APLStageBreak obsolete
+// ME20200222 - APLStageBreak obsolete
 //[OBSOLETE] #include <stdexcept>
 //[OBSOLETE] namespace apl {
 //[OBSOLETE]   //
@@ -603,12 +603,12 @@ namespace apl {
       int _maxShellID;
       vector<double> _maxShellRadius;
       bool _isConstructed;
-      vector<vector<vector<xvector<double> > > > phase_vectors;  // ME200116
+      vector<vector<vector<xvector<double> > > > phase_vectors;  // ME20200116
 
     private:
       void calculateWholeSymmetry(xstructure&);
       xstructure calculatePrimitiveStructure() const;
-      bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME200117
+      bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME20200117
       void free();
       void copy(const Supercell&);
 
@@ -623,7 +623,7 @@ namespace apl {
       string getDirectory() const;
       void initialize(const xstructure&);  // ME191225
       void clearSupercell();
-      //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME200220
+      //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME20200220
       bool isConstructed();
       void reset();
       xvector<int> determineSupercellDimensions(const aurostd::xoption&);  // ME191225
@@ -633,9 +633,9 @@ namespace apl {
       void trimStructure(int, const xvector<double>&,
           const xvector<double>&, const xvector<double>&,
           bool = true);
-      void projectToPrimitive();  // ME200117
-      void projectToOriginal();  // ME200117
-      xvector<int> buildSuitableForShell(int, bool, bool VERBOSE);  // ME200102
+      void projectToPrimitive();  // ME20200117
+      void projectToOriginal();  // ME20200117
+      xvector<int> buildSuitableForShell(int, bool, bool VERBOSE);  // ME20200102
       void setupShellRestrictions(int);
       // ME190715 BEGIN - added const to getter functions so they can be used with const Supercell &
       bool isShellRestricted() const;
@@ -656,7 +656,7 @@ namespace apl {
       const xstructure& getPrimitiveStructure() const;
       const xstructure& getInputStructure() const;
       const xstructure& getInputStructureLight() const;
-      const xstructure& getOriginalStructure() const;  // ME200117
+      const xstructure& getOriginalStructure() const;  // ME20200117
       int atomGoesTo(const _sym_op&, int, int, bool = TRUE); //CO190218
       int atomComesFrom(const _sym_op&, int, int, bool = TRUE); //CO190218
       const _sym_op& getSymOpWhichMatchAtoms(int, int, int);
@@ -667,7 +667,7 @@ namespace apl {
       xvector<double> getCPositionItsNearestImage(int, int);
       bool compareFPositions(xvector<double>&, xvector<double>&);          //CO
       bool compareFPositions(xvector<double>&, xvector<double>&, double);  //CO
-      void calculatePhaseVectors();  // ME200117
+      void calculatePhaseVectors();  // ME20200117
       bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
       bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
           int&, xvector<xcomplex<double> >&, bool);  // ME 180828
@@ -725,10 +725,10 @@ namespace apl {
 // "phoncalc.h"
 #define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  // ME190108
 #define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) // ME190108
-//#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME190108  // OBSOLETE ME200213 - the calculation does not use force fields
-//#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME190108  // OBSOLETE ME200213
-#define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  // ME200213
-#define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME200213
+//#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME190108  // OBSOLETE ME20200213 - the calculation does not use force fields
+//#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME190108  // OBSOLETE ME20200213
+#define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  // ME20200213
+#define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME20200213
 
 namespace apl {
   bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME190108
@@ -736,7 +736,7 @@ namespace apl {
   bool filesExistPhonons(_xinput&);
   bool outfileFoundAnywherePhonons(vector<_xinput>&);
   bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, bool=false);  // ME191029
-  bool readForcesFromDirectory(_xinput&);  // ME200219
+  bool readForcesFromDirectory(_xinput&);  // ME20200219
   void subtractZeroStateForces(vector<_xinput>&, bool);
   void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME190114
 }
@@ -773,7 +773,7 @@ namespace apl {
       void free();
       void copy(const ForceConstantCalculator&);
 
-      virtual bool calculateForceConstants() {return false;} // ME200211
+      virtual bool calculateForceConstants() {return false;} // ME20200211
 
       void symmetrizeForceConstantMatrices();
       void correctSumRules();
@@ -791,7 +791,7 @@ namespace apl {
 
       virtual bool runVASPCalculations(bool) {return false;};  // ME191029
       bool runVASPCalculationsBE(_xinput&, uint);
-      void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME200218
+      void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME20200218
 
       bool run();  // ME191029
       virtual void hibernate(const string&) {};
@@ -865,7 +865,7 @@ namespace apl {
       }  //CO
       void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO190108
-      bool calculateForceConstants();  // ME200211
+      bool calculateForceConstants();  // ME20200211
 
       void hibernate(const string&);
       void writeFORCES();
@@ -932,7 +932,7 @@ namespace apl {
       string _EOS_KSCHEME;
       string _EOS_STATIC_KSCHEME;
       int _EOS_STATIC_KPPRA;
-      string _PSTRESS;  // ME200220
+      string _PSTRESS;  // ME20200220
 
     public:
       QHA_AFLOWIN_CREATOR(Supercell& sc, _xinput& xinput,
@@ -1010,8 +1010,8 @@ namespace apl {
     private:
       void free();
       void copy(const LinearResponsePC&);
-      bool runVASPCalculationsDFPT(_xinput&);  // ME190113  // ME200213 - changed name
-      bool readForceConstantsFromVasprun(_xinput&);  // ME200211
+      bool runVASPCalculationsDFPT(_xinput&);  // ME190113  // ME20200213 - changed name
+      bool readForceConstantsFromVasprun(_xinput&);  // ME20200211
 
     public:
       LinearResponsePC();
@@ -1022,7 +1022,7 @@ namespace apl {
       void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
 
       bool runVASPCalculations(bool);  // ME191029
-      bool calculateForceConstants();  // ME200211
+      bool calculateForceConstants();  // ME20200211
 
       void hibernate(const string&);
   };
@@ -1100,7 +1100,7 @@ namespace apl {
       string getDirectory() const;
       int getNCPUs() const;
       ofstream& getOutputStream();
-      bool isPolarMaterial() const;  // ME200206
+      bool isPolarMaterial() const;  // ME20200206
       const vector<vector<xmatrix<double> > >& getHarmonicForceConstants() const;
       const vector<vector<double> >& getAnharmonicForceConstants(int) const;
       const vector<vector<int> >& getClusters(int) const;
@@ -1120,17 +1120,17 @@ namespace apl {
       xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
           xmatrix<xcomplex<double> >&, vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
       xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&);
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&);  // ME200206
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&);  // ME20200206
       xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
           vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
-      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  // ME200206
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  // ME20200206
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME190624
-      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME200206
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  // ME20200206
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
           vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
       xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME200206
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20200206
       double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
   };
 }  // namespace apl
@@ -1367,7 +1367,7 @@ namespace apl {
       ofstream& getOutputStream();
 
       void makeIrreducible();
-      void calculateLittleGroups();  // ME200109
+      void calculateLittleGroups();  // ME20200109
       void writeQpoints(string, bool=true);
       void writeIrredQpoints(string, bool=true);
 
@@ -1398,8 +1398,8 @@ namespace apl {
       const vector<int>& getWeights() const;
       bool isReduced() const;
       bool isGammaCentered() const;
-      bool littleGroupsCalculated() const;  // ME200109
-      const vector<int>& getLittleGroup(int) const;  // ME200109
+      bool littleGroupsCalculated() const;  // ME20200109
+      const vector<int>& getLittleGroup(int) const;  // ME20200109
 
     private:
       void free();
@@ -1531,16 +1531,16 @@ namespace apl {
       // ME190423 - END
       void calc(int);
       void calc(int, double);
-      void calc(int, double, double, double);  // ME200203
+      void calc(int, double, double, double);  // ME20200203
       void writePDOS(const string&);
       void writePDOS(string, string);  //[PINKU]
       xDOSCAR createDOSCAR();  // ME190614
       void writePHDOSCAR(const string&);  // ME190614
       // Interface IDOSCalculator
-      const std::vector<double>& getBins() const;  // ME200108 - added const
-      const std::vector<double>& getDOS() const;   // ME200108 - added const
-      const std::vector<double>& getIDOS() const;  // ME200210
-      bool hasNegativeFrequencies() const;  // ME200108 - added const
+      const std::vector<double>& getBins() const;  // ME20200108 - added const
+      const std::vector<double>& getDOS() const;   // ME20200108 - added const
+      const std::vector<double>& getIDOS() const;  // ME20200210
+      bool hasNegativeFrequencies() const;  // ME20200108 - added const
       string _system;  // ME190614
     private:
       void free();

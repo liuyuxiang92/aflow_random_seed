@@ -1075,7 +1075,7 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       xvasp.aopts.flag("AFLOWIN_FLAG::KPOINTS", TRUE); //CO20181226
       xvasp.aopts.push_attached("AFLOWIN_FLAG::KPOINTS", scheme);
     }
-    // ME200205 - set to implicit
+    // ME20200205 - set to implicit
     xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT", false);
     xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", false);
     xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
@@ -1149,7 +1149,7 @@ void setStatic(_xvasp& xvasp) {
 // ME20181102 - Do not convert unit cell
 void setPreserveUnitCell(_xvasp& xvasp) {
   xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL", false);
-  // ME200307 - Safety, in case the flag get re-activated somewhere else
+  // ME20200307 - Safety, in case the flag get re-activated somewhere else
   xvasp.aopts.pop_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL");
   xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL", "PRES");
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_PRESERVE", true);
