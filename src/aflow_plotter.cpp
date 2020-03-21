@@ -56,8 +56,8 @@ namespace plotter {
       plotoptions.push_attached("DIRECTORY", tokens[0]);
     }
 
-    plotoptions.flag("DATATYPE",xopt.flag("ATOMS")); //CO191010 - which table to look at, "atoms-projected" by default
-    plotoptions.flag("PLOT_ALL_ATOMS",xopt.flag("PLOT_ALL_ATOMS")); //CO191010
+    plotoptions.flag("DATATYPE",xopt.flag("ATOMS")); //CO20191010 - which table to look at, "atoms-projected" by default
+    plotoptions.flag("PLOT_ALL_ATOMS",xopt.flag("PLOT_ALL_ATOMS")); //CO20191010
 
     // Need to shift options if partial DOS are plotted
     uint shift = 0;
@@ -192,7 +192,7 @@ namespace plotter {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
     string soliloquy="plotter::savePlotGNUPLOT():";
     string directory = plotoptions.getattachedscheme("DIRECTORY");
-    if(directory.empty()){directory=aurostd::getPWD();}  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")//CO191004
+    if(directory.empty()){directory=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
     if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
     string filename = plotoptions.getattachedscheme("FILE_NAME");
     if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
@@ -200,7 +200,7 @@ namespace plotter {
     // PDF is default since we use pdflatex to compile
     string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
     if (format.empty()) format = "pdf";
-    string current_dir = aurostd::getPWD();  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+    string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
     // Create temp directory
     string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
     chdir(tmp.c_str());
@@ -285,7 +285,7 @@ namespace plotter {
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, "_");
       if (tokens.size() == 3) {
-        title = pflow::prettyPrintCompound(tokens[0], no_vrt, true, latex_ft) + " (ICSD \\#" + tokens[2];  //_none_ //_latex_ //CO190629
+        title = pflow::prettyPrintCompound(tokens[0], no_vrt, true, latex_ft) + " (ICSD \\#" + tokens[2];  //_none_ //_latex_ //CO20190629
         string lattice = plotoptions.getattachedscheme("LATTICE");
         if (lattice.empty()) title += ")";
         else title += ", " + lattice + ")";
@@ -307,7 +307,7 @@ namespace plotter {
           vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
           vector<double> composition = getCompositionFromANRLPrototype(proto);
           proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-          title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_ //CO190629
+          title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_ //CO20190629
         } else {
           if (tokens.size() == 3) proto += "." + tokens[2];
           vector<string> comp;
@@ -318,13 +318,13 @@ namespace plotter {
             proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
             vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
             vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
-            title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO190629
+            title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO20190629
           } else {  // Title not in prototype format
             return aurostd::fixStringLatex(default_title, false, false);
           }
         }
       } else {
-        return aurostd::fixStringLatex(default_title, false, false); //CO191110
+        return aurostd::fixStringLatex(default_title, false, false); //CO20191110
       }
       string lattice = plotoptions.getattachedscheme("LATTICE");
       if (lattice.empty()) title += ")";
@@ -336,8 +336,8 @@ namespace plotter {
     // Code only gets here if the title is AFLOW-formatted
     string set = plotoptions.getattachedscheme("DATASET");
     if (aurostd::string2utype<int>(set) > 0) {
-      title += " " + aurostd::fixStringLatex(plotoptions.getattachedscheme("SETLABEL"),false,false); //CO191110
-      title += " " + aurostd::fixStringLatex(plotoptions.getattachedscheme("DATALABEL"),false,false);  //CO191110
+      title += " " + aurostd::fixStringLatex(plotoptions.getattachedscheme("SETLABEL"),false,false); //CO20191110
+      title += " " + aurostd::fixStringLatex(plotoptions.getattachedscheme("DATALABEL"),false,false);  //CO20191110
       title += " (" + set + ")";
     }
     return title;
@@ -392,8 +392,8 @@ namespace plotter {
   //formatDefaultTitlePOCC////////////////////////////////////////////////////
   // Converts a POCC-formatted title into a plot title. It currently only
   // works if the POCC string consists only of P-designations.
-  string formatDefaultTitlePOCC(const xoption& plotoptions) {return formatDefaultTitlePOCC_191004(plotoptions);} //CO191110
-  string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version //CO191110
+  string formatDefaultTitlePOCC(const xoption& plotoptions) {return formatDefaultTitlePOCC_191004(plotoptions);} //CO20191110
+  string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="plotter::formatDefaultTitlePOCC():";
     stringstream message;
@@ -464,7 +464,7 @@ namespace plotter {
         break;
       }
       catch(aurostd::xerror& excpt){
-        xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+        xstr.clear(); //DX20191220 - uppercase to lowercase clear
         t=elements_prototype_str.find('.',t+1);
         continue;
       }
@@ -486,7 +486,7 @@ namespace plotter {
 
     string new_title="";
     string clean_specie="";
-    int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO181226
+    int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
     for(uint ispecies=0;ispecies<xstr.species.size();ispecies++){
       clean_specie=KBIN::VASP_PseudoPotential_CleanName(xstr.species[ispecies]);
       if(LDEBUG){cerr << soliloquy << " species[ispecies=" << ispecies << "]=" << clean_specie << endl;}
@@ -547,7 +547,7 @@ namespace plotter {
     // strings.
     bool broken = false;
     vector<double> composition = getCompositionFromPoccString(pocc, broken);
-    if(LDEBUG){  //CO191110
+    if(LDEBUG){  //CO20191110
       cerr << soliloquy << " broken=" << broken << endl;
       if(!broken){
         cerr << soliloquy << " composition=";
@@ -593,11 +593,11 @@ namespace plotter {
         generic = true;
         broken = true;
       } else {
-        compound = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft);  //_none_ //_latex_ //CO190629
+        compound = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft);  //_none_ //_latex_ //CO20190629
       }
     }
     if (generic) {  // Broken or unsupported string, so use a very generic title
-      return aurostd::fixStringLatex(default_title, false, false); //CO191110
+      return aurostd::fixStringLatex(default_title, false, false); //CO20191110
       //if (!broken) proto += ".POCC:" + pocc;  // Only add POCC string if not broken
     }
     proto = aurostd::fixStringLatex(proto, false, false);
@@ -725,14 +725,14 @@ namespace plotter {
     savePlotGNUPLOT(plotoptions, out);
   }
 
-  void PLOT_DOS(xoption& plotoptions, const xDOSCAR& xdos) { //CO191110
+  void PLOT_DOS(xoption& plotoptions, const xDOSCAR& xdos) { //CO20191110
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
     stringstream out;
     PLOT_DOS(plotoptions,out,xdos);
     savePlotGNUPLOT(plotoptions, out);
   }
 
-  void PLOT_DOS(xoption& plotoptions, stringstream& out) { //CO191110
+  void PLOT_DOS(xoption& plotoptions, stringstream& out) { //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="plotter::PLOT_DOS():";
 
@@ -745,7 +745,7 @@ namespace plotter {
     savePlotGNUPLOT(plotoptions, out);
   }
 
-  void patchDefaultTitleAFLOWIN(xoption& plotoptions) { //CO191110
+  void patchDefaultTitleAFLOWIN(xoption& plotoptions) { //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="plotter::PLOT_DOS():";
 
@@ -779,7 +779,7 @@ namespace plotter {
     }
 
     plotoptions.push_attached("DEFAULT_TITLE", xdos.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  //CO191110 - MARCO, check out and let me know if we should apply everywhere
+    patchDefaultTitleAFLOWIN(plotoptions);  //CO20191110 - MARCO, check out and let me know if we should apply everywhere
     setFileName(plotoptions);
     setTitle(plotoptions);
 
@@ -812,13 +812,13 @@ namespace plotter {
     PLOT_PDOS(plotoptions, out);
   }
 
-  void PLOT_PDOS(xoption& plotoptions, const xDOSCAR& xdos) {  //CO191110
+  void PLOT_PDOS(xoption& plotoptions, const xDOSCAR& xdos) {  //CO20191110
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
     stringstream out;
     PLOT_PDOS(plotoptions,out,xdos);
   }
 
-  void PLOT_PDOS(xoption& plotoptions, stringstream& out) {  //CO191110
+  void PLOT_PDOS(xoption& plotoptions, stringstream& out) {  //CO20191110
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
@@ -828,9 +828,9 @@ namespace plotter {
 
   void PLOT_PDOS(xoption& plotoptions, stringstream& out, const xDOSCAR& xdos) {
     string set = plotoptions.getattachedscheme("DATASET");
-    string datatype=plotoptions.getattachedscheme("DATATYPE");  //CO191010 - which table to look at, "atoms-projected" by default
+    string datatype=plotoptions.getattachedscheme("DATATYPE");  //CO20191010 - which table to look at, "atoms-projected" by default
     string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
-    bool plot_all_atoms = plotoptions.flag("PLOT_ALL_ATOMS"); //CO191010
+    bool plot_all_atoms = plotoptions.flag("PLOT_ALL_ATOMS"); //CO20191010
     int pdos = -1;
     if (!set.empty()) pdos = aurostd::string2utype<int>(set);
     plotoptions.push_attached("SETLABEL", "PDOS");
@@ -838,8 +838,8 @@ namespace plotter {
       PLOT_DOS(plotoptions,xdos);
       if (outformat == "GNUPLOT") savePlotGNUPLOT(plotoptions, out);
     } else {
-      xstructure xstr = getStructureWithNames(plotoptions,xdos.carstring); //getStructureWithNames(plotoptions);  //CO191010
-      if(datatype=="SPECIES"){  //CO191010 - plot "species-projected"
+      xstructure xstr = getStructureWithNames(plotoptions,xdos.carstring); //getStructureWithNames(plotoptions);  //CO20191010
+      if(datatype=="SPECIES"){  //CO20191010 - plot "species-projected"
         if (pdos == -1) {  // Plot partial DOS of all species
           uint nspecies=xstr.num_each_type.size();
           for (uint isp = 0; isp < nspecies; isp++) {
@@ -859,10 +859,10 @@ namespace plotter {
           PLOT_DOS(plotoptions, out, xdos);
           if (outformat == "GNUPLOT") savePlotGNUPLOT(plotoptions, out);
         }
-      }else{  //CO191010 - plot "atoms-projected"
+      }else{  //CO20191010 - plot "atoms-projected"
         if (pdos == -1) {  // Plot partial DOS of all inequivalent atoms
           uint natoms=0;
-          if (plot_all_atoms) {natoms = xstr.atoms.size();} //CO191010 
+          if (plot_all_atoms) {natoms = xstr.atoms.size();} //CO20191010 
           else {
             pflow::PerformFullSymmetry(xstr);
             natoms = xstr.iatoms.size();
@@ -1007,7 +1007,7 @@ namespace plotter {
     if (carstring == "PHON")
     { //CO200106 - patching for auto-indenting
       aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);
-    } else if(carstring == "POCC") { //CO191110
+    } else if(carstring == "POCC") { //CO20191110
       //[do NOT load in PARTCAR, we need an example ARUN POSCAR, they all have the same num_each_type]aurostd::efile2stringstream(directory+"/PARTCAR", poscar);
       string arun = plotoptions.getattachedscheme("ARUN_DIRECTORY");  //relative path
       aflowlib::vaspfile2stringstream(directory+"/"+arun, "POSCAR", poscar);
@@ -1015,7 +1015,7 @@ namespace plotter {
       aflowlib::vaspfile2stringstream(directory, "POSCAR", poscar);
     }
     xstructure xstr(poscar);
-    if (carstring != "POCC" && xstr.is_vasp4_poscar_format) {  //PARTCAR has species and it is NOT vasp4 format  //CO191110
+    if (carstring != "POCC" && xstr.is_vasp4_poscar_format) {  //PARTCAR has species and it is NOT vasp4 format  //CO20191110
       // No special case for phonons needed because PHPOSCAR is always in VASP5 format
       vector<string> atoms = KBIN::ExtractAtomicSpecies(directory);
       for (uint i = 0; i < atoms.size(); i++) {
@@ -1114,9 +1114,9 @@ namespace plotter {
     int pdos = aurostd::string2utype<int>(plotoptions.getattachedscheme("DATASET"));
     vector<string> labels;
     labels.push_back("total");  // There is always a total DOS
-    if(pdos>0){labels.front()+=" "+plotoptions.getattachedscheme("DATALABEL");} //CO191010
+    if(pdos>0){labels.front()+=" "+plotoptions.getattachedscheme("DATALABEL");} //CO20191010
     string projection = plotoptions.getattachedscheme("PROJECTION");
-    string datatype=plotoptions.getattachedscheme("DATATYPE");  //CO191010 - which table to look at, "atoms-projected" by default
+    string datatype=plotoptions.getattachedscheme("DATATYPE");  //CO20191010 - which table to look at, "atoms-projected" by default
     if(LDEBUG){
       cerr << soliloquy << " projection=" << projection << endl;
       cerr << soliloquy << " datatype=" << datatype << endl;
@@ -1125,12 +1125,12 @@ namespace plotter {
       // If the DOSCAR is lm-resolved, the orbital projection is the sum of all individual
       // orbitals with the same quantum number
       int norbitals=0;
-      if(datatype=="SPECIES"){  //CO191010 - plot "species-projected"
+      if(datatype=="SPECIES"){  //CO20191010 - plot "species-projected"
         xstructure xstr = getStructureWithNames(plotoptions,xdos.carstring);
         deque<deque<deque<deque<double> > > > vDOS_species=xdos.GetVDOSSpecies(xstr);
         norbitals=vDOS_species.front().size();
         dos=vDOS_species[pdos];
-      }else{  //CO191010 - plot "atoms-projected"
+      }else{  //CO20191010 - plot "atoms-projected"
         if (xdos.lmResolved) norbitals = (int) std::sqrt(xdos.vDOS[pdos].size());  // size is either 17 or 10
         else norbitals = (int) xdos.vDOS[pdos].size() - 1;
         if (xdos.lmResolved) {
@@ -1154,7 +1154,7 @@ namespace plotter {
         }
       }
       if(LDEBUG){cerr << soliloquy << " norbitals=" << norbitals << endl;}
-      //CO191010 - do labels last
+      //CO20191010 - do labels last
       for (int i = 0; i < norbitals; i++) {
         labels.push_back("$" + ORBITALS[i] + "$");
       }
@@ -1169,10 +1169,10 @@ namespace plotter {
         labels.push_back("$" + LM_ORBITALS[i-1] + "$");
       }
       dos = xdos.vDOS[pdos];
-    } else if (projection == "ATOMS") { //CO191004 - "ATOMS" is really "IATOMS"
+    } else if (projection == "ATOMS") { //CO20191004 - "ATOMS" is really "IATOMS"
       dos.push_back(xdos.vDOS[0][0]);
       xstructure xstr = getStructureWithNames(plotoptions,xdos.carstring);
-      if (plotoptions.flag("PLOT_ALL_ATOMS")) { //CO191010 - special mode - ALL atoms
+      if (plotoptions.flag("PLOT_ALL_ATOMS")) { //CO20191010 - special mode - ALL atoms
         if (xdos.vDOS.size() > 1) {
           for (uint i = 0; i < xstr.atoms.size(); i++) {
             dos.push_back(xdos.vDOS[i + 1][0]);
@@ -1198,7 +1198,7 @@ namespace plotter {
           dos.push_back(xdos.vDOS[pdos][0]);
         }
       }
-    } else if (projection == "SPECIES") {  //CO191110
+    } else if (projection == "SPECIES") {  //CO20191110
       xstructure xstr = getStructureWithNames(plotoptions,xdos.carstring);
       deque<deque<deque<deque<double> > > > vDOS_species=xdos.GetVDOSSpecies(xstr);
       if (pdos == 0) {
@@ -1506,15 +1506,15 @@ namespace plotter {
       cerr << soliloquy << " x=" << x << endl;
     }
 
-    //CO191110 - add 30% for every orbital bigger than d to account for larger key
+    //CO20191110 - add 30% for every orbital bigger than d to account for larger key
     if(ndos>4){x+=3*(ndos-4);}
     if(LDEBUG){cerr << soliloquy << " x(new1)=" << x << endl;}
 
-    //[CO191110 OBSOLETE]if ((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0)) {
-    //[CO191110 OBSOLETE]  dosmax = x * std::pow(10.0, l); 
-    //[CO191110 OBSOLETE]} else {
-    //[CO191110 OBSOLETE]  dosmax = (x + 1) * std::pow(10.0, l);
-    //[CO191110 OBSOLETE]}
+    //[CO20191110 OBSOLETE]if ((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0)) {
+    //[CO20191110 OBSOLETE]  dosmax = x * std::pow(10.0, l); 
+    //[CO20191110 OBSOLETE]} else {
+    //[CO20191110 OBSOLETE]  dosmax = (x + 1) * std::pow(10.0, l);
+    //[CO20191110 OBSOLETE]}
 
     // The DOS axis of the DOS plot should be divided into four tics,
     // which gives a nice grid density. However, this often makes the
@@ -1682,7 +1682,7 @@ namespace plotter {
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
-    xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO191110
+    xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO20191110
 
     plotoptions.push_attached("DEFAULT_TITLE", xdos.title);
     setFileName(plotoptions);
@@ -1722,11 +1722,11 @@ namespace plotter {
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xEIGENVAL xeigen;
-    xeigen.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHEIGENVAL_FILE); //CO191110
+    xeigen.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHEIGENVAL_FILE); //CO20191110
     xKPOINTS xkpts;
-    xkpts.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHKPOINTS_FILE); //CO191110
+    xkpts.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHKPOINTS_FILE); //CO20191110
     stringstream poscar;
-    aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);  //CO191110
+    aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);  //CO20191110
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
@@ -1769,13 +1769,13 @@ namespace plotter {
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
-    xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO191110
+    xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO20191110
     xEIGENVAL xeigen;
-    xeigen.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHEIGENVAL_FILE); //CO191110
+    xeigen.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHEIGENVAL_FILE); //CO20191110
     xKPOINTS xkpts;
-    xkpts.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHKPOINTS_FILE); //CO191110
+    xkpts.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHKPOINTS_FILE); //CO20191110
     stringstream poscar;
-    aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);  //CO191110
+    aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);  //CO20191110
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);

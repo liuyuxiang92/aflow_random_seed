@@ -322,8 +322,8 @@ bool KBIN_MATLAB_Directory(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags
   FileNameAFLOWIN=aflags.Directory+"/"+_AFLOWIN_;
   FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in);
   FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
-  //DX 20190125 [OBSOLETE] - need to remove null bytes : AflowIn="";char c; while (FileAFLOWIN.get(c)) AflowIn+=c;               // READ _AFLOWIN_ and put into AflowIn
-  AflowIn="";char c; while (FileAFLOWIN.get(c)) if(c!='\0'){ AflowIn+=c; }              // READ _AFLOWIN_ and put into AflowIn //DX 20190125 remove null bytes
+  //DX20190125 [OBSOLETE] - need to remove null bytes : AflowIn="";char c; while (FileAFLOWIN.get(c)) AflowIn+=c;               // READ _AFLOWIN_ and put into AflowIn
+  AflowIn="";char c; while (FileAFLOWIN.get(c)) if(c!='\0'){ AflowIn+=c; }              // READ _AFLOWIN_ and put into AflowIn //DX20190125 remove null bytes
   FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
   if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
     aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
