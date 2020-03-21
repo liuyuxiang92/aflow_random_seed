@@ -239,7 +239,7 @@ namespace plotter {
     if (filename.empty()) {
       string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
       if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
-      // ME200228 - Remove ANRL parameters
+      // ME20200228 - Remove ANRL parameters
       string::size_type t = default_title.find(":ANRL=");
       if (t != string::npos) {
         default_title = default_title.substr(0, t);
@@ -304,7 +304,7 @@ namespace plotter {
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, ".");
-      // ME200228 - title may contain ANRL parameters
+      // ME20200228 - title may contain ANRL parameters
       if ((tokens.size() > 2) && aurostd::substring2bool(tokens[2], "ANRL")) {
         string::size_type t = tokens[2].find_first_of(":");
         if (t != string::npos) {
@@ -935,7 +935,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  // ME200217
+    patchDefaultTitleAFLOWIN(plotoptions);  // ME20200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
@@ -989,7 +989,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  // ME200217
+    patchDefaultTitleAFLOWIN(plotoptions);  // ME20200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
