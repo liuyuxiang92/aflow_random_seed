@@ -52,14 +52,14 @@ string space_group;                     // http://periodictable.com      // DU 2
 uint space_group_number;                // http://periodictable.com      // DU 2019/05/17
 
 
-double Pearson_coefficient;             // Pearson mass deviation coefficient // ME181020
+double Pearson_coefficient;             // Pearson mass deviation coefficient // ME20181020
 xvector<double> lattice_constant;       // (pm) http://periodictable.com      // DU 2019/05/17
 xvector<double> lattice_angle;          // (rad) http://periodictable.com      // DU 2019/05/17
 string phase;                           //      http://periodictable.com      // DU 2019/05/17
 double radius;                      // Saxena (nm)
 double radius_PT;                       // (pm)       http://periodictable.com      // DU 2019/05/17
 double radius_covalent_PT;              // (pm)       http://periodictable.com      // DU 2019/05/17
-double radius_covalent;             // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) // DX and CO - 9/4/17
+double radius_covalent;             // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) // DX and CO - 20170904
 double radius_VanDerWaals_PT;           // (pm)       http://periodictable.com      // DU 2019/05/17
 double radii_Ghosh08;                    // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      // DU 2019/05/17
 double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      // DU 2019/05/17
@@ -286,12 +286,12 @@ std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from
 std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
 std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE// DX and CO - 9/4/17 
+std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE// DX and CO - 20170904 
 std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
 std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
 std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
 std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   // ME181020 Pearson mass deviation coefficient
+std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   // ME20181020 Pearson mass deviation coefficient
 
   */
   
@@ -981,7 +981,7 @@ xelement::xelement(uint Z) {
     HHIP=500;
     HHIR=500;
     xray_scatt=6.019;
-   // C//DX and CO -9/4/17 radius_covalent uses sp3 hybridization (most common)
+   // C//DX and CO -20170904 radius_covalent uses sp3 hybridization (most common)
   }
  // [AFLOW]STOP=Carbon
  // ********************************************************************************************************************************************************
@@ -2469,7 +2469,7 @@ xelement::xelement(uint Z) {
     HHIP=1600;
     HHIR=1800;
     xray_scatt=24.46;
-   //xray_scatt=24.3589; Mn JUNKAI CHANGED VALENCE// DX and CO- 9/4/17 radius_covalent[i] uses high spin configuration (most frequent)
+   //xray_scatt=24.3589; Mn JUNKAI CHANGED VALENCE// DX and CO- 20170904 radius_covalent[i] uses high spin configuration (most frequent)
   }
  // [AFLOW]STOP=Manganese
  // ********************************************************************************************************************************************************
@@ -2547,7 +2547,7 @@ xelement::xelement(uint Z) {
     HHIP=2400;
     HHIR=1400;
     xray_scatt=24.85;
-   //xray_scatt=24.6830; Fe JUNKAI CHANGED VALENCE// DX and CO - 9/4/17 radius_covalent[i] uses high spin configuration (most frequent)
+   //xray_scatt=24.6830; Fe JUNKAI CHANGED VALENCE// DX and CO - 20170904 radius_covalent[i] uses high spin configuration (most frequent)
   }
  // [AFLOW]STOP=Iron
  // ********************************************************************************************************************************************************
@@ -2625,7 +2625,7 @@ xelement::xelement(uint Z) {
     HHIP=3100;
     HHIR=2700;
     xray_scatt=24.59;
-   //Co JUNKAI CHANGED VALENCE// DX and CO - 9/4/17 radius_covalent[i] uses low spin configuration (most frequent)
+   //Co JUNKAI CHANGED VALENCE// DX and CO - 20170904 radius_covalent[i] uses low spin configuration (most frequent)
   }
  // [AFLOW]STOP=Cobalt
  // ********************************************************************************************************************************************************
