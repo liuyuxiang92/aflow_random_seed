@@ -1174,7 +1174,7 @@ _xvasp::_xvasp() {
   AVASP_arun_runname = "";  // ME 181019
   aplopts.clear();  // ME 181025
   aaplopts.clear();  // ME 181025
-  qhaopts.clear(); // AS 2020-03-02
+  qhaopts.clear(); // AS20200302
   AVASP_dirbase="";
   AVASP_libbase="";
   AVASP_label="";
