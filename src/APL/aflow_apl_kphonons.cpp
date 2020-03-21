@@ -7,15 +7,15 @@
 #include "../aflow.h"
 #include "aflow_apl.h"
 
-#define _ASTROPT_APL_OLD_ string("[AFLOW_PHONONS]") //CO 170601, ensure backwards compatibility (we ALWAYS support LEGACY)
-#define _ASTROPT_APL_ string("[AFLOW_APL]") //CO 170601
-#define _ASTROPT_QHA_ string("[AFLOW_QHA]") //CO 170601
-#define _ASTROPT_AAPL_ string("[AFLOW_AAPL]") //CO 170601
+#define _ASTROPT_APL_OLD_ string("[AFLOW_PHONONS]") //CO20170601, ensure backwards compatibility (we ALWAYS support LEGACY)
+#define _ASTROPT_APL_ string("[AFLOW_APL]") //CO20170601
+#define _ASTROPT_QHA_ string("[AFLOW_QHA]") //CO20170601
+#define _ASTROPT_AAPL_ string("[AFLOW_AAPL]") //CO20170601
 //temporary directory for storing QHA files
 #define _TMPDIR_ string("ARUN.APL.QH.TMP")  //[PINKU]
-#define _STROPT_ string("[VASP_FORCE_OPTION]") //ME181226
+#define _STROPT_ string("[VASP_FORCE_OPTION]") //ME20181226
 
-//CO181226
+//CO20181226
 #define COMPILE_SLIM
 
 bool _WITHIN_DUKE_ = false;
@@ -30,11 +30,11 @@ using std::auto_ptr;
 
 static const string _ANHARMONIC_IFCS_FILE_[2] = {"anharmonicIFCs_3rd.xml", "anharmonicIFCs_4th.xml"};
 static const string _CLUSTER_SET_FILE_[2] = {"clusterSet_3rd.xml", "clusterSet_4th.xml"};
-static const int _NUM_RELAX_ = 2; //ME181226
-static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME181226  // ME190125
+static const int _NUM_RELAX_ = 2; //ME20181226
+static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME20181226  // ME20190125
 
 namespace apl {
-  // ME190119
+  // ME20190119
   // Old apl::tokenize is essentially just aurostd::string2tokens
   void tokenize(const string& strin, vector<string>& tokens, const string& del) {
     aurostd::string2tokens(strin, tokens, del);
@@ -42,8 +42,8 @@ namespace apl {
 }
 
 namespace KBIN {
-  // ME 181107 - Relax structure with PREC=PHONONS before running APL
-  // ME 200102 - Make k-point grid commensurate with supercell size
+  // ME20181107 - Relax structure with PREC=PHONONS before running APL
+  // ME20200102 - Make k-point grid commensurate with supercell size
   bool relaxStructureAPL_VASP(int start_relax,
       const string& AflowIn,
       aurostd::xoption supercell_opts,  // ME20200102
@@ -132,21 +132,21 @@ namespace KBIN {
     // Update structure - do not set xvasp.str = str_fin or all other
     // information (species, PPs) will be deleted!
     stringstream xstr;
-    string filename = "CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(_NUM_RELAX_);  // ME190308
+    string filename = "CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(_NUM_RELAX_);  // ME20190308
     if (!aurostd::FileExist(filename)) return false;
     aurostd::file2stringstream(filename, xstr);
     xstructure str_fin(xstr, IOVASP_AUTO);
     // Restore species and PP information
-    str_fin.species = xvasp.str.species; // ME190109
-    str_fin.species_pp = xvasp.str.species_pp; // ME190109
-    str_fin.species_pp_type = xvasp.str.species_pp_type; // ME190109
-    str_fin.species_pp_version = xvasp.str.species_pp_version; // ME190109
-    str_fin.species_pp_ZVAL = xvasp.str.species_pp_ZVAL; // ME190109
-    str_fin.species_pp_vLDAU = xvasp.str.species_pp_vLDAU; // ME190109
+    str_fin.species = xvasp.str.species; // ME20190109
+    str_fin.species_pp = xvasp.str.species_pp; // ME20190109
+    str_fin.species_pp_type = xvasp.str.species_pp_type; // ME20190109
+    str_fin.species_pp_version = xvasp.str.species_pp_version; // ME20190109
+    str_fin.species_pp_ZVAL = xvasp.str.species_pp_ZVAL; // ME20190109
+    str_fin.species_pp_vLDAU = xvasp.str.species_pp_vLDAU; // ME20190109
 
-    xvasp.str = str_fin; // ME190109
-    if(LDEBUG){std::cout << xvasp.str << std::endl;} // ME190308
-    pflow::fixEmptyAtomNames(xvasp.str,true);  // ME190308
+    xvasp.str = str_fin; // ME20190109
+    if(LDEBUG){std::cout << xvasp.str << std::endl;} // ME20190308
+    pflow::fixEmptyAtomNames(xvasp.str,true);  // ME20190308
 
     // Safeguard for when CONVERT is set in the aflow.in file
     // CONVERT_UNIT_CELL may shift the origin, so not doing it here
@@ -155,7 +155,7 @@ namespace KBIN {
     // ME20200102 - should not be necessary anymore when the state is saved,
     // but it's good to convert it anyway to get "nicer" lattice vectors
     if (!vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") &&
-        !vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme.empty()) { // ME190109
+        !vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme.empty()) { // ME20190109
       xvasp.str.Standard_Lattice_primitive = false;
       xvasp.str.Standard_Lattice_conventional = false;
       VASP_Convert_Unit_Cell(xvasp, vflags, aflags, fileMessage, aus);
@@ -243,7 +243,7 @@ namespace KBIN {
     /////////////////////////////////////////////////////////////////////////////
 
     xinput.xvasp.AVASP_arun = true;
-    string function = "KBIN::RunPhonons_APL()";  // ME191029
+    string function = "KBIN::RunPhonons_APL()";  // ME20191029
     // Test
     //if (!(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL)) return; //PN180705
     if (!(kflags.KBIN_PHONONS_CALCULATION_APL ||
@@ -253,7 +253,7 @@ namespace KBIN {
           kflags.KBIN_PHONONS_CALCULATION_AAPL)) return; //PN180705
 
     //we make certain automatic fixes if we're within our domain, otherwise issue warning/error
-    // ME 190109 - OBSOLETE because this doesn't make any sense. The automatic fix that is applied is
+    // ME20190109 - OBSOLETE because this doesn't make any sense. The automatic fix that is applied is
     // the VASP version, which can be done anywhere. Moreover, the hostname becomes the name of the node
     //  whenever a job is sent to the queue.
     //  ::_WITHIN_DUKE_ = (aurostd::substring2bool(XHOST.hostname, "nietzsche") || aurostd::substring2bool(XHOST.hostname, "aflowlib") || aurostd::substring2bool(XHOST.hostname, "qrats") || aurostd::substring2bool(XHOST.hostname, "habana") || aurostd::substring2bool(XHOST.hostname, "quser"));
@@ -284,10 +284,10 @@ namespace KBIN {
     apl::Logger logger(messageFile, aflags);
     //logger.setModuleName("PHONONS");  //will rename later
 
-    string _ASTROPT_; //CO 170601
+    string _ASTROPT_; //CO20170601
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
-      logger.setModuleName("AAPL");  //CO 170601
-      _ASTROPT_ = _ASTROPT_AAPL_;    //CO 170601
+      logger.setModuleName("AAPL");  //CO20170601
+      _ASTROPT_ = _ASTROPT_AAPL_;    //CO20170601
     } else if (kflags.KBIN_PHONONS_CALCULATION_QHA || 
         kflags.KBIN_PHONONS_CALCULATION_QHA_A || 
         kflags.KBIN_PHONONS_CALCULATION_QHA_B || 
@@ -300,11 +300,11 @@ namespace KBIN {
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_A ||
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_B ||
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_C) { //PN180705
-      logger.setModuleName("QHA");  //CO 170601
-      _ASTROPT_ = _ASTROPT_QHA_;    //CO 170601
+      logger.setModuleName("QHA");  //CO20170601
+      _ASTROPT_ = _ASTROPT_QHA_;    //CO20170601
     } else {
-      logger.setModuleName("APL");  //CO 170601
-      _ASTROPT_ = _ASTROPT_APL_;    //CO 170601
+      logger.setModuleName("APL");  //CO20170601
+      _ASTROPT_ = _ASTROPT_APL_;    //CO20170601
     }
 
     logger << "RUNNING..." << apl::endl;
@@ -315,49 +315,49 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    // ME 181019 - Overwrite defaults for CHGCAR, WAVECAR, etc. Only write
+    // ME20181019 - Overwrite defaults for CHGCAR, WAVECAR, etc. Only write
     // these files if the user explicitly sets these flags. Otherwise, APL will
     // use too much disk space.
     if (xinput.AFLOW_MODE_VASP) {
       xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.options2entry(AflowIn,_STROPT_+"BADER=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_BADER",xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry && DEFAULT_VASP_FORCE_OPTION_BADER) {
-        logger << "Switching OFF BADER for APL calculations (default: OFF)." << apl::endl; //CO181226 - default OFF
+        logger << "Switching OFF BADER for APL calculations (default: OFF)." << apl::endl; //CO20181226 - default OFF
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.options2entry(AflowIn,_STROPT_+"CHGCAR=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_CHGCAR",xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.isentry && DEFAULT_VASP_FORCE_OPTION_CHGCAR) {
-        logger << "Switching OFF CHGCAR for APL calculations (default: OFF)." << apl::endl;  //CO181226 - default OFF
+        logger << "Switching OFF CHGCAR for APL calculations (default: OFF)." << apl::endl;  //CO20181226 - default OFF
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.options2entry(AflowIn,_STROPT_+"ELF=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_ELF",xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry && DEFAULT_VASP_FORCE_OPTION_ELF) {
-        logger << "Switching OFF ELF for APL calculations (default: OFF)." << apl::endl; //CO181226 - default OFF
+        logger << "Switching OFF ELF for APL calculations (default: OFF)." << apl::endl; //CO20181226 - default OFF
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.options2entry(AflowIn,_STROPT_+"WAVECAR=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_WAVECAR",xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.isentry && DEFAULT_VASP_FORCE_OPTION_WAVECAR) {
-        logger << "Switching OFF WAVECAR for APL calculations (default: OFF)." << apl::endl;  //CO181226 - default OFF
+        logger << "Switching OFF WAVECAR for APL calculations (default: OFF)." << apl::endl;  //CO20181226 - default OFF
       }
     }
 
     // APL ----------------------------------------------------------------------
 
-    // ME 181026 START
+    // ME20181026 START
 
     /***************************** READ PARAMETERS *****************************/
 
-    string USER_ENGINE="", USER_FREQFORMAT="", USER_SUPERCELL="", DOS_MESH_SCHEME="", USER_DOS_METHOD="", USER_TPT="", USER_DC_METHOD=""; //CO190114 - initialize everything
-    string USER_DOS_PROJECTIONS_CART_SCHEME = "", USER_DOS_PROJECTIONS_FRAC_SCHEME = ""; // ME190625
-    string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO190114 - initialize everything
-    bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false, USER_ZEROSTATE_CHGCAR = false; //CO190114 - initialize everything
-    bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO190114 - initialize everything
+    string USER_ENGINE="", USER_FREQFORMAT="", USER_SUPERCELL="", DOS_MESH_SCHEME="", USER_DOS_METHOD="", USER_TPT="", USER_DC_METHOD=""; //CO20190114 - initialize everything
+    string USER_DOS_PROJECTIONS_CART_SCHEME = "", USER_DOS_PROJECTIONS_FRAC_SCHEME = ""; // ME20190625
+    string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO20190114 - initialize everything
+    bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false, USER_ZEROSTATE_CHGCAR = false; //CO20190114 - initialize everything
+    bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO20190114 - initialize everything
     bool USER_DOS_PROJECT = false;  // ME20200213
-    double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO190114 - initialize everything  
-    int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO190114 - initialize everything
+    double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO20190114 - initialize everything  
+    int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO20190114 - initialize everything
     vector<int> USER_DOS_MESH(3);
     vector<xvector<double> > USER_DOS_PROJECTIONS;
     for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aplflags.size(); i++) {
@@ -374,15 +374,15 @@ namespace KBIN {
       if (key == "DMAG") {USER_DISTORTION_MAGNITUDE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
       if (key == "DXYZONLY") {USER_DISTORTIONS_XYZ_ONLY = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "DSYMMETRIZE") {USER_DISTORTIONS_SYMMETRIZE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "DINEQUIV_ONLY") {USER_DISTORTIONS_INEQUIVONLY = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;} //CO190131
+      if (key == "DINEQUIV_ONLY") {USER_DISTORTIONS_INEQUIVONLY = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;} //CO20190131
       // Special case: DPM can be true, false, or empty
       if (key == "DPM") {
         USER_DPM = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option;
-        USER_AUTO_DISTORTIONS=(!kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme.empty() && (kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme[0] == 'A' || kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme[0] == 'a')); //CO190131
+        USER_AUTO_DISTORTIONS=(!kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme.empty() && (kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme[0] == 'A' || kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme[0] == 'a')); //CO20190131
         continue;
       }
       if (key == "ZEROSTATE") {USER_ZEROSTATE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "ZEROSTATE_CHGCAR") {USER_ZEROSTATE_CHGCAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME191029
+      if (key == "ZEROSTATE_CHGCAR") {USER_ZEROSTATE_CHGCAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME20191029
       if (key == "FREQFORMAT") {USER_FREQFORMAT = aurostd::toupper(kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme); continue;}
       if (key == "DC") {USER_DC = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "DCPATH") {USER_DC_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
@@ -397,24 +397,24 @@ namespace KBIN {
       if (key == "DOSSMEAR") {USER_DOS_SMEAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
       if (key == "DOSPOINTS") {USER_DOS_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
       if (key == "DOS_PROJECT") {USER_DOS_PROJECT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME20200213
-      if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME190625
-      if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME190625
+      if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME20190625
+      if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME20190625
       if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "TPT") {USER_TPT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
     }
 
     /***************************** CHECK PARAMETERS *****************************/
 
-    //  try {  OBSOLETE ME191029 - error handling switched to aurostd::xerror
+    //  try {  OBSOLETE ME20191029 - error handling switched to aurostd::xerror
     string message;
 
-    // ME 190313 - START
+    // ME20190313 - START
     // Do not relax with --generate_aflowin_only option
     if (XHOST.GENERATE_AFLOWIN_ONLY && USER_RELAX) {
       USER_RELAX = false;
       logger << apl::warning << "RELAX will be switched OFF for generate_aflowin_only." << apl::endl;
     }
-    // ME 190313 - END
+    // ME20190313 - END
     // Relax structure
     if (USER_RELAX) {
       START_RELAX = 1;
@@ -449,10 +449,10 @@ namespace KBIN {
     if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
       message = "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
       message += "See README_AFLOW_APL.TXT for more information.";
-      //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+      //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
-    // ME191029
+    // ME20191029
     if (USER_ZEROSTATE_CHGCAR) {
       if (USER_ENGINE == "DM") {
         logger << "ZEROSTATE_CHGCAR requires the calculation of the undistorted supercell. ZEROSTATE will be switched on." << apl::endl;
@@ -475,7 +475,7 @@ namespace KBIN {
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "SUPERCELL. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
       }
     }
@@ -520,29 +520,29 @@ namespace KBIN {
         }
         uint ncoords = tokens.size();
         tokens.clear();
-        apl::tokenize(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  // ME190427 - also break along semicolon
+        apl::tokenize(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  // ME20190427 - also break along semicolon
         if (tokens.size() != ncoords) {
           message = "Mismatch between the number of points and the number of labels for the phonon dispersions. ";
           message += "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
           message += "See README_AFLOW_APL.TXT for more information.";
-          //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+          //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
         }
       } else {
         message = "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL. ";
         message += "See README_AFLOW_APL.TXT for more information.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
     }
 
     // DOS
-    if (USER_DOS || USER_TP) {  // ME190423
+    if (USER_DOS || USER_TP) {  // ME20190423
       tokens.clear();
       if (USER_DOS_METHOD != "LT" && USER_DOS_METHOD != "RS") {
         message = "Wrong setting in " + _ASTROPT_ + "DOSMETHOD. Use either LT or RS. ";
         message += "See README_AFLOW_APL.TXT for more information.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
       if ((USER_DOS_METHOD == "RS") && (USER_DOS_SMEAR < _ZERO_TOL_)) {
@@ -554,14 +554,14 @@ namespace KBIN {
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "DOSMESH. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
       } else {
         USER_DOS_MESH[0] = aurostd::string2utype<int>(tokens[0]);
         USER_DOS_MESH[1] = aurostd::string2utype<int>(tokens[1]);
         USER_DOS_MESH[2] = aurostd::string2utype<int>(tokens[2]);
       }
-      // ME190625 - projected DOS
+      // ME20190625 - projected DOS
       // ME20200213 - now has fully atom projected DOS (use zero vector to indicate)
       if (USER_DOS_PROJECT) {
         if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() || !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
@@ -603,14 +603,14 @@ namespace KBIN {
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "TPT. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
       }
       USER_TP_TSTART = aurostd::string2utype<double>(tokens[0]);
       USER_TP_TEND = aurostd::string2utype<double>(tokens[1]);
       USER_TP_TSTEP = aurostd::string2utype<double>(tokens[2]);
     }
-    // OBSOLETE - ME191029
+    // OBSOLETE - ME20191029
     //  } catch (std::exception& e) {
     //    logger << apl::error << e.what() << apl::endl;
     //    return;
@@ -635,7 +635,7 @@ namespace KBIN {
       } else {
         logger << "Distortions will be generated in three independent directions." << apl::endl;
       }
-      if (USER_DISTORTIONS_INEQUIVONLY) { //CO190131
+      if (USER_DISTORTIONS_INEQUIVONLY) { //CO20190131
         logger << "Distortion directions will be determined for inequivalent site only." << apl::endl;
       } else {
         logger << "Distortion directions will be determined for ALL site." << apl::endl;
@@ -648,7 +648,7 @@ namespace KBIN {
         logger << apl::warning << "Distortions will only be generated in the positive direction - this is NOT recommended." << apl::endl;
       }
       logger << "Forces from the undistored state will " << (USER_ZEROSTATE?"":"NOT ") << "be used." << apl::endl;
-      logger << "The CHGCAR file of the undistorted state will " << (USER_ZEROSTATE_CHGCAR?"":"NOT ") << "be used for distorted cells." << apl::endl;  // ME191029
+      logger << "The CHGCAR file of the undistorted state will " << (USER_ZEROSTATE_CHGCAR?"":"NOT ") << "be used for distorted cells." << apl::endl;  // ME20191029
     }
 
     logger << "Polar corrections will " << (USER_POLAR?"":"NOT ") << "be employed." << apl::endl;
@@ -678,14 +678,14 @@ namespace KBIN {
       logger << "Phonon dispersion curves will NOT be calculated." << apl::endl;
     }
 
-    if (USER_DOS || USER_TP) {  // ME190423
+    if (USER_DOS || USER_TP) {  // ME20190423
       logger << "Phonon DOS will be calculated using the ";
       logger << (USER_DOS_METHOD == "LT"?"Linear Tetrahedron":"Root Sampling") << " method ";
       logger << "along a " << USER_DOS_MESH[0] << "x" << USER_DOS_MESH[1] << "x" << USER_DOS_MESH[2];
       logger << " mesh with " << USER_DOS_NPOINTS << " bins.";
       if (USER_DOS_METHOD == "RS")
         logger << " A smearing value of " << USER_DOS_SMEAR << " eV will be used.";
-      // ME190626 - projected DOS
+      // ME20190626 - projected DOS
       if ((USER_DOS_PROJECTIONS.size() == 0) || (USER_DOS_METHOD == "RS")) {
         logger << " Projected phonon DOS will NOT be calculated.";
       } else {
@@ -709,18 +709,18 @@ namespace KBIN {
     } else {
       logger << "Thermodynamic properties will NOT be calculated." << apl::endl;
     }
-    // ME 181026 END
+    // ME20181026 END
 
     // AAPL ----------------------------------------------------------------------
 
-    // ME 181027 START
+    // ME20181027 START
 
     /***************************** READ PARAMETERS *****************************/
 
     string USER_BTE;
     bool USER_TCOND, USER_ISOTOPE, USER_BOUNDARY, USER_CUMULATIVEK, USER_AAPL_FOURTH_ORDER;
     double USER_NANO_SIZE, USER_EPS_SUM, USER_AAPL_MIX, USER_TCT_TSTART, USER_TCT_TEND, USER_TCT_TSTEP;
-    int USER_AAPL_MAX_ITER, USER_KPPRA_AAPL = -1;  // ME190408 - Added KPPRA_AAPL
+    int USER_AAPL_MAX_ITER, USER_KPPRA_AAPL = -1;  // ME20190408 - Added KPPRA_AAPL
     vector<double> USER_CUTOFF_DISTANCE(2);
     vector<int> USER_CUTOFF_SHELL(2), USER_THERMALGRID(3);
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
@@ -742,18 +742,18 @@ namespace KBIN {
         if (key == "BOUNDARY") {USER_BOUNDARY = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option; continue;}
         if (key == "CUMULATIVEK") {USER_CUMULATIVEK = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option; continue;}
         if (key == "NANO_SIZE") {USER_NANO_SIZE = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].content_double; continue;}
-        if (key == "KPPRA_AAPL") {USER_KPPRA_AAPL = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].content_int; continue;}  // ME190408
+        if (key == "KPPRA_AAPL") {USER_KPPRA_AAPL = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].content_int; continue;}  // ME20190408
       }
 
       /***************************** CHECK PARAMETERS *****************************/
 
-      //      try { OBSOLETE ME191029 - error handling will be done with aurostd::xerror
+      //      try { OBSOLETE ME20191029 - error handling will be done with aurostd::xerror
       //      string message;
       // Correct BTE
       if (USER_BTE != "RTA" && USER_BTE != "FULL") {
         message = "Wrong setting in " + _ASTROPT_ + "BTE. Use either RTA or FULL.";
         message += "See README_AFLOW_APL.TXT for more information.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
 
@@ -766,7 +766,7 @@ namespace KBIN {
         if (tokens.size() < 1) {
           message = "Not enought entries in " + _ASTROPT_ + "CUT_RAD. ";
           message += "See README_AFLOW_APL.TXT for more information.";
-          //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+          //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
         } else if (tokens.size() > 2) {
           logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_RAD. ";
@@ -790,7 +790,7 @@ namespace KBIN {
         if (tokens.size() < 1) {
           message = "Not enought entries in " + _ASTROPT_ + "CUT_SHELL. ";
           message += "See README_AFLOW_APL.TXT for more information.";
-          //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+          //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
         } else if (tokens.size() > 2) {
           logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_SHELL. ";
@@ -823,7 +823,7 @@ namespace KBIN {
       } else {
         message = "Wrong setting in " + _ASTROPT_ + "THERMALGRID. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
       }
 
@@ -841,7 +841,7 @@ namespace KBIN {
       } else {
         message = "Wrong setting in " + _ASTROPT_ + "TCT. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
-        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
       }
       // BOUNDARY and CUMULATIVEK
@@ -850,7 +850,7 @@ namespace KBIN {
         logger << apl::warning << "Both boundary effects and cumulative thermal conductivity cannot be ";
         logger << "set at the same time. Cumulative thermal conductivity has been switched off." << apl::endl;
       }
-      // OBSOLETE ME191029      
+      // OBSOLETE ME20191029      
       //    } catch (std::exception& e) {
       //      logger << apl::error << e.what() << apl::endl;
       //      return;
@@ -879,7 +879,7 @@ namespace KBIN {
         }
       }
 
-      if (USER_KPPRA_AAPL > 0) logger << "AAPL will use a KPPRA of " << USER_KPPRA_AAPL << " for static calculations." << apl::endl;  // ME190408
+      if (USER_KPPRA_AAPL > 0) logger << "AAPL will use a KPPRA of " << USER_KPPRA_AAPL << " for static calculations." << apl::endl;  // ME20190408
 
       logger << "Anharmonic IFCs will be calculated with a convergence criterion of " << USER_EPS_SUM << "." << apl::endl;
       logger << "A mixing coefficient of " << USER_AAPL_MIX << " will be used." << apl::endl;
@@ -913,7 +913,7 @@ namespace KBIN {
       USER_TCOND = false;
       logger << "Anharmonic force constants and thermal conductivity will NOT be calculated." << apl::endl;
     }
-    // ME 181027 STOP
+    // ME20181027 STOP
 
     // QHA ----------------------------------------------------------------------
 
@@ -1043,7 +1043,7 @@ namespace KBIN {
         tokens.clear(); scqha_pdis_T.clear();
         apl::tokenize(SCQHA_PDIS_T_OPTION.content_string, tokens, string(" ,"));
         if (tokens.size() == 0) {
-          // ME191031 - use xerror
+          // ME20191031 - use xerror
           //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_PDIS_T. Specify as SCQHA_PDIS_T=-100.0, 300.0, 600.0");
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the"+_ASTROPT_+"SCQHA_PDIS_T. Specify as SCQHA_PDIS_T=-100.0, 300.0, 600.0", _INPUT_ILLEGAL_);
         }
@@ -1101,7 +1101,7 @@ namespace KBIN {
           tokens.clear();
           apl::tokenize(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
           if (tokens.size() != 1) {
-            // ME191031 - use xerror
+            // ME20191031 - use xerror
             //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION_OPTION=3.0.");
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION_OPTION=3.0.", _INPUT_ILLEGAL_);
           }
@@ -1113,13 +1113,13 @@ namespace KBIN {
           kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C || kflags.KBIN_PHONONS_CALCULATION_QHA3P ||
           kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C){
 
-        CUTOFF_FREQ_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "CUTOFF_FREQ=" + "|" + _ASTROPT_APL_OLD_ + "CUTOFF_FREQ="), CUTOFF_FREQ_OPTION.option, CUTOFF_FREQ_OPTION.xscheme); //CO 170601
+        CUTOFF_FREQ_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "CUTOFF_FREQ=" + "|" + _ASTROPT_APL_OLD_ + "CUTOFF_FREQ="), CUTOFF_FREQ_OPTION.option, CUTOFF_FREQ_OPTION.xscheme); //CO20170601
         CUTOFF_FREQ = CUTOFF_FREQ_OPTION.content_double;
         if (CUTOFF_FREQ_OPTION.isentry) {
           tokens.clear();
           apl::tokenize(CUTOFF_FREQ_OPTION.content_string, tokens, string(" "));
           if (tokens.size() != 1) {
-            // ME191031 - use xerror
+            // ME20191031 - use xerror
             //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"CUTOFF_FREQ. Specify as CUTOFF_FREQ=0.01.");
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"CUTOFF_FREQ. Specify as CUTOFF_FREQ=0.01.", _INPUT_ILLEGAL_);
           }
@@ -1127,7 +1127,7 @@ namespace KBIN {
         logger << (CUTOFF_FREQ_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "CUTOFF_FREQ=" << CUTOFF_FREQ_OPTION.content_string << "." << apl::endl;
 
 
-        CALCULATE_EOS_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "EOS=" + "|" + _ASTROPT_APL_OLD_ + "EOS="), CALCULATE_EOS_OPTION.option, CALCULATE_EOS_OPTION.xscheme); //CO 170601
+        CALCULATE_EOS_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "EOS=" + "|" + _ASTROPT_APL_OLD_ + "EOS="), CALCULATE_EOS_OPTION.option, CALCULATE_EOS_OPTION.xscheme); //CO20170601
         logger << (CALCULATE_EOS_OPTION.isentry ? "Setting " : "DEFAULT ") << _ASTROPT_ << "EOS=" << (CALCULATE_EOS_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
 
         if ((CALCULATE_EOS_OPTION.option) && (CALCULATE_GRUNEISEN_OPTION.option || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B ||
@@ -1140,7 +1140,7 @@ namespace KBIN {
           tokens.clear();
           apl::tokenize(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
           if (tokens.size() != 3) {
-            // ME191031
+            // ME20191031
             //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1.");
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1.", _INPUT_ILLEGAL_);
           }
@@ -1150,13 +1150,13 @@ namespace KBIN {
           logger << (EOS_DISTORTION_RANGE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "EOS_DISTORTION_RANGE=" << EOS_DISTORTION_RANGE_OPTION.content_string << "." << apl::endl;
           logger << "The EOS properties will be calculated in distortion range <" << EOS_DISTORTION_START << "," << EOS_DISTORTION_END << "," << EOS_DISTORTION_DISTORTION_INC << "." << apl::endl;
 
-          FITTING_TYPE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "FITTING_TYPE=" + "|" + _ASTROPT_APL_OLD_ + "FITTING_TYPE="), FITTING_TYPE_OPTION.option, FITTING_TYPE_OPTION.xscheme); //CO 170601
+          FITTING_TYPE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "FITTING_TYPE=" + "|" + _ASTROPT_APL_OLD_ + "FITTING_TYPE="), FITTING_TYPE_OPTION.option, FITTING_TYPE_OPTION.xscheme); //CO20170601
           FITTING_TYPE = FITTING_TYPE_OPTION.content_string;
           if (FITTING_TYPE_OPTION.isentry) {
             tokens.clear();
             apl::tokenize(FITTING_TYPE_OPTION.content_string, tokens, string(" "));
             if (tokens.size() != 1) {
-              // ME191031 - use xerror
+              // ME20191031 - use xerror
               //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"FITTING_TYPE. Specify as FITTING_TYPE=BM2.");
               throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"FITTING_TYPE. Specify as FITTING_TYPE=BM2.", _INPUT_ILLEGAL_);
             }
@@ -1171,7 +1171,7 @@ namespace KBIN {
               tokens.clear();
               apl::tokenize(EOS_STATIC_KPPRA_OPTION.content_string, tokens, string(" "));
               if (tokens.size() != 1) {
-                // ME191031 - use xerror
+                // ME20191031 - use xerror
                 //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_STATIC_KPPRA. Specify as EOS_STATIC_KPPRA=10000.");
                 throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"EOS_STATIC_KPPRA. Specify as EOS_STATIC_KPPRA=10000.", _INPUT_ILLEGAL_);
               }
@@ -1184,7 +1184,7 @@ namespace KBIN {
             tokens.clear();
             apl::tokenize(NEDOS_OPTION.content_string, tokens, string(" "));
             if (tokens.size() != 1) {
-              // ME191031 - use xerror
+              // ME20191031 - use xerror
               //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"NEDOS. Specify as NEDOS=5000.");  //CO200106 - patching for auto-indenting
               throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"NEDOS. Specify as NEDOS=5000.", _INPUT_ILLEGAL_);
             }
@@ -1223,7 +1223,7 @@ namespace KBIN {
         tokens.clear();
         apl::tokenize(GP_DISTORTION_OPTION.content_string, tokens, string(" "));
         if (tokens.size() != 1) {
-          // ME191031 - use xerror
+          // ME20191031 - use xerror
           //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"GP_DISTORTION. Specify as GP_DISTORTION=0.03.");
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"GP_DISTORTION. Specify as GP_DISTORTION=0.03.", _INPUT_ILLEGAL_);
         }
@@ -1231,14 +1231,14 @@ namespace KBIN {
       logger << (GP_DISTORTION_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "GP_DISTORTION=" << GP_DISTORTION << "." << apl::endl;
     }
     //EOS SUBDIRECTORY OPTIONS. These are automic options and not controlled by users
-    CALCULATE_EOS_SUBDIRECTORIES_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "EOS_SD=" + "|" + _ASTROPT_APL_OLD_ + "EOS_SD="), CALCULATE_EOS_SUBDIRECTORIES_OPTION.option, CALCULATE_EOS_SUBDIRECTORIES_OPTION.xscheme); //CO 170601
+    CALCULATE_EOS_SUBDIRECTORIES_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "EOS_SD=" + "|" + _ASTROPT_APL_OLD_ + "EOS_SD="), CALCULATE_EOS_SUBDIRECTORIES_OPTION.option, CALCULATE_EOS_SUBDIRECTORIES_OPTION.xscheme); //CO20170601
     if(CALCULATE_EOS_SUBDIRECTORIES_OPTION.option){
       logger << (CALCULATE_EOS_SUBDIRECTORIES_OPTION.isentry ? "Setting " : "DEFAULT ") << _ASTROPT_ << "EOS_SD=" << (CALCULATE_EOS_SUBDIRECTORIES_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
-      EOS_DISTORTION_RANGE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "EOS_DISTORTION_RANGE=" + "|" + _ASTROPT_APL_OLD_ + "EOS_DISTORTION_RANGE="), EOS_DISTORTION_RANGE_OPTION.option, EOS_DISTORTION_RANGE_OPTION.xscheme); //CO 170601
+      EOS_DISTORTION_RANGE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "EOS_DISTORTION_RANGE=" + "|" + _ASTROPT_APL_OLD_ + "EOS_DISTORTION_RANGE="), EOS_DISTORTION_RANGE_OPTION.option, EOS_DISTORTION_RANGE_OPTION.xscheme); //CO20170601
       tokens.clear();
       apl::tokenize(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
       if (tokens.size() != 3) {
-        // ME191031 - use xerror
+        // ME20191031 - use xerror
         //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1");
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1", _INPUT_ILLEGAL_);
       }
@@ -1279,7 +1279,7 @@ namespace KBIN {
         tokens.clear();
         apl::tokenize(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
         if (tokens.size() != 1) {
-          // ME190131 - use xerror
+          // ME20190131 - use xerror
           //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION=3.0.");
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION=3.0.", _INPUT_ILLEGAL_);
         }
@@ -1289,12 +1289,12 @@ namespace KBIN {
     // PINKU QUASI-HARMONIC END
 
 
-    //  ME181026 - OBSOLETE until it's properly documented
+    //  ME20181026 - OBSOLETE until it's properly documented
     //    // Get the users maximum shell which will be included into calculation
     //    // CO, not sure how maxshell works here (F option), need to investigate further and add to README
     //    // also seems USER_WANTS_FULL_SHELL applies for both MAX and MIN shell settings, should one take precedence? should they be separate flags?
     //    if(!found_supercell){
-    //      USER_MAXSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MAXSHELL=" + "|" + _ASTROPT_QHA_ + "MAXSHELL=" + "|" + _ASTROPT_AAPL_ + "MAXSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MAXSHELL="), USER_MAXSHELL_OPTION.option, USER_MAXSHELL_OPTION.xscheme); //CO 170601
+    //      USER_MAXSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MAXSHELL=" + "|" + _ASTROPT_QHA_ + "MAXSHELL=" + "|" + _ASTROPT_AAPL_ + "MAXSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MAXSHELL="), USER_MAXSHELL_OPTION.option, USER_MAXSHELL_OPTION.xscheme); //CO20170601
     //      test = USER_MAXSHELL_OPTION.content_string;
     //      if (test[test.size() - 1] == 'f' || test[test.size() - 1] == 'F') {
     //        USER_MAXSHELL = aurostd::string2utype<int>(test.substr(0, test.size() - 1));
@@ -1310,11 +1310,11 @@ namespace KBIN {
     //      }
     //    }
     //
-    //    ME181026 - F option OBSOLETE until it's properly documented
+    //    ME20181026 - F option OBSOLETE until it's properly documented
     //    // Get the users minimum shell which will be included into calculation
     //    // CO, not sure how minshell works here (F option), need to investigate further and add to README
     //    if(!found_supercell){
-    //      USER_MINSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MINSHELL=" + "|" + _ASTROPT_QHA_ + "MINSHELL=" + "|" + _ASTROPT_AAPL_ + "MINSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MINSHELL="), USER_MINSHELL_OPTION.option, USER_MINSHELL_OPTION.xscheme); //CO 170601
+    //      USER_MINSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MINSHELL=" + "|" + _ASTROPT_QHA_ + "MINSHELL=" + "|" + _ASTROPT_AAPL_ + "MINSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MINSHELL="), USER_MINSHELL_OPTION.option, USER_MINSHELL_OPTION.xscheme); //CO20170601
     //      test = USER_MINSHELL_OPTION.content_string;
     //      if (test[test.size() - 1] == 'f' || test[test.size() - 1] == 'F') {
     //        USER_MINSHELL = aurostd::string2utype<int>(test.substr(0, test.size() - 1));
@@ -1338,7 +1338,7 @@ namespace KBIN {
 
     //fix vasp bin for LR or DM+POLAR
     if (USER_ENGINE == string("LR") || (USER_ENGINE == string("DM") && USER_POLAR)) {
-      if(xflags.AFLOW_MODE_VASP && !XHOST.GENERATE_AFLOWIN_ONLY){  // ME190313 - Do not check the VASP binary for generate_aflowin_only
+      if(xflags.AFLOW_MODE_VASP && !XHOST.GENERATE_AFLOWIN_ONLY){  // ME20190313 - Do not check the VASP binary for generate_aflowin_only
         try {
           // Check the version of VASP binary
           logger << "Checking VASP version for linear response calculations.";
@@ -1348,8 +1348,8 @@ namespace KBIN {
             logger << "[" << vaspVersion[0] << "]";
             if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
               logger << apl::warning << "." << apl::endl;
-              // if(_WITHIN_DUKE_){ OBSOLETE - ME 190108
-              // ME 190107 - fix both serial and MPI binaries
+              // if(_WITHIN_DUKE_){ OBSOLETE - ME20190108
+              // ME20190107 - fix both serial and MPI binaries
               kflags.KBIN_SERIAL_BIN = DEFAULT_VASP5_BIN;
               kflags.KBIN_MPI_BIN = DEFAULT_VASP5_MPI_BIN;
               if (kflags.KBIN_MPI) {
@@ -1357,16 +1357,16 @@ namespace KBIN {
               } else {
                 kflags.KBIN_BIN = kflags.KBIN_SERIAL_BIN;
               }
-              logger << apl::warning << "Modifying VASP bin to " << kflags.KBIN_BIN << " (AUTO modification)." << apl::endl;  // ME 190109
-              //[ME190109]            } else {
-              //[ME190109]              throw apl::APLRuntimeError("The LR engine needs VASP5 or higher.");
-              //[ME190109]            }
+              logger << apl::warning << "Modifying VASP bin to " << kflags.KBIN_BIN << " (AUTO modification)." << apl::endl;  // ME20190109
+              //[ME20190109]            } else {
+              //[ME20190109]              throw apl::APLRuntimeError("The LR engine needs VASP5 or higher.");
+              //[ME20190109]            }
             } else {
               logger << " OK." << apl::endl;
             }
           } else {
             logger << "Failed." << apl::warning << apl::endl;
-            // ME191031 - use xerror
+            // ME20191031 - use xerror
             //throw apl::APLLogicError("Unexpected binary format.");
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Unexpected binary format.", _FILE_WRONG_FORMAT_);
           }
@@ -1435,7 +1435,7 @@ namespace KBIN {
     }
     // ME20200102 - END
 
-    // ME190626 - Convert projection directions for DOS to Cartesian
+    // ME20190626 - Convert projection directions for DOS to Cartesian
     if ((USER_DOS_PROJECTIONS.size() > 0) && (!USER_DOS_PROJECTIONS_FRAC_SCHEME.empty())) {
       for (uint p = 0; p < USER_DOS_PROJECTIONS.size(); p++) {
         USER_DOS_PROJECTIONS[p] = xinput.getXStr().f2c * USER_DOS_PROJECTIONS[p];
@@ -1448,7 +1448,6 @@ namespace KBIN {
 
     //apl::Supercell supercell(xvasp.str,logger),supercell_test(xvasp.str,logger);    //corey, slow
     try {
-
     //ME20200102 - Moved into apl::Supercell
       //[OBSOLETE]  apl::Supercell supercell(xinput.getXStr(),aflags,logger); //xvasp.str, logger);  //CO  //CO181226
       //[OBSOLETE]  apl::Supercell supercell_test = supercell;    //CO
@@ -1490,17 +1489,15 @@ namespace KBIN {
       //[OBSOLETE]      }
       //[OBSOLETE]    }
       //[OBSOLETE]  }
-
       //      cerr << "USER_WANTS_FULL_SHELL=" << USER_WANTS_FULL_SHELL << endl;
       //    for(int i=2;i<20;i+=2) cerr << "try " << i << ": " << supercell_test.buildSuitableForShell(i,USER_WANTS_FULL_SHELL,FALSE) << endl;
-
-      //[OBSOLETE] if (USER_SUPERCELL.empty() && kflags.KBIN_MODULE_OPTIONS.supercell_method[2]) {  // Not documented - ME181026
+      //[OBSOLETE] if (USER_SUPERCELL.empty() && kflags.KBIN_MODULE_OPTIONS.supercell_method[2]) {  // Not documented - ME20181026
       //[OBSOLETE]   logger << "a Searching for suitable cell to handle " << USER_MAXSHELL << " shells..." << apl::endl;
       //[OBSOLETE]   bool USER_WANTS_FULL_SHELL = false;  // ME 181026
       //[OBSOLETE]   supercell.buildSuitableForShell(USER_MAXSHELL, USER_WANTS_FULL_SHELL, TRUE);
       //[OBSOLETE]   supercell.setupShellRestrictions(USER_MAXSHELL);
       //[OBSOLETE] } else if (USER_SUPERCELL.empty() && kflags.KBIN_MODULE_OPTIONS.supercell_method[3]) {
-      //[OBSOLETE]   bool USER_WANTS_FULL_SHELL = false;  // ME 181026
+      //[OBSOLETE]   bool USER_WANTS_FULL_SHELL = false;  // ME20181026
       //[OBSOLETE]   logger << "b Searching for suitable cell to handle " << USER_MINSHELL << " shells..." << apl::endl;
       //[OBSOLETE]   supercell.buildSuitableForShell(USER_MINSHELL, USER_WANTS_FULL_SHELL, TRUE);
       //[OBSOLETE] } else if (USER_SUPERCELL.find_first_of("xX") != string::npos) {
@@ -1515,12 +1512,12 @@ namespace KBIN {
       //[OBSOLETE]   if (USER_MAXSHELL > 0)
       //[OBSOLETE]     supercell.setupShellRestrictions(USER_MAXSHELL);
       //[OBSOLETE] }
-      //[OBSOLETE] //    else {  OBSOLETE ME181026 //[CO200106 - close bracket for indenting]}
+      //[OBSOLETE] //    else {  OBSOLETE ME20181026 //[CO200106 - close bracket for indenting]}
       //[OBSOLETE] //      throw apl::APLRuntimeError("The settings for supercell construction are confusing.");
 
       // CLUSTERS ---------------------------------------------------------
 
-      // ME 180925
+      // ME20180925
       // Calculate the clusters for thermal conductivity calculations
       vector<apl::ClusterSet> clusters;  // ME, default, only allocates to be passed into functions
       if (USER_TCOND) {
@@ -1547,7 +1544,7 @@ namespace KBIN {
               clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
                   USER_CUTOFF_DISTANCE[o-3], o, logger, aflags);
             } catch (aurostd::xerror excpt) {
-              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
+              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO20191201 - marco, patch so whereFileName() is included through logger()
               logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
               awakeClusterSet = false;
             }
@@ -1582,7 +1579,7 @@ namespace KBIN {
         phcalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
         phcalcdm->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY);
         phcalcdm->setDistortionSYMMETRIZE(USER_DISTORTIONS_SYMMETRIZE);
-        phcalcdm->setDistortionINEQUIVONLY(USER_DISTORTIONS_INEQUIVONLY); //CO190131
+        phcalcdm->setDistortionINEQUIVONLY(USER_DISTORTIONS_INEQUIVONLY); //CO20190131
         phcalcdm->setDistortionMagnitude(USER_DISTORTION_MAGNITUDE);
         phcalcdm->setCalculateZeroStateForces(USER_ZEROSTATE);
         phcalcdm->get_special_inputs(AflowIn);  //PINKU, to include PSTRESS and LDAU_PARAMETERS in the SUPERCELL files
@@ -1647,10 +1644,10 @@ namespace KBIN {
       }
       //QHA/SCQHA/QHA3P END
 
-      // ME191029 - Reordered APL workflow to accommodate ZEROSTATE CHGCAR
+      // ME20191029 - Reordered APL workflow to accommodate ZEROSTATE CHGCAR
       phcalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
 
-      // ME180820 - set up VASP calculations for thermal conductivity calculations
+      // ME20180820 - set up VASP calculations for thermal conductivity calculations
       bool aapl_stagebreak = false;
       if (USER_TCOND) {
         aapl_stagebreak = phcalc->buildVaspAAPL(phcalc->_clusters[0], USER_ZEROSTATE_CHGCAR);
@@ -1660,7 +1657,7 @@ namespace KBIN {
       } else {
         aapl_stagebreak = false;
       }
-      // ME1901029 - BEGIN
+      // ME201901029 - BEGIN
       phcalc->_stagebreak = (phcalc->_stagebreak || aapl_stagebreak);
 
       // Run ZEROSTATE calculation if ZEROSTATE CHGCAR
@@ -1681,21 +1678,21 @@ namespace KBIN {
       if (phcalc->_stagebreak) {
         throw apl::APLStageBreak();
       }
-      // ME1901029 - END
+      // ME201901029 - END
 
       // Run or awake
       bool isHibFileAvailable = aurostd::EFileExist(aflags.Directory +"/"+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE);  //|| //CO
       //aurostd::FileExist(string("apl.xml")); //CO
 
       if (USER_HIBERNATE && isHibFileAvailable) {
-        // OBSOLETE ME191029
+        // OBSOLETE ME20191029
         //if (aapl_stagebreak) {
-        //  throw apl::APLStageBreak();  // ME 180830
+        //  throw apl::APLStageBreak();  // ME20180830
         //}
         try {
           phcalc->awake();
         } //CO200106 - patching for auto-indenting
-        // ME191031 - use xerror
+        // ME20191031 - use xerror
         //catch (apl::APLLogicError& e)
         catch (aurostd::xerror& e)
         { //CO200106 - patching for auto-indenting
@@ -1739,7 +1736,7 @@ namespace KBIN {
           apl::PhononDispersionCalculator pdisc(*phcalc, logger);
 
           // Init path according to the aflow's definition for elec. struc.
-          // ME 181029 - Restructured
+          // ME20181029 - Restructured
           if (USER_DC_METHOD == "LATTICE") {
             pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
           } else {
@@ -1749,7 +1746,7 @@ namespace KBIN {
               pdisc.initPathCoords(USER_DC_INITCOORDS_CART, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, true);
             }
           }
-          // ME190501 Allow user to override path
+          // ME20190501 Allow user to override path
           if(!USER_DC_USERPATH.empty()){  // Set path
             pdisc.setPath(USER_DC_USERPATH);
           }
@@ -1770,12 +1767,12 @@ namespace KBIN {
         apl::QHAsubdirectoryData store(*phcalc, logger);
         store.setdir_prefix(_TMPDIR_);
         string dirname=store.getdir_name(aflags.Directory);
-        // ME190428 - START
+        // ME20190428 - START
         // MonkhorstPackMesh replaced by qmesh
         //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
         //  phcalc->getInputCellStructure(), logger);
         apl::QMesh qmesh(USER_DOS_MESH, phcalc->getInputCellStructure(), logger);
-        if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
+        if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME20190625
 
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
         //auto_ptr<apl::DOSCalculator> dosc;
@@ -1791,7 +1788,7 @@ namespace KBIN {
 
         apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
 
-        // ME190428 - END
+        // ME20190428 - END
         // Calculate DOS
         dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
         if (USER_DOS) dosc.writePDOS(_TMPDIR_, dirname);
@@ -1823,7 +1820,7 @@ namespace KBIN {
             apl::PhononDispersionCalculator pdisc(*phcalc,logger);
 
             // Init path according to the aflow's definition for elec. struc.
-            // ME 181029 - Restructured
+            // ME20181029 - Restructured
             if (USER_DC_METHOD == "LATTICE") {
               pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
             } else {
@@ -1833,7 +1830,7 @@ namespace KBIN {
                 pdisc.initPathCoords(USER_DC_INITCOORDS_CART, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, true);
               }
             }
-            // ME190501 Allow user to override path
+            // ME20190501 Allow user to override path
             if(!USER_DC_USERPATH.empty()) {  // Set path
               pdisc.setPath(USER_DC_USERPATH);
             }
@@ -1844,12 +1841,12 @@ namespace KBIN {
             pdisc.clear();
           }
           {
-            // ME190428 - START
+            // ME20190428 - START
             // MonkhorstPackMesh replaced by qmesh
             //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
             //                             phcalc->getInputCellStructure(),logger);
             apl::QMesh qmesh(USER_DOS_MESH, phcalc->getInputCellStructure(), logger);
-            if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
+            if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME20190625
 
             // OBSOLETE - DOSCalculator is not an auto_ptr anymore
             //auto_ptr<apl::DOSCalculator> dosc;
@@ -1863,7 +1860,7 @@ namespace KBIN {
             //}
 
             apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
-            // ME190428 - END
+            // ME20190428 - END
             // Calculate DOS
             dosc.calc(USER_DOS_NPOINTS,USER_DOS_SMEAR);
             if(USER_DOS)dosc.writePDOS(_TMPDIR_, dirname);
@@ -1917,7 +1914,7 @@ namespace KBIN {
           }
         }
         // Check if there was specified unit keyword...
-        // ME191031 - use xerror
+        // ME20191031 - use xerror
         if (((frequencyFormat & ~apl::OMEGA) & ~apl::ALLOW_NEGATIVE) == apl::NONE)
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Ambiguous frequency format.", _INPUT_AMBIGUOUS_);
         //        throw apl::APLLogicError("The mishmash frequency format.");
@@ -1940,7 +1937,7 @@ namespace KBIN {
         apl::PhononDispersionCalculator pdisc(*phcalc, logger);
 
         // Init path according to the aflow's definition for elec. struc.
-        // ME 181029 - Restructured
+        // ME20181029 - Restructured
         if (USER_DC_METHOD == "LATTICE") {
           supercell.projectToPrimitive();  // ME20200117 - project to primitive
           pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
@@ -1951,7 +1948,7 @@ namespace KBIN {
             pdisc.initPathCoords(USER_DC_INITCOORDS_CART, USER_DC_INITCOORDS_LABELS, USER_DC_NPOINTS, true);
           }
         }
-        // ME190501 Allow user to override path
+        // ME20190501 Allow user to override path
         if(!USER_DC_USERPATH.empty()){  // Set path
           pdisc.setPath(USER_DC_USERPATH);
         }
@@ -1961,7 +1958,7 @@ namespace KBIN {
 
         // Write results into PDIS file
         pdisc.writePDIS(aflags.Directory);
-        pdisc.writePHEIGENVAL(aflags.Directory);  // ME190614
+        pdisc.writePHEIGENVAL(aflags.Directory);  // ME20190614
         if (USER_DC_METHOD == "LATTICE") supercell.projectToOriginal();  // ME20200117 - reset to original
         //QHA/SCQHA/QHA3P  START //PN180705
         //////////////////////////////////////////////////////////////////////
@@ -1998,13 +1995,13 @@ namespace KBIN {
 
       if (USER_DOS || USER_TP) {
         // Generate mesh for calculation of DOS...
-        // ME190428 - START
+        // ME20190428 - START
         // MonkhorstPackMesh replaced by qmesh
         //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
         //                             phcalc->getInputCellStructure(), logger);
 
         apl::QMesh qmesh(USER_DOS_MESH, phcalc->getInputCellStructure(), logger);
-        if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
+        if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME20190625
         // Setup the DOS engine which is used also for thermodynamic properties
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
         //auto_ptr<apl::DOSCalculator> dosc;
@@ -2019,23 +2016,23 @@ namespace KBIN {
 
         // Calculate DOS
         apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
-        // ME190428 - END
+        // ME20190428 - END
         dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
         if (USER_DOS) {
           dosc.writePDOS(aflags.Directory);
-          dosc.writePHDOSCAR(aflags.Directory);  // ME190614
+          dosc.writePHDOSCAR(aflags.Directory);  // ME20190614
         }
 
         // Calculate thermal properties
         if (USER_TP) {
           //if (!dosc.hasNegativeFrequencies()) // ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
-            apl::ThermalPropertiesCalculator tpc(dosc, logger);  // ME190423
+            apl::ThermalPropertiesCalculator tpc(dosc, logger);  // ME20190423
             // ME20200108 - new ThermalPropertiesCalculator format
             tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
             tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
             //QHA/SCQHA/QHA3P START //PN180705
             //calculate Gruneisen
-            // ME 190428 - START
+            // ME20190428 - START
             // Uniform Mesh is obsolete - replaced by QMesh
             //vector<int> sc_size(3,0);
             //for (int i = 0; i < 3; i++) sc_size[i] = USER_DOS_MESH[i];
@@ -2061,7 +2058,7 @@ namespace KBIN {
                 ad.thermal_displacements(USER_TP_TSTART,USER_TP_TEND,USER_TP_TSTEP);
                 ad.write_normal_mode_direction(ptr_hsq->get_hs_kpoints());
               }}
-            // ME 190428 - END
+            // ME20190428 - END
             //QHA calculate Gruneisen
             std::vector< std::vector< double> > scqha_tv;
             if (CALCULATE_GRUNEISEN_OPTION.option   ||
@@ -2069,7 +2066,7 @@ namespace KBIN {
                 CALCULATE_GRUNEISEN_B_OPTION.option ||
                 CALCULATE_GRUNEISEN_C_OPTION.option) {
               if(!is_negative_freq){
-                // ME190428 - UniformMesh is obsolete - replaced by QMesh
+                // ME20190428 - UniformMesh is obsolete - replaced by QMesh
                 //if(umesh.get_kpoints().size()==0){
                 //  umesh.create_uniform_mesh(sc_size[0],sc_size[1],sc_size[2],phcalc->getInputCellStructure());
                 //}
@@ -2079,8 +2076,8 @@ namespace KBIN {
                 if(qha.set_imported_variables())
                 {
                   //QHA Grunneisen parameter calculations     
-                  //if(qha.calculation_gruneisen(&umesh))  OBSOLETE ME190428
-                  if(qha.calculation_gruneisen(&qmesh))  // ME190428
+                  //if(qha.calculation_gruneisen(&umesh))  OBSOLETE ME20190428
+                  if(qha.calculation_gruneisen(&qmesh))  // ME20190428
                   {
                     qha.write_gruneisen_parameter_mesh();
                     qha.Writeaverage_gp(USER_TP_TSTART,USER_TP_TEND,USER_TP_TSTEP);
@@ -2091,7 +2088,7 @@ namespace KBIN {
                 if(CALCULATE_EOS_OPTION.option)
                 {
                   //QHA EOS calculations
-                  //[CO181202 - NOT USED]apl::QH_ENERGIES eos_ens(*phcalc, *pheos, logger);
+                  //[CO20181202 - NOT USED]apl::QH_ENERGIES eos_ens(*phcalc, *pheos, logger);
                   apl::QH_ENERGIES eos_ens(*pheos, logger);
                   eos_ens.get_tmp_dir_name(_TMPDIR_);
                   eos_ens.get_xtracture(phcalc->getInputCellStructure());
@@ -2123,8 +2120,8 @@ namespace KBIN {
                         if(scqha.set_imported_variables())
                         {    
                           //QHA3P Gruneisen parameter calculations 
-                          //if(scqha.calculation_gruneisen(&umesh))  OBSOLETE ME190428
-                          if(scqha.calculation_gruneisen(&qmesh))  // ME190428
+                          //if(scqha.calculation_gruneisen(&umesh))  OBSOLETE ME20190428
+                          if(scqha.calculation_gruneisen(&qmesh))  // ME20190428
                           {
                             if(kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C)
                             { //PN 180719
@@ -2171,14 +2168,14 @@ namespace KBIN {
             } else if(kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A ||
                 kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C)
             {
-              //[CO181202 - NOT USED]apl::QH_ENERGIES eos_ens(*phcalc, *pheos, logger);
+              //[CO20181202 - NOT USED]apl::QH_ENERGIES eos_ens(*phcalc, *pheos, logger);
               apl::QH_ENERGIES eos_ens(*pheos, logger);
               eos_ens.get_xtracture(phcalc->getInputCellStructure());
               eos_ens.get_tmp_dir_name(_TMPDIR_);
               if(eos_ens.get_scqha_energies())
               {
                 if(!is_negative_freq){
-                  // ME190428 - UniformMesh is obsolete - replaced by QMesh
+                  // ME20190428 - UniformMesh is obsolete - replaced by QMesh
                   //if(umesh.get_kpoints().size()==0){
                   //  umesh.create_uniform_mesh(sc_size[0],sc_size[1],sc_size[2],phcalc->getInputCellStructure());
                   //}
@@ -2189,7 +2186,7 @@ namespace KBIN {
                   {
                     //QHA3P Gruneisen parameter calculation
                     //if(scqha.calculation_gruneisen(&umesh))  OBSOLETE M190428
-                    if(scqha.calculation_gruneisen(&qmesh))  // ME190428
+                    if(scqha.calculation_gruneisen(&qmesh))  // ME20190428
                     {
                       if(kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C)
                       { //PN 180719
@@ -2243,8 +2240,8 @@ namespace KBIN {
               }
               scqha_T.clear();
             }
-            if(ptr_hsq.get()) ptr_hsq->clear();  // ME190423
-            // umesh.clear();  OBSOLETE ME190428
+            if(ptr_hsq.get()) ptr_hsq->clear();  // ME20190423
+            // umesh.clear();  OBSOLETE ME20190428
             //QHA/SCQHA/QHA3P END
             tpc.clear(logger);  // ME20200108
           } else {
@@ -2267,7 +2264,7 @@ namespace KBIN {
         }
 
         // Clear old stuff
-        dosc.clear();  // ME190423
+        dosc.clear();  // ME20190423
         //delete dosc; //auto_ptr will do
         qmesh.clear(logger);  // ME191223
       }
@@ -2295,7 +2292,7 @@ namespace KBIN {
             try {
               phcalc->readAnharmonicIFCs(ifcs_hib_file, phcalc->_clusters[i]);
             } catch (aurostd::xerror excpt) {
-              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
+              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO20191201 - marco, patch so whereFileName() is included through logger()
               logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
               awakeAnharmIFCs = false;
             }
@@ -2340,7 +2337,7 @@ namespace KBIN {
       // delete phcalc; //auto_ptr will do
       supercell.clear();
     } catch (apl::APLStageBreak& e) {
-      logger << apl::notice << "Stopped. Waiting for required calculations..." << apl::endl;  //CO181226
+      logger << apl::notice << "Stopped. Waiting for required calculations..." << apl::endl;  //CO20181226
     }
   }
 }
@@ -2391,10 +2388,10 @@ namespace KBIN {
     apl::Logger logger(messageFile, aflags);
     //logger.setModuleName("PHONONS");  //will rename later
 
-    string _ASTROPT_; //CO 170601
+    string _ASTROPT_; //CO20170601
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
-      logger.setModuleName("AAPL");  //CO 170601
-      _ASTROPT_ = _ASTROPT_AAPL_;    //CO 170601
+      logger.setModuleName("AAPL");  //CO20170601
+      _ASTROPT_ = _ASTROPT_AAPL_;    //CO20170601
     } else if (kflags.KBIN_PHONONS_CALCULATION_QHA || 
         kflags.KBIN_PHONONS_CALCULATION_QHA_A || 
         kflags.KBIN_PHONONS_CALCULATION_QHA_B || 
@@ -2407,11 +2404,11 @@ namespace KBIN {
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_A ||
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_B ||
         kflags.KBIN_PHONONS_CALCULATION_QHA3P_C) { //PN180705
-      logger.setModuleName("QHA");  //CO 170601
-      _ASTROPT_ = _ASTROPT_QHA_;    //CO 170601
+      logger.setModuleName("QHA");  //CO20170601
+      _ASTROPT_ = _ASTROPT_QHA_;    //CO20170601
     } else {
-      logger.setModuleName("APL");  //CO 170601
-      _ASTROPT_ = _ASTROPT_APL_;    //CO 170601
+      logger.setModuleName("APL");  //CO20170601
+      _ASTROPT_ = _ASTROPT_APL_;    //CO20170601
     }
 
     logger << "RUNNING..." << apl::endl;
@@ -2430,9 +2427,9 @@ namespace KBIN {
     aurostd::xoption CALCULATE_ISOTOPE_OPTION; CALCULATE_ISOTOPE_OPTION.option = DEFAULT_AAPL_ISOTOPE;
     aurostd::xoption CALCULATE_CUMULATIVEK_OPTION; CALCULATE_CUMULATIVEK_OPTION.option = DEFAULT_AAPL_CUMULATIVEK;
     aurostd::xoption CALCULATE_BOUNDARY_OPTION; CALCULATE_BOUNDARY_OPTION.option = DEFAULT_AAPL_CUMULATIVEK;
-    //  aurostd::xoption USER_TDISTORTION_MAGNITUDE_OPTION; USER_TDISTORTION_MAGNITUDE_OPTION.xscheme = "0.015"; double USER_TDISTORTION_MAGNITUDE = 0.015;  OBSOLETE ME 181018
+    //  aurostd::xoption USER_TDISTORTION_MAGNITUDE_OPTION; USER_TDISTORTION_MAGNITUDE_OPTION.xscheme = "0.015"; double USER_TDISTORTION_MAGNITUDE = 0.015;  OBSOLETE ME20181018
     aurostd::xoption USER_THERMALGRID_OPTION; USER_THERMALGRID_OPTION.xscheme = DEFAULT_AAPL_THERMALGRID; string USER_THERMALGRID = DEFAULT_AAPL_THERMALGRID;
-    aurostd::xoption USER_CUTOFF_DISTANCE_OPTION; USER_CUTOFF_DISTANCE_OPTION.xscheme = DEFAULT_AAPL_CUT_RAD; vector<double> USER_CUTOFF_DISTANCE; //CO 180409
+    aurostd::xoption USER_CUTOFF_DISTANCE_OPTION; USER_CUTOFF_DISTANCE_OPTION.xscheme = DEFAULT_AAPL_CUT_RAD; vector<double> USER_CUTOFF_DISTANCE; //CO20180409
     vector<string> default_tokens;
     default_tokens.clear();
     apl::tokenize(DEFAULT_AAPL_CUT_RAD, default_tokens, string(" ,"));
@@ -2450,7 +2447,7 @@ namespace KBIN {
     default_stream << DEFAULT_AAPL_MIXING_COEFFICIENT;
     aurostd::xoption USER_AAPL_MIX_OPTION; USER_AAPL_MIX_OPTION.xscheme = default_stream.str(); double USER_AAPL_MIX = DEFAULT_AAPL_MIXING_COEFFICIENT;
     aurostd::xoption USER_AAPL_FOURTH_ORDER_OPTION; USER_AAPL_FOURTH_ORDER_OPTION.option = DEFAULT_AAPL_FOURTH_ORDER;
-    aurostd::xoption USER_CUTOFF_SHELL_OPTION; USER_CUTOFF_SHELL_OPTION.xscheme = DEFAULT_AAPL_CUT_SHELL; vector<int> USER_CUTOFF_SHELL; //CO 180409
+    aurostd::xoption USER_CUTOFF_SHELL_OPTION; USER_CUTOFF_SHELL_OPTION.xscheme = DEFAULT_AAPL_CUT_SHELL; vector<int> USER_CUTOFF_SHELL; //CO20180409
     default_tokens.clear();
     apl::tokenize(DEFAULT_AAPL_CUT_SHELL, default_tokens, string(" ,"));
     for (uint i = 0; i < default_tokens.size(); i++) USER_CUTOFF_SHELL.push_back(aurostd::string2utype<int>(default_tokens[i]));
@@ -2567,7 +2564,7 @@ namespace KBIN {
     default_stream.str("");
     default_stream << DEFAULT_APL_MINATOMS;
     aurostd::xoption USER_MINATOMS_OPTION; USER_MINATOMS_OPTION.xscheme = default_stream.str(); int USER_MINATOMS = DEFAULT_APL_MINATOMS;  //CO set by OPTION
-    bool USER_MINATOMS_RESTICTED_OPTION=0;  //CO 180404 - adding restricted variant to minatoms
+    bool USER_MINATOMS_RESTICTED_OPTION=0;  //CO20180404 - adding restricted variant to minatoms
     aurostd::xoption USER_SUPERCELL_OPTION; USER_SUPERCELL_OPTION.xscheme = ""; string USER_SUPERCELL = "";
 
     // User's control about calculation of dispersion curves
@@ -2625,52 +2622,52 @@ namespace KBIN {
       if(kflags.KBIN_PHONONS_CALCULATION_AAPL){
         // TCOND, e.g. TCOND = y
         CALCULATE_TCOND_OPTION.option = kflags.KBIN_PHONONS_CALCULATION_AAPL; //recycle what we parsed earlier
-        logger << _ASTROPT_ << "CALC is" << ( CALCULATE_TCOND_OPTION.option ? "" : " NOT" ) << " set." << apl::endl;  //CO 170601
-        logger << "Anharmonic force constants will" << ( CALCULATE_TCOND_OPTION.option ? "" : " NOT" ) << " be computed via AFLOW-AAPL." << apl::endl;   //CO 170601
+        logger << _ASTROPT_ << "CALC is" << ( CALCULATE_TCOND_OPTION.option ? "" : " NOT" ) << " set." << apl::endl;  //CO20170601
+        logger << "Anharmonic force constants will" << ( CALCULATE_TCOND_OPTION.option ? "" : " NOT" ) << " be computed via AFLOW-AAPL." << apl::endl;   //CO20170601
 
         // Get the user's magnitute of the threshold for the sumrule
-        USER_EPS_SUM_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "SUMRULE=" + "|" + _ASTROPT_APL_OLD_ + "SUMRULE="), USER_EPS_SUM_OPTION.option, USER_EPS_SUM_OPTION.xscheme); //CO 170601
-        USER_EPS_SUM = USER_EPS_SUM_OPTION.content_double; //CO 170601
+        USER_EPS_SUM_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "SUMRULE=" + "|" + _ASTROPT_APL_OLD_ + "SUMRULE="), USER_EPS_SUM_OPTION.option, USER_EPS_SUM_OPTION.xscheme); //CO20170601
+        USER_EPS_SUM = USER_EPS_SUM_OPTION.content_double; //CO20170601
         logger << (USER_EPS_SUM_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "SUMRULE=" << USER_EPS_SUM << "." << apl::endl;
         logger << "Convergence criterion for the sumrules is set to " <<  abs(USER_EPS_SUM) << " eV/Angs.^3." << apl::endl;
 
-        // ME 180821 - Get the mixing coefficient for the SCF procedure in AAPL
+        // ME20180821 - Get the mixing coefficient for the SCF procedure in AAPL
         USER_AAPL_MIX_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "MIXING_COEFFICIENT=" + "|" + _ASTROPT_APL_OLD_ + "MIXING_COEFFICIENT="), USER_AAPL_MIX_OPTION.option, USER_AAPL_MIX_OPTION.xscheme);
         USER_AAPL_MIX = USER_AAPL_MIX_OPTION.content_double;
         logger << (USER_AAPL_MIX_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "MIXING_COEFFICIENT=" << USER_AAPL_MIX << "." << apl::endl;
         logger << "The SCF for AAPL will use a mixing coefficient of " << USER_AAPL_MIX << "." << apl::endl;
 
-        // ME 180622 - Get the user's numnber of iterations for the sumrule
+        // ME20180622 - Get the user's numnber of iterations for the sumrule
         USER_AAPL_MAX_ITER_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "SUMRULE_MAX_ITER=" + "|" + _ASTROPT_APL_OLD_ + "SUMRULE_MAX_ITER="), USER_AAPL_MAX_ITER_OPTION.option, USER_AAPL_MAX_ITER_OPTION.xscheme);
         USER_AAPL_MAX_ITER = USER_AAPL_MAX_ITER_OPTION.content_double;
         logger << (USER_AAPL_MAX_ITER_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "SUMRULE_MAX_ITER=" << USER_AAPL_MAX_ITER << "." << apl::endl;
         logger << "Anharmonic IFCs need to be converged within " << abs(USER_AAPL_MAX_ITER) << " iterations." << apl::endl;
 
-        // ME 180913 - Calculate fourth order correction for thermal conductivity
+        // ME20180913 - Calculate fourth order correction for thermal conductivity
         USER_AAPL_FOURTH_ORDER_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "FOURTH_ORDER=" + "|" +_ASTROPT_APL_OLD_ + "FOURTH_ORDER="), USER_AAPL_FOURTH_ORDER_OPTION.option, USER_AAPL_FOURTH_ORDER_OPTION.xscheme);
         logger << (USER_AAPL_FOURTH_ORDER_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "FOURTH_ORDER=" << (USER_AAPL_FOURTH_ORDER_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
         logger << "Thermal conductivity will be calculated " << (USER_AAPL_FOURTH_ORDER_OPTION.option ? "with" : "without") << " four-phonon processes." << apl::endl;
 
-        /* OBSOLETE ME 181018
+        /* OBSOLETE ME20181018
         // Get the users magnitude of the distortion vector (in Angs. and real space)
-        USER_TDISTORTION_MAGNITUDE_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "TDMAG=" + "|" +_ASTROPT_APL_OLD_ + "TDMAG=" + "|" + _ASTROPT_ + "TDISMAG=" + "|" +_ASTROPT_APL_OLD_ + "TDISMAG="), USER_TDISTORTION_MAGNITUDE_OPTION.option, USER_TDISTORTION_MAGNITUDE_OPTION.xscheme);  //CO 170621 - TDISMAG legacy
+        USER_TDISTORTION_MAGNITUDE_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "TDMAG=" + "|" +_ASTROPT_APL_OLD_ + "TDMAG=" + "|" + _ASTROPT_ + "TDISMAG=" + "|" +_ASTROPT_APL_OLD_ + "TDISMAG="), USER_TDISTORTION_MAGNITUDE_OPTION.option, USER_TDISTORTION_MAGNITUDE_OPTION.xscheme);  //CO20170621 - TDISMAG legacy
         USER_TDISTORTION_MAGNITUDE = USER_TDISTORTION_MAGNITUDE_OPTION.content_double;
         logger << (USER_TDISTORTION_MAGNITUDE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "TDMAG=" << USER_TDISTORTION_MAGNITUDE << "." << apl::endl;
         logger << "The distortion magnitude for anharmonic IFCs will be " << USER_TDISTORTION_MAGNITUDE << " Angs." << apl::endl;
         */
 
         // ISOTOPE, e.g. ISOTOPE = y
-        CALCULATE_ISOTOPE_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "ISOTOPE=" + "|" +_ASTROPT_APL_OLD_ + "ISOTOPE="), CALCULATE_ISOTOPE_OPTION.option, CALCULATE_ISOTOPE_OPTION.xscheme); //CO 170601
+        CALCULATE_ISOTOPE_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "ISOTOPE=" + "|" +_ASTROPT_APL_OLD_ + "ISOTOPE="), CALCULATE_ISOTOPE_OPTION.option, CALCULATE_ISOTOPE_OPTION.xscheme); //CO20170601
         logger << (CALCULATE_ISOTOPE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "ISOTOPE=" << (CALCULATE_ISOTOPE_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
         logger << "Isotope effects " << (CALCULATE_ISOTOPE_OPTION.option ? "will" : "will NOT") << " be considered in the calculation." << apl::endl;
 
         //scattering at boundaries is handled either with BOUNDARY_OPTION + NANO_SIZE or CUMULATIVEK, if handled AT ALL
         // BOUNDARY, e.g. BOUNDARY = y
-        CALCULATE_BOUNDARY_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "BOUNDARY=" + "|" +_ASTROPT_APL_OLD_ + "BOUNDARY="), CALCULATE_BOUNDARY_OPTION.option, CALCULATE_BOUNDARY_OPTION.xscheme); //CO 170601
+        CALCULATE_BOUNDARY_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "BOUNDARY=" + "|" +_ASTROPT_APL_OLD_ + "BOUNDARY="), CALCULATE_BOUNDARY_OPTION.option, CALCULATE_BOUNDARY_OPTION.xscheme); //CO20170601
         logger << (CALCULATE_BOUNDARY_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "BOUNDARY=" << (CALCULATE_BOUNDARY_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
         logger << "The boundary term will " << (CALCULATE_BOUNDARY_OPTION.option ? "": "NOT ") << "be considered in the scattering time." << apl::endl;
         // CUMULATIVEK, e.g. CUMULATIVEK = y
-        CALCULATE_CUMULATIVEK_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "CUMULATIVEK=" + "|" +_ASTROPT_APL_OLD_ + "CUMULATIVEK="), CALCULATE_CUMULATIVEK_OPTION.option, CALCULATE_CUMULATIVEK_OPTION.xscheme); //CO 170601
+        CALCULATE_CUMULATIVEK_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "CUMULATIVEK=" + "|" +_ASTROPT_APL_OLD_ + "CUMULATIVEK="), CALCULATE_CUMULATIVEK_OPTION.option, CALCULATE_CUMULATIVEK_OPTION.xscheme); //CO20170601
         if(!(CALCULATE_BOUNDARY_OPTION.option || CALCULATE_CUMULATIVEK_OPTION.option) ){
           logger << (CALCULATE_CUMULATIVEK_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "CUMULATIVEK=" << (CALCULATE_CUMULATIVEK_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
           logger << "Boundary effects will NOT be considered in calculating the lattice thermal conductivity." << apl::endl;
@@ -2688,14 +2685,14 @@ namespace KBIN {
         }
         // Grain size
         if(CALCULATE_BOUNDARY_OPTION.option){
-          USER_NANO_SIZE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "NANO_SIZE=" + "|" + _ASTROPT_APL_OLD_ + "NANO_SIZE="), USER_NANO_SIZE_OPTION.option, USER_NANO_SIZE_OPTION.xscheme); //CO 170601
-          USER_NANO_SIZE = USER_NANO_SIZE_OPTION.content_double; //CO 170601
+          USER_NANO_SIZE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "NANO_SIZE=" + "|" + _ASTROPT_APL_OLD_ + "NANO_SIZE="), USER_NANO_SIZE_OPTION.option, USER_NANO_SIZE_OPTION.xscheme); //CO20170601
+          USER_NANO_SIZE = USER_NANO_SIZE_OPTION.content_double; //CO20170601
           logger << (USER_NANO_SIZE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "NANO_SIZE=" << USER_NANO_SIZE << "." << apl::endl;
           logger << "Boundary scattering will be computed for grain sizes of " << abs(USER_NANO_SIZE) << " nm." << apl::endl;
         }
 
         // BTE, e.g. BTE = RTA
-        USER_BTE_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "BTE=" + "|" +_ASTROPT_APL_OLD_ + "BTE="), USER_BTE_OPTION.option, USER_BTE_OPTION.xscheme); //CO 170601
+        USER_BTE_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "BTE=" + "|" +_ASTROPT_APL_OLD_ + "BTE="), USER_BTE_OPTION.option, USER_BTE_OPTION.xscheme); //CO20170601
         USER_BTE = USER_BTE_OPTION.content_string;
         transform(USER_BTE.begin(), USER_BTE.end(), USER_BTE.begin(), toupper);
         logger << (USER_BTE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "BTE=" << USER_BTE << "." << apl::endl;
@@ -2709,8 +2706,8 @@ namespace KBIN {
         }
 
         // THERMALGRID, e.g., THERMALGRID = 2x2x2
-        USER_THERMALGRID_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "THERMALGRID=" + "|" + _ASTROPT_APL_OLD_ + "THERMALGRID="), USER_THERMALGRID_OPTION.option, USER_THERMALGRID_OPTION.xscheme); //CO 170601
-        USER_THERMALGRID = USER_THERMALGRID_OPTION.content_string; //CO 170601
+        USER_THERMALGRID_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "THERMALGRID=" + "|" + _ASTROPT_APL_OLD_ + "THERMALGRID="), USER_THERMALGRID_OPTION.option, USER_THERMALGRID_OPTION.xscheme); //CO20170601
+        USER_THERMALGRID = USER_THERMALGRID_OPTION.content_string; //CO20170601
         tokens.clear();
         apl::tokenize(USER_THERMALGRID, tokens, string(" xX"));
         if (tokens.size() != 3) {throw apl::APLRuntimeError("Wrong setting in "+_ASTROPT_+"THERMALGRID. Specify as THERMALGRID=10x10x10.");}
@@ -2718,7 +2715,7 @@ namespace KBIN {
 
         // TCT, e.g., TCT = 1000:2000:10 -> temperature from 1000 to 2000 K by step 10 K
         // no default here
-        USER_TCT_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "TCT=" + "|" + _ASTROPT_APL_OLD_ + "TCT="), USER_TCT_OPTION.option, USER_TCT_OPTION.xscheme); //CO 170601
+        USER_TCT_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "TCT=" + "|" + _ASTROPT_APL_OLD_ + "TCT="), USER_TCT_OPTION.option, USER_TCT_OPTION.xscheme); //CO20170601
         tokens.clear();
         apl::tokenize(USER_TCT_OPTION.content_string, tokens, string(" :"));
         if (tokens.size() != 3) {
@@ -2740,7 +2737,7 @@ namespace KBIN {
         logger << "Thermal conductivity will be calculated in the temperature range <" << USER_TCT_TSTART << "," << USER_TCT_TEND << "> with step size " << USER_TCT_TSTEP << " K." << apl::endl;
 
         // Cutoff Radius (in Angstrom)
-        USER_CUTOFF_DISTANCE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "CUT_RAD=" + "|" + _ASTROPT_APL_OLD_ + "CUT_RAD="), USER_CUTOFF_DISTANCE_OPTION.option, USER_CUTOFF_DISTANCE_OPTION.xscheme); //CO 170601
+        USER_CUTOFF_DISTANCE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "CUT_RAD=" + "|" + _ASTROPT_APL_OLD_ + "CUT_RAD="), USER_CUTOFF_DISTANCE_OPTION.option, USER_CUTOFF_DISTANCE_OPTION.xscheme); //CO20170601
         if (USER_CUTOFF_SHELL_OPTION.isentry) {
           if (!USER_AAPL_FOURTH_ORDER_OPTION.option) {
             USER_CUTOFF_DISTANCE.resize(1);
@@ -2773,7 +2770,7 @@ namespace KBIN {
         }
 
         // Cutoff radius (in coordination shells)
-        USER_CUTOFF_SHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "CUT_SHELL=" + "|" + _ASTROPT_APL_OLD_ + "CUT_SHELL="), USER_CUTOFF_SHELL_OPTION.option, USER_CUTOFF_SHELL_OPTION.xscheme); //CO 170601
+        USER_CUTOFF_SHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "CUT_SHELL=" + "|" + _ASTROPT_APL_OLD_ + "CUT_SHELL="), USER_CUTOFF_SHELL_OPTION.option, USER_CUTOFF_SHELL_OPTION.xscheme); //CO20170601
         if (USER_CUTOFF_SHELL_OPTION.isentry) {
           if (!USER_AAPL_FOURTH_ORDER_OPTION.option) {
             USER_CUTOFF_SHELL.resize(1);
@@ -2805,7 +2802,7 @@ namespace KBIN {
           }
         }
 
-        // ME 180501 - If the user only specifies CUT_SHELL or CUT_RAD, unset the default values
+        // ME20180501 - If the user only specifies CUT_SHELL or CUT_RAD, unset the default values
         if (USER_CUTOFF_SHELL_OPTION.isentry && ! USER_CUTOFF_DISTANCE_OPTION.isentry){
           if (USER_AAPL_FOURTH_ORDER_OPTION.option) {
             USER_CUTOFF_DISTANCE.assign(2, 0.0);
@@ -2929,7 +2926,7 @@ namespace KBIN {
             kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C || kflags.KBIN_PHONONS_CALCULATION_QHA3P ||
             kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C){
 
-          CUTOFF_FREQ_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "CUTOFF_FREQ=" + "|" + _ASTROPT_APL_OLD_ + "CUTOFF_FREQ="), CUTOFF_FREQ_OPTION.option, CUTOFF_FREQ_OPTION.xscheme); //CO 170601
+          CUTOFF_FREQ_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "CUTOFF_FREQ=" + "|" + _ASTROPT_APL_OLD_ + "CUTOFF_FREQ="), CUTOFF_FREQ_OPTION.option, CUTOFF_FREQ_OPTION.xscheme); //CO20170601
           CUTOFF_FREQ = CUTOFF_FREQ_OPTION.content_double;
           if (CUTOFF_FREQ_OPTION.isentry) {
             tokens.clear();
@@ -2939,7 +2936,7 @@ namespace KBIN {
           logger << (CUTOFF_FREQ_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "CUTOFF_FREQ=" << CUTOFF_FREQ_OPTION.content_string << "." << apl::endl;
 
 
-          CALCULATE_EOS_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "EOS=" + "|" + _ASTROPT_APL_OLD_ + "EOS="), CALCULATE_EOS_OPTION.option, CALCULATE_EOS_OPTION.xscheme); //CO 170601
+          CALCULATE_EOS_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "EOS=" + "|" + _ASTROPT_APL_OLD_ + "EOS="), CALCULATE_EOS_OPTION.option, CALCULATE_EOS_OPTION.xscheme); //CO20170601
           logger << (CALCULATE_EOS_OPTION.isentry ? "Setting " : "DEFAULT ") << _ASTROPT_ << "EOS=" << (CALCULATE_EOS_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
 
           if ((CALCULATE_EOS_OPTION.option) && (CALCULATE_GRUNEISEN_OPTION.option || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B ||
@@ -2958,7 +2955,7 @@ namespace KBIN {
             logger << (EOS_DISTORTION_RANGE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "EOS_DISTORTION_RANGE=" << EOS_DISTORTION_RANGE_OPTION.content_string << "." << apl::endl;
             logger << "The EOS properties will be calculated in distortion range <" << EOS_DISTORTION_START << "," << EOS_DISTORTION_END << "," << EOS_DISTORTION_DISTORTION_INC << "." << apl::endl;
 
-            FITTING_TYPE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "FITTING_TYPE=" + "|" + _ASTROPT_APL_OLD_ + "FITTING_TYPE="), FITTING_TYPE_OPTION.option, FITTING_TYPE_OPTION.xscheme); //CO 170601
+            FITTING_TYPE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "FITTING_TYPE=" + "|" + _ASTROPT_APL_OLD_ + "FITTING_TYPE="), FITTING_TYPE_OPTION.option, FITTING_TYPE_OPTION.xscheme); //CO20170601
             FITTING_TYPE = FITTING_TYPE_OPTION.content_string;
             if (FITTING_TYPE_OPTION.isentry) {
               tokens.clear();
@@ -3023,10 +3020,10 @@ namespace KBIN {
         logger << (GP_DISTORTION_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "GP_DISTORTION=" << GP_DISTORTION << "." << apl::endl;
       }
       //EOS SUBDIRECTORY OPTIONS. These are automic options and not controlled by users
-      CALCULATE_EOS_SUBDIRECTORIES_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "EOS_SD=" + "|" + _ASTROPT_APL_OLD_ + "EOS_SD="), CALCULATE_EOS_SUBDIRECTORIES_OPTION.option, CALCULATE_EOS_SUBDIRECTORIES_OPTION.xscheme); //CO 170601
+      CALCULATE_EOS_SUBDIRECTORIES_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "EOS_SD=" + "|" + _ASTROPT_APL_OLD_ + "EOS_SD="), CALCULATE_EOS_SUBDIRECTORIES_OPTION.option, CALCULATE_EOS_SUBDIRECTORIES_OPTION.xscheme); //CO20170601
       if(CALCULATE_EOS_SUBDIRECTORIES_OPTION.option){
         logger << (CALCULATE_EOS_SUBDIRECTORIES_OPTION.isentry ? "Setting " : "DEFAULT ") << _ASTROPT_ << "EOS_SD=" << (CALCULATE_EOS_SUBDIRECTORIES_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
-        EOS_DISTORTION_RANGE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "EOS_DISTORTION_RANGE=" + "|" + _ASTROPT_APL_OLD_ + "EOS_DISTORTION_RANGE="), EOS_DISTORTION_RANGE_OPTION.option, EOS_DISTORTION_RANGE_OPTION.xscheme); //CO 170601
+        EOS_DISTORTION_RANGE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "EOS_DISTORTION_RANGE=" + "|" + _ASTROPT_APL_OLD_ + "EOS_DISTORTION_RANGE="), EOS_DISTORTION_RANGE_OPTION.option, EOS_DISTORTION_RANGE_OPTION.xscheme); //CO20170601
         tokens.clear();
         apl::tokenize(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
         if (tokens.size() != 3) {throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1");}
@@ -3074,27 +3071,27 @@ namespace KBIN {
 
       if( !(CALCULATE_TCOND_OPTION.option||CALCULATE_GRUNEISEN_OPTION.option) ){
         CALCULATE_APL_OPTION.option = kflags.KBIN_PHONONS_CALCULATION_APL;
-        logger << _ASTROPT_ << "CALC is" << ( CALCULATE_APL_OPTION.option ? "" : " NOT" ) << " set." << apl::endl;  //CO 170601
-        logger << "Harmonic force constants will" << ( CALCULATE_APL_OPTION.option ? "" : " NOT" ) << " be computed via AFLOW-APL." << apl::endl;   //CO 170601
-      }  //CO 170601
+        logger << _ASTROPT_ << "CALC is" << ( CALCULATE_APL_OPTION.option ? "" : " NOT" ) << " set." << apl::endl;  //CO20170601
+        logger << "Harmonic force constants will" << ( CALCULATE_APL_OPTION.option ? "" : " NOT" ) << " be computed via AFLOW-APL." << apl::endl;   //CO20170601
+      }  //CO20170601
 
       //BELOW HERE, all tags all shared, so we need to look for all combinations
 
       // HIBERNATE, e.g. HIBERNATE = y
-      USER_HIBERNATE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "HIBERNATE=" + "|" + _ASTROPT_QHA_ + "HIBERNATE=" + "|" + _ASTROPT_AAPL_ + "HIBERNATE=" + "|" + _ASTROPT_APL_OLD_ + "HIBERNATE="), USER_HIBERNATE_OPTION.option, USER_HIBERNATE_OPTION.xscheme); //CO 170601
+      USER_HIBERNATE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "HIBERNATE=" + "|" + _ASTROPT_QHA_ + "HIBERNATE=" + "|" + _ASTROPT_AAPL_ + "HIBERNATE=" + "|" + _ASTROPT_APL_OLD_ + "HIBERNATE="), USER_HIBERNATE_OPTION.option, USER_HIBERNATE_OPTION.xscheme); //CO20170601
       logger << (USER_HIBERNATE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "HIBERNATE=" << (USER_HIBERNATE_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
       logger << "The hibernate feature is switched " << (USER_HIBERNATE_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
 
       // FREQFORMAT, e.g. FREQFORMAT = "THz | allow_negative"
       //COREY, would help if you had some sort of stupidity test here
-      USER_FREQFORMAT_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "FREQFORMAT=" + "|" + _ASTROPT_QHA_ + "FREQFORMAT=" + "|" + _ASTROPT_AAPL_ + "FREQFORMAT=" + "|" + _ASTROPT_APL_OLD_ + "FREQFORMAT="), USER_FREQFORMAT_OPTION.option, USER_FREQFORMAT_OPTION.xscheme); //CO 170601
-      USER_FREQFORMAT = USER_FREQFORMAT_OPTION.content_string;  //CO 170601
+      USER_FREQFORMAT_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "FREQFORMAT=" + "|" + _ASTROPT_QHA_ + "FREQFORMAT=" + "|" + _ASTROPT_AAPL_ + "FREQFORMAT=" + "|" + _ASTROPT_APL_OLD_ + "FREQFORMAT="), USER_FREQFORMAT_OPTION.option, USER_FREQFORMAT_OPTION.xscheme); //CO20170601
+      USER_FREQFORMAT = USER_FREQFORMAT_OPTION.content_string;  //CO20170601
       transform(USER_FREQFORMAT.begin(), USER_FREQFORMAT.end(), USER_FREQFORMAT.begin(), toupper);
       logger << (USER_FREQFORMAT_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "FREQFORMAT=" << USER_FREQFORMAT << "." << apl::endl;
       logger << "The frequency will be returned in this format: " << USER_FREQFORMAT << "." << apl::endl;
 
       // ENGINE, e.g., ENGINE = DM or LR
-      USER_ENGINE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "ENGINE=" + "|" + _ASTROPT_QHA_ + "ENGINE=" + "|" + _ASTROPT_AAPL_ + "ENGINE=" + "|" + _ASTROPT_APL_OLD_ + "ENGINE="), USER_ENGINE_OPTION.option, USER_ENGINE_OPTION.xscheme); //CO 170601
+      USER_ENGINE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "ENGINE=" + "|" + _ASTROPT_QHA_ + "ENGINE=" + "|" + _ASTROPT_AAPL_ + "ENGINE=" + "|" + _ASTROPT_APL_OLD_ + "ENGINE="), USER_ENGINE_OPTION.option, USER_ENGINE_OPTION.xscheme); //CO20170601
       USER_ENGINE = USER_ENGINE_OPTION.content_string;
       transform(USER_ENGINE.begin(), USER_ENGINE.end(), USER_ENGINE.begin(), toupper);
       logger << (USER_ENGINE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "ENGINE=" << USER_ENGINE << "." << apl::endl;
@@ -3108,13 +3105,13 @@ namespace KBIN {
 
       // Get the users magnitute of the distortion vector (in Angs. and real space)
       if (USER_ENGINE == string("DM")) {
-        USER_DISTORTION_MAGNITUDE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DMAG=" + "|" + _ASTROPT_QHA_ + "DMAG=" + "|" + _ASTROPT_AAPL_ + "DMAG=" + "|" + _ASTROPT_APL_OLD_ + "DMAG=" + "|" + _ASTROPT_APL_ + "DISMAG=" + "|" + _ASTROPT_QHA_ + "DISMAG=" + "|" + _ASTROPT_AAPL_ + "DISMAG=" + "|" + _ASTROPT_APL_OLD_ + "DISMAG="), USER_DISTORTION_MAGNITUDE_OPTION.option, USER_DISTORTION_MAGNITUDE_OPTION.xscheme); //CO 170601, 170621 DISMAG legacy
+        USER_DISTORTION_MAGNITUDE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DMAG=" + "|" + _ASTROPT_QHA_ + "DMAG=" + "|" + _ASTROPT_AAPL_ + "DMAG=" + "|" + _ASTROPT_APL_OLD_ + "DMAG=" + "|" + _ASTROPT_APL_ + "DISMAG=" + "|" + _ASTROPT_QHA_ + "DISMAG=" + "|" + _ASTROPT_AAPL_ + "DISMAG=" + "|" + _ASTROPT_APL_OLD_ + "DISMAG="), USER_DISTORTION_MAGNITUDE_OPTION.option, USER_DISTORTION_MAGNITUDE_OPTION.xscheme); //CO20170601, 170621 DISMAG legacy
         USER_DISTORTION_MAGNITUDE = USER_DISTORTION_MAGNITUDE_OPTION.content_double;
         logger << (USER_DISTORTION_MAGNITUDE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "DMAG=" << USER_DISTORTION_MAGNITUDE << "." << apl::endl;
         logger << "The distortion magnitude will be " << USER_DISTORTION_MAGNITUDE << " Angs." << apl::endl;
 
         // Get flag for generation of displacements with positive/negative magnitude
-        USER_DISTORTIONS_PLUS_MINUS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DPM=" + "|" + _ASTROPT_QHA_ + "DPM=" + "|" + _ASTROPT_AAPL_ + "DPM=" + "|" + _ASTROPT_APL_OLD_ + "DPM="), USER_DISTORTIONS_PLUS_MINUS_OPTION.option, USER_DISTORTIONS_PLUS_MINUS_OPTION.xscheme); //CO 170601
+        USER_DISTORTIONS_PLUS_MINUS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DPM=" + "|" + _ASTROPT_QHA_ + "DPM=" + "|" + _ASTROPT_AAPL_ + "DPM=" + "|" + _ASTROPT_APL_OLD_ + "DPM="), USER_DISTORTIONS_PLUS_MINUS_OPTION.option, USER_DISTORTIONS_PLUS_MINUS_OPTION.xscheme); //CO20170601
         AUTO_DISTORTIONS_PLUS_MINUS_OPTION.option = !USER_DISTORTIONS_PLUS_MINUS_OPTION.option;
         if (USER_DISTORTIONS_PLUS_MINUS_OPTION.isentry){logger << (USER_DISTORTIONS_PLUS_MINUS_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "DPM=" << (USER_DISTORTIONS_PLUS_MINUS_OPTION.option ? "ON" : "OFF") << "." << apl::endl;}
         if (USER_DISTORTIONS_PLUS_MINUS_OPTION.option){logger << "Each distortion will be generated with both positive and negative magnitudes." << apl::endl;}
@@ -3122,21 +3119,21 @@ namespace KBIN {
         if (AUTO_DISTORTIONS_PLUS_MINUS_OPTION.option){logger << "DEFAULT " << _ASTROPT_ << "DPM=AUTO which considers negative distortions on a per-site basis." << apl::endl;} //corey AUTO
 
         // Get flag for generation of displacements only along the x, y, and z axis
-        USER_DISTORTIONS_XYZ_ONLY_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DXYZONLY=" + "|" + _ASTROPT_QHA_ + "DXYZONLY=" + "|" + _ASTROPT_AAPL_ + "DXYZONLY=" + "|" + _ASTROPT_APL_OLD_ + "DXYZONLY="), USER_DISTORTIONS_XYZ_ONLY_OPTION.option, USER_DISTORTIONS_XYZ_ONLY_OPTION.xscheme); //CO 170601
+        USER_DISTORTIONS_XYZ_ONLY_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DXYZONLY=" + "|" + _ASTROPT_QHA_ + "DXYZONLY=" + "|" + _ASTROPT_AAPL_ + "DXYZONLY=" + "|" + _ASTROPT_APL_OLD_ + "DXYZONLY="), USER_DISTORTIONS_XYZ_ONLY_OPTION.option, USER_DISTORTIONS_XYZ_ONLY_OPTION.xscheme); //CO20170601
         logger << (USER_DISTORTIONS_XYZ_ONLY_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "DXYZONLY=" << (USER_DISTORTIONS_XYZ_ONLY_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
         if (USER_DISTORTIONS_XYZ_ONLY_OPTION.option){logger << "Only distortions along the x, y, and z axis will be used." << apl::endl;}
         else {logger << "Distortions will be created along lattice vectors including faces and body diagonals." << apl::endl;}
 
         // ZEROSTATE; One next calculation will be done with no distortion, a such obtained
         // forces will be subtracted from the all forces obtained with distortions
-        USER_ZEROSTATE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "ZEROSTATE=" + "|" + _ASTROPT_QHA_ + "ZEROSTATE=" + "|" + _ASTROPT_AAPL_ + "ZEROSTATE=" + "|" + _ASTROPT_APL_OLD_ + "ZEROSTATE="), USER_ZEROSTATE_OPTION.option, USER_ZEROSTATE_OPTION.xscheme); //CO 170601
+        USER_ZEROSTATE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "ZEROSTATE=" + "|" + _ASTROPT_QHA_ + "ZEROSTATE=" + "|" + _ASTROPT_AAPL_ + "ZEROSTATE=" + "|" + _ASTROPT_APL_OLD_ + "ZEROSTATE="), USER_ZEROSTATE_OPTION.option, USER_ZEROSTATE_OPTION.xscheme); //CO20170601
         logger << (USER_ZEROSTATE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "ZEROSTATE=" << (USER_ZEROSTATE_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
         if (USER_ZEROSTATE_OPTION.option){logger << "The zero state forces will be also calculated and subtracted from all forces." << apl::endl;}
       }
 
       // Do polar correction
       if (USER_ENGINE == string("LR") || USER_ENGINE == string("DM")) {
-        CALCULATE_POLAR_CORRECTIONS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "POLAR=" + "|" + _ASTROPT_QHA_ + "POLAR=" + "|" + _ASTROPT_AAPL_ + "POLAR=" + "|" + _ASTROPT_APL_OLD_ + "POLAR="), CALCULATE_POLAR_CORRECTIONS_OPTION.option, CALCULATE_POLAR_CORRECTIONS_OPTION.xscheme); //CO 170601
+        CALCULATE_POLAR_CORRECTIONS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "POLAR=" + "|" + _ASTROPT_QHA_ + "POLAR=" + "|" + _ASTROPT_AAPL_ + "POLAR=" + "|" + _ASTROPT_APL_OLD_ + "POLAR="), CALCULATE_POLAR_CORRECTIONS_OPTION.option, CALCULATE_POLAR_CORRECTIONS_OPTION.xscheme); //CO20170601
         logger << (CALCULATE_POLAR_CORRECTIONS_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "POLAR=" << (CALCULATE_POLAR_CORRECTIONS_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
         logger << "The calculation of POLAR MATERIALS corrections is switched " << (CALCULATE_POLAR_CORRECTIONS_OPTION.option? "ON": "OFF") << "." << apl::endl;
       }
@@ -3176,7 +3173,7 @@ namespace KBIN {
 
       // RELAX, Should be the primitive structure relax before any supercell is build?
       //CO looks like this has yet to be implemented, need to figure this out
-      USER_WANTS_RELAX_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "RELAX=" + "|" + _ASTROPT_QHA_ + "RELAX=" + "|" + _ASTROPT_AAPL_ + "RELAX=" + "|" + _ASTROPT_APL_OLD_ + "RELAX="), USER_WANTS_RELAX_OPTION.option, USER_WANTS_RELAX_OPTION.xscheme); //CO 170601
+      USER_WANTS_RELAX_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "RELAX=" + "|" + _ASTROPT_QHA_ + "RELAX=" + "|" + _ASTROPT_AAPL_ + "RELAX=" + "|" + _ASTROPT_APL_OLD_ + "RELAX="), USER_WANTS_RELAX_OPTION.option, USER_WANTS_RELAX_OPTION.xscheme); //CO20170601
       if(USER_WANTS_RELAX_OPTION.isentry){
         logger << "Setting " << _ASTROPT_ << "RELAX=" << (USER_WANTS_RELAX_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
         if (USER_WANTS_RELAX_OPTION.option){logger << "The primitive cell is going to relax before the supercell build." << apl::endl;}
@@ -3184,7 +3181,7 @@ namespace KBIN {
 
       found_supercell = false;
       // SUPERCELL, e.g., SUPERCELL = 2x2x2
-      USER_SUPERCELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "SUPERCELL=" + "|" + _ASTROPT_QHA_ + "SUPERCELL=" + "|" + _ASTROPT_AAPL_ + "SUPERCELL=" + "|" + _ASTROPT_APL_OLD_ + "SUPERCELL="), USER_SUPERCELL_OPTION.option, USER_SUPERCELL_OPTION.xscheme); //CO 170601
+      USER_SUPERCELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "SUPERCELL=" + "|" + _ASTROPT_QHA_ + "SUPERCELL=" + "|" + _ASTROPT_AAPL_ + "SUPERCELL=" + "|" + _ASTROPT_APL_OLD_ + "SUPERCELL="), USER_SUPERCELL_OPTION.option, USER_SUPERCELL_OPTION.xscheme); //CO20170601
       USER_SUPERCELL = USER_SUPERCELL_OPTION.content_string;
       if(USER_SUPERCELL_OPTION.isentry){
         tokens.clear();
@@ -3204,8 +3201,8 @@ namespace KBIN {
       if(!found_supercell){
         USER_MINATOMS_OPTION.options2entry(AflowIn, string( 
               _ASTROPT_APL_ + "MINATOMS=" + "|" + _ASTROPT_QHA_ + "MINATOMS=" + "|" + _ASTROPT_AAPL_ + "MINATOMS=" + "|" + _ASTROPT_APL_OLD_ + "MINATOMS=" + "|" +
-              _ASTROPT_APL_ + "MINATOMS_RESTRICTED=" + "|" + _ASTROPT_QHA_ + "MINATOMS_RESTRICTED=" + "|" + _ASTROPT_AAPL_ + "MINATOMS_RESTRICTED=" + "|" + _ASTROPT_APL_OLD_ + "MINATOMS_RESTRICTED="  //CO 180418 - restricted means all dims are equal
-              ), USER_MINATOMS_OPTION.option, USER_MINATOMS_OPTION.xscheme); //CO 170601
+              _ASTROPT_APL_ + "MINATOMS_RESTRICTED=" + "|" + _ASTROPT_QHA_ + "MINATOMS_RESTRICTED=" + "|" + _ASTROPT_AAPL_ + "MINATOMS_RESTRICTED=" + "|" + _ASTROPT_APL_OLD_ + "MINATOMS_RESTRICTED="  //CO20180418 - restricted means all dims are equal
+              ), USER_MINATOMS_OPTION.option, USER_MINATOMS_OPTION.xscheme); //CO20170601
         USER_MINATOMS_RESTICTED_OPTION=aurostd::substring2bool(USER_MINATOMS_OPTION.keyword,"_RESTRICTED");
         USER_MINATOMS = USER_MINATOMS_OPTION.content_int;
         if(USER_MINATOMS_OPTION.isentry){
@@ -3219,7 +3216,7 @@ namespace KBIN {
       // CO, not sure how maxshell works here (F option), need to investigate further and add to README
       // also seems USER_WANTS_FULL_SHELL applies for both MAX and MIN shell settings, should one take precedence? should they be separate flags?
       if(!found_supercell){
-        USER_MAXSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MAXSHELL=" + "|" + _ASTROPT_QHA_ + "MAXSHELL=" + "|" + _ASTROPT_AAPL_ + "MAXSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MAXSHELL="), USER_MAXSHELL_OPTION.option, USER_MAXSHELL_OPTION.xscheme); //CO 170601
+        USER_MAXSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MAXSHELL=" + "|" + _ASTROPT_QHA_ + "MAXSHELL=" + "|" + _ASTROPT_AAPL_ + "MAXSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MAXSHELL="), USER_MAXSHELL_OPTION.option, USER_MAXSHELL_OPTION.xscheme); //CO20170601
         test = USER_MAXSHELL_OPTION.content_string;
         if (test[test.size() - 1] == 'f' || test[test.size() - 1] == 'F') {
           USER_MAXSHELL = aurostd::string2utype<int>(test.substr(0, test.size() - 1));
@@ -3238,7 +3235,7 @@ namespace KBIN {
       // Get the users minimum shell which will be included into calculation
       // CO, not sure how minshell works here (F option), need to investigate further and add to README
       if(!found_supercell){
-        USER_MINSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MINSHELL=" + "|" + _ASTROPT_QHA_ + "MINSHELL=" + "|" + _ASTROPT_AAPL_ + "MINSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MINSHELL="), USER_MINSHELL_OPTION.option, USER_MINSHELL_OPTION.xscheme); //CO 170601
+        USER_MINSHELL_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "MINSHELL=" + "|" + _ASTROPT_QHA_ + "MINSHELL=" + "|" + _ASTROPT_AAPL_ + "MINSHELL=" + "|" + _ASTROPT_APL_OLD_ + "MINSHELL="), USER_MINSHELL_OPTION.option, USER_MINSHELL_OPTION.xscheme); //CO20170601
         test = USER_MINSHELL_OPTION.content_string;
         if (test[test.size() - 1] == 'f' || test[test.size() - 1] == 'F') {
           USER_MINSHELL = aurostd::string2utype<int>(test.substr(0, test.size() - 1));
@@ -3266,12 +3263,12 @@ namespace KBIN {
       // ADDITIONAL OPTIONS ------------------------------------------------
 
       // DC. e.g., DC = yes
-      CALCULATE_PHONON_DISPERSIONS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DC=" + "|" + _ASTROPT_QHA_ + "DC=" + "|" + _ASTROPT_AAPL_ + "DC=" + "|" + _ASTROPT_APL_OLD_ + "DC="), CALCULATE_PHONON_DISPERSIONS_OPTION.option, CALCULATE_PHONON_DISPERSIONS_OPTION.xscheme); //CO 170601
+      CALCULATE_PHONON_DISPERSIONS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DC=" + "|" + _ASTROPT_QHA_ + "DC=" + "|" + _ASTROPT_AAPL_ + "DC=" + "|" + _ASTROPT_APL_OLD_ + "DC="), CALCULATE_PHONON_DISPERSIONS_OPTION.option, CALCULATE_PHONON_DISPERSIONS_OPTION.xscheme); //CO20170601
       logger << (CALCULATE_PHONON_DISPERSIONS_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "DC=" << (CALCULATE_PHONON_DISPERSIONS_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
       logger << "The calculation of PHONON DISPERSION curves is switched " << (CALCULATE_PHONON_DISPERSIONS_OPTION.option? "ON" : "OFF" ) << "." << apl::endl;
 
       if (CALCULATE_PHONON_DISPERSIONS_OPTION.option) {
-        //CO 180406 - only choose one way to define path, INITLATTICE/INITSG vs. INITCOORDS_FRAC/INITCOORDS_CART + INITCOORDS_LABELS
+        //CO20180406 - only choose one way to define path, INITLATTICE/INITSG vs. INITCOORDS_FRAC/INITCOORDS_CART + INITCOORDS_LABELS
         bool found_user_path=false;
 
         // DCINITLATTICE, e.g.,       DCINITLATTICE = RHL
@@ -3280,11 +3277,11 @@ namespace KBIN {
         // DCINITCOORDSCART, e.g.,    DCINITCOORDSCART = 0,0,0;0.5,0.5,0.5
         // DCINITCOORDSLABELS, e.g.,  DCINITCOORDSLABELS = G,L,M,X
         // defaults are empty strings, so don't set unless isentry
-        USER_DC_INITLATTICE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITLATTICE=" + "|" + _ASTROPT_QHA_ + "DCINITLATTICE=" + "|" + _ASTROPT_AAPL_ + "DCINITLATTICE=" + "|" + _ASTROPT_APL_OLD_ + "DCINITLATTICE="), USER_DC_INITLATTICE_OPTION.option, USER_DC_INITLATTICE_OPTION.xscheme); //CO 170601
-        USER_DC_INITSG_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITSG=" + "|" + _ASTROPT_QHA_ + "DCINITSG=" + "|" + _ASTROPT_AAPL_ + "DCINITSG=" + "|" + _ASTROPT_APL_OLD_ + "DCINITSG="), USER_DC_INITSG_OPTION.option, USER_DC_INITSG_OPTION.xscheme); //CO 170601
-        USER_DC_INITCOORDS_FRAC_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITCOORDSFRAC=" + "|" + _ASTROPT_QHA_ + "DCINITCOORDSFRAC=" + "|" + _ASTROPT_AAPL_ + "DCINITCOORDSFRAC=" + "|" + _ASTROPT_APL_OLD_ + "DCINITCOORDSFRAC="), USER_DC_INITCOORDS_FRAC_OPTION.option, USER_DC_INITCOORDS_FRAC_OPTION.xscheme); //CO 170601
-        USER_DC_INITCOORDS_CART_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITCOORDSCART=" + "|" + _ASTROPT_QHA_ + "DCINITCOORDSCART=" + "|" + _ASTROPT_AAPL_ + "DCINITCOORDSCART=" + "|" + _ASTROPT_APL_OLD_ + "DCINITCOORDSCART="), USER_DC_INITCOORDS_CART_OPTION.option, USER_DC_INITCOORDS_CART_OPTION.xscheme); //CO 170601
-        USER_DC_INITCOORDS_LABELS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITCOORDSLABELS=" + "|" + _ASTROPT_QHA_ + "DCINITCOORDSLABELS=" + "|" + _ASTROPT_AAPL_ + "DCINITCOORDSLABELS=" + "|" + _ASTROPT_APL_OLD_ + "DCINITCOORDSLABELS="), USER_DC_INITCOORDS_LABELS_OPTION.option, USER_DC_INITCOORDS_LABELS_OPTION.xscheme); //CO 170601
+        USER_DC_INITLATTICE_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITLATTICE=" + "|" + _ASTROPT_QHA_ + "DCINITLATTICE=" + "|" + _ASTROPT_AAPL_ + "DCINITLATTICE=" + "|" + _ASTROPT_APL_OLD_ + "DCINITLATTICE="), USER_DC_INITLATTICE_OPTION.option, USER_DC_INITLATTICE_OPTION.xscheme); //CO20170601
+        USER_DC_INITSG_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITSG=" + "|" + _ASTROPT_QHA_ + "DCINITSG=" + "|" + _ASTROPT_AAPL_ + "DCINITSG=" + "|" + _ASTROPT_APL_OLD_ + "DCINITSG="), USER_DC_INITSG_OPTION.option, USER_DC_INITSG_OPTION.xscheme); //CO20170601
+        USER_DC_INITCOORDS_FRAC_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITCOORDSFRAC=" + "|" + _ASTROPT_QHA_ + "DCINITCOORDSFRAC=" + "|" + _ASTROPT_AAPL_ + "DCINITCOORDSFRAC=" + "|" + _ASTROPT_APL_OLD_ + "DCINITCOORDSFRAC="), USER_DC_INITCOORDS_FRAC_OPTION.option, USER_DC_INITCOORDS_FRAC_OPTION.xscheme); //CO20170601
+        USER_DC_INITCOORDS_CART_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITCOORDSCART=" + "|" + _ASTROPT_QHA_ + "DCINITCOORDSCART=" + "|" + _ASTROPT_AAPL_ + "DCINITCOORDSCART=" + "|" + _ASTROPT_APL_OLD_ + "DCINITCOORDSCART="), USER_DC_INITCOORDS_CART_OPTION.option, USER_DC_INITCOORDS_CART_OPTION.xscheme); //CO20170601
+        USER_DC_INITCOORDS_LABELS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCINITCOORDSLABELS=" + "|" + _ASTROPT_QHA_ + "DCINITCOORDSLABELS=" + "|" + _ASTROPT_AAPL_ + "DCINITCOORDSLABELS=" + "|" + _ASTROPT_APL_OLD_ + "DCINITCOORDSLABELS="), USER_DC_INITCOORDS_LABELS_OPTION.option, USER_DC_INITCOORDS_LABELS_OPTION.xscheme); //CO20170601
         if(!found_user_path && USER_DC_INITLATTICE_OPTION.isentry) {
           USER_DC_INITLATTICE.clear(); USER_DC_INITCOORDS_FRAC.clear(); USER_DC_INITCOORDS_CART.clear();
           USER_DC_INITLATTICE = USER_DC_INITLATTICE_OPTION.content_string;
@@ -3329,7 +3326,7 @@ namespace KBIN {
 
         // DCUSERPATH, e.g., DCUSERPATH = G-X|X-U|K-G|G-L
         // default is empty string, so don't set unless isentry
-        USER_DC_USERPATH_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCUSERPATH=" + "|" + _ASTROPT_QHA_ + "DCUSERPATH=" + "|" + _ASTROPT_AAPL_ + "DCUSERPATH=" + "|" + _ASTROPT_APL_OLD_ + "DCUSERPATH="), USER_DC_USERPATH_OPTION.option, USER_DC_USERPATH_OPTION.xscheme); //CO 170601
+        USER_DC_USERPATH_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCUSERPATH=" + "|" + _ASTROPT_QHA_ + "DCUSERPATH=" + "|" + _ASTROPT_AAPL_ + "DCUSERPATH=" + "|" + _ASTROPT_APL_OLD_ + "DCUSERPATH="), USER_DC_USERPATH_OPTION.option, USER_DC_USERPATH_OPTION.xscheme); //CO20170601
         if(USER_DC_USERPATH_OPTION.isentry){
           USER_DC_USERPATH = USER_DC_USERPATH_OPTION.content_string;
           logger << "Setting " << _ASTROPT_ << "DCUSERPATH=" << USER_DC_USERPATH << "." << apl::endl;
@@ -3343,20 +3340,20 @@ namespace KBIN {
         //}
 
         // DCPOINTS, e.g., DCPOINTS = 100
-        USER_DC_NPOINTS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCPOINTS=" + "|" + _ASTROPT_QHA_ + "DCPOINTS=" + "|" + _ASTROPT_AAPL_ + "DCPOINTS=" + "|" + _ASTROPT_APL_OLD_ + "DCPOINTS="), USER_DC_NPOINTS_OPTION.option, USER_DC_NPOINTS_OPTION.xscheme); //CO 170601
+        USER_DC_NPOINTS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DCPOINTS=" + "|" + _ASTROPT_QHA_ + "DCPOINTS=" + "|" + _ASTROPT_AAPL_ + "DCPOINTS=" + "|" + _ASTROPT_APL_OLD_ + "DCPOINTS="), USER_DC_NPOINTS_OPTION.option, USER_DC_NPOINTS_OPTION.xscheme); //CO20170601
         USER_DC_NPOINTS = USER_DC_NPOINTS_OPTION.content_int;
         logger << (USER_DC_NPOINTS_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "DCPOINTS=" << USER_DC_NPOINTS << "." << apl::endl;
         logger << "Each subpath will be divided into " << USER_DC_NPOINTS << " points." << apl::endl;
       }
 
       // DOS, e.g., DOS = yes
-      CALCULATE_PHONON_DOS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOS=" + "|" + _ASTROPT_QHA_ + "DOS=" + "|" + _ASTROPT_AAPL_ + "DOS=" + "|" + _ASTROPT_APL_OLD_ + "DOS="), CALCULATE_PHONON_DOS_OPTION.option, CALCULATE_PHONON_DOS_OPTION.xscheme); //CO 170601
+      CALCULATE_PHONON_DOS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOS=" + "|" + _ASTROPT_QHA_ + "DOS=" + "|" + _ASTROPT_AAPL_ + "DOS=" + "|" + _ASTROPT_APL_OLD_ + "DOS="), CALCULATE_PHONON_DOS_OPTION.option, CALCULATE_PHONON_DOS_OPTION.xscheme); //CO20170601
       logger << (CALCULATE_PHONON_DOS_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "DOS=" << (CALCULATE_PHONON_DOS_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
       logger << "The calculation of PHONON DENSITY of states switched " << (CALCULATE_PHONON_DOS_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
 
       if (CALCULATE_PHONON_DOS_OPTION.option){
         // DOSMESH, e.g., DOSMESH = 20x20x20
-        USER_DOS_MESH_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOSMESH=" + "|" + _ASTROPT_QHA_ + "DOSMESH=" + "|" + _ASTROPT_AAPL_ + "DOSMESH=" + "|" + _ASTROPT_APL_OLD_ + "DOSMESH="), USER_DOS_MESH_OPTION.option, USER_DOS_MESH_OPTION.xscheme); //CO 170601
+        USER_DOS_MESH_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOSMESH=" + "|" + _ASTROPT_QHA_ + "DOSMESH=" + "|" + _ASTROPT_AAPL_ + "DOSMESH=" + "|" + _ASTROPT_APL_OLD_ + "DOSMESH="), USER_DOS_MESH_OPTION.option, USER_DOS_MESH_OPTION.xscheme); //CO20170601
         USER_DOS_MESH = USER_DOS_MESH_OPTION.content_string;
         tokens.clear();
         apl::tokenize(USER_DOS_MESH, tokens, string(" xX"));
@@ -3364,13 +3361,13 @@ namespace KBIN {
         logger << (USER_DOS_MESH_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "DOSMESH=" << USER_DOS_MESH << "." << apl::endl;
 
         // DOSPOINTS, e.g., DOSPOINTS = 2000
-        USER_DOS_NPOINTS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOSPOINTS=" + "|" + _ASTROPT_QHA_ + "DOSPOINTS=" + "|" + _ASTROPT_AAPL_ + "DOSPOINTS=" + "|" + _ASTROPT_APL_OLD_ + "DOSPOINTS="), USER_DOS_NPOINTS_OPTION.option, USER_DOS_NPOINTS_OPTION.xscheme); //CO 170601
+        USER_DOS_NPOINTS_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOSPOINTS=" + "|" + _ASTROPT_QHA_ + "DOSPOINTS=" + "|" + _ASTROPT_AAPL_ + "DOSPOINTS=" + "|" + _ASTROPT_APL_OLD_ + "DOSPOINTS="), USER_DOS_NPOINTS_OPTION.option, USER_DOS_NPOINTS_OPTION.xscheme); //CO20170601
         USER_DOS_NPOINTS = USER_DOS_NPOINTS_OPTION.content_int;
         logger << (USER_DOS_NPOINTS_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "USER_DOS_NPOINTS=" << USER_DOS_NPOINTS << "." << apl::endl;
         logger << "The phonon density of states will be calculated for " << USER_DOS_NPOINTS << " bins." << apl::endl;
 
         // DOSMETHOD, e.g., DOSMETHOD = LT
-        USER_DOS_METHOD_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOSMETHOD=" + "|" + _ASTROPT_QHA_ + "DOSMETHOD=" + "|" + _ASTROPT_AAPL_ + "DOSMETHOD=" + "|" + _ASTROPT_APL_OLD_ + "DOSMETHOD="), USER_DOS_METHOD_OPTION.option, USER_DOS_METHOD_OPTION.xscheme); //CO 170601
+        USER_DOS_METHOD_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOSMETHOD=" + "|" + _ASTROPT_QHA_ + "DOSMETHOD=" + "|" + _ASTROPT_AAPL_ + "DOSMETHOD=" + "|" + _ASTROPT_APL_OLD_ + "DOSMETHOD="), USER_DOS_METHOD_OPTION.option, USER_DOS_METHOD_OPTION.xscheme); //CO20170601
         USER_DOS_METHOD = USER_DOS_METHOD_OPTION.content_string;
         transform(USER_DOS_METHOD.begin(), USER_DOS_METHOD.end(), USER_DOS_METHOD.begin(), toupper);
         logger << (USER_DOS_METHOD_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "DOSMETHOD=" << USER_DOS_METHOD << "." << apl::endl;
@@ -3379,7 +3376,7 @@ namespace KBIN {
         else {throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"DOSMETHOD. Specify as DOSMETHOD=LT.");}
 
         // DOSSMEAR, e.g., DOSSMEAR = 0.05
-        USER_DOS_SMEAR_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOSSMEAR=" + "|" + _ASTROPT_QHA_ + "DOSSMEAR=" + "|" + _ASTROPT_AAPL_ + "DOSSMEAR=" + "|" + _ASTROPT_APL_OLD_ + "DOSSMEAR="), USER_DOS_SMEAR_OPTION.option, USER_DOS_SMEAR_OPTION.xscheme); //CO 170601
+        USER_DOS_SMEAR_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "DOSSMEAR=" + "|" + _ASTROPT_QHA_ + "DOSSMEAR=" + "|" + _ASTROPT_AAPL_ + "DOSSMEAR=" + "|" + _ASTROPT_APL_OLD_ + "DOSSMEAR="), USER_DOS_SMEAR_OPTION.option, USER_DOS_SMEAR_OPTION.xscheme); //CO20170601
         USER_DOS_SMEAR = USER_DOS_SMEAR_OPTION.content_double;
         override_option=false;
         if (USER_DOS_METHOD == string("RS")) {USER_DOS_SMEAR = DEFAULT_APL_DOSSMEAR; override_option=true;} // Default value, it is better with this...
@@ -3388,14 +3385,14 @@ namespace KBIN {
       }
 
       // TP, e.g., TP = yes
-      CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "TP=" + "|" + _ASTROPT_QHA_ + "TP=" + "|" + _ASTROPT_AAPL_ + "TP=" + "|" + _ASTROPT_APL_OLD_ + "TP="), CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.option, CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.xscheme); //CO 170601
+      CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "TP=" + "|" + _ASTROPT_QHA_ + "TP=" + "|" + _ASTROPT_AAPL_ + "TP=" + "|" + _ASTROPT_APL_OLD_ + "TP="), CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.option, CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.xscheme); //CO20170601
       logger << (CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "TP=" << (CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
       logger << "The calculation of THERMODYNAMIC properties switched " << (CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
       if (CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.option && !CALCULATE_PHONON_DOS_OPTION.option){logger << apl::warning << "The thermodynamic properties may be calculated by default settings for DOS calculation." << apl::endl;}
 
       // TPT, e.g., TPT = 1000:2000:10 -> temperature from 1000 to 2000 K by step 10 K
       if (CALCULATE_THERMODYNAMIC_PROPERTIES_OPTION.option){
-        USER_TPT_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "TPT=" + "|" + _ASTROPT_QHA_ + "TPT=" + "|" + _ASTROPT_AAPL_ + "TPT=" + "|" + _ASTROPT_APL_OLD_ + "TPT="), USER_TPT_OPTION.option, USER_TPT_OPTION.xscheme); //CO 170601
+        USER_TPT_OPTION.options2entry(AflowIn, string( _ASTROPT_APL_ + "TPT=" + "|" + _ASTROPT_QHA_ + "TPT=" + "|" + _ASTROPT_AAPL_ + "TPT=" + "|" + _ASTROPT_APL_OLD_ + "TPT="), USER_TPT_OPTION.option, USER_TPT_OPTION.xscheme); //CO20170601
         tokens.clear();
         apl::tokenize(USER_TPT_OPTION.content_string, tokens, string(" :"));
         if (tokens.size() != 3) {throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"TPT. Specify as TPT=1000:2000:10.");}
@@ -3417,7 +3414,7 @@ namespace KBIN {
       // Contruct the working supercell ////////////////////////////////////
 
       //apl::Supercell supercell(xvasp.str,logger),supercell_test(xvasp.str,logger);    //corey, slow
-      apl::Supercell supercell(xinput.getXStr(),aflags,logger); //xvasp.str, logger);  //CO  //CO181226
+      apl::Supercell supercell(xinput.getXStr(),aflags,logger); //xvasp.str, logger);  //CO  //CO20181226
       apl::Supercell supercell_test = supercell;    //CO
 
       //   pflow::PrintDist(xinput.getXStr(),20.0,cerr);
@@ -3481,7 +3478,7 @@ namespace KBIN {
         throw apl::APLRuntimeError("The settings for supercell construction are confusing.");
       }
 
-      // ME 180925
+      // ME20180925
       // Calculate the clusters for thermal conductivity calculations
       vector<apl::ClusterSet> clusters;  // ME, default, only allocates to be passed into functions
       if (CALCULATE_TCOND_OPTION.option) {
@@ -3508,7 +3505,7 @@ namespace KBIN {
               clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
                   USER_CUTOFF_DISTANCE[o-3], o, logger);
             } catch (aurostd::xerror excpt) {
-              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
+              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO20191201 - marco, patch so whereFileName() is included through logger()
               logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
               awakeClusterSet = false;
             }
@@ -3602,7 +3599,7 @@ namespace KBIN {
       }
       //QHA/SCQHA/QHA3P END
 
-      // ME180820 - set up VASP calculations for thermal conductivity calculations
+      // ME20180820 - set up VASP calculations for thermal conductivity calculations
       bool aapl_stagebreak;
       if (CALCULATE_TCOND_OPTION.option) {
         aapl_stagebreak = phcalc->buildVaspAAPL(phcalc->_clusters[0]);
@@ -3619,7 +3616,7 @@ namespace KBIN {
 
       if (USER_HIBERNATE_OPTION.option && isHibFileAvailable) {
         if (aapl_stagebreak) {
-          throw apl::APLStageBreak();  // ME 180830
+          throw apl::APLStageBreak();  // ME20180830
         }
         try {
           phcalc->awake();
@@ -3631,7 +3628,7 @@ namespace KBIN {
       }
 
       if (!isHibFileAvailable) {
-        phcalc->run(aapl_stagebreak);  // ME180830 -- added stagebreak bool
+        phcalc->run(aapl_stagebreak);  // ME20180830 -- added stagebreak bool
         if (USER_HIBERNATE_OPTION.option)
           phcalc->hibernate();
       }
@@ -3946,7 +3943,7 @@ namespace KBIN {
                 if(CALCULATE_EOS_OPTION.option)
                 {
                   //QHA EOS calculations
-                  //[CO181202 - NOT USED]apl::QH_ENERGIES eos_ens(*phcalc, *pheos, logger);
+                  //[CO20181202 - NOT USED]apl::QH_ENERGIES eos_ens(*phcalc, *pheos, logger);
                   apl::QH_ENERGIES eos_ens(*pheos, logger);
                   eos_ens.get_tmp_dir_name(_TMPDIR_);
                   eos_ens.get_xtracture(phcalc->getInputCellStructure());
@@ -4025,7 +4022,7 @@ namespace KBIN {
             } else if(kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A ||
                 kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C)
             {
-              //[CO181202 - NOT USED]apl::QH_ENERGIES eos_ens(*phcalc, *pheos, logger);
+              //[CO20181202 - NOT USED]apl::QH_ENERGIES eos_ens(*phcalc, *pheos, logger);
               apl::QH_ENERGIES eos_ens(*pheos, logger);
               eos_ens.get_xtracture(phcalc->getInputCellStructure());
               eos_ens.get_tmp_dir_name(_TMPDIR_);
@@ -4130,7 +4127,7 @@ namespace KBIN {
             try {
               phcalc->readAnharmonicIFCs(ifcs_hib_file, phcalc->_clusters[i]);
             } catch (aurostd::xerror excpt) {
-              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
+              logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO20191201 - marco, patch so whereFileName() is included through logger()
               logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
               awakeAnharmIFCs = false;
             }
@@ -4187,7 +4184,7 @@ namespace KBIN {
       // delete phcalc; //auto_ptr will do
       supercell.clear();
     } catch (apl::APLStageBreak& e) {
-      logger << apl::notice << "Stopped. Waiting for required calculations..." << apl::endl;  //CO181226
+      logger << apl::notice << "Stopped. Waiting for required calculations..." << apl::endl;  //CO20181226
     } catch (std::exception& e) {
       logger << apl::error << e.what() << apl::endl;
     }

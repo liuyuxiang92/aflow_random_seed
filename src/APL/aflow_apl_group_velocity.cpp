@@ -27,7 +27,7 @@
 namespace apl
 {
   // ***************************************************************************************
-  //GroupVelocity::GroupVelocity(IPhononCalculator& pc,  UniformMesh& umesh, Logger& l):_pc(pc),_umesh(umesh), _logger(l)  OBSOLETE ME190428
+  //GroupVelocity::GroupVelocity(IPhononCalculator& pc,  UniformMesh& umesh, Logger& l):_pc(pc),_umesh(umesh), _logger(l)  OBSOLETE ME20190428
   GroupVelocity::GroupVelocity(IPhononCalculator& pc,  QMesh& umesh, Logger& l):_pc(pc),_umesh(umesh), _logger(l)
   {
     _logger<<"Setting variables to calculate group velocities "<<apl::endl;
@@ -48,7 +48,7 @@ namespace apl
     _kpoints_kp.clear();
     _kpoints_km.clear();
     _kpoints.clear();
-    //_weights.clear(); ME190428 - not used
+    //_weights.clear(); ME20190428 - not used
     _gv.clear();
     _phvel.clear();
   }
@@ -61,11 +61,11 @@ namespace apl
     _freq_kp.clear(); _freq_km.clear(); _freq.clear();
 
 
-    // ME190428 - START
+    // ME20190428 - START
     //_kpoints=_umesh.get_kpoints();  OBSOLETE
     //_weights=_umesh.get_weights();  OBSOLETE - not used
     _kpoints = _umesh.getQPointsCPOS();
-    // ME190428 - END
+    // ME20190428 - END
     xvector<double> dv(3,1);
     _kpoints_kp.resize(_kpoints.size(), dv);
     _kpoints_km.resize(_kpoints.size(), dv);
@@ -86,10 +86,10 @@ namespace apl
 
     if (_kpoints.size()==0)
     {
-      // ME190726 - exit clean-up
+      // ME20190726 - exit clean-up
       //_logger<<apl::error<<"group velocity calculation _kpoints.size()==0 "<<apl::endl; 
       //exit(0);
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw APLRuntimeError("group velocity calculation _kpoints.size()==0");
       string function = "GroupVelocity::populate_variables()";
       string message = "group velocity calculation _kpoints.size()==0";
@@ -192,7 +192,7 @@ namespace apl
     string filename = "aflow.apl.gamma_point.out";
     aurostd::stringstream2file(dm, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw apl::APLRuntimeError("Cannot open output aflow.apl.gamma_point.out.");
       string function = "GroupVelocity::sound_speed()";
       string message = "Cannot open output " + filename;
@@ -234,7 +234,7 @@ namespace apl
     string filename = "aflow.apl.group_velocities.out";
     aurostd::stringstream2file(dm, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME191031 - use xerror
+      // ME20191031 - use xerror
       //throw apl::APLRuntimeError("Cannot open output aflow.apl.group_velocities.out file.");
       string function = "GroupVelocity::write()";
       string message = "Cannot open output file " + filename;
@@ -262,7 +262,7 @@ namespace apl
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME20180801
     _freq_test.resize(ncpus, false);
     // Show info 
     if( ncpus == 1 )
@@ -290,7 +290,7 @@ namespace apl
       threads.push_back( new std::thread(&GroupVelocity::solve_eigenvalues_at_k,this,startIndex,endIndex, icpu, ktype) );
     }
 
-    /* OBSOLETE ME180801
+    /* OBSOLETE ME20180801
        for(int icpu = 0; icpu < ncpus; icpu++) {
        startIndex = icpu * qpointsPerCPU;
        endIndex = startIndex + qpointsPerCPU;
