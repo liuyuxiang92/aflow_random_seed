@@ -27,6 +27,7 @@
 namespace apl
 {
   // ***************************************************************************************
+  //AtomicDisplacements::AtomicDisplacements(IPhononCalculator& pc, UniformMesh& mp, Logger& l):_pc(pc), _mp(mp), _logger(l) OBSOLETE ME20190428
   AtomicDisplacements::AtomicDisplacements(PhononCalculator& pc, QMesh& mp, Logger& l):_pc(pc), _mp(mp), _logger(l)
   {
     _logger<<"Preparing setup for Quasi-harmonic Gruneisen calculation "<<apl::endl;

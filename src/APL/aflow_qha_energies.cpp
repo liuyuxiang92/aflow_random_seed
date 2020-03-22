@@ -17,6 +17,7 @@
 namespace apl
 {
   // ***************************************************************************************
+  //[CO20181202 - NOT USED]QH_ENERGIES::QH_ENERGIES( IPhononCalculator& pc, QHA_AFLOWIN_CREATOR& runeos, Logger& l): _pc(pc),_runeos(runeos),_logger(l)
   QH_ENERGIES::QH_ENERGIES( QHA_AFLOWIN_CREATOR& runeos, Logger& l): _runeos(runeos),_logger(l)
   {
     _logger << "Calculating electronic and thermal energies to compute the thermodynamic properties"<< apl::endl; 
