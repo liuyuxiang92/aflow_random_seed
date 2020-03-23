@@ -983,7 +983,7 @@ namespace apl {
     // sc2pcMap - convert scell positions into primitive coordinates
     // and do straightforward fpos matching
     for (uint i = 0; i < natoms_sc; i++) {
-      fpos = pcell.c2f * _scStructure.atoms[i].cpos;
+      fpos = pcell.c2f * scell.atoms[i].cpos;
       uint j = 0;
       for (j = 0; j < natoms_pc; j++) {
         if (SYM::FPOSMatch(fpos, pcell.atoms[j].fpos, pcell.lattice, pcell.f2c, _skew, _sym_eps)) {
