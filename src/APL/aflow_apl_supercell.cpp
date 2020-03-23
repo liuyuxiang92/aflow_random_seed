@@ -135,7 +135,7 @@ namespace apl {
     // Copy
     _inStructure = xstr;
     _inStructure.ReScale(1.0);
-    _inStructure.ShifOriginToAtom(0);
+    _inStructure.ShiftOriginToAtom(0);
     _inStructure.BringInCell();  //clean up
 
     if(LDEBUG){
@@ -1280,7 +1280,7 @@ namespace apl {
     xstructure pcStructure=_inStructure;
     pcStructure.Standard_Primitive_UnitCellForm();
     pcStructure.ReScale(1.0);
-    pcStructure.ShifOriginToAtom(0);
+    pcStructure.ShiftOriginToAtom(0);
     pcStructure.BringInCell();
     return pcStructure;
   }
@@ -1990,7 +1990,7 @@ namespace apl {
   void Supercell::center(int i) {
     xvector<double> origin(3), frigin(3);
 #if CENTER_PRIM
-    //_inStructure.ShifOriginToAtom(_sc2pcMap[i]);
+    //_inStructure.ShiftOriginToAtom(_sc2pcMap[i]);
     //_inStructure.BringInCell();
     origin = _inStructure_original.atoms[_sc2pcMap[i]].cpos;
     frigin = _inStructure_original.atoms[_sc2pcMap[i]].fpos;
@@ -2001,7 +2001,7 @@ namespace apl {
       _inStructure.atoms[i] = BringInCell(_inStructure.atoms[i], _inStructure.lattice);
     }
 #endif
-    //_scStructure.ShifOriginToAtom(i);
+    //_scStructure.ShiftOriginToAtom(i);
     //_scStructure.BringInCell();
     origin = _scStructure_original.atoms[i].cpos;
     frigin = _scStructure_original.atoms[i].fpos;
@@ -2015,7 +2015,7 @@ namespace apl {
 
   void Supercell::center_original(void) {
     //just a (fast) undo for center(atom);
-    //refer to ShifOriginToAtom in case more properties need to be updated
+    //refer to ShiftOriginToAtom in case more properties need to be updated
 #if CENTER_PRIM
     _inStructure.origin = _inStructure_original.origin;
     for (uint i = 0; i < _inStructure.atoms.size(); i++) {

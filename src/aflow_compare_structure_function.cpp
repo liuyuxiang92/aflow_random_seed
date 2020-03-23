@@ -7274,7 +7274,7 @@ namespace compare{
     // shift an LFA atom to origin
     for(uint a=0;a<xstr_LFA_only.atoms.size();a++){
       if(xstr_LFA_only.atoms[a].name == lfa_name){
-        xstr_LFA_only.ShifOriginToAtom(a);
+        xstr_LFA_only.ShiftOriginToAtom(a);
         break;
       }
     }
@@ -7459,7 +7459,7 @@ namespace compare{
           // cerr << "xstr_supercell.atoms.size(): " << xstr_supercell.atoms.size() << endl;
           // for(uint a=0;a<xstr_supercell.atoms.size();a++){
           //   if(xstr_supercell.atoms[a].name == lfa_str2){
-          //     xstr_supercell.ShifOriginToAtom(a);
+          //     xstr_supercell.ShiftOriginToAtom(a);
           //     break;
           //   }
           // }
@@ -7469,7 +7469,7 @@ namespace compare{
           // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
           for(uint i=0;i<xstr1_tmp.atoms.size();i++){
             if(xstr1_tmp.atoms[i].name==lfa_str1){
-              xstr1_tmp.ShifOriginToAtom(i);
+              xstr1_tmp.ShiftOriginToAtom(i);
               xstr1_tmp.BringInCell(1e-10);
               break;
             }
@@ -7648,7 +7648,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]         // DX NEW so we don't need to do this in an inner loop
 // [OBSOLETE - DX20190717]         for(uint a=0;a<xstr.atoms.size();a++){
 // [OBSOLETE - DX20190717]           if(xstr.atoms[a].name == lfa){
-// [OBSOLETE - DX20190717]             xstr.ShifOriginToAtom(a);
+// [OBSOLETE - DX20190717]             xstr.ShiftOriginToAtom(a);
 // [OBSOLETE - DX20190717]             break;
 // [OBSOLETE - DX20190717]           }
 // [OBSOLETE - DX20190717]         }
@@ -7660,7 +7660,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]         // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
 // [OBSOLETE - DX20190717]         for(uint i=0;i<xstr1_tmp.atoms.size();i++){
 // [OBSOLETE - DX20190717]           if(xstr1_tmp.atoms[i].name==lfa_str1){
-// [OBSOLETE - DX20190717]             xstr1_tmp.ShifOriginToAtom(i);
+// [OBSOLETE - DX20190717]             xstr1_tmp.ShiftOriginToAtom(i);
 // [OBSOLETE - DX20190717]             xstr1_tmp.BringInCell(1e-10);
 // [OBSOLETE - DX20190717]             break;
 // [OBSOLETE - DX20190717]           }
@@ -7669,7 +7669,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]         // NEED TO SHIFT origin of xstr2 to one of the LFA
 // [OBSOLETE - DX20190717]         for(uint i=0;i<xstr2.atoms.size();i++){
 // [OBSOLETE - DX20190717]           if(xstr2.atoms[i].name==lfa){
-// [OBSOLETE - DX20190717]             xstr2.ShifOriginToAtom(i);
+// [OBSOLETE - DX20190717]             xstr2.ShiftOriginToAtom(i);
 // [OBSOLETE - DX20190717]             xstr2.BringInCell(1e-10);
 // [OBSOLETE - DX20190717]             break;
 // [OBSOLETE - DX20190717]           }
@@ -7981,7 +7981,7 @@ namespace compare{
         bool all_nn_calculated = false;
         for(uint iat=0; iat<proto.atoms.size();iat++){
           if(proto.atoms[iat].name==lfa){
-            proto.ShifOriginToAtom(iat);
+            proto.ShiftOriginToAtom(iat);
             proto.BringInCell(1e-10);
             if(VERBOSE){
               cerr << "compare::structureSearch: orig structure " << xstr1 << endl;
@@ -8452,7 +8452,7 @@ namespace compare{
 // [OBSOLETE - DX20190717] 	bool all_nn_calculated = false;
 // [OBSOLETE - DX20190717] 	for(uint iat=0; iat<proto.atoms.size();iat++){
 // [OBSOLETE - DX20190717] 	  if(proto.atoms[iat].name==lfa){
-// [OBSOLETE - DX20190717] 	    proto.ShifOriginToAtom(iat);
+// [OBSOLETE - DX20190717] 	    proto.ShiftOriginToAtom(iat);
 // [OBSOLETE - DX20190717] 	    proto.BringInCell(1e-10);
 // [OBSOLETE - DX20190717]             if(LDEBUG){
 // [OBSOLETE - DX20190717]               cerr << "compare::structureSearch: orig structure " << xstr1 << endl;

@@ -2469,10 +2469,10 @@ namespace pocc {
     bool RUN_FLAG = false;
     xstr1.SpeciesPutAlphabetic();
     xstr2.SpeciesPutAlphabetic();
-    xstr1.ShifOriginToAtom(0);
+    xstr1.ShiftOriginToAtom(0);
     pflow::Sort_atom_cpos(xstr1);
     for (int i=0; i<xstr2.num_each_type.at(0);i++) {
-      xstr2.ShifOriginToAtom(i);
+      xstr2.ShiftOriginToAtom(i);
       xstr2.BringInCell();
       pflow::Sort_atom_cpos(xstr2);
       if(CoordCompare(xstr1, xstr2)) {
@@ -2495,7 +2495,7 @@ namespace pocc {
     xstructure xstr1_sp, xstr2_sp;
     xstr1_sp = GetStandardPrimitive(xstr1);
     xstr2_sp = GetStandardPrimitive(xstr2);
-    xstr1_sp.ShifOriginToAtom(0);
+    xstr1_sp.ShiftOriginToAtom(0);
     xstr1_sp.BringInCell();
     pflow::Sort_atom_cpos(xstr1_sp);
 
@@ -2503,7 +2503,7 @@ namespace pocc {
     for (uint i=0; i<vec_rot.size();i++) {
       xstructure xstr2_sp_rot_tmp = vec_rot.at(i);
       for (uint j=0; j<xstr2_sp_rot_tmp.atoms.size();j++) {
-        xstr2_sp_rot_tmp.ShifOriginToAtom(j);
+        xstr2_sp_rot_tmp.ShiftOriginToAtom(j);
         xstr2_sp.BringInCell();
         pflow::Sort_atom_cpos(xstr2_sp_rot_tmp);
         if(CoordCompare(xstr1_sp, xstr2_sp_rot_tmp)) {

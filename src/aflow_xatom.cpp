@@ -5986,13 +5986,13 @@ void xstructure::AddCorners(void) {
 }
 
 // **************************************************************************
-// xstructure::ShifOriginToAtom
+// xstructure::ShiftOriginToAtom
 // **************************************************************************
 // // Shift the origin to atom(iat)
-void xstructure::ShifOriginToAtom(const int& iat) {
+void xstructure::ShiftOriginToAtom(const int& iat) {
   // DX and CO - START
   if(iat<0 || iat>=(int)atoms.size()) {
-    cerr << "ERROR void xstructure::ShifOriginToAtom(const int& iat),  iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ")" << endl;
+    cerr << "ERROR void xstructure::ShiftOriginToAtom(const int& iat),  iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ")" << endl;
     exit(0);
   }
   xvector<double> frigin(3);
@@ -10493,7 +10493,7 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
     cerr << "-----------------------------------------------------------------------" << endl;
     cerr << "ORIG STRUCTURE " << endl;
     cerr << a;
-    b.ReScale(1.0); b.ShifOriginToAtom(0); b.BringInCell(); //fast clean for comparison
+    b.ReScale(1.0); b.ShiftOriginToAtom(0); b.BringInCell(); //fast clean for comparison
     cerr << "NEW STRUCTURE " << endl;
     cerr << b;
     cerr << "STRUCTURES IDENTICAL = " << (compare::aflowCompareStructure(a,b,true) ? "TRUE" : "FALSE") << endl;
@@ -13033,7 +13033,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //now bring in cell
               b_atoms[ii]=BringInCell(b_atoms[ii],b.lattice);
             }
-            //bb.ShifOriginToAtom(iat);
+            //bb.ShiftOriginToAtom(iat);
             //bb.BringInCell();
 
             //IATOMS ONLY

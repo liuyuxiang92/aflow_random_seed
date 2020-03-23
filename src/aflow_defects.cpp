@@ -529,7 +529,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
   str=ReScale(BringInCell(_str),1.0);str.neg_scale=FALSE;
   // str.SetCoordinates(_COORDS_CARTESIAN_);
   
-  // if(1) str.ShifOriginToAtom(0);
+  // if(1) str.ShiftOriginToAtom(0);
   xmatrix<double> lattice(3,3);                         // lattice
   lattice=(str.lattice);                                // lattice
   xvector<double> a1(3),a2(3),a3(3);                    // a1,a2,a3 are the rows of the lattice matrix
