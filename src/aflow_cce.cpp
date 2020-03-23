@@ -177,7 +177,7 @@ namespace cce {
 
 
   //CCE///////////////////////////////////////////////////////////////////////
-  // ME 200213
+  // ME 20200213
   // For poscar2cce
   void CCE(aurostd::xoption& flags, std::istream& ist) {
     // initialize
@@ -662,7 +662,7 @@ namespace cce {
   /////////////////////////////////////////////////////////////////////////////
 
   //CCE_init_flags////////////////////////////////////////////////////////////
-  // ME 200213
+  // ME 20200213
   // Initializes the CCE flags to their default values.
   aurostd::xoption CCE_init_flags() {
     aurostd::xoption flags;
@@ -675,7 +675,7 @@ namespace cce {
   }
 
   //CCE_init_variables////////////////////////////////////////////////////////
-  // ME 200213
+  // ME 20200213
   // Initializes the CCE_variables struct.
   CCE_Variables CCE_init_variables(const xstructure& structure) {
     CCE_Variables cce_vars;
@@ -2806,7 +2806,7 @@ namespace cce {
   }
 
   //CCE_get_formation_enthalpies//////////////////////////////////////////////
-  // ME 200213
+  // ME 20200213
   // Returns the formation enthalpy per cell for each functional
   vector<double> CCE_get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars) {
     vector<double> formation_enthalpies(cce_correction.size(), 0.0);
@@ -2833,7 +2833,7 @@ namespace cce {
   /////////////////////////////////////////////////////////////////////////////
  
   //CCE_get_JSON/////////////////////////////////////////////////////////////
-  // ME 200213
+  // ME 20200213
   // Returns CCE results in JSON format
   string CCE_get_JSON(const xstructure& structure, const CCE_Variables& cce_vars) {
     stringstream json;
