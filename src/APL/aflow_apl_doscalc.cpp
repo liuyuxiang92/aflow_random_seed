@@ -588,6 +588,7 @@ namespace apl {
     xdos.number_energies = _dos.size();
     xdos.Efermi = 0.0;  // phonon DOS have no Fermi energy
     xdos.venergy = aurostd::vector2deque(_bins);
+    xdos.venergyEf = xdos.venergy;  // ME20200324
     for (uint i = 0; i < xdos.number_energies; i++) xdos.venergy[i] *= conv;
     xdos.viDOS.resize(1);
     xdos.viDOS[0] = aurostd::vector2deque(_idos);
