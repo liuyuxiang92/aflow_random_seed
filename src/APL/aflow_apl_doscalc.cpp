@@ -514,6 +514,7 @@ namespace apl {
     //     string message = "Cannot open output file " + filename + ".";
     //     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     //   }
+    // }
   }
 
   xDOSCAR DOSCalculator::createDOSCAR() {
