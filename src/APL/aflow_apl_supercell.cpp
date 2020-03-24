@@ -870,8 +870,8 @@ namespace apl {
 
     // The original structure may be a rotated primitive cell. Transform the
     // primitive cell so that they overlap or else the mapping will not work
-    if (_inStructure_original.atoms.size() == _pcStructure.atoms.size()) {
-      xmatrix<double> U = trasp(_inStructure_original.lattice) * inverse(trasp(_pcStructure.lattice));
+    if (_inStructure_original.atoms.size() == pcell.atoms.size()) {
+      xmatrix<double> U = trasp(_inStructure_original.lattice) * inverse(trasp(pcell.lattice));
       // For a rotation matrix, trasp(U) * U = I
       if (aurostd::isidentity(trasp(U) * U)) {
         pcell = Rotate(pcell, U);
@@ -1278,6 +1278,11 @@ namespace apl {
 
   xstructure Supercell::calculatePrimitiveStructure() const { //CO20180409
     xstructure pcStructure=_inStructure;
+    // ME20200324 - Setting LatticeReduction_avoid to true can results in
+    // primitive cells with slightly different lattice parameters, especially
+    // for monoclinic cells. This error can propagate and break mappings from
+    // the conventional to the primitive cell.
+    pcStructure.LatticeReduction_avoid = false;
     pcStructure.Standard_Primitive_UnitCellForm();
     pcStructure.ReScale(1.0);
     pcStructure.ShiftOriginToAtom(0);
