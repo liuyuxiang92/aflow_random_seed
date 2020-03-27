@@ -18,7 +18,7 @@
 #define AFLOW_APL_MULTITHREADS_ENABLE
 #include <thread>
 #else
-#warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
+#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 #define _DEBUG_AAPL_TCOND_ false
