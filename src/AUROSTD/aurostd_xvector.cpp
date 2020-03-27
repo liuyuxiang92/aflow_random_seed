@@ -439,6 +439,20 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+// ME20200327
+namespace aurostd {
+  template<class utype> xmatrix<utype>
+    outer_product(const xvector<utype>& a, const xvector<utype>& b) {
+      xmatrix<utype> M(a.urows, b.urows, a.lrows, b.lrows);
+      for (int i = a.lrows; i <= a.urows; i++) {
+        for (int j = b.lrows; j <= b.urows; j++) {
+          M[i][j] = a[i] * b[j];
+        }
+      }
+      return M;
+    }
+}
+
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>                 // operator xvector+xvector
     operator+(const xvector<utype>& a,const xvector<utype>& b) {
