@@ -2507,7 +2507,7 @@ string APENNSY_Parameters::APENNSY_HistogramList(_aflags &aflags) {
   cerr << "**********************************************************" << endl;
   // oss << max(EFDlibrary) << endl;
   xvector<int> EFDhistogram(0,1000);
-  EFDhistogram.reset(); //CO190808 reset sets all to 0
+  EFDhistogram.reset(); //CO20190808 reset sets all to 0
   uint i,j,k;
 
   for(j=0;j<alloys.size();j++) {
