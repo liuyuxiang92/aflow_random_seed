@@ -1,6 +1,7 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
+        -- Added check for required binaries to plotter. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
         -- Fixed broken system name for aflow_proto. (ME)
         -- Fixed plotter title and file names when ANRL parameters are present. (ME)
