@@ -1979,7 +1979,11 @@ namespace KBIN {
       // Init path according to the aflow's definition for elec. struc.
       // ME20181029 - Restructured
       if (USER_DC_METHOD == "LATTICE") {
-        supercell.projectToPrimitive();  // ME20200117 - project to primitive
+        if (!supercell.projectToPrimitive()) {  // ME20200117 - project to primitive
+          message = "Could not map the AFLOW standard primitive cell to the supercell.\
+                     Phonon dispersions will be calculated using the original structure instead.";
+          pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
+        }
         pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
       } else {
         if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_FRAC.empty()) {

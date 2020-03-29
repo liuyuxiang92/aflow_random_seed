@@ -633,7 +633,7 @@ namespace apl {
       void trimStructure(int, const xvector<double>&,
           const xvector<double>&, const xvector<double>&,
           bool = true);
-      void projectToPrimitive();  // ME20200117
+      bool projectToPrimitive();  // ME20200117
       void projectToOriginal();  // ME20200117
       xvector<int> buildSuitableForShell(int, bool, bool VERBOSE);  // ME20200102
       void setupShellRestrictions(int);

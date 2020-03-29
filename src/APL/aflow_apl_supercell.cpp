@@ -860,7 +860,7 @@ namespace apl {
   // ME20200116 - rebase to primitive
   // Does not capture rotated primitive cells yet, but does work for AFLOW's
   // standard conventional unit cells.
-  void Supercell::projectToPrimitive() {
+  bool Supercell::projectToPrimitive() {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     string function = "apl::Supercell::projectToPrimitive()";
     vector<int> pc2sc, sc2pc;
@@ -928,13 +928,9 @@ namespace apl {
       _sc2pcMap = sc2pc;
       _pc2scMap = pc2sc;
       calculatePhaseVectors();
+      return true;
     } else {
-      stringstream message;
-      message << " apl::Supercell::projectToPrimitive(): Could"
-        << " not map the AFLOW standard primitive cell to the supercell."
-        << " Phonon dispersions will be calculated using the original"
-        << " structure instead.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *messageFile, std::cout, _LOGGER_WARNING_);
+      return false;
     }
   }
 
