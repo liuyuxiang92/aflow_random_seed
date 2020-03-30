@@ -9690,7 +9690,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Initialize a, b, c, ksi, eta, zeta
   xvector<double> indat(6);
-  indat=Getabc_angles(in_lat,RADIANTS);
+  indat=Getabc_angles(in_lat,RADIANS);
   double a=indat(1)*indat(1);
   double b=indat(2)*indat(2);
   double c=indat(3)*indat(3);
@@ -9903,7 +9903,7 @@ LoopHead:
   // Make sure that a,b,c,alpha,beta,gamma are the same from
   // direct calculation and from using P to get niggli_lat.
   xvector<double> poutdat(6);
-  poutdat=Getabc_angles(niggli_lat,RADIANTS);
+  poutdat=Getabc_angles(niggli_lat,RADIANS);
   int flag=0;
   for(int i=1;i<=6;i++) {
     if(abs(poutdat(i)-outdat(i))>2*TOL) {flag=1;}
@@ -9960,7 +9960,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Initialize a, b, c, ksi, eta, zeta
   xvector<double> indat(6);
-  indat=Getabc_angles(in_lat,RADIANTS);
+  indat=Getabc_angles(in_lat,RADIANS);
   double a=indat(1)*indat(1);
   double b=indat(2)*indat(2);
   double c=indat(3)*indat(3);
@@ -10149,7 +10149,7 @@ LoopHead:
   // Make sure that a,b,c,alpha,beta,gamma are the same from
   // direct calculation and from using P to get niggli_lat.
   xvector<double> poutdat(6);
-  poutdat=Getabc_angles(niggli_lat,RADIANTS);
+  poutdat=Getabc_angles(niggli_lat,RADIANS);
   int flag=0;
   for(int i=1;i<=6;i++) {
     if(abs(poutdat(i)-outdat(i))>2*TOL) {flag=1;}

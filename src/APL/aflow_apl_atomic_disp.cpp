@@ -1,884 +1,738 @@
-// ***************************************************************************
+//****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2015           *
-// *                Aflow PINKU NATH - Duke University 2014-2016             *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *               Pinku Nath - Duke University 2014 - 2016                  *
+// *                  Marco Esters - Duke University 2020                    *
 // *                                                                         *
-// ***************************************************************************
-// Written by Pinku Nath
-// pn49@duke.edu
+//****************************************************************************
+// Written by Marco Esters based on work by Pinku Nath
 
 #include "aflow_apl.h"
-#include <iterator>
 
-#define _isnegative(a) (a<MIN_EIGEN_TRESHOLD) ? true : false
-
-#undef AFLOW_APL_MULTITHREADS_ENABLE
-
-#if GCC_VERSION >= 40400   // added two zeros
-#define AFLOW_APL_MULTITHREADS_ENABLE 1
+// Some parts are written within the C++0x support in GCC, especially std::thread,
+// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
+// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
+#if GCC_VERSION>= 40400
+#define AFLOW_APL_MULTITHREADS_ENABLE
 #include <thread>
 #else
-#warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
+#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
-//#  if __GNUC_PREREQ(4,9) // enable thread if gcc version is >= 4.9
-//#define AFLOW_APL_MULTITHREADS_ENABLE
-//#include <thread>
-//#endif 
-namespace apl
-{
-  // ***************************************************************************************
-  //AtomicDisplacements::AtomicDisplacements(IPhononCalculator& pc, UniformMesh& mp, Logger& l):_pc(pc), _mp(mp), _logger(l) OBSOLETE ME20190428
-  AtomicDisplacements::AtomicDisplacements(PhononCalculator& pc, QMesh& mp, Logger& l):_pc(pc), _mp(mp), _logger(l)
-  {
-    _logger<<"Preparing setup for Quasi-harmonic Gruneisen calculation "<<apl::endl;
-    clear();
-    _nBranches=_pc.getNumberOfBranches();
-    _CUTOFF_FREQ=0.00;
-    _is_freq_negative=false;
+
+static const string _APL_ADISP_MODULE_ = "APL";  // for the logger
+static const xcomplex<double> iONE(0.0, 1.0);
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                         CONSTRUCTORS/DESTRUCTORS                         //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  AtomicDisplacements::AtomicDisplacements() {
+    free();
   }
-  // ***************************************************************************************
-  AtomicDisplacements::~AtomicDisplacements(){this->clear();}
-  // ***************************************************************************************
-  void AtomicDisplacements::clear()
-  {
-    _atomic_masses_amu.clear();
-    _atomic_species.clear();
-    _rlattice.clear();
-    _kpoints.clear();
-    //_weights.clear();  ME20190428 - not used
-    _freq_Thz.clear();
-    _DM.clear(); 
+
+  AtomicDisplacements::AtomicDisplacements(PhononCalculator& pc) {
+    free();
+    _pc = &pc;
+  }
+
+  AtomicDisplacements::AtomicDisplacements(const AtomicDisplacements& that) {
+    free();
+    copy(that);
+  }
+
+  AtomicDisplacements& AtomicDisplacements::operator=(const AtomicDisplacements& that) {
+    if (this != &that) {
+      free();
+      copy(that);
+    }
+    return *this;
+  }
+
+  AtomicDisplacements::~AtomicDisplacements() {
+    free();
+  }
+
+  void AtomicDisplacements::copy(const AtomicDisplacements& that) {
+    _eigenvectors = that._eigenvectors;
+    _frequencies = that._frequencies;
+    _displacement_matrices = that._displacement_matrices;
+    _displacement_modes = that._displacement_modes;
+    _pc = that._pc;
+    _qpoints = that._qpoints;
+    _temperatures = that._temperatures;
+  }
+
+  void AtomicDisplacements::free() {
     _eigenvectors.clear();
-    _atomic_c_positions.clear();
-    _eigenvectors_path.clear();
-    _kpoints_path.clear();
+    _frequencies.clear();
+    _displacement_matrices.clear();
+    _displacement_modes.clear();
+    _qpoints.clear();
+    _temperatures.clear();
   }
-  // ***************************************************************************************
-  //initializing variables
-  void AtomicDisplacements::populate_variables(const xstructure& xs)
-  {
-    _logger<<"Populationg variables to calculate AtomicDisplacements properties" <<apl::endl;
-    xstructure xstr(xs);
 
-    _atomic_masses_amu.clear();
-    _atomic_species.clear();
-    // ME20200220 - BEGIN
-    const Supercell& scell = _pc.getSupercell();
-    uint pcAtomsSize = scell.getInputStructure().atoms.size();
-    for (uint i = 0; i < pcAtomsSize; i++) {
-      _atomic_masses_amu.push_back(scell.getAtomMass(scell.pc2scMap(i)));
-    }
-    //[OBSOLETE]_atomic_masses_amu=_pc.get_ATOMIC_MASSES_AMU();
-    // ME20200220 - END
-    for(uint i=0; i!=xstr.atoms.size(); i++){
-      _atomic_species.push_back(xstr.atoms[i].name);
-    }
-    _rlattice.clear();
-    // ME20190428 - START
-    //_rlattice=_mp.get_rlattice(); OBSOLETE
-    //_klattice=_mp.get_klattice(); OBSOLETE
-    _rlattice = _mp.getReciprocalCell().rlattice;
-    _klattice = _mp.getReciprocalCell().lattice;
-    _kpoints.clear();
-    _kpoints = _mp.getQPointsCPOS();
-    //_kpoints=_mp.get_kpoints();  OBSOLETE
-    //_weights.clear(); OBSOLETE - not used
-    //_weights=_mp.get_weights();  OBSOLETE - not used
-    // ME20190428 - END
-
-    _freq_Thz.clear();
-    xvector<double> dv(_nBranches,1);
-    _freq_Thz.resize(_kpoints.size(), dv);
-    _DM.clear(); _eigenvectors.clear();
-    xmatrix< xcomplex<double> > dd(_nBranches,_nBranches,1,1);
-    _DM.resize(_kpoints.size(), dd);//at +ve volume
-    _eigenvectors.resize(_kpoints.size(), dd);
-
-    _atomic_c_positions.clear();
-    xvector<double> tmp(3,1);
-    _atomic_c_positions.resize(_atomic_masses_amu.size(), tmp);
-
-    for (uint i=0;i<xstr.atoms.size(); i++)
-    {
-      _atomic_c_positions[i]=xstr.atoms[i].cpos;
-    }
+  void AtomicDisplacements::clear(PhononCalculator& pc) {
+    free();
+    _pc = &pc;
   }
-  // ***************************************************************************************
-  bool AtomicDisplacements::eigen_solver()
-  {
-    _freq_test.clear();
-    bool pass=false;
+
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                             EIGENVECTORS                                 //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  void AtomicDisplacements::calculateEigenvectors() {
+    _eigenvectors.clear();
+    _frequencies.clear();
+    int nq = (int) _qpoints.size();
+    if (nq == 0) return;
+    uint natoms = _pc->getInputCellStructure().atoms.size();
+    uint nbranches = _pc->getNumberOfBranches();
+    _eigenvectors.resize(nq, vector<vector<xvector<xcomplex<double> > > >(nbranches, vector<xvector<xcomplex<double> > >(natoms, xvector<xcomplex<double> >(3))));
+    _frequencies.resize(nq, vector<double> (nbranches, 0.0));
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    // Get the number of CPUS
-    int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
-    if(ncpus<1) ncpus=1;
-    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE 180801
-    _freq_test.resize(ncpus, false);
-    // Show info 
-    if( ncpus == 1 )
-    {
-      _logger.initProgressBar("Calculating eigenvalues for AtomicDisplacements");
+    int ncpus = _pc->getNCPUs();
+    if (ncpus > nq) ncpus = nq;
+    if (ncpus < 1) ncpus = 1;
+    if (ncpus > 1) {
+      vector<vector<int> > thread_dist = getThreadDistribution(nq, ncpus);
+      vector<std::thread*> threads;
+      for (int i = 0; i < ncpus; i++) {
+        threads.push_back(new std::thread(&AtomicDisplacements::calculateEigenvectorsInThread, this, thread_dist[i][0], thread_dist[i][1]));
+      }
+      for (int i = 0; i < ncpus; i++) {
+        threads[i]->join();
+        delete threads[i];
+      }
+    } else {
+      calculateEigenvectorsInThread(0, nq);
     }
-    else
-    {
-      _logger.initProgressBar("Calculating eigenvalues for AtomicDisplacements (" + stringify(ncpus) + " threads)");
-    }
-
-    // Distribute the calculation
-    int startIndex, endIndex;
-    std::vector< std::thread* > threads;
-    vector<vector<int> > thread_dist = getThreadDistribution((int) _kpoints.size(), ncpus);
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = thread_dist[icpu][0];
-      endIndex = thread_dist[icpu][1];
-      threads.push_back( new std::thread(&AtomicDisplacements::solve_eigenvalues_in_threads,this,startIndex,endIndex, icpu) );
-    }
-
-    /* OBSOLETE ME20180801
-       for(int icpu = 0; icpu < ncpus; icpu++) {
-       startIndex = icpu * qpointsPerCPU;
-       endIndex = startIndex + qpointsPerCPU;
-       if( ( (uint)endIndex > _kpoints.size() ) ||
-       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
-       endIndex = _kpoints.size();
-       threads.push_back( new std::thread(&AtomicDisplacements::solve_eigenvalues_in_threads,this,startIndex,endIndex, icpu) );
-       }
-       */
-    // Wait to finish all threads here!
-    for(uint i = 0; i < threads.size(); i++) {
-      threads[i]->join();
-      delete threads[i];
-    }
-
-    // Done
-    _logger.finishProgressBar();
-
-
-    uint bool_size=0;
-    for(uint id=0; id!=_freq_test.size(); id++)
-    {
-      bool_size+=(uint)_freq_test[id];
-    }
-    if(bool_size==(uint)ncpus)pass=true;
-    _freq_test.clear();
 #else
-    _freq_test.resize(1, false);
-    solve_eigenvalues_in_threads(0, (int)_kpoints.size(), 0);
-    uint bool_size=0;
-    for(uint id=0; id!=_freq_test.size(); id++)
-    {
-      bool_size+=(uint)_freq_test[id];
-    }
-    if(bool_size==1)pass=true;
+    calculateEigenvectorsInThread(0, nq);
 #endif
-
-    return pass;
   }
-  // ***************************************************************************************
-  void AtomicDisplacements::solve_eigenvalues_in_threads(int startIndex, int endIndex, int cpuid)
-  {
-    for(int In=startIndex;In<endIndex;In++)
-    {
-      xvector<double> qpoint;
-      xmatrix<xcomplex<double> >  DM(_nBranches,_nBranches,1,1);
 
-      qpoint=_kpoints[In];
-      DM=_pc.getDynamicalMatrix(qpoint);
-      _DM[In]=DM;
+  void AtomicDisplacements::calculateEigenvectorsInThread(int startIndex, int endIndex) {
+    uint nbranches = _pc->getNumberOfBranches();
+    uint natoms = _pc->getInputCellStructure().atoms.size();
+    xvector<double> freq(nbranches);
+    xmatrix<xcomplex<double> > eig(nbranches, nbranches, 1, 1);
+    for (int i = startIndex; i < endIndex; i++) {
+      freq = _pc->getFrequency(_qpoints[i].cpos, apl::THZ, eig);
+      for (uint br = 0; br < nbranches; br++) {
+        _frequencies[i][br] = freq[br + 1];
+        for (uint at = 0; at < natoms; at++) {
+          for (int j = 1; j < 4; j++) {
+            _eigenvectors[i][br][at][j] = eig[3 * at + j][br + 1];
+          }
+        }
+      }
+    }
+  }
 
-      //calculate eigenvalue and eigenvectors of a dynamical matirx
-      xvector<double> eigenvalues(_nBranches, 1);
-      xmatrix<xcomplex<double> > eigenvectors(_nBranches, _nBranches, 1,1);
-      apl::aplEigensystems e;
-      e.eigen_calculation(DM, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
+}  // namespace apl
 
-      for(uint j=1; j<=_nBranches; j++)
-      {
-        if(_iszero(eigenvalues[j]))eigenvalues[j]=0.0;
-        if(eigenvalues[j]<0){
-          if(_isnegative(eigenvalues[j]))
-          {
-            if(!_is_freq_negative)
-            {
-              _logger<<  apl::warning <<"AtomicDisplacements:: negative eigenvalue: = " <<eigenvalues[j]<<apl::endl;
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                             DISPLACEMENTS                                //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  void AtomicDisplacements::calculateMeanSquareDisplacements(const QMesh& qmesh, double Tstart, double Tend, double Tstep) {
+    _qpoints.clear();
+    _temperatures.clear();
+
+    if (Tstart > Tend) {
+      string function = "AtomicDisplacements::calculateDisplacements()";
+      string message = "Tstart cannot be higher than Tend.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
+    for (double T = Tstart; T <= Tend; T += Tstep) _temperatures.push_back(T);
+
+    _qpoints = qmesh.getPoints();
+    calculateMeanSquareDisplacementMatrices();
+  }
+
+  void AtomicDisplacements::calculateMeanSquareDisplacementMatrices() {
+    string message = "Calculating mean square displacement matrices.";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    _displacement_matrices.clear();
+    _displacement_modes.clear();
+    calculateEigenvectors();
+
+    uint ntemps = _temperatures.size();
+    uint natoms = _pc->getInputCellStructure().atoms.size();
+    uint nq = _qpoints.size();
+    uint nbranches = _pc->getNumberOfBranches();
+
+    _displacement_matrices.resize(ntemps, vector<xmatrix<xcomplex<double> > >(natoms, xmatrix<xcomplex<double> >(3, 3)));
+    vector<xmatrix<xcomplex<double> > > outer(natoms, xmatrix<xcomplex<double> >(3, 3));
+    vector<double> masses(natoms);
+    for (uint at = 0; at < natoms; at++) masses[at] = AMU2KILOGRAM * _pc->getSupercell().getAtomMass(_pc->getSupercell().pc2scMap(at));
+
+    // Factor 2pi necessary because frequencies are raw
+    double prefactor = (PLANCKSCONSTANT_hbar * Hz2THz * std::pow(1e10, 2)/(2 * PI * (double) _qpoints.size()));
+    for (uint q = 0; q < nq; q++) {
+      for (uint br = 0; br < nbranches; br++) {
+        if (_frequencies[q][br] > _AFLOW_APL_EPS_) {
+          for (uint at = 0; at < natoms; at++) {
+            outer[at] = aurostd::outer_product(_eigenvectors[q][br][at], conj(_eigenvectors[q][br][at]));
+          }
+          for (uint t = 0; t < ntemps; t++) {
+            double prefactor_T = prefactor * ((0.5 + getOccupationNumber(_temperatures[t], _frequencies[q][br]))/_frequencies[q][br]);
+            for (uint at = 0; at < natoms; at++) {
+              // Add element-wise (much faster)
+              for (int i = 1; i < 4; i++) {
+                for (int j = 1; j < 4; j++) {
+                  _displacement_matrices[t][at][i][j].re += (prefactor_T/masses[at]) * outer[at][i][j].re;
+                  _displacement_matrices[t][at][i][j].im += (prefactor_T/masses[at]) * outer[at][i][j].im;
+                }
+              }
             }
-            _is_freq_negative=true;
-            return;
-          } else eigenvalues[j]=0.00;
-        }
-        _freq_Thz[In][j]=sqrt(eigenvalues[j])*RAW2Hz;
-      }
-      _eigenvectors[In]=eigenvectors;
-    }
-    _freq_test[cpuid]=true;
-  }//fn end
-  // ***************************************************************************************
-  //thermal displacements calculation for a given range of temperature 
-  //formulas can be found in the link http://atztogo.github.io/phonopy/thermal-displacement.html
-  void AtomicDisplacements::thermal_displacements(double Ts, double Te, int Tinc)
-  {
-    _logger<<"calculating mean square displacements "<<apl::endl;
-    if(_atomic_masses_amu.size()!=_atomic_species.size())
-    {
-      _logger<<apl::error <<"error in atomic masses [remove apl.xml LOCK and run again] "<<apl::endl;
-      return;
-    }
-
-    uint qmesh_size=_eigenvectors.size();
-
-    stringstream os_disp;
-    os_disp<<"# Cartesian atomic meansquare displacements in Angstrom uint\n";
-
-    std::string STAR = std::string(5*_nBranches, '*');
-
-    os_disp<<"[AFLOW] "<<STAR<<"\n";
-    os_disp<< "[DISPLACEMENTS]START" <<"\n";
-    os_disp<<"#"<<setw(9)<<"T(K)"<<setw(15)<<"AtomType"<<setw(15)<<"xdir"<<setw(15)<<"ydir"<<setw(15)<<"zdir"<<"\n";
-    os_disp << std::fixed << std::showpoint;
-
-    for(double t=Ts; t<=Te; t=t+Tinc)
-    {
-      os_disp<<setw(10)<<setprecision(2)<<t<<"\n";
-      _VEC_ disps(_nBranches,0.0);
-
-      for(uint kvec=0; kvec!=qmesh_size; kvec++)
-      {
-        _CMAT_ eigenvectors=xmat2mat(_eigenvectors[kvec]);
-        _CMAT_ vecs2(_nBranches,
-            _CVEC_(_nBranches, _CD_(0.,0.)) );
-
-        for(uint i=0; i!=_nBranches; i++){
-          for(uint j=0; j!=_nBranches; j++){
-            vecs2[i][j]= std::abs(eigenvectors[i][j])*
-              std::abs(eigenvectors[i][j]);
-          }}
-
-        _MAT_ vecs2_T(_nBranches,
-            _VEC_ (_nBranches, 0.0) );
-
-        for(uint i=0; i!=_nBranches; i++){
-          for(uint j=0; j!=_nBranches; j++){
-            vecs2_T[i][j]=vecs2[j][i].real();
-          }}
-
-        _VEC_ f=xvec2vec(_freq_Thz[kvec]);
-
-        for(uint i=0; i!=_nBranches; i++){
-          uint cnt=0;
-          //run through all atoms and their directions
-          for(uint atom_alpha=0; atom_alpha!=_nBranches; atom_alpha++){
-            if(f[i]<_CUTOFF_FREQ)continue;
-            if((atom_alpha%3==0) && (atom_alpha!=0))cnt++;
-            double c=vecs2_T[i][atom_alpha]/(_atomic_masses_amu[cnt]*AMU2Kg);
-            disps[atom_alpha] += get_Q2(f[i], t) * c ;
           }
         }
-      }//kvec loop
-      os_disp<<setprecision(8);
-      size_t atom_cnt=0;
-      for(uint atom_alpha=0; atom_alpha!=_nBranches; atom_alpha++)
-      {
-        if((atom_alpha%3==0)&& atom_alpha!=0)
-        {
-          os_disp<<"\n";
-        }
-        if(atom_alpha%3==0)
-        {
-          os_disp<<setw(25)<<_atomic_species[atom_cnt];
-          atom_cnt++;
-        }
-        os_disp<<setw(15)<<disps[atom_alpha]/((double)qmesh_size);
       }
-      os_disp<<"\n";
-    }//t loop
+    }
+  }
 
-    os_disp<<"[AFLOW] "<<STAR<<"\n";
-    os_disp << "[DISPLACEMENTS]STOP" <<"\n";
+  void AtomicDisplacements::calculateNormalModeDisplacements(const vector<xvector<double> >& qpts, bool coords_are_fractional) {
+    _qpoints.clear();
+    uint nq = qpts.size();
+    _qpoints.resize(nq);
+    if (coords_are_fractional) {
+      xmatrix<double> f2c = trasp(ReciprocalLattice(_pc->getInputCellStructure()));
+      for (uint q = 0; q < nq; q++) {
+        _qpoints[q].fpos = qpts[q];
+        _qpoints[q].cpos = f2c * qpts[q];
+      }
+    } else {
+      xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(_pc->getInputCellStructure())));
+      for (uint q = 0; q < nq; q++) {
+        _qpoints[q].cpos = qpts[q];
+        _qpoints[q].fpos = c2f * qpts[q];
+      }
+    }
+    calculateNormalModeDisplacements();
+  }
 
-    string outfile =  "aflow.apl.displacements.out";
-    if(!aurostd::stringstream2file(os_disp, outfile, "WRITE")) {
-      // ME20191031 - use xerror
-      //throw APLRuntimeError("Cannot write aflow.apl.displacements.out");
-      string function = "AtomicDisplacements::thermal_displacements()";
-      string message = "Cannot write " + outfile;
+  void AtomicDisplacements::calculateNormalModeDisplacements() {
+    _displacement_matrices.clear();
+    _displacement_modes.clear();
+    _temperatures.clear();
+    calculateEigenvectors();
+
+    uint nq = _qpoints.size();
+    uint nbranches = _pc->getNumberOfBranches();
+    uint natoms = _pc->getInputCellStructure().atoms.size();
+    _displacement_modes.resize(nq, vector<vector<xvector<xcomplex<double> > > >(nbranches, vector<xvector<xcomplex<double> > >(natoms)));
+
+    vector<double> masses(natoms);
+    for (uint at = 0; at < natoms; at++) masses[at] = _pc->getSupercell().getAtomMass(_pc->getSupercell().pc2scMap(at));
+
+    for (uint q = 0; q < nq; q++) {
+      for (uint br = 0; br < nbranches; br++) {
+        if (_frequencies[q][br] > _AFLOW_APL_EPS_) {
+          for (uint at = 0; at < natoms; at++) {
+            _displacement_modes[q][br][at] = _eigenvectors[q][br][at]/sqrt(masses[at]);
+          }
+        }
+      }
+    }
+  }
+
+  double AtomicDisplacements::getOccupationNumber(double T, double f) {
+    if (T < _AFLOW_APL_EPS_) return 0.0;
+    else return (1.0/(exp(BEfactor_h_THz * f/T) - 1));
+  }
+
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                            GETTER FUNCTIONS                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  const vector<double>& AtomicDisplacements::getTemperatures() const {
+    return _temperatures;
+  }
+
+  const vector<vector<xmatrix<xcomplex<double> > > >& AtomicDisplacements::getDisplacementMatrices() const {
+    return _displacement_matrices;
+  }
+
+  vector<vector<xvector<double> > > AtomicDisplacements::getDisplacementVectors() const {
+    vector<vector<xvector<double> > >  disp_vec;
+    uint ntemps = _displacement_matrices.size();
+    if (ntemps > 0) {
+      uint natoms = _displacement_matrices[0].size();
+      disp_vec.resize(ntemps, vector<xvector<double> >(natoms, xvector<double>(3)));
+      for (uint t = 0; t < ntemps; t++) {
+        for (uint at = 0; at < natoms; at++) {
+          for (int i = 1; i < 4; i++) {
+            disp_vec[t][at][i] = _displacement_matrices[t][at][i][i].re;
+          }
+        }
+      }
+    }
+    return disp_vec;
+  }
+
+  const vector<vector<vector<xvector<xcomplex<double> > > > >& AtomicDisplacements::getModeDisplacements() const {
+    return _displacement_modes;
+  }
+
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                                FILE I/O                                  //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  void AtomicDisplacements::writeMeanSquareDisplacementsToFile(string filename) {
+    filename = aurostd::CleanFileName(filename);
+    string message = "Writing mean square displacements into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    vector<vector<xvector<double> > > disp_vec = getDisplacementVectors();
+    stringstream output;
+    string tag = "[APL_DISPLACEMENTS]";
+
+    output << AFLOWIN_SEPARATION_LINE << std::endl;
+    output << tag << "SYSTEM=" << _pc->getSystemName() << std::endl;
+    output << tag << "START" << std::endl;
+    output << "#" << std::setw(9) << "T (K)" << setw(15) << "Species"
+      << std::setw(15) << "x (A^2)" << std::setw(15) << "y (A^2)" << std::setw(15) << "z (A^2)" << std::endl;
+    output << std::fixed << std::showpoint;
+    for (uint t = 0; t < _temperatures.size(); t++) {
+      output << std::setw(10) << std::setprecision(2) << _temperatures[t];
+      for (uint at = 0; at < disp_vec[t].size(); at++) {
+        if (at == 0) {
+          output << std::setw(15) << _pc->getInputCellStructure().atoms[at].cleanname;
+        } else {
+          output << std::setw(25) << _pc->getInputCellStructure().atoms[at].cleanname;
+        }
+        for (int i = 1; i < 4; i++) output << std::setw(15) << std::setprecision(8) << disp_vec[t][at][i];
+        output << std::endl;
+      }
+    }
+    output << tag << "STOP" << std::endl;
+    output << AFLOWIN_SEPARATION_LINE << std::endl;
+
+    aurostd::stringstream2file(output, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "AtomicDisplacements::writeMeanSquareDisplacementsToFile()";
+      message = "Could not write to file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
-    aurostd::StringstreamClean(os_disp);
   }
-  // ***************************************************************************************
-  // ***************************************************************************************
-  //projected displacements along [hkl] direction for a given range of temperature
-  //formulas can be found in the link http://atztogo.github.io/phonopy/thermal-displacement.html
-  void  AtomicDisplacements::projected_displacement(const _VEC_ &direction, double Ts, double Te, int Tinc)
-  {
-    _logger<<"calculating projected mean square displacements along ["<<NumToStr<int>((int)direction[0])
-      <<" "<<NumToStr<int>((int)direction[1])<<" "<<NumToStr<int>((int)direction[2])<<"]" << apl::endl;
 
-    uint qmesh_size=_eigenvectors.size();
+  void AtomicDisplacements::writeSceneFileXcrysden(string filename, const vector<vector<vector<double> > >& disp, int nperiods) {
+    filename = aurostd::CleanFileName(filename);
+    string message = "Writing atomic displacements in XCRYSDEN format into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
 
-    if(qmesh_size==0){_logger << apl::error <<" eigenvectors are zero " <<apl::endl; return;}
+    uint natoms = disp.size();
+    uint nsteps = disp[0].size();
 
+    stringstream output;
+    output << "ANIMSTEPS " << (nperiods * nsteps) << std::endl;
+    output << "CRYSTAL" << std::endl;
+    output << "PRIMVEC" << std::endl;
+    output << _pc->getInputCellStructure().lattice;  // no std::endl necessary
 
-    if(_atomic_species.size()!=_atomic_masses_amu.size())
-    {
-      _logger << apl::error <<"error in atomic masses [remove apl.xml LOCK and run again]" <<apl::endl;
-      return;
-    }
-
-    vector<double> projector(3,0.);
-    _MAT_ lattice=xmatd2matd(_rlattice);
-
-    //get projected vector
-    for(uint i=0; i!=lattice.size(); i++){
-      vector<double> a=lattice[i];
-      projector[i]=apl_inner_product(a, direction);
-    }
-
-    double norm=0.0;
-    for(uint i=0; i!=projector.size(); i++)
-      norm+=projector[i]*projector[i];
-    norm=sqrt(norm);
-    for(uint i=0; i!=projector.size(); i++)
-      projector[i]/=norm;
-
-    //make transpose of eigenvector
-    vector<_CMAT_> p_eigenvectors;
-    for(uint i=0; i!=qmesh_size; i++)//sum over qpoints
-    {
-      //transpose of eigenvector
-      _CMAT_ EVE=xmat2mat(_eigenvectors[i]);
-      _CMAT_ EVE_T(_nBranches, _CVEC_(_nBranches, _CD_(0.0,0.0)));
-
-      for(uint j=0; j!=_nBranches; j++)
-        for(uint k=0; k!=_nBranches; k++)
-          EVE_T[j][k]=EVE[k][j];
-
-      _CMAT_ tmp2d;
-      for(uint j=0; j!=_nBranches; j++){
-        //seperate real and imeginary parts
-        _VEC_ vecsR(_nBranches,0.00);
-        _VEC_ vecsI(_nBranches,0.00);
-        for(uint k=0; k<_nBranches; k++){
-          vecsR[k]=EVE_T[j][k].real();
-          vecsI[k]=EVE_T[j][k].imag();
-        }
-        _CVEC_ tmp1d;
-        for(uint k=0; k<_nBranches; k++){
-          if(k%3==0){
-            vector<double> tmp1(vecsR.begin()+k, vecsR.begin()+k+3);
-            vector<double> tmp2(vecsI.begin()+k, vecsI.begin()+k+3);
-            double real=apl_inner_product(tmp1, projector);
-            double imag=apl_inner_product(tmp2, projector);
-            tmp1d.push_back(_CD_(real,imag));
+    int step = 1;
+    for (int i = 0; i < nperiods; i++) {
+      for (uint j = 0; j < nsteps; j++) {
+        output << "PRIMCOORD " << step << std::endl;
+        output << std::setw(4) << natoms << " 1" << std::endl;
+        for (uint at = 0; at < natoms; at++) {
+          output << std::setw(5) << GetAtomName((uint) disp[j][at][0]);
+          for (int k = 1; k < 7; k++) {
+            output << std::setw(15) << std::fixed << std::setprecision(8) << disp[j][at][k];
           }
+          output << std::endl;
         }
-        tmp2d.push_back(tmp1d);
+        step++;
       }
-      p_eigenvectors.push_back(tmp2d);
     }
 
-    uint nATOMs=_atomic_species.size();
-    _CVEC_ tmp1d(_nBranches,_CD_(0.,0.));
-    _CMAT_ tmp2d(nATOMs,tmp1d);
-    vector<_CMAT_> p_eigenvectorsT(qmesh_size, tmp2d);
-
-    for(uint i=0; i!=qmesh_size; i++){
-      for(uint j=0; j!=_nBranches; j++){
-        for(uint k=0; k!=nATOMs; k++){
-          p_eigenvectorsT[i][k][j]=p_eigenvectors[i][j][k];
-        }}}
-    stringstream os_disp;
-    os_disp<<"# Cartesian projected atomic meansquare displacements in Angstrom uint \n";
-    std::string STAR = std::string(10*_nBranches, '*');
-    os_disp<<"[AFLOW] "<<STAR<<"\n";
-    os_disp<< "[PROJECTED_DISPLACEMENTS]START" <<"\n";
-    os_disp<<setw(10)<<"# Projection direction set to ["<<(int)direction[0]<<" "<<(int)direction[1]<<" "<<(int)direction[2]<<"]\n";
-
-    os_disp<<"#"<<setw(14)<<"T(K)";
-    for(uint i=0; i!=nATOMs; i++)
-      os_disp<<setw(15)<<_atomic_species[i];
-    os_disp<<"\n";
-
-    //temperature dependent displacements
-    for(double t=Ts; t<=Te; t=t+Tinc){
-      _VEC_ disps(nATOMs,0.00);
-      for(uint kvec=0; kvec!=qmesh_size; kvec++)//qpoint sum
-      {
-        _CMAT_ eigenvectors=p_eigenvectorsT[kvec];
-        _CMAT_ vecs2(nATOMs, _CVEC_(_nBranches, _CD_(0.,0.)));
-
-        for(uint i=0; i!=nATOMs; i++){
-          for(uint j=0; j!=_nBranches; j++){
-            vecs2[i][j]= std::abs(eigenvectors[i][j])*
-              std::abs(eigenvectors[i][j]);
-          }}
-
-        //transpose of vecs2 and its complex parts are zero
-        _MAT_ vecs2_T(_nBranches, _VEC_(nATOMs, 0.0) );
-
-        for(uint i=0; i!=nATOMs; i++){
-          for(uint j=0; j!=_nBranches; j++){
-            vecs2_T[j][i]=vecs2[i][j].real();
-          }}
-
-        _VEC_ f= xvec2vec(_freq_Thz[kvec]);
-
-        for(uint i=0; i!=_nBranches; i++){
-          for(uint j=0; j<nATOMs; j++){
-            if(f[i]<_CUTOFF_FREQ)continue;
-            double c = vecs2_T[i][j]/(_atomic_masses_amu[j]*AMU2Kg);
-            disps[j]+=get_Q2(f[i], t)*c;
-          }
-        }
-      }//qpoint loop
-      //PRINT
-      for(uint i=0; i!=nATOMs; i++)
-        disps[i]/=(double)qmesh_size;
-
-      os_disp << setw(15)<<std::setprecision(2)<<t<<setw(15);
-
-      for(uint i=0; i!=nATOMs; i++){
-        os_disp << std::fixed << std::showpoint;
-        os_disp <<std::setprecision(8)<<disps[i]<<setw(15);
-      }
-      os_disp<<"\n";
-    }
-    os_disp<<"[AFLOW] "<<STAR<<"\n";
-    os_disp << "[PROJECTED_DISPLACEMENTS]STOP" <<"\n";
-
-    string outfile =  "aflow.apl.projected_displacements.out";
-    if(!aurostd::stringstream2file(os_disp, outfile, "WRITE")) {
-      // ME20191031 - use xerror
-      //throw APLRuntimeError("Cannot write aflow.apl.projected_displacements.out");
-      string function = "AtomicDisplacements::projected_displacements()";
-      string message = "Cannot write " + outfile;
+    aurostd::stringstream2file(output, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "AtomicDisplacements::writeMeanSquareDisplacementsToFile()";
+      message = "Could not write to file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
-    aurostd::StringstreamClean(os_disp);
   }
-  // ***************************************************************************************
-  //Zone-center phonon modes with directions indicated by arrows. This file can be visualized by XcrySDen.  
-  //bool  AtomicDisplacements::write_normal_mode_direction(string user_kpoints)
-  bool  AtomicDisplacements::write_normal_mode_direction(const vector<xvector<double> >& hs_kpoints)
-  {
-    if(hs_kpoints.size()==0)
-    {
-      _logger<<  apl::warning <<"AtomicDisplacements:: hs_kpoints.size()=0, "<<apl::endl;
-      return false;
-    }
-    //uint nk = user_kpoints_double.size();
-    uint nk = hs_kpoints.size();
-    vector<xmatrix<xcomplex<double> > > eigenvectors; eigenvectors.clear();
-    xmatrix<xcomplex<double> > tmp_c_m(_nBranches, _nBranches, 1,1);
-    eigenvectors.resize(nk, tmp_c_m);
-    xvector<double> tmp_d_v(_nBranches, 1);
-    vector<xvector<double> > eigenvalues; eigenvalues.clear();
-    eigenvalues.resize(nk, tmp_d_v);
 
-    for(uint i=0; i!=nk; i++)
-    {
-      xvector<double> kpoint(3,1);
-      //kpoint[1]=user_kpoints_double[i][0];
-      //kpoint[2]=user_kpoints_double[i][1];
-      //kpoint[3]=user_kpoints_double[i][2];
-      kpoint[1]=hs_kpoints[i][1];
-      kpoint[2]=hs_kpoints[i][2];
-      kpoint[3]=hs_kpoints[i][3];
-      //kpoint = trasp(_klattice) * kpoint;
+  void AtomicDisplacements::writeSceneFileVsim(string filename, const xstructure& xstr_projected,
+      const vector<vector<vector<xvector<xcomplex<double> > > > >& displacements) {
+    filename = aurostd::CleanFileName(filename);
+    string message = "Writing atomic displacements in V_SIM format into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
 
-      xmatrix<xcomplex<double> >  DM(_nBranches,_nBranches,1,1);
-      DM=_pc.getDynamicalMatrix(kpoint);
-      //calculate eigenvalue and eigenvectors of a dynamical matirx
-      apl::aplEigensystems e;
-      e.eigen_calculation(DM, eigenvalues[i], eigenvectors[i], APL_MV_EIGEN_SORT_VAL_ASC);
+    stringstream output;
+    // Lattice
+    output << std::setw(15) << std::setprecision(8) << std::fixed << xstr_projected.lattice[1][1]
+      << std::setw(15) << std::setprecision(8) << std::fixed << xstr_projected.lattice[2][1]
+      << std::setw(15) << std::setprecision(8) << std::fixed << xstr_projected.lattice[2][2] << std::endl;
+    output << std::setw(15) << std::setprecision(8) << std::fixed << xstr_projected.lattice[3][1]
+      << std::setw(15) << std::setprecision(8) << std::fixed << xstr_projected.lattice[3][2]
+      << std::setw(15) << std::setprecision(8) << std::fixed << xstr_projected.lattice[3][3] << std::endl;
+    // Atoms
+    uint natoms = xstr_projected.atoms.size();
+    for (uint at = 0; at < natoms; at++) {
+      for (int i = 1; i < 4; i++) output << std::setw(15) << std::setprecision(8) << xstr_projected.atoms[at].cpos[i];
+      output << std::setw(4) << xstr_projected.atoms[at].cleanname << std::endl;
     }
 
+    for (uint q = 0; q < displacements.size(); q++) {
+      for (uint br = 0; br < displacements[q].size(); br++) {
+        output << "#metaData: qpt=[";
+        for (int i = 1; i < 4; i++) output << _qpoints[q].fpos[i] << ";";
+        output << _frequencies[q][br] << "\\" << std::endl;
+        for (uint at = 0; at < natoms; at++) {
+          output << "#;";
+          for (int i = 1; i < 4; i++) output << displacements[q][br][at][i].re << ";";
+          for (int i = 1; i < 4; i++) {
+            output << displacements[q][br][at][i].im;
+            if (i < 3) output << ";";
+            else output << "\\" << std::endl;
+          }
+          output << std::endl;
+        }
+        output << "# ]" << std::endl;
+      }
+    }
 
-    std::ofstream ofs_anime("aflow.apl.normal_mode_direction.axsf");
-    if (!ofs_anime.is_open())
-    {
-      // ME20190726 - exit clean-up
-      //_logger<<apl::error<<"aflow.apl.normal_mode_direction.axsf unable to open"<<apl::endl;
-      //exit(0);
-      //throw APLRuntimeError("aflow.apl.normal_mode_direction.axsf unable to open");
-      string function = "AtomicDisplacements::write_normal_mode_direction()";
-      string message = "aflow.apl.normal_mode_direction.axsf unable to open";
+    aurostd::stringstream2file(output, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "AtomicDisplacements::writeMeanSquareDisplacementsToFile()";
+      message = "Could not write to file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
-    ofs_anime.setf(std::ios::scientific);
+  }
 
-    uint natmin = _atomic_masses_amu.size();
-    uint nbands=3 * natmin;
+}  // namespace apl
 
-    double force_factor = 100.0;
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                               INTERFACE                                  //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
-    vector<xvector<double> > xmod(natmin, xvector<double>(3,1));
-    vector<string> kd_tmp(natmin, "");
+namespace apl {
 
-    ofs_anime << "ANIMSTEPS " << nbands * nk << std::endl;
-    ofs_anime << "CRYSTAL" << std::endl;
-    ofs_anime << "PRIMVEC" << std::endl;
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow) {
+    string function = "apl::createAtomicDisplacementSceneFile()";
+    string message = "";
+    ofstream mf("/dev/null");
 
+    // Parse command line options
+    string directory = vpflow.getattachedscheme("ADISP::DIRECTORY");
+    if (directory.empty()) directory = "./";
+    else directory = aurostd::CleanFileName(directory + "/");
 
-    for (uint i = 0; i < 3; ++i) {
-      for (uint j = 0; j < 3; ++j) {
-        ofs_anime << std::setw(15) << _rlattice[i+1][j+1];
-      }
-      ofs_anime << std::endl;
+    // Format
+    string format = aurostd::toupper(vpflow.getattachedscheme("ADISP::FORMAT"));
+    if (format.empty()) format = aurostd::toupper(DEFAULT_APL_ADISP_SCENE_FORMAT);
+    string allowed_formats_str = "XCRYSDEN,V_SIM";
+    vector<string> allowed_formats;
+    aurostd::string2tokens(allowed_formats_str, allowed_formats, ",");
+    if (!aurostd::withinList(allowed_formats, format)) {
+      message = "Unregonized format " + format + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+    }
+    
+    // Amplitude
+    string amplitude_str = vpflow.getattachedscheme("ADISP::AMPLITUDE");
+    double amplitude = 0.0;
+    if (amplitude_str.empty()) amplitude = DEFAULT_APL_ADISP_AMPLITUDE;
+    else amplitude = aurostd::string2utype<double>(amplitude_str);
+    if (amplitude < _AFLOW_APL_EPS_) {
+      message = "Amplitude must be positive.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
 
-    for (uint i = 0; i < natmin; ++i) {
-      for (uint j = 1; j <= 3; ++j) {
-        xmod[i][j] = _atomic_c_positions[i][j];
-      }
-
-      kd_tmp[i] = _atomic_species[i];
-    }
-    double norm=0.0;
-    uint i = 0;
-
-    double amu_ry=911.444242;
-
-    for (uint ik = 0; ik < nk; ++ik) 
-    {
-      for (uint imode = 0; imode < nbands; ++imode) 
-      {
-        ofs_anime << "PRIMCOORD " << std::setw(10) << i + 1 << std::endl;
-        ofs_anime << std::setw(10) << natmin << std::setw(10) << 1 << std::endl;
-        norm = 0.0;
-
-        for (uint j = 0; j < 3 * natmin; ++j) {
-          //std::complex<double>  evec_tmp = std::complex<double> (eigenvectors[ik][imode+1][j+1].re, eigenvectors[ik][imode+1][j+1].im);
-          std::complex<double>  evec_tmp = std::complex<double> (eigenvectors[ik][j+1][imode+1].re, eigenvectors[ik][j+1][imode+1].im);
-          norm += std::pow(evec_tmp.real(), 2) + std::pow(evec_tmp.imag(), 2);
-        }
-
-        norm *= force_factor / (double)(natmin);
-
-        for (uint j = 0; j < natmin; ++j) {
-
-          ofs_anime << std::setw(10) << kd_tmp[j];
-
-          for (uint k = 0; k < 3; ++k) {
-            ofs_anime << std::setw(15) << xmod[j][k+1];
-          }
-          for (uint k = 0; k < 3; ++k) {
-            ofs_anime << std::setw(15)
-              << eigenvectors[ik][3 * j + (k+1)][imode+1].re
-              / (std::sqrt(_atomic_masses_amu[j]*amu_ry) * norm);
-            //<< eigenvectors[ik][imode+1][3 * (j+1) + (k+1)].re
-          }
-          ofs_anime << std::endl;
-        }
-
-        ++i;
+    // Number of steps per period
+    string nsteps_str = vpflow.getattachedscheme("ADISP::STEPS");
+    int nsteps = 0;
+    if (format != "V_SIM") {
+      if (nsteps_str.empty()) nsteps = DEFAULT_APL_ADISP_NSTEPS;
+      else nsteps = aurostd::string2utype<int>(nsteps_str);
+      if (nsteps < 1) {
+        message = "Number of steps must be a positive integer";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
     }
 
-    ofs_anime.close();
-    return true;
-  }
-  // ***************************************************************************************
-  void AtomicDisplacements::calc_participation_ratio_all()
-  {
-    ofstream out ("aflow.apl.apr.out");
-    if (!out.is_open())
-    {
-      _logger<<apl::error <<"aflow.apl.apr.out not able to open "<<apl::endl;
-      return;
-    }
-    std::string STAR = std::string(10*_nBranches, '*');
-    out<<"[AFLOW] "<<STAR<<"\n";
-    out<< "[ATOMIC PARTICIPATION RATIO]START" <<"\n";
-
-    out.setf(std::ios::scientific);
-
-    out << "# Atomic participation ratio of each phonon modes at k points\n";
-    out << "# kpoint, mode, atom, frequency[kpoint][mode] (THz), APR[kpoint][mode][atom]\n";
-    for(uint ik=0; ik!=_eigenvectors.size(); ik++)
-    {
-      out << "#" << std::setw(8) << ik + 1;
-      out << " k = ";
-      out << std::setw(15) << _kpoints[ik][1] << setw(15) << _kpoints[ik][2]<< setw(15) << _kpoints[ik][3]<<"\n";
-      _CMAT_ data2D = xmat2mat(_eigenvectors[ik]);
-      for(uint nBr=0; nBr!=data2D.size(); nBr++)
-      {
-        vector<double> ret(_atomic_masses_amu.size(), 0.0);
-        for(uint atom=0; atom!=_atomic_masses_amu.size(); atom++)
-        {
-          ret[atom] = (std::norm(data2D[3 * atom][nBr])
-              + std::norm(data2D[3 * atom + 1][nBr])
-              + std::norm(data2D[3 * atom + 2][nBr])) / _atomic_masses_amu[atom];
-        }
-        double sum = 0.0;
-        for (uint iat = 0; iat < _atomic_masses_amu.size(); ++iat) sum += ret[iat] * ret[iat];
-
-        for (uint iat = 0; iat < _atomic_masses_amu.size(); ++iat)
-          ret[iat] /= std::sqrt( (double)(_atomic_masses_amu.size()) * sum);
-
-        sum = 0.0;
-        for (uint iat = 0; iat < _atomic_masses_amu.size(); ++iat) {
-          sum += ret[iat];
-        }
-        for(uint i=0; i!=ret.size(); i++)
-        {
-          out << std::setw(8) << ik  + 1;
-          out << std::setw(5) << nBr + 1;
-          out << std::setw(5) << i + 1;
-          out<<setw(15)<<_freq_Thz[ik][nBr+1]<<setw(15)<<ret[i];
-          out<<"\n";
-        }
-        out<<"#Participation ratio \n";
-        out<<setw(15)<<sum<<"\n";
+    // Number of periods
+    string nperiods_str = vpflow.getattachedscheme("ADISP::PERIODS");
+    int nperiods = 0;
+    if (format != "V_SIM") {
+      if (nperiods_str.empty()) nperiods = DEFAULT_APL_ADISP_NPERIODS;
+      else nperiods = aurostd::string2utype<int>(nperiods_str);
+      if (nsteps < 1) {
+        message = "Number of periods must be a positive integer";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
-      out<<"\n";
     }
-    out<< "[ATOMIC PARTICIPATION RATIO]END" <<"\n";
-    out<<"[AFLOW] "<<STAR<<"\n";
-    out.close();
-  }
-  // ***************************************************************************************
-  bool AtomicDisplacements::calc_participation_ratio_along_path(const vector< xvector<double> > &qpoints)
-  {
-    if(qpoints.size()==0)
-    {
-      _logger<<  apl::warning <<"Can't calculate participation ratio along path, qpoints.size()==0 "<<apl::endl;
-      return false;
-    }
-    _kpoints_path.clear();
-    _kpoints_path=qpoints;
-    xmatrix< xcomplex<double> > dd(_nBranches,_nBranches,1,1);
-    _eigenvectors_path.resize(_kpoints_path.size(), dd);
 
-    return eigen_solver_path();
-  }
-  // ***************************************************************************************
-  void AtomicDisplacements::write_participation_ratio_along_path(const vector <double> &path, const vector<int> &path_segment)
-  {
-    if(path.size()==0)
-    {
-      _logger<<  apl::warning <<"Can't calculate participation ratio along path, path.size()==0 "<<apl::endl;
-      return;
-    }
-    if(path_segment.size()==0)
-    {
-      _logger<<  apl::warning <<"Can't calculate participation ratio along path, path_segment.size()==0 "<<apl::endl;
-      return;
-    }
-    ofstream out ("aflow.apl.apr.path.out");
-    if (!out.is_open())
-    {
-      _logger<<apl::error <<"aflow.apl.apr.path.out not able to open "<<apl::endl;
-      return;
-    }
-    //out.setf(std::ios::scientific);
-
-    for(uint ik=0; ik!=_eigenvectors_path.size(); ik++)
-    {
-      out<< setw(5) << path_segment[ik];
-      out<< setprecision(6)<<std::fixed << std::showpoint
-        << setw(15) << path[ik];
-
-      out<<setprecision(6)<<std::fixed << std::showpoint;
-
-      _CMAT_ data2D = xmat2mat(_eigenvectors[ik]);
-      for(uint nBr=0; nBr!=data2D.size(); nBr++)
-      {
-        vector<double> ret(_atomic_masses_amu.size(), 0.0);
-        for(uint atom=0; atom!=_atomic_masses_amu.size(); atom++)
-        {
-          ret[atom] = (std::norm(data2D[3 * atom][nBr])
-              + std::norm(data2D[3 * atom + 1][nBr])
-              + std::norm(data2D[3 * atom + 2][nBr])) / _atomic_masses_amu[atom];
-        }
-        double sum = 0.0;
-        for (uint iat = 0; iat < _atomic_masses_amu.size(); ++iat) sum += ret[iat] * ret[iat];
-
-        for (uint iat = 0; iat < _atomic_masses_amu.size(); ++iat)
-          ret[iat] /= std::sqrt( (double)(_atomic_masses_amu.size()) * sum);
-
-        sum = 0.0;
-        for (uint iat = 0; iat < _atomic_masses_amu.size(); ++iat) {
-          sum += ret[iat];
-        }
-        for(uint i=0; i!=ret.size(); i++)
-        {
-          out<<setw(15)<<ret[i];
+    // Range/supercell
+    string supercell_str = vpflow.getattachedscheme("ADISP::SUPERCELL");
+    string range_str = vpflow.getattachedscheme("ADISP::RANGE");
+    if (format != "V_SIM") {
+      if (supercell_str.empty() && range_str.empty()) {
+        supercell_str = "1x1x1";
+      } else if (!supercell_str.empty() && !range_str.empty()) {
+        message = "Cannot specify supercell and range at the same time.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
+      } else if (!supercell_str.empty()) {
+        vector<string> tokens;
+        aurostd::string2tokens(supercell_str, tokens, "xX");
+        if (tokens.size() != 3) {
+          message = "Broken supercell format.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
         }
       }
-      out<<"\n";
     }
-    out.close();
-  }
-  // ***************************************************************************************
-  void AtomicDisplacements::solve_eigenvalues_in_threads_path(int startIndex, int endIndex, int cpuid)
-  {
-    for(int In=startIndex;In<endIndex;In++)
-    {
-      xvector<double> qpoint;
-      xmatrix<xcomplex<double> >  DM(_nBranches,_nBranches,1,1);
 
-      qpoint=_kpoints_path[In];
-      DM=_pc.getDynamicalMatrix(qpoint);
+    // Branches
+    string branches_str = vpflow.getattachedscheme("ADISP::BRANCHES");
+    vector<int> branches;
+    if (format != "V_SIM") {
+      if (branches_str.empty()) {
+        message = "No branches selected. Displacements will be calculated for all.";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, directory, mf, std::cout);
+      } else {
+        aurostd::string2tokens(branches_str, branches, ",");
+      }
+    }
 
-      //calculate eigenvalue and eigenvectors of a dynamical matirx
-      xvector<double> eigenvalues(_nBranches, 1);
-      xmatrix<xcomplex<double> > eigenvectors(_nBranches, _nBranches, 1,1);
-      apl::aplEigensystems e;
-      e.eigen_calculation(DM, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
-
-      for(uint j=1; j<=_nBranches; j++)
-      {
-        if(_iszero(eigenvalues[j]))eigenvalues[j]=0.0;
-        if(eigenvalues[j]<0){
-          if(_isnegative(eigenvalues[j]))
-          {
-            if(!_is_freq_negative)
-            {
-              _logger<<  apl::warning <<"AtomicDisplacements:: negative eigenvalue: = " <<eigenvalues[j]<<apl::endl;
-            }
-            _is_freq_negative=true;
-            return;
-          } else eigenvalues[j]=0.00;
+    // q-points
+    string qpoints_str = vpflow.getattachedscheme("ADISP::QPOINTS");
+    vector<xvector<double> > qpoints;
+    if (qpoints_str.empty()) {
+      message = "No q-points given.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_MISSING_);
+    } else {
+      vector<string> tokens, tokens_qpt;
+      aurostd::string2tokens(qpoints_str, tokens, ";");
+      for (uint i = 0; i < tokens.size(); i++) {
+        aurostd::string2tokens(tokens[i], tokens_qpt, ",");
+        if (tokens_qpt.size() == 3) {
+          xvector<double> q(3);
+          for (int j = 0; j < 3; j++) q[j + 1] = aurostd::string2utype<double>(tokens_qpt[j]);
+          BringInCellInPlace(q, _ZERO_TOL_, 0.5, -0.5);
+          qpoints.push_back(q);
+        } else {
+          message = "Broken q-points format.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
         }
       }
-      _eigenvectors_path[In]=eigenvectors;
-    }
-    _freq_test[cpuid]=true;
-  }//fn end
-  // ***************************************************************************************
-  bool AtomicDisplacements::eigen_solver_path()
-  {
-    _freq_test.clear();
-    bool pass=false;
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    // Get the number of CPUS
-    int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
-    if(ncpus<1) ncpus=1;
-    //    int qpointsPerCPU = _kpoints_path.size() / ncpus;
-    _freq_test.resize(ncpus, false);
-    // Show info 
-    if( ncpus == 1 )
-    {
-      _logger.initProgressBar("Calculating eigenvalues for AtomicDisplacements");
-    }
-    else
-    {
-      _logger.initProgressBar("Calculating eigenvalues for AtomicDisplacements (" + stringify(ncpus) + " threads)");
     }
 
-    // Distribute the calculation
-    int startIndex, endIndex;
-    std::vector< std::thread* > threads;
-    vector<vector<int> > thread_dist = getThreadDistribution((int) _kpoints_path.size(), ncpus);
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = thread_dist[icpu][0];
-      endIndex = thread_dist[icpu][1];
-      threads.push_back( new std::thread(&AtomicDisplacements::solve_eigenvalues_in_threads_path,this,startIndex,endIndex, icpu) );
+    // Initialize phonon calculator
+    string statefile = directory + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE;
+    Supercell sc_pcalc(statefile, mf);
+    PhononCalculator pc(sc_pcalc, mf);
+    pc.setDirectory(directory);
+    string hibfile = directory + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE;
+    pc.awake(hibfile, false);
+    // Must project to primitive or the vibrations will be incorrect
+    if (!sc_pcalc.projectToPrimitive()) {
+      message = "Could not project to primitive structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
+    // Check branches
+    int nbr = (int) branches.size();
+    if (nbr == 0) {
+      nbr = (int) pc.getNumberOfBranches();
+      for (int br = 0; br < nbr; br++) branches.push_back(br);
+    } else {
+      int nbranches = pc.getNumberOfBranches();
+      for (int br = 0; br < nbr; br++) {
+        if (branches[br] >= nbranches) {
+          message = "Index " + aurostd::utype2string<int>(branches[br]) + " out of range.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        }
+      }
     }
 
-    /* OBSOLETE ME20180801
-       for(int icpu = 0; icpu < ncpus; icpu++) {
-       startIndex = icpu * qpointsPerCPU;
-       endIndex = startIndex + qpointsPerCPU;
-       if( ( (uint)endIndex > _kpoints_path.size() ) ||
-       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints_path.size() ) ) )
-       endIndex = _kpoints_path.size();
-       threads.push_back( new std::thread(&AtomicDisplacements::solve_eigenvalues_in_threads_path,this,startIndex,endIndex, icpu) );
-       }
-       */
+    // Done with setup - calculate displacements
+    AtomicDisplacements ad(pc);
+    ad.calculateNormalModeDisplacements(qpoints);
 
-    // Wait to finish all threads here!
-    for(uint i = 0; i < threads.size(); i++) {
-      threads[i]->join();
-      delete threads[i];
-    }
+    if (format == "XCRYSDEN") {
+      // Create supercell for the scene file
+      Supercell scell(pc.getInputCellStructure(), mf);
+      double range = AUROSTD_MAX_DOUBLE;
+      if (supercell_str.empty()) {
+        range = aurostd::string2utype<double>(range_str);
+        xvector<int> dims = LatticeDimensionSphere(scell.getInputStructure().lattice, range);
+        // Sphere is inside, so increase dimension to be safe
+        for (int i = 1; i < 4; i++) dims[i] += 1;
+        scell.build(dims, false);
+      } else {
+        vector<int> tokens;
+        aurostd::string2tokens(supercell_str, tokens, "xX");
+        scell.build(aurostd::vector2xvector(tokens), false);
+      }
+      if (!scell.projectToPrimitive()) {
+        message = "Could not project to primitive structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      }
 
-    // Done
-    _logger.finishProgressBar();
-
-
-    uint bool_size=0;
-    for(uint id=0; id!=_freq_test.size(); id++)
-    {
-      bool_size+=(uint)_freq_test[id];
-    }
-    if(bool_size==(uint)ncpus)pass=true;
-    _freq_test.clear();
-#else
-    _freq_test.resize(1, false);
-    solve_eigenvalues_in_threads_path(0, (int)_kpoints_path.size(), 0);
-    uint bool_size=0;
-    for(uint id=0; id!=_freq_test.size(); id++)
-    {
-      bool_size+=(uint)_freq_test[id];
-    }
-    if(bool_size==1)pass=true;
-#endif
-
-    return pass;
-  }
-  // ***************************************************************************************
-  double AtomicDisplacements::get_Q2(double freq, double t)
-  {
-    return (10.545721821978764) * (  //hbar*ev/A^2//
-        (get_population(freq, t) + 0.5) / (freq * 2. * M_PI));
-  }
-  // ***************************************************************************************
-  double AtomicDisplacements::get_population(double freq, double t)
-  {
-    if (t < 1.)
-      return 0.0;
-    else
-    {
-      return 1.0 / (exp((freq * 0.00413566733) / (8.61733825681e-05 * t)) - 1.);
+      vector<vector<vector<double> > > disp;
+      for (uint q = 0; q < qpoints.size(); q++) {
+        for (uint br = 0; br < branches.size(); br++) {
+          disp = ad.createDisplacementsXcrysden(scell, range, amplitude, q, br, nsteps);
+          stringstream filename;
+          filename << directory <<  DEFAULT_APL_FILE_PREFIX;
+          for (int i = 1; i < 4; i++) filename << "_" << qpoints[q][i];
+          filename << "_" << br << ".axsf";
+          ad.writeSceneFileXcrysden(filename.str(), disp, nperiods);
+        }
+      }
+    } else if (format == "V_SIM") {
+      xstructure xstr_oriented;
+      vector<vector<vector<xvector<xcomplex<double> > > > > displacements_oriented;
+      ad.getOrientedDisplacementsVsim(xstr_oriented, displacements_oriented);
+      string filename = directory + DEFAULT_APL_FILE_PREFIX + "displacements.ascii";
+      ad.writeSceneFileVsim(filename, xstr_oriented, displacements_oriented);
     }
   }
-  // ***************************************************************************************
-  _CMAT_ AtomicDisplacements::xmat2mat(const xmatrix<xcomplex<double> > &M)
-  {
-    _CMAT_ m(M.cols, _CVEC_(M.rows, _CD_(0.0,0.0)));
-    for(int i=0; i<M.rows; i++)
-      for(int j=0; j<M.cols; j++)
-        m[i][j]=_CD_(M[i+1][j+1].re, M[i+1][j+1].im);
 
-    return m;
-  }
-  // ***************************************************************************************
-  _VEC_ AtomicDisplacements::xvec2vec(const xvector<double> &V)
-  {
-    _VEC_ v(V.rows, 0.0);
-    for(int i=0; i<V.rows; i++)
-      v[i]=V[i+1];
+  vector<vector<vector<double> > > AtomicDisplacements::createDisplacementsXcrysden(const Supercell& scell,
+      double range, double amplitude, int q, int br, int nsteps) {
+    const xvector<double>& qpt = _qpoints[q].cpos;
+    const vector<xvector<xcomplex<double> > >& disp = _displacement_modes[q][br];
 
-    return v;
-  }
-  // ***************************************************************************************
-  template <typename T>
-    string AtomicDisplacements:: NumToStr ( T Number ){
-      ostringstream ss;
-      ss << Number;
-      return ss.str();
+    // Generate a list of atoms that are inside the desired sphere
+    const xstructure& scell_str = scell.getInputStructure();
+    uint natoms = scell_str.atoms.size();
+    vector<int> atoms;
+    if (range == AUROSTD_MAX_DOUBLE) {
+      for (uint iat = 0; iat < natoms; iat++) atoms.push_back(iat);
+    } else {
+      for (uint iat = 0; iat < natoms; iat++) {
+        if (aurostd::modulus(scell_str.atoms[iat].cpos) <= range) atoms.push_back(iat);
+      }
+      natoms = atoms.size();
     }
-  // ***************************************************************************************
-  _MAT_ AtomicDisplacements::xmatd2matd(const xmatrix<double> &M)
-  {
-    _MAT_ m(M.cols, _VEC_(M.rows, 0.0));
-    for(int i=0; i<M.rows; i++)
-      for(int j=0; j<M.cols; j++)
-        m[i][j]=M[i+1][j+1];
 
-    return m;
-  }
-  // ***************************************************************************************
-  double AtomicDisplacements::apl_inner_product(const vector<double> &a, const vector<double> &b)
-  {
-    if(a.size()!=b.size())
-      _logger<<apl::error<<"apl_inner_product() vector size must be equal" << apl::endl;
+    // Calculate original displacements
+    const vector<int>& sc2pcMap = scell._sc2pcMap;
+    const vector<int>& pc2scMap = scell._pc2scMap;
 
-    double sum=0.0;
-    for(uint i=0; i!=a.size(); i++)sum+=a[i]*b[i];
-    return sum;
+    // Calculate original displacements
+    vector<vector<vector<double> > > displacements(nsteps, vector<vector<double> >(natoms, vector<double>(7, 0.0)));
+    vector<xvector<xcomplex<double> > > displacements_orig(natoms, xvector<xcomplex<double> >(3));
+    int at = -1, at_pc = -1, at_eq_sc = -1;
+    xvector<double> dist_scell(3);
+    for (uint iat = 0; iat < natoms; iat++) {
+      at = atoms[iat];
+      at_pc = sc2pcMap[at];
+      at_eq_sc = pc2scMap[at_pc];
+      dist_scell = scell_str.atoms[at].cpos - scell_str.atoms[at_eq_sc].cpos;
+      displacements_orig[iat] = amplitude * exp(iONE * scalar_product(qpt, dist_scell)) * disp[at_pc];
+      displacements[0][iat][0] = (double) scell_str.atoms[at].atomic_number;
+      for (int i = 1; i < 4; i++) {
+        displacements[0][iat][i] = scell_str.atoms[at].cpos[i];
+        displacements[0][iat][i + 3] = displacements_orig[iat][i].re;
+      }
+    }
+
+    // Calculate displacements for the rest of the period
+    xcomplex<double> phase;
+    xvector<xcomplex<double> > disp_step;
+    for (int s = 1; s < nsteps; s++) {
+      phase = exp(-iONE * ((double) s/(double) nsteps));
+      for (uint iat = 0; iat < natoms; iat++) {
+        disp_step = phase * displacements_orig[iat];
+        at = atoms[iat];
+        displacements[s][at][0] = (double) scell_str.atoms[at].atomic_number;
+        for (int i = 1; i < 4; i++) {
+          displacements[s][at][i] += displacements[s - 1][at][i + 3];
+          displacements[s][at][i + 3] = disp_step[i].re;
+        }
+      }
+    }
+
+    return displacements;
   }
-  // ***************************************************************************************
-}//apl namespace end
+
+  void AtomicDisplacements::getOrientedDisplacementsVsim(xstructure& xstr_oriented,
+      vector<vector<vector<xvector<xcomplex<double> > > > >& displacements) {
+    // Project the structure such that a points along x and b along
+    // the x-y plane as required by V_sim
+    const xstructure& xstr_orig = _pc->getInputCellStructure();
+    xstr_oriented.clear();
+
+    // Project lattice
+    xvector<double> params = Getabc_angles(xstr_orig.lattice, RADIANS);
+    xmatrix<double> lattice(3, 3);
+    double cosalpha = cos(params[4]);
+    double cosbeta = cos(params[5]);
+    double cosgamma = cos(params[6]);
+    double singamma = sin(params[6]);
+    double l32 = (2* cosalpha - 2 * cosbeta * cosgamma)/(2 * singamma);
+    lattice[1][1] = params[1];
+    lattice[2][1] = params[2] * cosgamma;
+    lattice[2][2] = params[2] * singamma;
+    lattice[3][1] = params[3] * cosbeta;
+    lattice[3][2] = params[3] * l32;
+    lattice[3][3] = params[3] * sqrt(1 - std::pow(cosbeta, 2) - std::pow(l32, 2));
+    xstr_oriented.lattice = lattice;
+    xstr_oriented.f2c = trasp(lattice);
+    xstr_oriented.c2f = inverse(xstr_oriented.f2c);
+
+    // Project positions
+    uint natoms = xstr_orig.atoms.size();
+    for (uint i = 0; i < natoms; i++) {
+      _atom at = xstr_orig.atoms[i];
+      at.cpos = xstr_oriented.f2c * at.fpos;
+      xstr_oriented.atoms.push_back(at);
+    }
+
+    // Project displacements
+    uint nq = _qpoints.size();
+    uint nbr = _pc->getNumberOfBranches();
+    displacements.clear();
+    displacements.resize(nq, vector<vector<xvector<xcomplex<double> > > >(nbr, vector<xvector<xcomplex<double> > >(natoms)));
+
+    xmatrix<double> transf = xstr_oriented.f2c * xstr_orig.c2f;
+    for (uint q = 0; q < nq; q++) {
+      for (uint br = 0; br < nbr; br++) {
+        for (uint at = 0; at < natoms; at++) {
+          displacements[q][br][at] = transf * _displacement_modes[q][br][at];
+        }
+      }
+    }
+  }
+
+}  // namespace apl
+
+
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *               Pinku Nath - Duke University 2014 - 2016                  *
+// *                  Marco Esters - Duke University 2020                    *
+// *                                                                         *
+//****************************************************************************

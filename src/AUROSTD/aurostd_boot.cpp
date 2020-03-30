@@ -143,6 +143,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   aurostd::xvector<xcomplex<utype> > vxfirst,vx(2),vy(2),vbb=vxfirst,vcc(vxfirst),vxvx,vxvxvxvx(1,2),vb=vxfirst,vc(vxfirst); // DX 1/15/18 - equal operator was missing		//CO190329 - clang doesn't like x=x, changing to x=y
   aurostd::xvector<utype> vr;
   vx=vy;vx+vx;vx+=vy;vx-vx;vx-=vy;vx*vx; // DX 1/17/18 - added vx=vx		//CO190329 - clang doesn't like x=x, changing to x=y
+  vx=r*vy;vx=vy*r;vx=vy/r;vx=x*vy;vx=vy*x;vx=vy/r;  // ME20200329
   //xvector<xcomplex<utype> > va,vb=va,vc(va); // DX 1/15/18 - equal operator was missing
   sin(vx);sinh(vx);cos(vx);cosh(vx);exp(vx);log(vx);//sqrt(vx);
   vx.clear(); // DX 1/15/18 - clear was missing
@@ -166,6 +167,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1];mxmx=mx/my;mxmx/=my; // DX 1/15/18 - operator and equal operator initialized for xcomplex		//CO190329 - clang doesn't like x=x, changing to x=y
   exp(m); // DX 1/15/18 - add exponential or complex matrices
   m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
+  m=r*n;m=n*r;m=n/r;m+=n;m-=n;vx=mx*vy;  // ME20200329
   cout << m << endl; // DX 1/15/18 - ostream
   vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME 180904
   bool tf=false;  //CO200106 - set the result or clang complains

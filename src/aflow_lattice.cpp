@@ -1281,7 +1281,7 @@ namespace LATTICE {
                 } else {
                   str_sp.bravais_lattice_variation_type="RHL2";
                 }
-                alpha=alpha*pi/180.0; // change to RADIANTS !
+                alpha=alpha*pi/180.0; // change to RADIANS !
                 plattice[1][1]=a*cos(alpha/2.0);plattice[1][2]=-a*sin(alpha/2.0);plattice[1][3]=0.0; // make the standard primitive rhl
                 plattice[2][1]=a*cos(alpha/2.0);plattice[2][2]= a*sin(alpha/2.0);plattice[2][3]=0.0; // make the standard primitive rhl
                 plattice[3][1]=a*cos(alpha)/cos(alpha/2.0);plattice[3][2]=0.0;
@@ -2598,7 +2598,7 @@ namespace LATTICE {
                   } else {
                     str_sp.bravais_lattice_variation_type="RHL2";
                   }
-                  alpha=alpha*pi/180.0; // change to RADIANTS !
+                  alpha=alpha*pi/180.0; // change to RADIANS !
                   plattice[1][1]=a*cos(alpha/2.0);plattice[1][2]=-a*sin(alpha/2.0);plattice[1][3]=0.0; // make the standard primitive rhl
                   plattice[2][1]=a*cos(alpha/2.0);plattice[2][2]= a*sin(alpha/2.0);plattice[2][3]=0.0; // make the standard primitive rhl
                   plattice[3][1]=a*cos(alpha)/cos(alpha/2.0);plattice[3][2]=0.0;

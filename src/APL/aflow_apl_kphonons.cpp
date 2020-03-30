@@ -931,7 +931,6 @@ namespace KBIN {
 
     //  //PINKU QUASI-HARMONIC START
     aurostd::xoption CALCULATE_GROUPVELOCITY_OPTION; CALCULATE_GROUPVELOCITY_OPTION.option = false; //PN180705
-    aurostd::xoption CALCULATE_ATOMIC_DISPLACEMENT_OPTION; CALCULATE_ATOMIC_DISPLACEMENT_OPTION.option = false; //PN180705
     aurostd::xoption CALCULATE_GRUNEISEN_OPTION; CALCULATE_GRUNEISEN_OPTION.option = false;
     aurostd::xoption CALCULATE_DISPLACEMENTS_OPTION; CALCULATE_DISPLACEMENTS_OPTION.option = false;
     aurostd::xoption CALCULATE_GRUNEISEN_SUBDIRECTORIES_OPTION; CALCULATE_GRUNEISEN_SUBDIRECTORIES_OPTION.option = false;
@@ -1016,10 +1015,6 @@ namespace KBIN {
     //GROUPVELOCITY=y/n
     CALCULATE_GROUPVELOCITY_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "GROUP_VELOCITY=" + "|" + _ASTROPT_APL_OLD_ + "GROUP_VELOCITY="), CALCULATE_GROUPVELOCITY_OPTION.option,  CALCULATE_GROUPVELOCITY_OPTION.xscheme);
     logger << (CALCULATE_GROUPVELOCITY_OPTION.isentry ? "Setting " : "DEFAULT ") << _ASTROPT_ << "GROUP_VELOCITY=" << (CALCULATE_GROUPVELOCITY_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
-
-    //ATOMIC_DISPLACEMENT=y/n
-    CALCULATE_ATOMIC_DISPLACEMENT_OPTION.options2entry(AflowIn, string(_ASTROPT_ + "ATOMIC_DISPLACEMENT=" + "|" + _ASTROPT_APL_OLD_ + "ATOMIC_DISPLACEMENT="), CALCULATE_ATOMIC_DISPLACEMENT_OPTION.option,  CALCULATE_ATOMIC_DISPLACEMENT_OPTION.xscheme);
-    logger << (CALCULATE_ATOMIC_DISPLACEMENT_OPTION.isentry ? "Setting " : "DEFAULT ") << _ASTROPT_ << "ATOMIC_DISPLACEMENT=" << (CALCULATE_ATOMIC_DISPLACEMENT_OPTION.option ? "ON" : "OFF") << "." << apl::endl;
     //PINKU PHONON END
 
     //PINKU QUASI-HARMONIC START
@@ -1979,7 +1974,11 @@ namespace KBIN {
       // Init path according to the aflow's definition for elec. struc.
       // ME20181029 - Restructured
       if (USER_DC_METHOD == "LATTICE") {
-        supercell.projectToPrimitive();  // ME20200117 - project to primitive
+        if (!supercell.projectToPrimitive()) {  // ME20200117 - project to primitive
+          message = "Could not map the AFLOW standard primitive cell to the supercell.\
+                     Phonon dispersions will be calculated using the original structure instead.";
+          pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
+        }
         pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
       } else {
         if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_FRAC.empty()) {
@@ -2072,6 +2071,10 @@ namespace KBIN {
         // ME20200108 - new ThermalPropertiesCalculator format
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
         tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
+
+        apl::AtomicDisplacements ad(phcalc);
+        ad.calculateMeanSquareDisplacements(qmesh, USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
+        ad.writeMeanSquareDisplacementsToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE);
         //QHA/SCQHA/QHA3P START //PN180705
         //calculate Gruneisen
         // ME20190428 - START
@@ -2088,17 +2091,6 @@ namespace KBIN {
             if(vg.check_negative_frequencies()){
               vg.write();
               vg.clear();
-            }}
-          //atomic displacement calculations
-          if(CALCULATE_ATOMIC_DISPLACEMENT_OPTION.option){
-            // Uniform Mesh is obsolete - replaced by QMesh
-            //apl::AtomicDisplacements ad(*phcalc, umesh, logger);
-            apl::AtomicDisplacements ad(phcalc, qmesh, logger);
-            ad.set_frequency_cutoff(CUTOFF_FREQ);
-            ad.populate_variables(phcalc.getInputCellStructure());
-            if(ad.eigen_solver()){
-              ad.thermal_displacements(USER_TP_TSTART,USER_TP_TEND,USER_TP_TSTEP);
-              ad.write_normal_mode_direction(ptr_hsq->get_hs_kpoints());
             }}
           // ME20190428 - END
           //QHA calculate Gruneisen

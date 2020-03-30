@@ -2153,7 +2153,7 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); // D
 string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); // DX20170901 //DX20180526 - add directory //DX20180806 - added setting
 string GetLaueLabel(string& point_group); // DX20170901 //DX20180526 - add directory
 
-#define RADIANTS 0
+#define RADIANS 0
 #define DEGREES  1
 #define _calculate_symmetry_default_sgroup_radius_   2.0
 

@@ -616,6 +616,29 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+//ME20200329 real * complex vector
+namespace aurostd {
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(utype s, const xvector<xcomplex<utype> >& a) {
+      xvector<xcomplex<utype> > c(a.lrows, a.urows);
+      for (int i = c.lrows; i <= c.urows; i++) {
+        c[i].re = s * a[i].re;
+        c[i].im = s * a[i].im;
+      }
+      return c;
+    }
+
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(const xvector<xcomplex<utype> >& a, utype s) {
+      return s * a;
+    }
+
+  template<class utype> xvector<xcomplex<utype> >
+    operator/(const xvector<xcomplex<utype> >& a, utype s) {
+      return ((utype) 1/s) * a;
+    }
+}
+
 // --------------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>               // operator xvector << xvector

@@ -26,7 +26,8 @@
 #include "aflow_compare_structure.h" //DX20181023
 // [OBSOLETE] #include "aflow_contrib_cormac.h"
 #include "aflowlib.h"
-#include "aflow_gfa.h" //DF190329
+#include "aflow_gfa.h" //DF20190329
+#include "APL/aflow_apl.h"  // ME20200330
 
 extern double NearestNeighbour(const xstructure& a);
 
@@ -1345,6 +1346,19 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20180710 - check if used in proto
 
+  // ME20200330
+  vpflow.flag("VISUALIZE_PHONONS", aurostd::args2flag(argv,cmds,"--visualize_phonons"));
+  if (vpflow.flag("VISUALIZE_PHONONS")) {
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::AMPLITUDE","--amplitude=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::RANGE","--branches=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::FORMAT","--format=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::PERIODS","--periods=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::RANGE","--range=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::RANGE","--qpoints=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::STEPS","--steps=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::SUPERCELL","--supercell","");
+  }
+
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::EQUAL","--volume=","");
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::MULTIPLY_EQUAL","--volume*=","");
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::PLUS_EQUAL","--volume+=","");
@@ -1947,6 +1961,7 @@ namespace pflow {
       if(vpflow.flag("UFFENERGY")) {pocc::UFFENERGY(cin); _PROGRAMRUN=true;}
       // V
       if(vpflow.flag("VASP")) {cout << input2VASPxstr(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("VISUALIZE_PHONONS")) {apl::createAtomicDisplacementSceneFile(vpflow); _PROGRAMRUN=true;} // ME20200330
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::PLUS_EQUAL")) {cout << pflow::VOLUME("VOLUME::PLUS_EQUAL,"+vpflow.getattachedscheme("VOLUME::PLUS_EQUAL"),cin); _PROGRAMRUN=true;} 

@@ -606,7 +606,7 @@ namespace apl {
       vector<vector<vector<xvector<double> > > > phase_vectors;  // ME20200116
 
     private:
-      void calculateWholeSymmetry(xstructure&);
+      void calculateWholeSymmetry(xstructure&, bool=true);
       xstructure calculatePrimitiveStructure() const;
       bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME20200117
       void free();
@@ -615,13 +615,15 @@ namespace apl {
     public:
       Supercell();
       Supercell(const xstructure&, ofstream&, string="./"); //CO20181226
+      Supercell(const string&, ofstream&, string="./");  // ME20200112
       Supercell(const Supercell&);
       Supercell& operator=(const Supercell&);
       ~Supercell();
       void clear(ofstream&);
       void setDirectory(const string&);
       string getDirectory() const;
-      void initialize(const xstructure&);  // ME20191225
+      void readFromStateFile(const string&);  // ME20200212
+      void initialize(const xstructure&, bool=true);  // ME20191225
       void clearSupercell();
       //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME20200220
       bool isConstructed();
@@ -633,7 +635,7 @@ namespace apl {
       void trimStructure(int, const xvector<double>&,
           const xvector<double>&, const xvector<double>&,
           bool = true);
-      void projectToPrimitive();  // ME20200117
+      bool projectToPrimitive();  // ME20200117
       void projectToOriginal();  // ME20200117
       xvector<int> buildSuitableForShell(int, bool, bool VERBOSE);  // ME20200102
       void setupShellRestrictions(int);
@@ -754,6 +756,7 @@ namespace apl {
       ofstream* messageFile;
 
       vector<_xinput> xInputs;
+      string _AflowInFileName;
 
       // Calculate forces at no distortion - since for some structure
       // (not well relaxed, or with other problems) these forces have to be
@@ -811,6 +814,8 @@ namespace apl {
       void symmetrizeBornEffectiveChargeTensors(void);
       void readDielectricTensorFromAIMSOUT(void);
       void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
+      virtual void saveState(const string&) {}  // ME20200112
+      virtual void readFromStateFile(const string&) {};  // ME20200112
   };
 }
 
@@ -871,6 +876,8 @@ namespace apl {
       void writeFORCES();
       void writeDYNMAT();
       void writeXCrysDenForces();
+      void saveState(const string&);  // ME200212
+      void readFromStateFile(const string&);  // ME200212
 
     private:
       void copy(const DirectMethodPC&);
@@ -1025,6 +1032,8 @@ namespace apl {
       bool calculateForceConstants();  // ME20200211
 
       void hibernate(const string&);
+      void saveState(const string&);  // ME200212
+      void readFromStateFile(const string&); // ME200212
   };
 }  // namespace apl
 
@@ -1830,62 +1839,53 @@ namespace apl
 }
 // ***************************************************************************
 namespace apl {
-  class AtomicDisplacements
-  { //PN180705
-    private:
-      PhononCalculator& _pc;
-      //MonkhorstPackMesh& _mp;
-      //UniformMesh& _mp; OBSOLETE ME20190428
-      QMesh& _mp;  // ME20190428
-      Logger& _logger;
-    private:
-      vector<double> _atomic_masses_amu;
-      vector<xvector<double> > _atomic_c_positions;
-      vector<string> _atomic_species;
-      vector<xmatrix<xcomplex<double> > > _DM;
-      vector <xmatrix<xcomplex<double> > > _eigenvectors;
-      vector <xmatrix<xcomplex<double> > > _eigenvectors_path;
-      std::vector< aurostd::xvector<double> > _freq_Thz;
-      vector<vector<vector<double> > > atomic_participation_ratio;
-      vector<bool> _freq_test;
-      bool _is_freq_negative;
 
-      std::vector<aurostd::xvector<double> > _kpoints;
-      std::vector< aurostd::xvector<double> > _kpoints_path;
-      //std::vector< double > _weights;  OBSOLETE ME20190428 - not used
-      aurostd::xmatrix<double> _rlattice;
-      aurostd::xmatrix<double> _klattice;
-      uint _nBranches;
-      double _CUTOFF_FREQ;
-      void solve_eigenvalues_in_threads(int startIndex, int endIndex, int cpuid);
-      _CMAT_ xmat2mat(const xmatrix<xcomplex<double> > &M);
-      double get_population(double freq, double t);
-      double get_Q2(double freq, double t);
-      _VEC_ xvec2vec(const xvector<double> &V);
-      template <typename T> string NumToStr ( T Number );
-      _MAT_ xmatd2matd(const xmatrix<double> &M);
-      template<typename T> std::vector<T> split(const std::string& line);
-      template<class T> vector<T> splitWdelimiter(string s, string delimiter);
-      bool eigen_solver_path();
-      void solve_eigenvalues_in_threads_path(int startIndex, int endIndex, int cpuid);
-      double apl_inner_product(const vector<double> &a, const vector<double> &b);
+  class AtomicDisplacements {
+    protected:
+      PhononCalculator* _pc;
+
+    private:
+      void free();
+      void copy(const AtomicDisplacements&);
+
+      vector<vector<vector<xvector<xcomplex<double> > > > > _eigenvectors;
+      vector<vector<double> > _frequencies;
+      vector<vector<xmatrix<xcomplex<double> > > > _displacement_matrices;
+      vector<vector<vector<xvector<xcomplex<double> > > > > _displacement_modes;
+      vector<_qpoint> _qpoints;
+      vector<double> _temperatures;
+
+      void calculateEigenvectors();
+      void calculateEigenvectorsInThread(int, int);
+      void calculateMeanSquareDisplacementMatrices();
+      void calculateNormalModeDisplacements();
+      double getOccupationNumber(double, double);
+
     public:
-      AtomicDisplacements(PhononCalculator&, QMesh&, Logger&);  // ME20190428
+      AtomicDisplacements();
+      AtomicDisplacements(PhononCalculator&);
+      AtomicDisplacements(const AtomicDisplacements&);
+      AtomicDisplacements& operator=(const AtomicDisplacements&);
       ~AtomicDisplacements();
-      void clear();
-      void populate_variables(const xstructure& xs);
-      bool eigen_solver();
-      void set_frequency_cutoff(double d){_CUTOFF_FREQ=d;};
-      void thermal_displacements(double Ts, double Te, int Tinc);
-      void projected_displacement(const _VEC_ &direction, double Ts, double Te, int Tinc);
-      //bool write_normal_mode_direction(string user_kpoints);
-      bool  write_normal_mode_direction(const vector<xvector<double> >& hs_kpoints);
-      void atom_projected_dos();
-      void calc_participation_ratio_all();
-      bool calc_participation_ratio_along_path(const vector< xvector<double> > &qpoints);
-      void write_participation_ratio_along_path(const vector <double> &path, const vector<int> &path_segment);
-      bool calc_participation_ratio_at_user_kpoints(string user_kpoints);
+      void clear(PhononCalculator&);
+
+      void calculateMeanSquareDisplacements(const QMesh&, double, double, double);
+      void calculateNormalModeDisplacements(const vector<xvector<double> >& qpts, bool=true);
+
+      const vector<double>& getTemperatures() const;
+      const vector<vector<xmatrix<xcomplex<double> > > >& getDisplacementMatrices() const;
+      vector<vector<xvector<double> > > getDisplacementVectors() const;
+      const vector<vector<vector<xvector<xcomplex<double> > > > >& getModeDisplacements() const;
+
+      vector<vector<vector<double> > > createDisplacementsXcrysden(const Supercell&, double, double, int, int, int);
+      void getOrientedDisplacementsVsim(xstructure&, vector<vector<vector<xvector<xcomplex<double> > > > >&);
+
+      void writeMeanSquareDisplacementsToFile(string);
+      void writeSceneFileXcrysden(string, const vector<vector<vector<double> > >&, int);
+      void writeSceneFileVsim(string, const xstructure&, const vector<vector<vector<xvector<xcomplex<double> > > > >&);
   };
+
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow);
 }
 // ***************************************************************************
 // ***************************************************************************

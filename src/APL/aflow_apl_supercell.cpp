@@ -35,6 +35,14 @@ namespace apl {
     initialize(_xstr);
   }
 
+  // ME200212 - read from a state file
+  Supercell::Supercell(const string& filename, ofstream& mf, string directory) {
+    free();
+    messageFile = &mf;
+    _directory = directory;
+    readFromStateFile(filename);
+  }
+
   Supercell::Supercell(const Supercell& that) {
     free();
     copy(that);
@@ -117,7 +125,64 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void Supercell::initialize(const xstructure& _xstr) {
+  void Supercell::readFromStateFile(const string& filename) {
+    string function = "apl::Supercell::readFromStateFile()";
+    if (!aurostd::EFileExist(filename)) {
+      string message = "Could not find file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    }
+
+    // Read data
+    vector<string> vlines;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+    uint iline = 0;
+    stringstream poscar;
+
+    // Supercell dimensions
+    xvector<int> dims;
+    for (iline = 0; iline < nlines; iline++) {
+      if (aurostd::substring2bool(vlines[iline], "SUPERCELL=")) {
+        vector<string> tokens;
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        vector<int> vdims;
+        aurostd::string2tokens(tokens[1], vdims);
+        if (vdims.size() == 3) {
+          dims = aurostd::vector2xvector(vdims);
+          break;
+        }
+      }
+    }
+    if (iline == nlines) {
+      string message = "SUPERCELL tag not found or incomplete.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    // Structure
+    xstructure xstr;
+    for (iline = 0; iline < nlines; iline++) {
+      if (aurostd::substring2bool(vlines[iline], "INPUT_STRUCTURE=START")) {
+        while ((++iline < nlines) && !aurostd::substring2bool(vlines[iline], "INPUT_STRUCTURE=STOP")) {
+          poscar << vlines[iline] << std::endl;
+        }
+        if (iline < nlines) {
+          xstr = xstructure(poscar);
+          break;
+        }
+      }
+    }
+    if (iline == nlines) {
+      string message = "INPUT_STRUCTURE tag not found or incomplete.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
+    // Build
+    initialize(xstr, false);
+    build(dims, false);
+  }
+
+  // ME200315 - Added VERBOSE
+  void Supercell::initialize(const xstructure& _xstr, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="apl::Supercell::initialize():";
 
@@ -144,10 +209,12 @@ namespace apl {
     }
 
     //COREY, DO NOT MODIFY THE STRUCTURE BELOW HERE, THIS INCLUDES RESCALE(), BRINGINCELL(), SHIFORIGINATOM(), etc.
-    stringstream message;
-    message << "Estimating the symmetry of structure and calculating the input structure. Please be patient."; //primitive cell." << apl::endl; //CO20180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *messageFile, std::cout);
-    calculateWholeSymmetry(_inStructure);
+    if (VERBOSE) {
+      stringstream message;
+      message << "Estimating the symmetry of structure and calculating the input structure. Please be patient."; //primitive cell." << apl::endl; //CO20180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *messageFile, std::cout);
+    }
+    calculateWholeSymmetry(_inStructure, VERBOSE);
     if(LDEBUG){ //CO20190218
       bool write_inequivalent_flag=_inStructure.write_inequivalent_flag;
       _inStructure.write_inequivalent_flag=true;
@@ -231,7 +298,8 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  void Supercell::calculateWholeSymmetry(xstructure& xstr) {
+  //ME200315 - Added VERBOSE
+  void Supercell::calculateWholeSymmetry(xstructure& xstr, bool VERBOSE) {
     //[CO20181226 needs to write to correct directory]_aflags af;
     //[CO20181226 needs to write to correct directory]af.Directory = "./";
     //[CO20181226 needs to write to correct directory]af.QUIET = FALSE;
@@ -252,7 +320,7 @@ namespace apl {
 
     //CO20170804 - we want to append symmetry stuff to ofstream
     //if (!pflow::CalculateFullSymmetry(af, xstr))
-    if (!pflow::PerformFullSymmetry(xstr,*messageFile,_directory,kflags,true,cout)) //CO20181226
+    if (!pflow::PerformFullSymmetry(xstr,*messageFile,_directory,kflags,VERBOSE,cout)) //CO20181226
     { //CO200106 - patching for auto-indenting
       // ME20191031 - use xerror
       //throw APLRuntimeError("apl::Supercell::calculateWholeSymmetry(): Symmetry routine failed.");
@@ -860,7 +928,7 @@ namespace apl {
   // ME20200116 - rebase to primitive
   // Does not capture rotated primitive cells yet, but does work for AFLOW's
   // standard conventional unit cells.
-  void Supercell::projectToPrimitive() {
+  bool Supercell::projectToPrimitive() {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     string function = "apl::Supercell::projectToPrimitive()";
     vector<int> pc2sc, sc2pc;
@@ -928,13 +996,9 @@ namespace apl {
       _sc2pcMap = sc2pc;
       _pc2scMap = pc2sc;
       calculatePhaseVectors();
+      return true;
     } else {
-      stringstream message;
-      message << " apl::Supercell::projectToPrimitive(): Could"
-        << " not map the AFLOW standard primitive cell to the supercell."
-        << " Phonon dispersions will be calculated using the original"
-        << " structure instead.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *messageFile, std::cout, _LOGGER_WARNING_);
+      return false;
     }
   }
 

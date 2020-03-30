@@ -116,11 +116,25 @@ namespace aurostd {
   template<class utype> xvector<utype>                                   // vector_row*matrix
     operator*(const xvector<utype>&,const xmatrix<utype>&) __xprototype; // vector_row*matrix
 
+  // ME20200330 - Multiplication of a real matrix with a complex vector
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(const xmatrix<utype>&, const xvector<xcomplex<utype> >&) __xprototype;
+
   template<class utype> xmatrix<utype>                                   // scalar*matrix
     operator*(const utype,const xmatrix<utype>&) __xprototype;           // scalar*matrix
 
   template<class utype> xmatrix<utype>                                   // matrix*scalar
     operator*(const xmatrix<utype>&,const utype) __xprototype;           // matrix*scalar
+
+  // ME20200329 - real * complex matrix
+  template<class utype> xmatrix<xcomplex<utype> >
+    operator*(const xmatrix<xcomplex<utype> >&, utype) __xprototype;
+
+  template<class utype> xmatrix<xcomplex<utype> >
+    operator*(utype, const xmatrix<xcomplex<utype> >&) __xprototype;
+
+  template<class utype> xmatrix<xcomplex<utype> >
+    operator/(const xmatrix<xcomplex<utype> >&, utype) __xprototype;
 
   template<class utype> xmatrix<utype>
     operator/(const xmatrix<utype>&,const utype) __xprototype;

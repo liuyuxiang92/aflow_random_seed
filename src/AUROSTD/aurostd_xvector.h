@@ -147,6 +147,16 @@ namespace aurostd {
   template<class utype,class stype> xvector<utype>
     operator/(const xvector<utype>&,const stype) __xprototype;
 
+  //ME20200329 - real * complex vector
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(utype, const xvector<xcomplex<utype> >&);
+
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(const xvector<xcomplex<utype> >&, utype);
+
+  template<class utype> xvector<xcomplex<utype> >
+    operator/(const xvector<xcomplex<utype> >&, utype);
+
   template<class utype> xvector<utype>
     operator<<(const xvector<utype>&,const xvector<utype>&) __xprototype;
 

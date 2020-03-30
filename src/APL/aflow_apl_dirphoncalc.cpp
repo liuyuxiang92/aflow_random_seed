@@ -69,6 +69,7 @@ namespace apl {
     USER_GENERATE_PLUS_MINUS = that.USER_GENERATE_PLUS_MINUS;
     _aflowFlags = that._aflowFlags;
     _AflowIn = that._AflowIn;
+    _AflowInFileName = that._AflowInFileName;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
     messageFile = that.messageFile;
@@ -89,6 +90,7 @@ namespace apl {
     GENERATE_ONLY_XYZ = false;
     USER_GENERATE_PLUS_MINUS = false;  //CO
     xInputs.clear();
+    _AflowInFileName = _AFLOWIN_;
     _bornEffectiveChargeTensor.clear();
     _dielectricTensor.clear();
     _forceConstantMatrices.clear();
@@ -1237,7 +1239,201 @@ namespace apl {
     }
   }
 
-  //////////////////////////////////////////////////////////////////////////////
+  // ME200212
+  void DirectMethodPC::saveState(const string& filename) {
+    string function = "apl::LinearResponsePC::saveState()";
+    string message = "Saving state of the phonon calculator into " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    stringstream out;
+    string tag = "[APL_FC_CALCULATOR]";
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    out << tag << "AFLOWIN=" << _AflowInFileName << std::endl;
+    out << tag << "ENGINE=DM" << std::endl;
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    out << tag << "SUPERCELL=" << _supercell->scell << std::endl;
+    out << tag << "INPUT_STRUCTURE=START" << std::endl;
+    out << _supercell->getInputStructure();  // No endl necessary
+    out << tag << "INPUT_STRUCTURE=STOP" << std::endl;
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    out << tag << "DISTORTION_MAGNITUDE=" << DISTORTION_MAGNITUDE << std::endl;
+    out << tag << "DISTORTION_INEQUIVONLY=" << DISTORTION_INEQUIVONLY << std::endl;
+    out << tag << "DISTORTIONS=START" << std::endl;
+    int idxRun = 0;
+    for (uint i = 0; i < _uniqueDistortions.size(); i++) {
+      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+        out << i << " " << _uniqueDistortions[i][j] << " " << xInputs[idxRun++].xvasp.AVASP_arun_runname;
+        if (vvgenerate_plus_minus[i][j]) out << " " << xInputs[idxRun++].xvasp.AVASP_arun_runname;
+        out << std::endl;
+      }
+    }
+    out << tag << "DISTORTIONS=STOP" << std::endl;
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    out << tag << "ZEROSTATE=" << _calculateZeroStateForces << std::endl;
+    if (_calculateZeroStateForces) out << tag << "ZEROSTATE_RUNNAME=" << xInputs[idxRun++].xvasp.AVASP_arun_runname << std::endl;
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    out << tag << "POLAR=" << _isPolarMaterial << std::endl;
+    if (_isPolarMaterial) out << tag << "POLAR_RUNNAME=" << xInputs[idxRun].xvasp.AVASP_arun_runname << std::endl;
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    aurostd::stringstream2file(out, filename);
+    if (!aurostd::FileExist(filename)) {
+      string message = "Could not save state into file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+    }
+  }
+
+  void DirectMethodPC::readFromStateFile(const string& filename) {
+    string function = "apl::LinearResponsePC::readFromState()";
+    string message = "Reading state of the phonon calculator from " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    if (!aurostd::EFileExist(filename)) {
+      message = "Could not find file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    }
+
+    // Defaults
+    _xInput->xvasp.AVASP_arun_mode = "APL";
+    _isPolarMaterial = DEFAULT_APL_POLAR;
+    _calculateZeroStateForces = DEFAULT_APL_ZEROSTATE;
+    DISTORTION_MAGNITUDE = DEFAULT_APL_DMAG;
+    DISTORTION_INEQUIVONLY = DEFAULT_APL_DINEQUIV_ONLY;
+
+    // Read
+    xInputs.clear();
+    _uniqueDistortions.clear();
+    vvgenerate_plus_minus.clear();
+    vector<string> vlines, tokens;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+    uint iline = 0;
+    while (++iline < nlines) {
+      if (aurostd::substring2bool(vlines[iline], "AFLOWIN=")) {
+        tokens.clear();
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        if (tokens.size() != 2) {
+          string message = "Tag for AFLOWIN is broken.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        _AflowInFileName = tokens[1];
+      }
+      if (aurostd::substring2bool(vlines[iline], "DISTORTION_MAGNITUDE=")) {
+        tokens.clear();
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        if (tokens.size() != 2) {
+          string message = "Tag for DISTORTION_MAGNITUDE is broken.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        DISTORTION_MAGNITUDE = aurostd::string2utype<double>(tokens[1]);
+      } else if (aurostd::substring2bool(vlines[iline], "DISTORTION_INEQUIVONLY=")) {
+        tokens.clear();
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        if (tokens.size() != 2) {
+          string message = "Tag for DISTORTION_INEQUIVONLY correction is broken.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        DISTORTION_INEQUIVONLY = aurostd::string2utype<bool>(tokens[1]);
+      } else if (aurostd::substring2bool(vlines[iline], "DISTORTIONS=START")) {
+        xvector<double> distortion(3);
+        uint idist;
+        while ((iline++ < nlines) && !aurostd::substring2bool(vlines[iline], "DISTORTIONS=STOP")) {
+          tokens.clear();
+          aurostd::string2tokens(vlines[iline], tokens);
+          if ((tokens.size() < 5) || (tokens.size() > 7)) {
+            string message = "Broken line in DISTORTIONS.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+          }
+          // Distortions
+          idist = aurostd::string2utype<uint>(tokens[0]);
+          if (idist + 1 > _uniqueDistortions.size()) {
+            _uniqueDistortions.push_back(vector<xvector<double> >(0));
+            vvgenerate_plus_minus.push_back(vector<bool>(0));
+          }
+          for (int i = 1; i < 4; i++) distortion[i] = aurostd::string2utype<double>(tokens[i]);
+          _uniqueDistortions[idist].push_back(distortion);
+          xInputs.push_back(*_xInput);
+          xInputs.back().xvasp.AVASP_arun_runname = tokens[4];
+          if (tokens.size() == 5) {
+            vvgenerate_plus_minus[idist].push_back(false);
+          } else {
+            vvgenerate_plus_minus[idist].push_back(true);
+            xInputs.push_back(*_xInput);
+            xInputs.back().xvasp.AVASP_arun_runname = tokens[5];
+          }
+        }
+      } else if (aurostd::substring2bool(vlines[iline], "ZEROSTATE=")) {
+        tokens.clear();
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        if (tokens.size() != 2) {
+          string message = "Tag for ZEROSTATE calculation is broken.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        _calculateZeroStateForces = aurostd::string2utype<bool>(tokens[1]);
+        if (_calculateZeroStateForces) {
+          iline++;
+          if (iline == nlines) {
+            string message = "Runname for ZEROSTATE calculation is missing.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+          }
+          tokens.clear();
+          aurostd::string2tokens(vlines[iline], tokens, "=");
+          if (tokens.size() != 2) {
+            string message = "Runname tag for ZEROSTATE calculation is broken.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+          }
+          xInputs.push_back(*_xInput);
+          xInputs.back().setXStr(_supercell->getSupercellStructureLight());
+          xInputs.back().xvasp.AVASP_arun_runname = tokens[1];
+        }
+      } else if (aurostd::substring2bool(vlines[iline], "POLAR=")) {
+        tokens.clear();
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        if (tokens.size() != 2) {
+          string message = "Tag for POLAR is broken.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        _isPolarMaterial = aurostd::string2utype<bool>(tokens[1]);
+        if (_isPolarMaterial) {
+          iline++;
+          if (iline == nlines) {
+            string message = "Runname for polar correction is missing.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+          }
+          tokens.clear();
+          aurostd::string2tokens(vlines[iline], tokens, "=");
+          if (tokens.size() != 2) {
+            string message = "Runname tag for polar correction is broken.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+          }
+          xInputs.push_back(*_xInput);
+          xInputs.back().setXStr(_supercell->getInputStructureLight());
+          xInputs.back().xvasp.AVASP_arun_runname = tokens[1];
+        }
+      }
+    }
+
+    // Done reading - apply distortions to structures
+    int idxRun = 0;
+    for (uint i = 0; i < _uniqueDistortions.size(); i++) {
+      int idAtom = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i );
+      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+        for (uint k = 0; k < (vvgenerate_plus_minus[i][j] ? 2 : 1); k++) {
+          xInputs[idxRun].setXStr(_supercell->getSupercellStructureLight());
+          xstructure& xstr = xInputs[idxRun].getXStr();
+          xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0 ) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
+          xstr.atoms[idAtom].fpos = C2F(xstr.lattice, xstr.atoms[idAtom].cpos);
+          idxRun++;
+        }
+      }
+    }
+
+    // Set directories
+    string base_directory = _xInput->getDirectory();
+    string dir = "";
+    for (uint i = 0; i < xInputs.size(); i++) {
+      const _xvasp& xvasp = xInputs[i].xvasp;
+      dir = base_directory + "/ARUN." + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname + "/";
+      xInputs[i].setDirectory(aurostd::CleanFileName(dir));
+    }
+  }
 
 }  // namespace apl
 

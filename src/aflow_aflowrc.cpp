@@ -531,6 +531,8 @@
 #define         DEFAULT_APL_HARMIFC_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_APL_HARMIFC_FILE")
 #define AFLOWRC_DEFAULT_APL_HSKPTS_FILE                       string("hskpoints.out")
 #define         DEFAULT_APL_HSKPTS_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_HSKPTS_FILE")
+#define AFLOWRC_DEFAULT_APL_MSQRDISP_FILE                     string("displacements.out")  // ME20200329
+#define         DEFAULT_APL_MSQRDISP_FILE                     XHOST.adefault.getattachedscheme("DEFAULT_APL_MSQRDISP_FILE")  // ME20200329
 // ME20190614 - START
 #define AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE                     string("PHDOSCAR")
 #define         DEFAULT_APL_PHDOSCAR_FILE                     XHOST.adefault.getattachedscheme("DEFAULT_APL_PHDOSCAR_FILE")
@@ -541,6 +543,19 @@
 #define AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE                   string("PHEIGENVAL")
 #define         DEFAULT_APL_PHEIGENVAL_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_APL_PHEIGENVAL_FILE")
 // ME20190614 - END
+#define AFLOWRC_DEFAULT_APL_STATE_FILE                        string("fccalc_state.out")
+#define         DEFAULT_APL_STATE_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_APL_STATE_FILE")  // ME20200224
+
+// ME20200329 - BEGIN
+#define AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT                string("XCRYSDEN")
+#define         DEFAULT_APL_ADISP_SCENE_FORMAT                XHOST.adefault.getattachedscheme("DEFAULT_APL_ADISP_SCENE_FORMAT")
+#define AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE                   10.0
+#define         DEFAULT_APL_ADISP_AMPLITUDE                   XHOST.adefault.getattachedutype<double>("DEFAULT_APL_ADISP_AMPLITUDE")
+#define AFLOWRC_DEFAULT_APL_ADISP_NSTEPS                      20
+#define         DEFAULT_APL_ADISP_NSTEPS                      XHOST.adefault.getattachedutype<int>("DEFAULT_APL_ADISP_NSTEPS")
+#define AFLOWRC_DEFAULT_APL_ADISP_NPERIODS                    4
+#define         DEFAULT_APL_ADISP_NPERIODS                    XHOST.adefault.getattachedutype<int>("DEFAULT_APL_ADISP_NPERIODS")
+// ME20200329 - END
 
 // DEFAULT AAPL
 //// DEFAULT AAPL VALUES
@@ -1263,12 +1278,20 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DYNMAT_FILE",AFLOWRC_DEFAULT_APL_DYNMAT_FILE);
     aflowrc::load_default("DEFAULT_APL_HARMIFC_FILE",AFLOWRC_DEFAULT_APL_HARMIFC_FILE);
     aflowrc::load_default("DEFAULT_APL_HSKPTS_FILE",AFLOWRC_DEFAULT_APL_HSKPTS_FILE);
+    aflowrc::load_default("DEFAULT_APL_MSQRDISP_FILE", AFLOWRC_DEFAULT_APL_MSQRDISP_FILE);  // ME20200329
     // ME20190614 - START
     aflowrc::load_default("DEFAULT_APL_PHDOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE);
     aflowrc::load_default("DEFAULT_APL_PHPOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE);
     aflowrc::load_default("DEFAULT_APL_PHKPOINTS_FILE",AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE);
     aflowrc::load_default("DEFAULT_APL_PHEIGENVAL_FILE",AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE);
     // ME20190614 - END
+    aflowrc::load_default("DEFAULT_APL_STATE_FILE",AFLOWRC_DEFAULT_APL_STATE_FILE);  // ME20200224
+    // ME20200329 - BEGIN
+    aflowrc::load_default("DEFAULT_APL_ADISP_SCENE_FORMAT",AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT);
+    aflowrc::load_default("DEFAULT_APL_ADISP_AMPLITUDE",AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE);
+    aflowrc::load_default("DEFAULT_APL_ADISP_NSTEPS",AFLOWRC_DEFAULT_APL_ADISP_NSTEPS);
+    aflowrc::load_default("DEFAULT_APL_ADISP_NPERIODS",AFLOWRC_DEFAULT_APL_ADISP_NPERIODS);
+    // ME20200329 - END
     // DEFAULT AAPL
     //// DEFAULT AAPL VALUES
     aflowrc::load_default("DEFAULT_AAPL_BTE",AFLOWRC_DEFAULT_AAPL_BTE);
@@ -1769,12 +1792,20 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DYNMAT_FILE=\"" << AFLOWRC_DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HARMIFC_FILE=\"" << AFLOWRC_DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HSKPTS_FILE=\"" << AFLOWRC_DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_APL_MSQRDISP_FILE=\"" << AFLOWRC_DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  // ME20200329
     // ME20190614 - START
     aflowrc << "DEFAULT_APL_PHDOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHPOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHKPOINTS_FILE=\"" << AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHEIGENVAL_FILE=\"" << AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
     // ME20190614 - END
+    aflowrc << "DEFAULT_APL_STATE_FILE=\"" << AFLOWRC_DEFAULT_APL_STATE_FILE << "\"" << endl;  // ME20200224
+    // ME20200329 - BEGIN
+    aflowrc << "DEFAULT_APL_ADISP_SCENE_FORMAT=\"" << AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT << "\"" << endl;
+    aflowrc << "DEFAULT_APL_ADISP_AMPLITUDE=" << AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE << endl;
+    aflowrc << "DEFAULT_APL_ADISP_NSTEPS=" << AFLOWRC_DEFAULT_APL_ADISP_NSTEPS << endl;
+    aflowrc << "DEFAULT_APL_ADISP_NPERIODS=" << AFLOWRC_DEFAULT_APL_ADISP_NPERIODS << endl;
+    // ME20200329 - END
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AAPL" << endl;
@@ -2243,12 +2274,20 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DYNMAT_FILE\")=\"" << DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HARMIFC_FILE\")=\"" << DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HSKPTS_FILE\")=\"" << DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MSQRDISP_FILE\")=\"" << DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  // ME20200329
     // ME20190614 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHDOSCAR_FILE\")=\"" << DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHPOSCAR_FILE\")=\"" << DEFAULT_APL_PHPOSCAR_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHKPOINTS_FILE\")=\"" << DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHEIGENVAL_FILE\")=\"" << DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
     // ME20190614 - END
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_STATE_FILE\")=\"" << DEFAULT_APL_STATE_FILE << "\"" << endl;  // ME20200224
+    // ME20200329 - BEGIN
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ADISP_SCENE_FORMAT\")=\"" << DEFAULT_APL_ADISP_SCENE_FORMAT << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ADISP_AMPLITUDE\")=" << DEFAULT_APL_ADISP_AMPLITUDE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ADISP_NSTEPS\")=" << DEFAULT_APL_ADISP_NSTEPS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ADISP_NPERIODS\")=" << DEFAULT_APL_ADISP_NPERIODS << endl;
+    // ME20200329 - END
 
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BTE\")=\"" << DEFAULT_AAPL_BTE << "\"" << endl;
