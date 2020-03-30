@@ -1226,7 +1226,7 @@ namespace cce {
         if(LDEBUG){
           cerr << "num_pref_ox_states_electronegativity_sorted[" << i << "]: " << cce_vars.num_pref_ox_states_electronegativity_sorted[i] << endl;
           for (uint k=0,ksize=cce_vars.num_pref_ox_states_electronegativity_sorted[i];k<ksize;k++) {
-            cerr << "preferred oxidation state " << k << " of species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(structure.species[i]) << "): " <<  cce_vars.pref_ox_states_electronegativity_sorted[i][k] << endl;
+            cerr << "preferred oxidation state " << k << " of species " << i << " (" << KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]) << "): " <<  cce_vars.pref_ox_states_electronegativity_sorted[i][k] << endl;
           }
         }
       } else{
