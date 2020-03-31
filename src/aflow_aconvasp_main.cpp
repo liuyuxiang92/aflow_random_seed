@@ -1350,13 +1350,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("VISUALIZE_PHONONS", aurostd::args2flag(argv,cmds,"--visualize_phonons"));
   if (vpflow.flag("VISUALIZE_PHONONS")) {
     vpflow.args2addattachedscheme(argv,cmds,"ADISP::AMPLITUDE","--amplitude=","");
-    vpflow.args2addattachedscheme(argv,cmds,"ADISP::RANGE","--branches=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::BRANCHES","--branches=","");
     vpflow.args2addattachedscheme(argv,cmds,"ADISP::FORMAT","--format=","");
     vpflow.args2addattachedscheme(argv,cmds,"ADISP::PERIODS","--periods=","");
-    vpflow.args2addattachedscheme(argv,cmds,"ADISP::RANGE","--range=","");
-    vpflow.args2addattachedscheme(argv,cmds,"ADISP::RANGE","--qpoints=","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::QPOINTS","--qpoints=|--qpoint=|--q=","");
     vpflow.args2addattachedscheme(argv,cmds,"ADISP::STEPS","--steps=","");
-    vpflow.args2addattachedscheme(argv,cmds,"ADISP::SUPERCELL","--supercell","");
+    vpflow.args2addattachedscheme(argv,cmds,"ADISP::SUPERCELL","--scell=","");
   }
 
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::EQUAL","--volume=","");

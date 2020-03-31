@@ -614,6 +614,7 @@ namespace apl {
 
     public:
       Supercell();
+      Supercell(ofstream&);
       Supercell(const xstructure&, ofstream&, string="./"); //CO20181226
       Supercell(const string&, ofstream&, string="./");  // ME20200112
       Supercell(const Supercell&);
@@ -1877,11 +1878,11 @@ namespace apl {
       vector<vector<xvector<double> > > getDisplacementVectors() const;
       const vector<vector<vector<xvector<xcomplex<double> > > > >& getModeDisplacements() const;
 
-      vector<vector<vector<double> > > createDisplacementsXcrysden(const Supercell&, double, double, int, int, int);
-      void getOrientedDisplacementsVsim(xstructure&, vector<vector<vector<xvector<xcomplex<double> > > > >&);
+      vector<vector<vector<double> > > createDisplacementsXcrysden(const Supercell&, double, int, int, int);
+      void getOrientedDisplacementsVsim(xstructure&, vector<vector<vector<xvector<xcomplex<double> > > > >&, double);
 
       void writeMeanSquareDisplacementsToFile(string);
-      void writeSceneFileXcrysden(string, const vector<vector<vector<double> > >&, int);
+      void writeSceneFileXcrysden(string, const xstructure&, const vector<vector<vector<double> > >&, int);
       void writeSceneFileVsim(string, const xstructure&, const vector<vector<vector<xvector<xcomplex<double> > > > >&);
   };
 

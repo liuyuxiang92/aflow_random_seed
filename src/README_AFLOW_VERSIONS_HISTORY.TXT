@@ -1,6 +1,7 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- Mean square displacements now always calculated along with thermal properties. (ME)
+        -- Added interfaces to XCRYSDEN and V_SIM to visualize phonon displacements. (ME)
         -- Fixed multiplot bug in plotter. (ME)
         -- Added feature to plotter that allows setting the output image file name. (ME)
         -- Made adding directory to plot functions optional. Will take ./ as default. (ME)

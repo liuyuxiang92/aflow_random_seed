@@ -26,6 +26,11 @@ namespace apl {
     free();
   }
 
+  Supercell::Supercell(ofstream& mf) {
+    free();
+    messageFile = &mf;
+  }
+
   //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
   // ME20200102 - Refactored
   Supercell::Supercell(const xstructure& _xstr, ofstream& mf, string directory) {  //CO20181226
@@ -306,12 +311,13 @@ namespace apl {
 
     //CO20170804 - we want to append symmetry stuff to ofstream
     _kflags kflags;
-    kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_SGROUP_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_IATOMS_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_AGROUP_WRITE=TRUE;
+    // ME20200330 - Only write for verbose output
+    kflags.KBIN_SYMMETRY_PGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_FGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_SGROUP_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_IATOMS_WRITE=VERBOSE;
+    kflags.KBIN_SYMMETRY_AGROUP_WRITE=VERBOSE;
 
     //DX CAN REMOVE string options = "";
 
@@ -956,6 +962,7 @@ namespace apl {
         pcell.atoms[at].fpos = ones - pcell.atoms[at].fpos;
         pcell.atoms[at].cpos = pcell.f2c * pcell.atoms[at].fpos;
       }
+      pcell.BringInCell();
       mapped = getMaps(pcell, _inStructure_original, _scStructure, pc2sc, sc2pc);
     }
     if (mapped) {

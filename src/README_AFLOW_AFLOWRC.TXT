@@ -528,6 +528,11 @@ DEFAULT_PHONONS_KSCHEME
   choices: "M", "G"
   default: "G"
 
+DEFAULT_PHONONS_KPPRA
+  description: Number of k-points per reciprocal atom for phonon calculations.
+  type: integer
+  default: 3000
+
 DEFAULT_DOS_EMIN
   description: Minimum of the energy range over which the DOS is plotted.
   type: integer
@@ -1286,7 +1291,7 @@ DEFAULT_AAPL_THERMALGRID
   description: q-point grid for thermal conductivity calculations.
   type: string
   format: "N1xN2xN3"
-  default: "26x26x26"
+  default: "21x21x21"
 
 DEFAULT_AAPL_TCT
   description: Temperature range (Tstart, Tend) and step size (Tstep) for the thermal conductivity calculations.

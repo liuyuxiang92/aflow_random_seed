@@ -211,13 +211,13 @@ namespace apl {
     uint nq = qpts.size();
     _qpoints.resize(nq);
     if (coords_are_fractional) {
-      xmatrix<double> f2c = trasp(ReciprocalLattice(_pc->getInputCellStructure()));
+      xmatrix<double> f2c = trasp(ReciprocalLattice(_pc->getInputCellStructure().lattice));
       for (uint q = 0; q < nq; q++) {
         _qpoints[q].fpos = qpts[q];
         _qpoints[q].cpos = f2c * qpts[q];
       }
     } else {
-      xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(_pc->getInputCellStructure())));
+      xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(_pc->getInputCellStructure().lattice)));
       for (uint q = 0; q < nq; q++) {
         _qpoints[q].cpos = qpts[q];
         _qpoints[q].fpos = c2f * qpts[q];
@@ -242,10 +242,8 @@ namespace apl {
 
     for (uint q = 0; q < nq; q++) {
       for (uint br = 0; br < nbranches; br++) {
-        if (_frequencies[q][br] > _AFLOW_APL_EPS_) {
-          for (uint at = 0; at < natoms; at++) {
-            _displacement_modes[q][br][at] = _eigenvectors[q][br][at]/sqrt(masses[at]);
-          }
+        for (uint at = 0; at < natoms; at++) {
+          _displacement_modes[q][br][at] = _eigenvectors[q][br][at]/sqrt(masses[at]);
         }
       }
     }
@@ -342,19 +340,19 @@ namespace apl {
     }
   }
 
-  void AtomicDisplacements::writeSceneFileXcrysden(string filename, const vector<vector<vector<double> > >& disp, int nperiods) {
+  void AtomicDisplacements::writeSceneFileXcrysden(string filename, const xstructure& scell, const vector<vector<vector<double> > >& disp, int nperiods) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing atomic displacements in XCRYSDEN format into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
 
-    uint natoms = disp.size();
-    uint nsteps = disp[0].size();
+    uint nsteps = disp.size();
+    uint natoms = scell.atoms.size();
 
     stringstream output;
     output << "ANIMSTEPS " << (nperiods * nsteps) << std::endl;
     output << "CRYSTAL" << std::endl;
     output << "PRIMVEC" << std::endl;
-    output << _pc->getInputCellStructure().lattice;  // no std::endl necessary
+    output << scell.lattice << std::endl;
 
     int step = 1;
     for (int i = 0; i < nperiods; i++) {
@@ -362,8 +360,8 @@ namespace apl {
         output << "PRIMCOORD " << step << std::endl;
         output << std::setw(4) << natoms << " 1" << std::endl;
         for (uint at = 0; at < natoms; at++) {
-          output << std::setw(5) << GetAtomName((uint) disp[j][at][0]);
-          for (int k = 1; k < 7; k++) {
+          output << std::setw(5) << scell.atoms[at].atomic_number;
+          for (int k = 0; k < 6; k++) {
             output << std::setw(15) << std::fixed << std::setprecision(8) << disp[j][at][k];
           }
           output << std::endl;
@@ -414,7 +412,6 @@ namespace apl {
             if (i < 3) output << ";";
             else output << "\\" << std::endl;
           }
-          output << std::endl;
         }
         output << "# ]" << std::endl;
       }
@@ -495,17 +492,16 @@ namespace apl {
 
     // Range/supercell
     string supercell_str = vpflow.getattachedscheme("ADISP::SUPERCELL");
-    string range_str = vpflow.getattachedscheme("ADISP::RANGE");
+    xvector<int> sc_dim(3); sc_dim.set(1);
     if (format != "V_SIM") {
-      if (supercell_str.empty() && range_str.empty()) {
+      if (supercell_str.empty()) {
         supercell_str = "1x1x1";
-      } else if (!supercell_str.empty() && !range_str.empty()) {
-        message = "Cannot specify supercell and range at the same time.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
-      } else if (!supercell_str.empty()) {
-        vector<string> tokens;
+      } else {
+        vector<int> tokens;
         aurostd::string2tokens(supercell_str, tokens, "xX");
-        if (tokens.size() != 3) {
+        if (tokens.size() == 3) {
+          sc_dim = aurostd::vector2xvector(tokens);
+        } else {
           message = "Broken supercell format.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
         }
@@ -517,8 +513,8 @@ namespace apl {
     vector<int> branches;
     if (format != "V_SIM") {
       if (branches_str.empty()) {
-        message = "No branches selected. Displacements will be calculated for all.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, directory, mf, std::cout);
+        message = "No branches selected. Displacements will be calculated for all modes.";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, directory, mf, std::cout);
       } else {
         aurostd::string2tokens(branches_str, branches, ",");
       }
@@ -531,19 +527,17 @@ namespace apl {
       message = "No q-points given.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_MISSING_);
     } else {
-      vector<string> tokens, tokens_qpt;
-      aurostd::string2tokens(qpoints_str, tokens, ";");
-      for (uint i = 0; i < tokens.size(); i++) {
-        aurostd::string2tokens(tokens[i], tokens_qpt, ",");
-        if (tokens_qpt.size() == 3) {
-          xvector<double> q(3);
-          for (int j = 0; j < 3; j++) q[j + 1] = aurostd::string2utype<double>(tokens_qpt[j]);
-          BringInCellInPlace(q, _ZERO_TOL_, 0.5, -0.5);
+      vector<string> tokens;
+      aurostd::string2tokens(qpoints_str, tokens, ",");
+      xvector<double> q(3);
+      if (tokens.size() % 3 == 0) {
+        for (uint i = 0; i < tokens.size(); i += 3) {
+          for (int j = 0; j < 3; j++) q[j + 1] = aurostd::string2utype<double>(tokens[i + j]);
           qpoints.push_back(q);
-        } else {
-          message = "Broken q-points format.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
         }
+      } else {
+        message = "Broken q-points format.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
     }
 
@@ -580,19 +574,9 @@ namespace apl {
 
     if (format == "XCRYSDEN") {
       // Create supercell for the scene file
-      Supercell scell(pc.getInputCellStructure(), mf);
-      double range = AUROSTD_MAX_DOUBLE;
-      if (supercell_str.empty()) {
-        range = aurostd::string2utype<double>(range_str);
-        xvector<int> dims = LatticeDimensionSphere(scell.getInputStructure().lattice, range);
-        // Sphere is inside, so increase dimension to be safe
-        for (int i = 1; i < 4; i++) dims[i] += 1;
-        scell.build(dims, false);
-      } else {
-        vector<int> tokens;
-        aurostd::string2tokens(supercell_str, tokens, "xX");
-        scell.build(aurostd::vector2xvector(tokens), false);
-      }
+      Supercell scell(mf);
+      scell.initialize(pc.getInputCellStructure(), false);
+      scell.build(sc_dim, false);
       if (!scell.projectToPrimitive()) {
         message = "Could not project to primitive structure.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
@@ -601,60 +585,49 @@ namespace apl {
       vector<vector<vector<double> > > disp;
       for (uint q = 0; q < qpoints.size(); q++) {
         for (uint br = 0; br < branches.size(); br++) {
-          disp = ad.createDisplacementsXcrysden(scell, range, amplitude, q, br, nsteps);
+          disp = ad.createDisplacementsXcrysden(scell, amplitude, q, br, nsteps);
           stringstream filename;
-          filename << directory <<  DEFAULT_APL_FILE_PREFIX;
+          filename << directory <<  DEFAULT_APL_FILE_PREFIX << "displacements_q";
           for (int i = 1; i < 4; i++) filename << "_" << qpoints[q][i];
-          filename << "_" << br << ".axsf";
-          ad.writeSceneFileXcrysden(filename.str(), disp, nperiods);
+          filename << "_b_" << br << ".axsf";
+          ad.writeSceneFileXcrysden(filename.str(), scell.getSupercellStructure(), disp, nperiods);
         }
       }
     } else if (format == "V_SIM") {
       xstructure xstr_oriented;
       vector<vector<vector<xvector<xcomplex<double> > > > > displacements_oriented;
-      ad.getOrientedDisplacementsVsim(xstr_oriented, displacements_oriented);
+      ad.getOrientedDisplacementsVsim(xstr_oriented, displacements_oriented, amplitude);
       string filename = directory + DEFAULT_APL_FILE_PREFIX + "displacements.ascii";
       ad.writeSceneFileVsim(filename, xstr_oriented, displacements_oriented);
     }
   }
 
   vector<vector<vector<double> > > AtomicDisplacements::createDisplacementsXcrysden(const Supercell& scell,
-      double range, double amplitude, int q, int br, int nsteps) {
+      double amplitude, int q, int br, int nsteps) {
     const xvector<double>& qpt = _qpoints[q].cpos;
     const vector<xvector<xcomplex<double> > >& disp = _displacement_modes[q][br];
 
     // Generate a list of atoms that are inside the desired sphere
-    const xstructure& scell_str = scell.getInputStructure();
+    const xstructure& scell_str = scell.getSupercellStructure();
     uint natoms = scell_str.atoms.size();
-    vector<int> atoms;
-    if (range == AUROSTD_MAX_DOUBLE) {
-      for (uint iat = 0; iat < natoms; iat++) atoms.push_back(iat);
-    } else {
-      for (uint iat = 0; iat < natoms; iat++) {
-        if (aurostd::modulus(scell_str.atoms[iat].cpos) <= range) atoms.push_back(iat);
-      }
-      natoms = atoms.size();
-    }
 
     // Calculate original displacements
     const vector<int>& sc2pcMap = scell._sc2pcMap;
     const vector<int>& pc2scMap = scell._pc2scMap;
 
     // Calculate original displacements
-    vector<vector<vector<double> > > displacements(nsteps, vector<vector<double> >(natoms, vector<double>(7, 0.0)));
+    vector<vector<vector<double> > > displacements(nsteps, vector<vector<double> >(natoms, vector<double>(6, 0.0)));
     vector<xvector<xcomplex<double> > > displacements_orig(natoms, xvector<xcomplex<double> >(3));
-    int at = -1, at_pc = -1, at_eq_sc = -1;
+    int at_pc = -1, at_eq_sc = -1;
     xvector<double> dist_scell(3);
-    for (uint iat = 0; iat < natoms; iat++) {
-      at = atoms[iat];
+    for (uint at = 0; at < natoms; at++) {
       at_pc = sc2pcMap[at];
       at_eq_sc = pc2scMap[at_pc];
       dist_scell = scell_str.atoms[at].cpos - scell_str.atoms[at_eq_sc].cpos;
-      displacements_orig[iat] = amplitude * exp(iONE * scalar_product(qpt, dist_scell)) * disp[at_pc];
-      displacements[0][iat][0] = (double) scell_str.atoms[at].atomic_number;
-      for (int i = 1; i < 4; i++) {
-        displacements[0][iat][i] = scell_str.atoms[at].cpos[i];
-        displacements[0][iat][i + 3] = displacements_orig[iat][i].re;
+      displacements_orig[at] = amplitude * exp(iONE * scalar_product(qpt, dist_scell)) * disp[at_pc];
+      for (int i = 0; i < 3; i++) {
+        displacements[0][at][i] = scell_str.atoms[at].cpos[i + 1];
+        displacements[0][at][i + 3] = displacements_orig[at][i + 1].re;
       }
     }
 
@@ -662,14 +635,12 @@ namespace apl {
     xcomplex<double> phase;
     xvector<xcomplex<double> > disp_step;
     for (int s = 1; s < nsteps; s++) {
-      phase = exp(-iONE * ((double) s/(double) nsteps));
-      for (uint iat = 0; iat < natoms; iat++) {
-        disp_step = phase * displacements_orig[iat];
-        at = atoms[iat];
-        displacements[s][at][0] = (double) scell_str.atoms[at].atomic_number;
-        for (int i = 1; i < 4; i++) {
-          displacements[s][at][i] += displacements[s - 1][at][i + 3];
-          displacements[s][at][i + 3] = disp_step[i].re;
+      phase = exp(-(2.0 * PI * (double) s/(double) nsteps) * iONE);
+      for (uint at = 0; at < natoms; at++) {
+        disp_step = phase * displacements_orig[at];
+        for (int i = 0; i < 3; i++) {
+          displacements[s][at][i] = displacements[s - 1][at][i] + displacements[s - 1][at][i + 3];
+          displacements[s][at][i + 3] = disp_step[i + 1].re;
         }
       }
     }
@@ -678,7 +649,7 @@ namespace apl {
   }
 
   void AtomicDisplacements::getOrientedDisplacementsVsim(xstructure& xstr_oriented,
-      vector<vector<vector<xvector<xcomplex<double> > > > >& displacements) {
+      vector<vector<vector<xvector<xcomplex<double> > > > >& displacements, double amplitude) {
     // Project the structure such that a points along x and b along
     // the x-y plane as required by V_sim
     const xstructure& xstr_orig = _pc->getInputCellStructure();
@@ -716,7 +687,7 @@ namespace apl {
     displacements.clear();
     displacements.resize(nq, vector<vector<xvector<xcomplex<double> > > >(nbr, vector<xvector<xcomplex<double> > >(natoms)));
 
-    xmatrix<double> transf = xstr_oriented.f2c * xstr_orig.c2f;
+    xmatrix<double> transf = amplitude * xstr_oriented.f2c * xstr_orig.c2f;
     for (uint q = 0; q < nq; q++) {
       for (uint br = 0; br < nbr; br++) {
         for (uint at = 0; at < natoms; at++) {

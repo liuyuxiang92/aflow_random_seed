@@ -1594,6 +1594,7 @@ namespace KBIN {
       }
       // Run calculations
       apl_stagebreak = fccalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
+      fccalc->saveState(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
       if (!apl_stagebreak) {
         apl_stagebreak = !(fccalc->run());
         if (!apl_stagebreak) {

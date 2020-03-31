@@ -549,11 +549,11 @@
 // ME20200329 - BEGIN
 #define AFLOWRC_DEFAULT_APL_ADISP_SCENE_FORMAT                string("XCRYSDEN")
 #define         DEFAULT_APL_ADISP_SCENE_FORMAT                XHOST.adefault.getattachedscheme("DEFAULT_APL_ADISP_SCENE_FORMAT")
-#define AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE                   10.0
+#define AFLOWRC_DEFAULT_APL_ADISP_AMPLITUDE                   0.25
 #define         DEFAULT_APL_ADISP_AMPLITUDE                   XHOST.adefault.getattachedutype<double>("DEFAULT_APL_ADISP_AMPLITUDE")
 #define AFLOWRC_DEFAULT_APL_ADISP_NSTEPS                      20
 #define         DEFAULT_APL_ADISP_NSTEPS                      XHOST.adefault.getattachedutype<int>("DEFAULT_APL_ADISP_NSTEPS")
-#define AFLOWRC_DEFAULT_APL_ADISP_NPERIODS                    4
+#define AFLOWRC_DEFAULT_APL_ADISP_NPERIODS                    1
 #define         DEFAULT_APL_ADISP_NPERIODS                    XHOST.adefault.getattachedutype<int>("DEFAULT_APL_ADISP_NPERIODS")
 // ME20200329 - END
 
