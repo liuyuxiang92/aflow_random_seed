@@ -90,6 +90,9 @@ namespace apl {
 
 namespace apl {
 
+  //calculateEigenvectors/////////////////////////////////////////////////////
+  // Calculates eigenvectors and rearranges them from the APL matrix format
+  // into atom-resolved vectors.
   void AtomicDisplacements::calculateEigenvectors() {
     _eigenvectors.clear();
     _frequencies.clear();
@@ -149,6 +152,11 @@ namespace apl {
 
 namespace apl {
 
+  //calculateMeanSquareDisplacements//////////////////////////////////////////
+  // Calculates the complex mean square displacement matrices for a range of
+  // temperatures. For the formula, see e.g. A. A. Mardudin "Theory of
+  // Lattice Dynamics in the Harmonic Approximation", eq. 2.4.23 and 2.4.24.
+  // Units are Angstrom^2.
   void AtomicDisplacements::calculateMeanSquareDisplacements(const QMesh& qmesh, double Tstart, double Tend, double Tstep) {
     _qpoints.clear();
     _temperatures.clear();
@@ -206,7 +214,10 @@ namespace apl {
     }
   }
 
-  void AtomicDisplacements::calculateNormalModeDisplacements(const vector<xvector<double> >& qpts, bool coords_are_fractional) {
+  //calculateModeDisplacements////////////////////////////////////////////////
+  // Calculates the displacements for phonon modes along specific q-points.
+  // Units are 1/sqrt(amu).
+  void AtomicDisplacements::calculateModeDisplacements(const vector<xvector<double> >& qpts, bool coords_are_fractional) {
     _qpoints.clear();
     uint nq = qpts.size();
     _qpoints.resize(nq);
@@ -223,10 +234,10 @@ namespace apl {
         _qpoints[q].fpos = c2f * qpts[q];
       }
     }
-    calculateNormalModeDisplacements();
+    calculateModeDisplacements();
   }
 
-  void AtomicDisplacements::calculateNormalModeDisplacements() {
+  void AtomicDisplacements::calculateModeDisplacements() {
     _displacement_matrices.clear();
     _displacement_modes.clear();
     _temperatures.clear();
@@ -249,6 +260,9 @@ namespace apl {
     }
   }
 
+  //getOccupationNumber///////////////////////////////////////////////////////
+  // Calculates the phonon numbers for a specific frequency and temperature
+  // using Bose-Einstein statistics.
   double AtomicDisplacements::getOccupationNumber(double T, double f) {
     if (T < _AFLOW_APL_EPS_) return 0.0;
     else return (1.0/(exp(BEfactor_h_THz * f/T) - 1));
@@ -272,6 +286,8 @@ namespace apl {
     return _displacement_matrices;
   }
 
+  // The diagonal of the displacement matrix are the x-, y- and z-components.
+  // They are always real.
   vector<vector<xvector<double> > > AtomicDisplacements::getDisplacementVectors() const {
     vector<vector<xvector<double> > >  disp_vec;
     uint ntemps = _displacement_matrices.size();
@@ -303,6 +319,8 @@ namespace apl {
 
 namespace apl {
 
+  //writeMeanSquareDisplacementsToFile////////////////////////////////////////
+  // Writes the mean square displacement vectors to a file.
   void AtomicDisplacements::writeMeanSquareDisplacementsToFile(string filename) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing mean square displacements into file " + filename + ".";
@@ -340,6 +358,9 @@ namespace apl {
     }
   }
 
+  //writeSceneFileXcrysden////////////////////////////////////////////////////
+  // Writes an animated XCRYSDEN structure file that can be used to create a
+  // gif or mpeg of a phonon mode displacement.
   void AtomicDisplacements::writeSceneFileXcrysden(string filename, const xstructure& scell, const vector<vector<vector<double> > >& disp, int nperiods) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing atomic displacements in XCRYSDEN format into file " + filename + ".";
@@ -378,6 +399,9 @@ namespace apl {
     }
   }
 
+  //writeSceneFileVsim////////////////////////////////////////////////////////
+  // Writes displacements into a V_sim-formatted file that can be visualized
+  // by V_sim or ASCII-phonons.
   void AtomicDisplacements::writeSceneFileVsim(string filename, const xstructure& xstr_projected,
       const vector<vector<vector<xvector<xcomplex<double> > > > >& displacements) {
     filename = aurostd::CleanFileName(filename);
@@ -435,6 +459,8 @@ namespace apl {
 
 namespace apl {
 
+  //createAtomicDisplacementSceneFile/////////////////////////////////////////
+  // Interfaces with the command line to create a phonon visualization file.
   void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow) {
     string function = "apl::createAtomicDisplacementSceneFile()";
     string message = "";
@@ -570,7 +596,7 @@ namespace apl {
 
     // Done with setup - calculate displacements
     AtomicDisplacements ad(pc);
-    ad.calculateNormalModeDisplacements(qpoints);
+    ad.calculateModeDisplacements(qpoints);
 
     if (format == "XCRYSDEN") {
       // Create supercell for the scene file
@@ -602,6 +628,10 @@ namespace apl {
     }
   }
 
+  //createDisplacementsXcrysden///////////////////////////////////////////////
+  // Creates the displacements in a format that can be used to output into an
+  // XCRYSDEN animated structure file. Since XCRYSDEN cannot perform the time
+  // propagation itself, this function needs to create each time step.
   vector<vector<vector<double> > > AtomicDisplacements::createDisplacementsXcrysden(const Supercell& scell,
       double amplitude, int q, int br, int nsteps) {
     const xvector<double>& qpt = _qpoints[q].cpos;
@@ -648,10 +678,13 @@ namespace apl {
     return displacements;
   }
 
+  //getOrientedDisplacementsVsim//////////////////////////////////////////////
+  // Creates displacements in the V_sim format. V_sim expects structures to
+  // be projected such that a points along the x-axis and b points along the
+  // x-y-plane, so the structure and the displacements needs to be proejcted.
   void AtomicDisplacements::getOrientedDisplacementsVsim(xstructure& xstr_oriented,
       vector<vector<vector<xvector<xcomplex<double> > > > >& displacements, double amplitude) {
-    // Project the structure such that a points along x and b along
-    // the x-y plane as required by V_sim
+    // Project the structure as required by V_sim
     const xstructure& xstr_orig = _pc->getInputCellStructure();
     xstr_oriented.clear();
 

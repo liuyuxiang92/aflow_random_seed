@@ -1356,6 +1356,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"ADISP::QPOINTS","--qpoints=|--qpoint=|--q=","");
     vpflow.args2addattachedscheme(argv,cmds,"ADISP::STEPS","--steps=","");
     vpflow.args2addattachedscheme(argv,cmds,"ADISP::SUPERCELL","--scell=","");
+    vpflow.push_attached("ADISP::DIRECTORY", XHOST.vflag_control.getattachedscheme("DIRECTORY"));
   }
 
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::EQUAL","--volume=","");

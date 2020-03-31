@@ -1859,7 +1859,7 @@ namespace apl {
       void calculateEigenvectors();
       void calculateEigenvectorsInThread(int, int);
       void calculateMeanSquareDisplacementMatrices();
-      void calculateNormalModeDisplacements();
+      void calculateModeDisplacements();
       double getOccupationNumber(double, double);
 
     public:
@@ -1871,7 +1871,7 @@ namespace apl {
       void clear(PhononCalculator&);
 
       void calculateMeanSquareDisplacements(const QMesh&, double, double, double);
-      void calculateNormalModeDisplacements(const vector<xvector<double> >& qpts, bool=true);
+      void calculateModeDisplacements(const vector<xvector<double> >& qpts, bool=true);
 
       const vector<double>& getTemperatures() const;
       const vector<vector<xmatrix<xcomplex<double> > > >& getDisplacementMatrices() const;

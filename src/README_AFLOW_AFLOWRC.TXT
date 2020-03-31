@@ -1261,6 +1261,31 @@ DEFAULT_APL_PHEIGENVAL_FILE
   type: string
   default: "PHEIGENVAL"
 
+DEFAULT_APL_STATE_FILE
+  description: Output file to save the state of the force constant calculators.
+  type: string
+  default: "fccalc_state.out"
+
+DEFAULT_APL_ADISP_SCENE_FORMAT
+  description: Default format to visualize atomic displacements for phonon modes.
+  type: string
+  default: "XCRYSDEN"
+
+DEFAULT_APL_ADISP_AMPLITUDE
+  description: Default amplitude for atomic displacements.
+  type: double
+  default: 0.25
+
+DEFAULT_APL_ADISP_NSTEPS
+  description: The number of steps per period in an XCRYSDEN animated structure file.
+  type: integer
+  default: 20
+
+DEFAULT_APL_ADISP_NPERIODS
+  description: The number of periods in an XCRYSDEN animated structure file.
+  type: integer
+  default: 1
+
 ####################################################################################################
 DEFAULTS AAPL
 

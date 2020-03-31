@@ -1,5 +1,6 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        -- Added state writer and reader for the force constant calculators. (ME)
         -- Mean square displacements now always calculated along with thermal properties. (ME)
         -- Added interfaces to XCRYSDEN and V_SIM to visualize phonon displacements. (ME)
         -- Fixed multiplot bug in plotter. (ME)

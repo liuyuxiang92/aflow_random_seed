@@ -42,6 +42,7 @@ Table of Contents:
 3.2.    Phonon Density of States
 3.3.    Thermodynamic Properties
 3.4.    Plotting Phonon Properties
+3.5.    Visualizing Phonon Displacements
 
 4.    Saving and Loading APL Results (Hibernation)
 
@@ -503,6 +504,8 @@ Where TSTART and TEND are the initial and final temperature, respectively, and T
 temperature step size. The default setting is 0:2000:10, i.e. it calculates the properties from 0 K
 to 2000 K in 10 K steps.
 
+APL will also output mean square displacements for each atom inside that temperature range.
+
 3.4. Plotting Phonon Properties
 
 AFLOW can plot phonon dispersions, phonon DOS, and thermodynamic properties using the command line.
@@ -558,6 +561,56 @@ Thermodynamic properties can be plotted using:
 This command outputs four separate files for the internal energy, vibrational free energy,
 vibrational entropy, and isochoral heat capacity. The file aflow.apl.thermal_properties.out must be
 present in the directory.
+
+3.5. Visualizing Phonon Displacements
+
+APL provides an interface to the following output formats that can be used to visualize atomic
+displacements:
+
+  * XCRYSDEN
+  * V_sim
+
+The commands to create these output files are shown below:
+
+  aflow --visualize_phonons --qpoint=|--qpoints=|--q= [--format=XCRYSDEN|V_SIM] [--amplitude=] [--branches=] [--periods=] [--steps=] [--scell=] -D DIRECTORY
+        Outputs a phonon visualization file. Currently supported formats: xcrysden and v_sim.
+
+        Options for all formats:
+          --qpoint:    q-points for the phonons to be visualized as a comma-separated list.
+                       Multiple points can be specified.
+
+          --format:    The output file format.
+                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
+
+          --amplitude: The amplitude of the displacements.
+                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
+
+
+        Options for XCRYSDEN:
+          --branches:  The branches of the phonon modes as a comma-separated list.
+                       Default: all.
+
+          --periods:   The number of periods displayed in the output file.
+                       Default: DEFAULT_APL_ADISP_NPERIODS in .aflow.rc
+
+          --steps:     The number of steps per period in the output file.
+                       Default: DEFAULT_APL_ADISP_NSTEPS in .aflow.rc
+
+          --scell:     The supercell to be displayed in the output file.
+                       Default: unit cell.
+
+For XCRYSDEN, APL creates an animated structure (axsf) file for each phonon mode. These files
+contain animations that show the motions of the atoms for each of the mode. These animations can
+be used by XCRYSDEN to create mpeg movies or gif images. The parameter "steps" determines the
+number of steps for each period, and "periods" determines how many periods are output into the
+file. For gifs, one period is sufficient. The parameter "scell" can be used to show the
+displacements in a supercell instead of the unit cell, which is important for modes off the Gamma
+point.
+
+V_sim files will be output as aflow.apl.displacements.ascii, which contains all modes for the
+desired q-points. The file can be opened using V_sim or ASCII-phonons. These programs are captable
+of doing supercells and animations on their own and do not require steps, periods, or supercell
+parameters.
 
 
 4. Saving and Loading APL Results APL Calculations (Hibernation)
