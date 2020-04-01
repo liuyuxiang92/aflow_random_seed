@@ -157,6 +157,7 @@ namespace pflow {
   void KBAND(vector<string>);
   xstructure INFLATE_LATTICE(string options,istream& input);
   xstructure INFLATE_VOLUME(string options,istream& input);
+  void KPATH(istream& input,bool WWW); 
   void KPATH(istream& input,double grid,bool WWW); 
   xstructure KPOINTS(string options,istream& input,ostream& oss=cout);
   xstructure KPOINTS_DELTA(aurostd::xoption& vpflow, istream& input, ostream& oss=cout);

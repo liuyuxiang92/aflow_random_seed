@@ -1547,7 +1547,7 @@ namespace pflow {
       //[CO20181226 - OBSOLETE]if(vpflow.flag("HNFTOL")) {pflow::HNFTOL(argv,cin,cout); _PROGRAMRUN=true;}
       if(vpflow.flag("ICSD_MAKELABEL")) {pflow::ICSD(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
-      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",16.0),vpflow.flag("WWW")); _PROGRAMRUN=true;}
+      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),vpflow.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
       // ME20191001 - START
       if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
@@ -1976,7 +1976,7 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(argv,1,cin); _PROGRAMRUN=true;}
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNF")) {pflow::HNF(argv,cin,cout); _PROGRAMRUN=true;}
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNFTOL")) {pflow::HNFTOL(argv,cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",16.0),vpflow.flag("WWW")); _PROGRAMRUN=true;}
+      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),vpflow.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically
       // [OBSOLETE] if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(cin,aurostd::args2utype(argv,"--inflate_lattice|--ilattice",1.0)); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(cin,aurostd::args2utype(argv,"--inflate_volume|--ivolume",1.0)); _PROGRAMRUN=true;}
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
@@ -8054,8 +8054,18 @@ namespace pflow {
 // pflow::KPATH
 // ***************************************************************************
 namespace pflow {
+  void KPATH(istream& input,bool WWW) { //CO20200329
+    xstructure str_in(input,IOAFLOW_AUTO);
+    double grid=DEFAULT_BANDS_GRID;
+    if(str_in.num_each_type.size()==1){grid=DEFAULT_UNARY_BANDS_GRID;}
+    return KPATH(input,grid,WWW);
+  }
   void KPATH(istream& input,double grid,bool WWW) {
     xstructure str_in(input,IOAFLOW_AUTO);
+    if(std::signbit(grid)){ //CO20200329
+      grid=DEFAULT_BANDS_GRID;
+      if(str_in.num_each_type.size()==1){grid=DEFAULT_UNARY_BANDS_GRID;}
+    }
     xstructure str_sp,str_sc;
     // DX20170829 [OBSOLETE] LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
     bool full_sym=false; // DX20170829 - Speed increase

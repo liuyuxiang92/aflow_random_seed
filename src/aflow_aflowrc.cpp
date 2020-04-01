@@ -206,13 +206,13 @@
 #define         DEFAULT_BANDS_GRID                            XHOST.adefault.getattachedutype<int>("DEFAULT_BANDS_GRID") 
 #define AFLOWRC_DEFAULT_BANDS_LATTICE                         string("AUTO")
 #define         DEFAULT_BANDS_LATTICE                         XHOST.adefault.getattachedscheme("DEFAULT_BANDS_LATTICE")
-#define AFLOWRC_DEFAULT_KSCHEME                               string("M")
+#define AFLOWRC_DEFAULT_KSCHEME                               string("AUTO") //CO20200329
 #define         DEFAULT_KSCHEME                               XHOST.adefault.getattachedscheme("DEFAULT_KSCHEME")
 #define AFLOWRC_DEFAULT_KPPRA                                 6000
 #define         DEFAULT_KPPRA                                 XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA")
 #define AFLOWRC_DEFAULT_KPPRA_STATIC                          10000
 #define         DEFAULT_KPPRA_STATIC                          XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA_STATIC")
-#define AFLOWRC_DEFAULT_STATIC_KSCHEME                        string("M") // WAHYU DEFAULT
+#define AFLOWRC_DEFAULT_STATIC_KSCHEME                        string("AUTO") // WAHYU DEFAULT  //CO20200329
 #define         DEFAULT_STATIC_KSCHEME                        XHOST.adefault.getattachedscheme("DEFAULT_STATIC_KSCHEME")
 #define AFLOWRC_DEFAULT_KPPRA_ICSD                            8000
 #define         DEFAULT_KPPRA_ICSD                            XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA_ICSD")
