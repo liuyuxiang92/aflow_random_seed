@@ -886,7 +886,7 @@ namespace chull {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::HULL_FORMATION_ENTHALPY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::N1EG")) {  //SK20200327
-      pflow::logger(soliloquy, "CHULL::N1EG set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::N1EG set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_STRUCTURE_COMPARISON set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
