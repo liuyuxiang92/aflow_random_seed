@@ -885,6 +885,9 @@ namespace chull {
     if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::HULL_FORMATION_ENTHALPY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::N1EG")) {  //SK20200327
+      pflow::logger(soliloquy, "CHULL::N1EG set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
+    }
     if(vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_STRUCTURE_COMPARISON set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
@@ -3924,6 +3927,7 @@ namespace chull {
 
     bool remove_requested=m_cflags.flag("CHULL::NEGLECT");
     bool see_neglect=m_cflags.flag("CHULL::SEE_NEGLECT");
+    bool n1eg_requested=m_cflags.flag("CHULL::N1EG"); //SK20200327
     bool remove_invalid=true;
     bool remove_duplicate_entries=true;        //we remove duplicate entries from the database, but in general, keep input of user constant
     bool remove_extreme=m_cflags.flag("CHULL::REMOVE_EXTREMA");
@@ -3955,6 +3959,7 @@ namespace chull {
 
     vector<string> removing_messages;
     if(remove_requested){removing_messages.push_back("undesired");}
+    if(n1eg_requested){removing_messages.push_back("n1eg");}  //SK20200327
     if(remove_invalid){removing_messages.push_back("erroneous");}
     if(remove_duplicate_entries){removing_messages.push_back("duplicate");}
     if(remove_extreme){removing_messages.push_back("extreme");}
@@ -4005,6 +4010,14 @@ namespace chull {
           message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: as requested";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
           continue;
+        }
+        if(n1eg_requested) {
+          // point.m_i_nary = sum(elements_present) - 1
+          // point.getDim() is dimension of hull
+          // SK20200330
+          if (point.m_i_nary + 1 == point.getDim()) {
+            continue;
+          }
         }
         if(remove_extreme){
           if(m_formation_energy_hull){
@@ -11071,7 +11084,26 @@ namespace chull {
     // creating name of output file
     input=aurostd::joinWDelimiter(m_velements,"");
     //input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
-    main_JSON_file="aflow_"+input+"_hull_web.json"; //WS190620
+    //[SK20200325 - OBSOLETE]main_JSON_file="aflow_"+input+"_hull_web.json"; //WS190620
+    //SK20200331 start
+    bool sc_requested=m_cflags.flag("CHULL::NEGLECT");  //only neglect feature via web
+    bool n1eg_requested=m_cflags.flag("CHULL::N1EG");
+    vector<string> sc_point;
+    string delimiter="";
+    // naming stability criterion files
+    if(sc_requested) {
+      aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),sc_point,",");
+      delimiter = "_sc_";
+      // limiting to the characters after "aflow:" because ":" is a reserved character for php query calls
+      main_JSON_file=main_JSON_file + delimiter + sc_point[0].substr(6);
+    }
+    // naming n+1 enthalpy gain files
+    if (n1eg_requested) {
+      delimiter = "_n1eg";
+      main_JSON_file=main_JSON_file + delimiter;
+    }
+    //SK20200331 end
+    main_JSON_file=main_JSON_file+"_hull_web.json"; //SK20200327
     species_data_JSON_ss << aurostd::joinWDelimiter(aurostd::wrapVecEntries(m_velements,"\""),",");
     //for (uint i = 0; i < m_velements.size(); i++) {
     //  main_JSON_file.append(m_velements[i]);
