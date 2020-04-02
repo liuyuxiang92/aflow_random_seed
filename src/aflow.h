@@ -4182,9 +4182,11 @@ namespace KBIN {
   // [OBSOLETE] bool PHON_RunPhonons(const xstructure& _str,_aflags& aflags,const double& radius,const bool& osswrite,ostream& oss);
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
+  uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  
   void VASP_RunPhonons_AGL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
   // ----------------------------------------------------------------------------
   // aflow_ael_elasticity.cpp
+  uint relaxStructureAEL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);
   void VASP_RunPhonons_AEL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
 }
 

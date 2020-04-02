@@ -1349,7 +1349,11 @@ namespace KBIN {
             // ***************************************************************************
             // CO20180419 - POCC always comes first (NO POSCAR), need to convert PARTCAR -> POSCARs
             //other workflows follow, all of these precede relaxation/static/etc.
-            if(kflags.KBIN_POCC){KBIN::VASP_RunPOCC(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);} // CO20180419
+            if(kflags.KBIN_POCC){
+	      if (kflags.KBIN_PHONONS_CALCULATION_AEL) xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE", "AEL");  // CT20200319
+              if (kflags.KBIN_PHONONS_CALCULATION_AGL) xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE", "AGL");  // CT20200319
+	      KBIN::VASP_RunPOCC(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);
+	    } // CO20180419
             else if(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL) {KBIN::VASP_RunPhonons_APL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);} // PHONONIC PHONONIC PHONONIC // CO20170601
             else if(kflags.KBIN_PHONONS_CALCULATION_AGL==TRUE) {KBIN::VASP_RunPhonons_AGL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);} // here CORMAC WILL POOP an IF=>AGL
             else if(kflags.KBIN_PHONONS_CALCULATION_AEL==TRUE) {KBIN::VASP_RunPhonons_AEL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);}

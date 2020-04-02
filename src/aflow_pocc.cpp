@@ -113,7 +113,10 @@ namespace KBIN {
 
       //post-processing
       //pocc::patchStructuresFile(aflags,FileMESSAGE,oss);  //patch if needed
-      pcalc.postProcessing();
+      aurostd::xoption pp_options;
+      pp_options.flag("AGL", kflags.KBIN_PHONONS_CALCULATION_AGL); // CT20200319
+      pp_options.flag("AEL", kflags.KBIN_PHONONS_CALCULATION_AEL); // CT20200319
+      pcalc.postProcessing(pp_options);  // ME20200302 - added postprocessing xoption
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);return;}
 
@@ -1205,7 +1208,8 @@ namespace pocc {
     return vtemperatures;
   }
 
-  void POccCalculator::postProcessing(){
+  // CT20200319 - added AEL/AGL option
+  void POccCalculator::postProcessing(const aurostd::xoption& opts){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="POccCalculator::postProcessing():";
     stringstream message;
@@ -1250,6 +1254,15 @@ namespace pocc {
       calculateSTATICProperties(v_temperatures[itemp]);
       writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
     }
+    if (opts.flag("AEL")) {
+      if(LDEBUG){cerr << soliloquy << "Running AEL postprocessing" << endl;}
+      calculateElasticProperties(v_temperatures);
+    } // CT20200319
+    if (opts.flag("AGL")) {
+      if(LDEBUG){cerr << "Running AGL postprocessing" << endl;}
+      calculateDebyeThermalProperties(v_temperatures);
+    } // CT20200323
+
     //END: TEMPERATURE DEPENDENT PROPERTIES
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}

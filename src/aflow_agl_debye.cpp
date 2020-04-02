@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -13,7 +13,7 @@
 #include "aflow_ael_elasticity.h"
 
 // ###############################################################################
-//                  AFLOW Automatic GIBBS Library (AGL) (2013-2019)
+//                  AFLOW Automatic GIBBS Library (AGL) (2013-2020)
 // ###############################################################################
 //
 // Uses quasi-harmonic Debye model to obtain thermodynamic properties of materials
@@ -48,12 +48,17 @@ _AGL_data::_AGL_data() {
   hugoniotrun = false;
   hugoniotextrapolate = false;
   ael_pressure_calc = false;
+  postprocess = false;
   natoms = 0.0;
   cellmass = 0.0;
   dirpathname = "";
   sysname = "";
   pressure_external.clear();
   temperature_external.clear();
+  ntemperature = 0;
+  stemperature = 0.0;
+  npressure = 0;
+  spressure = 0.0;
   energyinput.clear();
   volumeinput.clear();
   energyinput_orig.clear();
@@ -206,12 +211,17 @@ const _AGL_data& _AGL_data::operator=(const _AGL_data& b) {       // operator=
     hugoniotrun = b.hugoniotrun;
     hugoniotextrapolate = b.hugoniotextrapolate;
     ael_pressure_calc = b.ael_pressure_calc;
+    postprocess = b.postprocess;
     natoms = b.natoms;
     cellmass = b.cellmass;
     dirpathname = b.dirpathname;
     sysname = b.sysname;
     pressure_external = b.pressure_external;
     temperature_external = b.temperature_external;
+    ntemperature = b.ntemperature;
+    stemperature = b.stemperature;
+    npressure = b.npressure;
+    spressure = b.spressure;
     energyinput = b.energyinput;
     volumeinput = b.volumeinput;
     energyinput_orig = b.energyinput_orig;
@@ -350,6 +360,25 @@ namespace KBIN {
     _AGL_data AGL_data;
     uint aglerror;
     ostringstream aus;
+    bool USER_RELAX=true;
+
+    if (XHOST.GENERATE_AFLOWIN_ONLY && USER_RELAX) {
+      USER_RELAX = false;
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_WARNING_ + "RELAX will be switched OFF for generate_aflowin_only." << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);      
+    }
+
+    if (USER_RELAX) {
+      aglerror = relaxStructureAGL_VASP(AflowIn, xvasp, aflags, kflags, vflags, FileMESSAGE);
+      if (aglerror != 0) {
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_ERROR_ + "Failed to relax structure prior to running AGL." << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);      
+	return;
+      }
+    }
+
 
     // Call RunDebye_AGL to run AGL
     aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
@@ -373,6 +402,198 @@ namespace KBIN {
     }
   }
 } // namespace KBIN
+
+namespace KBIN {
+  // CT 20200323 - Relax structure if it hasn't relaxed yet before running AGL
+  uint relaxStructureAGL_VASP(const string& AflowIn,
+      _xvasp& xvasp,
+      _aflags& aflags,
+      _kflags& kflags,
+      _vflags& vflags,
+      ofstream& FileMESSAGE) {
+    // bool LDEBUG=(FALSE || XHOST.DEBUG);
+    ostringstream aus;
+    // uint num_relax = xvasp.NRELAX;
+    uint num_relax = 2;
+    bool relax_complete = true;
+    bool krun;
+
+    aurostd::StringstreamClean(aus);
+    aus << _AELSTR_MESSAGE_ + "Number of requested relaxation runs = " << num_relax << endl;  
+    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+
+    // First check if relaxation has already been performed
+    for (uint i = 1; i <= num_relax; i++) {
+      string filename = aurostd::CleanFileName(xvasp.Directory) + "CONTCAR.relax" + aurostd::utype2string<int>(num_relax);
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_MESSAGE_ + "Relaxation CONTCAR filename = " << filename << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      if (aurostd::FileExist(filename) || aurostd::FileExist(filename + ".xz")) {
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ + "Relaxation " << i << " has aleady completed"  << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      } else {
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ + "Relaxation " << i << " has not completed"  << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	relax_complete = false;
+      }
+    }
+    if (relax_complete) {
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_MESSAGE_ + "Relaxation has aleady completed"  << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return 0;
+    } else {
+      for (uint i = 1; i <= num_relax; i++) {
+	krun = VASP_Produce_and_Modify_INPUT(xvasp, AflowIn, FileMESSAGE, aflags, kflags, vflags);
+	krun = (krun && VASP_Write_INPUT(xvasp, vflags));
+	krun = VASP_Run(xvasp, aflags, kflags, vflags, "relax" + aurostd::utype2string<int>(i), true, FileMESSAGE);
+	XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, FileMESSAGE);
+	if (i < num_relax) {
+	  XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, FileMESSAGE);
+	}
+      }
+    }
+    if (krun) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+}   
+
+// ***************************************************************************
+// KBIN::VASP_RunPhonons_AGL
+// ***************************************************************************
+namespace KBIN {
+  //
+  // Run AGL postprocessing: calls AGL from other parts of AFLOW, to run AGL postprocessing on previously run calculations
+  // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
+  //  void VASP_RunPhonons_AGL_postprocess(  _xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE) {
+  void VASP_RunPhonons_AGL_postprocess(string directory_LIB, string AflowInName, string FileLockName) {  
+    // Class to contain AGL input and output data
+    _AGL_data AGL_data;
+    uint aglerror;
+    ostringstream aus;
+    _xvasp xvasp;
+    string AflowIn;
+    _aflags aflags;
+    _kflags kflags;
+    _vflags vflags;
+    ofstream FileMESSAGE;
+
+    // Call AGL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
+    aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
+    if (aglerror != 0) {
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_ERROR_ + "AGL set xvasp flags failed" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return;
+    }
+
+    // Set AGL postprocess flag to true
+    AGL_data.postprocess = true;
+    
+    // Call RunDebye_AGL to run AGL
+    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    if(aglerror == 0) {
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_MESSAGE_ << "AGL Debye run completed successfully!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    } else if(aglerror == 8) { 
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_MESSAGE_ << "AGL Debye run waiting for other calculations!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    } else {
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_ERROR_ + "AGL Debye run failed" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    }
+  }
+} // namespace KBIN
+
+// ***************************************************************************
+// AGL_functions::Get_ThermalProperties_AGL_postprocess
+// ***************************************************************************
+namespace AGL_functions {
+  //
+  // Run AGL postprocessing: calls AGL from other parts of AFLOW, to run AGL postprocessing on previously run calculations
+  // Returns thermal properties: Debye temperature, Gruneisen parameter, Gibbs free energy per atom, vibrational free energy per atom
+  // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
+  uint Get_ThermalProperties_AGL_postprocess(string directory, const uint& ntemperature, const double& stemperature, const uint& npressure, const double& spressure, vector<double>& agl_temperature, vector<double>& agl_gibbs_energy_atom, vector<double>& agl_vibrational_energy_atom) {  
+    // Class to contain AGL input and output data
+    _AGL_data AGL_data;
+    uint aglerror;
+    ostringstream aus;
+    _xvasp xvasp;
+    string AflowIn;
+    _aflags aflags;
+    _kflags kflags;
+    _vflags vflags;
+    ofstream FileMESSAGE;
+    // string AflowInName = "agl_aflow.in";
+    // string FileLockName = "agl.LOCK";
+    // string AflowInName = _AFLOWIN_;
+    // string FileLockName = _AFLOWLOCK_;    
+    string AflowInName, FileLockName;
+
+    // string filedirname = aurostd::CleanFileName(directory) + "agl.LOCK";
+    if (aurostd::FileExist(aurostd::CleanFileName(directory) + "agl.LOCK")) {
+      FileLockName = "agl.LOCK";
+    } else if (aurostd::FileExist(aurostd::CleanFileName(directory) + "ael.LOCK")) {
+      FileLockName = "ael.LOCK";
+    } else {
+      FileLockName = _AFLOWLOCK_;
+    }
+
+    if (aurostd::FileExist(aurostd::CleanFileName(directory) + "agl_aflow.in")) {
+      AflowInName = "agl_aflow.in";
+    } else if (aurostd::FileExist(aurostd::CleanFileName(directory) + "ael_aflow.in")) {
+      AflowInName = "ael_aflow.in";
+    } else {
+      AflowInName = _AFLOWIN_;
+    }
+
+      
+    // Call AGL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
+    aglerror = AGL_functions::AGL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
+
+    // Set AGL postprocess flag to true
+    AGL_data.postprocess = true;
+
+    // Set temperature and pressure number/size of steps
+    AGL_data.ntemperature = ntemperature;
+    AGL_data.stemperature = stemperature;
+    AGL_data.npressure = npressure;
+    AGL_data.spressure = spressure;
+    
+    // Call RunDebye_AGL to run AGL
+    aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
+    if(aglerror == 0) {
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_MESSAGE_ + "AGL Debye run completed successfully!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+     
+      for (uint i = 0; i < AGL_data.GibbsFreeEnergy0pressureeV.size(); i++) {
+	agl_temperature.push_back(AGL_data.temperature_external.at(i));
+	agl_gibbs_energy_atom.push_back(AGL_data.GibbsFreeEnergy0pressureeV.at(i) / AGL_data.natoms);
+	agl_vibrational_energy_atom.push_back(AGL_data.HelmholtzEnergy0pressuremeV.at(i) / AGL_data.natoms);
+      }
+      return aglerror;
+    } else if(aglerror == 8) { 
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_MESSAGE_ + "AGL Debye run waiting for other calculations!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return aglerror;
+    } else {
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_ERROR_ + "AGL Debye run failed" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return aglerror;
+    }
+  }
+} // namespace AGL_functions
 
 // ***************************************************************************
 //
@@ -597,7 +818,7 @@ namespace AGL_functions {
   // Function to be called from APL or AEL to calculate thermal or mechanical properties as a function of pressure
   // Runs AGL to obtain Volume in cubic Angstrom and Volume scaling factors as a function of static pressure in GPa 
   // Required pressure values should be specified in the aflow.in file
-  uint Get_VolumeStaticPressure(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, ofstream& FileMESSAGE) {
+  uint Get_VolumeStaticPressure(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, bool& postprocess, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
     uint aglerror = 0;
@@ -605,6 +826,9 @@ namespace AGL_functions {
 
     // Set ael_pressure_calc to true
     AGL_data.ael_pressure_calc = true;
+
+    // Set AGL postprocess flag
+    AGL_data.postprocess = postprocess;    
 
     // Call RunDebye_AGL to run AGL
     aglerror = AGL_functions::RunDebye_AGL(xvasp, AflowIn, aflags, kflags, vflags, AGL_data, FileMESSAGE);
@@ -1129,16 +1353,22 @@ namespace AGL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }     
     // Get the user's number of pressure points to be used in the calculation
-    if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"NPRESSURE=",TRUE) ) {
-      USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NPRESSURE=",TRUE);
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "Number of pressure points = " << USER_NPRESSURE << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"NPRESSURE=",TRUE) ) {
-      USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NPRESSURE=",TRUE);
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "Number of pressure points = " << USER_NPRESSURE << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    if(AGL_data.postprocess && (AGL_data.npressure > 0)) {
+      USER_NPRESSURE = AGL_data.npressure;
+    } else {
+      // Otherwise, check in aflow.in file
+      if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"NPRESSURE=",TRUE) ) {
+	USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NPRESSURE=",TRUE);
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ << "Number of pressure points = " << USER_NPRESSURE << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"NPRESSURE=",TRUE) ) {
+	USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NPRESSURE=",TRUE);
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ << "Number of pressure points = " << USER_NPRESSURE << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
+      AGL_data.npressure = USER_NPRESSURE;
     }    
     // Check that value is not zero or negative; warn user and reset to default values if it is zero or negative
     if(USER_NPRESSURE < 1) {
@@ -1149,16 +1379,23 @@ namespace AGL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } 
     // Get the user's step size for the pressure values to be used in the calculation
-    if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE) ) {
-      USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE);
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "Pressure interval = " << USER_SPRESSURE << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE) ) {
-      USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE);
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "Pressure interval = " << USER_SPRESSURE << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    // First check if a different step size has been requested by a postprocessing command line option
+    if(AGL_data.postprocess && (AGL_data.spressure > 0.0)) {
+      USER_SPRESSURE = AGL_data.spressure;
+    } else {
+      // Otherwise, check in aflow.in file    
+      if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE) ) {
+	USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE);
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ << "Pressure interval = " << USER_SPRESSURE << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE) ) {
+	USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE);
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ << "Pressure interval = " << USER_SPRESSURE << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
+      AGL_data.spressure = USER_SPRESSURE;
     }
     // Check that value is not zero or negative; warn user and reset to default values if it is zero or negative
     if(USER_SPRESSURE < tolzero) {
@@ -1169,17 +1406,24 @@ namespace AGL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
     // Get the user's number of temperature points to be used in the calculation
-    if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"NTEMP=",TRUE) ) {
-      USER_NTEMPERATURE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NTEMP=",TRUE);
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "Number of temperature points = " << USER_NTEMPERATURE << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"NTEMP=",TRUE) ) {
-      USER_NTEMPERATURE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NTEMP=",TRUE);
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "Number of temperature points = " << USER_NTEMPERATURE << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    }    
+    // First check if a different number of points have been requested by a postprocessing command line option
+    if(AGL_data.postprocess && (AGL_data.ntemperature > 0)) {
+      USER_NTEMPERATURE = AGL_data.ntemperature;
+    } else {
+      // Otherwise, check in aflow.in file    
+      if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"NTEMP=",TRUE) ) {
+	USER_NTEMPERATURE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NTEMP=",TRUE);
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ << "Number of temperature points = " << USER_NTEMPERATURE << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"NTEMP=",TRUE) ) {
+	USER_NTEMPERATURE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NTEMP=",TRUE);
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ << "Number of temperature points = " << USER_NTEMPERATURE << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
+      AGL_data.ntemperature = USER_NTEMPERATURE;
+    }
     if(USER_NTEMPERATURE < 1) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Number of temperature points = " << USER_NTEMPERATURE << " < 1" << endl;  
@@ -1189,17 +1433,24 @@ namespace AGL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
     // Get the user's step size for the temperature values to be used in the calculation
-    if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"STEMP=",TRUE) ) {
-      USER_STEMPERATURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"STEMP=",TRUE);
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "Temperature interval = " << USER_STEMPERATURE << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"STEMP=",TRUE) ) {
-      USER_STEMPERATURE = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"STEMP=",TRUE);
-      aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_MESSAGE_ << "Temperature interval = " << USER_STEMPERATURE << endl;  
-      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    }  
+    // First check if a different step size has been requested by a postprocessing command line option
+    if(AGL_data.postprocess && (AGL_data.stemperature > 0.0)) {
+      USER_STEMPERATURE = AGL_data.stemperature;
+    } else {
+      // Otherwise, check in aflow.in file    
+      if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"STEMP=",TRUE) ) {
+	USER_STEMPERATURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"STEMP=",TRUE);
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ << "Temperature interval = " << USER_STEMPERATURE << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"STEMP=",TRUE) ) {
+	USER_STEMPERATURE = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"STEMP=",TRUE);
+	aurostd::StringstreamClean(aus);
+	aus << _AGLSTR_MESSAGE_ << "Temperature interval = " << USER_STEMPERATURE << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
+      AGL_data.stemperature = USER_STEMPERATURE;
+    }      
     // Check that value is not zero or negative; warn user and reset to default values if it is zero or negative
     if(USER_STEMPERATURE < tolzero) {
       aurostd::StringstreamClean(aus);
@@ -1787,7 +2038,7 @@ namespace AGL_functions {
     
     // Calls AFLOW AEL to calculate the Poisson ratio if selected by user
     if(USER_AEL_POISSON_RATIO.option) {
-      aglerror = AEL_functions::Get_PoissonRatio(xvasp, AflowIn, aflags, kflags, vflags, AGL_data.poissonratio, FileMESSAGE);
+      aglerror = AEL_functions::Get_PoissonRatio(xvasp, AflowIn, aflags, kflags, vflags, AGL_data.poissonratio, AGL_data.postprocess, FileMESSAGE);
       if(aglerror == 0) {
 	aurostd::StringstreamClean(aus);
 	aus << _AGLSTR_MESSAGE_ << "AEL successfully used to calculate Poisson ratio = " << AGL_data.poissonratio << endl;  
@@ -1832,7 +2083,7 @@ namespace AGL_functions {
       // Use default or user supplied value of Poisson ratio if AEL Poisson ratio is not selected by user
       AGL_data.poissonratio = USER_POISSON_RATIO;
       // Record source and value of Poisson ratio used
-      if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"POISSONRATIO=",TRUE) ) {
+      if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"POISSONRATIO=",TRUE) || (aurostd::substring2bool(AflowIn,_AGLSTROPT_+"POISSON_RATIO=",TRUE)) ) {
 	stringstream prss;
 	prss << AGL_data.poissonratio;
 	string prs = prss.str();
@@ -2155,7 +2406,12 @@ namespace AGL_functions {
 	    aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
 	    aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
 	    aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
-	    aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ) continue; 	
+	    aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
+	    ((XHOST.POSTPROCESS || AGL_data.postprocess) &&
+	     ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) ||
+	      (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
+	      (aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) ||
+	      (aurostd::FileExist( dirrunname.at(idVaspRun) + "/LOCK")))) ) continue;
 
 	// Check if structure is on list of failed runs to be skipped
 	// If so, then skip generation and continue to next structure
@@ -2175,7 +2431,7 @@ namespace AGL_functions {
 	}
   
 	// If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-	if (!XHOST.POSTPROCESS) {
+	if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {
 	  // Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
 	  // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
 	  // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
@@ -2229,7 +2485,7 @@ namespace AGL_functions {
       // If the data does not have a minimum, then this section of the code will add additional strained structures until a minimum is found
       // If the structure has been properly relaxed prior to running AFLOW AGL, then this problem should not occur
       // If this part of the code produces warnings, you should check the relaxation of the initial structure
-      if(USER_CHECK_EV_MIN.option) {
+      if(USER_CHECK_EV_MIN.option && !(XHOST.POSTPROCESS || AGL_data.postprocess)) {
 	aurostd::StringstreamClean(aus);
 	aus << _AGLSTR_MESSAGE_ << "Checking location of energy minimum" << endl;  
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2366,7 +2622,7 @@ namespace AGL_functions {
 	    continue;
 	  }
 	  // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-	  if (!XHOST.POSTPROCESS) {
+	  if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {
 	    // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
 	    // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
 	    // [OBSOLETE] if(aglerror != 0) {
@@ -2507,7 +2763,7 @@ namespace AGL_functions {
 	    continue;
 	  } 	  	  
 	  // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-	  if (!XHOST.POSTPROCESS) {	  
+	  if (!(XHOST.POSTPROCESS || AGL_data.postprocess)) {	  
 	  // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
 	    // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
 	    // [OBSOLETE] if(aglerror != 0) {
@@ -2561,7 +2817,7 @@ namespace AGL_functions {
       // Problems with the concavity of the (E, V) data are usually caused by an insufficient basis set or k-point mesh
       // If the data is not concave, then this section of the code will increase the density of the k-point mesh and rerun the VASP calculations
       // If this part of the code produces warnings, you should check the k-point mesh and the basis set
-      if(USER_CHECK_EV_CONCAVITY.option && !XHOST.POSTPROCESS) {	  
+      if(USER_CHECK_EV_CONCAVITY.option && !(XHOST.POSTPROCESS || AGL_data.postprocess)) {	  
 	aurostd::StringstreamClean(aus);
 	aus << _AGLSTR_MESSAGE_ << "Checking concavity of (E, V) data" << endl;  
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

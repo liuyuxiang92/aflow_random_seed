@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -16,7 +16,7 @@
 // [OBSOLETE] #define LIB2RAW_FIX_THIS_LATER FALSE // Not needed anymore due to "--quiet" option in lib2lib
 
 // ###############################################################################
-//                  AFLOW Automatic Elasticity Library (AEL) (2014-2019)
+//                  AFLOW Automatic Elasticity Library (AEL) (2014-2020)
 // ###############################################################################
 //
 // Uses strain-stress calculations to obtain elastic constants of materials
@@ -42,6 +42,7 @@ _AEL_data::_AEL_data() {
   relax_static = false;
   static_only = false;
   relax_only = false;
+  postprocess = false;
   aflowin_overwrite = false;
   mechanically_stable = true; 
   applied_pressure = 0.0;
@@ -127,6 +128,7 @@ const _AEL_data& _AEL_data::operator=(const _AEL_data& b) {       // operator=
     relax_static = b.relax_static;
     static_only = b.static_only;
     relax_only = b.relax_only;
+    postprocess = b.postprocess;
     aflowin_overwrite = b.aflowin_overwrite;
     mechanically_stable = b.mechanically_stable;
     applied_pressure = b.applied_pressure;
@@ -203,7 +205,25 @@ namespace KBIN {
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
     uint aelerror;
+    bool USER_RELAX=true;
     ostringstream aus;
+
+    if (XHOST.GENERATE_AFLOWIN_ONLY && USER_RELAX) {
+      USER_RELAX = false;
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_WARNING_ + "RELAX will be switched OFF for generate_aflowin_only." << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);      
+    }
+
+    if (USER_RELAX) {
+      aelerror = relaxStructureAEL_VASP(AflowIn, xvasp, aflags, kflags, vflags, FileMESSAGE);
+      if (aelerror != 0) {
+	aurostd::StringstreamClean(aus);
+	aus << _AELSTR_ERROR_ + "Failed to relax structure prior to running AEL." << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);      
+	return;
+      }
+    }
 
     // Call RunElastic_AEL to run AEL
     aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
@@ -228,6 +248,201 @@ namespace KBIN {
   }
 } // namespace KBIN
 
+namespace KBIN {
+  // CT 20200323 - Relax structure if it hasn't relaxed yet before running AEL
+  uint relaxStructureAEL_VASP(const string& AflowIn,
+      _xvasp& xvasp,
+      _aflags& aflags,
+      _kflags& kflags,
+      _vflags& vflags,
+      ofstream& FileMESSAGE) {
+    // bool LDEBUG=(FALSE || XHOST.DEBUG);
+    ostringstream aus;
+    // uint num_relax = xvasp.NRELAX;
+    uint num_relax = 2;
+    bool relax_complete = true;
+    bool krun;
+
+    // First check if relaxation has already been performed
+    for (uint i = 1; i <= num_relax; i++) {
+      string filename = aurostd::CleanFileName(xvasp.Directory) + "CONTCAR.relax" + aurostd::utype2string<int>(num_relax);
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_MESSAGE_ + "Relaxation CONTCAR filename = " << filename << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      if (aurostd::FileExist(filename) || aurostd::FileExist(filename + ".xz")) {
+	aurostd::StringstreamClean(aus);
+	aus << _AELSTR_MESSAGE_ + "Relaxation " << i << " has aleady completed"  << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      } else {
+	aurostd::StringstreamClean(aus);
+	aus << _AELSTR_MESSAGE_ + "Relaxation " << i << " has not completed"  << endl;  
+	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	relax_complete = false;
+      }
+    }
+    if (relax_complete) {
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_MESSAGE_ + "Relaxation has aleady completed"  << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return 0;
+    } else {
+      for (uint i = 1; i <= num_relax; i++) {
+	krun = VASP_Produce_and_Modify_INPUT(xvasp, AflowIn, FileMESSAGE, aflags, kflags, vflags);
+	krun = (krun && VASP_Write_INPUT(xvasp, vflags));
+	krun = VASP_Run(xvasp, aflags, kflags, vflags, "relax" + aurostd::utype2string<int>(i), true, FileMESSAGE);
+	XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, FileMESSAGE);
+	if (i < num_relax) {
+	  XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, FileMESSAGE);
+	}
+      }
+    }
+    if (krun) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+}   
+
+// ***************************************************************************
+// KBIN::VASP_RunPhonons_AEL
+// ***************************************************************************
+namespace KBIN {
+  //
+  // Run AEL postprocessing: calls AEL from other parts of AFLOW, to run AEL postprocessing on previously run calculations
+  // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
+  void VASP_RunPhonons_AEL_postprocess(string directory_LIB, string AflowInName, string FileLockName) {  
+    // Class to contain AEL input and output data
+    _AEL_data AEL_data;
+    uint aelerror;
+    ostringstream aus;
+    _xvasp xvasp;
+    string AflowIn;
+    _aflags aflags;
+    _kflags kflags;
+    _vflags vflags;
+    ofstream FileMESSAGE;
+
+    // Call AEL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
+    aelerror = AEL_functions::AEL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory_LIB, aflags, kflags, vflags, FileMESSAGE);
+
+    // Set AEL postprocess flag to true
+    AEL_data.postprocess = true;
+    
+    // Call RunDebye_AEL to run AEL
+    aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
+    if(!AEL_data.mechanically_stable) {
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_WARNING_ + "Negative stiffness tensor eigenvalues indicate mechanical instability" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);      
+    }
+    if(aelerror == 0) {
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_MESSAGE_ + "AEL Elastic constants run completed successfully!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    } else if(aelerror == 8) { 
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_MESSAGE_ + "AEL Elastic run waiting for other calculations!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    } else {
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_ERROR_ + "AEL Elastic constants run failed" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    }
+  }
+} // namespace KBIN
+
+// ***************************************************************************
+// AEL_functions::Get_ElasticProperties_AEL_postprocess
+// ***************************************************************************
+namespace AEL_functions {
+  //
+  // Run AEL postprocessing: calls AEL from other parts of AFLOW, to run AEL postprocessing on previously run calculations
+  // Returns elastic properties: bulk and shear moduli, Poisson ratio, elastic stiffness tensor
+  // See Computer Physics Communications 158, 57-72 (2004), Journal of Molecular Structure (Theochem) 368, 245-255 (1996), Phys. Rev. B 90, 174107 (2014) and Phys. Rev. Materials 1, 015401 (2017) for details
+  uint Get_ElasticProperties_AEL_postprocess(string directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor) {  
+    // Class to contain AEL input and output data
+    _AEL_data AEL_data;
+    uint aelerror;
+    ostringstream aus;
+    _xvasp xvasp;
+    string AflowIn;
+    _aflags aflags;
+    _kflags kflags;
+    _vflags vflags;
+    ofstream FileMESSAGE;
+    // string AflowInName = "agl_aflow.in";
+    // string FileLockName = "agl.LOCK";
+    // string AflowInName = _AFLOWIN_;
+    // string FileLockName = _AFLOWLOCK_;    
+    vector<double> elastic_tensor_row;
+    string AflowInName, FileLockName;
+
+    // string filedirname = aurostd::CleanFileName(directory) + "agl.LOCK";
+    if (aurostd::FileExist(aurostd::CleanFileName(directory) + "ael.LOCK")) {
+      FileLockName = "ael.LOCK";
+    } else if (aurostd::FileExist(aurostd::CleanFileName(directory) + "agl.LOCK")) {
+      FileLockName = "agl.LOCK";
+    } else {
+      FileLockName = _AFLOWLOCK_;
+    }
+
+    if (aurostd::FileExist(aurostd::CleanFileName(directory) + "ael_aflow.in")) {
+      AflowInName = "ael_aflow.in";
+    } else if (aurostd::FileExist(aurostd::CleanFileName(directory) + "agl_aflow.in")) {
+      AflowInName = "agl_aflow.in";
+    } else {
+      AflowInName = _AFLOWIN_;
+    }
+
+    aurostd::StringstreamClean(aus);
+    aus << _AELSTR_MESSAGE_ + "Directory path = " << directory << endl;  
+    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+  
+    // Call AEL_xvasp_flags_populate to populate xvasp, aflags, kflags and vflags classes
+    aelerror = AEL_functions::AEL_xvasp_flags_populate(xvasp, AflowIn, AflowInName, FileLockName, directory, aflags, kflags, vflags, FileMESSAGE);
+
+    // Set AEL postprocess flag to true
+    AEL_data.postprocess = true;
+    
+    // Call RunDebye_AEL to run AEL
+    aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
+    if(!AEL_data.mechanically_stable) {
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_WARNING_ + "Negative stiffness tensor eigenvalues indicate mechanical instability" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return aelerror;
+    }
+    if(aelerror == 0) {
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_MESSAGE_ + "AEL Elastic constants run completed successfully!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      ael_bulk_modulus_voigt = AEL_data.bulkmodulus_voigt;
+      ael_bulk_modulus_reuss = AEL_data.bulkmodulus_reuss;
+      ael_bulk_modulus_vrh = AEL_data.bulkmodulus_vrh;
+      ael_shear_modulus_voigt = AEL_data.shearmodulus_voigt;
+      ael_shear_modulus_reuss = AEL_data.shearmodulus_reuss;
+      ael_shear_modulus_vrh = AEL_data.shearmodulus_vrh;
+      ael_poisson_ratio = AEL_data.poisson_ratio;
+      ael_elastic_tensor = AEL_data.elastic_tensor;
+      ael_compliance_tensor = AEL_data.compliance_tensor;
+      return aelerror;
+    } else if(aelerror == 8) { 
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_MESSAGE_ + "AEL Elastic run waiting for other calculations!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return aelerror;
+    } else {
+      aurostd::StringstreamClean(aus);
+      aus << _AELSTR_ERROR_ + "AEL Elastic constants run failed" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      return aelerror;
+    }
+  }
+} // namespace KBIN
+
+
+
 // ***************************************************************************
 //
 // Set of functions to allow AEL to be called from other parts of AFLOW to obtain Poisson ratio, bulk modulus, etc.
@@ -241,12 +456,15 @@ namespace KBIN {
 // AEL_functions::Get_PoissonRatio
 // ***************************************************************************
 namespace AEL_functions {
-  uint Get_PoissonRatio(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, ofstream& FileMESSAGE) {
+  uint Get_PoissonRatio(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& Poissonratio, bool& postprocess, ofstream& FileMESSAGE) {
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
     uint aelerror;
     ostringstream aus;
 
+    // Set AEL postprocess flag
+    AEL_data.postprocess = postprocess;
+    
     // Call RunElastic_AEL to run AEL
     aelerror = AEL_functions::RunElastic_AEL(xvasp, AflowIn, aflags, kflags, vflags, AEL_data, FileMESSAGE);
     if(!AEL_data.mechanically_stable) {
@@ -963,7 +1181,7 @@ namespace AEL_functions {
     // Check if user has requested that the elastic constants be calculated as a function of pressure
     if(USER_PRESSURE_CALC.option) {
       // Call AGL to calculate pressure vs. volume values
-      aelerror = AGL_functions::Get_VolumeStaticPressure(xvasp, AflowIn, aflags, kflags, vflags, Pressure, PressureVolumes, VolumeScaleFactors, FileMESSAGE);
+      aelerror = AGL_functions::Get_VolumeStaticPressure(xvasp, AflowIn, aflags, kflags, vflags, Pressure, PressureVolumes, VolumeScaleFactors, AEL_data.postprocess, FileMESSAGE);
       // Check if calculation of pressure vs. volume values has finished properly
       if(aelerror == 0) {
 	aurostd::StringstreamClean(aus);
@@ -1708,14 +1926,28 @@ namespace AEL_functions {
 	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
 	      aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
 	      aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
-	      aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ) continue; 	 
+	      aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
+	  ((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+	   ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) ||
+	    (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/ael.LOCK")) ||
+	    (aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
+	    (aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) ||
+	    (aurostd::FileExist( dirrunname.at(idVaspRun) + "/ael.LOCK")) ||
+	    (aurostd::FileExist( dirrunname.at(idVaspRun) + "/LOCK")))) ) continue; 	 
 	} else {
 	  if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ||
 	      aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.relax2") ) ||
 	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.relax2") )||
 	      aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
 	      aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.relax2") ) ||
-	      aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.relax2") ) ) continue; 	 
+	      aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.relax2") ) ||
+	      ((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+	       ((aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/agl.LOCK")) ||
+		(aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/ael.LOCK")) ||
+		(aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/LOCK")) ||
+		(aurostd::FileExist( dirrunname.at(idVaspRun) + "/agl.LOCK")) ||
+		(aurostd::FileExist( dirrunname.at(idVaspRun) + "/ael.LOCK")) ||
+		(aurostd::FileExist( dirrunname.at(idVaspRun) + "/LOCK"))))  ) continue; 	 
 	}
 
 	// Check if structure is on list of failed runs to be skipped
@@ -1734,7 +1966,7 @@ namespace AEL_functions {
 	}
 
 	// If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-	if (!XHOST.POSTPROCESS) {
+	if (!(XHOST.POSTPROCESS || AEL_data.postprocess)) {
 	// Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
 	// [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), AEL_data, FileMESSAGE);
 	// [OBSOLETE] if(aelerror != 0) {
@@ -1783,14 +2015,28 @@ namespace AEL_functions {
 		  aurostd::EFileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
 		  aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/" + _AFLOWLOCK_ ) ||
 		  aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.static") ) ||
-		  aurostd::EFileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.static") ) )continue; 	 
+		  aurostd::EFileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.static") ) ||
+		  ((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+		   ((aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/agl.LOCK")) ||
+		    (aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/ael.LOCK")) ||
+		    (aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/LOCK")) ||
+		    (aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/agl.LOCK")) ||
+		    (aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/ael.LOCK")) ||
+		    (aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/LOCK")))) ) continue; 	 
 	    } else {
 	      if( aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ||
 		  aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.relax2") ) ||
 		  aurostd::EFileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.relax2") ) ||
 		  aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/" + _AFLOWLOCK_ ) ||
 		  aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.relax2") ) ||
-		  aurostd::EFileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.relax2") ) ) continue; 	 
+		  aurostd::EFileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.relax2") ) ||
+		  ((XHOST.POSTPROCESS || AEL_data.postprocess) &&
+		   ((aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/agl.LOCK")) ||
+		    (aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/ael.LOCK")) ||
+		    (aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/LOCK")) ||
+		    (aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/agl.LOCK")) ||
+		    (aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/ael.LOCK")) ||
+		    (aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/LOCK")))) ) continue; 	 
 	    }
 
 	    // Check if structure is on list of failed runs to be skipped
@@ -1809,7 +2055,7 @@ namespace AEL_functions {
 	    }
 
 	    // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-	    if (!XHOST.POSTPROCESS) {
+	    if (!(XHOST.POSTPROCESS || AEL_data.postprocess)) {	  
 	    // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
 	    // [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRunsPressures.at(k).at(idVaspRun), _vaspFlags, _kbinFlags, runnamepressures.at(k).at(idVaspRun), AEL_data, FileMESSAGE);
 	    // [OBSOLETE] if(aelerror != 0) {
