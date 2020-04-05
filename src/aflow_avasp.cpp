@@ -1579,8 +1579,8 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
                 if(tokens.at(2)=="PAW_RPBE") {pottype="PAW_RPBE";date=tokens.at(4);}  // potpaw_GGA/DEFAULT_VASP_POTCAR_DATE/Ge_h
                 if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);} //CO181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized" //CO191110
                 if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA";date=tokens.at(4);} //CO181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
-                if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO191020
-                if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO191020
+                if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead
+                if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2).find("PAW")!=string::npos) {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO191020  //CO20200404 - tokens.at(2)=="PAW_PBE" NOT GOOD, TITEL has PAW_PBE for PBE but PAW for LDA, use find instead
                 // SEE https://cms.mpi.univie.ac.at/wiki/index.php/METAGGA
               }
               if(pottype.empty()) {
