@@ -18,6 +18,7 @@
         -- added RHL to auto Gamma-centering kpoints schemes (CO)
         -- patched aflow.rc for AUTO kpoints generation (CO)
         -- patched TITEL search issue for PAW_LDA_KIN (CO)
+        -- patched --slab_check warning with det(lattice)<0 (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
