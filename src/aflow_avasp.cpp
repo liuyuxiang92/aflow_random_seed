@@ -2093,8 +2093,8 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       }
     }
 
-    //[OBSOLETE AS 2020-03-02] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE AS 2020-03-02] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;

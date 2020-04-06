@@ -42,7 +42,7 @@ namespace KBIN {
     module_opts.aaplflags = loadDefaultsAAPL();
     module_opts.aelflags = loadDefaultsAEL();
     module_opts.aglflags = loadDefaultsAGL();  
-    module_opts.qhaflags = loadDefaultsQHA();
+    module_opts.qhaflags = loadDefaultsQHA(); // AS20200302
     // The readParameters functions are necessary to set xvasp
     string placeholder = "";  // acts as pseudo-aflow.in
     readParametersAPL(placeholder, module_opts, xinput);
@@ -516,6 +516,7 @@ namespace KBIN {
   }
 
   // QHA-related functions -----------------------------------------------------
+  // AS20200302
   //loadDefaultsQHA/////////////////////////////////////////////////////////////
   // Sets all QHA flags to their default values.
   vector<aurostd::xoption> loadDefaultsQHA() {
