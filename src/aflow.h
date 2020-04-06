@@ -2678,7 +2678,7 @@ namespace KBIN {
   bool writeFlagAPL(const string& key,const xoption& xopt); //CO20181226  //ME20190113
   void readParametersAPL(const string&, _moduleOptions&, _xinput&);
   vector<aurostd::xoption> loadDefaultsQHA();
-  void readParametersQHA(const string&, _moduleOptions&, _xinput&); // AS 2020-03-02
+  void readParametersQHA(const string&, _moduleOptions&, _xinput&); // AS20200302
   vector<aurostd::xoption> loadDefaultsAAPL();
   bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO20181226  // ME20190113
   void readParametersAAPL(const string&, _moduleOptions&, _xinput&);
