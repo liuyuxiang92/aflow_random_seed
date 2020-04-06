@@ -83,7 +83,7 @@ forces. This can be achieved in one of two ways:
     For more information on the PREC option, see Section 2.1.1.
 
     APL automatically chooses the k-point grid for the relaxation to be commensurate with the
-    k-point grid for the supercell. For example, if a 3x2x1 supercell uses a 2x2x3 k-point gird,
+    k-point grid for the supercell. For example, if a 3x2x1 supercell uses a 2x2x3 k-point grid,
     the unit cell will be relaxed using a 6x4x3 k-point grid. This minimizes the risk of ghost
     forces in the supercell calculations.
 

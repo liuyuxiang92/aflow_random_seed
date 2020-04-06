@@ -68,7 +68,11 @@ namespace KBIN {
 
     // ME20200102
     // Determine k-point grid that is commensurate with the k-point grid of
-    // the supercell.
+    // the supercell. APL automatically chooses the k-point grid for the
+    // relaxation to be commensurate with the k-point grid for the supercell.
+    // For example, if a 3x2x1 supercell uses a 2x2x3 k-point grid, the unit
+    // cell will be relaxed using a 6x4x3 k-point grid. This minimizes the
+    // risk of ghost forces in the supercell calculations.
     apl::Logger l(fileMessage, aflags);
     apl::Supercell scell(xvasp.str, aflags, l);
     scell.build(scell_dims, false);
@@ -172,8 +176,8 @@ namespace KBIN {
     if (scell_dims != scell_dims_new) {
       string function = "KBIN::relaxStructureAPL_VASP()";
       stringstream message;
-      message << "Supercell dimensions of input structure (" << aurostd::joinWDelimiter(scell_dims, "x") << ")"
-              << " and relaxed structure (" << aurostd::joinWDelimiter(scell_dims_new, "x") << ")"
+      message << "Supercell dimensions of the pre-relaxation structure (" << aurostd::joinWDelimiter(scell_dims, "x") << ")"
+              << " and post-relaxation structure (" << aurostd::joinWDelimiter(scell_dims_new, "x") << ")"
               << " do not agree. This is likely due to different symmetries in these structures. Use"
               << " an input structure that is closer to the fully relaxed one, remove all"
               << " CONTCAR." << _APL_RELAX_PREFIX_ << "* files, and run APL again.";
@@ -185,8 +189,8 @@ namespace KBIN {
     if (kpts_sc != kpts_sc_new) {
       string function = "KBIN::relaxStructureAPL_VASP()";
       stringstream message;
-      message << "k-point grids  of the supercells of the input structure (" << aurostd::joinWDelimiter(kpts_sc, "x") << ")"
-              << " and the relaxed structure (" << aurostd::joinWDelimiter(kpts_sc_new, "x") <<  ")"
+      message << "k-point grids of the supercells of the pre-relaxation structure (" << aurostd::joinWDelimiter(kpts_sc, "x") << ")"
+              << " and the post-relaxation structure (" << aurostd::joinWDelimiter(kpts_sc_new, "x") <<  ")"
               << " do not agree. This is likely due to different symmetries in these structures. Use"
               << " an input structure that is closer to the fully relaxed one, remove all"
               << " CONTCAR." << _APL_RELAX_PREFIX_ << "* files, and run APL again.";

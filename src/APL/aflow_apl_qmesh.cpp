@@ -138,7 +138,18 @@ namespace apl {
   }
 
   //setupReciprocalCell///////////////////////////////////////////////////////
-  // Sets up the reciprocal cell that belongs to the q-mesh.
+  // Sets up the reciprocal cell that belongs to the q-mesh and calculates
+  // the point group. Literature and phonon codes are not consistent about
+  // whether to use pgroupk or pgroupk_xtal. To get all symmetry-related
+  // properties (see DOI: 10.1103/RevModPhys.40.1), pgroupk_xtal must be used
+  // or else the transformation properties of the dynamical matrix cannot be
+  // captured since they require symmetry operations that map atoms in real
+  // space. Thus, pgroupk_xtal needs to be used to get the irreducible wedge;
+  // using pgroupk is not correct. However, observables such as the phonon
+  // frequencies, eigenvectors, or phonon-phonon scattering matrices also have
+  // inversion symmetry, which is not always present in pgroupk_xtal. So,
+  // unless the dynamical matrix itself is needed, the Patterson symmetry
+  // (pgroupk_Patterson) can be used to create the irreducible wedge.
   void QMesh::setupReciprocalCell(xstructure xs, bool include_inversions) {
     _recCell.rlattice = xs.lattice;
     _recCell.lattice = ReciprocalLattice(_recCell.rlattice);
@@ -154,18 +165,7 @@ namespace apl {
     double tol = _AFLOW_APL_EPS_;
     _recCell.skewed = SYM::isLatticeSkewed(_recCell.lattice, min_dist, tol);
 
-    // Calculate the point group of the reciprocal cell. Literature and phonon
-    // codes are not consistent about whether to use pgroupk or pgroupk_xtal.
-    // To get all symmetry properties (see DOI: 10.1103/RevModPhys.40.1),
-    // pgroupk_xtal must be used or else the transformation properties of the
-    // dynamical matrix cannot be captured since they require symmetry
-    // operations that map atoms in real space. Thus, pgroupk_xtal needs to be
-    // used to get the irreducible wedge - using pgroupk is not correct.
-    // However, observables such as the phonon frequencies, eigenvectors, or
-    // phonon-phonon scattering matrices also have inversion symmetry, which
-    // is not always present in pgroupk_xtal. So, unless the dynamical matrix
-    // itself is needed, the Patterson symmetry (pgroupk_Patterson) can be
-    // used to create the irreducible wedge.
+    // Calculate the point group of the reciprocal cell.
     if (include_inversions && !xs.pgroupk_Patterson_calculated) {
       xs.CalculateSymmetryPointGroupKPatterson(false);
     } else if (!xs.pgroupk_xtal_calculated) {
@@ -307,7 +307,8 @@ namespace apl {
 
   // ME20200109
   //calculateLittleGroups/////////////////////////////////////////////////////
-  // Calculates little/small groups for each irreducible q-point.
+  // Calculates little/small groups for each irreducible q-point. The little
+  // group is the group that leaves a q-point invariant.
   void QMesh::calculateLittleGroups() {
     _littleGroups.resize(_nIQPs, vector<int>(1, 0));  // Identity is always invariant
     uint nsymops = _recCell.pgroup.size();
