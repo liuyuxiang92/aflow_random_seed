@@ -3849,17 +3849,18 @@ namespace aurostd {
       cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
       return 0;}	
     tokens.clear(); 
-    string content;
+    string content = "";
     aurostd::eurl2string(url,content);
     if(LDEBUG) { //CO 180627
       cerr << soliloquy << " content=" << endl;
       cerr << content << endl;
     }
-    if(content=="") {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+    if(content.empty()) {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
     for(uint i=0;i<stokens.size();i++)
-      if(stokens.at(i)!="") 
+      if(!stokens.at(i).empty()) 
         tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
     if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
     return tokens.size();
@@ -3883,7 +3884,8 @@ namespace aurostd {
       cerr << soliloquy << " content=" << endl;
       cerr << content << endl;
     }
-    if(content=="") {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+    if(content.empty()) {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
     for(uint i=0;i<stokens.size();i++)
@@ -6723,4 +6725,3 @@ namespace aurostd {
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
 // *                                                                         *
 // ***************************************************************************
-
