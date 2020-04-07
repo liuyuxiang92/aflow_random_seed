@@ -3757,7 +3757,7 @@ namespace aurostd {
     string soliloquy="aurostd::eurl2stringstream():";
     if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(verbose) cout << soliloquy << " Loading url=" << url << endl;
-    string stringIN;
+    string stringIN="";  //CO20200404
     bool out=eurl2string(url,stringIN,verbose);
     stringstreamIN.str(""); stringstreamIN << stringIN;
     return out;
@@ -3772,7 +3772,7 @@ namespace aurostd {
     string soliloquy="aurostd::url2stringstream():";
     if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(verbose) cout << soliloquy << " Loading url=" << url << endl;
-    string stringIN;
+    string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
     stringstreamIN.str(""); stringstreamIN << stringIN;
     return out;
@@ -3787,7 +3787,7 @@ namespace aurostd {
     string soliloquy="aurostd::eurl2vectorstring():";
     if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(verbose) cout << soliloquy << " Loading url=" << url << endl;
-    string stringIN;
+    string stringIN="";  //CO20200404
     bool out=eurl2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
     return out;
@@ -3801,7 +3801,7 @@ namespace aurostd {
     string soliloquy="aurostd::url2vectorstring():";
     if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(verbose) cout << soliloquy << " Loading url=" << url << endl;
-    string stringIN;
+    string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
     return out;
@@ -3816,7 +3816,7 @@ namespace aurostd {
     string soliloquy="aurostd::eurl2dequestring():";
     if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(verbose) cout << soliloquy << " Loading url=" << url << endl;
-    string stringIN;
+    string stringIN="";  //CO20200404
     bool out=eurl2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
     return out;
@@ -3831,7 +3831,7 @@ namespace aurostd {
     string soliloquy="aurostd::url2dequestring():";
     if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(verbose) cout << soliloquy << " Loading url=" << url << endl;
-    string stringIN;
+    string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
     return out;
@@ -3922,7 +3922,7 @@ namespace aurostd {
   // ***************************************************************************
   // CO200223
   string eurl2string(const string& url) {
-    string stringIN;
+    string stringIN="";    //CO20200404
     eurl2string(url,stringIN);
     return stringIN;
   }
@@ -3932,7 +3932,7 @@ namespace aurostd {
   // ***************************************************************************
   // wget URL to stringstream - Stefano Curtarolo
   string url2string(const string& url) {
-    string stringIN;
+    string stringIN="";  //CO20200404
     url2string(url,stringIN);
     return stringIN;
   }
