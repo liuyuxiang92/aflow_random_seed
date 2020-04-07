@@ -3680,24 +3680,31 @@ namespace aurostd {
   // CO200223
   bool eurl2string(const string& url,string& stringIN,bool verbose) {
     stringIN="";
-    if(aurostd::substring2bool(url,".bz2")){
-      string temp_file=aurostd::TmpFileCreate("eurl2string")+".bz2";
+    string ext=GetCompressionExtension(url);
+    if(!ext.empty()){
+      string temp_file=aurostd::TmpFileCreate("eurl2string")+ext;
       url2file(url,temp_file,verbose);
-      bz2file2string(temp_file,stringIN);
+      efile2string(temp_file,stringIN);
       return stringIN.length()>0;
     }
-    if(aurostd::substring2bool(url,".gz")){
-      string temp_file=aurostd::TmpFileCreate("eurl2string")+".gz";
-      url2file(url,temp_file,verbose);
-      gzfile2string(temp_file,stringIN);
-      return stringIN.length()>0;
-    }
-    if(aurostd::substring2bool(url,".xz")){
-      string temp_file=aurostd::TmpFileCreate("eurl2string")+".xz";
-      url2file(url,temp_file,verbose);
-      xzfile2string(temp_file,stringIN);
-      return stringIN.length()>0;
-    }
+    //[CO20200404 - OBSOLETE]if(aurostd::substring2bool(url,".bz2")){
+    //[CO20200404 - OBSOLETE]  string temp_file=aurostd::TmpFileCreate("eurl2string")+".bz2";
+    //[CO20200404 - OBSOLETE]  url2file(url,temp_file,verbose);
+    //[CO20200404 - OBSOLETE]  bz2file2string(temp_file,stringIN);
+    //[CO20200404 - OBSOLETE]  return stringIN.length()>0;
+    //[CO20200404 - OBSOLETE]}
+    //[CO20200404 - OBSOLETE]if(aurostd::substring2bool(url,".gz")){
+    //[CO20200404 - OBSOLETE]  string temp_file=aurostd::TmpFileCreate("eurl2string")+".gz";
+    //[CO20200404 - OBSOLETE]  url2file(url,temp_file,verbose);
+    //[CO20200404 - OBSOLETE]  gzfile2string(temp_file,stringIN);
+    //[CO20200404 - OBSOLETE]  return stringIN.length()>0;
+    //[CO20200404 - OBSOLETE]}
+    //[CO20200404 - OBSOLETE]if(aurostd::substring2bool(url,".xz")){
+    //[CO20200404 - OBSOLETE]  string temp_file=aurostd::TmpFileCreate("eurl2string")+".xz";
+    //[CO20200404 - OBSOLETE]  url2file(url,temp_file,verbose);
+    //[CO20200404 - OBSOLETE]  xzfile2string(temp_file,stringIN);
+    //[CO20200404 - OBSOLETE]  return stringIN.length()>0;
+    //[CO20200404 - OBSOLETE]}
     url2string(url,stringIN,verbose);
     return stringIN.length()>0;
   }
