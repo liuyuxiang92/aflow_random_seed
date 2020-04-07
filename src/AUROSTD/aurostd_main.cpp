@@ -3859,7 +3859,7 @@ namespace aurostd {
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
     for(uint i=0;i<stokens.size();i++)
-      if(stokens.at(i)!="") 
+      if(!stokens.at(i).empty()) 
         tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
     if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
     return tokens.size();
