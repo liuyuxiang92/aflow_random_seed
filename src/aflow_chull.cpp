@@ -867,6 +867,9 @@ namespace chull {
     if(vpflow.flag("CHULL::SEE_NEGLECT")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SEE_NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::N1EG")) { //SK20200327
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::N1EG set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
+    }
     if(vpflow.flag("CHULL::REMOVE_EXTREMA")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::REMOVE_EXTREMA set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
@@ -884,9 +887,6 @@ namespace chull {
     }
     if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::HULL_FORMATION_ENTHALPY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
-    }
-    if(vpflow.flag("CHULL::N1EG")) {  //SK20200327
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::N1EG set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_STRUCTURE_COMPARISON set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
@@ -3959,8 +3959,8 @@ namespace chull {
 
     vector<string> removing_messages;
     if(remove_requested){removing_messages.push_back("undesired");}
-    if(n1eg_requested){removing_messages.push_back("n1eg");}  //SK20200327
     if(remove_invalid){removing_messages.push_back("erroneous");}
+    if(n1eg_requested){removing_messages.push_back("n1eg");}  //SK20200327
     if(remove_duplicate_entries){removing_messages.push_back("duplicate");}
     if(remove_extreme){removing_messages.push_back("extreme");}
     if(remove_outliers){removing_messages.push_back("outlier");}
@@ -4015,7 +4015,7 @@ namespace chull {
           // point.m_i_nary = sum(elements_present) - 1
           // point.getDim() is dimension of hull
           // SK20200330
-          if (point.m_i_nary + 1 == point.getDim()) {
+          if (point.getDim() == point.m_i_nary + 1) {
             continue;
           }
         }
@@ -11084,6 +11084,7 @@ namespace chull {
     // creating name of output file
     input=aurostd::joinWDelimiter(m_velements,"");
     //input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
+    main_JSON_file="aflow_"+input; //SK20200406
     //[SK20200325 - OBSOLETE]main_JSON_file="aflow_"+input+"_hull_web.json"; //WS190620
     //SK20200331 start
     bool sc_requested=m_cflags.flag("CHULL::NEGLECT");  //only neglect feature via web
@@ -11094,8 +11095,8 @@ namespace chull {
     if(sc_requested) {
       aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),sc_point,",");
       delimiter = "_sc_";
-      // limiting to the characters after "aflow:" because ":" is a reserved character for php query calls
-      main_JSON_file=main_JSON_file + delimiter + sc_point[0].substr(6);
+      // limiting to the characters after "aflow:" because ":" is a reserved character for php query calls, also shortening queries
+      main_JSON_file=main_JSON_file + delimiter + sc_point[0].substr(6); // restricting to single auid to limit file name growth
     }
     // naming n+1 enthalpy gain files
     if (n1eg_requested) {
