@@ -3718,6 +3718,7 @@ namespace aurostd {
   // wget URL to string - Stefano Curtarolo
   bool url2string(const string& url,string& stringIN,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    stringIN="";
     if(!aurostd::IsCommandAvailable("wget")) {
       cerr << "ERROR - aurostd::url2string(): command \"wget\" is necessary !" << endl;
       return FALSE;}	
