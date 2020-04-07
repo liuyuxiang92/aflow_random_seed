@@ -4298,7 +4298,7 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
       xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-      if (step < xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+      if (step < xvasp.NRELAX) {  // ME20200107 - do not write when at the last step or there will be an extra INCAR
         aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
       }
       // xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR"); // DID REREAD
@@ -4338,7 +4338,7 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_KPOINTS_generated",TRUE);
       xvasp.KPOINTS_orig.str(std::string()); xvasp.KPOINTS_orig << xvasp.KPOINTS.str();
-      if (step < xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+      if (step < xvasp.NRELAX) {  // ME20200107 - do not write when at the last step or there will be an extra INCAR
         aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
       }
       // xvasp.KPOINTS << aurostd::file2string(xvasp.Directory+"/KPOINTS"); // DID REREAD
@@ -5736,7 +5736,38 @@ namespace KBIN {
 // KBIN::ExtractSystemName(string directory)
 // ***************************************************************************
 namespace KBIN {
-  string ExtractSystemName(string _directory) {
+  // ME20200217 - the old ExtractSystemName function (now ExtractSystemNameVASP)
+  // breaks for long system names since VASP cuts them off. The system in the
+  // aflow.in file should be the canonical system name since all VASP output
+  // ultimately depends on it.
+  string ExtractSystemName(const string& directory) {
+    string system_name = ExtractSystemNameFromAFLOWIN(directory);
+    if (system_name.empty()) {
+      string function = "KBIN::ExtractSystemName()";
+      string message = "Could not extract system.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+    return system_name;
+  }
+
+  string ExtractSystemNameFromAFLOWIN(string directory) {
+    if (directory.empty()) directory = ".";
+    string system_name = "";
+    string aflowin_path = directory + "/" + _AFLOWIN_;
+    if(aurostd::FileExist(aflowin_path)) {
+      string aflowin = "";
+      aurostd::file2string(aflowin_path, aflowin);
+      system_name = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::substring2string(aflowin, "[AFLOW]SYSTEM=", false));
+    } else {
+      string function = "KBIN::ExtractSystemNameFromAFLOWIN():";
+      string message = "Could not find file " + aflowin_path + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    }
+
+    return system_name;
+  }
+
+  string ExtractSystemNameFromVASP(string _directory) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string directory, SystemName, stmp, DOSCARfile;
     stringstream strline;

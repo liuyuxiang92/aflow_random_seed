@@ -1610,7 +1610,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.3]" << endl;
       directory+=pp_add_on+"/"+xvasp.AVASP_label;
       //  cerr << "DEBUG - " << soliloquy << " xvasp.AVASP_prototype_from_library_ directory(1)=" << directory << endl;    
-      system=""+aurostd::vectorstring2string(xvasp.str.species_pp)+(specify_pottype_once?":"+pottypedatestr:"")+"."+xvasp.AVASP_label;
+      system=""+aurostd::vectorstring2string(xvasp.str.species_pp)+((specify_pottype_once && !pottypedatestr.empty())?":"+pottypedatestr:"")+"."+xvasp.AVASP_label;  // ME20200228 - removed colon for empty pottypedatestr
       // label_text0 - MIX
       label_MIX=xvasp.AVASP_libbase+"/"+aurostd::vectorstring2string(xvasp.str.species_pp)+"/"+xvasp.AVASP_label+"/"+_AFLOWIN_;
       if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.4]" << endl;
