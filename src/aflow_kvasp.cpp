@@ -2895,6 +2895,8 @@ namespace KBIN {
               //2. SYMPREC
               //3. KMAX
               //4. ISYM=0
+              // ME20200304 - Do not fix when SYM=OFF
+              if (!vflags.KBIN_VASP_FORCE_OPTION_SYM.option) xfixed.flag("KKSYM", true);
               if(apply_new_kksym_fix==true && xwarning.flag("KKSYM")){
                 if(xfixed.flag("KKSYM_ISYM")==false){xfixed.flag("KKSYM",FALSE);} //CO20181226 last step, and xwarning.flag("KKSYM") can be ignored if xfixed.flag("KKSYM_ISYM") applied
                 //aus << "WWWWW  APPLYING NEW FIXES FOR KKSYM - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -3542,6 +3544,9 @@ namespace KBIN {
     if(qmwrite) {
       string FileNameXVASP=xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT;
       stringstream FileXVASPout;
+      // ME20200304 - do not overwrite prior runs
+      string FileNameXVASPfull = "";
+      if (aurostd::EFileExist(FileNameXVASP, FileNameXVASPfull)) aurostd::UncompressFile(FileNameXVASPfull);
       if(aurostd::FileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT)) { //RECYCLE PREVIOUS STUFF
         stringstream FileXVASPin;
         aurostd::file2stringstream(xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT,FileXVASPin);
