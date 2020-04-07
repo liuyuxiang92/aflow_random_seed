@@ -3685,6 +3685,9 @@ namespace aurostd {
       string temp_file=aurostd::TmpFileCreate("eurl2string")+ext;
       url2file(url,temp_file,verbose);
       efile2string(temp_file,stringIN);
+#ifndef _AFLOW_TEMP_PRESERVE_
+      aurostd::RemoveFile(temp_file);
+#endif
       return stringIN.length()>0;
     }
     //[CO20200404 - OBSOLETE]if(aurostd::substring2bool(url,".bz2")){

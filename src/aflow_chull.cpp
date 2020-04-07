@@ -10101,7 +10101,9 @@ namespace chull {
     aurostd::stringstream2file(main_TEX_ss, main_TEX_file);
     if(!aurostd::FileExist(main_TEX_file)) {
       chdir(PWD.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
+#endif
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not write "+main_TEX_file+" to "+LATEX_dir);
     }
     //watermark
@@ -10109,7 +10111,9 @@ namespace chull {
       aurostd::base642bin(_AFLOW_LOGO_SKINNY_BASE64_, aflow_logo_skinny_file);
       if(!aurostd::FileExist(aflow_logo_skinny_file)) {
         chdir(PWD.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
+#endif
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not write "+aflow_logo_skinny_file+" to "+LATEX_dir);
       }
     }
@@ -10117,7 +10121,9 @@ namespace chull {
       aurostd::base642bin(_AFLOW_LOGO_FULL_BASE64_, aflow_logo_full_file);
       if(!aurostd::FileExist(aflow_logo_full_file)) {
         chdir(PWD.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
+#endif
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not write "+aflow_logo_full_file+" to "+LATEX_dir);
       }
     }
@@ -10125,7 +10131,9 @@ namespace chull {
       aurostd::base642bin(_NOMAD_LOGO_BASE64_, logo_file_2);
       if(!aurostd::FileExist(logo_file_2)) {
         chdir(PWD.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
+#endif
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not write "+logo_file_2+" to "+LATEX_dir);
       }
     }
@@ -10171,7 +10179,9 @@ namespace chull {
 
       aurostd::file2directory(files_2_move, path);
       chdir(PWD.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
+#endif
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Issues compiling .tex file");
     }
     if(m_cflags.flag("CHULL::PNG_IMAGE")){
@@ -10209,7 +10219,9 @@ namespace chull {
 
         aurostd::file2directory(files_2_move, path);
         chdir(PWD.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
+#endif
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Issues converting PDF to PNG file");
       }
     }
@@ -10225,11 +10237,15 @@ namespace chull {
     }
     if(!aurostd::file2directory(files_2_move, path)) {
       chdir(PWD.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
+#endif
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unable to move files out of temporary compilation directory");
     }
     chdir(PWD.c_str());
+#ifndef _AFLOW_TEMP_PRESERVE_
     aurostd::RemoveDirectory(LATEX_dir);
+#endif
     if(!aurostd::FileExist(destination)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unable to write "+main_output_file+" to "+path);}
     message << main_output_file << " was created successfully, see destination=" << path;
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
