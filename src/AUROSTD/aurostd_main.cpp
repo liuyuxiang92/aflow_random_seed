@@ -3854,7 +3854,8 @@ namespace aurostd {
       cerr << soliloquy << " content=" << endl;
       cerr << content << endl;
     }
-    if(content=="") {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+    if(content.empty()) {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
     for(uint i=0;i<stokens.size();i++)
@@ -6722,4 +6723,3 @@ namespace aurostd {
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
 // *                                                                         *
 // ***************************************************************************
-
