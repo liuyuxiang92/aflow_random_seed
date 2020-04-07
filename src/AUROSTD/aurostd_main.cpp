@@ -3848,7 +3848,7 @@ namespace aurostd {
       cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
       return 0;}	
     tokens.clear(); 
-    string content;
+    string content = "";
     aurostd::eurl2string(url,content);
     if(LDEBUG) { //CO 180627
       cerr << soliloquy << " content=" << endl;
