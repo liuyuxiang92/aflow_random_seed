@@ -34,7 +34,7 @@ namespace apl
   // ***************************************************************************************
   void PhononHSQpoints::read_qpointfile(const string& directory)
   {
-    string file=aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HSKPTS_FILE); //ME20181226
+    string file=aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HSKPTS_FILE); //ME181226
     _logger << "Writing " << file << apl::endl;
     string command="";
     string bz2=string(file)+string(".bz2");
@@ -43,10 +43,10 @@ namespace apl
     if(!t1){
       if(t2){command=string("bzip2 -d ")+string(bz2);aurostd::execute2string(command);}
       else {
-        // ME20190726 - exit clean-up
+        // ME190726 - exit clean-up
         //_logger << apl::error << file<<" doesn't exist" << apl::endl; exit(0);
         //throw APLRuntimeError("File " + file + " doesn't exist");
-        // ME20191031 - use xerror
+        // ME191031 - use xerror
         string function = "PhononHSQpoints::read_qpointfile()";
         string message = "File " + file + " doesn't exist";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
@@ -56,9 +56,9 @@ namespace apl
     string line;
     ifstream in (file.c_str());
     if (!in.is_open()){
-      // ME20190726 - exit clean-up
+      // ME190726 - exit clean-up
       //_logger << apl::error << file<<" doesn't exist" << apl::endl; exit(0);
-      // ME20191031 - use xerror
+      // ME191031 - use xerror
       //throw APLRuntimeError("File " + file + " doesn't exist");
       string function = "PhononHSQpoints::read_qpointfile()";
       string message = "File " + file + " doesn't exist";
@@ -80,9 +80,9 @@ namespace apl
         apl::tokenize(line, vsr, string(" "));
         if(vsr.size()!=5)
         {
-          // ME20190726 - exit clean-up
+          // ME190726 - exit clean-up
           //_logger << apl::error << file<<" format error " << apl::endl; exit(0);
-          // ME20191031 - use xerror
+          // ME191031 - use xerror
           //throw APLRuntimeError("Format error in file " + file + ".");
           string function = "PhononHSQpoints::read_qpointfile()";
           string message = "Format error in file " + file + ".";

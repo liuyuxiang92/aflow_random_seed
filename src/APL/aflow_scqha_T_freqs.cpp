@@ -151,7 +151,7 @@ namespace apl
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
     if(ncpus<1) ncpus=1;
-    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME20180801
+    //    int qpointsPerCPU = _kpoints.size() / ncpus;  OBSOLETE ME180801
     _gp_path_test.resize(ncpus, false);
     // Show info 
     string msg="";
@@ -176,7 +176,7 @@ namespace apl
       threads.push_back( new std::thread(&T_spectra_SCQHA_QHA3P::get_freqs_in_threads,this,startIndex,endIndex, icpu) );
     }
 
-    /* OBSOLETE ME20180801
+    /* OBSOLETE ME180801
        for(int icpu = 0; icpu < ncpus; icpu++) {
        startIndex = icpu * qpointsPerCPU;
        endIndex = startIndex + qpointsPerCPU;
@@ -356,7 +356,7 @@ namespace apl
       }os_gp<<"\n";}
 
     if(!aurostd::stringstream2file(os_gp, outfile, "WRITE")) {
-      // ME20191031 - use xerror
+      // ME191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.scqha_pdis_T");
       string function = "T_spectra_SCQHA_QHA3P::write_T_dispersion()";
       string message = "Cannot write aflow.scqha_pdis_T";
@@ -368,7 +368,7 @@ namespace apl
   bool T_spectra_SCQHA_QHA3P::read_matrix(vector<xmatrix<xcomplex<double> > >&A, const string file)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      // ME20191031 - use xerror
+      // ME191031 - use xerror
       //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P:: Missing file: "+file);
       string function = "T_spectra_SCQHA_QHA3P::read_matrix()";
       string message = "Missing file: " + file;
@@ -404,9 +404,9 @@ namespace apl
   // ***************************************************************************************
   bool T_spectra_SCQHA_QHA3P::read_PDIS(vector<string> &hash_lines)
   {
-    string file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE;  // ME20190428
+    string file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE;  // ME190428
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      // ME20191031
+      // ME191031
       //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
       string function = "T_spectra_SCQHA_QHA3P::read_PDIS()";
       string message = "Missing file: " + file;
@@ -415,7 +415,7 @@ namespace apl
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      // ME20191031 - use xerror
+      // ME191031 - use xerror
       //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
       string function = "T_spectra_SCQHA_QHA3P::read_PDIS()";
       string message = "Missing file: " + file;

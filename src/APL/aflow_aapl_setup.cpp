@@ -25,21 +25,21 @@ namespace apl {
   // Sets the calculation options for the calculations of the anharmonic IFCs.
   void PhononCalculator::setAnharmonicOptions(int iter, double mix, double threshold) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_SETUP_);
-    // ME20190501 - START
+    // ME190501 - START
     // replaced old struct with xoption
     aurostd::xoption options;
     options.push_attached("MAX_ITER", aurostd::utype2string<int>(iter));
     options.push_attached("MIXING_COEFFICIENT", aurostd::utype2string<double>(mix));
     options.push_attached("THRESHOLD", aurostd::utype2string<double>(threshold));
-    // ME20190501 - END
+    // ME190501 - END
     anharmonic_IFC_options = options;
     if (LDEBUG) {
       string function = _AAPL_FORCES_ERR_PREFIX_ + "setAnharmonicOptions(): ";
-      // ME20190501 - START
+      // ME190501 - START
       std::cerr << function << "mixing coefficient = " << anharmonic_IFC_options.getattachedscheme("MIXING_COEFFICIENT") << std::endl;
       std::cerr << function << "max. number of iterations = " << anharmonic_IFC_options.getattachedscheme("MAX_ITER") << std::endl;
       std::cerr << function << "sumrule threshold = " << anharmonic_IFC_options.getattachedscheme("THRESHOLD") << std::endl;
-      // ME20190501 - END
+      // ME190501 - END
     }
   }
 
@@ -81,19 +81,19 @@ namespace apl {
     xinp.assign(nruns, _xInput);
 
     string chgcar_file = "";
-    if (zerostate_chgcar) {  // ME20191029 - for ZEROSTATE CHGCAR
+    if (zerostate_chgcar) {  // ME191029 - for ZEROSTATE CHGCAR
       chgcar_file = "../" + zerostate_dir + "/CHGCAR.static";
       if (_kbinFlags.KZIP_COMPRESS) chgcar_file += "." + _kbinFlags.KZIP_BIN;
     }
 
     int idxRun = 0;
     for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
-      const vector<int>& atoms = clst.ineq_distortions[ineq].atoms;  // ME20190108 - Declare to make code more legible
-      const _ineq_distortions& idist = clst.ineq_distortions[ineq];  // ME20190108 - Declare to make code more legible
+      const vector<int>& atoms = clst.ineq_distortions[ineq].atoms;  // ME190108 - Declare to make code more legible
+      const _ineq_distortions& idist = clst.ineq_distortions[ineq];  // ME190108 - Declare to make code more legible
       for (uint dist = 0; dist < idist.distortions.size(); dist++) {
-        const vector<int>& distortions = idist.distortions[dist][0];  // ME20190108 Declare to make code more legible
+        const vector<int>& distortions = idist.distortions[dist][0];  // ME190108 Declare to make code more legible
 
-        // ME20190109 - add title
+        // ME 190109 - add title
         xstructure& xstr = xinp[idxRun].getXStr();
         xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title);
         if (xstr.title.empty()) {
@@ -131,7 +131,7 @@ namespace apl {
           }
           xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
 
-          // ME20190113 - make sure that POSCAR has the correct format
+          // ME 190113 - make sure that POSCAR has the correct format
           if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
               (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
             xstr.is_vasp5_poscar_format = false;
@@ -158,15 +158,15 @@ namespace apl {
       const vector<int>& atoms, const int& ord,
       const int& run, const int& nruns) {
     std::stringstream runname;
-    // runname << "C" << ord << "_"; ME20190112 - removed redundancy
-    runname << ord << "_"; // ME20190112
+    // runname << "C" << ord << "_"; ME 190112 - removed redundancy
+    runname << ord << "_"; // ME 190112
 
-    // ME20190109 - Run ID with padding
-    runname << std::setfill('0') << std::setw(aurostd::getZeroPadding(nruns)) << run + 1 << "_";  // ME20190112
+    // ME 190109 - Run ID with padding
+    runname << std::setfill('0') << std::setw(aurostd::getZeroPadding(nruns)) << run + 1 << "_";  // ME190112
 
     // Atom and distortion IDs
     for (uint at = 0; at < atoms.size(); at++) {
-      // ME20190112 - made more compact
+      // ME 190112 - made more compact
       if (at > 0) runname << "-";
       runname << "A" << atoms[at] << "D" << distortions[at];
       //runname << "_A" << (at+1) << "_" << atoms[at];
@@ -184,7 +184,7 @@ namespace apl {
       const vector<int>& distortions,
       const vector<int>& atoms, double scale) {
     xinp.setXStr(_supercell.getSupercellStructureLight());  // Light copy because we don't need symmetry, etc.
-    xstructure& xstr = xinp.getXStr();  // ME20190109
+    xstructure& xstr = xinp.getXStr();  // ME 190109
     for (uint at = 0; at < atoms.size(); at++) {
       int atsc = atoms[at];
       int dist_index = distortions[at];
@@ -203,14 +203,14 @@ namespace apl {
         }
       }
       dist_cart *= DISTORTION_MAGNITUDE;
-      // ME20190109 - Add to title
+      // ME 190109 - Add to title
       xstr.title += " atom=" + stringify(atoms[at]);
-      //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(dist_cart)) + "]"; OBSOLETE ME20190112
-      std::stringstream distortion; // ME20190112 - need stringstream for nicer formatting
+      //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(dist_cart)) + "]"; OBSOLETE ME190112
+      std::stringstream distortion; // ME190112 - need stringstream for nicer formatting
       distortion << " distortion=["
         << std::setprecision(3) << dist_cart[1] << ","
         << std::setprecision(3) << dist_cart[2] << ","
-        << std::setprecision(3) << dist_cart[3] << "]"; // ME20190112
+        << std::setprecision(3) << dist_cart[3] << "]"; // ME190112
       xstr.title += distortion.str();
       xinp.getXStr().atoms[atsc].cpos += dist_cart;
       xinp.getXStr().atoms[atsc].fpos = C2F(xinp.getXStr().lattice, xinp.getXStr().atoms[atsc].cpos);
@@ -266,7 +266,7 @@ namespace apl {
     xInputsAAPL[o].clear();
   }
 
-  // ME20190114
+  // ME190114
   // Cannot use const reference for zerostate because of getXStr()
   void PhononCalculator::subtractZeroStateForcesAAPL(vector<_xinput>& xinps, _xinput& zerostate) {
     string function = _AAPL_FORCES_ERR_PREFIX_ + "subtractZeroStateForcesAAPL()";
