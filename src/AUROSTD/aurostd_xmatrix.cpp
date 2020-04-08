@@ -1371,7 +1371,7 @@ namespace aurostd {  // namespace aurostd
     eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
       if(nch==AUROSTD_MAX_INT){nch=nrh;}  //eye(3)==eye(3,3)
       xmatrix<utype> a(nrh,nch,nrl,ncl);
-      //[CO200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME20200106
+      //[CO200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME200106
       int i=0,j=0;
       for (i=a.lrows;i<=a.urows;i++){
         for (j=a.lcols;j<=a.ucols;j++){
@@ -3581,7 +3581,7 @@ namespace aurostd {
           z[ip]=0.0;
         }
       }
-      // ME20200106 - replace with xerror
+      // ME200106 - replace with xerror
       //cerr << _AUROSTD_XLIBS_ERROR_ << "JACOBI: Too many iterations in routine jacobi" << endl;
       //exit(0);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, "xmatrix::jacobi()", "Too many iterations.", _RUNTIME_ERROR_);

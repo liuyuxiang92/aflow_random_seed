@@ -64,7 +64,7 @@
 #define atom2mol                6.0221408E23                    //CO 180329
 #define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO 180329
 
-//ME20200107 - (A)APL conversion factors
+//ME200107 - (A)APL conversion factors
 #define THz2Hz                      1E12
 #define Hz2THz                      1/THz2Hz
 #define au2THz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2

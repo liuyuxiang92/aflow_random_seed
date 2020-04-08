@@ -42,7 +42,7 @@ namespace aurostd {
         //    utype re,im;
     };
 
-  // ME20200107
+  // ME200107
   // ---------------------------------------------- identical
   template<class utype> bool identical(const xcomplex<utype>&, const xcomplex<utype>&, utype);
   template<class utype> bool isdifferent(const xcomplex<utype>&, const xcomplex<utype>&, utype);

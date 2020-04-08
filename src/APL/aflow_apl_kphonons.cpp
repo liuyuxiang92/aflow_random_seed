@@ -138,7 +138,7 @@ namespace KBIN {
       _kflags& kflags,
       _xflags& xflags, 
       ofstream& messageFile) {
-    // ME20200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
+    // ME200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
     try {
       return RunPhonons_APL_181216(xinput,AflowIn,aflags,kflags,xflags,messageFile);
     } catch (aurostd::xerror e) {
