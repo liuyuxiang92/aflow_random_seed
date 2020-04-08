@@ -601,7 +601,7 @@ namespace apl {
     if (format == "XCRYSDEN") {
       // Create supercell for the scene file
       Supercell scell(mf);
-      scell.initialize(pc.getInputCellStructure(), false);
+      scell.initialize(pc.getSupercell().getOriginalStructure(), false);
       scell.build(sc_dim, false);
       if (!scell.projectToPrimitive()) {
         message = "Could not project to primitive structure.";
