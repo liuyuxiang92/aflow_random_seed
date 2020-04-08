@@ -660,7 +660,7 @@ namespace KBIN {
       xaims.str.write_inequivalent_flag=FALSE;
       //corey, fix if write_inequivalent_flag is present
       xaims.GEOM << xaims.str;
-      xaims.str.clear();xaims.GEOM >> xaims.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has changed //DX20191220 - uppercase to lowercase clear
+      xaims.str.clear();xaims.GEOM >> xaims.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has changed //DX 20191220 - uppercase to lowercase clear
       //corey add these flags to prevent recalculation and wasted effort
       xaims.str.Standard_Lattice_calculated=TRUE;
       xaims.str.Standard_Lattice_primitive=TRUE;
@@ -693,7 +693,7 @@ namespace KBIN {
       xaims.str.write_inequivalent_flag=FALSE;
       //corey, fix if write_inequivalent_flag is present
       xaims.GEOM << xaims.str;
-      xaims.str.clear();xaims.GEOM >> xaims.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has change //DX20191220 - uppercase to lowercase clear
+      xaims.str.clear();xaims.GEOM >> xaims.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has change //DX 20191220 - uppercase to lowercase clear
       //corey add these flags to prevent recalculation and wasted effort
       xaims.str.Standard_Lattice_calculated=TRUE;
       xaims.str.Standard_Lattice_conventional=TRUE;
@@ -702,7 +702,7 @@ namespace KBIN {
       xaims.str.write_inequivalent_flag=write_inequivalent_flag;
       // CO - END
       xaims.str.bravais_lattice_type=bravais_lattice_type;xaims.str.bravais_lattice_variation_type=bravais_lattice_variation_type;xaims.str.pearson_symbol=pearson_symbol;
-      // xaims.str.clear();xaims.GEOM >> xaims.str; //DX20191220 - uppercase to lowercase clear
+      // xaims.str.clear();xaims.GEOM >> xaims.str; //DX 20191220 - uppercase to lowercase clear
       // cout << xaims.str << endl;
       xaims.aopts.flag("FLAG::XAIMS_GEOM_generated",TRUE);
       xaims.aopts.flag("FLAG::XAIMS_GEOM_changed",TRUE);

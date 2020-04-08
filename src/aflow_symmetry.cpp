@@ -56,7 +56,7 @@ namespace SYM {
 } // namespace SYM
 
 namespace SYM {
-  double minimumDistance(const deque<_atom>& atoms){  //CO20190808
+  double minimumDistance(const deque<_atom>& atoms){  //CO190808
     //for NON periodic systems, use the default with lattice otherwise: minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale)
     double dist=0,dist_min=AUROSTD_MAX_DOUBLE;
     for(uint i=0;i<atoms.size()-1;i++){
@@ -86,8 +86,8 @@ namespace SYM {
     //}
     if(LDEBUG) cerr << "minimumDistance: LATTICE VECTORS [1] " << min_dist << endl;
 
-    //DX20180508 - FASTER MIN CART DISTANCE CALCULATOR - START
-    //DX20180508 - only calculate multiplication once (time-saver)
+    //DX 5/8/18 - FASTER MIN CART DISTANCE CALCULATOR - START
+    //DX 5/8/18 - only calculate multiplication once (time-saver)
     vector<vector<xvector<double> > > lattice_lengths;
     vector<vector<int> > lattice_indices;
     vector<xvector<double> > latt;
@@ -103,7 +103,7 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
 
     //combos of two lattice vectors
-    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO20190808 - .size()-1
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -146,7 +146,7 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
 
     //combos of three lattice vectors 
-    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO20190808 - .size()-1
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -191,14 +191,14 @@ namespace SYM {
     if(LDEBUG) cerr << "minimumDistance: COMBOS OF 3 LATTICE VECTORS [3] " << min_dist << endl;
 
     //distance between each atom
-    // DX20171023
+    // DX 10/23/17
     // Since we are finding the minimum interatomic distance, we want to find a distance smaller than the length of the minimum lattice vector 
     // distance.  Centering on each atom, we find the lattice dimensions sphere of the minimum distance.  If any atom is closer 
     // than the minimum distance, it becomes the radius for the new lattice dimensions sphere for the next iteration. 
 
 
-    //DX20180508 - FASTER MIN CART DISTANCE CALCULATOR - START
-    //DX20180508 - only calculate multiplication once (time-saver)
+    //DX 5/8/18 - FASTER MIN CART DISTANCE CALCULATOR - START
+    //DX 5/8/18 - only calculate multiplication once (time-saver)
     vector<xvector<double> > l1, l2, l3;
     vector<int> a_index, b_index, c_index;
     for(int a=-dims[1];a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a);} //DX calc once and store
@@ -207,7 +207,7 @@ namespace SYM {
 
     xvector<double> tmp;
 
-    for(uint i=0; i<atoms.size()-1; i++){ //CO20190808 - .size()-1
+    for(uint i=0; i<atoms.size()-1; i++){ //CO190808 - .size()-1
       // Cannot reduce more than (1,1,1), so don't recalculate
       if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
         dims=LatticeDimensionSphere(lattice,min_dist);
@@ -220,7 +220,7 @@ namespace SYM {
       }
       for(uint k=i+1; k<atoms.size(); k++){
         xvector<double> incell_dist = atoms[k].cpos-atoms[i].cpos;
-        //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
+        //DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
         for(uint m=0;m<l1.size();m++){
           xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
           for(uint n=0;n<l2.size();n++){
@@ -274,10 +274,10 @@ namespace SYM {
 // Set the default tolerance; based on minimum interatomic distance
 namespace SYM { 
   double defaultTolerance(const xstructure& xstr){
-    double min_dist = xstr.dist_nn_min; // CO20180409
-    if(min_dist == AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr);} // CO20180409
-    //if(xstr.dist_nn_min == AUROSTD_NAN){xstr.MinDist();}  // CO20180409
-    //min_dist = xstr.dist_nn_min; // CO20180409
+    double min_dist = xstr.dist_nn_min; // CO 180409
+    if(min_dist == AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr);} // CO 180409
+    //if(xstr.dist_nn_min == AUROSTD_NAN){xstr.MinDist();}  // CO 180409
+    //min_dist = xstr.dist_nn_min; // CO 180409
     double tolerance = min_dist/100.0;
     //double tolerance = min_dist/10.0;
     return tolerance;
@@ -289,14 +289,14 @@ namespace SYM {
 // **********************************************************************************************************************
 // Tolerance for angles; converted to a distance
 namespace SYM {
-  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, double tolerance){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, double tolerance){ //CO190520 - removed pointers for bools and doubles, added const where possible
     bool is_deg = false;
     return checkAngle(v1, v2, input_angle, is_deg, tolerance);
   }
 } // namespace SYM
 
 namespace SYM {
-  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, bool& is_deg, double tolerance){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, bool& is_deg, double tolerance){ //CO190520 - removed pointers for bools and doubles, added const where possible
     double mod_v1 = aurostd::modulus(v1);
     double mod_v2 = aurostd::modulus(v2);
     double avg_vec_mod = (mod_v1+mod_v2)/(2.0);
@@ -309,14 +309,14 @@ namespace SYM {
 } // namespace SYM
 
 namespace SYM {
-  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, double tolerance){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, double tolerance){ //CO190520 - removed pointers for bools and doubles, added const where possible
     bool is_deg = false;
     return checkAngle(mod_v1, mod_v2, angle1, angle2, is_deg, tolerance);
   }
 } // namespace SYM
 
 namespace SYM {
-  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, bool& is_deg, double tolerance){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, bool& is_deg, double tolerance){ //CO190520 - removed pointers for bools and doubles, added const where possible
     double avg_vec_mod = (mod_v1+mod_v2)/(2.0);
     double angle_diff = angle1-angle2;
     if(is_deg){
@@ -331,14 +331,14 @@ namespace SYM {
 // **********************************************************************************************************************
 // Tolerance scan for symmetry analysis
 namespace SYM {
-  // DX20170905 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance_old, int& count , double& min_dist, bool& no_scan) //CO20190520 - removed pointers for bools and doubles, added const where possible
-  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan) //CO20190520 - removed pointers for bools and doubles, added const where possible,  //DX20190524 - need pointer for change tolerance, otherwise it will not update
+  // DX 9/5/17 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance_old, int& count , double& min_dist, bool& no_scan) //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan) //CO190520 - removed pointers for bools and doubles, added const where possible,  //DX 20190524 - need pointer for change tolerance, otherwise it will not update
   { //CO200106 - patching for auto-indenting
     // Scans between 5*orig_tol/10.0 on upper end and 5*orig_tol/10 on the right
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    // DX20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX20180426 - added current working directory
-    string directory=xstr.directory; // DX20180426 - added current working directory
-    // DX20180221 [OBSOLETE] static unsigned int count = 0;
+    // DX 20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
+    string directory=xstr.directory; // DX 4/26/18 - added current working directory
+    // DX 2/22/18 [OBSOLETE] static unsigned int count = 0;
     uint cycle_count = 0; // keeps track of number of full cycle iteration
     double step = 0.05; // logarithmic step size
     double max_range = 1.0; // scan an order of magnitude in each direction
@@ -350,10 +350,10 @@ namespace SYM {
     double orig_tolerance = 0; 
 
     // Calculate original tolerance based on the number of times this function has been called
-    cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+    cycle_count = (xstr.sym_eps_change_count+1)/2; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
     if(cycle_count<=20){
       orig_range = step*cycle_count;
-      if(xstr.sym_eps_change_count%2==0){  //if even, scanned down in previous iteration // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+      if(xstr.sym_eps_change_count%2==0){  //if even, scanned down in previous iteration // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
         sign = -1.0;
       }
       else {  //if odd, scanned up in previous iteration
@@ -366,10 +366,10 @@ namespace SYM {
     }
     if(orig_range<=max_range && cycle_count<=20){ 
       // Calculate next tolerance value
-      xstr.sym_eps_change_count += 1; // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
-      cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+      xstr.sym_eps_change_count += 1; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+      cycle_count = (xstr.sym_eps_change_count+1)/2; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
       range = step*((double)cycle_count);
-      if(xstr.sym_eps_change_count%2==0){  //if even, scan down // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+      if(xstr.sym_eps_change_count%2==0){  //if even, scan down // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
         sign = -1.0;
       }   
       else {  //if odd, scan up
@@ -381,12 +381,12 @@ namespace SYM {
           if(tolerance >= min_dist){ //if larger than min distance, force lower scan
             sign = -1.0;
             tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
-            xstr.sym_eps_change_count += 1; // can no longer scan up, so we increase the count // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+            xstr.sym_eps_change_count += 1; // can no longer scan up, so we increase the count // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
           }
           if(tolerance < _ZERO_TOL_){
             sign = 1.0;
-            xstr.sym_eps_change_count += 1; // can no longer scan down, so we increase the count // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
-            cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+            xstr.sym_eps_change_count += 1; // can no longer scan down, so we increase the count // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+            cycle_count = (xstr.sym_eps_change_count+1)/2; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
             range = step*((double)cycle_count);
             tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
           }
@@ -396,23 +396,23 @@ namespace SYM {
           return TRUE; 
         }
         else {
-          cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [dir=" << directory << "]." << endl; // DX20180426 - changed xstr.directory to directory (pwd)
-          // DX20170901 exit(0);
+          cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [dir=" << directory << "]." << endl; // DX 4/26/18 - changed xstr.directory to directory (pwd)
+          // DX 9/1/17 exit(0);
           //count -=1;
           no_scan = true;
-          tolerance = orig_tolerance; // DX20170906
+          tolerance = orig_tolerance; // DX 9/6/17
           return FALSE;
         }
       }
       //count -=1;
       no_scan = true;
-      cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, but the tolerance scan is suppressed. [dir=" << directory << "]" << endl; // DX20180426 - changed xstr.directory to directory (pwd)
-      tolerance = orig_tolerance; // DX20170906
+      cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, but the tolerance scan is suppressed. [dir=" << directory << "]" << endl; // DX 4/26/18 - changed xstr.directory to directory (pwd)
+      tolerance = orig_tolerance; // DX 9/6/17
       return FALSE;
     }
     //return TRUE;
     no_scan = true;
-    tolerance = orig_tolerance; // DX20170906
+    tolerance = orig_tolerance; // DX 9/6/17
     //cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, but the tolerance scan is suppressed. [dir=" << xstr.directory << "]" << endl;
     return FALSE;
 
@@ -462,7 +462,7 @@ namespace SYM {
     // DX [OBSOLETE]	  call_count += 1;
     // DX [OBSOLETE]	  tolerance = orig_tolerance + sign*(times*tol_increment);
     // DX [OBSOLETE]	}
-    // DX [OBSOLETE]	// DX20170904 [OBSOLETE] if(LDEBUG) {cerr << "CHANGING TOLERANCE TO: " << tolerance << " (" << count << "/" << max_count << ")" << endl;} 
+    // DX [OBSOLETE]	// DX 9/4/17 [OBSOLETE] if(LDEBUG) {cerr << "CHANGING TOLERANCE TO: " << tolerance << " (" << count << "/" << max_count << ")" << endl;} 
     // DX [OBSOLETE]	//if(sign<0.0){ // one count involves scanning up and then down once
     // DX [OBSOLETE]	//  count += 1;
     // DX [OBSOLETE]	//}
@@ -475,7 +475,7 @@ namespace SYM {
     // DX [OBSOLETE]      if(call_count > max_count){
     // DX [OBSOLETE]	// DX cerr << "ERROR: Symmetry routine failed, tolerance range (" << orig_tolerance-(max_count*tol_increment) << " to " << orig_tolerance+(max_count*tol_increment) << ") tested [dir=" << xstr.directory << "]. Report to David Hicks (d.hicks@duke.edu). EXITING." << endl;
     // DX [OBSOLETE]	cerr << "WARNING: Inconsistent symmetry, tolerance range (" << orig_tolerance-((max_count/2)*tol_increment) << " to " << orig_tolerance+((max_count/2)*tol_increment) << ") tested [dir=" << xstr.directory << "]." << endl;
-    // DX [OBSOLETE]	// DX20170901 exit(0);
+    // DX [OBSOLETE]	// DX 9/1/17 exit(0);
     // DX [OBSOLETE]        no_scan = true;
     // DX [OBSOLETE]	return FALSE;
     // DX [OBSOLETE]      }
@@ -567,27 +567,27 @@ namespace SYM {
 // where atoms are close to the edge of the unit cell wall). Requires atoms to 
 // be the same type
 namespace SYM {
-  //overload //DX20190620
+  //overload //DX 20190620
   bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, bool skew, double tol){
     xmatrix<double> f2c=trasp(lattice);
     return AtomsMapped(a, b, lattice, f2c, skew, tol);
   }
 
-  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
-    if(a.spin_is_given){ // DX20170921 - magnetic symmetry
+  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+    if(a.spin_is_given){ // DX 9/21/17 - magnetic symmetry
       bool spins_match = (aurostd::abs(a.spin-b.spin)<=tol);
-      //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
-      return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
-    else if(a.noncoll_spin_is_given){ // DX20171205 - magnetic sym (non-collinear)
+    else if(a.noncoll_spin_is_given){ // DX 12/5/17 - magnetic sym (non-collinear)
       bool spins_match = (aurostd::abs(a.noncoll_spin(1)-b.noncoll_spin(1))<=tol && aurostd::abs(a.noncoll_spin(2)-b.noncoll_spin(2))<=tol &&
           aurostd::abs(a.noncoll_spin(3)-b.noncoll_spin(3))<=tol);
-      //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
-      return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
     else {
-      //return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type; //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name 
-      return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_)); //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name 
+      //return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type; //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
+      return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_)); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
     }
   }
 } // namespace SYM
@@ -597,17 +597,17 @@ namespace SYM {
 // **********************************************************************************************************************
 // If the lattice too skewed to used the PBC function? 
 namespace SYM {
-  bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     double max_skew = aurostd::max(aurostd::abs(SYM::DotPro(lattice(1),lattice(2))/(aurostd::modulus(lattice(1))*aurostd::modulus(lattice(2)))),
         aurostd::max(aurostd::abs(SYM::DotPro(lattice(2),lattice(3))/(aurostd::modulus(lattice(2))*aurostd::modulus(lattice(3)))),
           aurostd::abs(SYM::DotPro(lattice(3),lattice(1)/(aurostd::modulus(lattice(3))*aurostd::modulus(lattice(1)))))));
     double skew_tol = (1.0-aurostd::abs(max_skew))*min_dist;
-    XHOST.SKEW_TOL=skew_tol; // DX20171019
+    XHOST.SKEW_TOL=skew_tol; // DX 10/19/17
     return (skew_tol<tol);
   }
 } // namespace SYM
 
-//DX20190612 - START
+//DX 20190612 - START
 
 // ******************************************************************************
 // minimize distance - Cartesian method (ROBUST)
@@ -674,27 +674,27 @@ namespace SYM {
       }
     }
 
-    // DX20180423 - FASTER MIN CART DISTANCE CALCULATOR - END
-    // DX20180423 [OBSOLETE] min_vec = coord1-coord2;
-    // DX20180423 [OBSOLETE] double min_mod = aurostd::modulus(min_vec);
-    // DX20180423 [OBSOLETE] for(int a=-dims[1];a<=dims[1];a++){
-    // DX20180423 [OBSOLETE]   for(int b=-dims[2];b<=dims[2];b++){
-    // DX20180423 [OBSOLETE]     for(int c=-dims[3];c<=dims[3];c++){
-    // DX20180423 [OBSOLETE]       tmp = coord1-coord2+a*lattice(1)+b*lattice(2)+c*lattice(3);
-    // DX20180423 [OBSOLETE]       mod_tmp = aurostd::modulus(tmp);
-    // DX20180423 [OBSOLETE]       if(mod_tmp<min_mod){
-    // DX20180423 [OBSOLETE]         min_mod = mod_tmp;
-    // DX20180423 [OBSOLETE]         min_vec = tmp;
-    // DX20180423 [OBSOLETE]         ijk(1) = a;
-    // DX20180423 [OBSOLETE]         ijk(2) = b;
-    // DX20180423 [OBSOLETE]         ijk(3) = c;
-    // DX20180423 [OBSOLETE]       } 
-    // DX20180423 [OBSOLETE]     }
-    // DX20180423 [OBSOLETE]   }
-    // DX20180423 [OBSOLETE] }
-    //DX20180903 needs to return min_vec : return min_mod;
+    // DX 4/23/18 - FASTER MIN CART DISTANCE CALCULATOR - END
+    // DX 4/23/18 [OBSOLETE] min_vec = coord1-coord2;
+    // DX 4/23/18 [OBSOLETE] double min_mod = aurostd::modulus(min_vec);
+    // DX 4/23/18 [OBSOLETE] for(int a=-dims[1];a<=dims[1];a++){
+    // DX 4/23/18 [OBSOLETE]   for(int b=-dims[2];b<=dims[2];b++){
+    // DX 4/23/18 [OBSOLETE]     for(int c=-dims[3];c<=dims[3];c++){
+    // DX 4/23/18 [OBSOLETE]       tmp = coord1-coord2+a*lattice(1)+b*lattice(2)+c*lattice(3);
+    // DX 4/23/18 [OBSOLETE]       mod_tmp = aurostd::modulus(tmp);
+    // DX 4/23/18 [OBSOLETE]       if(mod_tmp<min_mod){
+    // DX 4/23/18 [OBSOLETE]         min_mod = mod_tmp;
+    // DX 4/23/18 [OBSOLETE]         min_vec = tmp;
+    // DX 4/23/18 [OBSOLETE]         ijk(1) = a;
+    // DX 4/23/18 [OBSOLETE]         ijk(2) = b;
+    // DX 4/23/18 [OBSOLETE]         ijk(3) = c;
+    // DX 4/23/18 [OBSOLETE]       } 
+    // DX 4/23/18 [OBSOLETE]     }
+    // DX 4/23/18 [OBSOLETE]   }
+    // DX 4/23/18 [OBSOLETE] }
+    //DX 20180903 needs to return min_vec : return min_mod;
 
-    return min_vec; //DX20180903 needs to return min_vec
+    return min_vec; //DX 20180903 needs to return min_vec
   }
 } //namespace SYM
 
@@ -721,14 +721,14 @@ namespace SYM {
 
 namespace SYM {
   xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff){
-    //DX20190904 [OBSOLETE] xvector<int> ijk;
-    //DX20190904 [OBSOLETE] return minimizeDistanceFractionalMethod(fdiff, ijk);
+    //DX 20190904 [OBSOLETE] xvector<int> ijk;
+    //DX 20190904 [OBSOLETE] return minimizeDistanceFractionalMethod(fdiff, ijk);
 
     // ---------------------------------------------------------------------------
     // loop over each component and bring close to origin 
     // (i.e., between -0.5 and 0.5 in fractional coordinates)
 
-    //DX20190904 - START
+    //DX 20190904 - START
     double tolerance=0.0;
     double upper_bound=0.5;
     double lower_bound=-0.5;
@@ -737,7 +737,7 @@ namespace SYM {
     BringInCellInPlace(min_diff, tolerance, upper_bound, lower_bound);
 
     return min_diff;
-    //DX20190904 - END
+    //DX 20190904 - END
   }
 } /// namespace SYM
 
@@ -749,192 +749,192 @@ namespace SYM {
     // loop over each component and bring close to origin 
     // (i.e., between -0.5 and 0.5 in fractional coordinates)
 
-    xvector<double> min_diff = minimizeDistanceFractionalMethod(fdiff); //DX20190904
+    xvector<double> min_diff = minimizeDistanceFractionalMethod(fdiff); //DX 20190904
 
-    for(int i=min_diff.lrows; i<=min_diff.urows; i++){ //DX20190904
+    for(int i=min_diff.lrows; i<=min_diff.urows; i++){ //DX 20190904
       ijk(i) = (int)(min_diff[i]-fdiff[i]);
     }
 
-    //DX20190416 [OBSOLETE] xvector<double> tmp = v_in;
-    //DX20190904 [OBSOLETE] for(uint i=1; i<4; i++){
-    //DX20190904 [OBSOLETE]   while(min_diff(i)>0.5){
-    //DX20190904 [OBSOLETE]     min_diff(i) = min_diff(i)-1;
-    //DX20190904 [OBSOLETE]     ijk(i)-=1;
-    //DX20190904 [OBSOLETE]   }
-    //DX20190904 [OBSOLETE]   while(min_diff(i)<=-0.5){
-    //DX20190904 [OBSOLETE]     min_diff(i) = min_diff(i)+1;
-    //DX20190904 [OBSOLETE]     ijk(i)+=1;
-    //DX20190904 [OBSOLETE]   }
-    //DX20190904 [OBSOLETE] }
+    //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
+    //DX 20190904 [OBSOLETE] for(uint i=1; i<4; i++){
+    //DX 20190904 [OBSOLETE]   while(min_diff(i)>0.5){
+    //DX 20190904 [OBSOLETE]     min_diff(i) = min_diff(i)-1;
+    //DX 20190904 [OBSOLETE]     ijk(i)-=1;
+    //DX 20190904 [OBSOLETE]   }
+    //DX 20190904 [OBSOLETE]   while(min_diff(i)<=-0.5){
+    //DX 20190904 [OBSOLETE]     min_diff(i) = min_diff(i)+1;
+    //DX 20190904 [OBSOLETE]     ijk(i)+=1;
+    //DX 20190904 [OBSOLETE]   }
+    //DX 20190904 [OBSOLETE] }
     return min_diff;
   }
 }
 
-//DX20190612 - END
-//DX20190613 [OBSOLETE] // ******************************************************************************
-//DX20190613 [OBSOLETE] // Minimize Cartesian Distance 
-//DX20190613 [OBSOLETE] // ******************************************************************************
-//DX20190613 [OBSOLETE] // Calculates the minimum distance between a pair of Cartesian coordinates. 
-//DX20190613 [OBSOLETE] // Here, we consider all images of the second coordinate and find the minimum distance
-//DX20190613 [OBSOLETE] // with respect to the first coordinate. 
-//DX20190613 [OBSOLETE] // This is the alternative to the PBC function (below). If the tolerance is larger than 
-//DX20190613 [OBSOLETE] // the skewed tolerance, then PBC is not robust enough and this function is used instead.
-//DX20190613 [OBSOLETE] // Note: This function takes a bit longer than PBC, but we do not loose robustness.
-//DX20190613 [OBSOLETE] namespace SYM {
-//DX20190613 [OBSOLETE]   bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
-//DX20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
-//DX20190613 [OBSOLETE]     xvector<int> ijk;
-//DX20190613 [OBSOLETE]     bool restriction = false;
-//DX20190613 [OBSOLETE]     return minimizeCartesianDistance(coord1, coord2, out, c2f, f2c, ijk, restriction, tol);
-//DX20190613 [OBSOLETE]   }
-//DX20190613 [OBSOLETE] } /// namespace SYM
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE] namespace SYM {
-//DX20190613 [OBSOLETE]   bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
-//DX20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
-//DX20190613 [OBSOLETE]     xmatrix<double> lattice = trasp(f2c);
-//DX20190613 [OBSOLETE]     xvector<double> min_vec;
-//DX20190613 [OBSOLETE]     double min_mod=minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
-//DX20190613 [OBSOLETE]     if(restriction){
-//DX20190613 [OBSOLETE]       if(aurostd::abs(ijk(1))>3 || aurostd::abs(ijk(2))>3 || aurostd::abs(ijk(3))>3){
-//DX20190613 [OBSOLETE]         return false;
-//DX20190613 [OBSOLETE]       }
-//DX20190613 [OBSOLETE]     }
-//DX20190613 [OBSOLETE]     out = c2f*min_vec;
-//DX20190613 [OBSOLETE]     return (min_mod<tol);
-//DX20190613 [OBSOLETE]   }
-//DX20190613 [OBSOLETE] } //namespace SYM
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE] namespace SYM {
-//DX20190613 [OBSOLETE] // ******************************************************************************
-//DX20190613 [OBSOLETE] // minimumCartesianDistance()
-//DX20190613 [OBSOLETE] // ******************************************************************************
-//DX20190613 [OBSOLETE] // Finds minimum distance between two cartesian coordinates in periodic cell
-//DX20190613 [OBSOLETE] // min_vec is full cartesian vector distances
-//DX20190613 [OBSOLETE] // ijk are the indices of the cell of the minimum distance image
-//DX20190613 [OBSOLETE] // ME20180730: minimumCartesianVector returns the smallest vector between two atoms.
-//DX20190613 [OBSOLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice){
-//DX20190613 [OBSOLETE]     xvector<double> min_vec;
-//DX20190613 [OBSOLETE]     xvector<int> ijk;
-//DX20190613 [OBSOLETE]     return minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
-//DX20190613 [OBSOLETE] }
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice, 
-//DX20190613 [OBSOLETE]     xvector<double>& min_vec,xvector<int>& ijk){
-//DX20190613 [OBSOLETE]    min_vec = minimumCartesianVector(coord1, coord2, lattice, ijk);
-//DX20190613 [OBSOLETE]    return aurostd::modulus(min_vec);
-//DX20190613 [OBSOLETE] }
-//DX20190613 [OBSOLETE]     
-//DX20190613 [OBSOLETE] xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvector<double>& coord2,
-//DX20190613 [OBSOLETE]                                        const xmatrix<double>& lattice) {
-//DX20190613 [OBSOLETE]   xvector<int> ijk;
-//DX20190613 [OBSOLETE]   xvector<double> min_vec = minimumCartesianVector(coord1, coord2, lattice, ijk);
-//DX20190613 [OBSOLETE]   return min_vec;
-//DX20190613 [OBSOLETE] }
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE] xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvector<double>& coord2,
-//DX20190613 [OBSOLETE]                                        const xmatrix<double>& lattice, xvector<int>& ijk) {
-//DX20190613 [OBSOLETE]     xvector<double> tmp, min_vec;
-//DX20190613 [OBSOLETE]     double mod_tmp;
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE]     double radius=RadiusSphereLattice(lattice);
-//DX20190613 [OBSOLETE]     xvector<int> dims(3);
-//DX20190613 [OBSOLETE]     dims=LatticeDimensionSphere(lattice,radius);
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE]     // DX20180423 - FASTER MIN CART DISTANCE CALCULATOR - START
-//DX20190613 [OBSOLETE]     // DX20180423 - only calculate multiplication once (time-saver)
-//DX20190613 [OBSOLETE]     vector<xvector<double> > l1, l2, l3;
-//DX20190613 [OBSOLETE]     vector<int> a_index, b_index, c_index;
-//DX20190613 [OBSOLETE]     for(int a=-dims[1];a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a);} // DX calc once and store
-//DX20190613 [OBSOLETE]     for(int b=-dims[2];b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b);} // DX calc once and store
-//DX20190613 [OBSOLETE]     for(int c=-dims[3];c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c);} // DX calc once and store
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE]     xvector<double> incell_dist = coord1-coord2;
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE]     min_vec = coord1-coord2;
-//DX20190613 [OBSOLETE]     double min_mod = aurostd::modulus(min_vec);
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE]     // DX20180423 - running vector in each loop saves computations; fewer duplicate operations
-//DX20190613 [OBSOLETE]     for(uint i=0;i<l1.size();i++){
-//DX20190613 [OBSOLETE]       xvector<double> a_component = incell_dist + l1[i];    // DX : coord1-coord2+a*lattice(1)
-//DX20190613 [OBSOLETE]       for(uint j=0;j<l2.size();j++){
-//DX20190613 [OBSOLETE]         xvector<double> ab_component = a_component + l2[j]; // DX : coord1-coord2+a*lattice(1) + (b+lattice(2))
-//DX20190613 [OBSOLETE]         for(uint k=0;k<l3.size();k++){
-//DX20190613 [OBSOLETE]           tmp = ab_component + l3[k];                       // DX : coord1-coord2+a*lattice(1) + (b+lattice(2)) + (c+lattice(3))
-//DX20190613 [OBSOLETE]           mod_tmp = aurostd::modulus(tmp);
-//DX20190613 [OBSOLETE]           if(mod_tmp<min_mod){
-//DX20190613 [OBSOLETE]             min_mod = mod_tmp;
-//DX20190613 [OBSOLETE]             min_vec = tmp;
-//DX20190613 [OBSOLETE]             ijk(1) = a_index[i];
-//DX20190613 [OBSOLETE]             ijk(2) = b_index[j];
-//DX20190613 [OBSOLETE]             ijk(3) = c_index[k];
-//DX20190613 [OBSOLETE]           } 
-//DX20190613 [OBSOLETE]         }
-//DX20190613 [OBSOLETE]       }
-//DX20190613 [OBSOLETE]     }
-//DX20190613 [OBSOLETE]     // DX20180423 - FASTER MIN CART DISTANCE CALCULATOR - END
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE] min_vec = coord1-coord2;
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE] double min_mod = aurostd::modulus(min_vec);
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE] for(int a=-dims[1];a<=dims[1];a++){
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]   for(int b=-dims[2];b<=dims[2];b++){
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]     for(int c=-dims[3];c<=dims[3];c++){
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]       tmp = coord1-coord2+a*lattice(1)+b*lattice(2)+c*lattice(3);
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]       mod_tmp = aurostd::modulus(tmp);
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]       if(mod_tmp<min_mod){
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]         min_mod = mod_tmp;
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]         min_vec = tmp;
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]         ijk(1) = a;
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]         ijk(2) = b;
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]         ijk(3) = c;
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]       } 
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]     }
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE]   }
-//DX20190613 [OBSOLETE]     // DX20180423 [OBSOLETE] }
-//DX20190613 [OBSOLETE]     //DX20180903 needs to return min_vec : return min_mod;
-//DX20190613 [OBSOLETE]     return min_vec; //DX20180903 needs to return min_vec
-//DX20190613 [OBSOLETE]     }
-//DX20190613 [OBSOLETE] } //namespace SYM
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE] // ******************************************************************************
-//DX20190613 [OBSOLETE] // Periodic Boundary Conditions (PBC)
-//DX20190613 [OBSOLETE] // ******************************************************************************
-//DX20190613 [OBSOLETE] // Minimizes fractional vector component by component.  This may not give the 
-//DX20190613 [OBSOLETE] // the true minimum distance in Cartesian. HOWEVER, it is safe to assume if the
-//DX20190613 [OBSOLETE] // mapping tolerance is small.  A heuristic maximum tolerance is the suprenum of 
-//DX20190613 [OBSOLETE] // the off-diagonal elements of the metric tensor (this is a well-tested quanitity).
-//DX20190613 [OBSOLETE] // For more information, contact David Hicks (d.hicks@duke.edu).
-//DX20190613 [OBSOLETE] namespace SYM {
-//DX20190613 [OBSOLETE]   bool PBC(xvector<double>& v_in){
-//DX20190613 [OBSOLETE]     xvector<int> ijk;
-//DX20190613 [OBSOLETE]     bool restriction = false;
-//DX20190613 [OBSOLETE]     return PBC(v_in, ijk, restriction);
-//DX20190613 [OBSOLETE]   }
-//DX20190613 [OBSOLETE] } /// namespace SYM
-//DX20190613 [OBSOLETE] 
-//DX20190613 [OBSOLETE] namespace SYM {
-//DX20190613 [OBSOLETE]   bool PBC(xvector<double>& v_in, xvector<int>& ijk, bool& restriction){
-//DX20190613 [OBSOLETE]     //DX20190416 [OBSOLETE] xvector<double> tmp = v_in;
-//DX20190613 [OBSOLETE]     for(uint i=1; i<4; i++){
-//DX20190613 [OBSOLETE]       while(v_in(i)>0.5){
-//DX20190613 [OBSOLETE]         v_in(i) = v_in(i)-1;
-//DX20190613 [OBSOLETE]         ijk(i)-=1;
-//DX20190613 [OBSOLETE]       }
-//DX20190613 [OBSOLETE]       while(v_in(i)<=-0.5){
-//DX20190613 [OBSOLETE]         v_in(i) = v_in(i)+1;
-//DX20190613 [OBSOLETE]         ijk(i)+=1;
-//DX20190613 [OBSOLETE]       }
-//DX20190613 [OBSOLETE]       if(aurostd::abs(ijk(i))>3 && restriction){
-//DX20190613 [OBSOLETE]         //DEBUGGER
-//DX20190613 [OBSOLETE]         //cerr << "ijk(i): " << ijk(i) << endl;
-//DX20190613 [OBSOLETE]         //cerr << "ERROR (PBC Function): More than three cells away!" << endl;
-//DX20190613 [OBSOLETE]         //exit(1);
-//DX20190613 [OBSOLETE]         return false;
-//DX20190613 [OBSOLETE]       }
-//DX20190613 [OBSOLETE]     }
-//DX20190613 [OBSOLETE]     return true;
-//DX20190613 [OBSOLETE]   }
-//DX20190613 [OBSOLETE] } /// namespace SYM
+//DX 20190612 - END
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Minimize Cartesian Distance 
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Calculates the minimum distance between a pair of Cartesian coordinates. 
+//DX 20190613 [OBSOLETE] // Here, we consider all images of the second coordinate and find the minimum distance
+//DX 20190613 [OBSOLETE] // with respect to the first coordinate. 
+//DX 20190613 [OBSOLETE] // This is the alternative to the PBC function (below). If the tolerance is larger than 
+//DX 20190613 [OBSOLETE] // the skewed tolerance, then PBC is not robust enough and this function is used instead.
+//DX 20190613 [OBSOLETE] // Note: This function takes a bit longer than PBC, but we do not loose robustness.
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE]   bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
+//DX 20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+//DX 20190613 [OBSOLETE]     xvector<int> ijk;
+//DX 20190613 [OBSOLETE]     bool restriction = false;
+//DX 20190613 [OBSOLETE]     return minimizeCartesianDistance(coord1, coord2, out, c2f, f2c, ijk, restriction, tol);
+//DX 20190613 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE] } /// namespace SYM
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE]   bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
+//DX 20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+//DX 20190613 [OBSOLETE]     xmatrix<double> lattice = trasp(f2c);
+//DX 20190613 [OBSOLETE]     xvector<double> min_vec;
+//DX 20190613 [OBSOLETE]     double min_mod=minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
+//DX 20190613 [OBSOLETE]     if(restriction){
+//DX 20190613 [OBSOLETE]       if(aurostd::abs(ijk(1))>3 || aurostd::abs(ijk(2))>3 || aurostd::abs(ijk(3))>3){
+//DX 20190613 [OBSOLETE]         return false;
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE]     out = c2f*min_vec;
+//DX 20190613 [OBSOLETE]     return (min_mod<tol);
+//DX 20190613 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE] } //namespace SYM
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // minimumCartesianDistance()
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Finds minimum distance between two cartesian coordinates in periodic cell
+//DX 20190613 [OBSOLETE] // min_vec is full cartesian vector distances
+//DX 20190613 [OBSOLETE] // ijk are the indices of the cell of the minimum distance image
+//DX 20190613 [OBSOLETE] // ME 180730: minimumCartesianVector returns the smallest vector between two atoms.
+//DX 20190613 [OBSOLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice){
+//DX 20190613 [OBSOLETE]     xvector<double> min_vec;
+//DX 20190613 [OBSOLETE]     xvector<int> ijk;
+//DX 20190613 [OBSOLETE]     return minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
+//DX 20190613 [OBSOLETE] }
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice, 
+//DX 20190613 [OBSOLETE]     xvector<double>& min_vec,xvector<int>& ijk){
+//DX 20190613 [OBSOLETE]    min_vec = minimumCartesianVector(coord1, coord2, lattice, ijk);
+//DX 20190613 [OBSOLETE]    return aurostd::modulus(min_vec);
+//DX 20190613 [OBSOLETE] }
+//DX 20190613 [OBSOLETE]     
+//DX 20190613 [OBSOLETE] xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvector<double>& coord2,
+//DX 20190613 [OBSOLETE]                                        const xmatrix<double>& lattice) {
+//DX 20190613 [OBSOLETE]   xvector<int> ijk;
+//DX 20190613 [OBSOLETE]   xvector<double> min_vec = minimumCartesianVector(coord1, coord2, lattice, ijk);
+//DX 20190613 [OBSOLETE]   return min_vec;
+//DX 20190613 [OBSOLETE] }
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvector<double>& coord2,
+//DX 20190613 [OBSOLETE]                                        const xmatrix<double>& lattice, xvector<int>& ijk) {
+//DX 20190613 [OBSOLETE]     xvector<double> tmp, min_vec;
+//DX 20190613 [OBSOLETE]     double mod_tmp;
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     double radius=RadiusSphereLattice(lattice);
+//DX 20190613 [OBSOLETE]     xvector<int> dims(3);
+//DX 20190613 [OBSOLETE]     dims=LatticeDimensionSphere(lattice,radius);
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 - FASTER MIN CART DISTANCE CALCULATOR - START
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 - only calculate multiplication once (time-saver)
+//DX 20190613 [OBSOLETE]     vector<xvector<double> > l1, l2, l3;
+//DX 20190613 [OBSOLETE]     vector<int> a_index, b_index, c_index;
+//DX 20190613 [OBSOLETE]     for(int a=-dims[1];a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a);} // DX calc once and store
+//DX 20190613 [OBSOLETE]     for(int b=-dims[2];b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b);} // DX calc once and store
+//DX 20190613 [OBSOLETE]     for(int c=-dims[3];c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c);} // DX calc once and store
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     xvector<double> incell_dist = coord1-coord2;
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     min_vec = coord1-coord2;
+//DX 20190613 [OBSOLETE]     double min_mod = aurostd::modulus(min_vec);
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
+//DX 20190613 [OBSOLETE]     for(uint i=0;i<l1.size();i++){
+//DX 20190613 [OBSOLETE]       xvector<double> a_component = incell_dist + l1[i];    // DX : coord1-coord2+a*lattice(1)
+//DX 20190613 [OBSOLETE]       for(uint j=0;j<l2.size();j++){
+//DX 20190613 [OBSOLETE]         xvector<double> ab_component = a_component + l2[j]; // DX : coord1-coord2+a*lattice(1) + (b+lattice(2))
+//DX 20190613 [OBSOLETE]         for(uint k=0;k<l3.size();k++){
+//DX 20190613 [OBSOLETE]           tmp = ab_component + l3[k];                       // DX : coord1-coord2+a*lattice(1) + (b+lattice(2)) + (c+lattice(3))
+//DX 20190613 [OBSOLETE]           mod_tmp = aurostd::modulus(tmp);
+//DX 20190613 [OBSOLETE]           if(mod_tmp<min_mod){
+//DX 20190613 [OBSOLETE]             min_mod = mod_tmp;
+//DX 20190613 [OBSOLETE]             min_vec = tmp;
+//DX 20190613 [OBSOLETE]             ijk(1) = a_index[i];
+//DX 20190613 [OBSOLETE]             ijk(2) = b_index[j];
+//DX 20190613 [OBSOLETE]             ijk(3) = c_index[k];
+//DX 20190613 [OBSOLETE]           } 
+//DX 20190613 [OBSOLETE]         }
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 - FASTER MIN CART DISTANCE CALCULATOR - END
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE] min_vec = coord1-coord2;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE] double min_mod = aurostd::modulus(min_vec);
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE] for(int a=-dims[1];a<=dims[1];a++){
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]   for(int b=-dims[2];b<=dims[2];b++){
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]     for(int c=-dims[3];c<=dims[3];c++){
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]       tmp = coord1-coord2+a*lattice(1)+b*lattice(2)+c*lattice(3);
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]       mod_tmp = aurostd::modulus(tmp);
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]       if(mod_tmp<min_mod){
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         min_mod = mod_tmp;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         min_vec = tmp;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         ijk(1) = a;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         ijk(2) = b;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         ijk(3) = c;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]       } 
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE] }
+//DX 20190613 [OBSOLETE]     //DX 20180903 needs to return min_vec : return min_mod;
+//DX 20190613 [OBSOLETE]     return min_vec; //DX 20180903 needs to return min_vec
+//DX 20190613 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE] } //namespace SYM
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Periodic Boundary Conditions (PBC)
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Minimizes fractional vector component by component.  This may not give the 
+//DX 20190613 [OBSOLETE] // the true minimum distance in Cartesian. HOWEVER, it is safe to assume if the
+//DX 20190613 [OBSOLETE] // mapping tolerance is small.  A heuristic maximum tolerance is the suprenum of 
+//DX 20190613 [OBSOLETE] // the off-diagonal elements of the metric tensor (this is a well-tested quanitity).
+//DX 20190613 [OBSOLETE] // For more information, contact David Hicks (d.hicks@duke.edu).
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE]   bool PBC(xvector<double>& v_in){
+//DX 20190613 [OBSOLETE]     xvector<int> ijk;
+//DX 20190613 [OBSOLETE]     bool restriction = false;
+//DX 20190613 [OBSOLETE]     return PBC(v_in, ijk, restriction);
+//DX 20190613 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE] } /// namespace SYM
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE]   bool PBC(xvector<double>& v_in, xvector<int>& ijk, bool& restriction){
+//DX 20190613 [OBSOLETE]     //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
+//DX 20190613 [OBSOLETE]     for(uint i=1; i<4; i++){
+//DX 20190613 [OBSOLETE]       while(v_in(i)>0.5){
+//DX 20190613 [OBSOLETE]         v_in(i) = v_in(i)-1;
+//DX 20190613 [OBSOLETE]         ijk(i)-=1;
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]       while(v_in(i)<=-0.5){
+//DX 20190613 [OBSOLETE]         v_in(i) = v_in(i)+1;
+//DX 20190613 [OBSOLETE]         ijk(i)+=1;
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]       if(aurostd::abs(ijk(i))>3 && restriction){
+//DX 20190613 [OBSOLETE]         //DEBUGGER
+//DX 20190613 [OBSOLETE]         //cerr << "ijk(i): " << ijk(i) << endl;
+//DX 20190613 [OBSOLETE]         //cerr << "ERROR (PBC Function): More than three cells away!" << endl;
+//DX 20190613 [OBSOLETE]         //exit(1);
+//DX 20190613 [OBSOLETE]         return false;
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE]     return true;
+//DX 20190613 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE] } /// namespace SYM
 
 // ******************************************************************************
 // FPOSMatch
@@ -945,7 +945,7 @@ namespace SYM {
 // --------------------------------------------------------
 // FPOSMatch: match element of deque<_atom> to _atom 
 
-// overload //DX20190620 
+// overload //DX 20190620 
 namespace SYM {
   bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, bool skew, double tol){
     xmatrix<double> f2c=trasp(lattice);
@@ -953,9 +953,9 @@ namespace SYM {
   }
 
   bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, 
-      const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
     for(uint i=0;i<atom_set.size();i++){
-      if(FPOSMatch(atom_set[i],atom2,lattice,f2c,skew,tol)){ //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
+      if(FPOSMatch(atom_set[i],atom2,lattice,f2c,skew,tol)){ //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
         match_type = atom_set[i].type;
         return TRUE;
       }
@@ -967,7 +967,7 @@ namespace SYM {
 // --------------------------------------------------------
 // FPOSMatch: match _atom to _atom 
 
-// overload //DX20190620 
+// overload //DX 20190620 
 namespace SYM {
   bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, bool skew, double tol){ 
     xmatrix<double> f2c=trasp(lattice);
@@ -975,8 +975,8 @@ namespace SYM {
   }
 
   bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, 
-      const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
-    return FPOSMatch(atom1.fpos,atom2.fpos,lattice,f2c,skew,tol); //DX20190619 - added lattice to input and remove "Atom" prefix in name
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
+    return FPOSMatch(atom1.fpos,atom2.fpos,lattice,f2c,skew,tol); //DX 20190619 - added lattice to input and remove "Atom" prefix in name
     //xvector<double> fdiff = atom1.fpos - atom2.fpos;
     //if(skew){
     //return minimizeCartesianDistance(atom1.cpos,atom2.cpos,fdiff,c2f,f2c,tol);
@@ -990,7 +990,7 @@ namespace SYM {
 
 // --------------------------------------------------------
 // FPOSMatch: match fpos to fpos
-// overload //DX20190620
+// overload //DX 20190620
 namespace SYM {
   bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice, bool skew, double tol){
     xmatrix<double> f2c=trasp(lattice);
@@ -998,20 +998,20 @@ namespace SYM {
   }
 
   bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice,
-      const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
     string soliloquy="SYM::FPOSMatch():";
 
-    //DX20190613 [OBSOLETE] xvector<double> fdiff = fpos1 - fpos2;
+    //DX 20190613 [OBSOLETE] xvector<double> fdiff = fpos1 - fpos2;
     if(XHOST.SKEW_TEST){
-      //DX20190613 [OBOSLETE] xvector<double> pbc_fdiff = fdiff;
-      //DX20190613 [OBOSLETE] PBC(pbc_fdiff);
-      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
+      //DX 20190613 [OBOSLETE] xvector<double> pbc_fdiff = fdiff;
+      //DX 20190613 [OBOSLETE] PBC(pbc_fdiff);
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX 20190613
       double min_fdiff_dist = aurostd::modulus(f2c*min_fdiff);
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
-      //DX20190613 [OBOSLETE] minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
-      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1, cpos2, lattice); //DX20190613
-      double min_cdiff_dist = aurostd::modulus(min_cdiff); //DX20190613 - changed variable names
+      //DX 20190613 [OBOSLETE] minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
+      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1, cpos2, lattice); //DX 20190613
+      double min_cdiff_dist = aurostd::modulus(min_cdiff); //DX 20190613 - changed variable names
       stringstream message; 
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)<_ZERO_TOL_){
         message << soliloquy << " minimum distances equal, and mappings same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
@@ -1034,23 +1034,23 @@ namespace SYM {
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
       }
     }
-    double min_dist = aurostd::modulus(CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew)); //DX20190620
-    //DX20190620 [moved into CPOSDistFromFPOS()] if(skew){
-    //DX20190620 [moved into CPOSDistFromFPOS()]   xvector<double> cpos1 = f2c*fpos1;
-    //DX20190620 [moved into CPOSDistFromFPOS()]   xvector<double> cpos2 = f2c*fpos2;
-    //DX20190620 [moved into CPOSDistFromFPOS()]   //DX20190613 [OBSOLETE] return minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
-    //DX20190620 [moved into CPOSDistFromFPOS()]   xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
-    //DX20190620 [moved into CPOSDistFromFPOS()]   min_dist = aurostd::modulus(min_cdiff); //DX20190613
-    //DX20190620 [moved into CPOSDistFromFPOS()] }
-    //DX20190620 [moved into CPOSDistFromFPOS()] else {
-    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
-    //DX20190620 [moved into CPOSDistFromFPOS()]   //DX20190613 [OBSOLETE] PBC(fdiff);
-    //DX20190620 [moved into CPOSDistFromFPOS()]   xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
-    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
-    //DX20190620 [moved into CPOSDistFromFPOS()]   min_dist = aurostd::modulus(f2c*min_fdiff); //DX20190613
-    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " min_dist=" << min_dist << endl;}
-    //DX20190620 [moved into CPOSDistFromFPOS()] }
-    return (min_dist<tol); //DX20190613
+    double min_dist = aurostd::modulus(CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew)); //DX 20190620
+    //DX 20190620 [moved into CPOSDistFromFPOS()] if(skew){
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   xvector<double> cpos1 = f2c*fpos1;
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   xvector<double> cpos2 = f2c*fpos2;
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   //DX 20190613 [OBSOLETE] return minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX 20190613
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   min_dist = aurostd::modulus(min_cdiff); //DX 20190613
+    //DX 20190620 [moved into CPOSDistFromFPOS()] }
+    //DX 20190620 [moved into CPOSDistFromFPOS()] else {
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   //DX 20190613 [OBSOLETE] PBC(fdiff);
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX 20190613
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   min_dist = aurostd::modulus(f2c*min_fdiff); //DX 20190613
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " min_dist=" << min_dist << endl;}
+    //DX 20190620 [moved into CPOSDistFromFPOS()] }
+    return (min_dist<tol); //DX 20190613
   }
 } // namespace SYM
 
@@ -1064,7 +1064,7 @@ namespace SYM {
     return FPOSDistFromFPOS(fpos1,fpos2,lattice,c2f,f2c,skew);
   }
   xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
-      const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO20190525
+      const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO190525
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="SYM::FPOSDistance():";
     if(LDEBUG){
@@ -1075,11 +1075,11 @@ namespace SYM {
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
-      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
+      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX 20190613
       min_fdiff = c2f*min_cdiff;
     }
     else {
-      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX 20190613
       if(LDEBUG){cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
       if(LDEBUG){cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
     }
@@ -1101,7 +1101,7 @@ namespace SYM {
     return CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew);
   }
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
-      const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO20190525
+      const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO190525
     bool VERBOSE=FALSE; //using LDEBUG would pollute output
     string soliloquy="SYM::CPOSDistance():";
     if(VERBOSE){
@@ -1112,12 +1112,12 @@ namespace SYM {
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
-      min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
+      min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX 20190613
       if(VERBOSE){cerr << soliloquy << " cpos1-cpos2=" << (cpos1-cpos2) << endl;}
       if(VERBOSE){cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;}
     }
     else {
-      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX 20190613
       min_cdiff = f2c*min_fdiff;
       if(VERBOSE){cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
       if(VERBOSE){cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
@@ -1132,27 +1132,27 @@ namespace SYM {
 // ******************************************************************************
 // applies c2f and f2c to atom.fpos and atom.cpos to see if there's a correspondence
 namespace SYM {
-  bool validateAtomPosition(const _atom& atom,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool validateAtomPosition(const _atom& atom,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO190520 - removed pointers for bools and doubles, added const where possible
 
     return validateAtomPosition(atom.cpos,atom.fpos,c2f,f2c,skew,_eps_);
   }
-  bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO20190520 - removed pointers for bools and doubles, added const where possible
-    //DX20190613 [OBSOLETE] xvector<double> fdiff = (c2f*cpos)-fpos;
+  bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO190520 - removed pointers for bools and doubles, added const where possible
+    //DX 20190613 [OBSOLETE] xvector<double> fdiff = (c2f*cpos)-fpos;
     double min_dist = 1e9;
     if(skew){
-      //DX20190613 [OBSOLETE] minimizeCartesianDistance(cpos,tmp,fdiff,c2f,f2c,_eps_);
+      //DX 20190613 [OBSOLETE] minimizeCartesianDistance(cpos,tmp,fdiff,c2f,f2c,_eps_);
       xvector<double> tmp_cpos = f2c*fpos;
-      xmatrix<double> lattice = trasp(f2c); //DX20190613 
-      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos,tmp_cpos,lattice); //DX20190613
-      min_dist = aurostd::modulus(min_cdiff); //DX20190613
+      xmatrix<double> lattice = trasp(f2c); //DX 20190613 
+      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos,tmp_cpos,lattice); //DX 20190613
+      min_dist = aurostd::modulus(min_cdiff); //DX 20190613
     }
     else {
-      //DX20190613 [OBSOLETE] PBC(fdiff);
-      xvector<double> tmp_fpos = c2f*cpos; //DX20190613
-      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(tmp_fpos,fpos); //DX20190613
-      min_dist = aurostd::modulus(f2c*min_fdiff); //DX20190613
+      //DX 20190613 [OBSOLETE] PBC(fdiff);
+      xvector<double> tmp_fpos = c2f*cpos; //DX 20190613
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(tmp_fpos,fpos); //DX 20190613
+      min_dist = aurostd::modulus(f2c*min_fdiff); //DX 20190613
     }
-    return min_dist<=_eps_; //DX20190613
+    return min_dist<=_eps_; //DX 20190613
   }
 } // namespace SYM
 
@@ -1163,16 +1163,16 @@ namespace SYM {
 // fast==FALSE ensures we map one-to-one, otherwise you need to check yourself later
 // MapAtomWithBasis (xvector<_atom>)
 namespace SYM {
-  //[CO20190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(vector<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f,
-  //[CO20190515 - not needed and is ambiguous with overload]                     xmatrix<double>& f2c, bool skew, double tol,bool fast){
-  //[CO20190515 - not needed and is ambiguous with overload]  uint mapped_index=0;
-  //[CO20190515 - not needed and is ambiguous with overload]  return MapAtomWithBasis(vec, a, map_types, index_to_check, c2f, f2c, skew, tol, mapped_index,fast);
-  //[CO20190515 - not needed and is ambiguous with overload]}
+  //[CO190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(vector<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f,
+  //[CO190515 - not needed and is ambiguous with overload]                     xmatrix<double>& f2c, bool skew, double tol,bool fast){
+  //[CO190515 - not needed and is ambiguous with overload]  uint mapped_index=0;
+  //[CO190515 - not needed and is ambiguous with overload]  return MapAtomWithBasis(vec, a, map_types, index_to_check, c2f, f2c, skew, tol, mapped_index,fast);
+  //[CO190515 - not needed and is ambiguous with overload]}
 } // namespace SYM
 
 // MapAtomWithBasis (xvector<_atom>) with mapping index
 namespace SYM {
-  //overload //DX20190620
+  //overload //DX 20190620
   bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
       bool skew, double tol, uint& mapped_index,bool fast){ 
     xmatrix<double> f2c=trasp(lattice);
@@ -1180,27 +1180,27 @@ namespace SYM {
   }
 
   bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
-      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     int count=0;
 
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
-        if(a.type==vec[index_to_check[i]].type){ // DX20170731 - Speed increase
-          if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX20190619 - lattice and f2c as input 
+        if(a.type==vec[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
+          if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input 
             count++;
             mapped_index=i;
-            if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
+            if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
           }
         }
       }
     } else {
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
-        if(FPOSMatch(a,vec[index_to_check[i]],lattice,skew,tol)){ //type specific //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+        if(FPOSMatch(a,vec[index_to_check[i]],lattice,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
           count++;
           mapped_index=i;
-          if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
+          if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
         }
       }
     }
@@ -1213,16 +1213,16 @@ namespace SYM {
 
 // MapAtomWithBasis (deque<_atom>)
 namespace SYM {
-  //[CO20190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(deque<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, 
-  //[CO20190515 - not needed and is ambiguous with overload]                     bool skew, double tol,bool fast){
-  //[CO20190515 - not needed and is ambiguous with overload]  uint mapped_index=0;
-  //[CO20190515 - not needed and is ambiguous with overload]  return MapAtomWithBasis(vec, a, map_types, index_to_check, c2f, f2c, skew, tol, mapped_index,fast);
-  //[CO20190515 - not needed and is ambiguous with overload]}
+  //[CO190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(deque<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, 
+  //[CO190515 - not needed and is ambiguous with overload]                     bool skew, double tol,bool fast){
+  //[CO190515 - not needed and is ambiguous with overload]  uint mapped_index=0;
+  //[CO190515 - not needed and is ambiguous with overload]  return MapAtomWithBasis(vec, a, map_types, index_to_check, c2f, f2c, skew, tol, mapped_index,fast);
+  //[CO190515 - not needed and is ambiguous with overload]}
 } // namespace SYM
 
 // MapAtomWithBasis (deque<_atom>) with mappping index
 namespace SYM {
-  //overload //DX20190620
+  //overload //DX 20190620
   bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
       bool skew, double tol, uint& mapped_index,bool fast){ 
     xmatrix<double> f2c=trasp(lattice);
@@ -1230,27 +1230,27 @@ namespace SYM {
   }
 
   bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice,
-      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     int count=0;
 
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = deq[index_to_check[i]];
-        if(a.type==deq[index_to_check[i]].type){ // DX20170731 - Speed increase
-          if(AtomsMapped(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX20190619 - lattice and f2c as input
+        if(a.type==deq[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
+          if(AtomsMapped(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX 20190619 - lattice and f2c as input
             count++;
             mapped_index=i;
-            if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
+            if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
           }
         }
       }
     } else {
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = deq[index_to_check[i]];
-        if(FPOSMatch(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+        if(FPOSMatch(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
           count++;
           mapped_index=i;
-          if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
+          if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
         }
       }
     }
@@ -1267,16 +1267,16 @@ namespace SYM {
 // Map an atom to a set of atoms
 // MapAtom (deque<_atom> and _atom)
 namespace SYM {
-  //DX20190620
-  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - replace f2c and c2f with lattice
+  //DX 20190620
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - replace f2c and c2f with lattice
     xmatrix<double> f2c=trasp(lattice);
     return MapAtom(a_deq, b, map_types, lattice, f2c, skew, tol);
   } 
 
-  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     for(uint i=0;i<a_deq.size();i++){
       //_atom a = a_deq[i];
-      if(MapAtom(a_deq[i], b, map_types, lattice, f2c, skew, tol)){ //DX20190619 - replace f2c and c2f with lattice
+      if(MapAtom(a_deq[i], b, map_types, lattice, f2c, skew, tol)){ //DX 20190619 - replace f2c and c2f with lattice
         return TRUE;
       }
     }
@@ -1286,16 +1286,16 @@ namespace SYM {
 
 // MapAtom (vector<_atom> and _atom)
 namespace SYM {
-  //overload //DX20190620
+  //overload //DX 20190620
   bool MapAtom(const vector<_atom>& a_vec, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){
     xmatrix<double> f2c=trasp(lattice);
     return MapAtom(a_vec, b, map_types, lattice, f2c, skew, tol);
   }
 
-  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     for(uint i=0;i<a_vec.size();i++){
       //_atom a = a_vec[i];
-      if(MapAtom(a_vec[i], b, map_types, lattice, f2c, skew, tol)){ //DX20190619 - replace f2c and c2f with lattice
+      if(MapAtom(a_vec[i], b, map_types, lattice, f2c, skew, tol)){ //DX 20190619 - replace f2c and c2f with lattice
         return TRUE;
       }
     }
@@ -1311,16 +1311,16 @@ namespace SYM {
 // MapAtom (xvector and xvector)
 // NOT TYPE SPECIFIC BY IT'S VERY NATURE
 namespace SYM {
-  //overload //DX20190620
+  //overload //DX 20190620
   bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, bool skew, double tol){
     xmatrix<double> f2c=trasp(lattice);
     return MapAtom(a, b, lattice, f2c, skew, tol);
   }
 
-  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     //_atom a_atom; a_atom.fpos=a; a_atom.cpos=f2c*a;
     //_atom b_atom; b_atom.fpos=b; b_atom.cpos=f2c*b;
-    if(FPOSMatch(a, b, lattice, f2c, skew, tol)){ //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+    if(FPOSMatch(a, b, lattice, f2c, skew, tol)){ //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
       return TRUE;
     }
     return FALSE;
@@ -1329,80 +1329,80 @@ namespace SYM {
 
 // MapAtom (_atom and _atom)
 namespace SYM { 
-  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - replace f2c and c2f with lattice
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - replace f2c and c2f with lattice
     xmatrix<double> f2c=trasp(lattice);
     return MapAtom(a, b, map_types, lattice, f2c, skew, tol);
   }
 
-  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     if(map_types){
-      return AtomsMapped(a,b,lattice,f2c,skew,tol); //type specific //DX20190619 - replace f2c and c2f with lattice
+      return AtomsMapped(a,b,lattice,f2c,skew,tol); //type specific //DX 20190619 - replace f2c and c2f with lattice
     } else {
-      return FPOSMatch(a.fpos,b.fpos,lattice,f2c,skew,tol); //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      return FPOSMatch(a.fpos,b.fpos,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
   }
 } // namespace SYM
 
-//DX20190905 [OBSOLETE] // ******************************************************************************
-//DX20190905 [OBSOLETE] // mod_one (Modify double by 1; to keep in unit cell)
-//DX20190905 [OBSOLETE] // ******************************************************************************
-//DX20190905 [OBSOLETE] // Bring a component of coordinate in the cell, based on a tolerance
-//DX20190905 [OBSOLETE] namespace SYM {
-//DX20190905 [OBSOLETE]   double mod_one(double d){
-//DX20190905 [OBSOLETE]     if(d==INFINITY || d!=d || d==-INFINITY ){
-//DX20190905 [OBSOLETE]       cerr << "SYM::mod_one: ERROR: (+-)INF or NAN value" << endl;
-//DX20190905 [OBSOLETE]       return d;
-//DX20190905 [OBSOLETE]     }
-//DX20190905 [OBSOLETE]     while(d>=1.0-_ZERO_TOL_){ //1e-10
-//DX20190905 [OBSOLETE]       d=d-1.0;
-//DX20190905 [OBSOLETE]     }
-//DX20190905 [OBSOLETE]     while(d<-_ZERO_TOL_){ //1e-10
-//DX20190905 [OBSOLETE]       d=d+1.0;
-//DX20190905 [OBSOLETE]     }
-//DX20190905 [OBSOLETE]     return d;
-//DX20190905 [OBSOLETE]   }
-//DX20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // mod_one (Modify double by 1; to keep in unit cell)
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // Bring a component of coordinate in the cell, based on a tolerance
+//DX 20190905 [OBSOLETE] namespace SYM {
+//DX 20190905 [OBSOLETE]   double mod_one(double d){
+//DX 20190905 [OBSOLETE]     if(d==INFINITY || d!=d || d==-INFINITY ){
+//DX 20190905 [OBSOLETE]       cerr << "SYM::mod_one: ERROR: (+-)INF or NAN value" << endl;
+//DX 20190905 [OBSOLETE]       return d;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     while(d>=1.0-_ZERO_TOL_){ //1e-10
+//DX 20190905 [OBSOLETE]       d=d-1.0;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     while(d<-_ZERO_TOL_){ //1e-10
+//DX 20190905 [OBSOLETE]       d=d+1.0;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     return d;
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE] }
 
-//DX20190905 [OBSOLETE] // ******************************************************************************
-//DX20190905 [OBSOLETE] // mod_one_atom (Modify fpos and ijk by 1; to keep in unit cell)
-//DX20190905 [OBSOLETE] // ******************************************************************************
-//DX20190905 [OBSOLETE] // Bring atom.fpos and atom.ijk in the cell, based on a tolerance
-//DX20190905 [OBSOLETE] namespace SYM {
-//DX20190905 [OBSOLETE]   _atom mod_one_atom(const _atom& atom_in){
-//DX20190905 [OBSOLETE]     _atom atom;
-//DX20190905 [OBSOLETE]     atom=atom_in;
-//DX20190905 [OBSOLETE]     atom.ijk=atom_in.ijk;
-//DX20190905 [OBSOLETE]     for(uint i=1;i<(uint)atom.fpos.rows+1;i++){
-//DX20190905 [OBSOLETE]       if(atom.fpos[i]==INFINITY || atom.fpos[i]!=atom.fpos[i] || atom.fpos[i]==-INFINITY ){
-//DX20190905 [OBSOLETE]         cerr << "SYM::mod_one_atom:ERROR: (+-)INF or NAN value" << endl;
-//DX20190905 [OBSOLETE]         return atom;
-//DX20190905 [OBSOLETE]       }
-//DX20190905 [OBSOLETE]       while(atom.fpos[i]>=1-_ZERO_TOL_){
-//DX20190905 [OBSOLETE]         atom.fpos[i]-=1.0;
-//DX20190905 [OBSOLETE]         atom.ijk[i]++;
-//DX20190905 [OBSOLETE]       }
-//DX20190905 [OBSOLETE]       while(atom.fpos[i]<-_ZERO_TOL_){
-//DX20190905 [OBSOLETE]         atom.fpos[i]+=1.0;
-//DX20190905 [OBSOLETE]         atom.ijk[i]--;
-//DX20190905 [OBSOLETE]       }
-//DX20190905 [OBSOLETE]     }
-//DX20190905 [OBSOLETE]     return atom;
-//DX20190905 [OBSOLETE]   }
-//DX20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // mod_one_atom (Modify fpos and ijk by 1; to keep in unit cell)
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // Bring atom.fpos and atom.ijk in the cell, based on a tolerance
+//DX 20190905 [OBSOLETE] namespace SYM {
+//DX 20190905 [OBSOLETE]   _atom mod_one_atom(const _atom& atom_in){
+//DX 20190905 [OBSOLETE]     _atom atom;
+//DX 20190905 [OBSOLETE]     atom=atom_in;
+//DX 20190905 [OBSOLETE]     atom.ijk=atom_in.ijk;
+//DX 20190905 [OBSOLETE]     for(uint i=1;i<(uint)atom.fpos.rows+1;i++){
+//DX 20190905 [OBSOLETE]       if(atom.fpos[i]==INFINITY || atom.fpos[i]!=atom.fpos[i] || atom.fpos[i]==-INFINITY ){
+//DX 20190905 [OBSOLETE]         cerr << "SYM::mod_one_atom:ERROR: (+-)INF or NAN value" << endl;
+//DX 20190905 [OBSOLETE]         return atom;
+//DX 20190905 [OBSOLETE]       }
+//DX 20190905 [OBSOLETE]       while(atom.fpos[i]>=1-_ZERO_TOL_){
+//DX 20190905 [OBSOLETE]         atom.fpos[i]-=1.0;
+//DX 20190905 [OBSOLETE]         atom.ijk[i]++;
+//DX 20190905 [OBSOLETE]       }
+//DX 20190905 [OBSOLETE]       while(atom.fpos[i]<-_ZERO_TOL_){
+//DX 20190905 [OBSOLETE]         atom.fpos[i]+=1.0;
+//DX 20190905 [OBSOLETE]         atom.ijk[i]--;
+//DX 20190905 [OBSOLETE]       }
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     return atom;
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE] }
 
-//DX20190905 [OBSOLETE] // ******************************************************************************
-//DX20190905 [OBSOLETE] // mod_one_xvec (Modify xvector compoenents by 1; to keep in unit cell)
-//DX20190905 [OBSOLETE] // ******************************************************************************
-//DX20190905 [OBSOLETE] // Bring a coordinate in the cell, based on vector tolerance
-//DX20190905 [OBSOLETE] namespace SYM {
-//DX20190905 [OBSOLETE]   xvector<double> mod_one_xvec(xvector<double> a){
-//DX20190905 [OBSOLETE]     xvector<double> b;
-//DX20190905 [OBSOLETE]     b(1) = mod_one(a(1));
-//DX20190905 [OBSOLETE]     b(2) = mod_one(a(2));
-//DX20190905 [OBSOLETE]     b(3) = mod_one(a(3));
-//DX20190905 [OBSOLETE]     return b;
-//DX20190905 [OBSOLETE]   }
-//DX20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // mod_one_xvec (Modify xvector compoenents by 1; to keep in unit cell)
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // Bring a coordinate in the cell, based on vector tolerance
+//DX 20190905 [OBSOLETE] namespace SYM {
+//DX 20190905 [OBSOLETE]   xvector<double> mod_one_xvec(xvector<double> a){
+//DX 20190905 [OBSOLETE]     xvector<double> b;
+//DX 20190905 [OBSOLETE]     b(1) = mod_one(a(1));
+//DX 20190905 [OBSOLETE]     b(2) = mod_one(a(2));
+//DX 20190905 [OBSOLETE]     b(3) = mod_one(a(3));
+//DX 20190905 [OBSOLETE]     return b;
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE] }
 
 // ******************************************************************************
 // Check for identity
@@ -1469,24 +1469,24 @@ namespace SYM {
     for(uint j=0;j<compressed_lattice_points.size();j++){
       bool matched = false;
       for(uint ii=0;ii<xstr.fgroup.size();ii++){
-        if(aurostd::identical(xstr.fgroup[ii].Uf,xstr.fgroup[0].Uf)){ // DX20171207 use default xmatrix identical tol
-          //DX20190613 [OBSOLETE] xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j];
+        if(aurostd::identical(xstr.fgroup[ii].Uf,xstr.fgroup[0].Uf)){ // DX 12/7/17 use default xmatrix identical tol
+          //DX 20190613 [OBSOLETE] xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j];
           double min_dist = 1e9;
           if(skew){
             xvector<double> tmp1 = xstr.f2c*xstr.fgroup[ii].ftau;
             xvector<double> tmp2 = xstr.f2c*compressed_lattice_points[j];
-            xvector<double> min_cdiff = minimizeDistanceCartesianMethod(tmp1,tmp2,xstr.lattice); //DX20190613
-            min_dist = aurostd::modulus(min_cdiff); //DX20190613
-            //DX20190613 [OBSOLETE] minimizeCartesianDistance(tmp1,tmp2,fdiff,xstr.c2f,xstr.f2c,xstr.sym_eps);
+            xvector<double> min_cdiff = minimizeDistanceCartesianMethod(tmp1,tmp2,xstr.lattice); //DX 20190613
+            min_dist = aurostd::modulus(min_cdiff); //DX 20190613
+            //DX 20190613 [OBSOLETE] minimizeCartesianDistance(tmp1,tmp2,fdiff,xstr.c2f,xstr.f2c,xstr.sym_eps);
           }
           else {
-            xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j]; //DX20190613
-            xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX20190613
-            min_dist = aurostd::modulus(xstr.f2c*min_fdiff); //DX20190613
-            //DX20190613 [OBSOLETE] PBC(fdiff);
+            xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j]; //DX 20190613
+            xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+            min_dist = aurostd::modulus(xstr.f2c*min_fdiff); //DX 20190613
+            //DX 20190613 [OBSOLETE] PBC(fdiff);
           }
-          //DX20190613 [OBSOLETE] if(aurostd::modulus(xstr.f2c*fdiff)<=xstr.sym_eps)
-          if(min_dist<=xstr.sym_eps) //DX20190613
+          //DX 20190613 [OBSOLETE] if(aurostd::modulus(xstr.f2c*fdiff)<=xstr.sym_eps)
+          if(min_dist<=xstr.sym_eps) //DX 20190613
           { //CO200106 - patching for auto-indenting
             matched = true;
             break;
@@ -1671,8 +1671,8 @@ namespace SYM {
     }
     double min_dist = a.dist_nn_min;
     if(min_dist==AUROSTD_NAN){min_dist=SYM::minimumDistance(a);}
-    //if(a.dist_nn_min == AUROSTD_NAN){a.MinDist();}  // CO20180409
-    //  min_dist = a.dist_nn_min; // CO20180409
+    //if(a.dist_nn_min == AUROSTD_NAN){a.MinDist();}  // CO 180409
+    //  min_dist = a.dist_nn_min; // CO 180409
     bool skew = isLatticeSkewed(a.lattice,min_dist,_eps_);
     return ApplyAtomValidate(atom_in,atom_out,symop,a.lattice,a.c2f,a.f2c,skew,_incell_,roff,_eps_);
   }
@@ -1693,12 +1693,12 @@ namespace SYM {
         cerr << "f2c " << f2c << endl;
         xvector<double>fdiff=(c2f*atom_in.cpos)-atom_in.fpos;
         cerr << "(c2f*cpos)-fpos = " << (c2f*atom_in.cpos)-atom_in.fpos << endl;
-        xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX20190613
-        cerr << "minimizeDistanceFractionalMethod(fdiff) = " << min_fdiff << endl; //DX20190613
-        cerr << "modulus(f2c*min_fdiff) = " << modulus(f2c*min_fdiff) << " <? " << _eps_ <<endl; //DX20190613
-        //DX20190613 [OBSOLETE] PBC(fdiff);
-        //DX20190613 [OBSOLETE] cerr << "PBC(fdiff) = " << fdiff << endl;
-        //DX20160613 [OBSOLETE] cerr << "modulus(f2c*fdiff) = " << modulus(f2c*fdiff) << " <? " << _eps_ <<endl;
+        xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+        cerr << "minimizeDistanceFractionalMethod(fdiff) = " << min_fdiff << endl; //DX 20190613
+        cerr << "modulus(f2c*min_fdiff) = " << modulus(f2c*min_fdiff) << " <? " << _eps_ <<endl; //DX 20190613
+        //DX 20190613 [OBSOLETE] PBC(fdiff);
+        //DX 20190613 [OBSOLETE] cerr << "PBC(fdiff) = " << fdiff << endl;
+        //DX 20160613 [OBSOLETE] cerr << "modulus(f2c*fdiff) = " << modulus(f2c*fdiff) << " <? " << _eps_ <<endl;
       }
       return false;
     }
@@ -1756,7 +1756,7 @@ namespace SYM {
     _atom atom;
     atom=atom_in;  // copies all the info !
     //[OBSOLETE] check check=symop.is_pgroup+symop.is_fgroup+symop.is_sgroup+symop.is_agroup;
-    int check = int(symop.is_pgroup)+int(symop.is_pgroupk)+int(symop.is_fgroup)+int(symop.is_pgroup_xtal)+int(symop.is_pgroupk_xtal)+int(symop.is_sgroup)+int(symop.is_agroup); // DX and CO // DX20191207 - added pgroupk_xtal
+    int check = int(symop.is_pgroup)+int(symop.is_pgroupk)+int(symop.is_fgroup)+int(symop.is_pgroup_xtal)+int(symop.is_pgroupk_xtal)+int(symop.is_sgroup)+int(symop.is_agroup); // DX and CO // DX 12/7/19 - added pgroupk_xtal
 
     bool identity=false;
     //bool roff=TRUE;
@@ -1766,7 +1766,7 @@ namespace SYM {
       cerr << "symop.is_pgroup=" << symop.is_pgroup << endl;
       cerr << "symop.is_pgroupk=" << symop.is_pgroupk << endl;
       cerr << "symop.is_pgroup_xtal=" << symop.is_pgroup_xtal << endl;
-      cerr << "symop.is_pgroupk_xtal=" << symop.is_pgroupk_xtal << endl; // DX20191207 - added pgroupk_xtal
+      cerr << "symop.is_pgroupk_xtal=" << symop.is_pgroupk_xtal << endl; // DX 12/7/19 - added pgroupk_xtal
       cerr << "symop.is_fgroup=" << symop.is_fgroup << endl;
       cerr << "symop.is_sgroup=" << symop.is_sgroup << endl;
       cerr << "symop.is_agroup=" << symop.is_agroup << endl;
@@ -1801,7 +1801,7 @@ namespace SYM {
     }
 
     atom.ijk=atom_in.ijk;
-    if(symop.is_pgroup==TRUE || symop.is_pgroup_xtal==TRUE || symop.is_pgroupk==TRUE || symop.is_pgroupk_xtal==TRUE || symop.is_agroup==TRUE) { // DX20191207 - added pgroupk_xtal
+    if(symop.is_pgroup==TRUE || symop.is_pgroup_xtal==TRUE || symop.is_pgroupk==TRUE || symop.is_pgroupk_xtal==TRUE || symop.is_agroup==TRUE) { // DX 12/7/19 - added pgroupk_xtal
       // if(symop.is_pgroup==TRUE) cerr << "point group symmetry" << endl;
       // if(symop.is_agroup==TRUE) cerr << "site point group symmetry" << endl
       //if(symop.str_Hermann_Mauguin != "1"){
@@ -1907,7 +1907,7 @@ namespace SYM {
     }
     //}
     if(_incell_) atom.ijk=xint(floor(atom.fpos));
-    if(symop.basis_map_calculated){ //FIXING FOR ME (MARCO) CO20180420
+    if(symop.basis_map_calculated){ //FIXING FOR ME (MARCO) CO 180420
       if((uint) atom_in.basis>=symop.basis_atoms_map.size()) {
         cerr << "SYM::ApplyAtom: error [5]" << endl;
         cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
@@ -1963,7 +1963,7 @@ namespace SYM {
       //if(modulus(f2c*fdiff)>_eps_) 
       //{
 
-      // CO/DX20170810
+      // CO/DX 170810
       //do not validate for sgroups, requires large search radius in the worse case (minimizeCartesianDistance)
       //if you did want to validate, need to change validateAtomPosition and subtract ctrasl/ftrasl first
       //Uc*(cpos-ctrasl) && Uf*(fpos-ftrasl)
@@ -2266,7 +2266,7 @@ namespace SYM {
   }
 #endif
 
-  bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
       cerr << "SYM::AtomsEquivalent: symmetry must have been calculated" << endl;exit(0);
     }
@@ -2277,7 +2277,7 @@ namespace SYM {
         return FALSE;
       }
       //tatom.fpos=BringInCell(tatom.fpos);
-      if(AtomsMapped(a,tatom,str.lattice,str.f2c,skew,tol)){  //TYPE SPECIFIC BY DEFAULT //DX20190619 - lattice and f2c as input
+      if(AtomsMapped(a,tatom,str.lattice,str.f2c,skew,tol)){  //TYPE SPECIFIC BY DEFAULT //DX 20190619 - lattice and f2c as input
         return TRUE;
       }
     }
@@ -2352,7 +2352,7 @@ namespace SYM {
 
 namespace SYM {
   //bool TypePointGroupOperation(const xmatrix<double> &Uc,string &_string, bool &_inversion,double &_angle,xvector<double> &_axis,xmatrix<double> &_generator)
-  bool TypePointGroupOperation(const xmatrix<double> &Uc, const xmatrix<double> &Uf, string &_string, bool &_inversion,double &_angle,xvector<double> &_axis,xmatrix<double> &_generator, xvector<double>& _generator_coefficients, xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_) // DX20180117 - added SU(2) and su(2) coefficients
+  bool TypePointGroupOperation(const xmatrix<double> &Uc, const xmatrix<double> &Uf, string &_string, bool &_inversion,double &_angle,xvector<double> &_axis,xmatrix<double> &_generator, xvector<double>& _generator_coefficients, xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_) // DX 1/17/18 - added SU(2) and su(2) coefficients
   { //CO200106 - patching for auto-indenting
     // calculate the type of symmetry.
     // you need to put your right hand on the origin,
@@ -2360,7 +2360,7 @@ namespace SYM {
     // for theta angles.
     // theta along r is equivalent to 2pi-theta along -r... try to plot.
     ostringstream aus;
-    //double _eps_=_EPS_,x,y,z; // DX20171024
+    //double _eps_=_EPS_,x,y,z; // DX 10/24/17
     double x,y,z;
     // getting angle and vector of rotation
     bool inversion=FALSE;
@@ -2381,26 +2381,26 @@ namespace SYM {
     I=aurostd::identity(I);II=-I;
     if(_roundoff_U) roundoff(U,_EPS_roundoff_);
     //  cerr << " U= " << endl << U << endl;
-    // DX20171207 Use Uf, elements are -1,0,1 : if(identical(U,I,_eps_))                                           // check unity  // fix the problem at theta=0.0
+    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,I,_eps_))                                           // check unity  // fix the problem at theta=0.0
     if(identical(Uf,I))
     { //CO200106 - patching for auto-indenting
       theta=0.0;r(1)=0.0;r(2)=0.0;r(3)=0.0;clear(A);  // ANGLE IS ZERO and axis is not defined
       inversion=FALSE;
       aus << "unity I       ";
       _inversion=inversion;_angle=theta*rad2deg;_axis(1)=r(1);_axis(2)=r(2);_axis(3)=r(3);_string=aus.str();_generator=A;
-      _generator_coefficients(1)=r(1);_generator_coefficients(2)=r(2);_generator_coefficients(3)=r(3); // DX20171206 - added generator coefficents
-      ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX20180117 - added SU2 and su2 coefficients
+      _generator_coefficients(1)=r(1);_generator_coefficients(2)=r(2);_generator_coefficients(3)=r(3); // DX 12/6/17 - added generator coefficents
+      ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX 1/17/18 - added SU2 and su2 coefficients
       return TRUE;
     }
-    // DX20171207 Use Uf, elements are -1,0,1 : if(identical(U,II,_eps_))                                           // check unity  // fix the problem at theta=0.0
+    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,II,_eps_))                                           // check unity  // fix the problem at theta=0.0
     if(identical(Uf,II))
     { //CO200106 - patching for auto-indenting
       theta=0.0;r(1)=0.0;r(2)=0.0;r(3)=0.0;clear(A);  // ANGLE IS ZERO and axis is not defined
       inversion=TRUE;
       aus << "inversion -I  ";
       _inversion=inversion;_angle=theta*rad2deg;_axis(1)=r(1);_axis(2)=r(2);_axis(3)=r(3);_string=aus.str();_generator=A;
-      _generator_coefficients(1)=r(1);_generator_coefficients(2)=r(2);_generator_coefficients(3)=r(3); // DX20171206 - added generator coefficents
-      ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX20180117 - added SU2 and su2 coefficients
+      _generator_coefficients(1)=r(1);_generator_coefficients(2)=r(2);_generator_coefficients(3)=r(3); // DX 12/6/17 - added generator coefficents
+      ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX 1/17/18 - added SU2 and su2 coefficients
       return TRUE;
     }
     // not unity and not inversion, check for inversions
@@ -2410,7 +2410,7 @@ namespace SYM {
     }
     // check if theta = 0 or pi (0 already done)
     // if angle is pi, then U*U=I, hence inv(U)=U, but inv(U)=Ut, hence U=Ut.... symmetric
-    // DX20171207 Use Uf, elements are -1,0,1 : if(identical(U,trasp(U),_eps_))    // if symmetric, theta = pi, because two operations U*U brings 2pi=I
+    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,trasp(U),_eps_))    // if symmetric, theta = pi, because two operations U*U brings 2pi=I
     if(identical(Uf*Uf,I))
     { //CO200106 - patching for auto-indenting
       double x,y,z;
@@ -2439,8 +2439,8 @@ namespace SYM {
       A(1,1)=0;A(1,2)=-z;A(1,3)=y;A(2,1)=z;A(2,2)=0;A(2,3)=-x;A(3,1)=-y;A(3,2)=x;A(3,3)=0;A=A*theta;Uexp=aurostd::exp(A);
       //  cerr << Uexp << endl << max(aurostd::abs(Uexp-U)) << endl;
       _inversion=inversion;_angle=theta*rad2deg;_axis(1)=r(1);_axis(2)=r(2);_axis(3)=r(3);_string=aus.str();_generator=A;
-      _generator_coefficients(1)=r(1);_generator_coefficients(2)=r(2);_generator_coefficients(3)=r(3); // DX20171206 - added generator coefficents
-      ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX20180117 - added SU2 and su2 coefficients
+      _generator_coefficients(1)=r(1);_generator_coefficients(2)=r(2);_generator_coefficients(3)=r(3); // DX 12/6/17 - added generator coefficents
+      ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX 1/17/18 - added SU2 and su2 coefficients
       return TRUE;
     } else {                          // not unity, not inversion, not theta=pi, generic case
       theta=((aurostd::trace(U)-1.0)/2.0);
@@ -2470,8 +2470,8 @@ namespace SYM {
       A(1,1)=0;A(1,2)=-z;A(1,3)=y;A(2,1)=z;A(2,2)=0;A(2,3)=-x;A(3,1)=-y;A(3,2)=x;A(3,3)=0;A=A*theta;Uexp=aurostd::exp(A);
       // cerr << Uexp << endl << max(aurostd::abs(Uexp-U)) << endl;
       _inversion=inversion;_angle=theta*rad2deg;_axis(1)=r(1);_axis(2)=r(2);_axis(3)=r(3);_string=aus.str();_generator=A;
-      _generator_coefficients(1)=r(1);_generator_coefficients(2)=r(2);_generator_coefficients(3)=r(3); // DX20171206 - added generator coefficents
-      ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX20180117 - added SU2 and su2 coefficients
+      _generator_coefficients(1)=r(1);_generator_coefficients(2)=r(2);_generator_coefficients(3)=r(3); // DX 12/6/17 - added generator coefficents
+      ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX 1/17/18 - added SU2 and su2 coefficients
       // cerr << _generator << endl;
       return TRUE;
     }
@@ -2491,9 +2491,9 @@ namespace SYM {
   //					    const xvector<double>& _axis,const xmatrix<double>& _generator)
   bool TypePointGroupOperationInternational(const xmatrix<double>& Uc,string& _stringHM,string& _stringSC,const bool& _inversion,const double& _angle,
       const xvector<double>& _axis,const xmatrix<double>& _generator, xvector<double>& _generator_coefficients, 
-      xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_) // DX20171206 - added generator coefficents // DX20180117 - added SU(2) and su(2) coefficients
+      xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_) // DX 12/6/17 - added generator coefficents // DX 1/17/18 - added SU(2) and su(2) coefficients
   { //CO200106 - patching for auto-indenting
-    //double _eps_=_EPS_; // DX20171024
+    //double _eps_=_EPS_; // DX 10/24/17
     _stringHM="XXXXX";
     _stringSC="XXXXX";
 
@@ -2529,8 +2529,8 @@ namespace SYM {
     cerr << "_axis=" << _axis << endl;
     cerr << "_generator=" << _generator << endl;
     cerr << "_generator_coefficients=" << _generator_coefficients << endl;
-    cerr << "_SU2_matrix=" << _SU2_matrix << endl; // DX20180117 - add SU(2)
-    cerr << "_su2_coeffiients=" << _su2_coefficients << endl; // DX20180117 - add su(2) coefficients
+    cerr << "_SU2_matrix=" << _SU2_matrix << endl; // DX 1/17/18 - add SU(2)
+    cerr << "_su2_coeffiients=" << _su2_coefficients << endl; // DX 1/17/18 - add su(2) coefficients
     cerr << endl << "ERROR SYM::TypePointGroupOperationInternational, you should never be here... [0] !" << endl;
     return FALSE;
   }
@@ -2569,19 +2569,19 @@ bool MapOperations(string s1,string s2) {
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
 // this functions comapares whether the point groups are identical, ignores Uf
 namespace SYM {
-  bool PointGroupsIdentical(const vector<_sym_op>& vpg1,const vector<_sym_op>& vpg2, double eps, bool is_same_lattice){ // DX20171207 - added is_same_lattice
+  bool PointGroupsIdentical(const vector<_sym_op>& vpg1,const vector<_sym_op>& vpg2, double eps, bool is_same_lattice){ // DX 12/7/17 - added is_same_lattice
     if(vpg1.size()!=vpg2.size()){
       return FALSE;
     }
     bool found;
-    // DX20171207 - compare Uf vs Uc : START
-    // DX20171207 - If the pgroups come from the same lattice, then the Ufs would be exactly the same 
+    // DX 12/7/17 - compare Uf vs Uc : START
+    // DX 12/7/17 - If the pgroups come from the same lattice, then the Ufs would be exactly the same 
     // (Uf comprised of integers; no tolerance needed).  If lattices are not the same, use Uc and eps.
     if(is_same_lattice){
       for(uint i=0;i<vpg1.size();i++){
         found=false;
         for(uint j=0;j<vpg2.size() && !found;j++){
-          if(aurostd::identical(vpg1[i].Uf,vpg2[j].Uf)){ // DX20171207 - Use Uf (only integers) not Uc and use xmatrix identical eps
+          if(aurostd::identical(vpg1[i].Uf,vpg2[j].Uf)){ // DX 12/7/17 - Use Uf (only integers) not Uc and use xmatrix identical eps
             found=true;
           }
         }
@@ -2607,7 +2607,7 @@ namespace SYM {
         }
       }
     }
-    // DX20171207 - compare Uf vs Uc : START
+    // DX 12/7/17 - compare Uf vs Uc : START
     return TRUE;
   }
 }
@@ -2622,7 +2622,7 @@ namespace SYM {
   bool CalculateQuaternion(_sym_op& a){
     //GEENA START WORKING HERE
 
-    a.quaternion_vector.clear(); a.quaternion_matrix.clear();  // CO20170706 - clear first
+    a.quaternion_vector.clear(); a.quaternion_matrix.clear();  // CO 170706 - clear first
     xvector<double> quaternion_vector(4); // creating the vector for 4x1
     xmatrix<double> quaternion_matrix(4, 4); // creating the matrix for 4x4
     a.quaternion_vector=quaternion_vector;
@@ -2673,7 +2673,7 @@ namespace SYM {
 }
 //GEENA STOP
 
-// DX20180117 - START
+// DX 1/17/18 - START
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
 // Function SYM::ComplexSU2Rotations
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2682,14 +2682,14 @@ namespace SYM {
   bool ComplexSU2Rotations(xmatrix<xcomplex<double> > & _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double& theta, xvector<double>& _axis){
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    xcomplex<double> q11(1.0*cos(theta/2.0),_axis(3)*sin(theta/2.0));                   // DX20180117 - added SU(2) matrix
-    xcomplex<double> q12(_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));              // DX20180117 - added SU(2) matrix
-    xcomplex<double> q21(-_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));             // DX20180117 - added SU(2) matrix
-    xcomplex<double> q22(1.0*cos(theta/2.0),-_axis(3)*sin(theta/2.0));                  // DX20180117 - added SU(2) matrix
-    _SU2_matrix(1,1)=q11;_SU2_matrix(1,2)=q12;_SU2_matrix(2,1)=q21;_SU2_matrix(2,2)=q22;// DX20180117 - added SU(2) matrix
-    xcomplex<double> coefficient1(0.0,_axis(1)/2.0);_su2_coefficients(1)=coefficient1;  // DX20180117 - added su(2) coefficients
-    xcomplex<double> coefficient2(0.0,_axis(2)/2.0);_su2_coefficients(2)=coefficient2;  // DX20180117 - added su(2) coefficients
-    xcomplex<double> coefficient3(0.0,_axis(3)/2.0);_su2_coefficients(3)=coefficient3;  // DX20180117 - added su(2) coefficients
+    xcomplex<double> q11(1.0*cos(theta/2.0),_axis(3)*sin(theta/2.0));                   // DX 1/17/18 - added SU(2) matrix
+    xcomplex<double> q12(_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));              // DX 1/17/18 - added SU(2) matrix
+    xcomplex<double> q21(-_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));             // DX 1/17/18 - added SU(2) matrix
+    xcomplex<double> q22(1.0*cos(theta/2.0),-_axis(3)*sin(theta/2.0));                  // DX 1/17/18 - added SU(2) matrix
+    _SU2_matrix(1,1)=q11;_SU2_matrix(1,2)=q12;_SU2_matrix(2,1)=q21;_SU2_matrix(2,2)=q22;// DX 1/17/18 - added SU(2) matrix
+    xcomplex<double> coefficient1(0.0,_axis(1)/2.0);_su2_coefficients(1)=coefficient1;  // DX 1/17/18 - added su(2) coefficients
+    xcomplex<double> coefficient2(0.0,_axis(2)/2.0);_su2_coefficients(2)=coefficient2;  // DX 1/17/18 - added su(2) coefficients
+    xcomplex<double> coefficient3(0.0,_axis(3)/2.0);_su2_coefficients(3)=coefficient3;  // DX 1/17/18 - added su(2) coefficients
 
     if(LDEBUG) {
       xmatrix<xcomplex<double> > complex_matrix(2,2);
@@ -2706,7 +2706,7 @@ namespace SYM {
             abs(_SU2_matrix(1,2).re-exp_matrix(1,2).re)<1e-3 && abs(_SU2_matrix(1,2).im-exp_matrix(1,2).im)<1e-3 &&
             abs(_SU2_matrix(2,1).re-exp_matrix(2,1).re)<1e-3 && abs(_SU2_matrix(2,1).im-exp_matrix(2,1).im)<1e-3 &&
             abs(_SU2_matrix(2,2).re-exp_matrix(2,2).re)<1e-3 && abs(_SU2_matrix(2,2).im-exp_matrix(2,2).im)<1e-3)){
-        //DX20200217 - warning to error
+        //DX 20200217 - warning to error
         string function_name = "SYM::ComplexSU2Rotations()";
         stringstream message;
         message << "Lie algebra does not connect back to Lie group, i.e., exp(theta*su(2)) != SU(2):" << endl;
@@ -2740,7 +2740,7 @@ namespace SYM {
 } // namespace SYM
 // DX AND COREY - END
 
-// DX20170814 - Split up function so we can call look-up table separately - START
+// DX 8/14/17 - Split up function so we can call look-up table separately - START
 namespace SYM {
   bool CalculatePointGroupCrystal(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {
     //return CalculatePointGroupCrystal_20160801(FileMESSAGE,a,aflags,_write_,osswrite,oss,_eps_,format);
@@ -2787,7 +2787,7 @@ namespace SYM {
       Uf=a.fgroup[ip].Uf;Uc=a.fgroup[ip].Uc;ftau=a.fgroup[ip].ftau;ctau=a.fgroup[ip].ctau;
       bool sym_found=FALSE;
       for(uint ii=0;ii<a.pgroup_xtal.size()&&!sym_found;ii++)
-        sym_found=(identical(Uf,a.pgroup_xtal[ii].Uf));     // look in all the list of operations  // DX20171207 - Use xmatrix identical eps
+        sym_found=(identical(Uf,a.pgroup_xtal[ii].Uf));     // look in all the list of operations  // DX 12/7/17 - Use xmatrix identical eps
       if(sym_found==FALSE) {                                    // new operation, generate and save it
         SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_PGROUP_XTAL_,FALSE); 
       }
@@ -2937,7 +2937,7 @@ namespace SYM {
           Uf=a.pgroupk_xtal[ip].Uf;Uc=a.pgroupk_xtal[ip].Uc;
           bool sym_found=FALSE;
           for(uint ii=0;ii<a.pgroupk_Patterson.size()&&!sym_found;ii++){
-            sym_found=(identical(Uf,a.pgroupk_Patterson[ii].Uf));     // look in all the list of operations  // DX20171207 - Use xmatrix identical eps
+            sym_found=(identical(Uf,a.pgroupk_Patterson[ii].Uf));     // look in all the list of operations  // DX 12/7/17 - Use xmatrix identical eps
           }
           if(sym_found==FALSE) {                                    // new operation, generate and save it
             SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_PGROUPK_PATTERSON_,FALSE); 
@@ -2945,7 +2945,7 @@ namespace SYM {
           Uf=Uf_inv*a.pgroupk_xtal[ip].Uf;Uc=Uc_inv*a.pgroupk_xtal[ip].Uc; //multiply by inversion matrix
           sym_found=FALSE;
           for(uint ii=0;ii<a.pgroupk_Patterson.size()&&!sym_found;ii++){
-            sym_found=(identical(Uf,a.pgroupk_Patterson[ii].Uf));     // look in all the list of operations  // DX20171207 - Use xmatrix identical eps
+            sym_found=(identical(Uf,a.pgroupk_Patterson[ii].Uf));     // look in all the list of operations  // DX 12/7/17 - Use xmatrix identical eps
           }
           if(sym_found==FALSE) {                                    // new operation, generate and save it
             SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_PGROUPK_PATTERSON_,FALSE); 
@@ -3092,78 +3092,78 @@ namespace SYM {
     string message="PGROUP_XTAL";
 
     // LOOK up table for the point group operations of the crystal
-    // DX20170916 [OBSOLETE]    vector<string> vops;vops.clear();
-    // DX20170916 [OBSOLETE]   string operations="";
-    // DX20170916 [OBSOLETE]    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
-    // DX20170916 [OBSOLETE]      vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
-    // DX20170916 [OBSOLETE]      operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
-    // DX20170916 [OBSOLETE]      if(kk<a.pgroup_xtal.size()) operations=operations+" ";
-    // DX20170916 [OBSOLETE]    }
+    // DX 9/16/17 [OBSOLETE]    vector<string> vops;vops.clear();
+    // DX 9/16/17 [OBSOLETE]   string operations="";
+    // DX 9/16/17 [OBSOLETE]    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // shift by 1 to use [kk-1]...
+    // DX 9/16/17 [OBSOLETE]      vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
+    // DX 9/16/17 [OBSOLETE]      operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
+    // DX 9/16/17 [OBSOLETE]      if(kk<a.pgroup_xtal.size()) operations=operations+" ";
+    // DX 9/16/17 [OBSOLETE]    }
 
     a.crystal_family="";a.crystal_system="";a.point_group_crystal_class="";
     a.point_group_Shoenflies="";a.point_group_Hermann_Mauguin="";a.point_group_orbifold="";
     a.point_group_type="";a.point_group_order="";a.point_group_structure="";
-    // DX20170906 [OBSOLETE] bool pg_found=FALSE;
-    string pgname = ""; // DX20170906
-    string operations = ""; // DX20170906
+    // DX 9/6/17 [OBSOLETE] bool pg_found=FALSE;
+    string pgname = ""; // DX 9/6/17
+    string operations = ""; // DX 9/6/17
 
-    // DX20170916 [OBSOLETE]    vector<string> pgf,pgn;
-    // DX20170916 [OBSOLETE]    // TRICLINIC
-    // DX20170916 [OBSOLETE]    pgf.push_back("1");pgn.push_back("1"); // 1
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 -1");pgn.push_back("-1"); // 2
-    // DX20170916 [OBSOLETE]    // MONOCLINIC
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 2");pgn.push_back("2"); // 3-5
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m");pgn.push_back("m"); // 6-9
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 2 m -1");pgn.push_back("2/m"); // 10-15
-    // DX20170916 [OBSOLETE]    // ORTHORHOMBIC
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 2 2 2");pgn.push_back("222"); // 16-24
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m m 2");pgn.push_back("mm2"); // 25-46
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m m 2 m 2 2 -1");pgn.push_back("mmm"); // 47-74
-    // DX20170916 [OBSOLETE]    // TETRAGONAL
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 4 2 4");pgn.push_back("4"); // 75-80
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 2 -4 -4");pgn.push_back("-4"); // 81-82
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 4 2 4 m -4 -1 -4");pgn.push_back("4/m"); // 83-88
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 4 2 4 2 2 2 2");pgn.push_back("422"); // 89-98
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m -2 4 m 2 4 -2");pgn.push_back("4mm"); // 99-110
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m 2 -4 m 2 -4 2");pgn.push_back("-42m"); // 111-122
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m -2 4 m 2 4 -2 m 2 2 -4 2 -1 -4 2");pgn.push_back("4/mmm"); // 123-142
-    // DX20170916 [OBSOLETE]    // HEXAGONAL-TRIGONAL
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 3 3");pgn.push_back("3"); // 143-146
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 3 3 -1 -3 -3");pgn.push_back("-3"); // 147-148
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 2 2 3 3 2");pgn.push_back("32"); // 149-155
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 3 3 m -2 -2");pgn.push_back("3m"); // 156-161
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m -2 3 3 -2 -1 2 2 -3 -3 2");pgn.push_back("-3m"); // 162-167
-    // DX20170916 [OBSOLETE]
-    // DX20170916 [OBSOLETE]    // HEXAGONAL-HEXAGONAL
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6");pgn.push_back("6"); // 168-173
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 3 3 m -6 -6");pgn.push_back("-6"); // 174
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6 m -6 -6 -1 -3 -3");pgn.push_back("6/m"); // 175-176
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6 2 2 2 2 2 2");pgn.push_back("622"); // 177-182
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 -2 m 3 3 -2 2 -2 m 6 6 -2");pgn.push_back("6mm"); // 183-186
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m -2 2 m 2 3 -6 3 -6 -2 2");pgn.push_back("-6m2"); // 187-190
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 m -2 2 m 2 3 -6 3 -6 -2 2 2 -1 -2 2 m 2 6 -3 6 -3 -2 2");pgn.push_back("6/mmm"); // 	191-194
-    // DX20170916 [OBSOLETE]    // CUBIC
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 2 3 3 3 3 2 2 3 3 3 3");pgn.push_back("23"); //  195-199
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 3 3 2 3 3 3 3 2 3 3 2 -1 -3 -3 m -3 -3 -3 -3 m -3 -3 m");pgn.push_back("m-3"); // 200-206
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 4 2 4 2 3 4 3 3 4 3 2 2 2 2 2 4 3 2 3 3 4 3 2");pgn.push_back("432"); // 207-214
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 -2 -2 3 3 -2 2 -2 -4 3 3 -4 -4 3 2 -4 3 -4 -4 2 -2 3 3 -2");pgn.push_back("-43m"); // 215-220
-    // DX20170916 [OBSOLETE]    pgf.push_back("1 -2 2 m -2 3 -3 4 3 -2 4 -3 2 -2 -1 2 -3 -3 -2 3 4 4 3 -2 -3 -4 3 2 2 3 -4 -3 2 -4 -3 3 4 m 2 -4 -3 2 3 -4 m 4 -4 2");pgn.push_back("m-3m"); // 221-230
-    // DX20170916 [OBSOLETE]    //  pgf.push_back("1 -2 -2 3 3 -2 -2 2 3 -4 -4 3 3 -4 -2 3 2 -4 -4 3 3 -2 -4 2 -1 2 2 -3 -3 2 2 m -3 4 4 -3 -3 4 2 -3 -2 4 4 -3 -3 2 4 -2");pgn.push_back("m-3m"); // 221-230
-    // DX20170916 [OBSOLETE]    // done
-    // DX20170916 [OBSOLETE]    for(uint i=0;i<pgf.size();i++) aurostd::StringSubst(pgf.at(i),"-2","m"); // -2 are mirrors orthogonal to the axis....
-    // DX20170916 [OBSOLETE]
-    // DX20170916 [OBSOLETE]    // -------------------------------------------------------------------- scanning  ORDER=48
-    // DX20170916 [OBSOLETE]    // find point group
-    // DX20170916 [OBSOLETE]    string pgname;
-    // DX20170916 [OBSOLETE]    aurostd::StringSubst(operations,"-2","m");
-    // DX20170916 [OBSOLETE]
-    // DX20170916 [OBSOLETE]    for(uint i=0;i<pgf.size()&&!pg_found;i++) {
-    // DX20170916 [OBSOLETE]      if(MapOperations(operations,pgf.at(i))) {pg_found=TRUE;pgname=pgn.at(i);}
-    // DX20170916 [OBSOLETE]    }
-    // DX20170916 [OBSOLETE]    //  cerr << pg_found << endl;
-    // DX20170916 [OBSOLETE]    //   cerr << pgname << endl;
+    // DX 9/16/17 [OBSOLETE]    vector<string> pgf,pgn;
+    // DX 9/16/17 [OBSOLETE]    // TRICLINIC
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1");pgn.push_back("1"); // 1
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -1");pgn.push_back("-1"); // 2
+    // DX 9/16/17 [OBSOLETE]    // MONOCLINIC
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2");pgn.push_back("2"); // 3-5
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m");pgn.push_back("m"); // 6-9
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 m -1");pgn.push_back("2/m"); // 10-15
+    // DX 9/16/17 [OBSOLETE]    // ORTHORHOMBIC
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 2 2");pgn.push_back("222"); // 16-24
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m m 2");pgn.push_back("mm2"); // 25-46
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m m 2 m 2 2 -1");pgn.push_back("mmm"); // 47-74
+    // DX 9/16/17 [OBSOLETE]    // TETRAGONAL
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4");pgn.push_back("4"); // 75-80
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 -4 -4");pgn.push_back("-4"); // 81-82
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 m -4 -1 -4");pgn.push_back("4/m"); // 83-88
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 2 2 2 2");pgn.push_back("422"); // 89-98
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 4 m 2 4 -2");pgn.push_back("4mm"); // 99-110
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m 2 -4 m 2 -4 2");pgn.push_back("-42m"); // 111-122
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 4 m 2 4 -2 m 2 2 -4 2 -1 -4 2");pgn.push_back("4/mmm"); // 123-142
+    // DX 9/16/17 [OBSOLETE]    // HEXAGONAL-TRIGONAL
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3");pgn.push_back("3"); // 143-146
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 -1 -3 -3");pgn.push_back("-3"); // 147-148
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 2 3 3 2");pgn.push_back("32"); // 149-155
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 m -2 -2");pgn.push_back("3m"); // 156-161
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 3 3 -2 -1 2 2 -3 -3 2");pgn.push_back("-3m"); // 162-167
+    // DX 9/16/17 [OBSOLETE]
+    // DX 9/16/17 [OBSOLETE]    // HEXAGONAL-HEXAGONAL
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6");pgn.push_back("6"); // 168-173
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 m -6 -6");pgn.push_back("-6"); // 174
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6 m -6 -6 -1 -3 -3");pgn.push_back("6/m"); // 175-176
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6 2 2 2 2 2 2");pgn.push_back("622"); // 177-182
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 m 3 3 -2 2 -2 m 6 6 -2");pgn.push_back("6mm"); // 183-186
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 2 m 2 3 -6 3 -6 -2 2");pgn.push_back("-6m2"); // 187-190
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 2 m 2 3 -6 3 -6 -2 2 2 -1 -2 2 m 2 6 -3 6 -3 -2 2");pgn.push_back("6/mmm"); // 	191-194
+    // DX 9/16/17 [OBSOLETE]    // CUBIC
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 3 3 3 3 2 2 3 3 3 3");pgn.push_back("23"); //  195-199
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 3 3 3 3 2 3 3 2 -1 -3 -3 m -3 -3 -3 -3 m -3 -3 m");pgn.push_back("m-3"); // 200-206
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 2 3 4 3 3 4 3 2 2 2 2 2 4 3 2 3 3 4 3 2");pgn.push_back("432"); // 207-214
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 -2 3 3 -2 2 -2 -4 3 3 -4 -4 3 2 -4 3 -4 -4 2 -2 3 3 -2");pgn.push_back("-43m"); // 215-220
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 2 m -2 3 -3 4 3 -2 4 -3 2 -2 -1 2 -3 -3 -2 3 4 4 3 -2 -3 -4 3 2 2 3 -4 -3 2 -4 -3 3 4 m 2 -4 -3 2 3 -4 m 4 -4 2");pgn.push_back("m-3m"); // 221-230
+    // DX 9/16/17 [OBSOLETE]    //  pgf.push_back("1 -2 -2 3 3 -2 -2 2 3 -4 -4 3 3 -4 -2 3 2 -4 -4 3 3 -2 -4 2 -1 2 2 -3 -3 2 2 m -3 4 4 -3 -3 4 2 -3 -2 4 4 -3 -3 2 4 -2");pgn.push_back("m-3m"); // 221-230
+    // DX 9/16/17 [OBSOLETE]    // done
+    // DX 9/16/17 [OBSOLETE]    for(uint i=0;i<pgf.size();i++) aurostd::StringSubst(pgf.at(i),"-2","m"); // -2 are mirrors orthogonal to the axis....
+    // DX 9/16/17 [OBSOLETE]
+    // DX 9/16/17 [OBSOLETE]    // -------------------------------------------------------------------- scanning  ORDER=48
+    // DX 9/16/17 [OBSOLETE]    // find point group
+    // DX 9/16/17 [OBSOLETE]    string pgname;
+    // DX 9/16/17 [OBSOLETE]    aurostd::StringSubst(operations,"-2","m");
+    // DX 9/16/17 [OBSOLETE]
+    // DX 9/16/17 [OBSOLETE]    for(uint i=0;i<pgf.size()&&!pg_found;i++) {
+    // DX 9/16/17 [OBSOLETE]      if(MapOperations(operations,pgf.at(i))) {pg_found=TRUE;pgname=pgn.at(i);}
+    // DX 9/16/17 [OBSOLETE]    }
+    // DX 9/16/17 [OBSOLETE]    //  cerr << pg_found << endl;
+    // DX 9/16/17 [OBSOLETE]    //   cerr << pgname << endl;
 
-    bool pg_found = PointGroupMap(a,pgname,operations,_PGROUP_XTAL_); // DX20170906
+    bool pg_found = PointGroupMap(a,pgname,operations,_PGROUP_XTAL_); // DX 9/6/17
     // -------------------------------------------------------------------- scanning  ORDER=48
     if(pgname=="m-3m") {
       pg_found=TRUE;
@@ -3176,7 +3176,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="cubic";a.crystal_system="cubic";a.point_group_crystal_class="tetrahedral";
       a.point_group_Shoenflies="T_d";a.point_group_Hermann_Mauguin="-43m";a.point_group_orbifold="*332";
-      a.point_group_type="none";a.point_group_order="24";a.point_group_structure="symmetric"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="24";a.point_group_structure="symmetric"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="432") {
       pg_found=TRUE;
@@ -3214,7 +3214,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="hexagonal";a.crystal_system="hexagonal";a.point_group_crystal_class="ditrigonal-dipyramidal";
       a.point_group_Shoenflies="D_3h";a.point_group_Hermann_Mauguin="-6m2";a.point_group_orbifold="*322";
-      a.point_group_type="none";a.point_group_order="12";a.point_group_structure="dihedral"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="12";a.point_group_structure="dihedral"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="6mm") {
       pg_found=TRUE;
@@ -3245,7 +3245,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="tetragonal";a.crystal_system="tetragonal";a.point_group_crystal_class="tetragonal-scalenoidal";
       a.point_group_Shoenflies="D_2d";a.point_group_Hermann_Mauguin="-42m";a.point_group_orbifold="2*2";
-      a.point_group_type="none";a.point_group_order="8";a.point_group_structure="dihedral"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="8";a.point_group_structure="dihedral"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="4mm") {
       pg_found=TRUE;
@@ -3276,7 +3276,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="hexagonal";a.crystal_system="hexagonal";a.point_group_crystal_class="trigonal-dipyramidal";
       a.point_group_Shoenflies="C_3h";a.point_group_Hermann_Mauguin="-6";a.point_group_orbifold="3*";
-      a.point_group_type="none";a.point_group_order="6";a.point_group_structure="cyclic"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="6";a.point_group_structure="cyclic"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="6") {
       pg_found=TRUE;
@@ -3307,7 +3307,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="tetragonal";a.crystal_system="tetragonal";a.point_group_crystal_class="tetragonal-disphenoidal";
       a.point_group_Shoenflies="S_4";a.point_group_Hermann_Mauguin="-4";a.point_group_orbifold="2x";
-      a.point_group_type="none";a.point_group_order="4";a.point_group_structure="cyclic"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="4";a.point_group_structure="cyclic"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="4") {
       pg_found=TRUE;
@@ -3390,11 +3390,11 @@ namespace SYM {
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
-    // DX20170906 [OBSOLETE] return Krun;
+    // DX 9/6/17 [OBSOLETE] return Krun;
     return pg_found;
   }
 } // namespace SYM
-// DX20170814 - Split up function so we can call look-up table separately - END
+// DX 8/14/17 - Split up function so we can call look-up table separately - END
 
 namespace SYM {
   bool CalculatePointGroupCrystal_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_, string format) {
@@ -3435,7 +3435,7 @@ namespace SYM {
       Uf=a.fgroup[ip].Uf;Uc=a.fgroup[ip].Uc;ftau=a.fgroup[ip].ftau;ctau=a.fgroup[ip].ctau;
       bool sym_found=FALSE;
       for(uint ii=0;ii<a.pgroup_xtal.size()&&!sym_found;ii++)
-        sym_found=(identical(Uf,a.pgroup_xtal[ii].Uf));     // look in all the list of operations  // DX20171207 - Use xmatrix identical eps
+        sym_found=(identical(Uf,a.pgroup_xtal[ii].Uf));     // look in all the list of operations  // DX 12/7/17 - Use xmatrix identical eps
       if(sym_found==FALSE) {                                    // new operation, generate and save it
         SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_PGROUP_XTAL_,FALSE); 
       }
@@ -3544,7 +3544,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="cubic";a.crystal_system="cubic";a.point_group_crystal_class="tetrahedral";
       a.point_group_Shoenflies="T_d";a.point_group_Hermann_Mauguin="-43m";a.point_group_orbifold="*332";
-      a.point_group_type="none";a.point_group_order="24";a.point_group_structure="symmetric"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="24";a.point_group_structure="symmetric"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="432") {
       pg_found=TRUE;
@@ -3582,7 +3582,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="hexagonal";a.crystal_system="hexagonal";a.point_group_crystal_class="ditrigonal-dipyramidal";
       a.point_group_Shoenflies="D_3h";a.point_group_Hermann_Mauguin="-6m2";a.point_group_orbifold="*322";
-      a.point_group_type="none";a.point_group_order="12";a.point_group_structure="dihedral"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="12";a.point_group_structure="dihedral"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="6mm") {
       pg_found=TRUE;
@@ -3613,7 +3613,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="tetragonal";a.crystal_system="tetragonal";a.point_group_crystal_class="tetragonal-scalenoidal";
       a.point_group_Shoenflies="D_2d";a.point_group_Hermann_Mauguin="-42m";a.point_group_orbifold="2*2";
-      a.point_group_type="none";a.point_group_order="8";a.point_group_structure="dihedral"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="8";a.point_group_structure="dihedral"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="4mm") {
       pg_found=TRUE;
@@ -3644,7 +3644,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="hexagonal";a.crystal_system="hexagonal";a.point_group_crystal_class="trigonal-dipyramidal";
       a.point_group_Shoenflies="C_3h";a.point_group_Hermann_Mauguin="-6";a.point_group_orbifold="3*";
-      a.point_group_type="none";a.point_group_order="6";a.point_group_structure="cyclic"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="6";a.point_group_structure="cyclic"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="6") {
       pg_found=TRUE;
@@ -3675,7 +3675,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="tetragonal";a.crystal_system="tetragonal";a.point_group_crystal_class="tetragonal-disphenoidal";
       a.point_group_Shoenflies="S_4";a.point_group_Hermann_Mauguin="-4";a.point_group_orbifold="2x";
-      a.point_group_type="none";a.point_group_order="4";a.point_group_structure="cyclic"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="4";a.point_group_structure="cyclic"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="4") {
       pg_found=TRUE;
@@ -3928,7 +3928,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="cubic";a.crystal_system="cubic";a.point_group_crystal_class="tetrahedral";
       a.point_group_Shoenflies="T_d";a.point_group_Hermann_Mauguin="-43m";a.point_group_orbifold="*332";
-      a.point_group_type="none";a.point_group_order="24";a.point_group_structure="symmetric"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="24";a.point_group_structure="symmetric"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="432") {
       pg_found=TRUE;
@@ -3966,7 +3966,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="hexagonal";a.crystal_system="hexagonal";a.point_group_crystal_class="ditrigonal-dipyramidal";
       a.point_group_Shoenflies="D_3h";a.point_group_Hermann_Mauguin="-6m2";a.point_group_orbifold="*322";
-      a.point_group_type="none";a.point_group_order="12";a.point_group_structure="dihedral"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="12";a.point_group_structure="dihedral"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="6mm") {
       pg_found=TRUE;
@@ -3997,7 +3997,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="tetragonal";a.crystal_system="tetragonal";a.point_group_crystal_class="tetragonal-scalenoidal";
       a.point_group_Shoenflies="D_2d";a.point_group_Hermann_Mauguin="-42m";a.point_group_orbifold="2*2";
-      a.point_group_type="none";a.point_group_order="8";a.point_group_structure="dihedral"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="8";a.point_group_structure="dihedral"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="4mm") {
       pg_found=TRUE;
@@ -4028,7 +4028,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="hexagonal";a.crystal_system="hexagonal";a.point_group_crystal_class="trigonal-dipyramidal";
       a.point_group_Shoenflies="C_3h";a.point_group_Hermann_Mauguin="-6";a.point_group_orbifold="3*";
-      a.point_group_type="none";a.point_group_order="6";a.point_group_structure="cyclic"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="6";a.point_group_structure="cyclic"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="6") {
       pg_found=TRUE;
@@ -4059,7 +4059,7 @@ namespace SYM {
       pg_found=TRUE;
       a.crystal_family="tetragonal";a.crystal_system="tetragonal";a.point_group_crystal_class="tetragonal-disphenoidal";
       a.point_group_Shoenflies="S_4";a.point_group_Hermann_Mauguin="-4";a.point_group_orbifold="2x";
-      a.point_group_type="none";a.point_group_order="4";a.point_group_structure="cyclic"; //DX20180827 - point group type changed from - to none
+      a.point_group_type="none";a.point_group_order="4";a.point_group_structure="cyclic"; //DX 20180827 - point group type changed from - to none
     }
     if(pgname=="4") {
       pg_found=TRUE;
@@ -4178,10 +4178,10 @@ namespace SYM {
     xmatrix<double> _Uf(3,3);_Uf=Uf;             // here we make copies so we do not mess up input
     string _string,_stringHM,_stringSC; bool _inversion;
     xvector<double> _axis(3);
-    xvector<double> _generator_coefficients(3); // DX20171206 - added generator coefficients
+    xvector<double> _generator_coefficients(3); // DX 12/6/17 - added generator coefficients
     xmatrix<double> _generator(3,3);
-    xmatrix<xcomplex<double> > _SU2_matrix(2,2); // DX20180117 - added SU(2) matrix
-    xvector<xcomplex<double> > _su2_coefficients(3); // DX20180117 - added su(2) coefficients
+    xmatrix<xcomplex<double> > _SU2_matrix(2,2); // DX 1/17/18 - added SU(2) matrix
+    xvector<xcomplex<double> > _su2_coefficients(3); // DX 1/17/18 - added su(2) coefficients
     double _angle;
     _sym_op symop;
     symop.basis_atoms_map.clear(); // empty
@@ -4191,17 +4191,17 @@ namespace SYM {
     // DX and CO - START
     symop.basis_map_calculated=basis_map_calculated;
     // DX and CO - END
-    if(group==_PGROUP_ || group==_PGROUP_XTAL_ || group==_FGROUP_ || group==_SGROUP_ || group==_AGROUP_ || group==_PGROUPK_ || group==_PGROUPK_XTAL_ || group==_PGROUPK_PATTERSON_) { // DX20171205 - Added pgroupk_xtal //DX20200129 - added Patterson symmetry
+    if(group==_PGROUP_ || group==_PGROUP_XTAL_ || group==_FGROUP_ || group==_SGROUP_ || group==_AGROUP_ || group==_PGROUPK_ || group==_PGROUPK_XTAL_ || group==_PGROUPK_PATTERSON_) { // DX 12/5/17 - Added pgroupk_xtal //DX 20200129 - added Patterson symmetry
       // DX AND COREY - START
       if(roff) {roundoff(_Uc,_EPS_roundoff_);roundoff(_Uf,_EPS_roundoff_);}                       // Uc cleanup from roundoff errors
       if(roff) {roundoff(ctau,_EPS_roundoff_);roundoff(ftau,_EPS_roundoff_);}
       if(roff) {roundoff(ctrasl,_EPS_roundoff_);roundoff(ftrasl,_EPS_roundoff_);}
       // DX AND COREY - END
       symop.Uc=_Uc;symop.Uf=_Uf;symop.ctau=ctau;symop.ftau=ftau;symop.ctrasl=ctrasl;symop.ftrasl=ftrasl;
-      SYM::TypePointGroupOperation(_Uc,_Uf,_string,_inversion,_angle,_axis,_generator,_generator_coefficients,_SU2_matrix,_su2_coefficients,a.sym_eps); // extract information in // DX added eps // DX20171206 - generator coefficients // DX20171207 - added Uf // DX20180117 - add SU(2) and su(2) coefficients
-      SYM::TypePointGroupOperationInternational(_Uc,_stringHM,_stringSC,_inversion,_angle,_axis,_generator,_generator_coefficients,_SU2_matrix,_su2_coefficients,a.sym_eps); // extract information // DX added eps // DX20171206 - generator coefficients // DX20180117 - add SU(2) and su(2) coefficients
-      symop.generator=_generator;symop.generator_coefficients=_generator_coefficients;symop.angle=_angle;symop.axis=_axis; // DX20171206 - generator coefficients
-      symop.SU2_matrix=_SU2_matrix;symop.su2_coefficients=_su2_coefficients; // DX20180117 - add SU(2) and su(2) coefficients
+      SYM::TypePointGroupOperation(_Uc,_Uf,_string,_inversion,_angle,_axis,_generator,_generator_coefficients,_SU2_matrix,_su2_coefficients,a.sym_eps); // extract information in // DX added eps // DX 12/6/17 - generator coefficients // DX 12/7/17 - added Uf // DX 1/17/18 - add SU(2) and su(2) coefficients
+      SYM::TypePointGroupOperationInternational(_Uc,_stringHM,_stringSC,_inversion,_angle,_axis,_generator,_generator_coefficients,_SU2_matrix,_su2_coefficients,a.sym_eps); // extract information // DX added eps // DX 12/6/17 - generator coefficients // DX 1/17/18 - add SU(2) and su(2) coefficients
+      symop.generator=_generator;symop.generator_coefficients=_generator_coefficients;symop.angle=_angle;symop.axis=_axis; // DX 12/6/17 - generator coefficients
+      symop.SU2_matrix=_SU2_matrix;symop.su2_coefficients=_su2_coefficients; // DX 1/17/18 - add SU(2) and su(2) coefficients
       symop.str_type=_string;symop.flag_inversion=_inversion;
       symop.str_Hermann_Mauguin=_stringHM;
       symop.str_Schoenflies=_stringSC;
@@ -4223,7 +4223,7 @@ namespace SYM {
       a.pgroup_xtal.push_back(symop);
       return a.pgroup_xtal.size();  // it returns the number of operations saved
     }
-    if(group==_PGROUPK_PATTERSON_) { //DX20200129
+    if(group==_PGROUPK_PATTERSON_) { //DX 20200129
       a.pgroupk_Patterson_calculated=TRUE;
       clear(symop.ctau);clear(symop.ftau);clear(symop.ctrasl);clear(symop.ftrasl);              // no translation on point group
       symop.is_pgroup=FALSE;symop.is_fgroup=FALSE;symop.is_sgroup=FALSE;symop.is_agroup=FALSE;symop.is_pgroupk=FALSE;symop.is_pgroup_xtal=FALSE;symop.is_pgroupk_xtal=FALSE;symop.is_pgroupk_Patterson=TRUE;
@@ -4246,7 +4246,7 @@ namespace SYM {
       a.agroup_calculated=TRUE;
       clear(symop.ctau);clear(symop.ftau);clear(symop.ctrasl);clear(symop.ftrasl);              // no translation on site point group
       symop.is_pgroup=FALSE;symop.is_fgroup=FALSE;symop.is_sgroup=FALSE;symop.is_agroup=TRUE;symop.is_pgroupk=FALSE;symop.is_pgroup_xtal=FALSE;symop.is_pgroupk_xtal=FALSE;symop.is_pgroupk_Patterson=FALSE;
-      symop.site=iat; // DX20170803
+      symop.site=iat; // DX 8/3/17
       a.agroup.at(iat).push_back(symop);
       return a.agroup.at(iat).size();   // it returns the number of operations saved
     }
@@ -4257,7 +4257,7 @@ namespace SYM {
       a.pgroupk.push_back(symop);
       return a.pgroupk.size();  // it returns the number of operations saved
     }
-    // DX20171205 - Added pgroupk_xtal - START
+    // DX 12/5/17 - Added pgroupk_xtal - START
     if(group==_PGROUPK_XTAL_) {
       a.pgroupk_xtal_calculated=TRUE;
       clear(symop.ctau);clear(symop.ftau);clear(symop.ctrasl);clear(symop.ftrasl);              // no translation on point group
@@ -4265,7 +4265,7 @@ namespace SYM {
       a.pgroupk_xtal.push_back(symop);
       return a.pgroupk_xtal.size();  // it returns the number of operations saved
     }
-    // DX20171205 - Added pgroupk_xtal - END
+    // DX 12/5/17 - Added pgroupk_xtal - END
     return (uint) 0;
   }
 } // namespace SYM
@@ -4346,11 +4346,11 @@ namespace SYM {
 
 namespace SYM {
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) { 
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
     string soliloquy="SYM::CalculatePointGroup():";
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     // Obtain the structure tolerance
-    //DX20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX20180426 - added current working directory
+    //DX 20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
     a.sym_eps=_eps_; // DX
 
     // AFLOW_FUNCTION_IMPLEMENTATION
@@ -4451,7 +4451,7 @@ namespace SYM {
               ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
               //keep only the lattice points within the sphere with radius
               if(modulus(rrr)<radius && 
-                  // DX START : Speed up vectors to check
+                  // DX - START : Speed up vectors to check
                   //((modulus(rrr)>na1_min && modulus(rrr)<na1_max) || 
                   // (modulus(rrr)>na2_min && modulus(rrr)<na2_max) || 
                   // (modulus(rrr)>na3_min && modulus(rrr)<na3_max)))
@@ -4459,7 +4459,7 @@ namespace SYM {
                  aurostd::abs(modulus(rrr)-na2) < _eps_ ||
                  aurostd::abs(modulus(rrr)-na3) < _eps_))
                  {  //CO200106 - patching for auto-indenting
-                   // DX END : Speed up vectors to check
+                   // DX - END : Speed up vectors to check
                    grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
                    *grid_clattice_ptr=rrr;                            // SAVE THEM ALL
                    grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
@@ -4477,8 +4477,8 @@ namespace SYM {
     // ------------------------------------------------------------------------------
     // for each set of three lattice points within the sphere see which one has the
     // same sets of lengths and angles as the original lattice unit cell vectors.
-    //[CO20190520 - testing setUf and setUc]_sym_op test; //delete me
-    //[CO20190520 - testing setUf and setUc]bool isequal; //delete me
+    //[CO190520 - testing setUf and setUc]_sym_op test; //delete me
+    //[CO190520 - testing setUf and setUc]bool isequal; //delete me
     uint ii=0,jj=0,kk=0;
     for(uint i=0;i<grid_clattice.size();i++){
       for(ii=1;ii<=3;ii++) temp_clattice(1,ii)=(*grid_clattice[i])(ii);
@@ -4517,30 +4517,30 @@ namespace SYM {
                           Bct=temp_clattice;Uc=trasp(Act)*inverse(trasp(Bct)); // Act=lattice;
                           Bdt=temp_flattice;Uf=trasp(Adt)*inverse(trasp(Bdt)); // Adt=I3... could remove !
 
-                          //[CO20190520 - testing setUf and setUc]if(LDEBUG) { //delete me
-                          //[CO20190520 - testing setUf and setUc]  test.setUf(Uf,lattice);
-                          //[CO20190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uc,test.Uc);
-                          //[CO20190520 - testing setUf and setUc]  if(!isequal){cerr << "BAD2!" << endl;}
+                          //[CO190520 - testing setUf and setUc]if(LDEBUG) { //delete me
+                          //[CO190520 - testing setUf and setUc]  test.setUf(Uf,lattice);
+                          //[CO190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uc,test.Uc);
+                          //[CO190520 - testing setUf and setUc]  if(!isequal){cerr << "BAD2!" << endl;}
 
-                          //[CO20190520 - testing setUf and setUc]  cerr << "Uc=" << endl;cerr << Uc << endl;
-                          //[CO20190520 - testing setUf and setUc]  //cerr << "c2f*Uc*f2c=" << endl;cerr << c2f*Uc*f2c << endl;
-                          //[CO20190520 - testing setUf and setUc]  //cerr << "f2c*Uc*c2f=" << endl;cerr << f2c*Uc*c2f << endl;
-                          //[CO20190520 - testing setUf and setUc]  cerr << "test.Uc=" << endl;cerr << test.Uc << endl;
+                          //[CO190520 - testing setUf and setUc]  cerr << "Uc=" << endl;cerr << Uc << endl;
+                          //[CO190520 - testing setUf and setUc]  //cerr << "c2f*Uc*f2c=" << endl;cerr << c2f*Uc*f2c << endl;
+                          //[CO190520 - testing setUf and setUc]  //cerr << "f2c*Uc*c2f=" << endl;cerr << f2c*Uc*c2f << endl;
+                          //[CO190520 - testing setUf and setUc]  cerr << "test.Uc=" << endl;cerr << test.Uc << endl;
 
-                          //[CO20190520 - testing setUf and setUc]  test.setUc(Uc,lattice);
-                          //[CO20190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uf,test.Uf);
-                          //[CO20190520 - testing setUf and setUc]  if(!isequal){cerr << "BAD1!" << endl;}
+                          //[CO190520 - testing setUf and setUc]  test.setUc(Uc,lattice);
+                          //[CO190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uf,test.Uf);
+                          //[CO190520 - testing setUf and setUc]  if(!isequal){cerr << "BAD1!" << endl;}
 
-                          //[CO20190520 - testing setUf and setUc]  cerr << "Uf=" << endl;cerr << Uf << endl;
-                          //[CO20190520 - testing setUf and setUc]  //cerr << "c2f*Uf*f2c=" << endl;cerr << c2f*Uf*f2c << endl;
-                          //[CO20190520 - testing setUf and setUc]  //cerr << "f2c*Uf*c2f=" << endl;cerr << f2c*Uf*c2f << endl;
-                          //[CO20190520 - testing setUf and setUc]  cerr << "test.Uf=" << endl;cerr << test.Uf << endl;
-                          //[CO20190520 - testing setUf and setUc]}
+                          //[CO190520 - testing setUf and setUc]  cerr << "Uf=" << endl;cerr << Uf << endl;
+                          //[CO190520 - testing setUf and setUc]  //cerr << "c2f*Uf*f2c=" << endl;cerr << c2f*Uf*f2c << endl;
+                          //[CO190520 - testing setUf and setUc]  //cerr << "f2c*Uf*c2f=" << endl;cerr << f2c*Uf*c2f << endl;
+                          //[CO190520 - testing setUf and setUc]  cerr << "test.Uf=" << endl;cerr << test.Uf << endl;
+                          //[CO190520 - testing setUf and setUc]}
 
                           // check whether this symmetry operation is new or not
                           sym_found=FALSE;
                           for(ii=0;ii<a.pgroup.size()&&!sym_found;ii++){
-                            sym_found=identical(Uf,a.pgroup[ii].Uf);       // look in all the list of operations  // DX20171207 - Use Uf (only integers) not Uc and use xmatrix identical eps
+                            sym_found=identical(Uf,a.pgroup[ii].Uf);       // look in all the list of operations  // DX 12/7/17 - Use Uf (only integers) not Uc and use xmatrix identical eps
                           }
                           // if the symmetry operation is new, add it to the pointgroup array
                           // and update all info about the sym_op object
@@ -4616,9 +4616,9 @@ namespace SYM {
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_,osswrite,oss,format);
-    string pgname = ""; // DX20170906
-    string operations = ""; // DX20170906
-    return PointGroupMap(a, pgname, operations, _PGROUP_); // DX20170906
+    string pgname = ""; // DX 9/6/17
+    string operations = ""; // DX 9/6/17
+    return PointGroupMap(a, pgname, operations, _PGROUP_); // DX 9/6/17
   }
 } // namespace SYM
 
@@ -4997,7 +4997,7 @@ namespace SYM {
     bool Krun=TRUE;
     // DX AND COREY -START
     string pgroup_type="pgroupk";
-    a.pgroupk.clear();  //CO20190204
+    a.pgroupk.clear();  //CO190204
     xstructure aa;aa.ReScale(1.0);         //contains FixLattices()
     aa.lattice=a.klattice;aa.ReScale(1.0); //contains FixLattices()
     aa.sym_eps = a.sym_eps; // DX NEED TO PROPOGATE sym_eps
@@ -5009,8 +5009,8 @@ namespace SYM {
     _atom atom;
     aa.AddAtom(atom); // just something in the origin;
     //  cerr << aa << endl;
-    // DX20170808 - New klattice routine [OBSOLETE] Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,aa,aflags,FALSE,osswrite,oss);
-    Krun=Krun && SYM::TransformSymmetryFromRealToReciprocal(FileMESSAGE,a,aa,aflags,osswrite,oss,pgroup_type); // DX20170808 - New klattice routine
+    // DX 8/8/17 - New klattice routine [OBSOLETE] Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,aa,aflags,FALSE,osswrite,oss);
+    Krun=Krun && SYM::TransformSymmetryFromRealToReciprocal(FileMESSAGE,a,aa,aflags,osswrite,oss,pgroup_type); // DX 8/8/17 - New klattice routine
     // ------------------------------------------------------------------------------
     a.pgroupk_calculated=TRUE;
     // ------------------------------------------------------------------------------
@@ -5034,7 +5034,7 @@ namespace SYM {
     bool Krun=TRUE;
     // DX AND COREY -START
     string pgroup_type="pgroupk_xtal";
-    a.pgroupk_xtal.clear(); //CO20190204
+    a.pgroupk_xtal.clear(); //CO190204
     xstructure aa;aa.ReScale(1.0);         //contains FixLattices()
     aa.lattice=a.klattice;aa.ReScale(1.0); //contains FixLattices()
     aa.sym_eps = a.sym_eps; // DX NEED TO PROPOGATE sym_eps
@@ -5046,8 +5046,8 @@ namespace SYM {
     _atom atom;
     aa.AddAtom(atom); // just something in the origin;
     //  cerr << aa << endl;
-    // DX20170808 - New klattice routine [OBSOLETE] Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,aa,aflags,FALSE,osswrite,oss);
-    Krun=Krun && SYM::TransformSymmetryFromRealToReciprocal(FileMESSAGE,a,aa,aflags,osswrite,oss,pgroup_type); // DX20170808 - New klattice routine
+    // DX 8/8/17 - New klattice routine [OBSOLETE] Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,aa,aflags,FALSE,osswrite,oss);
+    Krun=Krun && SYM::TransformSymmetryFromRealToReciprocal(FileMESSAGE,a,aa,aflags,osswrite,oss,pgroup_type); // DX 8/8/17 - New klattice routine
     // ------------------------------------------------------------------------------
     a.pgroupk_xtal_calculated=TRUE;
     // ------------------------------------------------------------------------------
@@ -5074,7 +5074,7 @@ namespace SYM {
 // The tolerance would be an ellipsoid, not a uniform sphere (i.e. direction dependent).
 // This procedure circumvents this problem and ensures the number of real space point group operations 
 // is always equal to the reciprocal space point group operations.
-// DX20170808
+// DX 8/8/17
 //
 namespace SYM {
   bool TransformSymmetryFromRealToReciprocal(ofstream &FileMESSAGE, xstructure& real_xstr, xstructure& reciprocal_xstr,
@@ -5107,8 +5107,8 @@ namespace SYM {
       for(uint i=0;i<real_xstr.pgroup.size();i++){
         //Uf = trasp_real_f2c*real_xstr.pgroup[i].Uc*trasp_real_c2f;
         //Uc = reciprocal_xstr.f2c*Uf*reciprocal_xstr.c2f;
-        Uf = trasp(inverse(real_xstr.pgroup[i].Uf)); // DX20170905 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
-        Uc = real_xstr.pgroup[i].Uc; // DX20170905 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
+        Uf = trasp(inverse(real_xstr.pgroup[i].Uf)); // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
+        Uc = real_xstr.pgroup[i].Uc; // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
         kk=SYM::AddSymmetryToStructure(reciprocal_xstr,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_,FALSE);  // kk number pgroups
         aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup[kk-1].str_type
           << " theta=";
@@ -5144,8 +5144,8 @@ namespace SYM {
       for(uint i=0;i<real_xstr.pgroup_xtal.size();i++){
         //Uf = trasp_real_f2c*real_xstr.pgroup_xtal[i].Uc*trasp_real_c2f;
         //Uc = reciprocal_xstr.f2c*Uf*reciprocal_xstr.c2f;
-        Uf = trasp(inverse(real_xstr.pgroup_xtal[i].Uf)); // DX20170905 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
-        Uc = real_xstr.pgroup_xtal[i].Uc; // DX20170905 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
+        Uf = trasp(inverse(real_xstr.pgroup_xtal[i].Uf)); // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
+        Uc = real_xstr.pgroup_xtal[i].Uc; // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
         kk=SYM::AddSymmetryToStructure(reciprocal_xstr,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_XTAL_,FALSE);  // kk number pgroups
         aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup_xtal[kk-1].str_type
           << " theta=";
@@ -5181,58 +5181,58 @@ namespace SYM {
 
 // DX AND COREY - START
 
-//DX20190905 [OBSOLETE] double BringInCell(const double& x) {
-//DX20190905 [OBSOLETE]   return BringInCell_20161115(x);
-//DX20190905 [OBSOLETE] }
-//DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] double BringInCell_20161115(const double& x) {
-//DX20190905 [OBSOLETE]   return SYM::mod_one(x);
-//DX20190905 [OBSOLETE] }
-//DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] #ifndef COMPILE_SLIM
-//DX20190905 [OBSOLETE] double BringInCell_20160101(const double& x) {
-//DX20190905 [OBSOLETE]   //  if(x>0.0) { y=x-(double)floor(x); return y; }
-//DX20190905 [OBSOLETE]   // else { if(x<0.0) y=x+floor(-x)+1.0;}
-//DX20190905 [OBSOLETE]   if(x> _EPS_) return x-floor(x);
-//DX20190905 [OBSOLETE]   if(x<-_EPS_) return x+floor(-x)+1.0;
-//DX20190905 [OBSOLETE]   //  if(abs(x)<0.0001) y=0.0;
-//DX20190905 [OBSOLETE]   // if(abs(x-1.0)<0.0001) y=0.0;
-//DX20190905 [OBSOLETE]   return 0.0;
-//DX20190905 [OBSOLETE] }
-//DX20190905 [OBSOLETE] #endif
-//DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] #ifndef COMPILE_SLIM
-//DX20190905 [OBSOLETE] double BringInCell_20160101(const double& x,double tolerance) {
-//DX20190905 [OBSOLETE]   //  if(x>0.0) { y=x-(double)floor(x); return y; }
-//DX20190905 [OBSOLETE]   // else { if(x<0.0) y=x+floor(-x)+1.0;}
-//DX20190905 [OBSOLETE]   if(x>tolerance) {return x-floor(x);}
-//DX20190905 [OBSOLETE]   if(x<tolerance) {return x+floor(-x)+1.0;}
-//DX20190905 [OBSOLETE]   //  if(abs(x)<0.0001) y=0.0;
-//DX20190905 [OBSOLETE]   // if(abs(x-1.0)<0.0001) y=0.0;
-//DX20190905 [OBSOLETE]   return 0.0;
-//DX20190905 [OBSOLETE] }
-//DX20190905 [OBSOLETE] #endif
-//DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] xvector<double> BringInCell2_20161115(const xvector<double>& v_in) {
-//DX20190905 [OBSOLETE]   return BringInCell2(v_in);
-//DX20190905 [OBSOLETE] }
-//DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] #ifndef COMPILE_SLIM
-//DX20190905 [OBSOLETE] xvector<double> BringInCell2_20160101(const xvector<double>& v_in,double tolerance) {
-//DX20190905 [OBSOLETE]   xvector<double> v_out(v_in.urows,v_in.lrows);
-//DX20190905 [OBSOLETE]   for(int i=v_out.lrows;i<=v_out.urows;i++) {
-//DX20190905 [OBSOLETE]     //v_out(i)=BringInCell(v_in(i),tolerance);
-//DX20190905 [OBSOLETE]     v_out(i)=BringInCell_20160101(v_in(i),tolerance);
-//DX20190905 [OBSOLETE]     if(abs(v_out(i))<tolerance) {v_out(i)=0.0;}
-//DX20190905 [OBSOLETE]     if(abs(v_out(i)-1.0)<tolerance) {v_out(i)=0.0;}
-//DX20190905 [OBSOLETE]   }
-//DX20190905 [OBSOLETE]   return v_out;
-//DX20190905 [OBSOLETE] }
-//DX20190905 [OBSOLETE] #endif
-//DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] xvector<double> BringInCell2(const xvector<double>& v_in) {
-//DX20190905 [OBSOLETE]   return SYM::mod_one_xvec(v_in);
-//DX20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] double BringInCell(const double& x) {
+//DX 20190905 [OBSOLETE]   return BringInCell_20161115(x);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] double BringInCell_20161115(const double& x) {
+//DX 20190905 [OBSOLETE]   return SYM::mod_one(x);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] #ifndef COMPILE_SLIM
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x) {
+//DX 20190905 [OBSOLETE]   //  if(x>0.0) { y=x-(double)floor(x); return y; }
+//DX 20190905 [OBSOLETE]   // else { if(x<0.0) y=x+floor(-x)+1.0;}
+//DX 20190905 [OBSOLETE]   if(x> _EPS_) return x-floor(x);
+//DX 20190905 [OBSOLETE]   if(x<-_EPS_) return x+floor(-x)+1.0;
+//DX 20190905 [OBSOLETE]   //  if(abs(x)<0.0001) y=0.0;
+//DX 20190905 [OBSOLETE]   // if(abs(x-1.0)<0.0001) y=0.0;
+//DX 20190905 [OBSOLETE]   return 0.0;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] #endif
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] #ifndef COMPILE_SLIM
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x,double tolerance) {
+//DX 20190905 [OBSOLETE]   //  if(x>0.0) { y=x-(double)floor(x); return y; }
+//DX 20190905 [OBSOLETE]   // else { if(x<0.0) y=x+floor(-x)+1.0;}
+//DX 20190905 [OBSOLETE]   if(x>tolerance) {return x-floor(x);}
+//DX 20190905 [OBSOLETE]   if(x<tolerance) {return x+floor(-x)+1.0;}
+//DX 20190905 [OBSOLETE]   //  if(abs(x)<0.0001) y=0.0;
+//DX 20190905 [OBSOLETE]   // if(abs(x-1.0)<0.0001) y=0.0;
+//DX 20190905 [OBSOLETE]   return 0.0;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] #endif
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20161115(const xvector<double>& v_in) {
+//DX 20190905 [OBSOLETE]   return BringInCell2(v_in);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] #ifndef COMPILE_SLIM
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20160101(const xvector<double>& v_in,double tolerance) {
+//DX 20190905 [OBSOLETE]   xvector<double> v_out(v_in.urows,v_in.lrows);
+//DX 20190905 [OBSOLETE]   for(int i=v_out.lrows;i<=v_out.urows;i++) {
+//DX 20190905 [OBSOLETE]     //v_out(i)=BringInCell(v_in(i),tolerance);
+//DX 20190905 [OBSOLETE]     v_out(i)=BringInCell_20160101(v_in(i),tolerance);
+//DX 20190905 [OBSOLETE]     if(abs(v_out(i))<tolerance) {v_out(i)=0.0;}
+//DX 20190905 [OBSOLETE]     if(abs(v_out(i)-1.0)<tolerance) {v_out(i)=0.0;}
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE]   return v_out;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] #endif
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2(const xvector<double>& v_in) {
+//DX 20190905 [OBSOLETE]   return SYM::mod_one_xvec(v_in);
+//DX 20190905 [OBSOLETE] }
 
 namespace SYM {
   //xstructure and _sym_op
@@ -5245,25 +5245,25 @@ namespace SYM {
     }
     return getFullSymBasis(a,symOp,map_types,tolerance,basis_atoms_map,basis_types_map);
   }
-  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO20190520 - removed pointers for bools and doubles, added const where possible
-    double min_dist=a.dist_nn_min; // CO20180409
-    if(min_dist == AUROSTD_NAN){min_dist=minimumDistance(a);} // CO20180409
-    bool skew = isLatticeSkewed(a.lattice,min_dist,tolerance); // CO20180409
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO190520 - removed pointers for bools and doubles, added const where possible
+    double min_dist=a.dist_nn_min; // CO 180409
+    if(min_dist == AUROSTD_NAN){min_dist=minimumDistance(a);} // CO 180409
+    bool skew = isLatticeSkewed(a.lattice,min_dist,tolerance); // CO 180409
     return getFullSymBasis(a,symOp,map_types,skew,tolerance,basis_atoms_map,basis_types_map);
   }
-  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO190520 - removed pointers for bools and doubles, added const where possible
     return getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,map_types,skew,tolerance,basis_atoms_map,basis_types_map);
   }
   //atoms, c2f, f2c and _sym_op
-  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO190520 - removed pointers for bools and doubles, added const where possible
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     bool fast=true;  // DX COME BACK HERE, MAKE THIS AN INPUT // CO, no need, if fast doesn't work, we have bigger problems
 
-    // CO20180420 - fixing for ME (Marco)
+    // CO 180420 - fixing for ME (Marco)
     bool basis_map_calculated_orig=symOp.basis_map_calculated;
     symOp.basis_map_calculated=false;
-    symOp.basis_map_calculated=basis_map_calculated_orig;  // CO20140420 - make sure to include me before any return/exit!!!!!
+    symOp.basis_map_calculated=basis_map_calculated_orig;  // CO 140420 - make sure to include me before any return/exit!!!!!
 
     //bool cont = true;
     uint count=0;
@@ -5281,7 +5281,7 @@ namespace SYM {
       // DX tmp=ApplyAtom(atoms[k],symOp,lattice,c2f,f2c,skew,true,false,ignoreFractionalOperation,tolerance); //incell, but no roff
       if(!ApplyAtomValidate(atoms[k],tmp,symOp,lattice,c2f,f2c,skew,true,false,tolerance)){ //incell, but no roff
         // Applying c2f and f2c to the Cartesian and fractional positions give different results (a tolerance issue) 
-        symOp.basis_map_calculated=basis_map_calculated_orig;  // CO20140420 - make sure to include me before any return/exit!!!!!
+        symOp.basis_map_calculated=basis_map_calculated_orig;  // CO 140420 - make sure to include me before any return/exit!!!!!
         return FALSE;
       }
       // DX TEST
@@ -5299,11 +5299,11 @@ namespace SYM {
       tmp.type = atoms[k].type;*/
       // DX TEST
       uint mapped_index=0;
-      if(MapAtomWithBasis(atoms, tmp, map_types, index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX20190619 - lattice and f2c as input
+      if(MapAtomWithBasis(atoms, tmp, map_types, index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX 20190619 - lattice and f2c as input
         basis_atoms_map.push_back(index_to_check[mapped_index]);
         basis_types_map.push_back(atoms[index_to_check[mapped_index]].type);
         if(fast){ //If you use fast, you should have verified that no atoms overlap (which is most of the time, hopefully)
-          // DX20170731 - fast also inherently checks one-to-one
+          // DX - 7/31/17 - fast also inherently checks one-to-one
           index_to_check.erase(index_to_check.begin()+mapped_index);
         }
         count++;
@@ -5327,7 +5327,7 @@ namespace SYM {
           cerr << "normal atom " << atoms.at(i).fpos << " | " << tmp.fpos << ", diff = " << fdiff << " (mod=" << aurostd::modulus(f2c*fdiff) << ")" << endl;
           }
           }*/
-        symOp.basis_map_calculated=basis_map_calculated_orig;  // CO20140420 - make sure to include me before any return/exit!!!!!
+        symOp.basis_map_calculated=basis_map_calculated_orig;  // CO 140420 - make sure to include me before any return/exit!!!!!
         return FALSE;
       }
     }
@@ -5337,13 +5337,13 @@ namespace SYM {
         cerr << "atom :" << atoms[k].fpos  << endl;
         cerr << "ratom:" << transformedcrystal[k].fpos  << endl;
         }*/
-      // DX20170731 - Check one-to-one speed increase : START
-      if(!fast){ // DX20170731 - If not fast, need to check if one-to-one
+      // DX - 7/31/17 - Check one-to-one speed increase : START
+      if(!fast){ // DX - 7/31/17 - If not fast, need to check if one-to-one
         vector<int> mappings = basis_atoms_map;
         for(uint i=0;i<mappings.size();i++){
           for(uint j=i+1;j<mappings.size();j++){
             if(mappings[i] == mappings[j]){
-              symOp.basis_map_calculated=basis_map_calculated_orig;  // CO20140420 - make sure to include me before any return/exit!!!!!
+              symOp.basis_map_calculated=basis_map_calculated_orig;  // CO 140420 - make sure to include me before any return/exit!!!!!
               return FALSE;
             }
           }
@@ -5351,21 +5351,21 @@ namespace SYM {
           i--;
         } 
       }
-      // DX20170731 - Check one-to-one speed increase : END
-      symOp.basis_map_calculated=basis_map_calculated_orig;  // CO20140420 - make sure to include me before any return/exit!!!!!
+      // DX - 7/31/17 - Check one-to-one speed increase : END
+      symOp.basis_map_calculated=basis_map_calculated_orig;  // CO 140420 - make sure to include me before any return/exit!!!!!
       return TRUE;
     }
     if(LDEBUG) {
       cerr << "SYM::getFullSymBasis: FAILED 2 - total mappings = " << count << ", should be " << atoms.size() << endl;
     }
-    symOp.basis_map_calculated=basis_map_calculated_orig;  // CO20140420 - make sure to include me before any return/exit!!!!!
+    symOp.basis_map_calculated=basis_map_calculated_orig;  // CO 140420 - make sure to include me before any return/exit!!!!!
     return FALSE;
   }
   // DX AND COREY - END
 
   // DX AND COREY - START
   // warning: this variant gets wrong basis_atoms_map, it flips indices between transformed crystal and original (but everything else should be the same)
-  bool getFullSymBasis_20170729(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis_20170729(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO190520 - removed pointers for bools and doubles, added const where possible
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     bool fast=true;  // DX COME BACK HERE, MAKE THIS AN INPUT // CO, no need, if fast doesn't work, we have bigger problems
@@ -5398,7 +5398,7 @@ namespace SYM {
       tmp.name = atoms[k].name;
       tmp.type = atoms[k].type;*/
       // DX TEST
-      if(MapAtom(atoms,tmp,map_types,lattice,f2c,skew,tolerance)){ //DX20190619 - lattice and f2c as input
+      if(MapAtom(atoms,tmp,map_types,lattice,f2c,skew,tolerance)){ //DX 20190619 - lattice and f2c as input
         transformedcrystal.push_back(tmp);
         index_to_check.push_back(k);
       }
@@ -5429,7 +5429,7 @@ namespace SYM {
     // ===== If each atom is mapped to another atom (i.e. onto), we need to check if each mapping is unique (i.e. one-to-one) ===== //
     for(uint ix=0;ix<atoms.size();ix++){
       uint mapped_index=0;
-      if(MapAtomWithBasis(transformedcrystal, atoms[ix], map_types,index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      if(MapAtomWithBasis(transformedcrystal, atoms[ix], map_types,index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
         basis_atoms_map.push_back(index_to_check[mapped_index]);
         basis_types_map.push_back(atoms[index_to_check[mapped_index]].type);
         if(fast){ //If you use fast, you should have verified that no atoms overlap (which is most of the time, hopefully)
@@ -5550,9 +5550,9 @@ namespace SYM {
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup index_for_smallest_group=" << index_for_smallest_group << endl;}
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup atoms_by_type.size()=" << atoms_by_type.size() << endl;}
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup atoms_by_type[index_for_smallest_group].size()=" << atoms_by_type[index_for_smallest_group].size() << endl;}
-        //DX20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau = mod_one_xvec(atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos);
-        symOp.ftau = atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos; //DX20190905 - uses new bring in cell function
-        BringInCellInPlace(symOp.ftau); //DX20190905 - uses new bring in cell function
+        //DX 20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau = mod_one_xvec(atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos);
+        symOp.ftau = atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos; //DX 20190905 - uses new bring in cell function
+        BringInCellInPlace(symOp.ftau); //DX 20190905 - uses new bring in cell function
         // CO - START
         symOp.ctau=a.f2c*symOp.ftau;
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup about to test symop" << endl;}
@@ -5561,8 +5561,8 @@ namespace SYM {
         if(getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,TRUE,skew,_eps_,basis_atoms_map,basis_types_map))
         { //CO200106 - patching for auto-indenting
           //Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=symOp.ftau; // for safety try to check out inverse
-          //DX20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau=mod_one_xvec(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[
-          BringInCellInPlace(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[ //DX20190905 - uses new BringInCell function
+          //DX 20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau=mod_one_xvec(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[
+          BringInCellInPlace(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[ //DX 20190905 - uses new BringInCell function
           for(uint i=1;i<=3;i++) {
             if(symOp.ftau[i]>1.0-_ZERO_TOL_){ 
               symOp.ftau[i]=0.0; // DX roundoff
@@ -5571,8 +5571,8 @@ namespace SYM {
           symOp.ctau=f2c*symOp.ftau;clear(symOp.ctrasl);clear(symOp.ftrasl);
           sym_found=FALSE;
           for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++){
-            sym_found=(aurostd::identical(symOp.Uf,a.fgroup[ii].Uf) &&   // DX20171207 - Use xmatrix identical eps
-                aurostd::identical(symOp.ctau,a.fgroup[ii].ctau,_eps_) && // DX20171207 - Use ctau not ftau
+            sym_found=(aurostd::identical(symOp.Uf,a.fgroup[ii].Uf) &&   // DX 12/7/17 - Use xmatrix identical eps
+                aurostd::identical(symOp.ctau,a.fgroup[ii].ctau,_eps_) && // DX 12/7/17 - Use ctau not ftau
                 aurostd::identical(basis_atoms_map,a.fgroup[ii].basis_atoms_map,0)); // look in all the list of operations
           }
           if(sym_found==FALSE) {                                          // new operation, generate and save it
@@ -5604,13 +5604,13 @@ namespace SYM {
     if(1) {
       uint unities=0;
       for(uint ii=0;ii<a.fgroup.size();ii++)
-        if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf)){unities++;}    // check unity 0 is always unity // DX used to be _eps_/10.0  // DX20171207 - Use xmatrix identical eps
+        if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf)){unities++;}    // check unity 0 is always unity // DX used to be _eps_/10.0  // DX 12/7/17 - Use xmatrix identical eps
       if(unities>1) {
         aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: Cell not primitive: as big as " << unities << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       }
       for(uint ii=0+1;ii<a.fgroup.size();ii++) // avoid origin
-        if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf)) { // DX used to be _eps_/10.0  // DX20171207 - Use xmatrix identical eps
+        if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf)) { // DX used to be _eps_/10.0  // DX 12/7/17 - Use xmatrix identical eps
           aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: non-primitive internal translation ftau=(" << a.fgroup[ii].ftau << ") " << endl;  
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
         }
@@ -7061,13 +7061,13 @@ namespace SYM {
   bool CalculateSitePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,int CALCULATION_MODE,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::getPWD(); // DX20180426 - added current working directory  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
+    string directory=aurostd::getPWD(); // DX 4/26/18 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     //CALCULATION_MODE == 0 (default) - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for all
     //CALCULATION_MODE == 1 - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for iatoms ONLY
     //CALCULATION_MODE == 2 - calculate all atoms standard routine (go through pgroups), get full basis for all
     if(!(CALCULATION_MODE == 0 || CALCULATION_MODE == 1 || CALCULATION_MODE == 2)) {
       cerr << "SYM::CalculateSitePointGroup ERROR:  Invalid calculation mode.  Must be 0, 1, or 2. Exiting [dir=" << a.directory << "]" << endl;
-      exit(0); // CO20180502 - normally don't use exit()'s, this one indicates input is INVALID
+      exit(0); // CO 180502 - normally don't use exit()'s, this one indicates input is INVALID
     }
 
     // Obtain the structure tolerance
@@ -7145,7 +7145,7 @@ namespace SYM {
           // found a site point group
           sym_found=FALSE;
           for(uint ii=0;ii<a.agroup.at(iat).size()&&!sym_found;ii++){
-            sym_found=identical(a.pgroup_xtal[pg].Uf,a.agroup.at(iat)[ii].Uf);       // look in all the list of operations // DX and CO  // DX20171207 - Use Uf (only integers) not Uc and use xmatrix identical eps
+            sym_found=identical(a.pgroup_xtal[pg].Uf,a.agroup.at(iat)[ii].Uf);       // look in all the list of operations // DX and CO  // DX 12/7/17 - Use Uf (only integers) not Uc and use xmatrix identical eps
           }
           // if the symmetry operation is new, add it to the pointgroup array
           // and update all info about the sym_op object
@@ -7362,7 +7362,7 @@ namespace SYM {
   bool CalculateSitePointGroup_EquivalentSites(xstructure &a,bool get_full_basis,double _eps_){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::getPWD(); // DX20180426 - added current working directory  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
+    string directory=aurostd::getPWD(); // DX 4/26/18 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
 
     // Obtain the structure tolerance
     a.sym_eps=_eps_;
@@ -7398,15 +7398,15 @@ namespace SYM {
         eat=a.iatoms[iiat][ieat];
         for(uint fg=0;fg<a.fgroup.size() && !found_fgroup;fg++){
           if(a.fgroup[fg].basis_map_calculated){
-            // DX [OBSOLETE] fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[eat]==iat; // DX20170731 - Incorrect, want centered at iatom not eatom
-            fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[iat]==eat; // DX20170731 find fgroup centered on iatom
+            // DX [OBSOLETE] fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[eat]==iat; // DX - 7/31/17 - Incorrect, want centered at iatom not eatom
+            fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[iat]==eat; // DX - 7/31/17 find fgroup centered on iatom
           } else {
             if(!SYM::ApplyAtomValidate(a.atoms[iat],tatom,a.fgroup[fg],a.lattice,a.c2f,a.f2c,skew,FALSE,FALSE,_eps_)){
               return FALSE;
             }
-            //DX20190905 [OBSOLETE-no more mod_one_xvec] tatom.fpos=mod_one_xvec(tatom.fpos);
-            BringInCellInPlace(tatom.fpos); //DX20190905 - uses new BringInCell function
-            fgroup_map=MapAtom(tatom, a.atoms[eat], FALSE, a.lattice, a.f2c, skew, _eps_); //DX20190619 - lattice and f2c as input
+            //DX 20190905 [OBSOLETE-no more mod_one_xvec] tatom.fpos=mod_one_xvec(tatom.fpos);
+            BringInCellInPlace(tatom.fpos); //DX 20190905 - uses new BringInCell function
+            fgroup_map=MapAtom(tatom, a.atoms[eat], FALSE, a.lattice, a.f2c, skew, _eps_); //DX 20190619 - lattice and f2c as input
           }
           if(fgroup_map){
             fSymOp=a.fgroup[fg];
@@ -7451,12 +7451,12 @@ namespace SYM {
               aSymOp.basis_map_calculated=false;
             }
             //a.agroup[eat].push_back(aSymOp);
-            SYM::AddSymmetryToStructure(a,eat,aSymOp.Uc,aSymOp.Uf,aSymOp.ctau,aSymOp.ftau,aSymOp.ctrasl,aSymOp.ftrasl,aSymOp.basis_atoms_map,aSymOp.basis_types_map,aSymOp.basis_map_calculated,_AGROUP_,FALSE);  // CO20170706 - make sure quaternion is updated
+            SYM::AddSymmetryToStructure(a,eat,aSymOp.Uc,aSymOp.Uf,aSymOp.ctau,aSymOp.ftau,aSymOp.ctrasl,aSymOp.ftrasl,aSymOp.basis_atoms_map,aSymOp.basis_types_map,aSymOp.basis_map_calculated,_AGROUP_,FALSE);  // CO 170706 - make sure quaternion is updated
           }
         } else {
           //if(!found_fgroup){  //[CO200106 - close bracket for indenting]}
           if(DEBUG_SYMMETRY){
-            cerr << "SYM::CalculateSitePointGroup_Equivalent warning[1a] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << " [dir=" << directory << "]" << endl; // DX20180426 - changed a.directory to directory (pwd)
+            cerr << "SYM::CalculateSitePointGroup_Equivalent warning[1a] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << " [dir=" << directory << "]" << endl; // DX 4/26/18 - changed a.directory to directory (pwd)
           }
           return FALSE;
           //cerr << "Not exiting though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
@@ -7684,7 +7684,7 @@ namespace SYM {
                           // check whether this symmetry operation is new or not
                           sym_found=FALSE;
                           for(ii=0;ii<a.pgroup.size()&&!sym_found;ii++)
-                            sym_found=identical(Uf,a.pgroup[ii].Uf);       // look in all the list of operations  // DX20171207 - Use Uf (only integers) not Uc and use xmatrix identical eps
+                            sym_found=identical(Uf,a.pgroup[ii].Uf);       // look in all the list of operations  // DX 12/7/17 - Use Uf (only integers) not Uc and use xmatrix identical eps
                           // if the symmetry operation is new, add it to the pointgroup array
                           // and update all info about the sym_op object
                           if(sym_found==FALSE) {                                 // new operation, generate and save it
@@ -7995,7 +7995,7 @@ namespace SYM {
   }
 } // namespace SYM
 
-// DX20170801 - START: Xgroups to JSON
+// DX 8/2/17 - START: Xgroups to JSON
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------- WRITE GROUPS TO JSON
 // SymmetryToJson
@@ -8084,17 +8084,17 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // DX20171207 - added generator_coefficients - START
+    // DX 12/7/17 - added generator_coefficients - START
     // generator coefficients
     if(group[i].generator.lrows){
-      sscontent_json << "\"generator_coefficients\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].generator_coefficients,5,roff),",") << "]" << eendl; //DX20180726 - added roff
+      sscontent_json << "\"generator_coefficients\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].generator_coefficients,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
     } else {
       if(PRINT_NULL){ sscontent_json << "\"generator_coefficients\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    // DX20171207 - added generator_coefficients - END
+    // DX 12/7/17 - added generator_coefficients - END
 
-    // DX20180117 - added SU2_matrix - START
+    // DX 1/17/18 - added SU2_matrix - START
     // SU(2) matrix
     if(group[i].SU2_matrix.lrows){
       sscontent_json << "\"SU2_matrix\":[" << "[" << aurostd::xcomplex2json(group[i].SU2_matrix(1,1)) << "," << aurostd::xcomplex2json(group[i].SU2_matrix(1,2)) << "]" << "," << eendl; 
@@ -8103,9 +8103,9 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
       if(PRINT_NULL){ sscontent_json << "\"SU2_matrix\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    // DX20180117 - added SU2_matrix - END
+    // DX 1/17/18 - added SU2_matrix - END
 
-    // DX20180117 - added su2_coefficients - START
+    // DX 1/17/18 - added su2_coefficients - START
     // su(2) coefficients
     if(group[i].su2_coefficients.lrows){
       sscontent_json << "\"su2_coefficients\":[" <<  aurostd::xcomplex2json(group[i].su2_coefficients(1)) << "," << aurostd::xcomplex2json(group[i].su2_coefficients(2)) << "," << aurostd::xcomplex2json(group[i].su2_coefficients(3)) << "]" << eendl; 
@@ -8113,7 +8113,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
       if(PRINT_NULL){ sscontent_json << "\"su2_coefficients\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    // DX20180117 - added su2_coefficients - END
+    // DX 1/17/18 - added su2_coefficients - END
 
     // angle
     if(group[i].angle!=AUROSTD_NAN){
@@ -8125,7 +8125,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // axis
     if(group[i].axis.lrows){
-      sscontent_json << "\"axis\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].axis,5,roff),",") << "]" << eendl; //DX20180726 - added roff
+      sscontent_json << "\"axis\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].axis,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
     } else {
       if(PRINT_NULL){ sscontent_json << "\"axis\":null" << eendl;}
     }
@@ -8219,9 +8219,9 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
   sss << "]" << eendl;
   return sss.str();
 }
-// DX20170801 - END: Xgroups to JSON
+// DX 8/2/17 - END: Xgroups to JSON
 
-// DX20170801 - START: agroups to JSON
+// DX 8/2/17 - START: agroups to JSON
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------- WRITE AROUPS TO JSON
 string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode){
@@ -8240,9 +8240,9 @@ string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode){
   sss << "]" << eendl;
   return sss.str();
 }
-// DX20170801 - END: agroups to JSON
+// DX 8/2/17 - END: agroups to JSON
 
-// DX20170801 - START: Equivalent atoms to JSON
+// DX 8/2/17 - START: Equivalent atoms to JSON
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------- WRITE EQUIVALENT ATOMS TO JSON
 string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
@@ -8293,7 +8293,7 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
   vcontent_json.clear();
   return sss.str();
 }
-// DX20170801 - END: Equivalent atoms to JSON
+// DX 8/2/17 - END: Equivalent atoms to JSON
 
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------- WRITE GROUPS
@@ -8302,15 +8302,15 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
 // This function writes aflow.pgroup.out, aflow.fgroup.out and
 // aflow.sgroup.out files on the directory - SC aug 2007
 
-// CO20171025 - redundant
-//// DX20170801 - START: Adding symmetry output formatting option
+// CO 171025 - redundant
+//// DX 8/2/17 - START: Adding symmetry output formatting option
 //bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char mode,const bool& osswrite,ostream& oss) {
 //  string format = "txt"; //Default output is aflow.xgroup.out (a text output)
 //  return KBIN_SymmetryWrite(FileMESSAGE,a,aflags,mode,osswrite,oss,format);
 //}
-//// DX20170801 - END: Adding symmetry output formatting option
+//// DX 8/2/17 - END: Adding symmetry output formatting option
 
-bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char mode,const bool& osswrite,ostream& oss,const string& format) { // DX20170801
+bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char mode,const bool& osswrite,ostream& oss,const string& format) { // DX 8/2/17
   ostringstream aus;
   xvector<double> aux_rrr(9),aux_ijk(9);
   bool Krun=TRUE;
@@ -8324,10 +8324,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   if(mode==_AGROUP_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   if(mode==_IATOMS_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   if(mode==_PGROUP_XTAL_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-  if(mode==_PGROUPK_XTAL_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // DX20171205 - Added pgroupk_xtal
-  if(mode==_PGROUPK_PATTERSON_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //DX20200129
+  if(mode==_PGROUPK_XTAL_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // DX 12/5/17 - Added pgroupk_xtal
+  if(mode==_PGROUPK_PATTERSON_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //DX 20200129
   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
     if(mode==_PGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_OUT;
     if(mode==_PGROUPK_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT;
     if(mode==_FGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_FGROUP_OUT;
@@ -8335,10 +8335,10 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     if(mode==_AGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_AGROUP_OUT;
     if(mode==_IATOMS_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_IATOMS_OUT;
     if(mode==_PGROUP_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT;
-    if(mode==_PGROUPK_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT; // DX20171205 - Added pgroupk_xtal
-    if(mode==_PGROUPK_PATTERSON_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT; //DX20200129
+    if(mode==_PGROUPK_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT; // DX 12/5/17 - Added pgroupk_xtal
+    if(mode==_PGROUPK_PATTERSON_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT; //DX 20200129
   }
-  if(aurostd::toupper(format)=="JSON"){ // DX20200206
+  if(aurostd::toupper(format)=="JSON"){ // DX 20200206
     if(mode==_PGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_JSON;
     if(mode==_PGROUPK_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON;
     if(mode==_FGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_FGROUP_JSON;
@@ -8346,16 +8346,16 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
     if(mode==_AGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_AGROUP_JSON;
     if(mode==_IATOMS_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_IATOMS_JSON;
     if(mode==_PGROUP_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON;
-    if(mode==_PGROUPK_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON; // DX20171205 - Added pgroupk_xtal
-    if(mode==_PGROUPK_PATTERSON_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON; //DX20200129
+    if(mode==_PGROUPK_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON; // DX 12/5/17 - Added pgroupk_xtal
+    if(mode==_PGROUPK_PATTERSON_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON; //DX 20200129
   }
   string _lines_="------------------------------------------------------------------------------------------------";
   FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
     FileOUTPUT << _lines_ << endl;
-  } // DX20170801
+  } // DX 8/2/17
   if(mode==_PGROUP_) {
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroup.size() << "    point group operations " << endl;
       for(uint k=0;k<a.pgroup.size();k++) {
@@ -8367,16 +8367,16 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroup,mode);          // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << SymmetryToJson(a.pgroup,mode);          // DX 8/2/17
       FileOUTPUT.flush();
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_PGROUP_XTAL_) {
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroup_xtal.size() << "    crystal point group operations " << endl;
       for(uint k=0;k<a.pgroup_xtal.size();k++) {
@@ -8388,17 +8388,17 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroup_xtal,mode);     // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << SymmetryToJson(a.pgroup_xtal,mode);     // DX 8/2/17
+      FileOUTPUT.flush();                                   // DX 8/2/17
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
-  // DX20171205 - Added pgroupk_xtal - START
+  // DX 12/5/17 - Added pgroupk_xtal - START
   if(mode==_PGROUPK_XTAL_) {
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW dual of crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
       for(uint k=0;k<a.pgroupk_xtal.size();k++) {
@@ -8410,17 +8410,17 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroupk_xtal,mode);     // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << SymmetryToJson(a.pgroupk_xtal,mode);     // DX 8/2/17
+      FileOUTPUT.flush();                                   // DX 8/2/17
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
-  // DX20171205 - Added pgroupk_xtal - END
+  // DX 12/5/17 - Added pgroupk_xtal - END
   if(mode==_PGROUPK_) {
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW point group klattice file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk.size() << "    point group operations " << endl;
       for(uint k=0;k<a.pgroupk.size();k++) {
@@ -8432,16 +8432,16 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroupk,mode);         // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << SymmetryToJson(a.pgroupk,mode);         // DX 8/2/17
+      FileOUTPUT.flush();                                   // DX 8/2/17
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
-  if(mode==_PGROUPK_PATTERSON_) { //DX20200129
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+  if(mode==_PGROUPK_PATTERSON_) { //DX 20200129
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW Patterson point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       FileOUTPUT << a.pgroupk_Patterson.size() << "    Patterson point group operations " << endl;
       for(uint k=0;k<a.pgroupk_Patterson.size();k++) {
@@ -8453,16 +8453,16 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroupk_Patterson,mode);     // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << SymmetryToJson(a.pgroupk_Patterson,mode);     // DX 8/2/17
+      FileOUTPUT.flush();                                   // DX 8/2/17
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_FGROUP_) {
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW factor group file, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
       FileOUTPUT << a.fgroup.size() << "    factor group operations " << endl;
       for(uint k=0;k<a.fgroup.size();k++) {
@@ -8474,16 +8474,16 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.fgroup,mode);          // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << SymmetryToJson(a.fgroup,mode);          // DX 8/2/17
+      FileOUTPUT.flush();                                   // DX 8/2/17
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_SGROUP_) {
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW space group file, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
       FileOUTPUT << a.sgroup.size() << "    space group operations " << endl;
       FileOUTPUT << a.sgroup_radius << "    radius of space group " << endl;
@@ -8497,16 +8497,16 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.sgroup,mode);          // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << SymmetryToJson(a.sgroup,mode);          // DX 8/2/17
+      FileOUTPUT.flush();                                   // DX 8/2/17
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_AGROUP_) {
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "AFLOW site point group file centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       for(uint iat=0;iat<a.atoms.size();iat++) {
         FileOUTPUT << " Site="  << iat << endl;
@@ -8522,16 +8522,16 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
           FileOUTPUT.flush();
         }
       }
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << AgroupSymmetryToJson(a.agroup,mode);    // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << AgroupSymmetryToJson(a.agroup,mode);    // DX 8/2/17
+      FileOUTPUT.flush();                                   // DX 8/2/17
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
   if(mode==_IATOMS_) {
-    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+    if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
       FileOUTPUT << "Equivalent atoms file " << endl;
       FileOUTPUT << _lines_ << endl;
       for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
@@ -8547,11 +8547,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       a.write_inequivalent_flag=temp;
       FileOUTPUT << _lines_ << endl;
       FileOUTPUT.flush();
-    }                                                       // DX20170801
-    if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << EquivalentAtomsToJson(a.iatoms);   // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+    }                                                       // DX 8/2/17
+    if(aurostd::toupper(format)=="JSON"){ // DX 20200206
+      FileOUTPUT << EquivalentAtomsToJson(a.iatoms);   // DX 8/2/17
+      FileOUTPUT.flush();                                   // DX 8/2/17
+    }                                                       // DX 8/2/17
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 
@@ -8560,7 +8560,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   return Krun;
 }
 
-// DX20170803 - Print symmetry to screen - START
+// DX 8/3/17 - Print symmetry to screen - START
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------ PRINT GROUPS TO SCREEN
@@ -8569,7 +8569,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
 // This function prints to screen all the symmetry elements for a given structure 
 bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode){
   // OUT format
-  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
+  if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX 20200206
     xvector<double> aux_rrr(9),aux_ijk(9);
     string _lines_="------------------------------------------------------------------------------------------------";
     if(mode == '\0' || mode == _PGROUP_){
@@ -8623,7 +8623,7 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
         oss.flush();
       }
     }
-    // DX20171205 - Added pgroupk_xtal - START
+    // DX 12/5/17 - Added pgroupk_xtal - START
     if(mode == '\0' || mode == _PGROUPK_XTAL_){
       oss << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
@@ -8637,8 +8637,8 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
         oss.flush();
       }
     }
-    // DX20171205 - Added pgroupk_xtal - END
-    // DX20200129 - Patterson symmetry - START
+    // DX 12/5/17 - Added pgroupk_xtal - END
+    // DX 20200129 - Patterson symmetry - START
     if(mode == '\0' || mode == _PGROUPK_PATTERSON_){
       oss << "AFLOW Patterson point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
       oss << a.pgroupk_Patterson.size() << "    point group operations " << endl;
@@ -8652,7 +8652,7 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
         oss.flush();
       }
     }
-    // DX20200129 - Patterson symmetry - END
+    // DX 20200129 - Patterson symmetry - END
     if(mode == '\0' || mode == _SGROUP_){
       oss << "AFLOW - space groups, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
       oss << a.sgroup.size() << "    space group operations " << endl;
@@ -8703,7 +8703,7 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
   }
 
   // JSON format
-  if(aurostd::toupper(format)=="JSON"){ // DX20200206
+  if(aurostd::toupper(format)=="JSON"){ // DX 20200206
     stringstream sscontent_json;
     vector<string> vcontent_json;
     if(mode == '\0' || mode == _PGROUP_){
@@ -8726,18 +8726,18 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
       sscontent_json << "\"pgroup_xtal\":" << SymmetryToJson(a.pgroup_xtal,tmp_mode);
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     }
-    if(mode == '\0' || mode == _PGROUPK_XTAL_){                                   // DX20171205 - Added pgroupk_xtal
+    if(mode == '\0' || mode == _PGROUPK_XTAL_){                                   // DX 12/5/17 - Added pgroupk_xtal
       char tmp_mode = _PGROUPK_XTAL_;
-      sscontent_json << "\"pgroupk_xtal\":" << SymmetryToJson(a.pgroupk_xtal,tmp_mode); // DX20171205 - Added pgroupk_xtal
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");        // DX20171205 - Added pgroupk_xtal
-    }                                                                             // DX20171205 - Added pgroupk_xtal
-    //DX20200129 - Patterson - BEGIN
+      sscontent_json << "\"pgroupk_xtal\":" << SymmetryToJson(a.pgroupk_xtal,tmp_mode); // DX 12/5/17 - Added pgroupk_xtal
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");        // DX 12/5/17 - Added pgroupk_xtal
+    }                                                                             // DX 12/5/17 - Added pgroupk_xtal
+    //DX 20200129 - Patterson - BEGIN
     if(mode == '\0' || mode == _PGROUPK_PATTERSON_){
       char tmp_mode = _PGROUPK_PATTERSON_;
       sscontent_json << "\"pgroupk_Patterson\":" << SymmetryToJson(a.pgroupk_Patterson,tmp_mode);
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     }
-    //DX20200129 - Patterson - END
+    //DX 20200129 - Patterson - END
     if(mode == '\0' || mode == _SGROUP_){
       char tmp_mode = _SGROUP_;
       sscontent_json << "\"sgroup\":" << SymmetryToJson(a.sgroup,tmp_mode);
@@ -8757,7 +8757,7 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
   }
   return FALSE;
 }
-// DX20170803 - Print symmetry to screen - END
+// DX 8/3/17 - Print symmetry to screen - END
 
 
 // --------------------------------------------------------------------------
@@ -8789,8 +8789,8 @@ bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &Fi
     kflags.KBIN_SYMMETRY_PGROUPK_WRITE=FALSE; //default
     kflags.KBIN_SYMMETRY_FGROUP_WRITE=TRUE;
     kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=TRUE;
-    kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=TRUE; // DX20171205 - Added pgroupk_xtal
-    kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=TRUE; //DX20200129
+    kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=TRUE; // DX 12/5/17 - Added pgroupk_xtal
+    kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=TRUE; //DX 20200129
     kflags.KBIN_SYMMETRY_IATOMS_WRITE=TRUE;
     kflags.KBIN_SYMMETRY_AGROUP_WRITE=TRUE;
     Krun=(Krun && pflow::PerformFullSymmetry(a,kflags.KBIN_SYMMETRY_EPS,kflags.KBIN_SYMMETRY_NO_SCAN,true,FileMESSAGE,aflags,kflags,osswrite,oss));
