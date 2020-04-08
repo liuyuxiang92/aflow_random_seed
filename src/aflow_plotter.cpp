@@ -212,7 +212,7 @@ namespace plotter {
 
     if (missing_binaries.size() == 0) {
       string directory = plotoptions.getattachedscheme("DIRECTORY");
-      if(directory.empty()){directory=aurostd::getPWD();}  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")//CO191004
+      if(directory.empty()){directory=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
       if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
       string filename = plotoptions.getattachedscheme("FILE_NAME");
       if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
@@ -220,7 +220,7 @@ namespace plotter {
       // PDF is default since we use pdflatex to compile
       string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
       if (format.empty()) format = "pdf";
-      string current_dir = aurostd::getPWD();  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+      string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
       // Create temp directory
       string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
       chdir(tmp.c_str());
@@ -263,7 +263,7 @@ namespace plotter {
     if (filename.empty()) {
       string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
       if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
-      // ME20200228 - Remove ANRL parameters
+      // ME200228 - Remove ANRL parameters
       string::size_type t = default_title.find(":ANRL=");
       if (t != string::npos) {
         default_title = default_title.substr(0, t);
@@ -328,7 +328,7 @@ namespace plotter {
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, ".");
-      // ME20200228 - title may contain ANRL parameters
+      // ME200228 - title may contain ANRL parameters
       if ((tokens.size() > 2) && aurostd::substring2bool(tokens[2], "ANRL")) {
         string::size_type t = tokens[2].find_first_of(":");
         if (t != string::npos) {
@@ -959,7 +959,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  // ME20200217
+    patchDefaultTitleAFLOWIN(plotoptions);  // ME200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
@@ -1013,7 +1013,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  // ME20200217
+    patchDefaultTitleAFLOWIN(plotoptions);  // ME200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);

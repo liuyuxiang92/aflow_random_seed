@@ -334,9 +334,9 @@ _aflags::_aflags() {
   KBIN_GEN_VASP_FROM_AFLOWIN            = FALSE;
   KBIN_GEN_AIMS_FROM_AFLOWIN            = FALSE;
   KBIN_GEN_AFLOWIN_FROM_VASP            = FALSE;
-  // DX START
+  // DX - START
   KBIN_GEN_SYMMETRY_OF_AFLOWIN          = FALSE;
-  // DX END
+  // DX - END
   KBIN_DELETE_AFLOWIN                   = FALSE;
   AFLOW_FORCE_MPI                       = FALSE;
   AFLOW_FORCE_SERIAL                    = FALSE;
@@ -385,9 +385,9 @@ void _aflags::copy(const _aflags& b) {
   KBIN_GEN_VASP_FROM_AFLOWIN            = b.KBIN_GEN_VASP_FROM_AFLOWIN;
   KBIN_GEN_AIMS_FROM_AFLOWIN            = b.KBIN_GEN_AIMS_FROM_AFLOWIN;
   KBIN_GEN_AFLOWIN_FROM_VASP            = b.KBIN_GEN_AFLOWIN_FROM_VASP;
-  // DX START
+  // DX - START
   KBIN_GEN_SYMMETRY_OF_AFLOWIN          = b.KBIN_GEN_SYMMETRY_OF_AFLOWIN;
-  // DX END
+  // DX - END
   KBIN_DELETE_AFLOWIN                   = b.KBIN_DELETE_AFLOWIN;
   AFLOW_FORCE_MPI                       = b.AFLOW_FORCE_MPI;
   AFLOW_FORCE_SERIAL                    = b.AFLOW_FORCE_SERIAL;
@@ -485,7 +485,7 @@ _kflags::_kflags() {
   KBIN_QSUB_MODE_IMPLICIT                          = FALSE;
   KBIN_QSUB_FILE                                   = FALSE;
   KBIN_SYMMETRY_CALCULATION                        = FALSE;
-  // DX START
+  // DX - START
   KBIN_SYMMETRY_NO_SCAN                            = FALSE;
   KBIN_SYMMETRY_EPS                                = AUROSTD_NAN;
   KBIN_SYMMETRY_CALCULATE_PGROUP                   = TRUE; // DX20170814 - Specify what to calculate/verify
@@ -495,7 +495,7 @@ _kflags::_kflags() {
   KBIN_SYMMETRY_CALCULATE_IATOMS                   = TRUE; // DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_AGROUP                   = TRUE; // DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_SGROUP                   = TRUE; // DX20170814 - Specify what to calculate/verify
-  // DX END
+  // DX - END
   KBIN_SYMMETRY_PGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_PGROUP_XTAL_WRITE                  = FALSE;
   KBIN_SYMMETRY_PGROUPK_WRITE                      = FALSE;
@@ -605,7 +605,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_QSUB_MODE_IMPLICIT                          = b.KBIN_QSUB_MODE_IMPLICIT;
   KBIN_QSUB_FILE                                   = b.KBIN_QSUB_FILE;
   KBIN_SYMMETRY_CALCULATION                        = b.KBIN_SYMMETRY_CALCULATION;
-  // DX START
+  // DX - START
   KBIN_SYMMETRY_NO_SCAN                            = b.KBIN_SYMMETRY_NO_SCAN;
   KBIN_SYMMETRY_EPS                                = b.KBIN_SYMMETRY_EPS;
   KBIN_SYMMETRY_CALCULATE_PGROUP                   = b.KBIN_SYMMETRY_CALCULATE_PGROUP; // DX20170814 - Specify what to calculate/verify
@@ -615,7 +615,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_SYMMETRY_CALCULATE_IATOMS                   = b.KBIN_SYMMETRY_CALCULATE_IATOMS; // DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_AGROUP                   = b.KBIN_SYMMETRY_CALCULATE_AGROUP; // DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_SGROUP                   = b.KBIN_SYMMETRY_CALCULATE_SGROUP; // DX20170814 - Specify what to calculate/verify
-  // DX END
+  // DX - END
   KBIN_SYMMETRY_PGROUP_WRITE                       = b.KBIN_SYMMETRY_PGROUP_WRITE;
   KBIN_SYMMETRY_PGROUP_XTAL_WRITE                  = b.KBIN_SYMMETRY_PGROUP_XTAL_WRITE;
   KBIN_SYMMETRY_PGROUPK_WRITE                      = b.KBIN_SYMMETRY_PGROUPK_WRITE;

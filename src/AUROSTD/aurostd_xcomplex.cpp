@@ -55,7 +55,7 @@ namespace aurostd {
       return *this;
     }
 
-  // ME20200107 - BEGIN
+  // ME200107 - BEGIN
   template<class utype>
     bool identical(const xcomplex<utype>& a, const xcomplex<utype>&b, utype _tol_) {
       return (identical(a.re, b.re, _tol_) && identical(a.im, b.im, _tol_));
@@ -80,7 +80,7 @@ namespace aurostd {
     bool isequal(const xcomplex<utype>& a, const xcomplex<utype>&b) {
       return identical(a, b, (utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     }
-  // ME20200107 - END
+  // ME200107 - END
 
   // namespace aurostd
   //   template<class utype>                            // operator <<  xcomplex<>
@@ -367,7 +367,7 @@ namespace aurostd {
     }
 
   // ------------------------------------------------------------ function conj
-  // ME180904 -- needed to compile conjugate transpose in xmatrix
+  // ME20180904 -- needed to compile conjugate transpose in xmatrix
   template<class utype>
     utype
     conj(const utype& x) {
@@ -475,7 +475,7 @@ namespace aurostd {
       return xcomplex<utype>(xr,ni);
     }
 
-  // ME 180907  
+  // ME20180907  
   // ------------------------------------------------------------ function magnitude square
   template<class utype> utype
     magsqr(const xcomplex<utype>& x) {
