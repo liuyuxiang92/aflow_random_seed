@@ -1,11 +1,16 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
+        -- Added check for required binaries to plotter. (ME)
+        -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
+        -- Fixed broken system name for aflow_proto. (ME)
+        -- Fixed plotter title and file names when ANRL parameters are present. (ME)
+        -- Fixed bug that deleted qmvasp files from previous runs instead of appending to them. (ME)
+        -- Removed VASP k-mesh symmetry fixes when SYM=OFF. (ME)
         -- Changed database file name conventions. (ME)
         -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
         -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
         -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
-        -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- updated README_AFLOW_COMPARE.TXT and README_AFLOW_ACONVASP.TXT with "relaxation_step" and "isopointal" comparison functionality (DX)
         -- added --relaxation_step flag to --compare2database and --compare_database_entries to compare original/relax1/most_relaxed geometry files (DX)
         -- added ABINIT detector and reader (DX)

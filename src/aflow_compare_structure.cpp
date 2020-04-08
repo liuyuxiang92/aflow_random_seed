@@ -2398,7 +2398,7 @@ namespace compare {
         str_proto_tmp.structure_representative = entry.vstr[structure_index];
         str_proto_tmp.structure_representative.ReScale(1.0); //DX20191105
         str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX20190321 - changed to false, i.e., do not load from common
-        str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directoryr
+        str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directory
         str_proto_tmp.structure_representative_generated=true;
         str_proto_tmp.structure_representative_from="aurl";
         str_proto_tmp.stoichiometry=tmp_reduced_stoich;

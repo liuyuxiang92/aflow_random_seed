@@ -212,7 +212,7 @@ namespace aurostd {
         if (m_mode == 'C') {
           std::cerr << "xcombos::initialize: combinations: " << n_choices << " choose " << m_choose << ((m_repeat)? " with " : " without ") << "repetitions.";
         } else {
-          std::cerr << "xcombos::initialize: enumerations of length" << m_choose << std::endl;
+          std::cerr << "xcombos::initialize: enumerations of length " << m_choose << std::endl;
         }
       }
       if ((m_repeat) || (m_mode == 'E')) {
