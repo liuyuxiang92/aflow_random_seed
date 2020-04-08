@@ -1240,7 +1240,7 @@ namespace aurostd {
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-// DX20180117 - Add xcomplex to json
+// DX20180118 - Add xcomplex to json
 namespace aurostd {
   template<typename utype> string _xcomplex2json(xcomplex<utype>& number) __xprototype;
   string xcomplex2json(xcomplex<double>& number);

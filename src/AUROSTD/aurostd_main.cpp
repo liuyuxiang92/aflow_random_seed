@@ -6211,7 +6211,7 @@ namespace aurostd {
   }
 }
 
-// DX20180117 - START: XCOMPLEX TO JSON
+// DX20180118 - START: XCOMPLEX TO JSON
 namespace aurostd {
   //***************************************************************************//
   // aurostd::xcomplex2json
@@ -6239,7 +6239,7 @@ namespace aurostd {
   string xcomplex2json(xcomplex<double>& number){ return _xcomplex2json(number); }
 }
 
-// DX20180117 - END: XCOMPLEX TO JSON
+// DX20180118 - END: XCOMPLEX TO JSON
 
 // DX20170803 - START: Matrix to JSON
 namespace aurostd {
@@ -6252,8 +6252,8 @@ namespace aurostd {
   // [OBSOLETE]   vector<string> rows;
   // [OBSOLETE]   for(uint i=1;i<(uint)xmat_in.rows+1;i++){
   // [OBSOLETE]     stringstream row;
-  // [OBSOLETE]     xvector<double> xvec = xmat_in(i); // DX20170821 - added roundoff
-  // [OBSOLETE]     if(roff){ xvec = roundoff(xvec,1e-8);} // DX20170821 - added roundoff
+  // [OBSOLETE]     xvector<double> xvec = xmat_in(i); // DX20170822 - added roundoff
+  // [OBSOLETE]     if(roff){ xvec = roundoff(xvec,1e-8);} // DX20170822 - added roundoff
   // [OBSOLETE]     row << "[" << joinWDelimiter(xvecDouble2vecString(xvec),",") << "]";
   // [OBSOLETE]     rows.push_back(row.str());
   // [OBSOLETE]   }
@@ -6265,8 +6265,8 @@ namespace aurostd {
     vector<string> rows;
     for(int i=1;i<=xmat_in.urows;i++){ // DX20180323 - fixed typo for initial index "int i=1" not "int i=xmat_in.urows"
       stringstream row;
-      xvector<double> xvec = xmat_in(i); // DX20170821 - added roundoff
-      //if(roff){ xvec = roundoff(xvec,tol);} // DX20170821 - added roundoff
+      xvector<double> xvec = xmat_in(i); // DX20170822 - added roundoff
+      //if(roff){ xvec = roundoff(xvec,tol);} // DX20170822 - added roundoff
       row << "[" << joinWDelimiter(xvecDouble2vecString(xvec,precision,roff,tol,FORMAT),",") << "]";
       rows.push_back(row.str());
       //cerr << i << "row.str(): " << row.str() << endl;
@@ -6286,54 +6286,54 @@ namespace aurostd {
   // [OBSOLETE] vector<string> vecDouble2vecString(const vector<double>& vin, bool roff) {
   // [OBSOLETE]   vector<string> vout;
   // [OBSOLETE]   for(uint i=0;i<vin.size();i++){
-  // [OBSOLETE]     double tmp = vin.at(i); // DX20170821 - add roundoff
-  // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170821 - add roundoff
-  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170821 - add roundoff
+  // [OBSOLETE]     double tmp = vin.at(i); // DX20170822 - add roundoff
+  // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170822 - add roundoff
+  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170822 - add roundoff
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
   vector<string> vecDouble2vecString(const vector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
     vector<string> vout;
     for(uint i=0;i<vin.size();i++){
-      //double tmp = vin.at(i); // DX20170821 - add roundoff
-      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170821 - add roundoff
-      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170821 - add roundoff
+      //double tmp = vin.at(i); // DX20170822 - add roundoff
+      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170822 - add roundoff
+      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170822 - add roundoff
     }
     return vout;
   }
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff) {
   // [OBSOLETE]   vector<string> vout;
   // [OBSOLETE]   for(uint i=1;i<(uint)vin.rows+1;i++){
-  // [OBSOLETE]     double tmp = vin(i); // DX20170821 - add roundoff
-  // [OBSOLETE]    if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170821 - add roundoff
-  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170821 - add roundoff
+  // [OBSOLETE]     double tmp = vin(i); // DX20170822 - add roundoff
+  // [OBSOLETE]    if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170822 - add roundoff
+  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170822 - add roundoff
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
   vector<string> xvecDouble2vecString(const xvector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
     vector<string> vout;
     for(int i=vin.lrows;i<=vin.urows;i++){
-      //double tmp = vin(i); // DX20170821 - add roundoff
-      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170821 - add roundoff
-      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170821 - add roundoff
+      //double tmp = vin(i); // DX20170822 - add roundoff
+      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170822 - add roundoff
+      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170822 - add roundoff
     }
     return vout;
   }
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff) {
   // [OBSOLETE]   deque<string> vout;
   // [OBSOLETE]   for(uint i=0;i<vin.size();i++){
-  // [OBSOLETE]     double tmp = vin.at(i); // DX20170821 - add roundoff
-  // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170821 - add roundoff
-  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170821 - add roundoff
+  // [OBSOLETE]     double tmp = vin.at(i); // DX20170822 - add roundoff
+  // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170822 - add roundoff
+  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170822 - add roundoff
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
   deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
-      //double tmp = vin.at(i); // DX20170821 - add roundoff
-      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170821 - add roundoff
-      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170821 - add roundoff
+      //double tmp = vin.at(i); // DX20170822 - add roundoff
+      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170822 - add roundoff
+      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170822 - add roundoff
     }
     return vout;
   }

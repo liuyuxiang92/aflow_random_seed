@@ -136,13 +136,13 @@ template<class utype> bool initialize_xcomplex(utype d) {
   x*x;x*r;r*x;x*=y;x*=r; // multiplication	//CO20190329 - clang doesn't like x=x, changing to x=y
   x/x;x/r;r/x;x/=y;x/=r; // division		//CO20190329 - clang doesn't like x=x, changing to x=y
   x=y;x=r;               // equal		//CO20190329 - clang doesn't like x=x, changing to x=y
-  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);// ME20200107
+  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);// ME200107
   x=abs(x)+arg(x)+polar(r,r)+conj(x)+norm(x)+cos(x)+cosh(x)+exp(x)+log(x)+pow(x,x)+pow(x,int(1))+pow(x,r)+pow(r,x)+sin(x)+sinh(x)+sqrt(x); // functions
   r = magsqr(x);  // ME20180907
 
   aurostd::xvector<xcomplex<utype> > vxfirst,vx(2),vy(2),vbb=vxfirst,vcc(vxfirst),vxvx,vxvxvxvx(1,2),vb=vxfirst,vc(vxfirst); // DX20180115 - equal operator was missing		//CO20190329 - clang doesn't like x=x, changing to x=y
   aurostd::xvector<utype> vr;
-  vx=vy;vx+vx;vx+=vy;vx-vx;vx-=vy;vx*vx; // DX 1/17/18 - added vx=vx		//CO20190329 - clang doesn't like x=x, changing to x=y
+  vx=vy;vx+vx;vx+=vy;vx-vx;vx-=vy;vx*vx; // DX20180117 - added vx=vx		//CO20190329 - clang doesn't like x=x, changing to x=y
   //xvector<xcomplex<utype> > va,vb=va,vc(va); // DX20180115 - equal operator was missing
   sin(vx);sinh(vx);cos(vx);cosh(vx);exp(vx);log(vx);//sqrt(vx);
   vx.clear(); // DX20180115 - clear was missing
@@ -165,7 +165,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   m(1,1)=n(1,1);m[1][1]=n[1][1];m=n;m=m+m;m=m*m;m=m-m;m.clear();//m=m*r;m=r*m;		//CO20190329 - clang doesn't like x=x, changing to x=y
   m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1];mxmx=mx/my;mxmx/=my; // DX20180115 - operator and equal operator initialized for xcomplex		//CO20190329 - clang doesn't like x=x, changing to x=y
   exp(m); // DX20180115 - add exponential or complex matrices
-  m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
+  m=x*m;m=m/x; // DX20180117 - allow for xcomplex * xmatrix<xcomplex>
   cout << m << endl; // DX20180115 - ostream
   vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME20180904
   bool tf=false;  //CO200106 - set the result or clang complains
