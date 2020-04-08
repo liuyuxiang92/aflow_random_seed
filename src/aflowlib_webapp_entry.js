@@ -131,7 +131,7 @@ AFLOW.load = function(root, loadparams) {
     AFLOW.cif2oss(AFLOW["cif" + root]) +
     ";key='" +
     key +
-    "'}; save state restorestate; " //CO190430 - missing semicolon
+    "'}; save state restorestate; " //CO20190430 - missing semicolon
   );
 };
 
