@@ -57,17 +57,17 @@ void CalculateNewStateAFLOW(string & SL_name) {
   // for Unix/Linux
   // ***********************************************
   // first get the current working directory
-  //char *pwd_old, *pwd;  //CO 181019 - avoid strncat warning of size()
+  //char *pwd_old, *pwd;  //CO20181019 - avoid strncat warning of size()
   //int pwd_old_size;
 
   string pwd,pwd_old;
-  pwd=pwd_old=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
-  //pwd_old = getcwd(NULL, 0);  //CO 181019 - avoid strncat warning of size()
+  pwd=pwd_old=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
+  //pwd_old = getcwd(NULL, 0);  //CO20181019 - avoid strncat warning of size()
   //pwd_old_size = strlen(pwd_old);
-  //pwd = new char[strlen(pwd_old) + SL_name.size()+2]; //CO 181019 - avoid strncat warning of size()
-  //strcpy(pwd, pwd_old); //CO 181019 - avoid strncat warning of size()
-  //strncat(pwd, "/", 1); //CO 181019 - avoid strncat warning of size()
-  //strncat(pwd, SL_name.c_str(), SL_name.size());  //CO 181019 - avoid strncat warning of size()
+  //pwd = new char[strlen(pwd_old) + SL_name.size()+2]; //CO20181019 - avoid strncat warning of size()
+  //strcpy(pwd, pwd_old); //CO20181019 - avoid strncat warning of size()
+  //strncat(pwd, "/", 1); //CO20181019 - avoid strncat warning of size()
+  //strncat(pwd, SL_name.c_str(), SL_name.size());  //CO20181019 - avoid strncat warning of size()
   pwd+='/';
   pwd+=SL_name;
 
@@ -80,7 +80,7 @@ void CalculateNewStateAFLOW(string & SL_name) {
     // child process
 
     // change to the new working directory
-    chdir(pwd.c_str()); //CO 181019 - avoid strncat warning of size()
+    chdir(pwd.c_str()); //CO20181019 - avoid strncat warning of size()
 
     // run the program generate new state
     char cmd_name[] = "aflow";
@@ -105,8 +105,8 @@ void CalculateNewStateAFLOW(string & SL_name) {
 
   } else {
     waitpid(pID, &child_exit_status, 0);
-    //delete [] pwd;  //CO 181019 - avoid strncat warning of size()
-    //delete [] pwd_old;  //CO 181019 - avoid strncat warning of size()
+    //delete [] pwd;  //CO20181019 - avoid strncat warning of size()
+    //delete [] pwd_old;  //CO20181019 - avoid strncat warning of size()
 
     aurostd::execute("cd "+SL_name+" &&  chmod "+ _MODE + " *");
     aurostd::execute("cp " + SL_name + "/" + AFLOW_RESULT_FILE + ".bz2 ./");

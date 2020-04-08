@@ -49,7 +49,7 @@ public:
   string CrystalStr_PT;                   // http://periodictable.com      // DU 2019/05/17
   string space_group;                     // http://periodictable.com      // DU 2019/05/17
   uint space_group_number;                // http://periodictable.com      // DU 2019/05/17
-  double Pearson_coefficient;             // Pearson mass deviation coefficient // ME181020
+  double Pearson_coefficient;             // Pearson mass deviation coefficient // ME20181020
   xvector<double> lattice_constant;       // (pm) http://periodictable.com      // DU 2019/05/17
   xvector<double> lattice_angle;          // (rad) http://periodictable.com      // DU 2019/05/17
   string phase;                           //      http://periodictable.com      // DU 2019/05/17

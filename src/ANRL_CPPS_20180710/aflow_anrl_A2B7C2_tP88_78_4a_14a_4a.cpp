@@ -136,7 +136,7 @@ namespace anrl {
     double z22=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A2B7C2_tP88_78_4a_14a_4a: z22=" << z22 << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
     str.scale=1.0;
 
     a1=a*xn;
