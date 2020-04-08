@@ -159,7 +159,8 @@ CONTRIB_FUNCS_CT_SRC = aflow_contrib_cormac.cpp
 
 CHULL_FUNCS_SRC = aflow_chull.cpp
 
-CCE_SRC = aflow_cce.cpp aflow_cce_data.cpp  #RF 190603 #RF 200217
+#RF 20190603 #RF 20200217
+CCE_SRC = aflow_cce.cpp aflow_cce_data.cpp
 #README_SRC= aflow_readme.cpp
 
 DATA_SRC=aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp
