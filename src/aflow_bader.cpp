@@ -64,24 +64,24 @@ namespace bader_functions {
     FixDirectory(directory);
     if(!aurostd::FileExist(directory)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to locate " << directory << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to locate " << directory << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return oss.str();
     }
     if(!Flags2BaderCommands(vpflow, bader_options, oss)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to gather flags for bader command." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to gather flags for bader command." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return oss.str();
     }
     if(!BaderCalc(vpflow, bader_options, directory, oss)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to perform bader calculation as specified." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to perform bader calculation as specified." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return oss.str();
@@ -111,8 +111,8 @@ namespace bader_functions {
     string outcar_file;
     if(!BaderExtensionFound("OUTCAR", outcar_file, directory)) {  //replace in place
       oss << endl;
-      oss << soliloquy << "ERROR: Cannot find suitable OUTCAR (OUTCAR.static, OUTCAR, or compressed variants)." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Cannot find suitable OUTCAR (OUTCAR.static, OUTCAR, or compressed variants)." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -126,8 +126,8 @@ namespace bader_functions {
     string poscar_file;
     if(!BaderExtensionFound("POSCAR", poscar_file, directory)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Cannot find suitable POSCAR (POSCAR.static, POSCAR, or compressed variants)." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Cannot find suitable POSCAR (POSCAR.static, POSCAR, or compressed variants)." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -156,8 +156,8 @@ namespace bader_functions {
         aurostd::string2tokens(input, tokens, "::");
         if(tokens.size() < 1 || tokens.size() > 2) {
           oss << endl;
-          oss << soliloquy << "ERROR: Incorrect format for input - number of tokens (::)." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Incorrect format for input - number of tokens (::)." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Needs to be either: " << endl;
           oss << soliloquy_empty << "CUTOFF1,CUTOFF2…[::DOWNSAMPLE], or " << endl;
           oss << soliloquy_empty << "CUTOFF[::DOWNSAMPLE1,DOWNSAMPLE2,...], or" << endl;
@@ -171,8 +171,8 @@ namespace bader_functions {
         for (uint i = 0; i < tokens.size(); i++) {
           if(aurostd::substring2bool(tokens.at(i), ":")) {
             oss << endl;
-            oss << soliloquy << "ERROR: Incorrect format for input, cannot specify sets (:) and cyclic (::) parameters." << " "; //<< endl // CO 180502;
-            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+            oss << soliloquy << "ERROR: Incorrect format for input, cannot specify sets (:) and cyclic (::) parameters." << " "; //<< endl // CO20180502;
+            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
             oss << soliloquy << "Exiting." << endl;
             oss << endl;
             return FALSE;
@@ -198,8 +198,8 @@ namespace bader_functions {
           aurostd::string2tokens(sets.at(i), tokens, ",");
           if(tokens.size() < 1 || tokens.size() > 2) {
             oss << endl;
-            oss << soliloquy << "ERROR: Incorrect format for input " << i + 1 << "." << " "; //<< endl // CO 180502;
-            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+            oss << soliloquy << "ERROR: Incorrect format for input " << i + 1 << "." << " "; //<< endl // CO20180502;
+            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
             oss << soliloquy << "Needs to be CUTOFF1[,DOWNSAMPLE1]:CUTOFF2[,DOWNSAMPLE2]:..." << endl;
             oss << soliloquy << "Exiting." << endl;
             oss << endl;
@@ -215,8 +215,8 @@ namespace bader_functions {
           aurostd::string2tokens(input, tokens, ",");
           if(tokens.size() != 2) {
             oss << endl;
-            oss << soliloquy << "ERROR: Incorrect format for input - number of tokens." << " "; //<< endl // CO 180502;
-            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+            oss << soliloquy << "ERROR: Incorrect format for input - number of tokens." << " "; //<< endl // CO20180502;
+            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
             oss << soliloquy << "Needs to be CUTOFF[,DOWNSAMPLE]." << endl;
             oss << soliloquy << "Exiting." << endl;
             oss << endl;
@@ -232,40 +232,40 @@ namespace bader_functions {
     //check if extracted successfully
     if(outcar.SYSTEM.empty()) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to extract system name from " << outcar_file << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to extract system name from " << outcar_file << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << outcar_file << " may be corrupted." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      return FALSE; // CO 180220
+      return FALSE; // CO20180220
     }
     if(outcar.species.empty()) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to extract species types from " << outcar_file << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to extract species types from " << outcar_file << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << outcar_file << " may be corrupted." << endl;
       oss << soliloquy << "OUTCAR may be corrupted." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      return FALSE; // CO 180220
+      return FALSE; // CO20180220
     }
     if(outcar.vZVAL.empty()) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to extract valence charges from " << outcar_file << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to extract valence charges from " << outcar_file << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << outcar_file << " may be corrupted." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      return FALSE; // CO 180220
+      return FALSE; // CO20180220
     }
     if(xstr_bader.num_each_type.empty()) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to extract atom count for each species from " << outcar_file << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to extract atom count for each species from " << outcar_file << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << poscar_file << " may be corrupted." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
-      return FALSE; // CO 180220
+      return FALSE; // CO20180220
     }
     //get vector for vZVAL, we need it for VVdiff later
     //it needs to be as big as the number of atoms in cell
@@ -300,8 +300,8 @@ namespace bader_functions {
     string soliloquy = "bader_functions::BaderCalc():  ";          // so you know who's speaking
     string soliloquy_empty = "                                 ";  // so you know who's speaking
 
-    // CO 180220 moved up from below
-    string execution_path = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    // CO20180220 moved up from below
+    string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     FixDirectory(directory);
     oss << soliloquy << "working within " << directory << "." << endl;
 
@@ -311,8 +311,8 @@ namespace bader_functions {
     // COREY fast checks START - 170613
     if(vspecies.size()!=num_each_type.size()){
       oss << endl;
-      oss << soliloquy << "ERROR: Input incorrect, vspecies.size()!=num_each_type.size() (" << vspecies.size() << "!=" << num_each_type.size() << ")" << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Input incorrect, vspecies.size()!=num_each_type.size() (" << vspecies.size() << "!=" << num_each_type.size() << ")" << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -325,8 +325,8 @@ namespace bader_functions {
     }
     if(vZVAL.size()!=natoms){
       oss << endl;
-      oss << soliloquy << "ERROR: Input incorrect, vZVAL.size()!=natoms (" << vZVAL.size() << "!=" << natoms << ")" << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Input incorrect, vZVAL.size()!=natoms (" << vZVAL.size() << "!=" << natoms << ")" << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -345,15 +345,15 @@ namespace bader_functions {
     //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // translate "./" into a full path, might be done twice
-    //[CO 180220 - moved up]string execution_path = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
-    //[CO 180220 - moved up]FixDirectory(directory);
+    //[CO20180220 - moved up]string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
+    //[CO20180220 - moved up]FixDirectory(directory);
 
     //NO LONGER AN ISSUE, corey
     //FORTRAN has a problem with strings/paths longer than 128 characters, check
     //if(directory.length()>=128) {
     //  oss << endl;
-    //  oss << soliloquy << "ERROR: Directory string length longer than 128. This will cause issues in Fortran." << " "; //<< endl // CO 180502;
-    //  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+    //  oss << soliloquy << "ERROR: Directory string length longer than 128. This will cause issues in Fortran." << " "; //<< endl // CO20180502;
+    //  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
     //  oss << soliloquy << "Exiting." << endl;
     //  oss << endl;
     //  return FALSE;
@@ -364,7 +364,7 @@ namespace bader_functions {
     // announce the directory to work in
     // unfortunate location for this message if you are coming from command line, but this is central to both command line/library
     // so I need it here
-    //[CO 180220 - moved up]oss << soliloquy << "working within " << directory << "." << endl;
+    //[CO20180220 - moved up]oss << soliloquy << "working within " << directory << "." << endl;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -390,8 +390,8 @@ namespace bader_functions {
       oss << soliloquy << "looking to use " << ref_file << " as reference file." << endl;
       if((!aurostd::FileExist(ref_file)) || aurostd::FileEmpty(ref_file)) {
         oss << endl;
-        oss << soliloquy << "ERROR: The reference charge file " << ref_file << " isn't present/is empty." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: The reference charge file " << ref_file << " isn't present/is empty." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -403,8 +403,8 @@ namespace bader_functions {
         oss << soliloquy << "decompressing " << ref_file << "." << endl;
         if(!aurostd::efile2tempfile(ref_file, ref_file)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to decompress " << ref_file << "." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to decompress " << ref_file << "." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -427,8 +427,8 @@ namespace bader_functions {
       if(!BaderExtensionFound(required_files.at(i), required_files.at(i), directory)) {  //replace in place
         oss << endl;
         oss << soliloquy << "ERROR: Cannot find required file " << required_files.at(i) << " (";
-        oss << required_files.at(i) << ".static, " << required_files.at(i) << ", or compressed variants)." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << required_files.at(i) << ".static, " << required_files.at(i) << ", or compressed variants)." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -441,8 +441,8 @@ namespace bader_functions {
         oss << soliloquy << "decompressing " << required_files.at(i) << "." << endl;
         if(!aurostd::efile2tempfile(required_files.at(i), tmp_file)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to decompress " << required_files.at(i) << "." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to decompress " << required_files.at(i) << "." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -454,8 +454,8 @@ namespace bader_functions {
         remove_files.push_back(tmp_file);
         if(aurostd::FileEmpty(tmp_file)) {
           oss << endl;
-          oss << soliloquy << "ERROR: " << required_files.at(i) << " is empty." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: " << required_files.at(i) << " is empty." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -473,8 +473,8 @@ namespace bader_functions {
     //oss << soliloquy << "creating BADER sub-directory." << endl;
     //if(!aurostd::DirectoryMake(bader_directory)) {
     //oss << endl;
-    //oss << soliloquy << "ERROR: Could not open sub-directory in " << directory << "." << " "; //<< endl // CO 180502;
-    //oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+    //oss << soliloquy << "ERROR: Could not open sub-directory in " << directory << "." << " "; //<< endl // CO20180502;
+    //oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
     //oss << soliloquy << "Exiting." << endl;
     //oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -502,8 +502,8 @@ namespace bader_functions {
       oss << soliloquy << "summing core and valence charge densities for reference file." << endl;
       if(!pflow::CHGSUM(species_header, required_files.at(1), required_files.at(2), ref_file, oss)) {
         oss << endl;
-        oss << soliloquy << "ERROR: Unable to sum core and valence charge densities." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unable to sum core and valence charge densities." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -514,8 +514,8 @@ namespace bader_functions {
       // check files exist
       if((!aurostd::FileExist(ref_file)) || aurostd::FileEmpty(ref_file)) {
         oss << endl;
-        oss << soliloquy << "ERROR: The reference charge file " << ref_file << " isn't present/is empty." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: The reference charge file " << ref_file << " isn't present/is empty." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -540,8 +540,8 @@ namespace bader_functions {
     if(LDEBUG) cerr << soliloquy << "CHECK BADER COMMAND" << endl;
     if(!aurostd::IsCommandAvailable("bader")) {
       oss << endl;
-      oss << soliloquy << "ERROR: bader command NOT found." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: bader command NOT found." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -551,7 +551,7 @@ namespace bader_functions {
     }
     string BADER_RUN_DIRECTORY = aurostd::TmpDirectoryCreate("BADER");
     oss << soliloquy << "changing directories to " << BADER_RUN_DIRECTORY << " to execute bader command." << endl;
-    string work_dir=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    string work_dir=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     chdir(BADER_RUN_DIRECTORY.c_str());
     //FORTRAN has a problem with strings/paths longer than 128 characters, so make everything local
     aurostd::CopyFile(required_files.at(0), "CHGCAR");
@@ -567,8 +567,8 @@ namespace bader_functions {
       //I'm guessing since the didn't exit for maxima in edge refinement (original bader command), we're okay
       if(aurostd::substring2bool(BADER_CODE_OUTPUT.str(), "ERROR: should be no new maxima in edge refinement")) {
         oss << endl;
-        oss << soliloquy << "ERROR: bader command issued error" << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: bader command issued error" << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "BADER CODE FAILURE: should be no new maxima in edge refinement" << endl;
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
@@ -611,8 +611,8 @@ namespace bader_functions {
     //BADER_CODE_OUTPUT << endl << aurostd::execute2string("/home/corey/bin/bader "+bader_options+" "+required_files.at(0)+" -ref "+ref_file) << endl;
     if(aurostd::substring2bool(BADER_CODE_OUTPUT.str(), "ERROR: should be no new maxima in edge refinement")) {
       oss << endl;
-      oss << soliloquy << "ERROR: bader command issued error" << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: bader command issued error" << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "BADER CODE FAILURE: should be no new maxima in edge refinement" << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
@@ -669,8 +669,8 @@ namespace bader_functions {
 #ifndef _AFLOW_TEMP_PRESERVE_
       if(!aurostd::RemoveDirectory(BADER_RUN_DIRECTORY)) {
         oss << endl;
-        oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Please check." << endl;
         oss << endl;
       }
@@ -684,7 +684,7 @@ namespace bader_functions {
           aurostd::CompressFile(compressed_file,DEFAULT_KZIP_BIN);
         }
       }
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       //oss << soliloquy << "Exiting." << endl;
       return TRUE;
     }
@@ -705,8 +705,8 @@ namespace bader_functions {
       } else {
         //echo warning, but don't exist
         oss << endl;
-        oss << soliloquy << "WARNING: " << standard_bader_files.at(i) << " was not created/is empty." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "WARNING: " << standard_bader_files.at(i) << " was not created/is empty." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "This is VERY unusual and likely an issue with the Bader analysis." << endl;
         oss << endl;
       }
@@ -768,8 +768,8 @@ namespace bader_functions {
         if(LDEBUG) cerr << soliloquy << "CHECKING SELECT ATOM FILES" << endl;
         if(!listORrange2vec(vpflow.getattachedscheme("BADER::PRINT_SELECT_ATOM"), range, oss)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to extract list/range command for print select atom." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to extract list/range command for print select atom." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -851,8 +851,8 @@ namespace bader_functions {
         if(LDEBUG) cerr << soliloquy << "CHECKING PRINT SELECT BADER FILES" << endl;
         if(!listORrange2vec(vpflow.getattachedscheme("BADER::PRINT_SELECT_BADER"), range, oss)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to extract list/range command for print select bader." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to extract list/range command for print select bader." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -998,8 +998,8 @@ namespace bader_functions {
       oss << soliloquy << "moving " << move_files.at(i) << " to " << directory << "." << endl;
       if(!aurostd::file2directory(move_files.at(i), directory)) {
         oss << endl;
-        oss << soliloquy << "ERROR: Unable to move " << move_files.at(i) << "." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unable to move " << move_files.at(i) << "." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -1060,8 +1060,8 @@ namespace bader_functions {
       }
     } else {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to locate ACF.dat (or its empty)." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to locate ACF.dat (or its empty)." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -1081,8 +1081,8 @@ namespace bader_functions {
 
     if(bader_charge.size() == 0 || volume.size() == 0 || bader_charge.size() != volume.size()) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to extract bader_charge/volume correctly." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to extract bader_charge/volume correctly." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Perhaps the file is corrupt?" << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
@@ -1211,8 +1211,8 @@ namespace bader_functions {
           sum_files.push_back(bader_atom_files.back());
           if((!aurostd::FileExist(bader_atom_files.back())) || aurostd::FileEmpty(bader_atom_files.back())) {
             oss << endl;
-            oss << soliloquy << "ERROR: " << bader_atom_files.back() << " not found/is empty." << " "; //<< endl // CO 180502;
-            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+            oss << soliloquy << "ERROR: " << bader_atom_files.back() << " not found/is empty." << " "; //<< endl // CO20180502;
+            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
             oss << soliloquy << "Exiting." << endl;
             oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -1233,8 +1233,8 @@ namespace bader_functions {
         }
         if(!pflow::CHGSUM(species_header, sum_files, species_files.back(), oss)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to sum atom files to create " << species_files.back() << "." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to sum atom files to create " << species_files.back() << "." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -1273,8 +1273,8 @@ namespace bader_functions {
             if(LDEBUG) cerr << soliloquy << "NO DOWNSAMPLE RATIOS SPECIFIED" << endl;
             if(cutoffs.size() != downsample_ratios.size()) {
               oss << endl;
-              oss << soliloquy << "ERROR: Number of cutoffs != number of downsample ratios." << " "; //<< endl // CO 180502;
-              oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+              oss << soliloquy << "ERROR: Number of cutoffs != number of downsample ratios." << " "; //<< endl // CO20180502;
+              oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
               oss << soliloquy << "This is necessary for sets." << endl;
               oss << soliloquy << "Exiting." << endl;
               oss << endl;
@@ -1312,8 +1312,8 @@ namespace bader_functions {
               if(downsample_ratios.size() != 0) {
                 if(!pflow::CHGCAR2JVXL(species_files.at(i), cutoffs.at(j), downsample_ratios.at(j), output_file, oss)) {
                   oss << endl;
-                  oss << soliloquy << "ERROR: Unable to create " << output_file << "." << " "; //<< endl // CO 180502;
-                  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+                  oss << soliloquy << "ERROR: Unable to create " << output_file << "." << " "; //<< endl // CO20180502;
+                  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
                   oss << soliloquy << "Exiting." << endl;
                   oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -1333,8 +1333,8 @@ namespace bader_functions {
               } else {
                 if(!pflow::CHGCAR2JVXL(species_files.at(i), cutoffs.at(j), output_file, oss)) {
                   oss << endl;
-                  oss << soliloquy << "ERROR: Unable to create " << output_file << "." << " "; //<< endl // CO 180502;
-                  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+                  oss << soliloquy << "ERROR: Unable to create " << output_file << "." << " "; //<< endl // CO20180502;
+                  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
                   oss << soliloquy << "Exiting." << endl;
                   oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -1376,8 +1376,8 @@ namespace bader_functions {
                 oss << soliloquy << "output file will be " << output_file << "." << endl;
                 if(!pflow::CHGCAR2JVXL(species_files.at(i), cutoffs.at(j), downsample_ratios.at(k), output_file, oss)) {
                   oss << endl;
-                  oss << soliloquy << "ERROR: Unable to create " << output_file << "." << " "; //<< endl // CO 180502;
-                  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+                  oss << soliloquy << "ERROR: Unable to create " << output_file << "." << " "; //<< endl // CO20180502;
+                  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
                   oss << soliloquy << "Exiting." << endl;
                   oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
@@ -1452,7 +1452,7 @@ namespace bader_functions {
 namespace bader_functions {
   void FixDirectory(string& directory) {
     string soliloquy = "bader_functions::FixDirectory():  ";  // so you know who's speaking
-    string execution_path = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     // translate "./" into a full path
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "CHECK DIRECTORY" << endl;
@@ -1479,7 +1479,7 @@ namespace bader_functions {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
 
-    // CO 180220 - directory stuff for logging
+    // CO20180220 - directory stuff for logging
     string directory = ".";  //default
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");  //XHOST.vflag_control.flag("DIRECTORY");//aflags.Directory;//vpflow.getattachedscheme("BADER::DIRECTORY");
@@ -1547,8 +1547,8 @@ namespace bader_functions {
         bader_options.append("-c voronoi ");
       } else {
         oss << endl;
-        oss << soliloquy << "ERROR: Unknown calculate option." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unknown calculate option." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1564,8 +1564,8 @@ namespace bader_functions {
         bader_options.append("-n voronoi ");
       } else {
         oss << endl;
-        oss << soliloquy << "ERROR: Unknown nocalculate option." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unknown nocalculate option." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1587,8 +1587,8 @@ namespace bader_functions {
         bader_options.append("-b ongrid ");
       } else {
         oss << endl;
-        oss << soliloquy << "ERROR: Unknown partition option." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unknown partition option." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1607,8 +1607,8 @@ namespace bader_functions {
         bader_options.append("-r " + misc_option + " ");
       } else {
         oss << endl;
-        oss << soliloquy << "ERROR: Unknown refine_edge_method option " + misc_option + "." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unknown refine_edge_method option " + misc_option + "." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1632,8 +1632,8 @@ namespace bader_functions {
         bader_options.append("-vac auto ");
       } else if(misc_option == "") {
         oss << endl;
-        oss << soliloquy << "ERROR: No density threshold given." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: No density threshold given." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1641,8 +1641,8 @@ namespace bader_functions {
         double vac_test = aurostd::string2utype<double>(misc_option);
         if(vac_test == 0) {
           oss << endl;
-          oss << soliloquy << "ERROR: Incorrect input for vacuum density. Must be a number (double)." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Incorrect input for vacuum density. Must be a number (double)." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return FALSE;
@@ -1668,8 +1668,8 @@ namespace bader_functions {
         bader_options.append("-m max ");
       } else {
         oss << endl;
-        oss << soliloquy << "ERROR: Unknown termination option " + misc_option + "." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unknown termination option " + misc_option + "." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1702,8 +1702,8 @@ namespace bader_functions {
         bader_options.append("-p all_atom -p all_bader ");
       } else {
         oss << endl;
-        oss << soliloquy << "ERROR: Unknown print_all option " + misc_option + "." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unknown print_all option " + misc_option + "." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1728,8 +1728,8 @@ namespace bader_functions {
         bader_options.append("-p atom_index -p bader_index ");
       } else {
         oss << endl;
-        oss << soliloquy << "ERROR: Unknown print_index option " + misc_option + "." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unknown print_index option " + misc_option + "." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1748,8 +1748,8 @@ namespace bader_functions {
       } else {
         if(!getPushCommand(vpflow.getattachedscheme("BADER::PRINT_SELECT_ATOM"), push_command, oss)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to gather input for print select atom command." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to gather input for print select atom command." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return FALSE;
@@ -1766,8 +1766,8 @@ namespace bader_functions {
       } else {
         if(!getPushCommand(vpflow.getattachedscheme("BADER::PRINT_SELECT_BADER"), push_command, oss)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to gather input for print select bader command." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to gather input for print select bader command." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return FALSE;
@@ -1784,8 +1784,8 @@ namespace bader_functions {
       if(LDEBUG) cerr << soliloquy << "vpflow.getattachedscheme(\"BADER::PRINT_SUM_ATOM\")=" << vpflow.flag("BADER::PRINT_SUM_ATOM") << endl;
       if(!getPushCommand(vpflow.getattachedscheme("BADER::PRINT_SUM_ATOM"), push_command, oss)) {
         oss << endl;
-        oss << soliloquy << "ERROR: Unable to gather input for print sum atom command." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unable to gather input for print sum atom command." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1798,8 +1798,8 @@ namespace bader_functions {
       if(LDEBUG) cerr << soliloquy << "vpflow.getattachedscheme(\"BADER::PRINT_SUM_BADER\")=" << vpflow.flag("BADER::PRINT_SUM_BADER") << endl;
       if(!getPushCommand(vpflow.getattachedscheme("BADER::PRINT_SUM_BADER"), push_command, oss)) {
         oss << endl;
-        oss << soliloquy << "ERROR: Unable to gather input for print sum bader command." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unable to gather input for print sum bader command." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1840,7 +1840,7 @@ namespace bader_functions {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
 
-    // CO 180220 - directory stuff for logging
+    // CO20180220 - directory stuff for logging
     string directory = ".";  //default
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");  //XHOST.vflag_control.flag("DIRECTORY");//aflags.Directory;//vpflow.getattachedscheme("BADER::DIRECTORY");
@@ -1854,8 +1854,8 @@ namespace bader_functions {
     if(LDEBUG) cerr << soliloquy << "CHECK THAT THERE'S NO MIXING BETWEEN LIST AND RANGE" << endl;
     if(aurostd::substring2bool(misc_option, ",") && aurostd::substring2bool(misc_option, "-")) {
       oss << endl;
-      oss << soliloquy << "ERROR: Do not mix notation for LIST and RANGE." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Do not mix notation for LIST and RANGE." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "You may only have '::' OR ':'." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
@@ -1869,8 +1869,8 @@ namespace bader_functions {
       for (uint i = 0; i < tokens.size(); i++) {
         if(tokens.at(i) == 0) {
           oss << endl;
-          oss << soliloquy << "ERROR: Input for list must be numerical and above 0: " << tokens.at(i) << "." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Input for list must be numerical and above 0: " << tokens.at(i) << "." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return FALSE;
@@ -1888,8 +1888,8 @@ namespace bader_functions {
       aurostd::string2tokens<int>(misc_option, tokens, "-");
       if(tokens.size() != 2) {
         oss << endl;
-        oss << soliloquy << "ERROR: Cannot specify more than one range." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Cannot specify more than one range." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1897,8 +1897,8 @@ namespace bader_functions {
       for (uint i = 0; i < tokens.size(); i++) {
         if(tokens.at(i) == 0) {
           oss << endl;
-          oss << soliloquy << "ERROR: Input for range must be numerical and above 0: " << tokens.at(i) << "." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Input for range must be numerical and above 0: " << tokens.at(i) << "." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return FALSE;
@@ -1907,8 +1907,8 @@ namespace bader_functions {
       //check that first entry !> second entry
       if(tokens.at(0) > tokens.at(1)) {
         oss << endl;
-        oss << soliloquy << "ERROR: First range element > second range element." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: First range element > second range element." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1920,8 +1920,8 @@ namespace bader_functions {
     test_value = aurostd::string2utype<int>(misc_option);
     if(test_value == 0) {
       oss << endl;
-      oss << soliloquy << "ERROR: Input for range must be numerical and above 0: " << test_value << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Input for range must be numerical and above 0: " << test_value << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -1942,7 +1942,7 @@ namespace bader_functions {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
 
-    // CO 180220 - directory stuff for logging
+    // CO20180220 - directory stuff for logging
     string directory = ".";  //default
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");  //XHOST.vflag_control.flag("DIRECTORY");//aflags.Directory;//vpflow.getattachedscheme("BADER::DIRECTORY");
@@ -1954,8 +1954,8 @@ namespace bader_functions {
     if(LDEBUG) cerr << soliloquy << "CHECK THAT THERE'S NO MIXING BETWEEN LIST AND RANGE" << endl;
     if(aurostd::substring2bool(misc_option, ",") && aurostd::substring2bool(misc_option, "-")) {
       oss << endl;
-      oss << soliloquy << "ERROR: Do not mix notation for LIST and RANGE." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Do not mix notation for LIST and RANGE." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "You may only have '::' OR ':'." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
@@ -1969,8 +1969,8 @@ namespace bader_functions {
       for (uint i = 0; i < vout.size(); i++) {
         if(vout.at(i) == 0) {
           oss << endl;
-          oss << soliloquy << "ERROR: Input for list must be numerical and above 0: " << vout.at(i) << "." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Input for list must be numerical and above 0: " << vout.at(i) << "." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return FALSE;
@@ -1987,8 +1987,8 @@ namespace bader_functions {
       aurostd::string2tokens<uint>(misc_option, tokens, "-");
       if(tokens.size() != 2) {
         oss << endl;
-        oss << soliloquy << "ERROR: Cannot specify more than one range." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Cannot specify more than one range." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -1996,8 +1996,8 @@ namespace bader_functions {
       for (uint i = 0; i < tokens.size(); i++) {
         if(tokens.at(i) == 0) {
           oss << endl;
-          oss << soliloquy << "ERROR: Input for range must be numerical and above 0: " << tokens.at(i) << "." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Input for range must be numerical and above 0: " << tokens.at(i) << "." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return FALSE;
@@ -2006,8 +2006,8 @@ namespace bader_functions {
       //check that first entry !> second entry
       if(tokens.at(0) > tokens.at(1)) {
         oss << endl;
-        oss << soliloquy << "ERROR: First range element > second range element." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: First range element > second range element." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -2021,8 +2021,8 @@ namespace bader_functions {
     test_value = aurostd::string2utype<int>(misc_option);
     if(test_value == 0) {
       oss << endl;
-      oss << soliloquy << "ERROR: Input must be numerical and above 0: " << misc_option << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Input must be numerical and above 0: " << misc_option << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -2043,10 +2043,10 @@ namespace bader_functions {
     string full_FileNameIN="";
     full_FileNameIN=directory + "/" + FileNameIN + ".static";
     if(aurostd::EFileExist(full_FileNameIN, FileNameOUT) && aurostd::FileNotEmpty(FileNameOUT)) { return TRUE; }
-    if(aurostd::FileExist(full_FileNameIN) && aurostd::FileNotEmpty(full_FileNameIN)) { FileNameOUT=full_FileNameIN; return TRUE; } // CO 180524
+    if(aurostd::FileExist(full_FileNameIN) && aurostd::FileNotEmpty(full_FileNameIN)) { FileNameOUT=full_FileNameIN; return TRUE; } // CO20180524
     full_FileNameIN=directory + "/" + FileNameIN;
     if(aurostd::EFileExist(full_FileNameIN, FileNameOUT) && aurostd::FileNotEmpty(FileNameOUT)) { return TRUE; }
-    if(aurostd::FileExist(full_FileNameIN) && aurostd::FileNotEmpty(full_FileNameIN)) { FileNameOUT=full_FileNameIN; return TRUE; } //CO 180524
+    if(aurostd::FileExist(full_FileNameIN) && aurostd::FileNotEmpty(full_FileNameIN)) { FileNameOUT=full_FileNameIN; return TRUE; } //CO20180524
     return FALSE;
   }
 }  // namespace bader_functions
@@ -2118,7 +2118,7 @@ namespace bader_functions {
     }
     if(LDEBUG) cerr << soliloquy << "GATHER CHGCAR_FILES" << endl;
     vector<string> chgcar_files;
-    string directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    string directory = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     string input = vpflow.getattachedscheme("PREPARE_CHGCAR_4_JMOL");
     if(aurostd::substring2bool(input, ",")) {
       aurostd::string2tokens(input, chgcar_files, ",");
@@ -2170,8 +2170,8 @@ namespace bader_functions {
       if(LDEBUG) cerr << soliloquy << "PATH " << path << endl;
       if(!get_species_string(outcar_file, species_header, path, file, oss)) {  //look in same path as CHGCAR
         oss << endl;
-        oss << soliloquy << "ERROR: Unable to gather new header for file." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unable to gather new header for file." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return oss.str();
@@ -2182,8 +2182,8 @@ namespace bader_functions {
     }
     if(!prepare_CHGCAR_4_Jmol(chgcar_file, species_header, zip_file, oss)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to rewrite file with appropriate header." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to rewrite file with appropriate header." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return oss.str();
@@ -2204,7 +2204,7 @@ namespace bader_functions {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
 
-    // CO 180220 - directory stuff for logging
+    // CO20180220 - directory stuff for logging
     string directory = ".";  //default
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");  //XHOST.vflag_control.flag("DIRECTORY");//aflags.Directory;//vpflow.getattachedscheme("BADER::DIRECTORY");
@@ -2218,8 +2218,8 @@ namespace bader_functions {
       if(LDEBUG) cerr << soliloquy << "OUTCAR SPECIFIED, NO NEED TO LOOK" << endl;
       if((!aurostd::FileExist(outcar_file)) || aurostd::FileEmpty(outcar_file)) {
         oss << endl;
-        oss << soliloquy << "ERROR: Unable to locate specified OUTCAR (or its empty): " << outcar_file << "." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unable to locate specified OUTCAR (or its empty): " << outcar_file << "." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -2232,8 +2232,8 @@ namespace bader_functions {
       //otherwise check in current path
       if(!BaderExtensionFound("OUTCAR", outcar_file, dir_to_look) && !BaderExtensionFound("OUTCAR", outcar_file, ".")) {
         oss << endl;
-        oss << soliloquy << "ERROR: Unable to locate OUTCAR/OUTCAR.static (compressed or otherwise) in path(" << file << ") or pwd." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unable to locate OUTCAR/OUTCAR.static (compressed or otherwise) in path(" << file << ") or pwd." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -2261,7 +2261,7 @@ namespace bader_functions {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
 
-    // CO 180220 - directory stuff for logging
+    // CO20180220 - directory stuff for logging
     string directory = ".";  //default
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");  //XHOST.vflag_control.flag("DIRECTORY");//aflags.Directory;//vpflow.getattachedscheme("BADER::DIRECTORY");
@@ -2275,8 +2275,8 @@ namespace bader_functions {
     any_file_exists=(any_file_exists || (aurostd::FileExist(chgcar_file) && aurostd::FileNotEmpty(chgcar_file)));
     if(!any_file_exists){
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to find " << chgcar_file << " (compressed or otherwise, or its empty)." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to find " << chgcar_file << " (compressed or otherwise, or its empty)." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -2292,8 +2292,8 @@ namespace bader_functions {
     aurostd::stringstream2file(chgcar_ss, chgcar_file_uncompressed);   //write back out
     if(zip_file && !aurostd::MatchCompressed(chgcar_file, chgcar_file_uncompressed)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to zip " << chgcar_file_uncompressed << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to zip " << chgcar_file_uncompressed << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -2324,11 +2324,11 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//[CO 180220 - moved to aurostd]***************************************************************************//
-//[CO 180220 - moved to aurostd] bader_functions::efile2tempfile
-//[CO 180220 - moved to aurostd]***************************************************************************//
-//[CO 180220 - moved to aurostd]namespace bader_functions {
-//[CO 180220 - moved to aurostd]}  // namespace bader_functions
+//[CO20180220 - moved to aurostd]***************************************************************************//
+//[CO20180220 - moved to aurostd] bader_functions::efile2tempfile
+//[CO20180220 - moved to aurostd]***************************************************************************//
+//[CO20180220 - moved to aurostd]namespace bader_functions {
+//[CO20180220 - moved to aurostd]}  // namespace bader_functions
 
 // ***************************************************************************//
 // pflow::CHGCAR2JVXL
@@ -2343,7 +2343,7 @@ namespace pflow {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
 
-    // CO 180220 - directory stuff for logging
+    // CO20180220 - directory stuff for logging
     string directory = ".";  //default
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");  //XHOST.vflag_control.flag("DIRECTORY");//aflags.Directory;//vpflow.getattachedscheme("BADER::DIRECTORY");
@@ -2368,8 +2368,8 @@ namespace pflow {
       aurostd::string2tokens(input, tokens, "::");
       if(tokens.size() < 2 || tokens.size() > 3) {
         oss << endl;
-        oss << soliloquy << "ERROR: Incorrect format for input - number of tokens (::)." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Incorrect format for input - number of tokens (::)." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Needs to be either: " << endl;
         oss << soliloquy_empty << "FILE1,FILE2,FILE3...::CUTOFF[::DOWNSAMPLE], " << endl;
         oss << soliloquy_empty << "FILE::CUTOFF1,CUTOFF2…[::DOWNSAMPLE], or " << endl;
@@ -2383,8 +2383,8 @@ namespace pflow {
       for (uint i = 0; i < tokens.size(); i++) {
         if(aurostd::substring2bool(tokens.at(i), ":")) {
           oss << endl;
-          oss << soliloquy << "ERROR: Incorrect format for input, cannot specify sets (:) and cyclic (::) parameters." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Incorrect format for input, cannot specify sets (:) and cyclic (::) parameters." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return oss.str();
@@ -2426,8 +2426,8 @@ namespace pflow {
         aurostd::string2tokens(sets.at(i), tokens, ",");
         if(tokens.size() < 2 || tokens.size() > 3) {
           oss << endl;
-          oss << soliloquy << "ERROR: Incorrect format for input " << i + 1 << "." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Incorrect format for input " << i + 1 << "." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Needs to be FILE1,CUTOFF1[,DOWNSAMPLE1]:FILE2,CUTOFF2[,DOWNSAMPLE2]:..." << endl;
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
@@ -2443,8 +2443,8 @@ namespace pflow {
       aurostd::string2tokens(input, tokens, ",");
       if(tokens.size() < 2 || tokens.size() > 3) {
         oss << endl;
-        oss << soliloquy << "ERROR: Incorrect format for input - number of tokens (,)." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Incorrect format for input - number of tokens (,)." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Needs to be: FILE,CUTOFF[,DOWNSAMPLE]." << endl;
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
@@ -2455,8 +2455,8 @@ namespace pflow {
       if(tokens.size() == 3) { downsample_ratios.push_back(aurostd::string2utype<int>(tokens.at(2))); }
     } else {
       oss << endl;
-      oss << soliloquy << "ERROR: Incorrect input, need at least FILE1,CUTOFF1." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Incorrect input, need at least FILE1,CUTOFF1." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return oss.str();
@@ -2470,8 +2470,8 @@ namespace pflow {
         string output = vpflow.getattachedscheme("CHGCAR2JVXL::OUTPUT");
         if(aurostd::substring2bool(output, "::")) {
           oss << endl;
-          oss << soliloquy << "ERROR: Incorrect input delimiter for output_files." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Incorrect input delimiter for output_files." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Please remove any \"::\"." << endl;
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
@@ -2484,8 +2484,8 @@ namespace pflow {
         }
         if(!CHGCAR2JVXL(chgcar_files, cutoffs, downsample_ratios, output_files, oss)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return oss.str();
@@ -2493,8 +2493,8 @@ namespace pflow {
         return oss.str();
       } else {
         oss << endl;
-        oss << soliloquy << "WARNING: An output file name can only be specified for sets." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "WARNING: An output file name can only be specified for sets." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "You have specified CYCLIC mode (::)." << endl;
         oss << soliloquy << "Ignoring output file name input." << endl;
         oss << endl;
@@ -2502,8 +2502,8 @@ namespace pflow {
     }
     if(!CHGCAR2JVXL(chgcar_files, cutoffs, downsample_ratios, cyclic, oss)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return oss.str();
@@ -2538,7 +2538,7 @@ namespace pflow {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
 
-    // CO 180220 - directory stuff for logging
+    // CO20180220 - directory stuff for logging
     string directory = ".";  //default
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");  //XHOST.vflag_control.flag("DIRECTORY");//aflags.Directory;//vpflow.getattachedscheme("BADER::DIRECTORY");
@@ -2555,8 +2555,8 @@ namespace pflow {
             for (uint k = 0; k < downsample_ratios.size(); k++) {
               if(!CHGCAR2JVXL(chgcar_files.at(i), cutoffs.at(j), downsample_ratios.at(k), oss)) {
                 oss << endl;
-                oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO 180502;
-                oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+                oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO20180502;
+                oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
                 oss << soliloquy << "Exiting." << endl;
                 oss << endl;
                 return FALSE;
@@ -2569,8 +2569,8 @@ namespace pflow {
           for (uint j = 0; j < cutoffs.size(); j++) {
             if(!CHGCAR2JVXL(chgcar_files.at(i), cutoffs.at(j), oss)) {
               oss << endl;
-              oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO 180502;
-              oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+              oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO20180502;
+              oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
               oss << soliloquy << "Exiting." << endl;
               oss << endl;
               return FALSE;
@@ -2585,8 +2585,8 @@ namespace pflow {
       if(downsample_ratios.size() != 0) {
         if(chgcar_files.size() != cutoffs.size() || chgcar_files.size() != downsample_ratios.size()) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unequal set parameters found." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unequal set parameters found." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Must have equal number of CHGCAR files, cutoffs, and downsample ratios." << endl;
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
@@ -2595,8 +2595,8 @@ namespace pflow {
       } else {
         if(chgcar_files.size() != cutoffs.size()) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unequal set parameters found." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unequal set parameters found." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Must have equal number of CHGCAR files and cutoffs." << endl;
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
@@ -2617,8 +2617,8 @@ namespace pflow {
         if(downsample_ratios.size() != 0) {
           if(chgcar_files.size() != cutoffs.size() || chgcar_files.size() != downsample_ratios.size() || chgcar_files.size() != output_files.size()) {
             oss << endl;
-            oss << soliloquy << "ERROR: Unequal set parameters found." << " "; //<< endl // CO 180502;
-            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+            oss << soliloquy << "ERROR: Unequal set parameters found." << " "; //<< endl // CO20180502;
+            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
             oss << soliloquy << "Number of OUTPUT files must match number of CHGCAR files, cutoffs, and downsample ratios." << endl;
             oss << soliloquy << "Exiting." << endl;
             oss << endl;
@@ -2628,8 +2628,8 @@ namespace pflow {
           //downsample_ratios.size()==0
           if(chgcar_files.size() != cutoffs.size() || chgcar_files.size() != output_files.size()) {
             oss << endl;
-            oss << soliloquy << "ERROR: Unequal set parameters found." << " "; //<< endl // CO 180502;
-            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+            oss << soliloquy << "ERROR: Unequal set parameters found." << " "; //<< endl // CO20180502;
+            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
             oss << soliloquy << "Number of OUTPUT files must match number of CHGCAR files and cutoffs." << endl;
             oss << soliloquy << "Exiting." << endl;
             oss << endl;
@@ -2643,8 +2643,8 @@ namespace pflow {
         for (uint i = 0; i < chgcar_files.size(); i++) {
           if(!CHGCAR2JVXL(chgcar_files.at(i), cutoffs.at(i), downsample_ratios.at(i), output_files.at(i), oss)) {
             oss << endl;
-            oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO 180502;
-            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+            oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO20180502;
+            oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
             oss << soliloquy << "Exiting." << endl;
             oss << endl;
             return FALSE;
@@ -2656,8 +2656,8 @@ namespace pflow {
       for (uint i = 0; i < chgcar_files.size(); i++) {
         if(!CHGCAR2JVXL(chgcar_files.at(i), cutoffs.at(i), output_files.at(i), oss)) {
           oss << endl;
-          oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO 180502;
-          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+          oss << soliloquy << "ERROR: Unable to convert CHGCAR files to .jvxl's." << " "; //<< endl // CO20180502;
+          oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
           return FALSE;
@@ -2742,7 +2742,7 @@ namespace pflow {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "BEGIN" << endl;
 
-    // CO 180220 - directory stuff for logging
+    // CO20180220 - directory stuff for logging
     string directory = ".";  //default
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");  //XHOST.vflag_control.flag("DIRECTORY");//aflags.Directory;//vpflow.getattachedscheme("BADER::DIRECTORY");
@@ -2766,8 +2766,8 @@ namespace pflow {
       command = "java -jar " + XHOST.command("Jmol.jar");
     } else {
       oss << endl;
-      oss << soliloquy << "ERROR: Unable to locate either JmolData (preferred), jmol, jmol.sh, or Jmol.jar in path." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Unable to locate either JmolData (preferred), jmol, jmol.sh, or Jmol.jar in path." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Please install Jmol." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
@@ -2779,40 +2779,40 @@ namespace pflow {
     //check if files exist/no negatives are present, throw error
     if(chgcar_file.empty() || (!aurostd::FileExist(chgcar_file)) || aurostd::FileEmpty(chgcar_file)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Input CHGCAR file does not exist (or its empty): " << chgcar_file << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Input CHGCAR file does not exist (or its empty): " << chgcar_file << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
     }
     if(cutoff < 0) {
       oss << endl;
-      oss << soliloquy << "ERROR: Cutoff cannot be negative: " << cutoff << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Cutoff cannot be negative: " << cutoff << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
     }
     if(cutoff == 0) {
       oss << endl;
-      oss << soliloquy << "ERROR: Input for cutoff be numerical and above 0: " << cutoff << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Input for cutoff be numerical and above 0: " << cutoff << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
     }
     if(downsample_ratio < 0) {
       oss << endl;
-      oss << soliloquy << "ERROR: Downsample ratio cannot be negative: " << downsample_ratio << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Downsample ratio cannot be negative: " << downsample_ratio << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
     }
     if(downsample_ratio == 0) {
       oss << endl;
-      oss << soliloquy << "ERROR: Input for downsample ratio be numerical and above 0: " << downsample_ratio << "." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Input for downsample ratio be numerical and above 0: " << downsample_ratio << "." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -2825,8 +2825,8 @@ namespace pflow {
     }
     if(output_file.substr(output_file.length() - 5, 5) != ".jvxl") {
       oss << endl;
-      oss << soliloquy << "ERROR: OUTPUT file must have .jvxl extension." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: OUTPUT file must have .jvxl extension." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
       return FALSE;
@@ -2841,8 +2841,8 @@ namespace pflow {
       oss << soliloquy << "decompressing " << chgcar_file << "." << endl;
       if(!aurostd::efile2tempfile(chgcar_file, chgcar_file)) {
         oss << endl;
-        oss << soliloquy << "ERROR: Unable to decompress " << chgcar_file << "." << " "; //<< endl // CO 180502;
-        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+        oss << soliloquy << "ERROR: Unable to decompress " << chgcar_file << "." << " "; //<< endl // CO20180502;
+        oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
         return FALSE;
@@ -2874,8 +2874,8 @@ namespace pflow {
     //if(!(aurostd::substring2bool(jmol_output,"isosurface1created")&&aurostd::substring2bool(jmol_output,"OKXJVXL")&&
     //  aurostd::FileExist(output_file))) {
     //  oss << endl;
-    //  oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl // CO 180502;
-    //  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+    //  oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl // CO20180502;
+    //  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
     //  oss << soliloquy << "Please correctly set your display variable and check your version of JmolData/Jmol." << endl;
     //  oss << soliloquy << "Exiting." << endl;
     //  oss << endl;
@@ -2888,8 +2888,8 @@ namespace pflow {
     //NO LONGER APPLICABLE
     //if(jmol_output!="-5") {    //expected command from Jmol, if it doesn't come out, then likely display variable off
     //  oss << endl;
-    //  oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl // CO 180502;
-    //  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+    //  oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl // CO20180502;
+    //  oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
     //  oss << soliloquy << "Please correctly set your display variable." << endl;
     //  oss << soliloquy << "Exiting." << endl;
     //  oss << endl;
@@ -2900,8 +2900,8 @@ namespace pflow {
     //}
     if((!aurostd::FileExist(output_file)) || aurostd::FileEmpty(output_file)) {
       oss << endl;
-      oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl // CO 180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO 180220
+      oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl // CO20180502;
+      oss << soliloquy << "[dir=" << directory << "]" << endl; // CO20180220
       oss << soliloquy << "Please correctly set your display variable and check your version of JmolData/Jmol." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
@@ -3002,7 +3002,7 @@ namespace pflow {
 
     // exchange "./" for an explicit path
     if(directory == "./") {
-      directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+      directory = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     }
 
     // announce the directory to be searched for phonon data
@@ -3054,50 +3054,50 @@ namespace pflow {
     }
 
     // Expected name of the data files
-    string phondisdat = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE,phondisdat_compressed;  // ME190211 - use aflow.rc filenames
-    string phondosdat = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE,phondosdat_compressed;  // ME190211 - use aflow.rc filenames
-    string phonthrmdat = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE,phonthrmdat_compressed;  // ME190211 - use aflow.rc filenames
+    string phondisdat = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE,phondisdat_compressed;  // ME20190211 - use aflow.rc filenames
+    string phondosdat = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE,phondosdat_compressed;  // ME20190211 - use aflow.rc filenames
+    string phonthrmdat = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE,phonthrmdat_compressed;  // ME20190211 - use aflow.rc filenames
 
     // Record which files are present and if they were compressed
     bool dis_data = false, dos_data = false, thermo_data = false;
     bool pdis_was_decompressed = false, pdos_was_decompressed = false, thermo_was_decompressed = false;
 
-    //CO 180515 START - new decompressing schemes
+    //CO20180515 START - new decompressing schemes
 
     // Search for the data files, if not found then search for compressed version
     string PDIS_tmp, PDOS_tmp, THERMO_tmp;  // string to hold path to temporary file
 
     // look for PDIS
     if(aurostd::EFileExist(phondisdat,phondisdat_compressed) && aurostd::FileNotEmpty(phondisdat_compressed)){
-      cout << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << ".EXT . . . " << endl;  // ME190211 - use aflow.rc filenames
+      cout << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << ".EXT . . . " << endl;  // ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phondisdat_compressed,PDIS_tmp); //aurostd::TmpFileCreate("PDIS_temp");
       pdis_was_decompressed = true;
       dis_data = true;
       phondisdat = PDIS_tmp;
     } else if(aurostd::FileExist(phondisdat) && aurostd::FileNotEmpty(phondisdat)) {dis_data = true;}
-    else {cout << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << " in " << directory << "." << endl;}  // ME190211 - use aflow.rc filenames
+    else {cout << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDIS_FILE << " in " << directory << "." << endl;}  // ME20190211 - use aflow.rc filenames
 
     // look for PDOS
     if(aurostd::EFileExist(phondosdat,phondosdat_compressed) && aurostd::FileNotEmpty(phondosdat_compressed)){
-      cout << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << ".EXT . . . " << endl;  // ME190211 - use aflow.rc filenames
+      cout << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << ".EXT . . . " << endl;  // ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phondosdat_compressed,PDOS_tmp); //aurostd::TmpFileCreate("PDOS_temp");
       pdis_was_decompressed = true;
-      dos_data = true;  // ME190328
+      dos_data = true;  // ME20190328
       phondosdat = PDOS_tmp;
     } else if(aurostd::FileExist(phondosdat) && aurostd::FileNotEmpty(phondosdat)) {dis_data = true;}
-    else {cout << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << " in " << directory << "." << endl;}  // ME190211 - use aflow.rc filenames
+    else {cout << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_PDOS_FILE << " in " << directory << "." << endl;}  // ME20190211 - use aflow.rc filenames
 
     // look for THERMO
     if(aurostd::EFileExist(phonthrmdat,phonthrmdat_compressed) && aurostd::FileNotEmpty(phonthrmdat_compressed)){
-      cout << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << ".EXT . . . " << endl;  // ME190211 - use aflow.rc filenames
+      cout << "pflow::PLOT_PHDISP:  Decompressing " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << ".EXT . . . " << endl;  // ME20190211 - use aflow.rc filenames
       aurostd::efile2tempfile(phonthrmdat_compressed,THERMO_tmp); //aurostd::TmpFileCreate("THERMO_temp");
       pdis_was_decompressed = true;
-      thermo_data = true;  // ME190328
+      thermo_data = true;  // ME20190328
       phonthrmdat = THERMO_tmp;
     } else if(aurostd::FileExist(phonthrmdat) && aurostd::FileNotEmpty(phonthrmdat)) {dis_data = true;}
-    else {cout << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << " in " << directory << "." << endl;}  // ME190211 - use aflow.rc filenames
+    else {cout << "pflow::PLOT_PHDISP:  AFLOW found no file named " << DEFAULT_APL_FILE_PREFIX << DEFAULT_APL_THERMO_FILE << " in " << directory << "." << endl;}  // ME20190211 - use aflow.rc filenames
 
-    //CO 180515 STOP - new decompressing schemes
+    //CO20180515 STOP - new decompressing schemes
 
     // prepare variables for storing calculation details contained in PDIS
     IPCFreqFlags freqUnits;
@@ -3131,7 +3131,7 @@ namespace pflow {
           tokens.clear();
           tokenize(temp, tokens, " ");  // divide by whitespace
           chemName = tokens[0].c_str();
-          aurostd::StringSubst(chemName, "/", ".");  // ME190328 - forward slash breaks image conversion
+          aurostd::StringSubst(chemName, "/", ".");  // ME20190328 - forward slash breaks image conversion
           temp = tokens[0] + " " + tokens[1];  // join chemical and crystal strings
           graph_title = temp.c_str();
           tokens.clear();
@@ -3437,7 +3437,7 @@ string gnuplotPhononHeader(string directory, string name, string unit, string pl
   string temp;
   temp.append("#Generated by AFLOW (Kevin Rasch [kevin.rasch@duke.edu], 2013, Duke) \n");
   temp.append("set term postscript eps enhanced color font \"Times-Roman, 40\" size 18, 10.125 \n");
-  temp.append("set output \"" + directory + "/" + aurostd::StringSubst(name, '/', '.') + "_" + unit + "_" + plot_type + ".eps" + "\" \n");  // ME 190211 - The name may contain / which breaks the script
+  temp.append("set output \"" + directory + "/" + aurostd::StringSubst(name, '/', '.') + "_" + unit + "_" + plot_type + ".eps" + "\" \n");  // ME20190211 - The name may contain / which breaks the script
   if((plot_type == "PHON") || (plot_type == "THERMO") || (plot_type == "PDISDOS")) {
     temp.append("set multiplot title \"" + title + "\"  \n");
   } else if((plot_type == "PDIS") || (plot_type == "PDOS")) {
@@ -3651,7 +3651,7 @@ void callOutputConversion(bool PNG, bool PDF, bool JPG, bool GIF, string directo
 // ***************************************************************************//
 void cleanGnuplotScript(bool file1, bool file2, bool file3, string script) {
   // Helper function for pflow::PLOT_PHDISP() that removes the gnuplot scripts
-  if(!XHOST.vflag_control.flag("KEEP::GPL")){ //CO 180809
+  if(!XHOST.vflag_control.flag("KEEP::GPL")){ //CO20180809
     if((file1 || file2) || file3) {
       cout << "pflow::PLOT_PHDISP:  Cleaning up . . . Gnuplot script refers to temporary files; removing it." << endl;
       aurostd::execute("rm -f " + script);  // script refers to the above temporary files--saving it is useless

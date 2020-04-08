@@ -52,7 +52,7 @@ string space_group;                     // http://periodictable.com      // DU 2
 uint space_group_number;                // http://periodictable.com      // DU 2019/05/17
 
 
-double Pearson_coefficient;             // Pearson mass deviation coefficient // ME181020
+double Pearson_coefficient;             // Pearson mass deviation coefficient // ME20181020
 xvector<double> lattice_constant;       // (pm) http://periodictable.com      // DU 2019/05/17
 xvector<double> lattice_angle;          // (rad) http://periodictable.com      // DU 2019/05/17
 string phase;                           //      http://periodictable.com      // DU 2019/05/17
@@ -291,7 +291,7 @@ std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starti
 std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
 std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
 std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   // ME181020 Pearson mass deviation coefficient
+std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   // ME20181020 Pearson mass deviation coefficient
 
   */
   

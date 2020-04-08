@@ -224,7 +224,7 @@ namespace pflow {
       cout << "This gives you the CCE corrections for PBE, LDA and SCAN if an aflow.in and a Bader charges file" << endl; 
       cout << "in AFLOW format are present and the oxidation numbers can be determined from them." << endl;
       cout << endl;
-      //[CO190620 - do NOT exit]exit(EXIT_FAILURE);
+      //[CO20190620 - do NOT exit]exit(EXIT_FAILURE);
       return;
     }
 
