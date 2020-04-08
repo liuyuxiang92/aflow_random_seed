@@ -367,7 +367,7 @@ namespace aurostd {
     }
 
   // ------------------------------------------------------------ function conj
-  // ME20180904 -- needed to compile conjugate transpose in xmatrix
+  // ME180904 -- needed to compile conjugate transpose in xmatrix
   template<class utype>
     utype
     conj(const utype& x) {
@@ -475,7 +475,7 @@ namespace aurostd {
       return xcomplex<utype>(xr,ni);
     }
 
-  // ME20180907  
+  // ME 180907  
   // ------------------------------------------------------------ function magnitude square
   template<class utype> utype
     magsqr(const xcomplex<utype>& x) {

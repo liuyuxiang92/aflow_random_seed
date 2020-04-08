@@ -47,9 +47,9 @@
 #ifndef _AUROSTD_BOOT_CPP_
 #include "aurostd_boot.cpp"
 #endif
-#ifndef _AUROSTD_XERROR_CPP_  //ME20180627
-#include "aurostd_xerror.cpp" //ME20180627
-#endif                        //ME20180627
+#ifndef _AUROSTD_XERROR_CPP_  //ME 180627
+#include "aurostd_xerror.cpp" //ME 180627
+#endif                        //ME 180627
 
 #endif  // _AURO_IMPLEMENTATIONS_
 

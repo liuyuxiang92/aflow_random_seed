@@ -169,7 +169,7 @@ namespace apl {
     }
     b.agroup.clear();
 #else
-    b.clear(); //DX20191220 - uppercase to lowercase clear
+    b.clear(); //DX 20191220 - uppercase to lowercase clear
     stringstream POSCAR;
     POSCAR.str("");
     if(0){cerr << a << std::endl;}
@@ -1090,7 +1090,7 @@ namespace apl {
   bool Supercell::compareFPositions(xvector<double>& v1, xvector<double>& v2, double eps) {
     // Get the difference vector for SUPERCELL positions
     // if symmetry related, use eps=_sym_eps (default), otherwise eps=_AFLOW_APL_EPS_
-    return SYM::FPOSMatch(v1, v2, _scStructure.lattice, _scStructure.f2c, _skew, eps); //DX20190619 - lattice and f2c as input
+    return SYM::FPOSMatch(v1, v2, _scStructure.lattice, _scStructure.f2c, _skew, eps); //DX 20190619 - lattice and f2c as input
   }
   //[CO20190218 - OBSOLETE]#else
   //[CO20190218 - OBSOLETE]bool Supercell::compareFPositions(const xvector<double>& v1,

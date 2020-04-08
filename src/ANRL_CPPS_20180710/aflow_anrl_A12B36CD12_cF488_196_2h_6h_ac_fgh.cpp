@@ -98,7 +98,7 @@ namespace anrl {
     double z13=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A12B36CD12_cF488_196_2h_6h_ac_fgh: z13=" << z13 << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
     str.scale=1.0;
 
     a1=(1.0/2.0)*a*yn+(1.0/2.0)*a*zn;

@@ -228,7 +228,7 @@ namespace apl {
   // Moves a q-point into the first Brillouin zone.
   // ME20190702 - made more robust
   void QMesh::moveToBZ(xvector<double>& qpt) const {
-    BringInCellInPlace(qpt, _ZERO_TOL_, 0.5, -0.5); //DX20190905 - removed SYM namespace
+    BringInCellInPlace(qpt, _ZERO_TOL_, 0.5, -0.5); //DX 20190905 - removed SYM namespace
   }
 
   //makeIrreducible/////////////////////////////////////////////////////////////

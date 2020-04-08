@@ -212,7 +212,7 @@ namespace plotter {
 
     if (missing_binaries.size() == 0) {
       string directory = plotoptions.getattachedscheme("DIRECTORY");
-      if(directory.empty()){directory=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
+      if(directory.empty()){directory=aurostd::getPWD();}  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")//CO191004
       if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
       string filename = plotoptions.getattachedscheme("FILE_NAME");
       if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
@@ -220,7 +220,7 @@ namespace plotter {
       // PDF is default since we use pdflatex to compile
       string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
       if (format.empty()) format = "pdf";
-      string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
+      string current_dir = aurostd::getPWD();  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
       // Create temp directory
       string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
       chdir(tmp.c_str());

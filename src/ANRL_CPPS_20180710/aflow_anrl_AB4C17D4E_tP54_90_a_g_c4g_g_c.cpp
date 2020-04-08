@@ -90,7 +90,7 @@ namespace anrl {
     double z9=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB4C17D4E_tP54_90_a_g_c4g_g_c: z9=" << z9 << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
     str.scale=1.0;
 
     a1=a*xn;

@@ -212,7 +212,7 @@ namespace apl {
           fpos_scaled = (pcell.fgroup[fg].Uf * scell.atoms[atsc].fpos) + ftau_scaled;
           for (uint at_map = 0; at_map < natoms; at_map++) {
             if (SYM::FPOSMatch(fpos_scaled, scell.atoms[at_map].fpos,
-                  scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX20190619 - lattice and f2c as input
+                  scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
               sym_map[fg][atsc] = at_map;
               mapped = true;
             }
@@ -257,12 +257,12 @@ namespace apl {
         countshell = 0;
         int at1 = cell.iatoms[i][0];
         for (uint at2 = 0; at2 < natoms; at2++) {
-          //DX20190613 [OBSOLETE - changed function name] distances[at2] = SYM::minimumCartesianDistance(cell.atoms[at1].cpos,
-          //DX20190613 [OBSOLETE - changed function name]                                                cell.atoms[at2].cpos,
-          //DX20190613 [OBSOLETE - changed function name]                                                cell.lattice);
+          //DX 20190613 [OBSOLETE - changed function name] distances[at2] = SYM::minimumCartesianDistance(cell.atoms[at1].cpos,
+          //DX 20190613 [OBSOLETE - changed function name]                                                cell.atoms[at2].cpos,
+          //DX 20190613 [OBSOLETE - changed function name]                                                cell.lattice);
           distances[at2] = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(cell.atoms[at1].cpos,
                 cell.atoms[at2].cpos,
-                cell.lattice)); //DX20190613
+                cell.lattice)); //DX 20190613
         }
         distances = aurostd::sort(distances);
         for (uint j = 1; j < natoms; j++) {
@@ -301,13 +301,13 @@ namespace apl {
       at1sc = pc2scMap[at1];
       shell.push_back(at1sc);
       for (uint at2 = 0; at2 < natoms_scell; at2++) {
-        //DX20190613 [OBSOLETE - changed function name] xvector<double> vec; xvector<int> ijk;
-        //DX20190613 [OBSOLETE - changed function name] double cart_dist = SYM::minimumCartesianDistance(scell.atoms[at1sc].cpos,
-        //DX20190613 [OBSOLETE - changed function name]                                                  scell.atoms[at2].cpos,
-        //DX20190613 [OBSOLETE - changed function name]                                                  scell.lattice, vec, ijk);
+        //DX 20190613 [OBSOLETE - changed function name] xvector<double> vec; xvector<int> ijk;
+        //DX 20190613 [OBSOLETE - changed function name] double cart_dist = SYM::minimumCartesianDistance(scell.atoms[at1sc].cpos,
+        //DX 20190613 [OBSOLETE - changed function name]                                                  scell.atoms[at2].cpos,
+        //DX 20190613 [OBSOLETE - changed function name]                                                  scell.lattice, vec, ijk);
         double cart_dist = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(scell.atoms[at1sc].cpos,
               scell.atoms[at2].cpos,
-              scell.lattice)); //DX20190613
+              scell.lattice)); //DX 20190613
         if (cart_dist < cutoff) {
           shell.push_back(at2);
         }
@@ -405,12 +405,12 @@ namespace apl {
           int at = coordination_shells[s][clst[o-1] + 1];
           for (int d = 1; d < o; d++) {
             int atc = atoms_in_cluster[d];
-            //DX20190613 [OBSOLETE - changed function name] double mdist = SYM::minimumCartesianDistance(scell.atoms[at].cpos,
-            //DX20190613 [OBSOLETE - changed function name]                                              scell.atoms[atc].cpos,
-            //DX20190613 [OBSOLETE - changed function name]                                              scell.lattice);
+            //DX 20190613 [OBSOLETE - changed function name] double mdist = SYM::minimumCartesianDistance(scell.atoms[at].cpos,
+            //DX 20190613 [OBSOLETE - changed function name]                                              scell.atoms[atc].cpos,
+            //DX 20190613 [OBSOLETE - changed function name]                                              scell.lattice);
             double mdist = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(scell.atoms[at].cpos,
                   scell.atoms[atc].cpos,
-                  scell.lattice)); //DX20190613
+                  scell.lattice)); //DX 20190613
             if (mdist > cutoff) {
               append = false;
               d = o;
@@ -598,7 +598,7 @@ namespace apl {
           // No need to compare when atoms are of different type
           if (scell.atoms[j].type == scell.atoms[atoms[i]].type) {
             if (SYM::FPOSMatch(fpos_transl, scell.atoms[j].fpos, scell.lattice,
-                  scell.f2c, update, scell.sym_eps)) { //DX20190619 - lattice and f2c as input
+                  scell.f2c, update, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
               atoms_translated[i] = j;
               j = scell.atoms.size();
             }
@@ -1024,7 +1024,7 @@ namespace apl {
         xvector<double> fpos = scell.c2f * (scell.atoms[atom_trans].cpos - transl);
         for (uint at_map = 0; at_map < natoms; at_map++) {
           if (SYM::FPOSMatch(fpos, scell.atoms[at_map].fpos,
-                scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX20190619 - lattice and f2c as input
+                scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
             transformation_map[at] = at_map;
             at_map = natoms;
           }

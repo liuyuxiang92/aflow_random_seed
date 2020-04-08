@@ -73,7 +73,7 @@ namespace anrl {
     double z6=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_A7BC3D13_cF192_219_de_b_c_ah: z6=" << z6 << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
     str.scale=1.0;
 
     a1=(1.0/2.0)*a*yn+(1.0/2.0)*a*zn;

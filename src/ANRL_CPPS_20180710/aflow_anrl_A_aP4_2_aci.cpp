@@ -84,7 +84,7 @@ namespace anrl {
     if(LDEBUG) { cerr << "anrl::PrototypeANRL_A_aP4_2_aci: sin(gamma)=" << sin(deg2rad*gamma)  << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
     str.scale=1.0;
 
     double cx=c*cos(deg2rad*beta);
