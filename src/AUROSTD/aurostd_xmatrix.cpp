@@ -15,7 +15,7 @@
 //#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ double(1.0e-6)
 
 //#ifndef _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_
-//#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ 1.0e-6 // DX 171025
+//#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ 1.0e-6 // DX20171025
 //#endif
 
 #ifndef XXEND
@@ -53,7 +53,7 @@ namespace aurostd {  // namespace aurostd
       urows=std::max(nrl,nrh); //if(!nrh||!nch) urows=0; this messes up convasp
       lcols=std::min(ncl,nch); //if(!nrh||!nch) lcols=0; this messes up convasp
       ucols=std::max(ncl,nch); //if(!nrh||!nch) ucols=0; this messes up convasp
-      refresh();  //CO191112
+      refresh();  //CO20191112
 #ifdef _XMATH_DEBUG_CONSTRUCTORS
       cerr << "M -> constructor:"
         << "  lrows=" << lrows << ", urows=" << urows
@@ -79,9 +79,9 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
-    xmatrix<utype>::xmatrix(const xmatrix<utype>& b) : msize(0) {copy(b);}  //CO191112
+    xmatrix<utype>::xmatrix(const xmatrix<utype>& b) : msize(0) {copy(b);}  //CO20191112
   template<class utype>                                       // copy constructor
-    xmatrix<utype>::xmatrix(const xvector<utype>& b) : msize(0) {copy(b);}  //CO191112
+    xmatrix<utype>::xmatrix(const xvector<utype>& b) : msize(0) {copy(b);}  //CO20191112
 }
 
 namespace aurostd {  // namespace aurostd
@@ -89,7 +89,7 @@ namespace aurostd {  // namespace aurostd
     xmatrix<utype>::xmatrix(int vrows,int vcols, utype* a) : msize(0) {  // a starts from 0..
       lrows=1;urows=vrows;
       lcols=1;ucols=vcols;
-      refresh();  //CO191112
+      refresh();  //CO20191112
 #ifdef _XMATH_DEBUG_CONSTRUCTORS
       cerr << "M -> copy constructor:"
         << "  lrows=" << lrows << ", urows=" << urows
@@ -133,7 +133,7 @@ namespace aurostd {  // namespace aurostd
         << ", lcols=" << lcols << ", ucols=" << ucols
         << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-      free(); //CO190808
+      free(); //CO20190808
     }
 }
 // ----------------------------------------------------------------------------
@@ -141,7 +141,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd { // namespace aurostd
   template<class utype>
-    void xmatrix<utype>::free() { //CO190808
+    void xmatrix<utype>::free() { //CO20190808
       if(msize>0) {
         delete [] (corpus[lrows]+lcols-XXEND);
         delete [] (corpus+lrows-XXEND);
@@ -152,8 +152,8 @@ namespace aurostd { // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    void xmatrix<utype>::copy(const xmatrix<utype>& b) { //CO190808
-      if(lrows!=b.lrows||urows!=b.urows||lcols!=b.lrows||ucols!=b.ucols||msize!=b.msize) {    // if dims(this)!=dims(a) => build a new xmatrix !!!  //CO190808 - VERY IMPORTANT that we not only check lrows/urows/lcols/ucols, but msize, as xmatrix could just have been initialized (msize==0)
+    void xmatrix<utype>::copy(const xmatrix<utype>& b) { //CO20190808
+      if(lrows!=b.lrows||urows!=b.urows||lcols!=b.lrows||ucols!=b.ucols||msize!=b.msize) {    // if dims(this)!=dims(a) => build a new xmatrix !!!  //CO20190808 - VERY IMPORTANT that we not only check lrows/urows/lcols/ucols, but msize, as xmatrix could just have been initialized (msize==0)
         free();
         lrows=b.lrows;urows=b.urows;rows=b.rows;
         lcols=b.lcols;ucols=b.ucols;cols=b.cols;
@@ -190,10 +190,10 @@ namespace aurostd {  // namespace aurostd
             corpus[i+lrows][j+lcols] = b.corpus[i+b.lrows][j+b.lcols];
           }
         }
-      } //CO190808 - we definitely have corpus now
+      } //CO20190808 - we definitely have corpus now
     }
   template<class utype>
-    void xmatrix<utype>::copy(const xvector<utype>& b) { //CO190808
+    void xmatrix<utype>::copy(const xvector<utype>& b) { //CO20190808
       xmatrix<utype> a(b.urows,1,b.lrows,1);
       for(int i=b.lrows;i<=b.urows;i++){a[i][1]=b[i];}
       copy(a);
@@ -202,7 +202,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                             // operator =
-    xmatrix<utype>& xmatrix<utype>::operator=(const xmatrix<utype>& b) {  //CO191112
+    xmatrix<utype>& xmatrix<utype>::operator=(const xmatrix<utype>& b) {  //CO20191112
       if(this!=&b) {copy(b);}
       return *this;
     }
@@ -210,7 +210,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    void xmatrix<utype>::refresh(void) { //CO190808
+    void xmatrix<utype>::refresh(void) { //CO20190808
       rows=urows-lrows+1;      //if(!nrh||!nch) rows=0; this messes up convasp
       cols=ucols-lcols+1;      //if(!nrh||!nch) cols=0; this messes up convasp
       if(rows==0||cols==0) {
@@ -283,7 +283,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ME 180904 returns a matrix column as an xvector
+// ME20180904 returns a matrix column as an xvector
 namespace aurostd {  // namespace aurostd
   template<class utype>
     xvector<utype> xmatrix<utype>::getcol(int i) const {
@@ -297,7 +297,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    xvector<utype> xmatrix<utype>::getdiag(int k,int _lrows) const { //CO191210
+    xvector<utype> xmatrix<utype>::getdiag(int k,int _lrows) const { //CO20191210
       //first get length
       int _rows=0,i=0,j=0;
       for(i=lrows;i<=urows;i++){
@@ -316,13 +316,13 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-//CO190808
+//CO20190808
 namespace aurostd {  // namespace aurostd
   //this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
   //lrows_out,lcols_out specifies lrows,lcols of mat_out
   //this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
   template<class utype> void
-    xmatrix<utype>::getmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
+    xmatrix<utype>::getmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       string soliloquy="aurostd::getmatInPlace():";
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
       if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
@@ -341,29 +341,29 @@ namespace aurostd {  // namespace aurostd
       }
     }
   template<class utype> void
-    xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO191110
+    xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
       xmatrix<utype> xmat;
       (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       xv_out=xmatrix2xvector(xmat,urow,ucol,lrow,lcol,(urow==lrow) ? lrows_out : lcols_out);
     }
   template<class utype> xmatrix<utype>
-    xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
+    xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       xmatrix<utype> xmat;
       (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       return xmat;
     }
   template<class utype> xvector<utype>
-    xmatrix<utype>::getvec(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
+    xmatrix<utype>::getvec(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       xvector<utype> xvec;
       (*this).getmatInPlace(xvec,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       return xvec;
     }
 }
 
-//CO190808
+//CO20190808
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    void xmatrix<utype>::setrow(const xvector<utype>& row,int irow) {  //CO191110
+    void xmatrix<utype>::setrow(const xvector<utype>& row,int irow) {  //CO20191110
       return setmat(row,irow,false);
       //[OVERLOAD WITH SETMAT()]string soliloquy="aurostd::setrow():";
       //[OVERLOAD WITH SETMAT()]if(row.lrows!=lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"row.lrows!=lcols",_INPUT_ILLEGAL_);}
@@ -374,10 +374,10 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-//CO190808
+//CO20190808
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    void xmatrix<utype>::setcol(const xvector<utype>& col,int icol) {  //CO191110
+    void xmatrix<utype>::setcol(const xvector<utype>& col,int icol) {  //CO20191110
       return setmat(col,icol,true);
       //[OVERLOAD WITH SETMAT()]string soliloquy="aurostd::setcol():";
       //[OVERLOAD WITH SETMAT()]if(col.lrows!=lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"col.lrows!=lrows",_INPUT_ILLEGAL_);}
@@ -388,10 +388,10 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-//CO190808
+//CO20190808
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    void xmatrix<utype>::setmat(const xmatrix<utype>& mat,int lrow,int lcol) { //these are the starting lrow, lcol, end is dictated by size of mat //CO191110
+    void xmatrix<utype>::setmat(const xmatrix<utype>& mat,int lrow,int lcol) { //these are the starting lrow, lcol, end is dictated by size of mat //CO20191110
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       string soliloquy="aurostd::setmat():";
       int urow=lrow+mat.rows-1; //ending row
@@ -409,7 +409,7 @@ namespace aurostd {  // namespace aurostd
       }
     }
   template<class utype>
-    void xmatrix<utype>::setmat(const xvector<utype>& xv,int icol,bool col) { //replace icol (col==true) or row (col==false) //CO191110
+    void xmatrix<utype>::setmat(const xvector<utype>& xv,int icol,bool col) { //replace icol (col==true) or row (col==false) //CO20191110
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       string soliloquy="aurostd::setmat():";
       int lrow=1,lcol=1,urow=1,ucol=1;
@@ -547,7 +547,7 @@ namespace aurostd {  // namespace aurostd
       if(!this->issquare||!b.issquare||this->rows!=b.rows)
         //{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*=: "
         //  <<  "defined only for square xmatrixes with equal dimensions " << endl;exit(0);}
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,"xmatrix<utype>::operator *=():","failure in operator*=: defined only for square xmatrixes with equal dimensions",_INPUT_ILLEGAL_);  //CO191112
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,"xmatrix<utype>::operator *=():","failure in operator*=: defined only for square xmatrixes with equal dimensions",_INPUT_ILLEGAL_);  //CO20191112
 
       xmatrix<utype> a(this->urows,this->ucols,this->lrows,this->lcols);
       int i=0,j=0,k=0,ii=0,jj=0,kk=0;
@@ -577,7 +577,7 @@ namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>&                  
     // removed inline
     xmatrix<utype>::operator *=(utype r)
-    {  //CO191110
+    {  //CO20191110
 #ifdef _XMATH_DEBUG_OPERATORS
       printf("M -> operator *=: ");
       printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
@@ -598,7 +598,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>&                  
     // removed inline
-    xmatrix<utype>::operator /=(utype r){  //CO191110
+    xmatrix<utype>::operator /=(utype r){  //CO20191110
 #ifdef _XMATH_DEBUG_OPERATORS
       printf("M -> operator *=: ");
       printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
@@ -615,7 +615,7 @@ namespace aurostd {  // namespace aurostd
     }
   template<class utype> xmatrix<utype>&                  
     // removed inline
-    xmatrix<utype>::operator /=(const xmatrix<utype>& a){  //CO191201 - right matrix division
+    xmatrix<utype>::operator /=(const xmatrix<utype>& a){  //CO20191201 - right matrix division
 #ifdef _XMATH_DEBUG_OPERATORS
       printf("M -> operator *=: ");
       printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
@@ -710,7 +710,7 @@ namespace aurostd {  // namespace aurostd
       printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif    
       if(a.cols!=b.rows) {
-        // ME190814 - eliminate exit
+        // ME20190814 - eliminate exit
         //{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*: (a.cols!=b.rows)=FALSE" << endl;exit(0);}    
         string function = "aurostd::xmatrix<utype>::operator*";
         string message = "a.cols != b.rows";
@@ -743,7 +743,7 @@ namespace aurostd {  // namespace aurostd
       return  c;
     }
 
-  // ME190814 - multiplication of a real matrix with a complex matrix
+  // ME20190814 - multiplication of a real matrix with a complex matrix
   template<class utype>
     xmatrix<xcomplex<utype> > operator*(const xmatrix<utype>& a, const xmatrix<xcomplex<utype> >& b) {
 #ifdef _XMATH_DEBUG_OPERATORS
@@ -839,10 +839,10 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
     operator/(const xmatrix<utype>& a,const utype s) {
-      return (utype) ((utype)1/s)*a;                     // DX 1/15/17 - add utype to 1/s to account for xcomplex
+      return (utype) ((utype)1/s)*a;                     // DX20170115 - add utype to 1/s to account for xcomplex
     }
   template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
-    operator/(const xmatrix<utype>& a,const xmatrix<utype>& b) {  //CO191201
+    operator/(const xmatrix<utype>& a,const xmatrix<utype>& b) {  //CO20191201
       return a*inverse(b);
     }
 }
@@ -884,12 +884,12 @@ namespace aurostd {  // namespace aurostd
 
   template<class utype> bool                             // is xmatrix == xmatrix ?
     identical(const xmatrix<utype>& a,const xmatrix<utype>& b,const utype& _tol_,const char& _mode_) {
-      // ME190814 - BEGIN
+      // ME20190814 - BEGIN
       // [OBSOLETE - return false instead] if(a.rows!=b.rows) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[1]" << endl;exit(0);}
       // [OBSOLETE - return false instead] if(a.cols!=b.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[2]" << endl;exit(0);}
       if ((a.rows != b.rows) || (a.cols != b.cols)) return false;
-      //if(a.isfloat || a.iscomplex) { ME190814 - this doesn't work for xcomplex because abs() and _tol_ have different types //[CO200106 - close bracket for indenting]}
-      // ME190814 - END
+      //if(a.isfloat || a.iscomplex) { ME20190814 - this doesn't work for xcomplex because abs() and _tol_ have different types //[CO200106 - close bracket for indenting]}
+      // ME20190814 - END
       if(a.isfloat) {
         if(_mode_==1) { // relative tolerance
           for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++)
@@ -969,7 +969,7 @@ namespace aurostd {  // namespace aurostd
       return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
     }
 
-  // ME190814 - xcomplex version
+  // ME20190814 - xcomplex version
   // namespace aurostd
   template<class utype> bool
     identical(const xmatrix<xcomplex<utype> >& a, const xmatrix<xcomplex<utype> >& b, const utype& _tol_, const char& _mode_) {
@@ -1084,7 +1084,7 @@ namespace aurostd {  // namespace aurostd
 
   // namespace aurostd
   template<class utype> bool
-    isdiagonal(const xmatrix<utype>& a,const utype& _eps_) { // DX 171025
+    isdiagonal(const xmatrix<utype>& a,const utype& _eps_) { // DX20171025
       for(int i=a.lrows;i<=a.urows;i++)
         for(int j=a.lcols;j<=a.ucols;j++)
           if(i-a.lrows+1!=j-a.lcols+1)  // i != j
@@ -1368,7 +1368,7 @@ namespace aurostd {  // namespace aurostd
   //171008 - CO
   //doesn't have to be square like identity
   template<class utype> xmatrix<utype>
-    eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
+    eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO20190520
       if(nch==AUROSTD_MAX_INT){nch=nrh;}  //eye(3)==eye(3,3)
       xmatrix<utype> a(nrh,nch,nrl,ncl);
       //[CO200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME20200106
@@ -1385,7 +1385,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   //171008 - CO
   template<class utype> xmatrix<utype>
-    ones_xm(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
+    ones_xm(int nrh,int nch,int nrl,int ncl) __xprototype { //CO20190520
       xmatrix<utype> a(nrh,nch,nrl,ncl);
       for (int i=a.lrows;i<=a.urows;i++){
         for (int j=a.lcols;j<=a.ucols;j++){
@@ -1494,7 +1494,7 @@ namespace aurostd {                   // conversion to xmatrix<utype>
 
 namespace aurostd {                   // conversion to xvector
   template<class utype> xvector<utype>
-    xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO191110
+    xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO20191110
       string soliloquy="aurostd::xmatrix2xvector():";
       if(urow==lrow){
         xvector<utype> xv((ucol-lcol)+1,lrows_out);
@@ -1509,10 +1509,10 @@ namespace aurostd {                   // conversion to xvector
     }
 }
 
-//CO191201
+//CO20191201
 namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
   template<class utype> xmatrix<double> 
-    xmatrixutype2double(const xmatrix<utype>& a){ //CO191201
+    xmatrixutype2double(const xmatrix<utype>& a){ //CO20191201
       xmatrix<double> b(a.urows,a.ucols,a.lrows,a.lcols);
       int i=0,j=0;
       for(i=a.lrows;i<=a.urows;i++){
@@ -1524,10 +1524,10 @@ namespace aurostd {                   // conversion from xmatrix<int> to xmatrix
     }
 }
 
-//CO191201
+//CO20191201
 namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
   template<class utype> xmatrix<utype> 
-    xmatrixdouble2utype(const xmatrix<double>& a,bool check_int){  //CO191201
+    xmatrixdouble2utype(const xmatrix<double>& a,bool check_int){  //CO20191201
       xmatrix<utype> b(a.urows,a.ucols,a.lrows,a.lcols);
       int i=0,j=0;
       if(check_int){
@@ -1633,9 +1633,9 @@ namespace aurostd {  // namespace aurostd
       /* returns the determinant **/
       if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::det()","a must be square",_INPUT_ILLEGAL_);}
       if(a.lrows!=1 || a.lcols!=1){xmatrix<utype> b=a;shiftlrowscols(b,1,1);return det(b);}
-      //[CO191201 - OBSOLETE]if(a.rows != a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.rows = a.cols" << endl;exit(0);}
-      //[CO191201 - OBSOLETE]if(a.lrows!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.lrows = 1" << endl;exit(0);}
-      //[CO191201 - OBSOLETE]if(a.lcols!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.lcols = 1" << endl;exit(0);}
+      //[CO20191201 - OBSOLETE]if(a.rows != a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.rows = a.cols" << endl;exit(0);}
+      //[CO20191201 - OBSOLETE]if(a.lrows!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.lrows = 1" << endl;exit(0);}
+      //[CO20191201 - OBSOLETE]if(a.lcols!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.lcols = 1" << endl;exit(0);}
       int size=a.rows;
       //  cerr << "DET CALL size="<<size<< endl;
       if(size==1) { return (utype) a[1][1]; }
@@ -1682,14 +1682,14 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 // Cayley-Menger Determinant
 // http://mathworld.wolfram.com/Cayley-MengerDeterminant.html
-// CO 180515
+// CO20180515
 namespace aurostd { // namespace aurostd
   template<class utype> utype
     CMdet(const xmatrix<utype>& B){ //Cayley-Menger Determinant for simplex content
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       string soliloquy="aurostd::CMdet():";
       if(!B.issquare){cerr << _AUROSTD_XLIBS_ERROR_ << "failure in xmatrix CMdet() defined for square xmatrixes [1]" << endl << endl;exit(0);}
-      xmatrix<utype> B_hat=ones_xm<utype>(B.urows+1,B.ucols+1,B.lrows,B.lcols); //CO190520
+      xmatrix<utype> B_hat=ones_xm<utype>(B.urows+1,B.ucols+1,B.lrows,B.lcols); //CO20190520
       B_hat(B.lrows,B.lcols)=(utype)0;
       for(int row=B.lrows;row<=B.urows;row++){
         for(int col=B.lcols;col<=B.ucols;col++){
@@ -1708,7 +1708,7 @@ namespace aurostd { // namespace aurostd
 // ----------------------------------------------------------------------------
 // getRotationMatrix3D() rotating a onto b
 // https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
-// CO 190324
+// CO20190324
 namespace aurostd { // namespace aurostd
   template<class utype> xmatrix<utype>
     getRotationMatrix3D(const xvector<utype>& a,const xvector<utype>& b){
@@ -1721,7 +1721,7 @@ namespace aurostd { // namespace aurostd
         cerr << soliloquy << " a=" << a << endl;
         cerr << soliloquy << " b=" << b << endl;
       }
-      xmatrix<utype> R=aurostd::eye<utype>(3,3); //CO190520
+      xmatrix<utype> R=aurostd::eye<utype>(3,3); //CO20190520
 
       //trivial cases
       if(aurostd::isequal(a,b,(utype)_ZERO_TOL_)){return R;}
@@ -1760,8 +1760,8 @@ namespace aurostd {  // namespace aurostd
       //       exit(0);
       //     }
       if(irow>=a.lrows && irow<=a.urows && jcol>=a.lcols && jcol<=a.ucols) {
-        //[CO191201 - OBSOLETE]xmatrix<utype> b(a.urows-1,a.ucols-1,a.lrows,a.lcols);
-        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows-1 || b.ucols!=b.ucols-1){ //CO191201
+        //[CO20191201 - OBSOLETE]xmatrix<utype> b(a.urows-1,a.ucols-1,a.lrows,a.lcols);
+        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows-1 || b.ucols!=b.ucols-1){ //CO20191201
           xmatrix<utype> c(a.urows-1,a.ucols-1,a.lrows,a.lcols);
           b=c;
         }
@@ -1772,12 +1772,12 @@ namespace aurostd {  // namespace aurostd
             if(i<irow && j>jcol) b[i][j-1]=a[i][j];
             if(i>irow && j>jcol) b[i-1][j-1]=a[i][j];
           }
-        //[CO191201 - OBSOLETE]return b;
+        //[CO20191201 - OBSOLETE]return b;
         return;
       }
       if((irow<a.lrows || irow>a.urows) && jcol>=a.lcols && jcol<=a.ucols) {
-        //[CO191201 - OBSOLETE]xmatrix<utype> b(a.urows,a.ucols-1,a.lrows,a.lcols);
-        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows || b.ucols!=b.ucols-1){ //CO191201
+        //[CO20191201 - OBSOLETE]xmatrix<utype> b(a.urows,a.ucols-1,a.lrows,a.lcols);
+        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows || b.ucols!=b.ucols-1){ //CO20191201
           xmatrix<utype> c(a.urows,a.ucols-1,a.lrows,a.lcols);
           b=c;
         }
@@ -1786,12 +1786,12 @@ namespace aurostd {  // namespace aurostd
             if(j<jcol) b[i][j]=a[i][j];
             if(j>jcol) b[i][j-1]=a[i][j];
           }
-        //[CO191201 - OBSOLETE]return b;
+        //[CO20191201 - OBSOLETE]return b;
         return;
       }
       if(irow>=a.lrows && irow<=a.urows && (jcol<a.lcols || jcol>a.ucols)) {
-        //[CO191201 - OBSOLETE]xmatrix<utype> b(a.urows-1,a.ucols,a.lrows,a.lcols);
-        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows-1 || b.ucols!=b.ucols){ //CO191201
+        //[CO20191201 - OBSOLETE]xmatrix<utype> b(a.urows-1,a.ucols,a.lrows,a.lcols);
+        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows-1 || b.ucols!=b.ucols){ //CO20191201
           xmatrix<utype> c(a.urows-1,a.ucols,a.lrows,a.lcols);
           b=c;
         }
@@ -1800,11 +1800,11 @@ namespace aurostd {  // namespace aurostd
             if(i<irow) b[i][j]=a[i][j];
             if(i>irow) b[i-1][j]=a[i][j];
           }
-        //[CO191201 - OBSOLETE]return b;
+        //[CO20191201 - OBSOLETE]return b;
         return;
       }
-      //[CO191201 - OBSOLETE]return a;
-      b=a;  //CO191201
+      //[CO20191201 - OBSOLETE]return a;
+      b=a;  //CO20191201
     }
   template<class utype> xmatrix<utype>                       // minor submatrix - IN PLACE
     submatrix(const xmatrix<utype>& a,int irow,int jcol) {
@@ -1842,7 +1842,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function inverse xmatrix<>
-    void adjointInPlace(const xmatrix<utype>& a,xmatrix<utype>& b) { //CO191201
+    void adjointInPlace(const xmatrix<utype>& a,xmatrix<utype>& b) { //CO20191201
       //inspired by https://www.mathsisfun.com/algebra/matrix-inverse-minors-cofactors-adjugate.html
       if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverseByAdjoint()","a must be square",_INPUT_ILLEGAL_);}
       b=a;
@@ -1857,13 +1857,13 @@ namespace aurostd {  // namespace aurostd
       traspInPlace(b);
     }
   template<class utype>                                 // function inverse xmatrix<>
-    xmatrix<utype> adjoint(const xmatrix<utype>& a) { //CO191201
+    xmatrix<utype> adjoint(const xmatrix<utype>& a) { //CO20191201
       xmatrix<utype> b;
       adjointInPlace(a,b);
       return b;
     }
   template<class utype>                                 // function inverse xmatrix<>
-    xmatrix<utype> inverseByAdjoint(const xmatrix<utype>& a) {return (utype)1.0/det(a) * adjoint(a);} //CO191201
+    xmatrix<utype> inverseByAdjoint(const xmatrix<utype>& a) {return (utype)1.0/det(a) * adjoint(a);} //CO20191201
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverse(const xmatrix<utype>& a) {
       // returns the inverse
@@ -1875,24 +1875,24 @@ namespace aurostd {  // namespace aurostd
         shiftlrowscols(b,a.lrows,a.lcols);
         return b;
       }
-      //[CO191201 - OBSOLETE]if(a.rows != a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.rows = a.cols" << endl;exit(0);}
-      //[CO191201 - OBSOLETE]if(a.lrows!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.lrows = 1" << endl;exit(0);}
-      //[CO191201 - OBSOLETE]if(a.lcols!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.lcols = 1" << endl;exit(0);}
+      //[CO20191201 - OBSOLETE]if(a.rows != a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.rows = a.cols" << endl;exit(0);}
+      //[CO20191201 - OBSOLETE]if(a.lrows!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.lrows = 1" << endl;exit(0);}
+      //[CO20191201 - OBSOLETE]if(a.lcols!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.lcols = 1" << endl;exit(0);}
       int size=a.rows;
       xmatrix<utype> b(a.rows,a.cols);
       //  cerr << "DET CALL size="<<size<< endl;
       utype adet=det(a);
-      //[CO191201 - OBSOLETE]if(adet==(utype) 0)  {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: singular matrix" << endl;exit(0);}
+      //[CO20191201 - OBSOLETE]if(adet==(utype) 0)  {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: singular matrix" << endl;exit(0);}
       if(adet==(utype) 0)  {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverse()","singular matrix",_INPUT_ILLEGAL_);}
       if(size==1) {b[1][1]=(utype)1/a[1][1]; return b;}
-      if(size==2) { //CO191201
-        //[CO191201 - OBSOLETE]{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: 2x2 not written yet" << endl;exit(0);} return b;
+      if(size==2) { //CO20191201
+        //[CO20191201 - OBSOLETE]{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: 2x2 not written yet" << endl;exit(0);} return b;
         b[1][1]=a[2][2]/adet;b[1][2]=-a[1][2]/adet;
         b[2][1]=-a[2][1]/adet;b[2][2]=a[1][1]/adet;
         return b;
       }
       if(size==3) {
-        //[CO191201 - already calculated above]adet=det(a);
+        //[CO20191201 - already calculated above]adet=det(a);
         //b[1][1]=(+a[2][2]*a[3][3]-a[2][3]*a[3][2])/adet;   // with fast index []
         //b[1][2]=(-a[1][2]*a[3][3]+a[1][3]*a[3][2])/adet;   // with fast index []
         //b[1][3]=(+a[1][2]*a[2][3]-a[1][3]*a[2][2])/adet;   // with fast index []
@@ -1914,7 +1914,7 @@ namespace aurostd {  // namespace aurostd
         return b;
       }
       if(size==4) {
-        //[CO191201 - already calculated above]adet=det(a);
+        //[CO20191201 - already calculated above]adet=det(a);
         //b[1][1]=(+a[2][2]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])-a[2][3]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])+a[2][4]*(a[3][2]*a[4][3]-a[3][3]*a[4][2]))/adet;   // with fast index []
         //b[2][1]=(-a[2][1]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])+a[2][3]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])-a[2][4]*(a[3][1]*a[4][3]-a[3][3]*a[4][1]))/adet;   // with fast index []
         //b[3][1]=(+a[2][1]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])-a[2][2]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])+a[2][4]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
@@ -1949,14 +1949,14 @@ namespace aurostd {  // namespace aurostd
         b(4,4)=(+a(1,1)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(1,2)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))+a(1,3)*(a(2,1)*a(3,2)-a(2,2)*a(3,1)))/adet;   // with slow index ()
         return b;
       }
-      //CO191201 - GaussJordan() is INCREDIBLY unstable (division by small numbers over and over again)
+      //CO20191201 - GaussJordan() is INCREDIBLY unstable (division by small numbers over and over again)
       //use inverseByAdjoint, which waits until the end to divide by a (hopefully) bigger number
-      //[CO191201 - OBSOLETE]// if everything fails move to GaussJordan
-      //[CO191201 - OBSOLETE]b=a;
-      //[CO191201 - OBSOLETE]xmatrix<utype> B(a.rows,a.cols);
-      //[CO191201 - OBSOLETE]GaussJordan(b,B);  
+      //[CO20191201 - OBSOLETE]// if everything fails move to GaussJordan
+      //[CO20191201 - OBSOLETE]b=a;
+      //[CO20191201 - OBSOLETE]xmatrix<utype> B(a.rows,a.cols);
+      //[CO20191201 - OBSOLETE]GaussJordan(b,B);  
       //    if(size>=6) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: " << size << "x" << size << " not written yet" << endl;exit(0);}
-      //[CO191201 - OBSOLETE]return b;
+      //[CO20191201 - OBSOLETE]return b;
       return inverseByAdjoint(a);
     }
 }
@@ -1964,7 +1964,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    bool isNonInvertible(const xmatrix<utype>& a) {  // RETURN ERROR if non invertible  //CO191201
+    bool isNonInvertible(const xmatrix<utype>& a) {  // RETURN ERROR if non invertible  //CO20191201
       utype c=aurostd::det(a);
       if(abs(c)<10e-14) {return TRUE;}
       return FALSE;
@@ -1995,7 +1995,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function sum xmatrix<>
-    utype modulus(const xmatrix<utype>& a) {  //CO191110
+    utype modulus(const xmatrix<utype>& a) {  //CO20191110
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function sum: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
@@ -2004,7 +2004,7 @@ namespace aurostd {  // namespace aurostd
       return sqrt(modulussquare(a)); //sqrt(sum(trasp(a) * a))
     }
   template<class utype>                                 // function sum xmatrix<>
-    utype modulussquare(const xmatrix<utype>& a) {  //CO191110
+    utype modulussquare(const xmatrix<utype>& a) {  //CO20191110
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function sum: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
@@ -2014,7 +2014,7 @@ namespace aurostd {  // namespace aurostd
     }
 
   template<class utype>                                 // function sum xmatrix<>
-    utype modulus2(const xmatrix<utype>& a) { //CO191110
+    utype modulus2(const xmatrix<utype>& a) { //CO20191110
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function sum: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
@@ -2209,7 +2209,7 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-  template<class utype> utype  // DX 1/15/17 - double to utype (needed for xcomplex)                                          // trace
+  template<class utype> utype  // DX20170115 - double to utype (needed for xcomplex)                                          // trace
     trace(const xmatrix<utype>& a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function trace: ");
@@ -2218,7 +2218,7 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(!a.issquare)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in trace defined for square xmatrixes" << endl;exit(0);}
-      utype out=0.0; // DX 1/15/17 - double to utype (needed for xcomplex)
+      utype out=0.0; // DX20170115 - double to utype (needed for xcomplex)
       for(int i=a.lrows;i<=a.urows;i++)
         out+=a[i][i];
       return out;
@@ -2228,7 +2228,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {
   template<class utype>
-    xmatrix<utype> KroneckerProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { // ME 180614 - Kronecker product
+    xmatrix<utype> KroneckerProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { // ME20180614 - Kronecker product
       int rows, cols, r, c;
       utype aelement, belement;
       rows = A.rows * B.rows;
@@ -2384,7 +2384,7 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-  // ME 180904
+  // ME20180904
   template<class utype> xmatrix<utype>                             // conj xmatrix
     conj(const xmatrix<utype>& a){
       if (a.iscomplex) {
@@ -2402,11 +2402,11 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> void
-    traspSquareInPlace(xmatrix<utype>& a,bool conjugate){ //CO191201 - only designed for square matrices
+    traspSquareInPlace(xmatrix<utype>& a,bool conjugate){ //CO20191201 - only designed for square matrices
       if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::traspSquareInPlace():","this function is designed only for square matrices",_VALUE_ILLEGAL_);}
       int i=0,j=0;
       utype aij=(utype)0;
-      if(a.iscomplex&&conjugate){ //CO191201
+      if(a.iscomplex&&conjugate){ //CO20191201
         for(i=a.lrows;i<=a.urows;i++){
           for(j=i+1;j<=a.urows;j++){
             aij=a[i][j];
@@ -2427,14 +2427,14 @@ namespace aurostd {  // namespace aurostd
       }
     }
   template<class utype> void
-    traspInPlace(const xmatrix<utype>& a,xmatrix<utype>& b,bool conjugate){ //CO191201
+    traspInPlace(const xmatrix<utype>& a,xmatrix<utype>& b,bool conjugate){ //CO20191201
       //always works, just not most efficient for square matrices
       if(b.lrows!=a.lcols || b.lcols!=a.lrows || b.urows!=a.ucols || b.ucols!=a.urows){
         xmatrix<utype> c(a.ucols,a.urows,a.lcols,a.lrows);
         b=c;
       }
       int i=0,j=0;
-      if(a.iscomplex&&conjugate){ //CO191201
+      if(a.iscomplex&&conjugate){ //CO20191201
         for(i=a.lrows;i<=a.urows;i++){
           for(j=a.lcols;j<=a.ucols;j++){b[j][i]=conj(a[i][j]);}  //cannot do j=i+1 since b is unpopulated
         }
@@ -2447,7 +2447,7 @@ namespace aurostd {  // namespace aurostd
       }
     }
   template<class utype> void                             // trasp xmatrix
-    traspInPlace(xmatrix<utype>& a,bool conjugate){  // ME190813 - conjugate complex now an option //CO191201 - in place
+    traspInPlace(xmatrix<utype>& a,bool conjugate){  // ME20190813 - conjugate complex now an option //CO20191201 - in place
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function traspose xmatrix: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
@@ -2460,18 +2460,18 @@ namespace aurostd {  // namespace aurostd
         a=b;
         return;
       }
-      //[CO191201 - OBSOLETE]xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
-      //[CO191201 - OBSOLETE]for(int i=a.lrows;i<=a.urows;i++)
-      //[CO191201 - OBSOLETE]  for(int j=a.lcols;j<=a.ucols;j++)
-      //[CO191201 - OBSOLETE]    if (a.iscomplex && conjugate) {
-      //[CO191201 - OBSOLETE]      out[j][i] = conj(a[i][j]);
-      //[CO191201 - OBSOLETE]    } else {
-      //[CO191201 - OBSOLETE]      out[j][i]=a[i][j];
-      //[CO191201 - OBSOLETE]    }
-      //[CO191201 - OBSOLETE]return out;
+      //[CO20191201 - OBSOLETE]xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
+      //[CO20191201 - OBSOLETE]for(int i=a.lrows;i<=a.urows;i++)
+      //[CO20191201 - OBSOLETE]  for(int j=a.lcols;j<=a.ucols;j++)
+      //[CO20191201 - OBSOLETE]    if (a.iscomplex && conjugate) {
+      //[CO20191201 - OBSOLETE]      out[j][i] = conj(a[i][j]);
+      //[CO20191201 - OBSOLETE]    } else {
+      //[CO20191201 - OBSOLETE]      out[j][i]=a[i][j];
+      //[CO20191201 - OBSOLETE]    }
+      //[CO20191201 - OBSOLETE]return out;
     }
   template<class utype> xmatrix<utype>              // trasp xmatrix
-    trasp(const xmatrix<utype>& a,bool conjugate){  //CO191201
+    trasp(const xmatrix<utype>& a,bool conjugate){  //CO20191201
       xmatrix<utype> b(a.ucols,a.urows,a.lcols,a.lrows);
       traspInPlace(a,b,conjugate);
       return b;
@@ -2481,14 +2481,14 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                             // trasp xvector
-    trasp(const xvector<utype>& a, bool conjugate){  // ME190813 - conjugate complex now an option
+    trasp(const xvector<utype>& a, bool conjugate){  // ME20190813 - conjugate complex now an option
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function traspose xvector: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
 #endif
       xmatrix<utype> b(a.urows,1,a.lrows,1);
       int i=0;
-      if(a.iscomplex&&conjugate){ //CO191201
+      if(a.iscomplex&&conjugate){ //CO20191201
         for(i=a.lrows;i<=a.urows;i++){b[i][1]=conj(a[i]);}
       }else{
         for(i=a.lrows;i<=a.urows;i++){b[i][1]=a[i];}
@@ -2602,7 +2602,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd { // namespace aurostd
 
   template<class utype> void  // function shift lrows so first index is i
-    shiftlrows(xmatrix<utype>& a,int i){ //CO191201
+    shiftlrows(xmatrix<utype>& a,int i){ //CO20191201
       if(a.lrows==i){return;}
       xmatrix<utype> b(a.rows+i-1,a.ucols,i,a.lcols);
       int k=i;
@@ -2615,7 +2615,7 @@ namespace aurostd { // namespace aurostd
     }
 
   template<class utype> void  // function shift lcols so first index is i
-    shiftlcols(xmatrix<utype>& a,int i){ //CO191201
+    shiftlcols(xmatrix<utype>& a,int i){ //CO20191201
       if(a.lcols==i){return;}
       xmatrix<utype> b(a.urows,a.cols+i-1,a.lrows,i);
       int k=i;
@@ -2628,7 +2628,7 @@ namespace aurostd { // namespace aurostd
     }
 
   template<class utype> void  // function shift lrows and lcols so first index is i, j
-    shiftlrowscols(xmatrix<utype>& a,int i,int j){ //CO191201
+    shiftlrowscols(xmatrix<utype>& a,int i,int j){ //CO20191201
       if(a.lrows==i && a.lcols==j){return;}
       xmatrix<utype> b(a.rows+i-1,a.cols+j-1,i,j);
       int k=i,l=j;
@@ -3094,12 +3094,12 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
 }
 
 namespace aurostd {  // namespace aurostd
-  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd){ //CO191201
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd){ //CO20191201
     if(ma.rows==0 || ma.cols==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.rows==0 || ma.cols==0",_INPUT_NUMBER_);}
     xmatrix<int> mx(ma.urows,ma.ucols,ma.lrows,ma.lcols),my(ma.urows,ma.ucols,ma.lrows,ma.lcols);
     return GCD(ma,mb,mgcd,mx,my);
   }
-  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my){ //CO191291
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my){ //CO20191291
     if(ma.rows==0 || ma.cols==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.rows==0 || ma.cols==0",_INPUT_NUMBER_);}
     //ma vs. mb
     if(ma.lrows!=mb.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.lrows!=mb.lrows",_INDEX_MISMATCH_);}
@@ -3337,7 +3337,7 @@ namespace aurostd {
       xvector<utype> dist(4); // the distances from T to enclosing lattice points of B,C (4 corners of the ppiped)
       xvector<utype> i(3),i1(3),i2(3),i3(3),i4(3); // lattice coordinates of A, in the affine plane, using the B,C basis vectors
       int idx; // index of the smallest distance from T to a lattice point in B,C
-      //[CO191201 - OBSOLETE]bool err;
+      //[CO20191201 - OBSOLETE]bool err;
       //integer j
       utype lambda;
       //print *,"entering reduction routine..."
@@ -3370,10 +3370,10 @@ namespace aurostd {
         ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
       }//GH
       // [OBSOLETE]        aurostd::matrix_inverse(ABC,ABCinv,err);
-      //[CO191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
-      //[CO191201 - OBSOLETE]if(err) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  A,B,C vectors in reduce_A_in_ABC are co-planar" << endl;exit(0);}
-      if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO191201
-      ABCinv=inverse(ABC);  //CO191201
+      //[CO20191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
+      //[CO20191201 - OBSOLETE]if(err) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  A,B,C vectors in reduce_A_in_ABC are co-planar" << endl;exit(0);}
+      if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO20191201
+      ABCinv=inverse(ABC);  //CO20191201
       i=aurostd::nint(ABCinv*T);
 
       // print *,"Lattice coordinates of origin enclosing T:", i
@@ -3399,10 +3399,10 @@ namespace aurostd {
       }//GH
 
       // [OBSOLETE]  aurostd::matrix_inverse(ABC,ABCinv,err);
-      //[CO191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
+      //[CO20191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
       //
-      if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO191201
-      ABCinv=inverse(ABC);  //CO191201
+      if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO20191201
+      ABCinv=inverse(ABC);  //CO20191201
       ABC=ABCinv*oldABC-aurostd::nint(ABCinv*oldABC);
 
       for(int i=1;i<=3;i++) {
@@ -3428,10 +3428,10 @@ namespace aurostd {
   //  number theory, 2004, vol. 3076, pp. 338-357 ISBN 3-540-22156-5
   template<class utype> utype
     reduce_to_shortest_basis(const xmatrix<utype>& IN,xmatrix<utype>& OUT,utype eps,bool VERBOSE) {
-      string soliloquy="aurostd::reduce_to_shortest_basis():";  //CO191201
+      string soliloquy="aurostd::reduce_to_shortest_basis():";  //CO20191201
       xvector<utype> A(3),B(3),C(3);
       xmatrix<utype> check(3,3);
-      //[CO191201 - OBSOLETE]bool err;
+      //[CO20191201 - OBSOLETE]bool err;
       utype od,odnew;
       int ii=0,iimax=10000;
       // IN has colum-vectors
@@ -3459,12 +3459,12 @@ namespace aurostd {
         //     if(ii++>iimax) {OUT=IN;return orthogonality_defect(OUT);}
       }
       // [OBSOLETE]    matrix_inverse(OUT,check,err);
-      //[CO191201 - OBSOLETE]err=aurostd::inverse(OUT,check);
-      //[CO191201 - OBSOLETE]if(err==TRUE) { 
-      //[CO191201 - OBSOLETE]  cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: OUT matrix is singular in reduce_to_shortest_basis" << endl;
-      //[CO191201 - OBSOLETE]  exit(0);
-      //[CO191201 - OBSOLETE]}
-      if(aurostd::isNonInvertible(OUT)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"OUT matrix is singular in reduce_to_shortest_basis",_VALUE_RANGE_);} //CO191201
+      //[CO20191201 - OBSOLETE]err=aurostd::inverse(OUT,check);
+      //[CO20191201 - OBSOLETE]if(err==TRUE) { 
+      //[CO20191201 - OBSOLETE]  cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: OUT matrix is singular in reduce_to_shortest_basis" << endl;
+      //[CO20191201 - OBSOLETE]  exit(0);
+      //[CO20191201 - OBSOLETE]}
+      if(aurostd::isNonInvertible(OUT)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"OUT matrix is singular in reduce_to_shortest_basis",_VALUE_RANGE_);} //CO20191201
       check=aurostd::inverse(OUT);
       //  Check that the conversion from old to new lattice vectors is still an integer matrix
       if(sum(abs(check*IN-nint(check*IN)))>eps) { 
@@ -3588,7 +3588,7 @@ namespace aurostd {
     }
 #undef ROTATE  
 
-  // ME190815
+  // ME20190815
   // Jacobi algorithm for Hermitian matrices (used to be in APL/apl_aplmath.cpp)
   // Based on http://arxiv.org/abs/physics/0607103
   template<class utype>
@@ -3791,10 +3791,10 @@ namespace aurostd {
 }
 
 // ****************************************************
-// CO 171129
+// CO20171129
 namespace aurostd {
   template<class utype>
-    void QRDecomposition_HouseHolder(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO191110
+    void QRDecomposition_HouseHolder(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO20191110
       return QRDecomposition_HouseHolder_MW(mat_orig,Q,R,tol);
       //_MW() and _TB() show to have about the same run time, but _MW() can be slightly faster
       //could be because of extra LDEBUG bool checks
@@ -3803,7 +3803,7 @@ namespace aurostd {
       //_MW() is shorter and easier to follow
     }
   template<class utype>
-    void QRDecomposition_HouseHolder_MW(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO191110
+    void QRDecomposition_HouseHolder_MW(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO20191110
       // mat is mxn, m>=n
       // inspired by https://www.mathworks.com/matlabcentral/answers/169648-qr-factorization-using-householder-transformations
       string soliloquy="aurostd::QRDecomposition_HouseHolder():";
@@ -3851,7 +3851,7 @@ namespace aurostd {
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }
   template<class utype>
-    void QRDecomposition_HouseHolder_TB(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO191110
+    void QRDecomposition_HouseHolder_TB(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO20191110
       // mat is mxn, m>=n
       // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
       // this function stores household rotations (v) to create Q at the end
@@ -4825,7 +4825,7 @@ namespace aurostd {
 
 
 //*****************************************************************************
-// MATRIX NORMS - ME190718
+// MATRIX NORMS - ME20190718
 //*****************************************************************************
 
 namespace aurostd {
@@ -5283,7 +5283,7 @@ namespace aurostd { // namespace aurostd
           A_inv[i][j]+=V[i][k]/W[k]*U[j][k];
       }
     }
-    if(LDEBUG){ //CO190327
+    if(LDEBUG){ //CO20190327
       cerr << "cematrix::InverseMatrix: Inverse of matrix A" << endl;
       for(i=1;i <=ncol;i++) { // U
         for(j=1;j <=nrow;j++) 
@@ -5306,8 +5306,8 @@ namespace aurostd { // namespace aurostd
         }
       }
     }
-    bool verbose = (LDEBUG || isequal(Iden,Iden_tmp));  //CO190327
-    if(verbose){ //CO190327
+    bool verbose = (LDEBUG || isequal(Iden,Iden_tmp));  //CO20190327
+    if(verbose){ //CO20190327
       cerr << "cematrix::InverseMatrix: A_inv is the inverse of matrix A? ";
       if(isequal(Iden,Iden_tmp) ) {
         cerr << "Yes!" << endl;;
