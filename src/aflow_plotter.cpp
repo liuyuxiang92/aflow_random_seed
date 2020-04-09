@@ -279,6 +279,8 @@ namespace plotter {
     plotoptions.push_attached("FILE_NAME", filename);
     // The .tex file created by gnuplot cannot have . or includegraphics will break
     plotoptions.push_attached("FILE_NAME_LATEX", aurostd::StringSubst(filename, ".", "_"));
+    // ME20200409 - Some terminals do not handle : well, which can break convert
+    plotoptions.push_attached("FILE_NAME_LATEX", aurostd::StringSubst(filename, ":", "_"));
     if(LDEBUG){
       cerr << soliloquy << " filename=" << plotoptions.getattachedscheme("FILE_NAME") << endl;
       cerr << soliloquy << " filename_latex=" << plotoptions.getattachedscheme("FILE_NAME_LATEX") << endl;
