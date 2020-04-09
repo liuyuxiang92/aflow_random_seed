@@ -50,7 +50,7 @@ namespace cce {
   void CCE(aurostd::xoption& flags);
   vector<double> CCE_correct(const string& directory_path);
   vector<double> CCE_correct(xstructure& structure, string& functional);
-  void CCE(aurostd::xoption& flags, std::istream& ist); // ME 20200213
+  void CCE(aurostd::xoption& flags, std::istream& ist); // ME20200213
   void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
   // read user input (from command line or directory path)
   xstructure CCE_read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
@@ -59,8 +59,8 @@ namespace cce {
   vector<double> CCE_get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   string CCE_get_functional_from_aflow_in(const xstructure& structure, string& aflowin_file);
   // initialise flags and variables
-  aurostd::xoption CCE_init_flags(); // ME 20200213
-  CCE_Variables CCE_init_variables(const xstructure&); // ME 20200213
+  aurostd::xoption CCE_init_flags(); // ME20200213
+  CCE_Variables CCE_init_variables(const xstructure&); // ME20200213
   // structural analysis
   string CCE_determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
   vector<uint> CCE_check_for_multi_anion_system(CCE_Variables& cce_vars, double tolerance, xstructure& structure, xoption& cce_flags);
@@ -106,9 +106,9 @@ namespace cce {
   void CCE_check_get_per_super_ox_corrections(CCE_Variables& cce_vars);
   // apply corrections and get corrected formation enthalpies
   void CCE_check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
-  vector<double> CCE_get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME 20200213
+  vector<double> CCE_get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME20200213
   // write output and citation
-  string CCE_get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME 20200213
+  string CCE_get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME20200213
   string CCE_write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string CCE_write_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string CCE_write_citation();
