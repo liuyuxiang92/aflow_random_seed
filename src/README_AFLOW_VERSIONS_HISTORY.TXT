@@ -34,6 +34,7 @@
         -- patched getPathAURL() to load from LIB if available (CO)
         -- patched loadXStructure() to handle compressed POSCARs (CO)
         -- added more POSCAR variants to loadXStructure() (CO)
+        -- small speed-ups to N+1 calculation in chull (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
