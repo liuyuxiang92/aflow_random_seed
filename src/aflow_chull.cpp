@@ -27,7 +27,7 @@
 // DEFINITIONS
 const std::string AFLOW_WEB = string("http://" + AFLOWLIB_MATERIALS_SERVER);
 const std::string NOMAD_WEB = string("http://www.nomad-coe.eu/");
-const std::string ENTRY_PAGE_URL_PREFIX = string(AFLOW_WEB + "/material.php?id=");
+const std::string ENTRY_PAGE_URL_PREFIX = string(AFLOW_WEB + "/material/?id=");  //"/material.php?id="
 const std::string AFLOW_HULL_ENDPOINT_STRING = "aflow_hull_endpoint";
 const std::string LATEX_DEFAULT_COLORS = "blue,green,red,brown,cyan,lime,magenta,olive,orange,pink,purple,teal,violet,darkgray,gray,lightgray,black,white,yellow"; //putting favorites near beginning, not so good ones in the back
 const std::string LATEX_DVIPS_COLORS = "Apricot,Aquamarine,Bittersweet,Black,Blue,BlueGreen,BlueViolet,BrickRed,Brown,BurntOrange,CadetBlue,CarnationPink,Cerulean,CornflowerBlue,Cyan,Dandelion,DarkOrchid,Emerald,ForestGreen,Fuchsia,Goldenrod,Gray,GreenGreen,Yellow,JungleGreen,Lavender,LimeGreen,Magenta,Mahogany,Maroon,Melon,MidnightBlue,Mulberry,NavyBlue,OliveGreen,Orange,OrangeRed,Orchid,Peach,Periwinkle,PineGreen,Plum,ProcessBlue,Purple,RawSienna,Red,RedOrange,RedViolet,Rhodamine,RoyalBlue,RoyalPurple,RubineRed,Salmon,SeaGreen,Sepia,SkyBlue,SpringGreen,Tan,TealBlue,Thistle,Turquoise,Violet,VioletRed,White,WildStrawberry,Yellow,YellowGreen,YellowOrange";  //contains defaults and more
@@ -6227,6 +6227,7 @@ namespace chull {
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Hull not initialized");}
     if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
     ChullPoint point=m_points[i_point];
+    if(point.m_i_nary==0){return AUROSTD_MAX_DOUBLE;} //N+1(unary)=formation_enthalpy (distance from 0 point) - TECHNICALLY TRUE (allowed in polytope theory), but our definition for N+1 enthalpy gain really starts for binaries (Delta H[{N|1,...,N-1}]), can NOT have 1|0
     bool force_calc_binaries=false; //set TRUE for debugging
     if(point.m_i_nary==0 || (point.m_i_nary==1 && force_calc_binaries==false) ){ //N+1(unary)=formation_enthalpy (distance from 0 point), N+1(binary)=formation_enthalpy (distance from 0 tieline)
       if(LDEBUG){cerr << soliloquy << " found " << (point.m_i_nary==0 ? "unary" : "binary") << ", returning abs(enthalpy_formation_atom)" << endl;}
@@ -6322,8 +6323,9 @@ namespace chull {
       //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
       //set sign convention, negative for outside hull
       //scriterion=abs(scriterion);
-      message << "Ground-state";
-      message << " (i_point=" << i_point;
+      message << "Ground-state ";
+      message << (!m_points[i_point].m_entry.compound.empty()?m_points[i_point].m_entry.compound:"")+" ";
+      message << "(i_point=" << i_point;
       message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
       message << ") shows stability criterion = ";
       message << chull::convertUnits(scriterion,(m_formation_energy_hull?_m_:_std_)) << " ";
@@ -6380,7 +6382,9 @@ namespace chull {
       np1egain=getNPlus1EnergyGain(i_point);
       //CONSISTENCY CHECKS?
       //yes - for unaries/binaries N+1 == formation enthalpy
-      if(m_points[i_point].m_i_nary==0 || m_points[i_point].m_i_nary==1){
+      //[MATHEMATICALLY ALLOWED but our definition of N+1 energy does not allow for unaries, so don't check]if(m_points[i_point].m_i_nary==0 || m_points[i_point].m_i_nary==1)
+      if(m_points[i_point].m_i_nary==1)
+      {
         if(m_points[i_point].m_has_entry&&m_points[i_point].m_entry.enthalpy_formation_atom!=AUROSTD_NAN){
           if(!aurostd::identical(abs(np1egain),abs(m_points[i_point].m_entry.enthalpy_formation_atom),ZERO_MEV_TOL)){
             message << "abs(np1egain) != abs(m_points[i_point].m_entry.enthalpy_formation_atom) [ " << abs(np1egain) << " != " << abs(m_points[i_point].m_entry.enthalpy_formation_atom) << " ], please check";
@@ -6418,12 +6422,15 @@ namespace chull {
       //KEEP THE SIGN CONVENTION AS IS, it is correct without manipulation
       //set sign convention, negative for outside hull
       //np1egain=abs(np1egain);
-      message << "Ground-state";
-      message << " (i_point=" << i_point;
-      message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
-      message << ") shows N+1 energy gain = ";
-      message << chull::convertUnits(np1egain,(m_formation_energy_hull?_m_:_std_)) << " ";
-      message << (m_formation_energy_hull?"meV/atom":"K");
+      if(m_points[i_point].m_i_nary>0){ //don't print for unaries
+        message << "Ground-state ";
+        message << (!m_points[i_point].m_entry.compound.empty()?m_points[i_point].m_entry.compound:"")+" ";
+        message << "(i_point=" << i_point;
+        message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
+        message << ") shows N+1 energy gain = ";
+        message << chull::convertUnits(np1egain,(m_formation_energy_hull?_m_:_std_)) << " ";
+        message << (m_formation_energy_hull?"meV/atom":"K");
+      }
       //this check should STILL work for unaries, as it's the difference of distances, and
       //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive np1egain
       //by convention, energy gains are NEGATIVE as they are outside the hull
@@ -7613,6 +7620,40 @@ namespace chull {
       if(LDEBUG) {cerr << soliloquy << " " << valignments_entrytable_string.back() << endl;}
     }
 
+    //for compound name / ground state thermo properties (2 columns)
+    uint n_cols_compoundname_thermoprops=2;
+    vector<uint> valignments_compoundname_thermopropstable_uint;
+    uint total_alignment_compoundname_thermoprops=0;
+    for(uint i=0;i<n_cols_compoundname_thermoprops;i++){
+      if(i==0){valignments_compoundname_thermopropstable_uint.push_back(3); total_alignment_compoundname_thermoprops+=valignments_compoundname_thermopropstable_uint.back();}
+      if(i==1){valignments_compoundname_thermopropstable_uint.push_back(5); total_alignment_compoundname_thermoprops+=valignments_compoundname_thermopropstable_uint.back();}
+    }
+
+    vector<string> valignments_compoundname_thermopropstable_string;
+    page_width_fraction=0.0;
+    for(uint i=0,fl_size_i=valignments_compoundname_thermopropstable_uint.size();i<fl_size_i;i++){
+      page_width_fraction=page_width*(double)valignments_compoundname_thermopropstable_uint[i]/(double)total_alignment_compoundname_thermoprops;
+      if(i==0){valignments_compoundname_thermopropstable_string.push_back("L{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
+      if(i==1){valignments_compoundname_thermopropstable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
+      if(LDEBUG) {cerr << soliloquy << " " << valignments_compoundname_thermopropstable_string.back() << endl;}
+    }
+    
+    //for 1 column tables (left align)
+    uint n_cols_onecol_left=1;
+    vector<uint> valignments_onecol_lefttable_uint;
+    uint total_alignment_onecol_left=0;
+    for(uint i=0;i<n_cols_onecol_left;i++){
+      if(i==0){valignments_onecol_lefttable_uint.push_back(1); total_alignment_onecol_left+=valignments_onecol_lefttable_uint.back();}
+    }
+
+    vector<string> valignments_onecol_lefttable_string;
+    page_width_fraction=0.0;
+    for(uint i=0,fl_size_i=valignments_onecol_lefttable_uint.size();i<fl_size_i;i++){
+      page_width_fraction=page_width*(double)valignments_onecol_lefttable_uint[i]/(double)total_alignment_onecol_left;
+      if(i==0){valignments_onecol_lefttable_string.push_back("L{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
+      if(LDEBUG) {cerr << soliloquy << " " << valignments_onecol_lefttable_string.back() << endl;}
+    }
+
     //for equilibrium/decomposition reactions
     uint n_cols_reaction=2;
     vector<uint> valignments_reactiontable_uint;
@@ -7920,6 +7961,7 @@ namespace chull {
     }
     if(!no_doc && !image_only) {
       doc_header_TEX_ss << "\\usepackage{longtable}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\vbadness=10000" << " \%HEADER" << endl; //patches vbadness warnings (hline issue) with longtable - https://tex.stackexchange.com/questions/71096/underfull-vbox-in-each-longtable-can-it-be-fixed-or-must-it-be-ignored
       //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]doc_header_TEX_ss << "\\usepackage{tabu}" << " \%HEADER" << endl;
       doc_header_TEX_ss << "\\usepackage{booktabs} \%midrule and toprule" << " \%HEADER" << endl;
       //http://tex.stackexchange.com/questions/167948/package-rerunfilecheck-warning-file-out-has-changed
@@ -9822,9 +9864,10 @@ namespace chull {
       bool add_vspace=true; //ONLY once, first TERNARY is too close to column headers
       string pdftable_font_sizes;
       vector<string> chpoint_properties;
-      bool print_scriterion;
-      stringstream scriterion_data_ss;
-      uint num_cols_scriterion=3;
+      bool print_scriterion=true,print_np1=true;
+      stringstream scriterion_data_ss,np1_data_ss;
+      //uint num_cols_scriterion=2;
+      //uint num_cols_np1=3;
       uint tmp_precision;
       double tmp_roundoff_tol;
       if(compounds_column_report){pdftable_font_sizes="\\fontsize{4}{6}\\selectfont";}
@@ -9922,9 +9965,9 @@ namespace chull {
                     equilibrium_phases_CP.clear();
                     //get header
                     //misc = prettyPrintCompound(entry,gcd_vrt,true,latex_ft);
-                    equilibrium_phases_header_TEX_ss << "vertex of facets (" << m_coord_groups[i_coord_group].getDim() << "-phase equilibria)";
+                    equilibrium_phases_header_TEX_ss << "vertex of facets: (" << m_coord_groups[i_coord_group].getDim() << "-phase~equilibria)";  //patched ugly looking discontinuity
                     //equilibrium_phases_header_TEX_ss << " with " << misc;
-                    equilibrium_phases_header_TEX_ss << ":";
+                    //equilibrium_phases_header_TEX_ss << ":";
                   }
                 } else {
                   // decomposition equation
@@ -10018,16 +10061,18 @@ namespace chull {
                 main_TEX_ss << "\\vspace{-15pt}" << endl;
                 added_nary_tag=true;
               }
-              main_TEX_ss << "{" << pdftable_font_sizes << endl;
-              //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]main_TEX_ss << "\\begin{longtabu}{|" << aurostd::joinWDelimiter(valignments,"|") << "|}" << endl;
-              main_TEX_ss << "\\begin{longtable}{|" << aurostd::joinWDelimiter(valignments_entrytable_string,"|") << "|}" << endl;
-              putColumnHeader = false;
-              if(internal_links && isViablePoint(m_coord_groups[i_coord_group].m_ref_state)) {
-                uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
-                main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{\\phantomsection\\label{"+input + "_" + m_points[ref_state].m_entry.auid + "}} \\\\[0.1cm]" << endl;
-              } else {main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
+              //main_TEX_ss << "{" << pdftable_font_sizes << endl;
+              ////[CO20190226 - TABU IS BROKEN IN TeX Live 2019]main_TEX_ss << "\\begin{longtabu}{|" << aurostd::joinWDelimiter(valignments,"|") << "|}" << endl;
+              //main_TEX_ss << "\\begin{longtable}{|" << aurostd::joinWDelimiter(valignments_entrytable_string,"|") << "|}" << endl;
+              //putColumnHeader = false;
+              //if(internal_links && isViablePoint(m_coord_groups[i_coord_group].m_ref_state)) {
+              //  uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
+              //  main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{\\phantomsection\\label{"+input + "_" + m_points[ref_state].m_entry.auid + "}} \\\\[0.1cm]" << endl;
+              //} else {main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
               print_scriterion=false;
+              print_np1=false;
               scriterion_data_ss.str("");
+              np1_data_ss.str("");
               if(m_coord_groups[i_coord_group].m_is_on_hull) {
                 _report_data_ss << " " << "(ground-state)"; // if ground-state
                 if(m_coord_groups[i_coord_group].m_stability_criterion<AUROSTD_NAN){
@@ -10039,19 +10084,56 @@ namespace chull {
                   scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
                   scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
+                if(m_coord_groups[i_coord_group].m_i_nary>=1 && m_coord_groups[i_coord_group].m_n_plus_1_energy_gain<AUROSTD_NAN){ //print binaries anyway... //print only for ternaries and up, binaries is trivial formation enthalpy (save space)
+                  print_np1=true;
+                  tmp_precision=0;
+                  tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);
+                  //np1_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
+                  if(0){
+                    np1_data_ss << "$\\Delta H[N|\\{1,\\cdots,N-1\\}]="; //this delta is okay, should be italicized
+                  }else{
+                    np1_data_ss << "$\\Delta H[" << m_coord_groups[i_coord_group].m_i_nary+1 << "|";
+                    if(m_coord_groups[i_coord_group].m_i_nary==0){np1_data_ss << "0";}  //not allowed anymore, but we can print the value
+                    else if(m_coord_groups[i_coord_group].m_i_nary==1){np1_data_ss << "1";}
+                    else if(m_coord_groups[i_coord_group].m_i_nary==2){np1_data_ss << "\\{1,2\\}";}
+                    else if(m_coord_groups[i_coord_group].m_i_nary==3){np1_data_ss << "\\{1,2,3\\}";}
+                    else if(m_coord_groups[i_coord_group].m_i_nary>3){np1_data_ss << "\\{1,\\cdots," << m_coord_groups[i_coord_group].m_i_nary << "\\}";}
+                    np1_data_ss << "]="; //this delta is okay, should be italicized
+                  }
+                  np1_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_n_plus_1_energy_gain,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
+                  np1_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
+                }
               } else {
                 _report_data_ss << " " << "(unstable)"; // if above hull	  
               }
               // compound name
-              main_TEX_ss << "\\multicolumn{" << vheaders.size()-(print_scriterion?num_cols_scriterion:0) << "}{l}{";
-              main_TEX_ss << "\\cellcolor{white}\\normalsize{" + _report_data_ss.str();
-              main_TEX_ss << "}}";
-              if(print_scriterion){
-                main_TEX_ss << " & \\multicolumn{" << num_cols_scriterion << "}{r}{";
-                main_TEX_ss << "\\cellcolor{white}\\normalsize{" + scriterion_data_ss.str();
-                main_TEX_ss << "}}";
+              main_TEX_ss << "\\begin{longtable}{" << aurostd::joinWDelimiter( (m_coord_groups[i_coord_group].m_is_on_hull?valignments_compoundname_thermopropstable_string:valignments_onecol_lefttable_string) ,"") << "}" << endl;
+              if(internal_links && isViablePoint(m_coord_groups[i_coord_group].m_ref_state)) {
+                uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
+                main_TEX_ss << "\\multicolumn{" << (m_coord_groups[i_coord_group].m_is_on_hull?n_cols_compoundname_thermoprops:n_cols_onecol_left) << "}{l}{\\phantomsection\\label{"+input + "_" + m_points[ref_state].m_entry.auid + "}} \\\\[0.1cm]" << endl;
+              } else {main_TEX_ss << "\\multicolumn{" << (m_coord_groups[i_coord_group].m_is_on_hull?n_cols_compoundname_thermoprops:n_cols_onecol_left) << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
+              //main_TEX_ss << "\\multicolumn{" << vheaders.size()-((print_scriterion?num_cols_scriterion:0)+(print_np1?num_cols_np1:0)) << "}{l}{";
+              main_TEX_ss << "\\cellcolor{white}\\normalsize{" + _report_data_ss.str() << "}";
+              //main_TEX_ss << "}";
+              if(print_scriterion || print_np1){
+                main_TEX_ss << " & ";
+                //main_TEX_ss << "\\multicolumn{" << (print_scriterion?num_cols_scriterion:0)+(print_np1?num_cols_np1:0) << "}{r}{";
+                main_TEX_ss << "\\cellcolor{white}\\normalsize{" + (print_scriterion?scriterion_data_ss.str():"") + (print_np1?", ":"") + (print_np1?np1_data_ss.str():"") << "}";
+                //main_TEX_ss << "}";
               }
-              main_TEX_ss << " \\\\[0.1cm]" << endl;
+              main_TEX_ss << " \\\\[0.05cm]" << endl;  //0.1cm
+              main_TEX_ss << "\\end{longtable}" << endl;
+              main_TEX_ss << "\\vspace{-23pt}" << endl;
+              
+              //main table
+              main_TEX_ss << "{" << pdftable_font_sizes << endl;
+              //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]main_TEX_ss << "\\begin{longtabu}{|" << aurostd::joinWDelimiter(valignments,"|") << "|}" << endl;
+              main_TEX_ss << "\\begin{longtable}{|" << aurostd::joinWDelimiter(valignments_entrytable_string,"|") << "|}" << endl;
+              putColumnHeader = false;
+              //if(internal_links && isViablePoint(m_coord_groups[i_coord_group].m_ref_state)) {
+              //  uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
+              //  main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{\\phantomsection\\label{"+input + "_" + m_points[ref_state].m_entry.auid + "}} \\\\[0.1cm]" << endl;
+              //} else {main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
               main_TEX_ss << "\\hline" << endl;
               main_TEX_ss << report_data_ss.str();
               main_TEX_ss << "\\hline" << endl;
@@ -10070,7 +10152,7 @@ namespace chull {
               if(!(equilibrium_phases_header_TEX_ss.str().empty() && equilibrium_phases_TEX_ss.str().empty() && reaction_chem_eq_TEX_ss.str().empty())) {
                 main_TEX_ss << "\\vspace{-20pt}" << endl;
                 //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]main_TEX_ss << "\\begin{longtabu}{X[1,l]X[3,r]}" << endl;
-                main_TEX_ss << "\\begin{longtable}{" << valignments_reactiontable_string[0] << string("") << valignments_reactiontable_string[1] << "}" << endl;
+                main_TEX_ss << "\\begin{longtable}{" << aurostd::joinWDelimiter(valignments_reactiontable_string,"") << "}" << endl;
                 if(m_coord_groups[i_coord_group].m_is_on_hull) {
                   if(include_equilibrium_phases && !(equilibrium_phases_header_TEX_ss.str().empty() && equilibrium_phases_TEX_ss.str().empty())) {
                     main_TEX_ss << equilibrium_phases_header_TEX_ss.str();
@@ -10100,6 +10182,7 @@ namespace chull {
               //if(i!=m_coord_groups.size()-1) {main_TEX_ss << "\\vspace{-20pt}" << endl;}
             }
             scriterion_data_ss.str("");
+            np1_data_ss.str("");
             _report_data_ss.str("");
             report_data_ss.str("");
             reaction_chem_eq_TEX_ss.str("");
