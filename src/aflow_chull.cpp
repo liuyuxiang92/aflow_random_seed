@@ -635,6 +635,13 @@ namespace chull {
         try{
           ChullPoint cp(coords,FileMESSAGE,oss,hull.m_has_stoich_coords,hull.m_formation_energy_hull,false);  //not a real point
           dist2hull=hull.getDistanceToHull(cp,false,true);  //do not redo, get signed distance (this is energy)
+          bool should_be_positive=!hull.m_lower_hull;
+          bool correct_sign_vertical_distance=chull::correctSignVerticalDistance(dist2hull,should_be_positive);
+          if(LDEBUG){
+            cerr << soliloquy << " dist2hull=" << dist2hull << endl;
+            cerr << soliloquy << " correct_sign_vertical_distance=" << correct_sign_vertical_distance << endl;
+          }
+          if(!correct_sign_vertical_distance){dist2hull*=-1.0;}
         }
         catch(aurostd::xerror& err){
           pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -663,7 +670,7 @@ namespace chull {
           double roundoff_tol=5.0*pow(10,-((int)precision)-1);
           message << "hull_energy" << aurostd::wrapString("coords="+aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
           message << " = ";
-          if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << -chull::convertUnits(dist2hull, _m_) << " (meV/atom)";} //dist2hull here needs negative sign
+          if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << chull::convertUnits(dist2hull, _m_) << " (meV/atom)";} //dist2hull here needs negative sign
           else {message << dist2hull << " (K)";}
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
         }
