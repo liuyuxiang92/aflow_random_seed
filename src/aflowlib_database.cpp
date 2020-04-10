@@ -663,10 +663,10 @@ namespace aflowlib {
       start += key.length();
       end = json.find("\":", start);
       if (end != string::npos) {
+        // In case there is any white space between key and value
         value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
         // If we have a nested object, "value" should only be '{' + white space by now.
         if (value[0] == '{') {
-          // In case there is any white space between key and value
           string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow()";
           string message = "JSON parser cannot read nested objects.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
