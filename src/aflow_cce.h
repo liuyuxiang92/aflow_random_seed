@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *           Aflow RICO FRIEDRICH - Duke University 2018-2019              *
 // *                                                                         *
 // ***************************************************************************
@@ -20,7 +20,7 @@ namespace pflow {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *           Aflow RICO FRIEDRICH - Duke University 2018-2019              *
 // *                                                                         *
 // ***************************************************************************

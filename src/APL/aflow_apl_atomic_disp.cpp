@@ -338,11 +338,7 @@ namespace apl {
     for (uint t = 0; t < _temperatures.size(); t++) {
       output << std::setw(10) << std::setprecision(2) << _temperatures[t];
       for (uint at = 0; at < disp_vec[t].size(); at++) {
-        if (at == 0) {
-          output << std::setw(15) << _pc->getInputCellStructure().atoms[at].cleanname;
-        } else {
-          output << std::setw(25) << _pc->getInputCellStructure().atoms[at].cleanname;
-        }
+        output << (at==0?std::setw(15):std::setw(25)) << _pc->getInputCellStructure().atoms[at].cleanname;
         for (int i = 1; i < 4; i++) output << std::setw(15) << std::setprecision(8) << disp_vec[t][at][i];
         output << std::endl;
       }

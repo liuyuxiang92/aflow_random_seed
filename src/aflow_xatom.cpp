@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2007-2019
@@ -15277,6 +15277,6 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

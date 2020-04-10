@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -3644,10 +3644,10 @@ namespace aflowlib {
       uint j=auid2present(auid);
       if(j) {
         if(LDEBUG) cerr << "_aflowlib_entry::directory2auid: conflict auid=" << auid << endl;	
-        cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT POTENTIAL " << " j=" << j << " " << auid << " " << vAURL.at(j) << " " << aurl << endl;
-        if(vAURL.at(j)!=aurl) { // avoid conflict with yourself
+        cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT POTENTIAL " << " j=" << j << " " << auid << " " << XHOST_vAURL.at(j) << " " << aurl << endl;
+        if(XHOST_vAURL.at(j)!=aurl) { // avoid conflict with yourself
           string salt="AUID_salt["+aurostd::utype2string<long double>(aurostd::get_useconds())+"]";
-          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRUE      " << " j=" << j << " " << auid << " " << vAURL.at(j) << " " << aurl << "  " << salt << endl;
+          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRUE      " << " j=" << j << " " << auid << " " << XHOST_vAURL.at(j) << " " << aurl << "  " << salt << endl;
           string file=vfiles2.at(0);
 
           // [OBSOLETE] aurostd::StringSubst(file,".EXT","");
@@ -3665,7 +3665,7 @@ namespace aflowlib {
 
           conflict=TRUE; // recheck
         } else {
-          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRIVIAL   " << " j=" << j << " " << auid << " " << vAURL.at(j) << " " << aurl << endl;
+          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRIVIAL   " << " j=" << j << " " << auid << " " << XHOST_vAURL.at(j) << " " << aurl << endl;
         }
       }
     }
@@ -3686,15 +3686,15 @@ namespace aflowlib {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     uint k=0;
     if(LDEBUG) cerr << "auid2present: BEGIN" << endl;
-    if(XHOST_AUID.size()==0) XHOST_AUID=init::InitGlobalObject("vAUID","",FALSE);
-    if(XHOST_AURL.size()==0) XHOST_AURL=init::InitGlobalObject("vAURL","",FALSE);
+    if(XHOST_vAUID.size()==0) init::InitGlobalObject("vLIBS","",FALSE);
+    if(XHOST_vAURL.size()==0) init::InitGlobalObject("vLIBS","",FALSE);
     if(auid=="") return 0;
-    if(LDEBUG) cerr << "auid2present: [4] vAURL.size()=" << vAURL.size() << endl;
-    if(LDEBUG) cerr << "auid2present: [4] vAUID.size()=" << vAUID.size() << endl;
+    if(LDEBUG) cerr << "auid2present: [4] XHOST_vAURL.size()=" << XHOST_vAURL.size() << endl;
+    if(LDEBUG) cerr << "auid2present: [4] XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
     bool found=FALSE;
-    for(uint j=0;j<vAUID.size()&&!found;j++) {
-      if(LDEBUG && vAUID.at(j)==auid) cerr << "[" << auid << "] [" << vAUID.at(j) << "]" << " [" << j << "]" << endl;
-      if(vAUID.at(j)==auid) {k=j;found=FALSE;}
+    for(uint j=0;j<XHOST_vAUID.size()&&!found;j++) {
+      if(LDEBUG && XHOST_vAUID.at(j)==auid) cerr << "[" << auid << "] [" << XHOST_vAUID.at(j) << "]" << " [" << j << "]" << endl;
+      if(XHOST_vAUID.at(j)==auid) {k=j;found=FALSE;}
     }
     if(LDEBUG) cerr << "auid2present: END k=" << k << endl;
     return k;
@@ -3865,9 +3865,9 @@ namespace aflowlib { // move to web interface
       cerr << "ERROR - aflowlib::AflowlibLocator: wrong mode=" << mode << endl;
       exit(0);
     }
-    if(XHOST_vAUID.size()==0) aurostd::string2vectorstring(init::InitGlobalObject("vAUID"),XHOST_vAUID); // cerr << XHOST_vAUID.size() << endl;
-    if(XHOST_vAURL.size()==0) aurostd::string2vectorstring(init::InitGlobalObject("vAURL"),XHOST_vAURL); // cerr << XHOST_vAURL.size() << endl;
-    if(XHOST_vLOOP.size()==0) aurostd::string2vectorstring(init::InitGlobalObject("vLOOP"),XHOST_vLOOP); // cerr << XHOST_vLOOP.size() << endl;
+    if(XHOST_vAUID.size()==0) { init::InitGlobalObject("vLIBS"); }
+    if(XHOST_vAURL.size()==0) { init::InitGlobalObject("vLIBS"); }
+    if(XHOST_vLOOP.size()==0) { init::InitGlobalObject("vLIBS"); }
     if(XHOST_vAUID.size()!=XHOST_vAURL.size() || XHOST_vAUID.size()!=XHOST_vLOOP.size()) {
       cerr << "ERROR - aflowlib::AflowlibLocator: XHOST_vAUID.size()!=XHOST_vAURL.size() || XHOST_vAUID.size()!=XHOST_vLOOP.size()" << endl;
       cerr << "                                   XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
@@ -6123,7 +6123,7 @@ namespace aflowlib {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

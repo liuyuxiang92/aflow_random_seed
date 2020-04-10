@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -507,53 +507,54 @@ namespace init {
       if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) oss << "XHOST_LIBRARY_LIB8=" << XHOST_LIBRARY_LIB8 << " : vAFLOW_PROJECTS_DIRECTORIES.at(" << XHOST_LIBRARY_LIB8 << ")=" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8) << endl;
       if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) oss << "XHOST_LIBRARY_LIB9=" << XHOST_LIBRARY_LIB9 << " : vAFLOW_PROJECTS_DIRECTORIES.at(" << XHOST_LIBRARY_LIB9 << ")=" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9) << endl;
 
-      //      if(XHOST_LIBRARY_AUID!=LIBRARY_NOTHING) {
-      // 	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_AUID_LIB"),tokens,"\n");
-      // 	oss << "Library_CALCULATED_AUID_LIB.size()=" << tokens.size() << endl;
-      //       }
+      //  [OBSOLETE]     if(XHOST_LIBRARY_AUID!=LIBRARY_NOTHING) {
+      //  [OBSOLETE]	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_AUID_LIB"),tokens,"\n");
+      //  [OBSOLETE]	oss << "Library_CALCULATED_AUID_LIB.size()=" << tokens.size() << endl;
+      //  [OBSOLETE]      }
+      init::InitLoadString("vLIBS");
       if(XHOST_LIBRARY_ICSD!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_ICSD_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_ICSD_LIB.size()=" << XHOST_Library_CALCULATED_ICSD_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB0_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB0_LIB.size()=" << XHOST_Library_CALCULATED_LIB0_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB1!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB1_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB1_LIB.size()=" << XHOST_Library_CALCULATED_LIB1_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB2!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB2_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB2_LIB.size()=" << XHOST_Library_CALCULATED_LIB2_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB3_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB3_LIB.size()=" << XHOST_Library_CALCULATED_LIB3_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB4!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB4_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB4_LIB.size()=" << XHOST_Library_CALCULATED_LIB4_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB5!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB5_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB5_LIB.size()=" << XHOST_Library_CALCULATED_LIB5_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB6!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB6_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB6_LIB.size()=" << XHOST_Library_CALCULATED_LIB6_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB7!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB7_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB7_LIB.size()=" << XHOST_Library_CALCULATED_LIB7_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB8_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB8_LIB.size()=" << XHOST_Library_CALCULATED_LIB8_LIB.size() << endl;
       }
       if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB9_LIB.size()=" << tokens.size() << endl;
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB9_LIB.size()=" << XHOST_Library_CALCULATED_LIB9_LIB.size() << endl;
       }
     }
 
@@ -638,6 +639,8 @@ namespace init {
     if(!directory_clean.empty()){XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
     if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
     //CO20190402 STOP - cleaning directory, giving us something to print with logger
+
+    // LOGICS to intercept --file= => XHOST.vflag_control.flag("FILE") XHOST.vflag_control.getattachedscheme("FILE")
     // FILE NEEDS A SPECIAL TREATMENT
     string file_default="xxxx",file=file_default;
     found=FALSE;
@@ -645,7 +648,9 @@ namespace init {
     if(!found&&(found=aurostd::args2attachedflag(argv,cmds,"--FILE=|--file=|--F=|--f="))) {file=aurostd::args2attachedstring(argv,"--FILE=|--file=|--F=|--f=",file_default);if(INIT_VERBOSE) cerr << "--FILE=" << file << " " << endl;}
     XHOST.vflag_control.flag("FILE",found);  // if found
     if(XHOST.vflag_control.flag("FILE")) XHOST.vflag_control.push_attached("FILE",file);
-    if(XHOST.vflag_control.flag("FILE")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"FILE\")=[" << XHOST.vflag_control.getattachedscheme("FILE") << "]" << endl; 
+    if(XHOST.vflag_control.flag("FILE")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"FILE\")=[" << XHOST.vflag_control.getattachedscheme("FILE") << "]" << endl;
+
+    
     // VFILES NEEDS A SPECIAL TREATMENT
     string dirs_default="xxxx",dirs=dirs_default;
     vector<string> vdir;
@@ -834,12 +839,42 @@ namespace init {
     if(!XHOST.vflag_control.flag("XPLUG_NUM_SIZE")) XHOST.vflag_control.push_attached("XPLUG_NUM_SIZE",aurostd::utype2string(128));
     XHOST.vflag_control.flag("XPLUG_NUM_THREADS",aurostd::args2attachedflag(argv,"--np="));
     XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX",aurostd::args2attachedflag(argv,"--npmax")); // CO20180124
-    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=",""));
+    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=","0")); // SC20200319
     if(!XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")) { //ME20181113
       XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME20181113
       //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO200106 - close bracket for indenting]}
     }
 
+    // USEFUL shortcuts // SC20200319
+    if(!aurostd::args2attachedflag(argv,"--np=")) {
+      deque<string> vshort; aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,32,48,52,64",vshort,",");
+      for(uint ishort=0;ishort<vshort.size();ishort++) {
+	if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  // SC20200319
+	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
+	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
+	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",vshort.at(ishort));
+	  //	  if(INIT_VERBOSE)
+	  cerr << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+	}
+      }
+    }
+    // USEFUL shortcuts // SC20200323 
+    if(!XHOST.vflag_control.flag("FILE")) { // not specified file
+      deque<string> vshort; aurostd::string2tokens("0,1,2,3,4,5,6,7,8,9",vshort,",");
+      for(uint ishort=0;ishort<vshort.size();ishort++) {
+	if(aurostd::args2flag(argv,cmds,"--multi=x.lib"+vshort.at(ishort)) || aurostd::args2flag(argv,cmds,"--multi=./x.lib"+vshort.at(ishort))) {  // SC20200323
+	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
+	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
+	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","16");
+	  XHOST.vflag_control.flag("FILE",TRUE);  // if found
+	  XHOST.vflag_control.push_attached("FILE","x.lib"+vshort.at(ishort));
+	  cerr << "init::InitMachine: FOUND FILE=" << XHOST.vflag_control.getattachedscheme("FILE") << endl;
+	  cerr << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+	}
+      }
+    }
+
+   
     // ME20181103 - set MPI when number of threads is larger than 1
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX") || 
         (aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS")) > 1)) {
@@ -985,39 +1020,180 @@ namespace init {
       if(XHOST.hostname=="nietzsche.mems.duke.edu"&&XHOST.user=="auro"&&aurostd::FileExist(XHOST.home+"/work/AFLOW3/aflow_data")) {  // CO, special stefano
         out=aurostd::execute2string(string(XHOST.home+"/work/AFLOW3/aflow_data")+string(" ")+str2load);
         if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
-        if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
+	//       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
         if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
-      } else {
+     } else {
         if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
         out=aurostd::execute2string(XHOST.command("aflow_data")+" "+str2load);
-      }
+       }
     } else { // cerr << string(aflow_data_path+"/"+XHOST.command("aflow_data")) << endl;
       out=aurostd::execute2string(aflow_data_path+"/"+XHOST.command("aflow_data")+" "+str2load);
-    }
-
-    if(LDEBUG) cerr << soliloquy << "  length=" << out.length() << endl;
+     }
+    if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
     if(LDEBUG) cerr.flush();
     //    if(LDEBUG) exit(0);
-    return out;
+    if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
+
+    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()!=3) {
+      for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
+      XHOST_vLIBS.clear();
+      XHOST_vLIBS.push_back(vector<string>()); // AURL
+      XHOST_vLIBS.push_back(vector<string>()); // AUID
+      XHOST_vLIBS.push_back(vector<string>()); // LOOP
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
+      vector<string> vout;
+      string aurl,auid,loop;
+      bool found=FALSE;
+      aurostd::string2vectorstring(out,vout);
+      for(uint i=0;i<vout.size();) {
+	aurl=vout.at(i);XHOST_vLIBS.at(0).push_back(vout.at(i++)); // AURL
+	auid=vout.at(i);XHOST_vLIBS.at(1).push_back(vout.at(i++)); // AUID
+	loop=vout.at(i);XHOST_vLIBS.at(2).push_back(vout.at(i++)); // LOOP
+	aurostd::StringSubst(aurl,"aflowlib.duke.edu:","");
+	aurostd::StringSubst(aurl,"materials.duke.edu:","");
+	found=FALSE;
+	// XHOST_Library_CALCULATED_ICSD
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/ICSD")) {
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/ICSD_RAW/","");
+	    aurostd::StringSubst(aurl,"AFLOWDATA/ICSD_WEB/","");
+	    XHOST_Library_CALCULATED_ICSD_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_ICSD_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB0
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB0")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB0_RAW/","");
+	    XHOST_Library_CALCULATED_LIB0_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB0_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB1
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB1")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB1_RAW/","");
+	    XHOST_Library_CALCULATED_LIB1_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB1_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB2
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB2")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB2_RAW/","");
+	    XHOST_Library_CALCULATED_LIB2_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB2_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB3
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB3")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB3_RAW/","");
+	    XHOST_Library_CALCULATED_LIB3_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB3_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB4
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB4")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB4_RAW/","");
+	    XHOST_Library_CALCULATED_LIB4_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB4_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB5
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB5")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB5_RAW/","");
+	    XHOST_Library_CALCULATED_LIB5_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB5_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB6
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB6")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB6_RAW/","");
+	    XHOST_Library_CALCULATED_LIB6_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB6_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB7
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB7")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB7_RAW/","");
+	    XHOST_Library_CALCULATED_LIB7_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB7_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB8
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB8")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB8_RAW/","");
+	    XHOST_Library_CALCULATED_LIB8_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB8_RAW.push_back(aurl);
+	  }
+	// XHOST_Library_CALCULATED_LIB9
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB9")) { 
+	    found=TRUE;
+	    aurostd::StringSubst(aurl,"AFLOWDATA/LIB9_RAW/","");
+	    XHOST_Library_CALCULATED_LIB9_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB9_RAW.push_back(aurl);
+	  }
+      }
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.at(0).size()=" << XHOST_vLIBS.at(0).size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.at(1).size()=" << XHOST_vLIBS.at(1).size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.at(2).size()=" << XHOST_vLIBS.at(2).size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_ICSD_LIB.size()=" << XHOST_Library_CALCULATED_ICSD_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB0_LIB.size()=" << XHOST_Library_CALCULATED_LIB0_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB1_LIB.size()=" << XHOST_Library_CALCULATED_LIB1_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB2_LIB.size()=" << XHOST_Library_CALCULATED_LIB2_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB3_LIB.size()=" << XHOST_Library_CALCULATED_LIB3_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB4_LIB.size()=" << XHOST_Library_CALCULATED_LIB4_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB5_LIB.size()=" << XHOST_Library_CALCULATED_LIB5_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB6_LIB.size()=" << XHOST_Library_CALCULATED_LIB6_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB7_LIB.size()=" << XHOST_Library_CALCULATED_LIB7_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB8_LIB.size()=" << XHOST_Library_CALCULATED_LIB8_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB9_LIB.size()=" << XHOST_Library_CALCULATED_LIB9_LIB.size() << endl;
+    }
+    return out; 
   }
 } // namespace init
 
-vector<string> vvAURL,vvAUID,vvLOOP;
+bool vAURL_cutout(vector<string>& vvAURL,string cutout,bool LVERBOSE) {
+  bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
+  stringstream sss;
+  if(LDEBUG) cerr << "vAUID_cutout: XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
+  if(LDEBUG) cerr << "vAURL_cutout: XHOST_vAURL.size()=" << XHOST_vAURL.size() << endl;
+  if(LDEBUG) cerr << "vLOOP_cutout: XHOST_vLOOP.size()=" << XHOST_vLOOP.size() << endl;
+  if(LDEBUG) cerr << "vLIBS_cutout: XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
+  vector<string> tokens;
+  aurostd::string2tokens(cutout,tokens,"|");
+  string aus;
+  if(!XHOST_vAURL.size()) init::InitLoadString("vLIBS",LVERBOSE);
+  for(uint i=0;i<tokens.size();i++) {
+    for(uint j=0;j<XHOST_vAURL.size();j++) {
+      aus=XHOST_vAURL.at(j);
+      if(aurostd::substring2bool(aus,tokens.at(i))) {
+        aurostd::StringSubst(aus,tokens.at(i),"");
+        aurostd::StringSubst(aus,"aflowlib.duke.edu:","");
+        aurostd::StringSubst(aus,"materials.duke.edu:","");
+        vvAURL.push_back(aus);
+      }
+    }
+  }
+  return true;
+}
 
 string vAURL_cutout(string cutout,bool LVERBOSE) {
   bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
   stringstream sss;
-  if(LDEBUG) cerr << "vAURL_cutout: XHOST_AURL.size()=" << XHOST_AURL.size() << "  " << "vvAURL.size()=" << vvAURL.size() << endl;
+  if(LDEBUG) cerr << "vAUID_cutout: XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
+  if(LDEBUG) cerr << "vAURL_cutout: XHOST_vAURL.size()=" << XHOST_vAURL.size() << endl;
+  if(LDEBUG) cerr << "vLOOP_cutout: XHOST_vLOOP.size()=" << XHOST_vLOOP.size() << endl;
+  if(LDEBUG) cerr << "vLIBS_cutout: XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
   vector<string> tokens;
   aurostd::string2tokens(cutout,tokens,"|");
-  if(!vvAURL.size()) aurostd::string2vectorstring(init::InitGlobalObject("vAURL","",LVERBOSE),vvAURL); // a bit of recursivity helps
+  string aus;
+  if(!XHOST_vAURL.size()) init::InitLoadString("vLIBS",LVERBOSE);
   for(uint i=0;i<tokens.size();i++) {
-    for(uint j=0;j<vvAURL.size();j++) {
-      if(aurostd::substring2bool(vvAURL.at(j),tokens.at(i))) {
-        aurostd::StringSubst(vvAURL.at(j),tokens.at(i),"");
-        aurostd::StringSubst(vvAURL.at(j),"aflowlib.duke.edu:","");
-        aurostd::StringSubst(vvAURL.at(j),"materials.duke.edu:","");
-        sss << vvAURL.at(j) << endl;
+    for(uint j=0;j<XHOST_vAURL.size();j++) {
+      aus=XHOST_vAURL.at(j);
+      if(aurostd::substring2bool(aus,tokens.at(i))) {
+        aurostd::StringSubst(aus,tokens.at(i),"");
+        aurostd::StringSubst(aus,"aflowlib.duke.edu:","");
+        aurostd::StringSubst(aus,"materials.duke.edu:","");
+	sss << aus << endl;
       }
     }
   }
@@ -1042,50 +1218,24 @@ namespace init {
       }
     } // FIX
     // FILES CALCULATED
-    // README_CALCULATED_ICSD
-    if(str=="Library_CALCULATED_ICSD_LIB") { if(XHOST_Library_CALCULATED_ICSD_LIB.empty()) { return XHOST_Library_CALCULATED_ICSD_LIB=vAURL_cutout("AFLOWDATA/ICSD_RAW/|AFLOWDATA/ICSD_WEB/",LVERBOSE);} else { return XHOST_Library_CALCULATED_ICSD_LIB;}} 
-    if(str=="Library_CALCULATED_ICSD_RAW") { if(XHOST_Library_CALCULATED_ICSD_RAW.empty()) { return XHOST_Library_CALCULATED_ICSD_RAW=vAURL_cutout("AFLOWDATA/ICSD_RAW/|AFLOWDATA/ICSD_WEB/",LVERBOSE);} else { return XHOST_Library_CALCULATED_ICSD_RAW;}}  
-    // README_CALCULATED_LIB0
-    if(str=="Library_CALCULATED_LIB0_LIB") { if(XHOST_Library_CALCULATED_LIB0_LIB.empty()) { return XHOST_Library_CALCULATED_LIB0_LIB=vAURL_cutout("AFLOWDATA/LIB0_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB0_LIB;}} 
-    if(str=="Library_CALCULATED_LIB0_RAW") { if(XHOST_Library_CALCULATED_LIB0_RAW.empty()) { return XHOST_Library_CALCULATED_LIB0_RAW=vAURL_cutout("AFLOWDATA/LIB0_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB0_RAW;}} 
-    // README_CALCULATED_LIB1
-    if(str=="Library_CALCULATED_LIB1_LIB") { if(XHOST_Library_CALCULATED_LIB1_LIB.empty()) { return XHOST_Library_CALCULATED_LIB1_LIB=vAURL_cutout("AFLOWDATA/LIB1_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB1_LIB;}} 
-    if(str=="Library_CALCULATED_LIB1_RAW") { if(XHOST_Library_CALCULATED_LIB1_RAW.empty()) { return XHOST_Library_CALCULATED_LIB1_RAW=vAURL_cutout("AFLOWDATA/LIB1_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB1_RAW;}} 
-    // README_CALCULATED_LIB2
-    if(str=="Library_CALCULATED_LIB2_LIB") { if(XHOST_Library_CALCULATED_LIB2_LIB.empty()) { return XHOST_Library_CALCULATED_LIB2_LIB=vAURL_cutout("AFLOWDATA/LIB2_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB2_LIB;}} 
-    if(str=="Library_CALCULATED_LIB2_RAW") { if(XHOST_Library_CALCULATED_LIB2_RAW.empty()) { return XHOST_Library_CALCULATED_LIB2_RAW=vAURL_cutout("AFLOWDATA/LIB2_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB2_RAW;}} 
-    // README_CALCULATED_LIB3
-    if(str=="Library_CALCULATED_LIB3_LIB") { if(XHOST_Library_CALCULATED_LIB3_LIB.empty()) { return XHOST_Library_CALCULATED_LIB3_LIB=vAURL_cutout("AFLOWDATA/LIB3_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB3_LIB;}} 
-    if(str=="Library_CALCULATED_LIB3_RAW") { if(XHOST_Library_CALCULATED_LIB3_RAW.empty()) { return XHOST_Library_CALCULATED_LIB3_RAW=vAURL_cutout("AFLOWDATA/LIB3_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB3_RAW;}} 
-    // README_CALCULATED_LIB4
-    if(str=="Library_CALCULATED_LIB4_LIB") { if(XHOST_Library_CALCULATED_LIB4_LIB.empty()) { return XHOST_Library_CALCULATED_LIB4_LIB=vAURL_cutout("AFLOWDATA/LIB4_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB4_LIB;}} 
-    if(str=="Library_CALCULATED_LIB4_RAW") { if(XHOST_Library_CALCULATED_LIB4_RAW.empty()) { return XHOST_Library_CALCULATED_LIB4_RAW=vAURL_cutout("AFLOWDATA/LIB4_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB4_RAW;}} 
-    // README_CALCULATED_LIB5
-    if(str=="Library_CALCULATED_LIB5_LIB") { if(XHOST_Library_CALCULATED_LIB5_LIB.empty()) { return XHOST_Library_CALCULATED_LIB5_LIB=vAURL_cutout("AFLOWDATA/LIB5_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB5_LIB;}} 
-    if(str=="Library_CALCULATED_LIB5_RAW") { if(XHOST_Library_CALCULATED_LIB5_RAW.empty()) { return XHOST_Library_CALCULATED_LIB5_RAW=vAURL_cutout("AFLOWDATA/LIB5_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB5_RAW;}} 
-    // README_CALCULATED_LIB6
-    if(str=="Library_CALCULATED_LIB6_LIB") { if(XHOST_Library_CALCULATED_LIB6_LIB.empty()) { return XHOST_Library_CALCULATED_LIB6_LIB=vAURL_cutout("AFLOWDATA/LIB6_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB6_LIB;}} 
-    if(str=="Library_CALCULATED_LIB6_RAW") { if(XHOST_Library_CALCULATED_LIB6_RAW.empty()) { return XHOST_Library_CALCULATED_LIB6_RAW=vAURL_cutout("AFLOWDATA/LIB6_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB6_RAW;}} 
-    // README_CALCULATED_LIB7
-    if(str=="Library_CALCULATED_LIB7_LIB") { if(XHOST_Library_CALCULATED_LIB7_LIB.empty()) { return XHOST_Library_CALCULATED_LIB7_LIB=vAURL_cutout("AFLOWDATA/LIB7_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB7_LIB;}} 
-    if(str=="Library_CALCULATED_LIB7_RAW") { if(XHOST_Library_CALCULATED_LIB7_RAW.empty()) { return XHOST_Library_CALCULATED_LIB7_RAW=vAURL_cutout("AFLOWDATA/LIB7_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB7_RAW;}} 
-    // README_CALCULATED_LIB8
-    if(str=="Library_CALCULATED_LIB8_LIB") { if(XHOST_Library_CALCULATED_LIB8_LIB.empty()) { return XHOST_Library_CALCULATED_LIB8_LIB=vAURL_cutout("AFLOWDATA/LIB8_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB8_LIB;}} 
-    if(str=="Library_CALCULATED_LIB8_RAW") { if(XHOST_Library_CALCULATED_LIB8_RAW.empty()) { return XHOST_Library_CALCULATED_LIB8_RAW=vAURL_cutout("AFLOWDATA/LIB8_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB8_RAW;}} 
-    // README_CALCULATED_LIB9
-    if(str=="Library_CALCULATED_LIB9_LIB") { if(XHOST_Library_CALCULATED_LIB9_LIB.empty()) { return XHOST_Library_CALCULATED_LIB9_LIB=vAURL_cutout("AFLOWDATA/LIB9_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB9_LIB;}} 
-    if(str=="Library_CALCULATED_LIB9_RAW") { if(XHOST_Library_CALCULATED_LIB9_RAW.empty()) { return XHOST_Library_CALCULATED_LIB9_RAW=vAURL_cutout("AFLOWDATA/LIB9_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB9_RAW;}} 
-    // AUID AURL LOOP
-    if(str=="vAUID") { if(XHOST_AUID.empty()) {XHOST_AUID=aurostd::RemoveWhiteSpaces(init::InitLoadString(str,LVERBOSE));aurostd::string2vectorstring(XHOST_AUID,XHOST_vAUID);return XHOST_AUID;} else { return XHOST_AUID;}} // 
-    if(str=="vAURL") { if(XHOST_AURL.empty()) {XHOST_AURL=aurostd::RemoveWhiteSpaces(init::InitLoadString(str,LVERBOSE));aurostd::string2vectorstring(XHOST_AURL,XHOST_vAURL);return XHOST_AURL;} else { return XHOST_AURL;}} // 
-    if(str=="vLOOP") { if(XHOST_LOOP.empty()) {XHOST_LOOP=aurostd::RemoveWhiteSpaces(init::InitLoadString(str,LVERBOSE));aurostd::string2vectorstring(XHOST_LOOP,XHOST_vLOOP);return XHOST_LOOP;} else { return XHOST_LOOP;}} // 
-    // [OBSOLETE]   // TABLE PROTOTYPES
-    // [OBSOLETE]   if(str=="AFLOW_BinaryRead") { if(XHOST_AFLOW_BinaryRead.empty()) { return XHOST_AFLOW_BinaryRead=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_BinaryRead;}} //
-    // [OBSOLETE]   if(str=="AFLOW_Binary_Angle_Read") { if(XHOST_AFLOW_Binary_Angle_Read.empty()) { return XHOST_AFLOW_Binary_Angle_Read=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_Binary_Angle_Read;}} // 
+    if(str=="Library_CALCULATED_ICSD_LIB" || str=="Library_CALCULATED_ICSD_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB0_LIB" || str=="Library_CALCULATED_LIB0_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB1_LIB" || str=="Library_CALCULATED_LIB1_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB2_LIB" || str=="Library_CALCULATED_LIB2_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB3_LIB" || str=="Library_CALCULATED_LIB3_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB4_LIB" || str=="Library_CALCULATED_LIB4_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB5_LIB" || str=="Library_CALCULATED_LIB5_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB6_LIB" || str=="Library_CALCULATED_LIB6_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB7_LIB" || str=="Library_CALCULATED_LIB7_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB8_LIB" || str=="Library_CALCULATED_LIB8_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB9_LIB" || str=="Library_CALCULATED_LIB9_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    // AUID AURL LOOP LIBS
+    if(str=="vLIBS" || str=="XHOST_vLIBS") { init::InitLoadString("vLIBS",LVERBOSE);} // just make them all
     // AFLOWLIB THINGS
     // LOAD
     // if(str=="aflowlib_lib0") { if(XHOST_aflowlib_lib0.empty()) { return XHOST_aflowlib_lib0=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib0;}} // 
-    // if(str=="aflowlib_lib1") { if(XHOST_aflowlib_lib1.empty()) { return XHOST_aflowlib_lib1=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib1;}} //        // if(str=="aflowlib_lib2") { if(XHOST_aflowlib_lib2.empty()) { return XHOST_aflowlib_lib2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib2;}} //
+    // if(str=="aflowlib_lib1") { if(XHOST_aflowlib_lib1.empty()) { return XHOST_aflowlib_lib1=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib1;}} //
+    // if(str=="aflowlib_lib2") { if(XHOST_aflowlib_lib2.empty()) { return XHOST_aflowlib_lib2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib2;}} //
     // if(str=="aflowlib_lib3") { if(XHOST_aflowlib_lib3.empty()) { return XHOST_aflowlib_lib3=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib3;}} // 
     // if(str=="aflowlib_lib4") { if(XHOST_aflowlib_lib4.empty()) { return XHOST_aflowlib_lib4=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib4;}} // 
     // if(str=="aflowlib_lib5") { if(XHOST_aflowlib_lib5.empty()) { return XHOST_aflowlib_lib5=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib5;}} // 
@@ -2783,6 +2933,6 @@ namespace init {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

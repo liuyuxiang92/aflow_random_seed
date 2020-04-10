@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -447,21 +447,18 @@ void PERFORM_TEST3(ostream& oss) {
   exit(0);
 }
 
-//extern vector<string> vAUID,vAURL;
 vector<string> vAUID_new,vAURL_new;
 
 void PERFORM_TEST1(ostream& oss) {
   aflowlib::auid2present(); // empty=- load
-  
-  oss << vAUID.size() << " " << vAURL.size() << endl; 
-  
-  for(uint i=0;i<vAUID.size();i++) { 
+  oss << XHOST_vAUID.size() << " " << XHOST_vAURL.size() << endl; 
+  for(uint i=0;i<XHOST_vAUID.size();i++) { 
     uint j;
-    if((j=aflowlib::auid2present(vAUID.at(i)))) {
-      oss << "found duplicate i=" << i << " j=" << j << " " << vAUID.at(i) << " " << vAURL.at(i) << " " << vAURL_new.at(j) << endl;
+    if((j=aflowlib::auid2present(XHOST_vAUID.at(i)))) {
+      oss << "found duplicate i=" << i << " j=" << j << " " << XHOST_vAUID.at(i) << " " << XHOST_vAURL.at(i) << " " << vAURL_new.at(j) << endl;
     } else { 
-      vAUID_new.push_back(vAUID.at(i)); // survives all
-      vAURL_new.push_back(vAURL.at(i)); // survives all
+      vAUID_new.push_back(XHOST_vAUID.at(i)); // survives all
+      vAURL_new.push_back(XHOST_vAURL.at(i)); // survives all
       //      if(!aurostd::mod((int) vAUID_new.size(),20000))	oss << vAUID_new.size() << " " << vAURL_new.size() << endl; 
     }
   }
@@ -539,7 +536,7 @@ int pinku_main(void) {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************
 

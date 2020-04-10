@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -82,6 +82,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   vGlobal_uint.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_uint.push_back(0); 
   vGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_string.push_back(""); 
   vvGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvGlobal_string.push_back(vector<string>()); 
+  vvLIBS.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvLIBS.push_back(vector<string>()); 
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD.push_back(""); 
   // [OBSOLETE] vLibrary_ICSD_ALL.clear(); // for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD_ALL.push_back(""); 
   // [OBSOLETE] Library_ICSD_ALL="";
@@ -180,6 +181,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vGlobal_uint.clear();for(uint i=0;i<b.vGlobal_uint.size();i++) vGlobal_uint.push_back(b.vGlobal_uint.at(i));
   vGlobal_string.clear();for(uint i=0;i<b.vGlobal_string.size();i++) vGlobal_string.push_back(b.vGlobal_string.at(i));
   vvGlobal_string.clear();for(uint i=0;i<b.vvGlobal_string.size();i++) vvGlobal_string.push_back(b.vvGlobal_string.at(i));
+  vvLIBS.clear();for(uint i=0;i<b.vvLIBS.size();i++) vvLIBS.push_back(b.vvLIBS.at(i));
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<b.vLibrary_ICSD.size();i++) vLibrary_ICSD.push_back(b.vLibrary_ICSD.at(i));
   // [OBSOLETE] vLibrary_ICSD_ALL.clear();for(uint i=0;i<b.vLibrary_ICSD_ALL.size();i++) vLibrary_ICSD_ALL.push_back(b.vLibrary_ICSD_ALL.at(i));
   // [OBSOLETE] Library_ICSD_ALL=b.Library_ICSD_ALL;
@@ -224,6 +226,7 @@ void _XHOST::free() { // free PRIVATE
   vGlobal_uint.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_uint.push_back(0); 
   vGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_string.push_back(""); 
   vvGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvGlobal_string.push_back(vector<string>()); 
+  vvLIBS.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvLIBS.push_back(vector<string>()); 
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD.push_back(""); 
   // [OBSOLETE] vLibrary_ICSD_ALL.clear();
   XHOST_vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) XHOST_vLibrary_ICSD.push_back("");  // needs some initialization
@@ -2022,6 +2025,6 @@ void xStream::setOSS(ostream& oss) {p_oss=&oss;}
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

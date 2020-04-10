@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -109,43 +109,63 @@ namespace aurostd {
       vector<string> vLibrary;
       if(library==XHOST_LIBRARY_LIB0) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB0" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_RAW"),tokens,"\n");
+	// [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_RAW"),tokens,"\n");
+	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB0_RAW;
       }
       if(library==XHOST_LIBRARY_LIB1) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB1" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_RAW"),tokens,"\n");
-      }
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_RAW"),tokens,"\n");
+ 	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB1_RAW;
+     }
       if(library==XHOST_LIBRARY_LIB2) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB2" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_RAW"),tokens,"\n");
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_RAW"),tokens,"\n");
+ 	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB2_RAW;
       }
       if(library==XHOST_LIBRARY_LIB3) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB3" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
+ 	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB3_RAW;
       }
       if(library==XHOST_LIBRARY_LIB4) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB4" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
+ 	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB4_RAW;
       }
       if(library==XHOST_LIBRARY_LIB5) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB5" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
-      }
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
+	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB5_RAW;
+       }
       if(library==XHOST_LIBRARY_LIB6) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB6" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
+ 	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB6_RAW;
       }
       if(library==XHOST_LIBRARY_LIB7) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB7" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
+ 	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB7_RAW;
       }
       if(library==XHOST_LIBRARY_LIB8) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB8" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
+ 	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB8_RAW;
       }
       if(library==XHOST_LIBRARY_LIB9) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB9" << endl;
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
+        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
+ 	init::InitLoadString("vLIBS");
+	tokens=XHOST_Library_CALCULATED_LIB9_RAW;
       }
       for(uint i=0;i<tokens.size();i++)
         if(aurostd::substring2bool(tokens.at(i),"/")) {
@@ -1704,8 +1724,10 @@ namespace KBIN {
             }
             // ***************************************************************************
             // COMPRESS
-            if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
-          }
+            if(Krun && kflags.KZIP_COMPRESS) {
+	      Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+	    }
+	  }
           // ************************************************************************************************************************************
           // MATLAB MODE
           if(kflags.AFLOW_MODE_MATLAB) {
@@ -1723,7 +1745,8 @@ namespace KBIN {
             }
             // ***************************************************************************
             // COMPRESS
-            if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+            if(Krun && kflags.KZIP_COMPRESS)
+	      Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
             Krun=FALSE;
           }
           // ************************************************************************************************************************************
@@ -1771,7 +1794,8 @@ namespace KBIN {
             }
             // ***************************************************************************
             // COMPRESS
-            if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+            if(Krun && kflags.KZIP_COMPRESS)
+	      Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
           }
           // ************************************************************************************************************************************
           // MPI SWTICHES
@@ -1827,10 +1851,15 @@ namespace KBIN {
                 aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
                 aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL");
               Krun=(Krun && KBIN::VASP_Directory(FileLOCK,aflags,kflags));
-            }
+	    }
             // ***************************************************************************
-            // COMPRESS
-            if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+            // COMPRESS	    
+            if(Krun && kflags.KZIP_COMPRESS) {
+	      // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
+	      Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+ 	      // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
+	      // exit(0);
+	    }
           }
           // ************************************************************************************************************************************
           // MATLAB MODE
@@ -1916,16 +1945,16 @@ namespace KBIN {
 
 // *******************************************************************************************
 namespace KBIN {
-  void CompressDirectory(const _aflags& aflags,const _kflags& kflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  bool CompressDirectory(const _aflags& aflags,const _kflags& kflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::CompressDirectory():";
     // DX and CO - START
-    //aus << "cd " << aflags.Directory << " && ";
-    //aus << "ls | grep -v .EXT | ";                                // CO, skip anything with bzip extension
-    //aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";     // CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
-    //aus << "grep -v SKIP | ";
-    //aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
-    //aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    // CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
+    // [OBSOLETE]  aus << "cd " << aflags.Directory << " && ";
+    // [OBSOLETE]  aus << "ls | grep -v .EXT | ";                                // CO, skip anything with bzip extension
+    // [OBSOLETE]  aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";     // CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
+    // [OBSOLETE]  aus << "grep -v SKIP | ";
+    // [OBSOLETE]  aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
+    // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    // CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
     vector<string> _vfiles,vfiles;
     string compressed_variant;
     aurostd::DirectoryLS(aflags.Directory,_vfiles);
@@ -1943,52 +1972,53 @@ namespace KBIN {
       file_path=aflags.Directory + "/" + _vfiles[i];
       if(LDEBUG) {cerr << soliloquy << " file_path=" << file_path << endl;}
       if(aurostd::IsDirectory(file_path)){continue;}  //compress files only
-      if(aurostd::EFileExist(file_path,compressed_variant)){
-        //need full path here, also, notice the placement here, actual compressed variant would have been skipped, this is for the uncompressed variant
-        //both compressed and uncompressed variants exists
-        //assume compressed is from a previous run, hence obsolete
-        //delete it before compressing uncompressed variant
-        aurostd::RemoveFile(compressed_variant);
-      }
+      // [OBSOLETE]  if(aurostd::EFileExist(file_path,compressed_variant)){ // SC20200408
+      // [OBSOLETE]  //need full path here, also, notice the placement here, actual compressed variant would have been skipped, this is for the uncompressed variant // SC20200408
+      // [OBSOLETE]  //both compressed and uncompressed variants exists // SC20200408
+      // [OBSOLETE]  //assume compressed is from a previous run, hence obsolete // SC20200408
+      // [OBSOLETE]  //delete it before compressing uncompressed variant // SC20200408
+      // [OBSOLETE]  aurostd::RemoveFile(compressed_variant);  //  // SC20200408 = no needed because it will overwrite it -f  // SC20200408
+      // [OBSOLETE] }
       vfiles.push_back(_vfiles[i]);
     }
-    //aurostd::string2vectorstring(aurostd::execute2string(aus),vfiles);
-    //cerr << vfiles.size() << endl;
-    //aurostd::StringstreamClean(aus);
-    //cerr << "COREY " << aurostd::joinWDelimiter(vfiles," ") << endl;
-    //exit(0);
+    // [OBSOLETE] aurostd::string2vectorstring(aurostd::execute2string(aus),vfiles);
+    // [OBSOLETE] cerr << vfiles.size() << endl;
+    // [OBSOLETE] aurostd::StringstreamClean(aus);
+    // [OBSOLETE] cerr << "COREY " << aurostd::joinWDelimiter(vfiles," ") << endl;
+    // [OBSOLETE] exit(0);
     if(vfiles.size()){
       ostringstream aus;
       //aurostd::StringstreamClean(aus);
       aus << "cd " << aflags.Directory << " && " << endl;
       for(uint i=0;i<vfiles.size();i++){ //better than doing it all in one shot
-        aus << kflags.KZIP_BIN << " " << vfiles[i] << "; " << endl;  //semi-colon is important, keeps going if it stalls on one
+        aus << kflags.KZIP_BIN << " -9f " << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one
       }
-      //aus << kflags.KZIP_BIN << " " << aurostd::joinWDelimiter(vfiles," ") << endl; //AVOID, because if one fails, the whole command stops
+      // aus << kflags.KZIP_BIN << " " << aurostd::joinWDelimiter(vfiles," ") << endl; //AVOID, because if one fails, the whole command stops
       aurostd::execute(aus);
-      //cerr << aus.str() << endl;
+      // cerr << aus.str() << endl;
     }
-    //aus << kflags.KZIP_BIN << " `find . " << XHOST.Find_Parameters << " -name \"*\" | grep -v LOCK | grep -v SKIP | grep \"./\"` " << endl;
-    //aus << kflags.KZIP_BIN << " `ls | grep -v LOCK | grep -v SKIP | grep -v " << KBIN_SUBDIRECTORIES << "| grep -v " << _AFLOWIN_ << " | grep -v apl.xml ` " << endl;
-    //apl.xml can now be zipped
-    //set up is slightly redundant (LOCK vs. agl.LOCK), but very safe
-    //aus << kflags.KZIP_BIN << " `ls | grep -v .EXT | ";                 // CO, skip anything with bzip extension
-    //aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";           // CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
-    //aus << "grep -v SKIP | ";
-    //aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
-    //aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ` " << endl; // CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
-    //  cerr << aus.str() << endl;
-    //aurostd::execute(aus);
+    // [OBSOLETE] aus << kflags.KZIP_BIN << " `find . " << XHOST.Find_Parameters << " -name \"*\" | grep -v LOCK | grep -v SKIP | grep \"./\"` " << endl;
+    // [OBSOLETE] aus << kflags.KZIP_BIN << " `ls | grep -v LOCK | grep -v SKIP | grep -v " << KBIN_SUBDIRECTORIES << "| grep -v " << _AFLOWIN_ << " | grep -v apl.xml ` " << endl;
+    // [OBSOLETE] apl.xml can now be zipped
+    // [OBSOLETE] set up is slightly redundant (LOCK vs. agl.LOCK), but very safe
+    // [OBSOLETE] aus << kflags.KZIP_BIN << " `ls | grep -v .EXT | ";                 // CO, skip anything with bzip extension
+    // [OBSOLETE] aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";           // CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
+    // [OBSOLETE] aus << "grep -v SKIP | ";
+    // [OBSOLETE] aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
+    // [OBSOLETE] aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ` " << endl; // CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
+    // [OBSOLETE] cerr << aus.str() << endl;
+    // [OBSOLETE] aurostd::execute(aus);
     // DX and CO - END
+    return TRUE;
   }
 }
 
 // *******************************************************************************************
 namespace KBIN {
-  void CompressDirectory(const _aflags& aflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  bool CompressDirectory(const _aflags& aflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     _kflags kflags;
     kflags.KZIP_BIN=DEFAULT_KZIP_BIN+" -9q";
-    KBIN::CompressDirectory(aflags,kflags);
+    return KBIN::CompressDirectory(aflags,kflags);
   }
 }
 
@@ -2164,6 +2194,6 @@ namespace KBIN {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
