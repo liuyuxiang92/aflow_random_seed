@@ -11094,13 +11094,14 @@ namespace chull {
     // naming stability criterion files
     if(sc_requested) {
       aurostd::string2tokens(m_cflags.getattachedscheme("CHULL::NEGLECT"),sc_point,",");
+      std::sort(sc_point.begin(),sc_point.end()); //CO20200404 - this sort is NOT necessary, as web only removes 1 point a time, but this is SAFE
       delimiter = "_sc_";
       // limiting to the characters after "aflow:" because ":" is a reserved character for php query calls, also shortening queries
-      main_JSON_file=main_JSON_file + delimiter + sc_point[0].substr(6); // restricting to single auid to limit file name growth
+      main_JSON_file=main_JSON_file + delimiter + sc_point[0].substr(6); // restricting to single auid to limit file name growth, the substr(6) removes 'aflow:' from string which would cause issues for the filename/web
     }
     // naming n+1 enthalpy gain files
     if (n1eg_requested) {
-      delimiter = "_n1eg";
+      delimiter = "_n1eg";  //CO20200404 - n+1 is the same for all points on a hull
       main_JSON_file=main_JSON_file + delimiter;
     }
     //SK20200331 end
