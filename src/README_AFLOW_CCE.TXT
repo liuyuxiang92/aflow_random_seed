@@ -7,7 +7,7 @@
 LATEST VERSION OF THE FILE:        materials.duke.edu/AFLOW/README_AFLOW_CCE.TXT
 ********************************************************************************
 
-Written by Rico Friedrich, Corey Oses, and Marco Esters, 2019-2020
+Written by Rico Friedrich, Corey Oses, and Marco Esters, 2018-2020
 
 USER INSTRUCTIONS:
 
@@ -33,7 +33,7 @@ be PBE (default).
 Details for the options available are explained in the following.
 
 (ii) AVAILABLE OPTIONS:
---cce                       Prints user instructions.
+--cce/--cce=POSCAR --usage  Prints user instructions.
 --cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP5 POSCAR format.
 --dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies, 
                             they are assumed to be: (i) negative for compounds lower in energy 

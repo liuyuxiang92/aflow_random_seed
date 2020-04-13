@@ -47,76 +47,76 @@ namespace cce {
   // for command line use, 
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
-  void CCE(aurostd::xoption& flags);
-  vector<double> CCE_correct(const string& directory_path);
-  vector<double> CCE_correct(xstructure& structure, string& functional);
-  void CCE(aurostd::xoption& flags, std::istream& ist); // ME20200213
+  void write_corrections(aurostd::xoption& flags, ostream& oss=std::cout);
+  void write_corrections(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout); // ME20200213
+  vector<double> calculate_corrections(const string& directory_path);
+  vector<double> calculate_corrections(xstructure& structure, string& functional);
   void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
   // read user input (from command line or directory path)
-  xstructure CCE_read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
-  void CCE_get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
-  int CCE_get_offset(const string& functional);
-  vector<double> CCE_get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
-  string CCE_get_functional_from_aflow_in(const xstructure& structure, string& aflowin_file);
+  xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
+  void get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
+  int get_offset(const string& functional);
+  vector<double> get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
+  string get_functional_from_aflow_in(const xstructure& structure, string& aflowin_file);
   // initialise flags and variables
-  aurostd::xoption CCE_init_flags(); // ME20200213
-  CCE_Variables CCE_init_variables(const xstructure&); // ME20200213
+  aurostd::xoption init_flags(); // ME20200213
+  CCE_Variables init_variables(const xstructure&); // ME20200213
   // structural analysis
-  string CCE_determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
-  vector<uint> CCE_check_for_multi_anion_system(CCE_Variables& cce_vars, double tolerance, xstructure& structure, xoption& cce_flags);
-  vector<double> CCE_get_dist_cutoffs(double tolerance, const xstructure& structure);
-  vector<uint> CCE_get_num_neighbors(double tolerance, xstructure& structure);
-  vector<uint> CCE_get_num_neighbors(const string& anion_species, double tolerance, xstructure& structure);
-  vector<uint> CCE_get_num_neighbors(const string& anion_species, double tolerance, xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
-  void CCE_check_per_super_oxides(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
+  string determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
+  vector<uint> check_for_multi_anion_system(CCE_Variables& cce_vars, double tolerance, xstructure& structure, xoption& cce_flags);
+  vector<double> get_dist_cutoffs(double tolerance, const xstructure& structure);
+  vector<uint> get_num_neighbors(double tolerance, xstructure& structure);
+  vector<uint> get_num_neighbors(const string& anion_species, double tolerance, xstructure& structure);
+  vector<uint> get_num_neighbors(const string& anion_species, double tolerance, xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
+  void check_per_super_oxides(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
   // determine oxidation numbers from electronegativities
-  vector<double> CCE_get_oxidation_states_from_electronegativities(xstructure& structure);
-  vector<double> CCE_get_oxidation_states_from_electronegativities(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
-  void CCE_set_anion_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
-  void CCE_sort_species_by_electronegativity(const xstructure& structure, CCE_Variables& cce_vars);
-  void CCE_load_ox_states_templates_each_species(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
-  void CCE_try_preferred_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
-  void CCE_treat_SbO2_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_Pb3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_Ti_O_Magneli_phase_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_Fe3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_Mn3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_Co3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_alkali_sesquioxide_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  vector<double> get_oxidation_states_from_electronegativities(xstructure& structure);
+  vector<double> get_oxidation_states_from_electronegativities(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
+  void set_anion_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
+  void sort_species_by_electronegativity(const xstructure& structure, CCE_Variables& cce_vars);
+  void load_ox_states_templates_each_species(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
+  void try_preferred_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
+  void treat_SbO2_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void treat_Pb3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void treat_Ti_O_Magneli_phase_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void treat_Fe3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void treat_Mn3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void treat_Co3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void treat_alkali_sesquioxide_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   // following special cases only needed when determining oxidation states from Bader charges
-  void CCE_treat_MnMoO4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_Ca2Fe2O5_CaFe2O4_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_treat_FeTiO3_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  void CCE_try_all_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
-  void CCE_determine_cation_oxidation_states(const vector<vector<double> >& possible_ox_states, const xstructure& structure, CCE_Variables& cce_vars); // ME Nov. 2019
-  double CCE_print_oxidation_states_and_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  double CCE_print_oxidation_states_and_get_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
-  double CCE_get_oxidation_states_sum(CCE_Variables& cce_vars);
-  double CCE_get_oxidation_states_sum(CCE_Variables& cce_vars, xoption& cce_flags);
+  void treat_MnMoO4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void treat_Ca2Fe2O5_CaFe2O4_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void treat_FeTiO3_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  void try_all_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
+  void determine_cation_oxidation_states(const vector<vector<double> >& possible_ox_states, const xstructure& structure, CCE_Variables& cce_vars); // ME Nov. 2019
+  double print_oxidation_states_and_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  double print_oxidation_states_and_get_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  double get_oxidation_states_sum(CCE_Variables& cce_vars);
+  double get_oxidation_states_sum(CCE_Variables& cce_vars, xoption& cce_flags);
   // determine oxidation numbers from Bader charges (outdated)
-  vector<double> CCE_get_oxidation_states_from_Bader(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars);
-  void CCE_get_system_name_functional_from_aflow_in(const xstructure& structure, string& system_name, xoption& cce_flags, string& functional, CCE_Variables& cce_vars);
-  vector<double> CCE_get_Bader_charges_from_Bader_file(const string& Bader_file, const xstructure& structure, CCE_Variables& cce_vars);
-  vector<double> CCE_Bader_charges_to_oxidation_states(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars, string& functional);
-  void CCE_general_attempt_fixing_oxidation_states(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
+  vector<double> get_oxidation_states_from_Bader(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars);
+  void get_system_name_functional_from_aflow_in(const xstructure& structure, string& system_name, xoption& cce_flags, string& functional, CCE_Variables& cce_vars);
+  vector<double> get_Bader_charges_from_Bader_file(const string& Bader_file, const xstructure& structure, CCE_Variables& cce_vars);
+  vector<double> Bader_charges_to_oxidation_states(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars, string& functional);
+  void general_attempt_fixing_oxidation_states(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags);
   // assign corrections
-  void CCE_get_corrections(xoption& cce_flags, const xstructure& structure, vector<vector<double> >& corrections_atom, CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species);
-  void CCE_load_cation_corrections(CCE_Variables& cce_vars, const xstructure& structure, vector<vector<double> >& corrections_atom, const string& corrections_line, uint i);
-  void CCE_set_anion_corrections(CCE_Variables& cce_vars, const xstructure& structure, vector<vector<double> >& corrections_atom, uint i);
-  void CCE_check_get_per_super_ox_corrections(CCE_Variables& cce_vars);
+  void get_corrections(xoption& cce_flags, const xstructure& structure, vector<vector<double> >& corrections_atom, CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species);
+  void load_cation_corrections(CCE_Variables& cce_vars, const xstructure& structure, vector<vector<double> >& corrections_atom, const string& corrections_line, uint i);
+  void set_anion_corrections(CCE_Variables& cce_vars, const xstructure& structure, vector<vector<double> >& corrections_atom, uint i);
+  void check_get_per_super_ox_corrections(CCE_Variables& cce_vars);
   // apply corrections and get corrected formation enthalpies
-  void CCE_check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
-  vector<double> CCE_get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME20200213
+  void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
+  vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME20200213
   // write output and citation
-  string CCE_get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME20200213
-  string CCE_write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
-  string CCE_write_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
-  string CCE_write_citation();
+  string get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME20200213
+  string write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
+  string write_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
+  string write_citation();
   // write user instructions
-  string CCE_print_usage();
+  string print_usage();
   // aflow_cce_data.cpp load corrections and other data
-  string CCE_get_corrections_line(const string& cor_identifier);
-  string CCE_get_Bader_templates(const string& element);
+  string get_corrections_line(const string& cor_identifier);
+  string get_Bader_templates(const string& element);
 }
 
 #endif  // _AFLOW_CCE_H_

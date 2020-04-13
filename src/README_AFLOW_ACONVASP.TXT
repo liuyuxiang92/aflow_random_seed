@@ -727,7 +727,7 @@ LATTICES = (the ones with "")
         Outputs to standard out a new POSCAR file with atom
         positions in cartesian coordinates.
 
-  aflow --cce
+  aflow --cce/--cce=POSCAR --usage
         Prints user instructions for CCE.
   aflow --cce=POSCAR
         options:

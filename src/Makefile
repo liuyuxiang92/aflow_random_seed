@@ -1038,6 +1038,7 @@ check_full:
 	$(MAKE) aflowSG_check
 	$(MAKE) aflowSYM_check
 	$(MAKE) aflow_xtal_match_check
+	$(MAKE) cce_check
 proto_check:
 	@echo "Performing 'aflow --proto' test"
 	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \

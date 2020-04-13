@@ -5622,10 +5622,10 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME20190627 - END
     }
-    if(!gfound && (FILE=="POSCAR" || FILE=="CONTCAR")) {
+    if(!gfound && (FILE=="POSCAR" || FILE=="CONTCAR")) { //RF20200409
       gfound=TRUE;
       if(LDEBUG) cerr << "aflowlib::vaspfile2stringstream: FILE=" << FILE << endl;
-      string extension=".bz2,.gz,.xz,.bands,.bands.bz2,.bands.gz,.bands.xz,.static,.static.bz2,.static.gz,.static.xz,.relax2,.relax2.bz2,.relax2.gz,.relax2.xz,.relax1,.relax1.bz2,.relax1.gz,.relax1.xz";
+      string extension=".bz2,.gz,.xz,.bands,.bands.bz2,.bands.gz,.bands.xz,.static,.static.bz2,.static.gz,.static.xz,.relax2,.relax2.bz2,.relax2.gz,.relax2.xz,.relax1,.relax1.bz2,.relax1.gz,.relax1.xz"; //RF20200409
       deque<string> vtype;aurostd::string2tokens(extension,vtype,",");vtype.push_front(""); // have to add emptyness to vtype at the beginning
       //     if(LDEBUG) aurostd::execute("ls -las \""+str_dir+"\"");
       for(uint i=0;i<vtype.size();i++) {

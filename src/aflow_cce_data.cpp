@@ -15,9 +15,9 @@
 #include "aflow_cce.h"
 
 namespace cce {
-  //CCE_get_corrections_line////////////////////////////////////////////////////////
+  //get_corrections_line////////////////////////////////////////////////////////
   // function to get corrections
-  string CCE_get_corrections_line(const string& cor_identifier) {
+  string get_corrections_line(const string& cor_identifier) {
   //CCE corrections per bond for DFT formation energies for polar materials from binary data using AFLOW (PBE, LDA, SCAN, and PBE+U_ICSD) 
   //with PAW data sets for VASP 5.4.4 and measured experimental values according to the CCE paper 
   //Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019). 
@@ -134,9 +134,9 @@ namespace cce {
   else {return "";}                                                                                                      
   }
 
-  //CCE_get_Bader_templates////////////////////////////////////////////////////////
+  //get_Bader_templates////////////////////////////////////////////////////////
   // function to get Bader charges from the binaries used to determine the corrections
-  string CCE_get_Bader_templates(const string& element) {
+  string get_Bader_templates(const string& element) {
   //Bader charges of the elements obtained from binary oxides
   //for DFT+U corrections will only be included for the PBE(+U) calculations used to generate the AFLOW ICSD data
   //DFT+U calculations differ not only by the U value but also by other specifications of the implementation, see:
