@@ -1154,7 +1154,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD DOS related values DATA" << endl;
   EMIN=0.0;EMAX=0.0;SIGMA=0.0;ISMEAR=0;  // for aflowlib_libraries.cpp 
-  for(uint iline=vcontent.size()-1;iline>0;iline--)
+  for(uint iline=vcontent.size()-1;iline<vcontent.size();iline--) //CO20200404
     //  for(uint iline=0;iline<vcontent.size();iline++)
   { //CO200106 - patching for auto-indenting
     if(aurostd::substring2bool(vcontent.at(iline),"EMIN") && aurostd::substring2bool(vcontent.at(iline),"energy-range for DOS")) vline.push_back(vcontent.at(iline));
@@ -1189,7 +1189,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   LDIAG="";                     // for aflowlib_libraries.cpp
   IMIX=0;INIMIX=0;MIXPRE=0;     // for aflowlib_libraries.cpp
   AMIX=0.0;BMIX=0.0;AMIX_MAG=0.0;BMIX_MAG=0.0;AMIN=0.0;WC=0.0;  // for aflowlib_libraries.cpp
-  for(uint iline=vcontent.size()-1;iline>0;iline--)
+  for(uint iline=vcontent.size()-1;iline<vcontent.size();iline--) //CO20200404
     //  for(uint iline=0;iline<vcontent.size();iline++)
   { //CO200106 - patching for auto-indenting
     if(aurostd::substring2bool(vcontent.at(iline),"IALGO") && aurostd::substring2bool(vcontent.at(iline),"algorithm")) vline.push_back(vcontent.at(iline));
@@ -1238,7 +1238,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD Intra band minimization DATA" << endl;
   WEIMIN=0.0;EBREAK=0.0;DEPER=0.0;TIME=0.0;  // for aflowlib_libraries.cpp
-  for(uint iline=vcontent.size()-1;iline>0;iline--)
+  for(uint iline=vcontent.size()-1;iline<vcontent.size();iline--) //CO20200404
     //  for(uint iline=0;iline<vcontent.size();iline++)
   { //CO200106 - patching for auto-indenting
     if(aurostd::substring2bool(vcontent.at(iline),"WEIMIN") && aurostd::substring2bool(vcontent.at(iline),"energy-eigenvalue tresh-hold")) vline.push_back(vcontent.at(iline));
