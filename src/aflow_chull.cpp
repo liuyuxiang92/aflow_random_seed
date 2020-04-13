@@ -447,6 +447,11 @@ namespace chull {
       // STOP Jupyter notebook writing files
       ////////////////////////////////////////////////////////////////////////////
 
+      //speed ups for command line options
+      if(vpflow.flag("CHULL::DIST2HULL") || vpflow.flag("CHULL::STABILITY_CRITERION") || vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
+        vpflow.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true);
+      }
+
       ////////////////////////////////////////////////////////////////////////////
       // START Hull initialization
       ////////////////////////////////////////////////////////////////////////////

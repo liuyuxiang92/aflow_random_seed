@@ -39,6 +39,7 @@
         -- added N+1 enthalpy gain to chull pdf doc (CO)
         -- patched vbadness warnings with longtable in chull (CO)
         -- patched hull_energy sign (CO)
+        -- added chull_check to Makefile (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
