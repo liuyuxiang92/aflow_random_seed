@@ -1893,11 +1893,16 @@ namespace plotter {
 
     // Get data
     string thermo_file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
+    // ME20200413 - Since multiple data files are plotted, the user file
+    // name functions as base file name.
+    string user_file_name = plotoptions.getattachedscheme("FILE_NAME_USER");
+    plotoptions.pop_attached("FILE_NAME_USER");
     if (aurostd::EFileExist(thermo_file)) {
       string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
       plotoptions.push_attached("DATA_FILE", thermo_file);
       plotoptions.push_attached("KEYWORD", "APL_THERMO");
       vector<vector<double> > data = readAflowDataFile(plotoptions);
+      if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  // ME20200413
       for (int i = 0; i < nprops; i++) {
         plotoptions.pop_attached("YMIN");
         if (!ymin[i].empty()) plotoptions.push_attached("YMIN", ymin[i]);
