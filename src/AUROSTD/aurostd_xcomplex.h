@@ -157,7 +157,7 @@ namespace aurostd {
   // ------------------------------------------------------------ function conj
   template <class utype> // removed inline
     xcomplex<utype>  conj(const xcomplex<utype>& x) __xprototype;
-  template <class utype> // ME 180904
+  template <class utype> // ME20180904
     utype  conj(const utype& x) __xprototype;
   // ------------------------------------------------------------ function norm
   template <class utype> // removed inline
@@ -206,7 +206,7 @@ namespace aurostd {
   template <class utype> xcomplex<utype>
     sqrt(const xcomplex<utype>&) __xprototype;
 
-  // ME180907
+  // ME20180907
   // ------------------------------------------------------------ function magnitude square
   template <class utype> utype
     magsqr(const xcomplex<utype>&) __xprototype;

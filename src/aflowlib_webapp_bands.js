@@ -33,7 +33,7 @@ $(document).ready(function() {
   for (var i = 0; i < lineLabels.length; ++i) {
     var label = lineLabels[i];
     label = label.replace("G", "G");
-    label = label.replace("Sigm", "&Sigma;");	//CO190301
+    label = label.replace("Sigm", "&Sigma;");	//CO20190301
     label = label.replace("_1", "<tspan class='subScript' dy='3'>1</tspan>");
     lineLabels[i] = label;
   }
