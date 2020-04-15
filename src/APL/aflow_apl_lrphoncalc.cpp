@@ -291,7 +291,7 @@ namespace apl {
   // ME200212
   void LinearResponsePC::saveState(const string& filename) {
     string function = "apl::LinearResponsePC::saveState()";
-    string message = "Saving state of the phonon calculator into " + filename + ".";
+    string message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";

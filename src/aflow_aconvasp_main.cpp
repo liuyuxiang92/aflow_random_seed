@@ -926,7 +926,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDISP", "--plotphdisp=|--plotphonondispersion=|--pphdis=", "./");
   }
   if (aurostd::args2flag(argv, cmds, "--plotphdispdos")) {
-    vpflow.flag("PLOT_PHDISPDOS");
+    vpflow.flag("PLOT_PHDISPDOS", true);
     vpflow.addattachedscheme("PLOT_PHDISPDOS", "./", true);
   } else {
     vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDISPDOS", "--plotphdispdos=", "./");

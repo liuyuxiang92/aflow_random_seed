@@ -2289,8 +2289,8 @@ namespace KBIN {
           double idos_percent = 100.0 * idos[i]/idos.back();
           // Cannot use std::setprecision with apl:logger, so use this workaround.
           stringstream percent;
-          percent << std::dec << std::setprecision(1) << idos_percent;
-          logger << apl::warning << "There are negative frequencies in the phonon DOS, covering "
+          percent << std::fixed << std::setprecision(1) << idos_percent;
+          logger << apl::warning << "There are imaginary frequencies in the phonon DOS, covering "
             << percent.str() << "\% of the integrated DOS. These frequencies were omitted in the "
             << "calculation of thermodynamic properties." << apl::endl;
         }
