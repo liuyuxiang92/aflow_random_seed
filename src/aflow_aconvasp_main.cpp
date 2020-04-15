@@ -522,7 +522,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   vpflow.flag("CORNERS",aurostd::args2flag(argv,cmds,"--corner|--corners"));
 
-  // [OBSOLETE] DX20170901 vpflow.flag("DATA",aurostd::args2flag(argv,cmds,"--data"));
+  // DX20170901 [OBSOLETE] vpflow.flag("DATA",aurostd::args2flag(argv,cmds,"--data"));
   vpflow.args2addattachedscheme(argv,cmds,"DATA","--data=",""); // DX20170901 - SGDATA + JSON
   if(vpflow.flag("DATA")){ // DX20170901 - SGDATA + JSON
     vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); // DX20170901 - SGDATA + JSON
@@ -546,7 +546,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("DIST",aurostd::args2flag(argv,cmds,"--dist"));
   vpflow.args2addattachedscheme(argv,cmds,"DIST","--dist=","");
 
-  // [OBSOLETE] DX20170901 vpflow.flag("EDATA",aurostd::args2flag(argv,cmds,"--edata"));
+  // DX20170901 [OBSOLETE] vpflow.flag("EDATA",aurostd::args2flag(argv,cmds,"--edata"));
   vpflow.args2addattachedscheme(argv,cmds,"EDATA","--edata=",""); // DX20170901 - SGDATA + JSON
   if(vpflow.flag("EDATA")){ // DX20170901 - SGDATA + JSON
     vpflow.flag("DATA::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); // DX20170901 - SGDATA + JSON
@@ -1402,7 +1402,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"POMASS::ATOM","--pomass_atom=|--POMASS_ATOM=|--pomassatom=|--POMASSATOM=","");
 
   //Richard's symmetry functions (RHT)
-  // DX START
+  // DX - START
   vpflow.flag("ORTHODEFECT_RHT",aurostd::args2flag(argv,cmds,"--OrthoDefect"));  //RHT
   vpflow.flag("REVERSE_SPACEGROUP_RHT",aurostd::args2flag(argv,cmds,"--revsg")); //RHT
   vpflow.flag("PRIMITIVE_LATTICE_RHT",aurostd::args2flag(argv,cmds, "--primr | --fastprimitivecell | --fprim")); //RHT
@@ -1426,7 +1426,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE]  vpflow.flag("AFLOWSG",aurostd::args2flag(argv,cmds, "--aflowSG")); //RHT  // FIX
   // end Richard's symmetry (RHT)
   // WE MIGHT NEED TO PUT THEM AROUND IN ALPHABETIC ORDER, keep the //RHT
-  // DX END
+  // DX - END
 
   // *************************************
   // cluster expansion method
@@ -1688,7 +1688,7 @@ namespace pflow {
       if(vpflow.flag("CE::SUPERLATTICE")) {pflow::Superlattice(vpflow.getattachedscheme("CE::SUPERLATTICE")); _PROGRAMRUN=true;}
       if(vpflow.flag("CE::SQS")) {pflow::SQS(vpflow.getattachedscheme("CE::SQS")); _PROGRAMRUN=true;}
       // D
-      // [OBSOLETE] DX20170901 if(vpflow.flag("DATA")) {pflow::DATA("DATA",cin); _PROGRAMRUN=true;}
+      // DX20170901 [OBSOLETE] if(vpflow.flag("DATA")) {pflow::DATA("DATA",cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA")) {pflow::DATA("DATA",cin,vpflow,cout); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA1")) {pflow::DATA1(vpflow.getattachedscheme("DATA1"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("DATA2")) {pflow::DATA2(cin); _PROGRAMRUN=true;}
@@ -1698,7 +1698,7 @@ namespace pflow {
       if(vpflow.flag("DIST")) {pflow::DIST(vpflow.getattachedscheme("DIST"),cin); _PROGRAMRUN=true;}
       //if(DYNADIEL) {pflow::DYNADIEL(argv) ; _PROGRAMRUN=true ;} // CAMILO
       // E
-      // [OBSOLETE] DX20170901 if(vpflow.flag("EDATA")) {pflow::DATA("EDATA",cin); _PROGRAMRUN=true;}
+      // DX20170901 [OBSOLETE] if(vpflow.flag("EDATA")) {pflow::DATA("EDATA",cin); _PROGRAMRUN=true;}
       if(vpflow.flag("EDATA")) {pflow::DATA("EDATA",cin,vpflow,cout); _PROGRAMRUN=true;}
       if(vpflow.flag("EDOS")) {pflow::EDOS(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("EFFMASS")) { pflow::EFFMASS(argv, cout) ; _PROGRAMRUN=true ; } // CAMILO
@@ -1992,7 +1992,7 @@ namespace pflow {
       // [OBSOLETE]       bool WRITE=TRUE;
       //DX20180807 [OBSOLETE] ofstream File("/dev/null");
       //DX20180807 [OBSOLETE] bool verbose=TRUE;
-      // DX START 
+      // DX - START 
       //WYCCAR FUNCTIONS (AUTO and MANUAL)
       // [OBSOLETE]      if(vpflow.flag("WYCCAR_RHT")) {initsymmats();initglides();initsymops();SetTolerance(argv);
       // [OBSOLETE]   xstructure str(cin); str.SpaceGroup_ITC(false,argv);printWyccar(File,str,aflags,WRITE,verbose,cout); _PROGRAMRUN=true;}
@@ -2003,7 +2003,7 @@ namespace pflow {
       //[OBSOLETE] (DX)if(vpflow.flag("WYCCAR_MANUAL_RHT")) {// [OBSOLETE] initsymmats();initglides();initsymops();SetTolerance(argv);
       //[OBSOLETE] (DX)  xstructure str(cin); double tolerance=0.001; int man_int=-1; if(argv.size()==2) {tolerance=0.001;}; if(argv.size()>=3) {tolerance=atof(argv.at(2).c_str()); man_int=atof(argv.at(3).c_str());}; str.SpaceGroup_ITC(tolerance,man_int); printWyccar(File,str,verbose,cout); _PROGRAMRUN=true;}
       //End Richard's Functions
-      // DX END
+      // DX - END
 
     }
     // *********************************************************************
@@ -3147,7 +3147,7 @@ namespace pflow {
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+vext.at(i)) || //DX20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+vext.at(i)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+vext.at(i)) || // DX20180117 - added pgroupk_xtal
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+vext.at(i)) || // DX20180118 - added pgroupk_xtal
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+vext.at(i)) ||
@@ -3158,7 +3158,7 @@ namespace pflow {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT+"*");} //DX20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+"*");} // DX20180117 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT+"*");} // DX20180118 - added pgroupk_xtal
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT+"*");}
@@ -3169,7 +3169,7 @@ namespace pflow {
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+vext.at(i)) || //DX20200129
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+vext.at(i)) ||
-            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+vext.at(i)) || // DX20180117 - added pgroupk_xtal
+            aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+vext.at(i)) || // DX20180118 - added pgroupk_xtal
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+vext.at(i)) ||
             aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+vext.at(i)) ||
@@ -3180,7 +3180,7 @@ namespace pflow {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)){   aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON+"*");} //DX20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON+"*");}
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+"*");} // DX20180117 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON+"*");} // DX20180118 - added pgroupk_xtal
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON+"*");}
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+vext.at(i)) || aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON)){ aurostd::RemoveFile(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON+"*");}
@@ -3202,7 +3202,7 @@ namespace pflow {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT,DEFAULT_KZIP_BIN); //DX20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT,DEFAULT_KZIP_BIN);
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,DEFAULT_KZIP_BIN); // DX20180117 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT,DEFAULT_KZIP_BIN); // DX20180118 - added pgroupk_xtal
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_FGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_SGROUP_OUT,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_AGROUP_OUT,DEFAULT_KZIP_BIN);
@@ -3213,7 +3213,7 @@ namespace pflow {
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON,DEFAULT_KZIP_BIN); //DX20200129
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_JSON,DEFAULT_KZIP_BIN);
-        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,DEFAULT_KZIP_BIN); // DX20180117 - added pgroupk_xtal
+        if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_JSON,DEFAULT_KZIP_BIN); // DX20180118 - added pgroupk_xtal
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_FGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_SGROUP_JSON,DEFAULT_KZIP_BIN);
         if(aurostd::FileExist(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON)) aurostd::CompressFile(directory+"/"+DEFAULT_AFLOW_AGROUP_JSON,DEFAULT_KZIP_BIN);
@@ -6259,7 +6259,7 @@ namespace pflow {
         }
       } // DX20170814
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL){ // DX20171205 - Added pgroupk_xtal
-        if(!SYM::CalculatePointGroupKCrystal(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE,osswrite,oss,format)){ // DX20180117 - PGROUPK_XTAL not PGROUPK
+        if(!SYM::CalculatePointGroupKCrystal(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE,osswrite,oss,format)){ // DX20180118 - PGROUPK_XTAL not PGROUPK
           if(!no_scan){
             a.ClearSymmetry();
             // DX20170905 [OBSOLETE] if(!SYM::change_tolerance(a,a.sym_eps,orig_tolerance,change_sym_count,min_dist,no_scan))
@@ -13100,13 +13100,13 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::LIST\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::LIST") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.getattachedscheme((\"AFLOWIN_FLAG::LIST_VCMD\")=" << PARAMS.vparams.getattachedscheme("AFLOWIN_FLAG::LIST_VCMD") << endl;
 
-    // DX20180117 - Add ANRL functionality - START
+    // DX20180118 - Add ANRL functionality - START
     // check params
     if(LDEBUG) cerr << soliloquy << " CHECK PARAMS" << endl;
     PARAMS.vparams.flag("AFLOWIN_FLAG::PARAMS",vpflow.flag("PARAMS"));
     if(vpflow.flag("PARAMS")) PARAMS.vparams.push_attached("AFLOWIN_FLAG::PARAMS",vpflow.getattachedscheme("PARAMS"));
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::PARAMS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::PARAMS") << endl;
-    // DX20180117 - Add ANRL functionality - END
+    // DX20180118 - Add ANRL functionality - END
 
     //DX20190227 - add anrl lattice parameter flag - START
     PARAMS.vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM",vpflow.flag("PROTO::USE_ANRL_LATTICE_PARAM"));
@@ -13203,7 +13203,7 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::AUTONOLDAU\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::AUTONOLDAU") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::STDOUT\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::STDOUT") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::LIST\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::LIST") << endl;
-    if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::PARAMS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::PARAMS") << endl; // DX20180117 - Added ANRL functionality
+    if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::PARAMS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::PARAMS") << endl; // DX20180118 - Added ANRL functionality
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::POCC_PARAMS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::POCC_PARAMS") << endl; //CO20181226
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::POCC_TOL\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::POCC_TOL") << endl; //CO20181226
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.getattachedscheme((\"AFLOWIN_FLAG::LIST_VCMD\")=" << PARAMS.vparams.getattachedscheme("AFLOWIN_FLAG::LIST_VCMD") << endl;
@@ -13896,7 +13896,7 @@ namespace pflow {
     // AFLOW ENGINE RHT
     if(mode=="AFLOW" || mode=="aflow") { // RHT
       if(LDEBUG) cerr << "pflow::SG: aflow" << endl;
-      // DX START
+      // DX - START
       a.ReScale(1.0);
       // DX20170921 - MAGNETIC SYMMETRY - START
       if(vpflow.flag("SG::MAGNETIC")){
@@ -13904,21 +13904,21 @@ namespace pflow {
         ProcessAndAddSpinToXstructure(a, magmom_info); //DX20191108 - condensed into a single function
       }
       // DX20170921 - MAGNETIC SYMMETRY - END
-      // [OBSOLETE] DX20170921 - double default_tolerance=SYM::defaultTolerance(a);
-      // [OBSOLETE] DX20170921 - double tolerance = default_tolerance;
-      // [OBSOLETE] DX20170921 - if(tokens.size()==0) {tolerance=default_tolerance;}
-      // [OBSOLETE] DX20170921 -if(tokens.size()>=1 && tokens.at(0) != "--debug") {
-      // [OBSOLETE] DX20170921 -  if(tokens.at(0).at(0) == 't' || tokens.at(0).at(0) == 'T'){ //Tight
-      // [OBSOLETE] DX20170921 -    tolerance=default_tolerance;
-      // [OBSOLETE] DX20170921 -  }
-      // [OBSOLETE] DX20170921 -  else if(tokens.at(0).at(0) == 'l' || tokens.at(0).at(0) == 'L'){ //Loose
-      // [OBSOLETE] DX20170921 -    tolerance=default_tolerance*10.0;
-      // [OBSOLETE] DX20170921 -  }
-      // [OBSOLETE] DX20170921 -  else {
-      // [OBSOLETE] DX20170921 -    tolerance=aurostd::string2utype<double>(tokens.at(0));
-      // [OBSOLETE] DX20170921 -  }
-      // [OBSOLETE] DX20170921 -}
-      // DX END
+      // DX [OBSOLETE] 9/21/17 - double default_tolerance=SYM::defaultTolerance(a);
+      // DX [OBSOLETE] 9/21/17 - double tolerance = default_tolerance;
+      // DX [OBSOLETE] 9/21/17 - if(tokens.size()==0) {tolerance=default_tolerance;}
+      // DX [OBSOLETE] 9/21/17 -if(tokens.size()>=1 && tokens.at(0) != "--debug") {
+      // DX [OBSOLETE] 9/21/17 -  if(tokens.at(0).at(0) == 't' || tokens.at(0).at(0) == 'T'){ //Tight
+      // DX [OBSOLETE] 9/21/17 -    tolerance=default_tolerance;
+      // DX [OBSOLETE] 9/21/17 -  }
+      // DX [OBSOLETE] 9/21/17 -  else if(tokens.at(0).at(0) == 'l' || tokens.at(0).at(0) == 'L'){ //Loose
+      // DX [OBSOLETE] 9/21/17 -    tolerance=default_tolerance*10.0;
+      // DX [OBSOLETE] 9/21/17 -  }
+      // DX [OBSOLETE] 9/21/17 -  else {
+      // DX [OBSOLETE] 9/21/17 -    tolerance=aurostd::string2utype<double>(tokens.at(0));
+      // DX [OBSOLETE] 9/21/17 -  }
+      // DX [OBSOLETE] 9/21/17 -}
+      // DX - END
       double default_tolerance=SYM::defaultTolerance(a);
       double tolerance = AUROSTD_NAN;
       if(vpflow.flag("SG::TOLERANCE")){

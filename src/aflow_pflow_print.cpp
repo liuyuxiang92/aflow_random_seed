@@ -1065,7 +1065,7 @@ namespace pflow {
           oss << " Real space: Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
           oss << " Real space: Superlattice Variation           = " << str_aus.bravais_superlattice_variation_type << endl;
           // DX oss << " Real space: Superlattice System              = " << str_aus.bravais_lattice_system << endl;
-          oss << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; // DX fixed mistake in line above
+          oss << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; // DX - fixed mistake in line above
           oss << " Real space: Pearson Symbol Superlattice      = " << str_aus.pearson_symbol_superlattice << endl;
           }
           oss << "RECIPROCAL LATTICE" << endl;

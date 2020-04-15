@@ -702,7 +702,7 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
   // remove structure information
   structures_duplicate_names.erase(structures_duplicate_names.begin()+index);
   structures_duplicate_compounds.erase(structures_duplicate_compounds.begin()+index); //DX20190111 - added compound, e.g., Ag1Br2
-  // DX may need to be careful here.  If we have a mix of generated and non-generated, we may have difficulties
+  // DX - may need to be careful here.  If we have a mix of generated and non-generated, we may have difficulties
   if(structures_duplicate_generated[index]){
     structures_duplicate.erase(structures_duplicate.begin()+index);
   }
@@ -1278,7 +1278,7 @@ namespace compare {
     else if(structure_from=="aurl"){
       aflowlib::_aflowlib_entry entry; entry.aurl = structure_name; 
       //DX20190326 - need to put url path, i.e., structure name, [OBSOLETE] if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;}
-      //DX B4 20191105 - if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX20190326
+      //DX ORIG B4 20191105 - if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX20190326
       if(!pflow::loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (aurl=" << entry.aurl << ") ... skipping..." << endl; return false;} //DX20191105
       if(entry.vstr.size()==1){
         structure = entry.vstr[0];
@@ -3497,11 +3497,11 @@ namespace compare{
                //vsgroups[i] == comparison_schemes[j].space_group &&
                matchableSpaceGroups(vsgroups[i],comparison_schemes[j].space_group) &&
                matchableWyckoffPositions(vgrouped_Wyckoff_positions[i], comparison_schemes[j].grouped_Wyckoff_positions,same_species)))){
-                 //DX if(same_material_stoich==true && 
-                 //DX   vstoichs[i] == comparison_schemes[j].stoichiometry && 
-                 //DX   vpearsons[i] == comparison_schemes[j].Pearson && 
-                 //DX   vsgroups[i] == comparison_schemes[j].space_group &&
-                 //DX   matchableWyckoffPositions(vgrouped_Wyckoff_positions[i], comparison_schemes[j].grouped_Wyckoff_positions,same_species)){ //[CO200106 - close bracket for indenting]}
+                 //DX ORIG if(same_material_stoich==true && 
+                 //DX ORIG   vstoichs[i] == comparison_schemes[j].stoichiometry && 
+                 //DX ORIG   vpearsons[i] == comparison_schemes[j].Pearson && 
+                 //DX ORIG   vsgroups[i] == comparison_schemes[j].space_group &&
+                 //DX ORIG   matchableWyckoffPositions(vgrouped_Wyckoff_positions[i], comparison_schemes[j].grouped_Wyckoff_positions,same_species)){ //[CO200106 - close bracket for indenting]}
                  if(same_species==false){
                    for(uint e=0;e<vvelements[i].size();e++){
                      bool already_in=false;
@@ -3791,7 +3791,7 @@ namespace compare{
 //DX [OBSOLETE]    // ========== Check final_prototypes ========== //
 //DX [OBSOLETE]    // It is possible that two prototypes are the same regardless 
 //DX [OBSOLETE]    // of having different space groups.
-//DX [OBSOLETE]    //DX BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
+//DX [OBSOLETE]    //DX - BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
 //DX [OBSOLETE] 
 //DX [OBSOLETE]    message << "Number of unique prototypes: " << final_prototypes.size() << " (out of " << vxstrs.size() << " structures).";
 //DX [OBSOLETE]    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
@@ -4529,7 +4529,7 @@ namespace compare{
 
     // append new prototype groupings
     compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX20200103
-    //DX20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
+    //DX ORIG 20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
     return final_prototypes;
   }
 }
@@ -5802,7 +5802,7 @@ namespace compare{
 // DX20191122 [MOVED TO XATOM]               // ---------------------------------------------------------------------------
 // DX20191122 [MOVED TO XATOM]               // if new distance is close to the original it is the same coordination shell (add to coordination)
 // DX20191122 [MOVED TO XATOM]               // otherwise, reset coordination shell
-// DX20191122 [MOVED TO XATOM]               // DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+// DX20191122 [MOVED TO XATOM]               // DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
 // DX20191122 [MOVED TO XATOM]               if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
 // DX20191122 [MOVED TO XATOM]               else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
 // DX20191122 [MOVED TO XATOM]               min_dist=tmp_mod;
@@ -5815,7 +5815,7 @@ namespace compare{
 // DX20191122 [MOVED TO XATOM]                 frequency=0; //reset
 // DX20191122 [MOVED TO XATOM]               }
 // DX20191122 [MOVED TO XATOM]             }
-// DX20191122 [MOVED TO XATOM]             // DX FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+// DX20191122 [MOVED TO XATOM]             // DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
 // DX20191122 [MOVED TO XATOM]             else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
 // DX20191122 [MOVED TO XATOM]           }
 // DX20191122 [MOVED TO XATOM]         }
@@ -5877,12 +5877,12 @@ namespace compare{
 // DX20191122 [MOVED TO XATOM]               tmp = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
 // DX20191122 [MOVED TO XATOM]               double tmp_mod = aurostd::modulus(tmp);
 // DX20191122 [MOVED TO XATOM]               if(tmp_mod<min_dist){
-// DX20191122 [MOVED TO XATOM]                 //DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+// DX20191122 [MOVED TO XATOM]                 //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
 // DX20191122 [MOVED TO XATOM]                 if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
 // DX20191122 [MOVED TO XATOM]                 else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
 // DX20191122 [MOVED TO XATOM]                 min_dist=tmp_mod;
 // DX20191122 [MOVED TO XATOM]               }
-// DX20191122 [MOVED TO XATOM]               //DX FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+// DX20191122 [MOVED TO XATOM]               //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
 // DX20191122 [MOVED TO XATOM]               else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
 // DX20191122 [MOVED TO XATOM]             }
 // DX20191122 [MOVED TO XATOM]           }
@@ -6070,7 +6070,7 @@ namespace compare{
           }
         }
         // Need to find the min distance; thus check distance between neighboring cells to find true minimum.
-        //DX running vector in each loop saves computations; fewer duplicate operations
+        //DX - running vector in each loop saves computations; fewer duplicate operations
         if(incell_mod>0.25){
           for(uint m=0;m<l1.size();m++){
             xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
@@ -6547,7 +6547,7 @@ namespace compare{
         // ---------------------------------------------------------------------------
         // check frequency of distance
         // this is sensitive to tolerance of cutoff; use with caution
-        // DX THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.neighbor_frequencies[j]){ continue; }
+        // DX - THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.neighbor_frequencies[j]){ continue; }
 
         // ---------------------------------------------------------------------------
         // exact match 
@@ -6723,15 +6723,15 @@ namespace compare{
 // DX20191122 [MOVED TO XATOM]         LFA_env.type_center = xstr.atoms[i].type;
 // DX20191122 [MOVED TO XATOM] 
 // DX20191122 [MOVED TO XATOM]         for(uint j=0;j<LFAs.size();j++)
-// DX20191122 [MOVED TO XATOM]         //DX for(uint j=0;j<xstr.species.size();j++)
+// DX20191122 [MOVED TO XATOM]         //DX ORIG for(uint j=0;j<xstr.species.size();j++)
 // DX20191122 [MOVED TO XATOM]         { //CO200106 - patching for auto-indenting
 // DX20191122 [MOVED TO XATOM]           //if(xstr.species[j]!=lfa){
 // DX20191122 [MOVED TO XATOM]             uint frequency = 0;
 // DX20191122 [MOVED TO XATOM]             vector<xvector<double> > coordinates;
-// DX20191122 [MOVED TO XATOM]             //DX LFA_env.elements_neighbor.push_back(xstr.species[j]);
+// DX20191122 [MOVED TO XATOM]             //DX ORIG LFA_env.elements_neighbor.push_back(xstr.species[j]);
 // DX20191122 [MOVED TO XATOM]             LFA_env.elements_neighbor.push_back(LFAs[j]); //TEST 
 // DX20191122 [MOVED TO XATOM]             LFA_env.types_neighbor.push_back(j);
-// DX20191122 [MOVED TO XATOM]             //DX LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,xstr.species[j]));
+// DX20191122 [MOVED TO XATOM]             //DX ORIG LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,xstr.species[j]));
 // DX20191122 [MOVED TO XATOM]             LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,LFAs[j])); //TEST
 // DX20191122 [MOVED TO XATOM]             LFA_env.coordinations_neighbor.push_back(frequency);
 // DX20191122 [MOVED TO XATOM]             LFA_env.coordinates_neighbor.push_back(coordinates);
@@ -7319,7 +7319,7 @@ namespace compare{
     string function_name = "compare::latticeAndOriginSearch()";
 
     bool test_one_lfa_only = false; //DX20190318
-    //DX SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
+    //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
 
     bool magnetic_analysis = (xstr1.atoms[0].spin_is_given || xstr1.atoms[0].noncoll_spin_is_given);
     min_misfit_info.is_magnetic_misfit=(magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_); //DX20191218

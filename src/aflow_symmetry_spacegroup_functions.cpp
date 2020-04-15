@@ -1441,7 +1441,7 @@ namespace SYM {
 // ******************************************************************************
 // mod_one (Modify double by 1; to keep in unit cell)
 // ******************************************************************************
-// [OBSOLETE] DX20170809
+// DX OBSOLETE? 9/8/17
 //namespace SYM {
 //double mod_one(double d) {
 ////double delta=1e-6;
@@ -3091,7 +3091,7 @@ namespace SYM {
                   //cerr << endl;
                   first_wyckoff = false;
                   // ========== Store Wyckoff Position ========== //
-                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX20171211 - need to updated coord to include non-parametrized Wyckoff positions
+                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX20171212 - need to updated coord to include non-parametrized Wyckoff positions
                   tmp_Wyckoff_site.type = tmp_equivalent_atoms_shifted[ix].name;
                   //DX20191010 - update partial occupation value - START
                   if(CCell.partial_occupation_flag){
@@ -3225,7 +3225,7 @@ namespace SYM {
           atomicbasis = atoms_tmp;
           CCell.atoms = atoms_tmp;
           i = -1;
-          found_position=0; // DX20170911
+          found_position=0; // DX20170912
         } 
         else {
           break;

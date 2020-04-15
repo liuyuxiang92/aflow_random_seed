@@ -2238,7 +2238,7 @@ namespace KBIN {
     // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {
     //  if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
     // }
-    //DX20180501 - CMU EULER - END
+    //DX20180502 - CMU EULER - END
 
     // for reducint CPUs on the fly
     if(aflags.AFLOW_GLOBAL_NCPUS<0) kflags.KBIN_MPI_NCPUS=-aflags.AFLOW_GLOBAL_NCPUS; // this to force things on reducing CPUS
