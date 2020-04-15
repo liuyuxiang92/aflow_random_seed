@@ -43,7 +43,6 @@ namespace cce {
   // for reading input, analyzing structure, determining oxidation numbers, assigning corrections, 
   // calculating total corrections and corrected formation enthalpies, and writing output
   void write_corrections(aurostd::xoption& flags, ostream& oss) {
-    //bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
 
     /************************************/
     // Print user instructions
@@ -59,8 +58,13 @@ namespace cce {
     /************************************/
     //read structural data from structure file provided on command line
     xstructure structure=read_structure(flags.getattachedscheme("CCE_CORRECTION::POSCAR_PATH"));
+
+    return write_corrections(structure, flags);
+  }
+
+  void write_corrections(xstructure& structure, aurostd::xoption& flags) {
     aurostd::xoption cce_flags = init_flags();
-    if(!flags.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty() && !aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))){ // when POSCAR_PATH is provided the command line must have called the function instead of another part of AFLOW
+    if(!(aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") && !aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))){ // additional output like oxidation numbers should not be provided for tests and json
       cce_flags.flag("COMMAND_LINE",TRUE);
     }
     CCE_Variables cce_vars = init_variables(structure);
@@ -73,18 +77,20 @@ namespace cce {
     /********************************************************/
     // Read oxidation numbers if provided
     /********************************************************/
-    cce_flags.flag("OX_NUMS_PROVIDED",FALSE);
     if(flags.flag("CCE_CORRECTION::OXIDATION_NUMBERS")){
       cce_vars.oxidation_states = get_oxidation_states(flags.getattachedscheme("CCE_CORRECTION::OXIDATION_NUMBERS"), structure, cce_flags, cce_vars);
       cce_flags.flag("OX_NUMS_PROVIDED",TRUE);
     }
 
+    return write_corrections(structure, flags, cce_flags, cce_vars);
+  }
+
+  void write_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     /********************************************************/
     // Get CCE corrections
     /********************************************************/
     // obtain total CCE corrections per cell from CCE core function only based on
     // structure, oxidation numbers and functional information
-    cce_flags.flag("CORRECTABLE",TRUE); // first assuming that formation energy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
     CCE_core(structure, cce_vars, cce_flags);
 
     // CALCULATE CORRECTED FORMATION ENTHALPIES AT 298.15 AND 0K ###################################
@@ -122,42 +128,11 @@ namespace cce {
   //write_corrections///////////////////////////////////////////////////////////////////////
   // ME20200213
   // For poscar2cce
-  void write_corrections(aurostd::xoption& flags, std::istream& ist, ostream& oss) {
-    // initialize
-    aurostd::xoption cce_flags = init_flags();
-    if (!(aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON")) {
-      cce_flags.flag("COMMAND_LINE", true);
-    }
+  void write_corrections(aurostd::xoption& flags, std::istream& ist) {
+    // read structure
+    xstructure structure=read_structure(ist);
 
-    xstructure structure(ist);
-    structure.ReScale(1.0);
-    CCE_Variables cce_vars = init_variables(structure);
-
-    // Get DFT energies
-    get_dft_form_energies_functionals(flags.getattachedscheme("CCE_CORRECTION::DFT_FORMATION_ENERGIES"), flags.getattachedscheme("CCE_CORRECTION::FUNCTIONALS"), cce_vars); //provide precalc. DFT formation energies & corresponding functionals
-
-    // Get oxidation states
-    if(flags.flag("CCE_CORRECTION::OXIDATION_NUMBERS")) {
-      cce_vars.oxidation_states = get_oxidation_states(flags.getattachedscheme("CCE_CORRECTION::OXIDATION_NUMBERS"), structure, cce_flags, cce_vars);
-      cce_flags.flag("OX_NUMS_PROVIDED",TRUE);
-    }
-
-    // Run main CCE function to determine correction
-    CCE_core(structure, cce_vars, cce_flags);
-    if (cce_flags.flag("CORRECTABLE")) {
-      cce_vars.cce_form_energy_cell = get_formation_enthalpies(cce_vars.cce_correction, cce_vars);
-
-      if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-        oss << get_JSON(structure, cce_vars) << std::endl;
-      } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
-        oss << write_test_output(cce_vars, cce_vars.cce_form_energy_cell) << std::endl;
-      } else {
-        // write CCE corrections & corrected formation enthalpies per cell and atom
-        oss << write_output(structure, cce_vars, cce_vars.cce_form_energy_cell);
-        // write CCE citation
-        oss << write_citation();
-      }
-    }
+    return write_corrections(structure, flags);
   }
 
 
@@ -378,11 +353,25 @@ namespace cce {
   //read_structure////////////////////////////////////////////////////////
   // read structural data from structure file provided on command line
   xstructure read_structure(const string& structure_file, int mode){ // first argument can be directly structure_file and not structure_file_path
-    bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::read_structure():";
     stringstream message;
     //string structure_file = aurostd::file2string(structure_file_path); // first argument of read_structure_function does not need to be converted to string since it contains already the file content and not only the file name
     xstructure structure(structure_file, mode);
+    return read_structure(structure);
+  }
+
+  //read_structure////////////////////////////////////////////////////////
+  // read structural data from istream
+  xstructure read_structure(std::istream& ist){
+    string soliloquy="cce::read_structure():";
+    xstructure structure(ist);
+    return read_structure(structure);
+  }
+
+  xstructure read_structure(xstructure& structure){
+    bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
+    string soliloquy="cce::read_structure():";
+    stringstream message;
     structure.ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
     //let the program spit out what it thinks (input structure)
     if(LDEBUG){
@@ -669,7 +658,7 @@ namespace cce {
   aurostd::xoption init_flags() {
     aurostd::xoption flags;
     flags.flag("COMMAND_LINE", false);
-    flags.flag("CORRECTABLE", true);
+    flags.flag("CORRECTABLE", true); // first assuming that formation energy of system IS correctable; will be set to not correctable if, for any atom, no correction can be identified
     flags.flag("OX_NUMS_PROVIDED", false);
     flags.flag("MULTI_ANION_SYSTEM", false);
     flags.flag("O_MULTI_ANION_SPECIES", false); // whether one of the multi anion species is O for which per/superoxide tests need to be made
@@ -1298,85 +1287,84 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::treat_SbO2_special_case():";
     stringstream message;
-    if ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Sb") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Sb" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) ) {
-      uint num_O_before_Sb;
-      if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Sb" ) {
-        num_O_before_Sb=4;
-      } else {
-        num_O_before_Sb=0;
+    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Sb") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Sb" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
+    uint num_O_before_Sb;
+    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Sb" ) {
+      num_O_before_Sb=4;
+    } else {
+      num_O_before_Sb=0;
+    }
+    double amount_Sb=0;
+    double amount_O=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "Sb"){
+        amount_Sb+=1;
+      } else if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
       }
-      double amount_Sb=0;
-      double amount_O=0;
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of Sb ions= " << amount_Sb << endl;
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+    }
+    double Sb_O_ratio;
+    if ( amount_O != 0 ){
+      Sb_O_ratio=amount_Sb/amount_O;
+    } else {
+      message << "Amount of O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
+    if ( aurostd::isequal(Sb_O_ratio,0.5) ){
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+        oss << "WARNING: This system is identified as a mixed valence compound." << endl;
+        oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
+        oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
+        oss << "Sb2O4 with ratio of Sb/O= " << Sb_O_ratio << endl;
+      }
+      uint num_formula_units_in_cell;
+      num_formula_units_in_cell=structure.atoms.size()/6; // 6 for Sb2O4
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+      }
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
         if (structure.atoms[i].cleanname == "Sb"){
-          amount_Sb+=1;
-        } else if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
-        }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of Sb ions= " << amount_Sb << endl;
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-      }
-      double Sb_O_ratio;
-      if ( amount_O != 0 ){
-        Sb_O_ratio=amount_Sb/amount_O;
-      } else {
-        message << "Amount of O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      }
-      if ( aurostd::isequal(Sb_O_ratio,0.5) ){
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING: This system is identified as a mixed valence compound." << endl;
-          oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
-          oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
-          oss << "Sb2O4 with ratio of Sb/O= " << Sb_O_ratio << endl;
-        }
-        uint num_formula_units_in_cell;
-        num_formula_units_in_cell=structure.atoms.size()/6; // 6 for Sb2O4
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-        }
-        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-          if (structure.atoms[i].cleanname == "Sb"){
-            // taking the first Sb ions as +3 (without knowing whether they are actually +3); works only because 
-            // the number of bonds for them will be adjusted to 4 as needed for Sb2O4 disregarding the actual 
-            // number of Sb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-            if ( i < (1+num_O_before_Sb)*num_formula_units_in_cell ){  // (1 Sb3+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
-              cce_vars.oxidation_states[i]=+3;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+3 " << endl;
-              }
-              cce_vars.num_neighbors[i]=4; // for Sb2O4 the Sb3+ ions are 4-fold coordinated by oxygen
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+3: " << cce_vars.num_neighbors[i] << endl;
-              }
-            } else {
-              cce_vars.oxidation_states[i]=5;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+5 " << endl;
-              }
-              cce_vars.num_neighbors[i]=6; // for Sb2O4 the Sb5+ ions are 6-fold coordinated by oxygen
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+5: " << cce_vars.num_neighbors[i] << endl;
-              }
+          // taking the first Sb ions as +3 (without knowing whether they are actually +3); works only because 
+          // the number of bonds for them will be adjusted to 4 as needed for Sb2O4 disregarding the actual 
+          // number of Sb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+          if ( i < (1+num_O_before_Sb)*num_formula_units_in_cell ){  // (1 Sb3+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
+            cce_vars.oxidation_states[i]=+3;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+3 " << endl;
+            }
+            cce_vars.num_neighbors[i]=4; // for Sb2O4 the Sb3+ ions are 4-fold coordinated by oxygen
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+3: " << cce_vars.num_neighbors[i] << endl;
+            }
+          } else {
+            cce_vars.oxidation_states[i]=5;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+5 " << endl;
+            }
+            cce_vars.num_neighbors[i]=6; // for Sb2O4 the Sb5+ ions are 6-fold coordinated by oxygen
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+5: " << cce_vars.num_neighbors[i] << endl;
             }
           }
         }
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-        }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Sb-O binary with Sb/O ratio 0.5 the above set oxidation states should always work
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        } else {
-          cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-        }
+      }
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+      }
+      // print oxidation numbers and calculate sum
+      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+      // system should not be regarded correctable if sum over oxidation states is not zero
+      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Sb-O binary with Sb/O ratio 0.5 the above set oxidation states should always work
+        cce_flags.flag("CORRECTABLE",FALSE);
+        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+      } else {
+        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
       }
     }
   }
@@ -1388,85 +1376,84 @@ namespace cce {
     string soliloquy="cce::treat_Pb3O4_special_case():";
     stringstream message;
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
-    if ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Pb") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Pb" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) ) {
-      uint num_O_before_Pb;
-      if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Pb" ) {
-        num_O_before_Pb=4;
-      } else {
-        num_O_before_Pb=0;
+    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Pb") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Pb" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
+    uint num_O_before_Pb;
+    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Pb" ) {
+      num_O_before_Pb=4;
+    } else {
+      num_O_before_Pb=0;
+    }
+    double amount_Pb=0;
+    double amount_O=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "Pb"){
+        amount_Pb+=1;
+      } else if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
       }
-      double amount_Pb=0;
-      double amount_O=0;
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of Pb ions= " << amount_Pb << endl;
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+    }
+    double Pb_O_ratio;
+    if ( amount_O != 0 ){
+      Pb_O_ratio=amount_Pb/amount_O;
+    } else {
+      message << "Amount of O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
+    if ( aurostd::isequal(Pb_O_ratio,0.75) ){
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+        oss << "WARNING: This system is identified as a mixed valence compound." << endl;
+        oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
+        oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
+        oss << "Pb3O4 with ratio of Pb/O= " << Pb_O_ratio << endl;
+      }
+      uint num_formula_units_in_cell;
+      num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Pb3O4
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+      }
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
         if (structure.atoms[i].cleanname == "Pb"){
-          amount_Pb+=1;
-        } else if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
-        }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of Pb ions= " << amount_Pb << endl;
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-      }
-      double Pb_O_ratio;
-      if ( amount_O != 0 ){
-        Pb_O_ratio=amount_Pb/amount_O;
-      } else {
-        message << "Amount of O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      }
-      if ( aurostd::isequal(Pb_O_ratio,0.75) ){
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING: This system is identified as a mixed valence compound." << endl;
-          oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
-          oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
-          oss << "Pb3O4 with ratio of Pb/O= " << Pb_O_ratio << endl;
-        }
-        uint num_formula_units_in_cell;
-        num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Pb3O4
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-        }
-        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-          if (structure.atoms[i].cleanname == "Pb"){
-            // taking the first Pb ions as +4 (without knowing whether they are actually +4); works only because 
-            // the number of bonds for them will be adjusted to 6 as needed for Pb3O4 disregarding the actual 
-            // number of Pb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-            if ( i < (1+num_O_before_Pb)*num_formula_units_in_cell ){  // (1 Pb4+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
-              cce_vars.oxidation_states[i]=+4;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+4 " << endl;
-              }
-              cce_vars.num_neighbors[i]=6; // for Pb3O4 the Pb4+ ions are 6-fold coordinated by oxygen
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+4: " << cce_vars.num_neighbors[i] << endl;
-              }
-            } else {
-              cce_vars.oxidation_states[i]=+2;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+2 " << endl;
-              }
-              cce_vars.num_neighbors[i]=3; // for Pb3O4 the Pb2+ ions are 3-fold coordinated by oxygen
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+2: " << cce_vars.num_neighbors[i] << endl;
-              }
+          // taking the first Pb ions as +4 (without knowing whether they are actually +4); works only because 
+          // the number of bonds for them will be adjusted to 6 as needed for Pb3O4 disregarding the actual 
+          // number of Pb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+          if ( i < (1+num_O_before_Pb)*num_formula_units_in_cell ){  // (1 Pb4+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
+            cce_vars.oxidation_states[i]=+4;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+4 " << endl;
+            }
+            cce_vars.num_neighbors[i]=6; // for Pb3O4 the Pb4+ ions are 6-fold coordinated by oxygen
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+4: " << cce_vars.num_neighbors[i] << endl;
+            }
+          } else {
+            cce_vars.oxidation_states[i]=+2;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+2 " << endl;
+            }
+            cce_vars.num_neighbors[i]=3; // for Pb3O4 the Pb2+ ions are 3-fold coordinated by oxygen
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+2: " << cce_vars.num_neighbors[i] << endl;
             }
           }
         }
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-        }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Pb-O binary with Pb/O ratio 0.75 the above set oxidation states should always work
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        } else {
-          cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-        }
+      }
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+      }
+      // print oxidation numbers and calculate sum
+      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+      // system should not be regarded correctable if sum over oxidation states is not zero
+      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Pb-O binary with Pb/O ratio 0.75 the above set oxidation states should always work
+        cce_flags.flag("CORRECTABLE",FALSE);
+        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+      } else {
+        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
       }
     }
   }
@@ -1479,96 +1466,95 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::treat_Ti_O_Magneli_phase_special_case():";
     stringstream message;
-    if ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Ti") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Ti" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) ) {
-      uint num_O_before_Ti;
-      if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Ti" ) {
-        num_O_before_Ti=5;
-      } else {
-        num_O_before_Ti=0;
+    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Ti") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Ti" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
+    uint num_O_before_Ti;
+    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Ti" ) {
+      num_O_before_Ti=5;
+    } else {
+      num_O_before_Ti=0;
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "Ti-O system, Magneli for Ti_nO_(2n-1), i.e. Ti-O ratio= " << 3.0/5 << ", " << 4.0/7 << ", " << 5.0/9 << ", " << 6.0/11 << ", " << 7.0/13 << ", " << 8.0/15 << ", " << 9.0/17 << ", " << 10.0/19 << "..." << endl;
+    }
+    double amount_O=0;
+    double amount_Ti=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
+      } else if (structure.atoms[i].cleanname == "Ti"){
+        amount_Ti+=1;
       }
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+      cerr << soliloquy << "number of Ti ions= " << amount_Ti << endl;
+    }
+    double Ti_O_ratio;
+    if ( amount_O != 0 ){
+      Ti_O_ratio=amount_Ti/amount_O;
+    } else {
+      message << "Amount of O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "ratio of Ti/O= " << Ti_O_ratio << endl;
+    }
+    uint num_formula_units_in_cell;
+    // check for Magneli composition Ti_(n)O_(2n-1)
+    double n;
+    bool magneli = false;
+    for(n=3;n<101;n++){
+      //oss << "n/(2*n-1)= " << n/(2*n-1) << endl;
+      if ( aurostd::isequal(Ti_O_ratio,n/(2*n-1)) ){
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << endl;
+          oss << "WARNING: This system is identified as a mixed valence compound." << endl;
+          oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
+          oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
+          oss << "n= " << n << " Magneli composition Ti_nO_(2n-1)" << endl;
+        }
+        magneli = true;
+        num_formula_units_in_cell=amount_Ti/n;
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        }
+      }
+    }
+    if ( magneli == false){
       if(LDEBUG){
-        cerr << soliloquy << "Ti-O system, Magneli for Ti_nO_(2n-1), i.e. Ti-O ratio= " << 3.0/5 << ", " << 4.0/7 << ", " << 5.0/9 << ", " << 6.0/11 << ", " << 7.0/13 << ", " << 8.0/15 << ", " << 9.0/17 << ", " << 10.0/19 << "..." << endl;
+        cerr << soliloquy << "Not a Magneli composition." << endl;
       }
-      double amount_O=0;
-      double amount_Ti=0;
+    }
+    if (magneli){
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
-        } else if (structure.atoms[i].cleanname == "Ti"){
-          amount_Ti+=1;
-        }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-        cerr << soliloquy << "number of Ti ions= " << amount_Ti << endl;
-      }
-      double Ti_O_ratio;
-      if ( amount_O != 0 ){
-        Ti_O_ratio=amount_Ti/amount_O;
-      } else {
-        message << "Amount of O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "ratio of Ti/O= " << Ti_O_ratio << endl;
-      }
-      uint num_formula_units_in_cell;
-      // check for Magneli composition Ti_(n)O_(2n-1)
-      double n;
-      bool magneli = false;
-      for(n=3;n<101;n++){
-        //oss << "n/(2*n-1)= " << n/(2*n-1) << endl;
-        if ( aurostd::isequal(Ti_O_ratio,n/(2*n-1)) ){
-          if(cce_flags.flag("COMMAND_LINE")){
-            oss << endl;
-            oss << "WARNING: This system is identified as a mixed valence compound." << endl;
-            oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
-            oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
-            oss << "n= " << n << " Magneli composition Ti_nO_(2n-1)" << endl;
-          }
-          magneli = true;
-          num_formula_units_in_cell=amount_Ti/n;
-          if(cce_flags.flag("COMMAND_LINE")){
-            oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-          }
-        }
-      }
-      if ( magneli == false){
-        if(LDEBUG){
-          cerr << soliloquy << "Not a Magneli composition." << endl;
-        }
-      }
-      if (magneli){
-        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-          if (structure.atoms[i].cleanname == "Ti"){
-            // taking the first Ti as +3 (without knowing whether they are actually +3) works only because 
-            // for the Magneli phases both Ti+3 and Ti+4 have both always 6 Ti-O bonds
-            if ( i < (2+num_O_before_Ti)*num_formula_units_in_cell ){
-              cce_vars.oxidation_states[i]=+3;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+3 " << endl;
-              }
-            } else {
-              cce_vars.oxidation_states[i]=+4;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
-              }
+        if (structure.atoms[i].cleanname == "Ti"){
+          // taking the first Ti as +3 (without knowing whether they are actually +3) works only because 
+          // for the Magneli phases both Ti+3 and Ti+4 have both always 6 Ti-O bonds
+          if ( i < (2+num_O_before_Ti)*num_formula_units_in_cell ){
+            cce_vars.oxidation_states[i]=+3;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+3 " << endl;
+            }
+          } else {
+            cce_vars.oxidation_states[i]=+4;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
             }
           }
         }
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-        }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Magneli phase the above set oxidation states should always work
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        } else {
-          cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-        }
+      }
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+      }
+      // print oxidation numbers and calculate sum
+      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+      // system should not be regarded correctable if sum over oxidation states is not zero
+      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Magneli phase the above set oxidation states should always work
+        cce_flags.flag("CORRECTABLE",FALSE);
+        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+      } else {
+        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
       }
     }
   }
@@ -1588,85 +1574,84 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::treat_Fe3O4_special_case():";
     stringstream message;
-    if ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Fe") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) ) {
-      uint num_O_before_Fe;
-      if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Fe" ) {
-        num_O_before_Fe=4;
-      } else {
-        num_O_before_Fe=0;
+    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Fe") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
+    uint num_O_before_Fe;
+    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Fe" ) {
+      num_O_before_Fe=4;
+    } else {
+      num_O_before_Fe=0;
+    }
+    double amount_Fe=0;
+    double amount_O=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "Fe"){
+        amount_Fe+=1;
+      } else if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
       }
-      double amount_Fe=0;
-      double amount_O=0;
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of Fe ions= " << amount_Fe << endl;
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+    }
+    double Fe_O_ratio;
+    if ( amount_O != 0 ){
+      Fe_O_ratio=amount_Fe/amount_O;
+    } else {
+      message << "Amount of O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
+    if ( aurostd::isequal(Fe_O_ratio,0.75) ){
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+        oss << "WARNING: This system is identified as a mixed valence compound." << endl;
+        oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
+        oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
+        oss << "Fe3O4 with ratio of Fe/O= " << Fe_O_ratio << endl;
+      }
+      uint num_formula_units_in_cell;
+      num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Fe3O4
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+      }
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
         if (structure.atoms[i].cleanname == "Fe"){
-          amount_Fe+=1;
-        } else if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
-        }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of Fe ions= " << amount_Fe << endl;
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-      }
-      double Fe_O_ratio;
-      if ( amount_O != 0 ){
-        Fe_O_ratio=amount_Fe/amount_O;
-      } else {
-        message << "Amount of O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      }
-      if ( aurostd::isequal(Fe_O_ratio,0.75) ){
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING: This system is identified as a mixed valence compound." << endl;
-          oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
-          oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
-          oss << "Fe3O4 with ratio of Fe/O= " << Fe_O_ratio << endl;
-        }
-        uint num_formula_units_in_cell;
-        num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Fe3O4
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-        }
-        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-          if (structure.atoms[i].cleanname == "Fe"){
-            // taking the first Fe ions as +2 (without knowing whether they are actually +2); works only because 
-            // the number of bonds for them will be adjusted to 6 (octahedral) as needed for Fe3O4 disregarding the actual 
-            // number of Fe-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-            if ( i < (1+num_O_before_Fe)*num_formula_units_in_cell ){  // 1 Fe2+ ions per formula unit * number of formula units
-              cce_vars.oxidation_states[i]=+2;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
-              }
-              cce_vars.num_neighbors[i]=6; // for Fe3O4 the Fe2+ ions are 6-fold coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+2: " << cce_vars.num_neighbors[i] << endl;
-              }
-            } else {
-              cce_vars.oxidation_states[i]=+3;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
-              }
-              cce_vars.num_neighbors[i]=5; // for Fe3O4 the Fe3+ ions are evenly 6- and 4-fold, so on average 5-fold (set here as a hack) coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+3 (average between even 6- and 4-fold coordination): " << cce_vars.num_neighbors[i] << endl;
-              }
+          // taking the first Fe ions as +2 (without knowing whether they are actually +2); works only because 
+          // the number of bonds for them will be adjusted to 6 (octahedral) as needed for Fe3O4 disregarding the actual 
+          // number of Fe-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+          if ( i < (1+num_O_before_Fe)*num_formula_units_in_cell ){  // 1 Fe2+ ions per formula unit * number of formula units
+            cce_vars.oxidation_states[i]=+2;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
+            }
+            cce_vars.num_neighbors[i]=6; // for Fe3O4 the Fe2+ ions are 6-fold coordinated by oxygen according to Wikipedia
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+2: " << cce_vars.num_neighbors[i] << endl;
+            }
+          } else {
+            cce_vars.oxidation_states[i]=+3;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
+            }
+            cce_vars.num_neighbors[i]=5; // for Fe3O4 the Fe3+ ions are evenly 6- and 4-fold, so on average 5-fold (set here as a hack) coordinated by oxygen according to Wikipedia
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+3 (average between even 6- and 4-fold coordination): " << cce_vars.num_neighbors[i] << endl;
             }
           }
         }
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-        }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Fe-O binary with Fe/O ratio 0.75 the above set oxidation states should always work
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        } else {
-          cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-        }
+      }
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+      }
+      // print oxidation numbers and calculate sum
+      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+      // system should not be regarded correctable if sum over oxidation states is not zero
+      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Fe-O binary with Fe/O ratio 0.75 the above set oxidation states should always work
+        cce_flags.flag("CORRECTABLE",FALSE);
+        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+      } else {
+        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
       }
     }
   }
@@ -1681,85 +1666,84 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::treat_Mn3O4_special_case():";
     stringstream message;
-    if ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Mn") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Mn" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) ) {
-      uint num_O_before_Mn;
-      if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Mn" ) {
-        num_O_before_Mn=4;
-      } else {
-        num_O_before_Mn=0;
+    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Mn") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Mn" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
+    uint num_O_before_Mn;
+    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Mn" ) {
+      num_O_before_Mn=4;
+    } else {
+      num_O_before_Mn=0;
+    }
+    double amount_Mn=0;
+    double amount_O=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "Mn"){
+        amount_Mn+=1;
+      } else if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
       }
-      double amount_Mn=0;
-      double amount_O=0;
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of Mn ions= " << amount_Mn << endl;
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+    }
+    double Mn_O_ratio;
+    if ( amount_O != 0 ){
+      Mn_O_ratio=amount_Mn/amount_O;
+    } else {
+      message << "Amount of O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
+    if ( aurostd::isequal(Mn_O_ratio,0.75) ){
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+        oss << "WARNING: This system is identified as a mixed valence compound." << endl;
+        oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
+        oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
+        oss << "Mn3O4 with ratio of Mn/O= " << Mn_O_ratio << endl;
+      }
+      uint num_formula_units_in_cell;
+      num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Mn3O4
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+      }
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
         if (structure.atoms[i].cleanname == "Mn"){
-          amount_Mn+=1;
-        } else if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
-        }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of Mn ions= " << amount_Mn << endl;
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-      }
-      double Mn_O_ratio;
-      if ( amount_O != 0 ){
-        Mn_O_ratio=amount_Mn/amount_O;
-      } else {
-        message << "Amount of O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      }
-      if ( aurostd::isequal(Mn_O_ratio,0.75) ){
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING: This system is identified as a mixed valence compound." << endl;
-          oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
-          oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
-          oss << "Mn3O4 with ratio of Mn/O= " << Mn_O_ratio << endl;
-        }
-        uint num_formula_units_in_cell;
-        num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Mn3O4
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-        }
-        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-          if (structure.atoms[i].cleanname == "Mn"){
-            // taking the first Mn ions as +2 (without knowing whether they are actually +2); works only because 
-            // the number of bonds for them will be adjusted to 4 (tetrahedral) as needed for Mn3O4 disregarding the actual 
-            // number of Mn-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-            if ( i < (1+num_O_before_Mn)*num_formula_units_in_cell ){  // 1 Mn2+ ions per formula unit * number of formula units
-              cce_vars.oxidation_states[i]=+2;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
-              }
-              cce_vars.num_neighbors[i]=4; // for Mn3O4 the Mn2+ ions are 4-fold coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Mn (atom[" << i << "]) taken as Mn+2: " << cce_vars.num_neighbors[i] << endl;
-              }
-            } else {
-              cce_vars.oxidation_states[i]=+3;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+3 " << endl;
-              }
-              cce_vars.num_neighbors[i]=6; // for Mn3O4 the Mn3+ ions are 6-fold coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Mn (atom[" << i << "]) taken as Mn+3: " << cce_vars.num_neighbors[i] << endl;
-              }
+          // taking the first Mn ions as +2 (without knowing whether they are actually +2); works only because 
+          // the number of bonds for them will be adjusted to 4 (tetrahedral) as needed for Mn3O4 disregarding the actual 
+          // number of Mn-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+          if ( i < (1+num_O_before_Mn)*num_formula_units_in_cell ){  // 1 Mn2+ ions per formula unit * number of formula units
+            cce_vars.oxidation_states[i]=+2;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
+            }
+            cce_vars.num_neighbors[i]=4; // for Mn3O4 the Mn2+ ions are 4-fold coordinated by oxygen according to Wikipedia
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Mn (atom[" << i << "]) taken as Mn+2: " << cce_vars.num_neighbors[i] << endl;
+            }
+          } else {
+            cce_vars.oxidation_states[i]=+3;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+3 " << endl;
+            }
+            cce_vars.num_neighbors[i]=6; // for Mn3O4 the Mn3+ ions are 6-fold coordinated by oxygen according to Wikipedia
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Mn (atom[" << i << "]) taken as Mn+3: " << cce_vars.num_neighbors[i] << endl;
             }
           }
         }
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-        }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Mn-O binary with Mn/O ratio 0.75 the above set oxidation states should always work
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        } else {
-          cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-        }
+      }
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+      }
+      // print oxidation numbers and calculate sum
+      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+      // system should not be regarded correctable if sum over oxidation states is not zero
+      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Mn-O binary with Mn/O ratio 0.75 the above set oxidation states should always work
+        cce_flags.flag("CORRECTABLE",FALSE);
+        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+      } else {
+        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
       }
     }
   }
@@ -1774,85 +1758,84 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::treat_Co3O4_special_case():";
     stringstream message;
-    if ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Co") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Co" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) ) {
-      uint num_O_before_Co;
-      if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Co" ) {
-        num_O_before_Co=4;
-      } else {
-        num_O_before_Co=0;
+    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Co") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Co" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
+    uint num_O_before_Co;
+    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Co" ) {
+      num_O_before_Co=4;
+    } else {
+      num_O_before_Co=0;
+    }
+    double amount_Co=0;
+    double amount_O=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "Co"){
+        amount_Co+=1;
+      } else if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
       }
-      double amount_Co=0;
-      double amount_O=0;
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of Co ions= " << amount_Co << endl;
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+    }
+    double Co_O_ratio;
+    if ( amount_O != 0 ){
+      Co_O_ratio=amount_Co/amount_O;
+    } else {
+      message << "Amount of O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
+    if ( aurostd::isequal(Co_O_ratio,0.75) ){
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+        oss << "WARNING: This system is identified as a mixed valence compound." << endl;
+        oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
+        oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
+        oss << "Co3O4 with ratio of Co/O= " << Co_O_ratio << endl;
+      }
+      uint num_formula_units_in_cell;
+      num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Co3O4
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+      }
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
         if (structure.atoms[i].cleanname == "Co"){
-          amount_Co+=1;
-        } else if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
-        }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of Co ions= " << amount_Co << endl;
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-      }
-      double Co_O_ratio;
-      if ( amount_O != 0 ){
-        Co_O_ratio=amount_Co/amount_O;
-      } else {
-        message << "Amount of O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      }
-      if ( aurostd::isequal(Co_O_ratio,0.75) ){
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING: This system is identified as a mixed valence compound." << endl;
-          oss << "The oxidation numbers and the number of cation-anion bonds will be set as known for this special case." << endl;
-          oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
-          oss << "Co3O4 with ratio of Co/O= " << Co_O_ratio << endl;
-        }
-        uint num_formula_units_in_cell;
-        num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Co3O4
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-        }
-        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-          if (structure.atoms[i].cleanname == "Co"){
-            // taking the first Co ions as +2 (without knowing whether they are actually +2); works only because 
-            // the number of bonds for them will be adjusted to 4 (tetrahedral) as needed for Co3O4 disregarding the actual 
-            // number of Co-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-            if ( i < (1+num_O_before_Co)*num_formula_units_in_cell ){  // 1 Co2+ ions per formula unit * number of formula units
-              cce_vars.oxidation_states[i]=+2;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Co+2 " << endl;
-              }
-              cce_vars.num_neighbors[i]=4; // for Co3O4 the Co2+ ions are 4-fold coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Co (atom[" << i << "]) taken as Co+2: " << cce_vars.num_neighbors[i] << endl;
-              }
-            } else {
-              cce_vars.oxidation_states[i]=+3;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Co+3 " << endl;
-              }
-              cce_vars.num_neighbors[i]=6; // for Co3O4 the Co3+ ions are 6-fold coordinated by oxygen according to Wikipedia
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "Modified number of neighbors of Co (atom[" << i << "]) taken as Co+3: " << cce_vars.num_neighbors[i] << endl;
-              }
+          // taking the first Co ions as +2 (without knowing whether they are actually +2); works only because 
+          // the number of bonds for them will be adjusted to 4 (tetrahedral) as needed for Co3O4 disregarding the actual 
+          // number of Co-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+          if ( i < (1+num_O_before_Co)*num_formula_units_in_cell ){  // 1 Co2+ ions per formula unit * number of formula units
+            cce_vars.oxidation_states[i]=+2;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Co+2 " << endl;
+            }
+            cce_vars.num_neighbors[i]=4; // for Co3O4 the Co2+ ions are 4-fold coordinated by oxygen according to Wikipedia
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Co (atom[" << i << "]) taken as Co+2: " << cce_vars.num_neighbors[i] << endl;
+            }
+          } else {
+            cce_vars.oxidation_states[i]=+3;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Co+3 " << endl;
+            }
+            cce_vars.num_neighbors[i]=6; // for Co3O4 the Co3+ ions are 6-fold coordinated by oxygen according to Wikipedia
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "Modified number of neighbors of Co (atom[" << i << "]) taken as Co+3: " << cce_vars.num_neighbors[i] << endl;
             }
           }
         }
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-        }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Co-O binary with Co/O ratio 0.75 the above set oxidation states should always work
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        } else {
-          cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-        }
+      }
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+      }
+      // print oxidation numbers and calculate sum
+      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+      // system should not be regarded correctable if sum over oxidation states is not zero
+      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Co-O binary with Co/O ratio 0.75 the above set oxidation states should always work
+        cce_flags.flag("CORRECTABLE",FALSE);
+        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+      } else {
+        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
       }
     }
   }
@@ -1872,99 +1855,98 @@ namespace cce {
     string alkali_metals = "Li,Na,K,Rb,Cs,Fr";
     vector<string> valkali_metals;
     aurostd::string2tokens(alkali_metals, valkali_metals, ",");
-    if ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1]))) || (aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[0])) && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) ) { // check whether it is a binary alkali metal oxide
-      if(LDEBUG){
-        cerr << soliloquy << "This is a binary alkali metal oxide, checking whether it is an alkali metal sesquioxide..." << endl;
-      }
-      uint num_alkali_before_O; // num cations before O not O before cations since setting oxidation states of anions below, not for cations as in other cases
-      string alkali_metal;
-      if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1])) ) {
-        num_alkali_before_O=0;
-        alkali_metal=KBIN::VASP_PseudoPotential_CleanName(structure.species[1]);
+    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1]))) || (aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[0])) && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;} // check whether it is a binary alkali metal oxide
+    if(LDEBUG){
+      cerr << soliloquy << "This is a binary alkali metal oxide, checking whether it is an alkali metal sesquioxide..." << endl;
+    }
+    uint num_alkali_before_O; // num cations before O not O before cations since setting oxidation states of anions below, not for cations as in other cases
+    string alkali_metal;
+    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1])) ) {
+      num_alkali_before_O=0;
+      alkali_metal=KBIN::VASP_PseudoPotential_CleanName(structure.species[1]);
+    } else {
+      num_alkali_before_O=2;
+      alkali_metal=KBIN::VASP_PseudoPotential_CleanName(structure.species[0]);
+    }
+    double amount_O=0;
+    double amount_alkali=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
       } else {
-        num_alkali_before_O=2;
-        alkali_metal=KBIN::VASP_PseudoPotential_CleanName(structure.species[0]);
+        amount_alkali+=1;
       }
-      double amount_O=0;
-      double amount_alkali=0;
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+      cerr << soliloquy << "number of alkali (" << alkali_metal << ") ions= " << amount_alkali << endl;
+    }
+    double O_alkali_ratio;
+    if ( amount_alkali != 0 ){
+      O_alkali_ratio=amount_O/amount_alkali;
+    } else {
+      message << "Amount of alkali atoms determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
+    }
+    // check for sesqui-composition alkali_metal2O3
+    if ( aurostd::isequal(O_alkali_ratio,1.5) ){
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+        oss << "WARNING: This system is identified as an alkali metal sesquioxide (formally) containing both per- and superoxide ions." << endl;
+        oss << "The oxidation numbers and the number of per- and superoxide bonds will be set as known for this special case." << endl;
+        oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each oxidation state occurs should be correct." << endl;
+        oss << alkali_metal << "2O3 with ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
+      }
+      uint num_formula_units_in_cell;
+      num_formula_units_in_cell=structure.atoms.size()/5; // 5 for alkali_metal2O3
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+      }
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
         if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
-        } else {
-          amount_alkali+=1;
-        }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-        cerr << soliloquy << "number of alkali (" << alkali_metal << ") ions= " << amount_alkali << endl;
-      }
-      double O_alkali_ratio;
-      if ( amount_alkali != 0 ){
-        O_alkali_ratio=amount_O/amount_alkali;
-      } else {
-        message << "Amount of alkali atoms determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
-      }
-      // check for sesqui-composition alkali_metal2O3
-      if ( aurostd::isequal(O_alkali_ratio,1.5) ){
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-          oss << "WARNING: This system is identified as an alkali metal sesquioxide (formally) containing both per- and superoxide ions." << endl;
-          oss << "The oxidation numbers and the number of per- and superoxide bonds will be set as known for this special case." << endl;
-          oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each oxidation state occurs should be correct." << endl;
-          oss << alkali_metal << "2O3 with ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
-        }
-        uint num_formula_units_in_cell;
-        num_formula_units_in_cell=structure.atoms.size()/5; // 5 for alkali_metal2O3
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-        }
-        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-          if (structure.atoms[i].cleanname == "O"){
-            // taking the first O ions as -0.5 (superox. Os, without knowing whether they are actually -0.5); works only because 
-            // the number of superoxide bonds will be adjusted to 1 per formula unit as needed for alkali metal sesquioxides
-            // taking last O ions as -1 (perox. Os, without knowing whether they are actually -1); works only because 
-            // the number of peroxide bonds will be adjusted to 0.5 per formula unit as needed for alkali metal sesquioxides
-            // (this is a hack since I know how many bonds there should be for each ion type)
-            if ( i < (2+num_alkali_before_O)*num_formula_units_in_cell ){  // 2 superoxide O-atoms per formula unit * number of formula units
-              cce_vars.oxidation_states[i]=-0.5;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-0.5 " << endl;
-              }
-              cce_vars.superox_indices[i]=1;
-            } else {
-              cce_vars.oxidation_states[i]=-1;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-1 " << endl;
-              }
-              cce_vars.perox_indices[i]=1;
+          // taking the first O ions as -0.5 (superox. Os, without knowing whether they are actually -0.5); works only because 
+          // the number of superoxide bonds will be adjusted to 1 per formula unit as needed for alkali metal sesquioxides
+          // taking last O ions as -1 (perox. Os, without knowing whether they are actually -1); works only because 
+          // the number of peroxide bonds will be adjusted to 0.5 per formula unit as needed for alkali metal sesquioxides
+          // (this is a hack since I know how many bonds there should be for each ion type)
+          if ( i < (2+num_alkali_before_O)*num_formula_units_in_cell ){  // 2 superoxide O-atoms per formula unit * number of formula units
+            cce_vars.oxidation_states[i]=-0.5;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-0.5 " << endl;
             }
+            cce_vars.superox_indices[i]=1;
+          } else {
+            cce_vars.oxidation_states[i]=-1;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-1 " << endl;
+            }
+            cce_vars.perox_indices[i]=1;
           }
         }
-        cce_vars.num_superox_bonds=1*num_formula_units_in_cell; // 1 superox. bonds per formula unit * num. formula units
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << "Number of superoxide bonds set to: " << cce_vars.num_superox_bonds << endl;
-        }
-        cce_vars.num_perox_bonds=0.5*num_formula_units_in_cell; // 0.5 perox. bonds per formula unit * num. formula units; this should neve yield a non-integer since there should be at least one complete peroxide ion per cell
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << "Number of peroxide bonds set to: " << cce_vars.num_perox_bonds << endl;
-        }
-        if(cce_flags.flag("COMMAND_LINE")){
-          oss << endl;
-        }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for an alkali metal sesquioxide set oxidation states should always work
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        } else {
-          cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-        }
+      }
+      cce_vars.num_superox_bonds=1*num_formula_units_in_cell; // 1 superox. bonds per formula unit * num. formula units
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << "Number of superoxide bonds set to: " << cce_vars.num_superox_bonds << endl;
+      }
+      cce_vars.num_perox_bonds=0.5*num_formula_units_in_cell; // 0.5 perox. bonds per formula unit * num. formula units; this should neve yield a non-integer since there should be at least one complete peroxide ion per cell
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << "Number of peroxide bonds set to: " << cce_vars.num_perox_bonds << endl;
+      }
+      if(cce_flags.flag("COMMAND_LINE")){
+        oss << endl;
+      }
+      // print oxidation numbers and calculate sum
+      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+      // system should not be regarded correctable if sum over oxidation states is not zero
+      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for an alkali metal sesquioxide set oxidation states should always work
+        cce_flags.flag("CORRECTABLE",FALSE);
+        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+      } else {
+        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
       }
     }
   }
@@ -1979,56 +1961,55 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::treat_MnMoO4_special_case():";
     stringstream message;
-    if ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Mn" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Mo" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "O" ) {
-      double amount_Mn=0;
-      double amount_Mo=0;
-      double amount_O=0;
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "Mn"){
-          amount_Mn+=1;
-        } else if (structure.atoms[i].cleanname == "Mo"){
-          amount_Mo+=1;
-        } else if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
+    if (! ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Mn" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Mo" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "O" )) {return;}
+    double amount_Mn=0;
+    double amount_Mo=0;
+    double amount_O=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "Mn"){
+        amount_Mn+=1;
+      } else if (structure.atoms[i].cleanname == "Mo"){
+        amount_Mo+=1;
+      } else if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
+      }
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of Mn ions= " << amount_Mn << endl;
+      cerr << soliloquy << "number of Mo ions= " << amount_Mo << endl;
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+    }
+    if (amount_Mo != 0 && amount_O != 0) {
+      if (aurostd::isequal(amount_Mn/amount_Mo,1.0) && aurostd::isequal(amount_Mn/amount_O,0.25) && aurostd::isequal(amount_Mo/amount_O,0.25)) {
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "MnMoO4 special treatment since sum over oxdiation states is zero but individual oxidation numbers are wrong!!!" << endl;
         }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of Mn ions= " << amount_Mn << endl;
-        cerr << soliloquy << "number of Mo ions= " << amount_Mo << endl;
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-      }
-      if (amount_Mo != 0 && amount_O != 0) {
-        if (aurostd::isequal(amount_Mn/amount_Mo,1.0) && aurostd::isequal(amount_Mn/amount_O,0.25) && aurostd::isequal(amount_Mo/amount_O,0.25)) {
-          if(cce_flags.flag("COMMAND_LINE")){
-            oss << "MnMoO4 special treatment since sum over oxdiation states is zero but individual oxidation numbers are wrong!!!" << endl;
-          }
-          for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-            if (structure.atoms[i].cleanname == "Mn"){
-              cce_vars.oxidation_states[i]=+2;
-              if(cce_flags.flag("COMMAND_LINE")){
-               oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
-              }
-            }
-            if (structure.atoms[i].cleanname == "Mo"){
-              cce_vars.oxidation_states[i]=+6;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mo+6 " << endl;
-              }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Mn"){
+            cce_vars.oxidation_states[i]=+2;
+            if(cce_flags.flag("COMMAND_LINE")){
+             oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
             }
           }
-          // print oxidation numbers and calculate sum
-          cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-          // system should not be regarded correctable if sum over oxidation states is not zero
-          if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
-            cce_flags.flag("CORRECTABLE",FALSE);
-            cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-            cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+          if (structure.atoms[i].cleanname == "Mo"){
+            cce_vars.oxidation_states[i]=+6;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mo+6 " << endl;
+            }
           }
         }
-      } else {
-        message << "Amount of Mo or O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+        // print oxidation numbers and calculate sum
+        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+        // system should not be regarded correctable if sum over oxidation states is not zero
+        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
+          cce_flags.flag("CORRECTABLE",FALSE);
+          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+        }
       }
+    } else {
+      message << "Amount of Mo or O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
   }
 
@@ -2039,72 +2020,71 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::treat_Ca2Fe2O5_CaFe2O4_LDA_special_case():";
     stringstream message;
-    if ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Ca" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "O" ) {
-      double amount_Ca=0;
-      double amount_Fe=0;
-      double amount_O=0;
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "Ca"){
-          amount_Ca+=1;
-        } else if (structure.atoms[i].cleanname == "Fe"){
-          amount_Fe+=1;
-        } else if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
+    if (! ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Ca" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "O" )) {return;}
+    double amount_Ca=0;
+    double amount_Fe=0;
+    double amount_O=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "Ca"){
+        amount_Ca+=1;
+      } else if (structure.atoms[i].cleanname == "Fe"){
+        amount_Fe+=1;
+      } else if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
+      }
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of Ca ions= " << amount_Ca << endl;
+      cerr << soliloquy << "number of Fe ions= " << amount_Fe << endl;
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+    }
+    //making sure it is Ca2Fe2O5
+    if (amount_Fe != 0 && amount_O != 0) {
+      if (aurostd::isequal(amount_Ca/amount_Fe,1.0) && aurostd::isequal(amount_Ca/amount_O,0.4) && aurostd::isequal(amount_Fe/amount_O,0.4)) {
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "Ca2Fe2O5 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
         }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of Ca ions= " << amount_Ca << endl;
-        cerr << soliloquy << "number of Fe ions= " << amount_Fe << endl;
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-      }
-      //making sure it is Ca2Fe2O5
-      if (amount_Fe != 0 && amount_O != 0) {
-        if (aurostd::isequal(amount_Ca/amount_Fe,1.0) && aurostd::isequal(amount_Ca/amount_O,0.4) && aurostd::isequal(amount_Fe/amount_O,0.4)) {
-          if(cce_flags.flag("COMMAND_LINE")){
-            oss << "Ca2Fe2O5 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
-          }
-          for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-            if (structure.atoms[i].cleanname == "Fe"){
-              cce_vars.oxidation_states[i]=+3;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
-              }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Fe"){
+            cce_vars.oxidation_states[i]=+3;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
             }
           }
-          // print oxidation numbers and calculate sum
-          cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-          // system should not be regarded correctable if sum over oxidation states is not zero
-          if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
-            cce_flags.flag("CORRECTABLE",FALSE);
-            cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-            cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-          }
-        //making sure it is CaFe2O4
-        } else if (amount_Ca/amount_Fe == 0.5 && amount_Ca/amount_O == 0.25 && amount_Fe/amount_O == 0.5) {
-          if(cce_flags.flag("COMMAND_LINE")){
-            oss << "CaFe2O4 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
-          }
-          for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-            if (structure.atoms[i].cleanname == "Fe"){
-              cce_vars.oxidation_states[i]=+3;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
-              }
+        }
+        // print oxidation numbers and calculate sum
+        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+        // system should not be regarded correctable if sum over oxidation states is not zero
+        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
+          cce_flags.flag("CORRECTABLE",FALSE);
+          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+        }
+      //making sure it is CaFe2O4
+      } else if (amount_Ca/amount_Fe == 0.5 && amount_Ca/amount_O == 0.25 && amount_Fe/amount_O == 0.5) {
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "CaFe2O4 special treatment for LDA since oxidation numbers for Fe, which should be Fe+3, are not correctly determined from Bader charges for all Fe!!!" << endl;
+        }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Fe"){
+            cce_vars.oxidation_states[i]=+3;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
             }
           }
-          // print oxidation numbers and calculate sum
-          cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-          // system should not be regarded correctable if sum over oxidation states is not zero
-          if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
-            cce_flags.flag("CORRECTABLE",FALSE);
-            cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-            cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-          }
         }
-      } else {
-        message << "Amount of Fe or O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+        // print oxidation numbers and calculate sum
+        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+        // system should not be regarded correctable if sum over oxidation states is not zero
+        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
+          cce_flags.flag("CORRECTABLE",FALSE);
+          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+        }
       }
+    } else {
+      message << "Amount of Fe or O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
   }
 
@@ -2116,51 +2096,50 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::treat_FeTiO3_LDA_special_case():";
     stringstream message;
-    if ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "Ti" ) {
-      double amount_Fe=0;
-      double amount_O=0;
-      double amount_Ti=0;
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "Fe"){
-          amount_Fe+=1;
-        } else if (structure.atoms[i].cleanname == "O"){
-          amount_O+=1;
-        } else if (structure.atoms[i].cleanname == "Ti"){
-          amount_Ti+=1;
+    if (! ( structure.species.size() == 3 && KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Fe" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[2]) == "Ti" )) {return;}
+    double amount_Fe=0;
+    double amount_O=0;
+    double amount_Ti=0;
+    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+      if (structure.atoms[i].cleanname == "Fe"){
+        amount_Fe+=1;
+      } else if (structure.atoms[i].cleanname == "O"){
+        amount_O+=1;
+      } else if (structure.atoms[i].cleanname == "Ti"){
+        amount_Ti+=1;
+      }
+    }
+    if(LDEBUG){
+      cerr << soliloquy << "number of Fe ions= " << amount_Fe << endl;
+      cerr << soliloquy << "number of O ions= " << amount_O << endl;
+      cerr << soliloquy << "number of Ti ions= " << amount_Ti << endl;
+    }
+    //making sure it is FeTiO3
+    if (amount_Ti != 0 && amount_O != 0) {
+      if (aurostd::isequal(amount_Fe/amount_Ti,1.0) && aurostd::isequal(amount_Fe/amount_O,1.0/3) && aurostd::isequal(amount_Ti/amount_O,1.0/3)) {
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "FeTiO3 special treatment for LDA since oxidation numbers for Ti, which should be Ti+4, are not correctly determined from Bader charges and using other fixing would also change Fe oxidation numbers!!!" << endl;
         }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << "number of Fe ions= " << amount_Fe << endl;
-        cerr << soliloquy << "number of O ions= " << amount_O << endl;
-        cerr << soliloquy << "number of Ti ions= " << amount_Ti << endl;
-      }
-      //making sure it is FeTiO3
-      if (amount_Ti != 0 && amount_O != 0) {
-        if (aurostd::isequal(amount_Fe/amount_Ti,1.0) && aurostd::isequal(amount_Fe/amount_O,1.0/3) && aurostd::isequal(amount_Ti/amount_O,1.0/3)) {
-          if(cce_flags.flag("COMMAND_LINE")){
-            oss << "FeTiO3 special treatment for LDA since oxidation numbers for Ti, which should be Ti+4, are not correctly determined from Bader charges and using other fixing would also change Fe oxidation numbers!!!" << endl;
-          }
-          for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-            if (structure.atoms[i].cleanname == "Ti"){
-              cce_vars.oxidation_states[i]=+4;
-              if(cce_flags.flag("COMMAND_LINE")){
-                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
-              }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Ti"){
+            cce_vars.oxidation_states[i]=+4;
+            if(cce_flags.flag("COMMAND_LINE")){
+              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
             }
           }
-          // print oxidation numbers and calculate sum
-          cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
-          // system should not be regarded correctable if sum over oxidation states is not zero
-          if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
-            cce_flags.flag("CORRECTABLE",FALSE);
-            cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-            cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-          }
         }
-      } else {
-        message << "Amount of Ti or O determined to be ZERO. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+        // print oxidation numbers and calculate sum
+        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(cce_vars, structure, cce_flags);
+        // system should not be regarded correctable if sum over oxidation states is not zero
+        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
+          cce_flags.flag("CORRECTABLE",FALSE);
+          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+        }
       }
+    } else {
+      message << "Amount of Ti or O determined to be ZERO. Please check your structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
   }
 
@@ -2824,26 +2803,26 @@ namespace cce {
     }
   }
 
-  //get_formation_enthalpies//////////////////////////////////////////////
-  // ME20200213
-  // Returns the formation enthalpy per cell for each functional
-  vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars) {
-    vector<double> formation_enthalpies(cce_correction.size(), 0.0);
-    uint num_funcs=cce_vars.vfunctionals.size();
-    for (uint i = 0; i < num_funcs; i++) {
-      if (cce_vars.vfunctionals[i] != "exp" ) {
-        if (cce_vars.dft_energies.size() > 0) {
-          // for 298.15 K
-          formation_enthalpies[2*i] = cce_vars.dft_energies[i] - cce_correction[2*i];
-          // for 0 K
-          formation_enthalpies[2*i+1] = cce_vars.dft_energies[i] - cce_correction[2*i+1];
-        }
-      } else { // treat exp. separately since formation enthalpy is equal to sum of corrections in this case
-        formation_enthalpies[2*i] = cce_correction[2*i];
-      }
-    }
-    return formation_enthalpies;
-  }
+  ////get_formation_enthalpies//////////////////////////////////////////////
+  //// ME20200213
+  //// Returns the formation enthalpy per cell for each functional
+  //vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars) {
+  //  vector<double> formation_enthalpies(cce_correction.size(), 0.0);
+  //  uint num_funcs=cce_vars.vfunctionals.size();
+  //  for (uint i = 0; i < num_funcs; i++) {
+  //    if (cce_vars.vfunctionals[i] != "exp" ) {
+  //      if (cce_vars.dft_energies.size() > 0) {
+  //        // for 298.15 K
+  //        formation_enthalpies[2*i] = cce_vars.dft_energies[i] - cce_correction[2*i];
+  //        // for 0 K
+  //        formation_enthalpies[2*i+1] = cce_vars.dft_energies[i] - cce_correction[2*i+1];
+  //      }
+  //    } else { // treat exp. separately since formation enthalpy is equal to sum of corrections in this case
+  //      formation_enthalpies[2*i] = cce_correction[2*i];
+  //    }
+  //  }
+  //  return formation_enthalpies;
+  //}
 
   /////////////////////////////////////////////////////////////////////////////
   //                                                                         //

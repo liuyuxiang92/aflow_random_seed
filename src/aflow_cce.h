@@ -48,12 +48,16 @@ namespace cce {
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
   void write_corrections(aurostd::xoption& flags, ostream& oss=std::cout);
-  void write_corrections(aurostd::xoption& flags, std::istream& ist, ostream& oss=std::cout); // ME20200213
+  void write_corrections(xstructure& structure, aurostd::xoption& flags);
+  void write_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void write_corrections(aurostd::xoption& flags, std::istream& ist); // ME20200213
   vector<double> calculate_corrections(const string& directory_path);
   vector<double> calculate_corrections(xstructure& structure, string& functional);
   void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
   // read user input (from command line or directory path)
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
+  xstructure read_structure(std::istream& ist);
+  xstructure read_structure(xstructure& structure);
   void get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
   int get_offset(const string& functional);
   vector<double> get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
@@ -106,7 +110,7 @@ namespace cce {
   void check_get_per_super_ox_corrections(CCE_Variables& cce_vars);
   // apply corrections and get corrected formation enthalpies
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
-  vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME20200213
+  //vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME20200213
   // write output and citation
   string get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME20200213
   string write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
