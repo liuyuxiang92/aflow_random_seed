@@ -338,7 +338,7 @@ namespace SYM {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // DX20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX20180426 - added current working directory
     string directory=xstr.directory; // DX20180426 - added current working directory
-    // DX20180221 [OBSOLETE] static unsigned int count = 0;
+    // DX20180222 [OBSOLETE] static unsigned int count = 0;
     uint cycle_count = 0; // keeps track of number of full cycle iteration
     double step = 0.05; // logarithmic step size
     double max_range = 1.0; // scan an order of magnitude in each direction
@@ -350,10 +350,10 @@ namespace SYM {
     double orig_tolerance = 0; 
 
     // Calculate original tolerance based on the number of times this function has been called
-    cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+    cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180222 - is now system specific (changed count to xstr.sym_eps_change_count)
     if(cycle_count<=20){
       orig_range = step*cycle_count;
-      if(xstr.sym_eps_change_count%2==0){  //if even, scanned down in previous iteration // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+      if(xstr.sym_eps_change_count%2==0){  //if even, scanned down in previous iteration // DX20180222 - is now system specific (changed count to xstr.sym_eps_change_count)
         sign = -1.0;
       }
       else {  //if odd, scanned up in previous iteration
@@ -366,10 +366,10 @@ namespace SYM {
     }
     if(orig_range<=max_range && cycle_count<=20){ 
       // Calculate next tolerance value
-      xstr.sym_eps_change_count += 1; // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
-      cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+      xstr.sym_eps_change_count += 1; // DX20180222 - is now system specific (changed count to xstr.sym_eps_change_count)
+      cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180222 - is now system specific (changed count to xstr.sym_eps_change_count)
       range = step*((double)cycle_count);
-      if(xstr.sym_eps_change_count%2==0){  //if even, scan down // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+      if(xstr.sym_eps_change_count%2==0){  //if even, scan down // DX20180222 - is now system specific (changed count to xstr.sym_eps_change_count)
         sign = -1.0;
       }   
       else {  //if odd, scan up
@@ -381,12 +381,12 @@ namespace SYM {
           if(tolerance >= min_dist){ //if larger than min distance, force lower scan
             sign = -1.0;
             tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
-            xstr.sym_eps_change_count += 1; // can no longer scan up, so we increase the count // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+            xstr.sym_eps_change_count += 1; // can no longer scan up, so we increase the count // DX20180222 - is now system specific (changed count to xstr.sym_eps_change_count)
           }
           if(tolerance < _ZERO_TOL_){
             sign = 1.0;
-            xstr.sym_eps_change_count += 1; // can no longer scan down, so we increase the count // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
-            cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180221 - is now system specific (changed count to xstr.sym_eps_change_count)
+            xstr.sym_eps_change_count += 1; // can no longer scan down, so we increase the count // DX20180222 - is now system specific (changed count to xstr.sym_eps_change_count)
+            cycle_count = (xstr.sym_eps_change_count+1)/2; // DX20180222 - is now system specific (changed count to xstr.sym_eps_change_count)
             range = step*((double)cycle_count);
             tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
           }
@@ -1186,11 +1186,11 @@ namespace SYM {
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
-        if(a.type==vec[index_to_check[i]].type){ // DX20170731 - Speed increase
+        if(a.type==vec[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
           if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX20190619 - lattice and f2c as input 
             count++;
             mapped_index=i;
-            if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
+            if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
           }
         }
       }
@@ -1200,7 +1200,7 @@ namespace SYM {
         if(FPOSMatch(a,vec[index_to_check[i]],lattice,skew,tol)){ //type specific //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
           count++;
           mapped_index=i;
-          if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
+          if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
         }
       }
     }
@@ -1236,11 +1236,11 @@ namespace SYM {
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = deq[index_to_check[i]];
-        if(a.type==deq[index_to_check[i]].type){ // DX20170731 - Speed increase
+        if(a.type==deq[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
           if(AtomsMapped(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX20190619 - lattice and f2c as input
             count++;
             mapped_index=i;
-            if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
+            if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
           }
         }
       }
@@ -1250,7 +1250,7 @@ namespace SYM {
         if(FPOSMatch(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
           count++;
           mapped_index=i;
-          if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
+          if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
         }
       }
     }
@@ -4451,7 +4451,7 @@ namespace SYM {
               ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
               //keep only the lattice points within the sphere with radius
               if(modulus(rrr)<radius && 
-                  // DX START : Speed up vectors to check
+                  // DX - START : Speed up vectors to check
                   //((modulus(rrr)>na1_min && modulus(rrr)<na1_max) || 
                   // (modulus(rrr)>na2_min && modulus(rrr)<na2_max) || 
                   // (modulus(rrr)>na3_min && modulus(rrr)<na3_max)))
@@ -4459,7 +4459,7 @@ namespace SYM {
                  aurostd::abs(modulus(rrr)-na2) < _eps_ ||
                  aurostd::abs(modulus(rrr)-na3) < _eps_))
                  {  //CO200106 - patching for auto-indenting
-                   // DX END : Speed up vectors to check
+                   // DX - END : Speed up vectors to check
                    grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
                    *grid_clattice_ptr=rrr;                            // SAVE THEM ALL
                    grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
@@ -5304,7 +5304,7 @@ namespace SYM {
         basis_atoms_map.push_back(index_to_check[mapped_index]);
         basis_types_map.push_back(atoms[index_to_check[mapped_index]].type);
         if(fast){ //If you use fast, you should have verified that no atoms overlap (which is most of the time, hopefully)
-          // DX20170731 - fast also inherently checks one-to-one
+          // DX - 7/31/17 - fast also inherently checks one-to-one
           index_to_check.erase(index_to_check.begin()+mapped_index);
         }
         count++;
@@ -5338,8 +5338,8 @@ namespace SYM {
         cerr << "atom :" << atoms[k].fpos  << endl;
         cerr << "ratom:" << transformedcrystal[k].fpos  << endl;
         }*/
-      // DX20170731 - Check one-to-one speed increase : START
-      if(!fast){ // DX20170731 - If not fast, need to check if one-to-one
+      // DX - 7/31/17 - Check one-to-one speed increase : START
+      if(!fast){ // DX - 7/31/17 - If not fast, need to check if one-to-one
         vector<int> mappings = basis_atoms_map;
         for(uint i=0;i<mappings.size();i++){
           for(uint j=i+1;j<mappings.size();j++){
@@ -5352,7 +5352,7 @@ namespace SYM {
           i--;
         } 
       }
-      // DX20170731 - Check one-to-one speed increase : END
+      // DX - 7/31/17 - Check one-to-one speed increase : END
       symOp.basis_map_calculated=basis_map_calculated_orig;  // CO20140420 - make sure to include me before any return/exit!!!!!
       return TRUE;
     }
@@ -7408,8 +7408,8 @@ namespace SYM {
         eat=a.iatoms[iiat][ieat];
         for(uint fg=0;fg<a.fgroup.size() && !found_fgroup;fg++){
           if(a.fgroup[fg].basis_map_calculated){
-            // DX [OBSOLETE] fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[eat]==iat; // DX20170731 - Incorrect, want centered at iatom not eatom
-            fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[iat]==eat; // DX20170731 find fgroup centered on iatom
+            // DX [OBSOLETE] fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[eat]==iat; // DX - 7/31/17 - Incorrect, want centered at iatom not eatom
+            fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[iat]==eat; // DX - 7/31/17 find fgroup centered on iatom
           } else {
             if(!SYM::ApplyAtomValidate(a.atoms[iat],tatom,a.fgroup[fg],a.lattice,a.c2f,a.f2c,skew,FALSE,FALSE,_eps_)){
               return FALSE;
@@ -8005,7 +8005,7 @@ namespace SYM {
   }
 } // namespace SYM
 
-// DX20170801 - START: Xgroups to JSON
+// DX20170802 - START: Xgroups to JSON
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------- WRITE GROUPS TO JSON
 // SymmetryToJson
@@ -8229,9 +8229,9 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
   sss << "]" << eendl;
   return sss.str();
 }
-// DX20170801 - END: Xgroups to JSON
+// DX20170802 - END: Xgroups to JSON
 
-// DX20170801 - START: agroups to JSON
+// DX20170802 - START: agroups to JSON
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------- WRITE AROUPS TO JSON
 string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode){
@@ -8250,9 +8250,9 @@ string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode){
   sss << "]" << eendl;
   return sss.str();
 }
-// DX20170801 - END: agroups to JSON
+// DX20170802 - END: agroups to JSON
 
-// DX20170801 - START: Equivalent atoms to JSON
+// DX20170802 - START: Equivalent atoms to JSON
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------- WRITE EQUIVALENT ATOMS TO JSON
 string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
@@ -8303,7 +8303,7 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
   vcontent_json.clear();
   return sss.str();
 }
-// DX20170801 - END: Equivalent atoms to JSON
+// DX20170802 - END: Equivalent atoms to JSON
 
 // --------------------------------------------------------------------------
 // ------------------------------------------------------------- WRITE GROUPS
@@ -8313,14 +8313,14 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
 // aflow.sgroup.out files on the directory - SC aug 2007
 
 // CO20171025 - redundant
-//// DX20170801 - START: Adding symmetry output formatting option
+//// DX20170802 - START: Adding symmetry output formatting option
 //bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char mode,const bool& osswrite,ostream& oss) {
 //  string format = "txt"; //Default output is aflow.xgroup.out (a text output)
 //  return KBIN_SymmetryWrite(FileMESSAGE,a,aflags,mode,osswrite,oss,format);
 //}
-//// DX20170801 - END: Adding symmetry output formatting option
+//// DX20170802 - END: Adding symmetry output formatting option
 
-bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char mode,const bool& osswrite,ostream& oss,const string& format) { // DX20170801
+bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char mode,const bool& osswrite,ostream& oss,const string& format) { // DX20170802
   ostringstream aus;
   xvector<double> aux_rrr(9),aux_ijk(9);
   bool Krun=TRUE;
@@ -8363,7 +8363,7 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
   if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
     FileOUTPUT << _lines_ << endl;
-  } // DX20170801
+  } // DX20170802
   if(mode==_PGROUP_) {
     if(aurostd::toupper(format)=="TXT" || aurostd::toupper(format)=="TEXT"){ // DX20200206
       FileOUTPUT << "AFLOW point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
@@ -8377,11 +8377,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroup,mode);          // DX20170801
+      FileOUTPUT << SymmetryToJson(a.pgroup,mode);          // DX20170802
       FileOUTPUT.flush();
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
@@ -8398,11 +8398,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroup_xtal,mode);     // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+      FileOUTPUT << SymmetryToJson(a.pgroup_xtal,mode);     // DX20170802
+      FileOUTPUT.flush();                                   // DX20170802
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
@@ -8420,11 +8420,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroupk_xtal,mode);     // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+      FileOUTPUT << SymmetryToJson(a.pgroupk_xtal,mode);     // DX20170802
+      FileOUTPUT.flush();                                   // DX20170802
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
@@ -8442,11 +8442,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroupk,mode);         // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+      FileOUTPUT << SymmetryToJson(a.pgroupk,mode);         // DX20170802
+      FileOUTPUT.flush();                                   // DX20170802
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
@@ -8463,11 +8463,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.pgroupk_Patterson,mode);     // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+      FileOUTPUT << SymmetryToJson(a.pgroupk_Patterson,mode);     // DX20170802
+      FileOUTPUT.flush();                                   // DX20170802
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_PATTERSON Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
@@ -8484,11 +8484,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.fgroup,mode);          // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+      FileOUTPUT << SymmetryToJson(a.fgroup,mode);          // DX20170802
+      FileOUTPUT.flush();                                   // DX20170802
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
@@ -8507,11 +8507,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
         FileOUTPUT << _lines_ << endl;
         FileOUTPUT.flush();
       }
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << SymmetryToJson(a.sgroup,mode);          // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+      FileOUTPUT << SymmetryToJson(a.sgroup,mode);          // DX20170802
+      FileOUTPUT.flush();                                   // DX20170802
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
@@ -8532,11 +8532,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
           FileOUTPUT.flush();
         }
       }
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << AgroupSymmetryToJson(a.agroup,mode);    // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+      FileOUTPUT << AgroupSymmetryToJson(a.agroup,mode);    // DX20170802
+      FileOUTPUT.flush();                                   // DX20170802
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
   }
@@ -8557,11 +8557,11 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
       a.write_inequivalent_flag=temp;
       FileOUTPUT << _lines_ << endl;
       FileOUTPUT.flush();
-    }                                                       // DX20170801
+    }                                                       // DX20170802
     if(aurostd::toupper(format)=="JSON"){ // DX20200206
-      FileOUTPUT << EquivalentAtomsToJson(a.iatoms);   // DX20170801
-      FileOUTPUT.flush();                                   // DX20170801
-    }                                                       // DX20170801
+      FileOUTPUT << EquivalentAtomsToJson(a.iatoms);   // DX20170802
+      FileOUTPUT.flush();                                   // DX20170802
+    }                                                       // DX20170802
     FileOUTPUT.clear();FileOUTPUT.close();
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS Symmetry: writing END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 
