@@ -64,7 +64,6 @@ namespace apl {
   void ForceConstantCalculator::copy(const ForceConstantCalculator& that) {
     _aflowFlags = that._aflowFlags;
     _AflowIn = that._AflowIn;
-    _AflowInFileName = that._AflowInFileName;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
     messageFile = that.messageFile;
@@ -79,7 +78,6 @@ namespace apl {
 
   void ForceConstantCalculator::free() {
     xInputs.clear();
-    _AflowInFileName = _AFLOWIN_;
     _bornEffectiveChargeTensor.clear();
     _dielectricTensor.clear();
     _forceConstantMatrices.clear();
@@ -606,8 +604,8 @@ namespace apl {
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
-    outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AflowInFileName << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-      << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AflowInFileName, APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
+    outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
+      << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
     outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
   }

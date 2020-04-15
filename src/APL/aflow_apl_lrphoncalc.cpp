@@ -61,7 +61,6 @@ namespace apl {
   void LinearResponsePC::copy(const LinearResponsePC& that) {
     _aflowFlags = that._aflowFlags;
     _AflowIn = that._AflowIn;
-    _AflowInFileName = that._AflowInFileName;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
     messageFile = that.messageFile;
@@ -76,7 +75,6 @@ namespace apl {
 
   void LinearResponsePC::free() {
     xInputs.clear();
-    _AflowInFileName = _AFLOWIN_;
     _bornEffectiveChargeTensor.clear();
     _dielectricTensor.clear();
     _forceConstantMatrices.clear();
@@ -296,7 +294,6 @@ namespace apl {
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
     out << AFLOWIN_SEPARATION_LINE << std::endl;
-    out << tag << "AFLOWIN=" << _AflowInFileName << std::endl;
     out << tag << "ENGINE=LR" << std::endl;
     out << AFLOWIN_SEPARATION_LINE << std::endl;
     out << tag << "SUPERCELL=" << _supercell->scell << std::endl;
@@ -338,15 +335,6 @@ namespace apl {
     uint nlines = vlines.size();
     uint iline = 0;
     while (++iline < nlines) {
-      if (aurostd::substring2bool(vlines[iline], "AFLOWIN=")) {
-        tokens.clear();
-        aurostd::string2tokens(vlines[iline], tokens, "=");
-        if (tokens.size() != 2) {
-          string message = "Tag for AFLOWIN is broken.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
-        }
-        _AflowInFileName = tokens[1];
-      }
       if (aurostd::substring2bool(vlines[iline], "POLAR=")) {
         aurostd::string2tokens(vlines[iline], tokens, "=");
         if (tokens.size() != 2) {

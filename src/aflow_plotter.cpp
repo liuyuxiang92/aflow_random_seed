@@ -1878,7 +1878,7 @@ namespace plotter {
   void PLOT_THERMO(xoption& plotoptions) {
     stringstream out;
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
-    plotoptions.push_attached("COLOR", "$000000");
+    plotoptions.push_attached("COLOR", "#000000");
     plotoptions.push_attached("LINETYPES", "-1");
     PLOT_THERMO(plotoptions, out);
   }

@@ -733,6 +733,7 @@ namespace apl {
 #define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  // ME20200213
 #define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME20200213
 
+// Interface
 namespace apl {
   bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME20190108
   void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
@@ -757,7 +758,6 @@ namespace apl {
       ofstream* messageFile;
 
       vector<_xinput> xInputs;
-      string _AflowInFileName;
 
       // Calculate forces at no distortion - since for some structure
       // (not well relaxed, or with other problems) these forces have to be
