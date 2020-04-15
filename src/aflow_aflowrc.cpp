@@ -529,6 +529,9 @@
 #define         DEFAULT_APL_DYNMAT_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_DYNMAT_FILE")
 #define AFLOWRC_DEFAULT_APL_HARMIFC_FILE                      string("harmonicIFCs.xml")
 #define         DEFAULT_APL_HARMIFC_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_APL_HARMIFC_FILE")
+// ME20200415
+#define AFLOWRC_DEFAULT_APL_POLAR_FILE                        string("polar.xml")
+#define         DEFAULT_APL_POLAR_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_APL_POLAR_FILE")
 #define AFLOWRC_DEFAULT_APL_HSKPTS_FILE                       string("hskpoints.out")
 #define         DEFAULT_APL_HSKPTS_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_HSKPTS_FILE")
 // ME20190614 - START
@@ -1262,6 +1265,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_THERMO_FILE",AFLOWRC_DEFAULT_APL_THERMO_FILE);
     aflowrc::load_default("DEFAULT_APL_DYNMAT_FILE",AFLOWRC_DEFAULT_APL_DYNMAT_FILE);
     aflowrc::load_default("DEFAULT_APL_HARMIFC_FILE",AFLOWRC_DEFAULT_APL_HARMIFC_FILE);
+    aflowrc::load_default("DEFAULT_APL_POLAR_FILE",AFLOWRC_DEFAULT_APL_POLAR_FILE);  // ME20200415
     aflowrc::load_default("DEFAULT_APL_HSKPTS_FILE",AFLOWRC_DEFAULT_APL_HSKPTS_FILE);
     // ME20190614 - START
     aflowrc::load_default("DEFAULT_APL_PHDOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE);
@@ -1768,6 +1772,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_THERMO_FILE=\"" << AFLOWRC_DEFAULT_APL_THERMO_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_DYNMAT_FILE=\"" << AFLOWRC_DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HARMIFC_FILE=\"" << AFLOWRC_DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_APL_POLAR_FILE=\"" << AFLOWRC_DEFAULT_APL_POLAR_FILE << "\"" << endl;  // ME20200415
     aflowrc << "DEFAULT_APL_HSKPTS_FILE=\"" << AFLOWRC_DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
     // ME20190614 - START
     aflowrc << "DEFAULT_APL_PHDOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
@@ -2242,6 +2247,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_THERMO_FILE\")=\"" << DEFAULT_APL_THERMO_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DYNMAT_FILE\")=\"" << DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HARMIFC_FILE\")=\"" << DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_POLAR_FILE\")=\"" << DEFAULT_APL_POLAR_FILE << "\"" << endl;  // ME20200415
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HSKPTS_FILE\")=\"" << DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
     // ME20190614 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHDOSCAR_FILE\")=\"" << DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;

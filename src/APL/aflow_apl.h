@@ -730,7 +730,9 @@ namespace apl {
 #define _AFLOW_APL_DFPT_RUNNAME_ string("DFPT")  // ME20200213
 #define _AFLOW_APL_DFPT_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_DFPT_RUNNAME_) // ME20200213
 
+// Interface
 namespace apl {
+
   bool createAflowInPhonons(const _aflags&, const _kflags&, const _xflags&, _xinput&); // ME20190108
   void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
   bool filesExistPhonons(_xinput&);
@@ -739,6 +741,7 @@ namespace apl {
   bool readForcesFromDirectory(_xinput&);  // ME20200219
   void subtractZeroStateForces(vector<_xinput>&, bool);
   void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME20190114
+
 }
 
 namespace apl {
