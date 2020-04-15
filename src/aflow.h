@@ -3447,40 +3447,60 @@ namespace plotter {
   void generateHeader(stringstream&, const aurostd::xoption&, bool=false);
   void savePlotGNUPLOT(const aurostd::xoption&, const stringstream&);
   void setFileName(aurostd::xoption&, string="");
-  void setTitle(aurostd::xoption&);
-  string formatDefaultPlotTitle(const aurostd::xoption&);
+  void setTitle(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void setTitle(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  string formatDefaultPlotTitle(const aurostd::xoption&,ostream& oss=cout); //CO20200404
+  string formatDefaultPlotTitle(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  // ME20190813
   vector<double> getCompositionFromANRLPrototype(const string&);
-  string formatDefaultTitlePOCC(const aurostd::xoption&);
-  string formatDefaultTitlePOCC_191004(const aurostd::xoption&); //CO20191110
-  string formatDefaultTitlePOCC_190101(const aurostd::xoption&);
+  string formatDefaultTitlePOCC(const aurostd::xoption&,ostream& oss=cout); //CO20200404
+  string formatDefaultTitlePOCC(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  string formatDefaultTitlePOCC_191004(const aurostd::xoption&,ostream& oss=cout); //CO20191110 //CO20200404
+  string formatDefaultTitlePOCC_191004(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110 //CO20200404
+  string formatDefaultTitlePOCC_190101(const aurostd::xoption&,ostream& oss=cout);  //CO20200404
   vector<double> getCompositionFromPoccString(const string&, bool&);
 
   // Electronic structure ----------------------------------------------------
   void patchDefaultTitleAFLOWIN(xoption& plotoptions);  //CO20191110
   // Plot functions
-  void PLOT_DOS(aurostd::xoption&);
-  void PLOT_DOS(aurostd::xoption&,const xDOSCAR&); //CO20191110
-  void PLOT_DOS(aurostd::xoption&, stringstream&);
-  void PLOT_DOS(aurostd::xoption&, stringstream&,const xDOSCAR&);  //CO20191110
-  void PLOT_PDOS(aurostd::xoption&);
-  void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&); //CO20191110
-  void PLOT_PDOS(aurostd::xoption&, stringstream&);
-  void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&);  //CO20191110
-  void PLOT_BAND(aurostd::xoption&);
-  void PLOT_BAND(aurostd::xoption&, stringstream&);
+  void PLOT_DOS(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_DOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_DOS(aurostd::xoption&,const xDOSCAR&,ostream& oss=cout); //CO20191110 //CO20200404
+  void PLOT_DOS(aurostd::xoption&,const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110 //CO20200404
+  void PLOT_DOS(aurostd::xoption&,stringstream&,ostream& oss=cout); //CO20200404
+  void PLOT_DOS(aurostd::xoption&,stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_DOS(aurostd::xoption&,stringstream&,const xDOSCAR&,ostream& oss=cout);  //CO20191110  //CO20200404
+  void PLOT_DOS(aurostd::xoption&,stringstream&,const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20191110  //CO20200404
+  
+  void PLOT_PDOS(aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void PLOT_PDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&,ostream& oss=cout); //CO20191110 //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110 //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, stringstream&,ostream& oss=cout); //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&,ostream& oss=cout);  //CO20191110 //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20191110 //CO20200404
+  
+  void PLOT_BAND(aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void PLOT_BAND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_BAND(aurostd::xoption&, stringstream&,ostream& oss=cout); //CO20200404
+  void PLOT_BAND(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void BANDDOS2JSON(ostream&, string);
-  void PLOT_BANDDOS(aurostd::xoption&);
-  void PLOT_BANDDOS(aurostd::xoption&, stringstream&);
+  void PLOT_BANDDOS(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_BANDDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_BANDDOS(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
+  void PLOT_BANDDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Helper functions
-  xstructure getStructureWithNames(const aurostd::xoption&, const string& carstring="CAR");  //CO20191110
+  xstructure getStructureWithNames(const aurostd::xoption&,const string& carstring="CAR",ostream& oss=cout);  //CO20191110 //CO20200404
+  xstructure getStructureWithNames(const aurostd::xoption&,ofstream& FileMESSAGE,const string& carstring="CAR",ostream& oss=cout);  //CO20191110 //CO20200404
   string getLatticeFromKpointsTitle(const string&);
   void shiftEfermiToZero(xEIGENVAL&, double);
   void setEMinMax(aurostd::xoption&, double, double);
 
   // DOS
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&);
+  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Bands
   void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);
@@ -3496,25 +3516,38 @@ namespace plotter {
   string getFormattedUnit(const string&);
 
   // Phonons -----------------------------------------------------------------
-  void PLOT_PHDOS(aurostd::xoption&);
-  void PLOT_PHDOS(aurostd::xoption&, stringstream&);
-  void PLOT_PHDISP(aurostd::xoption&);
-  void PLOT_PHDISP(aurostd::xoption&, stringstream&);
-  void PLOT_PHDISPDOS(aurostd::xoption&);
-  void PLOT_PHDISPDOS(aurostd::xoption&, stringstream&);
+  void PLOT_PHDOS(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_PHDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_PHDOS(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
+  void PLOT_PHDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+
+  void PLOT_PHDISP(aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void PLOT_PHDISP(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_PHDISP(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_PHDISPDOS(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_PHDISPDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_PHDISPDOS(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20204004
+  void PLOT_PHDISPDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20204004
+
   void convertEnergies(xEIGENVAL&, const string&);
   void convertEnergies(xDOSCAR&, const string&);
   double getEnergyConversionFactor(const string&);
 
   // Properties plotter ------------------------------------------------------
-  void PLOT_THERMO(aurostd::xoption&);
-  void PLOT_THERMO(aurostd::xoption&, stringstream&);
-  void PLOT_TCOND(aurostd::xoption&);
-  void PLOT_TCOND(aurostd::xoption&, stringstream&);
+  void PLOT_THERMO(aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void PLOT_THERMO(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_THERMO(aurostd::xoption&, stringstream&,ostream& oss=cout); //CO20200404
+  void PLOT_THERMO(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_TCOND(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_TCOND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_TCOND(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
+  void PLOT_TCOND(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // General plots -----------------------------------------------------------
-  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int);
-  void plotMatrix(xoption& plotoptions, stringstream&);
+  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ostream& oss=cout); //CO20200404
+  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void plotMatrix(xoption& plotoptions, stringstream&,ostream& oss=cout); //CO20200404
+  void plotMatrix(xoption& plotoptions, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void setPlotLabels(aurostd::xoption&, const string&, const string&, const string&, const string&);
   vector<vector<double> > readAflowDataFile(aurostd::xoption&);
   void generatePlotGNUPLOT(stringstream&, const xoption&, const vector<vector<double> >&);

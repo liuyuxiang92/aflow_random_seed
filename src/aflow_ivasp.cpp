@@ -5516,10 +5516,11 @@ namespace KBIN {
 // ***************************************************************************//
 namespace KBIN {
   xstructure GetMostRelaxedStructure(string directory) {
+    string soliloquy="KBIN::GetMostRelaxedStructure():";  //CO20200404
     string POSCARfile;
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
     deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - KBIN::ExtractAtomicSpecies: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+    if(vext.size()!=vcat.size()) { cerr << "ERROR - " << soliloquy << " vext.size()!=vcat.size(), aborting." << endl; exit(0); } //CO20200404
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //READ POSCAR.orig
@@ -5591,12 +5592,13 @@ namespace KBIN {
 // ***************************************************************************//
 namespace KBIN {
   vector<string> ExtractAtomicSpecies(string directory) {
+    string soliloquy="KBIN::ExtractAtomicSpecies():"; //CO20200404
     string OUTCARfile; //, POSCARfile;
     string file_outcar_tmp=aurostd::TmpFileCreate("OUTCAR.tmp");
 
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
     deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - KBIN::ExtractAtomicSpecies: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+    if(vext.size()!=vcat.size()) { cerr << "ERROR - " << soliloquy << " vext.size()!=vcat.size(), aborting." << endl; exit(0); } //CO20200404
 
     xstructure xstr_name=GetMostRelaxedStructure(directory); //CO20180626
 

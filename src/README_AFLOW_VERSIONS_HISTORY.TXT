@@ -41,6 +41,8 @@
         -- patched hull_energy sign (CO)
         -- added chull_check to Makefile (CO)
         -- patched --bandgap and --bandgapdos to work with extension-less OUTCAR/DOSCAR (CO)
+        -- patched species-project dos plot issues: lacking species key and emax TOO high (CO)
+        -- added logger objects to plotter functions (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
