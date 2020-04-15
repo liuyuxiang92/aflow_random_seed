@@ -53,7 +53,7 @@ namespace cce {
   void write_corrections(aurostd::xoption& flags, std::istream& ist); // ME20200213
   vector<double> calculate_corrections(const string& directory_path);
   vector<double> calculate_corrections(xstructure& structure, string& functional);
-  void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
+  void CCE_core(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   // read user input (from command line or directory path)
   xstructure read_structure(const string& structure_file, int=IOAFLOW_AUTO); // set xstructure mode argument only here and it is automoatically recognized in the main CCE cpp file
   xstructure read_structure(std::istream& ist);

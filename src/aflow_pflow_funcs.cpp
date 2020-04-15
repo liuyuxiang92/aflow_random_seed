@@ -6925,8 +6925,8 @@ namespace pflow {
     int natoms=pflow::GetNumAtoms(str);
     double vol=pflow::GetVol(lat);
     matrix<double> atfpos=pflow::GetFpos(str);
-    vector<int> attyp=pflow::GetTypes(str);
-    vector<string> names=pflow::GetNames(str);
+    vector<int> attyp=GetTypes(str);
+    vector<string> names=GetNames(str);
     // Charges should be stored in names - turn into vector of doubles.
     vector<double> atchg(natoms);
     double totchg=0;
@@ -7161,8 +7161,8 @@ namespace pflow {
     int natoms=pflow::GetNumAtoms(str);
     // double vol=pflow::GetVol(lat);  // DANE not used
     matrix<double> atfpos=pflow::GetFpos(str);
-    vector<int> attyp=pflow::GetTypes(str);
-    vector<string> names=pflow::GetNames(str);
+    vector<int> attyp=GetTypes(str);
+    vector<string> names=GetNames(str);
     // Charges should be stored in names - turn into vector of doubles.
     vector<double> atchg(natoms);
     double totchg=0;

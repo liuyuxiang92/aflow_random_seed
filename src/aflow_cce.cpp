@@ -91,7 +91,7 @@ namespace cce {
     /********************************************************/
     // obtain total CCE corrections per cell from CCE core function only based on
     // structure, oxidation numbers and functional information
-    CCE_core(structure, cce_vars, cce_flags);
+    CCE_core(structure, cce_flags, cce_vars);
 
     // CALCULATE CORRECTED FORMATION ENTHALPIES AT 298.15 AND 0K ###################################
     if (cce_flags.flag("CORRECTABLE")){
@@ -187,7 +187,7 @@ namespace cce {
     cce_vars.vfunctionals.push_back(functional);
     cce_vars.offset.push_back(get_offset(functional));
     // run main CCE function to determine correction
-    CCE_core(structure, cce_vars, cce_flags);
+    CCE_core(structure, cce_flags, cce_vars);
     // cce_vars.cce_corrections can be returned directly since there is always only one functional for this CCE function
     return cce_vars.cce_correction;
   } // main CCE function for calling inside AFLOW
@@ -198,7 +198,7 @@ namespace cce {
   // main CCE function core called by all other main CCE functions
   // analyzing structure, determining oxidation numbers, assigning corrections,
   // and calculating total corrections
-  void CCE_core(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags) {
+  void CCE_core(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::CCE_core():";
     // corrections_atom, (su-)perox_correction, cce_correction and cce_form_energy_cell can only be resized after vfunctionals.size() is known from previous main CCE functions calling CCE_core
