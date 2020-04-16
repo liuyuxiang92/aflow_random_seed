@@ -10,6 +10,13 @@
 #ifndef _AFLOW_CCE_H_
 #define _AFLOW_CCE_H_
 
+static const string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U_ICSD,exp"; // when adding a new functional also introduce new 'offset' in get_offset function needed for reading corrections from lookup table
+static const string CCE_default_output_functionals= "PBE,LDA,SCAN,exp"; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
+static const double _CCE_NN_DIST_TOL_ = 0.5; // 0.5 Ang tolerance between shortest and longest bonds for each cation-anion pair; works best up to now; in future maybe bonding could be explicitly determined via Bader analysis
+static const double _CCE_NN_DIST_TOL_MULTI_ANION_ = 0.4; // 0.4 Ang tolerance between shortest and longest bonds for each bond when testing for multi-anion compound; it was found that the standard 0.5 Ang tol. is too large such that different anions appear to be bonded, which would prevent anions to be detected as such
+static const double _CCE_OX_TOL_ = 0.001; // choose small finite value since sum of oxidation states might not be exactly zero due to numerics
+static const double _CCE_SELF_DIST_TOL_ = 0.001; // distance tolerance in Ang for neighbor screening to savely exclude the cation itself having distance zero to itself
+
 namespace cce {
   struct CCE_Variables {
     vector<double> dft_energies;
@@ -67,46 +74,46 @@ namespace cce {
   CCE_Variables init_variables(const xstructure&); // ME20200213
   // structural analysis
   string determine_anion_species(const xstructure& structure, CCE_Variables& cce_vars);
-  vector<uint> check_for_multi_anion_system(CCE_Variables& cce_vars, double tolerance, xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  vector<double> get_dist_cutoffs(double tolerance, const xstructure& structure);
-  vector<uint> get_num_neighbors(double tolerance, xstructure& structure);
-  vector<uint> get_num_neighbors(const string& anion_species, double tolerance, xstructure& structure);
-  vector<uint> get_num_neighbors(const string& anion_species, double tolerance, xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
-  void check_per_super_oxides(xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags, ostream& oss=std::cout);
+  vector<uint> check_for_multi_anion_system(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_MULTI_ANION_, ostream& oss=std::cout);
+  vector<uint> get_num_neighbors(xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
+  vector<uint> get_num_neighbors(xstructure& structure, const string& anion_species, double tolerance=_CCE_NN_DIST_TOL_);
+  vector<uint> get_num_neighbors(xstructure& structure, const string& anion_species, xoption& cce_flags, CCE_Variables& cce_vars, double tolerance=_CCE_NN_DIST_TOL_, ostream& oss=std::cout);
+  vector<double> get_dist_cutoffs(const xstructure& structure, double tolerance=_CCE_NN_DIST_TOL_);
+  void check_per_super_oxides(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // determine oxidation numbers from electronegativities
   vector<double> get_oxidation_states_from_electronegativities(xstructure& structure);
-  vector<double> get_oxidation_states_from_electronegativities(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags, ostream& oss=std::cout);
+  vector<double> get_oxidation_states_from_electronegativities(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void set_anion_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
   void sort_species_by_electronegativity(const xstructure& structure, CCE_Variables& cce_vars);
-  void load_ox_states_templates_each_species(const xstructure& structure, CCE_Variables& cce_vars, xoption& cce_flags);
+  void load_ox_states_templates_each_species(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
   void try_preferred_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
-  void treat_SbO2_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  void treat_Pb3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  void treat_Ti_O_Magneli_phase_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  void treat_Fe3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  void treat_Mn3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  void treat_Co3O4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  void treat_alkali_sesquioxide_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
+  void treat_SbO2_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void treat_Pb3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void treat_Ti_O_Magneli_phase_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void treat_Fe3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void treat_Mn3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void treat_Co3O4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void treat_alkali_sesquioxide_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // following special cases only needed when determining oxidation states from Bader charges
-  void treat_MnMoO4_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  void treat_Ca2Fe2O5_CaFe2O4_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  void treat_FeTiO3_LDA_special_case(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
+  void treat_MnMoO4_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void treat_Ca2Fe2O5_CaFe2O4_LDA_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void treat_FeTiO3_LDA_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   void try_all_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars);
-  void determine_cation_oxidation_states(const vector<vector<double> >& possible_ox_states, const xstructure& structure, CCE_Variables& cce_vars); // ME Nov. 2019
-  double print_oxidation_states_and_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
-  double print_oxidation_states_and_get_sum(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
+  void determine_cation_oxidation_states(const xstructure& structure, CCE_Variables& cce_vars, const vector<vector<double> >& possible_ox_states); // ME Nov. 2019
+  double print_oxidation_states_and_sum(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  double print_oxidation_states_and_get_sum(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   double get_oxidation_states_sum(CCE_Variables& cce_vars);
-  double get_oxidation_states_sum(CCE_Variables& cce_vars, xoption& cce_flags, ostream& oss=std::cout);
+  double get_oxidation_states_sum(xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // determine oxidation numbers from Bader charges (outdated)
-  vector<double> get_oxidation_states_from_Bader(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars, ostream& oss=std::cout);
-  void get_system_name_functional_from_aflow_in(const xstructure& structure, string& system_name, xoption& cce_flags, string& functional, CCE_Variables& cce_vars, ostream& oss=std::cout);
-  vector<double> get_Bader_charges_from_Bader_file(const string& Bader_file, const xstructure& structure, CCE_Variables& cce_vars);
-  vector<double> Bader_charges_to_oxidation_states(xoption& cce_flags, const xstructure& structure, CCE_Variables& cce_vars, string& functional);
-  void general_attempt_fixing_oxidation_states(CCE_Variables& cce_vars, const xstructure& structure, xoption& cce_flags, ostream& oss=std::cout);
+  vector<double> get_oxidation_states_from_Bader(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void get_system_name_functional_from_aflow_in(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& system_name, string& functional, ostream& oss=std::cout);
+  vector<double> get_Bader_charges_from_Bader_file(const xstructure& structure, CCE_Variables& cce_vars, const string& Bader_file);
+  vector<double> Bader_charges_to_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, string& functional);
+  void general_attempt_fixing_oxidation_states(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
   // assign corrections
-  void get_corrections(xoption& cce_flags, const xstructure& structure, vector<vector<double> >& corrections_atom, CCE_Variables& cce_vars, const vector<uint>& num_neighbors, const string& considered_anion_species);
-  void load_cation_corrections(CCE_Variables& cce_vars, const xstructure& structure, vector<vector<double> >& corrections_atom, const string& corrections_line, uint i);
-  void set_anion_corrections(CCE_Variables& cce_vars, const xstructure& structure, vector<vector<double> >& corrections_atom, uint i);
+  void get_corrections(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, const string& considered_anion_species, const vector<uint>& num_neighbors, vector<vector<double> >& corrections_atom);
+  void load_cation_corrections(const xstructure& structure, CCE_Variables& cce_vars, const string& corrections_line, vector<vector<double> >& corrections_atom, uint i);
+  void set_anion_corrections(const xstructure& structure, CCE_Variables& cce_vars, vector<vector<double> >& corrections_atom, uint i);
   void check_get_per_super_ox_corrections(CCE_Variables& cce_vars);
   // apply corrections and get corrected formation enthalpies
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
