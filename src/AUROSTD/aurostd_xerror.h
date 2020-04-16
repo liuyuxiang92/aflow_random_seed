@@ -48,8 +48,8 @@ namespace aurostd {
       ~xerror() throw() {};
       int error_code;
       std::string what();
-      std::string whereFunction();  //CO191201
-      std::string whereFileName();  //CO191201
+      std::string whereFunction();  //CO20191201
+      std::string whereFileName();  //CO20191201
       std::string error_message;
     private:
       int error_type, error_number;

@@ -107,7 +107,7 @@ namespace pflow {
   string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX20181004
   vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow); //DX20181004 //DX20190314 - changed return value
   vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20190314 - overloaded 
-  // [OBSOLETE] DX20170901 void DATA(string smode,istream& input);
+  // DX20170901 [OBSOLETE] void DATA(string smode,istream& input);
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss=cout); // DX20170901 - SGDATA + JSON
   void DATA1(string options,istream& input);
   void DATA2(istream& input);
@@ -477,7 +477,7 @@ namespace pflow {
   void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt",bool already_calculated=false); // CO20171027
   void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, aurostd::xoption& vpflow, const string& format="txt",bool already_calculated=false); //DX20180823
   void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt",bool already_calculated=false); //DX20180822
-  // [OBSOLETE] DX20170901 void PrintData(const xstructure&,ostream& oss,string mode,const string& format="txt",bool already_calculated=false);
+  // DX20170901 [OBSOLETE] void PrintData(const xstructure&,ostream& oss,string mode,const string& format="txt",bool already_calculated=false);
   void PrintData(const xstructure& str,ostream& oss,string smode,double tolerance, bool no_scan, const int& sg_setting=1, const string& format="txt");
   void PrintData(const xstructure& str,ostream& oss,string smode,const string& format="txt");
   void PrintData1(const xstructure& str1,const double& rcut,ostream& oss);
