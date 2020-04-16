@@ -1,5 +1,7 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        -- Separated harmonic force constants and Born effective charges/dielectric tensor into separate hibernate files. (ME)
+        -- APL will not always read harmonic force constants when HIBERNATE=ON. (ME)
         -- Fixed multiplot bug in plotter. (ME)
         -- Added feature to plotter that allows setting the output image file name. (ME)
         -- Made adding directory to plot functions optional. Will take ./ as default. (ME)

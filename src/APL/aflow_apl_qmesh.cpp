@@ -31,23 +31,26 @@ namespace apl {
     free();
   }
 
-  QMesh::QMesh(ofstream& mf) {
+  QMesh::QMesh(ofstream& mf, ostream& os) {
     free();
     messageFile = &mf;
+    oss = &os;
   }
 
-  QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf,
+  QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf, ostream& os,
       bool include_inversions, bool gamma_centered, string directory) {
     free();
     messageFile = &mf;
+    oss = &os;
     _directory = directory;
     initialize(grid, xs, include_inversions, gamma_centered);
   }
 
-  QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf,
+  QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf, ostream& os,
       bool include_inversions, bool gamma_centered, string directory) {
     free();
     messageFile = &mf;
+    oss = &os;
     _directory = directory;
     initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
   }
@@ -72,6 +75,7 @@ namespace apl {
     _littleGroups = that._littleGroups;
     _littleGroupsCalculated = that._littleGroupsCalculated;
     messageFile = that.messageFile;
+    oss = that.oss;
     _directory = that._directory;
     _nIQPs = that._nIQPs;
     _nQPs = that._nQPs;
@@ -116,9 +120,10 @@ namespace apl {
     _weights.clear();
   }
 
-  void QMesh::clear(ofstream& mf) {
+  void QMesh::clear(ofstream& mf, ostream& os) {
     free();
     messageFile = &mf;
+    oss = &os;
   }
 
 }  // namespace apl
@@ -229,7 +234,7 @@ namespace apl {
   void QMesh::generateGridPoints(bool force_gamma) {
     stringstream message;
     message << "Generating a " << _qptGrid[1] << "x" << _qptGrid[2] << "x" << _qptGrid[3] << " q-point mesh.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, *oss);
     _qpoints.resize(_nQPs);
     _ibzqpts.resize(_nQPs);  // Before making the mesh irreducible, treat all q-points as irreducible q-points
     _weights.assign(_nQPs, 1);
@@ -346,7 +351,7 @@ namespace apl {
     }
     _reduced = true;
     message << "Found " << _nIQPs << " irreducible qpoints.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, *oss);
   }
 
   // ME20200109

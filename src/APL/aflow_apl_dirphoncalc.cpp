@@ -24,14 +24,14 @@ namespace apl {
 
   DirectMethodPC::DirectMethodPC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, string& AflowIn, ofstream& mf)
-    : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf) {
+      _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os)
+    : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, os) {
       free();
     }
 
   DirectMethodPC::DirectMethodPC(const DirectMethodPC& that)
     : ForceConstantCalculator(*that._supercell, *that._xInput, *that._aflowFlags, *that._kbinFlags,
-      *that._xFlags, *that._AflowIn, *that.messageFile) {
+      *that._xFlags, *that._AflowIn, *that.messageFile, *that.oss) {
     free();
     copy(that);
   }
@@ -49,7 +49,7 @@ namespace apl {
   }
 
   void DirectMethodPC::clear(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
+      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os) {
     free();
     _supercell = &sc;
     _xInput = &xinput;
@@ -58,6 +58,7 @@ namespace apl {
     _xFlags = &xflags;
     _AflowIn = &AflowIn;
     messageFile = &mf;
+    oss = &os;
   }
 
   void DirectMethodPC::copy(const DirectMethodPC& that) {
@@ -72,6 +73,7 @@ namespace apl {
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
     messageFile = that.messageFile;
+    oss = that.oss;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
     _kbinFlags = that._kbinFlags;
@@ -173,7 +175,7 @@ namespace apl {
         generate_plus_minus = vvgenerate_plus_minus[i][j];
         if (AUTO_GENERATE_PLUS_MINUS && !generate_plus_minus) {
           message << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "].";
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
         }
         for (uint k = 0; k < (generate_plus_minus ? 2 : 1); k++) {
           //CO - END
@@ -243,7 +245,7 @@ namespace apl {
             xInputs[idxRun].setDirectory(_xInput->getDirectory() + "/" + runname);
             if (!filesExistPhonons(xInputs[idxRun])) {
               message << "Creating " << xInputs[idxRun].getDirectory();
-              pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+              pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
               createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInputs[idxRun], *messageFile);
               stagebreak = true;
             }
@@ -280,7 +282,7 @@ namespace apl {
         xInputs[idxRun].setDirectory(_xInput->getDirectory() + "/" + runname);
         if (!filesExistPhonons(xInputs[idxRun])) {
           message << "Creating " << xInputs[idxRun].getDirectory();
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
           createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInputs[idxRun], *messageFile);
           stagebreak = true;
         }
@@ -471,7 +473,7 @@ namespace apl {
       dof += _uniqueDistortions[i].size();
     }
     message << "Found " << dof << " degree(s) of freedom.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms();
     for (uint i = 0; i < natoms; i++) {  //CO200212 - int->uint
       uint id = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
@@ -482,7 +484,7 @@ namespace apl {
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](1) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](2) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](3) << "].";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
       }
     }
   }
@@ -682,7 +684,7 @@ namespace apl {
     //CO - END
     // Show info
     message << "Calculating the missing force fields by symmetry.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
 
     // Let's go
     for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
@@ -884,7 +886,7 @@ namespace apl {
 
     //
     message << "Calculating the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
 
     // We have a party. Let's fun with us...
     //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO20190218
@@ -987,79 +989,10 @@ namespace apl {
 
 namespace apl {
 
-  void DirectMethodPC::hibernate(const string& filename) {
-    stringstream outfile;
-
-    writeHibernateHeader(outfile);
-    writeForceField(outfile);
-    writeForceConstants(outfile);
-    if (_isPolarMaterial) writePolar(outfile);
-    outfile << "</apl>" << std::endl;
-
-    aurostd::stringstream2file(outfile, filename); //ME20181226
-    if (!aurostd::FileExist(filename)) { //ME20181226
-      string function = "ForceConstantCalculator::hibernate()";
-      string message = "Cannot open output file " + filename + "."; //ME20181226
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-    }
-  }
-
-  void DirectMethodPC::writeForceField(stringstream& outfile) {
-    string tab = " ";
-    // Unique distortions
-    outfile << tab << "<distortions units=\"Angstrom\" cs=\"cartesian\">" << std::endl;
-
-    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-    outfile << setprecision(8);
-    outfile << tab << tab << "<i name=\"magnitude\">" << setw(15) << DISTORTION_MAGNITUDE << "</i>" << std::endl;
-
-    outfile << tab << tab << "<varray>" << std::endl;
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-      outfile << tab << tab << tab << "<varray atomID=\"" << _supercell->getUniqueAtomID(i) << "\">" << std::endl;
-      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        outfile << tab << tab << tab << tab << "<v>";
-        outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-        outfile << setprecision(8);
-        outfile << setw(15) << _uniqueDistortions[i][j](1) << " ";
-        outfile << setw(15) << _uniqueDistortions[i][j](2) << " ";
-        outfile << setw(15) << _uniqueDistortions[i][j](3);
-        outfile << "</v>" << std::endl;
-      }
-      outfile << tab << tab << tab << "</varray>" << std::endl;
-    }
-    outfile << tab << tab << "</varray>" << std::endl;
-    outfile << tab << "</distortions>" << std::endl;
-
-    // Forces
-    outfile << tab << "<forcefields units=\"eV/Angstrom\" cs=\"cartesian\">" << std::endl;
-    outfile << tab << tab << "<varray>" << std::endl;
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-      outfile << tab << tab << tab << "<varray atomID=\"" << _supercell->getUniqueAtomID(i) << "\">" << std::endl;
-      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        outfile << tab << tab << tab << tab << "<varray distortion=\"" << j << "\">" << std::endl;
-        for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
-          outfile << tab << tab << tab << tab << tab << "<v>";
-          outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-          outfile << setprecision(15);
-          outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](1) << " ";
-          outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](2) << " ";
-          outfile << setw(24) << std::scientific << _uniqueForces[i][j][k](3);
-          outfile << "</v>" << std::endl;
-        }
-        outfile << tab << tab << tab << tab << "</varray>" << std::endl;
-      }
-      outfile << tab << tab << tab << "</varray>" << std::endl;
-    }
-    outfile << tab << tab << "</varray>" << std::endl;
-    outfile << tab << "</forcefields>" << std::endl;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-
   void DirectMethodPC::writeDYNMAT() {
     string filename = aurostd::CleanFileName(_aflowFlags->Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
     string message = "Writing forces into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
 
     stringstream outfile;
 
@@ -1114,13 +1047,13 @@ namespace apl {
   void DirectMethodPC::writeFORCES() {
     string function = "apl::DirectMethodPC::writeFORCES()";
     string message = "Writing forces into file FORCES.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
 
     xstructure ix;
     string filename = "SPOSCAR";
     if (!aurostd::FileEmpty(filename)) {
       message = "Reading " + filename;
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
       stringstream SPOSCAR;
       aurostd::efile2stringstream(filename, SPOSCAR);
       SPOSCAR >> ix;
@@ -1185,7 +1118,7 @@ namespace apl {
   void DirectMethodPC::writeXCrysDenForces() {
     string function = "apl::DirectMethodPC::writeXCrysDenForces()";
     string message = "Writing forces into file XCrysDenForces.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
     _supercell->center_original();  //COREY
 
     stringstream outfile;  //CO

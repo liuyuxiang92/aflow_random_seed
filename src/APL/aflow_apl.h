@@ -233,12 +233,12 @@ namespace apl {
     // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
     public:
       ClusterSet();
-      ClusterSet(const Supercell&, int, double, ofstream&, _aflags&);  // Constructor
-      ClusterSet(const string&, const Supercell&, int, double, int, ofstream&, _aflags&);  // From file
+      ClusterSet(const Supercell&, int, double, ofstream&, _aflags&, ostream& oss=std::cout);  // Constructor
+      ClusterSet(const string&, const Supercell&, int, double, int, ofstream&, _aflags&, ostream& oss=std::cout);  // From file
       ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
       ~ClusterSet();  // Destructor
       const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
-      void clear(ofstream&, _aflags&);
+      void clear(ofstream&, _aflags&, ostream& oss=std::cout);
       void initialize(const Supercell&, int, double);
 
       vector<_cluster> clusters;
@@ -266,6 +266,7 @@ namespace apl {
 
     private:
       ofstream* messageFile;
+      ostream* oss;
       _aflags* aflags;
 
       void free();
@@ -333,11 +334,11 @@ namespace apl {
     // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
     public:
       AnharmonicIFCs();
-      AnharmonicIFCs(_xinput&, _aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&);
+      AnharmonicIFCs(_xinput&, _aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&, ostream& oss=std::cout);
       AnharmonicIFCs(const AnharmonicIFCs&);
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
       ~AnharmonicIFCs();
-      void clear(_xinput&,_aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&);
+      void clear(_xinput&,_aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&, ostream& oss=std::cout);
 
       void setOptions(double, int, double, double, bool);
       int getOrder() const;
@@ -355,7 +356,7 @@ namespace apl {
       _xflags* _xFlags;
       ClusterSet* clst;
       ofstream* messageFile;
-      bool new_ofstream;
+      ostream* oss;
 
       vector<_xinput> xInputs;
       bool _useZeroStateForces;
@@ -585,6 +586,7 @@ namespace apl {
     private:
       string _directory;  // for the logger
       ofstream* messageFile;
+      ostream* oss;
       xstructure _inStructure;
       xstructure _inStructure_original;  //CO
       xstructure _inStructure_light;     //CO, does not include HEAVY symmetry stuff
@@ -614,11 +616,11 @@ namespace apl {
 
     public:
       Supercell();
-      Supercell(const xstructure&, ofstream&, string="./"); //CO20181226
+      Supercell(const xstructure&, ofstream&, ostream& oss=std::cout, string="./"); //CO20181226
       Supercell(const Supercell&);
       Supercell& operator=(const Supercell&);
       ~Supercell();
-      void clear(ofstream&);
+      void clear(ofstream&, ostream&);
       void setDirectory(const string&);
       string getDirectory() const;
       void initialize(const xstructure&);  // ME20191225
@@ -755,6 +757,7 @@ namespace apl {
       _xflags* _xFlags; //_vflags& _vaspFlags;
       string* _AflowIn;
       ofstream* messageFile;
+      ostream* oss;
 
       vector<_xinput> xInputs;
 
@@ -781,26 +784,26 @@ namespace apl {
       void symmetrizeForceConstantMatrices();
       void correctSumRules();
 
+      void writeHarmonicIFCs(const string&);
+      void writeBornChargesDielectricTensor(const string&);
+
       void printForceConstantMatrices(ostream&);
       void printFCShellInfo(ostream&);
 
     public:
       ForceConstantCalculator();
-      ForceConstantCalculator(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      ForceConstantCalculator(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
       ForceConstantCalculator(const ForceConstantCalculator&);
       ForceConstantCalculator& operator=(const ForceConstantCalculator&);
       virtual ~ForceConstantCalculator() {};
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
 
       virtual bool runVASPCalculations(bool) {return false;};  // ME20191029
       bool runVASPCalculationsBE(_xinput&, uint);
       void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME20200218
 
       bool run();  // ME20191029
-      virtual void hibernate(const string&) {};
-      void writeHibernateHeader(stringstream&);
-      void writeForceConstants(stringstream&);
-      void writePolar(stringstream&);
+      void hibernate();
 
       const vector<vector<xmatrix<double> > >& getForceConstants() const;
       const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
@@ -850,11 +853,11 @@ namespace apl {
 
     public:
       DirectMethodPC();
-      DirectMethodPC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      DirectMethodPC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
       DirectMethodPC(const DirectMethodPC&);
       DirectMethodPC& operator=(const DirectMethodPC&);
       ~DirectMethodPC();
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
 
       bool calculateForceFields();  // ME20190412  // ME20191029
       // Easy access to global parameters
@@ -870,7 +873,6 @@ namespace apl {
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO20190108
       bool calculateForceConstants();  // ME20200211
 
-      void hibernate(const string&);
       void writeFORCES();
       void writeDYNMAT();
       void writeXCrysDenForces();
@@ -942,7 +944,7 @@ namespace apl {
           _aflags& aflags, _kflags& kflags,
           _xflags& xflags,
           string&,
-          ofstream& mf);
+          ofstream& mf, ostream& os=std::cout);
       ~QHA_AFLOWIN_CREATOR();
       void clear();
     public:
@@ -1018,16 +1020,14 @@ namespace apl {
 
     public:
       LinearResponsePC();
-      LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
       LinearResponsePC(const LinearResponsePC&);
       LinearResponsePC& operator=(const LinearResponsePC&);
       ~LinearResponsePC();
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&);
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
 
       bool runVASPCalculations(bool);  // ME20191029
       bool calculateForceConstants();  // ME20200211
-
-      void hibernate(const string&);
   };
 }  // namespace apl
 
@@ -1040,7 +1040,7 @@ namespace apl {
     public:
       GeneralizedSupercellApproach(Supercell&, _xinput&,
           _aflags&, _kflags&, _xflags&, //_vflags&, 
-          string&, ofstream&);
+          string&, ofstream&, ostream& os=std::cout);
       ~GeneralizedSupercellApproach();
       void clear();
   };
@@ -1075,11 +1075,15 @@ namespace apl {
       vector<vector<vector<double> > > anharmonicIFCs;
       vector<vector<vector<int> > > clusters;
       ofstream* messageFile;
-
+      ostream* oss;
 
     private:
       void copy(const PhononCalculator&);  // ME20191228
       void free();
+
+      void readHarmonicIFCs(const string&);
+      void readBornChargesDielectricTensor(const string&);
+
       xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&);
       xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&,
           vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180829
@@ -1088,11 +1092,11 @@ namespace apl {
 
     public:
       PhononCalculator();
-      PhononCalculator(Supercell&, ofstream&);
+      PhononCalculator(Supercell&, ofstream&, ostream& oss=std::cout);
       PhononCalculator(const PhononCalculator&);
       PhononCalculator& operator=(const PhononCalculator&);
-      virtual ~PhononCalculator();
-      void clear(Supercell&, ofstream&);
+      ~PhononCalculator();
+      void clear(Supercell&, ofstream&, ostream& oss=std::cout);
 
       // Getter functions
       const Supercell& getSupercell() const;
@@ -1102,7 +1106,8 @@ namespace apl {
       string getSystemName() const;  // ME20190614
       string getDirectory() const;
       int getNCPUs() const;
-      ofstream& getOutputStream();
+      ofstream& getOutputFileStream();
+      ostream& getOutputStringStream();
       bool isPolarMaterial() const;  // ME20200206
       const vector<vector<xmatrix<double> > >& getHarmonicForceConstants() const;
       const vector<vector<double> >& getAnharmonicForceConstants(int) const;
@@ -1112,12 +1117,13 @@ namespace apl {
       void setSystem(const string&);
       void setDirectory(const string&);
       void setNCPUs(const _kflags&);
+      void setPolarMaterial(bool);
 
       // IFCs
       void setHarmonicForceConstants(const ForceConstantCalculator&);
-      void awake(const string&, bool=true);
+      void awake();
       void setAnharmonicForceConstants(const AnharmonicIFCs&);
-      void readAnharmonicIFCs(string, bool=true);
+      void readAnharmonicIFCs(string);
 
       // Dynamical Matrix/Frequencies
       xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
@@ -1353,13 +1359,13 @@ namespace apl {
   class QMesh {
     public:
       QMesh();
-      QMesh(ofstream&);
-      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool=true, bool=true, string="./");
-      QMesh(const vector<int>&, const xstructure&, ofstream&, bool=true, bool=true, string="./");
+      QMesh(ofstream&, ostream& os=std::cout);
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
+      QMesh(const vector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
-      void clear(ofstream&);
+      void clear(ofstream&, ostream& os=std::cout);
       void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
 
@@ -1409,6 +1415,7 @@ namespace apl {
       void copy(const QMesh&);
 
       ofstream* messageFile;
+      ostream* oss;
       string _directory;
 
       vector<int> _ibzqpts;  // The indices of the irreducible q-points
@@ -1597,6 +1604,7 @@ namespace apl {
   class ThermalPropertiesCalculator {
     private:
       ofstream* messageFile;
+      ostream* oss;
       string _directory;
       std::vector<double> _freqs_0K;
       std::vector<double> _dos_0K;
@@ -1610,13 +1618,13 @@ namespace apl {
 
     public:
       ThermalPropertiesCalculator();
-      ThermalPropertiesCalculator(ofstream&);
-      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, string="./");
-      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, string="./");
+      ThermalPropertiesCalculator(ofstream&, ostream& os=std::cout);
+      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, ostream& os=std::cout, string="./");
+      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, ostream& os=std::cout, string="./");
       ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
       ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
       ~ThermalPropertiesCalculator();
-      void clear(ofstream&);
+      void clear(ofstream&, ostream& os=std::cout);
 
       void setDirectory(const string&);
       string getDirectory() const;
@@ -1671,11 +1679,11 @@ namespace apl {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
       TCONDCalculator();
-      TCONDCalculator(PhononCalculator&, QMesh&, ofstream&, _aflags&);
+      TCONDCalculator(PhononCalculator&, QMesh&, _aflags&);
       TCONDCalculator(const TCONDCalculator&);
       TCONDCalculator& operator=(const TCONDCalculator&);
       ~TCONDCalculator();
-      void clear(PhononCalculator&, QMesh&, ofstream&, _aflags&);
+      void clear(PhononCalculator&, QMesh&, _aflags&);
       void initialize();
 
       aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
@@ -1700,7 +1708,6 @@ namespace apl {
       PhononCalculator* _pc;  // Reference to the phonon calculator
       QMesh* _qm;  // Reference to the q-point mesh
       Logger _logger;  // The APL logger
-      ofstream* messageFile;
       _aflags* aflags;
 
       void free();

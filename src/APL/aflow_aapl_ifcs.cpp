@@ -51,13 +51,14 @@ namespace apl {
   }
 
   AnharmonicIFCs::AnharmonicIFCs(_xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, ClusterSet& _clst, ofstream& mf) {
+      _xflags& xflags, ClusterSet& _clst, ofstream& mf, ostream& os) {
     free();
     _xInput = &xinput;
     _aflowFlags = &aflags;
     _kbinFlags = &kflags;
     _xFlags = &xflags;
     messageFile = &mf;
+    oss = &os;
     clst = &_clst;
     order = clst->order;
   }
@@ -86,6 +87,7 @@ namespace apl {
     clst = that.clst;
     distortion_magnitude = that.distortion_magnitude;
     messageFile = that.messageFile;
+    oss = that.oss;
     force_constants = that.force_constants;
     max_iter = that.max_iter;
     mixing_coefficient = that.mixing_coefficient;
@@ -114,7 +116,7 @@ namespace apl {
 
   //clear/////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::clear(_xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, ClusterSet& _clst, ofstream& mf) {
+      _xflags& xflags, ClusterSet& _clst, ofstream& mf, ostream& os) {
     free();
     _xInput = &xinput;
     _aflowFlags = &aflags;
@@ -122,6 +124,7 @@ namespace apl {
     _xFlags = &xflags;
     clst = &_clst;
     messageFile = &mf;
+    oss = &os;
   }
 
 
@@ -156,7 +159,7 @@ namespace apl {
       _logger << "4th";
     }
     _logger << " order IFCs.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, *_aflowFlags, *messageFile, *oss);
 
     // Determine the number of runs so the run ID in the folder name can be
     // padded with the appropriate number of zeros.
@@ -186,7 +189,7 @@ namespace apl {
       }
       if (d == ndir) {
         string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, *_aflowFlags, *messageFile, std::cout, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, *_aflowFlags, *messageFile, *oss, _LOGGER_WARNING_);
         zerostate_chgcar = false;
       } else {
         chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
@@ -357,11 +360,11 @@ namespace apl {
     }
     vector<vector<vector<xvector<double> > > > force_tensors = storeForces(xInputs);
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", *_aflowFlags, *messageFile, *oss);
     vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst->ineq_distortions, force_tensors);
     force_tensors.clear();
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", *_aflowFlags, *messageFile, *oss);
     force_constants = symmetrizeIFCs(ifcs_unsym);
     return true;
   }
@@ -638,11 +641,11 @@ namespace apl {
     // Do iterations
     int num_iter = 0;
     double max_err = 0.0;
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", *_aflowFlags, *messageFile, std::cout);
-    std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-    std::cout << std::setw(15) << "Iteration";
-    std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-    std::cout << std::setw(20) << "Abs. max. error" << std::endl;
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", *_aflowFlags, *messageFile, *oss);
+    *oss << std::setiosflags(std::ios::fixed | std::ios::right);
+    *oss << std::setw(15) << "Iteration";
+    *oss << std::setiosflags(std::ios::fixed | std::ios::right);
+    *oss << std::setw(20) << "Abs. max. error" << std::endl;
     do {
       // 1. Symmetrize using linear combinations
       applyLinCombs(ifcs);  
@@ -660,10 +663,10 @@ namespace apl {
         }
       }
 
-      std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-      std::cout << std::setw(15) << num_iter;
-      std::cout << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-      std::cout << std::setw(20) << max_err << std::endl;
+      *oss << std::setiosflags(std::ios::fixed | std::ios::right);
+      *oss << std::setw(15) << num_iter;
+      *oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+      *oss << std::setw(20) << max_err << std::endl;
 
       // 4. Correct IFCs
       if (max_err > sumrule_threshold) {
@@ -671,7 +674,7 @@ namespace apl {
       }
       num_iter++;
     } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", *_aflowFlags, *messageFile, *oss);
     if (num_iter > max_iter) {
       string function = _AAPL_IFCS_ERR_PREFIX_ + "symmetrizeIFCs";
       stringstream message;

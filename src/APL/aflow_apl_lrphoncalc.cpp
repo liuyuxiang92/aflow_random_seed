@@ -22,14 +22,14 @@ namespace apl {
 
   LinearResponsePC::LinearResponsePC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, string& AflowIn, ofstream& mf)
-    : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf) {
+      _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os)
+    : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, os) {
       free();
     }
 
   LinearResponsePC::LinearResponsePC(const LinearResponsePC& that)
     : ForceConstantCalculator(*that._supercell, *that._xInput, *that._aflowFlags, *that._kbinFlags,
-      *that._xFlags, *that._AflowIn, *that.messageFile) {
+      *that._xFlags, *that._AflowIn, *that.messageFile, *that.oss) {
     free();
     copy(that);
   }
@@ -47,7 +47,7 @@ namespace apl {
   }
 
   void LinearResponsePC::clear(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
+      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os) {
     free();
     _supercell = &sc;
     _xInput = &xinput;
@@ -56,6 +56,7 @@ namespace apl {
     _xFlags = &xflags;
     _AflowIn = &AflowIn;
     messageFile = &mf;
+    oss = &os;
   }
 
   void LinearResponsePC::copy(const LinearResponsePC& that) {
@@ -64,6 +65,7 @@ namespace apl {
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
     messageFile = that.messageFile;
+    oss = that.oss;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
     _kbinFlags = that._kbinFlags;
@@ -94,7 +96,7 @@ namespace apl {
   bool LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
     if (zerostate_chgcar) {
       string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, *oss, _LOGGER_WARNING_);
     }
     bool stagebreak = false;
 
@@ -141,7 +143,7 @@ namespace apl {
       xInput.setDirectory(_xInput->getDirectory() + "/" + runname);
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
         createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *messageFile);
         stagebreak = true;
       }
@@ -184,7 +186,7 @@ namespace apl {
   bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
     string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
 
     // Read vasprun.xml
@@ -193,7 +195,7 @@ namespace apl {
       filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
       if (aurostd::EFileExist(filename)) {
         message << "Could not find vasprun.xml file for linear response calculations.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
         return false;
       }
     }
@@ -248,7 +250,7 @@ namespace apl {
     // Convert Hessian matrix into force constants
     for (uint i = 0; i < natoms; i++) {
       for (uint j = 0; j < natoms; j++) {
-        // Hessian matrix is normalized by masses, so multiply to get FCs
+        // Hessian matrix is normalized by masses, so multiply to get IFCs
         mass = std::sqrt(_supercell->getAtomMass(i) * _supercell->getAtomMass(j));
         for (int k = 0; k < 3; k++) {
           for (int l = 0; l < 3; l++) {
@@ -258,32 +260,6 @@ namespace apl {
       }
     }
     return true;
-  }
-
-}  // namespace apl
-
-//////////////////////////////////////////////////////////////////////////////
-//                                                                          //
-//                               FILE OUTPUT                                //
-//                                                                          //
-//////////////////////////////////////////////////////////////////////////////
-
-namespace apl {
-
-  void LinearResponsePC::hibernate(const string& filename) {
-    stringstream outfile;
-
-    writeHibernateHeader(outfile);
-    writeForceConstants(outfile);
-    if (_isPolarMaterial) writePolar(outfile);
-    outfile << "</apl>" << std::endl;
-
-    aurostd::stringstream2file(outfile, filename); //ME20181226
-    if (!aurostd::FileExist(filename)) { //ME20181226
-      string function = "ForceConstantCalculator::hibernate()";
-      string message = "Cannot open output file " + filename + "."; //ME20181226
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-    }
   }
 
 }  // namespace apl

@@ -25,7 +25,7 @@ namespace apl {
   }
 
   ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
+      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os) {
     free();
     _supercell = &sc;
     _xInput = &xinput;
@@ -34,6 +34,7 @@ namespace apl {
     _xFlags = &xflags;
     _AflowIn = &AflowIn;
     messageFile = &mf;
+    oss = &os;
   }
 
   ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) {
@@ -50,7 +51,7 @@ namespace apl {
   }
 
   void ForceConstantCalculator::clear(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf) {
+      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os) {
     free();
     _supercell = &sc;
     _xInput = &xinput;
@@ -59,6 +60,7 @@ namespace apl {
     _xFlags = &xflags;
     _AflowIn = &AflowIn;
     messageFile = &mf;
+    oss = &os;
   }
 
   void ForceConstantCalculator::copy(const ForceConstantCalculator& that) {
@@ -67,6 +69,7 @@ namespace apl {
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
     messageFile = that.messageFile;
+    oss = that.oss;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
     _kbinFlags = that._kbinFlags;
@@ -155,7 +158,7 @@ namespace apl {
     //CO - END
 
     string message = "Symmetrizing the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
 
     vector<xmatrix<double> > row;
     for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
@@ -276,7 +279,7 @@ namespace apl {
       xInput.setDirectory( _xInput->getDirectory() + "/" + runname );
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
         createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *messageFile);
         stagebreak = true;
       }
@@ -297,7 +300,7 @@ namespace apl {
         infilename = directory + string("/OUTCAR");
         if (!aurostd::EFileExist(infilename, infilename)) {
           message << "The OUTCAR file in " << directory << " is missing.";
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
           return false;
         }
       }
@@ -324,7 +327,7 @@ namespace apl {
       for (int b = 1; b <= 3; b++)
         message << std::fixed << std::setw(5) << std::setprecision(3) << _dielectricTensor(a, b) << " ";
 
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
     return true;
   }
 
@@ -419,17 +422,17 @@ namespace apl {
     //CO - END
     // Show charges
     message << "Input born effective charge tensors (for primitive cell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++) {
       int id = i;
       message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
         << std::setw(2) << _supercell->getInputStructure().atoms[id].cleanname
         << ") Born effective charge = ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
     }
 
     // Step1
@@ -481,7 +484,7 @@ namespace apl {
 
     // Step 3
     message << "Forcing the acoustic sum rule (ASR). Resulting born effective charges (for the supercell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
 
     xmatrix<double> sum(3, 3);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++)
@@ -506,7 +509,7 @@ namespace apl {
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
     }
   }
 
@@ -591,15 +594,27 @@ namespace apl {
 
 namespace apl {
 
-  void ForceConstantCalculator::writeHibernateHeader(stringstream& outfile) {
-    // XML declaration
-    outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
+  void ForceConstantCalculator::hibernate() {
+    string base = _aflowFlags->Directory + "/" + DEFAULT_APL_FILE_PREFIX;
+    string filename = aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE);
+    string message = "Writing harmonic IFCs into file " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+    writeHarmonicIFCs(filename);
+    if (_isPolarMaterial) {
+      filename = aurostd::CleanFileName(base + DEFAULT_APL_POLAR_FILE);
+      message = "Writing harmonic IFCs into file " + filename + ".";
+      writeBornChargesDielectricTensor(filename);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+    }
+  }
 
-    // Our structure
+  void ForceConstantCalculator::writeHarmonicIFCs(const string& filename) {
+    stringstream outfile;
     string tab = " ";
-    outfile << "<apl>" << std::endl;
 
-    // Info about calculation run
+    // Header
+    outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
+    outfile << "<apl>" << std::endl;
     outfile << tab << "<generator>" << std::endl;
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
@@ -608,10 +623,8 @@ namespace apl {
       << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
     outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
-  }
 
-  void ForceConstantCalculator::writeForceConstants(stringstream& outfile) {
-    string tab = " ";
+    // Force constants
     outfile << tab << "<fcms units=\"eV/Angstrom^2\" cs=\"cartesian\" rows=\""
       << _forceConstantMatrices.size() << "\" cols=\""
       << _forceConstantMatrices[0].size() << "\">" << std::endl;
@@ -637,10 +650,32 @@ namespace apl {
     }
     outfile << tab << tab << "</varray>" << std::endl;
     outfile << tab << "</fcms>" << std::endl;
+    outfile << "</apl>" << std::endl;
+
+    aurostd::stringstream2file(outfile, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "ForceConstantCalculator::writeHarmonicIFCs()";
+      string message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
   }
 
-  void ForceConstantCalculator::writePolar(stringstream& outfile) {
+  void ForceConstantCalculator::writeBornChargesDielectricTensor(const string& filename) {
+    stringstream outfile;
     string tab = " ";
+
+    // Header
+    outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
+    outfile << "<apl>" << std::endl;
+    outfile << tab << "<generator>" << std::endl;
+    string time = aflow_get_time_string();
+    if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
+    outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
+    outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
+      << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
+    outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
+    outfile << tab << "</generator>" << std::endl;
+
     // Born effective charge tensors
     outfile << tab << "<born units=\"a.u.\" cs=\"cartesian\">" << std::endl;
     outfile << tab << tab << "<varray>" << std::endl;
@@ -662,7 +697,7 @@ namespace apl {
     outfile << tab << tab << "</varray>" << std::endl;
     outfile << tab << "</born>" << std::endl;
 
-    // Dielectric constant matrix
+    // Dielectric tensor
     outfile << tab << "<epsilon units=\"a.u.\" cs=\"cartesian\">" << std::endl;
     outfile << tab << tab << "<matrix>" << std::endl;
     for (int k = 1; k <= 3; k++) {
@@ -677,6 +712,14 @@ namespace apl {
     }
     outfile << tab << tab << "</matrix>" << std::endl;
     outfile << tab << "</epsilon>" << std::endl;
+    outfile << "</apl>" << std::endl;
+
+    aurostd::stringstream2file(outfile, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "ForceConstantCalculator::writeHarmonicIFCs()";
+      string message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
   }
 
   // ///////////////////////////////////////////////////////////////////////////

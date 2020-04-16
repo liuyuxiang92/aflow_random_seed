@@ -4193,10 +4193,10 @@ namespace KBIN {
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  // ME 20181107
-  void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
-  void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general
-  void RunPhonons_APL_181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general //CO20181216
+  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&,ostream& oss=std::cout);  // ME 20181107
+  void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
+  void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
+  void RunPhonons_APL_181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
   void RunPhonons_APL_180101(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general //CO20181216
   // [OBSOLETE] bool PHON_RunPhonons(const xstructure& _str,_aflags& aflags,const double& radius,const bool& osswrite,ostream& oss);
   // ----------------------------------------------------------------------------
