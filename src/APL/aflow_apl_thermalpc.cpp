@@ -41,21 +41,24 @@ namespace apl {
     free();
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf, ostream& os) {
     free();
     messageFile = &mf;
+    oss = &os;
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, string directory) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, ostream& os, string directory) {
     free();
     messageFile = &mf;
+    oss = &os;
     _directory = directory;
     initialize(dosc.getBins(), dosc.getDOS(), dosc._system);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, string directory) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, ostream& os, string directory) {
     free();
     messageFile = &mf;
+    oss = &os;
     _directory = directory;
     vector<double> freq = aurostd::deque2vector(xdos.venergy);
     // Convert to THz
@@ -70,7 +73,10 @@ namespace apl {
   }
 
   ThermalPropertiesCalculator& ThermalPropertiesCalculator::operator=(const ThermalPropertiesCalculator& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 
@@ -84,6 +90,7 @@ namespace apl {
     _dos_0K = that._dos_0K;
     _directory = that._directory;
     messageFile = that.messageFile;
+    oss = that.oss;
     system = that.system;
     temperatures = that.temperatures;
     Cv = that.Cv;
@@ -107,9 +114,10 @@ namespace apl {
     U0 = 0.0;
   }
 
-  void ThermalPropertiesCalculator::clear(ofstream& mf) {
-    ThermalPropertiesCalculator that(mf);
-    copy(that);
+  void ThermalPropertiesCalculator::clear(ofstream& mf, ostream& os) {
+    free();
+    messageFile = &mf;
+    oss = &os;
   }
 
   void ThermalPropertiesCalculator::setDirectory(const string& directory) {

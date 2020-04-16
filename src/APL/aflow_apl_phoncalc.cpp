@@ -26,9 +26,10 @@ namespace apl {
     free();
   }
 
-  PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf) {
+  PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf, ostream& os) {
     free();
     messageFile = &mf;
+    oss = &os;
     _supercell = &sc;
     _directory = "./";
     _ncpus = 1;
@@ -62,6 +63,7 @@ namespace apl {
     _supercell = that._supercell;
     _system = that._system;
     messageFile = that.messageFile;
+    oss = that.oss;
   }
 
   PhononCalculator::~PhononCalculator() {
@@ -83,10 +85,11 @@ namespace apl {
   }
 
 
-  void PhononCalculator::clear(Supercell& sc, ofstream& mf) {
+  void PhononCalculator::clear(Supercell& sc, ofstream& mf, ostream& os) {
     free();
     _supercell = &sc;
     messageFile = &mf;
+    oss = &os;
   }
 
 }  // namespace apl
@@ -128,8 +131,12 @@ namespace apl {
     return _ncpus;
   }
 
-  ofstream& PhononCalculator::getOutputStream() {
+  ofstream& PhononCalculator::getOutputFileStream() {
     return *messageFile;
+  }
+
+  ostream& PhononCalculator::getOutputStringStream() {
+    return *oss;
   }
 
   // ME20200206
@@ -167,6 +174,10 @@ namespace apl {
     _ncpus = KBIN::get_NCPUS(kfl);
   }
 
+  void PhononCalculator::setPolarMaterial(bool polar) {
+    _isPolarMaterial = polar;
+  }
+
 }  // namespace apl
 
 //////////////////////////////////////////////////////////////////////////////
@@ -188,11 +199,17 @@ namespace apl {
     }
   }
 
-  void PhononCalculator::awake(const string& hibfile, bool compare_checksum) {
+  void PhononCalculator::awake() {
+    string base = _directory + "/" + DEFAULT_APL_FILE_PREFIX;
+    readHarmonicIFCs(aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE));
+    if (_isPolarMaterial) readBornChargesDielectricTensor(aurostd::CleanFileName(base + DEFAULT_APL_POLAR_FILE));
+  }
+
+  void PhononCalculator::readHarmonicIFCs(const string& hibfile) {
     //CO, we already checked that it exists before, just open
     vector<string> vlines;                           //CO
     aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME20181226
-    string function = _APL_PHCALC_ERR_PREFIX_ + "awake()";
+    string function = _APL_PHCALC_ERR_PREFIX_ + "readHarmonicIFCs()";
 
     //CO - START
     if (!vlines.size()) {
@@ -212,24 +229,6 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
     }
     //CO - END
-
-    if (compare_checksum) {
-      // Get _AFLOWIN_ checksum and compare it to current
-      while (true) {
-        if (line_count == vlines.size())  //CO
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Can not find <i name=\"checksum\" ...> tag.", _FILE_CORRUPT_);
-        line = vlines[line_count++];  //CO
-        if (line.find("checksum") != string::npos)
-          break;
-      }
-      int t = line.find_first_of(">") + 1;
-      tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-      if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME20190219
-        string message = "The " + _AFLOWIN_ + " file has been changed from the hibernated state.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-      }
-    }
-    tokens.clear();
 
     // Get force constant matrices
     while (true) {
@@ -274,24 +273,50 @@ namespace apl {
       row.push_back(m);
       line = vlines[line_count++];  //CO
     }
+  }
 
-    // Try to read born effective charges and dielectric constant
-    //cerr << "APL-DEBUG Get born effective charge tensors" << std::endl; //CO
-    // Get born effective charge tensors
-    _isPolarMaterial = true;
-    while (_isPolarMaterial) {
+  void PhononCalculator::readBornChargesDielectricTensor(const string& hibfile) {
+    string function = _APL_PHCALC_ERR_PREFIX_ + "readBornChargesDielectricTensor()";
+    string message = "";
+    if (!aurostd::EFileExist(hibfile)) {
+      message = "Cannot find file " + hibfile + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+    }
+
+    vector<string> vlines;
+    aurostd::efile2vectorstring(hibfile, vlines);
+
+    //CO - START
+    if (!vlines.size()) {
+      message = "Cannot open output file " + hibfile + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+    }
+
+    string line;
+    uint line_count = 0;
+    vector<string> tokens;
+
+    // Test of xml...
+    line = vlines[line_count++];
+    if (line.find("xml") == string::npos) {
+      message = "Not an xml file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
+    }
+
+    // Get Born effective charge tensors
+    xmatrix<double> m(3, 3);
+    while (true) {
       if (line_count == vlines.size()) {
-        _isPolarMaterial = false;
-        break;
+        message = "Cannot find <born> tag.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];  //CO
       if (line.find("born") != string::npos) break;
-    }
-    if (_isPolarMaterial) {
+
       line = vlines[line_count++];  //CO
       while (true) {
         if (line_count == vlines.size()) { //CO
-          string message = "Incomplete <born> tag.";
+          message = "Incomplete <born> tag.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];  //CO
@@ -309,31 +334,30 @@ namespace apl {
         _bornEffectiveChargeTensor.push_back(m);
         line = vlines[line_count++];  //CO
       }
+    }
 
-      // Get dielectric constant tensor
-      while (true) {
-        if (line_count == vlines.size()) {
-          _isPolarMaterial = false;
-          string message = "Can not find <epsilon> tag.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
-        }
-        line = vlines[line_count++];  //CO
-        if (line.find("epsilon") != string::npos)
-          break;
+    // Get dielectric constant tensor
+    while (true) {
+      if (line_count == vlines.size()) {
+        message = "Cannot find <epsilon> tag.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];  //CO
-      for (int k = 1; k <= 3; k++) {
-        line = vlines[line_count++];  //CO
-        int t = line.find_first_of(">") + 1;
-        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-        _dielectricTensor(k, 1) = aurostd::string2utype<double>(tokens.at(0));
-        _dielectricTensor(k, 2) = aurostd::string2utype<double>(tokens.at(1));
-        _dielectricTensor(k, 3) = aurostd::string2utype<double>(tokens.at(2));
-        tokens.clear();
-      }
-      _inverseDielectricTensor = inverse(_dielectricTensor);
-      _recsqrtDielectricTensorDeterminant = 1.0 / sqrt(determinant(_dielectricTensor));
+      if (line.find("epsilon") != string::npos) break;
     }
+
+    line = vlines[line_count++];  //CO
+    for (int k = 1; k <= 3; k++) {
+      line = vlines[line_count++];  //CO
+      int t = line.find_first_of(">") + 1;
+      tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+      _dielectricTensor(k, 1) = aurostd::string2utype<double>(tokens.at(0));
+      _dielectricTensor(k, 2) = aurostd::string2utype<double>(tokens.at(1));
+      _dielectricTensor(k, 3) = aurostd::string2utype<double>(tokens.at(2));
+      tokens.clear();
+    }
+    _inverseDielectricTensor = inverse(_dielectricTensor);
+    _recsqrtDielectricTensorDeterminant = 1.0 / sqrt(determinant(_dielectricTensor));
   }
 
   void PhononCalculator::setAnharmonicForceConstants(const AnharmonicIFCs& fc) {
@@ -349,11 +373,12 @@ namespace apl {
     clusters[order - 3] = fc.getClusters();
   }
 
-  void PhononCalculator::readAnharmonicIFCs(string filename, bool compare_checksum) {
+  void PhononCalculator::readAnharmonicIFCs(string filename) {
     filename = aurostd::CleanFileName(filename);
     string function = _APL_PHCALC_ERR_PREFIX_ + "readAnharmonicIFCs()";
+    string message = "";
     if (!aurostd::EFileExist(filename)) {
-      string message = "Could not open file " + filename + ". File not found.";
+      message = "Could not open file " + filename + ". File not found.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
 
@@ -361,7 +386,7 @@ namespace apl {
     aurostd::efile2vectorstring(filename, vlines);
     uint nlines = vlines.size();
     if (nlines == 0) {
-      string message = "Cannot open file " + filename + ". File empty or corrupt.";
+      message = "Cannot open file " + filename + ". File empty or corrupt.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
 
@@ -370,38 +395,18 @@ namespace apl {
 
     // Check that this is a valid xml file
     if (line.find("xml") == string::npos) {
-      string message = "File is not a valid xml file.";
+      message = "File is not a valid xml file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
     }
 
     int t = 0;
     vector<string> tokens;
 
-    // Checksum
-    if (compare_checksum) {
-      while (true) {
-        if (line_count == nlines) {
-          string message = "Checksum not found in hibernate file.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
-        }
-        line = vlines[line_count++];
-        if (line.find("checksum") != string::npos) {
-          t = line.find_first_of(">") + 1;
-          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), tokens, " ");
-          if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {
-            string message = "The " + _AFLOWIN_ + " file has been changed from the hibernated state.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-          }
-          break;
-        }
-      }
-    }
-
     // Read order
     uint order = 0;
     while (true) {
       if (line_count == nlines) {
-        string message = "order tag not found.";
+        message = "order tag not found.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
@@ -415,7 +420,7 @@ namespace apl {
     // Read IFCs
     while (true) {
       if (line_count == nlines) {
-        string message = "force_constants tag not found.";
+        message = "force_constants tag not found.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
@@ -433,7 +438,7 @@ namespace apl {
     vector<int> cl;
     while (line.find("/force_constants") == string::npos) {
       if (line_count == nlines) {
-        string message = "force_constants tag incomplete.";
+        message = "force_constants tag incomplete.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
@@ -460,7 +465,7 @@ namespace apl {
     }
 
     if (ifcs.size() != clst.size()) {
-      string message = "Number of IFCs is different from the number of clusters.";
+      message = "Number of IFCs is different from the number of clusters.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
 

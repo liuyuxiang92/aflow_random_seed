@@ -828,8 +828,8 @@ uint xstructure::GetPrimitiveCell(void) {
     //DX20191011 [OBSOLETE] tmp_atom.fpos = (*this).atoms[i].fpos;
     //DX20191011 [OBSOLETE] tmp_atom.cpos = (*this).atoms[i].cpos;
     //DX20191011 [OBSOLETE] tmp_atom.type = (*this).atoms[i].type;
-    //DX20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; // DX DX20170921 - magnetic sym
-    //DX20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; // DX DX20170921 - magnetic sym
+    //DX20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; // DX20170921 - magnetic sym
+    //DX20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; // DX20170921 - magnetic sym
     //DX20191011 [OBSOLETE] tmp_atom.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
     //DX20191011 [OBSOLETE] tmp_atom.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
     string tmpname = (*this).atoms[i].name;
@@ -888,8 +888,8 @@ uint xstructure::GetPrimitiveCell(void) {
       tmp.fpos = ::BringInCell(atomic_basis_[i].fpos); //DX20190905 - new BringInCell function and go outside xstructure scope
       //DX20191011 [OBSOLETE] tmp.name = atomic_basis_[i].name;
       //DX20191011 [OBSOLETE] tmp.type = atomic_basis_[i].type;
-      //DX20191011 [OBSOLETE] tmp.spin = atomic_basis_[i].spin; // DX DX20170921 - magnetic sym
-      //DX20191011 [OBSOLETE] tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX DX20170921 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp.spin = atomic_basis_[i].spin; // DX20170921 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX20170921 - magnetic sym
       //DX20191011 [OBSOLETE] tmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
       //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
       full_basis.push_back(tmp);
@@ -922,8 +922,8 @@ uint xstructure::GetPrimitiveCell(void) {
         BringInCellInPlace(atmp.fpos); //DX20190905
         //DX20191011 [OBSOLETE] atmp.name = atomic_basis_[i].name;
         //DX20191011 [OBSOLETE] atmp.type = atomic_basis_[i].type;
-        //DX20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; // DX DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; // DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX20170921 - magnetic sym
         //DX20191011 [OBSOLETE] atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
         //DX20191011 [OBSOLETE] atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
         if(SYM::MapAtom(atomic_basis_, atmp, TRUE, lattice_basis_xmat, f2c, skew, (*this).sym_eps)) { //DX20190215 - _SYM_TOL_ to (*this).sym_eps //DX20190619 - lattice_basis_xmat and f2c as input
@@ -1074,10 +1074,10 @@ uint xstructure::GetPrimitiveCell(void) {
       //DX20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
       //DX20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
       //DX20191011 [OBSOLETE] tmp_atom.name_is_given = true;
-      //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; // DX DX20170921 - magnetic sym
-      tmp_atom.spin_is_given = false; // DX DX20170921 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; // DX20170921 - magnetic sym
+      tmp_atom.spin_is_given = false; // DX20170921 - magnetic sym
       if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
-        tmp_atom.spin_is_given = true; // DX DX20170921 - magnetic sym
+        tmp_atom.spin_is_given = true; // DX20170921 - magnetic sym
       }
       tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
       tmp_atom.noncoll_spin_is_given = false; // DX20171205 - magnetic sym (non-collinear)
@@ -1163,8 +1163,8 @@ namespace SYM {
         tmp.cpos = expanded_lattice_points[i] + F2C(L, xstr.atoms[j].fpos);
         //DX20191011 [OBSOLETE] tmp.name = xstr.atoms[j].name;
         //DX20191011 [OBSOLETE] tmp.type = xstr.atoms[j].type;
-        //DX20191011 [OBSOLETE] tmp.spin = xstr.atoms[j].spin; // DX DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin = xstr.atoms[j].spin; // DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX20170921 - magnetic sym
         //DX20191011 [OBSOLETE] tmp.noncoll_spin = xstr.atoms[j].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
         //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = xstr.atoms[j].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
         out.push_back(tmp);
@@ -2369,9 +2369,9 @@ namespace SYM {
         total_mod.clear();
         continue;
       }
-      // DX20171211 - Consider all possible unique axis choices - else {
-      // DX20171211 - Consider all possible unique axis choices -   break;
-      // DX20171211 - Consider all possible unique axis choices - }
+      // DX20171212 - Consider all possible unique axis choices - else {
+      // DX20171212 - Consider all possible unique axis choices -   break;
+      // DX20171212 - Consider all possible unique axis choices - }
 
       int e = index[smallest_gt_min_index(0, -1, -1, total_mod)][0];
       tranvec_e = possible_efg_vectors[e];
@@ -2481,7 +2481,7 @@ namespace SYM {
         candidate_lattice_vectors.push_back(CL);
         candidate_lattice_chars.push_back('m'); //unique axis c; use 'm' since 'c' is reserved for cubic
       }
-    } // DX20171211 - Consider all possible unique axis choices 
+    } // DX20171212 - Consider all possible unique axis choices 
     return true;
   }
 } //namespace SYM
@@ -4364,7 +4364,7 @@ namespace SYM {
 // ***************************************************************************
 // Plot lattice
 // ***************************************************************************
-// DX20161221 - Is this function needed?  If so, need to switch over to xstructure
+// DX20161222 - Is this function needed?  If so, need to switch over to xstructure
 //string plot_lattice(vector<string> files){
 //
 //  int a = atoi(files[2].c_str());

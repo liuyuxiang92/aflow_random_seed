@@ -52,7 +52,8 @@ namespace KBIN {
       _aflags& aflags,
       _kflags& kflags,
       _vflags& vflags,
-      ofstream& fileMessage) {
+      ofstream& fileMessage,
+      ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     ostringstream aus;
     stringstream message;
@@ -77,7 +78,7 @@ namespace KBIN {
 
     // ME20200102
     // Determine k-point grid that is commensurate with the grid of the supercell
-    apl::Supercell scell(xvasp.str, fileMessage, aflags.Directory);
+    apl::Supercell scell(xvasp.str, fileMessage, oss, aflags.Directory);
     scell.build(scell_dims, false);
     int kppra_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KPPRA.content_int;
     string scheme_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KSCHEME.content_string;
@@ -89,7 +90,7 @@ namespace KBIN {
     message << "APL will use a " << aurostd::joinWDelimiter(kpts_sc, "x") << " k-point grid (KPPRA = " << kppra_phonons << ")"
       << " for a " << aurostd::joinWDelimiter(scell_dims, "x") << " supercell. To keep k-point grids commensurate,"
       << " relaxations will be performed on a " << aurostd::joinWDelimiter(kpts_pc, "x") << " k-point grid.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags.Directory, fileMessage, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags.Directory, fileMessage, oss);
 
     // Create k-points file
     stringstream kpts_file;
@@ -218,10 +219,10 @@ namespace KBIN {
       string AflowIn,
       _aflags& aflags,
       _kflags& kflags,
-      _vflags& vflags, ofstream& messageFile) {
+      _vflags& vflags, ofstream& messageFile, ostream& oss) {
     _xinput xinput(xvasp);
     _xflags xflags(vflags);
-    return RunPhonons_APL(xinput,AflowIn,aflags,kflags,xflags,messageFile);
+    return RunPhonons_APL(xinput,AflowIn,aflags,kflags,xflags,messageFile, oss);
   }
 
   void RunPhonons_APL(_xinput& xinput,
@@ -229,12 +230,13 @@ namespace KBIN {
       _aflags& aflags,
       _kflags& kflags,
       _xflags& xflags, 
-      ofstream& messageFile) {
+      ofstream& messageFile,
+      ostream& oss) {
     // ME20200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
     try {
       return RunPhonons_APL_181216(xinput,AflowIn,aflags,kflags,xflags,messageFile);
     } catch (aurostd::xerror e) {
-      pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, aflags.Directory, messageFile, std::cout, _LOGGER_ERROR_);
+      pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, aflags.Directory, messageFile, oss, _LOGGER_ERROR_);
     }
   }
   void RunPhonons_APL_181216(_xinput& xinput,
@@ -242,7 +244,8 @@ namespace KBIN {
       _aflags& aflags,
       _kflags& kflags,
       _xflags& xflags, 
-      ofstream& messageFile) {
+      ofstream& messageFile,
+      ostream& oss) {
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
@@ -1399,7 +1402,7 @@ namespace KBIN {
       xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
     }
 
-    apl::Supercell supercell(xinput.getXStr(), messageFile, aflags.Directory);
+    apl::Supercell supercell(xinput.getXStr(), messageFile, oss, aflags.Directory);
     // Determine the supercell dimensions
     xvector<int> scell_dims = supercell.determineSupercellDimensions(supercell_opts);
 
@@ -1531,7 +1534,7 @@ namespace KBIN {
     /////////////////////////////////////////////////////////////////////////////
 
     // Set up the phonon calculator
-    apl::PhononCalculator phcalc(supercell, messageFile);
+    apl::PhononCalculator phcalc(supercell, messageFile, oss);
     if (xflags.vflags.AFLOW_SYSTEM.content_string.empty()) {
       phcalc.setSystem(supercell.getInputStructure().title);
     } else {
@@ -1539,6 +1542,7 @@ namespace KBIN {
     }
     phcalc.setDirectory(aflags.Directory);
     phcalc.setNCPUs(kflags);
+    phcalc.setPolarMaterial(USER_POLAR);
 
     // FORCE CONSTANTS ----------------------------------------------------------
     bool stagebreak = false;
@@ -1550,11 +1554,11 @@ namespace KBIN {
     // Try to read first
     if (awakeHarmIFCs) {
       try {
-        pflow::logger(_AFLOW_FILE_NAME_, "APL", "Awakening...", aflags, messageFile, std::cout);
-        phcalc.awake(hibfile);
+        pflow::logger(_AFLOW_FILE_NAME_, "APL", "Awakening...", aflags, messageFile, oss);
+        phcalc.awake();
       } catch (aurostd::xerror& e) {
         message = e.error_message + " Skipping awakening...";
-        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
         awakeHarmIFCs = false;
       }
     }
@@ -1565,7 +1569,7 @@ namespace KBIN {
       auto_ptr<apl::ForceConstantCalculator> fccalc;
       if (USER_ENGINE == string("DM")) {
         apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, xinput, aflags,
-            kflags, xflags, AflowIn, messageFile);
+            kflags, xflags, AflowIn, messageFile, oss);
         fccalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
         fccalcdm->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY);
         fccalcdm->setDistortionSYMMETRIZE(USER_DISTORTIONS_SYMMETRIZE);
@@ -1589,7 +1593,7 @@ namespace KBIN {
       //  } //CO200106 - patching for auto-indenting
       else {
         fccalc.reset(new apl::LinearResponsePC(supercell, xinput, aflags,
-              kflags, xflags, AflowIn, messageFile));
+              kflags, xflags, AflowIn, messageFile, oss));
         fccalc->setPolarMaterial(USER_POLAR);  // ME20200218
       }
       // Run calculations
@@ -1598,7 +1602,7 @@ namespace KBIN {
       if (!apl_stagebreak) {
         apl_stagebreak = !(fccalc->run());
         if (!apl_stagebreak) {
-          if (USER_HIBERNATE) fccalc->hibernate(hibfile);
+          if (USER_HIBERNATE) fccalc->hibernate();
           phcalc.setHarmonicForceConstants(*fccalc);
         }
       }
@@ -1616,7 +1620,7 @@ namespace KBIN {
     {
 
       pheos.reset(new apl::QHA_AFLOWIN_CREATOR(supercell, xinput, aflags,
-            kflags, xflags, AflowIn, messageFile));
+            kflags, xflags, AflowIn, messageFile, oss));
 
       pheos->setGP(CALCULATE_GRUNEISEN_OPTION.option, CALCULATE_GRUNEISEN_A_OPTION.option, CALCULATE_GRUNEISEN_B_OPTION.option, CALCULATE_GRUNEISEN_C_OPTION.option);
       if( CALCULATE_SCQHA_OPTION.option || CALCULATE_SCQHA_A_OPTION.option || CALCULATE_SCQHA_B_OPTION.option || CALCULATE_SCQHA_C_OPTION.option )
@@ -1656,14 +1660,14 @@ namespace KBIN {
         if (awakeAnharmIFCs) {
           try {
             message = "Reading anharmonic IFCs from " + ifcs_hib_file + ".";
-            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout);
-            phcalc.readAnharmonicIFCs(ifcs_hib_file, true);
+            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
+            phcalc.readAnharmonicIFCs(ifcs_hib_file);
           } catch (aurostd::xerror& excpt) {
             message = excpt.error_message + " Skipping awakening of ";
             if (o == 3) message += "3rd";
             else message += aurostd::utype2string<int>(o) + "th";
             message = excpt.error_message + " order anharmonic IFCs.";
-            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
+            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
             awakeAnharmIFCs = false;
           }
         }
@@ -1677,17 +1681,17 @@ namespace KBIN {
           if (awakeClusterSet) {
             try {
               clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
-                  USER_CUTOFF_DISTANCE[o-3], o, messageFile, aflags);
+                  USER_CUTOFF_DISTANCE[o-3], o, messageFile, aflags, oss);
             } catch (aurostd::xerror excpt) {
               message = excpt.error_message;
-              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
+              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
               awakeClusterSet = false;
             }
           }
           // Reading clusters failed - determine
           if (!awakeClusterSet) {
             clst = apl::ClusterSet(supercell, USER_CUTOFF_SHELL[o-3],
-                USER_CUTOFF_DISTANCE[o-3], messageFile, aflags);
+                USER_CUTOFF_DISTANCE[o-3], messageFile, aflags, oss);
             clst.build(o);
             clst.buildDistortions();
             if (USER_HIBERNATE) {
@@ -1695,7 +1699,7 @@ namespace KBIN {
             }
           }
           // Setup calculations
-          apl::AnharmonicIFCs anharm(xinput, aflags, kflags, xflags, clst, messageFile);
+          apl::AnharmonicIFCs anharm(xinput, aflags, kflags, xflags, clst, messageFile, oss);
           anharm.setOptions(USER_DISTORTION_MAGNITUDE, USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM, USER_ZEROSTATE);
           aapl_stagebreak = (anharm.runVASPCalculations(USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
           // Calculate IFCs
@@ -1726,7 +1730,7 @@ namespace KBIN {
       }
       if (d == ndir) {
         string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
         USER_ZEROSTATE_CHGCAR = false;
       } else {
         string chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
@@ -1811,7 +1815,7 @@ namespace KBIN {
       // MonkhorstPackMesh replaced by qmesh
       //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
       //  phcalc->getInputCellStructure(), logger);
-      apl::QMesh qmesh(messageFile);
+      apl::QMesh qmesh(messageFile, oss);
       qmesh.setDirectory(aflags.Directory);
       qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
       if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME20190625
@@ -1883,7 +1887,7 @@ namespace KBIN {
           // MonkhorstPackMesh replaced by qmesh
           //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
           //                             phcalc->getInputCellStructure(),logger);
-          apl::QMesh qmesh(messageFile);
+          apl::QMesh qmesh(messageFile, oss);
           qmesh.setDirectory(aflags.Directory);
           qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
           if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME20190625
@@ -1978,7 +1982,7 @@ namespace KBIN {
         if (!supercell.projectToPrimitive()) {  // ME20200117 - project to primitive
           message = "Could not map the AFLOW standard primitive cell to the supercell.\
                      Phonon dispersions will be calculated using the original structure instead.";
-          pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, std::cout, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
         }
         pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
       } else {
@@ -2040,7 +2044,7 @@ namespace KBIN {
       //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
       //                             phcalc->getInputCellStructure(), logger);
 
-      apl::QMesh qmesh(messageFile);
+      apl::QMesh qmesh(messageFile, oss);
       qmesh.setDirectory(aflags.Directory);
       qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
       if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME20190625
@@ -2068,7 +2072,7 @@ namespace KBIN {
       // Calculate thermal properties
       if (USER_TP) {
         //if (!dosc.hasNegativeFrequencies()) // ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
-        apl::ThermalPropertiesCalculator tpc(dosc, messageFile, aflags.Directory);  // ME20190423
+        apl::ThermalPropertiesCalculator tpc(dosc, messageFile, oss, aflags.Directory);  // ME20190423
         // ME20200108 - new ThermalPropertiesCalculator format
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
         tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
@@ -2309,8 +2313,8 @@ namespace KBIN {
     if (USER_TCOND) {
       // Get q-points
       message = "Starting thermal conductivity calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, std::cout);
-      apl::QMesh qmtcond(messageFile);
+      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
+      apl::QMesh qmtcond(messageFile, oss);
       qmtcond.setDirectory(aflags.Directory);
       qmtcond.initialize(USER_DOS_MESH, phcalc.getInputCellStructure(), true, true);
       qmtcond.makeIrreducible();
@@ -2318,7 +2322,7 @@ namespace KBIN {
       qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);
 
       // Do the thermal conductivity calculation
-      apl::TCONDCalculator tcond(phcalc, qmtcond, messageFile, aflags);
+      apl::TCONDCalculator tcond(phcalc, qmtcond, aflags);
 
       // Set calculation options
       tcond.calc_options.flag("RTA", (USER_BTE == "RTA"));

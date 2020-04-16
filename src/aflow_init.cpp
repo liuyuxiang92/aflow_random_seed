@@ -608,9 +608,9 @@ namespace init {
         aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
         aurostd::args2attachedflag(argv,cmds,"--run=") ||
         aurostd::args2flag(argv,cmds,"--generate_vasp_from_aflowin|--generate_aflowin_from_vasp"));
-    // DX START
+    // DX - START
     XHOST.vflag_control.flag("AFLOWIN_SYM",aurostd::args2flag(argv,cmds,"--generate_symmetry|--generate_sym")); // DX
-    // DX END
+    // DX - END
     // [OBSOLETE]    XHOST.vflag_control.flag("SWITCH_AFLOWLIB",aurostd::args2flag(argv,cmds,"--aflowlib") || aurostd::args2attachedflag(argv,cmds,"--aflowlib="));
     XHOST.vflag_control.flag("SWITCH_APENNSY1",aurostd::args2flag(argv,cmds,"--apennsy|--lib2|--lib2u|--lib2pgm|--LIB2|--LIB2U|--LIB2PGM|--libraryX|--libraryU|--libraryPGM|--alloy"));
     XHOST.vflag_control.flag("SWITCH_APENNSY2",aurostd::args2flag(argv,cmds,"--apool|--apool_private|--apool_test|--library2|-simpls|--simpls|--VASPIN|--energy|--psenergy"));

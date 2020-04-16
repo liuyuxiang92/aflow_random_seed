@@ -71,7 +71,7 @@ namespace anrl {
     double x2=vparameters.at(i++);                 if(LDEBUG) { cerr << "anrl::PrototypeANRL_AB2_hP9_180_d_j: x2=" << x2 << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
     str.scale=1.0;
 
     a1=(1.0/2.0)*a*xn-(sqrt(3.0)/2.0)*a*yn;

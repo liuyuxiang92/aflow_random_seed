@@ -79,10 +79,9 @@ namespace apl {
     free();
   }
 
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, ofstream& mf, _aflags& a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, _aflags& a) {
     _pc = &pc;
     _qm = &qm;
-    messageFile = &mf;
     aflags = &a;
     initialize();
   }
@@ -111,7 +110,6 @@ namespace apl {
     gvel = that.gvel;
     intr_trans_probs = that.intr_trans_probs;
     intr_trans_probs_iso = that.intr_trans_probs_iso;
-    messageFile = that.messageFile;
     nBranches = that.nBranches;
     nIQPs = that.nIQPs;
     nQPs = that.nQPs;
@@ -147,17 +145,16 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, ofstream& mf, _aflags& a) {
+  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, _aflags& a) {
     free();
     _pc = &pc;
     _qm = &qm;
-    messageFile = &mf;
     aflags = &a;
     initialize();
   }
 
   void TCONDCalculator::initialize() {
-    _logger.initialize(*messageFile, *aflags);
+    _logger.initialize(_pc->getOutputFileStream(), *aflags);
     _logger.setModuleName(_AAPL_TCOND_MODULE_);
     nBranches = _pc->getNumberOfBranches();
     nQPs = _qm->getnQPs();
@@ -190,10 +187,10 @@ namespace apl {
     // Frequencies and group velocities
     calculateFrequenciesGroupVelocities();
 
-    string filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE);
+    string filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE);
     writeTempIndepOutput(filename, "Frequency", "THz", freq);
 
-    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
+    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
     writeGroupVelocities(filename);
 
     // Grueneisen parameters
@@ -205,7 +202,7 @@ namespace apl {
     for (uint t = 0; t < temperatures.size(); t++) {
       grueneisen_avg[t] = calculateAverageGrueneisen(temperatures[t], grueneisen_modes);
     }
-    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GRUENEISEN_FILE);
+    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GRUENEISEN_FILE);
     writeGrueneisen(filename, grueneisen_avg, grueneisen_modes);
 
     // Transition probabilities
@@ -221,12 +218,12 @@ namespace apl {
       thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], rates_total, rates_anharm);
     }
 
-    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
+    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
     writeTempDepOutput(filename, "SCATTERING_RATES", "1/ps", temperatures, rates_total);
-    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_3RD_FILE);
+    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_3RD_FILE);
     writeTempDepOutput(filename, "SCATTERING_RATES_ANHARMONIC", "1/ps", temperatures, rates_anharm);
 
-    filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE);
+    filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE);
     writeThermalConductivity(filename);
   }
 
@@ -473,7 +470,7 @@ namespace apl {
 #endif
 
     // Output phase space
-    string filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_PS_FILE);
+    string filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_PS_FILE);
     writePhaseSpace(filename, phase_space);
 
     if (calc_options.flag("ISOTOPE")) {
@@ -511,13 +508,13 @@ namespace apl {
         _logger.finishProgressBar();
 #endif
       }
-      string filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_ISOTOPE_FILE);
+      string filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_ISOTOPE_FILE);
       writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_isotope);
     }
 
     if (calc_options.flag("BOUNDARY")) {
       rates_boundary = calculateTransitionProbabilitiesBoundary();
-      string filename = aurostd::CleanFileName(aflags->Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
+      string filename = aurostd::CleanFileName(_pc->getDirectory() + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
       writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_boundary);
     }
   }
@@ -1002,10 +999,11 @@ namespace apl {
       int num_iter = 1;
       double norm = 0.0;
       _logger << "Begin SCF for the Boltzmann transport equation." << apl::endl;
-      std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-      std::cout << std::setw(15) << "Iteration";
-      std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-      std::cout << std::setw(25) << "Rel. Change in Norm" << std::endl;
+      ostream& oss = _pc->getOutputStringStream();
+      oss << std::setiosflags(std::ios::fixed | std::ios::right);
+      oss << std::setw(15) << "Iteration";
+      oss << std::setiosflags(std::ios::fixed | std::ios::right);
+      oss << std::setw(25) << "Rel. Change in Norm" << std::endl;
       do {
         tcond_prev = tcond;
         getMeanFreeDispFull(rates, occ, mfd);
@@ -1015,10 +1013,10 @@ namespace apl {
         // the norm. That way, less iterations for high thermal conductivity
         // materials are required.
         norm = frobenius_norm(tcond_prev - tcond)/frobenius_norm(tcond_prev);
-        std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-        std::cout << std::setw(15) << num_iter;
-        std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-        std::cout << std::setw(25) << std::dec << (norm) << std::endl;
+        oss << std::setiosflags(std::ios::fixed | std::ios::right);
+        oss << std::setw(15) << num_iter;
+        oss << std::setiosflags(std::ios::fixed | std::ios::right);
+        oss << std::setw(25) << std::dec << (norm) << std::endl;
         num_iter++;
       } while ((std::abs(norm) > TCOND_ITER_THRESHOLD) && (num_iter <= max_iter));
       if (num_iter > max_iter) {
@@ -1286,7 +1284,7 @@ namespace apl {
   // Writes temperature-independent output files.
   void TCONDCalculator::writeTempIndepOutput(const string& filename, string keyword,
       const string& unit, const vector<vector<double> >& data) {
-    string path = aurostd::CleanFileName(aflags->Directory + "/" + filename);
+    string path = aurostd::CleanFileName(_pc->getDirectory() + "/" + filename);
     stringstream output;
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     string key = "[AAPL_" + aurostd::toupper(aurostd::StringSubst(keyword, " ", "_")) + "]";

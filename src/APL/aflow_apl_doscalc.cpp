@@ -130,7 +130,7 @@ namespace apl {
 
     //CO - START
     string message = "Calculating frequencies for the phonon DOS.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
 
     // Prepare storage
     _freqs.clear();
@@ -312,11 +312,11 @@ namespace apl {
     //rawCalc(USER_DOS_NPOINTS);  OBSOLETE
     if (_bzmethod == "LT") {
       string message = "Calculating phonon DOS using the linear tetrahedron method.";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
       calcDosLT();
     } else if (_bzmethod == "RS") {
       string message = "Calculating phonon DOS using the root sampling method.";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
       calcDosRS();
     }
     // ME20190423 - END
@@ -506,7 +506,7 @@ namespace apl {
     double factorRaw2meV = _pc->getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
     string message = "Writing phonon density of states into file " + aurostd::CleanFileName(filename) + "."; //ME20181226
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
@@ -535,7 +535,7 @@ namespace apl {
   void DOSCalculator::writePHDOSCAR(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
     string message = "Writing phonon density of states into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
     stringstream doscar;
     xDOSCAR xdos = createDOSCAR();
     doscar << xdos;
@@ -655,7 +655,7 @@ namespace apl {
 
     string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE; //ME20181226
     string message = "Writing phonon density of states into file " + filename + "."; //ME20181226
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
     //outfile << "############### ############### ############### ###############" << std::endl;
     outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);

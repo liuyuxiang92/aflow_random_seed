@@ -174,7 +174,7 @@ namespace apl {
 
   void AtomicDisplacements::calculateMeanSquareDisplacementMatrices() {
     string message = "Calculating mean square displacement matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
     _displacement_matrices.clear();
     _displacement_modes.clear();
     calculateEigenvectors();
@@ -324,7 +324,7 @@ namespace apl {
   void AtomicDisplacements::writeMeanSquareDisplacementsToFile(string filename) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing mean square displacements into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
     vector<vector<xvector<double> > > disp_vec = getDisplacementVectors();
     stringstream output;
     string tag = "[APL_DISPLACEMENTS]";
@@ -360,7 +360,7 @@ namespace apl {
   void AtomicDisplacements::writeSceneFileXcrysden(string filename, const xstructure& scell, const vector<vector<vector<double> > >& disp, int nperiods) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing atomic displacements in XCRYSDEN format into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
 
     uint nsteps = disp.size();
     uint natoms = scell.atoms.size();
@@ -402,7 +402,7 @@ namespace apl {
       const vector<vector<vector<xvector<xcomplex<double> > > > >& displacements) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing atomic displacements in V_SIM format into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputStream(), std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
 
     stringstream output;
     // Lattice
@@ -457,7 +457,7 @@ namespace apl {
 
   //createAtomicDisplacementSceneFile/////////////////////////////////////////
   // Interfaces with the command line to create a phonon visualization file.
-  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow) {
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ostream& oss) {
     string function = "apl::createAtomicDisplacementSceneFile()";
     string message = "";
     ofstream mf("/dev/null");
@@ -536,7 +536,7 @@ namespace apl {
     if (format != "V_SIM") {
       if (branches_str.empty()) {
         message = "No branches selected. Displacements will be calculated for all modes.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, directory, mf, std::cout);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, directory, mf, oss);
       } else {
         aurostd::string2tokens(branches_str, branches, ",");
       }
@@ -568,8 +568,7 @@ namespace apl {
     Supercell sc_pcalc(statefile, mf);
     PhononCalculator pc(sc_pcalc, mf);
     pc.setDirectory(directory);
-    string hibfile = directory + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE;
-    pc.awake(hibfile, false);
+    pc.awake();
     // Must project to primitive or the vibrations will be incorrect
     if (!sc_pcalc.projectToPrimitive()) {
       message = "Could not project to primitive structure.";

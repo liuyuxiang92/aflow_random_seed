@@ -616,14 +616,15 @@ parameters.
 4. Saving and Loading APL Results APL Calculations (Hibernation)
 
 In order to avoid recalculating the force constant matrix with every run, APL has implemented a
-hibernation system which saves the forces, the force constants, the Born effective charge tensor,
-and the dielectric constant tensor into an output file (aflow.apl.harmonicIFCs.xml).
+hibernation system which saves the force constants into the file aflow.apl.harmonicIFCs.xml.
+Born effective charges and the dielectric tensor are stored in aflow.apl.polar.xml.
 
 This behavior can be switched on(off) using the HIBERNATE keyword: 
 
     [AFLOW_APL]HIBERNATE=ON(OFF)
 
-It is turned on by default.
+It is turned on by default. If settings in the aflow.in file change the calculation of the force
+constants, these files must be deleted for the changes to take effect.
 
 
 5. Inheritance from AFLOW

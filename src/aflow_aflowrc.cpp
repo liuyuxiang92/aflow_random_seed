@@ -87,11 +87,11 @@
 #define         DEFAULT_AFLOW_POSTSCRIPT_COMMAND        XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_POSTSCRIPT_COMMAND")
 #define AFLOWRC_DEFAULT_AFLOW_PGROUP_OUT                string("aflow.pgroup.out")
 #define         DEFAULT_AFLOW_PGROUP_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUP_JSON               string("aflow.pgroup.json")      // DX20170801 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_PGROUP_JSON               string("aflow.pgroup.json")      // DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_PGROUP_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_OUT           string("aflow.pgroup_xtal.out")
 #define         DEFAULT_AFLOW_PGROUP_XTAL_OUT           XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_XTAL_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON          string("aflow.pgroup_xtal.json") // DX20170801 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_PGROUP_XTAL_JSON          string("aflow.pgroup_xtal.json") // DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_PGROUP_XTAL_JSON          XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUP_XTAL_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT     string("aflow.pgroupk_Patterson.out") //DX20200129
 #define         DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT     XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_PATTERSON_OUT") //DX20200129
@@ -99,27 +99,27 @@
 #define         DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON    XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_PATTERSON_JSON") //DX20200129
 #define AFLOWRC_DEFAULT_AFLOW_PGROUPK_OUT               string("aflow.pgroupk.out")
 #define         DEFAULT_AFLOW_PGROUPK_OUT               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON              string("aflow.pgroupk.json")     // DX20170801 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_JSON              string("aflow.pgroupk.json")     // DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_PGROUPK_JSON              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_OUT          string("aflow.pgroupk_xtal.out") // DX20171205 - Added pgroupk_xtal
 #define         DEFAULT_AFLOW_PGROUPK_XTAL_OUT          XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_XTAL_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_JSON         string("aflow.pgroupk_xtal.json")// DX20170801 - Add JSON // DX20171205 - Added pgroupk_xtal
+#define AFLOWRC_DEFAULT_AFLOW_PGROUPK_XTAL_JSON         string("aflow.pgroupk_xtal.json")// DX20170802 - Add JSON // DX20171205 - Added pgroupk_xtal
 #define         DEFAULT_AFLOW_PGROUPK_XTAL_JSON         XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PGROUPK_XTAL_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_FGROUP_OUT                string("aflow.fgroup.out")
 #define         DEFAULT_AFLOW_FGROUP_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_FGROUP_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_FGROUP_JSON               string("aflow.fgroup.json")      // DX20170801 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_FGROUP_JSON               string("aflow.fgroup.json")      // DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_FGROUP_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_FGROUP_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_SGROUP_OUT                string("aflow.sgroup.out")
 #define         DEFAULT_AFLOW_SGROUP_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_SGROUP_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_SGROUP_JSON               string("aflow.sgroup.json")      // DX20170801 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_SGROUP_JSON               string("aflow.sgroup.json")      // DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_SGROUP_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_SGROUP_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_AGROUP_OUT                string("aflow.agroup.out")
 #define         DEFAULT_AFLOW_AGROUP_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_AGROUP_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_AGROUP_JSON               string("aflow.agroup.json")      // DX20170801 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_AGROUP_JSON               string("aflow.agroup.json")      // DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_AGROUP_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_AGROUP_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_IATOMS_OUT                string("aflow.iatoms.out")
 #define         DEFAULT_AFLOW_IATOMS_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_IATOMS_OUT")
-#define AFLOWRC_DEFAULT_AFLOW_IATOMS_JSON               string("aflow.iatoms.json")      // DX20170801 - Add JSON
+#define AFLOWRC_DEFAULT_AFLOW_IATOMS_JSON               string("aflow.iatoms.json")      // DX20170802 - Add JSON
 #define         DEFAULT_AFLOW_IATOMS_JSON               XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_IATOMS_JSON")
 #define AFLOWRC_DEFAULT_AFLOW_ICAGES_OUT                string("aflow.icages.out")
 #define         DEFAULT_AFLOW_ICAGES_OUT                XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_ICAGES_OUT")
@@ -529,6 +529,9 @@
 #define         DEFAULT_APL_DYNMAT_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_DYNMAT_FILE")
 #define AFLOWRC_DEFAULT_APL_HARMIFC_FILE                      string("harmonicIFCs.xml")
 #define         DEFAULT_APL_HARMIFC_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_APL_HARMIFC_FILE")
+// ME20200415
+#define AFLOWRC_DEFAULT_APL_POLAR_FILE                        string("polar.xml")
+#define         DEFAULT_APL_POLAR_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_APL_POLAR_FILE")
 #define AFLOWRC_DEFAULT_APL_HSKPTS_FILE                       string("hskpoints.out")
 #define         DEFAULT_APL_HSKPTS_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_HSKPTS_FILE")
 #define AFLOWRC_DEFAULT_APL_MSQRDISP_FILE                     string("displacements.out")  // ME20200329
@@ -851,14 +854,14 @@
 #define AFLOWRC_MPI_BINARY_DIR_FULTON_MARYLOU                 string("/fslgroup/fslg_datamining/bin/") // FULTON_MARYLOU
 #define         MPI_BINARY_DIR_FULTON_MARYLOU                 XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_FULTON_MARYLOU")
 
-//DX CMU EULER - START
+//DX - CMU EULER - START
 #define AFLOWRC_MPI_OPTIONS_CMU_EULER                         string("") // CMU EULER
 #define         MPI_OPTIONS_CMU_EULER                         XHOST.adefault.getattachedscheme("MPI_OPTIONS_CMU_EULER")
 #define AFLOWRC_MPI_COMMAND_CMU_EULER                         string("mpirun -np") // CMU_EULER
 #define         MPI_COMMAND_CMU_EULER                         XHOST.adefault.getattachedscheme("MPI_COMMAND_CMU_EULER")
 #define AFLOWRC_MPI_BINARY_DIR_CMU_EULER                      string("/home/Tools/bin/") // CMU_EULER
 #define         MPI_BINARY_DIR_CMU_EULER                      XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_CMU_EULER")
-//DX CMU EULEr - END
+//DX - CMU EULEr - END
 
 #define AFLOWRC_MPI_OPTIONS_MACHINE1                          string("") // future expansions
 #define         MPI_OPTIONS_MACHINE1                          XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE1")
@@ -1277,6 +1280,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_THERMO_FILE",AFLOWRC_DEFAULT_APL_THERMO_FILE);
     aflowrc::load_default("DEFAULT_APL_DYNMAT_FILE",AFLOWRC_DEFAULT_APL_DYNMAT_FILE);
     aflowrc::load_default("DEFAULT_APL_HARMIFC_FILE",AFLOWRC_DEFAULT_APL_HARMIFC_FILE);
+    aflowrc::load_default("DEFAULT_APL_POLAR_FILE",AFLOWRC_DEFAULT_APL_POLAR_FILE);  // ME20200415
     aflowrc::load_default("DEFAULT_APL_HSKPTS_FILE",AFLOWRC_DEFAULT_APL_HSKPTS_FILE);
     aflowrc::load_default("DEFAULT_APL_MSQRDISP_FILE", AFLOWRC_DEFAULT_APL_MSQRDISP_FILE);  // ME20200329
     // ME20190614 - START
@@ -1791,6 +1795,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_THERMO_FILE=\"" << AFLOWRC_DEFAULT_APL_THERMO_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_DYNMAT_FILE=\"" << AFLOWRC_DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HARMIFC_FILE=\"" << AFLOWRC_DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_APL_POLAR_FILE=\"" << AFLOWRC_DEFAULT_APL_POLAR_FILE << "\"" << endl;  // ME20200415
     aflowrc << "DEFAULT_APL_HSKPTS_FILE=\"" << AFLOWRC_DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_MSQRDISP_FILE=\"" << AFLOWRC_DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  // ME20200329
     // ME20190614 - START
@@ -2273,6 +2278,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_THERMO_FILE\")=\"" << DEFAULT_APL_THERMO_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DYNMAT_FILE\")=\"" << DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HARMIFC_FILE\")=\"" << DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_POLAR_FILE\")=\"" << DEFAULT_APL_POLAR_FILE << "\"" << endl;  // ME20200415
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HSKPTS_FILE\")=\"" << DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_MSQRDISP_FILE\")=\"" << DEFAULT_APL_MSQRDISP_FILE << "\"" << endl;  // ME20200329
     // ME20190614 - START

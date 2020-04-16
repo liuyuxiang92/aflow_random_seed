@@ -1618,7 +1618,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.3]" << endl;
       directory+=pp_add_on+"/"+xvasp.AVASP_label;
       //  cerr << "DEBUG - " << soliloquy << " xvasp.AVASP_prototype_from_library_ directory(1)=" << directory << endl;    
-      system=""+aurostd::vectorstring2string(xvasp.str.species_pp)+(specify_pottype_once?":"+pottypedatestr:"")+"."+xvasp.AVASP_label;
+      system=""+aurostd::vectorstring2string(xvasp.str.species_pp)+((specify_pottype_once && !pottypedatestr.empty())?":"+pottypedatestr:"")+"."+xvasp.AVASP_label;  // ME200228 - removed colon for empty pottypedatestr
       // label_text0 - MIX
       label_MIX=xvasp.AVASP_libbase+"/"+aurostd::vectorstring2string(xvasp.str.species_pp)+"/"+xvasp.AVASP_label+"/"+_AFLOWIN_;
       if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.4]" << endl;
@@ -1706,10 +1706,10 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0));species_pp_backup.push_back(xvasp.str.species_pp.at(0));  // to prevent mess up of species
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0));species_volume.push_back(xvasp.str.species_volume.at(0));
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0));species_mass.push_back(xvasp.str.species_mass.at(0));
-        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); // DX20180117 - instead of adding 2 (see above)
-        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); // DX20180117 - instead of adding 2 (see above)
-        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); // DX20180117 - instead of adding 2 (see above)
-        //[CO20181226 OBSOLETE]deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); // DX20180117 - instead of adding 2 (see above)
+        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
+        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
+        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); // DX20180118 - instead of adding 2 (see above)
+        //[CO20181226 OBSOLETE]deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); // DX20180118 - instead of adding 2 (see above)
         //	xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in); // FOR HTQC
         xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in,xvasp_in.AVASP_prototype_mode); 
         xstr_orig = xvasp.str; //DX20190326 - mirror saving unpocc'd structure
@@ -3711,10 +3711,10 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0));species_pp_backup.push_back(xvasp.str.species_pp.at(0));  // to prevent mess up of species
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0));species_volume.push_back(xvasp.str.species_volume.at(0));
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0));species_mass.push_back(xvasp.str.species_mass.at(0));
-        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); // DX20180117 - instead of adding 2 (see above)
-        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); // DX20180117 - instead of adding 2 (see above)
-        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); // DX20180117 - instead of adding 2 (see above)
-        deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); // DX20180117 - instead of adding 2 (see above)
+        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
+        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
+        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); // DX20180118 - instead of adding 2 (see above)
+        deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); // DX20180118 - instead of adding 2 (see above)
         //	xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in); // FOR HTQC
         xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in,xvasp_in.AVASP_prototype_mode); 
         for(uint i=0;i<xvasp.str.species_pp.size()&&i<species_pp_backup.size();i++) xvasp.str.species_pp.at(i)=species_pp_backup.at(i); // to restore mess up of species
@@ -5053,7 +5053,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   }
 
   bool reverse=PARAMS->vparams.flag("AFLOWIN_FLAG::REVERSE"); //CO20181226
-  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); // DX20180117 - added parameters to AVASP
+  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); // DX20180118 - added parameters to AVASP
   //DX20190227 - START
   // default without parameters is to use the atomic volume scaling method (i.e., a=-1)
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
@@ -5962,7 +5962,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
   _xvasp xvasp;
   AVASP_DefaultValuesBinary_AFLOWIN(xvasp);
   xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); // DX20180117 - added parameters to AVASP
+  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); // DX20180118 - added parameters to AVASP
   //DX20190227 - START
   // default without parameters is to use the atomic volume scaling method (i.e., a=-1)
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
