@@ -34,7 +34,7 @@ extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
 
-// ME20190219 - Define the checksum algorithm used for APL hibernate files
+// ME 190219 - Define the checksum algorithm used for APL hibernate files
 #define APL_CHECKSUM_ALGO  string("Fletcher32")
 
 // Basic objects ...
@@ -44,7 +44,7 @@ extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 #include <stdexcept>
 namespace apl {
   //
-  // OBSOLETE ME20191031 - use xerror
+  // OBSOLETE ME191031 - use xerror
   //class APLRuntimeError : public std::runtime_error {
   // public:
   //  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
@@ -103,7 +103,7 @@ namespace apl {
       _aflags _aflowFlags;
       stringstream _ss;
       int _progressBarLastPercent;
-      double _progressBarPercent;  // ME20180831
+      double _progressBarPercent;  // ME180831
       bool _isQuiet;
 
     public:
@@ -113,7 +113,7 @@ namespace apl {
       ofstream& getOutputStream();
       void initProgressBar(const char*);
       void initProgressBar(const string&);
-      void updateProgressBar(double);  // ME20180831
+      void updateProgressBar(double);  // ME180831
       void updateProgressBar(int, int);
       void finishProgressBar();
       void setTypeOfMessage(const string&);
@@ -164,14 +164,14 @@ namespace apl {
     inline std::string stringify(const T& x) {
       std::ostringstream o;
       if (!(o << x)) {
-        // ME20191031 - use xerror
+        // ME191031 - use xerror
         //throw APLRuntimeError(std::string("stringify(") + typeid(x).name() + ")");
         throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::stringify()", std::string("stringify(") + typeid(x).name() + ")");
       }
       return o.str();
     }
-  // ME20190219 - BEGIN
-  //[OBSOLETE] vector<vector<int> > getThreadDistribution(const int&, const int&);  // ME20180801
+  // ME 190219 - BEGIN
+  //[OBSOLETE] vector<vector<int> > getThreadDistribution(const int&, const int&);  // ME 180801
   void tokenize(const string& strin, vector<string>& tokens, const string& del);
   //[OBSOLETE] string getVASPVersionString(const string&);
   //[OBSOLETE] unsigned int getFileCheckSum(const string&);
@@ -180,7 +180,7 @@ namespace apl {
   //[OBSOLETE] void printXMatrix(const xmatrix<double>&);
   //[OBSOLETE] void printXMatrix(const xmatrix<xcomplex<double> >&);
   //[OBSOLETE] void printXMatrix2(const xmatrix<xcomplex<double> >&);
-  // ME20190219 - END
+  // ME 190219 - END
 }  // namespace apl
 
 // ***************************************************************************
@@ -190,7 +190,7 @@ namespace apl {
 
 namespace apl {
   // Options for anharmonic IFC calculations
-  // OBSOLETE ME20190501 - Replaced with xoption
+  // OBSOLETE ME190501 - Replaced with xoption
   //struct _anharmonicIFCOptions {
   //  int max_iter;
   //  double sumrule_threshold;
@@ -242,8 +242,8 @@ namespace apl {
       vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
       double cutoff;  // Cutoff radius in Angstroms
       vector<xvector<double> > distortion_vectors;  // List of distortion vectors
-      vector<_ineq_distortions> higher_order_ineq_distortions;  // ME20190531 - for 3rd derivatives of higher order processes
-      vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  // ME20190520
+      vector<_ineq_distortions> higher_order_ineq_distortions;  // ME190531 - for 3rd derivatives of higher order processes
+      vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  // ME190520
       vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
       vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
       int nifcs;  // Number of force constants for each set of atoms.
@@ -256,7 +256,7 @@ namespace apl {
       xvector<int> sc_dim;  // Dimensions of the supercell.
       vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
 
-      const _cluster& getCluster(const int& i) const;  // ME20190520
+      const _cluster& getCluster(const int& i) const;  // ME190520
       void build(int);
       void buildDistortions();
       void writeClusterSetToFile(const string&);
@@ -330,10 +330,10 @@ namespace apl {
     // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
     public:
       AnharmonicIFCs(ClusterSet&, Logger&, _aflags&);
-      AnharmonicIFCs(vector<_xinput>&, ClusterSet&, const double&,  // ME20190529
-          const aurostd::xoption&, Logger&, _aflags&);  // ME20190501
+      AnharmonicIFCs(vector<_xinput>&, ClusterSet&, const double&,  // ME190529
+          const aurostd::xoption&, Logger&, _aflags&);  // ME190501
       AnharmonicIFCs(const string&, ClusterSet&, const double&,
-          const aurostd::xoption&, Logger&, _aflags&);  // ME20190501
+          const aurostd::xoption&, Logger&, _aflags&);  // ME190501
       AnharmonicIFCs(const AnharmonicIFCs&);
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
       ~AnharmonicIFCs();
@@ -342,7 +342,7 @@ namespace apl {
       ClusterSet& clst;  // Reference to the corresponding ClusterSet
       vector<vector<int> > cart_indices;  // A list of all Cartesian indices
       double distortion_magnitude;  // The magnitude of the distortions in Angstroms
-      vector<vector<double> > force_constants;  // Symmetrized IFCs - ME20190520
+      vector<vector<double> > force_constants;  // Symmetrized IFCs - ME190520
       int max_iter;  // Number of iterations for the sum rules
       double mixing_coefficient;  // The mixing coefficient for the SCF procedure
       int order;  // The order of the IFCs
@@ -568,13 +568,13 @@ namespace apl {
 namespace apl {
   class Supercell {
     private:
-      _aflags _aflowFlags;  //CO20181226
+      _aflags _aflowFlags;  //CO181226
       Logger& _logger;
       xstructure _inStructure;
       xstructure _inStructure_original;  //CO
       xstructure _inStructure_light;     //CO, does not include HEAVY symmetry stuff
       //deque<_atom> _inStructure_atoms_original; //CO
-      xstructure _pcStructure;           //CO20180406 - for the path
+      xstructure _pcStructure;           //CO 180406 - for the path
       xstructure _scStructure;
       xstructure _scStructure_original;  //CO
       xstructure _scStructure_light;     //CO, does not include HEAVY symmetry stuff
@@ -594,7 +594,7 @@ namespace apl {
       xstructure calculatePrimitiveStructure() const;
 
     public:
-      Supercell(const xstructure&, const _aflags& aflags, Logger&); //CO20181226
+      Supercell(const xstructure&, const _aflags& aflags, Logger&); //CO181226
       Supercell(const Supercell&);
       ~Supercell();
       void LightCopy(const xstructure& a, xstructure& b);
@@ -608,12 +608,12 @@ namespace apl {
           bool = true);
       int buildSuitableForShell(int, bool, bool VERBOSE);
       void setupShellRestrictions(int);
-      // ME20190715 BEGIN - added const to getter functions so they can be used with const Supercell &
+      // ME190715 BEGIN - added const to getter functions so they can be used with const Supercell &
       bool isShellRestricted() const;
       int getMaxShellID() const;
       int getNumberOfAtoms() const;
       int getNumberOfUniqueAtoms() const;
-      int getNumberOfEquivalentAtomsOfType(int) const; //CO20190218
+      int getNumberOfEquivalentAtomsOfType(int) const; //CO190218
       int getUniqueAtomID(int) const;
       int getUniqueAtomID(int, int) const;
       const _atom& getUniqueAtom(int) const;
@@ -621,14 +621,14 @@ namespace apl {
       double getUniqueAtomMass(int) const;
       double getAtomMass(int) const;
       int getAtomNumber(int) const;
-      // ME20190715 END
+      // ME190715 END
       const xstructure& getSupercellStructure() const;
       const xstructure& getSupercellStructureLight() const;
       const xstructure& getPrimitiveStructure() const;
       const xstructure& getInputStructure() const;
       const xstructure& getInputStructureLight() const;
-      int atomGoesTo(const _sym_op&, int, int, bool = TRUE); //CO20190218
-      int atomComesFrom(const _sym_op&, int, int, bool = TRUE); //CO20190218
+      int atomGoesTo(const _sym_op&, int, int, bool = TRUE); //CO190218
+      int atomComesFrom(const _sym_op&, int, int, bool = TRUE); //CO190218
       const _sym_op& getSymOpWhichMatchAtoms(int, int, int);
       xvector<double> getFPositionItsNearestImage(const xvector<double>&,
           const xvector<double>&,
@@ -639,7 +639,7 @@ namespace apl {
       bool compareFPositions(xvector<double>&, xvector<double>&, double);  //CO
       bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
       bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
-          int&, xvector<xcomplex<double> >&, bool);  // ME20180828
+          int&, xvector<xcomplex<double> >&, bool);  // ME 180828
       int pc2scMap(int) const;
       int sc2pcMap(int) const;
       void center(int);
@@ -651,7 +651,7 @@ namespace apl {
       const vector<_sym_op>& getAGROUP(int) const;
       bool isDerivativeStructure() const;
       double getEPS(void) const;
-      // ME20190715 - END
+      // ME190715 - END
       // CO - END
       // **** BEGIN JJPR *****
       xvector<int> scell;
@@ -690,56 +690,56 @@ namespace apl {
     public:
       virtual ~IPhononCalculator() {}
       virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&) = 0;
-      virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &) = 0;  // ME20190624
+      virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &) = 0;  // ME190624
       virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &,
-          vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  // ME20180827
+          vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  // ME 180827
       virtual double getEPS() = 0;  //CO
       virtual double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags) = 0;
       virtual const Supercell& getSupercell() = 0;
       virtual const xstructure& getInputCellStructure() = 0;
       virtual const xstructure& getSuperCellStructure() = 0;
       virtual uint getNumberOfBranches() = 0;
-      virtual string getSystemName() = 0;  // ME20190614
+      virtual string getSystemName() = 0;  // ME190614
       // **** BEGIN PINKU ******
       virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&) = 0;
       virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&,
           vector<xmatrix<xcomplex<double> > >&,
-          bool=true) = 0;  // ME20180827
+          bool=true) = 0;  // ME 180827
       virtual vector<double> get_ATOMIC_MASSES_AMU() = 0;
       virtual void get_special_inputs(string& AflowIn) = 0;
-      virtual void get_NCPUS(string& ncpus) = 0;  //CO20180214
-      virtual void get_NCPUS(int& ncpus) = 0;     //CO20180214
+      virtual void get_NCPUS(string& ncpus) = 0;  //CO 180214
+      virtual void get_NCPUS(int& ncpus) = 0;     //CO 180214
       // **** END   PINKU ******
   };
 }  // namespace apl
 
 // ***************************************************************************
 // "phoncalc.h"
-#define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  // ME20190108
-#define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) // ME20190108
-#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME20190108
-#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME20190108
+#define _AFLOW_APL_BORN_EPSILON_RUNNAME_ string("LRBE")  // ME190108
+#define _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_) // ME190108
+#define _AFLOW_APL_FORCEFIELDS_RUNNAME_ string("LRFF")  // ME190108
+#define _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_ string(ARUN_DIRECTORY_PREFIX + "APL_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_) // ME190108
 
 namespace apl {
   class PhononCalculator : virtual public IPhononCalculator {
     protected:
       // USER PARAMETERS
       double DISTORTION_MAGNITUDE;
-      bool DISTORTION_INEQUIVONLY; //CO20190108
-      bool TCOND; // ME20180821
-      aurostd::xoption anharmonic_IFC_options;  // ME20180821  // ME20190501
+      bool DISTORTION_INEQUIVONLY; //CO190108
+      bool TCOND; // ME180821
+      aurostd::xoption anharmonic_IFC_options;  // ME180821  // ME190501
       // Aflow's stuff required for running some routines
       _xinput& _xInput; //_xvasp& _vaspRun;
       _aflags& _aflowFlags;
       _kflags& _kbinFlags;
       _xflags& _xFlags; //_vflags& _vaspFlags;
       string& _AflowIn;
-      string _system;  // ME20190614 - for VASP-style output files
+      string _system;  // ME190614 - for VASP-style output files
 
       // Our standard and common output system
       Logger& _logger;
       // To tar or not to tar
-      //  bool DOtar;  OBSOLETE - ME20181024
+      //  bool DOtar;  OBSOLETE - ME181024
       // The computational model, supercell (now used by both implementations)
       Supercell& _supercell;
       vector<vector<_xinput> > xInputsAAPL; //vector<_xvasp> vaspRuns for AAPL;
@@ -775,8 +775,8 @@ namespace apl {
       vector<xmatrix<xcomplex<double> > > _gammaEwaldCorr;
 
     private:
-      void copy(const PhononCalculator&);  // ME20191228
-      virtual void calculateForceFields() {}  // ME20190412  // ME20191029
+      void copy(const PhononCalculator&);  // ME191228
+      virtual void calculateForceFields() {}  // ME190412  // ME191029
       void completeForceFields();
       void projectToCartesianDirections();
       void buildForceConstantMatrices();
@@ -786,31 +786,31 @@ namespace apl {
       void printFCShellInfo(ostream&);
       xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&);
       xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180827
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
       xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&);
       xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180829
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180829
       xmatrix<xcomplex<double> > getNonanalyticalTermGonze(const xvector<double>);
       xmatrix<xcomplex<double> > getEwaldSumDipolDipolContribution(const xvector<double>, bool = true);
       vector<double> get_ATOMIC_MASSES_AMU() { return ATOMIC_MASSES_AMU; }  //[PINKU]
       void store_masses();                                                  //[PINKU]
     protected:
       void writeOUTPUT(_xinput&);
-      //void createAIMSOUTPUT(const _xaims&); //CO20180406 - obsolete
-      //void createAFLOWIN(const _xvasp&);    //CO20180406 - obsolete
+      //void createAIMSOUTPUT(const _xaims&); //CO 180406 - obsolete
+      //void createAFLOWIN(const _xvasp&);    //CO 180406 - obsolete
 
     public:
       PhononCalculator(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
       PhononCalculator& operator=(const PhononCalculator&);
       virtual ~PhononCalculator();
       void clear();
-      void run();  // ME20191029
+      void run();  // ME191029
       xvector<double> getEigenvalues(const xvector<double>&);
       xvector<double> getEigenvalues(const xvector<double>&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180827
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
       void isPolarMaterial(bool b) { _isPolarMaterial = b; }
       void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
-      void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO20190108
+      void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO190108
       void setCalculateZeroStateForces(bool b) { _calculateZeroStateForces = b; }
       void setTCOND(bool b) { TCOND = b; }
       void hibernate();
@@ -824,52 +824,52 @@ namespace apl {
       void setAnharmonicOptions(int, double, double);
       bool buildVaspAAPL(const ClusterSet&, bool);
       string buildRunNameAAPL(const vector<int>&, const vector<int>&,
-          const int&, const int&, const int&);// ME20190108
+          const int&, const int&, const int&);// ME190108
       void applyDistortionsAAPL(_xinput&, const vector<aurostd::xvector<double> >&,
           const vector<int>&, const vector<int>&, double scale=1.0);
       void calculateAnharmonicIFCs(ClusterSet&);
       void readAnharmonicIFCs(const string&, ClusterSet&);
-      void subtractZeroStateForcesAAPL(vector<_xinput>&, _xinput&);  // ME20190114
+      void subtractZeroStateForcesAAPL(vector<_xinput>&, _xinput&);  // ME190114
       //******* END ME ************
-      bool _stagebreak;  // ME20191029
+      bool _stagebreak;  // ME191029
       // Interface
-      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME20180827
-      xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&);  // ME20190624
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
+      xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&);  // ME190624
       xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&, 
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180827
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
       double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
       const Supercell& getSupercell();
       const xstructure& getInputCellStructure();
       const xstructure& getSuperCellStructure();
       double getEPS();  //CO
       uint getNumberOfBranches();
-      string getSystemName();  // ME20190614
+      string getSystemName();  // ME190614
       /* friend void runVASPCalculationsBE(apl::PhononCalculator*); */
       /* friend void readBornEffectiveChargesFromOUTCAR(apl::PhononCalculator *pcalculator); */
       /* friend void symmetrizeBornEffectiveChargeTensors(apl::PhononCalculator *pcalculator); */
       /* friend void readDielectricTensorFromOUTCAR(apl::PhononCalculator *pcalculator); */
-      void runVASPCalculationsBE(_xinput&, uint=0); // ME20190113
-      void runVASPCalculationsLRBE(_xinput&, bool, uint=0);  // ME20181024 // ME20190113
-      void calculateDielectricTensor(const _xinput&);  // ME20191029
+      void runVASPCalculationsBE(_xinput&, uint=0); // ME190113
+      void runVASPCalculationsLRBE(_xinput&, bool, uint=0);  // ME181024 // ME190113
+      void calculateDielectricTensor(const _xinput&);  // ME191029
       void readBornEffectiveChargesFromAIMSOUT(void);
-      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  // ME20190113
+      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  // ME190113
       void symmetrizeBornEffectiveChargeTensors(void);
       void readDielectricTensorFromAIMSOUT(void);
-      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
+      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME190113
       void get_special_inputs(string& AflowIn);                                    //PINKU
-      void get_NCPUS(string& ncpus);  //CO20180214
-      void get_NCPUS(int& ncpus);     //CO20180214
-      // BEGIN ME20180518
+      void get_NCPUS(string& ncpus);  //CO 180214
+      void get_NCPUS(int& ncpus);     //CO 180214
+      // BEGIN ME 180518
       bool filesExistPhonons(_xinput&);
-      bool createAflowInPhonons(_xinput&); // ME20190108
+      bool createAflowInPhonons(_xinput&); // ME190108
       void createAflowInPhonons(_xinput&, const string&);
       bool outfileFoundAnywherePhonons(vector<_xinput>&);
-      void outfileFoundEverywherePhonons(vector<_xinput>&, bool=false);  // ME20191029
+      void outfileFoundEverywherePhonons(vector<_xinput>&, bool=false);  // ME191029
       void subtractZeroStateForces(vector<_xinput>&);
-      // END ME20180518
-      vector<xvector<double> > readForcesFromQmvasp(const string&); // ME20190607
-      virtual void runVASPCalculations(bool) {}  // ME20191029
-      string zerostate_dir;  // ME20191030
+      // END ME 180518
+      vector<xvector<double> > readForcesFromQmvasp(const string&); // ME190607
+      virtual void runVASPCalculations(bool) {}  // ME191029
+      string zerostate_dir;  // ME191030
   };
 }  // namespace apl
 
@@ -884,7 +884,7 @@ namespace apl {
       bool USER_GENERATE_PLUS_MINUS;
       //CO - END
       bool GENERATE_ONLY_XYZ;
-      bool DISTORTION_SYMMETRIZE; //CO20190108
+      bool DISTORTION_SYMMETRIZE; //CO190108
 
     protected:
       void estimateUniqueDistortions(const xstructure&,
@@ -892,9 +892,9 @@ namespace apl {
       void testDistortion(const xvector<double>&, const vector<_sym_op>&,
           vector<xvector<double> >&,
           vector<xvector<double> >&,
-          bool integrate_equivalent_distortions=true);  //CO20190114
-      bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO20190218
-      void runVASPCalculations(bool);  // ME20190412
+          bool integrate_equivalent_distortions=true);  //CO190114
+      bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO190218
+      void runVASPCalculations(bool);  // ME190412
       // BORN
       /* void runVASPCalculationsBE(); */
       /* void readBornEffectiveChargesFromOUTCAR(); */
@@ -905,7 +905,7 @@ namespace apl {
       DirectMethodPC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
       ~DirectMethodPC();
       void clear();
-      void calculateForceFields();  // ME20190412  // ME20191029
+      void calculateForceFields();  // ME190412  // ME191029
       // Easy access to global parameters
       //void setGeneratePlusMinus(bool b) { GENERATE_PLUS_MINUS = b; } //JAHNATEK ORIGINAL
       void setGeneratePlusMinus(bool _auto_, bool _user_) {
@@ -913,10 +913,10 @@ namespace apl {
         USER_GENERATE_PLUS_MINUS = _user_;
       }  //CO
       void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
-      void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO20190108
+      void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO190108
 
     private:
-      vector<vector<bool> > vvgenerate_plus_minus;  // ME20191029
+      vector<vector<bool> > vvgenerate_plus_minus;  // ME191029
   };
 }  // namespace apl
 
@@ -1044,18 +1044,18 @@ namespace apl {
   class LinearResponsePC : public PhononCalculator {
     private:
       /* void runVASPCalculationsBE(); */
-      void runVASPCalculationsFF(_xinput&);  // ME20190113
+      void runVASPCalculationsFF(_xinput&);  // ME190113
       /* void readBornEffectiveChargesFromOUTCAR(); */
       /* void symmetrizeBornEffectiveChargeTensors(); */
       /* void readDielectricTensorFromOUTCAR(); */
-      void readForceFieldsFromDYNMAT(const _xinput&);  // ME20190113
+      void readForceFieldsFromDYNMAT(const _xinput&);  // ME190113
 
     public:
       LinearResponsePC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
       ~LinearResponsePC();
       void clear();
-      void runVASPCalculations(bool);  // ME20191029
-      void calculateForceFields();  // ME20190412  // ME20191029
+      void runVASPCalculations(bool);  // ME191029
+      void calculateForceFields();  // ME190412  // ME191029
   };
 }  // namespace apl
 
@@ -1077,7 +1077,7 @@ namespace apl {
 // ***************************************************************************
 
 //PINKU - START
-// OBSOLETE, moved to .aflow.rc - ME20181024
+// OBSOLETE, moved to .aflow.rc - ME181024
 //#define AFLOW_APL_VASP_USE_LEPSILON
 //#undef AFLOW_APL_VASP_USE_LCALCEPS  // HAS some problem [PINKU]
 //PINKU - END
@@ -1111,7 +1111,7 @@ namespace apl {
 
     private:
       void buildPath();
-      // [OBSOLETE ME20190219] void tokenize(const string&, vector<string>&, string);
+      // [OBSOLETE ME190219] void tokenize(const string&, vector<string>&, string);
 
     public:
       PathBuilder();
@@ -1127,7 +1127,7 @@ namespace apl {
       void takeAflowElectronicPath(const string&,const Supercell&);//, const xstructure&, const xstructure&);
       void setMode(ModeEnumType);
       void setStore(StoreEnumType);
-      const StoreEnumType& getStore() const;  // ME20190614
+      const StoreEnumType& getStore() const;  // ME190614
       void setDensity(int);
       int getDensity();
       uint getPathSize();
@@ -1139,7 +1139,7 @@ namespace apl {
       std::vector<aurostd::xvector<double> > getPath(ModeEnumType, const string&);
       double getPathLength();
       double getPathLength(uint);
-      xKPOINTS createKPOINTS(const Supercell&);  // ME20190614
+      xKPOINTS createKPOINTS(const Supercell&);  // ME190614
   };
 }  // namespace apl
 
@@ -1154,7 +1154,7 @@ namespace apl {
       std::vector<xvector<double> > _qpoints;
       std::vector<xvector<double> > _freqs;
       IPCFreqFlags _frequencyFormat;
-      double _temperature;  // ME20190614
+      double _temperature;  // ME190614
       //[OBSOLETE PN180705]vector<double> path;       //[PINKU]
       //[OBSOLETE PN180705]vector<int> path_segment;  //[PINKU]
     private:
@@ -1164,19 +1164,19 @@ namespace apl {
       PhononDispersionCalculator(IPhononCalculator&, Logger&);
       ~PhononDispersionCalculator();
       void clear();
-      void initPathCoords(const string&,const string&,int,bool=false);  //CO20180406
+      void initPathCoords(const string&,const string&,int,bool=false);  //CO 180406
       void initPathLattice(const string&, int);
       void setPath(const string&);
       void calc(const IPCFreqFlags);
       void writePDIS(const string&);
       bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
       std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PINKU]
-      // ME20190614 - START
+      // ME190614 - START
       xEIGENVAL createEIGENVAL();
       void writePHEIGENVAL(const string&);
       void writePHKPOINTS(const string&);
       string _system;
-      // ME2019614 - STOP
+      // ME19614 - STOP
       //[OBSOLETE PN180705]std::vector<double> get_path() { return path; }                   //[PINKU]
       //[OBSOLETE PN180705]std::vector<int> get_path_segment() { return path_segment; }      //[PINKU]
   };
@@ -1207,7 +1207,7 @@ namespace apl { //PN180705
   };
 } // namespace apl
 // ***************************************************************************
-// ME20190417 - BEGIN
+// ME 190417 - BEGIN
 // ***************************************************************************
 // OBSOLETE - all q-point grids are now described using the QMesh class
 // "irpg.h"
@@ -1220,7 +1220,7 @@ namespace apl { //PN180705
 //  virtual aurostd::xmatrix<double> getReciprocalLattice() = 0;
 //  virtual std::vector<aurostd::xvector<double> > getPoints() = 0;
 //  virtual std::vector<double> getWeights() = 0;
-//  virtual aurostd::xtensor<int> getAllToIrrPointMap() = 0; //ME20180705
+//  virtual aurostd::xtensor<int> getAllToIrrPointMap() = 0; //ME180705
 //};
 //}  // end namespace apl
 //
@@ -1236,7 +1236,7 @@ namespace apl { //PN180705
 //  aurostd::xvector<double> _shift;
 //  aurostd::xmatrix<double> _rlattice;
 //  aurostd::xmatrix<double> _klattice;
-//  aurostd::xtensor<int> _allToIrrPointMap; //ME20180705
+//  aurostd::xtensor<int> _allToIrrPointMap; //ME180705
 //  bool _isIrreducible;
 //
 // private:
@@ -1254,7 +1254,7 @@ namespace apl { //PN180705
 //  aurostd::xmatrix<double> getReciprocalLattice();
 //  std::vector<aurostd::xvector<double> > getPoints();
 //  std::vector<double> getWeights();
-//  aurostd::xtensor<int> getAllToIrrPointMap(); //ME20180705
+//  aurostd::xtensor<int> getAllToIrrPointMap(); //ME180705
 //};
 //}  // namespace apl
 
@@ -1302,8 +1302,8 @@ namespace apl {
       int getIrredQPointIndex(int, int, int) const;
       const _qpoint& getQPoint(int) const;
       const _qpoint& getQPoint(int, int, int) const;
-      const _qpoint& getQPoint(const xvector<double>&) const;  // ME20190813
-      int getQPointIndex(xvector<double>) const;  // ME20190813
+      const _qpoint& getQPoint(const xvector<double>&) const;  // ME190813
+      int getQPointIndex(xvector<double>) const;  // ME190813
       int getQPointIndex(int, int, int) const;
       vector<xvector<double> > getQPointsCPOS() const;
       vector<xvector<double> > getQPointsFPOS() const;
@@ -1312,7 +1312,7 @@ namespace apl {
       const vector<int>& getIbzqpts() const;
       const vector<_qpoint>& getPoints() const;
       const _kcell& getReciprocalCell() const;
-      bool isShifted() const;  // ME20190813
+      bool isShifted() const;  // ME190813
       const xvector<double>& getShift() const;
       const vector<int>& getWeights() const;
       bool isReduced() const;
@@ -1353,15 +1353,15 @@ namespace apl {
       ~LTMethod();
       void clear(QMesh&, Logger&);
 
-      void makeIrreducible();  // ME20190625
+      void makeIrreducible();  // ME190625
 
       const vector<vector<int> >& getTetrahedra() const;
       const vector<int>& getTetrahedron(int) const;
       const vector<int>& getIrredTetrahedron(int) const;
       int getCorner(int, int) const;
-      // const int& getCornerIrred(const int&, const int&) const; OBSOLETE ME201906
-      vector<vector<int> > getIrreducibleTetrahedra() const;  // ME20190625
-      vector<vector<int> > getIrreducibleTetrahedraIbzqpt() const;  // ME20190625
+      // const int& getCornerIrred(const int&, const int&) const; OBSOLETE ME1906
+      vector<vector<int> > getIrreducibleTetrahedra() const;  // ME190625
+      vector<vector<int> > getIrreducibleTetrahedraIbzqpt() const;  // ME190625
 
       int getnTetrahedra() const;
       int getnIrredTetrahedra() const;
@@ -1376,26 +1376,26 @@ namespace apl {
       QMesh& _qm;
       Logger& _logger;  // The APL logger
 
-      vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra - ME20190625
-      vector<int> _irredTetrahedra;  // List of irreducible tetrahedra - ME20190625
-      bool _reduced;  // ME20190625
+      vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra - ME190625
+      vector<int> _irredTetrahedra;  // List of irreducible tetrahedra - ME190625
+      bool _reduced;  // ME190625
       int _nTetra;  // The number of tetrahedra
-      int _nIrredTetra;  // The number of irreducible tetrahedra - ME20190625
+      int _nIrredTetra;  // The number of irreducible tetrahedra - ME190625
       double _volumePerTetrahedron;  // The relative volume of each tetrahedron
       vector<int> _weights;  // The weights of each irreducible tetrahedron
 
       void generateTetrahedra();
       vector<vector<xvector<int> > > initializeTetrahedra();
       void findMostCompact(vector<vector<xvector<int> > >&);
-      void generateAllTetrahedra(const vector<vector<xvector<int> > >&);  // ME20190625
+      void generateAllTetrahedra(const vector<vector<xvector<int> > >&);  // ME190625
   };
 }  // namespace apl
 
 // ***************************************************************************
-// ME20190417 - END
+// ME 190417 - END
 // ***************************************************************************
 // ***************************************************************************
-// OBSOLETE ME20190417 - There is no need for a virtual parent class with only
+// OBSOLETE ME190417 - There is no need for a virtual parent class with only
 // one child class
 // "idosc.h"
 //
@@ -1418,17 +1418,17 @@ namespace apl {
 #define RAW2Hz 15.6333046177
 #define AMU2Kg 1.66053904
 #define MIN_EIGEN_TRESHOLD -1e-2  // eigenvalue treshold in AMU
-  //class DOSCalculator : virtual public IDOSCalculator  OBSOLETE ME20190424
-  class DOSCalculator  // ME20190424
+  //class DOSCalculator : virtual public IDOSCalculator  OBSOLETE ME190424
+  class DOSCalculator  // ME190424
   { //CO200106 - patching for auto-indenting
     protected:
       IPhononCalculator& _pc;
-      //  IReciprocalPointGrid& _rg;  OBSOLETE ME20190417
+      //  IReciprocalPointGrid& _rg;  OBSOLETE ME 190417
       QMesh& _rg;
       Logger& _logger;
-      string _bzmethod;  // ME20190423
+      string _bzmethod;  // ME190423
       std::vector<aurostd::xvector<double> > _qpoints;
-      //std::vector<int> _qweights;  OBSOLETE ME20190423
+      //std::vector<int> _qweights;  OBSOLETE ME190423
       std::vector<aurostd::xvector<double> > _freqs;
       double _minFreq;
       double _maxFreq;
@@ -1436,45 +1436,45 @@ namespace apl {
       double _halfStepDOS;
       std::vector<double> _bins;
       std::vector<double> _dos;
-      std::vector<double> _idos;  // ME20190614
-      std::vector<xmatrix<xcomplex<double> > > _eigen;  // ME20190624 - eigenvectors for projected DOS
-      std::vector<vector<vector<double> > > _projectedDOS; // ME20190614 - projectedDOS.at(atom).at(direction).at(frequency)
-      std::vector<xvector<double> > _projections;  // ME20190626 - the projection directions for the DOS in Cartesian coordinates
-      double _temperature;  // ME20190614
+      std::vector<double> _idos;  // ME190614
+      std::vector<xmatrix<xcomplex<double> > > _eigen;  // ME190624 - eigenvectors for projected DOS
+      std::vector<vector<vector<double> > > _projectedDOS; // ME190614 - projectedDOS.at(atom).at(direction).at(frequency)
+      std::vector<xvector<double> > _projections;  // ME190626 - the projection directions for the DOS in Cartesian coordinates
+      double _temperature;  // ME190614
       //CO - START
       //private:
       void calculateInOneThread(int, int);
       //CO - END
     protected:
       void calculateFrequencies();
-      void smearWithGaussian(vector<double>&, vector<double>&, double, double);  // ME20190614
+      void smearWithGaussian(vector<double>&, vector<double>&, double, double);  // ME190614
 
     public:
-      //  DOSCalculator(IPhononCalculator&, IReciprocalPointGrid&, Logger&);  OBSOLETE ME20190417
-      DOSCalculator(IPhononCalculator&, QMesh&, Logger&, string, const vector<xvector<double> >&);  // ME20190423 // ME20190624 - added projections
+      //  DOSCalculator(IPhononCalculator&, IReciprocalPointGrid&, Logger&);  OBSOLETE ME190417
+      DOSCalculator(IPhononCalculator&, QMesh&, Logger&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
       virtual ~DOSCalculator();
-      // ME20190423 - START
-      //virtual void rawCalc(int) {} OBSOLETE ME20190419
+      // ME190423 - START
+      //virtual void rawCalc(int) {} OBSOLETE ME190419
       void calcDosRS();
       void calcDosLT();
-      // ME20190423 - END
+      // ME190423 - END
       void calc(int);
       void calc(int, double);
       void clear();
       void writePDOS(const string&);
       void writePDOS(string, string);  //[PINKU]
-      xDOSCAR createDOSCAR();  // ME20190614
-      void writePHDOSCAR(const string&);  // ME20190614
+      xDOSCAR createDOSCAR();  // ME190614
+      void writePHDOSCAR(const string&);  // ME190614
       // Interface IDOSCalculator
       std::vector<double> getBins();
       std::vector<double> getDOS();
       bool hasNegativeFrequencies();
-      string _system;  // ME20190614
+      string _system;  // ME190614
   };
 }  // namespace apl
 
 // ***************************************************************************
-// OBSOLETE ME20190423 - RootSamplingMethod and LinearTetrahedronMethod have
+// OBSOLETE ME190423 - RootSamplingMethod and LinearTetrahedronMethod have
 // been integrated into DOSCalculator
 // "rsmdos.h"
 //namespace apl {
@@ -1519,8 +1519,8 @@ namespace apl {
 
   class ThermalPropertiesCalculator {
     private:
-      //IDOSCalculator& _dosc;  //CO  OBSOLETE ME20190423
-      DOSCalculator& _dosc;  // ME20190423
+      //IDOSCalculator& _dosc;  //CO  OBSOLETE ME190423
+      DOSCalculator& _dosc;  // ME190423
       Logger& _logger;
       std::vector<double> _bins;
       std::vector<double> _dos;
@@ -1532,8 +1532,8 @@ namespace apl {
       double getScalingFactor(ThermalPropertiesUnits units);
 
     public:
-      //ThermalPropertiesCalculator(IDOSCalculator&, Logger&);  OBSOLETE ME20190423
-      ThermalPropertiesCalculator(DOSCalculator&, Logger&);  // ME20190423
+      //ThermalPropertiesCalculator(IDOSCalculator&, Logger&);  OBSOLETE ME190423
+      ThermalPropertiesCalculator(DOSCalculator&, Logger&);  // ME190423
       ~ThermalPropertiesCalculator();
       void clear();
       void writeTHERMO(double, double, double, const string&);
@@ -1552,19 +1552,19 @@ namespace apl {
 
 namespace apl {
 
-  //[ME20190520 - MOVED UP]struct _qpoint {
-  //[ME20190520 - MOVED UP]  xvector<double> cpos;  // Cartesian position of the q-point
-  //[ME20190520 - MOVED UP]  xvector<double> fpos;  // Fractional coordinates of the q-point
-  //[ME20190520 - MOVED UP]  xvector<int> indices;  // Indices of the q-point grid for this q-point
-  //[ME20190520 - MOVED UP]  int symop;  // Symmetry operation to transform into an irreducible q-point
-  //[ME20190520 - MOVED UP]};
+  //[ME190520 - MOVED UP]struct _qpoint {
+  //[ME190520 - MOVED UP]  xvector<double> cpos;  // Cartesian position of the q-point
+  //[ME190520 - MOVED UP]  xvector<double> fpos;  // Fractional coordinates of the q-point
+  //[ME190520 - MOVED UP]  xvector<int> indices;  // Indices of the q-point grid for this q-point
+  //[ME190520 - MOVED UP]  int symop;  // Symmetry operation to transform into an irreducible q-point
+  //[ME190520 - MOVED UP]};
 
-  //[ME20190520 - MOVED UP]struct _kcell {
-  //[ME20190520 - MOVED UP]  xmatrix<double> lattice;  // The reciprocal lattice vectors
-  //[ME20190520 - MOVED UP]  xmatrix<double> c2f;  // Conversion matrix from Cartesian to fractional
-  //[ME20190520 - MOVED UP]  xmatrix<double> f2c;  // Conversion matrix from fractional to Cartesian
-  //[ME20190520 - MOVED UP]  bool skewed;  // Is the lattice skewed?
-  //[ME20190520 - MOVED UP]};
+  //[ME190520 - MOVED UP]struct _kcell {
+  //[ME190520 - MOVED UP]  xmatrix<double> lattice;  // The reciprocal lattice vectors
+  //[ME190520 - MOVED UP]  xmatrix<double> c2f;  // Conversion matrix from Cartesian to fractional
+  //[ME190520 - MOVED UP]  xmatrix<double> f2c;  // Conversion matrix from fractional to Cartesian
+  //[ME190520 - MOVED UP]  bool skewed;  // Is the lattice skewed?
+  //[ME190520 - MOVED UP]};
 
   class TCONDCalculator {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
@@ -1649,7 +1649,7 @@ namespace apl {
 // END ME: Lattice Thermal Conductivity (AAPL)
 // ***************************************************************************
 
-// OBSOLETE - ME20190428 - all q-point grids are now described using the QMesh class
+// OBSOLETE - ME190428 - all q-point grids are now described using the QMesh class
 //namespace apl
 //{
 //  class UniformMesh
@@ -1685,8 +1685,8 @@ namespace apl
   { //PN180705
     private:
       IPhononCalculator& _pc;
-      //UniformMesh& _umesh;  OBSOLETE ME20190428
-      QMesh& _umesh;  // ME20190428
+      //UniformMesh& _umesh;  OBSOLETE ME190428
+      QMesh& _umesh;  // ME190428
       Logger& _logger;
 
       std::vector< aurostd::xvector<double> > _freq_kp;
@@ -1702,7 +1702,7 @@ namespace apl
       std::vector< aurostd::xvector<double> > _kpoints_km;
       vector<aurostd::xvector<double> > _kpoints;
 
-      //std::vector< double > _weights;  OBSOLETE ME20190428 - not used
+      //std::vector< double > _weights;  OBSOLETE ME190428 - not used
       uint  _nBranches;
       double _sound_speed;
       double _kshift;
@@ -1715,8 +1715,8 @@ namespace apl
       void clear_auxiliary_variables();
 
     public:
-      //GroupVelocity(IPhononCalculator&, UniformMesh&, Logger&);  OBSOLETE ME20190428
-      GroupVelocity(IPhononCalculator&, QMesh&, Logger&);  // ME20190428
+      //GroupVelocity(IPhononCalculator&, UniformMesh&, Logger&);  OBSOLETE ME190428
+      GroupVelocity(IPhononCalculator&, QMesh&, Logger&);  // ME190428
       ~GroupVelocity();
       void clear();
 
@@ -1736,8 +1736,8 @@ namespace apl {
     private:
       IPhononCalculator& _pc;
       //MonkhorstPackMesh& _mp;
-      //UniformMesh& _mp; OBSOLETE ME20190428
-      QMesh& _mp;  // ME20190428
+      //UniformMesh& _mp; OBSOLETE ME190428
+      QMesh& _mp;  // ME190428
       Logger& _logger;
     private:
       vector<double> _atomic_masses_amu;
@@ -1753,7 +1753,7 @@ namespace apl {
 
       std::vector<aurostd::xvector<double> > _kpoints;
       std::vector< aurostd::xvector<double> > _kpoints_path;
-      //std::vector< double > _weights;  OBSOLETE ME20190428 - not used
+      //std::vector< double > _weights;  OBSOLETE ME190428 - not used
       aurostd::xmatrix<double> _rlattice;
       aurostd::xmatrix<double> _klattice;
       uint _nBranches;
@@ -1772,8 +1772,8 @@ namespace apl {
       double apl_inner_product(const vector<double> &a, const vector<double> &b);
     public:
       //AtomicDisplacements(IPhononCalculator&, MonkhorstPackMesh&, Logger&);
-      //AtomicDisplacements(IPhononCalculator&, UniformMesh&, Logger&);  OBSOLETE ME20190428
-      AtomicDisplacements(IPhononCalculator&, QMesh&, Logger&);  // ME20190428
+      //AtomicDisplacements(IPhononCalculator&, UniformMesh&, Logger&);  OBSOLETE ME190428
+      AtomicDisplacements(IPhononCalculator&, QMesh&, Logger&);  // ME190428
       ~AtomicDisplacements();
       void clear();
       void populate_variables(const xstructure& xs);
@@ -1854,7 +1854,7 @@ namespace apl
       //Calculate Geuneisen along high symmetry path
       bool calculation_gruneisen(const std::vector< aurostd::xvector<double> > &kpoints);
       //Calculate Gruneisen in mesh
-      //bool calculation_gruneisen(apl::UniformMesh* umesh);  OBSOLETE ME20190428
+      //bool calculation_gruneisen(apl::UniformMesh* umesh);  OBSOLETE ME190428
       bool calculation_gruneisen(apl::QMesh* umesh);
       //get negative frequency index 
       bool get_is_negative_freq(){return _is_negative_freq;}
@@ -1963,8 +1963,8 @@ namespace apl
       //Calculate Gruneisen in given k-points 
       bool calculation_gruneisen(const std::vector< aurostd::xvector<double> > &kpoints);
       //Calculate Gruneisen in uniform k-mesh
-      //bool calculation_gruneisen(apl::UniformMesh* umesh);  OBSOLETE ME20190428
-      bool calculation_gruneisen(apl::QMesh* umesh);  // ME20190428
+      //bool calculation_gruneisen(apl::UniformMesh* umesh);  OBSOLETE ME190428
+      bool calculation_gruneisen(apl::QMesh* umesh);  // ME190428
       //
       void set_cutoff_freq(double a){_cutoff_freq=a;}
       //Write Gruneisen
@@ -2112,11 +2112,11 @@ namespace apl
   class QH_ENERGIES
   { //PN180705
     private:
-      //[CO20181202 - NOT USED]IPhononCalculator& _pc;
+      //[CO181202 - NOT USED]IPhononCalculator& _pc;
       QHA_AFLOWIN_CREATOR&  _runeos;
       Logger& _logger;
     public:
-      //[CO20181202 - NOT USED]QH_ENERGIES(IPhononCalculator&, QHA_AFLOWIN_CREATOR&, Logger&);
+      //[CO181202 - NOT USED]QH_ENERGIES(IPhononCalculator&, QHA_AFLOWIN_CREATOR&, Logger&);
       QH_ENERGIES(QHA_AFLOWIN_CREATOR&, Logger&);
       ~QH_ENERGIES();
       void clear();
@@ -2441,7 +2441,7 @@ namespace apl
       bool _is_magnetic;
       uint _nBranches;
       //thermodynamic properties
-      double _Eeq, _Beq, _Veq, _Bp; //, _dE_dV, _d2E_dV2; //CO20180817
+      double _Eeq, _Beq, _Veq, _Bp; //, _dE_dV, _d2E_dV2; //CO 180817
       //temperature free energy data
       vector<vector<double> > _TF;
       //static energies
@@ -2688,7 +2688,7 @@ namespace aurostd {
 }
 
 
-//OBSOLETE - ME20190815 - moved to aurostd::xmatrix
+//OBSOLETE - ME190815 - moved to aurostd::xmatrix
 namespace apl {
   //void tred2(xmatrix<xcomplex<double> >&);
   void zheevByJacobiRotation(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
@@ -2732,7 +2732,7 @@ namespace apl {
 #define cursor_attr_blink() printf("\033[5m")     /*Supposed to make text blink, usually bolds it instead*/
 #define cursor_attr_reverse() printf("\033[7m")   /*Swap background and foreground colors*/
 
-// OBSOLETE ME20191031 - not used
+// OBSOLETE ME191031 - not used
 // ***************************************************************************
 // xtensor.hpp
 //

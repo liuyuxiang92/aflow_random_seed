@@ -48,7 +48,7 @@ _XHOST XHOST;  // GLOBAL
 // init::InitMachine
 // ***************************************************************************
 namespace init {
-  int GetCPUCores() { // CO20180124
+  int GetCPUCores() { // CO 180124
     int ncpus=sysconf(_SC_NPROCESSORS_ONLN);
     if(ncpus==96) ncpus=48; // fix the hyperthreading lie
     if(ncpus<1) ncpus=1;
@@ -70,8 +70,8 @@ namespace init {
     XHOST.QUIET=aurostd::args2flag(argv,cmds,"--quiet|-q");
     XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
     XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
-    XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); // DX20171025
-    XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
+    XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); // DX 171025
+    XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO190402
     XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
 
     XHOST.tmpfs=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","/tmp");
@@ -266,13 +266,13 @@ namespace init {
     // GET AFLOW_DATA
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [13]" << endl;
     found=FALSE;
-    //CO20180706 - above we override Progname ./aflow with aflow, so it will never look in ./aflow
+    //CO 180706 - above we override Progname ./aflow with aflow, so it will never look in ./aflow
     //I am assuming this is for a good reason, but it screws things up here
     //so we need to rely on XHOST.argv.at(0) as above
     if(!found&&(XHOST.argv[0]=="aflow"||XHOST.argv[0]=="aflowd"||XHOST.argv[0]=="aconvasp"||XHOST.argv[0]=="apennsy")) {
       string aflow_data_command="aflow_data";
-      //CO20180706 - note, IsCommandAvailableModify() simply overwrites aflow_data_command with true path from `which'
-      if(aurostd::IsCommandAvailableModify(aflow_data_command)){XHOST.vcmd.push_back(aflow_data_command);found=TRUE;}  //CO20180703
+      //CO 180706 - note, IsCommandAvailableModify() simply overwrites aflow_data_command with true path from `which'
+      if(aurostd::IsCommandAvailableModify(aflow_data_command)){XHOST.vcmd.push_back(aflow_data_command);found=TRUE;}  //CO 180703
     }
     if(!found&&(XHOST.argv[0]=="./aflow"||XHOST.argv[0]=="./aflowd"||XHOST.argv[0]=="./aconvasp"||XHOST.argv[0]=="./apennsy")) {
       if(aurostd::FileExist("./aflow_data")){XHOST.vcmd.push_back("./aflow_data");found=TRUE;}
@@ -280,11 +280,11 @@ namespace init {
     if(!found&&(XHOST.argv[0]=="/usr/local/bin/aflow"||XHOST.argv[0]=="/usr/local/bin/aflowd"||XHOST.argv[0]=="/usr/local/bin/aconvasp"||XHOST.argv[0]=="/usr/local/bin/apennsy")) {
       if(aurostd::FileExist("/usr/local/bin/aflow_data")){XHOST.vcmd.push_back("/usr/local/bin/aflow_data");found=TRUE;}
     }
-    //[OBSOLETE CO20180706]if(!found&&(XHOST.progname=="aflow"||XHOST.progname=="aflowd"||XHOST.progname=="aconvasp"||XHOST.progname=="apennsy")) {XHOST.vcmd.push_back("aflow_data");found=TRUE;}
-    //[OBSOLETE CO20180706]if(!found&&(XHOST.progname=="./aflow"||XHOST.progname=="./aflowd"||XHOST.progname=="./aconvasp"||XHOST.progname=="./apennsy")) {XHOST.vcmd.push_back("./aflow_data");found=TRUE;}
-    //[OBSOLETE CO20180706]if(!found&&(XHOST.progname=="/usr/local/bin/aflow"||XHOST.progname=="/usr/local/bin/aflowd"||XHOST.progname=="/usr/local/bin/aconvasp"||XHOST.progname=="/usr/local/bin/apennsy")) {XHOST.vcmd.push_back("/usr/local/bin/aflow_data");found=TRUE;}
+    //[OBSOLETE CO 180706]if(!found&&(XHOST.progname=="aflow"||XHOST.progname=="aflowd"||XHOST.progname=="aconvasp"||XHOST.progname=="apennsy")) {XHOST.vcmd.push_back("aflow_data");found=TRUE;}
+    //[OBSOLETE CO 180706]if(!found&&(XHOST.progname=="./aflow"||XHOST.progname=="./aflowd"||XHOST.progname=="./aconvasp"||XHOST.progname=="./apennsy")) {XHOST.vcmd.push_back("./aflow_data");found=TRUE;}
+    //[OBSOLETE CO 180706]if(!found&&(XHOST.progname=="/usr/local/bin/aflow"||XHOST.progname=="/usr/local/bin/aflowd"||XHOST.progname=="/usr/local/bin/aconvasp"||XHOST.progname=="/usr/local/bin/apennsy")) {XHOST.vcmd.push_back("/usr/local/bin/aflow_data");found=TRUE;}
     if(!found) {
-      aurostd::string2tokens(XHOST.argv.at(0),tokens,"/");  //CO20180703 - note, string2tokens without consecutive keeps beginning / with first entry
+      aurostd::string2tokens(XHOST.argv.at(0),tokens,"/");  //CO 180703 - note, string2tokens without consecutive keeps beginning / with first entry
       string aflow_data="";
       for(uint i=0;i<tokens.size()-1;i++) {aflow_data+=tokens.at(i)+"/";} aflow_data+=string("aflow_data");
       if(aurostd::FileExist(aflow_data)) {
@@ -426,21 +426,21 @@ namespace init {
       oss << "MPI_HYPERTHREADING_MPCDF_HYDRA=" << MPI_HYPERTHREADING_MPCDF_HYDRA << "\"" << endl;
       oss << "MPI_BINARY_DIR_MPCDF_HYDRA=" << MPI_BINARY_DIR_MPCDF_HYDRA << "\"" << endl;
       // CO - END
-      //DX20190509 - MACHINE001 - START
+      //DX 20190509 - MACHINE001 - START
       oss << "MPI_OPTIONS_MACHINE001=" << MPI_OPTIONS_MACHINE001 << "\"" << endl;
       oss << "MPI_COMMAND_MACHINE001=" << MPI_COMMAND_MACHINE001 << "\"" << endl;
       oss << "MPI_BINARY_DIR_MACHINE001=" << MPI_BINARY_DIR_MACHINE001 << "\"" << endl;
-      //DX20190509 - MACHINE001 - END
-      //DX20190509 - MACHINE002 - START
+      //DX 20190509 - MACHINE001 - END
+      //DX 20190509 - MACHINE002 - START
       oss << "MPI_OPTIONS_MACHINE002=" << MPI_OPTIONS_MACHINE002 << "\"" << endl;
       oss << "MPI_COMMAND_MACHINE002=" << MPI_COMMAND_MACHINE002 << "\"" << endl;
       oss << "MPI_BINARY_DIR_MACHINE002=" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
-      //DX20190509 - MACHINE002 - END
-      //DX20190107 - CMU EULER - START
+      //DX 20190509 - MACHINE002 - END
+      //DX 20190107 - CMU EULER - START
       oss << "MPI_OPTIONS_CMU_EULER=" << MPI_OPTIONS_CMU_EULER << "\"" << endl;
       oss << "MPI_COMMAND_CMU_EULER=" << MPI_COMMAND_CMU_EULER << "\"" << endl;
       oss << "MPI_BINARY_DIR_CMU_EULER=" << MPI_BINARY_DIR_CMU_EULER << "\"" << endl;
-      //DX20190107 - CMU EULER - END
+      //DX 20190107 - CMU EULER - END
       oss << "MPI_OPTIONS_DUKE_MATERIALS=" << MPI_OPTIONS_DUKE_MATERIALS << "\"" << endl;
       oss << "MPI_COMMAND_DUKE_MATERIALS=" << MPI_COMMAND_DUKE_MATERIALS << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_MATERIALS=" << MPI_BINARY_DIR_DUKE_MATERIALS << "\"" << endl;
@@ -629,15 +629,15 @@ namespace init {
     XHOST.vflag_control.flag("DIRECTORY",found);  // if found
     if(XHOST.vflag_control.flag("DIRECTORY")) XHOST.vflag_control.push_attached("DIRECTORY",dir);
     if(XHOST.vflag_control.flag("DIRECTORY")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"DIR\")=[" << XHOST.vflag_control.getattachedscheme("DIRECTORY") << "]" << endl; 
-    //CO20190402 START - cleaning directory, giving us something to print with logger
+    //CO190402 START - cleaning directory, giving us something to print with logger
     string directory_clean="";
     if(XHOST.vflag_control.flag("DIRECTORY")){directory_clean=XHOST.vflag_control.getattachedscheme("DIRECTORY");}
     aurostd::StringSubst(directory_clean,"//","/");  //clean
     directory_clean=aurostd::RemoveWhiteSpaces(directory_clean);
-    if(directory_clean.empty() || directory_clean=="./" || directory_clean=="."){directory_clean=aurostd::getPWD()+"/";}  //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(directory_clean.empty() || directory_clean=="./" || directory_clean=="."){directory_clean=aurostd::getPWD()+"/";}  //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     if(!directory_clean.empty()){XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
     if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
-    //CO20190402 STOP - cleaning directory, giving us something to print with logger
+    //CO190402 STOP - cleaning directory, giving us something to print with logger
     // FILE NEEDS A SPECIAL TREATMENT
     string file_default="xxxx",file=file_default;
     found=FALSE;
@@ -669,7 +669,7 @@ namespace init {
     // exit(0); 
 
     XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"-h|--help"));
-    XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  // ME20180531
+    XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  // ME180531
     XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3",aurostd::args2flag(argv,cmds,"-l|--license"));
     XHOST.vflag_control.flag("README_AFLOW",aurostd::args2flag(argv,cmds,"--readme=run|--readme=aflow|--readme_aflow"));
     XHOST.vflag_control.flag("README_AFLOW_PFLOW",aurostd::args2flag(argv,cmds,"--readme=pflow|--readme=processor|--readme=aconvasp|--readme_aconvasp"));
@@ -681,14 +681,14 @@ namespace init {
     XHOST.vflag_control.flag("README_AEL",aurostd::args2flag(argv,cmds,"--readme=ael|--readme_ael"));
     XHOST.vflag_control.flag("README_ANRL",aurostd::args2flag(argv,cmds,"--readme=anrl|--readme_anrl"));
     XHOST.vflag_control.flag("README_COMPARE",aurostd::args2flag(argv,cmds,"--readme=compare|--readme_compare"));
-    XHOST.vflag_control.flag("README_GFA",aurostd::args2flag(argv,cmds,"--readme=gfa|--readme_gfa")); //CO20190401
+    XHOST.vflag_control.flag("README_GFA",aurostd::args2flag(argv,cmds,"--readme=gfa|--readme_gfa")); //CO190401
     XHOST.vflag_control.flag("README_SYMMETRY",aurostd::args2flag(argv,cmds,"--readme=symmetry|--readme_symmetry"));
-    XHOST.vflag_control.flag("README_CCE",aurostd::args2flag(argv,cmds,"--readme=cce|--readme_cce")); //CO20190620
-    XHOST.vflag_control.flag("README_CHULL",aurostd::args2flag(argv,cmds,"--readme=chull|--readme_chull")); //CO20190620
+    XHOST.vflag_control.flag("README_CCE",aurostd::args2flag(argv,cmds,"--readme=cce|--readme_cce")); //CO190620
+    XHOST.vflag_control.flag("README_CHULL",aurostd::args2flag(argv,cmds,"--readme=chull|--readme_chull")); //CO190620
     XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION",aurostd::args2flag(argv,cmds,"--readme=partial_occupation|--readme=pocc|--readme_pocc"));
     XHOST.vflag_control.flag("README_APENNSY",aurostd::args2flag(argv,cmds,"--readme=apennsy|--readme_apennsy"));
     XHOST.vflag_control.flag("README_SCRIPTING",aurostd::args2flag(argv,cmds,"--readme=scripting|--readme_scripting|--readme=script|--readme_script"));
-    XHOST.vflag_control.flag("README_EXCEPTIONS", aurostd::args2flag(argv, cmds, "--readme=errors|--readme_errors|--readme=exceptions|--readme_exceptions"));  // ME20180531
+    XHOST.vflag_control.flag("README_EXCEPTIONS", aurostd::args2flag(argv, cmds, "--readme=errors|--readme_errors|--readme=exceptions|--readme_exceptions"));  // ME 180531
     XHOST.vflag_control.flag("README_HTRESOURCES",aurostd::args2flag(argv,cmds,"--readme=htresources|--readme_htresources|--readme=resources|--readme_resources"));
     XHOST.vflag_control.flag("README_XAFLOW",aurostd::args2flag(argv,cmds,"--readme=xaflow|--readme_xaflow"));
     XHOST.vflag_control.flag("README_AFLOWRC",aurostd::args2flag(argv,cmds,"--readme=aflowrc|--readme_aflowrc"));
@@ -704,19 +704,19 @@ namespace init {
           XHOST.vflag_control.flag("README_AEL") ||
           XHOST.vflag_control.flag("README_ANRL") ||
           XHOST.vflag_control.flag("README_COMPARE") ||
-          XHOST.vflag_control.flag("README_GFA") || //CO20190401
+          XHOST.vflag_control.flag("README_GFA") || //CO190401
           XHOST.vflag_control.flag("README_SYMMETRY") ||
-          XHOST.vflag_control.flag("README_CCE") || //CO20190620
-          XHOST.vflag_control.flag("README_CHULL") || //CO2019620
+          XHOST.vflag_control.flag("README_CCE") || //CO190620
+          XHOST.vflag_control.flag("README_CHULL") || //CO19620
           XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") ||
           XHOST.vflag_control.flag("README_APENNSY") ||
           XHOST.vflag_control.flag("README_SCRIPTING") ||
-          XHOST.vflag_control.flag("README_EXCEPTIONS") ||  // ME20180531
+          XHOST.vflag_control.flag("README_EXCEPTIONS") ||  // ME180531
           XHOST.vflag_control.flag("README_HTRESOURCES") ||
           XHOST.vflag_control.flag("README_XAFLOW") ||
           XHOST.vflag_control.flag("README_AFLOWRC") ||
-          FALSE)){  // CO20180306 - need to catch --readme such that it doesn't interfere with --readme=
-            XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  // CO20180306
+          FALSE)){  // CO 180306 - need to catch --readme such that it doesn't interfere with --readme=
+            XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  // CO 180306
           }
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AFLOW_HELP\")=" << XHOST.vflag_control.flag("AFLOW_HELP") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_AFLOW_LICENSE_GPL3\")=" << XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3") << endl;
@@ -728,10 +728,10 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_AEL\")=" << XHOST.vflag_control.flag("README_AEL") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_ANRL\")=" << XHOST.vflag_control.flag("README_ANRL") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_COMPARE\")=" << XHOST.vflag_control.flag("README_COMPARE") << endl;
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_GFA\")=" << XHOST.vflag_control.flag("README_GFA") << endl;  //CO20190401
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_GFA\")=" << XHOST.vflag_control.flag("README_GFA") << endl;  //CO190401
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_SYMMETRY\")=" << XHOST.vflag_control.flag("README_SYMMETRY") << endl;
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_CCE\")=" << XHOST.vflag_control.flag("README_CCE") << endl;  //CO20190620
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_CHULL\")=" << XHOST.vflag_control.flag("README_CHULL") << endl;  //CO20190620
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_CCE\")=" << XHOST.vflag_control.flag("README_CCE") << endl;  //CO190620
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_CHULL\")=" << XHOST.vflag_control.flag("README_CHULL") << endl;  //CO190620
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_PARTIAL_OCCUPATION\")=" << XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_APENNSY\")=" << XHOST.vflag_control.flag("README_APENNSY") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_SCRIPTING\")=" << XHOST.vflag_control.flag("README_SCRIPTING") << endl;
@@ -764,7 +764,7 @@ namespace init {
 
     XHOST.vflag_control.flag("PRINT_MODE::HTML",aurostd::args2flag(XHOST.argv,cmds,"--print=html|--print_html")); 
     XHOST.vflag_control.flag("PRINT_MODE::TXT",aurostd::args2flag(XHOST.argv,cmds,"--print=txt|--print_txt")); 
-    XHOST.vflag_control.flag("PRINT_MODE::JSON",aurostd::args2flag(XHOST.argv,cmds,"--print=json|--print_json")); // DX20170907 - Add json
+    XHOST.vflag_control.flag("PRINT_MODE::JSON",aurostd::args2flag(XHOST.argv,cmds,"--print=json|--print_json")); // DX 9/7/17 - Add json
     XHOST.vflag_control.flag("PRINT_MODE::LATEX",aurostd::args2flag(XHOST.argv,cmds,"--print=latex|--print_latex"));
     XHOST.vflag_control.flag("PRINT_MODE::YEAR",aurostd::args2flag(XHOST.argv,cmds,"--print=year|--print_year"));
     XHOST.vflag_control.flag("PRINT_MODE::DOI",aurostd::args2flag(XHOST.argv,cmds,"--print=doi|--print_doi"));
@@ -782,7 +782,7 @@ namespace init {
     XHOST.vflag_control.flag("OSS::CERR",aurostd::args2flag(XHOST.argv,cmds,"--oss=cerr|--oss_cerr|--CERR|--cerr"));
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::HTML\")=" << XHOST.vflag_control.flag("PRINT_MODE::HTML") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::TXT\")=" << XHOST.vflag_control.flag("PRINT_MODE::TXT") << endl;
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl; // DX20170907 - Add json
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl; // DX 9/7/17 - Add json
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::LATEX\")=" << XHOST.vflag_control.flag("PRINT_MODE::LATEX") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::YEAR\")=" << XHOST.vflag_control.flag("PRINT_MODE::YEAR") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::DOI\")=" << XHOST.vflag_control.flag("PRINT_MODE::DOI") << endl;
@@ -815,11 +815,11 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JPG\")=" << XHOST.vflag_control.flag("PRINT_MODE::JPG") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::PNG\")=" << XHOST.vflag_control.flag("PRINT_MODE::PNG") << endl;
 
-    //[CO20191110]run pocc post-processing for particular temperatures from command line
-    XHOST.vflag_control.flag("CALCULATION_TEMPERATURE",aurostd::args2attachedflag(argv,"--temperature=|--temp="));  //CO20191110
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.flag("CALCULATION_TEMPERATURE") << endl;  //CO20191110
-    if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")) XHOST.vflag_control.push_attached("CALCULATION_TEMPERATURE",aurostd::args2attachedstring(argv,"--temperature=|--temp=","300")); //CO20191110
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE") << endl;  //CO20191110
+    //[CO191110]run pocc post-processing for particular temperatures from command line
+    XHOST.vflag_control.flag("CALCULATION_TEMPERATURE",aurostd::args2attachedflag(argv,"--temperature=|--temp="));  //CO191110
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.flag("CALCULATION_TEMPERATURE") << endl;  //CO191110
+    if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")) XHOST.vflag_control.push_attached("CALCULATION_TEMPERATURE",aurostd::args2attachedstring(argv,"--temperature=|--temp=","300")); //CO191110
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE") << endl;  //CO191110
 
     XHOST.vflag_control.flag("XPLUG_DO_CLEAN",aurostd::args2flag(XHOST.argv,cmds,"--doclean"));
     XHOST.vflag_control.flag("XPLUG_DO_ADD",aurostd::args2flag(argv,"--add"));
@@ -833,14 +833,14 @@ namespace init {
     if(XHOST.vflag_control.flag("XPLUG_NUM_SIZE")) XHOST.vflag_control.push_attached("XPLUG_NUM_SIZE",aurostd::args2attachedstring(argv,"--nsize=",""));
     if(!XHOST.vflag_control.flag("XPLUG_NUM_SIZE")) XHOST.vflag_control.push_attached("XPLUG_NUM_SIZE",aurostd::utype2string(128));
     XHOST.vflag_control.flag("XPLUG_NUM_THREADS",aurostd::args2attachedflag(argv,"--np="));
-    XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX",aurostd::args2attachedflag(argv,"--npmax")); // CO20180124
+    XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX",aurostd::args2attachedflag(argv,"--npmax")); // CO 180124
     if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=",""));
-    if(!XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")) { //ME20181113
-      XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME20181113
-      //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO200106 - close bracket for indenting]}
+    if(!XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")) { //ME181113
+      XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME181113
+      //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME 181113  //[CO200106 - close bracket for indenting]}
     }
 
-    // ME20181103 - set MPI when number of threads is larger than 1
+    // ME 181103 - set MPI when number of threads is larger than 1
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX") || 
         (aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS")) > 1)) {
       XHOST.MPI = true;
@@ -904,7 +904,7 @@ namespace init {
     XHOST.vflag_control.flag("GRANTS",aurostd::args2flag(argv,cmds,"--grant|--grants"));
     if(XHOST.vflag_control.flag("GRANTS")) XHOST.vflag_control.push_attached("GRANTS",aurostd::args2attachedstring(argv,"--grant=|--grants=",""));
     if(LDEBUG) cout << "OUTREACH OPTIONS: xscheme=" << XHOST.vflag_control.xscheme << endl;
-    //    if(LDEBUG) cout << "OUTREACH OPTIONS: vxscheme.size()=" << XHOST.vflag_control.vxscheme.size() << endl;  OBSOLETE ME20181102
+    //    if(LDEBUG) cout << "OUTREACH OPTIONS: vxscheme.size()=" << XHOST.vflag_control.vxscheme.size() << endl;  OBSOLETE ME 181102
     if(LDEBUG) cout << "OUTREACH OPTIONS: vxsghost.size()=" << XHOST.vflag_control.vxsghost.size() << endl;
     if(LDEBUG) cout << "OUTREACH OPTIONS: argv.size()=" << argv.size() << endl;
 
@@ -1122,11 +1122,11 @@ namespace init {
     if(str=="README_AFLOW_AEL_TXT") { if(XHOST_README_AFLOW_AEL_TXT.empty()) { return XHOST_README_AFLOW_AEL_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_AEL_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_ANRL_TXT") { if(XHOST_README_AFLOW_ANRL_TXT.empty()) { return XHOST_README_AFLOW_ANRL_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_ANRL_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_COMPARE_TXT") { if(XHOST_README_AFLOW_COMPARE_TXT.empty()) { return XHOST_README_AFLOW_COMPARE_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_COMPARE_TXT;}} // LOADED TXTS
-    if(str=="README_AFLOW_GFA_TXT") { if(XHOST_README_AFLOW_GFA_TXT.empty()) { return XHOST_README_AFLOW_GFA_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_GFA_TXT;}} // LOADED TXTS  //CO20190401
+    if(str=="README_AFLOW_GFA_TXT") { if(XHOST_README_AFLOW_GFA_TXT.empty()) { return XHOST_README_AFLOW_GFA_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_GFA_TXT;}} // LOADED TXTS  //CO190401
     if(str=="README_AFLOW_SYM_TXT") { if(XHOST_README_AFLOW_SYM_TXT.empty()) { return XHOST_README_AFLOW_SYM_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_SYM_TXT;}} // LOADED TXTS
-    if(str=="README_AFLOW_CCE_TXT") { if(XHOST_README_AFLOW_CCE_TXT.empty()) { return XHOST_README_AFLOW_CCE_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CCE_TXT;}} // LOADED TXTS  //CO20190620
-    if(str=="README_AFLOW_CHULL_TXT") { if(XHOST_README_AFLOW_CHULL_TXT.empty()) { return XHOST_README_AFLOW_CHULL_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CHULL_TXT;}} // LOADED TXTS  //CO20190620
-    if(str=="README_AFLOW_EXCEPTIONS_TXT") {if(XHOST_README_AFLOW_EXCEPTIONS_TXT.empty()){ return XHOST_README_AFLOW_EXCEPTIONS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_EXCEPTIONS_TXT;}}  // ME20180531
+    if(str=="README_AFLOW_CCE_TXT") { if(XHOST_README_AFLOW_CCE_TXT.empty()) { return XHOST_README_AFLOW_CCE_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CCE_TXT;}} // LOADED TXTS  //CO190620
+    if(str=="README_AFLOW_CHULL_TXT") { if(XHOST_README_AFLOW_CHULL_TXT.empty()) { return XHOST_README_AFLOW_CHULL_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CHULL_TXT;}} // LOADED TXTS  //CO190620
+    if(str=="README_AFLOW_EXCEPTIONS_TXT") {if(XHOST_README_AFLOW_EXCEPTIONS_TXT.empty()){ return XHOST_README_AFLOW_EXCEPTIONS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_EXCEPTIONS_TXT;}}  // ME180531
     if(str=="README_PROTO_TXT") { if(XHOST_README_PROTO_TXT.empty()) { return XHOST_README_PROTO_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_PROTO_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_XAFLOW_TXT") { if(XHOST_README_AFLOW_XAFLOW_TXT.empty()) { return XHOST_README_AFLOW_XAFLOW_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_XAFLOW_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_AFLOWRC_TXT") { if(XHOST_README_AFLOW_AFLOWRC_TXT.empty()) { return XHOST_README_AFLOW_AFLOWRC_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_AFLOWRC_TXT;}} // LOADED TXTS
@@ -1249,7 +1249,7 @@ namespace init {
 namespace init {
   string AFLOW_Projects_Directories(string lib) {
     bool LDEBUG=FALSE;
-    if(LDEBUG){;} //CO20190906 - keep LDEBUG busy
+    if(LDEBUG){;} //CO190906 - keep LDEBUG busy
     string out="";
     if(lib=="AUID" || lib=="auid") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
     if(lib=="ICSD" || lib=="icsd") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
@@ -1559,12 +1559,12 @@ string Message(string list2print) {
   if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME")) oss << " - [date=" << aflow_get_time_string() << "]";
   if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";
   //  if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0)
-  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; // CO20170628 - slow otherwise!!!
+  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; // CO 170628 - slow otherwise!!!
   if(XHOST.vTemperatureCore.size()>0) if(max(XHOST.vTemperatureCore)>AFLOW_CORE_TEMPERATURE_BEEP) oss << " - [ERROR_TEMPERATURE=" << max(XHOST.vTemperatureCore) << ">" << AFLOW_CORE_TEMPERATURE_BEEP << "@ host=" << XHOST.hostname<< "]";
   // oss << endl;
   pthread_mutex_unlock(&mutex_INIT_Message);
   // do some killing
-  //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  // CO20170628 - this is already run above, very slow
+  //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  // CO 170628 - this is already run above, very slow
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("aflow",XHOST.maxmem);
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("clamd",XHOST.maxmem);
   return oss.str();

@@ -17,7 +17,7 @@ namespace aurostd {
 
   // constructure
   xoption::xoption() {
-    keyword=""; //DX20180824 - missing from constructor
+    keyword=""; //DX 20180824 - missing from constructor
     isentry=FALSE; 
     content_string="";
     content_double=0.0;
@@ -43,7 +43,7 @@ namespace aurostd {
 
   // copy fuction
   void xoption::copy(const xoption& b) {
-    keyword=b.keyword; //DX20180824 - missing from copy constructor
+    keyword=b.keyword; //DX 20180824 - missing from copy constructor
     isentry=b.isentry;
     content_string=b.content_string;
     content_double=b.content_double;
@@ -97,7 +97,7 @@ namespace aurostd {
     if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: option_DEFAULT=" << (option_DEFAULT?"TRUE":"FALSE") << endl;
     if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
     // start the scan
-    //string keyword; //CO20180404 - now a member of the object
+    //string keyword; //CO 180404 - now a member of the object
     vector<string> vkeyword;
     // tokenize the option
     aurostd::string2tokens(input_keyword,vkeyword,"|"); 
@@ -144,8 +144,8 @@ namespace aurostd {
         if(isentry && !xscheme_DEFAULT.empty()) {
           if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: SCHEME MODE" << endl;
           content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,FALSE));
-          // ME20181030 - Special case: if the scheme is a Boolean keyword, unset option
-          // ME20190107 - Cannot use N or F because it's ambiguous (nitrogen, fluorine)
+          // ME 181030 - Special case: if the scheme is a Boolean keyword, unset option
+          // ME 190107 - Cannot use N or F because it's ambiguous (nitrogen, fluorine)
           string content = aurostd::toupper(content_string);
           if ((content == "OFF") || (content == "FALSE") || (content == "NO")) {
             option = false;
@@ -283,7 +283,7 @@ namespace aurostd {
     }
   }
 
-  bool xoption::isscheme(string check) const {                     //CO20180101
+  bool xoption::isscheme(string check) const {                     //CO 180101
     // ISSCHEME and FLAG checks only vxscheme... does not manage the ghost, so for example    // SC20200114
     // CONVERT_UNIT_CELL (as flag) will not be confused with CONVERT_UNIT_CELL=STANDARD as method.   // SC20200114
     // Thanks to Marco Esters for getting this bug.   // SC20200114
@@ -326,11 +326,11 @@ namespace aurostd {
     if(operation==TRUE) {
       if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
       if(LDEBUG) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: ADD_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
-      //CO20181226 START - check that it doesn't already exist, multiples don't affect isscheme, but affects how we iterate through aplopts
+      //CO181226 START - check that it doesn't already exist, multiples don't affect isscheme, but affects how we iterate through aplopts
       for(uint i=0;i<vxscheme.size();i++){
         if(aurostd::toupper(vxscheme.at(i))==aurostd::toupper(_xscheme)){opscheme(_xscheme,FALSE);} //recursion is GNU's pleasure
       }
-      //CO20181226 STOP
+      //CO181226 STOP
       vxscheme.push_back(aurostd::toupper(_xscheme));
       if(LDEBUG) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: ADD_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
     } else {
@@ -399,11 +399,11 @@ namespace aurostd {
     if(operation==TRUE) {
       if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opattachedscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
       if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opattachedscheme: GHOST=" << attached << endl;
-      //CO20181226 START - check that it doesn't already exist, multiples affect getattachedscheme
+      //CO181226 START - check that it doesn't already exist, multiples affect getattachedscheme
       for(uint i=0;i<vxsghost.size();i+=2) {
         if(aurostd::toupper(vxsghost.at(i))==aurostd::toupper(_xscheme)) {opattachedscheme(_xscheme,attached,FALSE);} //recursion is GNU's pleasure
       }
-      //CO20181226 STOP
+      //CO181226 STOP
       vxsghost.push_back(aurostd::toupper(_xscheme));
       vxsghost.push_back(attached);
     }  else {

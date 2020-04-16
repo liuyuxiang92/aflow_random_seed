@@ -35,7 +35,7 @@ using aurostd::ran0;
 #define COMMENT_NEGLECT_2 string("//")
 #define COMMENT_NEGLECT_3 string("!")
 
-//CO20171215 - moved to xscalar
+//CO 171215 - moved to xscalar
 // ***************************************************************************
 // ROUNDOFF for scalars
 //namespace aurostd { // DX add roundoff for scalar values
@@ -66,7 +66,7 @@ namespace aurostd {
   long double get_delta_useconds(long double& useconds_begin) {long double out=aurostd::get_useconds()-useconds_begin;useconds_begin=aurostd::get_useconds();return out;}
   string get_time(void) {int h=get_hour(),m=get_min(),s=get_sec();return (h<10?"0":"")+aurostd::utype2string(h)+":"+(m<10?"0":"")+aurostd::utype2string(m)+":"+(s<10?"0":"")+aurostd::utype2string(s);}
   string get_datetime(void) { return utype2string(get_date())+"_"+get_time();}
-  string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO20171215
+  string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO 171215
     stringstream misc_ss;
     int y=aurostd::get_year(),b=aurostd::get_month(),d=aurostd::get_day(),h=get_hour(),m=get_min(),s=get_sec();
     misc_ss << y << date_delim << (b<10?"0":"") << b << date_delim << (d<10?"0":"") << d;
@@ -643,7 +643,7 @@ namespace aurostd {
   // Function getPWD()
   // ***************************************************************************
   // a function to get current directory
-  string getPWD(){  //CO20191112
+  string getPWD(){  //CO191112
     //old way also needs PATH_LENGTH_MAX, not good for current LONG pocc directories
     //[old way - need to convert char array -> string]const int PATH_LENGTH_MAX=1024;
     //[old way - need to convert char array -> string]char work_dir[PATH_LENGTH_MAX];
@@ -879,13 +879,13 @@ namespace aurostd {
   // ***************************************************************************
   // Clean a string from ASCII junk
   // Stefano Curtarolo
-  string CleanStringASCII(const string& s) {return CleanStringASCII_190712(s);} //CO20190712
-  string CleanStringASCII_190712(const string& s) { //CO20190712
+  string CleanStringASCII(const string& s) {return CleanStringASCII_190712(s);} //CO190712
+  string CleanStringASCII_190712(const string& s) { //CO190712
     string ss=s;
     CleanStringASCII_InPlace(ss);
     return ss;
   }
-  string CleanStringASCII_190101(const string& s) { //CO20190712
+  string CleanStringASCII_190101(const string& s) { //CO190712
     string ss="";
     for(uint i=0;i<s.length();i++) {
       if(s[i]>='A' && s[i]<='Z') ss+=s[i];  // LETTERS
@@ -904,7 +904,7 @@ namespace aurostd {
   // Similar to CleanStringASCII, but does NOT create a new string (costly if done MANY times)
   // Corey Oses 190712
   void CleanStringASCII_InPlace(string& s) {
-    //[CO20190712 - slight optimization if we go backwards]for(uint i=0;i<s.length();i++)
+    //[CO190712 - slight optimization if we go backwards]for(uint i=0;i<s.length();i++)
     for(uint i=s.length()-1;i<s.length();i--)
     { //CO200106 - patching for auto-indenting
       if(!(
@@ -919,11 +919,11 @@ namespace aurostd {
     }
   }
 
-  //DX20190516 - remove control code characters - START
+  //DX 20190516 - remove control code characters - START
   // ***************************************************************************
   // Function removeControlCodeCharactersFromString
   // ***************************************************************************
-  bool RemoveControlCodeCharactersFromString(const string& in, string& out){  //CO20190620
+  bool RemoveControlCodeCharactersFromString(const string& in, string& out){  //CO190620
 
     // removes control code and backspace characters (e.g., NUL, DEL, etc.)
     // only keep printable characters (i.e., digits, letters, punctuation, and spaces) 
@@ -949,7 +949,7 @@ namespace aurostd {
     // a boolean indicates if the stringstream contained a control code character
     // stringstream input version
     //
-    // ME20190614: We don't want carriage returns either because they mess up string additions.
+    // ME190614: We don't want carriage returns either because they mess up string additions.
     // Since they point to the beginning of the string, adding to a string with a carriage
     // return would overwrite instead of append
 
@@ -960,8 +960,8 @@ namespace aurostd {
 
     //stringstream tmp; tmp << ss_in.str();
     while(ss_in.get(c)){
-      //[CO20190620 - still doesn't work]if(isprint(c) || isspace(c) || (c != '\r')) {  // ME20190614 //[CO200106 - close bracket for indenting]}
-      if((isprint(c) || isspace(c) || FALSE) && ((c != '\r') || FALSE)) {ss_out << c;}  //CO20190620 - add more cases before FALSE
+      //[CO190620 - still doesn't work]if(isprint(c) || isspace(c) || (c != '\r')) {  // ME190614 //[CO200106 - close bracket for indenting]}
+      if((isprint(c) || isspace(c) || FALSE) && ((c != '\r') || FALSE)) {ss_out << c;}  //CO190620 - add more cases before FALSE
       else{detected_control_char = true;}
     }
     //uint count=0;
@@ -980,9 +980,9 @@ namespace aurostd {
     //}
     return detected_control_char;
   }
-  //DX20190516 - remove control code characters - END
+  //DX 20190516 - remove control code characters - END
 
-  //DX20190211 - remove control code characters from file - START
+  //DX 20190211 - remove control code characters from file - START
   // ***************************************************************************
   // Function RemoveControlCodeCharactersFromFile
   // ***************************************************************************
@@ -1020,9 +1020,9 @@ namespace aurostd {
     else{ cerr << "ERROR - aurostd::RemoveControlCodeCharactersFromFile(): File does not exist: " << directory << "/" << filename << endl;exit(0); }
     return false;
   }
-  //DX20190211 - remove control code characters from file - END
+  //DX 20190211 - remove control code characters from file - END
 
-  //DX20190125 - remove null bytes - START
+  //DX 20190125 - remove null bytes - START
   // ***************************************************************************
   // Function isNullbyte
   // ***************************************************************************
@@ -1040,9 +1040,9 @@ namespace aurostd {
     out.erase(remove_if(out.begin(),out.end(),isNullByte), out.end());
     return out;
   }
-  //DX20190125 - remove null bytes - END
+  //DX 20190125 - remove null bytes - END
 
-  //DX20190211 - remove null characters from file - START
+  //DX 20190211 - remove null characters from file - START
   // ***************************************************************************
   // Function RemoveBinaryCharactersFromFile()
   // ***************************************************************************
@@ -1066,7 +1066,7 @@ namespace aurostd {
     }
     return true;
   }
-  //DX20190211 - remove binary characters from file - END
+  //DX 20190211 - remove binary characters from file - END
 
   // ***************************************************************************
   // Function CGI_StringClean
@@ -1104,12 +1104,12 @@ namespace aurostd {
     for (uint i=0;i<s.size();i++) if(s[i]!=' ' && s[i]!='\t') ss+=s[i];
     return ss;
   }
-  string RemoveWhiteSpaces(const string& s, const char toggle) {  //CO20190710
+  string RemoveWhiteSpaces(const string& s, const char toggle) {  //CO190710
     if(s.size()==0) return s;  // nothing to do
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toggle) copy=!copy;  //CO20190710
+      if(s[i]==toggle) copy=!copy;  //CO190710
       if(copy) if(s[i]!=' ' && s[i]!='\t') ss+=s[i];
       if(!copy) ss+=s[i];
     }
@@ -1166,12 +1166,12 @@ namespace aurostd {
     for (uint i=0;i<s.size();i++) if(s[i]!=' ') ss+=s[i];
     return ss;
   }
-  string RemoveSpaces(const string& s, const char toggle) { //CO20190710
+  string RemoveSpaces(const string& s, const char toggle) { //CO190710
     if(s.size()==0) return s;  // nothing to do
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toggle) copy=!copy;  //CO20190710
+      if(s[i]==toggle) copy=!copy;  //CO190710
       if(copy) if(s[i]!=' ') ss+=s[i];
       if(!copy) ss+=s[i];
     }
@@ -1202,12 +1202,12 @@ namespace aurostd {
     for (uint i=0;i<s.size();i++) if(s[i]!='\t') ss+=s[i];
     return ss;
   }
-  string RemoveTabs(const string& s, const char toggle) { //CO20190710
+  string RemoveTabs(const string& s, const char toggle) { //CO190710
     if(s.size()==0) return s;  // nothing to do
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toggle) copy=!copy;  //CO20190710
+      if(s[i]==toggle) copy=!copy;  //CO190710
       if(copy) if(s[i]!='\t') ss+=s[i];
       if(!copy) ss+=s[i];
     }
@@ -1246,7 +1246,7 @@ namespace aurostd {
   //     return ss;
   //   }
 
-  // ME20190614 - added vector<string> version of RemoveComments
+  // ME190614 - added vector<string> version of RemoveComments
   vector<string> RemoveComments(const vector<string>& vstrin) {
     vector<string> vstrout;
     string::size_type loc;
@@ -1289,14 +1289,14 @@ namespace aurostd {
   //[OBSOLETE]    string strout=strin;
   //[OBSOLETE]    vector<string> vstrout;aurostd::string2vectorstring(strout,vstrout);
   //[OBSOLETE]    strout.clear();
-  //[OBSOLETE]    string::size_type loc;  //CO20180409, don't do find twice (expensive)
+  //[OBSOLETE]    string::size_type loc;  //CO 180409, don't do find twice (expensive)
   //[OBSOLETE]    for(uint i=0;i<vstrout.size();i++) {
   //[OBSOLETE]      //COMMENT_NEGLECT_1
-  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_1);  //CO20180409
+  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_1);  //CO 180409
   //[OBSOLETE]      vstrout.at(i)=vstrout.at(i).substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
   //[OBSOLETE]
   //[OBSOLETE]      //COMMENT_NEGLECT_2, but not ":"+//COMMENT_NEGLECT_1
-  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_2);  //CO20180409
+  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_2);  //CO 180409
   //[OBSOLETE]      while(loc!=string::npos){
   //[OBSOLETE]        if(!(loc>0&&loc<vstrout.at(i).size()&&vstrout.at(i).at(loc-1)==':')){  //find the NOT case where we are in the range and we find ':' before comment
   //[OBSOLETE]          vstrout.at(i)=vstrout.at(i).substr(0,loc);
@@ -1306,7 +1306,7 @@ namespace aurostd {
   //[OBSOLETE]      }
   //[OBSOLETE]
   //[OBSOLETE]      //COMMENT_NEGLECT_3
-  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_3);  //CO20180409
+  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_3);  //CO 180409
   //[OBSOLETE]      vstrout.at(i)=vstrout.at(i).substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
   //[OBSOLETE]
   //[OBSOLETE]if(vstrout.at(i).find(COMMENT_NEGLECT_1)!=string::npos) 
@@ -1330,9 +1330,9 @@ namespace aurostd {
     if(s.size()==0) return s;  // nothing to do
     string ss=s;
     RemoveCharacterInPlace(ss,character);
-    //[CO20190712 - OBSOLETE with RemoveCharacterInPlace()]for (uint i=0;i<s.size();i++) {
-    //[CO20190712 - OBSOLETE with RemoveCharacterInPlace()]  if(s[i]!=character) ss+=s[i];
-    //[CO20190712 - OBSOLETE with RemoveCharacterInPlace()]}
+    //[CO190712 - OBSOLETE with RemoveCharacterInPlace()]for (uint i=0;i<s.size();i++) {
+    //[CO190712 - OBSOLETE with RemoveCharacterInPlace()]  if(s[i]!=character) ss+=s[i];
+    //[CO190712 - OBSOLETE with RemoveCharacterInPlace()]}
     return ss;
   }
 
@@ -1387,8 +1387,8 @@ namespace aurostd {
   // ***************************************************************************
   // Removes numbers from string
   // Stefano Curtarolo
-  string RemoveNumbers(const string& s) {return RemoveNumbers_190712(s);} //CO20190712
-  string RemoveNumbers_190712(const string& s) {  //CO20190712 - avoids creating many copies of string
+  string RemoveNumbers(const string& s) {return RemoveNumbers_190712(s);} //CO190712
+  string RemoveNumbers_190712(const string& s) {  //CO190712 - avoids creating many copies of string
     if(s.size()==0) return s;  // nothing to do
     string ss=s;
     RemoveNumbersInPlace(ss);
@@ -1409,7 +1409,7 @@ namespace aurostd {
   // ***************************************************************************
   // Similar to RemoveNumbers, but does NOT create a new string (costly if done MANY times)
   // Corey Oses 190712
-  void RemoveNumbersInPlace(string& s) { //CO20190712
+  void RemoveNumbersInPlace(string& s) { //CO190712
     RemoveCharacterInPlace(s,'0');RemoveCharacterInPlace(s,'1');RemoveCharacterInPlace(s,'2');
     RemoveCharacterInPlace(s,'3');RemoveCharacterInPlace(s,'4');RemoveCharacterInPlace(s,'5');
     RemoveCharacterInPlace(s,'6');RemoveCharacterInPlace(s,'7');RemoveCharacterInPlace(s,'8');
@@ -1438,10 +1438,10 @@ namespace aurostd {
   // Stefano Curtarolo
   string RemoveSubStringFirst(const string& str_orig, const string& str_rm) {
     string t=str_orig;
-    RemoveSubStringFirstInPlace(t,str_rm);  //CO20190712
-    //[CO20190712 - moved to RemoveSubStringFirstInPlace()]std::string::size_type i = t.find(str_rm);
-    //[CO20190712 - moved to RemoveSubStringFirstInPlace()]if(i != std::string::npos)
-    //[CO20190712 - moved to RemoveSubStringFirstInPlace()]  t.erase(i, str_rm.length( ));
+    RemoveSubStringFirstInPlace(t,str_rm);  //CO190712
+    //[CO190712 - moved to RemoveSubStringFirstInPlace()]std::string::size_type i = t.find(str_rm);
+    //[CO190712 - moved to RemoveSubStringFirstInPlace()]if(i != std::string::npos)
+    //[CO190712 - moved to RemoveSubStringFirstInPlace()]  t.erase(i, str_rm.length( ));
     return t;
   }
 
@@ -1463,12 +1463,12 @@ namespace aurostd {
   // Stefano Curtarolo
   string RemoveSubString(const string& str_orig, const string& str_rm) {
     string t=str_orig;
-    RemoveSubStringInPlace(t,str_rm); //CO20190712
-    //[CO20190712 - moved to RemoveSubStringInPlace()]string::size_type i;
-    //[CO20190712 - moved to RemoveSubStringInPlace()]while(t.find(str_rm)!=string::npos) {
-    //[CO20190712 - moved to RemoveSubStringInPlace()]  i = t.find(str_rm);
-    //[CO20190712 - moved to RemoveSubStringInPlace()]  if(i != std::string::npos) t.erase(i, str_rm.length( ));
-    //[CO20190712 - moved to RemoveSubStringInPlace()]};
+    RemoveSubStringInPlace(t,str_rm); //CO190712
+    //[CO190712 - moved to RemoveSubStringInPlace()]string::size_type i;
+    //[CO190712 - moved to RemoveSubStringInPlace()]while(t.find(str_rm)!=string::npos) {
+    //[CO190712 - moved to RemoveSubStringInPlace()]  i = t.find(str_rm);
+    //[CO190712 - moved to RemoveSubStringInPlace()]  if(i != std::string::npos) t.erase(i, str_rm.length( ));
+    //[CO190712 - moved to RemoveSubStringInPlace()]};
     return t;
   }
 
@@ -1478,15 +1478,15 @@ namespace aurostd {
   // Similar to RemoveSubString, but does NOT create a new string (costly if done MANY times)
   // Corey Oses 190712
   void RemoveSubStringInPlace(string& t, const string& str_rm) {
-    string::size_type i = t.find(str_rm); //CO20190712 - fewer operations
-    while(i != string::npos) {  //CO20190712 - fewer operations
-      t.erase(i, str_rm.length( )); //CO20190712 - fewer operations
-      i = t.find(str_rm); //CO20190712 - fewer operations
+    string::size_type i = t.find(str_rm); //CO190712 - fewer operations
+    while(i != string::npos) {  //CO190712 - fewer operations
+      t.erase(i, str_rm.length( )); //CO190712 - fewer operations
+      i = t.find(str_rm); //CO190712 - fewer operations
     }
-    //[CO20190712 - OBSOLETE]while(t.find(str_rm)!=string::npos) {
-    //[CO20190712 - OBSOLETE]  i = t.find(str_rm);
-    //[CO20190712 - OBSOLETE]  if(i != std::string::npos) t.erase(i, str_rm.length( ));
-    //[CO20190712 - OBSOLETE]};
+    //[CO190712 - OBSOLETE]while(t.find(str_rm)!=string::npos) {
+    //[CO190712 - OBSOLETE]  i = t.find(str_rm);
+    //[CO190712 - OBSOLETE]  if(i != std::string::npos) t.erase(i, str_rm.length( ));
+    //[CO190712 - OBSOLETE]};
   }
 
   // ***************************************************************************
@@ -1720,7 +1720,7 @@ namespace aurostd {
     //Decompresses file to temp file, and return its path
     //SAFE: Will return FileNameIn if compression not needed
     string FileNameIN="";
-    if(!(aurostd::FileExist(_FileNameIN,FileNameIN) || aurostd::EFileExist(_FileNameIN,FileNameIN))) {  //CO20191110 - get FileNameIN from functions
+    if(!(aurostd::FileExist(_FileNameIN,FileNameIN) || aurostd::EFileExist(_FileNameIN,FileNameIN))) {  //CO191110 - get FileNameIN from functions
       cerr << endl;
       cerr << "ERROR - aurostd::efile2tempfile: file=" << _FileNameIN << " not present !" << endl;  ///is empty
       cerr << endl;
@@ -1984,7 +1984,7 @@ namespace aurostd {
   // Corey Oses
   // tells you if the compressed variant exists
   bool EFileExist(const string& _FileName, string& FileNameOut){
-    string FileName=aurostd::CleanFileName(_FileName); //CO20191110
+    string FileName=aurostd::CleanFileName(_FileName); //CO191110
     if(FileExist(FileName+".xz")) {FileNameOut=FileName+".xz";return TRUE;}
     if(FileExist(FileName+".bz2")) {FileNameOut=FileName+".bz2";return TRUE;}
     if(FileExist(FileName+".gz")) {FileNameOut=FileName+".gz";return TRUE;}
@@ -1998,7 +1998,7 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo - jan 08
   // returns in bytes the size of a file
-  // ME20191001 - Changed to unsigned long long int to accommodate large files
+  // ME191001 - Changed to unsigned long long int to accommodate large files
   unsigned long long int FileSize(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
     ifstream FileStream;
@@ -2043,21 +2043,21 @@ namespace aurostd {
   bool FileNotEmpty(const string& FileName) {
     return !FileEmpty(FileName);
   }
-  bool EFileEmpty(const string& FileName) {  //CO20190808
-    string decompressed_file=""; //CO20190808
-    efile2tempfile(FileName,decompressed_file);  //CO20190808
+  bool EFileEmpty(const string& FileName) {  //CO190808
+    string decompressed_file=""; //CO190808
+    efile2tempfile(FileName,decompressed_file);  //CO190808
     bool fileempty=FileEmpty(decompressed_file);
     RemoveFile(decompressed_file);
     return fileempty;
   }
-  bool EFileNotEmpty(const string& FileName) {  //CO20190808
+  bool EFileNotEmpty(const string& FileName) {  //CO190808
     return !EFileEmpty(FileName);
   }
 
   // ***************************************************************************
   // Function FileModificationTime
   // ***************************************************************************
-  // ME20181712
+  // ME 181712
   // Checks the modification date of the file and returns it as an integer
 
   long int FileModificationTime(const string& _FileName) {
@@ -2075,7 +2075,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function getFileChecmSum
   // ***************************************************************************
-  // ME20190219
+  // ME 190219
   // Generates the checksum of a file
   // Taken from old APL/apl_hroutines.
   unsigned int getFileCheckSum(const string& filename, const string& algo) {
@@ -2117,7 +2117,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function getFletcher32
   // ***************************************************************************
-  // ME20190219
+  // ME 190219
   // Generates the 32 bit checksum of a string based on Fletcher's algorithm.
   // See http://en.wikipedia.org/wiki/Fletcher%27s_checksum
   // Taken from old APL/apl_hroutines.
@@ -2206,7 +2206,7 @@ namespace aurostd {
     return aurostd::IsCommandAvailable(command,position);
   }
 
-  //CO20180706 - fixed this function, previously command/position trampled all over each other
+  //CO 180706 - fixed this function, previously command/position trampled all over each other
   bool IsCommandAvailableModify(string& command) {
     string position;
     if(!aurostd::IsCommandAvailable(command,position)) return FALSE;
@@ -2999,7 +2999,7 @@ namespace aurostd {
     // stringstreamIN.clear();stringstreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.size();  // return FALSE if something got messed up
   }
-  uint string2vectorstring(const string& stringIN,vector<string> &vstringout,bool consecutive,bool trim_edges) {  //CO20170613
+  uint string2vectorstring(const string& stringIN,vector<string> &vstringout,bool consecutive,bool trim_edges) {  //CO 170613
     //CO mods 170613
     //we are adding functionality here, because string2tokens will treat "\n\n" same as "\n", but not "\n \n"
     //consecutive will do the following: "sssss" -> <"s","s",...>
@@ -3046,9 +3046,9 @@ namespace aurostd {
     aurostd::stream2vectorstring(stringstreamIN,vstringout);
     return vstringout;
   }
-  vector<string> string2vectorstring(const string& stringIN,bool consecutive,bool trim_edges) { //CO20170613
+  vector<string> string2vectorstring(const string& stringIN,bool consecutive,bool trim_edges) { //CO 170613
     vector<string> vstringout;
-    aurostd::string2vectorstring(stringIN,vstringout,consecutive,trim_edges); //CO20170613
+    aurostd::string2vectorstring(stringIN,vstringout,consecutive,trim_edges); //CO 170613
     return vstringout;
   }
 
@@ -3242,39 +3242,39 @@ namespace aurostd {
   // write string to file - Stefano Curtarolo
   bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& _file,string mode) {
     string file=aurostd::CleanFileName(_file);
-    bool writeable=true;  //CO20190808 - captures whether we can open/write file
+    bool writeable=true;  //CO190808 - captures whether we can open/write file
     if(mode=="POST" || mode=="APPEND") {
       stringstream FileINPUT;
       aurostd::file2stringstream(file,FileINPUT);
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
-      writeable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
+      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << FileINPUT.str();
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writeable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
+      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }
     if(mode=="PRE") {
       stringstream FileINPUT;
       aurostd::file2stringstream(file,FileINPUT);
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
-      writeable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
+      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT << FileINPUT.str();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writeable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
+      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }
     if(mode=="WRITE" || mode=="") {
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
-      writeable=FileOUTPUT.is_open(); //CO20190808 - captures whether we can open/write file
+      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writeable; //TRUE;  // return FALSE if something got messed up //CO20190808 - captures whether we can open/write file
+      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }   
     return FALSE;
   }
@@ -3434,8 +3434,8 @@ namespace aurostd {
   }
   //CO - END
   uint efile2string(const string& FileNameIN,string& StringIN) {
-    //[CO20190808 - OBSOLETE, we clean inside FileExist()]string FileNameIN=aurostd::CleanFileName(_FileNameIN),FileNameOUT;  //corey
-    string FileNameOUT=""; //CO20191110
+    //[CO190808 - OBSOLETE, we clean inside FileExist()]string FileNameIN=aurostd::CleanFileName(_FileNameIN),FileNameOUT;  //corey
+    string FileNameOUT=""; //CO191110
     // cerr << "efile2string; BEGIN FileNameIN=[" << FileNameIN << "]" << endl;
     if(!FileExist(FileNameIN,FileNameOUT) && !EFileExist(FileNameIN,FileNameOUT)) {
       // cerr << "ERROR - aurostd::efile2string: file=" << FileNameIN << " not present !" << endl;
@@ -3764,7 +3764,7 @@ namespace aurostd {
     tokens.clear(); 
     string content;
     aurostd::url2string(url,content);
-    if(LDEBUG) { //CO20180627
+    if(LDEBUG) { //CO 180627
       cerr << "aurostd::url2tokens<utype>(vector) content=" << endl;
       cerr << content << endl;
     }
@@ -3805,8 +3805,8 @@ namespace aurostd {
   // change mod of a file - Stefano Curtarolo
   bool ChmodFile(string chmod_string,string _file) { // "" compliant April/2019 SC
     string file=aurostd::CleanFileName(_file);
-    if(chmod_string.empty()){return false;} //CO20190321
-    if(file.empty()){return false;} //CO20190321
+    if(chmod_string.empty()){return false;} //CO190321
+    if(file.empty()){return false;} //CO190321
     ostringstream aus;
     aurostd::StringstreamClean(aus);
     aus << CHMOD_BIN << " " << chmod_string << " \"" << file << "\"" << endl;
@@ -3835,7 +3835,7 @@ namespace aurostd {
       //     cerr << "ERROR - aurostd::file2directory:  destination=" << destination << " " << endl;
       return FALSE;
     }
-    if(!aurostd::IsDirectory(destination)) //CO20180220 //FileExist(destination))
+    if(!aurostd::IsDirectory(destination)) //CO 180220 //FileExist(destination))
     { //CO200106 - patching for auto-indenting
       cerr << "ERROR - aurostd::file2directory: " << destination << " cannot be found !" << endl;
       return FALSE;
@@ -3948,7 +3948,7 @@ namespace aurostd {
   // Finds string2tokens to split strings in tokens
   // Stefano Curtarolo
   // void string2tokens(const string& str,vector<string>& tokens,const string& delimiters=" ") {  //[CO200106 - close bracket for indenting]}
-  uint string2tokens(const string& str,std::vector<string>& tokens,const string& delimiters,bool consecutive) { //CO20170613
+  uint string2tokens(const string& str,std::vector<string>& tokens,const string& delimiters,bool consecutive) { //CO 170613
     //CO mods 170613
     //we are adding functionality here, because string2tokens will treat "\n\n" same as "\n", but not "\n \n"
     //consecutive will do the following: "sssss" -> <"s","s",...>
@@ -3967,24 +3967,24 @@ namespace aurostd {
   }
 
   // void string2tokens(const string& str,deque<string>& tokens,const string& delimiters=" ") { //[CO200106 - close bracket for indenting]}
-  uint string2tokens(const string& str,std::deque<string>& tokens,const string& delimiters,bool consecutive) { //CO20170613
+  uint string2tokens(const string& str,std::deque<string>& tokens,const string& delimiters,bool consecutive) { //CO 170613
     vector<string> vtokens;
-    uint i=aurostd::string2tokens(str,vtokens,delimiters,consecutive);  //CO20170613
+    uint i=aurostd::string2tokens(str,vtokens,delimiters,consecutive);  //CO 170613
     tokens.clear();
     for(i=0;i<vtokens.size();i++) tokens.push_back(vtokens.at(i));
     return tokens.size();
   }
-  template<class utype> uint string2tokens(const string& str,std::vector<utype>& tokens,const string& delimiters,bool consecutive) {  //CO20170613
+  template<class utype> uint string2tokens(const string& str,std::vector<utype>& tokens,const string& delimiters,bool consecutive) {  //CO 170613
     vector<string> stokens;
-    uint out=aurostd::string2tokens(str,stokens, delimiters,consecutive); //CO20170613
+    uint out=aurostd::string2tokens(str,stokens, delimiters,consecutive); //CO 170613
     tokens.clear();
     for(uint i=0;i<stokens.size();i++)
       tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
     return out;
   }
-  template<class utype> uint string2tokens(const string& str,std::deque<utype>& tokens,const string& delimiters,bool consecutive) { //CO20170613
+  template<class utype> uint string2tokens(const string& str,std::deque<utype>& tokens,const string& delimiters,bool consecutive) { //CO 170613
     deque<string> stokens;
-    uint out=aurostd::string2tokens(str,stokens, delimiters,consecutive); //CO20170613
+    uint out=aurostd::string2tokens(str,stokens, delimiters,consecutive); //CO 170613
     tokens.clear();
     for(uint i=0;i<stokens.size();i++)
       tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
@@ -4246,24 +4246,24 @@ namespace aurostd {
   // Function StringsAlphabetic
   // ***************************************************************************
   // says if two strings are in alphabetical order
-  bool StringsAlphabetic(const string& A,const string& B,bool allow_identical) { //CO20181019
+  bool StringsAlphabetic(const string& A,const string& B,bool allow_identical) { //CO181019
     if(A<B) return TRUE; // cerr << "A<B" << "  " << A << "<" << B << endl;
     if(A>B) return FALSE; //cerr << "A>B" << "  " << A << ">" << B << endl;
-    if(A==B) return allow_identical; //cerr << "A==B" << "  " << A << "==" << B << endl; //CO20181019
+    if(A==B) return allow_identical; //cerr << "A==B" << "  " << A << "==" << B << endl; //CO181019
     return TRUE;
   }
 
   // ***************************************************************************
   // Function StringsAlphabetic
   // ***************************************************************************
-  // says if two strings are in alphabetical order  //CO20180801
+  // says if two strings are in alphabetical order  //CO 180801
   bool StringsAlphabetic(const vector<string>& input,bool allow_identical) {
-    for(uint i=1;i<input.size();i++){ //CO20190218
+    for(uint i=1;i<input.size();i++){ //CO190218
       if(!StringsAlphabetic(input[i-1],input[i],allow_identical)){return false;}
     }
     return true;
   }
-  bool StringsAlphabetic(const deque<string>& input,bool allow_identical) { //CO20190218
+  bool StringsAlphabetic(const deque<string>& input,bool allow_identical) { //CO190218
     for(uint i=1;i<input.size();i++){
       if(!StringsAlphabetic(input[i-1],input[i],allow_identical)){return false;}
     }
@@ -4446,26 +4446,26 @@ namespace aurostd {
     return (bool) substring_present_file_FAST(FileName,strsub1,FALSE);
   }
 
-  bool withinList(const vector<string>& list,const string& input) { //CO20181010
-    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
-    //return false;  OBSOLETE ME20190905
+  bool withinList(const vector<string>& list,const string& input) { //CO181010
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
     int index;
     return withinList(list, input, index);
   }
-  bool withinList(const vector<int>& list,int input) {  //CO20181010
-    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
-    //return false;  OBSOLETE ME20190905
+  bool withinList(const vector<int>& list,int input) {  //CO181010
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
     int index;
     return withinList(list, input, index);
   }
-  bool withinList(const vector<uint>& list,uint input) {  //CO20181010
-    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
-    //return false;  OBSOLETE ME20190905
+  bool withinList(const vector<uint>& list,uint input) {  //CO181010
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
     int index;
     return withinList(list, input, index);
   }
 
-  // ME20190813 - added versions that also determine the index of the item in the list
+  // ME190813 - added versions that also determine the index of the item in the list
   bool withinList(const vector<string>& list, const string& input, int& index) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input) {
@@ -4923,7 +4923,7 @@ namespace aurostd {
     return out;
   }
 
-  //CO20190419 - moved from chull
+  //CO190419 - moved from chull
   string fixStringLatex(const string& input, bool double_back_slash,bool symmetry_string) {
     // deals with special characters for LaTeX, like some characters in prototype
     // see http://tex.stackexchange.com/questions/34580/escape-character-in-latex
@@ -5030,7 +5030,7 @@ namespace aurostd {
 
 // ***************************************************************************
 // FUNCTION DOUBLE2FRACTION
-// DX20190824 (moved from aflow_symmetry_spacegroup_functions.cpp)
+// DX 20190824 (moved from aflow_symmetry_spacegroup_functions.cpp)
 // hard-coded variant until generic converter is integrated
 
 // ******************************************************************************
@@ -5070,9 +5070,9 @@ namespace aurostd {
     else if(aurostd::abs(a - (1.0 / 6.0)) < tol) {
       out = "1/6";
     }
-    else if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX20180726 - added
-      out = "5/6"; //DX20180726 - added
-    } //DX20180726 - added
+    else if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX 20180726 - added
+      out = "5/6"; //DX 20180726 - added
+    } //DX 20180726 - added
     else if(aurostd::abs(a - (1.0 / 8.0)) < tol) {
       out = "1/8";
     }
@@ -5085,18 +5085,18 @@ namespace aurostd {
     else if(aurostd::abs(a - (7.0 / 8.0)) < tol) {
       out = "7/8";
     }
-    else if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX20180726 - added
-      out = "1/12"; //DX20180726 - added
-    } //DX20180726 - added
-    else if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX20180726 - added
-      out = "5/12"; //DX20180726 - added
-    } //DX20180726 - added
-    else if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX20180726 - added
-      out = "7/12"; //DX20180726 - added
-    } //DX20180726 - added
-    else if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX20180726 - added
-      out = "11/12"; //DX20180726 - added
-    } //DX20180726 - added
+    else if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX 20180726 - added
+      out = "1/12"; //DX 20180726 - added
+    } //DX 20180726 - added
+    else if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX 20180726 - added
+      out = "5/12"; //DX 20180726 - added
+    } //DX 20180726 - added
+    else if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX 20180726 - added
+      out = "7/12"; //DX 20180726 - added
+    } //DX 20180726 - added
+    else if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX 20180726 - added
+      out = "11/12"; //DX 20180726 - added
+    } //DX 20180726 - added
     else {
       message << "Could not find hard-coded fraction for the double " << a << ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
@@ -5612,7 +5612,7 @@ namespace aurostd  {
 // ***************************************************************************
 // aurostd::vector2deque(const vector<utype>& vin)
 // ***************************************************************************
-// CO20181226
+// CO181226
 namespace aurostd  {
   template<class utype> deque<utype> vector2deque(const vector<utype>& vin){
     deque<utype> dout;
@@ -5624,7 +5624,7 @@ namespace aurostd  {
 // ***************************************************************************
 // aurostd::vector2deque(const vector<utype>& vin)
 // ***************************************************************************
-// CO20181226
+// CO181226
 namespace aurostd  {
   template<class utype> vector<utype> deque2vector(const deque<utype>& din){
     vector<utype> vout;
@@ -5744,7 +5744,7 @@ namespace aurostd {
     if (ientries.rows > 2) {
       for (int i =ientries.lrows; i <= ientries.urows; i++) {
         output << ientries[i];
-        if (i == ientries.urows - 1) {  //CO20180216 - added -1
+        if (i == ientries.urows - 1) {  //CO 180216 - added -1
           output << lDelim;
         } else if (i !=ientries.urows) {
           output << delim;
@@ -5753,7 +5753,7 @@ namespace aurostd {
     } else {
       for (int i = ientries.lrows; i <= ientries.urows; i++) {
         output << ientries[i];
-        if (i == ientries.urows - 1) {  //CO20180216 - added -1
+        if (i == ientries.urows - 1) {  //CO 180216 - added -1
           output << mDelim;
         } else if (i != ientries.urows) {
           output << delim;
@@ -6211,7 +6211,7 @@ namespace aurostd {
   }
 }
 
-// DX20180118 - START: XCOMPLEX TO JSON
+// DX 1/18/18 - START: XCOMPLEX TO JSON
 namespace aurostd {
   //***************************************************************************//
   // aurostd::xcomplex2json
@@ -6239,9 +6239,9 @@ namespace aurostd {
   string xcomplex2json(xcomplex<double>& number){ return _xcomplex2json(number); }
 }
 
-// DX20180118 - END: XCOMPLEX TO JSON
+// DX 1/18/18 - END: XCOMPLEX TO JSON
 
-// DX20170803 - START: Matrix to JSON
+// DX 8/3/17 - START: Matrix to JSON
 namespace aurostd {
   //***************************************************************************//
   // aurostd::xmatDouble2String(xmatrix<double>& xmat_in)
@@ -6252,8 +6252,8 @@ namespace aurostd {
   // [OBSOLETE]   vector<string> rows;
   // [OBSOLETE]   for(uint i=1;i<(uint)xmat_in.rows+1;i++){
   // [OBSOLETE]     stringstream row;
-  // [OBSOLETE]     xvector<double> xvec = xmat_in(i); // DX20170822 - added roundoff
-  // [OBSOLETE]     if(roff){ xvec = roundoff(xvec,1e-8);} // DX20170822 - added roundoff
+  // [OBSOLETE]     xvector<double> xvec = xmat_in(i); // DX 8/22/17 - added roundoff
+  // [OBSOLETE]     if(roff){ xvec = roundoff(xvec,1e-8);} // DX 8/22/17 - added roundoff
   // [OBSOLETE]     row << "[" << joinWDelimiter(xvecDouble2vecString(xvec),",") << "]";
   // [OBSOLETE]     rows.push_back(row.str());
   // [OBSOLETE]   }
@@ -6263,10 +6263,10 @@ namespace aurostd {
   string xmatDouble2String(const xmatrix<double>& xmat_in, int precision, bool roff, double tol, char FORMAT){
     stringstream output;
     vector<string> rows;
-    for(int i=1;i<=xmat_in.urows;i++){ // DX20180323 - fixed typo for initial index "int i=1" not "int i=xmat_in.urows"
+    for(int i=1;i<=xmat_in.urows;i++){ // DX 3/23/18 - fixed typo for initial index "int i=1" not "int i=xmat_in.urows"
       stringstream row;
-      xvector<double> xvec = xmat_in(i); // DX20170822 - added roundoff
-      //if(roff){ xvec = roundoff(xvec,tol);} // DX20170822 - added roundoff
+      xvector<double> xvec = xmat_in(i); // DX 8/22/17 - added roundoff
+      //if(roff){ xvec = roundoff(xvec,tol);} // DX 8/22/17 - added roundoff
       row << "[" << joinWDelimiter(xvecDouble2vecString(xvec,precision,roff,tol,FORMAT),",") << "]";
       rows.push_back(row.str());
       //cerr << i << "row.str(): " << row.str() << endl;
@@ -6275,7 +6275,7 @@ namespace aurostd {
     return output.str();
   }
 }
-// DX20170803 - START: Matrix to END
+// DX 8/3/17 - START: Matrix to END
 
 namespace aurostd {
   //***************************************************************************//
@@ -6286,54 +6286,54 @@ namespace aurostd {
   // [OBSOLETE] vector<string> vecDouble2vecString(const vector<double>& vin, bool roff) {
   // [OBSOLETE]   vector<string> vout;
   // [OBSOLETE]   for(uint i=0;i<vin.size();i++){
-  // [OBSOLETE]     double tmp = vin.at(i); // DX20170822 - add roundoff
-  // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170822 - add roundoff
-  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170822 - add roundoff
+  // [OBSOLETE]     double tmp = vin.at(i); // DX 8/22/17 - add roundoff
+  // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX 8/22/17 - add roundoff
+  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX 8/22/17 - add roundoff
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
   vector<string> vecDouble2vecString(const vector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
     vector<string> vout;
     for(uint i=0;i<vin.size();i++){
-      //double tmp = vin.at(i); // DX20170822 - add roundoff
-      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170822 - add roundoff
-      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170822 - add roundoff
+      //double tmp = vin.at(i); // DX 8/22/17 - add roundoff
+      //if(roff){ tmp=roundoff(tmp,tol); } // DX 8/22/17 - add roundoff
+      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX 8/22/17 - add roundoff
     }
     return vout;
   }
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff) {
   // [OBSOLETE]   vector<string> vout;
   // [OBSOLETE]   for(uint i=1;i<(uint)vin.rows+1;i++){
-  // [OBSOLETE]     double tmp = vin(i); // DX20170822 - add roundoff
-  // [OBSOLETE]    if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170822 - add roundoff
-  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170822 - add roundoff
+  // [OBSOLETE]     double tmp = vin(i); // DX 8/22/17 - add roundoff
+  // [OBSOLETE]    if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX 8/22/17 - add roundoff
+  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX 8/22/17 - add roundoff
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
   vector<string> xvecDouble2vecString(const xvector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
     vector<string> vout;
     for(int i=vin.lrows;i<=vin.urows;i++){
-      //double tmp = vin(i); // DX20170822 - add roundoff
-      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170822 - add roundoff
-      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170822 - add roundoff
+      //double tmp = vin(i); // DX 8/22/17 - add roundoff
+      //if(roff){ tmp=roundoff(tmp,tol); } // DX 8/22/17 - add roundoff
+      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX 8/22/17 - add roundoff
     }
     return vout;
   }
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff) {
   // [OBSOLETE]   deque<string> vout;
   // [OBSOLETE]   for(uint i=0;i<vin.size();i++){
-  // [OBSOLETE]     double tmp = vin.at(i); // DX20170822 - add roundoff
-  // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX20170822 - add roundoff
-  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX20170822 - add roundoff
+  // [OBSOLETE]     double tmp = vin.at(i); // DX 8/22/17 - add roundoff
+  // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } // DX 8/22/17 - add roundoff
+  // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); // DX 8/22/17 - add roundoff
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
   deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
-      //double tmp = vin.at(i); // DX20170822 - add roundoff
-      //if(roff){ tmp=roundoff(tmp,tol); } // DX20170822 - add roundoff
-      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX20170822 - add roundoff
+      //double tmp = vin.at(i); // DX 8/22/17 - add roundoff
+      //if(roff){ tmp=roundoff(tmp,tol); } // DX 8/22/17 - add roundoff
+      vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); // DX 8/22/17 - add roundoff
     }
     return vout;
   }
