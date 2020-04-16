@@ -2862,7 +2862,10 @@ namespace cce {
       json << "}";
       if (i < nfuncs - 1) json << ",";
     }
-    json << "}";
+    json << "},";
+    json << "\"publication\":";
+    json << "\"Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019). ";
+    json << "https://doi.org/10.1038/s41524-019-0192-1\"";
     json << "}";
     return json.str();
   }
