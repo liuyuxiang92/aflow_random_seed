@@ -20,6 +20,7 @@
         -- cleaned text/json if-statements in symmetry writing functions (DX)
         -- added Patterson symmetry usage to README_AFLOW_SYM.TXT and README_AFLOW_ACONVASP.TXT (DX)
         -- added error for non-standard prototypes that create structures with atoms too close (CO+DX)
+        -- added secondary wget location for AFLOW3_FREE files for make (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
