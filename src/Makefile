@@ -491,6 +491,7 @@ aflow_data_calculated.cpp: Makefile
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
 	if [ ! -f aflow_data_calculated.cpp ]; then rm -rf aflow_data_calculated.cpp.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/aflow_data_calculated.cpp.xz && xz -dv aflow_data_calculated.cpp.xz ; fi
+	if [ ! -f aflow_data_calculated.cpp ]; then rm -rf aflow_data_calculated.cpp.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/aflow_data_calculated.cpp.xz && xz -dv aflow_data_calculated.cpp.xz ; fi
 	touch $@
 aflow_data_htqc.cpp: README_LIBRARY_HTQC.TXT Makefile
 	rm -f aflow_data_htqc.cpp
@@ -589,6 +590,7 @@ aflow_data_stokes.cpp: Makefile
 	if [ -f $(EXTRA_FREE)/DATA_PHVASP/phvaspsetup_POSCAR.xz ]; then xzcat $(EXTRA_FREE)/DATA_PHVASP/phvaspsetup_POSCAR.xz | perl -p -e 's/\#/_ASCII_23_/g' | perl -p -e 's/\"/_ASCII_22_/g' | perl -p -e 's/\\/_ASCII_5C_/g' | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_stokes.cpp ; fi
 	if [ -f $(EXTRA_FREE)/DATA_PHVASP/phvaspsetup_POSCAR.xz ]; then echo "\";" >> aflow_data_stokes.cpp ; fi
 	if [ ! -f aflow_data_stokes.cpp ]; then rm -rf aflow_data_stokes.cpp.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/aflow_data_stokes.cpp.xz && xz -dv aflow_data_stokes.cpp.xz ; fi
+	if [ ! -f aflow_data_stokes.cpp ]; then rm -rf aflow_data_stokes.cpp.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/aflow_data_stokes.cpp.xz && xz -dv aflow_data_stokes.cpp.xz ; fi
 	touch $@
 aflow_data_nist.cpp: Makefile 
 	rm -rf aflow_data_nist.cpp
@@ -607,6 +609,7 @@ aflow_data_nist.cpp: Makefile
 	if [ -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz ]; then xzcat $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_nist.cpp ; fi
 	if [ -f $(EXTRA_FREE)/NIST/ICSD_List_2014.txt.xz ]; then echo "\";" >> aflow_data_nist.cpp ; fi
 	if [ ! -f aflow_data_nist.cpp ]; then rm -rf aflow_data_nist.cpp.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/aflow_data_nist.cpp.xz && xz -dv aflow_data_nist.cpp.xz ; fi
+	if [ ! -f aflow_data_nist.cpp ]; then rm -rf aflow_data_nist.cpp.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/aflow_data_nist.cpp.xz && xz -dv aflow_data_nist.cpp.xz ; fi
 	touch $@
 aflow_data_aflow_potcars.cpp: Makefile 
 	rm -rf aflow_data_aflow_potcars.cpp
@@ -765,6 +768,7 @@ aflow_matlab_funcs.cpp: Makefile
 	if [ -f $(EXTRA_FREE)/MATLAB/plotband.m ]; then cat $(EXTRA_FREE)/MATLAB/plotband.m | perl -p -e 's/\"/\\\"/g' | perl -p -e 's/\\G/\\\\G/g' | perl -p -e 's/\\S/\\\\S/g' | perl -p -e 's/\n/\" << std::endl;\n   strstream << \"/g' | perl -p -e 's/MATLAB_FUNCS_DIRECTORY/\" << DIRECTORY << \"/g' | perl -p -e 's/DOS_SCALE_MODE/\" << OPTION1 << \"/g' >> aflow_matlab_funcs.cpp ; fi
 	if [ -f $(EXTRA_FREE)/MATLAB/plotband.m ]; then echo "\" << std::endl; return strstream.str();};" >> aflow_matlab_funcs.cpp ; fi
 	if [ ! -f aflow_matlab_funcs.cpp ]; then rm -rf aflow_matlab_funcs.cpp.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/aflow_matlab_funcs.cpp.xz && xz -dv aflow_matlab_funcs.cpp.xz ; fi
+	if [ ! -f aflow_matlab_funcs.cpp ]; then rm -rf aflow_matlab_funcs.cpp.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/aflow_matlab_funcs.cpp.xz && xz -dv aflow_matlab_funcs.cpp.xz ; fi
 	touch $@
 aflow_gnuplot_funcs.cpp: Makefile
 	rm -rf aflow_gnuplot_funcs.cpp
@@ -777,6 +781,7 @@ aflow_gnuplot_funcs.cpp: Makefile
 	if [ -f $(EXTRA_FREE)/GNUPLOT/plotbz.sh ]; then cat $(EXTRA_FREE)/GNUPLOT/plotbz.sh | perl -p -e 's/\\/\\\\/g' | perl -p -e 's/\"/\\\"/g' | perl -p -e 's/\\G/\\\\G/g' | perl -p -e 's/\\S/\\\\S/g' | perl -p -e 's/\n/\" << std::endl;\n   strstream << \"/g' | perl -p -e 's/GNUPLOT_FUNCS_DIRECTORY/\" << DIRECTORY << \"/g' | perl -p -e 's/GNUPLOT_FUNCS_OPTION1/\" << OPTION1 << \"/g' >> aflow_gnuplot_funcs.cpp ; fi
 	if [ -f $(EXTRA_FREE)/GNUPLOT/plotbz.sh ]; then echo "\" << std::endl; return strstream.str();};" >> aflow_gnuplot_funcs.cpp ; fi
 	if [ ! -f aflow_gnuplot_funcs.cpp ]; then rm -rf aflow_gnuplot_funcs.cpp.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/aflow_gnuplot_funcs.cpp.xz && xz -dv aflow_gnuplot_funcs.cpp.xz ; fi
+	if [ ! -f aflow_gnuplot_funcs.cpp ]; then rm -rf aflow_gnuplot_funcs.cpp.xz*; wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/aflow_gnuplot_funcs.cpp.xz && xz -dv aflow_gnuplot_funcs.cpp.xz ; fi
 	touch $@
 aurostd_xtemplates.o: aurostd_xtemplates.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aurostd_xtemplates.cpp -c
@@ -1013,7 +1018,8 @@ version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT
 #CO190218 - STOP
 wget:	realclean
 	rm -rf aflow3.tar.xz* aflow_test.tar.xz*
-	wget http://materials.duke.edu/auro/aflow3.tar.xz
+	if [ ! -f aflow3.tar.xz ]; then wget http://materials.duke.edu/auro/aflow3.tar.xz; fi
+	if [ ! -f aflow3.tar.xz ]; then wget http://aflowlib.duke.edu/AFLOW/AFLOW3_FREE/aflow3.tar.xz; fi
 	tar xfvp aflow3.tar.xz
 	rm -rf aflow3.tar.xz 
 distroget: wget
