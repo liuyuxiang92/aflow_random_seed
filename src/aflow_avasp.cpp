@@ -6742,18 +6742,24 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   if(LDEBUG) cerr << soliloquy << " 0d" << endl;
 
   if(xvasp.AVASP_aflowin_only_if_missing) { // this test is redundant, but since the Prototype generation is slow, it is nice to avoid unless you really need it
-    //  cerr << "[" << xvasp.AVASP_label << "]" << endl;
-    //  if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) cerr << "SKIPPISSIMO" << endl;
-    //     vector<string> austokens,vLibrary;
-    //     aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),austokens,"\n");
-    //     for(uint i=0;i<austokens.size();i++)
-    //       if(aurostd::substring2bool(austokens.at(i),"/"))
-    // 	vLibrary.push_back(austokens.at(i));
+    // [OBSOLETE] cerr << "[" << xvasp.AVASP_label << "]" << endl;
+    // [OBSOLETE]   if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) cerr << "SKIPPISSIMO" << endl;
+    // [OBSOLETE]      vector<string> austokens,vLibrary;
+    // [OBSOLETE]      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),austokens,"\n");
+    // [OBSOLETE]      for(uint i=0;i<austokens.size();i++)
+    // [OBSOLETE]        if(aurostd::substring2bool(austokens.at(i),"/"))
+    // [OBSOLETE]  	vLibrary.push_back(austokens.at(i));
 
     // TEST IF CALCULATED
-    if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) {if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl; return TRUE;}
+    init::InitGlobalObject("vLIBS");
+    // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) {
+    if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,xvasp.AVASP_label+" ")) {
+      if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl;
+      return TRUE;
+    }
     for(uint ilattice=1;ilattice<=14;ilattice++) {
-      if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+      // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+      if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
         if(DEBUG_SKIP) cerr << "SKIP (calculated): " << lattices[ilattice] << "/" << xvasp.AVASP_label << endl;
         return TRUE;
       }

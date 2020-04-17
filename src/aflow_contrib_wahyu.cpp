@@ -875,13 +875,16 @@ namespace pflow {
       //find RAW
       aurostd::execute("find "+init::AFLOW_Projects_Directories("ICSD")+"/RAW/ -type d | grep ICSD | sort > wRAWlist.tmp");
     } else {
+      init::InitGlobalObject("vLIBS");
       //write LIB
       oftmp.open("wLIBlist.tmp");
-      oftmp << init::InitGlobalObject("Library_CALCULATED_ICSD_LIB");
+      for(uint i=0;i<XHOST_Library_CALCULATED_ICSD_LIB.size();i++)
+	oftmp << XHOST_Library_CALCULATED_ICSD_LIB.at(i) << endl;
       oftmp.close();
       //write RAW
       oftmp.open("wRAWlist.tmp");
-      oftmp << init::InitGlobalObject("Library_CALCULATED_ICSD_RAW");
+      for(uint i=0;i<XHOST_Library_CALCULATED_ICSD_RAW.size();i++)
+	oftmp << XHOST_Library_CALCULATED_ICSD_RAW.at(i) << endl;
       oftmp.close();		
     }
     aurostd::execute("subst \""+init::AFLOW_Projects_Directories("ICSD")+"/LIB/\" \"\" wLIBlist.tmp");

@@ -235,6 +235,9 @@ namespace aurostd {
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
+  long double get_mseconds(void);
+  long double get_mseconds(long double reference_useconds);
+  long double get_delta_mseconds(long double& useconds_begin);
   long double get_useconds(void);
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);

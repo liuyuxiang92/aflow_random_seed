@@ -61,6 +61,9 @@ namespace aurostd {
   long double get_seconds(void) {timeval tim;gettimeofday(&tim,NULL);return tim.tv_sec+tim.tv_usec/1e6;}
   long double get_seconds(long double reference_seconds) { return get_seconds()-reference_seconds;}
   long double get_delta_seconds(long double& seconds_begin) {long double out=get_seconds()-seconds_begin;seconds_begin=get_seconds();return out;}
+  long double get_mseconds(void) {timeval tim;gettimeofday(&tim,NULL);return tim.tv_usec/1000.0;}
+  long double get_mseconds(long double reference_useconds) { return (aurostd::get_useconds()-reference_useconds)/1000.0;}
+  long double get_delta_mseconds(long double& useconds_begin) {long double out=(aurostd::get_useconds()-useconds_begin)/1000.0;useconds_begin=aurostd::get_useconds()/1000.0;return out;}
   long double get_useconds(void) {timeval tim;gettimeofday(&tim,NULL);return tim.tv_usec;}
   long double get_useconds(long double reference_useconds) { return aurostd::get_useconds()-reference_useconds;}
   long double get_delta_useconds(long double& useconds_begin) {long double out=aurostd::get_useconds()-useconds_begin;useconds_begin=aurostd::get_useconds();return out;}
@@ -2029,6 +2032,7 @@ namespace aurostd {
   // tells you if the compressed variant exists
   bool EFileExist(const string& _FileName, string& FileNameOut){
     string FileName=aurostd::CleanFileName(_FileName); //CO191110
+    if(FileExist(FileName)) {FileNameOut=FileName;return TRUE;}
     if(FileExist(FileName+".xz")) {FileNameOut=FileName+".xz";return TRUE;}
     if(FileExist(FileName+".bz2")) {FileNameOut=FileName+".bz2";return TRUE;}
     if(FileExist(FileName+".gz")) {FileNameOut=FileName+".gz";return TRUE;}
@@ -3530,7 +3534,7 @@ namespace aurostd {
     ofstream FileOUT;
     FileOUT.open(file.c_str(),std::ios::out);
     bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
-    for(uint iline;iline<vline.size();iline++) FileOUT << vline.at(iline) << endl;
+    for(uint iline=0;iline<vline.size();iline++) FileOUT << vline.at(iline) << endl;
     // FileOUT << StringstreamOUT.rdbuf();
     FileOUT.flush();FileOUT.clear();FileOUT.close();
     return writable;
@@ -3565,7 +3569,7 @@ namespace aurostd {
     ofstream FileOUT;
     FileOUT.open(file.c_str(),std::ios::out);
     bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
-    for(uint iline;iline<vline.size();iline++)  FileOUT << vline.at(iline) << endl;
+    for(uint iline=0;iline<vline.size();iline++)  FileOUT << vline.at(iline) << endl;
     // FileOUT << StringstreamOUT.rdbuf();
     FileOUT.flush();FileOUT.clear();FileOUT.close();
     return writable;
@@ -3601,7 +3605,7 @@ namespace aurostd {
     ofstream FileOUT;
     FileOUT.open(file.c_str(),std::ios::out);
     bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
-    for(uint iline;iline<vline.size();iline++) FileOUT << vline.at(iline) << endl;
+    for(uint iline=0;iline<vline.size();iline++) FileOUT << vline.at(iline) << endl;
     // FileOUT << StringstreamOUT.rdbuf();
     FileOUT.flush();FileOUT.clear();FileOUT.close();
     return writable;
@@ -3679,7 +3683,7 @@ namespace aurostd {
     if(!FileExist(FileNameIN,FileNameOUT) && !EFileExist(FileNameIN,FileNameOUT)) {
       cerr << "ERROR - aurostd::efile2stringstream: file=" << FileNameIN << " not present !" << endl;
       return FALSE;}   
-    if(aurostd::substring2bool(FileNameOUT,".bz2")) return aurostd::bz2file2stringstream(FileNameOUT,StringstreamIN);
+    if(aurostd::substring2bool(FileNameOUT,".bz2") ) return aurostd::bz2file2stringstream(FileNameOUT,StringstreamIN);
     if(aurostd::substring2bool(FileNameOUT,".gz"))  return aurostd::gzfile2stringstream(FileNameOUT,StringstreamIN);
     if(aurostd::substring2bool(FileNameOUT,".xz"))  return aurostd::xzfile2stringstream(FileNameOUT,StringstreamIN);
     return aurostd::file2stringstream(FileNameOUT,StringstreamIN);

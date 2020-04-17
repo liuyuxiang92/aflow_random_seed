@@ -353,6 +353,7 @@ class _XHOST {
     vector<uint>   vGlobal_uint;      // parameters uint
     vector<string> vGlobal_string;    // parameters as strings
     vector<vector<string> > vvGlobal_string; // parameters as vector strings
+    vector<vector<string> > vvLIBS; // parameters as vector strings
     // vector<string> vLibrary_ICSD;     // ordered by #species (needs to be allocated)
     // vector<string> vLibrary_ICSD_ALL; // line by line
     // string Library_ICSD_ALL;          // the complete library
@@ -366,7 +367,10 @@ class _XHOST {
     aurostd::xoption vflag_outreach;  // argv/argc options following the xoption structure
     aurostd::xoption vflag_control;  // argv/argc options following the xoption structure
     aurostd::xoption vschema;        // keywords, names, units etc etc
-
+    // USUAL COMMANDS
+    vector<string> vcat; //     cat, bzcat, xzcat, gzcat
+    vector<string> vext; //      "",  .bz2,   .xz,   .gz
+    vector<string> vzip; //      "", bzip2,    xz,  gzip
     // AFLOWRC
     string aflowrc_filename;
     string aflowrc_content;
@@ -385,28 +389,6 @@ class _XHOST {
 
 #define XHOST_vGlobal_MAX                              256
 #define XHOST_Library_HTQC                             XHOST.vGlobal_string.at(0)
-#define XHOST_Library_CALCULATED_ICSD_LIB              XHOST.vGlobal_string.at(1)
-#define XHOST_Library_CALCULATED_ICSD_RAW              XHOST.vGlobal_string.at(2)
-#define XHOST_Library_CALCULATED_LIB0_LIB              XHOST.vGlobal_string.at(3)
-#define XHOST_Library_CALCULATED_LIB0_RAW              XHOST.vGlobal_string.at(4)
-#define XHOST_Library_CALCULATED_LIB1_LIB              XHOST.vGlobal_string.at(5)
-#define XHOST_Library_CALCULATED_LIB1_RAW              XHOST.vGlobal_string.at(6)
-#define XHOST_Library_CALCULATED_LIB2_LIB              XHOST.vGlobal_string.at(7)
-#define XHOST_Library_CALCULATED_LIB2_RAW              XHOST.vGlobal_string.at(8)
-#define XHOST_Library_CALCULATED_LIB3_LIB              XHOST.vGlobal_string.at(9)
-#define XHOST_Library_CALCULATED_LIB3_RAW              XHOST.vGlobal_string.at(10)
-#define XHOST_Library_CALCULATED_LIB4_LIB              XHOST.vGlobal_string.at(11)
-#define XHOST_Library_CALCULATED_LIB4_RAW              XHOST.vGlobal_string.at(12)
-#define XHOST_Library_CALCULATED_LIB5_LIB              XHOST.vGlobal_string.at(13)
-#define XHOST_Library_CALCULATED_LIB5_RAW              XHOST.vGlobal_string.at(14)
-#define XHOST_Library_CALCULATED_LIB6_LIB              XHOST.vGlobal_string.at(15)
-#define XHOST_Library_CALCULATED_LIB6_RAW              XHOST.vGlobal_string.at(16)
-#define XHOST_Library_CALCULATED_LIB7_LIB              XHOST.vGlobal_string.at(17)
-#define XHOST_Library_CALCULATED_LIB7_RAW              XHOST.vGlobal_string.at(18)
-#define XHOST_Library_CALCULATED_LIB8_LIB              XHOST.vGlobal_string.at(19)
-#define XHOST_Library_CALCULATED_LIB8_RAW              XHOST.vGlobal_string.at(20)
-#define XHOST_Library_CALCULATED_LIB9_LIB              XHOST.vGlobal_string.at(21)
-#define XHOST_Library_CALCULATED_LIB9_RAW              XHOST.vGlobal_string.at(22)
 #define XHOST_aflowlib_icsd                            XHOST.vGlobal_string.at(23)
 #define XHOST_aflowlib_lib0                            XHOST.vGlobal_string.at(24)
 #define XHOST_aflowlib_lib1                            XHOST.vGlobal_string.at(25)
@@ -418,24 +400,46 @@ class _XHOST {
 #define XHOST_aflowlib_lib7                            XHOST.vGlobal_string.at(31)
 #define XHOST_aflowlib_lib8                            XHOST.vGlobal_string.at(32)
 #define XHOST_aflowlib_lib9                            XHOST.vGlobal_string.at(33)
-#define XHOST_AUID                                     XHOST.vGlobal_string.at(34)
-#define XHOST_AURL                                     XHOST.vGlobal_string.at(35)
-#define XHOST_LOOP                                     XHOST.vGlobal_string.at(36)
-#define XHOST_Library_ICSD_ALL                         XHOST.vGlobal_string.at(37)
+//#define XHOST_AUID                                     XHOST.vGlobal_string.at(34)
+//#define XHOST_AURL                                     XHOST.vGlobal_string.at(35)
+//#define XHOST_LOOP                                     XHOST.vGlobal_string.at(36)
+#define XHOST_Library_ICSD_ALL                         XHOST.vGlobal_string.at(38)
 //  string Library_ICSD_ALL;          // the complete library
 
-#define XHOST_vAUID                                    XHOST.vvGlobal_string.at(0)
-#define XHOST_vAURL                                    XHOST.vvGlobal_string.at(1)
-#define XHOST_vLOOP                                    XHOST.vvGlobal_string.at(2)
-#define vAUID XHOST_vAUID
-#define vAURL XHOST_vAURL
-#define vLOOP XHOST_vLOOP
+#define XHOST_vLIBS XHOST.vvLIBS
+#define XHOST_vAURL XHOST.vvLIBS.at(0)
+#define XHOST_vAUID XHOST.vvLIBS.at(1)
+#define XHOST_vLOOP XHOST.vvLIBS.at(2)
+#define XHOST_LIBRARY_JSONL                            XHOST.vGlobal_string.at(3)
 
-#define vVASP_POTCAR_DIRECTORIES                       XHOST.vvGlobal_string.at(3)
-#define vAFLOW_LIBRARY_DIRECTORIES                     XHOST.vvGlobal_string.at(4)
-#define vAFLOW_PROJECTS_DIRECTORIES                    XHOST.vvGlobal_string.at(5)
-#define XHOST_vLibrary_ICSD                            XHOST.vvGlobal_string.at(6)
-#define XHOST_vLibrary_ICSD_ALL                        XHOST.vvGlobal_string.at(7)
+#define vVASP_POTCAR_DIRECTORIES                       XHOST.vvGlobal_string.at(4)
+#define vAFLOW_LIBRARY_DIRECTORIES                     XHOST.vvGlobal_string.at(5)
+#define vAFLOW_PROJECTS_DIRECTORIES                    XHOST.vvGlobal_string.at(6)
+#define XHOST_vLibrary_ICSD                            XHOST.vvGlobal_string.at(7)
+#define XHOST_vLibrary_ICSD_ALL                        XHOST.vvGlobal_string.at(8)
+#define XHOST_Library_CALCULATED_ICSD_LIB              XHOST.vvGlobal_string.at(9)
+#define XHOST_Library_CALCULATED_ICSD_RAW              XHOST.vvGlobal_string.at(10)
+#define XHOST_Library_CALCULATED_LIB0_LIB              XHOST.vvGlobal_string.at(11)
+#define XHOST_Library_CALCULATED_LIB0_RAW              XHOST.vvGlobal_string.at(12)
+#define XHOST_Library_CALCULATED_LIB1_LIB              XHOST.vvGlobal_string.at(13)
+#define XHOST_Library_CALCULATED_LIB1_RAW              XHOST.vvGlobal_string.at(14)
+#define XHOST_Library_CALCULATED_LIB2_LIB              XHOST.vvGlobal_string.at(15)
+#define XHOST_Library_CALCULATED_LIB2_RAW              XHOST.vvGlobal_string.at(16)
+#define XHOST_Library_CALCULATED_LIB3_LIB              XHOST.vvGlobal_string.at(17)
+#define XHOST_Library_CALCULATED_LIB3_RAW              XHOST.vvGlobal_string.at(18)
+#define XHOST_Library_CALCULATED_LIB4_LIB              XHOST.vvGlobal_string.at(19)
+#define XHOST_Library_CALCULATED_LIB4_RAW              XHOST.vvGlobal_string.at(20)
+#define XHOST_Library_CALCULATED_LIB5_LIB              XHOST.vvGlobal_string.at(21)
+#define XHOST_Library_CALCULATED_LIB5_RAW              XHOST.vvGlobal_string.at(22)
+#define XHOST_Library_CALCULATED_LIB6_LIB              XHOST.vvGlobal_string.at(23)
+#define XHOST_Library_CALCULATED_LIB6_RAW              XHOST.vvGlobal_string.at(24)
+#define XHOST_Library_CALCULATED_LIB7_LIB              XHOST.vvGlobal_string.at(25)
+#define XHOST_Library_CALCULATED_LIB7_RAW              XHOST.vvGlobal_string.at(26)
+#define XHOST_Library_CALCULATED_LIB8_LIB              XHOST.vvGlobal_string.at(27)
+#define XHOST_Library_CALCULATED_LIB8_RAW              XHOST.vvGlobal_string.at(28)
+#define XHOST_Library_CALCULATED_LIB9_LIB              XHOST.vvGlobal_string.at(29)
+#define XHOST_Library_CALCULATED_LIB9_RAW              XHOST.vvGlobal_string.at(30)
+
 //  vector<string> vLibrary_ICSD;     // ordered by #species
 //  vector<string> vLibrary_ICSD_ALL; // line by line
 
@@ -453,10 +457,10 @@ class _XHOST {
 #define XHOST_README_AFLOW_AEL_TXT                     XHOST.vGlobal_string.at(51)
 #define XHOST_README_AFLOW_ANRL_TXT                    XHOST.vGlobal_string.at(52)
 #define XHOST_README_AFLOW_COMPARE_TXT                 XHOST.vGlobal_string.at(53)
-#define XHOST_README_AFLOW_GFA_TXT                     XHOST.vGlobal_string.at(53)  //CO20190401
+#define XHOST_README_AFLOW_GFA_TXT                     XHOST.vGlobal_string.at(53) //CO20190401
 #define XHOST_README_AFLOW_SYM_TXT                     XHOST.vGlobal_string.at(54)
-#define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO20190620
-#define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO20190620
+#define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55) //CO20190620
+#define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56) //CO20190620
 #define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57) //ME20180705
 #define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(58)
 #define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(59)
@@ -503,6 +507,7 @@ class _XHOST {
 #define XHOST_LIBRARY_LIB9                             XHOST.vGlobal_uint.at(9)
 #define XHOST_LIBRARY_ICSD                             XHOST.vGlobal_uint.at(10)
 #define XHOST_LIBRARY_AUID                             XHOST.vGlobal_uint.at(11)
+
 
 // max is 128
 extern _XHOST XHOST; // this will be global
@@ -2645,8 +2650,8 @@ namespace KBIN {
   void RUN_Directory(_aflags& aflags);
   void AFLOW_RUN_Directory(const _aflags& aflags);
   void RUN_DirectoryScript(const _aflags& aflags,const string& script,const string& output);
-  void CompressDirectory(const _aflags& aflags,const _kflags& kflags);
-  void CompressDirectory(const _aflags& aflags);
+  bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
+  bool CompressDirectory(const _aflags& aflags);
   void Clean(const _aflags& aflags);
   void Clean(const string directory);
   void XClean(string options);
@@ -2783,10 +2788,10 @@ namespace KBIN {
   bool VASP_Produce_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false);
   bool VASP_Modify_INPUT(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags);
   bool VASP_Produce_and_Modify_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false); // CO20180418
-  bool VASP_Write_AUID_FILE(const string& directory,const vector<string>& vAUIDs,const vector<string>& species);
-  bool VASP_Write_AUID_FILE(const string& directory,const deque<string>& vAUIDs,const deque<string>& species);
-  bool VASP_Write_AUID_AFLOWIN(const string& directory,const vector<string>& vAUIDs,const vector<string>& species);
-  bool VASP_Write_AUID_AFLOWIN(const string& directory,const deque<string>& vAUIDs,const deque<string>& species);
+  bool VASP_Write_ppAUID_FILE(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
+  bool VASP_Write_ppAUID_FILE(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
+  bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
+  bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
   bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags);
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
@@ -3243,6 +3248,8 @@ uint xPOTCAR_Initialize(void);
 bool xPOTCAR_PURE_Printer(xPOTCAR& xPOT,ostream& oss,bool LVERBOSE=FALSE);
 xPOTCAR xPOTCAR_Finder(vector<string>& species_pp_AUID,vector<string>& species_pp_AUID_collisions,const string& TITEL,const string& LEXCH,const double& EATOM,const double& RMAX,bool LVERBOSE=FALSE);
 xPOTCAR xPOTCAR_Finder(const string& AUID,bool LVERBOSE=FALSE);
+bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA=""); // returns if available
+bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& gs,double& enthalpy_atom,double& volume_atom,double& spin_atom);
 
 // -------------------------------------------------------------------------------------------------
 class xVASPRUNXML {

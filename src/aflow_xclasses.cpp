@@ -83,6 +83,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   vGlobal_uint.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_uint.push_back(0); 
   vGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_string.push_back(""); 
   vvGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvGlobal_string.push_back(vector<string>()); 
+  vvLIBS.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvLIBS.push_back(vector<string>()); 
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD.push_back(""); 
   // [OBSOLETE] vLibrary_ICSD_ALL.clear(); // for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD_ALL.push_back(""); 
   // [OBSOLETE] Library_ICSD_ALL="";
@@ -104,6 +105,10 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   XHOST_LIBRARY_LIB9=LIBRARY_NOTHING;
   XHOST_LIBRARY_ICSD=LIBRARY_NOTHING;
   XHOST_vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) XHOST_vLibrary_ICSD.push_back("");  // needs some initialization
+  // extensions
+  vcat.clear();vcat.push_back("cat");vcat.push_back("bzcat"); vcat.push_back("xzcat");vcat.push_back("gzcat");
+  vext.clear();vext.push_back("");   vext.push_back(".bz2");  vext.push_back(".xz");  vext.push_back(".gz");
+  vzip.clear();vzip.push_back("");   vzip.push_back("bzip2"); vzip.push_back("xz");   vzip.push_back("gzip");
   // AFLOWRC
   aflowrc_filename="";    // AFLOWRC
   aflowrc_content="";    // AFLOWRC
@@ -182,6 +187,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vGlobal_uint.clear();for(uint i=0;i<b.vGlobal_uint.size();i++) vGlobal_uint.push_back(b.vGlobal_uint.at(i));
   vGlobal_string.clear();for(uint i=0;i<b.vGlobal_string.size();i++) vGlobal_string.push_back(b.vGlobal_string.at(i));
   vvGlobal_string.clear();for(uint i=0;i<b.vvGlobal_string.size();i++) vvGlobal_string.push_back(b.vvGlobal_string.at(i));
+  vvLIBS.clear();for(uint i=0;i<b.vvLIBS.size();i++) vvLIBS.push_back(b.vvLIBS.at(i));
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<b.vLibrary_ICSD.size();i++) vLibrary_ICSD.push_back(b.vLibrary_ICSD.at(i));
   // [OBSOLETE] vLibrary_ICSD_ALL.clear();for(uint i=0;i<b.vLibrary_ICSD_ALL.size();i++) vLibrary_ICSD_ALL.push_back(b.vLibrary_ICSD_ALL.at(i));
   // [OBSOLETE] Library_ICSD_ALL=b.Library_ICSD_ALL;
@@ -191,6 +197,10 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vflag_outreach=b.vflag_outreach;
   vflag_control=b.vflag_control;
   vschema=b.vschema;
+  // extensions
+  vcat.clear();for(uint i=0;i<b.vcat.size();i++) vcat.push_back(b.vcat.at(i));
+  vext.clear();for(uint i=0;i<b.vext.size();i++) vext.push_back(b.vext.at(i));
+  vzip.clear();for(uint i=0;i<b.vzip.size();i++) vzip.push_back(b.vzip.at(i));
   // AFLOWRC
   aflowrc_filename=b.aflowrc_filename;    // AFLOWRC
   aflowrc_content=b.aflowrc_content;    // AFLOWRC
@@ -226,6 +236,7 @@ void _XHOST::free() { // free PRIVATE
   vGlobal_uint.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_uint.push_back(0); 
   vGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vGlobal_string.push_back(""); 
   vvGlobal_string.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvGlobal_string.push_back(vector<string>()); 
+  vvLIBS.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vvLIBS.push_back(vector<string>()); 
   // [OBSOLETE] vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) vLibrary_ICSD.push_back(""); 
   // [OBSOLETE] vLibrary_ICSD_ALL.clear();
   XHOST_vLibrary_ICSD.clear();for(uint i=0;i<XHOST_vGlobal_MAX;i++) XHOST_vLibrary_ICSD.push_back("");  // needs some initialization
@@ -235,6 +246,10 @@ void _XHOST::free() { // free PRIVATE
   vflag_outreach.clear();
   vflag_control.clear();
   vschema.clear();
+  // extensions
+  vcat.clear();vcat.push_back("cat");vcat.push_back("bzcat"); vcat.push_back("xzcat");vcat.push_back("gzcat");
+  vext.clear();vext.push_back("");   vext.push_back(".bz2");  vext.push_back(".xz");  vext.push_back(".gz");
+  vzip.clear();vzip.push_back("");   vzip.push_back("bzip2"); vzip.push_back("xz");   vzip.push_back("gzip");
   // AFLOWRC
   aflowrc_filename.clear();    // AFLOWRC
   aflowrc_content.clear();    // AFLOWRC

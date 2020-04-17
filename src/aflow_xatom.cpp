@@ -442,17 +442,17 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Lr"; vatom_name[i]="Lawrencium"; vatom_mass[i]*=262.11;   vatom_volume[i]=NNN;     vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Lr
 
   /*
-     int valence_wahyu[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
-     for(uint j=1;j<93;j++) {
-     int test=vatom_valence_std[j];
-     if(j<=9 && test>=5) {test=test-8;} // first row
-     if(j<=17 && test>=5) {test=test-8;} // second row
-  //   if(test!=valence_wahyu[j]) 
-  cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_wahyu[j];
-  if(test!=valence_wahyu[j]) cerr << "   ****   ";
-  cerr << endl;
-  }
-  exit(0);
+    int valence_wahyu[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
+    for(uint j=1;j<93;j++) {
+    int test=vatom_valence_std[j];
+    if(j<=9 && test>=5) {test=test-8;} // first row
+    if(j<=17 && test>=5) {test=test-8;} // second row
+    //   if(test!=valence_wahyu[j]) 
+    cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_wahyu[j];
+    if(test!=valence_wahyu[j]) cerr << "   ****   ";
+    cerr << endl;
+    }
+    exit(0);
   */
 
 
@@ -1755,14 +1755,14 @@ vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const str
 // Reset dims for RadiusSphereLattice() - DX20191122
 // ***************************************************************************
 void resetLatticeDimensions(const xmatrix<double>& lattice, 
-    double radius, 
-    xvector<int>& dims,
-    vector<xvector<double> >& l1, 
-    vector<xvector<double> >& l2, 
-    vector<xvector<double> >& l3, 
-    vector<int>& a_index, 
-    vector<int>& b_index, 
-    vector<int>& c_index){
+			    double radius, 
+			    xvector<int>& dims,
+			    vector<xvector<double> >& l1, 
+			    vector<xvector<double> >& l2, 
+			    vector<xvector<double> >& l3, 
+			    vector<int>& a_index, 
+			    vector<int>& b_index, 
+			    vector<int>& c_index){
 
   // resets the lattice dimensions (dims) based on radius
   // generates lattice vectors (l1,l2,l3) right away = speed increase
@@ -1800,9 +1800,9 @@ void resetLatticeDimensions(const xmatrix<double>& lattice,
 // minimumCoordinationShellLatticeOnly() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
-    double& min_dist, 
-    uint& frequency, 
-    vector<xvector<double> >& coordinates){
+					 double& min_dist, 
+					 uint& frequency, 
+					 vector<xvector<double> >& coordinates){
 
   // determine the minimum coordination shell of the lattice
   // i.e., find the set of closest neighbors to the origin
@@ -1819,10 +1819,10 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
 // minimumCoordinationShellLatticeOnly() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
-    double& min_dist, 
-    uint& frequency, 
-    vector<xvector<double> >& coordinates, 
-    double radius){
+					 double& min_dist, 
+					 uint& frequency, 
+					 vector<xvector<double> >& coordinates, 
+					 double radius){
 
   // determine the minimum coordination shell of the lattice
   // i.e., find the set of closest neighbors to the origin
@@ -1836,25 +1836,25 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
   resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
 
   minimumCoordinationShellLatticeOnly(lattice, dims, l1, l2, l3, 
-      a_index, b_index, c_index, 
-      min_dist, frequency, coordinates, radius);
+				      a_index, b_index, c_index, 
+				      min_dist, frequency, coordinates, radius);
 }
 
 // ***************************************************************************
 // minimumCoordinationShellLatticeOnly() - DX20191122
 // ***************************************************************************
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, 
-    xvector<int>& dims,
-    vector<xvector<double> >& l1, 
-    vector<xvector<double> >& l2, 
-    vector<xvector<double> >& l3, 
-    vector<int>& a_index, 
-    vector<int>& b_index, 
-    vector<int>& c_index, 
-    double& min_dist, 
-    uint& frequency, 
-    vector<xvector<double> >& coordinates,
-    double radius){
+					 xvector<int>& dims,
+					 vector<xvector<double> >& l1, 
+					 vector<xvector<double> >& l2, 
+					 vector<xvector<double> >& l3, 
+					 vector<int>& a_index, 
+					 vector<int>& b_index, 
+					 vector<int>& c_index, 
+					 double& min_dist, 
+					 uint& frequency, 
+					 vector<xvector<double> >& coordinates,
+					 double radius){
 
   // determine the minimum coordination shell environment of the lattice
   // i.e., find the set of closest neighbors to the origin
@@ -1911,10 +1911,10 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
 // minimumCoordinationShell() - DX20191122 
 // ***************************************************************************
 void minimumCoordinationShell(const xstructure& xstr, 
-    uint center_index, 
-    double& min_dist, 
-    uint& frequency, 
-    vector<xvector<double> >& coordinates){
+			      uint center_index, 
+			      double& min_dist, 
+			      uint& frequency, 
+			      vector<xvector<double> >& coordinates){
 
   string type = "";
 
@@ -1925,11 +1925,11 @@ void minimumCoordinationShell(const xstructure& xstr,
 // minimumCoordinationShell() - DX20191122
 // ***************************************************************************
 void minimumCoordinationShell(const xstructure& xstr, 
-    uint center_index, 
-    double& min_dist, 
-    uint& frequency, 
-    vector<xvector<double> >& coordinates, 
-    const string& type){
+			      uint center_index, 
+			      double& min_dist, 
+			      uint& frequency, 
+			      vector<xvector<double> >& coordinates, 
+			      const string& type){
 
   // determine the minimum coordination shell environment
   // "type" enables the search of environments by certain elements/types only
@@ -1986,8 +1986,8 @@ void minimumCoordinationShell(const xstructure& xstr,
       // use variant that stores the lattice dimension information so it can be 
       // updated for the "minimumCoordinationShell" function
       minimumCoordinationShellLatticeOnly(xstr.lattice, dims, l1, l2, l3, 
-          a_index, b_index, c_index, 
-          min_dist, frequency, coordinates, search_radius);
+					  a_index, b_index, c_index, 
+					  min_dist, frequency, coordinates, search_radius);
     }
   }
 }
@@ -3538,9 +3538,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
     for(uint i=0;i<vinput.size()&&QE==5;i++) {
       if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && 
-          !aurostd::substring2bool(vinput[i],"crystal","CRYSTAL") && 
-          !aurostd::substring2bool(vinput[i],"bohr","BOHR") && // DX added
-          !aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
+	 !aurostd::substring2bool(vinput[i],"crystal","CRYSTAL") && 
+	 !aurostd::substring2bool(vinput[i],"bohr","BOHR") && // DX added
+	 !aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
         cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
       if( aurostd::substring2bool(vinput[i],"&system")) {
@@ -3589,9 +3589,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
       aurostd::string2tokens(vinput[i],tokens_line," ");
       if(tokens_line.size()){
         IOMODE_found=(IOMODE_found || 
-            tokens_line[0]=="atom" || 
-            tokens_line[0]=="atom_frac" || 
-            tokens_line[0]=="lattice_vector");
+		      tokens_line[0]=="atom" || 
+		      tokens_line[0]=="atom_frac" || 
+		      tokens_line[0]=="lattice_vector");
       }
     }
     if(IOMODE_found){
@@ -3919,8 +3919,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.partial_occupation_site_tol=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined  // CO20170803 - site tol
     a.partial_occupation_stoich_tol=DEFAULT_POCC_STOICH_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined // CO20180409
     //}
-    if(a.partial_occupation_flag) //&& a.neg_scale_second) // CO20180409
-    { //CO200106 - patching for auto-indenting
+    if(a.partial_occupation_flag) { //&& a.neg_scale_second) // CO20180409
       if(LDEBUG) {cerr << soliloquy << " a.neg_scale_second=" << a.neg_scale_second << ", a.scale_second=" << a.scale_second << endl;}
       if(a.neg_scale_second){a.partial_occupation_HNF=(int) (-a.scale_second);} // CO20180409
       else {
@@ -4516,14 +4515,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // NOW ADD ATOMS
     for(uint i=0;i<vinput.size();i++) {
       // DX20180124 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"crystal","CRYSTAL"))
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"CRYSTAL")) // DX20180124 - added aurostd::toupper
-      { //CO200106 - patching for auto-indenting
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"CRYSTAL")) { // DX20180124 - added aurostd::toupper
         iline=i+1;a.coord_flag=_COORDS_FRACTIONAL_;
         jline=iline+nat_value; // DX20180123 - added nat
       }
       // DX20180124 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM"))
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")) // DX20180124 - added aurostd::toupper
-      { //CO200106 - patching for auto-indenting
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")) { // DX20180124 - added aurostd::toupper
         iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
         jline=iline+nat_value; // DX20180123 - added nat
       }
@@ -4793,7 +4790,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
         //[CO20190629 - no exit()]exit(0);
         message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO20190629
-          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO20190629
+		<< general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }
@@ -4847,7 +4844,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         atom_site_fields.push_back(vinput[i]);
       }
       else if(found_atom_site_labels && aurostd::RemoveWhiteSpaces(vinput[i]).size()!=0 && 
-          vinput[i][0]=='_' && !aurostd::substring2bool(vinput[i],"aniso")){ //DX20190718 - to account for non-standard fields, e.g., _sm_ (Springer Materials) fields; not standard, but abundant
+	      vinput[i][0]=='_' && !aurostd::substring2bool(vinput[i],"aniso")){ //DX20190718 - to account for non-standard fields, e.g., _sm_ (Springer Materials) fields; not standard, but abundant
         if(already_storing_atoms){ break; } //DX20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         atom_site_fields.push_back(vinput[i]);
       }
@@ -5622,27 +5619,27 @@ xstructure GetStructure(const int& iomode,const string& Directory) {
 // change coordinates type
 void xstructure::SetCoordinates(const int& mode)  {
   switch(mode) {
-    case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
-                                                   cerr << "ERROR SetCoordinate [1] mode=" << mode << endl; exit(0);
-                                                   break;
-                                                 }
-    case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
-                                                   cerr << "ERROR SetCoordinate [2] mode=" << mode << endl; exit(0);
-                                                   break;
-                                                 }
-    case _COORDS_CARTESIAN_ : {
-                                coord_flag=_COORDS_CARTESIAN_;
-                                strcpy(coord_type,"C");
-                                break;
-                              }
-    case _COORDS_FRACTIONAL_ : {
-                                 coord_flag=_COORDS_FRACTIONAL_;
-                                 strcpy(coord_type,"D");
-                                 break;
-                               }
-    default: {
-               cerr << "SetCoordinates NOTHING TO DO  mode=" << mode << endl;
-             }
+  case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
+    cerr << "ERROR SetCoordinate [1] mode=" << mode << endl; exit(0);
+    break;
+  }
+  case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
+    cerr << "ERROR SetCoordinate [2] mode=" << mode << endl; exit(0);
+    break;
+  }
+  case _COORDS_CARTESIAN_ : {
+    coord_flag=_COORDS_CARTESIAN_;
+    strcpy(coord_type,"C");
+    break;
+  }
+  case _COORDS_FRACTIONAL_ : {
+    coord_flag=_COORDS_FRACTIONAL_;
+    strcpy(coord_type,"D");
+    break;
+  }
+  default: {
+    cerr << "SetCoordinates NOTHING TO DO  mode=" << mode << endl;
+  }
   }
 }
 
@@ -5751,22 +5748,22 @@ void xstructure::AddAtom(const _atom& atom) {
   // NEW STYLE
   bool found=FALSE;
   if(0)  for(uint iat=0;iat<atoms.size()&&!found;iat++) {
-    if(iat<atoms.size()-1) {
-      if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
-        //	if(LDEBUG)
-        cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-        atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
-        found=TRUE;
+      if(iat<atoms.size()-1) {
+	if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
+	  //	if(LDEBUG)
+	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+	  atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
+	  found=TRUE;
+	}
       }
     }
-  }
   if(1) {
     std::deque<_atom>::iterator it=atoms.begin();
     for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
       if(iat<atoms.size()-1) {
         //	cerr << "HERE0 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;
         if((atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) || 
-            (atoms.at(iat).type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
+	   (atoms.at(iat).type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO20180705 - for pocc sorting, larger pocc ahead of smaller pocc
           //	if(LDEBUG)
           //	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
           atoms.insert(it+1,btom);  // it is iterator, fine for insert.
@@ -5898,9 +5895,8 @@ void xstructure::RemoveFractionalCopies(double tol) {
         xvector<double> fdiff = atoms.at(iat1).fpos-atoms.at(iat2).fpos; //DX20180503 - account for PBC
         fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX20190613
         //DX20190613 [OBSOLETE] SYM::PBC(fdiff); //DX20180503 - account for PBC
-        if(aurostd::modulus((*this).f2c*fdiff)<tol && flag_remove==FALSE) //DX20180503 - account for PBC and perform in Cartesian space
+        if(aurostd::modulus((*this).f2c*fdiff)<tol && flag_remove==FALSE) { //DX20180503 - account for PBC and perform in Cartesian space
           //DX20180503 [OBSOLETE] if(aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol && flag_remove==FALSE)
-        { //CO200106 - patching for auto-indenting
           flag_remove=TRUE;
           irm=iat2;
         }
@@ -6561,7 +6557,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   stringstream message;
   int spacegroupnumber=0;
   if(spacegroupsymbol[0] != 'P' && spacegroupsymbol[0] != 'I' && spacegroupsymbol[0] != 'F' &&
-      spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
+     spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
     message << "routine: space group specified invalid (lattice centering not identified: P,I,F,R,C,A): ";
     message << "input symbol=" << spacegroupsymbol << " [dir=" << directory << "]." << endl;
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
@@ -7534,7 +7530,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   if(setting==0){ //signals default //DX20180807
     // if RHL, AFLOW prefers hexagonal setting (i.e., setting=2)
     if(spacegroupnumber==146 || spacegroupnumber==148 || spacegroupnumber==155 || spacegroupnumber==160 || 
-        spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){
+       spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){
       setting=2;
     }
     // else setting==1
@@ -8589,8 +8585,8 @@ double det(const xvector<double>& v1,const xvector<double>& v2,const xvector<dou
   return scalar_product(v1,vector_product(v2,v3));
 }
 double det(const double& a11,const double& a12,const double& a13,
-    const double& a21,const double& a22,const double& a23,
-    const double& a31,const double& a32,const double& a33) {
+	   const double& a21,const double& a22,const double& a23,
+	   const double& a31,const double& a32,const double& a33) {
   return a11*a22*a33+a12*a23*a31+a13*a21*a32-a13*a22*a31-a12*a21*a33-a11*a23*a32;
 }
 double GetVol(const xvector<double>& v1,const xvector<double>& v2,const xvector<double>& v3) {
@@ -8654,9 +8650,9 @@ xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& per
 }
 
 xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_IMPLEMENTATION
-    const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
-    const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
-    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+			      const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
+			      const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
+			      const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -8665,10 +8661,10 @@ xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_
 }
 
 xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_IMPLEMENTATION
-    const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
-    const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
-    const xvector<int>& permut,     // AFLOW_FUNCTION_IMPLEMENTATION
-    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+			      const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
+			      const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
+			      const xvector<int>& permut,     // AFLOW_FUNCTION_IMPLEMENTATION
+			      const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -9688,7 +9684,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Start loop
 
-LoopHead:
+ LoopHead:
 
   cnt++;
   //  cerr << "DEBUG: Niggli() cnt=" << cnt << endl;
@@ -9711,8 +9707,7 @@ LoopHead:
 
   // Step 1
   // DX20180209 [OBSOLETE] if(((a-b)>TOL) || ((abs(a-b)<TOL) && (abs(ksi)>abs(eta)) ) )
-  if(((a-b)>TOL) || ((abs(a-b)<TOL) && ((abs(ksi)-abs(eta))>TOL) ) ) // DX20180209 - more robust; precision
-  { //CO200106 - patching for auto-indenting
+  if(((a-b)>TOL) || ((abs(a-b)<TOL) && ((abs(ksi)-abs(eta))>TOL) ) ) { // DX20180209 - more robust; precision
     temp=a;a=b;b=temp;
     temp=-ksi;ksi=-eta;eta=temp;
     P=P*m1;
@@ -9722,8 +9717,7 @@ LoopHead:
 
   // Step 2
   // DX20180209 [OBSOLETE] if(((b-c)>TOL) || ((abs(b-c)<TOL) && (abs(eta)>abs(zeta)) ) )
-  if(((b-c)>TOL) || ((abs(b-c)<TOL) && ((abs(eta)-abs(zeta))>TOL) ) ) // DX20180209 - more robust; precision
-  { //CO200106 - patching for auto-indenting
+  if(((b-c)>TOL) || ((abs(b-c)<TOL) && ((abs(eta)-abs(zeta))>TOL) ) ) { // DX20180209 - more robust; precision
     temp=b;b=c;c=temp;
     temp=-eta;eta=-zeta;zeta=temp;
     P=P*m2;
@@ -9735,115 +9729,115 @@ LoopHead:
   // Step 3
   // DX20180209 [OBSOLETE] if((ksi*eta*zeta)>0.0)
   if((ksi*eta*zeta)>TOL) // DX20180209 - more robust; precision
-  { //CO200106 - patching for auto-indenting
-    m3(1,1)=SignNoZero(ksi);
-    m3(2,2)=SignNoZero(eta);
-    m3(3,3)=SignNoZero(zeta);
-    P=P*m3;
-    ksi=abs(ksi);
-    eta=abs(eta);
-    zeta=abs(zeta);
-    // tpx
-    // _sdebug_GetNiggliCell(3,cnt,a,b,c,ksi,eta,zeta,cout);
-  }
+    { 
+      m3(1,1)=SignNoZero(ksi);
+      m3(2,2)=SignNoZero(eta);
+      m3(3,3)=SignNoZero(zeta);
+      P=P*m3;
+      ksi=abs(ksi);
+      eta=abs(eta);
+      zeta=abs(zeta);
+      // tpx
+      // _sdebug_GetNiggliCell(3,cnt,a,b,c,ksi,eta,zeta,cout);
+    }
 
   // Step 4
   // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
   if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=-TOL))  // DX20180211 - if any are zero, then, ksi*eta*zeta is zero
     //if(ksi*eta*zeta<=TOL) // DX20180209 - more robust; precision
-  { //CO200106 - patching for auto-indenting
-    m4(1,1)=-(SignNoZero(ksi));
-    m4(2,2)=-(SignNoZero(eta));
-    m4(3,3)=-(SignNoZero(zeta));
-    if(abs(ksi)<TOL) m4(1,1)=m4(2,2)*m4(3,3);
-    if(abs(eta)<TOL) m4(2,2)=m4(1,1)*m4(3,3);
-    if(abs(zeta)<TOL) m4(3,3)=m4(1,1)*m4(2,2);
-    P=P*m4;
-    ksi=-abs(ksi);
-    eta=-abs(eta);
-    zeta=-abs(zeta);
-    // tpx
-    // _sdebug_GetNiggliCell(4,cnt,a,b,c,ksi,eta,zeta,cout);
-  }
+    { 
+      m4(1,1)=-(SignNoZero(ksi));
+      m4(2,2)=-(SignNoZero(eta));
+      m4(3,3)=-(SignNoZero(zeta));
+      if(abs(ksi)<TOL) m4(1,1)=m4(2,2)*m4(3,3);
+      if(abs(eta)<TOL) m4(2,2)=m4(1,1)*m4(3,3);
+      if(abs(zeta)<TOL) m4(3,3)=m4(1,1)*m4(2,2);
+      P=P*m4;
+      ksi=-abs(ksi);
+      eta=-abs(eta);
+      zeta=-abs(zeta);
+      // tpx
+      // _sdebug_GetNiggliCell(4,cnt,a,b,c,ksi,eta,zeta,cout);
+    }
 
   // Step 5
   if(((abs(ksi)-b)>TOL) ||
-      ((abs(ksi-b)<TOL) && (2.0*eta-zeta)<-TOL) || // DX20180209 - more robust; precision
-      ((abs(ksi+b)<TOL) && (zeta<-TOL)) ) // DX20180209 - more robust; precision
+     ((abs(ksi-b)<TOL) && (2.0*eta-zeta)<-TOL) || // DX20180209 - more robust; precision
+     ((abs(ksi+b)<TOL) && (zeta<-TOL)) ) // DX20180209 - more robust; precision
     // DX20180209 [OBSOLETE] if(((abs(ksi)-b)>=TOL) ||
     // DX20180209 [OBSOLETE] ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
     // DX20180209 [OBSOLETE] ((abs(ksi+b)<TOL) && (zeta<0)) )
-  { //CO200106 - patching for auto-indenting
-    m5(2,3)=-(SignNoZero(ksi));
-    P=P*m5;
-    temp1=b+c-ksi*SignNoZero(ksi);
-    temp2=eta-zeta*SignNoZero(ksi);
-    temp3=ksi-2.0*b*SignNoZero(ksi);
-    c=temp1;
-    eta=temp2;
-    ksi=temp3;
-    // tpx
-    // _sdebug_GetNiggliCell(5,cnt,a,b,c,ksi,eta,zeta,cout);
-    goto LoopHead;
-  }
+    { 
+      m5(2,3)=-(SignNoZero(ksi));
+      P=P*m5;
+      temp1=b+c-ksi*SignNoZero(ksi);
+      temp2=eta-zeta*SignNoZero(ksi);
+      temp3=ksi-2.0*b*SignNoZero(ksi);
+      c=temp1;
+      eta=temp2;
+      ksi=temp3;
+      // tpx
+      // _sdebug_GetNiggliCell(5,cnt,a,b,c,ksi,eta,zeta,cout);
+      goto LoopHead;
+    }
 
   // Step 6
   if(((abs(eta)-a)>TOL) || 
-      ((abs(eta-a)<TOL) && (2.0*ksi-zeta)<-TOL) || // DX20180209 - more robust; precision
-      ((abs(eta+a)<TOL) && (zeta<-TOL))) // DX20180209 - more robust; precision
+     ((abs(eta-a)<TOL) && (2.0*ksi-zeta)<-TOL) || // DX20180209 - more robust; precision
+     ((abs(eta+a)<TOL) && (zeta<-TOL))) // DX20180209 - more robust; precision
     // DX20180209 [OBSOLETE] ((abs(eta-a)<TOL) && (2.0*ksi<zeta)) ||
     // DX20180209 [OBSOLETE] ((abs(eta+a)<TOL) && (zeta<0)))
-  { //CO200106 - patching for auto-indenting
-    m6(1,3)=-SignNoZero(eta);
-    P=P*m6;
-    temp1=a+c-eta*SignNoZero(eta);
-    temp2=ksi-zeta*SignNoZero(eta);
-    temp3=eta-2.0*a*SignNoZero(eta);
-    c=temp1;
-    ksi=temp2;
-    eta=temp3;
-    // tpx
-    // _sdebug_GetNiggliCell(6,cnt,a,b,c,ksi,eta,zeta,cout);
-    goto LoopHead; // DX20180211 - this was missing
-  }
+    {
+      m6(1,3)=-SignNoZero(eta);
+      P=P*m6;
+      temp1=a+c-eta*SignNoZero(eta);
+      temp2=ksi-zeta*SignNoZero(eta);
+      temp3=eta-2.0*a*SignNoZero(eta);
+      c=temp1;
+      ksi=temp2;
+      eta=temp3;
+      // tpx
+      // _sdebug_GetNiggliCell(6,cnt,a,b,c,ksi,eta,zeta,cout);
+      goto LoopHead; // DX20180211 - this was missing
+    }
 
   // Step 7
   if(((abs(zeta)-a)>TOL) || 
-      ((abs(zeta-a)<TOL) && (2.0*ksi-eta)<-TOL) || // DX20180209 - more robust; precision
-      ((abs(zeta+a)<TOL) && (eta<-TOL))) // DX20180209 - more robust; precision
+     ((abs(zeta-a)<TOL) && (2.0*ksi-eta)<-TOL) || // DX20180209 - more robust; precision
+     ((abs(zeta+a)<TOL) && (eta<-TOL))) // DX20180209 - more robust; precision
     // DX20180209 [OBSOLETE] ((abs(zeta-a)<TOL) && (2.0*ksi<eta)) ||
     // DX20180209 [OBSOLETE] ((abs(zeta+a)<TOL) && (eta<0)))
-  { //CO200106 - patching for auto-indenting
-    m7(1,2)=-SignNoZero(zeta);
-    P=P*m7;
-    temp1=a+b-zeta*SignNoZero(zeta);
-    temp2=ksi-eta*SignNoZero(zeta);
-    temp3=zeta-2.0*a*SignNoZero(zeta);
-    b=temp1;
-    ksi=temp2;
-    zeta=temp3;
-    // tpx
-    // _sdebug_GetNiggliCell(7,cnt,a,b,c,ksi,eta,zeta,cout);
-    goto LoopHead;
-  }
+    { 
+      m7(1,2)=-SignNoZero(zeta);
+      P=P*m7;
+      temp1=a+b-zeta*SignNoZero(zeta);
+      temp2=ksi-eta*SignNoZero(zeta);
+      temp3=zeta-2.0*a*SignNoZero(zeta);
+      b=temp1;
+      ksi=temp2;
+      zeta=temp3;
+      // tpx
+      // _sdebug_GetNiggliCell(7,cnt,a,b,c,ksi,eta,zeta,cout);
+      goto LoopHead;
+    }
 
   // Step 8
   // DX20180209 [OBSOLETE] if((ksi+eta+zeta+a+b<0) ||
   // DX20180209 [OBOSLETE]   ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0)))
   if((ksi+eta+zeta+a+b<-TOL) || // DX20180209 - more robust; precision
-      (abs(ksi+eta+zeta+a+b)<TOL && (2.0*(a+eta)+zeta>TOL))) // DX20180209 - more robust; precision
-  { //CO200106 - patching for auto-indenting
-    P=P*m8;
-    temp1=a+b+c+ksi+eta+zeta;
-    temp2=2.0*b+ksi+zeta;
-    temp3=2.0*a+eta+zeta;
-    c=temp1;
-    ksi=temp2;
-    eta=temp3;
-    // tpx
-    // _sdebug_GetNiggliCell(8,cnt,a,b,c,ksi,eta,zeta,cout);
-    goto LoopHead;
-  }
+     (abs(ksi+eta+zeta+a+b)<TOL && (2.0*(a+eta)+zeta>TOL))) // DX20180209 - more robust; precision
+    { 
+      P=P*m8;
+      temp1=a+b+c+ksi+eta+zeta;
+      temp2=2.0*b+ksi+zeta;
+      temp3=2.0*a+eta+zeta;
+      c=temp1;
+      ksi=temp2;
+      eta=temp3;
+      // tpx
+      // _sdebug_GetNiggliCell(8,cnt,a,b,c,ksi,eta,zeta,cout);
+      goto LoopHead;
+    }
 
   // Renormalize back to regular cell (divide by RENORM)
   xvector<double> outdat(6);
@@ -9958,7 +9952,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Start loop
 
-LoopHead:
+ LoopHead:
 
   cnt++;
   //  cerr << "DEBUG: Niggli() cnt=" << cnt << endl;
@@ -10012,8 +10006,7 @@ LoopHead:
 
   // Step 4
   // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
-  if(ksi*eta*zeta<=0)
-  { //CO200106 - patching for auto-indenting
+  if(ksi*eta*zeta<=0) {
     m4(1,1)=-(SignNoZero(ksi));
     m4(2,2)=-(SignNoZero(eta));
     m4(3,3)=-(SignNoZero(zeta));
@@ -10030,8 +10023,8 @@ LoopHead:
 
   // Step 5
   if(((abs(ksi)-b)>=TOL) ||
-      ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
-      ((abs(ksi+b)<TOL) && (zeta<0)) ) {
+     ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
+     ((abs(ksi+b)<TOL) && (zeta<0)) ) {
     m5(2,3)=-(SignNoZero(ksi));
     P=P*m5;
     temp1=b+c-ksi*SignNoZero(ksi);
@@ -10047,7 +10040,7 @@ LoopHead:
 
   // Step 6
   if(((abs(eta)-a)>TOL) || ((abs(eta-a)<TOL) && (2.0*ksi<zeta)) ||
-      ((abs(eta+a)<TOL) && (zeta<0))) {
+     ((abs(eta+a)<TOL) && (zeta<0))) {
     m6(1,3)=-SignNoZero(eta);
     P=P*m6;
     temp1=a+c-eta*SignNoZero(eta);
@@ -10062,7 +10055,7 @@ LoopHead:
 
   // Step 7
   if(((abs(zeta)-a)>TOL) || ((abs(zeta-a)<TOL) && (2.0*ksi<eta)) ||
-      ((abs(zeta+a)<TOL) && (eta<0))) {
+     ((abs(zeta+a)<TOL) && (eta<0))) {
     m7(1,2)=-SignNoZero(zeta);
     P=P*m7;
     temp1=a+b-zeta*SignNoZero(zeta);
@@ -10078,7 +10071,7 @@ LoopHead:
 
   // Step 8
   if((ksi+eta+zeta+a+b<0) ||
-      ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0))) {
+     ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0))) {
     P=P*m8;
     temp1=a+b+c+ksi+eta+zeta;
     temp2=2.0*b+ksi+zeta;
@@ -10196,7 +10189,7 @@ xmatrix<double> GetNiggliStr(const xmatrix<double>& lattice) {
 }
 
 void _sdebug_GetNiggliCell(int step,int iter,double a,double b,double c,
-    double ksi,double eta,double zeta,ostream& sout) {
+			   double ksi,double eta,double zeta,ostream& sout) {
   if(0) {
     // tpx
     sout << "Step: " << step << endl;
@@ -10397,8 +10390,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     tmp.cpos = f2c_new * tmp.fpos;
     //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
     //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
-    //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
-    //[OBSOLETE]  { //CO200106 - patching for auto-indenting
+    //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
     //[OBSOLETE]    duplicate_atom = true;
     //[OBSOLETE]    break;
     //[OBSOLETE]  }
@@ -10880,8 +10872,7 @@ xstructure _old_BringInCompact(const xstructure& a) {
             }                                        // test the atom  
             bond=aurostd::modulus(actstpos-acref1pos);    // test the bond distance
             // if((bond<min_bond)                  // if it is OK then DO IT !
-            if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) )
-            { //CO200106 - patching for auto-indenting
+            if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) ) {
               // if it is OK then DO IT !
               min_bond=bond;                                      // update
               adtrgpos=adtstpos;
@@ -10934,8 +10925,7 @@ void xstructure::BringInCompact(void) {
             }                                        // test the atom  
             bond=aurostd::modulus(actstpos-acref1pos);    // test the bond distance
             // if((bond<min_bond)                  // if it is OK then DO IT !
-            if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) )
-            { //CO200106 - patching for auto-indenting
+            if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) ) {
               // if it is OK then DO IT !
               min_bond=bond;                                      // update
               adtrgpos=adtstpos;
@@ -10987,12 +10977,12 @@ void xstructure::BringInWignerSeitz(void) {
           proj_a23=scalar_product(rat,a23)/na23/na23;
           proj_a123=scalar_product(rat,a123)/na123/na123;
           if((proj_a1>-0.5 && proj_a1<=0.5) &&
-              (proj_a2>-0.5 && proj_a2<=0.5) &&
-              (proj_a3>-0.5 && proj_a3<=0.5) &&
-              (proj_a12>-0.5 && proj_a12<=0.5) &&
-              (proj_a31>-0.5 && proj_a31<=0.5) &&
-              (proj_a23>-0.5 && proj_a23<=0.5) &&
-              (proj_a123>-0.5 && proj_a123<=0.5)) {
+	     (proj_a2>-0.5 && proj_a2<=0.5) &&
+	     (proj_a3>-0.5 && proj_a3<=0.5) &&
+	     (proj_a12>-0.5 && proj_a12<=0.5) &&
+	     (proj_a31>-0.5 && proj_a31<=0.5) &&
+	     (proj_a23>-0.5 && proj_a23<=0.5) &&
+	     (proj_a123>-0.5 && proj_a123<=0.5)) {
             atoms.at(iat).cpos(1)=rat(1);
             atoms.at(iat).cpos(2)=rat(2);
             atoms.at(iat).cpos(3)=rat(3);
@@ -11651,8 +11641,8 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
   for(uint iat1=0;iat1<sstr.atoms.size();iat1++) {
     for(uint iat2=0;iat2<sstr.atoms.size();iat2++) {
       if(iat2!=iat1 &&
-          sstr.atoms.at(iat1).type==ispecie_min &&
-          sstr.atoms.at(iat2).type==ispecie_min) {
+	 sstr.atoms.at(iat1).type==ispecie_min &&
+	 sstr.atoms.at(iat2).type==ispecie_min) {
         fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
         cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
         if(IsTranslationFVector(sstr,fdisp)) candidate_lattice_vector.push_back(cdisp);
@@ -11712,8 +11702,8 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
           atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
           atom.fpos=C2F(b.lattice,atom.cpos);
           if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+	     atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+	     atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
             for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
               atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
             // atom_found=FALSE;
@@ -11888,8 +11878,8 @@ xstructure GetPrimitive2(const xstructure& a) {
           atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
           atom.fpos=C2F(b.lattice,atom.cpos);
           if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+	     atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+	     atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
             for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
               atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
             // atom_found=FALSE;
@@ -12029,8 +12019,8 @@ xstructure GetPrimitive3(const xstructure& a) {
           atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
           atom.fpos=C2F(b.lattice,atom.cpos);
           if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+	     atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+	     atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
             for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
               atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
             // atom_found=FALSE;
@@ -12418,8 +12408,8 @@ bool alreadyInCell(_atom& atom, deque<_atom> atoms){
     fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX20190613
     //DX20190613 [OBSOLETE] SYM::PBC(fdiff);
     if(aurostd::abs(fdiff(1))<_ZERO_TOL_ && 
-        aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
-        aurostd::abs(fdiff(3))<_ZERO_TOL_){
+       aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
+       aurostd::abs(fdiff(3))<_ZERO_TOL_){
       return TRUE;
     }
   }
@@ -12447,9 +12437,8 @@ bool alreadyInCell(_atom& atom, deque<_atom> atoms){
 
 // COREY - START
 xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
+			bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell)
-{ //CO200106 - patching for auto-indenting
   //#define _eps_scell_ 1.0e-5
   //#define _eps_scell_ 0.0
   // check for error
@@ -12496,8 +12485,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //                            abs(supercell(2,1))<zeroTol && abs(supercell(2,3))<zeroTol &&
   //                            abs(supercell(3,1))<zeroTol && abs(supercell(3,2))<zeroTol);
   bool derivative_structure=!(aurostd::isdiagonal(supercell) && 
-      aurostd::isequal(nx,ny) && 
-      aurostd::isequal(ny,nz));
+			      aurostd::isequal(nx,ny) && 
+			      aurostd::isequal(ny,nz));
   // COREY
   //VERY IMPORTANT, as we need to reduce the symmetry of the derivative structure
   //getting the basis serves as a validation for the symmetry operator
@@ -12567,8 +12556,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //cerr << "atom " << a.iatoms[ia][iia] << " fpos_rot   " << atom.fpos << endl;
               //cerr << "atom_fpos: " << atom.fpos << endl;
               //DX20180726 - if(inCell(atom.fpos)) //hard cut off
-              if(uniqueAtomInCell(atom, b.atoms)) //soft cut off; then check images later //DX20180726
-              { //CO200106 - patching for auto-indenting
+              if(uniqueAtomInCell(atom, b.atoms)) { //soft cut off; then check images later //DX20180726
                 //if(atom.fpos(1)>=-_eps_scell_ && atom.fpos(1)<1.0-_eps_scell_ &&
                 //  atom.fpos(2)>=-_eps_scell_ && atom.fpos(2)<1.0-_eps_scell_ &&
                 //  atom.fpos(3)>=-_eps_scell_ && atom.fpos(3)<1.0-_eps_scell_)      // found something inside
@@ -12676,49 +12664,49 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //  atom.fpos(2)>=-_eps_scell_ && atom.fpos(2)<1.0-_eps_scell_ &&
               //  atom.fpos(3)>=-_eps_scell_ && atom.fpos(3)<1.0-_eps_scell_)      // found something inside
               // atom=BringInCell(atom,b.lattice);
-            { //CO200106 - patching for auto-indenting
-              b.num_each_type[atom.type]++;                  // CONVASP_MODE
-              b.comp_each_type[atom.type]+=atom.partial_occupation_value;                  // CONVASP_MODE
-              //ijk
-              atom.ijk(1)=i;atom.ijk(2)=j;atom.ijk(3)=k;
-              //DX20180726 - bring close to origin 
-              atom = BringCloseToOrigin(atom, b.f2c);  //updates fpos/cpos/ijk
-              b.atoms.push_back(atom);  //do NOT use AddAtom(), AddAtom() rearranges per species and we need to know the mapping
-              //save cshifts for fgroups later...
-              match=false;
-              for(uint cf=0;cf<cshifts.size()&&!match;cf++){
-                if(aurostd::isequal(cshift,cshifts[cf],_ZERO_TOL_)){
-                  match=true;
-                }
-              }
-              if(!match){
-                cshifts.push_back(cshift);
-              }
+	      { 
+		b.num_each_type[atom.type]++;                  // CONVASP_MODE
+		b.comp_each_type[atom.type]+=atom.partial_occupation_value;                  // CONVASP_MODE
+		//ijk
+		atom.ijk(1)=i;atom.ijk(2)=j;atom.ijk(3)=k;
+		//DX20180726 - bring close to origin 
+		atom = BringCloseToOrigin(atom, b.f2c);  //updates fpos/cpos/ijk
+		b.atoms.push_back(atom);  //do NOT use AddAtom(), AddAtom() rearranges per species and we need to know the mapping
+		//save cshifts for fgroups later...
+		match=false;
+		for(uint cf=0;cf<cshifts.size()&&!match;cf++){
+		  if(aurostd::isequal(cshift,cshifts[cf],_ZERO_TOL_)){
+		    match=true;
+		  }
+		}
+		if(!match){
+		  cshifts.push_back(cshift);
+		}
 
-              //mapping
-              sc2pcMap.push_back(ia);
-              if(ignore_pcmap==false && pcmap==false){
-                if(force_strict_pc2scMap==true){  //only if i==0 && j==0 && k==0 atom
-                  if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
-                } else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
-              }
-              //[CO20190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
-              //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-              //[CO20190116 - OBSOLETE]  pcmap=true;
-              //[CO20190116 - OBSOLETE]}
-              //[CO20190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
-              //[CO20190116 - OBSOLETE]//so just pick the first one
-              //[CO20190116 - OBSOLETE]if(!pcmap){
-              //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-              //[CO20190116 - OBSOLETE]  pcmap=true;
-              //[CO20190116 - OBSOLETE]}
-              //matching cpos does not work!
-              //matching by index (i,j,k) does not work because of inCell()
-              //if(!i&&!j&&!k) pc2scMap.push_back(b.atoms.size()-1);
-              //if(aurostd::identical(a.atoms[ia].cpos,atom.cpos,1e-6)){
-              //  pc2scMap[a.iatoms[ia][iia]]=b.atoms.size()-1;
-              //}
-            }
+		//mapping
+		sc2pcMap.push_back(ia);
+		if(ignore_pcmap==false && pcmap==false){
+		  if(force_strict_pc2scMap==true){  //only if i==0 && j==0 && k==0 atom
+		    if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
+		  } else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
+		}
+		//[CO20190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
+		//[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+		//[CO20190116 - OBSOLETE]  pcmap=true;
+		//[CO20190116 - OBSOLETE]}
+		//[CO20190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
+		//[CO20190116 - OBSOLETE]//so just pick the first one
+		//[CO20190116 - OBSOLETE]if(!pcmap){
+		//[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+		//[CO20190116 - OBSOLETE]  pcmap=true;
+		//[CO20190116 - OBSOLETE]}
+		//matching cpos does not work!
+		//matching by index (i,j,k) does not work because of inCell()
+		//if(!i&&!j&&!k) pc2scMap.push_back(b.atoms.size()-1);
+		//if(aurostd::identical(a.atoms[ia].cpos,atom.cpos,1e-6)){
+		//  pc2scMap[a.iatoms[ia][iia]]=b.atoms.size()-1;
+		//}
+	      }
           }
         }
       }
@@ -13091,9 +13079,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 // COREY - END
 
 xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
+			bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell)
-{ //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   if(supercell.rows==9) {
     _supercell(1,1)=supercell(1);_supercell(1,2)=supercell(2);_supercell(1,3)=supercell(3);
@@ -13114,9 +13101,8 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
+			bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell)
-{ //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   if(supercell.rows==9) {
     _supercell(1,1)=supercell(1);_supercell(1,2)=supercell(2);_supercell(1,3)=supercell(3);
@@ -13137,9 +13123,8 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
+			bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33)
-{ //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   _supercell.clear();
   _supercell(1,1)=(double) sc11;_supercell(1,2)=(double) sc12;_supercell(1,3)=(double) sc13;
@@ -13149,9 +13134,8 @@ xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,con
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
+			bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3)
-{ //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   _supercell.clear();
   _supercell(1,1)=(double) sc1;
@@ -13670,13 +13654,13 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
   oss << "TITL " << str.title << endl;
   oss.precision(8);
   oss << "CELL "
-    << str.scale*aurostd::modulus(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3)) << " "
-    << str.scale*aurostd::modulus(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3)) << " "
-    << str.scale*aurostd::modulus(str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-    << aurostd::angle(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-    << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-    << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(2,1),str.lattice(2,2),str.lattice(2,3))
-    << endl;
+      << str.scale*aurostd::modulus(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3)) << " "
+      << str.scale*aurostd::modulus(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3)) << " "
+      << str.scale*aurostd::modulus(str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+      << aurostd::angle(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+      << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+      << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(2,1),str.lattice(2,2),str.lattice(2,3))
+      << endl;
   // oss << str.atoms.size() << endl;
   oss.precision(10);
   k=0;
@@ -13719,9 +13703,9 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
   if(P_EQUAL) oss << "EQUAL ";
   if(P_EXACT) oss << "EXACT ";
   if(!aurostd::isequal(P_ang,PLATON_TOLERANCE_ANGLE,1.0e-6) ||
-      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D1,1.0e-6) ||
-      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D2,1.0e-6) ||
-      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D3,1.0e-6))
+     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D1,1.0e-6) ||
+     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D2,1.0e-6) ||
+     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D3,1.0e-6))
     //    printf("%14.10f %14.10f %14.10f %14.10f ",P_ang,P_d1,P_d2,P_d3);  printf("\n");
     oss << P_ang << " " << P_d1 << " " << P_d2 << " " << P_d3 << " ";//
   oss << endl;
@@ -14343,8 +14327,7 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
       ab_component = a_component + l2[j];          // DX : i*lattice(1) + j*lattice(2)
       for(uint k=0;k<l3.size();k++) {
         //DX20191218 [WRONG INDICES] if(i!=0 || j!=0 || k!=0)
-        if(a_index[i]!=0 || b_index[j]!=0 || c_index[k]!=0) //DX20191218
-        { //CO200106 - patching for auto-indenting
+        if(a_index[i]!=0 || b_index[j]!=0 || c_index[k]!=0) {//DX20191218
           abc_component = ab_component + l3[k];    // DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
           for(uint iat=0;iat<natoms;iat++) {       //DX20191107 - replace str.atoms.size() with natoms
             atom=str.atoms[iat];                   //DX20190709 - at to [] = speed increase
@@ -14425,20 +14408,20 @@ int GenerateGridAtoms(xstructure& str) {
 // **************************************************************************
 namespace aurostd {   // INT
   class _ssort_int_value0123 {                    // sorting through reference
-    public:
-      bool operator()(const vector<int>& v1, const vector<int>& v2) const {
-        if(v1[0]<v2[0]) return TRUE;
-        if(v1[0]==v2[0]) {
-          if(v1[1]>v2[1]) return TRUE;
-          if(v1[1]==v2[1]) {
-            if(v1[2]>v2[2]) return TRUE;
-            if(v1[2]==v2[2]) {
-              if(v1[3]>v2[3]) return TRUE;
-            }
-          }
-        }
-        return FALSE;
+  public:
+    bool operator()(const vector<int>& v1, const vector<int>& v2) const {
+      if(v1[0]<v2[0]) return TRUE;
+      if(v1[0]==v2[0]) {
+	if(v1[1]>v2[1]) return TRUE;
+	if(v1[1]==v2[1]) {
+	  if(v1[2]>v2[2]) return TRUE;
+	  if(v1[2]==v2[2]) {
+	    if(v1[3]>v2[3]) return TRUE;
+	  }
+	}
       }
+      return FALSE;
+    }
   };
 }
 
@@ -14615,8 +14598,8 @@ xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk) {
 // CO20170717 - Compare this with PBC() function, this function brings in to 0th cell, PBC brings in to cell between -0.5 and 0.5
 // PBC() is good for minimizing overall fpos
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,
-    xvector<int>& ijk,const xmatrix<double>& lattice,
-    const bool coord_flag) {
+		    xvector<int>& ijk,const xmatrix<double>& lattice,
+		    const bool coord_flag) {
   double TOL=1e-11;
   xvector<double> cpos(3),fpos(3);
   // p_cell0=xvector<double> (3);
@@ -14650,38 +14633,38 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,
 // **************************************************************************
 // For sort algorithm in GetNeighData
 class compare_GetNeighData {
-  public:  
-    int operator()(const _atom& a, const _atom& b) {
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)" << endl;
-      double tol=1e-15;
-      // Sort by distance
-      if(aurostd::isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)) {
-        if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
-        // Sort by unit cell values
-        if(a.name==b.name) {
-          if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name==b.name" << endl;
-          xvector<int> ijka=a.ijk;
-          xvector<int> ijkb=b.ijk;
-          int va=100*ijka(1)+10*ijka(2)+1*ijka(3);
-          int vb=100*ijkb(1)+10*ijkb(2)+1*ijkb(3);
-          return va<vb;
-        } else {
-          if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name!=b.name" << endl;
-          return a.name<b.name;
-        }
+public:  
+  int operator()(const _atom& a, const _atom& b) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)" << endl;
+    double tol=1e-15;
+    // Sort by distance
+    if(aurostd::isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)) {
+      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
+      // Sort by unit cell values
+      if(a.name==b.name) {
+	if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name==b.name" << endl;
+	xvector<int> ijka=a.ijk;
+	xvector<int> ijkb=b.ijk;
+	int va=100*ijka(1)+10*ijka(2)+1*ijka(3);
+	int vb=100*ijkb(1)+10*ijkb(2)+1*ijkb(3);
+	return va<vb;
       } else {
-        if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  !isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
-        return GetDistFromOrigin(a)<GetDistFromOrigin(b);
+	if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name!=b.name" << endl;
+	return a.name<b.name;
       }
-      // Sort by name
-      // if(a.name==b.name) {
-      //  return GetDistFromOrigin(a)<GetDistFromOrigin(b);
-      // }
-      // else {
-      //  return a.name<b.name;
-      // }
+    } else {
+      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  !isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
+      return GetDistFromOrigin(a)<GetDistFromOrigin(b);
     }
+    // Sort by name
+    // if(a.name==b.name) {
+    //  return GetDistFromOrigin(a)<GetDistFromOrigin(b);
+    // }
+    // else {
+    //  return a.name<b.name;
+    // }
+  }
 };
 
 // **************************************************************************
@@ -14691,8 +14674,8 @@ class compare_GetNeighData {
 // it for each atom in a vector of atom objects in order of increasing distance.  
 
 void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,		
-    const double& rmin, const double& rmax,
-    deque<deque<_atom> >& neigh_mat) {
+			      const double& rmin, const double& rmax,
+			      deque<deque<_atom> >& neigh_mat) {
   double epsilon=1.0e-3;  // sometimes you have wrong images due to roundoff
   deque<_atom> neigh_vec;
   // Get data from str.
