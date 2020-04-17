@@ -102,7 +102,8 @@ namespace aflowlib {
     species_pp.clear();vspecies_pp.clear();
     species_pp_version.clear();vspecies_pp_version.clear();
     species_pp_ZVAL.clear();vspecies_pp_ZVAL.clear();
-    species_pp_AUID.clear();vspecies_pp_AUID.clear();   
+    species_pp_AUID.clear();vspecies_pp_AUID.clear();
+    METAGGA.clear();
     spin_cell=AUROSTD_NAN;spin_atom=AUROSTD_NAN;
     spinD.clear();vspinD.clear();
     spinD_magmom_orig.clear();vspinD_magmom_orig.clear();
@@ -308,6 +309,7 @@ namespace aflowlib {
     species_pp_version=b.species_pp_version;vspecies_pp_version.clear();for(uint i=0;i<b.vspecies_pp_version.size();i++) vspecies_pp_version.push_back(b.vspecies_pp_version.at(i));
     species_pp_ZVAL=b.species_pp_ZVAL;vspecies_pp_ZVAL.clear();for(uint i=0;i<b.vspecies_pp_ZVAL.size();i++) vspecies_pp_ZVAL.push_back(b.vspecies_pp_ZVAL.at(i));
     species_pp_AUID=b.species_pp_AUID;vspecies_pp_AUID.clear();for(uint i=0;i<b.vspecies_pp_AUID.size();i++) vspecies_pp_AUID.push_back(b.vspecies_pp_AUID.at(i));
+    METAGGA=b.METAGGA;
     spin_cell=b.spin_cell;spin_atom=b.spin_atom;
     spinD=b.spinD;vspinD.clear();for(uint i=0;i<b.vspinD.size();i++) vspinD.push_back(b.vspinD.at(i));
     spinD_magmom_orig=b.spinD_magmom_orig;vspinD_magmom_orig.clear();for(uint i=0;i<b.vspinD_magmom_orig.size();i++) vspinD_magmom_orig.push_back(b.vspinD_magmom_orig.at(i));
@@ -667,6 +669,7 @@ namespace aflowlib {
         else if(keyword=="species_pp_version") {species_pp_version=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_version.push_back(stokens.at(j));}
         else if(keyword=="species_pp_ZVAL") {species_pp_ZVAL=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_ZVAL.push_back(aurostd::string2utype<double>(stokens.at(j)));}
 	else if(keyword=="species_pp_AUID") {species_pp_AUID=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_AUID.push_back(stokens.at(j));}
+	else if(keyword=="metagga" || keyword=="METAGGA") {METAGGA=content;}
 	else if(keyword=="spin_cell") {spin_cell=aurostd::string2utype<double>(content);}
         else if(keyword=="spin_atom") {spin_atom=aurostd::string2utype<double>(content);}
         else if(keyword=="spinD") {spinD=content;for(uint j=0;j<stokens.size();j++) vspinD.push_back(aurostd::string2utype<double>(stokens.at(j)));}
@@ -977,6 +980,7 @@ namespace aflowlib {
       oss << "species_pp_version=" << species_pp_version << "  vspecies_pp_version= ";for(uint j=0;j<vspecies_pp_version.size();j++) oss << vspecies_pp_version.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "species_pp_ZVAL=" << species_pp_ZVAL << "  vspecies_pp_ZVAL= ";for(uint j=0;j<vspecies_pp_ZVAL.size();j++) oss << vspecies_pp_ZVAL.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "species_pp_AUID=" << species_pp_AUID << "  vspecies_pp_AUID= ";for(uint j=0;j<vspecies_pp_AUID.size();j++) oss << vspecies_pp_AUID.at(j) << " "; oss << (html?"<br>":"") << endl;
+      oss << "metagga=" << METAGGA << (html?"<br>":"") << endl;
       oss << "spin_cell=" << spin_cell << (html?"<br>":"") << endl; 
       oss << "spin_atom=" << spin_atom << (html?"<br>":"") << endl; 
       oss << "spinD=" << spinD << "  vspinD= "; for(uint j=0;j<vspinD.size();j++) oss << vspinD.at(j) << " "; oss << (html?"<br>":"") << endl;
@@ -1138,6 +1142,7 @@ namespace aflowlib {
       if(species_pp_version.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_version=" << species_pp_version << eendl;
       if(species_pp_ZVAL.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_ZVAL=" << species_pp_ZVAL << eendl;
       if(species_pp_AUID.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_AUID=" << species_pp_AUID << eendl;
+      if(METAGGA.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "metagga=" << METAGGA << eendl;
       // ME20190124 - add more detailed LDAU information
       if(ldau_TLUJ.size()) {
         // ME20190124 - BEGIN
@@ -1595,6 +1600,15 @@ namespace aflowlib {
         sscontent_json << "\"species_pp_AUID\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies_pp_AUID,"\""),",") << "]" << eendl;
       } else {
         if(PRINT_NULL) sscontent_json << "\"species_pp_AUID\":null" << eendl;
+      }
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(METAGGA.size()) {
+        sscontent_json << "\"metagga\":\"" << METAGGA << "\"" << eendl;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"metagga\":null" << eendl;
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
@@ -3214,6 +3228,7 @@ namespace aflowlib {
     ofstream FileMESSAGE;
     return correctBadDatabase(FileMESSAGE,verbose,oss);
   }
+  
   void _aflowlib_entry::correctBadDatabase(ofstream& FileMESSAGE,bool verbose,ostream& oss){
     //CO20180828 - LIB2 also contains unaries //so far we only know of bad binaries
     //APENNSY neglect - LIB2 only //CO20180828 - LIB2 also contains unaries  //binaries only
@@ -3227,7 +3242,7 @@ namespace aflowlib {
       //[OBSOLETE CO20180828]string pseudoB = vspecies_pp[1];
       // tiny corrections
       //gamma_IrV
-      if(pseudoA == "Cd" && pseudoB == "Pt" && prototype == "181") {
+      if(pseudoA=="Cd" && pseudoB=="Pt" && prototype=="181") {
         enthalpy_formation_atom -= 0.0013;
         enthalpy_formation_cell = natoms * enthalpy_formation_atom;
         if(verbose){
@@ -3236,7 +3251,7 @@ namespace aflowlib {
         }
       }
       //gamma_IrV
-      if(pseudoA == "Ir" && pseudoB == "V_sv" && prototype == "291") {
+      if(pseudoA=="Ir" && pseudoB=="V_sv" && prototype=="291") {
         enthalpy_formation_cell -= 0.001;
         enthalpy_formation_atom -= 0.0005;
         enthalpy_cell -= 0.001;
@@ -3247,7 +3262,7 @@ namespace aflowlib {
         }
       }
       // HfPd
-      if(pseudoA == "Hf_pv" && pseudoB == "Pd_pv" && prototype == "192") {
+      if(pseudoA=="Hf_pv" && pseudoB=="Pd_pv" && prototype=="192") {
         enthalpy_formation_atom -= 0.003;
         enthalpy_formation_cell = natoms * enthalpy_formation_atom;
         enthalpy_atom = enthalpy_formation_atom;
@@ -3258,7 +3273,7 @@ namespace aflowlib {
         }
       }
       // sigma
-      if(pseudoA == "Ir" && pseudoB == "Nb_sv" && prototype == "600.ABBAB") {
+      if(pseudoA=="Ir" && pseudoB=="Nb_sv" && prototype=="600.ABBAB") {
         enthalpy_formation_cell += 0.001;
         enthalpy_formation_atom += 0.0005;
         enthalpy_cell += 0.001;
@@ -3273,7 +3288,7 @@ namespace aflowlib {
         }
       }
       // sigma
-      if(pseudoA == "Os_pv" && pseudoB == "Re_pv" && prototype == "122") {
+      if(pseudoA=="Os_pv" && pseudoB=="Re_pv" && prototype=="122") {
         enthalpy_formation_atom -= 0.001;
         enthalpy_formation_cell = natoms * enthalpy_formation_atom;
         enthalpy_atom = enthalpy_formation_atom;
@@ -3321,256 +3336,213 @@ namespace aflowlib {
       //[OBSOLETE CO20180828]string pseudoA = vspecies_pp[0];
       //[OBSOLETE CO20180828]string pseudoB = vspecies_pp[1];
       // bad Ag is a wrong relaxation
-      if((pseudoA == "Ag" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Ag" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Ag" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Ag" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ag is a wrong relaxation
-      if((pseudoA == "Ag" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Ag" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Ag" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Ag" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Au is a wrong relaxation
-      if((pseudoA == "Au" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Au" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Au" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Au" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Al_h pseudopotential !
-      if((pseudoA == "Al_h" && pflow::prototypeMatch(prototype, "307")) ||
-          (pseudoB == "Al_h" && pflow::prototypeMatch(prototype, "308"))) {
+      if((pseudoA=="Al_h" && pflow::prototypeMatch(prototype,"307")) || (pseudoB=="Al_h" && pflow::prototypeMatch(prototype,"308"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Al_h pseudopotential !
-      if((pseudoA == "Al_h" && pflow::prototypeMatch(prototype, "A7.A")) ||
-          (pseudoB == "Al_h" && pflow::prototypeMatch(prototype, "A7.B"))) {
+      if((pseudoA=="Al_h" && pflow::prototypeMatch(prototype,"A7.A")) || (pseudoB=="Al_h" && pflow::prototypeMatch(prototype,"A7.B"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Al_h pseudopotential !
-      if((pseudoA == "Al_h" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Al_h" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Al_h" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Al_h" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ca_sv is a wrong relaxation
-      if((pseudoA == "Ca_sv" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Ca_sv" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Ca_sv" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Ca_sv" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ca_sv is a wrong relaxation
-      if((pseudoA == "Ca_sv" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Ca_sv" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Ca_sv" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Ca_sv" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Cd is a wrong relaxation
-      if((pseudoA == "Cd" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Cd" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Cd" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Cd" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Cu_pv is a wrong relaxation
-      if((pseudoA == "Cu_pv" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Cu_pv" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Cu_pv" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Cu_pv" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Cu_pv is a wrong relaxation
-      if((pseudoA == "Cu_pv" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Cu_pv" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Cu_pv" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Cu_pv" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Fe_pv is a wrong relaxation
-      if((pseudoA == "Fe_pv" && pflow::prototypeMatch(prototype, "307")) ||
-          (pseudoB == "Fe_pv" && pflow::prototypeMatch(prototype, "308"))) {
+      if((pseudoA=="Fe_pv" && pflow::prototypeMatch(prototype,"307")) || (pseudoB=="Fe_pv" && pflow::prototypeMatch(prototype,"308"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Fe_pv is a wrong relaxation
-      if((pseudoA == "Fe_pv" && pflow::prototypeMatch(prototype, "A7.A")) ||
-          (pseudoB == "Fe_pv" && pflow::prototypeMatch(prototype, "A7.B"))) {
+      if((pseudoA=="Fe_pv" && pflow::prototypeMatch(prototype,"A7.A")) || (pseudoB=="Fe_pv" && pflow::prototypeMatch(prototype,"A7.B"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ge_h is a wrong relaxation
-      if((pseudoA == "Ge_h" && pflow::prototypeMatch(prototype, "305")) ||
-          (pseudoB == "Ge_h" && pflow::prototypeMatch(prototype, "306"))) {
+      if((pseudoA=="Ge_h" && pflow::prototypeMatch(prototype,"305")) || (pseudoB=="Ge_h" && pflow::prototypeMatch(prototype,"306"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad In_d is a wrong relaxation
-      if((pseudoA == "In_d" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "In_d" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="In_d" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="In_d" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ir is a wrong relaxation
-      if((pseudoA == "Ir" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Ir" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Ir" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Ir" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad K_sv is a wrong relaxation
-      if((pseudoA == "K_sv" && pflow::prototypeMatch(prototype, "307")) ||
-          (pseudoB == "K_sv" && pflow::prototypeMatch(prototype, "308"))) {
+      if((pseudoA=="K_sv" && pflow::prototypeMatch(prototype,"307")) || (pseudoB=="K_sv" && pflow::prototypeMatch(prototype,"308"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad K_sv is a wrong relaxation
-      if((pseudoA == "K_sv" && pflow::prototypeMatch(prototype, "A7.A")) ||
-          (pseudoB == "K_sv" && pflow::prototypeMatch(prototype, "A7.B"))) {
+      if((pseudoA=="K_sv" && pflow::prototypeMatch(prototype,"A7.A")) || (pseudoB=="K_sv" && pflow::prototypeMatch(prototype,"A7.B"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad La is a wrong relaxation
-      if((pseudoA == "La" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "La" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="La" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="La" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad La is a wrong relaxation
-      if((pseudoA == "La" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "La" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="La" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="La" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Li_sv is a wrong relaxation
-      if((pseudoA == "Li_sv" && pflow::prototypeMatch(prototype, "307")) ||
-          (pseudoB == "Li_sv" && pflow::prototypeMatch(prototype, "308"))) {
+      if((pseudoA=="Li_sv" && pflow::prototypeMatch(prototype,"307")) || (pseudoB=="Li_sv" && pflow::prototypeMatch(prototype,"308"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Li_sv is a wrong relaxation
-      if((pseudoA == "Li_sv" && pflow::prototypeMatch(prototype, "A7.A")) ||
-          (pseudoB == "Li_sv" && pflow::prototypeMatch(prototype, "A7.B"))) {
+      if((pseudoA=="Li_sv" && pflow::prototypeMatch(prototype,"A7.A")) || (pseudoB=="Li_sv" && pflow::prototypeMatch(prototype,"A7.B"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Na_pv is a wrong relaxation
-      if((pseudoA == "Na_pv" && pflow::prototypeMatch(prototype, "307")) ||
-          (pseudoB == "Na_pv" && pflow::prototypeMatch(prototype, "308"))) {
+      if((pseudoA=="Na_pv" && pflow::prototypeMatch(prototype,"307")) || (pseudoB=="Na_pv" && pflow::prototypeMatch(prototype,"308"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Na_pv is a wrong relaxation
-      if((pseudoA == "Na_pv" && pflow::prototypeMatch(prototype, "A7.A")) ||
-          (pseudoB == "Na_pv" && pflow::prototypeMatch(prototype, "A7.B"))) {
+      if((pseudoA=="Na_pv" && pflow::prototypeMatch(prototype,"A7.A")) || (pseudoB=="Na_pv" && pflow::prototypeMatch(prototype,"A7.B"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ni_pv is a wrong relaxation
-      if((pseudoA == "Ni_pv" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Ni_pv" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Ni_pv" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Ni_pv" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ni_pv is a wrong relaxation
-      if((pseudoA == "Ni_pv" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Ni_pv" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Ni_pv" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Ni_pv" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Pb_d is a wrong relaxation
-      if((pseudoA == "Pb_d" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Pb_d" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Pb_d" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Pb_d" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Pb_d is a wrong relaxation
-      if((pseudoA == "Pb_d" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Pb_d" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Pb_d" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Pb_d" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Pd_pv is a wrong relaxation
-      if((pseudoA == "Pd_pv" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Pd_pv" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Pd_pv" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Pd_pv" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Pd_pv is a wrong relaxation
-      if((pseudoA == "Pd_pv" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Pd_pv" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Pd_pv" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Pd_pv" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Pt is a wrong relaxation
-      if((pseudoA == "Pt" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Pt" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Pt" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Pt" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Pt is a wrong relaxation
-      if((pseudoA == "Pt" && pflow::prototypeMatch(prototype, "317")) ||
-          (pseudoB == "Pt" && pflow::prototypeMatch(prototype, "318"))) {
+      if((pseudoA=="Pt" && pflow::prototypeMatch(prototype,"317")) || (pseudoB=="Pt" && pflow::prototypeMatch(prototype,"318"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
-
       // bad Rh_pv is a wrong relaxation
-      if((pseudoA == "Rh_pv" && pflow::prototypeMatch(prototype, "303")) ||
-          (pseudoB == "Rh_pv" && pflow::prototypeMatch(prototype, "304"))) {
+      if((pseudoA=="Rh_pv" && pflow::prototypeMatch(prototype,"303")) || (pseudoB=="Rh_pv" && pflow::prototypeMatch(prototype,"304"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Si_h is a wrong relaxation
-      if((pseudoA == "Si_h" && pflow::prototypeMatch(prototype, "305")) ||
-          (pseudoB == "Si_h" && pflow::prototypeMatch(prototype, "306"))) {
+      if((pseudoA=="Si_h" && pflow::prototypeMatch(prototype,"305")) || (pseudoB=="Si_h" && pflow::prototypeMatch(prototype,"306"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Si_h is a wrong relaxation
-      if((pseudoA == "Si_h" && pflow::prototypeMatch(prototype, "307")) ||
-          (pseudoB == "Si_h" && pflow::prototypeMatch(prototype, "308"))) {
+      if((pseudoA=="Si_h" && pflow::prototypeMatch(prototype,"307")) || (pseudoB=="Si_h" && pflow::prototypeMatch(prototype,"308"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Si_h is a wrong relaxation
-      if((pseudoA == "Si_h" && pflow::prototypeMatch(prototype, "A7.A")) ||
-          (pseudoB == "Si_h" && pflow::prototypeMatch(prototype, "A7.B"))) {
+      if((pseudoA=="Si_h" && pflow::prototypeMatch(prototype,"A7.A")) || (pseudoB=="Si_h" && pflow::prototypeMatch(prototype,"A7.B"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Si_h is a wrong relaxation
-      if((pseudoA == "Si_h" && pflow::prototypeMatch(prototype, "323")) ||
-          (pseudoB == "Si_h" && pflow::prototypeMatch(prototype, "324"))) {
+      if((pseudoA=="Si_h" && pflow::prototypeMatch(prototype,"323")) || (pseudoB=="Si_h" && pflow::prototypeMatch(prototype,"324"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ta_pv is a wrong relaxation
-      if((pseudoA == "Ta_pv" && pflow::prototypeMatch(prototype, "307")) ||
-          (pseudoB == "Ta_pv" && pflow::prototypeMatch(prototype, "308"))) {
+      if((pseudoA=="Ta_pv" && pflow::prototypeMatch(prototype,"307")) || (pseudoB=="Ta_pv" && pflow::prototypeMatch(prototype,"308"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad Ta_pv is a wrong relaxation
-      if((pseudoA == "Ta_pv" && pflow::prototypeMatch(prototype, "A7.A")) ||
-          (pseudoB == "Ta_pv" && pflow::prototypeMatch(prototype, "A7.B"))) {
+      if((pseudoA=="Ta_pv" && pflow::prototypeMatch(prototype,"A7.A")) || (pseudoB=="Ta_pv" && pflow::prototypeMatch(prototype,"A7.B"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // bad B_h is a wrong relaxation
-      if((pseudoA == "B_h" && pflow::prototypeMatch(prototype, "317")) ||
-          (pseudoB == "B_h" && pflow::prototypeMatch(prototype, "318"))) {
+      if((pseudoA=="B_h" && pflow::prototypeMatch(prototype,"317")) || (pseudoB=="B_h" && pflow::prototypeMatch(prototype,"318"))) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
 
       // sigma
-      if(pseudoA == "Os_pv" && pseudoB == "Re_pv" &&
-          pflow::prototypeMatch(prototype, "448")) {
+      if(pseudoA=="Os_pv" && pseudoB=="Re_pv" && pflow::prototypeMatch(prototype,"448")) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
       // wrong channel, bug
-      if(pseudoA == "Rh_pv" && pseudoB == "Zr_sv" &&
-          pflow::prototypeMatch(prototype, "381")) {
+      if(pseudoA=="Rh_pv" && pseudoB=="Zr_sv" && pflow::prototypeMatch(prototype,"381")) {
         reason=pseudoA+pseudoB+":"+prototype+" is ill-calculated in the database";
         return true;
       }
@@ -3656,31 +3628,23 @@ namespace aflowlib {
 
       if(LDEBUG) cerr << "_aflowlib_entry::directory2auid: auid=" << auid << endl;
       conflict=FALSE;
-      uint j=auid2present(auid);
-      if(j) {
-        if(LDEBUG) cerr << "_aflowlib_entry::directory2auid: conflict auid=" << auid << endl;	
-        cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT POTENTIAL " << " j=" << j << " " << auid << " " << vAURL.at(j) << " " << aurl << endl;
-        if(vAURL.at(j)!=aurl) { // avoid conflict with yourself
+      string aurl_found;
+      if(aflowlib::auid2present(auid,aurl_found,1)) {
+       if(LDEBUG) cerr << "_aflowlib_entry::directory2auid: conflict auid=" << auid << endl;	
+          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT POTENTIAL " << auid << " " << aurl_found << " " << aurl << endl;
+        if(aurl_found!=aurl) { // avoid conflict with yourself
           string salt="AUID_salt["+aurostd::utype2string<long double>(aurostd::get_useconds())+"]";
-          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRUE      " << " j=" << j << " " << auid << " " << vAURL.at(j) << " " << aurl << "  " << salt << endl;
+          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRUE      " << auid << " " << aurl_found << " " << aurl << "  " << salt << endl;
           string file=vfiles2.at(0);
-
-          // [OBSOLETE] aurostd::StringSubst(file,".EXT","");
-          // [OBSOLETE] stringstream sss;aurostd:EXTfile2stringstream(directory+"/"+file+".EXT",sss); sss << endl << salt << endl;
-          // [OBSOLETE] aurostd::execute("mv "+directory+"/"+file+".EXT"+" "+directory+"/"+file+".conflict_auid.EXT");
-          // [OBSOLETE] aurostd::stringstream2file(sss,directory+"/"+file);
-          // [OBSOLETE] aurostd::BzipFile(directory+"/"+file);
-
-          for(uint iext=0;iext<vext.size();iext++) {
-            aurostd::StringSubst(file,vext.at(iext),"");
-          }
+	  //
+          for(uint iext=0;iext<vext.size();iext++) { aurostd::StringSubst(file,vext.at(iext),""); }
           stringstream sss;aurostd::efile2stringstream(directory+"/"+file+DEFAULT_KZIP_EXT,sss); sss << endl << salt << endl;
           aurostd::execute("mv \""+directory+"/"+file+DEFAULT_KZIP_EXT+"\""+" \""+directory+"/"+file+".conflict_auid"+DEFAULT_KZIP_EXT+"\"");
           aurostd::stringstream2compressfile(DEFAULT_KZIP_BIN,sss,directory+"/"+file);
-
+	  //
           conflict=TRUE; // recheck
         } else {
-          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRIVIAL   " << " j=" << j << " " << auid << " " << vAURL.at(j) << " " << aurl << endl;
+          cerr << "[WARNING]  _aflowlib_entry::directory2auid: CONFLICT TRIVIAL   " << auid << " " << aurl_found << " " << aurl << endl;
         }
       }
     }
@@ -3697,24 +3661,99 @@ namespace aflowlib {
     return TRUE;
   }
 
-  uint auid2present(string auid) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    uint k=0;
-    if(LDEBUG) cerr << "auid2present: BEGIN" << endl;
-    if(XHOST_AUID.size()==0) XHOST_AUID=init::InitGlobalObject("vAUID","",FALSE);
-    if(XHOST_AURL.size()==0) XHOST_AURL=init::InitGlobalObject("vAURL","",FALSE);
-    if(auid=="") return 0;
-    if(LDEBUG) cerr << "auid2present: [4] vAURL.size()=" << vAURL.size() << endl;
-    if(LDEBUG) cerr << "auid2present: [4] vAUID.size()=" << vAUID.size() << endl;
-    bool found=FALSE;
-    for(uint j=0;j<vAUID.size()&&!found;j++) {
-      if(LDEBUG && vAUID.at(j)==auid) cerr << "[" << auid << "] [" << vAUID.at(j) << "]" << " [" << j << "]" << endl;
-      if(vAUID.at(j)==auid) {k=j;found=FALSE;}
+  bool json2aflowlib(const string& json,string key,string& value) { // SC20200415
+    // return TRUE if something has been found
+    value="";
+    key="\""+key+"\":";
+    string::size_type start,end;
+    start=json.find(key);
+    if(start!=string::npos) {
+      start+=key.length();
+      end=json.find("\":",start);
+      if(end!=string::npos){
+	value=json.substr(start,end-start);
+	end=value.find_last_of(",");
+	value=value.substr(0,end);
+      } else {
+	end=json.find("}",start);
+	value=json.substr(start,end-start);
+      }
+      //    if((value[0]=='\"') && (value[value.size()-1]=='\"')) value=value.substr(1,value.size()-2);  // Remove quotes
+    } else {
+      value="";
     }
-    if(LDEBUG) cerr << "auid2present: END k=" << k << endl;
-    return k;
+    // cleanup
+    aurostd::StringSubst(value,"[","");  // Remove brakets
+    aurostd::StringSubst(value,"]","");  // Remove brakets
+    aurostd::StringSubst(value,"\"",""); // Remove quotes
+
+    return !value.empty();
   }
 
+  uint auid2present(string auid,string& aurl,int mode) {
+    bool LDEBUG=1;//(FALSE || XHOST.DEBUG);
+    if(LDEBUG) cerr << "auid2present: BEGIN mode=" << mode << endl;
+    string loop="",json="";aurl="";
+    if(auid=="" || auid.size()!=22) { cerr << "auid2present: auid.size() needs to be 22 characters long" << endl; return FALSE;}
+ 
+    // [OBSOLETE]    if(mode==0) {
+    // [OBSOLETE]    if(XHOST_vAUID.size()==0 || XHOST_vAURL.size()==0) init::InitGlobalObject("vLIBS","",FALSE);
+    // [OBSOLETE]    if(LDEBUG) cerr << "auid2present: [4] XHOST_vAURL.size()=" << XHOST_vAURL.size() << "  XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
+    // [OBSOLETE]    bool found=FALSE;
+    // [OBSOLETE]    for(uint j=0;j<XHOST_vAUID.size()&&!found;j++) {
+    // [OBSOLETE]  	if(LDEBUG && XHOST_vAUID.at(j)==auid) cerr << "[" << auid << "] [" << XHOST_vAUID.at(j) << "] [" << XHOST_vAURL.at(j) << "]" << "" << " [" << j << "]" << endl;
+    // [OBSOLETE]  	if(XHOST_vAUID.at(j)==auid) {found=TRUE;aurl=XHOST_vAURL.at(j);}
+    // [OBSOLETE]    }
+    // [OBSOLETE]    if(LDEBUG) cerr << "auid2present: END  auid=" << auid << "  aurl=" << aurl << endl;
+    // [OBSOLETE]    return found;
+    // [OBSOLETE]   }
+    if(mode==1) { // PICK THIS ONE DEFAULT
+      //  bool auid2present(string auid,string& aurl) {
+      string jsonl_file=XHOST_LIBRARY_JSONL+"/"; for(uint i=0;i<8;i++) jsonl_file+=auid.at(i); jsonl_file+=".jsonl";
+      jsonl_file=aurostd::CleanFileName(jsonl_file);
+      for(uint i=0;i<XHOST.vext.size()&&aurl.empty();i++) {
+	if(LDEBUG) cerr << "auid2present: TESTING=" << jsonl_file << XHOST.vext.at(i) << endl; 
+	if(aurostd::FileExist(jsonl_file+XHOST.vext.at(i))) {
+	  if(LDEBUG) cerr << "auid2present: FOUND=" << jsonl_file << XHOST.vext.at(i) << endl; 
+	  json=aurostd::execute2string(XHOST.vcat.at(i)+" "+jsonl_file+XHOST.vext.at(i)+" | grep "+auid);
+	  aflowlib::json2aflowlib(json,"aurl",aurl);
+	  aflowlib::json2aflowlib(json,"loop",loop);
+	}
+      }
+      if(LDEBUG) cerr << "auid2present: END  auid=" << auid << "  aurl=" << aurl << "  loop=" << loop << "  json.size()=" << json.size() << endl;
+      return json.size();
+    }
+    if(mode==2) { // not that faster and does not keep an outside vAUID table so it does not see the TRIVIAL CONFLICTS
+      //  bool auid2present(string auid,string& aurl) { 
+      string jsonl_file=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID)+"/"+aflowlib::auid2directory(auid)+"/RAW/aflowlib.json";
+      jsonl_file=aurostd::CleanFileName(jsonl_file);
+      for(uint i=0;i<XHOST.vext.size();i++) {
+	if(LDEBUG) cerr << "auid2present: TESTING=" << jsonl_file << XHOST.vext.at(i) << endl; 
+	if(aurostd::FileExist(jsonl_file+XHOST.vext.at(i))) {
+	  if(LDEBUG) cerr << "auid2present: FOUND=" << jsonl_file << XHOST.vext.at(i) << endl; 
+	  json=aurostd::execute2string(XHOST.vcat.at(i)+" "+jsonl_file+XHOST.vext.at(i));
+	  aflowlib::json2aflowlib(json,"aurl",aurl);
+	  aflowlib::json2aflowlib(json,"loop",loop);
+	}
+      }
+      if(LDEBUG) cerr << "auid2present: END  auid=" << auid << "  aurl=" << aurl << "  loop=" << loop << "  json.size()=" << json.size() << endl;
+      return json.size();
+    }
+
+    
+    return FALSE;
+  }
+
+  /*
+   time ./aflow --beep --force --lib2raw=/common/LIB3/LIB/Cu_pvHgSn/TFCC004.CAB
+   time aflow --beep --force --lib2raw=/common/LIB3/LIB/Cu_pvHgSn/TFCC004.CAB  
+   time ./aflow --beep --force --lib2raw=/common/LIB3/LIB/AgCdCo/TFCC001.ABC   
+   time aflow --beep --force --lib2raw=/common/LIB3/LIB/AgCdCo/TFCC001.ABC  
+   time ./aflow --beep --force --lib2raw="/common/LIB4/LIB/AgCdCoZr_sv:PAW_PBE/ABCD_cF16_216_c_d_b_a.ABCD"
+   time aflow --beep --force --lib2raw="/common/LIB4/LIB/AgCdCoZr_sv:PAW_PBE/ABCD_cF16_216_c_d_b_a.ABCD"
+   
+
+  */
   uint auid2vauid(const string auid, deque<string>& vauid) {                // splits the auid into vauid
     vauid.clear();
     //    vauid.push_back(auid.substr(0,6)); for(uint i=6;i<=20;i+=2) vauid.push_back(auid.substr(i,2));  // splitting aflow:/ab/cd..
@@ -3880,9 +3919,9 @@ namespace aflowlib { // move to web interface
       cerr << "ERROR - aflowlib::AflowlibLocator: wrong mode=" << mode << endl;
       exit(0);
     }
-    if(XHOST_vAUID.size()==0) aurostd::string2vectorstring(init::InitGlobalObject("vAUID"),XHOST_vAUID); // cerr << XHOST_vAUID.size() << endl;
-    if(XHOST_vAURL.size()==0) aurostd::string2vectorstring(init::InitGlobalObject("vAURL"),XHOST_vAURL); // cerr << XHOST_vAURL.size() << endl;
-    if(XHOST_vLOOP.size()==0) aurostd::string2vectorstring(init::InitGlobalObject("vLOOP"),XHOST_vLOOP); // cerr << XHOST_vLOOP.size() << endl;
+    if(XHOST_vAUID.size()==0) { init::InitGlobalObject("vLIBS"); }
+    if(XHOST_vAURL.size()==0) { init::InitGlobalObject("vLIBS"); }
+    if(XHOST_vLOOP.size()==0) { init::InitGlobalObject("vLIBS"); }
     if(XHOST_vAUID.size()!=XHOST_vAURL.size() || XHOST_vAUID.size()!=XHOST_vLOOP.size()) {
       cerr << "ERROR - aflowlib::AflowlibLocator: XHOST_vAUID.size()!=XHOST_vAURL.size() || XHOST_vAUID.size()!=XHOST_vLOOP.size()" << endl;
       cerr << "                                   XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;

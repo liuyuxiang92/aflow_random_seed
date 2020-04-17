@@ -40,6 +40,7 @@ _outreach::_outreach() {
   link="";
   type="";
   _isinvited=FALSE;
+  _isonline=FALSE;
   host="";
   abstract="";
   pdf="";
@@ -76,6 +77,7 @@ void _outreach::copy(const _outreach& b) {
   link=b.link;
   type=b.type;
   _isinvited=b._isinvited;
+  _isonline=b._isonline;
   host=b.host;
   abstract=b.abstract;
   pdf=b.pdf;
@@ -133,12 +135,14 @@ uint fixlabel(const vector<string>& vlabel,vector<string>& vlabelfixed) {
 
 ostream& operator<<(ostream& oss,const _outreach& outreach) {
   // ******************************************************************************************************************************************************
-  // ARTICLE
-  if(aurostd::substring2bool(outreach.type,"ARTICLE")) {
-    bool compact=TRUE;stringstream newline;newline << endl;
-
-    string authors;
-    for(uint iauth=0;iauth<outreach.vauthor.size();iauth++) {
+   bool compact=TRUE;
+   stringstream newline;newline << endl;
+   
+   // ***************************************************************************
+   // ARTICLE
+   if(aurostd::substring2bool(outreach.type,"ARTICLE")) {
+     string authors;
+     for(uint iauth=0;iauth<outreach.vauthor.size();iauth++) {
       authors+=outreach.vauthor.at(iauth);
       if(outreach.vauthor.size()==2 && iauth==outreach.vauthor.size()-2) authors+=" and ";
       if(outreach.vauthor.size()!=2 && iauth==outreach.vauthor.size()-2) authors+=", and ";
@@ -158,19 +162,19 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       //   oss  << endl;
       // EXTRA STUFF FOR PHP WEB
       // 7th line DOI
-      if(outreach.doi.length()>0)
+      if(outreach.doi.size())
 	oss << "doi: " << outreach.doi;
       //     // 6th line PDF
-      //     if(outreach.pdf.length()>0)
+      //     if(outreach.pdf.size())
       //       oss << "[<a href="+WEB_PDF+outreach.pdf << "><b>pdf</b></a>] " << endl;
       //     // 6th line SUPPLEMENTARY
-      //     if(outreach.supplementary.length()>0)
+      //     if(outreach.supplementary.size())
       //       oss << "[<a href="+WEB_PDF+outreach.supplementary << "><b>suppl</b></a>] " << endl;
       //     // 6th line ARXIV
-      //     if(outreach.arxiv.length()>0)
+      //     if(outreach.arxiv.size())
       //       oss << "[<a href="+outreach.arxiv << "><b>arxiv</b></a>] " << endl;
       //     // 6th line LINK
-      //     if(outreach.link.length()>0)
+      //     if(outreach.link.size())
       //       oss << "[<a href="+outreach.link << "><b>link</b></a>] " << endl;
       //     // Xth line EXTRA
       //     for(uint ix=0;ix<outreach.vextra_html.size();ix++)
@@ -182,7 +186,7 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       oss << "<li>";
       if(outreach.newflag) {
 	if(XHOST.vflag_control.flag("PRINT_MODE::NEW") && outreach.newflag) oss << "<blink><b>NEW </b></blink>";
-	if(XHOST.vflag_control.flag("PRINT_MODE::DATE") && outreach.newflag && outreach.date.length()>0) oss << "<b>" << outreach.date << "</b>";
+	if(XHOST.vflag_control.flag("PRINT_MODE::DATE") && outreach.newflag && outreach.date.size()) oss << "<b>" << outreach.date << "</b>";
 	oss << " "; //endl;
       }
       if(XHOST.vflag_control.flag("PRINT_MODE::NUMBER")) {
@@ -201,19 +205,19 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       oss << "<span class=\"pubJournal\">" << outreach.journal << "</span>. " << (compact?" ":newline.str());
       // EXTRA STUFF FOR PHP WEB
       // 7th line DOI
-      if(XHOST.vflag_control.flag("PRINT_MODE::DOI") && outreach.doi.length()>0)
+      if(XHOST.vflag_control.flag("PRINT_MODE::DOI") && outreach.doi.size())
 	oss << "[<a href="+WEB_DOI+outreach.doi << "><b>doi" << "=" << outreach.doi << "</b></a>] " << (compact?" ":newline.str());
       // 6th line PDF    
-      if(XHOST.vflag_control.flag("PRINT_MODE::PDF") && outreach.pdf.length()>0)
+      if(XHOST.vflag_control.flag("PRINT_MODE::PDF") && outreach.pdf.size())
 	oss << "[<a href="+WEB_PDF+outreach.pdf << "><b>pdf</b></a>] " << (compact?" ":newline.str());
       // 6th line SUPPLEMENTARY
-      if(XHOST.vflag_control.flag("PRINT_MODE::PDF") && outreach.supplementary.length()>0)
+      if(XHOST.vflag_control.flag("PRINT_MODE::PDF") && outreach.supplementary.size())
 	oss << "[<a href="+WEB_PDF+outreach.supplementary << "><b>suppl</b></a>] " << (compact?" ":newline.str());
       // 6th line ARXIV
-      if(outreach.arxiv.length()>0)
+      if(outreach.arxiv.size())
 	oss << "[<a href="+outreach.arxiv << "><b>arxiv</b></a>] " << (compact?" ":newline.str());
       // 6th line LINK
-      if(outreach.link.length()>0)
+      if(outreach.link.size())
 	oss << "[<a href="+outreach.link << "><b>link</b></a>] " << (compact?" ":newline.str());
       // Xth line EXTRA
       for(uint ix=0;ix<outreach.vextra_html.size();ix++) {
@@ -245,7 +249,7 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       // EXTRA STUFF FOR LATEX
       bool link=FALSE;
       // 7th line DOI
-      if(XHOST.vflag_control.flag("PRINT_MODE::DOI") && outreach.doi.length()>0) {
+      if(XHOST.vflag_control.flag("PRINT_MODE::DOI") && outreach.doi.size()) {
 	string doi="";
 	doi="\\ifthenelse {\\equal{\\hyperlinks}{true}}{";
 	doi+="{\\newline \\sf \\href{http://dx.doi.org/"+outreach.doi+"}{DOI: "+aurostd::html2latex(outreach.doi)+"}}";
@@ -262,7 +266,7 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
 	}
       }
       // 7th line PDF
-      if((XHOST.vflag_control.flag("PRINT_MODE::PDF") || (!XHOST.vflag_control.flag("PRINT_MODE::PDF") && XHOST.vflag_control.flag("PRINT_MODE::DOI"))) && outreach.doi.length()==0 && outreach.pdf.length()>0) {
+      if((XHOST.vflag_control.flag("PRINT_MODE::PDF") || (!XHOST.vflag_control.flag("PRINT_MODE::PDF") && XHOST.vflag_control.flag("PRINT_MODE::DOI"))) && outreach.doi.length()==0 && outreach.pdf.size()) {
 	string pdf="";
 	pdf="\\ifthenelse {\\equal{\\hyperlinks}{true}}{{\\sf [\\href{"+WEB_PDF+outreach.pdf+"}{pdf}]}}{}";
 	oss << " " << pdf;
@@ -290,40 +294,49 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
   // PRESENTATION
   if(aurostd::substring2bool(outreach.type,"PRESENTATION")) {
     if(XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
-      if(outreach._isinvited && outreach.type=="PRESENTATION_TALK") oss << "Invited talk:";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_SEMINAR") oss << "Invited seminar:";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_COLLOQUIUM") oss << "Invited colloquium:";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_PLENARY") oss << "Plenary Speaker:";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_KEYNOTE") oss << "Keynote Speaker:";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_TUTORIAL") oss << "Tutorial:";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_PANELIST") oss << "Invited panelist:";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_TALK") oss << "Invited talk";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_SEMINAR") oss << "Invited seminar";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_COLLOQUIUM") oss << "Invited colloquium";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_PLENARY") oss << "Plenary Speaker";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_KEYNOTE") oss << "Keynote Speaker";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_TUTORIAL") oss << "Tutorial";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_PANELIST") oss << "Invited panelist";
+      if(outreach._isonline) { oss << " (online):"; } else {  oss << ":"; }
       oss << " " << aurostd::latex2txt(outreach.title) << "; ";
       oss << "" << aurostd::latex2txt(outreach.place) << ", ";
       oss << "" << aurostd::latex2txt(outreach.date) << ". ";
-      //    oss << "" << endl;
+      if(outreach.link.size()) {
+	oss << "link: " << outreach.link;
+      }
     }
     if(XHOST.vflag_control.flag("PRINT_MODE::HTML")) {
-      if(outreach._isinvited && outreach.type=="PRESENTATION_TALK") oss << "<b> Invited talk:</b>";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_SEMINAR") oss << "<b> Invited seminar:</b>";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_COLLOQUIUM") oss << "<b> Invited colloquium:</b>";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_PLENARY") oss << "<b> Plenary Speaker:</b>";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_KEYNOTE") oss << "<b> Keynote Speaker:</b>";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_TUTORIAL") oss << "<b> Tutorial:</b>";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_PANELIST") oss << "<b> Invited panelist:</b>";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_TALK") oss << "<b> Invited talk";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_SEMINAR") oss << "<b> Invited seminar";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_COLLOQUIUM") oss << "<b> Invited colloquium";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_PLENARY") oss << "<b> Plenary Speaker";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_KEYNOTE") oss << "<b> Keynote Speaker";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_TUTORIAL") oss << "<b> Tutorial";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_PANELIST") oss << "<b> Invited panelist";
+      if(outreach._isonline) { oss << " (online):</b>"; } else {  oss << ":</b>"; }
       //    oss << "<br>" << endl;
       oss << "<i> " << aurostd::latex2html(outreach.title) << "</i>; " << endl;
       oss << "" << aurostd::latex2html(outreach.place) << ", " << endl;
       oss << "" << aurostd::latex2html(outreach.date) << ". ";// << endl;
       oss << "<br>" << endl;
+      if(outreach.link.size()) {
+ 	oss << "[<a href="+outreach.link << "><b>link" << "=" << outreach.link << "</b></a>] " << (compact?" ":newline.str());
+	oss << "<br>" << endl;
+      }
     }
     if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {
-      if(outreach._isinvited && outreach.type=="PRESENTATION_TALK") oss << "{\\bf Invited talk:}";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_SEMINAR") oss << "{\\bf Invited seminar:}";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_COLLOQUIUM") oss << "{\\bf Invited colloquium:}";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_PLENARY") oss << "{\\bf Plenary Speaker:}";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_KEYNOTE") oss << "{\\bf Keynote Speaker:}";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_TUTORIAL") oss << "{\\bf Tutorial:}";
-      if(outreach._isinvited && outreach.type=="PRESENTATION_PANELIST") oss << "{\\bf Invited panelist:}";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_TALK") oss << "{\\bf Invited talk";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_SEMINAR") oss << "{\\bf Invited seminar";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_COLLOQUIUM") oss << "{\\bf Invited colloquium";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_PLENARY") oss << "{\\bf Plenary Speaker";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_KEYNOTE") oss << "{\\bf Keynote Speaker";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_TUTORIAL") oss << "{\\bf Tutorial";
+      if(outreach._isinvited && outreach.type=="PRESENTATION_PANELIST") oss << "{\\bf Invited panelist";
+      if(outreach._isonline) { oss << " (online):}"; } else {  oss << ":}"; }
       oss << endl;
       // 3rd line AUTHORS
       if(0) {
@@ -334,11 +347,16 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       oss << "{\\it " << outreach.title << "}; " << endl;
       oss << "" << outreach.place << ", " << endl;
       oss << "" << outreach.date << ". ";// << endl;
+      if(outreach.link.size()) {
+	oss << endl;
+	oss << "\\ifthenelse {\\equal{\\hyperlinks}{true}}{";
+	oss << "{\\newline \\sf \\href{" << outreach.link << "}{LINK: " << aurostd::html2latex(outreach.link) << "}}";
+	oss << "}{{\\newline \\sf LINK: " << aurostd::html2latex(outreach.link) << "}}";
+      }
     }
   }
   return oss;
 }
-
 
 // ******************************************************************************************************************************************************
 void voutreach_print_publications_EXTRA(ostream& oss);
@@ -1146,6 +1164,11 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
 	    if(object=="PRESS" || object=="press") ptmp.type="PRESS";
 	    if(object=="AWARDS" || object=="awards") ptmp.type="AWARDS";
 	  }
+	  if(ktokens.at(0)=="ONLINE" || ktokens.at(0)=="online") { // check ONLINESS
+	    if(object=="YES" || object=="yes" || object=="TRUE" || object=="true" || object=="1") {ptmp._isonline=TRUE;}
+	    if(object=="NO" || object=="no" || object=="FALSE" || object=="false" || object=="0") {ptmp._isonline=FALSE;}
+	  }
+
 	  if(ktokens.at(0)=="TITLE" || ktokens.at(0)=="title") ptmp.title=object; // check title
 	  if(ktokens.at(0)=="JOURNAL" || ktokens.at(0)=="journal") ptmp.journal=object; // check journal
 	  if(ktokens.at(0)=="LINK" || ktokens.at(0)=="link") ptmp.link=object; // check link
