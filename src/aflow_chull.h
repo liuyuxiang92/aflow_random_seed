@@ -697,8 +697,8 @@ namespace chull {
       uint getNearestFacetVertically(const vector<uint>& i_facets,const xvector<double>& point) const;
       double getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,uint i_point) const;
       double getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,const ChullPoint& point) const;
-      double getDistanceToHull(uint i_point,bool redo=false,bool get_signed_distance=false) const;  //CO190808
-      double getDistanceToHull(const ChullPoint& point,bool redo=false,bool get_signed_distance=false) const; //CO190808
+      double getDistanceToHull(uint i_point,bool redo=false,bool get_signed_distance=false) const;  //CO20190808
+      double getDistanceToHull(const ChullPoint& point,bool redo=false,bool get_signed_distance=false) const; //CO20190808
       vector<double> getDistancesToHull(const vector<string>& vauid,bool redo=false) const;
       vector<uint> extractDecompositionPhases(const ChullFacet& facet) const;
       vector<uint> getDecompositionPhases(uint i_point) const;
@@ -856,7 +856,7 @@ namespace chull {
       string getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix=true) const;
       string prettyPrintPrototype(const ChullPoint& point, bool double_back_slash,bool icsd_label_skim=false) const;
       string prettyPrintPrototype(const aflowlib::_aflowlib_entry& entry, bool double_back_slash,bool icsd_label_skim=false) const;
-      //[CO190419 - moved to aurostd_main.cpp]string fixStringLatex(const string& input, bool double_back_slash,bool symmetry_string) const;
+      //[CO20190419 - moved to aurostd_main.cpp]string fixStringLatex(const string& input, bool double_back_slash,bool symmetry_string) const;
       string getPlotHeaderPDF(char function_mode,const string& column_header,bool points_color_gradient=DEFAULT_CHULL_LATEX_COLOR_GRADIENT) const;
       string getPlotPointContentPDF(const ChullPoint& point,bool zero_end_point=true,bool zero_dist_2_hull=false) const;
       string getNodeCoordPosition(const ChullPoint& point) const;

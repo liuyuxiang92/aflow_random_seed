@@ -56,7 +56,7 @@ namespace SYM {
 } // namespace SYM
 
 namespace SYM {
-  double minimumDistance(const deque<_atom>& atoms){  //CO190808
+  double minimumDistance(const deque<_atom>& atoms){  //CO20190808
     //for NON periodic systems, use the default with lattice otherwise: minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale)
     double dist=0,dist_min=AUROSTD_MAX_DOUBLE;
     for(uint i=0;i<atoms.size()-1;i++){
@@ -103,7 +103,7 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
 
     //combos of two lattice vectors
-    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO20190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -146,7 +146,7 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
 
     //combos of three lattice vectors 
-    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO20190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -207,7 +207,7 @@ namespace SYM {
 
     xvector<double> tmp;
 
-    for(uint i=0; i<atoms.size()-1; i++){ //CO190808 - .size()-1
+    for(uint i=0; i<atoms.size()-1; i++){ //CO20190808 - .size()-1
       // Cannot reduce more than (1,1,1), so don't recalculate
       if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
         dims=LatticeDimensionSphere(lattice,min_dist);
@@ -289,14 +289,14 @@ namespace SYM {
 // **********************************************************************************************************************
 // Tolerance for angles; converted to a distance
 namespace SYM {
-  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, double tolerance){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, double tolerance){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     bool is_deg = false;
     return checkAngle(v1, v2, input_angle, is_deg, tolerance);
   }
 } // namespace SYM
 
 namespace SYM {
-  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, bool& is_deg, double tolerance){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, bool& is_deg, double tolerance){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     double mod_v1 = aurostd::modulus(v1);
     double mod_v2 = aurostd::modulus(v2);
     double avg_vec_mod = (mod_v1+mod_v2)/(2.0);
@@ -309,14 +309,14 @@ namespace SYM {
 } // namespace SYM
 
 namespace SYM {
-  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, double tolerance){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, double tolerance){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     bool is_deg = false;
     return checkAngle(mod_v1, mod_v2, angle1, angle2, is_deg, tolerance);
   }
 } // namespace SYM
 
 namespace SYM {
-  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, bool& is_deg, double tolerance){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, bool& is_deg, double tolerance){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     double avg_vec_mod = (mod_v1+mod_v2)/(2.0);
     double angle_diff = angle1-angle2;
     if(is_deg){
@@ -331,8 +331,8 @@ namespace SYM {
 // **********************************************************************************************************************
 // Tolerance scan for symmetry analysis
 namespace SYM {
-  // DX20170509 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance_old, int& count , double& min_dist, bool& no_scan) //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan) //CO190520 - removed pointers for bools and doubles, added const where possible,  //DX20190524 - need pointer for change tolerance, otherwise it will not update
+  // DX20170509 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance_old, int& count , double& min_dist, bool& no_scan) //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan) //CO20190520 - removed pointers for bools and doubles, added const where possible,  //DX20190524 - need pointer for change tolerance, otherwise it will not update
   { //CO200106 - patching for auto-indenting
     // Scans between 5*orig_tol/10.0 on upper end and 5*orig_tol/10 on the right
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -397,7 +397,7 @@ namespace SYM {
         }
         else {
           cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [dir=" << directory << "]." << endl; // DX20180426 - changed xstr.directory to directory (pwd)
-          // DX 9/1/17 exit(0);
+          // DX20170901 exit(0);
           //count -=1;
           no_scan = true;
           tolerance = orig_tolerance; // DX20170906
@@ -475,7 +475,7 @@ namespace SYM {
     // DX [OBSOLETE]      if(call_count > max_count){
     // DX [OBSOLETE]	// DX cerr << "ERROR: Symmetry routine failed, tolerance range (" << orig_tolerance-(max_count*tol_increment) << " to " << orig_tolerance+(max_count*tol_increment) << ") tested [dir=" << xstr.directory << "]. Report to David Hicks (d.hicks@duke.edu). EXITING." << endl;
     // DX [OBSOLETE]	cerr << "WARNING: Inconsistent symmetry, tolerance range (" << orig_tolerance-((max_count/2)*tol_increment) << " to " << orig_tolerance+((max_count/2)*tol_increment) << ") tested [dir=" << xstr.directory << "]." << endl;
-    // DX [OBSOLETE]	// DX 9/1/17 exit(0);
+    // DX [OBSOLETE]	// DX20170901 exit(0);
     // DX [OBSOLETE]        no_scan = true;
     // DX [OBSOLETE]	return FALSE;
     // DX [OBSOLETE]      }
@@ -573,8 +573,8 @@ namespace SYM {
     return AtomsMapped(a, b, lattice, f2c, skew, tol);
   }
 
-  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
-    if(a.spin_is_given){ // DX 9/21/17 - magnetic symmetry
+  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+    if(a.spin_is_given){ // DX20170921 - magnetic symmetry
       bool spins_match = (aurostd::abs(a.spin-b.spin)<=tol);
       //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
       return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
@@ -597,7 +597,7 @@ namespace SYM {
 // **********************************************************************************************************************
 // If the lattice too skewed to used the PBC function? 
 namespace SYM {
-  bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     double max_skew = aurostd::max(aurostd::abs(SYM::DotPro(lattice(1),lattice(2))/(aurostd::modulus(lattice(1))*aurostd::modulus(lattice(2)))),
         aurostd::max(aurostd::abs(SYM::DotPro(lattice(2),lattice(3))/(aurostd::modulus(lattice(2))*aurostd::modulus(lattice(3)))),
           aurostd::abs(SYM::DotPro(lattice(3),lattice(1)/(aurostd::modulus(lattice(3))*aurostd::modulus(lattice(1)))))));
@@ -782,7 +782,7 @@ namespace SYM {
 //DX20190613 [OBSOLETE] // Note: This function takes a bit longer than PBC, but we do not loose robustness.
 //DX20190613 [OBSOLETE] namespace SYM {
 //DX20190613 [OBSOLETE]   bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
-//DX20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+//DX20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
 //DX20190613 [OBSOLETE]     xvector<int> ijk;
 //DX20190613 [OBSOLETE]     bool restriction = false;
 //DX20190613 [OBSOLETE]     return minimizeCartesianDistance(coord1, coord2, out, c2f, f2c, ijk, restriction, tol);
@@ -791,7 +791,7 @@ namespace SYM {
 //DX20190613 [OBSOLETE] 
 //DX20190613 [OBSOLETE] namespace SYM {
 //DX20190613 [OBSOLETE]   bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
-//DX20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+//DX20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
 //DX20190613 [OBSOLETE]     xmatrix<double> lattice = trasp(f2c);
 //DX20190613 [OBSOLETE]     xvector<double> min_vec;
 //DX20190613 [OBSOLETE]     double min_mod=minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
@@ -953,7 +953,7 @@ namespace SYM {
   }
 
   bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, 
-      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
     for(uint i=0;i<atom_set.size();i++){
       if(FPOSMatch(atom_set[i],atom2,lattice,f2c,skew,tol)){ //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
         match_type = atom_set[i].type;
@@ -975,7 +975,7 @@ namespace SYM {
   }
 
   bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, 
-      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
     return FPOSMatch(atom1.fpos,atom2.fpos,lattice,f2c,skew,tol); //DX20190619 - added lattice to input and remove "Atom" prefix in name
     //xvector<double> fdiff = atom1.fpos - atom2.fpos;
     //if(skew){
@@ -998,7 +998,7 @@ namespace SYM {
   }
 
   bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice,
-      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
     string soliloquy="SYM::FPOSMatch():";
 
     //DX20190613 [OBSOLETE] xvector<double> fdiff = fpos1 - fpos2;
@@ -1064,7 +1064,7 @@ namespace SYM {
     return FPOSDistFromFPOS(fpos1,fpos2,lattice,c2f,f2c,skew);
   }
   xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
-      const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO190525
+      const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="SYM::FPOSDistance():";
     if(LDEBUG){
@@ -1101,7 +1101,7 @@ namespace SYM {
     return CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew);
   }
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
-      const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO190525
+      const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool VERBOSE=FALSE; //using LDEBUG would pollute output
     string soliloquy="SYM::CPOSDistance():";
     if(VERBOSE){
@@ -1132,11 +1132,11 @@ namespace SYM {
 // ******************************************************************************
 // applies c2f and f2c to atom.fpos and atom.cpos to see if there's a correspondence
 namespace SYM {
-  bool validateAtomPosition(const _atom& atom,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool validateAtomPosition(const _atom& atom,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO20190520 - removed pointers for bools and doubles, added const where possible
 
     return validateAtomPosition(atom.cpos,atom.fpos,c2f,f2c,skew,_eps_);
   }
-  bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     //DX20190613 [OBSOLETE] xvector<double> fdiff = (c2f*cpos)-fpos;
     double min_dist = 1e9;
     if(skew){
@@ -1163,11 +1163,11 @@ namespace SYM {
 // fast==FALSE ensures we map one-to-one, otherwise you need to check yourself later
 // MapAtomWithBasis (xvector<_atom>)
 namespace SYM {
-  //[CO190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(vector<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f,
-  //[CO190515 - not needed and is ambiguous with overload]                     xmatrix<double>& f2c, bool skew, double tol,bool fast){
-  //[CO190515 - not needed and is ambiguous with overload]  uint mapped_index=0;
-  //[CO190515 - not needed and is ambiguous with overload]  return MapAtomWithBasis(vec, a, map_types, index_to_check, c2f, f2c, skew, tol, mapped_index,fast);
-  //[CO190515 - not needed and is ambiguous with overload]}
+  //[CO20190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(vector<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f,
+  //[CO20190515 - not needed and is ambiguous with overload]                     xmatrix<double>& f2c, bool skew, double tol,bool fast){
+  //[CO20190515 - not needed and is ambiguous with overload]  uint mapped_index=0;
+  //[CO20190515 - not needed and is ambiguous with overload]  return MapAtomWithBasis(vec, a, map_types, index_to_check, c2f, f2c, skew, tol, mapped_index,fast);
+  //[CO20190515 - not needed and is ambiguous with overload]}
 } // namespace SYM
 
 // MapAtomWithBasis (xvector<_atom>) with mapping index
@@ -1180,17 +1180,17 @@ namespace SYM {
   }
 
   bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
-      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
     int count=0;
 
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
-        if(a.type==vec[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
+        if(a.type==vec[index_to_check[i]].type){ // DX20170731 - Speed increase
           if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX20190619 - lattice and f2c as input 
             count++;
             mapped_index=i;
-            if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
+            if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
           }
         }
       }
@@ -1200,7 +1200,7 @@ namespace SYM {
         if(FPOSMatch(a,vec[index_to_check[i]],lattice,skew,tol)){ //type specific //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
           count++;
           mapped_index=i;
-          if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
+          if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
         }
       }
     }
@@ -1213,11 +1213,11 @@ namespace SYM {
 
 // MapAtomWithBasis (deque<_atom>)
 namespace SYM {
-  //[CO190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(deque<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, 
-  //[CO190515 - not needed and is ambiguous with overload]                     bool skew, double tol,bool fast){
-  //[CO190515 - not needed and is ambiguous with overload]  uint mapped_index=0;
-  //[CO190515 - not needed and is ambiguous with overload]  return MapAtomWithBasis(vec, a, map_types, index_to_check, c2f, f2c, skew, tol, mapped_index,fast);
-  //[CO190515 - not needed and is ambiguous with overload]}
+  //[CO20190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(deque<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, 
+  //[CO20190515 - not needed and is ambiguous with overload]                     bool skew, double tol,bool fast){
+  //[CO20190515 - not needed and is ambiguous with overload]  uint mapped_index=0;
+  //[CO20190515 - not needed and is ambiguous with overload]  return MapAtomWithBasis(vec, a, map_types, index_to_check, c2f, f2c, skew, tol, mapped_index,fast);
+  //[CO20190515 - not needed and is ambiguous with overload]}
 } // namespace SYM
 
 // MapAtomWithBasis (deque<_atom>) with mappping index
@@ -1230,17 +1230,17 @@ namespace SYM {
   }
 
   bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice,
-      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
     int count=0;
 
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = deq[index_to_check[i]];
-        if(a.type==deq[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
+        if(a.type==deq[index_to_check[i]].type){ // DX20170731 - Speed increase
           if(AtomsMapped(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX20190619 - lattice and f2c as input
             count++;
             mapped_index=i;
-            if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
+            if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
           }
         }
       }
@@ -1250,7 +1250,7 @@ namespace SYM {
         if(FPOSMatch(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
           count++;
           mapped_index=i;
-          if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
+          if(fast){return TRUE;} // DX20170731 - Speed increase, check one-to-one after
         }
       }
     }
@@ -1268,12 +1268,12 @@ namespace SYM {
 // MapAtom (deque<_atom> and _atom)
 namespace SYM {
   //DX20190620
-  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - replace f2c and c2f with lattice
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - replace f2c and c2f with lattice
     xmatrix<double> f2c=trasp(lattice);
     return MapAtom(a_deq, b, map_types, lattice, f2c, skew, tol);
   } 
 
-  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
     for(uint i=0;i<a_deq.size();i++){
       //_atom a = a_deq[i];
       if(MapAtom(a_deq[i], b, map_types, lattice, f2c, skew, tol)){ //DX20190619 - replace f2c and c2f with lattice
@@ -1292,7 +1292,7 @@ namespace SYM {
     return MapAtom(a_vec, b, map_types, lattice, f2c, skew, tol);
   }
 
-  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
     for(uint i=0;i<a_vec.size();i++){
       //_atom a = a_vec[i];
       if(MapAtom(a_vec[i], b, map_types, lattice, f2c, skew, tol)){ //DX20190619 - replace f2c and c2f with lattice
@@ -1317,7 +1317,7 @@ namespace SYM {
     return MapAtom(a, b, lattice, f2c, skew, tol);
   }
 
-  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
     //_atom a_atom; a_atom.fpos=a; a_atom.cpos=f2c*a;
     //_atom b_atom; b_atom.fpos=b; b_atom.cpos=f2c*b;
     if(FPOSMatch(a, b, lattice, f2c, skew, tol)){ //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
@@ -1329,12 +1329,12 @@ namespace SYM {
 
 // MapAtom (_atom and _atom)
 namespace SYM { 
-  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - replace f2c and c2f with lattice
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - replace f2c and c2f with lattice
     xmatrix<double> f2c=trasp(lattice);
     return MapAtom(a, b, map_types, lattice, f2c, skew, tol);
   }
 
-  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
     if(map_types){
       return AtomsMapped(a,b,lattice,f2c,skew,tol); //type specific //DX20190619 - replace f2c and c2f with lattice
     } else {
@@ -2266,7 +2266,7 @@ namespace SYM {
   }
 #endif
 
-  bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     if(!str.pgroup_calculated || !str.fgroup_calculated || !str.sgroup_calculated) {
       cerr << "SYM::AtomsEquivalent: symmetry must have been calculated" << endl;exit(0);
     }
@@ -4143,7 +4143,7 @@ namespace SYM {
 
 namespace SYM {
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) { 
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
     string soliloquy="SYM::CalculatePointGroup():";
     if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
     // Obtain the structure tolerance
@@ -4246,7 +4246,7 @@ namespace SYM {
               ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
               //keep only the lattice points within the sphere with radius
               if(modulus(rrr)<radius && 
-                  // DX - START : Speed up vectors to check
+                  // DX START : Speed up vectors to check
                   //((modulus(rrr)>na1_min && modulus(rrr)<na1_max) || 
                   // (modulus(rrr)>na2_min && modulus(rrr)<na2_max) || 
                   // (modulus(rrr)>na3_min && modulus(rrr)<na3_max)))
@@ -4254,7 +4254,7 @@ namespace SYM {
                  aurostd::abs(modulus(rrr)-na2) < _eps_ ||
                  aurostd::abs(modulus(rrr)-na3) < _eps_))
                  {  //CO200106 - patching for auto-indenting
-                   // DX - END : Speed up vectors to check
+                   // DX END : Speed up vectors to check
                    grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
                    *grid_clattice_ptr=rrr;                            // SAVE THEM ALL
                    grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
@@ -4272,8 +4272,8 @@ namespace SYM {
     // ------------------------------------------------------------------------------
     // for each set of three lattice points within the sphere see which one has the
     // same sets of lengths and angles as the original lattice unit cell vectors.
-    //[CO190520 - testing setUf and setUc]_sym_op test; //delete me
-    //[CO190520 - testing setUf and setUc]bool isequal; //delete me
+    //[CO20190520 - testing setUf and setUc]_sym_op test; //delete me
+    //[CO20190520 - testing setUf and setUc]bool isequal; //delete me
     uint ii=0,jj=0,kk=0;
     for(uint i=0;i<grid_clattice.size();i++){
       for(ii=1;ii<=3;ii++) temp_clattice(1,ii)=(*grid_clattice[i])(ii);
@@ -4312,25 +4312,25 @@ namespace SYM {
                           Bct=temp_clattice;Uc=trasp(Act)*inverse(trasp(Bct)); // Act=lattice;
                           Bdt=temp_flattice;Uf=trasp(Adt)*inverse(trasp(Bdt)); // Adt=I3... could remove !
 
-                          //[CO190520 - testing setUf and setUc]if(LDEBUG) { //delete me
-                          //[CO190520 - testing setUf and setUc]  test.setUf(Uf,lattice);
-                          //[CO190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uc,test.Uc);
-                          //[CO190520 - testing setUf and setUc]  if(!isequal){cerr << "BAD2!" << endl;}
+                          //[CO20190520 - testing setUf and setUc]if(LDEBUG) { //delete me
+                          //[CO20190520 - testing setUf and setUc]  test.setUf(Uf,lattice);
+                          //[CO20190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uc,test.Uc);
+                          //[CO20190520 - testing setUf and setUc]  if(!isequal){cerr << "BAD2!" << endl;}
 
-                          //[CO190520 - testing setUf and setUc]  cerr << "Uc=" << endl;cerr << Uc << endl;
-                          //[CO190520 - testing setUf and setUc]  //cerr << "c2f*Uc*f2c=" << endl;cerr << c2f*Uc*f2c << endl;
-                          //[CO190520 - testing setUf and setUc]  //cerr << "f2c*Uc*c2f=" << endl;cerr << f2c*Uc*c2f << endl;
-                          //[CO190520 - testing setUf and setUc]  cerr << "test.Uc=" << endl;cerr << test.Uc << endl;
+                          //[CO20190520 - testing setUf and setUc]  cerr << "Uc=" << endl;cerr << Uc << endl;
+                          //[CO20190520 - testing setUf and setUc]  //cerr << "c2f*Uc*f2c=" << endl;cerr << c2f*Uc*f2c << endl;
+                          //[CO20190520 - testing setUf and setUc]  //cerr << "f2c*Uc*c2f=" << endl;cerr << f2c*Uc*c2f << endl;
+                          //[CO20190520 - testing setUf and setUc]  cerr << "test.Uc=" << endl;cerr << test.Uc << endl;
 
-                          //[CO190520 - testing setUf and setUc]  test.setUc(Uc,lattice);
-                          //[CO190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uf,test.Uf);
-                          //[CO190520 - testing setUf and setUc]  if(!isequal){cerr << "BAD1!" << endl;}
+                          //[CO20190520 - testing setUf and setUc]  test.setUc(Uc,lattice);
+                          //[CO20190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uf,test.Uf);
+                          //[CO20190520 - testing setUf and setUc]  if(!isequal){cerr << "BAD1!" << endl;}
 
-                          //[CO190520 - testing setUf and setUc]  cerr << "Uf=" << endl;cerr << Uf << endl;
-                          //[CO190520 - testing setUf and setUc]  //cerr << "c2f*Uf*f2c=" << endl;cerr << c2f*Uf*f2c << endl;
-                          //[CO190520 - testing setUf and setUc]  //cerr << "f2c*Uf*c2f=" << endl;cerr << f2c*Uf*c2f << endl;
-                          //[CO190520 - testing setUf and setUc]  cerr << "test.Uf=" << endl;cerr << test.Uf << endl;
-                          //[CO190520 - testing setUf and setUc]}
+                          //[CO20190520 - testing setUf and setUc]  cerr << "Uf=" << endl;cerr << Uf << endl;
+                          //[CO20190520 - testing setUf and setUc]  //cerr << "c2f*Uf*f2c=" << endl;cerr << c2f*Uf*f2c << endl;
+                          //[CO20190520 - testing setUf and setUc]  //cerr << "f2c*Uf*c2f=" << endl;cerr << f2c*Uf*c2f << endl;
+                          //[CO20190520 - testing setUf and setUc]  cerr << "test.Uf=" << endl;cerr << test.Uf << endl;
+                          //[CO20190520 - testing setUf and setUc]}
 
                           // check whether this symmetry operation is new or not
                           sym_found=FALSE;
@@ -4792,7 +4792,7 @@ namespace SYM {
     bool Krun=TRUE;
     // DX AND COREY -START
     string pgroup_type="pgroupk";
-    a.pgroupk.clear();  //CO190204
+    a.pgroupk.clear();  //CO20190204
     xstructure aa;aa.ReScale(1.0);         //contains FixLattices()
     aa.lattice=a.klattice;aa.ReScale(1.0); //contains FixLattices()
     aa.sym_eps = a.sym_eps; // DX NEED TO PROPOGATE sym_eps
@@ -4829,7 +4829,7 @@ namespace SYM {
     bool Krun=TRUE;
     // DX AND COREY -START
     string pgroup_type="pgroupk_xtal";
-    a.pgroupk_xtal.clear(); //CO190204
+    a.pgroupk_xtal.clear(); //CO20190204
     xstructure aa;aa.ReScale(1.0);         //contains FixLattices()
     aa.lattice=a.klattice;aa.ReScale(1.0); //contains FixLattices()
     aa.sym_eps = a.sym_eps; // DX NEED TO PROPOGATE sym_eps
@@ -5038,17 +5038,17 @@ namespace SYM {
     }
     return getFullSymBasis(a,symOp,map_types,tolerance,basis_atoms_map,basis_types_map);
   }
-  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     double min_dist=a.dist_nn_min; // CO20180409
     if(min_dist == AUROSTD_NAN){min_dist=minimumDistance(a);} // CO20180409
     bool skew = isLatticeSkewed(a.lattice,min_dist,tolerance); // CO20180409
     return getFullSymBasis(a,symOp,map_types,skew,tolerance,basis_atoms_map,basis_types_map);
   }
-  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO20190520 - removed pointers for bools and doubles, added const where possible
     return getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,map_types,skew,tolerance,basis_atoms_map,basis_types_map);
   }
   //atoms, c2f, f2c and _sym_op
-  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO20190520 - removed pointers for bools and doubles, added const where possible
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     bool fast=true;  // DX COME BACK HERE, MAKE THIS AN INPUT // CO, no need, if fast doesn't work, we have bigger problems
@@ -5096,7 +5096,7 @@ namespace SYM {
         basis_atoms_map.push_back(index_to_check[mapped_index]);
         basis_types_map.push_back(atoms[index_to_check[mapped_index]].type);
         if(fast){ //If you use fast, you should have verified that no atoms overlap (which is most of the time, hopefully)
-          // DX - 7/31/17 - fast also inherently checks one-to-one
+          // DX20170731 - fast also inherently checks one-to-one
           index_to_check.erase(index_to_check.begin()+mapped_index);
         }
         count++;
@@ -5130,8 +5130,8 @@ namespace SYM {
         cerr << "atom :" << atoms[k].fpos  << endl;
         cerr << "ratom:" << transformedcrystal[k].fpos  << endl;
         }*/
-      // DX - 7/31/17 - Check one-to-one speed increase : START
-      if(!fast){ // DX - 7/31/17 - If not fast, need to check if one-to-one
+      // DX20170731 - Check one-to-one speed increase : START
+      if(!fast){ // DX20170731 - If not fast, need to check if one-to-one
         vector<int> mappings = basis_atoms_map;
         for(uint i=0;i<mappings.size();i++){
           for(uint j=i+1;j<mappings.size();j++){
@@ -5144,7 +5144,7 @@ namespace SYM {
           i--;
         } 
       }
-      // DX - 7/31/17 - Check one-to-one speed increase : END
+      // DX20170731 - Check one-to-one speed increase : END
       symOp.basis_map_calculated=basis_map_calculated_orig;  // CO20140420 - make sure to include me before any return/exit!!!!!
       return TRUE;
     }
@@ -5158,7 +5158,7 @@ namespace SYM {
 
   // DX AND COREY - START
   // warning: this variant gets wrong basis_atoms_map, it flips indices between transformed crystal and original (but everything else should be the same)
-  bool getFullSymBasis_20170729(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis_20170729(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO20190520 - removed pointers for bools and doubles, added const where possible
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     bool fast=true;  // DX COME BACK HERE, MAKE THIS AN INPUT // CO, no need, if fast doesn't work, we have bigger problems
@@ -6854,7 +6854,7 @@ namespace SYM {
   bool CalculateSitePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,int CALCULATION_MODE,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::getPWD(); // DX20180426 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+    string directory=aurostd::getPWD(); // DX20180426 - added current working directory  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
     //CALCULATION_MODE == 0 (default) - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for all
     //CALCULATION_MODE == 1 - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for iatoms ONLY
     //CALCULATION_MODE == 2 - calculate all atoms standard routine (go through pgroups), get full basis for all
@@ -7155,7 +7155,7 @@ namespace SYM {
   bool CalculateSitePointGroup_EquivalentSites(xstructure &a,bool get_full_basis,double _eps_){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::getPWD(); // DX20180426 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+    string directory=aurostd::getPWD(); // DX20180426 - added current working directory  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
 
     // Obtain the structure tolerance
     a.sym_eps=_eps_;
@@ -7191,8 +7191,8 @@ namespace SYM {
         eat=a.iatoms[iiat][ieat];
         for(uint fg=0;fg<a.fgroup.size() && !found_fgroup;fg++){
           if(a.fgroup[fg].basis_map_calculated){
-            // DX [OBSOLETE] fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[eat]==iat; // DX - 7/31/17 - Incorrect, want centered at iatom not eatom
-            fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[iat]==eat; // DX - 7/31/17 find fgroup centered on iatom
+            // DX [OBSOLETE] fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[eat]==iat; // DX20170731 - Incorrect, want centered at iatom not eatom
+            fgroup_map=(uint)a.fgroup[fg].basis_atoms_map[iat]==eat; // DX20170731 find fgroup centered on iatom
           } else {
             if(!SYM::ApplyAtomValidate(a.atoms[iat],tatom,a.fgroup[fg],a.lattice,a.c2f,a.f2c,skew,FALSE,FALSE,_eps_)){
               return FALSE;

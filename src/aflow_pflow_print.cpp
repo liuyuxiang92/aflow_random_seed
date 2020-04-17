@@ -980,10 +980,10 @@ namespace pflow {
         oss << " Real space Volume: " << vol << endl;
         oss << " Real space c/a = " << data(3)/data(1) << endl;
         str_aus=str;//,str_sp,str_sc; // CO20171027
-        // DX 9/1/17 -Add tolerance - START
+        // DX20170901 -Add tolerance - START
         str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
         str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; // DX20180226 - added sym eps change count
-        // DX 9/1/17 -Add tolerance - END
+        // DX20170901 -Add tolerance - END
         if(smode=="EDATA") {
           // str_aus.CalculateSymmetryPointGroup(FALSE);
           // str_aus.CalculateSymmetryFactorGroup(FALSE);
@@ -1024,7 +1024,7 @@ namespace pflow {
           }
           //DX20180608 - recalculate GetLatticeType() before changing tolerance - END
           sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
-          // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
+          // DX20170901 - Add consistency check for input symmetry method and ITC method - START
           int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
           bool derivative_structure=false;
           if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan){
@@ -1056,7 +1056,7 @@ namespace pflow {
               continue;
             }
           }
-          // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - END
+          // DX20170901 - Add consistency check for input symmetry method and ITC method - END
           oss << "BRAVAIS LATTICE OF THE LATTICE (pgroup)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_lattice_type << endl;// " " << str.title << endl;
           oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_lattice_variation_type << endl;//wahyu mod
@@ -1065,7 +1065,7 @@ namespace pflow {
           oss << " Real space: Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
           oss << " Real space: Superlattice Variation           = " << str_aus.bravais_superlattice_variation_type << endl;
           // DX oss << " Real space: Superlattice System              = " << str_aus.bravais_lattice_system << endl;
-          oss << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; // DX - fixed mistake in line above
+          oss << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; // DX fixed mistake in line above
           oss << " Real space: Pearson Symbol Superlattice      = " << str_aus.pearson_symbol_superlattice << endl;
           }
           oss << "RECIPROCAL LATTICE" << endl;
@@ -1266,7 +1266,7 @@ namespace pflow {
             //DX20180608 - recalculate GetLatticeType() before changing tolerance - END
             sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
             vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-            // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
+            // DX20170901 - Add consistency check for input symmetry method and ITC method - START
             int multiplicity_of_primitive =str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
             bool derivative_structure=false;
             if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan == true){
@@ -1301,7 +1301,7 @@ namespace pflow {
                 continue;
               }
             }
-            // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - END
+            // DX20170901 - Add consistency check for input symmetry method and ITC method - END
 
             // Real space: bravais lattice lattice type
             if(str_aus.bravais_lattice_lattice_type.size()){
@@ -3478,7 +3478,7 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
   //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
   vector<vector<double> > ids;
   pflow::matrix<double> data;
-  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO190620 - intmax can be grabbed later
+  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO20190620 - intmax can be grabbed later
 
   //get intmax
   double intmax=1e-8;
@@ -3494,7 +3494,7 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
 
   // Print out all data.
   oss << "Wavelength(Ang) = " << lambda << endl;
-  oss << "Atom_Name  ScattFact   Mass(amu)   B(Ang)(DW=exp(-B*sin(theta)^2/lambda^2))" << endl; //CO190329
+  oss << "Atom_Name  ScattFact   Mass(amu)   B(Ang)(DW=exp(-B*sin(theta)^2/lambda^2))" << endl; //CO20190329
   for(uint iat=0;iat<(uint) num_atoms;iat++) {
     oss <<setw(4)<<iat+1<<" "<<setw(4)<<str.atoms.at(iat).cleanname << " ";
     if(str.atoms.at(iat).cleanname.length()>1) oss << " ";

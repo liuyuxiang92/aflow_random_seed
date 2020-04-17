@@ -828,8 +828,8 @@ uint xstructure::GetPrimitiveCell(void) {
     //DX20191011 [OBSOLETE] tmp_atom.fpos = (*this).atoms[i].fpos;
     //DX20191011 [OBSOLETE] tmp_atom.cpos = (*this).atoms[i].cpos;
     //DX20191011 [OBSOLETE] tmp_atom.type = (*this).atoms[i].type;
-    //DX20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; // DX 9/21/17 - magnetic sym
-    //DX20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; // DX 9/21/17 - magnetic sym
+    //DX20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; // DX20170921 - magnetic sym
+    //DX20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; // DX20170921 - magnetic sym
     //DX20191011 [OBSOLETE] tmp_atom.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
     //DX20191011 [OBSOLETE] tmp_atom.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
     string tmpname = (*this).atoms[i].name;
@@ -888,8 +888,8 @@ uint xstructure::GetPrimitiveCell(void) {
       tmp.fpos = ::BringInCell(atomic_basis_[i].fpos); //DX20190905 - new BringInCell function and go outside xstructure scope
       //DX20191011 [OBSOLETE] tmp.name = atomic_basis_[i].name;
       //DX20191011 [OBSOLETE] tmp.type = atomic_basis_[i].type;
-      //DX20191011 [OBSOLETE] tmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
-      //DX20191011 [OBSOLETE] tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp.spin = atomic_basis_[i].spin; // DX20170921 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX20170921 - magnetic sym
       //DX20191011 [OBSOLETE] tmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
       //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
       full_basis.push_back(tmp);
@@ -922,8 +922,8 @@ uint xstructure::GetPrimitiveCell(void) {
         BringInCellInPlace(atmp.fpos); //DX20190905
         //DX20191011 [OBSOLETE] atmp.name = atomic_basis_[i].name;
         //DX20191011 [OBSOLETE] atmp.type = atomic_basis_[i].type;
-        //DX20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
-        //DX20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; // DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX20170921 - magnetic sym
         //DX20191011 [OBSOLETE] atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
         //DX20191011 [OBSOLETE] atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
         if(SYM::MapAtom(atomic_basis_, atmp, TRUE, lattice_basis_xmat, f2c, skew, (*this).sym_eps)) { //DX20190215 - _SYM_TOL_ to (*this).sym_eps //DX20190619 - lattice_basis_xmat and f2c as input
@@ -1027,7 +1027,7 @@ uint xstructure::GetPrimitiveCell(void) {
       xmatrix<double> PL_inv = aurostd::inverse(prim_lattice);
       double same_atom_tol = (*this).dist_nn_min - 0.1;  //min_dist itself will consider nn atom to be the same, needs to be slightly smaller.`
       //Now get atoms inside of new, reduced basis:
-      //[CO190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); // CO20180409
+      //[CO20190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); // CO20180409
       newbasis = foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); // CO20180409 //DX20190619 - false->do not check min dists (expensive)
       //DEBUG
       //cerr << "newbasis.size(): " << newbasis.size() << endl;
@@ -1074,10 +1074,10 @@ uint xstructure::GetPrimitiveCell(void) {
       //DX20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
       //DX20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
       //DX20191011 [OBSOLETE] tmp_atom.name_is_given = true;
-      //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; // DX 9/21/17 - magnetic sym
-      tmp_atom.spin_is_given = false; // DX 9/21/17 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; // DX20170921 - magnetic sym
+      tmp_atom.spin_is_given = false; // DX20170921 - magnetic sym
       if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
-        tmp_atom.spin_is_given = true; // DX 9/21/17 - magnetic sym
+        tmp_atom.spin_is_given = true; // DX20170921 - magnetic sym
       }
       tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
       tmp_atom.noncoll_spin_is_given = false; // DX20171205 - magnetic sym (non-collinear)
@@ -1159,12 +1159,12 @@ namespace SYM {
       for (uint j = 0; j < xstr.atoms.size(); j++) {  // (OBSOLETE) go from 1 because
         // the origin at 0 0 0 is taken care of by the expanded lattice
         _atom tmp = xstr.atoms[j]; //DX20191011 initialized instead of setting explictly (below)
-        //tmp.print_RHT = true; //CO190405 - get rid of this!
+        //tmp.print_RHT = true; //CO20190405 - get rid of this!
         tmp.cpos = expanded_lattice_points[i] + F2C(L, xstr.atoms[j].fpos);
         //DX20191011 [OBSOLETE] tmp.name = xstr.atoms[j].name;
         //DX20191011 [OBSOLETE] tmp.type = xstr.atoms[j].type;
-        //DX20191011 [OBSOLETE] tmp.spin = xstr.atoms[j].spin; // DX 9/21/17 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin = xstr.atoms[j].spin; // DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX20170921 - magnetic sym
         //DX20191011 [OBSOLETE] tmp.noncoll_spin = xstr.atoms[j].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
         //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = xstr.atoms[j].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
         out.push_back(tmp);
@@ -1647,7 +1647,7 @@ namespace SYM {
         // *****************************************************************************************************************************
         // ========== Conventional Atomic Basis ========== //
         //Now add those basis atoms that fit in conventional cell:
-        //[CO190520]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX20190215 - _SYM_TOL_ to sym_tol
+        //[CO20190520]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX20190215 - _SYM_TOL_ to sym_tol
         deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, xstr.lattice, CL, skew, sym_tol, false); //DX20190215 - _SYM_TOL_ to sym_tol //DX20190619 - false->do not check min dists (expensive)
 
         bool consistent_ratio = true;  // Change tolerances if the ratio between atomic basis atoms is inconsistent with the primitive cell.

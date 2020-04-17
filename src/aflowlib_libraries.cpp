@@ -755,7 +755,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_CheckProjectFromDirectory" << endl;	 
     CheckMaterialServer("aflowlib::LIB2RAW_CheckProjectFromDirectory"); // must be in AFLOW_MATERIALS_SERVER
     // find from PWD
-    string PROJECT_LIBRARY="NOTHING",directory_pwd=aurostd::getPWD();aurostd::StringSubst(directory_pwd,"\n","");  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+    string PROJECT_LIBRARY="NOTHING",directory_pwd=aurostd::getPWD();aurostd::StringSubst(directory_pwd,"\n","");  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
     if(directory_pwd=="/common/GNDSTATE") directory_pwd="/common/LIB2"; // [HISTORIC]
     aurostd::StringSubst(directory_pwd,"common/SCINT","common/ICSD"); // [HISTORIC]
     aurostd::StringSubst(directory_pwd,"common/ELPASOLITES","common/AURO"); // [HISTORIC]
@@ -840,7 +840,7 @@ namespace aflowlib {
     CheckMaterialServer("aflowlib::LIB2RAW_ALL"); // must be in AFLOW_MATERIALS_SERVER
     string PROJECT_LIBRARY;
     if(tokens.size()==2) PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(tokens.at(1));
-    else PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(aurostd::getPWD()); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+    else PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(aurostd::getPWD()); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
     cerr << "aflowlib::LIB2RAW_ALL FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
 
     int multi_sh_value=XHOST.CPU_Cores;
@@ -1023,7 +1023,7 @@ namespace aflowlib {
       flag_FORCE=true;
       string directory=aurostd::CleanFileName(options);
       aurostd::StringSubst(directory,"./","");
-      if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+      if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
       flag_WEB=FALSE;
       flag_files_LIB=FALSE,flag_files_RAW=FALSE,flag_files_WEB=FALSE;
       directory_LIB=directory;
@@ -1129,7 +1129,8 @@ namespace aflowlib {
 
     bool perform_LOCK=TRUE,perform_BANDS=FALSE,perform_BADER=FALSE,perform_MAGNETIC=FALSE,perform_THERMODYNAMICS=FALSE;
     bool perform_AGL=FALSE,perform_AEL=FALSE;
-
+    bool perform_PATCH=TRUE; // to inject updates while LIB2RAW
+     
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front(""); // cheat for void string
     for(uint iext=0;iext<vext.size();iext++) {
       if(aurostd::FileExist(directory_LIB+"/OUTCAR.relax1"+vext.at(iext)) ||
@@ -1178,8 +1179,8 @@ namespace aflowlib {
       cout << "aflowlib::LIB2RAW: directory_RAW is empty" << endl;
       return FALSE;
     }
-    //if(LOCAL){aurostd::execute("rm -rf \""+directory_RAW)+"\"";} //CO190321 - safer NOT to -rf
-    //{ aurostd::DirectoryMake(directory_RAW);aurostd::execute("rm -f \"/"+directory_RAW+"/*\""); } //CO190321 - the prepending of '/' is BAD, only works for Stefano but can kill a local users whole computer if "/"+directory_RAW exists
+    //if(LOCAL){aurostd::execute("rm -rf \""+directory_RAW)+"\"";} //CO20190321 - safer NOT to -rf
+    //{ aurostd::DirectoryMake(directory_RAW);aurostd::execute("rm -f \"/"+directory_RAW+"/*\""); } //CO20190321 - the prepending of '/' is BAD, only works for Stefano but can kill a local users whole computer if "/"+directory_RAW exists
     {
       aurostd::DirectoryMake(directory_RAW);
       aurostd::RemoveFile(directory_RAW+"/*");
@@ -1194,8 +1195,8 @@ namespace aflowlib {
         cout << "aflowlib::LIB2RAW: directory_WEB is empty" << endl;
         return FALSE;
       }
-      //if(LOCAL){aurostd::execute("rm -rf \""+directory_WEB+"\"");} //CO190321 - safer NOT to -rf
-      //aurostd::DirectoryMake(directory_WEB);aurostd::execute("rm -f \"/"+directory_WEB+"/*\""); //CO190321 - the prepending of '/' is BAD, only works for Stefano but can kill a local users whole computer if "/"+directory_RAW exists
+      //if(LOCAL){aurostd::execute("rm -rf \""+directory_WEB+"\"");} //CO20190321 - safer NOT to -rf
+      //aurostd::DirectoryMake(directory_WEB);aurostd::execute("rm -f \"/"+directory_WEB+"/*\""); //CO20190321 - the prepending of '/' is BAD, only works for Stefano but can kill a local users whole computer if "/"+directory_RAW exists
       aurostd::DirectoryMake(directory_WEB);
       aurostd::RemoveFile(directory_WEB+"/*");
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_WEB+"/*\"");
@@ -1355,11 +1356,18 @@ namespace aflowlib {
         cout << "aflowlib::LIB2RAW: LOCK LOOP ---------------------------------------------------------------------------------" << endl;
         aflowlib::LIB2RAW_Loop_LOCK(directory_LIB,directory_RAW,vfile,aflowlib_data,"aflowlib::LIB2RAW (LOCK):");	
       }
+     // ---------------------------------------------------------------------------------------------------------------------------------
+      // do the PATCH
+      if(perform_PATCH) {
+        cout << "aflowlib::LIB2RAW: PATCH LOOP --------------------------------------------------------------------------------" << endl;
+        aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,"aflowlib::LIB2RAW (PATCH):");	
+      }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // write DOS + BANDS JSON // CO20171025
       string system_name=KBIN::ExtractSystemName(directory_LIB);
       if((aurostd::FileExist(directory_LIB+"/DOSCAR.static") || aurostd::EFileExist(directory_LIB+"/DOSCAR.static")) &&
-          (aurostd::FileExist(directory_LIB+"/POSCAR.static") || aurostd::EFileExist(directory_LIB+"/POSCAR.static"))) {
+	 (aurostd::FileExist(directory_LIB+"/POSCAR.static") || aurostd::EFileExist(directory_LIB+"/POSCAR.static"))) {
+	cout << "aflowlib::LIB2RAW: DOS + BANDS JSON  ---------------------------------------------------------------------------------" << endl;
         stringstream _json_file,json_file;
         aurostd::xoption vpflow;  //dummy
         if(estructure::DOSDATA_JSON(vpflow,directory_LIB,_json_file,true)) {
@@ -1381,7 +1389,8 @@ namespace aflowlib {
       // ---------------------------------------------------------------------------------------------------------------------------------
       // DO THE COMPRESSING
       //      cout << "COMPRESSING" << endl;
-
+      cout << "aflowlib::LIB2RAW: COMPRESSING REMOVING LINKING --------------------------------------------------------------" << endl;
+      
       // generic for compressing and linking
       deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
       deque<string> vtype; aurostd::string2tokens(".orig,.relax,.relax1,.relax2,.relax3,.relax4,.static,.bands",vtype,",");
@@ -1717,16 +1726,16 @@ namespace aflowlib {
     LDEBUG=FALSE; //CO20180321
     // CO20180216 - more robust for any type of directory/file setup
     vector<string> Chmod_Files;
-    if(LDEBUG) {cerr << soliloquy << " pwd=" << aurostd::getPWD() << endl;}  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+    if(LDEBUG) {cerr << soliloquy << " pwd=" << aurostd::getPWD() << endl;}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
 
-    //[CO190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_RAW+"\" -type d`");
+    //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_RAW+"\" -type d`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_RAW+"\" -type d"),Chmod_Files);
     for(uint i=0;i<Chmod_Files.size();i++){
       if(LDEBUG) {cerr << soliloquy << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
       aurostd::ChmodFile("755",Chmod_Files[i]);
     }
 
-    //[CO190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_RAW+"\" -type f`");
+    //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_RAW+"\" -type f`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_RAW+"\" -type f"),Chmod_Files);
     for(uint i=0;i<Chmod_Files.size();i++){
       if(LDEBUG) {cerr << soliloquy << " \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
@@ -1734,14 +1743,14 @@ namespace aflowlib {
     }
 
     if(CHMODWEB) {
-      //[CO190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_WEB+"\" -type d`");
+      //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_WEB+"\" -type d`");
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_WEB+"\" -type d"),Chmod_Files);
       for(uint i=0;i<Chmod_Files.size();i++){
         if(LDEBUG) {cerr << soliloquy << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
         aurostd::ChmodFile("755",Chmod_Files[i]);
       }
 
-      //[CO190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_WEB+"\" -type f`");
+      //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_WEB+"\" -type f`");
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_WEB+"\" -type f"),Chmod_Files);
       for(uint i=0;i<Chmod_Files.size();i++){
         if(LDEBUG) {cerr << soliloquy << " \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
@@ -1749,14 +1758,14 @@ namespace aflowlib {
       }
     }
 
-    //[CO190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_LIB+"\" -type d`");
+    //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_LIB+"\" -type d`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_LIB+"\" -type d"),Chmod_Files);
     for(uint i=0;i<Chmod_Files.size();i++){
       if(LDEBUG) {cerr << soliloquy << " \"" << XHOST.command("chmod")+" 755 \""+Chmod_Files[i] << "\"\"" << endl;}
       aurostd::ChmodFile("755",Chmod_Files[i]);
     }
 
-    //[CO190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_LIB+"\" -type f`");
+    //[CO20190321 - bust if find grabs nothing]aurostd::execute("chmod 644 `find \""+directory_LIB+"\" -type f`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_LIB+"\" -type f"),Chmod_Files);
     for(uint i=0;i<Chmod_Files.size();i++){
       if(LDEBUG) {cerr << soliloquy << " \"" << XHOST.command("chmod")+" 644 \""+Chmod_Files[i] << "\"\"" << endl;}
@@ -1999,15 +2008,15 @@ namespace aflowlib {
       aurostd::execute(command);
 
       // EXECUTE PLOTBAND
-      //[CO191112 - OBSOLETE]char work_dir[1024];
-      //[CO191112 - OBSOLETE]string cdir; //, wdir;
-      //[CO191112 - OBSOLETE]cdir = getcwd(work_dir, 1024);  //Get the working directory
-      //[CO191112 - OBSOLETE back and forth directory change]string work_dir=aurostd::getPWD();    //Get the working directory //CO191112
+      //[CO20191112 - OBSOLETE]char work_dir[1024];
+      //[CO20191112 - OBSOLETE]string cdir; //, wdir;
+      //[CO20191112 - OBSOLETE]cdir = getcwd(work_dir, 1024);  //Get the working directory
+      //[CO20191112 - OBSOLETE back and forth directory change]string work_dir=aurostd::getPWD();    //Get the working directory //CO20191112
 
-      //[CO191112 - OBSOLETE]char raw_dir[1024];
-      //[CO191112 - OBSOLETE]strcpy(raw_dir, directory_RAW.c_str());
-      //[CO191112 - OBSOLETE]chdir(raw_dir);               //Change into the RAW directory
-      //[CO191112 - OBSOLETE back and forth directory change]chdir(directory_RAW.c_str());                //Change into the RAW directory  //CO191112
+      //[CO20191112 - OBSOLETE]char raw_dir[1024];
+      //[CO20191112 - OBSOLETE]strcpy(raw_dir, directory_RAW.c_str());
+      //[CO20191112 - OBSOLETE]chdir(raw_dir);               //Change into the RAW directory
+      //[CO20191112 - OBSOLETE back and forth directory change]chdir(directory_RAW.c_str());                //Change into the RAW directory  //CO20191112
 
       // [OBSOLETE]  vector<string> directory;
       // [OBSOLETE]  directory.push_back(" ");
@@ -2019,14 +2028,14 @@ namespace aflowlib {
       // [OBSOLETE - ME20190614]  estructure::PLOT_BANDDOS("./");
       // [OBSOLETE - ME20190614]  estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
 
-      //[CO191112 - OBSOLETE back and forth directory change]chdir(work_dir.c_str());  //Go to the working directory //CO191112
+      //[CO20191112 - OBSOLETE back and forth directory change]chdir(work_dir.c_str());  //Go to the working directory //CO20191112
     }
 
-    //[CO191112] - NO PDF JPG detected in aflow_gnuplot_funcs.cpp, so this is useless anyway
-    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]// Kesong adds it
-    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "cd \"" << directory_RAW << "\"" << endl;
-    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "rm -f *pdf *jpg " << endl;
-    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]aurostd::execute(command);
+    //[CO20191112] - NO PDF JPG detected in aflow_gnuplot_funcs.cpp, so this is useless anyway
+    //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]// Kesong adds it
+    //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "cd \"" << directory_RAW << "\"" << endl;
+    //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "rm -f *pdf *jpg " << endl;
+    //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]aurostd::execute(command);
 
     // DONE
     cout << MESSAGE << " aflowlib::LIB2RAW_Loop_Bands: end " << directory_LIB << endl;
@@ -2227,9 +2236,9 @@ namespace aflowlib {
 // aflowlib::LIB2RAW_Loop_Thermodynamics
 // ***************************************************************************
 namespace aflowlib {
-  bool ExtractOUT_from_VASP_OUTCAR(string _file,const double& data_natoms,xOUTCAR& outcar) {
-    bool flag=outcar.GetPropertiesFile(_file);
-    if(aurostd::abs(data_natoms-(double) outcar.natoms)>0.1) { cerr << "ERROR ExtractOUT_from_VASP_OUTCAR: data_natoms(" << data_natoms << ")!= (int) outcar.natoms(" << outcar.natoms << ") ..." << endl;exit(0); }
+  bool ExtractOUT_from_VASP_OUTCAR(string _file,const double& data_natoms,xOUTCAR& xOUT) {
+    bool flag=xOUT.GetPropertiesFile(_file);
+    if(aurostd::abs(data_natoms-(double) xOUT.natoms)>0.1) { cerr << "ERROR ExtractOUT_from_VASP_OUTCAR: data_natoms(" << data_natoms << ")!= (int) xOUT.natoms(" << xOUT.natoms << ") ..." << endl;exit(0); }
     return flag;
   }
 }
@@ -2388,9 +2397,9 @@ namespace aflowlib {
 
     xstructure str_orig,str_relax1,str_relax;
 
-    // DX - START
+    // DX START
     // DX20180526 [OBSOLETE] str_orig.directory = str_relax1.directory = str_relax.directory = aflags.Directory;
-    // DX - END
+    // DX END
 
     vector<string> tokens;
 
@@ -2402,9 +2411,9 @@ namespace aflowlib {
     vector<xvector<double> > data_vforces;                      // QM FORCES calculation
     vector<xvector<double> > data_vpositions_cartesian;         // QM POSITIONS_CARTESIAN calculation
 
-    xOUTCAR outcar;
-    // xDOSCAR doscar;
-    // xEIGENVAL eigenval;
+    xOUTCAR xOUT;
+    // xDOSCAR xDOS;
+    // xEIGENVAL xEIG;
     xKPOINTS kpoints;
 
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Thermodynamics [2]" << endl;
@@ -2781,88 +2790,88 @@ namespace aflowlib {
 
     // LOAD ENERGY DATA1
     if(flag_ENERGY1) {
-      outcar.GetPropertiesFile(directory_RAW+"/OUTCAR.relax1",data.natoms,TRUE);
+      xOUT.GetPropertiesFile(directory_RAW+"/OUTCAR.relax1",data.natoms,TRUE);
       //   ExtractDataOSZICAR(directory_RAW+"/OSZICAR.relax1",data.natoms,data1_dE,data1_dEN,data1_mag,data1_mag_atom);
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENERGY1 total E0 (eV) = " << (data1_energy_cell=outcar.energy_cell) << endl;
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENERGY1 per atom E0/N (eV) = " << (data1_energy_atom=outcar.energy_atom) << endl;
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY1 total E0 (eV) = " << outcar.enthalpy_cell << endl;
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY1 per atom E0/N (eV) = " << outcar.enthalpy_atom << endl;
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPIN1 mag (\\mu) = " << outcar.mag_cell << endl;
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPIN1 per atom mag/N (\\mu) = " << outcar.mag_atom << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENERGY1 total E0 (eV) = " << (data1_energy_cell=xOUT.energy_cell) << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENERGY1 per atom E0/N (eV) = " << (data1_energy_atom=xOUT.energy_atom) << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY1 total E0 (eV) = " << xOUT.enthalpy_cell << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY1 per atom E0/N (eV) = " << xOUT.enthalpy_atom << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPIN1 mag (\\mu) = " << xOUT.mag_cell << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPIN1 per atom mag/N (\\mu) = " << xOUT.mag_atom << endl;
     }
     // LOAD ENERGY DATA
-    outcar.GetPropertiesFile(directory_RAW+"/OUTCAR.relax",data.natoms,TRUE);
+    xOUT.GetPropertiesFile(directory_RAW+"/OUTCAR.relax",data.natoms,TRUE);
     kpoints.GetPropertiesFile(directory_RAW+"/KPOINTS.relax",TRUE);
 
-    data.pressure=outcar.pressure;
+    data.pressure=xOUT.pressure;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PRESSURE (kB) = " << data.pressure << endl;
     data.vstress_tensor.clear();
-    data.vstress_tensor.push_back(outcar.stress(1,1));data.vstress_tensor.push_back(outcar.stress(1,2));data.vstress_tensor.push_back(outcar.stress(1,3));
-    data.vstress_tensor.push_back(outcar.stress(2,1));data.vstress_tensor.push_back(outcar.stress(2,2));data.vstress_tensor.push_back(outcar.stress(2,3));
-    data.vstress_tensor.push_back(outcar.stress(3,1));data.vstress_tensor.push_back(outcar.stress(3,2));data.vstress_tensor.push_back(outcar.stress(3,3));
+    data.vstress_tensor.push_back(xOUT.stress(1,1));data.vstress_tensor.push_back(xOUT.stress(1,2));data.vstress_tensor.push_back(xOUT.stress(1,3));
+    data.vstress_tensor.push_back(xOUT.stress(2,1));data.vstress_tensor.push_back(xOUT.stress(2,2));data.vstress_tensor.push_back(xOUT.stress(2,3));
+    data.vstress_tensor.push_back(xOUT.stress(3,1));data.vstress_tensor.push_back(xOUT.stress(3,2));data.vstress_tensor.push_back(xOUT.stress(3,3));
     data.stress_tensor="";
     if(data.vstress_tensor.size())
       for(uint i=0;i<data.vstress_tensor.size();i++)
         data.stress_tensor+=aurostd::utype2string(data.vstress_tensor.at(i),7)+(i<data.vstress_tensor.size()-1?",":"");
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " STRESS_TENSOR (kB) = " << data.stress_tensor << endl;
-    data.pressure_residual=outcar.pressure_residual;
+    data.pressure_residual=xOUT.pressure_residual;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PRESSURE_RESIDUAL (kB) = " << data.pressure_residual << endl;
-    data.Pulay_stress=outcar.Pulay_stress;
+    data.Pulay_stress=xOUT.Pulay_stress;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PULAY_STRESS (kB) = " << data.Pulay_stress << endl;
-    data.energy_cell=outcar.energy_cell;
+    data.energy_cell=xOUT.energy_cell;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENERGY total E0 (eV) = " << data.energy_cell << endl;
-    data.energy_atom=outcar.energy_atom;
+    data.energy_atom=xOUT.energy_atom;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENERGY per atom E0/N (eV) = " << data.energy_atom << endl;
-    data.enthalpy_cell=outcar.enthalpy_cell;
+    data.enthalpy_cell=xOUT.enthalpy_cell;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY total E0 (eV) = " << data.enthalpy_cell << endl;
-    data.enthalpy_atom=outcar.enthalpy_atom;
+    data.enthalpy_atom=xOUT.enthalpy_atom;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY per atom E0/N (eV) = " << data.enthalpy_atom << "   " << directory_LIB << endl;
-    data.eentropy_cell=outcar.eentropy_cell;
+    data.eentropy_cell=xOUT.eentropy_cell;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " E-ENTROPY total E0 (eV) = " << data.eentropy_cell << endl;
-    data.eentropy_atom=outcar.eentropy_atom;
+    data.eentropy_atom=xOUT.eentropy_atom;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " E-ENTROPY per atom E0/N (eV) = " << data.eentropy_atom << endl;
-    data.PV_cell=outcar.PV_cell;
+    data.PV_cell=xOUT.PV_cell;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PV total E0 (eV) = " << data.PV_cell << endl;
-    data.PV_atom=outcar.PV_atom;
+    data.PV_atom=xOUT.PV_atom;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PV per atom E0/N (eV) = " << data.PV_atom << endl;
-    data.spin_cell=outcar.mag_cell;
+    data.spin_cell=xOUT.mag_cell;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPIN mag (\\mu) = " << data.spin_cell << endl;
-    data.spin_atom=outcar.mag_atom;
+    data.spin_atom=xOUT.mag_atom;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPIN per atom mag/N (\\mu) = " << data.spin_atom << "   " << directory_LIB << endl;
     // CO20180130 - START
     //moving FROM magnetic loop so we keep spin/cell, spin/atom, and spinD all together
     data.spinD="";
     data.vspinD.clear();
-    if(outcar.vmag.size()) {
-      for(uint i=0;i<(uint) outcar.vmag.size();i++) {
-        data.spinD+=aurostd::utype2string<double>(outcar.vmag.at(i),5)+(i<outcar.vmag.size()-1?",":"");
-        data.vspinD.push_back(outcar.vmag.at(i));
+    if(xOUT.vmag.size()) {
+      for(uint i=0;i<(uint) xOUT.vmag.size();i++) {
+        data.spinD+=aurostd::utype2string<double>(xOUT.vmag.at(i),5)+(i<xOUT.vmag.size()-1?",":"");
+        data.vspinD.push_back(xOUT.vmag.at(i));
       }
     } else {
-      for(uint i=0;i<outcar.natoms;i++) {  //use outcar.natoms as there can be a primitivization between relax and static
-        data.spinD+=aurostd::utype2string<double>(0)+(i<outcar.natoms-1?",":"");
+      for(uint i=0;i<xOUT.natoms;i++) {  //use xOUT.natoms as there can be a primitivization between relax and static
+        data.spinD+=aurostd::utype2string<double>(0)+(i<xOUT.natoms-1?",":"");
         data.vspinD.push_back(0.0);
       }
     }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPIND (\\mu) = " << data.spinD << "   " << directory_LIB << endl;
     // CO20180130 - STOP
-    data.energy_cutoff=outcar.ENCUT;
+    data.energy_cutoff=xOUT.ENCUT;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENERGY_CUTOFF (eV) = " << data.energy_cutoff << endl;
-    data.delta_electronic_energy_convergence=outcar.total_energy_change;
+    data.delta_electronic_energy_convergence=xOUT.total_energy_change;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DELTA_ELECTRONIC_ENERGY_CONVERGENCE (eV) = " << data.delta_electronic_energy_convergence << endl; // CORMAC
-    data.delta_electronic_energy_threshold=outcar.EDIFF;
+    data.delta_electronic_energy_threshold=xOUT.EDIFF;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DELTA_ELECTRONIC_ENERGY_THRESHOLD (eV) = " << data.delta_electronic_energy_threshold << endl; // CORMAC
     data.nkpoints=kpoints.nkpoints;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " NKPOINTS (from KPOINTS) = " << data.nkpoints << endl;
     data.kpoints_nnn_relax=kpoints.nnn_kpoints;
     data.kpoints=aurostd::utype2string(kpoints.nnn_kpoints[1])+","+aurostd::utype2string(kpoints.nnn_kpoints[2])+","+aurostd::utype2string(kpoints.nnn_kpoints[3]);
-    data.nkpoints_irreducible=outcar.nkpoints_irreducible;
+    data.nkpoints_irreducible=xOUT.nkpoints_irreducible;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " NKPOINTS_IRREDUCIBLE (from OUTCAR) = " << data.nkpoints_irreducible << endl;
     data.kppra=data.natoms*kpoints.nkpoints;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " NKPPRA = " << data.kppra << endl;
-    data_vforces.clear(); for(uint i=0;i<outcar.vforces.size();i++) { data_vforces.push_back(outcar.vforces.at(i)); }
+    data_vforces.clear(); for(uint i=0;i<xOUT.vforces.size();i++) { data_vforces.push_back(xOUT.vforces.at(i)); }
     data.vforces=data_vforces;
-    data_vpositions_cartesian.clear(); for(uint i=0;i<outcar.vpositions_cartesian.size();i++)  data_vpositions_cartesian.push_back(outcar.vpositions_cartesian.at(i));
+    data_vpositions_cartesian.clear(); for(uint i=0;i<xOUT.vpositions_cartesian.size();i++)  data_vpositions_cartesian.push_back(xOUT.vpositions_cartesian.at(i));
     data.vpositions_cartesian=data_vpositions_cartesian;
     int precfp=8; //DX20190320 - changed from uint to int, otherwise breaks
     data.forces="";
@@ -2889,6 +2898,7 @@ namespace aflowlib {
     data.vspecies_pp.clear();
     data.vspecies_pp_version.clear();
     data.vspecies_pp_ZVAL.clear();
+    data.vspecies_pp_AUID.clear();
 
     for(uint itry=1;itry<=5&&str_relax.species.size()==0;itry++) {  // ONLY OUTCAR as POTCARS ARE OBSOLETE
       deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
@@ -2903,26 +2913,29 @@ namespace aflowlib {
         if(aurostd::FileExist(fileE_LIB)) {
 	  if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Thermodynamics: fileE_LIB=" << fileE_LIB << endl;
           // [OBSOLETE]	stringstream stream_outcar(aurostd::execute2string("bzcat"+" \""+fileE_LIB+"\""));
-          // [OBSOLETE]	outcar.GetProperties(stream_outcar);
-          outcar.GetPropertiesFile(fileE_LIB);
-          // DEBUG	for(uint i=0;i<outcar.species.size();i++) cerr << "outcar.species.at(i)=" << outcar.species.at(i) << endl;
-          str_relax.species.clear(); for(uint i=0;i<outcar.species.size();i++) { str_relax.species.push_back(outcar.species.at(i));data.vspecies.push_back(outcar.species.at(i)); } // for aflowlib_libraries.cpp
-	  if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Thermodynamics: outcar.species.size()=" << outcar.species.size() << endl;
-	  str_relax.species_pp.clear(); for(uint i=0;i<outcar.species_pp.size();i++) { str_relax.species_pp.push_back(outcar.species_pp.at(i));data.vspecies_pp.push_back(outcar.species_pp.at(i)); } // for aflowlib_libraries.cpp
-          str_relax.species_pp_type.clear(); for(uint i=0;i<outcar.species_pp_type.size();i++) { str_relax.species_pp_type.push_back(outcar.species_pp_type.at(i));/*data.vspecies_pp_type.push_back(outcar.vspecies_pp_type.at(i));*/} // for aflowlib_libraries.cpp
-          str_relax.species_pp_version.clear(); for(uint i=0;i<outcar.species_pp_version.size();i++) { str_relax.species_pp_version.push_back(outcar.species_pp_version.at(i));data.vspecies_pp_version.push_back(outcar.species_pp_version.at(i)); } // for aflowlib_libraries.cpp
-          str_relax.species_pp_ZVAL.clear(); for(uint i=0;i<outcar.vZVAL.size();i++) { str_relax.species_pp_ZVAL.push_back(outcar.vZVAL.at(i));data.vspecies_pp_ZVAL.push_back(outcar.vZVAL.at(i)); } // for aflowlib_libraries.cpp
-          data.dft_type=outcar.pp_type;
-          data.vdft_type.push_back(outcar.pp_type);  // CO, this is technically a vector (RESTAPI paper)
-          str_relax.species_pp_vLDAU.clear(); for(uint i=0;i<outcar.species_pp_vLDAU.size();i++) str_relax.species_pp_vLDAU.push_back(outcar.species_pp_vLDAU.at(i));  // for aflowlib_libraries.cpp
-          data.ldau_TLUJ=outcar.string_LDAU;
+          // [OBSOLETE]	xOUT.GetProperties(stream_outcar);
+          xOUT.GetPropertiesFile(fileE_LIB);
+          // DEBUG	for(uint i=0;i<xOUT.species.size();i++) cerr << "xOUT.species.at(i)=" << xOUT.species.at(i) << endl;
+          str_relax.species.clear(); for(uint i=0;i<xOUT.species.size();i++) { str_relax.species.push_back(xOUT.species.at(i));data.vspecies.push_back(xOUT.species.at(i)); } // for aflowlib_libraries.cpp
+	  if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Thermodynamics: xOUT.species.size()=" << xOUT.species.size() << endl;
+	  str_relax.species_pp.clear(); for(uint i=0;i<xOUT.species_pp.size();i++) { str_relax.species_pp.push_back(xOUT.species_pp.at(i));data.vspecies_pp.push_back(xOUT.species_pp.at(i)); } // for aflowlib_libraries.cpp
+          str_relax.species_pp_type.clear(); for(uint i=0;i<xOUT.species_pp_type.size();i++) { str_relax.species_pp_type.push_back(xOUT.species_pp_type.at(i));/*data.vspecies_pp_type.push_back(xOUT.vspecies_pp_type.at(i));*/} // for aflowlib_libraries.cpp
+          str_relax.species_pp_version.clear(); for(uint i=0;i<xOUT.species_pp_version.size();i++) { str_relax.species_pp_version.push_back(xOUT.species_pp_version.at(i));data.vspecies_pp_version.push_back(xOUT.species_pp_version.at(i)); } // for aflowlib_libraries.cpp
+          str_relax.species_pp_ZVAL.clear(); for(uint i=0;i<xOUT.vZVAL.size();i++) { str_relax.species_pp_ZVAL.push_back(xOUT.vZVAL.at(i));data.vspecies_pp_ZVAL.push_back(xOUT.vZVAL.at(i)); } // for aflowlib_libraries.cpp
+	  data.vspecies_pp_AUID.clear(); for(uint i=0;i<xOUT.species_pp_AUID.size();i++) { data.vspecies_pp_AUID.push_back(xOUT.species_pp_AUID.at(i)); } // for aflowlib_libraries.cpp
+          data.dft_type=xOUT.pp_type;
+          data.vdft_type.push_back(xOUT.pp_type);  // CO, this is technically a vector (RESTAPI paper)
+          str_relax.species_pp_vLDAU.clear(); for(uint i=0;i<xOUT.species_pp_vLDAU.size();i++) str_relax.species_pp_vLDAU.push_back(xOUT.species_pp_vLDAU.at(i));  // for aflowlib_libraries.cpp
+          data.ldau_TLUJ=xOUT.string_LDAU;	  
+	  
+	  
           // ME20190124 BEGIN - Store LDAU information individually
           // Note that the vector here has the species in the columns, not the
           // rows because this is closer to the format in the out and json files.
           data.vLDAU.resize(4);
-          for (uint i = 0; i < outcar.species_pp_vLDAU.size(); i++) {
+          for (uint i = 0; i < xOUT.species_pp_vLDAU.size(); i++) {
             for (int j = 0; j < 4; j++) {
-              data.vLDAU[j].push_back(outcar.species_pp_vLDAU[i][j]);
+              data.vLDAU[j].push_back(xOUT.species_pp_vLDAU[i][j]);
             }
           }
           // ME20190124 - END
@@ -2944,6 +2957,7 @@ namespace aflowlib {
     if(data.nspecies!=str_relax.species_pp_type.size()) { cerr << MESSAGE << " ERROR [3] - data.nspecies[" << data.nspecies << "]!=str_relax.species_pp_type.size()[" << str_relax.species_pp_type.size() << "]" << endl;exit(0); }
     if(data.nspecies!=str_relax.species_pp_version.size()) { cerr << MESSAGE << " ERROR [4] - data.nspecies[" << data.nspecies << "]!=str_relax.species_pp_version.size()[" << str_relax.species_pp_version.size() << "]" << endl;exit(0); }
     if(data.nspecies!=str_relax.species_pp_ZVAL.size()) { cerr << MESSAGE << " ERROR [5] - data.nspecies[" << data.nspecies << "]!=str_relax.species_pp_ZVAL.size()[" << str_relax.species_pp_ZVAL.size() << "]" << endl;exit(0); }
+    if(data.nspecies!=data.vspecies_pp_AUID.size()) { cerr << MESSAGE << " ERROR [5] - data.nspecies[" << data.nspecies << "]!=data.vspecies_pp_AUID.size()[" << data.vspecies_pp_AUID.size() << "]" << endl;exit(0); }
     if(data.nspecies!=str_relax.species_volume.size()) { cerr << MESSAGE << " ERROR [6] - data.nspecies[" << data.nspecies << "]!=str_relax.species_volume.size()[" << str_relax.species_volume.size() << "]" << endl;exit(0); }
     if(data.nspecies!=str_relax.species_mass.size()) { cerr << MESSAGE << " ERROR [7] - data.nspecies[" << data.nspecies << "]!=str_relax.species_mass.size()[" << str_relax.species_mass.size() << "]" << endl;exit(0); }
 
@@ -2957,6 +2971,7 @@ namespace aflowlib {
     data.species_pp="";
     data.species_pp_version="";
     data.species_pp_ZVAL="";
+    data.species_pp_AUID="";
     data.valence_cell_iupac=0.0;
     data.valence_cell_std=0.0;
     for(uint i=0;i<(uint) data.nspecies;i++) {
@@ -2971,6 +2986,7 @@ namespace aflowlib {
       // [UNUSED]    data.species_pp_type+=str_relax.species_pp_type.at(i);if(i<data.nspecies-1) data.species_pp_type+=",";
       data.species_pp_version+=str_relax.species_pp_version.at(i);if(i<data.nspecies-1) data.species_pp_version+=",";
       data.species_pp_ZVAL+=aurostd::utype2string(str_relax.species_pp_ZVAL.at(i));if(i<data.nspecies-1) data.species_pp_ZVAL+=",";
+      data.species_pp_AUID+=data.vspecies_pp_AUID.at(i);if(i<data.nspecies-1) data.species_pp_AUID+=",";
       //  cerr << "SIMPLE=" << str_relax.species.at(i) << endl;
       data.valence_cell_iupac+=str_relax.num_each_type.at(i)*GetAtomValenceIupac(str_relax.species.at(i));
       data.valence_cell_std+=str_relax.num_each_type.at(i)*GetAtomValenceStd(str_relax.species.at(i));
@@ -3003,6 +3019,7 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PSEUDOPOTENTIAL dft_type=" << data.dft_type << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PSEUDOPOTENTIAL species_pp_version = " << data.species_pp_version << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PSEUDOPOTENTIAL species_pp_ZVAL = " << data.species_pp_ZVAL << endl;
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PSEUDOPOTENTIAL species_pp_AUID = " << data.species_pp_AUID << endl;
     // reference
     bool isLDAUcalc=FALSE;
     if(str_relax.species_pp_vLDAU.at(0).size()>0) isLDAUcalc=TRUE;
@@ -3030,7 +3047,7 @@ namespace aflowlib {
         //	if(data.nspecies>1)
         //	enthalpy_atom_ref=EnthalpyReference(str_relax.species_pp.at(i),str_relax.species_pp_type.at(i),str_relax.species_pp_vLDAU.at(i),cerr);  // OLD
         enthalpy_atom_ref=EnthalpyReference(str_relax.species_pp_version.at(i),str_relax.species_pp_vLDAU.at(i),cerr);
-        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE SPECIE_pp_version=" << str_relax.species_pp_version.at(i) << "  Href=" << enthalpy_atom_ref << endl;
+        if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE species_pp_version=" << str_relax.species_pp_version.at(i) << " species_pp_AUID=" << data.vspecies_pp_AUID.at(i) << "  Href=" << enthalpy_atom_ref << " FIX !!" << endl;
         venthalpy_atom_ref.push_back(enthalpy_atom_ref);
       }
 
@@ -3467,9 +3484,9 @@ namespace aflowlib {
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing orig (POSCAR.orig) text format: " << directory_RAW << endl;
         // [OBSOLETE] aurostd::execute("cd \""+directory_RAW+"\" && cat POSCAR.orig | aflow --edata > "+DEFAULT_FILE_EDATA_ORIG_OUT);
         str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX20191220 - uppercase to lowercase clear
-        // DX - START
+        // DX START
         //DX20180526 [OBSOLETE] str.directory = str_sp.directory = str_sc.directory = aflags.Directory;
-        // DX - END
+        // DX END
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; // CO20171027 // DX20180226 - set equal str
         aurostd::xoption vpflow_edata_orig; //DX20180823 - added xoption
@@ -4519,15 +4536,15 @@ namespace aflowlib {
 
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Bader [2]" << endl;
 
-    deque<string> vspecies;aurostd::string2tokens(data.species,vspecies,",");
+    vector<string> vspecies;aurostd::string2tokens(data.species,vspecies,",");
     for(uint i=0;i<vspecies.size();i++)
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << vspecies.at(i) << endl;
 
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Bader [3]" << endl;
 
-    vector<double> vspecies_pp_ZVAL=data.vspecies_pp_ZVAL;//;aurostd::string2tokens(data.species_pp_ZVAL,vspecies_pp_ZVAL,",");
-    for(uint i=0;i<vspecies_pp_ZVAL.size();i++)
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " " << vspecies_pp_ZVAL.at(i) << endl;
+    vector<double> vspecies_pp_ZVAL;
+    for(uint i=0;i<data.vspecies_pp_ZVAL.size();i++) { vspecies_pp_ZVAL.push_back(data.vspecies_pp_ZVAL.at(i)); }//;aurostd::string2tokens(data.species_pp_ZVAL,vspecies_pp_ZVAL,",");
+    for(uint i=0;i<vspecies_pp_ZVAL.size();i++) { if(AFLOWLIB_VERBOSE) { cout << MESSAGE << " " << vspecies_pp_ZVAL.at(i) << endl; } } 
 
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Bader [4]" << endl;
 
@@ -4947,12 +4964,6 @@ namespace aflowlib {
       } // iremove
     } // iext
 
-    // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/aflow.in~")) {
-    // [OBSOLETE]    aurostd::RemoveFile(directory_LIB+"/aflow.in~");
-    // [OBSILETE]  if(AFLOWLIB_VERBOSE) 
-    // [OBSOLETE]	cout << MESSAGE << " removing file: " << aurostd::CleanFileName(directory_LIB+"/aflow.in~") << endl;
-    // [OBSOLETE] }
-
     vector<string> vremoveERROR;
     aurostd::string2tokens("aflow.error.rotmat,aflow.error.nbands,aflow.error.symprec,aflow.error.read_kpoints_rd_sym,aflow.error.ibzkpt,aflow.error.gamma_shift,aflow.error.mpich11,aflow.error.mpich139,aflow.error.nkxyz_ikptd,aflow.error.eddrmm,aflow.error.lreal,aflow.error.exccor,aflow.error.brmix,aflow.error.dav,aflow.error.edddav,aflow.error.efield_pead,aflow.error.zpotrf,aflow.error.zpotrf_potim,aflow.error.natoms,aflow.error.psmaxn,aflow.error.npar,aflow.error.nparc,aflow.error.nparn,aflow.error.npar_remove,aflow.error.csloshing,aflow.error.dentet",vremoveERROR,",");
     for(uint iext=0;iext<vext.size();iext++) {
@@ -4963,14 +4974,58 @@ namespace aflowlib {
       } // iremove
     } // iext
 
-    // [OBSOLETE]  for(uint i=0;i<vremove.size();i++) {
-    // [OBSOLETE]  if(aurostd::FileExist(directory_LIB+"/"+vremove.at(iremove)+vext.at(iext))) {
-    // [OBSOLETE]	aurostd::RemoveFile(directory_LIB+"/"+vremove.at(iremove)+vext.at(iext));
-    // [OBSOLETE]	if(AFLOWLIB_VERBOSE) cout << MESSAGE << " removing file: " << aurostd::CleanFileName(directory_LIB+"/"+vremove.at(iremove)+vext.at(iext)) << endl;
-    // [OBSOLETE]   }
-    // [OBSOLETE]  }
     // done   ---------------------------------------------------------------
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_LOCK - end " << directory_LIB << endl;
+    return TRUE;
+  }
+}
+
+// ***************************************************************************
+// aflowlib::LIB2RAW_Loop_PATCH
+// ***************************************************************************
+namespace aflowlib {
+  bool LIB2RAW_Loop_PATCH(string& directory_LIB,string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,string MESSAGE) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_PATCH [1]" << endl;
+    // Stefano Curtarolo 2009-2010-2011-2012
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_PATCH - begin " << directory_LIB << endl;
+    if(AFLOWLIB_VERBOSE&&0) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_PATCH - begin " << directory_RAW << endl;  // to avoid unused
+    if(AFLOWLIB_VERBOSE&&0) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_PATCH - begin " << vfile.size() << endl;  // to avoid unused
+    //  aflowlib_out << _AFLOWLIB_ENTRY_SEPARATOR_ << "loop=PATCH";
+
+    // --------------------------------------------------------------------
+    // CHECK existence of DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT
+    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); 
+    //    deque<string> vzip; aurostd::string2tokens("bzip2,xz,gzip",vzip,",");vzip.push_back("");
+    string file="";
+    for(uint iext=0;iext<vext.size()&&file.empty();iext++)
+      if(aurostd::FileExist(directory_LIB+"/"+DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT+vext.at(iext)))
+	file=directory_LIB+"/"+DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT+vext.at(iext);
+    
+    if(file!="") {
+      // if(AFLOWLIB_VERBOSE)
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FOUND " << file << endl;
+    } else {
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " WRITING " << directory_LIB << "/" << DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT << endl;
+      KBIN::VASP_Write_AUID_FILE(directory_LIB,data.vspecies_pp_AUID,data.vspecies);
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " COMPRESSING " << directory_LIB << "/" << DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT << endl;
+      aurostd::CompressFile(directory_LIB+"/"+DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT,DEFAULT_KZIP_BIN);
+    }
+    // --------------------------------------------------------------------
+    // CHECK existence of VASP_POTCAR_AUID in aflow.in
+    vector<string> vVASP_POTCAR_AUID;
+    aurostd::string2vectorstring(aurostd::execute2string("cat "+directory_LIB+"/"+_AFLOWIN_+" | grep VASP_POTCAR_AUID"),vVASP_POTCAR_AUID);
+    if(LDEBUG) cout << "aflowlib::LIB2RAW_Loop_PATCH: vVASP_POTCAR_AUID.size()=" << vVASP_POTCAR_AUID.size() << endl;
+
+    if(vVASP_POTCAR_AUID.size()) {
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FOUND [VASP_POTCAR_AUID] in " <<  _AFLOWIN_ << ": " << vVASP_POTCAR_AUID.at(0) << endl;
+    } else {
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FIXING " << directory_LIB << "/" << _AFLOWIN_ << endl;
+      KBIN::VASP_Write_AUID_AFLOWIN(directory_LIB,data.vspecies_pp_AUID,data.vspecies);
+    } 
+    
+    // done   ---------------------------------------------------------------
+    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_PATCH - end " << directory_LIB << endl;
     return TRUE;
   }
 }
@@ -5056,7 +5111,7 @@ namespace aflowlib {
     deque<string> vcmd; aurostd::string2tokens("bzcat,xzcat,zcat",vcmd,",");
     deque<string> vrelax; aurostd::string2tokens(".relax1,.relax2,.relax3,.static,.bands",vrelax,",");
     deque<string> vremdirname;aurostd::string2tokens("OUTCAR,OSZICAR,CONTCAR,EIGENVAL",vremdirname,",");
-    deque<string> vbroken;aurostd::string2tokens("OUTCAR,CHG,CHGCAR,PROCAR,EIGENVAL,vasprun.xml",vbroken,",");
+    deque<string> vbroken;  // no more list... this checks everything
        
     for(uint iremdirname=0;iremdirname<vremdirname.size();iremdirname++) {
       for(uint irelax=0;irelax<vrelax.size();irelax++) {
@@ -5113,7 +5168,8 @@ namespace aflowlib {
         if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/OUTCAR"+vrelax.at(irelax))) { ok=FALSE;print=FALSE;obb<<" no=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
         if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/OSZICAR"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=OSZICAR"+vrelax.at(irelax)+".EXT"; }}
         if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/vasp.out"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=vasp.out"+vrelax.at(irelax)+".EXT"; }}
-        if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=EIGENVAL"+vrelax.at(irelax)+".EXT"; }}
+        if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/INCAR"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=INCAR"+vrelax.at(irelax)+".EXT"; }}
+	//      if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=EIGENVAL"+vrelax.at(irelax)+".EXT"; }}
         if(vrelax.at(irelax)==".static")
           if(ok) { obb<<"d"; if(!aurostd::EFileExist(dir+"/DOSCAR"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=DOSCAR"+vrelax.at(irelax)+".EXT"; }}
         // "OUTCAR"+vrelax.at(irelax)+".EXT"  //CO200106 - patching for auto-indenting (quotes)
@@ -5122,7 +5178,7 @@ namespace aflowlib {
           for(uint iext=0;iext<vext.size();iext++) {
             if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+vext.at(iext))) {
               answer=aurostd::execute2utype<int>(vcmd.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+vext.at(iext)+"\" | grep -c \"(sec)\" ");
-              if(answer!=4 && answer!=5) { ok=FALSE;obb<<" error(" << answer << ")=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
+              if(answer!=4 && answer!=5) { ok=FALSE;obb<<". error(" << answer << ")=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
           }
         }
 	obb<<".";
@@ -5130,16 +5186,23 @@ namespace aflowlib {
           for(uint iext=0;iext<vext.size();iext++) {
             if(aurostd::FileExist(dir+"/vasp.out"+vrelax.at(irelax)+vext.at(iext))) {
               answer=aurostd::execute2utype<int>(vcmd.at(iext)+" \""+dir+"/vasp.out"+vrelax.at(irelax)+vext.at(iext)+"\" | grep -c \"The distance between some ions is very small\" ");
-              if(answer!=0) { ok=FALSE;obb<<" ions=vasp.out"+vrelax.at(irelax)+".EXT"; }}
+              if(answer!=0) { ok=FALSE;obb<<". ions=vasp.out"+vrelax.at(irelax)+".EXT"; }}
           }
 	}
-	obb<<".";	
-	for(uint ibroken=0;ibroken<vbroken.size();ibroken++) {
-	  if(ok) { obb<<"b"; // TEST "+vbroken.at(ibroken)+"
-	    for(uint iext=0;iext<vext.size();iext++) {
-	      if(aurostd::FileExist(dir+"/"+vbroken.at(ibroken)+vrelax.at(irelax)+vext.at(iext))) {
-		answer=aurostd::execute2utype<int>(vcmd.at(iext)+" \""+dir+"/"+vbroken.at(ibroken)+vrelax.at(irelax)+vext.at(iext)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
-		if(answer!=0) { ok=FALSE;obb<<" Broken_file="+vbroken.at(ibroken)+vrelax.at(irelax)+".EXT"; }}
+	obb<<".";
+      }
+      if(ok) {// obb<<"b"; // TEST "+vbroken.at(ibroken)+"
+	for(uint iext=0;iext<vext.size();iext++) {
+	  if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+vext.at(iext))) {
+	    //	    cerr << string("ls "+dir+"/*"+vrelax.at(irelax)+vext.at(iext)) << endl;
+	    aurostd::string2dequestring(aurostd::execute2string("ls "+dir+"/*"+vrelax.at(irelax)+vext.at(iext)),vbroken);
+	    for(uint ibroken=0;ibroken<vbroken.size();ibroken++) {
+	      //      cerr << "[" << vbroken.at(ibroken) << "]" << endl;
+	      if(ok && aurostd::FileExist(vbroken.at(ibroken))) {
+		obb<<"b";
+		//		answer=aurostd::execute2utype<int>(vcmd.at(iext)+" \""+dir+"/"+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
+		answer=aurostd::execute2utype<int>(vcmd.at(iext)+" \""+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
+		if(answer!=0) { ok=FALSE;obb<<". Broken_file="+vbroken.at(ibroken)+".EXT"; }}
 	    }
 	  }
 	}
@@ -5755,7 +5818,7 @@ namespace aflowlib {
       flag_FORCE=true;
       string directory=aurostd::CleanFileName(options);
       aurostd::StringSubst(directory,"./","");
-      if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
+      if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
       // OBSOLETE flag_files_LIB=FALSE;
       directory_LIB=directory;
       PROJECT_LIBRARY=directory_LIB;

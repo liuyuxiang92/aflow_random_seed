@@ -979,8 +979,8 @@ namespace aflowlib {
 
         //  if(vatomX.size()==0 && vvolumeX.size()==0)
         {  // fix volume in WYC
-          //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-          str.SetVolume(volume);  //CO190205 - more robust
+          //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+          str.SetVolume(volume);  //CO20190205 - more robust
           str.neg_scale=TRUE;
         }
         // strip unstrip atoms
@@ -1981,8 +1981,8 @@ namespace aflowlib {
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) TITLE(6): " << str.title << endl; }
 
       if(mode_load==STRUCTURE_MODE_ICSD) {
-        //[CO190406 - fixing for HASH comment]str.title=label_library+" "+"#"+sgstring+" - "+"("+label+")";  // SG# AS Wahyu wants
-        str.title=label_library+" SG="+sgstring+" - "+"("+label+")";  // SG# AS Wahyu wants //CO190520
+        //[CO20190406 - fixing for HASH comment]str.title=label_library+" "+"#"+sgstring+" - "+"("+label+")";  // SG# AS Wahyu wants
+        str.title=label_library+" SG="+sgstring+" - "+"("+label+")";  // SG# AS Wahyu wants //CO20190520
         str.title+=" - "+str.prototype+" "+_ICSD_STRING_;                                                // SG# as Wahyu wants
         str.title=str.title+" (WICKOFF "+sgstring+" "+str.spacegrouplabel+")";
       }
@@ -2106,8 +2106,8 @@ namespace aflowlib {
       }
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [6] volume=" << volume << endl; }
       // fix volume in WYC or ABC
-      //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-      str.SetVolume(volume);  //CO190205 - more robust
+      //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+      str.SetVolume(volume);  //CO20190205 - more robust
       str.neg_scale=TRUE;
     }
     if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] structure_mode_volume" << endl; }
@@ -2147,7 +2147,7 @@ namespace aflowlib {
       //    *voss << "str.spacegroupnumberoption=" << str.spacegroupnumberoption << endl;
 
       xstructure str_in(str),str_sp,str_sc;
-      // DX - START
+      // DX START
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] symmetry 1 - Symmetry tolerance scan (DX and COREY) " << endl; }
       LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
       // DX
@@ -2167,7 +2167,7 @@ namespace aflowlib {
       //if(str_sp.bravais_lattice_type.empty() || str_sp.bravais_lattice_type=="UNKNOWN") {
       //if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] symmetry 1.5 - try again - loose" << endl; }
       //LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc);}
-      // DX - END
+      // DX END
 
       str.bravais_lattice_type=str_sp.bravais_lattice_type;
       str.bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
@@ -2214,7 +2214,7 @@ namespace aflowlib {
           if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) (aflow_xproto.cpp): inheriting  eps=" << eps << "  epsang=" << epsang << " " << endl; }
         }
         str_sp.bravais_lattice_type="X";
-        // DX - START
+        // DX START
         // [[JUNKAI OBSOLETE]]  uint step=0;
         //  while (str_sp.bravais_lattice_type!=str.bravais_lattice_type && str_sp.bravais_lattice_type!="UNKNOWN" && step<10) {  //[CO200106 - close bracket for indenting]}
         LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc); // DX
@@ -2261,7 +2261,7 @@ namespace aflowlib {
         // [[JUNKAI OBSOLETE]]  }
         // [[JUNKAI OBSOLETE]]  eps=eps/3.0;epsang=epsang/3.0;
         // [[JUNKAI OBSOLETE]]}
-        // DX - END
+        // DX END
 
         if(str_sp.bravais_lattice_type!=str.bravais_lattice_type) {
           oss << "ERROR (aflow_xproto.cpp): label=" << label << "  " << str_sp.bravais_lattice_type << " " << str.bravais_lattice_type << " "
@@ -2992,8 +2992,8 @@ namespace aflowlib {
 
         //  if(PARAMS->vatomX.size()==0 && PARAMS->vvolumeX.size()==0)
         {  // fix volume in WYC
-          //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-          str.SetVolume(volume);  //CO190205 - more robust
+          //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+          str.SetVolume(volume);  //CO20190205 - more robust
           str.neg_scale=TRUE;
         }
         // strip unstrip atoms
@@ -3918,8 +3918,8 @@ namespace aflowlib {
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) TITLE(6): " << str.title << endl;
 
       if(mode_load==STRUCTURE_MODE_ICSD) {
-        //[CO190406 - fixing for HASH comment]str.title=label_library+" "+"#"+sgstring+" - "+"("+PARAMS->label+")";  // SG# AS Wahyu wants
-        str.title=label_library+" SG="+sgstring+" - "+"("+PARAMS->label+")";  // SG# AS Wahyu wants //CO190520
+        //[CO20190406 - fixing for HASH comment]str.title=label_library+" "+"#"+sgstring+" - "+"("+PARAMS->label+")";  // SG# AS Wahyu wants
+        str.title=label_library+" SG="+sgstring+" - "+"("+PARAMS->label+")";  // SG# AS Wahyu wants //CO20190520
         str.title+=" - "+str.prototype+" "+_ICSD_STRING_;                                                // SG# as Wahyu wants
         str.title=str.title+" (WICKOFF "+sgstring+" "+str.spacegrouplabel+")";
       }
@@ -4036,8 +4036,8 @@ namespace aflowlib {
       }
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [6] volume=" << volume << endl;
       // fix volume in WYC or ABC
-      //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-      str.SetVolume(volume);  //CO190205 - more robust
+      //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+      str.SetVolume(volume);  //CO20190205 - more robust
       str.neg_scale=TRUE;
     }
     if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] structure_mode_volume" << endl;
@@ -4074,7 +4074,7 @@ namespace aflowlib {
       //    cerr << "str.spacegroupnumber=" << str.spacegroupnumber << endl;
       //    cerr << "str.spacegroupnumberoption=" << str.spacegroupnumberoption << endl;
 
-      // DX - START
+      // DX START
       xstructure str_in(str),str_sp,str_sc;
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] symmetry 1 - Symmetry tolerance scan (DX and COREY) " << endl; }
       LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);      
@@ -4097,7 +4097,7 @@ namespace aflowlib {
       //if(str_sp.bravais_lattice_type.empty() || str_sp.bravais_lattice_type=="UNKNOWN") {
       //if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] symmetry 1.5 - try again - loose" << endl;
       //LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc);}
-      // DX - END
+      // DX END
 
       str.bravais_lattice_type=str_sp.bravais_lattice_type;
       str.bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
@@ -4144,7 +4144,7 @@ namespace aflowlib {
           if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) (aflow_xproto.cpp): inheriting  eps=" << eps << "  epsang=" << epsang << " " << endl;
         }
         str_sp.bravais_lattice_type="X";
-        // DX - START
+        // DX START
         // [[JUNKAI OBSOLETE]] uint step=0;
         LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc); // DX
         // [[JUNKAI OBSOLETE]]

@@ -90,7 +90,7 @@ namespace KBIN {
     opt.keyword="DMAG"; opt.xscheme = utype2string<double>(DEFAULT_APL_DMAG, FLAG_PRECISION); aplflags.push_back(opt); opt.clear();
     opt.keyword="DXYZONLY"; opt.option = DEFAULT_APL_DXYZONLY; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="DSYMMETRIZE"; opt.option = DEFAULT_APL_DSYMMETRIZE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
-    opt.keyword="DINEQUIV_ONLY"; opt.option = DEFAULT_APL_DINEQUIV_ONLY; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear(); //CO190131
+    opt.keyword="DINEQUIV_ONLY"; opt.option = DEFAULT_APL_DINEQUIV_ONLY; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear(); //CO20190131
     //[ME20181226 - now a default in .aflow.rc]// Special case: DPM can be true, false, or empty
     opt.keyword="DPM"; opt.xscheme = DEFAULT_APL_DPM; opt.option = (opt.xscheme=="ON"?true:false); aplflags.push_back(opt); opt.clear();  //CO20181226
     //[ME20181226 - now a default in .aflow.rc]// Special case: k-points options can be empty
@@ -239,8 +239,8 @@ namespace KBIN {
       if (xinput.xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_ENGINE") == "LR") {
         // Unset DM parameters - do not unset DMAG because AAPL may need it
         xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_DPM", false);
-        xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_DSYMMETRIZE", false); //CO190131
-        xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_DINEQUIV_ONLY", false); //CO190131
+        xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_DSYMMETRIZE", false); //CO20190131
+        xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_DINEQUIV_ONLY", false); //CO20190131
         xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_DXYZONLY", false);
         xinput.xvasp.aplopts.flag("AFLOWIN_FLAG::APL_ZEROSTATE", false);
       } else {

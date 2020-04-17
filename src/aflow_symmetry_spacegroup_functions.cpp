@@ -258,11 +258,11 @@ namespace SYM {
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num) {
     split_atom_types = SYM::break_up_by_type(atomic_basis);
     if(split_atom_types.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::getAtomGCD():","split_atom_types.size()==0",_INPUT_ERROR_);}
-    gcd_num=1;  //CO+DX191201
+    gcd_num=1;  //CO+DX20191201
     if(split_atom_types.size() > 1) { // If only one type of atom, set to 1
-      gcd_num=(int)split_atom_types[0].size();  //CO+DX191201
+      gcd_num=(int)split_atom_types[0].size();  //CO+DX20191201
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
-        aurostd::GCD(gcd_num, (int)split_atom_types[p + 1].size(),gcd_num);  //CO191201
+        aurostd::GCD(gcd_num, (int)split_atom_types[p + 1].size(),gcd_num);  //CO20191201
       }
     }
     return true;
@@ -1441,7 +1441,7 @@ namespace SYM {
 // ******************************************************************************
 // mod_one (Modify double by 1; to keep in unit cell)
 // ******************************************************************************
-// DX OBSOLETE? 9/8/17
+// [OBSOLETE] DX20170809
 //namespace SYM {
 //double mod_one(double d) {
 ////double delta=1e-6;
@@ -1892,8 +1892,8 @@ namespace SYM {
         xb();  
       }
     }
-    for (uint s = 0; s < same_site_symmetry_positions.size(); s++) {  // DX 9/11/17 - Check all shifts not just minimum (minimum may not work) 
-      for (uint t = 0; t < same_site_symmetry_positions[s].size(); t++) {  // DX 9/11/17 - Check all shifts not just minimum (minimum may not work)
+    for (uint s = 0; s < same_site_symmetry_positions.size(); s++) {  // DX20170911 - Check all shifts not just minimum (minimum may not work) 
+      for (uint t = 0; t < same_site_symmetry_positions[s].size(); t++) {  // DX20170911 - Check all shifts not just minimum (minimum may not work)
         xvector<double> candidate_shift = SYM::Wyckoff_position_string2xvector(same_site_symmetry_positions[s][t]); 
         bool stored_shift=false; 
         for(uint p=0;p<possible_shifts.size();p++){
@@ -4567,8 +4567,8 @@ namespace SYM {
         tmp.cpos = f2c * tmp.fpos;
         //DX20191011 [OBSOLETE] tmp.name = atoms[k].name;
         //DX20191011 [OBSOLETE] tmp.type = atoms[k].type;
-        //DX20191011 [OBSOLETE] tmp.spin = atoms[k].spin; // DX 9/21/17 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = atoms[k].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin = atoms[k].spin; // DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = atoms[k].spin_is_given; // DX20170921 - magnetic sym
         //DX20191011 [OBSOLETE] tmp.noncoll_spin = atoms[k].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
         //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
         bool contained = false;
@@ -4625,8 +4625,8 @@ namespace SYM {
         tmp.cpos = f2c * tmp.fpos;
         //DX20191011 [OBSOLETE] tmp.name = equivalent_atoms[i][j].name;
         //DX20191011 [OBSOLETE] tmp.type = equivalent_atoms[i][j].type;
-        //DX20191011 [OBSOLETE] tmp.spin = equivalent_atoms[i][j].spin; // DX 9/21/17 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin = equivalent_atoms[i][j].spin; // DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; // DX20170921 - magnetic sym
         //DX20191011 [OBSOLETE] tmp.noncoll_spin = equivalent_atoms[i][j].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
         //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = equivalent_atoms[i][j].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
         if(one_shifted_group.size() == 0) {
@@ -4675,11 +4675,11 @@ namespace SYM {
     }
     bool consistent_ratio = true;
     if(split_atom_types.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::GCD_conventional_atomic_basis():","split_atom_types.size()==0",_INPUT_ERROR_);}
-    int GCD_num = 1;  //CO+DX191201
+    int GCD_num = 1;  //CO+DX20191201
     if(split_atom_types.size() > 1) { // If only one type of atom, set to 1
-      GCD_num=(int)split_atom_types[0].size();  //CO+DX191201
+      GCD_num=(int)split_atom_types[0].size();  //CO+DX20191201
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
-        aurostd::GCD(GCD_num, (int)split_atom_types[p + 1].size(),GCD_num); //CO191201
+        aurostd::GCD(GCD_num, (int)split_atom_types[p + 1].size(),GCD_num); //CO20191201
       }
       for (uint p = 0; p < prim_split_atom_types.size(); p++) {
         for (uint s = 0; s < split_atom_types.size(); s++) {

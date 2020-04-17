@@ -57,7 +57,7 @@ _atom::_atom() {
   fpos_equation.clear(); //DX20180607 - symbolic math for atom positions
   cpos_equation.clear(); //DX20180607 - symbolic math for atom positions
   spin=0.0;
-  spin_is_given=FALSE; // DX 9/21/17 - magnetic sym
+  spin_is_given=FALSE; // DX20170921 - magnetic sym
   noncoll_spin.clear(); // DX20171205 - magnetic sym (non-collinear)
   noncoll_spin_is_given=FALSE; // DX20171205 - magnetic sym (non-collinear)
   mass=0.0;
@@ -84,7 +84,7 @@ _atom::_atom() {
   partial_occupation_flag=FALSE;
   shell=0;
   verbose=FALSE;
-  print_RHT=false;  //CO190405 //true; //CHANGE THIS BACK TO FALSE WHEN DONE DEBUGGING  (RHT)
+  print_RHT=false;  //CO20190405 //true; //CHANGE THIS BACK TO FALSE WHEN DONE DEBUGGING  (RHT)
   print_cartesian=FALSE;
 }
 
@@ -103,7 +103,7 @@ void _atom::copy(const _atom& b) { // copy PRIVATE
   fpos_equation=b.fpos_equation; //DX20180607 - symbolic math for atom positions
   cpos_equation=b.cpos_equation; //DX20180607 - symbolic math for atom positions
   spin=b.spin;
-  spin_is_given=b.spin_is_given; // DX 9/21/17 - magnetic sym
+  spin_is_given=b.spin_is_given; // DX20170921 - magnetic sym
   noncoll_spin=b.noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
   noncoll_spin_is_given=b.noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
   mass=b.mass;
@@ -159,7 +159,7 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "ATOM COUT" << endl;
       oss << "type=" << atom.type << endl;
       oss << "spin=" << atom.spin << endl;
-      oss << "spin_is_given=" << atom.spin_is_given << endl; // DX 9/21/17 - magnetic sym
+      oss << "spin_is_given=" << atom.spin_is_given << endl; // DX20170921 - magnetic sym
       oss << "noncoll_spin=" << atom.noncoll_spin << endl;                   // DX20171205 - magnetic sym (non-collinear)
       oss << "noncoll_spin_is_given=" << atom.noncoll_spin_is_given << endl; // DX20171205 - magnetic sym (non-collinear)
       oss << "mass=" << atom.mass << endl;
@@ -240,14 +240,14 @@ void _atom::CleanName(void) {
 
 void _atom::CleanSpin(void) {
   spin=0.0;
-  spin_is_given=FALSE; // DX 9/21/17 - magnetic sym
+  spin_is_given=FALSE; // DX20170921 - magnetic sym
   noncoll_spin.clear();            // DX20171205 - magnetic sym (non-collinear)
   noncoll_spin_is_given=FALSE; // DX20171205 - magnetic sym (non-collinear)
-  if(name.find("+")!=string::npos) {spin=atof(name.substr(name.find("+")).c_str()); spin_is_given=TRUE;} // DX 9/21/17 - magnetic sym
-  if(name.find("-")!=string::npos) {spin=atof(name.substr(name.find("-")).c_str()); spin_is_given=TRUE;} // DX 9/21/17 - magnetic sym
+  if(name.find("+")!=string::npos) {spin=atof(name.substr(name.find("+")).c_str()); spin_is_given=TRUE;} // DX20170921 - magnetic sym
+  if(name.find("-")!=string::npos) {spin=atof(name.substr(name.find("-")).c_str()); spin_is_given=TRUE;} // DX20170921 - magnetic sym
 }
 
-void _atom::ClearSymmetry(void) { //CO190219
+void _atom::ClearSymmetry(void) { //CO20190219
   (*this).equivalent=-1;
   (*this).is_inequivalent=TRUE;
   (*this).num_equivalents=0;
@@ -954,11 +954,11 @@ double GetPearsonCoefficient(const int& iat) {
 // **************************************************************************
 double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density) { // density in g/cm^3, return in cm
   if(species.size()!=composition.size()) {
-    //[CO190629 - no exit()]cerr << "ERROR - GetCompoundAttenuationLength: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
-    //[CO190629 - no exit()]exit(0);
-    stringstream message; //CO190629
-    message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO190629
+    //[CO20190629 - no exit()]cerr << "ERROR - GetCompoundAttenuationLength: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
+    //[CO20190629 - no exit()]exit(0);
+    stringstream message; //CO20190629
+    message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO20190629
   }
   // cout << "Density=" << density << "<br>" << endl;
   double numerator=0.0,denominator=0.0;
@@ -1081,7 +1081,7 @@ uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vect
     for(uint j=0;j<letters.length();j++)
       if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
 
-  cerr << alloy << endl; exit(0); //CO190629 - need to clean this exit(), but this function looks unused...
+  cerr << alloy << endl; exit(0); //CO20190629 - need to clean this exit(), but this function looks unused...
 
   speciesX.clear();
   for(uint i=0;i<alloy.length();i++) {
@@ -1338,7 +1338,7 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   oss << " (" << buf12_re << "," << buf12_im << ")" << endl; 
   oss << " (" << buf21_re << "," << buf21_im << ") "; 
   oss << " (" << buf22_re << "," << buf22_im << ")" << "  SU(2) complex matrix [(real,imaginary)]" << endl; 
-  // DX - formatting issues with complesx: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
+  // DX formatting issues with complesx: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
   char buf1_re[80],buf1_im[80],buf2_re[80],buf2_im[80],buf3_re[80],buf3_im[80];
   sprintf(buf1_re,iobuf.c_str(),symop.su2_coefficients(1).re);sprintf(buf1_im,iobuf.c_str(),symop.su2_coefficients(1).im);
   sprintf(buf2_re,iobuf.c_str(),symop.su2_coefficients(2).re);sprintf(buf2_im,iobuf.c_str(),symop.su2_coefficients(2).im);
@@ -1346,7 +1346,7 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   oss << " (" << buf1_re << "," << buf1_im << ") ";
   oss << " (" << buf2_re << "," << buf2_im << ") ";
   oss << " (" << buf3_re << "," << buf3_im << ")" << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
-  // DX - formatting issues with complex: oss << " " << symop.su2_coefficients << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
+  // DX formatting issues with complex: oss << " " << symop.su2_coefficients << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
   // DX20180115 - adding SU(2) and su(2); specific xcomplex printing - END
   oss << " "<< symop.angle << "  angle " << endl;
   oss << "" << symop.axis <<  "  axis " << endl;
@@ -1383,12 +1383,12 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   return oss;
 }
 
-void _sym_op::setUc(const xmatrix<double>& _Uc,const xmatrix<double>& lattice){ //CO190520
+void _sym_op::setUc(const xmatrix<double>& _Uc,const xmatrix<double>& lattice){ //CO20190520
   Uc=_Uc;
   xmatrix<double> f2c=trasp(lattice);xmatrix<double> c2f=inverse(trasp(lattice));
   Uf=c2f*Uc*f2c;
 }
-void _sym_op::setUf(const xmatrix<double>& _Uf,const xmatrix<double>& lattice){ //CO190520
+void _sym_op::setUf(const xmatrix<double>& _Uf,const xmatrix<double>& lattice){ //CO20190520
   Uf=_Uf;
   xmatrix<double> f2c=trasp(lattice);xmatrix<double> c2f=inverse(trasp(lattice));
   Uc=f2c*Uf*c2f;
@@ -1886,7 +1886,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
             // ---------------------------------------------------------------------------
             // if new distance is close to the original it is the same coordination shell (add to coordination)
             // otherwise, reset coordination shell
-            // DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            // DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
             if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
             else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
             min_dist=tmp_mod;
@@ -1899,7 +1899,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
               frequency=0; //reset
             }
           }
-          // DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+          // DX FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
           else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
         }
       }
@@ -1964,12 +1964,12 @@ void minimumCoordinationShell(const xstructure& xstr,
             tmp_coord = ab_component + l3[p];                 // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
             double tmp_mod = aurostd::modulus(tmp_coord);
             if(tmp_mod<min_dist){
-              //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+              //DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
               if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
               else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp_coord); } //initialize
               min_dist=tmp_mod;
             }
-            //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            //DX FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
             else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
           }
         }
@@ -2797,21 +2797,21 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     // done
     oss << endl;
 
-    double _coord;  //CO190322 - remove annoying -0.0000000
+    double _coord;  //CO20190322 - remove annoying -0.0000000
     for(uint iat=0;iat<a.atoms.size();iat++) {
       oss << " ";
       for(uint j=1;j<=3;j++) {
         //	oss << " ";
-        if(a.coord_flag==_COORDS_FRACTIONAL_) {_coord=a.atoms.at(iat).fpos(j);} //CO190322 - remove annoying -0.0000000
-        if(a.coord_flag==_COORDS_CARTESIAN_)  {_coord=a.atoms.at(iat).cpos(j);} //CO190322 - remove annoying -0.0000000
+        if(a.coord_flag==_COORDS_FRACTIONAL_) {_coord=a.atoms.at(iat).fpos(j);} //CO20190322 - remove annoying -0.0000000
+        if(a.coord_flag==_COORDS_CARTESIAN_)  {_coord=a.atoms.at(iat).cpos(j);} //CO20190322 - remove annoying -0.0000000
 
-        _coord=aurostd::roundoff(_coord,pow(10.0,-(double)_precision_)); //CO190322 - remove annoying -0.0000000
-        if(abs(_coord)<10.0) oss << " "; //CO190322 - remove annoying -0.0000000
-        if(!std::signbit(_coord)) oss << " ";  //CO190322 - remove annoying -0.0000000
-        oss << _coord << " "; //CO190322 - remove annoying -0.0000000
+        _coord=aurostd::roundoff(_coord,pow(10.0,-(double)_precision_)); //CO20190322 - remove annoying -0.0000000
+        if(abs(_coord)<10.0) oss << " "; //CO20190322 - remove annoying -0.0000000
+        if(!std::signbit(_coord)) oss << " ";  //CO20190322 - remove annoying -0.0000000
+        oss << _coord << " "; //CO20190322 - remove annoying -0.0000000
 
-        //[CO190322 OBSOLETE]if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
-        //[CO190322 OBSOLETE]if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
+        //[CO20190322 OBSOLETE]if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
+        //[CO20190322 OBSOLETE]if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
       }
       //  cout << aurostd::modulus(a.atoms.at(iat).cpos) << " ";
       if(a.isd==TRUE)
@@ -2959,9 +2959,9 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(a.atoms.at(iat).name_is_given==TRUE) {
         oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
       } else {
-        //[CO190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
-        message << "QE needs atoms species names";  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
+        //[CO20190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
+        message << "QE needs atoms species names";  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
       }
       for(uint j=1;j<=3;j++) {
         //  oss << " ";
@@ -3018,15 +3018,15 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     if(a_iomode==IOABINIT_AUTO) oss << "# " << a.title <<endl;//<< " (AUTO)" << endl;
     if(a_iomode==IOABINIT_GEOM) oss << "# " << a.title <<endl;//<< " (GEOM)" << endl;
     oss << "acell   " << double(1) << "   " << double(1) << "   " << double(1) << "  ANGSTR" << endl; // scaling of the primitive vectors, in Bohr.
-    for(uint j=1;j<=3;j++) { //CO190908 - manual is misleading, it's row-based// each COLUMN of this array is one primitive translation
+    for(uint j=1;j<=3;j++) { //CO20190908 - manual is misleading, it's row-based// each COLUMN of this array is one primitive translation
       if(j==1) oss << "rprim";
       if(j==2) oss << "     ";
       if(j==3) oss << "     ";
       for(uint i=1;i<=3;i++) {
         oss << " ";
-        if(abs(a.lattice(j,i))<10.0) oss << " ";  //CO190908 - manual is misleading, it's row-based
-        if(!std::signbit(a.lattice(j,i))) oss << " "; //CO190908 - manual is misleading, it's row-based
-        oss << a.lattice(j,i) << "";  //CO190908 - manual is misleading, it's row-based
+        if(abs(a.lattice(j,i))<10.0) oss << " ";  //CO20190908 - manual is misleading, it's row-based
+        if(!std::signbit(a.lattice(j,i))) oss << " "; //CO20190908 - manual is misleading, it's row-based
+        oss << a.lattice(j,i) << "";  //CO20190908 - manual is misleading, it's row-based
       }
       oss << endl;
     }
@@ -3369,7 +3369,7 @@ string DeStupidizer(string &strin) {
 }
 
 bool sortAtomsTypes(const _atom& a1,const _atom& a2) {  //CO20180705
-  //CO190218
+  //CO20190218
   //sorting on DOUBLES is dangerous, we need to avoid flipping equivalent atoms
   //so we need to set a cutoff
   if(a1.type!=a2.type){return a1.type<a2.type;}
@@ -3392,7 +3392,7 @@ bool sortAtomsTypes(const _atom& a1,const _atom& a2) {  //CO20180705
 
 //ideal for AFLOW (alphabetized) + POCC (grouped by occupations)
 bool sortAtomsNames(const _atom& a1,const _atom& a2) {  //CO20180705
-  //CO190218
+  //CO20190218
   //sorting on DOUBLES is dangerous, we need to avoid flipping equivalent atoms
   //so we need to set a cutoff
   if(a1.name!=a2.name){return a1.name<a2.name;}
@@ -3415,7 +3415,7 @@ bool sortAtomsNames(const _atom& a1,const _atom& a2) {  //CO20180705
 }
 
 bool sortAtomsDist(const _atom& a1,const _atom& a2) {
-  //CO190218
+  //CO20190218
   //sorting on DOUBLES is dangerous, we need to avoid flipping equivalent atoms
   //so we need to set a cutoff
   if(a1.type!=a2.type){return a1.type<a2.type;}
@@ -3464,8 +3464,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
   string input_no_spaces=aurostd::joinWDelimiter(vinput,"");
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
   if(input_no_spaces.empty()){
-    //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+    //[CO20190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO20190629
   }  // CO20180702
 
   if(LDEBUG) cerr << soliloquy << " DeStupidizer" << endl;
@@ -3487,8 +3487,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
     DeStupidizer(vinput[i]);
   }
   if(vinput.size()==0) {
-    //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+    //[CO20190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO20190629
   }  // CO20180420
 
   //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   exit(0);
@@ -3497,9 +3497,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
   vector<double> poccaus; // partial occupation local host
   a.partial_occupation_sublattice.clear(); // partial occupation local host
 
-  //CO190219 - need to clear atoms
-  //a.atoms.clear();  //CO190219 - need to use RemoveAtom() (safe)
-  //CO190219 - really remove atoms
+  //CO20190219 - need to clear atoms
+  //a.atoms.clear();  //CO20190219 - need to use RemoveAtom() (safe)
+  //CO20190219 - really remove atoms
   for(uint i=a.atoms.size()-1;i<a.atoms.size();i--){
     if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
     a.RemoveAtom(i);
@@ -3548,8 +3548,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
     if(QE==5 && QE_ERROR) {
-      //[CO190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QE input errors",_INPUT_MISSING_); //CO190629
+      //[CO20190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QE input errors",_INPUT_MISSING_); //CO20190629
     }
     if(QE==5 && !QE_ERROR) {
       a.iomode=IOQE_AUTO; // might need further discipline but for now it is ok.. 2013 May SC
@@ -3624,39 +3624,39 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(lat_found || atom_found){
           if(lat_found && tokens_line.size()<4){  //could be more, but not less
-            //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
-            //[CO190629 - no exit()]cerr << "lattice_vector ";
-            //[CO190629 - no exit()]cerr << "at line[" << i+1 << "] is ill-defined" << endl;
-            //[CO190629 - no exit()]cerr << "line: " << vinput[i] << endl;
-            //[CO190629 - no exit()]exit(1);
-            message << " AIMS input error, ";  //CO196029
-            message << "lattice_vector "; //CO190629
-            message << "at line[" << i+1 << "] is ill-defined" << endl; //CO190629
-            message << "line: " << vinput[i] << endl; //CO190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+            //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
+            //[CO20190629 - no exit()]cerr << "lattice_vector ";
+            //[CO20190629 - no exit()]cerr << "at line[" << i+1 << "] is ill-defined" << endl;
+            //[CO20190629 - no exit()]cerr << "line: " << vinput[i] << endl;
+            //[CO20190629 - no exit()]exit(1);
+            message << " AIMS input error, ";  //CO20196029
+            message << "lattice_vector "; //CO20190629
+            message << "at line[" << i+1 << "] is ill-defined" << endl; //CO20190629
+            message << "line: " << vinput[i] << endl; //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
-            //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
-            //[CO190629 - no exit()]cerr << "atom position ";
-            //[CO190629 - no exit()]cerr << "at line[" << i+1 << "] "; //CO20180627
-            //[CO190629 - no exit()]if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO20180627
-            //[CO190629 - no exit()]else {cerr << "is ill-defined" << endl;} //CO20180627
-            //[CO190629 - no exit()]cerr << "line: " << vinput[i] << endl;
-            //[CO190629 - no exit()]exit(1);
-            message << " AIMS input error, "; //CO190629
-            message << "atom position "; //CO190629
-            message << "at line[" << i+1 << "] "; //CO190629
-            if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO190629
-            else {message << "is ill-defined" << endl;} //CO190629
-            message << "line: " << vinput[i] << endl;  //CO190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+            //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
+            //[CO20190629 - no exit()]cerr << "atom position ";
+            //[CO20190629 - no exit()]cerr << "at line[" << i+1 << "] "; //CO20180627
+            //[CO20190629 - no exit()]if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO20180627
+            //[CO20190629 - no exit()]else {cerr << "is ill-defined" << endl;} //CO20180627
+            //[CO20190629 - no exit()]cerr << "line: " << vinput[i] << endl;
+            //[CO20190629 - no exit()]exit(1);
+            message << " AIMS input error, "; //CO20190629
+            message << "atom position "; //CO20190629
+            message << "at line[" << i+1 << "] "; //CO20190629
+            if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO20190629
+            else {message << "is ill-defined" << endl;} //CO20190629
+            message << "line: " << vinput[i] << endl;  //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
           }
         }
       }
       if(!atom_found_anywhere){
-        //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
-        //[CO190629 - no exit()]exit(1);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
+        //[CO20190629 - no exit()]exit(1);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO20190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
       if(lat_found_anywhere || frac_found_anywhere){
@@ -3672,16 +3672,16 @@ istream& operator>>(istream& cinput, xstructure& a) {
             else if(lat_count==2){lat2_found=true;}
             else if(lat_count==3){lat3_found=true;}
             else {
-              //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
-              //[CO190629 - no exit()]exit(1);
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO190629
+              //[CO20190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
+              //[CO20190629 - no exit()]exit(1);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO20190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
-          //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
-          //[CO190629 - no exit()]exit(1);
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO190629
+          //[CO20190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
+          //[CO20190629 - no exit()]exit(1);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO20190629
         }
       }
     }
@@ -3724,34 +3724,34 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- TITLE
     // input.getline(stmp,MAX_TITLE_SIZE);title=stmp;
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }  // CO20180420 - check for missing lines
     a.title=vinput.at(iline++);
     // -------------- SCALE
     //    input >> a.scale;
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }  // CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing second line in poscar" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing second line in poscar" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     // oss << tokens.size() <<  " = " << tokens.at(0) << endl;exit(0);
     a.scale=0.0;
@@ -3764,12 +3764,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // oss << sstring << endl;
     // -------------- UNIT CELL
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }  // CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::string2tokens(stmp,tokens);
@@ -3787,22 +3787,22 @@ istream& operator>>(istream& cinput, xstructure& a) {
       a.lattice(1,3)=aurostd::string2utype<double>(tokens[2]);
       stringstream input_tmp;
       if(vinput.size()-1<iline) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "missing line[" << iline << "]" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }  // CO20180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
       if(vinput.size()-1<iline) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "missing line[" << iline << "]" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }  // CO20180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
@@ -3859,7 +3859,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     clear(a.origin);
     // ---------------------------------------------------------------
     // -------------- CHECK VASP4 VASP5 and CHECK DIRECT/CARTESIANS STUFF
-    //CO190629 - shift to line with Direct/Cartesian to find POCC specification
+    //CO20190629 - shift to line with Direct/Cartesian to find POCC specification
     //don't worry about setting Selective Dynamics yet (but be aware of it)
     if(a.iomode==IOVASP_POSCAR) stmp=vinput[6]; //true for VASP4, change if VASP5 later
     if(a.iomode==IOVASP_ABCCAR) stmp=vinput[4];
@@ -3867,13 +3867,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      //[CO190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO190629
-      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      //[CO20190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO20190629
+      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
     }
 
     // VASP 4
@@ -3896,20 +3896,20 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
 
     if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
-      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
+      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
     }
 
-    //[CO190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
-    //[CO190629 - OBSOLETE]  // VASP 4
-    //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=TRUE;
-    //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=FALSE;
-    //[CO190629 - OBSOLETE]} else {
-    //[CO190629 - OBSOLETE]  // VASP 5
-    //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=FALSE;
-    //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=TRUE;
-    //[CO190629 - OBSOLETE]}
+    //[CO20190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
+    //[CO20190629 - OBSOLETE]  // VASP 4
+    //[CO20190629 - OBSOLETE]  a.is_vasp4_poscar_format=TRUE;
+    //[CO20190629 - OBSOLETE]  a.is_vasp5_poscar_format=FALSE;
+    //[CO20190629 - OBSOLETE]} else {
+    //[CO20190629 - OBSOLETE]  // VASP 5
+    //[CO20190629 - OBSOLETE]  a.is_vasp4_poscar_format=FALSE;
+    //[CO20190629 - OBSOLETE]  a.is_vasp5_poscar_format=TRUE;
+    //[CO20190629 - OBSOLETE]}
 
     a.partial_occupation_flag=FALSE;
 
@@ -3944,12 +3944,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //last line was last lattice vector/geometry line
     if(a.is_vasp5_poscar_format) {
       if(vinput.size()-1<iline) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "missing line[" << iline << "]" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }  // CO20180420 - check for missing lines
       stmp=vinput.at(iline++);  // to skip toward vasp5
     }
@@ -3957,11 +3957,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- ATOMS
     // Number of atoms of each type and total number of atoms.
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }  // CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     // The following is necessary because if the last lattice parameter has
@@ -3972,12 +3972,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     tmpns=aurostd::RemoveWhiteSpaces(stmp);
     if(string(tmpns).size()==0) {
       if(vinput.size()-1<iline) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "missing line[" << iline << "]" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }  // CO20180420 - check for missing lines
       stmp=vinput.at(iline++);
     }
@@ -4015,12 +4015,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
           for(uint j=0;j<tokens_j.size();j++) {
             aurostd::string2tokens(tokens_j.at(j),tokens_k,"*");
             if(tokens_k.size()==0) {
-              //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
-              //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-              //[CO190629 - no exit()]exit(0);
-              message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO190629
-              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+              //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
+              //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+              //[CO20190629 - no exit()]exit(0);
+              message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO20190629
+              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
             }
             nnumber=aurostd::string2utype<int>(tokens_k.at(0));
             if(tokens_k.size()==1) dpocc=1.0;
@@ -4032,12 +4032,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
               if(tokens_k.size()==2) a.partial_occupation_sublattice.push_back(i); // put specie number
             }
             if(tokens_k.size()>=3) {
-              //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
-              //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-              //[CO190629 - no exit()]exit(0);
-              message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO190629
-              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+              //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
+              //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+              //[CO20190629 - no exit()]exit(0);
+              message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO20190629
+              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
             }
           } // loop on +
           a.num_each_type.push_back(number);
@@ -4053,12 +4053,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     string stmp;
     if(LDEBUG) cerr << soliloquy << " DEBUG [1]" << endl;
     if(vinput.size()-1<iline) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "missing line[" << iline << "]" << endl; //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }  // CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");
@@ -4066,12 +4066,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     aurostd::string2tokens(stmp,stmp_tokens);
     // Note that if there are spaces at the beginning of the line we have to remove them.
     if(stmp_tokens.size()==0) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     } else {
       if(LDEBUG) cerr << soliloquy << " DEBUG [2]" << endl;
       string sstmp=stmp_tokens.at(0);
@@ -4079,12 +4079,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(sstmp[0]=='S' || sstmp[0]=='s') {
         a.isd=TRUE;
         if(vinput.size()-1<iline){
-          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "missing line[" << iline << "]" << endl; //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "missing line[" << iline << "]" << endl; //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }  // CO20180420 - check for missing lines
         stmp=vinput.at(iline++);
         sstmp=aurostd::RemoveSpaces(stmp);
@@ -4100,20 +4100,20 @@ istream& operator>>(istream& cinput, xstructure& a) {
           a.coord_type[0]=sstmp[0];
           a.coord_flag=_COORDS_CARTESIAN_;
           if(a.iomode==IOVASP_WYCKCAR) {
-            //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
-            //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-            //[CO190629 - no exit()]exit(0);
-            message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO190629
-            for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+            //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
+            //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+            //[CO20190629 - no exit()]exit(0);
+            message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO20190629
+            for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
           }
         } else {
-          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "Did not find coordinate type D/d or C/c." << endl;  //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "Did not find coordinate type D/d or C/c." << endl;  //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }
       }
       a.coord_type[1]='\0';
@@ -4166,12 +4166,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
         stmp=vinput.at(iline++);
         if(LDEBUG) cerr << soliloquy << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
         if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
-          //[CO190629 - no exit()]oss << "ERROR:  Unsufficient number of atom lines." << endl;
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "Insufficient number of atom lines." << endl;  //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR:  Unsufficient number of atom lines." << endl;
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "Insufficient number of atom lines." << endl;  //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }  
         if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
         stmp=aurostd::RemoveCharacter(stmp,'\t');
@@ -4180,12 +4180,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
         aurostd::string2tokens(stmp,stmp_tokens);
         if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
         if(stmp_tokens.size()<3) {
-          //[CO190629 - no exit()]oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; // CO20180409
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; // CO20180409
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }  
 
         int id=0;
@@ -4250,19 +4250,19 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(a.order_parameter_structure==TRUE) {
           if(stmp_tokens.size()!=5 && stmp_tokens.size()!=6) {
             if(a.order_parameter_structure==TRUE) {
-              //[CO190629 - no exit()]cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
-              //[CO190629 - no exit()]cerr << "  x y z Name OrderParameter "                     << endl;
-              //[CO190629 - no exit()]cerr << " where x,y,z are the coordinates " << endl;
-              //[CO190629 - no exit()]cerr << " Name is the symbol of the atom  " << endl;
-              //[CO190629 - no exit()]cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
-              //[CO190629 - no exit()]cerr << " good luck" << endl;
-              //[CO190629 - no exit()]exit(0);
-              message << "With the order parameter you must specify " << endl;  //CO190629
-              message << "  x y z Name OrderParameter "                     << endl;  //CO190629
-              message << " where x,y,z are the coordinates " << endl; //CO190629
-              message << " Name is the symbol of the atom  " << endl; //CO190629
-              message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+              //[CO20190629 - no exit()]cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
+              //[CO20190629 - no exit()]cerr << "  x y z Name OrderParameter "                     << endl;
+              //[CO20190629 - no exit()]cerr << " where x,y,z are the coordinates " << endl;
+              //[CO20190629 - no exit()]cerr << " Name is the symbol of the atom  " << endl;
+              //[CO20190629 - no exit()]cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
+              //[CO20190629 - no exit()]cerr << " good luck" << endl;
+              //[CO20190629 - no exit()]exit(0);
+              message << "With the order parameter you must specify " << endl;  //CO20190629
+              message << "  x y z Name OrderParameter "                     << endl;  //CO20190629
+              message << " where x,y,z are the coordinates " << endl; //CO20190629
+              message << " Name is the symbol of the atom  " << endl; //CO20190629
+              message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
             }
           }
           if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
@@ -4318,7 +4318,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(uint i=0;i<vinput.size();i++){ 
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NAT=",true)){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
           if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"NAT=",true)){
             vector<string> tokens; 
@@ -4350,7 +4350,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       // DX20180123 - added ibrav - START
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"IBRAV=",true)){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
           if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"IBRAV=",true)){
             vector<string> tokens; 
@@ -4369,7 +4369,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELLDM")){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
           if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"CELLDM",true)){ // DX20170124 - added aurostd::toupper
             celldm_count++;
@@ -4390,7 +4390,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       for(uint i=0;i<vinput.size();i++){
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"A=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"A=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4403,7 +4403,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"B=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"B=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4416,7 +4416,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"C=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"C=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4429,7 +4429,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAB=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAB=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4442,7 +4442,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAC=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAC=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4455,7 +4455,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSBC=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSBC=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4545,12 +4545,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
       aurostd::string2tokens(stmp,stmp_tokens);
       if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
       if(stmp_tokens.size()<4) {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; // CO20180409
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; // CO20180409
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }  
       int id=0;
       string name;
@@ -4619,7 +4619,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(LDEBUG) cerr << soliloquy << " CIF" << endl;
     a.scale=1.0; 
     a.neg_scale=FALSE; 
-    a.lattice=aurostd::eye<double>(); //CO190520
+    a.lattice=aurostd::eye<double>(); //CO20190520
 
     a.spacegroupnumber=0;
     a.spacegroupnumberoption=0;
@@ -4788,23 +4788,23 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
       else {
-        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
-        //[CO190629 - no exit()]  << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
-        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-        //[CO190629 - no exit()]exit(0);
-        message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO190629
-          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+        //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
+        //[CO20190629 - no exit()]  << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
+        //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO20190629 - no exit()]exit(0);
+        message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO20190629
+          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO20190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }
     }
     if(!found_setting){
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
@@ -4894,12 +4894,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
           a.AddAtom(atom_tmp);
           already_storing_atoms=TRUE; //DX20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         } else {
-          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
-          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-          //[CO190629 - no exit()]exit(0);
-          message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO190629
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+          //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
+          //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO20190629 - no exit()]exit(0);
+          message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO20190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
         }
       }
     }
@@ -4936,7 +4936,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // START FROM CELL
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
-    a.lattice=aurostd::eye<double>();//CO190520
+    a.lattice=aurostd::eye<double>();//CO20190520
 
     uint lat_count=0;
     //get lattice first, if available (c2f,f2c)
@@ -5096,12 +5096,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
   } else {
     // have partial
     if(poccaus.size()!=a.atoms.size()) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
-      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
+      //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO20190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     // create list (empty)
     a.comp_each_type.clear();
@@ -5176,14 +5176,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(a.iomode==IOVASP_ABCCAR) aurostd::string2tokens((vinput[3]),tokens);
     if(a.iomode==IOVASP_WYCKCAR) aurostd::string2tokens((vinput[3]),tokens);
     if(a.num_each_type.size()!=tokens.size()) {
-      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
-      //[CO190629 - no exit()]oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
-      //[CO190629 - no exit()]oss << "      tokens.size()=" << tokens.size() << endl;
-      //[CO190629 - no exit()]exit(0);
-      message << "You need to specify the same number of species and atoms types" << endl;  //CO190629
-      message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO190629
-      message << "      tokens.size()=" << tokens.size() << endl; //CO190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+      //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
+      //[CO20190629 - no exit()]oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
+      //[CO20190629 - no exit()]oss << "      tokens.size()=" << tokens.size() << endl;
+      //[CO20190629 - no exit()]exit(0);
+      message << "You need to specify the same number of species and atoms types" << endl;  //CO20190629
+      message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO20190629
+      message << "      tokens.size()=" << tokens.size() << endl; //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     for(uint i=0;i<tokens.size();i++) {
       a.species.push_back(tokens.at(i));
@@ -5307,28 +5307,28 @@ istream& operator>>(istream& cinput, xstructure& a) {
 #endif
   // CHECKS
   if(a.atoms.size()!=a.qm_atoms.size())     {
-    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
-    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO190629 - no exit()]exit(0);
-    message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO190629
-    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
+    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO20190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO20190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
-    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
-    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO190629 - no exit()]exit(0);
-    message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO190629
-    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
+    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO20190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO20190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
-    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
-    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
-    //[CO190629 - no exit()]exit(0);
-    message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO190629
-    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
+    //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
+    //[CO20190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO20190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO20190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
   }
 
   // ---------------------------------------------------------------
@@ -5652,7 +5652,7 @@ void xstructure::SetCoordinates(const int& mode)  {
 // **************************************************************************
 // This fixes basis and number
 void xstructure::MakeBasis(void) {
-  // need to update NUMBER and BASIS, number seems restricted to convasp and largely OBSOLETE (CO190226)
+  // need to update NUMBER and BASIS, number seems restricted to convasp and largely OBSOLETE (CO20190226)
   for(uint iatom=0;iatom<atoms.size();iatom++) {
     atoms.at(iatom).basis=iatom;
     atoms.at(iatom).number=iatom;
@@ -5741,7 +5741,7 @@ void xstructure::AddAtom(const _atom& atom) {
   }
   if(btom.name_is_given) {
     btom.CleanName();
-    // DX 9/21/17 - Need to keep spin info  btom.CleanSpin();
+    // DX20170921 - Need to keep spin info  btom.CleanSpin();
   }
   GetStoich();  //170724 - CO
 
@@ -5849,7 +5849,7 @@ void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO20181226
   }
 }
 
-void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms){ //CO190520
+void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms){ //CO20190520
   //this is the SAFEST/CLEANEST way to replace atoms in an xstructure
   //it takes care of num_each_type, species, etc.
   bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -7519,7 +7519,7 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
 // GetSpaceGroupHall
 // ***************************************************************************
 string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
-  // DX - Hall distinguishes space group setting.  This table assumes the first 
+  // DX Hall distinguishes space group setting.  This table assumes the first 
   //      setting that appears in the ITC.
   //      For more settings, they need to be hard-coded here.
   string soliloquy = "aflow_xatom.cpp::GetSpaceGroupHall()"; //DX20190708 - for xerror
@@ -8149,8 +8149,8 @@ xmatrix<double> MetricTensor(const xmatrix<double>& lattice,double scale) {
     exit(1);
   }
   xmatrix<double> metric_tensor(lattice.rows,lattice.cols);
-  for(int i=lattice.lrows;i<=lattice.urows;i++){ //CO190520
-    for(int j=lattice.lcols;j<=lattice.ucols;j++){ //CO190520
+  for(int i=lattice.lrows;i<=lattice.urows;i++){ //CO20190520
+    for(int j=lattice.lcols;j<=lattice.ucols;j++){ //CO20190520
       metric_tensor(i,j)=aurostd::scalar_product(lattice(i),lattice(j));
     }
   }
@@ -8850,7 +8850,7 @@ double RadiusSphereLattice(const xmatrix<double>& lattice,double scale) {
 xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radius,double scale) {
   // Adapted from AVDV routine
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="LatticeDimensionSphere():"; //CO190520
+  string soliloquy="LatticeDimensionSphere():"; //CO20190520
   xmatrix<double> lattice; lattice=scale*_lattice;
   int i,j,k;
   xmatrix<double> invlattice(3,3),normals(3,3),frac_normals(3,3);
@@ -8898,11 +8898,11 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   }
   //get the normals in the coordinates system of the lattice vectors
   invlattice=aurostd::inverse(lattice);
-  if(LDEBUG) { //CO190520
-    cerr << soliloquy << " normals="<< endl;cerr << normals << endl; //CO190520
-    cerr << soliloquy << " lattice="<< endl;cerr << lattice << endl; //CO190520
-    cerr << soliloquy << " inverse(lattice)="<< endl;cerr << invlattice << endl; //CO190520
-  } //CO190520
+  if(LDEBUG) { //CO20190520
+    cerr << soliloquy << " normals="<< endl;cerr << normals << endl; //CO20190520
+    cerr << soliloquy << " lattice="<< endl;cerr << lattice << endl; //CO20190520
+    cerr << soliloquy << " inverse(lattice)="<< endl;cerr << invlattice << endl; //CO20190520
+  } //CO20190520
 
   for(i=1;i<=3;i++) {
     for(j=1;j<=3;j++) {
@@ -9136,11 +9136,11 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
   // str_in.CalculateSymmetryPointGroup(TRUE);
   // str_in.CalculateSymmetryFactorGroup(TRUE);
   // str_in.CalculateSymmetryPointGroupCrystal(TRUE);
-  // DX - START
+  // DX START
   bool same_eps = false;
   uint count = 0;
   while(same_eps == false && count++ < 100){
-    // DX - END
+    // DX END
     if(0) {
       LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
       // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0001,0.001);
@@ -9202,7 +9202,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     // DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
     // DX20170814 - END
     LATTICE::Standard_Lattice_StructureDefault(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,false); // DX // DX20180226 - do not need to do full sym for recip
-    // DX - START
+    // DX START
     if(str_sp.sym_eps == str_reciprocal_sp.sym_eps){
       same_eps = true;
     }
@@ -9210,7 +9210,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
       str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
       str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
     }
-    // DX - END
+    // DX END
     this->reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
     this->reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [6]" << endl;
@@ -9242,7 +9242,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     // DX and CO - END
     // DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JUNKAI
     LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); // DX // DX20180226 - do not need to do full sym for superlattice
-    // DX - START
+    // DX START
     if(str_sp.sym_eps == str_superlattice_sp.sym_eps){
       same_eps = true;
     }
@@ -9250,7 +9250,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
       str_sp.sym_eps = str_superlattice_sp.sym_eps;
       str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
     }
-    // DX - END
+    // DX END
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
     this->bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
     this->bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
@@ -9533,17 +9533,17 @@ string xstructure::SpeciesString(void) {
 // ***************************************************************************
 // Set the species  Stefano Curtarolo Nov 2014
 uint xstructure::SetSpecies(const deque<string>& vspecies) {
-  string soliloquy="xstructure::SetSpecies():"; //CO190317
-  stringstream message; //CO190317
+  string soliloquy="xstructure::SetSpecies():"; //CO20190317
+  stringstream message; //CO20190317
   if(vspecies.size()!=species.size() ) {
-    message << "vspecies.size()!=species.size()"; //CO190317
-    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190317
-    //[CO190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=species.size()" << endl;exit(0);
+    message << "vspecies.size()!=species.size()"; //CO20190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190317
+    //[CO20190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=species.size()" << endl;exit(0);
   }
   if(vspecies.size()!=num_each_type.size() ) {
-    message << "vspecies.size()!=num_each_type.size()"; //CO190317
-    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190317
-    //[CO190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=num_each_type.size()" << endl;exit(0);
+    message << "vspecies.size()!=num_each_type.size()"; //CO20190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190317
+    //[CO20190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=num_each_type.size()" << endl;exit(0);
   }
   int iatom=0;
   for(uint itype=0;itype<num_each_type.size();itype++) {
@@ -9553,7 +9553,7 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
     for(int j=0;j<num_each_type.at(itype);j++) {
       atoms.at(iatom).name=itype_species;    // CONVASP_MODE
       atoms.at(iatom).CleanName();
-      // DX 9/21/17 - Need to keep spin info atoms.at(iatom).CleanSpin();
+      // DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
       atoms.at(iatom).name_is_given=TRUE;
       iatom++;
     }
@@ -10325,12 +10325,12 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 // Fold atoms into cell
 // ******************************************************************************
 // Folds atoms into the cell
-//DX20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew) { //CO190520 - removed pointers for bools and doubles, added const where possible
+//DX20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew) { //CO20190520 - removed pointers for bools and doubles, added const where possible
 //DX20190214 [OBSOLETE]   double tol = _SYM_TOL_;
 //DX20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
 //DX20190214 [OBSOLETE]}
 
-deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
+deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="foldAtomsInCell():";
 
@@ -10343,7 +10343,7 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
   xstructure atomic_grid; //stays empty if not needed
   if(!fold_in_only){
     double radius=RadiusSphereLattice(lattice_new);
-    xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO190520
+    xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO20190520
     if(LDEBUG){
       cerr << soliloquy << " a.lattice=" << endl;cerr << a.lattice << endl;
       cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
@@ -10353,14 +10353,14 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
       cerr << soliloquy << " radius(lattice_new)=" << radius << endl;
       cerr << soliloquy << " dims=" << dims << endl;
     }
-    //[CO190520 - excessive, too large of an exploration radius]xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
+    //[CO20190520 - excessive, too large of an exploration radius]xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
     //xmatrix<double> supercell; supercell(1,1)=dim; supercell(2,2)=dim; supercell(3,3)=dim;  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
     //vector<int> sc2pcMap, pc2scMap; //dummy
     if(LDEBUG) {cerr << soliloquy << " building atomic grid with dims=[" << dims << "]" << endl;}
     atomic_grid=a;atomic_grid.clean(); //DX20191220 - uppercase to lowercase clean
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
     if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
-    ptr_atoms=&atomic_grid.grid_atoms;  //CO190808 - GenerateGridAtoms() populates grid_atoms, not atoms
+    ptr_atoms=&atomic_grid.grid_atoms;  //CO20190808 - GenerateGridAtoms() populates grid_atoms, not atoms
   }
   const deque<_atom> atoms=*ptr_atoms;
 
@@ -10383,15 +10383,15 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
 
   _atom tmp;
   for (uint j = 0; j < atoms.size(); j++) {
-    //[CO190520 - this case is not needed]if(atoms_in_cell.size() == 0) {
-    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = c2f_new * atoms[j].cpos;
-    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = BringInCell(atoms[j].fpos);
-    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].cpos = f2c_new * atoms[j].fpos;
-    //[CO190520 - this case is not needed]  atoms_in_cell.push_back(atoms[j]);
-    //[CO190520 - this case is not needed]  atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
-    //[CO190520 - this case is not needed]  atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
-    //[CO190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
-    //[CO190520 - this case is not needed]} else {  //[CO200106 - close bracket for indenting]}
+    //[CO20190520 - this case is not needed]if(atoms_in_cell.size() == 0) {
+    //[CO20190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = c2f_new * atoms[j].cpos;
+    //[CO20190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = BringInCell(atoms[j].fpos);
+    //[CO20190520 - this case is not needed]  //[OBSOLETE]atoms[j].cpos = f2c_new * atoms[j].fpos;
+    //[CO20190520 - this case is not needed]  atoms_in_cell.push_back(atoms[j]);
+    //[CO20190520 - this case is not needed]  atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
+    //[CO20190520 - this case is not needed]  atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
+    //[CO20190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
+    //[CO20190520 - this case is not needed]} else {  //[CO200106 - close bracket for indenting]}
     //bool duplicate_atom = false;
     tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
     tmp.cpos = f2c_new * tmp.fpos;
@@ -10412,7 +10412,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
       atoms_in_cell.back().cpos = tmp.cpos;
       atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
     }
-    //[CO190520 - this case is not needed]}
+    //[CO20190520 - this case is not needed]}
   }
 
   if(check_min_dists){ //DX20190613
@@ -10456,9 +10456,9 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
   //get skew - STOP
   b.lattice=lattice_new; //b.f2c=trasp(b.lattice); b.c2f=inverse(b.f2c);  //set new lattice, f2c, c2f
   //b.atoms=foldAtomsInCell(b.atoms,b.c2f,b.f2c,skew,tol);                //fold atoms into new lattice
-  //[CO190520 - ReplaceAtoms()]b.atoms=foldAtomsInCell(a,b.lattice,skew,tol,true);                   //fold atoms into new lattice, don't bother folding out (slow)
-  deque<_atom> atoms=foldAtomsInCell(a,b.lattice,skew,tol);  //CO190520 - ReplaceAtoms()
-  b.ReplaceAtoms(atoms);  //CO190520 - ReplaceAtoms()
+  //[CO20190520 - ReplaceAtoms()]b.atoms=foldAtomsInCell(a,b.lattice,skew,tol,true);                   //fold atoms into new lattice, don't bother folding out (slow)
+  deque<_atom> atoms=foldAtomsInCell(a,b.lattice,skew,tol);  //CO20190520 - ReplaceAtoms()
+  b.ReplaceAtoms(atoms);  //CO20190520 - ReplaceAtoms()
   if((0||LDEBUG)&&!isequal(a.lattice,b.lattice,1e-3)){
     cerr << "-----------------------------------------------------------------------" << endl;
     cerr << "ORIG STRUCTURE " << endl;
@@ -10605,7 +10605,7 @@ xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper
 // -------------------------------------------------------------------
 // _atom (change in place, update fpos only) 
 void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, double lower_bound) { //DX20190904
-  xvector<double> orig_fpos = atom.fpos; //DX - needed for ijk later
+  xvector<double> orig_fpos = atom.fpos; //DX needed for ijk later
   BringInCellInPlace(atom.fpos, tolerance, upper_bound, lower_bound);
 
   // update ijk
@@ -10637,20 +10637,20 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
   }
 }
 
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in,double epsilon) {
 //DX20190905 [OBSOLETE]   // DX and CO - START
 //DX20190905 [OBSOLETE]   return BringInCell_20160101(v_in,epsilon);
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon) {
 //DX20190905 [OBSOLETE]   return BringInCell_20160101(v_in,epsilon); //SYM::mod_one_xvec(v_in);
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon) {
 //DX20190905 [OBSOLETE]   double incelleps=1.0-epsilon;
@@ -10676,21 +10676,21 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] 
 //DX20190905 [OBSOLETE] // DX anc CO - START
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
 //DX20190905 [OBSOLETE]  
 //DX20190905 [OBSOLETE]   return BringInCell_20160101(atom_in,lattice,epsilon);
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
 //DX20190905 [OBSOLETE]   return BringInCell_20160101(atom_in,lattice,epsilon);//BringInCell(atom_in,lattice);
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] // DX and CO - END
 //DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
 //DX20190905 [OBSOLETE]   double _incelleps=1.0;
@@ -10742,13 +10742,13 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 //DX20190905 [OBSOLETE] //}
 //DX20190905 [OBSOLETE] 
 //DX20190905 [OBSOLETE] // DX and CO - START
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a,double epsilon) {
 //DX20190905 [OBSOLETE]   return BringInCell_20160101(a,epsilon);
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a,double epsilon) {
 //DX20190905 [OBSOLETE]   xstructure b(a); // copies everything
@@ -10758,7 +10758,7 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 //DX20190905 [OBSOLETE]   return b;
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a,double epsilon) {
 //DX20190905 [OBSOLETE]   xstructure b(a); // copies everything
@@ -10807,7 +10807,7 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 //DX20190905 [OBSOLETE] }
 //DX20190905 [OBSOLETE] // DX and CO - END
 //DX20190905 [OBSOLETE] 
-//DX20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX20190905 [OBSOLETE] //CO20190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
 //DX20190905 [OBSOLETE] void xstructure::BringInCell(double epsilon) {
 //DX20190905 [OBSOLETE]   _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
@@ -12213,7 +12213,7 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
 // ***************************************************************************
 // Function SetAutoVolume
 // ***************************************************************************
-void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO191010
+void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
   string soliloquy="xstructure::setAutoVolume():";
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   stringstream message;
@@ -12359,7 +12359,7 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
   return FALSE;
 }
 
-// DX - START
+// DX START
 //DX20191125 [OBSOLETE - GENERALIZED BELOW] bool inCell(xvector<double>& pos_vec){
 //DX20191125 [OBSOLETE - GENERALIZED BELOW]   //DX20180726 [OBSOLETE] if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0-_ZERO_TOL_ &&
 //DX20191125 [OBSOLETE - GENERALIZED BELOW]   //DX20180726 [OBSOLETE]    pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0-_ZERO_TOL_ &&
@@ -12372,7 +12372,7 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
 //DX20191125 [OBSOLETE - GENERALIZED BELOW]   return FALSE;
 //DX20191125 [OBSOLETE - GENERALIZED BELOW] }
 //DX20191125 [OBSOLETE - GENERALIZED BELOW] }
-// DX - END
+// DX END
 
 // ***************************************************************************
 // atomInCell() 
@@ -12447,7 +12447,7 @@ bool alreadyInCell(_atom& atom, deque<_atom> atoms){
 
 // COREY - START
 xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell)
 { //CO200106 - patching for auto-indenting
   //#define _eps_scell_ 1.0e-5
@@ -12509,11 +12509,11 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //corey END
 
   // DX20190319 - added option to expand strictly by uniform supercell matrix - START
-  // CO190409 - note, force_supercell_matrix is PURELY for speed up purposes, the other approach should yield the same results (just slower)
-  if(force_supercell_matrix && aurostd::isdiagonal(supercell)){dims[1]=nx;dims[2]=ny;dims[3]=nz;} //[CO190520 - fixing for dims] && !derivative_structure){dim=nx;} // if here, then nx=ny=nz
+  // CO20190409 - note, force_supercell_matrix is PURELY for speed up purposes, the other approach should yield the same results (just slower)
+  if(force_supercell_matrix && aurostd::isdiagonal(supercell)){dims[1]=nx;dims[2]=ny;dims[3]=nz;} //[CO20190520 - fixing for dims] && !derivative_structure){dim=nx;} // if here, then nx=ny=nz
   else{
     radius=RadiusSphereLattice(b.lattice);
-    dims=LatticeDimensionSphere(a.lattice,radius);//[CO190520 - EXCESSIVE]dim=max(dims)+1;
+    dims=LatticeDimensionSphere(a.lattice,radius);//[CO20190520 - EXCESSIVE]dim=max(dims)+1;
   } 
 
   if(LDEBUG){cerr << soliloquy << " dims=" << dims << endl;}
@@ -12522,7 +12522,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 
   bool match=false;
 
-  //CO190409 - this pc2scMap issue is more complicated...
+  //CO20190409 - this pc2scMap issue is more complicated...
   //this is how we resolve: force_strict_pc2scMap
   //if force_strict_pc2scMap==false (default), then the pc2scMap returns the first of the equivalent atoms
   //this is good because of how the algorithm enumerates equivalent atoms: 
@@ -12531,7 +12531,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //therefore, use force_strict_pc2scMap=true
   //for force_strict_pc2scMap==true, the supercell matrix should be diagonal, otherwise you are not guaranteed to get the i==0 && j==0 && k==0 atom
   //if force_strict_pc2scMap==true and it does not find the i==0 && j==0 && k==0, it throws an error
-  //CO190114 - pc2scMap only makes sense for true supercell expansions
+  //CO20190114 - pc2scMap only makes sense for true supercell expansions
   //there are cases where we use GetSuperCell to convert between representations (see aflow_lattice.cpp)
   //in this case, a mapping is not really possible/useful, so clear out pc2scMap
   bool ignore_pcmap=false;
@@ -12552,9 +12552,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     for(uint ia=0;ia<a.iatoms.size();ia++){
       for(uint iia=0;iia<a.iatoms[ia].size();iia++){
         pcmap=false;
-        //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++) {  //[CO200106 - close bracket for indenting]}
-        //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++) {  //[CO200106 - close bracket for indenting]}
-        //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++) {  //[CO200106 - close bracket for indenting]}
+        //[CO20190520 - EXCESSIVE]for(i=-dim;i<=dim;i++) {  //[CO200106 - close bracket for indenting]}
+        //[CO20190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++) {  //[CO200106 - close bracket for indenting]}
+        //[CO20190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++) {  //[CO200106 - close bracket for indenting]}
         for(i=-dims[1];i<=dims[1];i++) {
           for(j=-dims[2];j<=dims[2];j++) {
             for(k=-dims[3];k<=dims[3];k++) {
@@ -12612,16 +12612,16 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                     if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
                   } else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
                 }
-                //[CO190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
-                //[CO190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-                //[CO190116 - OBSOLETE]  pcmap=true;
-                //[CO190116 - OBSOLETE]}
-                //[CO190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
-                //[CO190116 - OBSOLETE]//so just pick the first one
-                //[CO190116 - OBSOLETE]if(!pcmap){
-                //[CO190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-                //[CO190116 - OBSOLETE]  pcmap=true;
-                //[CO190116 - OBSOLETE]}
+                //[CO20190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
+                //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+                //[CO20190116 - OBSOLETE]  pcmap=true;
+                //[CO20190116 - OBSOLETE]}
+                //[CO20190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
+                //[CO20190116 - OBSOLETE]//so just pick the first one
+                //[CO20190116 - OBSOLETE]if(!pcmap){
+                //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+                //[CO20190116 - OBSOLETE]  pcmap=true;
+                //[CO20190116 - OBSOLETE]}
                 //matching cpos does not work!
                 //matching by index (i,j,k) does not work because of inCell()
                 //if(!i&&!j&&!k) pc2scMap.push_back(b.atoms.size()-1);
@@ -12658,9 +12658,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   } else {
     for(uint ia=0;ia<a.atoms.size();ia++) {
       pcmap=false;
-      //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++){ //[CO200106 - close bracket for indenting]}
-      //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++){ //[CO200106 - close bracket for indenting]}
-      //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++){ //[CO200106 - close bracket for indenting]}
+      //[CO20190520 - EXCESSIVE]for(i=-dim;i<=dim;i++){ //[CO200106 - close bracket for indenting]}
+      //[CO20190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++){ //[CO200106 - close bracket for indenting]}
+      //[CO20190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++){ //[CO200106 - close bracket for indenting]}
       for(i=-dims[1];i<=dims[1];i++){
         for(j=-dims[2];j<=dims[2];j++){
           for(k=-dims[3];k<=dims[3];k++){
@@ -12702,16 +12702,16 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                   if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
                 } else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
               }
-              //[CO190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
-              //[CO190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-              //[CO190116 - OBSOLETE]  pcmap=true;
-              //[CO190116 - OBSOLETE]}
-              //[CO190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
-              //[CO190116 - OBSOLETE]//so just pick the first one
-              //[CO190116 - OBSOLETE]if(!pcmap){
-              //[CO190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
-              //[CO190116 - OBSOLETE]  pcmap=true;
-              //[CO190116 - OBSOLETE]}
+              //[CO20190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
+              //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+              //[CO20190116 - OBSOLETE]  pcmap=true;
+              //[CO20190116 - OBSOLETE]}
+              //[CO20190116 - OBSOLETE]//pc2scMap is sort of irrelevant, we just need to pick ONE equivalent atom (there are many)
+              //[CO20190116 - OBSOLETE]//so just pick the first one
+              //[CO20190116 - OBSOLETE]if(!pcmap){
+              //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
+              //[CO20190116 - OBSOLETE]  pcmap=true;
+              //[CO20190116 - OBSOLETE]}
               //matching cpos does not work!
               //matching by index (i,j,k) does not work because of inCell()
               //if(!i&&!j&&!k) pc2scMap.push_back(b.atoms.size()-1);
@@ -12747,20 +12747,20 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   double density_a=a.scale*a.scale*a.scale*abs(det(a.lattice))/a.atoms.size();
   double density_b=b.scale*b.scale*b.scale*abs(det(b.lattice))/b.atoms.size();
   if(abs(b.atoms.size()-a.atoms.size()*fraction)>0.1 || abs(density_a-density_b)>0.001) {
-    //[CO190520 - OBSOLETE]cerr << "ERROR   xstructure xstructure::GetSuperCell     " << endl;
-    //[CO190520 - OBSOLETE]cerr << "         supercell has the wrong number of atoms" << endl;
-    //[CO190520 - OBSOLETE]cerr << "         b.atoms.size()     = " << b.atoms.size() << endl;
-    //[CO190520 - OBSOLETE]cerr << "         a.atoms.size()     = " << a.atoms.size() << endl;
-    //[CO190520 - OBSOLETE]cerr << "         b.scale            = " << b.scale << endl;
-    //[CO190520 - OBSOLETE]cerr << "         a.scale            = " << a.scale << endl;
-    //[CO190520 - OBSOLETE]cerr << "         fraction           = " << fraction << endl;
-    //[CO190520 - OBSOLETE]cerr << "         supercell atoms    = " << fraction*a.atoms.size() << endl;
-    //[CO190520 - OBSOLETE]cerr << "         b.density          = " << density_b << endl;
-    //[CO190520 - OBSOLETE]cerr << "         a.density          = " << density_a << endl;
-    //[CO190520 - OBSOLETE]cerr << "         b.lattice          = " << endl;
-    //[CO190520 - OBSOLETE]cerr << b.lattice << endl;
-    //[CO190520 - OBSOLETE]cerr << "         a.lattice          = " << endl;
-    //[CO190520 - OBSOLETE]cerr << a.lattice << endl;
+    //[CO20190520 - OBSOLETE]cerr << "ERROR   xstructure xstructure::GetSuperCell     " << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         supercell has the wrong number of atoms" << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         b.atoms.size()     = " << b.atoms.size() << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         a.atoms.size()     = " << a.atoms.size() << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         b.scale            = " << b.scale << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         a.scale            = " << a.scale << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         fraction           = " << fraction << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         supercell atoms    = " << fraction*a.atoms.size() << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         b.density          = " << density_b << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         a.density          = " << density_a << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         b.lattice          = " << endl;
+    //[CO20190520 - OBSOLETE]cerr << b.lattice << endl;
+    //[CO20190520 - OBSOLETE]cerr << "         a.lattice          = " << endl;
+    //[CO20190520 - OBSOLETE]cerr << a.lattice << endl;
 
     message << "Supercell has the wrong number of atoms" << endl;
     message << "b.atoms.size()     = " << b.atoms.size() << endl;
@@ -13091,7 +13091,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 // COREY - END
 
 xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell)
 { //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
@@ -13099,14 +13099,14 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
     _supercell(1,1)=supercell(1);_supercell(1,2)=supercell(2);_supercell(1,3)=supercell(3);
     _supercell(2,1)=supercell(4);_supercell(2,2)=supercell(5);_supercell(2,3)=supercell(6);
     _supercell(3,1)=supercell(7);_supercell(3,2)=supercell(8);_supercell(3,3)=supercell(9);
-    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
   if(supercell.rows==3) {
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
-    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
-  //[CO190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  //[CO190520 -OBSOLETE]exit(0);
+  //[CO20190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
+  //[CO20190520 -OBSOLETE]exit(0);
   string soliloquy="GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
@@ -13114,7 +13114,7 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell)
 { //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
@@ -13122,14 +13122,14 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
     _supercell(1,1)=supercell(1);_supercell(1,2)=supercell(2);_supercell(1,3)=supercell(3);
     _supercell(2,1)=supercell(4);_supercell(2,2)=supercell(5);_supercell(2,3)=supercell(6);
     _supercell(3,1)=supercell(7);_supercell(3,2)=supercell(8);_supercell(3,3)=supercell(9);
-    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
   if(supercell.rows==3) {
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
-    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
-  //[CO190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  //[CO190520 -OBSOLETE]exit(0);
+  //[CO20190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
+  //[CO20190520 -OBSOLETE]exit(0);
   string soliloquy="GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
@@ -13137,7 +13137,7 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33)
 { //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
@@ -13145,11 +13145,11 @@ xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,con
   _supercell(1,1)=(double) sc11;_supercell(1,2)=(double) sc12;_supercell(1,3)=(double) sc13;
   _supercell(2,1)=(double) sc21;_supercell(2,2)=(double) sc22;_supercell(2,3)=(double) sc23;
   _supercell(3,1)=(double) sc31;_supercell(3,2)=(double) sc32;_supercell(3,3)=(double) sc33;
-  return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   //xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3)
 { //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
@@ -13157,7 +13157,7 @@ xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const
   _supercell(1,1)=(double) sc1;
   _supercell(2,2)=(double) sc2;
   _supercell(3,3)=(double) sc3;
-  return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 //corey START
@@ -13167,8 +13167,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell) 
   bool get_symmetry=false;
   bool get_full_basis=false;
   bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(aa,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(aa,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell) {
@@ -13177,8 +13177,8 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell) {
   bool get_symmetry=false;
   bool get_full_basis=false;
   bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(a,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix //CO190409 - added force_strict_pc2scMap
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell) {
@@ -13187,8 +13187,8 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell) {
   bool get_symmetry=false;
   bool get_full_basis=false;
   bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(a,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap);  //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap);  //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33) {
@@ -13197,8 +13197,8 @@ xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,con
   bool get_symmetry=false;
   bool get_full_basis=false;
   bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(a,sc11,sc12,sc13,sc21,sc22,sc23,sc31,sc32,sc33,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,sc11,sc12,sc13,sc21,sc22,sc23,sc31,sc32,sc33,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3) {
@@ -13207,8 +13207,8 @@ xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const
   bool get_symmetry=false;
   bool get_full_basis=false;
   bool force_supercell_matrix=false; //DX20190319 - added force_supercell_matrix
-  bool force_strict_pc2scMap=false; //CO190409 - added force_strict_pc2scMap
-  return GetSuperCell(a,sc1,sc2,sc3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix //CO190409 - added force_strict_pc2scMap
+  bool force_strict_pc2scMap=false; //CO20190409 - added force_strict_pc2scMap
+  return GetSuperCell(a,sc1,sc2,sc3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix //CO20190409 - added force_strict_pc2scMap
 }
 //corey END
 
@@ -13250,10 +13250,10 @@ void xstructure::ClearSymmetry(void) {
   for(uint i=0;i<iatoms.size();i++)
     iatoms.at(i).clear();
   iatoms.clear();
-  for(uint i=0;i<atoms.size();i++){atoms[i].ClearSymmetry();} //CO190219
+  for(uint i=0;i<atoms.size();i++){atoms[i].ClearSymmetry();} //CO20190219
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetry
@@ -13340,7 +13340,7 @@ bool CalculateSymmetry(xstructure& str) {
   return CalculateSymmetry(str,FALSE,cout,FALSE,_calculate_symmetry_default_sgroup_radius_*MaxStructureLattice(str));
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryPointGroup
@@ -13387,7 +13387,7 @@ void CalculateSymmetryPointGroup(xstructure& str) {
   CalculateSymmetryPointGroup(str,FALSE,cout,FALSE);
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupCrystal
@@ -13442,7 +13442,7 @@ void CalculateSymmetryPointGroupCrystal(xstructure& str) {
   CalculateSymmetryPointGroupCrystal(str,FALSE,cout,FALSE);
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryFactorGroup
@@ -13491,7 +13491,7 @@ void CalculateSymmetryFactorGroup(xstructure& str) {
   CalculateSymmetryFactorGroup(str,FALSE,cout,FALSE);
 }
 
-// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupKlattice
@@ -13545,20 +13545,20 @@ void xstructure::buildGenericTitle(bool vasp_input,bool force_fix){
   if(vasp_input){pflow::fixEmptyAtomNames(*this,force_fix);}
   title.clear();
   title=getGenericTitleXStructure(*this,false); //no latex
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]uint iat=0;
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]//if any names missing from atoms, lets use generic names
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]bool atom_names=true;
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]for(uint i=0;i<atoms.size()&&atom_names;i++){if(atoms[i].name.empty()){atom_names=false;}} // CO20180316 - use pp names
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]for(uint itype=0;itype<num_each_type.size();itype++){
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]  for(uint j=0;j<(uint) num_each_type.at(itype);j++) {
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]    if(j==0){
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]      if(atom_names){title+=atoms.at(iat).name;} // CO20180316 - use pp names
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]      else {title+=char('A'+itype);}
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]      title+=aurostd::utype2string(num_each_type.at(itype));
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]    }
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]    iat++;
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]  }
-  //[CO190418 - MOVED TO aflow_pflow_functions.cpp]}
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]uint iat=0;
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]//if any names missing from atoms, lets use generic names
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]bool atom_names=true;
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]for(uint i=0;i<atoms.size()&&atom_names;i++){if(atoms[i].name.empty()){atom_names=false;}} // CO20180316 - use pp names
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]for(uint itype=0;itype<num_each_type.size();itype++){
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]  for(uint j=0;j<(uint) num_each_type.at(itype);j++) {
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]    if(j==0){
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]      if(atom_names){title+=atoms.at(iat).name;} // CO20180316 - use pp names
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]      else {title+=char('A'+itype);}
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]      title+=aurostd::utype2string(num_each_type.at(itype));
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]    }
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]    iat++;
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]  }
+  //[CO20190418 - MOVED TO aflow_pflow_functions.cpp]}
 }
 
 // ***************************************************************************
@@ -13618,7 +13618,7 @@ void xstructure::xstructure2abinit(void) {
 // ***************************************************************************
 // Function xstructure2cif
 // ***************************************************************************
-void xstructure::xstructure2cif(void) { //DX190131
+void xstructure::xstructure2cif(void) { //DX20190131
   ReScale(1.0);
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
@@ -13631,7 +13631,7 @@ void xstructure::xstructure2cif(void) { //DX190131
 // ***************************************************************************
 // Function xstructure2abccar
 // ***************************************************************************
-void xstructure::xstructure2abccar(void) { //DX190131
+void xstructure::xstructure2abccar(void) { //DX20190131
   ReScale(1.0);
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
@@ -13743,7 +13743,7 @@ void xstructure::FakeNames(void) {
         if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
         //	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
         atoms.at(iatom).CleanName();
-        // DX 9/21/17 - Need to keep spin info atoms.at(iatom).CleanSpin();
+        // DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
         atoms.at(iatom).name_is_given=TRUE;
       }
       iatom++;
@@ -13891,34 +13891,34 @@ string xstructure::findsym2print(double tolerance) {
 // a matrix.  Then we must add q to all the final cartesian
 // positions.
 xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
-  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
-  string soliloquy="Rotate():"; //CO190520
-  if(LDEBUG) { //CO190520
-    cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO190520
-    cerr << soliloquy << " a.origin=" << a.origin << endl; //CO190520
+  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
+  string soliloquy="Rotate():"; //CO20190520
+  if(LDEBUG) { //CO20190520
+    cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO20190520
+    cerr << soliloquy << " a.origin=" << a.origin << endl; //CO20190520
   }
   // Get R_0(p) for all cartesian positions.
   xstructure b(a);
   xmatrix<double> nlattice(3,3);
   nlattice=trasp(a.lattice);
   b.lattice=trasp(rm*nlattice);
-  b.FixLattices();  //CO190409 - so we don't need to keep redefining f2c/c2f
-  const xmatrix<double>& f2c=b.f2c; //CO190520
-  const xmatrix<double>& c2f=b.c2f; //CO190520
-  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).cpos=f2c*b.atoms.at(ia).fpos;}  //CO190409 - so we don't need to keep redefining f2c/c2f
-  //[CO190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
-  //[CO190409 - OBSOLETE]  b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
+  b.FixLattices();  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  const xmatrix<double>& f2c=b.f2c; //CO20190520
+  const xmatrix<double>& c2f=b.c2f; //CO20190520
+  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).cpos=f2c*b.atoms.at(ia).fpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
+  //[CO20190409 - OBSOLETE]  b.atoms.at(ia).cpos=F2C(b.lattice,b.atoms.at(ia).fpos);
   //Get R_0(q)
   xvector<double> r_orig(3);
   r_orig=rm*b.origin;
   // Assign new cartesian positions
   for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).cpos+=(-r_orig+b.origin);}
-  //[CO190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
-  //[CO190409 - OBSOLETE]  b.atoms.at(ia).cpos=b.atoms.at(ia).cpos-r_orig+b.origin;
+  //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
+  //[CO20190409 - OBSOLETE]  b.atoms.at(ia).cpos=b.atoms.at(ia).cpos-r_orig+b.origin;
   // Get all the direct coords.
-  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).fpos=c2f*b.atoms.at(ia).cpos;}  //CO190409 - so we don't need to keep redefining f2c/c2f
-  //[CO190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
-  //[CO190409 - OBSOLETE]  b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
+  for(int ia=0;ia<(int)b.atoms.size();ia++){b.atoms.at(ia).fpos=c2f*b.atoms.at(ia).cpos;}  //CO20190409 - so we don't need to keep redefining f2c/c2f
+  //[CO20190409 - OBSOLETE]for(int ia=0;ia<(int)b.atoms.size();ia++)
+  //[CO20190409 - OBSOLETE]  b.atoms.at(ia).fpos=C2F(b.lattice,b.atoms.at(ia).cpos);
   return b;
 }
 
@@ -14199,14 +14199,14 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
 }
 
 int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - added date [ORIG]
-  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
-  string soliloquy="GenerateGridAtoms():"; //CO190520
-  if(LDEBUG) { //CO190520
-    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO190520
-    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO190520
-    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO190520
-    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO190520
-  } //CO190520
+  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
+  string soliloquy="GenerateGridAtoms():"; //CO20190520
+  if(LDEBUG) { //CO20190520
+    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
+    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
+    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
+    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
+  } //CO20190520
   // same scale as before
   str.grid_atoms.clear();
   str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
@@ -14214,9 +14214,9 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
   str.BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
   //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
-  const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
-  const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
+  const xvector<double>& a1=str.lattice(1);  //CO20190520 - no need to make copies
+  const xvector<double>& a2=str.lattice(2);  //CO20190520 - no need to make copies
+  const xvector<double>& a3=str.lattice(3);  //CO20190520 - no need to make copies
 
   for(uint iat=0;iat<str.atoms.size();iat++){
     str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX20190709 - at to [] = speed increase
@@ -14236,18 +14236,18 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
             atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
             str.grid_atoms.push_back(atom);
             str.grid_atoms_sc2pcMap.push_back(iat); // CO20171025
-            if(LDEBUG) { //CO190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+            if(LDEBUG) { //CO20190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
               cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms.back() << endl; //DX20191218
               cerr << soliloquy << " grid_atoms_sc2pcMap[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms_sc2pcMap.back() << endl; // DX20191218
-            } //CO190520
+            } //CO20190520
           }
         }
       }
     }
   }
-  if(0){  //CO190808 - quick check of mindist
+  if(0){  //CO20190808 - quick check of mindist
     double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
     for(uint i=0;i<str.grid_atoms.size()-1;i++){
       for(uint j=i+1;j<str.grid_atoms.size();j++){
@@ -14270,14 +14270,14 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
 }
 
 int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - [NEW]
-  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
-  string soliloquy="GenerateGridAtoms():"; //CO190520
-  if(LDEBUG) { //CO190520
-    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO190520
-    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO190520
-    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO190520
-    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO190520
-  } //CO190520
+  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
+  string soliloquy="GenerateGridAtoms():"; //CO20190520
+  if(LDEBUG) { //CO20190520
+    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO20190520
+    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
+    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
+    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
+  } //CO20190520
   // same scale as before
   str.grid_atoms.clear();
   str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
@@ -14285,9 +14285,9 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   str.BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
   //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
-  const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
-  const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
+  const xvector<double>& a1=str.lattice(1);  //CO20190520 - no need to make copies
+  const xvector<double>& a2=str.lattice(2);  //CO20190520 - no need to make copies
+  const xvector<double>& a3=str.lattice(3);  //CO20190520 - no need to make copies
   //DX20190709 - calculate and store once = speed - START
   vector<xvector<double> > l1, l2, l3;
   vector<int> a_index, b_index, c_index;
@@ -14326,10 +14326,10 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   //atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX20190709 - at to [] = speed increase
   //str.grid_atoms.push_back(atom);
   //str.grid_atoms_sc2pcMap.push_back(iat); // CO20171025
-  //if(LDEBUG) { //CO190520
-  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-  //} //CO190520
+  //if(LDEBUG) { //CO20190520
+  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
+  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+  //} //CO20190520
   //}
   //}
   //}
@@ -14361,21 +14361,21 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
             //DX20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); // CO20171025
             str.grid_atoms[grid_atom_count] = atom;
             str.grid_atoms_sc2pcMap[grid_atom_count] = iat; // CO20171025
-            if(LDEBUG) { //CO190520
-              //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-              //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO190520
+            if(LDEBUG) { //CO20190520
+              //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO20190520
+              //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO20190520
+              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO20190520
               cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << str.grid_atoms[grid_atom_count] << endl; //DX20191218
               cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << str.grid_atoms_sc2pcMap[grid_atom_count] << endl; // DX20191218
-            } //CO190520
+            } //CO20190520
             grid_atom_count++; //DX20191122
           }
         }
       }
     }
   }
-  if(0){  //CO190808 - quick check of mindist
+  if(0){  //CO20190808 - quick check of mindist
     double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
     for(uint i=0;i<str.grid_atoms.size()-1;i++){
       for(uint j=i+1;j<str.grid_atoms.size();j++){
@@ -15071,7 +15071,7 @@ string xstructure2json(xstructure& xstr) {
   if(xstr.species.size()){
     deque<string> cleaned_species; //DX20190612 - cleaned species names
     for(uint i=0;i<xstr.species.size(); i++) { cleaned_species.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); } //DX20190612 - cleaned species names
-    sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapDeqEntries(cleaned_species,"\""),",") << "]" << eendl; //DX20190612 - cleaned species names
+    sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(cleaned_species,"\""),",") << "]" << eendl; //DX20190612 - cleaned species names
   } else {
     if(PRINT_NULL){ sscontent_json << "\"species\":null" << eendl;}
   }

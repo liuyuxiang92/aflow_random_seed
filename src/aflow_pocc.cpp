@@ -21,8 +21,8 @@
 #include "aflow_pocc.h"
 #include "aflow_compare_structure.h"
 
-#define _DEBUG_POCC_ false  //CO190116
-#define _DEBUG_POCC_CLUSTER_ANALYSIS_ false && _DEBUG_POCC_  //CO190116
+#define _DEBUG_POCC_ false  //CO20190116
+#define _DEBUG_POCC_CLUSTER_ANALYSIS_ false && _DEBUG_POCC_  //CO20190116
 
 const string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
 const string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //no-period is important
@@ -64,8 +64,8 @@ namespace pocc {
 
     //aflags
     _aflags aflags;
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
 
     //aflow.in
     string AflowIn_file,AflowIn;
@@ -2433,7 +2433,7 @@ namespace pocc {
     v_config_order=getConfigOrder(v_types_config);
   }
 
-  //CO190205 - come back!
+  //CO20190205 - come back!
   //we do config_order based on count of vacancies
   //not sure this is optimal
   //we want to do it based on which vacancy configurations are most similar (so as to not recalculate the cluster bonding)
@@ -3130,7 +3130,7 @@ namespace pocc {
   }
 
   void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-    if(XHOST.WEB_MODE){return;} //CO190520 - no progress bar for web stuff
+    if(XHOST.WEB_MODE){return;} //CO20190520 - no progress bar for web stuff
     double progress = (double)current/(double)end;
     int pos = BAR_WIDTH * progress;
 
@@ -4673,7 +4673,7 @@ namespace pocc {
         xvasp.AVASP_arun=true;
         xvasp.AVASP_arun_mode = "POCC"; //CO20181226
         xvasp.AVASP_arun_runname = getARUNString(isupercell);
-        xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE); //[CO191110]high-entropy offers increased solubility over binaries
+        xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE); //[CO20191110]high-entropy offers increased solubility over binaries
 
         XHOST.QUIET=true;
 
@@ -4829,15 +4829,15 @@ namespace pocc {
 
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ostream& oss) {
     _aflags aflags;
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) {ofstream FileMESSAGE;return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);}
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) {
     _aflags aflags;
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
@@ -5408,31 +5408,31 @@ namespace pocc {
       xstructure xstr_pocc_tmp(xstr_pocc);
       xstr_pocc_tmp.SetSpecies(aurostd::vector2deque(species)); //do NOT change order of species assignment
 
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]deque<_atom> atoms;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint iatom=0;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint ispec=0;ispec<xstr_pocc_tmp.num_each_type.size();ispec++){ //re-label all atoms
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  for(uint i=0;i<(uint)xstr_pocc_tmp.num_each_type[ispec];i++){
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    if(LDEBUG) {cerr << soliloquy << " converting " << xstr_pocc_tmp.atoms[iatom].name << " to " << species[ispec] << endl;}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.push_back(xstr_pocc_tmp.atoms[iatom++]);
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().name=species[ispec];
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().CleanName();
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().name_is_given=(!atoms.back().name.empty());
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  }
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]std::stable_sort(atoms.begin(),atoms.end(),sortAtomsNames); //safe because we do AddAtom() below
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]//assign types
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint itype=0;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms[0].type=itype;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=1;i<atoms.size();i++){
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]	if(atoms[i].name!=atoms[i-1].name){itype++;}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]	atoms[i].type=itype;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=xstr_pocc_tmp.atoms.size()-1;i<xstr_pocc_tmp.atoms.size();i--){  //remove atoms
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  xstr_pocc_tmp.RemoveAtom(i);
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=0;i<atoms.size();i++){xstr_pocc_tmp.AddAtom(atoms[i]);}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms.clear();
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]deque<_atom> atoms;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint iatom=0;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint ispec=0;ispec<xstr_pocc_tmp.num_each_type.size();ispec++){ //re-label all atoms
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  for(uint i=0;i<(uint)xstr_pocc_tmp.num_each_type[ispec];i++){
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    if(LDEBUG) {cerr << soliloquy << " converting " << xstr_pocc_tmp.atoms[iatom].name << " to " << species[ispec] << endl;}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.push_back(xstr_pocc_tmp.atoms[iatom++]);
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().name=species[ispec];
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().CleanName();
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().name_is_given=(!atoms.back().name.empty());
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  }
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]std::stable_sort(atoms.begin(),atoms.end(),sortAtomsNames); //safe because we do AddAtom() below
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]//assign types
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint itype=0;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms[0].type=itype;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=1;i<atoms.size();i++){
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]	if(atoms[i].name!=atoms[i-1].name){itype++;}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]	atoms[i].type=itype;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=xstr_pocc_tmp.atoms.size()-1;i<xstr_pocc_tmp.atoms.size();i--){  //remove atoms
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  xstr_pocc_tmp.RemoveAtom(i);
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=0;i<atoms.size();i++){xstr_pocc_tmp.AddAtom(atoms[i]);}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms.clear();
 
       if(LDEBUG) {
         cerr << soliloquy << " xstr_pocc_tmp" << endl;
@@ -5591,7 +5591,7 @@ namespace pocc {
     }
     ss_header << " | " << getHeaderMaxSiteError(); //header_max_site_error;
     ss_header << " | " << getHeaderMaxStoichError(); //header_max_stoich_error;
-    //ss_header << " | " << getHeaderStoichiometry(); //CO190131 - fix later
+    //ss_header << " | " << getHeaderStoichiometry(); //CO20190131 - fix later
     ss_header << " " << endl;
 
     return ss_header.str();
@@ -5666,8 +5666,8 @@ namespace pocc {
     tmp_ss.str(""); tmp_ss << stoich_error;
     line_output << " | " << aurostd::PaddedPOST(tmp_ss.str(),getHeaderMaxStoichError().size()); //header_max_stoich_error.size()//getHNFTableErrorPadding());
     tmp_ss.str(""); tmp_ss << stoich_error;
-    //line_output << " | " << aurostd::PaddedPOST(tmp_ss.str(),getHeaderStoichiometry().size()); //CO190131 - fix later
-    //tmp_ss.str(""); tmp_ss << stoich_error; //CO190131 - fix later
+    //line_output << " | " << aurostd::PaddedPOST(tmp_ss.str(),getHeaderStoichiometry().size()); //CO20190131 - fix later
+    //tmp_ss.str(""); tmp_ss << stoich_error; //CO20190131 - fix later
     line_output << " " << endl;
 
     return line_output.str();
@@ -6201,7 +6201,7 @@ namespace pocc {
     //}
     //}
     uint atom1;
-    double uff_bonding_distance=DEFAULT_UFF_BONDING_DISTANCE; //CO190208 - remember, this is not a raw distance, but a distance to within the nn distance
+    double uff_bonding_distance=DEFAULT_UFF_BONDING_DISTANCE; //CO20190208 - remember, this is not a raw distance, but a distance to within the nn distance
     for(uint sc_atom1=0;sc_atom1<xstr_ss.atoms.size();sc_atom1++){
       if(isVacancy(m_vacancies,sc_atom1)){continue;}
       atom1=xstr_cluster.grid_atoms_pc2scMap[sc_atom1];

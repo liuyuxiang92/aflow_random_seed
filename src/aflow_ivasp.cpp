@@ -73,6 +73,41 @@ namespace KBIN {
   }
 }
 
+
+namespace KBIN {
+  bool VASP_Write_AUID_FILE(const string& directory,const vector<string>& vAUIDs,const vector<string>& species) {
+    vector<string> vWRITE;
+    vWRITE.push_back("AFLOW: AUID of pseudopotentials: NAUID="+aurostd::utype2string<uint>(vAUIDs.size()));
+    if(vAUIDs.size()!=species.size()) return FALSE;
+    for(uint i=0;i<vAUIDs.size();i++)
+      vWRITE.push_back(vAUIDs.at(i)+" "+aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(species.at(i)),3));
+    aurostd::vectorstring2file(vWRITE,directory+"/"+DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT);
+    return TRUE;
+  }
+  bool VASP_Write_AUID_FILE(const string& directory,const deque<string>& vAUIDs,const deque<string>& species) {
+    return VASP_Write_AUID_FILE(directory,aurostd::deque2vector(vAUIDs),aurostd::deque2vector(species));
+  }
+  bool VASP_Write_AUID_AFLOWIN(const string& directory,const vector<string>& vAUIDs,const vector<string>& species) {
+    if(vAUIDs.size()!=species.size()) return FALSE;
+    struct stat fileInfo;
+    stat(string(directory+"/"+_AFLOWIN_).c_str(), &fileInfo);
+    string date=std::ctime(&fileInfo.st_mtime);
+    if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
+
+    string WRITE="[VASP_POTCAR_AUID]";
+    for(uint i=0;i<vAUIDs.size();i++) {
+      WRITE+=vAUIDs.at(i);
+      if(i<vAUIDs.size()-1) WRITE+=",";
+    }
+    aurostd::execute("echo \""+WRITE+"\" >> "+directory+"/"+_AFLOWIN_);
+    aurostd::execute("touch -m --date=\""+date+"\" "+directory+"/"+_AFLOWIN_);
+    return TRUE;
+  }
+  bool VASP_Write_AUID_AFLOWIN(const string& directory,const deque<string>& vAUIDs,const deque<string>& species) {
+    return VASP_Write_AUID_AFLOWIN(directory,aurostd::deque2vector(vAUIDs),aurostd::deque2vector(species));
+  }
+}
+
 namespace KBIN {
   bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     ifstream DirectoryStream;
@@ -91,6 +126,9 @@ namespace KBIN {
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")));
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.POTCAR,string(xvasp.Directory+"/POTCAR")));
+    if(Krun) Krun=(Krun && VASP_Write_AUID_FILE(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
+    if(Krun) Krun=(Krun && VASP_Write_AUID_AFLOWIN(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
+    
     // VASP BACKUP VASP WRITE
     if(Krun && xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR_orig,string(xvasp.Directory+"/POSCAR.orig")));
     if(Krun && xvasp.aopts.flag("FLAG::XVASP_INCAR_changed"))   Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR_orig,string(xvasp.Directory+"/INCAR.orig")));
@@ -107,8 +145,8 @@ namespace KBIN {
 // PseudoPotential_CleanName
 // gets rid of all junk in the name
 namespace KBIN {
-  string VASP_PseudoPotential_CleanName(const string& speciesIN) {return VASP_PseudoPotential_CleanName_190712(speciesIN);} //CO190712
-  string VASP_PseudoPotential_CleanName_190712(const string& speciesIN) { //CO190712
+  string VASP_PseudoPotential_CleanName(const string& speciesIN) {return VASP_PseudoPotential_CleanName_190712(speciesIN);} //CO20190712
+  string VASP_PseudoPotential_CleanName_190712(const string& speciesIN) { //CO20190712
     //the old function assumed only a single species input
     //now, the species input can be a full species string: Mn_pvPt, etc.
     //need to remove ALL instances of pp info
@@ -119,7 +157,7 @@ namespace KBIN {
     VASP_PseudoPotential_CleanName_InPlace(species);
     return species;
   }
-  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only) { //CO190712
+  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only) { //CO20190712
     //WARNING: to anyone adding to this list, BE CAREFUL to avoid adding entries that contain capital letters
     //they must be added to CAPITAL_LETTERS_PP_LIST in aflow.h
     //these pp suffixes cause problems when parsing compounds (capital letters)
@@ -131,52 +169,52 @@ namespace KBIN {
     }
 
     if(capital_letters_only==false){
-      aurostd::RemoveSubStringInPlace(species,"_old");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Si_h_old
-      aurostd::RemoveSubStringInPlace(species,".old");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Mg_pv.old
-      aurostd::RemoveSubStringInPlace(species,"_vnew");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Pd_vnew
-      aurostd::RemoveSubStringInPlace(species,"_new2");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Ti_sv_new2
-      aurostd::RemoveSubStringInPlace(species,"_new");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Au_new
+      aurostd::RemoveSubStringInPlace(species,"_old");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Si_h_old
+      aurostd::RemoveSubStringInPlace(species,".old");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Mg_pv.old
+      aurostd::RemoveSubStringInPlace(species,"_vnew");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Pd_vnew
+      aurostd::RemoveSubStringInPlace(species,"_new2");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Ti_sv_new2
+      aurostd::RemoveSubStringInPlace(species,"_new");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Au_new
 
-      aurostd::RemoveSubStringInPlace(species,"_pvf");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Cu_pvf
-      aurostd::RemoveSubStringInPlace(species,"_rel");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Pb_d_rel
-      aurostd::RemoveSubStringInPlace(species,"_ref");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Ge_d_GW_ref
-      aurostd::RemoveSubStringInPlace(species,"_local");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/C_local
-      aurostd::RemoveSubStringInPlace(species,"_nopc");  //CO190712 - potpaw_LDA/potpaw_PBE.20100505/Si_nopc
-      aurostd::RemoveSubStringInPlace(species,".nrel");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Ga_pv_GW.nrel
-      aurostd::RemoveSubStringInPlace(species,"_nr");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/C_h_nr
-      aurostd::RemoveSubStringInPlace(species,"_nc");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/H_nc_GW
-      aurostd::RemoveSubStringInPlace(species,"_n");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/As_GW_n
-      aurostd::RemoveSubStringInPlace(species,"_parsv");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Mg_pv_parsv_GW
-      aurostd::RemoveSubStringInPlace(species,"_sv2");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Li_sv2
+      aurostd::RemoveSubStringInPlace(species,"_pvf");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Cu_pvf
+      aurostd::RemoveSubStringInPlace(species,"_rel");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Pb_d_rel
+      aurostd::RemoveSubStringInPlace(species,"_ref");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Ge_d_GW_ref
+      aurostd::RemoveSubStringInPlace(species,"_local");  //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/C_local
+      aurostd::RemoveSubStringInPlace(species,"_nopc");  //CO20190712 - potpaw_LDA/potpaw_PBE.20100505/Si_nopc
+      aurostd::RemoveSubStringInPlace(species,".nrel");  //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Ga_pv_GW.nrel
+      aurostd::RemoveSubStringInPlace(species,"_nr");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/C_h_nr
+      aurostd::RemoveSubStringInPlace(species,"_nc");  //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/H_nc_GW
+      aurostd::RemoveSubStringInPlace(species,"_n");  //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/As_GW_n
+      aurostd::RemoveSubStringInPlace(species,"_parsv");  //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Mg_pv_parsv_GW
+      aurostd::RemoveSubStringInPlace(species,"_sv2");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Li_sv2
       aurostd::RemoveSubStringInPlace(species,"_sv");
-      aurostd::RemoveSubStringInPlace(species,"_vs"); //CO190712 - potpaw_PBE/potpaw_PBE.20100506/N_vs
+      aurostd::RemoveSubStringInPlace(species,"_vs"); //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/N_vs
       aurostd::RemoveSubStringInPlace(species,"_pv");
-      aurostd::RemoveSubStringInPlace(species,"_dr");  //CO190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.20100505/Pb_dr
-      aurostd::RemoveSubStringInPlace(species,"_d3");  //CO190712 - BEFORE _d //potpaw_PBE/potpaw_PBE.20100506/Ge_d3
-      aurostd::RemoveSubStringInPlace(species,"_d2");  //CO190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.05May2010/As_d2_GW
+      aurostd::RemoveSubStringInPlace(species,"_dr");  //CO20190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.20100505/Pb_dr
+      aurostd::RemoveSubStringInPlace(species,"_d3");  //CO20190712 - BEFORE _d //potpaw_PBE/potpaw_PBE.20100506/Ge_d3
+      aurostd::RemoveSubStringInPlace(species,"_d2");  //CO20190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.05May2010/As_d2_GW
       aurostd::RemoveSubStringInPlace(species,"_d");
-      aurostd::RemoveSubStringInPlace(species,"_soft");  //CO190712 - BEFORE _s
+      aurostd::RemoveSubStringInPlace(species,"_soft");  //CO20190712 - BEFORE _s
       aurostd::RemoveSubStringInPlace(species,"_s");
-      //[CO190712 - OBSOLETE really _n and _2]aurostd::RemoveSubStringInPlace(species,"_2_n");
+      //[CO20190712 - OBSOLETE really _n and _2]aurostd::RemoveSubStringInPlace(species,"_2_n");
       aurostd::RemoveSubStringInPlace(species,"_h");
-      aurostd::RemoveSubStringInPlace(species,"_f");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Cu_f
-      aurostd::RemoveSubStringInPlace(species,"_af"); //CO191110 - SHACHAR aflow pp 
+      aurostd::RemoveSubStringInPlace(species,"_f");  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Cu_f
+      aurostd::RemoveSubStringInPlace(species,"_af"); //CO20191110 - SHACHAR aflow pp 
 
       aurostd::RemoveSubStringInPlace(species,"_1");
       aurostd::RemoveSubStringInPlace(species,"_2");
       aurostd::RemoveSubStringInPlace(species,"_3");
 
-      aurostd::RemoveSubStringInPlace(species,"1.75"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.75
-      aurostd::RemoveSubStringInPlace(species,"1.66"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
-      aurostd::RemoveSubStringInPlace(species,"1.33"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
-      aurostd::RemoveSubStringInPlace(species,"1.25"); //CO190712 - before all other decimal numbers
-      aurostd::RemoveSubStringInPlace(species,"1.5"); //CO190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
-      aurostd::RemoveSubStringInPlace(species,".75");  //CO190712 - before 0.5
-      aurostd::RemoveSubStringInPlace(species,".25");  //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
-      aurostd::RemoveSubStringInPlace(species,".66"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
-      aurostd::RemoveSubStringInPlace(species,".33"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
-      aurostd::RemoveSubStringInPlace(species,".42"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
-      aurostd::RemoveSubStringInPlace(species,".58"); //CO190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
+      aurostd::RemoveSubStringInPlace(species,"1.75"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.75
+      aurostd::RemoveSubStringInPlace(species,"1.66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
+      aurostd::RemoveSubStringInPlace(species,"1.33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
+      aurostd::RemoveSubStringInPlace(species,"1.25"); //CO20190712 - before all other decimal numbers
+      aurostd::RemoveSubStringInPlace(species,"1.5"); //CO20190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
+      aurostd::RemoveSubStringInPlace(species,".75");  //CO20190712 - before 0.5
+      aurostd::RemoveSubStringInPlace(species,".25");  //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
+      aurostd::RemoveSubStringInPlace(species,".66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
+      aurostd::RemoveSubStringInPlace(species,".33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
+      aurostd::RemoveSubStringInPlace(species,".42"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
+      aurostd::RemoveSubStringInPlace(species,".58"); //CO20190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
       aurostd::RemoveSubStringInPlace(species,".5");
 
       aurostd::RemoveSubStringInPlace(species,"+1");
@@ -208,43 +246,43 @@ namespace KBIN {
       aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN+"/");
       aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/");
 
-      aurostd::RemoveSubStringInPlace(species,"__"); //CO190712 - BEFORE _ - potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW__
-      aurostd::RemoveSubStringInPlace(species,"_");  //CO190712  //potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW_
+      aurostd::RemoveSubStringInPlace(species,"__"); //CO20190712 - BEFORE _ - potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW__
+      aurostd::RemoveSubStringInPlace(species,"_");  //CO20190712  //potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW_
     }
   }
   string VASP_PseudoPotential_CleanName_190101(const string& speciesIN) {
     string species=speciesIN;
     uint i=1,imax=2;
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_GW");  //CO190712
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_new");  //CO190712
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_AE");  //CO190712
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_GW");  //CO20190712
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_new");  //CO20190712
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_AE");  //CO20190712
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_sv");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_pv");
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_d2");  //CO190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.05May2010/As_d2_GW
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_d2");  //CO20190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.05May2010/As_d2_GW
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_d");
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_soft");  //CO190712 - BEFORE _s
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_soft");  //CO20190712 - BEFORE _s
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_s");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_200eV");
-    //[CO190712 - moved up before _s]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_soft");
+    //[CO20190712 - moved up before _s]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_soft");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_2_n");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_h");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_1");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_2");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_3");
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.75"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.75
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.66"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.33"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.25"); //CO190712 - before all other decimal numbers
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.5"); //CO190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".75");  //CO190712 - before 0.5
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".25");  //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".66"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".33"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".42"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".58"); //CO190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.75"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.75
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.25"); //CO20190712 - before all other decimal numbers
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.5"); //CO20190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".75");  //CO20190712 - before 0.5
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".25");  //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".42"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".58"); //CO20190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".5");
-    //[CO190712 - moved up 0.5]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".75");
-    //[CO190712 - moved up before all other decimal numbers]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.25");
+    //[CO20190712 - moved up 0.5]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".75");
+    //[CO20190712 - moved up before all other decimal numbers]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.25");
 
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"+1");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"+3");
@@ -265,14 +303,14 @@ namespace KBIN {
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN+"/");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/");
     // COREY - END
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"__"); //CO190712 - BEFORE _ - potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW__
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_");  //CO190712  //potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW_
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"__"); //CO20190712 - BEFORE _ - potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW__
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_");  //CO20190712  //potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW_
     return species;
   }
 }
 
 namespace KBIN {
-  bool VASP_PseudoPotential_CleanName_TEST(void){ //CO190712
+  bool VASP_PseudoPotential_CleanName_TEST(void){ //CO20190712
     bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy="KBIN::VASP_PseudoPotential_CleanName_TEST():";
     stringstream message;
@@ -1736,7 +1774,7 @@ namespace KBIN {
       aus << "00000  MESSAGE POSCAR  STANDARD_PRIMITIVE Unit Cell " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xvasp.str.Standard_Primitive_UnitCellForm();
-      xvasp.str.sortAtomsEquivalent();  //CO190216 - critical for prospective APL calculations, better to sort before relaxations and not have to sort again in the future
+      xvasp.str.sortAtomsEquivalent();  //CO20190216 - critical for prospective APL calculations, better to sort before relaxations and not have to sort again in the future
       // CO - START
       //corey, fix issue with iatoms tag becoming atom names
       bool write_inequivalent_flag=xvasp.str.write_inequivalent_flag;
@@ -1770,7 +1808,7 @@ namespace KBIN {
       aus << "00000  MESSAGE POSCAR  STANDARD_CONVENTIONAL Unit Cell " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xvasp.str.Standard_Conventional_UnitCellForm();
-      xvasp.str.sortAtomsEquivalent();  //CO190216 - critical for prospective APL calculations, better to sort before relaxations and not have to sort again in the future
+      xvasp.str.sortAtomsEquivalent();  //CO20190216 - critical for prospective APL calculations, better to sort before relaxations and not have to sort again in the future
       // CO - START
       //corey, fix issue with iatoms tag becoming atom names
       bool write_inequivalent_flag=xvasp.str.write_inequivalent_flag;
@@ -1807,7 +1845,7 @@ namespace KBIN {
       aus << "00000  MESSAGE POSCAR  NIGGLI Unit Cell Reduction " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xvasp.str.NiggliUnitCellForm();
-      xvasp.str.sortAtomsEquivalent();  //CO190216 - critical for prospective APL calculations, better to sort before relaxations and not have to sort again in the future
+      xvasp.str.sortAtomsEquivalent();  //CO20190216 - critical for prospective APL calculations, better to sort before relaxations and not have to sort again in the future
       xvasp.str.title=xvasp.str.title+" [Niggli Unit Cell Form]";
       xvasp.POSCAR.str(std::string());xvasp.POSCAR.clear();
       xvasp.POSCAR << xvasp.str;
@@ -1821,7 +1859,7 @@ namespace KBIN {
       aus << "00000  MESSAGE POSCAR  MINKOWSKI Basis Reduction " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xvasp.str.MinkowskiBasisReduction();
-      xvasp.str.sortAtomsEquivalent();  //CO190216 - critical for prospective APL calculations, better to sort before relaxations and not have to sort again in the future
+      xvasp.str.sortAtomsEquivalent();  //CO20190216 - critical for prospective APL calculations, better to sort before relaxations and not have to sort again in the future
       xvasp.str.title=xvasp.str.title+" [Minkowski Basis Reduction]";
       xvasp.POSCAR.str(std::string());xvasp.POSCAR.clear();
       xvasp.POSCAR << xvasp.str;
@@ -1871,7 +1909,7 @@ namespace KBIN {
       aus << "00000  MESSAGE POSCAR  CARTESIAN Basis Coordinates" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xvasp.str.SetCoordinates(_COORDS_CARTESIAN_);
-      //[CO190216 - seems mistake]xvasp.str.title=xvasp.str.title+" [WignerSeitz Basis]";
+      //[CO20190216 - seems mistake]xvasp.str.title=xvasp.str.title+" [WignerSeitz Basis]";
       xvasp.POSCAR.str(std::string());xvasp.POSCAR.clear();
       xvasp.POSCAR << xvasp.str;
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_generated",TRUE);
@@ -2350,7 +2388,7 @@ namespace KBIN {
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------
 // POTCAR
 namespace KBIN {
-  bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar) {
+  bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string pseudopotential="nothing";
     FilePotcar="";DataPotcar="";
@@ -2371,8 +2409,8 @@ namespace KBIN {
     if(aurostd::substring2bool(species_pp,"potpaw_PBE_KIN") || aurostd::substring2bool(species_pp,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN))
       pseudopotential=DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN;
 
-    if (LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: species_pp=" << species_pp << endl; 
-    if (LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: pseudopotential=" << pseudopotential << endl;
+    if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: species_pp=" << species_pp << endl; 
+    if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: pseudopotential=" << pseudopotential << endl;
     //    exit(0);
 
     bool found=FALSE;
@@ -2383,13 +2421,20 @@ namespace KBIN {
       found=TRUE;
       FilePotcar=init::InitLoadString(string2load_list,FALSE);
       DataPotcar=init::InitLoadString(string2load_data,FALSE);
-    }
+      string file_tmp=aurostd::TmpFileCreate("DataPotcar");
+      AUIDPotcar=aurostd::file2auid(file_tmp);
+      if(aurostd::FileExist(file_tmp)) aurostd::RemoveFile(file_tmp);
+
+      if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: species_pp=" << species_pp << endl; 
+      if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: pseudopotential=" << pseudopotential << endl;
+      if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: AUIDPotcar=" << AUIDPotcar << endl; 
+}
     return found;
   }
 }
 
 namespace KBIN {
-  bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar) {
+  bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string pseudopotential="nothing";
     FilePotcar="";DataPotcar="";
@@ -2410,8 +2455,8 @@ namespace KBIN {
     if(aurostd::substring2bool(species_pp,"potpaw_PBE_KIN") || aurostd::substring2bool(species_pp,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN))
       pseudopotential=DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN;
 
-    if (LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: species_pp=" << species_pp << endl; 
-    if (LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: pseudopotential=" << pseudopotential << endl;
+    if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: species_pp=" << species_pp << endl; 
+    if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: pseudopotential=" << pseudopotential << endl;
     //    exit(0);
 
     bool found=FALSE;
@@ -2421,7 +2466,7 @@ namespace KBIN {
         string FilePotcark;
         if(k==0) FilePotcark=species_pp;      // k==0 dont touch
         if(k>0) FilePotcark=vVASP_POTCAR_DIRECTORIES.at(j)+"/"+species_pp;
-        //if(k==1) FilePotcark=FilePotcark; // nothing done //CO190329 - compiler doesn't like FilePotcark=FilePotcark
+        //if(k==1) FilePotcark=FilePotcark; // nothing done //CO20190329 - compiler doesn't like FilePotcark=FilePotcark
         if(k==2) aurostd::StringSubst(FilePotcark,pseudopotential,pseudopotential+"/"+DEFAULT_VASP_POTCAR_DATE);  // current POST
         if(k==3) aurostd::StringSubst(FilePotcark,pseudopotential,DEFAULT_VASP_POTCAR_DATE+"/"+pseudopotential);  // current PRE
         if(k==4) aurostd::StringSubst(FilePotcark,pseudopotential,pseudopotential+"/dateP1");   // dateP1 POST
@@ -2454,7 +2499,13 @@ namespace KBIN {
       while (FileINPUT.get(c)) aus.put(c);
       FileINPUT.clear();FileINPUT.close();
       DataPotcar=aus.str();
+      
+      AUIDPotcar=aurostd::file2auid(FilePotcar);
+      if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: species_pp=" << species_pp << endl; 
+      if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: pseudopotential=" << pseudopotential << endl;
+      if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: AUIDPotcar=" << AUIDPotcar << endl; 
     }
+
     return found;
   }
 }
@@ -2499,7 +2550,7 @@ namespace KBIN {
       // Prepare POTCAR
       ifstream FileINPUT;
       vector<string> FilePotcars;
-      string FilePotcar,DataPotcar;
+      string FilePotcar,DataPotcar,AUIDPotcar;
       if(!vflags.KBIN_VASP_POTCAR_FILE.flag("SYSTEM_AUTO")) {
         subS2="[VASP_POTCAR_FILE]"; // STRING TO SEARCH
         subS1=AflowIn.substr(AflowIn.find(subS2));
@@ -2572,7 +2623,7 @@ namespace KBIN {
           aurostd::StringSubst(cleanname,"/POTCAR","");
           vector<string> tokens;aurostd::string2tokens(cleanname,tokens,"/");
           if(tokens.size()>0) cleanname=tokens.at(tokens.size()-1);
-          if (LDEBUG) cerr << "[VASP_Produce_POTCAR]: vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme << endl;
+          if(LDEBUG) cerr << "[VASP_Produce_POTCAR]: vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme << endl;
           if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme=="potpaw_PBE_KIN")
             FilePotcars.at(i)=DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/"+AVASP_Get_PseudoPotential_PAW_PBE_KIN(cleanname);
           if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme=="potpaw_LDA_KIN")
@@ -2596,8 +2647,8 @@ namespace KBIN {
           aurostd::string2tokens(FilePotcars[i], tokens, "/");
           if (tokens.size() > 0) xvasp.str.species_pp[i] = tokens.back();
 
-          if (LDEBUG) cerr << "[VASP_Produce_POTCAR]: cleanname=" << cleanname << endl;
-          if (LDEBUG) cerr << "[VASP_Produce_POTCAR]: FilePotcars.at(" << i << ")=" << FilePotcars.at(i) << endl;
+          if(LDEBUG) cerr << "[VASP_Produce_POTCAR]: cleanname=" << cleanname << endl;
+          if(LDEBUG) cerr << "[VASP_Produce_POTCAR]: FilePotcars.at(" << i << ")=" << FilePotcars.at(i) << endl;
         }
       }
 
@@ -2633,24 +2684,26 @@ namespace KBIN {
         bool found_DATA=FALSE;
         bool found_FILE=FALSE;
         if(AFLOW_PSEUDOPOTENTIALS) {
-          found_DATA=KBIN::VASP_Find_DATA_POTCAR(FilePotcars.at(i),FilePotcar,DataPotcar);
+          found_DATA=KBIN::VASP_Find_DATA_POTCAR(FilePotcars.at(i),FilePotcar,DataPotcar,AUIDPotcar);
           if(found_DATA) {
-            aus << "00000  MESSAGE POTCAR  DATA: Found potcar FilePotcar=" << FilePotcar << " - DataPotcar.size()=" << DataPotcar.size() << " " << endl;
+            aus << "00000  MESSAGE POTCAR  DATA: Found potcar FilePotcar=" << FilePotcar << " - DataPotcar.size()=" << DataPotcar.size() << " - AUIDPotcar=" << AUIDPotcar << " " << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.POTCAR << DataPotcar << endl;
+	    xvasp.POTCAR_AUID.push_back(AUIDPotcar);
             // [OBSOLETE] aus << "00000  MESSAGE POTCAR  DATA: Found potcar xvasp.POTCAR.str().size()=" << xvasp.POTCAR.str().size() << " " << endl;
             // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	      
           }
         } else {
-          found_FILE=KBIN::VASP_Find_FILE_POTCAR(FilePotcars.at(i),FilePotcar,DataPotcar);
+          found_FILE=KBIN::VASP_Find_FILE_POTCAR(FilePotcars.at(i),FilePotcar,DataPotcar,AUIDPotcar);
           if(found_FILE) {
             // FileINPUT.clear();FileINPUT.open(FilePotcar.c_str(),std::ios::in);
             // char c;while (FileINPUT.get(c)) xvasp.POTCAR.put(c);
             // FileINPUT.clear();FileINPUT.close();
-            aus << "00000  MESSAGE POTCAR  FILE: Found potcar FilePotcar=" << FilePotcar << " - DataPotcar.size()=" << DataPotcar.size() << " " << endl;
+            aus << "00000  MESSAGE POTCAR  FILE: Found potcar FilePotcar=" << FilePotcar << " - DataPotcar.size()=" << DataPotcar.size() << " - AUIDPotcar=" << AUIDPotcar << " " << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.POTCAR << DataPotcar;// << endl; file has already new line
-            // [OBSOLETE] aus << "00000  MESSAGE POTCAR  FILE: Found potcar xvasp.POTCAR.str().size()=" << xvasp.POTCAR.str().size() << " " << endl;
+    	    xvasp.POTCAR_AUID.push_back(AUIDPotcar);
+        // [OBSOLETE] aus << "00000  MESSAGE POTCAR  FILE: Found potcar xvasp.POTCAR.str().size()=" << xvasp.POTCAR.str().size() << " " << endl;
             // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	      
           } else {
             aus << "EEEEE  POTCAR [" << FilePotcars.at(i).c_str() << "] not found! (aflow_ivasp.cpp) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -5783,17 +5836,17 @@ namespace KBIN {
       if(aurostd::FileExist(doscarfile_tmp)) aurostd::RemoveFile(doscarfile_tmp);
 
       //Get the working directory
-      //[CO191112 - OBSOLETE]const int PATH_LENGTH_MAX=1024;
-      //[CO191112 - OBSOLETE]char work_dir[PATH_LENGTH_MAX];
-      //[CO191112 - OBSOLETE]getcwd(work_dir, PATH_LENGTH_MAX);  
-      string work_dir=aurostd::getPWD();  //CO191112
+      //[CO20191112 - OBSOLETE]const int PATH_LENGTH_MAX=1024;
+      //[CO20191112 - OBSOLETE]char work_dir[PATH_LENGTH_MAX];
+      //[CO20191112 - OBSOLETE]getcwd(work_dir, PATH_LENGTH_MAX);  
+      string work_dir=aurostd::getPWD();  //CO20191112
 
       //Get the data directory
       chdir(directory.c_str());  //Jump into the data directory
-      //[CO191112 - OBSOLETE]char data_dir[PATH_LENGTH_MAX];
-      //[CO191112 - OBSOLETE]getcwd(data_dir, PATH_LENGTH_MAX);  
-      string data_dir=aurostd::getPWD();  //CO191112
-      chdir(work_dir.c_str()); //Jump back into the work directory  //CO191112
+      //[CO20191112 - OBSOLETE]char data_dir[PATH_LENGTH_MAX];
+      //[CO20191112 - OBSOLETE]getcwd(data_dir, PATH_LENGTH_MAX);  
+      string data_dir=aurostd::getPWD();  //CO20191112
+      chdir(work_dir.c_str()); //Jump back into the work directory  //CO20191112
 
       //Check whether it is MAGNETIC DATABASE
       bool FLAG_MAGNETIC=FALSE;
@@ -5804,7 +5857,7 @@ namespace KBIN {
         return SystemName;
       } else {
         vector<string> data;
-        aurostd::string2tokens(data_dir.c_str(), data, "/");  //CO191112
+        aurostd::string2tokens(data_dir.c_str(), data, "/");  //CO20191112
         int datasize=data.size();
         bool FLAG_DIRECTORY_ICSD=FALSE;
         for (uint i=0; i<data.size();i++) {

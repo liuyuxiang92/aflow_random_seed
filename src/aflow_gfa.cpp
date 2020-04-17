@@ -27,9 +27,9 @@
 
 //gfa
 // [OBSOLETE] #define _ZTOL_ 0.05 //Tolerance for positive formation enthalpies - was originally 0.05
-//[CO190628]#define KbT 0.025 // setting for room temperature - 0.025, could also be human body temperature - 0.0267
-#define TEMPERATURE 300 //Kelvin //CO190628
-#define KbT KBOLTZEV*TEMPERATURE // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO190628
+//[CO20190628]#define KbT 0.025 // setting for room temperature - 0.025, could also be human body temperature - 0.0267
+#define TEMPERATURE 300 //Kelvin //CO20190628
+#define KbT KBOLTZEV*TEMPERATURE // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO20190628
 
 /********DEFINITIONS**********/
 
@@ -245,7 +245,7 @@ void DetermineDistinctAEs(vector<vector<xmatrix<int> > > VatomicEnvironments, ve
           for(int j=0;j<str(1,2);j++){
             for(uint l=0;l<distinctAE[ns].size();l++){
               int similarVertices=0;
-              if(str(2,j+1)==(int)distinctAE[ns][l].size()/3){ //CO190329
+              if(str(2,j+1)==(int)distinctAE[ns][l].size()/3){ //CO20190329
                 for(int k=0;k<str(2,j+1);k++){
                   for(uint m=0;m<distinctAE[ns][l].size()/3;m++){
                     if(str((4+j),(3*k+1))==distinctAE[ns][l][3*m] && str((4+j),(3*k+2))==distinctAE[ns][l][3*m+1] && str((4+j),(3*k+3))==distinctAE[ns][l][3*m+2]){
@@ -716,11 +716,11 @@ namespace pflow {
       vector<uint> distinctAE_size, vector<chull::ChullPoint> vcpt, vector<vector<double> > VStoichE,
       vector<string> species){
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190424
-    string soliloquy="pflow::ComputeGFA():";  //CO190424
-    if(LDEBUG) { //CO190424
-      for(uint i=0;i<Egs.size();i++){cerr << soliloquy << " Egs[i=" << i << "]=" << Egs[i] << endl;} //CO190424
-    } //CO190424
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190424
+    string soliloquy="pflow::ComputeGFA():";  //CO20190424
+    if(LDEBUG) { //CO20190424
+      for(uint i=0;i<Egs.size();i++){cerr << soliloquy << " Egs[i=" << i << "]=" << Egs[i] << endl;} //CO20190424
+    } //CO20190424
 
     aurostd::xcombos xc(entries_size, dimension);
     vector<vector<int> > indices;
@@ -752,7 +752,7 @@ namespace pflow {
 
     for(uint X=0;X<vcpt.size();X++){
       vector<double> gstoich; double last=1;
-      for(int i=vcpt[X].m_coords.lrows;i<=vcpt[X].m_coords.urows-1;i++){  //CO190424
+      for(int i=vcpt[X].m_coords.lrows;i<=vcpt[X].m_coords.urows-1;i++){  //CO20190424
         gstoich.push_back(vcpt[X].m_coords[i]);
         last=last-vcpt[X].m_coords[i];
       }
@@ -828,7 +828,7 @@ namespace pflow {
 
           double sigma_r=0.1;
 
-          //CO190509
+          //CO20190509
           //heuristic, so calculation is feasible for ternaries
           int sigma_weight = 3;
           if(dimension==2){sigma_weight=300;} //include everything
@@ -841,8 +841,8 @@ namespace pflow {
               dt=dt+pow(VStoichE.at(indices[l][i]).at(x)-gstoich[x],2);
             }
             dt=sqrt(dt);
-            //[CO190501 - OBSOLETE]if(dt>300*sigma_r)
-            if(dt>sigma_weight*sigma_r) //CO190501
+            //[CO20190501 - OBSOLETE]if(dt>300*sigma_r)
+            if(dt>sigma_weight*sigma_r) //CO20190501
             { //CO200106 - patching for auto-indenting
               stop=true;
               break;
@@ -854,15 +854,15 @@ namespace pflow {
 
           if(stop==false){
 
-            vector<xvector<double> > lhs, rhs; xvector<double> compositionL(dimension); //-1,0);  //CO190424
+            vector<xvector<double> > lhs, rhs; xvector<double> compositionL(dimension); //-1,0);  //CO20190424
             for (uint x=0;x<dimension;x++){
-              compositionL[x+compositionL.lrows]=gstoich[x];  //CO190424
+              compositionL[x+compositionL.lrows]=gstoich[x];  //CO20190424
             }
             lhs.push_back(compositionL);
             for(uint i=0;i<dimension;i++){
-              xvector<double> compositionR(dimension);  //-1,0);  //CO190424
+              xvector<double> compositionR(dimension);  //-1,0);  //CO20190424
               for(uint x=0;x<dimension;x++){
-                compositionR[x+compositionR.lrows]=VStoichE.at(indices[l][i]).at(x);  //CO190424
+                compositionR[x+compositionR.lrows]=VStoichE.at(indices[l][i]).at(x);  //CO20190424
               }
               rhs.push_back(compositionR);
             }
@@ -1040,8 +1040,8 @@ namespace pflow {
   //************** Function for computing GFA (end)
 
   void CalculateGFA(aurostd::xoption& vpflow, const string& alloy, const string& AE_file_read, double fe_cut){
-    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190424
-    string soliloquy="pflow::CalculateGFA():";  //CO190424
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190424
+    string soliloquy="pflow::CalculateGFA():";  //CO20190424
 
     uint entries_size=0;
     string buffer;
@@ -1056,8 +1056,8 @@ namespace pflow {
     chull::ConvexHull the_hull;
     vector<chull::ChullPoint> Vpoint, vcpt;
     ostream& oss=cout;
-    vector<string> species=stringElements2VectorElements(alloy,true,true,pp_string,false,oss);  //clean and sort, do not keep_pp //[CO190712 - OBSOLETE]getAlphabeticVectorString(alloy);
-    string input=aurostd::joinWDelimiter(species,""); //getAlphabeticString(alloy); //CO190712
+    vector<string> species=stringElements2VectorElements(alloy,true,true,pp_string,false,oss);  //clean and sort, do not keep_pp //[CO20190712 - OBSOLETE]getAlphabeticVectorString(alloy);
+    string input=aurostd::joinWDelimiter(species,""); //getAlphabeticString(alloy); //CO20190712
     vector<chull::CoordGroup> VCoordGroup;
 
     uint dimension=species.size();
@@ -1069,7 +1069,7 @@ namespace pflow {
       vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_LIB3", true);
     }
     vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE", true);
-    //[CO190715 - LOAD_ENTRIES_ONLY_ALPHABETICAL -> LOAD_ENTRIES_NON_ALPHABETICAL]vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL",true);  
+    //[CO20190715 - LOAD_ENTRIES_ONLY_ALPHABETICAL -> LOAD_ENTRIES_NON_ALPHABETICAL]vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL",true);  
     vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES",true);
 
     bool quiet=XHOST.QUIET;
@@ -1330,22 +1330,22 @@ namespace pflow {
     EntryData.close();
 
     if(dimension==2){
-      xvector<double> vst(dimension); //1,0); //CO190424
+      xvector<double> vst(dimension); //1,0); //CO20190424
       for(double i=0;i<101;i++){
-        vst[vst.lrows]=i/100; //CO190424
-        vst[vst.lrows+1]=2; //CO190424
+        vst[vst.lrows]=i/100; //CO20190424
+        vst[vst.lrows+1]=2; //CO20190424
         chull::ChullPoint cpt(vst, cout, true, true, true);
         vcpt.push_back(cpt);
       }
     }
     else if(dimension==3){
-      xvector<double> vst(dimension); //2,0); //CO190424
+      xvector<double> vst(dimension); //2,0); //CO20190424
       for(double i=0;i<21;i++){
         for(double j=0;j<21;j++){
           if(1-i/20-j/20>-0.00001){
-            vst[vst.lrows]=i/20;  //CO190424
-            vst[vst.lrows+1]=j/20;  //CO190424
-            vst[vst.lrows+2]=2; //CO190424
+            vst[vst.lrows]=i/20;  //CO20190424
+            vst[vst.lrows+1]=j/20;  //CO20190424
+            vst[vst.lrows+2]=2; //CO20190424
             chull::ChullPoint cpt(vst, cout, true, true, true);
             vcpt.push_back(cpt);
           }
@@ -1354,11 +1354,11 @@ namespace pflow {
     }
     vector<chull::ChullPoint> tVpoint;
     for(uint i=0;i<VStoichE.size();i++){
-      xvector<double> vst(dimension); //-1,0);  //CO190424
-      for(int j=vst.lrows;j<=vst.urows-1;j++){ //CO190424
-        vst[j]=VStoichE[i][j-vst.lrows]; //CO190424
+      xvector<double> vst(dimension); //-1,0);  //CO20190424
+      for(int j=vst.lrows;j<=vst.urows-1;j++){ //CO20190424
+        vst[j]=VStoichE[i][j-vst.lrows]; //CO20190424
       }
-      vst[vst.urows]=VStoichE[i].back();  //CO190424
+      vst[vst.urows]=VStoichE[i].back();  //CO20190424
       chull::ChullPoint cpt(vst, cout, true, true, false);
       tVpoint.push_back(cpt);  
     }
@@ -1375,16 +1375,16 @@ namespace pflow {
     VCoordGroup = the_hull.m_coord_groups;
     Vpoint = the_hull.m_points;
 
-    if(LDEBUG) {cerr << soliloquy << " [1]" << endl;} //CO190424
+    if(LDEBUG) {cerr << soliloquy << " [1]" << endl;} //CO20190424
 
     for(uint i=0;i<stoichiometries.size();i++){
       bool equal=false;
       for(uint j=0;j<vcpt.size();j++){
-        for(int k=vcpt[j].m_coords.lrows;k<=vcpt[j].m_coords.urows-1;k++){  //CO190424
-          if(vcpt[j].m_coords[k]!=stoichiometries[i][k-vcpt[j].m_coords.lrows]){  //CO190424
+        for(int k=vcpt[j].m_coords.lrows;k<=vcpt[j].m_coords.urows-1;k++){  //CO20190424
+          if(vcpt[j].m_coords[k]!=stoichiometries[i][k-vcpt[j].m_coords.lrows]){  //CO20190424
             break;
           }
-          else if ((k-vcpt[j].m_coords.lrows)==(int)dimension-2){  //CO190424
+          else if ((k-vcpt[j].m_coords.lrows)==(int)dimension-2){  //CO20190424
             equal=true;
           }
         }
@@ -1392,92 +1392,92 @@ namespace pflow {
           break;
         }
         else if(j==vcpt.size()-1){
-          xvector<double> vst(dimension); //-1,0);  //CO190424
-          for(int k=vst.lrows;k<=vst.urows-1;k++){  //CO190424
-            vst[k]=stoichiometries[i][k-vst.lrows]; //CO190424
+          xvector<double> vst(dimension); //-1,0);  //CO20190424
+          for(int k=vst.lrows;k<=vst.urows-1;k++){  //CO20190424
+            vst[k]=stoichiometries[i][k-vst.lrows]; //CO20190424
           }
-          vst[vst.urows]=2; //CO190424
+          vst[vst.urows]=2; //CO20190424
           chull::ChullPoint cpt(vst, cout, true, true, true);
           vcpt.push_back(cpt);
         }
       }
     }
 
-    if(LDEBUG) {cerr << soliloquy << " [2]" << endl;} //CO190424
+    if(LDEBUG) {cerr << soliloquy << " [2]" << endl;} //CO20190424
 
     sort(vcpt.begin(), vcpt.end());
 
     VDecomp_coefs.resize(vcpt.size());  VDecomp_phases.resize(vcpt.size());
-    if(LDEBUG) {cerr << soliloquy << " [2.0]" << endl;} //CO190424
+    if(LDEBUG) {cerr << soliloquy << " [2.0]" << endl;} //CO20190424
     for(uint i=0;i<vcpt.size();i++){
       bool on_hull=false;
-      if(LDEBUG) {cerr << soliloquy << " [2.1]" << endl;} //CO190424
+      if(LDEBUG) {cerr << soliloquy << " [2.1]" << endl;} //CO20190424
       for(uint j=0;j<VCoordGroup.size();j++){
-        for(int k=vcpt[i].m_coords.lrows;k<=vcpt[i].m_coords.urows-1;k++){  //CO190424
+        for(int k=vcpt[i].m_coords.lrows;k<=vcpt[i].m_coords.urows-1;k++){  //CO20190424
           if(abs(vcpt[i].m_coords[k]-VCoordGroup[j].m_coords[k])>0.00001){
             break;
           }
-          else if((k-vcpt[i].m_coords.lrows)==(int)dimension-2 && VCoordGroup[j].m_is_on_hull){  //CO190424
+          else if((k-vcpt[i].m_coords.lrows)==(int)dimension-2 && VCoordGroup[j].m_is_on_hull){  //CO20190424
             on_hull=true;
             VDecomp_coefs[i].push_back(1.0); VDecomp_phases[i].push_back(VCoordGroup[j].m_ref_state);
-            Egs.push_back(Vpoint.at(VCoordGroup[j].m_hull_member).getLastCoord());  //CO190424
-            if(LDEBUG) { //CO190424
-              cerr << soliloquy << " VCoordGroup[j].m_hull_member=" << VCoordGroup[j].m_hull_member << endl; //CO190424
-              cerr << soliloquy << " Egs.back()=" << Egs.back() << endl; //CO190424
-            } //CO190424
+            Egs.push_back(Vpoint.at(VCoordGroup[j].m_hull_member).getLastCoord());  //CO20190424
+            if(LDEBUG) { //CO20190424
+              cerr << soliloquy << " VCoordGroup[j].m_hull_member=" << VCoordGroup[j].m_hull_member << endl; //CO20190424
+              cerr << soliloquy << " Egs.back()=" << Egs.back() << endl; //CO20190424
+            } //CO20190424
           }
         }
       }
-      if(LDEBUG) {cerr << soliloquy << " [2.2]" << endl;} //CO190424
+      if(LDEBUG) {cerr << soliloquy << " [2.2]" << endl;} //CO20190424
       if(on_hull==false){
-        Egs.push_back(vcpt[i].getLastCoord()-the_hull.getDistanceToHull(vcpt[i]));  //CO190424
-        if(LDEBUG) { //CO190424
-          cerr << soliloquy << " i=" << i << endl; //CO190424
-          cerr << soliloquy << " vcpt[i].m_coords[dimension-1]=" << vcpt[i].getLastCoord() << endl; //CO190424
-          cerr << soliloquy << " the_hull.getDistanceToHull(vcpt[i])=" << the_hull.getDistanceToHull(vcpt[i]) << endl; //CO190424
-          cerr << soliloquy << " Egs.back()=" << Egs.back() << endl; //CO190424
-        } //CO190424
+        Egs.push_back(vcpt[i].getLastCoord()-the_hull.getDistanceToHull(vcpt[i]));  //CO20190424
+        if(LDEBUG) { //CO20190424
+          cerr << soliloquy << " i=" << i << endl; //CO20190424
+          cerr << soliloquy << " vcpt[i].m_coords[dimension-1]=" << vcpt[i].getLastCoord() << endl; //CO20190424
+          cerr << soliloquy << " the_hull.getDistanceToHull(vcpt[i])=" << the_hull.getDistanceToHull(vcpt[i]) << endl; //CO20190424
+          cerr << soliloquy << " Egs.back()=" << Egs.back() << endl; //CO20190424
+        } //CO20190424
         VDecomp_phases[i]=the_hull.getDecompositionPhases(vcpt[i]);
-        vector<xvector<double> > lhs, rhs; double others=0; xvector<double> compositionL(VDecomp_phases[i].size()); //-1,0);  //CO190424
+        vector<xvector<double> > lhs, rhs; double others=0; xvector<double> compositionL(VDecomp_phases[i].size()); //-1,0);  //CO20190424
 
         for(uint j=0;j<VDecomp_phases[i].size();j++){
           if(Vpoint[VDecomp_phases[i][j]].m_is_artificial){
             VDecomp_phases[i][j]=the_hull.m_coord_groups.at(Vpoint.at(VDecomp_phases[i][j]).m_i_coord_group).m_ref_state;
           }
         }
-        int k=compositionL.lrows; //CO190424
-        for(int j=vcpt[i].m_coords.lrows;j<=vcpt[i].m_coords.urows-1;j++){  //CO190424
+        int k=compositionL.lrows; //CO20190424
+        for(int j=vcpt[i].m_coords.lrows;j<=vcpt[i].m_coords.urows-1;j++){  //CO20190424
           if(vcpt[i].m_coords[j]!=0){
             compositionL[k]=vcpt[i].m_coords[j];
             others=others+vcpt[i].m_coords[j];   
             k++;
           }
         }
-        if(abs(1-others)>0.00001){compositionL[compositionL.urows]=1-others;} //CO190424
+        if(abs(1-others)>0.00001){compositionL[compositionL.urows]=1-others;} //CO20190424
         lhs.push_back(compositionL);
 
         for(uint j=0;j<VDecomp_phases[i].size();j++){
-          others=0; /*k=compositionR.lrows;*/ xvector<double> compositionR(VDecomp_phases[i].size()); //-1,0); //CO190424
-          k=compositionR.lrows; //CO190424
-          for(int l=vcpt[i].m_coords.lrows;l<=vcpt[i].m_coords.urows-1;l++){  //CO190424
+          others=0; /*k=compositionR.lrows;*/ xvector<double> compositionR(VDecomp_phases[i].size()); //-1,0); //CO20190424
+          k=compositionR.lrows; //CO20190424
+          for(int l=vcpt[i].m_coords.lrows;l<=vcpt[i].m_coords.urows-1;l++){  //CO20190424
             if(vcpt[i].m_coords[l]!=0){
               compositionR[k]=Vpoint.at(VDecomp_phases[i][j]).m_coords[l];
               others=others+Vpoint.at(VDecomp_phases[i][j]).m_coords[l];
               k++;
             }
           }
-          if(abs(1-others)>0.00001){compositionR[compositionR.urows]=1-others;}  //CO190424
+          if(abs(1-others)>0.00001){compositionR[compositionR.urows]=1-others;}  //CO20190424
           rhs.push_back(compositionR);
         }
 
         xvector<double> decomp_coeffs = balanceChemicalEquation(lhs,rhs,true,0.001);
         for(uint j=1;j<VDecomp_phases[i].size()+1;j++){
-          VDecomp_coefs[i].push_back(decomp_coeffs[j+decomp_coeffs.lrows]); //CO190424
+          VDecomp_coefs[i].push_back(decomp_coeffs[j+decomp_coeffs.lrows]); //CO20190424
         }
       }
     }
 
-    if(LDEBUG) {cerr << soliloquy << " [3]" << endl;} //CO190424
+    if(LDEBUG) {cerr << soliloquy << " [3]" << endl;} //CO20190424
 
     cout << endl << "Computing GFA for " << vcpt.size() << " stoichiometries. . ." << endl << endl;
 
@@ -1500,7 +1500,7 @@ namespace pflow {
     GFAData << "GFA" << endl;
     for(uint i=0;i<vcpt.size();i++){
       double last=1;
-      for(int j=vcpt[i].m_coords.lrows;j<=vcpt[i].m_coords.urows-1;j++){  //CO190424
+      for(int j=vcpt[i].m_coords.lrows;j<=vcpt[i].m_coords.urows-1;j++){  //CO20190424
         GFAData << vcpt[i].m_coords[j] << "  ";
         last=last-vcpt[i].m_coords[j];
       }

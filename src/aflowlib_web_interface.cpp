@@ -102,6 +102,7 @@ namespace aflowlib {
     species_pp.clear();vspecies_pp.clear();
     species_pp_version.clear();vspecies_pp_version.clear();
     species_pp_ZVAL.clear();vspecies_pp_ZVAL.clear();
+    species_pp_AUID.clear();vspecies_pp_AUID.clear();   
     spin_cell=AUROSTD_NAN;spin_atom=AUROSTD_NAN;
     spinD.clear();vspinD.clear();
     spinD_magmom_orig.clear();vspinD_magmom_orig.clear();
@@ -306,6 +307,7 @@ namespace aflowlib {
     species_pp=b.species_pp;vspecies_pp.clear();for(uint i=0;i<b.vspecies_pp.size();i++) vspecies_pp.push_back(b.vspecies_pp.at(i));
     species_pp_version=b.species_pp_version;vspecies_pp_version.clear();for(uint i=0;i<b.vspecies_pp_version.size();i++) vspecies_pp_version.push_back(b.vspecies_pp_version.at(i));
     species_pp_ZVAL=b.species_pp_ZVAL;vspecies_pp_ZVAL.clear();for(uint i=0;i<b.vspecies_pp_ZVAL.size();i++) vspecies_pp_ZVAL.push_back(b.vspecies_pp_ZVAL.at(i));
+    species_pp_AUID=b.species_pp_AUID;vspecies_pp_AUID.clear();for(uint i=0;i<b.vspecies_pp_AUID.size();i++) vspecies_pp_AUID.push_back(b.vspecies_pp_AUID.at(i));
     spin_cell=b.spin_cell;spin_atom=b.spin_atom;
     spinD=b.spinD;vspinD.clear();for(uint i=0;i<b.vspinD.size();i++) vspinD.push_back(b.vspinD.at(i));
     spinD_magmom_orig=b.spinD_magmom_orig;vspinD_magmom_orig.clear();for(uint i=0;i<b.vspinD_magmom_orig.size();i++) vspinD_magmom_orig.push_back(b.vspinD_magmom_orig.at(i));
@@ -468,6 +470,7 @@ namespace aflowlib {
     vspecies_pp.clear(); // clear all vectors
     vspecies_pp_version.clear(); // clear all vectors
     vspecies_pp_ZVAL.clear(); // clear all vectors
+    vspecies_pp_AUID.clear(); // clear all vectors
     vspinD.clear(); // clear all vectors
     vspinD_magmom_orig.clear(); // clear all vectors
     vsponsor.clear();
@@ -663,7 +666,8 @@ namespace aflowlib {
         else if(keyword=="species_pp") {species_pp=content;for(uint j=0;j<stokens.size();j++) vspecies_pp.push_back(stokens.at(j));}
         else if(keyword=="species_pp_version") {species_pp_version=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_version.push_back(stokens.at(j));}
         else if(keyword=="species_pp_ZVAL") {species_pp_ZVAL=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_ZVAL.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-        else if(keyword=="spin_cell") {spin_cell=aurostd::string2utype<double>(content);}
+	else if(keyword=="species_pp_AUID") {species_pp_AUID=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_AUID.push_back(stokens.at(j));}
+	else if(keyword=="spin_cell") {spin_cell=aurostd::string2utype<double>(content);}
         else if(keyword=="spin_atom") {spin_atom=aurostd::string2utype<double>(content);}
         else if(keyword=="spinD") {spinD=content;for(uint j=0;j<stokens.size();j++) vspinD.push_back(aurostd::string2utype<double>(stokens.at(j)));}
         else if(keyword=="spinD_magmom_orig") {spinD_magmom_orig=content;for(uint j=0;j<stokens.size();j++) vspinD_magmom_orig.push_back(aurostd::string2utype<double>(stokens.at(j)));}
@@ -972,6 +976,7 @@ namespace aflowlib {
       oss << "species_pp=" << species_pp << "  vspecies_pp= ";for(uint j=0;j<vspecies_pp.size();j++) oss << vspecies_pp.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "species_pp_version=" << species_pp_version << "  vspecies_pp_version= ";for(uint j=0;j<vspecies_pp_version.size();j++) oss << vspecies_pp_version.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "species_pp_ZVAL=" << species_pp_ZVAL << "  vspecies_pp_ZVAL= ";for(uint j=0;j<vspecies_pp_ZVAL.size();j++) oss << vspecies_pp_ZVAL.at(j) << " "; oss << (html?"<br>":"") << endl;
+      oss << "species_pp_AUID=" << species_pp_AUID << "  vspecies_pp_AUID= ";for(uint j=0;j<vspecies_pp_AUID.size();j++) oss << vspecies_pp_AUID.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "spin_cell=" << spin_cell << (html?"<br>":"") << endl; 
       oss << "spin_atom=" << spin_atom << (html?"<br>":"") << endl; 
       oss << "spinD=" << spinD << "  vspinD= "; for(uint j=0;j<vspinD.size();j++) oss << vspinD.at(j) << " "; oss << (html?"<br>":"") << endl;
@@ -1132,6 +1137,7 @@ namespace aflowlib {
       // if(species_pp_type.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_type=" << species_pp_type << eendl;
       if(species_pp_version.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_version=" << species_pp_version << eendl;
       if(species_pp_ZVAL.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_ZVAL=" << species_pp_ZVAL << eendl;
+      if(species_pp_AUID.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_AUID=" << species_pp_AUID << eendl;
       // ME20190124 - add more detailed LDAU information
       if(ldau_TLUJ.size()) {
         // ME20190124 - BEGIN
@@ -1580,6 +1586,15 @@ namespace aflowlib {
         sscontent_json << "\"species_pp_ZVAL\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vspecies_pp_ZVAL,9),",") << "]" << eendl;
       } else {
         if(PRINT_NULL) sscontent_json << "\"species_pp_ZVAL\":null" << eendl;
+      }
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      //////////////////////////////////////////////////////////////////////////
+
+      //////////////////////////////////////////////////////////////////////////
+      if(vspecies_pp_AUID.size()) {
+        sscontent_json << "\"species_pp_AUID\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies_pp_AUID,"\""),",") << "]" << eendl;
+      } else {
+        if(PRINT_NULL) sscontent_json << "\"species_pp_AUID\":null" << eendl;
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
@@ -4111,6 +4126,8 @@ namespace aflowlib {
 
 
 // ***************************************************************************
+/* FUNCITON IS OBSOLETE SC20200327
+
 namespace aflowlib {
   uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -5569,7 +5586,7 @@ namespace aflowlib {
 
 //#include "aflowlib_web_interface_test2.cpp"
 //#include "aflowlib_web_interface_test3.cpp"
-
+*/
 
 // ***************************************************************************
 namespace aflowlib {
@@ -5597,7 +5614,7 @@ namespace aflowlib {
       string directory_AUID_LIB="",directory_AUID_RAW="",directory_AUID_WEB="";
       string url_WEB;
       string label="";
-      // //string line_gif="<br><img border=0 width=60% height=2 src=http://materials.duke.edu/auro/images/line.gif><br><br>";
+      // string line_gif="<br><img border=0 width=60% height=2 src=http://materials.duke.edu/auro/images/line.gif><br><br>";
       // string art058_link=" https://doi.org/10.1016/j.commatsci.2010.05.010";
       // string art064_link=" https://doi.org/10.1021/co200012w";
       // string icsd_link=" https://www.fiz-karlsruhe.com/icsd.html";
@@ -6103,20 +6120,10 @@ namespace aflowlib {
         //    oss << "[" << option << "]" << endl;
         oss << strtmp << endl;
       }
-
     }
-
     return voptions.size();
   }
 }
-
-
-
-
-
-
-
-
 
 
 #endif  // _AURO_IMPLEMENTATIONS_

@@ -3,7 +3,7 @@
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
-// Stefano Curtarolo - Kesong Yang - Camilo Calderon
+// Stefano Curtarolo - Kesong Yang - Camilo Calderon - Corey Oses
 // fixed for xz - SC 2018
 
 #ifndef _AFLOW_OVASP_CPP_
@@ -58,20 +58,29 @@ xOUTCAR::xOUTCAR() {
   // Intra band minimization
   WEIMIN=0.0;EBREAK=0.0;DEPER=0.0;TIME=0.0;  // for aflowlib_libraries.cpp
   // begin shared xPOTCAR
-  ENMAX=0.0;vENMAX.clear();     // for aflowlib_libraries.cpp
-  ENMIN=0.0;vENMIN.clear();     // for aflowlib_libraries.cpp
-  POMASS_sum=0.0;POMASS_min=0.0;POMASS_max=0.0;vPOMASS.clear();   // for aflowlib_libraries.cpp
-  ZVAL_sum=0.0;ZVAL_min=0.0;ZVAL_max=0.0;vZVAL.clear();       // for aflowlib_libraries.cpp
-  EATOM_min=0.0;EATOM_max=0.0;vEATOM.clear(); // for aflowlib_libraries.cpp
-  RCORE_min=0.0;RCORE_max=0.0;vRCORE.clear(); // for aflowlib_libraries.cpp
-  RWIGS_min=0.0;RWIGS_max=0.0;vRWIGS.clear(); // for aflowlib_libraries.cpp
-  EAUG_min=0.0;EAUG_max=0.0;vEAUG.clear(); // for aflowlib_libraries.cpp
+  ENMAX=0.0;vENMAX.clear();                                      // for aflowlib_libraries.cpp
+  ENMIN=0.0;vENMIN.clear();                                      // for aflowlib_libraries.cpp
+  POMASS_sum=0.0;POMASS_min=0.0;POMASS_max=0.0;vPOMASS.clear();  // for aflowlib_libraries.cpp
+  ZVAL_sum=0.0;ZVAL_min=0.0;ZVAL_max=0.0;vZVAL.clear();          // for aflowlib_libraries.cpp
+  EATOM_min=0.0;EATOM_max=0.0;vEATOM.clear();          // for aflowlib_libraries.cpp
+  RCORE_min=0.0;RCORE_max=0.0;vRCORE.clear();          // for aflowlib_libraries.cpp
+  RWIGS_min=0.0;RWIGS_max=0.0;vRWIGS.clear();          // for aflowlib_libraries.cpp
+  EAUG_min=0.0;EAUG_max=0.0;vEAUG.clear();              // for aflowlib_libraries.cpp
+  RAUG_min=0.0;RAUG_max=0.0;vRAUG.clear();              // for aflowlib_libraries.cpp
+  RMAX_min=0.0;RMAX_max=0.0;vRMAX.clear();              // unicity
+  vTITEL.clear();                                                // unicity
+  vLEXCH.clear();                                                // unicity 
   // end shared xPOTCAR
   pp_type="";                   // for aflowlib_libraries.cpp
   species.clear();              // for aflowlib_libraries.cpp
+  species_Z.clear();            // for aflowlib_libraries.cpp
   species_pp.clear();           // for aflowlib_libraries.cpp
   species_pp_type.clear();      // for aflowlib_libraries.cpp
   species_pp_version.clear();   // for aflowlib_libraries.cpp
+  species_pp_AUID.clear();      // for aflowlib_libraries.cpp
+  species_pp_AUID_collisions.clear();   // for aflowlib_libraries.cpp
+  species_pp_groundstate_energy.clear();      // for aflowlib_libraries.cpp
+  species_pp_groundstate_structure.clear();   // for aflowlib_libraries.cpp
   species_pp_vLDAU.clear();     // for aflowlib_libraries.cpp
   string_LDAU="";               // for aflowlib_libraries.cpp
   isKIN=FALSE;                  // for aflowlib_libraries.cpp
@@ -115,7 +124,7 @@ xOUTCAR::xOUTCAR() {
   //Egap_net = 0.0;               // for aflowlib_libraries.cpp     // CO
   Egap_fit_net = AUROSTD_NAN;   // for aflowlib_libraries.cpp 
   Egap_net = AUROSTD_NAN;       // for aflowlib_libraries.cpp 
-  ERROR = "";                   // for aflowlib_libraries.cpp 
+  ERROR = "";                   // for aflowlib_libraries.cpp
 }        
 
 xOUTCAR::~xOUTCAR() {
@@ -139,14 +148,23 @@ void xOUTCAR::free() {
   vRCORE.clear();                      // for aflowlib_libraries.cpp
   vRWIGS.clear();                      // for aflowlib_libraries.cpp
   vEAUG.clear();                       // for aflowlib_libraries.cpp
+  vRAUG.clear();                       // for aflowlib_libraries.cpp
+  vRMAX.clear();                       // for aflowlib_libraries.cpp
+  vTITEL.clear();                      // unicity
+  vLEXCH.clear();                      // unicity
   // end shared xPOTCAR
   species.clear();                     // for aflowlib_libraries.cpp
+  species_Z.clear();                   // for aflowlib_libraries.cpp
   species_pp.clear();                  // for aflowlib_libraries.cpp
   species_pp_type.clear();             // for aflowlib_libraries.cpp
   species_pp_version.clear();          // for aflowlib_libraries.cpp
+  species_pp_AUID.clear();             // for aflowlib_libraries.cpp
+  species_pp_AUID_collisions.clear();  // for aflowlib_libraries.cpp
+  species_pp_groundstate_energy.clear();      // for aflowlib_libraries.cpp
+  species_pp_groundstate_structure.clear();   // for aflowlib_libraries.cpp
   species_pp_vLDAU.clear();            // for aflowlib_libraries.cpp
-  vkpoint_reciprocal.clear();      // for aflowlib_libraries.cpp
-  vkpoint_cartesian.clear();       // for aflowlib_libraries.cpp
+  vkpoint_reciprocal.clear();          // for aflowlib_libraries.cpp
+  vkpoint_cartesian.clear();           // for aflowlib_libraries.cpp
   vweights.clear();                    // for aflowlib_libraries.cpp
   //------------------------------------------------------------------------------
   // GetEffectiveMass
@@ -232,12 +250,23 @@ void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
   vRWIGS.clear(); for(uint i=0;i<b.vRWIGS.size();i++) vRWIGS.push_back(b.vRWIGS.at(i)); // for aflowlib_libraries.cpp
   EAUG_min=b.EAUG_min;EAUG_max=b.EAUG_max;
   vEAUG.clear(); for(uint i=0;i<b.vEAUG.size();i++) vEAUG.push_back(b.vEAUG.at(i)); // for aflowlib_libraries.cpp
+  RAUG_min=b.RAUG_min;RAUG_max=b.RAUG_max;
+  vRAUG.clear(); for(uint i=0;i<b.vRAUG.size();i++) vRAUG.push_back(b.vRAUG.at(i)); // for aflowlib_libraries.cpp
+  RMAX_min=b.RMAX_min;RMAX_max=b.RMAX_max;
+  vRMAX.clear(); for(uint i=0;i<b.vRMAX.size();i++) vRMAX.push_back(b.vRMAX.at(i)); // for aflowlib_libraries.cpp
+  vTITEL.clear(); for(uint i=0;i<b.vTITEL.size();i++) vTITEL.push_back(b.vTITEL.at(i)); // for aflowlib_libraries.cpp
+  vLEXCH.clear(); for(uint i=0;i<b.vLEXCH.size();i++) vLEXCH.push_back(b.vLEXCH.at(i)); // for aflowlib_libraries.cpp
   // end shared xPOTCAR
   pp_type=b.pp_type;                            // for aflowlib_libraries.cpp
   species.clear(); for(uint i=0;i<b.species.size();i++) species.push_back(b.species.at(i)); // for aflowlib_libraries.cpp
+  species_Z.clear(); for(uint i=0;i<b.species_Z.size();i++) species_Z.push_back(b.species_Z.at(i)); // for aflowlib_libraries.cpp
   species_pp.clear(); for(uint i=0;i<b.species_pp.size();i++) species_pp.push_back(b.species_pp.at(i)); // for aflowlib_libraries.cpp
   species_pp_type.clear(); for(uint i=0;i<b.species_pp_type.size();i++) species_pp_type.push_back(b.species_pp_type.at(i)); // for aflowlib_libraries.cpp
   species_pp_version.clear(); for(uint i=0;i<b.species_pp_version.size();i++) species_pp_version.push_back(b.species_pp_version.at(i));  // for aflowlib_libraries.cpp
+  species_pp_AUID.clear(); for(uint i=0;i<b.species_pp_AUID.size();i++) species_pp_AUID.push_back(b.species_pp_AUID.at(i));  // for aflowlib_libraries.cpp
+  species_pp_AUID_collisions.clear(); for(uint i=0;i<b.species_pp_AUID_collisions.size();i++) species_pp_AUID_collisions.push_back(b.species_pp_AUID_collisions.at(i));  // for aflowlib_libraries.cpp
+  species_pp_groundstate_energy.clear(); for(uint i=0;i<b.species_pp_groundstate_energy.size();i++) species_pp_groundstate_energy.push_back(b.species_pp_groundstate_energy.at(i));  // for aflowlib_libraries.cpp
+  species_pp_groundstate_structure.clear(); for(uint i=0;i<b.species_pp_groundstate_structure.size();i++) species_pp_groundstate_structure.push_back(b.species_pp_groundstate_structure.at(i));  // for aflowlib_libraries.cpp
   species_pp_vLDAU.clear(); for(uint i=0;i<b.species_pp_vLDAU.size();i++) species_pp_vLDAU.push_back(b.species_pp_vLDAU.at(i));
   string_LDAU=b.string_LDAU;                     // for aflowlib_libraries.cpp
   isKIN=b.isKIN;                                 // for aflowlib_libraries.cpp
@@ -305,6 +334,143 @@ void xOUTCAR::clear() {  // clear PRIVATE
   copy(_temp);
   filename=filename_aus;
 }
+
+ostream& operator<<(ostream& oss, const xOUTCAR& xOUT) {  // SC20200330
+  bool LVERBOSE=(FALSE || XHOST.DEBUG);
+  if(LVERBOSE) cerr << "xOUTCAR::operator<<: ---------------------------------" << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::operator<<: BEGIN" << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::operator<<: filename=[" << xOUT.filename << "]" << endl;
+  oss << " filename=" << xOUT.filename<< endl;
+  oss << " vcontent.size()=" << xOUT.vcontent.size() << endl;
+  oss << " SYSTEM=" << xOUT.SYSTEM << endl;
+  oss << " NIONS=" << xOUT.NIONS << endl;
+  oss << " Efermi=" << xOUT.Efermi << endl;
+  oss << " isLSCOUPLING=" << xOUT.isLSCOUPLING << endl;
+  oss << " natoms=" << xOUT.natoms << endl;
+  oss << " energy_cell=" << xOUT.energy_cell << endl;
+  oss << " energy_atom=" << xOUT.energy_atom << endl;
+  oss << " energy_atom=" << xOUT.energy_atom << endl;
+  oss << " enthalpy_atom=" << xOUT.enthalpy_atom << endl;
+  oss << " eentropy_cell=" << xOUT.eentropy_cell << endl;
+  oss << " eentropy_atom=" << xOUT.eentropy_atom << endl;
+  oss << " PV_cell=" << xOUT.PV_cell << endl;
+  oss << " PV_atom=" << xOUT.PV_atom << endl;
+  // xmatrix<double> stress;                                       // for aflowlib_libraries.cpp
+  oss << " mag_cell=" << xOUT.mag_cell << endl;
+  oss << " mag_atom=" << xOUT.mag_atom << endl;
+  //   vector<double> vmag;                                          // for aflowlib_libraries.cpp
+  //   vector<xvector<double> > vmag_noncoll;                        // DX20171205 - non-collinear
+  oss << " volume_cell=" << xOUT.volume_cell << endl;
+  oss << " volume_atom=" << xOUT.volume_atom << endl;
+  oss << " pressure=" << xOUT.pressure << endl;
+  oss << " pressure_residual=" << xOUT.pressure_residual << endl;
+  oss << " Pulay_stress=" << xOUT.Pulay_stress << endl;
+  //   vector<aurostd::xvector<double> > vforces;                    // for aflowlib_libraries.cpp
+  //   vector<aurostd::xvector<double> > vpositions_cartesian;       // for aflowlib_libraries.cpp
+  oss << " ENCUT=" << xOUT.ENCUT << endl;
+  oss << " EDIFF=" << xOUT.EDIFF << endl;
+  oss << " EDIFFG=" << xOUT.EDIFFG << endl;
+  oss << " POTIM=" << xOUT.POTIM << endl;
+  oss << " TEIN=" << xOUT.TEIN << endl;
+  oss << " TEBEG=" << xOUT.TEBEG << endl;
+  oss << " TEEND=" << xOUT.TEEND << endl;
+  oss << " SMASS=" << xOUT.SMASS << endl;
+  oss << " NPACO=" << xOUT.NPACO << endl;
+  oss << " APACO=" << xOUT.APACO << endl;
+  oss << " PSTRESS=" << xOUT.PSTRESS << endl;
+  oss << " NBANDS=" << xOUT.NBANDS << endl;
+  oss << " NKPTS=" << xOUT.NKPTS << endl;
+  oss << " NSW=" << xOUT.NSW << endl;
+  oss << " NBLOCK=" << xOUT.NBLOCK << endl;
+  oss << " KBLOCK=" << xOUT.KBLOCK << endl;
+  oss << " IBRION=" << xOUT.IBRION << endl;
+  oss << " NFREE=" << xOUT.NFREE << endl;
+  oss << " ISIF=" << xOUT.ISIF << endl;
+  oss << " IWAVPR=" << xOUT.IWAVPR << endl;
+  oss << " ISYM=" << xOUT.ISYM << endl;
+  oss << " ISPIN=" << xOUT.ISPIN << endl;
+  oss << " EMIN=" << xOUT.EMIN << endl;
+  oss << " EMAX=" << xOUT.EMAX << endl;
+  oss << " SIGMA=" << xOUT.SIGMA << endl;
+  oss << " ISMEAR=" << xOUT.ISMEAR << endl;
+  oss << " IALGO=" << xOUT.IALGO << endl;
+  oss << " LDIAG=" << xOUT.LDIAG << endl;
+  oss << " IMIX=" << xOUT.IMIX << endl;
+  oss << " INIMIX=" << xOUT.INIMIX << endl;
+  oss << " MIXPRE=" << xOUT.MIXPRE << endl;
+  oss << " AMIX=" << xOUT.AMIX << endl;
+  oss << " BMIX=" << xOUT.BMIX << endl;
+  oss << " AMIX_MAG=" << xOUT.AMIX_MAG << endl;
+  oss << " BMIX_MAG=" << xOUT.BMIX_MAG << endl;
+  oss << " AMIN=" << xOUT.AMIN << endl;
+  oss << " WC=" << xOUT.WC << endl;
+  oss << " WEIMIN=" << xOUT.WEIMIN << endl;
+  oss << " EBREAK=" << xOUT.EBREAK << endl;
+  oss << " DEPER=" << xOUT.DEPER << endl;
+  oss << " TIME=" << xOUT.TIME << endl;
+  oss << " ENMAX=" << xOUT.ENMAX << "  vENMAX.size()=" << xOUT.vENMAX.size() << ": "; for(uint i=0;i<xOUT.vENMAX.size();i++) { oss << xOUT.vENMAX.at(i) << " "; } oss << endl;
+  oss << " ENMIN=" << xOUT.ENMIN << "  vENMIN.size()=" << xOUT.vENMIN.size() << ": "; for(uint i=0;i<xOUT.vENMIN.size();i++) { oss << xOUT.vENMIN.at(i) << " "; } oss << endl;
+  oss << " POMASS_sum=" << xOUT.POMASS_sum << " POMASS_min=" << xOUT.POMASS_min << " POMASS_max=" << xOUT.POMASS_max << " vPOMASS.size()=" << xOUT.vPOMASS.size() << ": "; for(uint i=0;i<xOUT.vPOMASS.size();i++) { oss << xOUT.vPOMASS.at(i) << " "; } oss << " " << endl;
+  oss << " ZVAL_sum=" << xOUT.ZVAL_sum << " ZVAL_min=" << xOUT.ZVAL_min << " ZVAL_max=" << xOUT.ZVAL_max << " vZVAL.size()=" << xOUT.vZVAL.size() << ": "; for(uint i=0;i<xOUT.vZVAL.size();i++) { oss << xOUT.vZVAL.at(i) << " "; } oss << " " << endl;
+  oss << " EATOM_min=" << xOUT.EATOM_min << " EATOM_max=" << xOUT.EATOM_max << " vEATOM.size()=" << xOUT.vEATOM.size() << ": "; for(uint i=0;i<xOUT.vEATOM.size();i++) { oss << xOUT.vEATOM.at(i) << " "; } oss << " " << endl;
+  oss << " RCORE_min=" << xOUT.RCORE_min << " RCORE_max=" << xOUT.RCORE_max << " vRCORE.size()=" << xOUT.vRCORE.size() << ": "; for(uint i=0;i<xOUT.vRCORE.size();i++) { oss << xOUT.vRCORE.at(i) << " "; } oss << " " << endl;
+  oss << " RWIGS_min=" << xOUT.RWIGS_min << " RWIGS_max=" << xOUT.RWIGS_max << " vRWIGS.size()=" << xOUT.vRWIGS.size() << ": "; for(uint i=0;i<xOUT.vRWIGS.size();i++) { oss << xOUT.vRWIGS.at(i) << " "; } oss << " " << endl;
+  oss << " EAUG_min=" << xOUT.EAUG_min << " EAUG_max=" << xOUT.EAUG_max << " vEAUG.size()=" << xOUT.vEAUG.size() << ": "; for(uint i=0;i<xOUT.vEAUG.size();i++) { oss << xOUT.vEAUG.at(i) << " "; } oss << " " << endl;
+  oss << " RAUG_min=" << xOUT.RAUG_min << " RAUG_max=" << xOUT.RAUG_max << " vRAUG.size()=" << xOUT.vRAUG.size() << ": "; for(uint i=0;i<xOUT.vRAUG.size();i++) { oss << xOUT.vRAUG.at(i) << " "; } oss << " " << endl;
+  oss << " RMAX_min=" << xOUT.RMAX_min << " RMAX_max=" << xOUT.RMAX_max << " vRMAX.size()=" << xOUT.vRMAX.size() << ": "; for(uint i=0;i<xOUT.vRMAX.size();i++) { oss << xOUT.vRMAX.at(i) << " "; } oss << " " << endl;
+  oss << " vTITEL.size()=" << xOUT.vTITEL.size() << ": "; for(uint i=0;i<xOUT.vTITEL.size();i++) { oss << xOUT.vTITEL.at(i) << " "; } oss << endl;
+  oss << " vLEXCH.size()=" << xOUT.vLEXCH.size() << ": "; for(uint i=0;i<xOUT.vLEXCH.size();i++) { oss << xOUT.vLEXCH.at(i) << " "; } oss << endl;
+  oss << " pp_type=" << xOUT.pp_type << endl;
+  oss << " species.size()=" << xOUT.species.size() << ": "; for(uint i=0;i<xOUT.species.size();i++) { oss << xOUT.species.at(i) << " "; } oss << endl;
+  oss << " species_Z.size()=" << xOUT.species_Z.size() << ": "; for(uint i=0;i<xOUT.species_Z.size();i++) { oss << xOUT.species_Z.at(i) << " "; } oss << endl;
+  oss << " species_pp.size()=" << xOUT.species_pp.size() << ": "; for(uint i=0;i<xOUT.species_pp.size();i++) { oss << xOUT.species_pp.at(i) << " "; } oss << endl;
+  oss << " species_pp_type.size()=" << xOUT.species_pp_type.size() << ": "; for(uint i=0;i<xOUT.species_pp_type.size();i++) { oss << xOUT.species_pp_type.at(i) << " "; } oss << endl;
+  oss << " species_pp_version.size()=" << xOUT.species_pp_version.size() << ": "; for(uint i=0;i<xOUT.species_pp_version.size();i++) { oss << xOUT.species_pp_version.at(i) << " "; } oss << endl;
+  oss << " species_pp_AUID.size()=" << xOUT.species_pp_AUID.size() << ": "; for(uint i=0;i<xOUT.species_pp_AUID.size();i++) { oss << xOUT.species_pp_AUID.at(i) << " "; } oss << endl;
+  oss << " species_pp_AUID_collisions.size()=" << xOUT.species_pp_AUID_collisions.size() << ": "; for(uint i=0;i<xOUT.species_pp_AUID_collisions.size();i++) { oss << xOUT.species_pp_AUID_collisions.at(i) << " "; } oss << endl;
+  oss << " species_pp_groundstate_energy.size()=" << xOUT.species_pp_groundstate_energy.size() << ": "; for(uint i=0;i<xOUT.species_pp_groundstate_energy.size();i++) { oss << xOUT.species_pp_groundstate_energy.at(i) << " "; } oss << endl;
+  oss << " species_pp_groundstate_structure.size()=" << xOUT.species_pp_groundstate_structure.size() << ": "; for(uint i=0;i<xOUT.species_pp_groundstate_structure.size();i++) { oss << xOUT.species_pp_groundstate_structure.at(i) << " "; } oss << endl;
+  // deque<deque<double> > species_pp_vLDAU;  // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+  oss << " isKIN=" << xOUT.isKIN << endl;
+  oss << " isMETAGGA=" << xOUT.isMETAGGA << endl;
+  oss << " METAGGA=" << xOUT.METAGGA << endl;
+  oss << " nweights=" << xOUT.nweights << endl;
+  oss << " nkpoints_irreducible=" << xOUT.nkpoints_irreducible << endl;
+  //vector<aurostd::xvector<double> > vkpoint_reciprocal;         // kpoints reading
+  //vector<aurostd::xvector<double> > vkpoint_cartesian;          // kpoints reading
+  oss << " vweights.size()=" << xOUT.vweights.size() << ": "; for(uint i=0;i<xOUT.vweights.size();i++) { oss << xOUT.vweights.at(i) << " "; } oss << endl;
+  oss << " calculation_time=" << xOUT.calculation_time << endl;
+  oss << " calculation_memory=" << xOUT.calculation_memory << endl;
+  oss << " calculation_cores=" << xOUT.calculation_cores << endl;
+  // xstructure xstr;                                              // for GetBandGap()
+  // EFFECTIVE MASSES
+  oss << " band_index.size()=" << xOUT.band_index.size() << ": "; for(uint i=0;i<xOUT.band_index.size();i++) { oss << xOUT.band_index.at(i) << " "; } oss << endl;
+  oss << " carrier_spin.size()=" << xOUT.carrier_spin.size() << ": "; for(uint i=0;i<xOUT.carrier_spin.size();i++) { oss << xOUT.carrier_spin.at(i) << " "; } oss << endl;
+  oss << " carrier_type.size()=" << xOUT.carrier_type.size() << ": "; for(uint i=0;i<xOUT.carrier_type.size();i++) { oss << xOUT.carrier_type.at(i) << " "; } oss << endl;
+  // vector<vector<double> > extrema_cart_coord;
+  // vector<vector<double> > effective_mass_axes;
+  oss << " equivalent_valley.size()=" << xOUT.equivalent_valley.size() << ": "; for(uint i=0;i<xOUT.equivalent_valley.size();i++) { oss << xOUT.equivalent_valley.at(i) << " "; } oss << endl;
+  oss << " effective_mass_DOS.size()=" << xOUT.effective_mass_DOS.size() << ": "; for(uint i=0;i<xOUT.effective_mass_DOS.size();i++) { oss << xOUT.effective_mass_DOS.at(i) << " "; } oss << endl;
+  oss << " effective_mass_COND.size()=" << xOUT.effective_mass_COND.size() << ": "; for(uint i=0;i<xOUT.effective_mass_COND.size();i++) { oss << xOUT.effective_mass_COND.at(i) << " "; } oss << endl;
+  oss << " mass_elec_dos.size()=" << xOUT.mass_elec_dos.size() << ": "; for(uint i=0;i<xOUT.mass_elec_dos.size();i++) { oss << xOUT.mass_elec_dos.at(i) << " "; } oss << endl;
+  oss << " mass_hole_dos.size()=" << xOUT.mass_hole_dos.size() << ": "; for(uint i=0;i<xOUT.mass_hole_dos.size();i++) { oss << xOUT.mass_hole_dos.at(i) << " "; } oss << endl;
+  oss << " mass_elec_conduction.size()=" << xOUT.mass_elec_conduction.size() << ": "; for(uint i=0;i<xOUT.mass_elec_conduction.size();i++) { oss << xOUT.mass_elec_conduction.at(i) << " "; } oss << endl;
+  oss << " mass_hole_conduction.size()=" << xOUT.mass_hole_conduction.size() << ": "; for(uint i=0;i<xOUT.mass_hole_conduction.size();i++) { oss << xOUT.mass_hole_conduction.at(i) << " "; } oss << endl;
+  oss << " conduction_band_min.size()=" << xOUT.conduction_band_min.size() << ": "; for(uint i=0;i<xOUT.conduction_band_min.size();i++) { oss << xOUT.conduction_band_min.at(i) << " "; } oss << endl;
+  oss << " conduction_band_min_net=" << xOUT.conduction_band_min_net << endl;
+  oss << " valence_band_max.size()=" << xOUT.valence_band_max.size() << ": "; for(uint i=0;i<xOUT.valence_band_max.size();i++) { oss << xOUT.valence_band_max.at(i) << " "; } oss << endl;
+  oss << " valence_band_max_net=" << xOUT.valence_band_max_net << endl;
+  oss << " Egap.size()=" << xOUT.Egap.size() << ": "; for(uint i=0;i<xOUT.Egap.size();i++) { oss << xOUT.Egap.at(i) << " "; } oss << endl;
+  oss << " Egap_net=" << xOUT.Egap_net << endl;
+  oss << " Egap_fit.size()=" << xOUT.Egap_fit.size() << ": "; for(uint i=0;i<xOUT.Egap_fit.size();i++) { oss << xOUT.Egap_fit.at(i) << " "; } oss << endl;
+  oss << " Egap_fit_net=" << xOUT.Egap_fit_net << endl;
+  oss << " Egap_type.size()=" << xOUT.Egap_type.size() << ": "; for(uint i=0;i<xOUT.Egap_type.size();i++) { oss << xOUT.Egap_type.at(i) << " "; } oss << endl;
+  oss << " Egap_type_net=" << xOUT.Egap_type_net << endl;
+  oss << " ERROR=" << xOUT.ERROR << endl;
+   // ----------------------------------------------------------------------
+  if(LVERBOSE) cerr << "xOUTCAR::operator<<: END" << endl;
+  return oss;   
+} // SC20200330
 
 bool xOUTCAR::GetProperties(const string& stringIN,bool QUIET) {
   stringstream sss; sss.str(stringIN);
@@ -444,6 +610,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: BEGIN" << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: filename=[" << filename << "]" << endl;
   if(LVERBOSE) cerr.precision(12);
+
   // ----------------------------------------------------------------------
   // STEFANO
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
@@ -927,26 +1094,24 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
   // if pressure correct enthalpy
   // ----------------------------------------------------------------------
-  // EATOM RCORE RWIGS EAUG ENMAX ENMIN POMASS ZVAL
+  // ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RMAX
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD \"EATOM RCORE RWIGS EAUG ENMAX ENMIN POMASS ZVAL\" DATA" << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RMAX\" DATA" << endl;
   vline.clear();
-  vENMAX.clear();vENMIN.clear();
-  vPOMASS.clear();vZVAL.clear();
-  vEATOM.clear();
-  vRCORE.clear();
-  vRWIGS.clear();
-  vEAUG.clear();
+  vENMAX.clear();vENMIN.clear();vPOMASS.clear();vZVAL.clear();vEATOM.clear();vRCORE.clear();vRWIGS.clear();vEAUG.clear();vRAUG.clear();vRMAX.clear();
   for(uint iline=0;iline<vcontent.size();iline++) {
+    aurostd::StringSubst(vcontent.at(iline),"EMMIN","ENMIN"); // Kresseeeeeeeeeee
     if(aurostd::substring2bool(vcontent.at(iline),"ENMAX") && aurostd::substring2bool(vcontent.at(iline),"ENMIN")) vline.push_back(vcontent.at(iline));
     if(aurostd::substring2bool(vcontent.at(iline),"POMASS") && aurostd::substring2bool(vcontent.at(iline),"ZVAL")) vline.push_back(vcontent.at(iline));
     if(aurostd::substring2bool(vcontent.at(iline),"EATOM") && aurostd::substring2bool(vcontent.at(iline),"eV")) vline.push_back(vcontent.at(iline));
     if(aurostd::substring2bool(vcontent.at(iline),"RCORE") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
     if(aurostd::substring2bool(vcontent.at(iline),"RWIGS") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
     if(aurostd::substring2bool(vcontent.at(iline),"EAUG")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"RAUG") && aurostd::substring2bool(vcontent.at(iline),"sphere")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"RMAX") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
   }
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"EATOM RCORE RWIGS EAUG ENMAX ENMIN POMASS ZVAL\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO200106 - patching for auto-indenting
+  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RAUG RMAX\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO200106 - patching for auto-indenting
   for(uint j=0;j<vline.size();j++) {
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
@@ -961,32 +1126,47 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="RCORE" && k+1<tokens.size()) vRCORE.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
       if(tokens.at(k)=="RWIGS" && k==0 && k+1<tokens.size()) vRWIGS.push_back(aurostd::string2utype<double>(tokens.at(k+1))); // pick the 1st
       if(tokens.at(k)=="EAUG" && k+1<tokens.size()) vEAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="RAUG" && k+1<tokens.size()) vRAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="RMAX" && k+1<tokens.size()) vRMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
     }
   }
 
-  EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i); } cerr << " " << endl;}
-
-  RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i); } cerr  << " " << endl;}
-
-  RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i); } cerr  << " " << endl;}
-
-  EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i); } cerr  << " " << endl;}
+  if(vENMIN.size()<vENMAX.size()) vENMIN.push_back(0.0);  // ENMIN MIGHT NOT BE THERE
+  if(vRCORE.size()<vENMAX.size()) vRCORE.push_back(0.0);  // RCORE MIGHT NOT BE THERE
+  if(vRWIGS.size()<vENMAX.size()) vRWIGS.push_back(0.0);  // RWIGS MIGHT NOT BE THERE
+  if(vEAUG.size()<vENMAX.size()) vEAUG.push_back(0.0);    // EAUG MIGHT NOT BE THERE
+  if(vRAUG.size()<vENMAX.size()) vRAUG.push_back(0.0);    // RAUG MIGHT NOT BE THERE
+  if(vRMAX.size()<vENMAX.size()) vRMAX.push_back(0.0);    // RMAX MIGHT NOT BE THERE
 
   ENMAX=aurostd::max(vENMAX);
   ENMIN=aurostd::min(vENMIN);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i); } cerr << " " << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i); } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
 
   POMASS_sum=aurostd::sum(vPOMASS);POMASS_min=aurostd::min(vPOMASS);POMASS_max=aurostd::max(vPOMASS);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i); } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
 
   ZVAL_sum=aurostd::sum(vZVAL);ZVAL_min=aurostd::min(vZVAL);ZVAL_max=aurostd::max(vZVAL);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i); } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
 
+  EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
+
+  RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
+
+  RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
+
+  EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
+
+  RAUG_min=aurostd::min(vRAUG);RAUG_max=aurostd::max(vRAUG);
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
+
+  RMAX_min=aurostd::min(vRMAX);RMAX_max=aurostd::max(vRMAX);
+  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr  << " " << endl;}
+  
   // ----------------------------------------------------------------------
   // KINETIC AND METAGGA DATA
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
@@ -1022,48 +1202,99 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   // LVERBOSE=1;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA" << endl;
+ 
   vline.clear();
-  for(uint iline=0;iline<vcontent.size();iline++) 
-    if(aurostd::substring2bool(vcontent.at(iline),"TITEL")) {
-      vline.push_back(vcontent.at(iline));
-      if(LVERBOSE) cerr << vcontent.at(iline) << endl;
+  vTITEL.clear();
+  vLEXCH.clear();
+  for(uint iline=0;iline<vcontent.size();iline++)  {
+    if(aurostd::substring2bool(vcontent.at(iline),"=")) {
+      if(aurostd::substring2bool(vcontent.at(iline),"TITEL")) {
+ 	aurostd::string2tokens(vcontent.at(iline),tokens,"=");
+	if(tokens.size()>1) vTITEL.push_back(tokens.at(1));
+	//	if(LVERBOSE) cerr << "xOUTCAR::GetProperties: TITEL=" << tokens.at(1) << endl;
+      }
+      if(aurostd::substring2bool(vcontent.at(iline),"LEXCH")) {
+	if(!aurostd::substring2bool(vcontent.at(iline),"exchange")) {
+	  aurostd::string2tokens(vcontent.at(iline),tokens,"=");
+	  if(tokens.size()>1) vLEXCH.push_back(tokens.at(1));
+	  //	if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LEXCH=" << tokens.at(1) << endl;
+	}
+      }
     }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO200106 - patching for auto-indenting
-  for(uint j=0;j<vline.size();j++) {
-    aurostd::string2tokens(vline.at(j),tokens,"=");
-    vline.at(j)=tokens.at(1);
-    aurostd::string2tokens(vline.at(j),tokens," ");
+  }
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vEATOM.size()=" << vEATOM.size() << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
+  if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+ 
+  for(uint j=0;j<vTITEL.size();j++) {
+    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SPECIES(" << j << ") " << endl;
+    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vTITEL.at(j)=" << vTITEL.at(j) << endl;
+    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
+    aurostd::string2tokens(vTITEL.at(j),tokens," ");
     pp_type=tokens.at(0);
     if(pp_type=="US" or pp_type=="NC") {
       pp_type="GGA";
-      for(uint iiline=0;iiline<vcontent.size();iiline++) 
-        if(aurostd::substring2bool(vcontent.at(iiline),"GGA"))
-          if(aurostd::substring2bool(vcontent.at(iiline),"eV"))
+      for(uint iTITEL=0;iTITEL<vcontent.size();iTITEL++) {
+        if(aurostd::substring2bool(vcontent.at(iTITEL),"GGA")) {
+          if(aurostd::substring2bool(vcontent.at(iTITEL),"eV")) {
             pp_type="LDA";
+	  }
+	}
+      }
     }
     if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << "xOUTCAR::GetProperties: PAW_LDA" << endl;
     if(isKIN) pp_type+="_KIN";
     if(isMETAGGA) pp_type+=":"+METAGGA;
     if(LVERBOSE) cerr << "xOUTCAR::GetProperties: pp_type=" << pp_type << endl;
     species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1)));
+    species_Z.push_back(xelement::symbol2Z(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1))));
     species_pp.push_back(tokens.at(1));
     species_pp_type.push_back(pp_type);
     if(pp_type=="LDA" && tokens.size()<3) tokens.push_back(DEFAULT_VASP_POTCAR_DATE_POT_LDA);
     if(pp_type=="GGA" && tokens.size()<3) tokens.push_back(DEFAULT_VASP_POTCAR_DATE_POT_GGA);
     species_pp_version.push_back(tokens.at(1)+":"+pp_type+":"+tokens.at(2));
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version] = "
-      << species.at(species.size()-1) << " ["
-        << species_pp.at(species_pp.size()-1) << ", "
-        << species_pp_type.at(species_pp_type.size()-1) << ", "
-        << species_pp_version.at(species_pp_version.size()-1) << "]" << endl;
+
+    
+    vTITEL.at(j)=aurostd::RemoveWhiteSpaces(vTITEL.at(j));
+    vLEXCH.at(j)=aurostd::RemoveWhiteSpaces(vLEXCH.at(j));   
+    xPOTCAR xPOT(xPOTCAR_Finder(species_pp_AUID,species_pp_AUID_collisions,vTITEL.at(j),vLEXCH.at(j),vEATOM.at(j),vRMAX.at(j),LVERBOSE)); // FIXES species_pp_AUID,species_pp_AUID_collisions
+    species_pp_groundstate_energy.push_back(xPOT.species_pp_groundstate_energy.at(0));
+    species_pp_groundstate_structure.push_back(xPOT.species_pp_groundstate_structure.at(0));
+    
+    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version, AUID] = "
+                      << species.at(species.size()-1) << " ["
+                      << species_Z.at(species_Z.size()-1) << ", "
+                      << species_pp.at(species_pp.size()-1) << ", "
+                      << species_pp_type.at(species_pp_type.size()-1) << ", "
+                      << species_pp_version.at(species_pp_version.size()-1) << ", "
+                      << species_pp_AUID.at(species_pp_AUID.size()-1) <<  ", "
+                      << species_pp_groundstate_energy.at(species_pp_groundstate_energy.size()-1) <<  ", "
+                      << species_pp_groundstate_structure.at(species_pp_groundstate_structure.size()-1) << "]" << endl;
   }
+ 
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species.size()=" << species.size() << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_Z.size()=" << species_Z.size() << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp.size()=" << species_pp.size() << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << endl;
-  // exit(0);
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_AUID.size()=" << species_pp_AUID.size() << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << endl;
+  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << endl;
+  if(species_pp_AUID_collisions.size()) {
+    cerr << "xOUTCAR::GetProperties: COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+    ERROR_flag=TRUE;
+  }
+  
   // ----------------------------------------------------------------------
   // LDAU DATA
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
@@ -2420,7 +2651,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   Egap_type.clear();            Egap_type.resize(ISPIN);
   Egap_fit.clear();             Egap_fit.resize(ISPIN);
 
-  //[CO191004]double _METALGAP = -AUROSTD_NAN, _METALEDGE = -1.0;
+  //[CO20191004]double _METALGAP = -AUROSTD_NAN, _METALEDGE = -1.0;
   for(uint ispin=0;ispin<(uint)ISPIN;ispin++){
     if(broad_type[ispin]==empty){
       valence_band_max[ispin]=_METALEDGE_;
@@ -2607,7 +2838,7 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
   bool SPIN_UP = FALSE, SPIN_DN = FALSE;
   //double  CELLVOL=0; CELLVOLCUTOFF=0,   // CO20171002 - GARBAGE A != A^-1
   double EMIN = -100.0, EMAX = 100.0;
-  //[CO191004]double _METALGAP = -1.0E+09, _METALEDGE = -1.0; 
+  //[CO20191004]double _METALGAP = -1.0E+09, _METALEDGE = -1.0; 
   double _ENER_EPS = 1.0E-08, _ELEC_EPS = 1.0E-02, _ZERO = 0.0;
 
   // change this into an error message
@@ -3567,11 +3798,11 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
 
 // ***************************************************************************
 // class xDOSCAR
-xDOSCAR::xDOSCAR() {free();}  //CO191110
+xDOSCAR::xDOSCAR() {free();}  //CO20191110
 
-xDOSCAR::~xDOSCAR() {free();} //CO191110
+xDOSCAR::~xDOSCAR() {free();} //CO20191110
 
-void xDOSCAR::free() {  //CO191110
+void xDOSCAR::free() {  //CO20191110
   content="";
   vcontent.clear();
   filename="";
@@ -3587,7 +3818,7 @@ void xDOSCAR::free() {  //CO191110
   energy_max=0.0;
   energy_min=0.0;
   number_energies=0;
-  number_atoms=0; //CO191010
+  number_atoms=0; //CO20191010
   partial=false;  // ME20190614
   denergy=0.0;
   venergy.clear();
@@ -3596,7 +3827,7 @@ void xDOSCAR::free() {  //CO191110
   // vDOSs.clear();vDOSp.clear();vDOSd.clear(); OBSOLETE ME20190614 - not used
   isLSCOUPLING = false;  // ME20190620
   lmResolved = false;  // ME20190620
-  carstring=""; //CO191010
+  carstring=""; //CO20191010
   ERROR="";
   conduction_band_min.clear();
   conduction_band_min_net=AUROSTD_NAN;
@@ -3627,18 +3858,18 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
   energy_max=b.energy_max;
   energy_min=b.energy_min;
   number_energies=b.number_energies;
-  number_atoms=b.number_atoms;  //CO191010
+  number_atoms=b.number_atoms;  //CO20191010
   partial = b.partial;  // ME20190614
   denergy=b.denergy;  
-  venergy.clear(); for(uint ienergy=0;ienergy<b.venergy.size();ienergy++) venergy.push_back(b.venergy[ienergy]);  //CO191004
-  venergyEf.clear(); for(uint ienergy=0;ienergy<b.venergyEf.size();ienergy++) venergyEf.push_back(b.venergyEf[ienergy]); //CO191004
+  venergy.clear(); for(uint ienergy=0;ienergy<b.venergy.size();ienergy++) venergy.push_back(b.venergy[ienergy]);  //CO20191004
+  venergyEf.clear(); for(uint ienergy=0;ienergy<b.venergyEf.size();ienergy++) venergyEf.push_back(b.venergyEf[ienergy]); //CO20191004
   viDOS.clear();
-  for(uint ispin=0;ispin<b.viDOS.size();ispin++){ //CO191004
+  for(uint ispin=0;ispin<b.viDOS.size();ispin++){ //CO20191004
     viDOS.push_back(deque<double>(0));
     for(uint ienergy=0;ienergy<b.viDOS[ispin].size();ienergy++) viDOS[ispin].push_back(b.viDOS[ispin][ienergy]);
   }
   vDOS.clear();   // ME20190614
-  for(uint iatom=0;iatom<b.vDOS.size();iatom++){ //CO191004
+  for(uint iatom=0;iatom<b.vDOS.size();iatom++){ //CO20191004
     vDOS.push_back(deque<deque<deque<double> > >(0));
     for(uint iorbital=0;iorbital<b.vDOS[iatom].size();iorbital++){
       vDOS[iatom].push_back(deque<deque<double> >(0));
@@ -3655,7 +3886,7 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
   //vDOSd.clear(); for(uint i=0;i<b.vDOSd.size();i++) vDOSd.push_back(b.vDOSd.at(i));  OBSOLETE ME20190614 - not used
   isLSCOUPLING = b.isLSCOUPLING;  // ME20190620
   lmResolved = b.lmResolved;  // ME20190620
-  carstring=b.carstring;  //CO191010
+  carstring=b.carstring;  //CO20191010
   ERROR=b.ERROR;
   conduction_band_min.clear(); for(uint ispin=0;ispin<b.conduction_band_min.size();ispin++){conduction_band_min.push_back(b.conduction_band_min[ispin]);}
   conduction_band_min_net=b.conduction_band_min_net;
@@ -4027,8 +4258,8 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   return TRUE;
 }
 
-//CO191217 - copies everything from spin channel 1 to spin channel 2
-void xDOSCAR::convertSpinOFF2ON() { //CO191217
+//CO20191217 - copies everything from spin channel 1 to spin channel 2
+void xDOSCAR::convertSpinOFF2ON() { //CO20191217
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="xDOSCAR::convertSpinOFF2ON():";
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -4062,7 +4293,7 @@ void xDOSCAR::convertSpinOFF2ON() { //CO191217
   spin=1;
 }
 
-bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO191110
+bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO20191110
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="xDOSCAR::checkVDOS():";
   stringstream message;
@@ -4109,7 +4340,7 @@ bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO191110
   return true;
 }
 
-bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,double occ_tol) { //CO191004
+bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,double occ_tol) { //CO20191004
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="xDOSCAR::GetBandGap():";
 
@@ -4212,7 +4443,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     cerr << soliloquy << " metal_found=" << metal_found << endl;
   }
 
-  //[CO191004]double _METALGAP = -AUROSTD_NAN, _METALEDGE = -1.0;
+  //[CO20191004]double _METALGAP = -AUROSTD_NAN, _METALEDGE = -1.0;
   Egap.resize(ISPIN);
   Egap_fit.resize(ISPIN);
   Egap_type.resize(ISPIN);
@@ -4277,8 +4508,8 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   return true;
 }
 
-deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(const xstructure& xstr) const {return GetVDOSSpecies(xstr.num_each_type);} //CO191004
-deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_each_type) const { //CO191004
+deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(const xstructure& xstr) const {return GetVDOSSpecies(xstr.num_each_type);} //CO20191004
+deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_each_type) const { //CO20191004
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="xDOSCAR::GetBandGap():";
   stringstream message;
@@ -4734,7 +4965,7 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
   vector<double> band_info_vbt(2, xdoscar.Efermi);
   vector<double> band_info_cbb(2, xdoscar.Efermi);
   vector<int> valley_elec(2), valley_hole(2);
-  double _ENER_RANGE = 0.026; //[CO191004]_METALGAP =  -1.0E09;
+  double _ENER_RANGE = 0.026; //[CO20191004]_METALGAP =  -1.0E09;
   bool SPIN_UP = FALSE, SPIN_DN = FALSE;
   string compound_name = xdoscar.title;
   int ispin = xeigenval.spin+1;
@@ -5355,7 +5586,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
 //-------------------------------------------------------------------------------------------------
 // PrintBandGap: Print the output of xDOSCAR::GetBandGap
 // 2019: Corey Oses
-bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO191110
+bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="PrintBandGap_DOS():";
   stringstream ss_outcar_static(""),ss_outcar_bands("");
@@ -5453,7 +5684,7 @@ bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO191110
 // PrintEffectiveMass: Print the output of xOUTCAR::GetEffectiveMass 
 // 2014: Camilo E. Calderon
 bool PrintEffectiveMass(string& directory, ostream &oss) {
-  //[CO191004]double _METALGAP = -1.0E09;
+  //[CO20191004]double _METALGAP = -1.0E09;
   bool SPIN_UP = FALSE, SPIN_DN = FALSE;
   bool EM_TAG;
   stringstream file_OUTCAR, file_DOSCAR, file_EIGENVAL;
@@ -6869,19 +7100,37 @@ xPOTCAR::xPOTCAR() {
   POTCAR_PAW=FALSE;             // for aflowlib_libraries.cpp
   POTCAR_TYPE="";               // for aflowlib_libraries.cpp
   POTCAR_KINETIC=FALSE;         // for aflowlib_libraries.cpp
-  ENMAX=0.0;vENMAX.clear();     // for aflowlib_libraries.cpp
-  ENMIN=0.0;vENMIN.clear();     // for aflowlib_libraries.cpp
-  POMASS_sum=0.0;POMASS_min=0.0;POMASS_max=0.0;vPOMASS.clear(); // for aflowlib_libraries.cpp
-  ZVAL_sum=0.0;ZVAL_min=0.0;ZVAL_max=0.0;vZVAL.clear();         // for aflowlib_libraries.cpp
-  EATOM_min=0.0;EATOM_max=0.0;vEATOM.clear(); // for aflowlib_libraries.cpp
-  RCORE_min=0.0;RCORE_max=0.0;vRCORE.clear(); // for aflowlib_libraries.cpp
-  RWIGS_min=0.0;RWIGS_max=0.0;vRWIGS.clear(); // for aflowlib_libraries.cpp
-  EAUG_min=0.0;EAUG_max=0.0;vEAUG.clear(); // for aflowlib_libraries.cpp
+  POTCAR_GW=FALSE;              // for aflowlib_libraries.cpp
+  POTCAR_AE=FALSE;              // for aflowlib_libraries.cpp
+   // begin shared xPOTCAR
+  ENMAX=0.0;vENMAX.clear();                             // for aflowlib_libraries.cpp
+  ENMIN=0.0;vENMIN.clear();                             // for aflowlib_libraries.cpp
+  POMASS_sum=0.0;POMASS_min=0.0;POMASS_max=0.0;vPOMASS.clear();  // for aflowlib_libraries.cpp
+  ZVAL_sum=0.0;ZVAL_min=0.0;ZVAL_max=0.0;vZVAL.clear(); // for aflowlib_libraries.cpp
+  EATOM_min=0.0;EATOM_max=0.0;vEATOM.clear();           // for aflowlib_libraries.cpp
+  RCORE_min=0.0;RCORE_max=0.0;vRCORE.clear();           // for aflowlib_libraries.cpp
+  RWIGS_min=0.0;RWIGS_max=0.0;vRWIGS.clear();           // for aflowlib_libraries.cpp
+  EAUG_min=0.0;EAUG_max=0.0;vEAUG.clear();              // for aflowlib_libraries.cpp
+  RAUG_min=0.0;RAUG_max=0.0;vRAUG.clear();              // for aflowlib_libraries.cpp
+  RMAX_min=0.0;RMAX_max=0.0;vRMAX.clear();              // unicity
+  vTITEL.clear();                                       // unicity
+  vLEXCH.clear();                                       // unicity 
+  // end shared xPOTCAR
   pp_type="";                   // for aflowlib_libraries.cpp
   species.clear();              // for aflowlib_libraries.cpp
+  species_Z.clear();            // for aflowlib_libraries.cpp
   species_pp.clear();           // for aflowlib_libraries.cpp
   species_pp_type.clear();      // for aflowlib_libraries.cpp
   species_pp_version.clear();   // for aflowlib_libraries.cpp
+  species_pp_AUID.clear();      // for aflowlib_libraries.cpp
+  species_pp_AUID_collisions.clear();   // for aflowlib_libraries.cpp
+  species_pp_groundstate_energy.clear();      // for aflowlib_libraries.cpp
+  species_pp_groundstate_structure.clear();      // for aflowlib_libraries.cpp
+  // objects/functions for references energies
+  // [OBSOLETE] vsymbol.clear();                              // for pseudopotential references
+  // [OBSOLETE] vname.clear();                                // for pseudopotential references
+  // [OBSOLETE] vdate.clear();                                // for pseudopotential references
+  AUID="";                                      // for pseudopotential references
 }  
 
 xPOTCAR::~xPOTCAR() {
@@ -6890,18 +7139,32 @@ xPOTCAR::~xPOTCAR() {
 
 void xPOTCAR::free() {
   vcontent.clear(); 
-  vENMAX.clear();                     // for aflowlib_libraries.cpp
-  vENMIN.clear();                     // for aflowlib_libraries.cpp
-  vPOMASS.clear();                    // for aflowlib_libraries.cpp
-  vZVAL.clear();                      // for aflowlib_libraries.cpp
-  vEATOM.clear();                     // for aflowlib_libraries.cpp
-  vRCORE.clear();                     // for aflowlib_libraries.cpp
-  vRWIGS.clear();                     // for aflowlib_libraries.cpp
-  vEAUG.clear();                      // for aflowlib_libraries.cpp
   species.clear();                    // for aflowlib_libraries.cpp
+  species_Z.clear();                  // for aflowlib_libraries.cpp
   species_pp.clear();                 // for aflowlib_libraries.cpp
   species_pp_type.clear();            // for aflowlib_libraries.cpp
   species_pp_version.clear();         // for aflowlib_libraries.cpp
+  species_pp_AUID.clear();   // for aflowlib_libraries.cpp
+  species_pp_AUID_collisions.clear();   // for aflowlib_libraries.cpp
+  species_pp_groundstate_energy.clear();   // for aflowlib_libraries.cpp
+  species_pp_groundstate_structure.clear();      // for aflowlib_libraries.cpp
+  // begin shared xPOTCAR
+  vENMAX.clear();                      // for aflowlib_libraries.cpp
+  vENMIN.clear();                      // for aflowlib_libraries.cpp
+  vPOMASS.clear();                     // for aflowlib_libraries.cpp
+  vZVAL.clear();                       // for aflowlib_libraries.cpp
+  vEATOM.clear();                      // for aflowlib_libraries.cpp
+  vRCORE.clear();                      // for aflowlib_libraries.cpp
+  vRWIGS.clear();                      // for aflowlib_libraries.cpp
+  vEAUG.clear();                       // for aflowlib_libraries.cpp
+  vRAUG.clear();                       // for aflowlib_libraries.cpp
+  vRMAX.clear();                       // for aflowlib_libraries.cpp
+  vTITEL.clear();                      // unicity
+  vLEXCH.clear();                      // unicity
+  // [OBSOLETE] vsymbol.clear();                     // for pseudopotential references
+  // [OBSOLETE] vname.clear();                       // for pseudopotential references
+  // [OBSOLETE] vdate.clear();                       // for pseudopotential references
+  // end shared xPOTCAR
 }
 
 void xPOTCAR::copy(const xPOTCAR& b) { // copy PRIVATE
@@ -6913,6 +7176,9 @@ void xPOTCAR::copy(const xPOTCAR& b) { // copy PRIVATE
   POTCAR_PAW=b.POTCAR_PAW;
   POTCAR_TYPE=b.POTCAR_TYPE;
   POTCAR_KINETIC=b.POTCAR_KINETIC;
+  POTCAR_GW=b.POTCAR_GW;
+  POTCAR_AE=b.POTCAR_AE;
+  // begin shared xPOTCAR
   ENMAX=b.ENMAX;
   vENMAX.clear(); for(uint i=0;i<b.vENMAX.size();i++) vENMAX.push_back(b.vENMAX.at(i)); // for aflowlib_libraries.cpp
   ENMIN=b.ENMIN;
@@ -6929,11 +7195,28 @@ void xPOTCAR::copy(const xPOTCAR& b) { // copy PRIVATE
   vRWIGS.clear(); for(uint i=0;i<b.vRWIGS.size();i++) vRWIGS.push_back(b.vRWIGS.at(i)); // for aflowlib_libraries.cpp
   EAUG_min=b.EAUG_min;EAUG_max=b.EAUG_max;
   vEAUG.clear(); for(uint i=0;i<b.vEAUG.size();i++) vEAUG.push_back(b.vEAUG.at(i)); // for aflowlib_libraries.cpp
+  RAUG_min=b.RAUG_min;RAUG_max=b.RAUG_max;
+  vRAUG.clear(); for(uint i=0;i<b.vRAUG.size();i++) vRAUG.push_back(b.vRAUG.at(i)); // for aflowlib_libraries.cpp
+  RMAX_min=b.RMAX_min;RMAX_max=b.RMAX_max;
+  vRMAX.clear(); for(uint i=0;i<b.vRMAX.size();i++) vRMAX.push_back(b.vRMAX.at(i)); // for aflowlib_libraries.cpp
+  vTITEL.clear(); for(uint i=0;i<b.vTITEL.size();i++) vTITEL.push_back(b.vTITEL.at(i)); // for aflowlib_libraries.cpp
+  vLEXCH.clear(); for(uint i=0;i<b.vLEXCH.size();i++) vLEXCH.push_back(b.vLEXCH.at(i)); // for aflowlib_libraries.cpp
+  // end shared xPOTCAR
   pp_type=b.pp_type;                   // for aflowlib_libraries.cpp
   species.clear(); for(uint i=0;i<b.species.size();i++) species.push_back(b.species.at(i)); // for aflowlib_libraries.cpp
+  species_Z.clear(); for(uint i=0;i<b.species_Z.size();i++) species_Z.push_back(b.species_Z.at(i)); // for aflowlib_libraries.cpp
   species_pp.clear(); for(uint i=0;i<b.species_pp.size();i++) species_pp.push_back(b.species_pp.at(i)); // for aflowlib_libraries.cpp
   species_pp_type.clear(); for(uint i=0;i<b.species_pp_type.size();i++) species_pp_type.push_back(b.species_pp_type.at(i)); // for aflowlib_libraries.cpp
   species_pp_version.clear(); for(uint i=0;i<b.species_pp_version.size();i++) species_pp_version.push_back(b.species_pp_version.at(i));  // for aflowlib_libraries.cpp
+  species_pp_AUID.clear(); for(uint i=0;i<b.species_pp_AUID.size();i++) species_pp_AUID.push_back(b.species_pp_AUID.at(i));  // for aflowlib_libraries.cpp
+  species_pp_AUID_collisions.clear(); for(uint i=0;i<b.species_pp_AUID_collisions.size();i++) species_pp_AUID_collisions.push_back(b.species_pp_AUID_collisions.at(i));  // for aflowlib_libraries.cpp
+  species_pp_groundstate_energy.clear(); for(uint i=0;i<b.species_pp_groundstate_energy.size();i++) species_pp_groundstate_energy.push_back(b.species_pp_groundstate_energy.at(i)); // for pseudopotential references
+  species_pp_groundstate_structure.clear(); for(uint i=0;i<b.species_pp_groundstate_structure.size();i++) species_pp_groundstate_structure.push_back(b.species_pp_groundstate_structure.at(i)); // for pseudopotential references
+  // objects/functions for references energies
+  // [OBSOLETE] vsymbol.clear(); for(uint i=0;i<b.vsymbol.size();i++) vsymbol.push_back(b.vsymbol.at(i)); // for pseudopotential references
+  // [OBSOLETE] vname.clear(); for(uint i=0;i<b.vname.size();i++) vname.push_back(b.vname.at(i)); // for pseudopotential references
+  // [OBSOLETE] vdate.clear(); for(uint i=0;i<b.vdate.size();i++) vdate.push_back(b.vdate.at(i)); // for pseudopotential references
+  AUID=b.AUID; // for pseudopotential references
 }
 
 const xPOTCAR& xPOTCAR::operator=(const xPOTCAR& b) {  // operator= PUBLIC
@@ -6980,10 +7263,13 @@ bool xPOTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VER
   return out;
 }
 
+#define PSEUDOPOTENTIAL_GENERATOR_pad 70
+ 
 bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool LVERBOSE=(FALSE || XHOST.DEBUG);
   bool ERROR_flag=FALSE;
-  if(LVERBOSE) cout << "xPOTCAR::GetProperties: BEGIN" << endl;
+  // XHOST.PSEUDOPOTENTIAL_GENERATOR=TRUE;
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: BEGIN" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -6993,64 +7279,207 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(filename=="") filename="stringstream";
   // crunching to eat the info
 
+   // GET AUID AS SOON AS POSSIBLE
+  if(aurostd::FileExist(filename)) {
+    AUID=aurostd::file2auid(filename);
+  }
+   
   // get parameters
   //  vline.clear();
   for(uint iline=0;iline<vcontent.size();iline++) {
     aurostd::string2tokens(vcontent.at(iline),tokens);
     //    cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
     if(iline==4) title=vcontent.at(iline);  // might be wrong
+  } 
+  
+  // ----------------------------------------------------------------------
+  // EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" DATA" << endl;
+  vline.clear();
+  vENMAX.clear();vENMIN.clear();vPOMASS.clear();vZVAL.clear();vEATOM.clear();vRCORE.clear();vRWIGS.clear();vEAUG.clear();vRAUG.clear();vRMAX.clear();
+  for(uint iline=0;iline<vcontent.size();iline++) {
+    aurostd::StringSubst(vcontent.at(iline),"EMMIN","ENMIN"); // Kresseeeeeeeeeee
+    if(aurostd::substring2bool(vcontent.at(iline),"ENMAX") && aurostd::substring2bool(vcontent.at(iline),"ENMIN")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"POMASS") && aurostd::substring2bool(vcontent.at(iline),"ZVAL")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"EATOM") && aurostd::substring2bool(vcontent.at(iline),"eV")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"RCORE") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"RWIGS") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"EAUG")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"RAUG") && aurostd::substring2bool(vcontent.at(iline),"sphere")) vline.push_back(vcontent.at(iline));
+    if(aurostd::substring2bool(vcontent.at(iline),"RMAX") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
   }
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO200106 - patching for auto-indenting
+  for(uint j=0;j<vline.size();j++) {
+    aurostd::StringSubst(vline.at(j),"="," ");
+    aurostd::StringSubst(vline.at(j),";"," ");
+    //    if(LVERBOSE) cerr << vline.at(j) << endl;
+    aurostd::string2tokens(vline.at(j),tokens," ");
+    for(uint k=0;k<tokens.size();k++) {
+      if(tokens.at(k)=="ENMAX" && k+1<tokens.size()) vENMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="ENMIN" && k+1<tokens.size()) vENMIN.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="POMASS" && k+1<tokens.size()) vPOMASS.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="ZVAL" && k+1<tokens.size()) vZVAL.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="EATOM" && k+1<tokens.size()) vEATOM.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="RCORE" && k+1<tokens.size()) vRCORE.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="RWIGS" && k==0 && k+1<tokens.size()) vRWIGS.push_back(aurostd::string2utype<double>(tokens.at(k+1))); // pick the 1st
+      if(tokens.at(k)=="EAUG" && k+1<tokens.size()) vEAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="RAUG" && k+1<tokens.size()) vRAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+      if(tokens.at(k)=="RMAX" && k+1<tokens.size()) vRMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
+    }
+  }
+  
+  if(vENMIN.size()<vENMAX.size()) vENMIN.push_back(0.0);  // ENMIN MIGHT NOT BE THERE
+  if(vRCORE.size()<vENMAX.size()) vRCORE.push_back(0.0);  // RCORE MIGHT NOT BE THERE
+  if(vRWIGS.size()<vENMAX.size()) vRWIGS.push_back(0.0);  // RWIGS MIGHT NOT BE THERE
+  if(vEAUG.size()<vENMAX.size()) vEAUG.push_back(0.0);    // EAUG MIGHT NOT BE THERE
+  if(vRAUG.size()<vENMAX.size()) vRAUG.push_back(0.0);    // RAUG MIGHT NOT BE THERE
+  if(vRMAX.size()<vENMAX.size()) vRMAX.push_back(0.0);    // RMAX MIGHT NOT BE THERE
+  
+  ENMAX=aurostd::max(vENMAX);
+  ENMIN=aurostd::min(vENMIN);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
+  
+  POMASS_sum=aurostd::sum(vPOMASS);POMASS_min=aurostd::min(vPOMASS);POMASS_max=aurostd::max(vPOMASS);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
+  
+  ZVAL_sum=aurostd::sum(vZVAL);ZVAL_min=aurostd::min(vZVAL);ZVAL_max=aurostd::max(vZVAL);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
+  
+  EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
+  
+  RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
+  
+  RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
+  
+  EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
 
+  RAUG_min=aurostd::min(vRAUG);RAUG_max=aurostd::max(vRAUG);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
+
+  RMAX_min=aurostd::min(vRMAX);RMAX_max=aurostd::max(vRMAX);
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr << " " << endl;}
+
+   
   // ----------------------------------------------------------------------
   // PSEUDOPOTENTIAL DATA
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA" << endl;
+  
   vline.clear();
-  for(uint iline=0;iline<vcontent.size();iline++) 
-    if(aurostd::substring2bool(vcontent.at(iline),"TITEL")) {
-      vline.push_back(vcontent.at(iline));
-      //      if(LVERBOSE) cerr << vcontent.at(iline) << endl;
+  vTITEL.clear();
+  vLEXCH.clear();
+  for(uint iline=0;iline<vcontent.size();iline++)  {
+    if(aurostd::substring2bool(vcontent.at(iline),"=")) {
+      if(aurostd::substring2bool(vcontent.at(iline),"TITEL")) {
+ 	aurostd::string2tokens(vcontent.at(iline),tokens,"=");
+	if(tokens.size()>1) vTITEL.push_back(tokens.at(1));
+	//	if(LVERBOSE) cerr << "xPOTCAR::GetProperties: TITEL=" << tokens.at(1) << endl;
+      }
+      if(aurostd::substring2bool(vcontent.at(iline),"LEXCH")) {
+	if(!aurostd::substring2bool(vcontent.at(iline),"exchange")) {
+	  aurostd::string2tokens(vcontent.at(iline),tokens,"=");
+	  if(tokens.size()>1) vLEXCH.push_back(tokens.at(1));
+	  //	if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LEXCH=" << tokens.at(1) << endl;
+	}
+      }
     }
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "ERROR - xPOTCAR::GetProperties: wrong number of pseudopotentials in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO200106 - patching for auto-indenting
-  for(uint j=0;j<vline.size();j++) {
-    aurostd::string2tokens(vline.at(j),tokens,"=");
-    vline.at(j)=tokens.at(1);
-    aurostd::string2tokens(vline.at(j),tokens," ");
+  }
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << endl;
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
+
+  if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  
+  for(uint j=0;j<vTITEL.size();j++) {
+    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: SPECIES(" << j << ") " << endl;
+    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vTITEL.at(j)=" << vTITEL.at(j) << endl;
+    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
+    aurostd::string2tokens(vTITEL.at(j),tokens," ");
     pp_type=tokens.at(0);
-    if(pp_type=="US" or pp_type=="NC") {
+     if(pp_type=="US" or pp_type=="NC") {
       pp_type="GGA";
       for(uint iiline=0;iiline<vcontent.size();iiline++) 
         if(aurostd::substring2bool(vcontent.at(iiline),"GGA"))
           if(aurostd::substring2bool(vcontent.at(iiline),"eV"))
             pp_type="LDA";
     }
-    if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << "xPOTCAR::GetProperties: PAW_LDA" << endl;
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: pp_type=" << pp_type << endl;
-    species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1)));
-    species_pp.push_back(tokens.at(1));
-    species_pp_type.push_back(pp_type);
-    if(pp_type=="LDA" && tokens.size()<3) tokens.push_back(DEFAULT_VASP_POTCAR_DATE_POT_LDA);
-    if(pp_type=="GGA" && tokens.size()<3) tokens.push_back(DEFAULT_VASP_POTCAR_DATE_POT_GGA);
-    species_pp_version.push_back(tokens.at(1)+":"+pp_type+":"+tokens.at(2));
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version] = "
-      << species.at(species.size()-1) << " ["
-        << species_pp.at(species_pp.size()-1) << ", "
-        //		      << species_pp_type.at(species_pp_type.size()-1) << ", "
-        << species_pp_version.at(species_pp_version.size()-1) << "]" << endl;
+    if(tokens.size()>1) {
+      if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << "xPOTCAR::GetProperties: PAW_LDA" << endl;
+      if(LVERBOSE) cerr << "xPOTCAR::GetProperties: pp_type=" << pp_type << " " << "tokens.size()=" << tokens.size() << endl;
+      species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1)));
+      species_Z.push_back(xelement::symbol2Z(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1))));
+      species_pp.push_back(tokens.at(1));
+      species_pp_type.push_back(pp_type);
+      if(pp_type=="LDA" && tokens.size()<3) tokens.push_back(DEFAULT_VASP_POTCAR_DATE_POT_LDA);
+      if(pp_type=="GGA" && tokens.size()<3) tokens.push_back(DEFAULT_VASP_POTCAR_DATE_POT_GGA);
+      species_pp_version.push_back(tokens.at(1)+":"+pp_type+":"+tokens.at(2));
+    } else { // only  one definition
+      pp_type="AE";
+      species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(0))); 
+      species_Z.push_back(xelement::symbol2Z(KBIN::VASP_PseudoPotential_CleanName(tokens.at(0)))); 
+      species_pp.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(0))); // same as species
+      species_pp_type.push_back(pp_type);
+      species_pp_version.push_back(tokens.at(0)+":"+pp_type+":"+"BigBang"); // ALL Atomic Potential has been existing since the BigBang
+    }
+
+    vTITEL.at(j)=aurostd::RemoveWhiteSpaces(vTITEL.at(j));
+    vLEXCH.at(j)=aurostd::RemoveWhiteSpaces(vLEXCH.at(j));   
+    xPOTCAR xPOT(xPOTCAR_Finder(species_pp_AUID,species_pp_AUID_collisions,vTITEL.at(j),vLEXCH.at(j),vEATOM.at(j),vRMAX.at(j),LVERBOSE)); // FIXES species_pp_AUID,species_pp_AUID_collisions
+    species_pp_groundstate_energy.push_back(xPOT.species_pp_groundstate_energy.at(0));
+    species_pp_groundstate_structure.push_back(xPOT.species_pp_groundstate_structure.at(0));
+
+    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version, AUID] = "
+		      << species.at(species.size()-1) << " ["
+		      << species_Z.at(species_Z.size()-1) << ", "
+		      << species_pp.at(species_pp.size()-1) << ", "
+		      << species_pp_type.at(species_pp_type.size()-1) << ", "
+		      << species_pp_version.at(species_pp_version.size()-1) << ", "
+		      << species_pp_AUID.at(species_pp_AUID.size()-1) <<  ", "
+		      << species_pp_groundstate_energy.at(species_pp_groundstate_energy.size()-1) <<  ", "
+		      << species_pp_groundstate_structure.at(species_pp_groundstate_structure.size()-1) << "]" << endl;
   }
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;
+  
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;}
   if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species.size()=" << species.size() << ": "; for(uint i=0;i<species.size();i++) { cerr << species.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_Z.size()=" << species_Z.size() << ": "; for(uint i=0;i<species_Z.size();i++) { cerr << species_Z.at(i) << " "; } cerr << endl;}
   if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp.size()=" << species_pp.size() << ": "; for(uint i=0;i<species_pp.size();i++) { cerr << species_pp.at(i) << " "; } cerr << endl;}
   if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << ": "; for(uint i=0;i<species_pp_type.size();i++) { cerr << species_pp_type.at(i) << " "; } cerr << endl;}
   if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << ": "; for(uint i=0;i<species_pp_version.size();i++) { cerr << species_pp_version.at(i) << " "; } cerr << endl;}
-
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_AUID.size()=" << species_pp_AUID.size() << ": "; for(uint i=0;i<species_pp_AUID.size();i++) { cerr << species_pp_AUID.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << ": "; for(uint i=0;i<species_pp_AUID_collisions.size();i++) { cerr << species_pp_AUID_collisions.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << ": "; for(uint i=0;i<species_pp_groundstate_energy.size();i++) { cerr << species_pp_groundstate_energy.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << ": "; for(uint i=0;i<species_pp_groundstate_structure.size();i++) { cerr << species_pp_groundstate_structure.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << ": "; for(uint i=0;i<vTITEL.size();i++) { cerr << vTITEL.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << ": "; for(uint i=0;i<vLEXCH.size();i++) { cerr << vLEXCH.at(i) << " "; } cerr << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: filename=" << filename << endl;}
+  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: AUID=" << AUID << endl;}
+  if(species_pp_AUID_collisions.size()) {
+    cerr << "xPOTCAR::GetProperties: COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+    ERROR_flag=TRUE;
+  }
+  if(LVERBOSE) cerr.flush();
 
   // ----------------------------------------------------------------------
   // POTCAR_PAW POTCAR_TYPE POTCAR_KINETIC
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD POTCAR_PAW POTCAR_TYPE" << endl;
   POTCAR_PAW=FALSE;
   POTCAR_KINETIC=FALSE;
+  POTCAR_GW=FALSE;
+  POTCAR_AE=FALSE;
   if(content.find("PAW")!=string::npos) POTCAR_PAW=TRUE;
+  if(content.find("GW")!=string::npos) POTCAR_GW=TRUE;
+  if(content.find("AE potential")!=string::npos) POTCAR_AE=TRUE;
   // POTCAR DONE **************************************************
   // CHECK FOR US => LDA/GGA
   bool is_US=FALSE,is_LDA=FALSE;
@@ -7076,70 +7505,18 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_PAW = " << POTCAR_PAW << endl;
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_TYPE = " << POTCAR_TYPE << endl;
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_KINETIC = " << POTCAR_KINETIC << endl;
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_GW = " << POTCAR_GW << endl;
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_AE = " << POTCAR_AE << endl;
+
   // ----------------------------------------------------------------------
-  // EATOM RCORE RWIGS EAUG ENMAX ENMIN POMASS ZVAL
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD \"EATOM RCORE RWIGS EAUG ENMAX ENMIN POMASS ZVAL\" DATA" << endl;
-  vline.clear();
-  vENMAX.clear();vENMIN.clear();
-  vPOMASS.clear();vZVAL.clear();
-  vEATOM.clear();
-  vRCORE.clear();
-  vRWIGS.clear();
-  vEAUG.clear();
-  for(uint iline=0;iline<vcontent.size();iline++) {
-    if(aurostd::substring2bool(vcontent.at(iline),"ENMAX") && aurostd::substring2bool(vcontent.at(iline),"ENMIN")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"POMASS") && aurostd::substring2bool(vcontent.at(iline),"ZVAL")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"EATOM") && aurostd::substring2bool(vcontent.at(iline),"eV")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"RCORE") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"RWIGS") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"EAUG")) vline.push_back(vcontent.at(iline));
-  }
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) { if(!QUIET) cerr << "ERROR - xPOTCAR::GetProperties: wrong number of \"EATOM RCORE RWIGS EAUG ENMAX ENMIN POMASS ZVAL\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO200106 - patching for auto-indenting
-  for(uint j=0;j<vline.size();j++) {
-    aurostd::StringSubst(vline.at(j),"="," ");
-    aurostd::StringSubst(vline.at(j),";"," ");
-    //    if(LVERBOSE) cerr << vline.at(j) << endl;
-    aurostd::string2tokens(vline.at(j),tokens," ");
-    for(uint k=0;k<tokens.size();k++) {
-      if(tokens.at(k)=="ENMAX" && k+1<tokens.size()) vENMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="ENMIN" && k+1<tokens.size()) vENMIN.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="POMASS" && k+1<tokens.size()) vPOMASS.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="ZVAL" && k+1<tokens.size()) vZVAL.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="EATOM" && k+1<tokens.size()) vEATOM.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="RCORE" && k+1<tokens.size()) vRCORE.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="RWIGS" && k==0 && k+1<tokens.size()) vRWIGS.push_back(aurostd::string2utype<double>(tokens.at(k+1))); // pick the 1st
-      if(tokens.at(k)=="EAUG" && k+1<tokens.size()) vEAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-    }
-  }
+  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: WRITE vxpseudopotentials" << endl;
 
-  EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) cerr << vEATOM.at(i) << " "; cerr << endl;}
-
-  RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) cerr << vRCORE.at(i) << " "; cerr << endl;}
-
-  RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) cerr << vRWIGS.at(i) << " "; cerr << endl;}
-
-  EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) cerr << vEAUG.at(i) << " "; cerr << endl;}
-
-  ENMAX=aurostd::max(vENMAX);
-  ENMIN=aurostd::min(vENMIN);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) cerr << vENMAX.at(i) << " "; cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) cerr << vENMIN.at(i) << " "; cerr << endl;}
-
-  POMASS_sum=aurostd::sum(vPOMASS);POMASS_min=aurostd::min(vPOMASS);POMASS_max=aurostd::max(vPOMASS);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) cerr << vPOMASS.at(i) << " "; cerr << endl;}
-
-  ZVAL_sum=aurostd::sum(vZVAL);ZVAL_min=aurostd::min(vZVAL);ZVAL_max=aurostd::max(vZVAL);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) cerr << vZVAL.at(i) << " "; cerr << endl;}
-
+  if(XHOST.PSEUDOPOTENTIAL_GENERATOR && species.size()==1) xPOTCAR_PURE_Printer((*this),cout);
+  
   // ----------------------------------------------------------------------
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: (BULLSHIT DONT USE) title=" << title << endl;
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vcontent.size()=" << vcontent.size() << endl;
-
+  
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: END" << endl;
@@ -8137,69 +8514,69 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
 //-------------------------------------------------------------------------------------------------
 
-//CO190803 - START
+//CO20190803 - START
 //---------------------------------------------------------------------------------
 // class xQMVASP
 //---------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 // constructor
-xQMVASP::xQMVASP() {free();} //CO191110
+xQMVASP::xQMVASP() {free();} //CO20191110
 
-xQMVASP::~xQMVASP() {free();}  //CO191110
+xQMVASP::~xQMVASP() {free();}  //CO20191110
 
-void xQMVASP::free() { //CO191110
+void xQMVASP::free() { //CO20191110
   //------------------------------------------------------------------------------
   content="";                   // for aflowlib_libraries.cpp
   vcontent.clear();             // for aflowlib_libraries.cpp
   filename="";                  // for aflowlib_libraries.cpp
   H_atom_relax=AUROSTD_NAN;
   H_atom_static=AUROSTD_NAN;
-  vforces.clear();              //CO191112
+  vforces.clear();              //CO20191112
 }
 
-void xQMVASP::copy(const xQMVASP& b) { // copy PRIVATE //CO191110
+void xQMVASP::copy(const xQMVASP& b) { // copy PRIVATE //CO20191110
   content=b.content;
   vcontent.clear();for(uint i=0;i<b.vcontent.size();i++){vcontent.push_back(b.vcontent[i]);}  // for aflowlib_libraries.cpp
   filename=b.filename;
   H_atom_relax=b.H_atom_relax;
   H_atom_static=b.H_atom_static;
-  vforces.clear();for(uint i=0;i<b.vforces.size();i++){vforces.push_back(b.vforces[i]);}  //CO191112
+  vforces.clear();for(uint i=0;i<b.vforces.size();i++){vforces.push_back(b.vforces[i]);}  //CO20191112
 }
 
-const xQMVASP& xQMVASP::operator=(const xQMVASP& b) {  // operator= PUBLIC //CO191110
+const xQMVASP& xQMVASP::operator=(const xQMVASP& b) {  // operator= PUBLIC //CO20191110
   if(this!=&b) {free();copy(b);}
   return *this;
 }
 
-xQMVASP::xQMVASP(const string& fileIN,bool QUIET) {  //CO191110
+xQMVASP::xQMVASP(const string& fileIN,bool QUIET) {  //CO20191110
   clear(); // so it does not mess up vector/deque
   filename=fileIN;
   GetPropertiesFile(fileIN,QUIET);
 }
 
-xQMVASP::xQMVASP(const xQMVASP& b) {copy(b);} // copy PUBLIC  //CO191110
+xQMVASP::xQMVASP(const xQMVASP& b) {copy(b);} // copy PUBLIC  //CO20191110
 
-void xQMVASP::clear() {  // clear PRIVATE  //CO191110
+void xQMVASP::clear() {  // clear PRIVATE  //CO20191110
   xQMVASP _temp;
   string filename_aus=filename;
   copy(_temp);
   filename=filename_aus;
 }
 
-bool xQMVASP::GetProperties(const string& stringIN,bool QUIET) { //CO191110
+bool xQMVASP::GetProperties(const string& stringIN,bool QUIET) { //CO20191110
   stringstream sss; sss.str(stringIN);
   if(filename=="") filename=DEFAULT_AFLOW_QMVASP_OUT;
   return xQMVASP::GetProperties(sss,QUIET);
 }
 
-bool xQMVASP::GetPropertiesFile(const string& fileIN,bool QUIET) { //CO191110
+bool xQMVASP::GetPropertiesFile(const string& fileIN,bool QUIET) { //CO20191110
   stringstream sss;
   if(filename=="") filename=fileIN;
   aurostd::efile2stringstream(fileIN,sss);
   return xQMVASP::GetProperties(sss,QUIET);
 }
 
-bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {  //CO191110
+bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {  //CO20191110
   string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
   bool out=GetPropertiesFile(tmpfile);
@@ -8207,7 +8584,7 @@ bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool VER
   return out;
 }
 
-bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //CO191110
+bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //CO20191110
   string soliloquy="xQMVASP::GetProperties():";
   bool LVERBOSE=(FALSE || XHOST.DEBUG || !QUIET);
   bool ERROR_flag=FALSE;
@@ -8245,7 +8622,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
         }
         // ME20191218 - substring2bool ignores comments and TOTAL-FORCE is in a comment line
       }
-      // [OBSOLETE - ME20191219] else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")) //CO191112 - forces for APL
+      // [OBSOLETE - ME20191219] else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")) //CO20191112 - forces for APL
       else if(vcontent[iline].find("TOTAL-FORCE") != string::npos)
       { //CO200106 - patching for auto-indenting
         vforces.clear();
@@ -8279,7 +8656,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
 }
 
 //-------------------------------------------------------------------------------------------------
-//CO190803 - STOP
+//CO20190803 - STOP
 
 
 #endif //  _AFLOW_OVASP_CPP_

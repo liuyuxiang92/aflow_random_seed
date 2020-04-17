@@ -1256,7 +1256,6 @@ namespace aurostd {
       // COMMENT_NEGLECT_1
       loc = line.find(COMMENT_NEGLECT_1);
       line = line.substr(0, loc);
-
       // COMMENT_NEGLECT_2
       loc = line.find(COMMENT_NEGLECT_2);
       while (loc != string::npos) {
@@ -1267,7 +1266,32 @@ namespace aurostd {
         }
         loc = line.find(COMMENT_NEGLECT_2, loc + 1);
       }
-
+      // COMMENT_NEGLECT_3
+      loc = line.find(COMMENT_NEGLECT_3);
+      line = line.substr(0, loc);
+      if (!line.empty()) vstrout.push_back(line);
+    }
+    return vstrout;
+  }
+  deque<string> RemoveComments(const deque<string>& vstrin) {
+    deque<string> vstrout;
+    string::size_type loc;
+    string line;
+    for (uint i = 0; i < vstrin.size(); i++) {
+      line = vstrin[i];
+      // COMMENT_NEGLECT_1
+      loc = line.find(COMMENT_NEGLECT_1);
+      line = line.substr(0, loc);
+      // COMMENT_NEGLECT_2
+      loc = line.find(COMMENT_NEGLECT_2);
+      while (loc != string::npos) {
+        // Do not remove :// since it is not a comment
+        if (!((loc > 0) && (loc < line.size()) && (line[loc -1] == ':'))) {
+          line = line.substr(0, loc);
+          break;
+        }
+        loc = line.find(COMMENT_NEGLECT_2, loc + 1);
+      }
       // COMMENT_NEGLECT_3
       loc = line.find(COMMENT_NEGLECT_3);
       line = line.substr(0, loc);
@@ -1498,7 +1522,7 @@ namespace aurostd {
   bool DirectoryMake(string _Directory) {  // "" compliant April/2019 SC
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string Directory(CleanFileName(_Directory));
-    std::vector<string> tokens;
+    std::deque<string> tokens;
     string dir_tmp,command;
     aurostd::string2tokens(Directory,tokens,"/");
     if(Directory.at(0)=='/') tokens[0]="/"+tokens[0]; // fix the root thing
@@ -1528,7 +1552,7 @@ namespace aurostd {
   bool SSH_DirectoryMake(string user, string machine,string _Directory) {  // "" compliant April/2019 SC
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string Directory(CleanFileName(_Directory));
-    std::vector<string> tokens;
+    std::deque<string> tokens;
     string dir_tmp,command;
     aurostd::string2tokens(Directory,tokens,"/");
     if(Directory.at(0)=='/') tokens[0]="/"+tokens[0]; // fix the root thing
@@ -1562,6 +1586,26 @@ namespace aurostd {
   // Stefano Curtarolo
   // Returns the content of a directory without "." and ".."
   bool DirectoryLS(string _Directory,vector<string> &vfiles) {
+    vfiles.clear();
+    string Directory(CleanFileName(_Directory));
+    DIR *dp;
+    struct dirent *ep;
+    string file;
+    dp=opendir(Directory.c_str());
+    if(dp!=NULL) {
+      while((ep=readdir(dp))) {
+        file=(ep->d_name);
+        if(file!="." && file!="..")
+          vfiles.push_back(file);
+      }
+      (void) closedir (dp);
+    } else {
+      cerr << "ERROR: aurostd::DirectoryLS Couldn't open the directory: " << Directory << endl;
+      return FALSE;
+    }
+    return TRUE;
+  }
+  bool DirectoryLS(string _Directory,deque<string> &vfiles) {
     vfiles.clear();
     string Directory(CleanFileName(_Directory));
     DIR *dp;
@@ -3242,39 +3286,39 @@ namespace aurostd {
   // write string to file - Stefano Curtarolo
   bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& _file,string mode) {
     string file=aurostd::CleanFileName(_file);
-    bool writeable=true;  //CO190808 - captures whether we can open/write file
+    bool writable=true;  //CO190808 - captures whether we can open/write file
     if(mode=="POST" || mode=="APPEND") {
       stringstream FileINPUT;
       aurostd::file2stringstream(file,FileINPUT);
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
-      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
+      writable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << FileINPUT.str();
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
+      return writable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }
     if(mode=="PRE") {
       stringstream FileINPUT;
       aurostd::file2stringstream(file,FileINPUT);
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
-      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
+      writable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT << FileINPUT.str();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
+      return writable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }
     if(mode=="WRITE" || mode=="") {
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
-      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
+      writable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
+      return writable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }   
     return FALSE;
   }
@@ -3461,72 +3505,106 @@ namespace aurostd {
   // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring 
   // ***************************************************************************
   // write file to vector string - Stefano Curtarolo
-  uint file2vectorstring(string FileNameIN,vector<string>& vlines) {
-    return aurostd::string2vectorstring(file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint file2vectorstring(string FileNameIN,vector<string>& vline) {
+    return aurostd::string2vectorstring(file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vlines) {
-    return aurostd::string2vectorstring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline) {
+    return aurostd::string2vectorstring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vlines) {
-    return aurostd::string2vectorstring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline) {
+    return aurostd::string2vectorstring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vlines) {
-    return aurostd::string2vectorstring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline) {
+    return aurostd::string2vectorstring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint efile2vectorstring(string FileNameIN,vector<string>& vlines) {
-    return aurostd::string2vectorstring(efile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint efile2vectorstring(string FileNameIN,vector<string>& vline) {
+    return aurostd::string2vectorstring(efile2string(aurostd::CleanFileName(FileNameIN)),vline);
+  }
+  
+  bool vectorstring2file(const vector<string>& vline,string FileNameOUT) {
+    string file=aurostd::CleanFileName(FileNameOUT);
+    ofstream FileOUT;
+    FileOUT.open(file.c_str(),std::ios::out);
+    bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
+    for(uint iline;iline<vline.size();iline++) FileOUT << vline.at(iline) << endl;
+    // FileOUT << StringstreamOUT.rdbuf();
+    FileOUT.flush();FileOUT.clear();FileOUT.close();
+    return writable;
   }
 
   // ***************************************************************************
   // Function file2dequestring bz2file2dequestring gzfile2dequestring xzfile2dequestring efile2dequestring 
   // ***************************************************************************
   // write file to deque string - Stefano Curtarolo
-  uint file2dequestring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint file2dequestring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint bz2file2dequestring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint bz2file2dequestring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint gzfile2dequestring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint gzfile2dequestring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint xzfile2dequestring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint xzfile2dequestring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint efile2dequestring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint efile2dequestring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
+
+  bool dequestring2file(const deque<string>& vline,string FileNameOUT) {
+    string file=aurostd::CleanFileName(FileNameOUT);
+    ofstream FileOUT;
+    FileOUT.open(file.c_str(),std::ios::out);
+    bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
+    for(uint iline;iline<vline.size();iline++)  FileOUT << vline.at(iline) << endl;
+    // FileOUT << StringstreamOUT.rdbuf();
+    FileOUT.flush();FileOUT.clear();FileOUT.close();
+    return writable;
+  }
+
 
   // ***************************************************************************
   // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring overloading for file2vector
   // ***************************************************************************
   // write file to deque string - Stefano Curtarolo
-  uint file2vectorstring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint file2vectorstring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint bz2file2vectorstring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint bz2file2vectorstring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint gzfile2vectorstring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint gzfile2vectorstring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint xzfile2vectorstring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint xzfile2vectorstring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint efile2vectorstring(string FileNameIN,deque<string>& vlines) {
-    return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  uint efile2vectorstring(string FileNameIN,deque<string>& vline) {
+    return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vline);
+  }
+
+  bool vectorstring2file(const deque<string>& vline,string FileNameOUT) {
+    string file=aurostd::CleanFileName(FileNameOUT);
+    ofstream FileOUT;
+    FileOUT.open(file.c_str(),std::ios::out);
+    bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
+    for(uint iline;iline<vline.size();iline++) FileOUT << vline.at(iline) << endl;
+    // FileOUT << StringstreamOUT.rdbuf();
+    FileOUT.flush();FileOUT.clear();FileOUT.close();
+    return writable;
   }
 
   // ***************************************************************************
@@ -3727,13 +3805,13 @@ namespace aurostd {
   // Function url2vectorstring
   // ***************************************************************************
   // wget URL to vectorstring - Stefano Curtarolo
-  bool url2vectorstring(string url,vector<string>& vlines,bool verbose) {
+  bool url2vectorstring(string url,vector<string>& vline,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "aurostd::url2vectorstring() Loading url=" << url << endl;
     if(verbose) cout << "aurostd::url2vectorstring() Loading url=" << url << endl;
     string stringIN;
     bool out=url2string(url,stringIN,verbose);
-    aurostd::string2tokens(stringIN,vlines);
+    aurostd::string2tokens(stringIN,vline);
     return out;
   }
 
@@ -3741,13 +3819,13 @@ namespace aurostd {
   // Function url2dequestring
   // ***************************************************************************
   // wget URL to dequestring - Stefano Curtarolo
-  bool url2dequestring(string url,deque<string>& vlines,bool verbose) {
+  bool url2dequestring(string url,deque<string>& vline,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "aurostd::url2dequestring() Loading url=" << url << endl;
     if(verbose) cout << "aurostd::url2dequestring() Loading url=" << url << endl;
     string stringIN;
     bool out=url2string(url,stringIN,verbose);
-    aurostd::string2tokens(stringIN,vlines);
+    aurostd::string2tokens(stringIN,vline);
     return out;
   }
 
@@ -3874,7 +3952,34 @@ namespace aurostd {
     aurostd::execute("mv \""+file+"\" \""+destination+"\"");
     return TRUE;
   }
-
+  
+  //***************************************************************************//
+  // aurostd::file2md5sum
+  //***************************************************************************//
+  // Stefano Curtarolo
+  string file2md5sum(const string& file) { // SC20200326
+    vector<string> vtokens;
+    if(aurostd::FileExist(file)) {
+      aurostd::string2tokens(aurostd::execute2string("md5sum "+file),vtokens," ");
+      if(vtokens.size()>0) return vtokens.at(0);
+    }
+    return "";
+  }
+  
+  //***************************************************************************//
+  // aurostd::file2auid
+  //***************************************************************************//
+  // Stefano Curtarolo
+  string file2auid(const string& file) { // SC20200326
+    vector<string> vtokens;
+    if(aurostd::FileExist(file)) {
+    uint64_t crc=0;
+    crc=aurostd::crc64(crc,aurostd::efile2string(file)); // DONT TOUCH THIS
+    return aurostd::crc2string(crc);
+    }
+    return "";
+  }
+  
   // ***************************************************************************
   // Function IsDirectory
   // ***************************************************************************
@@ -4136,6 +4241,10 @@ namespace aurostd {
     double tmp=from;
     if(roff){tmp=roundoff(from,tol);}
     return (string) stream2stream<string>(tmp,precision,FORMAT);
+  }
+  string bool2string(bool from) {
+    if(from) return "TRUE";
+    return "FALSE";
   }
 
   // ***************************************************************************
@@ -6328,7 +6437,8 @@ namespace aurostd {
   // [OBSOLETE]   }
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
-  deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+  // [OBSOLETE]  deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {  // USE OVERLOADING
+  deque<string> vecDouble2vecString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) { // SC20200330
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
       //double tmp = vin.at(i); // DX 8/22/17 - add roundoff
@@ -6338,7 +6448,7 @@ namespace aurostd {
     return vout;
   }
 }
-
+ 
 namespace aurostd {
   //***************************************************************************//
   // aurostd::wrapVecEntries(vector<string>& vin,string wrap)
@@ -6358,10 +6468,10 @@ namespace aurostd {
     }
     return vout;
   }
-  deque<string> wrapDeqEntries(const deque<string>& vin,string wrap){
-    return wrapDeqEntries(vin,wrap,wrap);
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap){
+    return wrapVecEntries(vin,wrap,wrap);
   }
-  deque<string> wrapDeqEntries(const deque<string>& vin,string wrap_start,string wrap_end){
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end){
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
       if(vin.at(i).length()){
