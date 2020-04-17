@@ -57,7 +57,7 @@ _atom::_atom() {
   fpos_equation.clear(); //DX20180607 - symbolic math for atom positions
   cpos_equation.clear(); //DX20180607 - symbolic math for atom positions
   spin=0.0;
-  spin_is_given=FALSE; // DX20180921 - magnetic sym
+  spin_is_given=FALSE; // DX20170921 - magnetic sym
   noncoll_spin.clear(); // DX20171205 - magnetic sym (non-collinear)
   noncoll_spin_is_given=FALSE; // DX20171205 - magnetic sym (non-collinear)
   mass=0.0;
@@ -103,7 +103,7 @@ void _atom::copy(const _atom& b) { // copy PRIVATE
   fpos_equation=b.fpos_equation; //DX20180607 - symbolic math for atom positions
   cpos_equation=b.cpos_equation; //DX20180607 - symbolic math for atom positions
   spin=b.spin;
-  spin_is_given=b.spin_is_given; // DX20180921 - magnetic sym
+  spin_is_given=b.spin_is_given; // DX20170921 - magnetic sym
   noncoll_spin=b.noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
   noncoll_spin_is_given=b.noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
   mass=b.mass;
@@ -159,7 +159,7 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "ATOM COUT" << endl;
       oss << "type=" << atom.type << endl;
       oss << "spin=" << atom.spin << endl;
-      oss << "spin_is_given=" << atom.spin_is_given << endl; // DX20180921 - magnetic sym
+      oss << "spin_is_given=" << atom.spin_is_given << endl; // DX20170921 - magnetic sym
       oss << "noncoll_spin=" << atom.noncoll_spin << endl;                   // DX20171205 - magnetic sym (non-collinear)
       oss << "noncoll_spin_is_given=" << atom.noncoll_spin_is_given << endl; // DX20171205 - magnetic sym (non-collinear)
       oss << "mass=" << atom.mass << endl;
@@ -240,11 +240,11 @@ void _atom::CleanName(void) {
 
 void _atom::CleanSpin(void) {
   spin=0.0;
-  spin_is_given=FALSE; // DX20180921 - magnetic sym
+  spin_is_given=FALSE; // DX20170921 - magnetic sym
   noncoll_spin.clear();            // DX20171205 - magnetic sym (non-collinear)
   noncoll_spin_is_given=FALSE; // DX20171205 - magnetic sym (non-collinear)
-  if(name.find("+")!=string::npos) {spin=atof(name.substr(name.find("+")).c_str()); spin_is_given=TRUE;} // DX20180921 - magnetic sym
-  if(name.find("-")!=string::npos) {spin=atof(name.substr(name.find("-")).c_str()); spin_is_given=TRUE;} // DX20180921 - magnetic sym
+  if(name.find("+")!=string::npos) {spin=atof(name.substr(name.find("+")).c_str()); spin_is_given=TRUE;} // DX20170921 - magnetic sym
+  if(name.find("-")!=string::npos) {spin=atof(name.substr(name.find("-")).c_str()); spin_is_given=TRUE;} // DX20170921 - magnetic sym
 }
 
 void _atom::ClearSymmetry(void) { //CO20190219
@@ -266,7 +266,7 @@ std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);   // store starting fro
 std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
 std::vector<double> vatom_radius(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE // DX and CO - DX20180904 
+std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE // DX and CO - 9/4/17 
 std::vector<double> vatom_electronegativity(NUM_ELEMENTS);        // store starting from ONE
 std::vector<string> vatom_crystal(NUM_ELEMENTS);        // store starting from ONE
 std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);         // store starting from ONE
@@ -286,7 +286,7 @@ void atoms_initialize(void) {
     vatom_miedema_gamma_s.at(i)=NNN;                  // Miedema Rule Table 1a Physica 100B (1980) 1-28   \gamma_s^0 in (mJ/m^2)
     vatom_miedema_BVm.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   BV_m (kJ/mole)
     vatom_radius.at(i)=NNN;             // Saxena (nm)
-    vatom_radius_covalent.at(i)=NNN;    // Codero (Angstroms) // DX and CO - DX20180904
+    vatom_radius_covalent.at(i)=NNN;    // Codero (Angstroms) // DX and CO - 9/4/17
     vatom_electronegativity.at(i)=NNN;  // Saxena
     vatom_crystal.at(i)="nnn";          // Ashcroft-Mermin
   }
@@ -315,7 +315,7 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Be"; vatom_name[i]="Beryllium";    vatom_mass[i]*=9.0122;    vatom_volume[i]= 7.83290; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=4.20;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.9;  vatom_miedema_gamma_s[i]=1900;   vatom_miedema_BVm[i]=4.9;   vatom_radius[i]=0.114;  vatom_radius_covalent[i]=0.96;   vatom_electronegativity[i]=1.57;  vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.50; vatom_pearson_coefficient[i]=0.0;  // Be
   // p-electron systems
   i++; vatom_symbol[i]="B";  vatom_name[i]="Boron";        vatom_mass[i]*=10.81;     vatom_volume[i]= 5.88420; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3;  vatom_miedema_phi_star[i]=4.75;  vatom_miedema_nws[i]=1.55;  vatom_miedema_Vm[i]=2.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.097;  vatom_radius_covalent[i]=0.84;   vatom_electronegativity[i]=2.04;  vatom_crystal[i]="tet";  vatom_pettifor_scale[i]=2.00; vatom_pearson_coefficient[i]=0.00135391428;  // B
-  i++; vatom_symbol[i]="C";  vatom_name[i]="Carbon";       vatom_mass[i]*=12.011;    vatom_volume[i]= 5.59490; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4;  vatom_miedema_phi_star[i]=6.20;  vatom_miedema_nws[i]=1.90;  vatom_miedema_Vm[i]=1.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.077;  vatom_radius_covalent[i]=0.76;   vatom_electronegativity[i]=2.55;  vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=2.50; vatom_xray_scatt[i]=6.019; vatom_pearson_coefficient[i]=0.00007387218;   // C  // DX and CO - DX20180904 vatom_radius_covalent uses sp3 hybridization (most common)
+  i++; vatom_symbol[i]="C";  vatom_name[i]="Carbon";       vatom_mass[i]*=12.011;    vatom_volume[i]= 5.59490; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4;  vatom_miedema_phi_star[i]=6.20;  vatom_miedema_nws[i]=1.90;  vatom_miedema_Vm[i]=1.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.077;  vatom_radius_covalent[i]=0.76;   vatom_electronegativity[i]=2.55;  vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=2.50; vatom_xray_scatt[i]=6.019; vatom_pearson_coefficient[i]=0.00007387218;   // C  // DX and CO - 9/4/17 vatom_radius_covalent uses sp3 hybridization (most common)
   i++; vatom_symbol[i]="N";  vatom_name[i]="Nitrogen";     vatom_mass[i]*=14.0067;   vatom_volume[i]= 7.59940; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5;  vatom_miedema_phi_star[i]=7.00;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.2;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.071;  vatom_radius_covalent[i]=0.71;   vatom_electronegativity[i]=3.04;  vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=3.00; vatom_pearson_coefficient[i]=0.00001857771; // N JUNKAI CHANGED VALENCE
   i++; vatom_symbol[i]="O";  vatom_name[i]="Oxygen";       vatom_mass[i]*=15.9994;   vatom_volume[i]= 7.78230; vatom_valence_std[i]=6; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=6.97;  vatom_miedema_nws[i]=1.70;  vatom_miedema_Vm[i]=2.656;vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.060;  vatom_radius_covalent[i]=0.66;   vatom_electronegativity[i]=3.44;  vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=3.50; vatom_xray_scatt[i]=8.052; vatom_pearson_coefficient[i]=0.00003358805;  // O Table 27 of JUNKAI
   i++; vatom_symbol[i]="F";  vatom_name[i]="Fluorine";     vatom_mass[i]*=18.9984;   vatom_volume[i]= 9.99090; vatom_valence_std[i]=7; vatom_valence_iupac[i]=1;  vatom_miedema_phi_star[i]=NNN;   vatom_miedema_nws[i]=NNN;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=NNN;    vatom_radius_covalent[i]=0.57;   vatom_electronegativity[i]=3.98;  vatom_crystal[i]="mcl";  vatom_pettifor_scale[i]=4.00; vatom_pearson_coefficient[i]=0.0;  // F
@@ -342,9 +342,9 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Ti";vatom_name[i]="Titanium";    vatom_mass[i]*=47.9;     vatom_volume[i]=17.1035; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.65; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=4.8; vatom_miedema_gamma_s[i]=2050;  vatom_miedema_BVm[i]=11.0; vatom_radius[i]=0.147; vatom_radius_covalent[i]=1.60;   vatom_electronegativity[i]=1.54; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.79; vatom_xray_scatt[i]=22.24; vatom_pearson_coefficient[i]=0.000286456;  // Ti
   i++; vatom_symbol[i]="V"; vatom_name[i]="Vanadium";    vatom_mass[i]*=50.9415;  vatom_volume[i]=13.2086; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.25; vatom_miedema_nws[i]=1.64; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=2600;  vatom_miedema_BVm[i]=14.0; vatom_radius[i]=0.132; vatom_radius_covalent[i]=1.53;   vatom_electronegativity[i]=1.63; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.84; vatom_pearson_coefficient[i]=9.54831E-07;  // V
   i++; vatom_symbol[i]="Cr";vatom_name[i]="Chromium";    vatom_mass[i]*=51.996;   vatom_volume[i]=11.4136; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.65; vatom_miedema_nws[i]=1.74; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2400;  vatom_miedema_BVm[i]=14.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=1.66; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.89; vatom_xray_scatt[i]=23.84; vatom_pearson_coefficient[i]=0.00013287;  // Cr
-  i++; vatom_symbol[i]="Mn";vatom_name[i]="Manganese";   vatom_mass[i]*=54.93805; vatom_volume[i]=10.6487; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.61; vatom_miedema_Vm[i]=3.8; vatom_miedema_gamma_s[i]=1600;  vatom_miedema_BVm[i]=4.4;  vatom_radius[i]=0.112; vatom_radius_covalent[i]=1.61;   vatom_electronegativity[i]=1.55; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=0.94; vatom_xray_scatt[i]=24.46; vatom_pearson_coefficient[i]=1.67276E-32;  // vatom_xray_scatt[i]=24.3589; Mn JUNKAI CHANGED VALENCE // DX and CO - DX20180904 vatom_radius_covalent[i] uses high spin configuration (most frequent)   
-  i++; vatom_symbol[i]="Fe";vatom_name[i]="Iron";        vatom_mass[i]*=55.847;   vatom_volume[i]=10.2315; vatom_valence_std[i]=8; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.93; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.124; vatom_radius_covalent[i]=1.52;   vatom_electronegativity[i]=1.83; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.99; vatom_xray_scatt[i]=24.85; vatom_pearson_coefficient[i]=9.17912E-05;  // vatom_xray_scatt[i]=24.6830; Fe JUNKAI CHANGED VALENCE // DX and CO - DX20180904 vatom_radius_covalent[i] uses high spin configuration (most frequent) 
-  i++; vatom_symbol[i]="Co";vatom_name[i]="Cobalt";      vatom_mass[i]*=58.9332;  vatom_volume[i]=10.3205; vatom_valence_std[i]=9; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.10; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=13.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.26;   vatom_electronegativity[i]=1.88; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.04; vatom_xray_scatt[i]=24.59; vatom_pearson_coefficient[i]=0.0;  // Co JUNKAI CHANGED VALENCE // DX and CO - DX20180904 vatom_radius_covalent[i] uses low spin configuration (most frequent)   
+  i++; vatom_symbol[i]="Mn";vatom_name[i]="Manganese";   vatom_mass[i]*=54.93805; vatom_volume[i]=10.6487; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.61; vatom_miedema_Vm[i]=3.8; vatom_miedema_gamma_s[i]=1600;  vatom_miedema_BVm[i]=4.4;  vatom_radius[i]=0.112; vatom_radius_covalent[i]=1.61;   vatom_electronegativity[i]=1.55; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=0.94; vatom_xray_scatt[i]=24.46; vatom_pearson_coefficient[i]=1.67276E-32;  // vatom_xray_scatt[i]=24.3589; Mn JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses high spin configuration (most frequent)   
+  i++; vatom_symbol[i]="Fe";vatom_name[i]="Iron";        vatom_mass[i]*=55.847;   vatom_volume[i]=10.2315; vatom_valence_std[i]=8; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.93; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.124; vatom_radius_covalent[i]=1.52;   vatom_electronegativity[i]=1.83; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.99; vatom_xray_scatt[i]=24.85; vatom_pearson_coefficient[i]=9.17912E-05;  // vatom_xray_scatt[i]=24.6830; Fe JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses high spin configuration (most frequent) 
+  i++; vatom_symbol[i]="Co";vatom_name[i]="Cobalt";      vatom_mass[i]*=58.9332;  vatom_volume[i]=10.3205; vatom_valence_std[i]=9; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.10; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=13.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.26;   vatom_electronegativity[i]=1.88; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.04; vatom_xray_scatt[i]=24.59; vatom_pearson_coefficient[i]=0.0;  // Co JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses low spin configuration (most frequent)   
   i++; vatom_symbol[i]="Ni";vatom_name[i]="Nickel";      vatom_mass[i]*=58.69;    vatom_volume[i]=10.8664; vatom_valence_std[i]=10; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=5.20; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2450;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.24;   vatom_electronegativity[i]=1.91; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.09; vatom_xray_scatt[i]=25.02; vatom_pearson_coefficient[i]=0.000430773;  // Ni
   i++; vatom_symbol[i]="Cu";vatom_name[i]="Copper";      vatom_mass[i]*=63.546;   vatom_volume[i]=12.0159; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.55; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=1850;  vatom_miedema_BVm[i]=9.3;  vatom_radius[i]=0.128; vatom_radius_covalent[i]=1.32;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.20; vatom_xray_scatt[i]=27.03; vatom_pearson_coefficient[i]=0.00021086;  // Cu JUNKAI CHANGED VALENCE    
   i++; vatom_symbol[i]="Zn";vatom_name[i]="Zinc";        vatom_mass[i]*=65.38;    vatom_volume[i]=15.0827; vatom_valence_std[i]=12; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.32; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=1020;  vatom_miedema_BVm[i]=5.5;  vatom_radius[i]=0.133; vatom_radius_covalent[i]=1.22;   vatom_electronegativity[i]=1.65; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.44; vatom_xray_scatt[i]=28.44; vatom_pearson_coefficient[i]=0.000595597;  // Zn
@@ -689,7 +689,7 @@ double GetAtomRadius(const uint& atnum) {
   return vatom_radius.at(atnum);
 }
 
-// DX and CO - DX20180904 - START 
+// DX and CO - 9/4/17 - START 
 // **************************************************************************
 // Function GetAtomRadiusCovalent
 // **************************************************************************
@@ -706,7 +706,7 @@ double GetAtomRadiusCovalent(const uint& atnum) {
   }
   return vatom_radius_covalent.at(atnum);
 }
-// DX and CO - DX20180904 - END 
+// DX and CO - 9/4/17 - END 
 
 // **************************************************************************
 // Function GetAtomElectronegativity
@@ -1341,7 +1341,7 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   oss << " (" << buf12_re << "," << buf12_im << ")" << endl; 
   oss << " (" << buf21_re << "," << buf21_im << ") "; 
   oss << " (" << buf22_re << "," << buf22_im << ")" << "  SU(2) complex matrix [(real,imaginary)]" << endl; 
-  // DX formatting issues with complesx: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
+  // DX - formatting issues with complesx: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
   char buf1_re[80],buf1_im[80],buf2_re[80],buf2_im[80],buf3_re[80],buf3_im[80];
   sprintf(buf1_re,iobuf.c_str(),symop.su2_coefficients(1).re);sprintf(buf1_im,iobuf.c_str(),symop.su2_coefficients(1).im);
   sprintf(buf2_re,iobuf.c_str(),symop.su2_coefficients(2).re);sprintf(buf2_im,iobuf.c_str(),symop.su2_coefficients(2).im);
@@ -1349,7 +1349,7 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   oss << " (" << buf1_re << "," << buf1_im << ") ";
   oss << " (" << buf2_re << "," << buf2_im << ") ";
   oss << " (" << buf3_re << "," << buf3_im << ")" << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
-  // DX formatting issues with complex: oss << " " << symop.su2_coefficients << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
+  // DX - formatting issues with complex: oss << " " << symop.su2_coefficients << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;
   // DX20180115 - adding SU(2) and su(2); specific xcomplex printing - END
   oss << " "<< symop.angle << "  angle " << endl;
   oss << "" << symop.axis <<  "  axis " << endl;
@@ -1529,7 +1529,7 @@ wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
 
 // operator <<
 ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
-  // DX20171211 [OBSOLETE] oss << "wyckoffsite_ITC operator<< " << endl;
+  // DX20171212 [OBSOLETE] oss << "wyckoffsite_ITC operator<< " << endl;
   oss << " coord: "<< site.coord << endl;
   oss << " type: "<< site.type << endl;
   oss << " letter: "<< site.letter << endl;
@@ -1889,7 +1889,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
             // ---------------------------------------------------------------------------
             // if new distance is close to the original it is the same coordination shell (add to coordination)
             // otherwise, reset coordination shell
-            // DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            // DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
             if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
             else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
             min_dist=tmp_mod;
@@ -1902,7 +1902,7 @@ void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
               frequency=0; //reset
             }
           }
-          // DX FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+          // DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
           else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
         }
       }
@@ -1967,12 +1967,12 @@ void minimumCoordinationShell(const xstructure& xstr,
             tmp_coord = ab_component + l3[p];                 // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
             double tmp_mod = aurostd::modulus(tmp_coord);
             if(tmp_mod<min_dist){
-              //DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+              //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
               if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
               else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp_coord); } //initialize
               min_dist=tmp_mod;
             }
-            //DX FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
             else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
           }
         }
@@ -2121,7 +2121,7 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
   // SYMMETRY TOLERANCE ----------------------------
   sym_eps=AUROSTD_NAN; // DX
   sym_eps_calculated=false; // DX, this means that it was calculated and set by the symmetry routines
-  sym_eps_change_count=0; // DX20180221 - added tolerance count specific to structure
+  sym_eps_change_count=0; // DX20180222 - added tolerance count specific to structure
   // DX and CO - END
   // PGROUP ----------------------------
   pgroup.clear();            // just initialize
@@ -2424,7 +2424,7 @@ void xstructure::copy(const xstructure& bstr) {
   // SYMMETRY TOLERANCE ----------------------------
   sym_eps=bstr.sym_eps; // DX
   sym_eps_calculated=bstr.sym_eps_calculated; // DX
-  sym_eps_change_count=bstr.sym_eps_change_count; // DX20180221 - added tolerance count specific to structure
+  sym_eps_change_count=bstr.sym_eps_change_count; // DX20180222 - added tolerance count specific to structure
   // DX and CO - END
   // PGROUP ----------------------------
   pgroup.clear();
@@ -4329,7 +4329,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(uint i=0;i<vinput.size();i++){ 
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NAT=",true)){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
           if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"NAT=",true)){
             vector<string> tokens; 
@@ -4361,7 +4361,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       // DX20180123 - added ibrav - START
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"IBRAV=",true)){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
           if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"IBRAV=",true)){
             vector<string> tokens; 
@@ -4380,7 +4380,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELLDM")){
         vector<string> comma_tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX it is possible to have multiple fields per line
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
           if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"CELLDM",true)){ // DX20170124 - added aurostd::toupper
             celldm_count++;
@@ -4401,7 +4401,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       for(uint i=0;i<vinput.size();i++){
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"A=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"A=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4414,7 +4414,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"B=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"B=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4427,7 +4427,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"C=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"C=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4440,7 +4440,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAB=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAB=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4453,7 +4453,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAC=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAC=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -4466,7 +4466,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } 
         if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSBC=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
             if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSBC=",true)){ // DX20170124 - added aurostd::toupper
               vector<string> tokens; 
@@ -5286,7 +5286,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.dist_nn_min=AUROSTD_NAN;    // CO
   a.sym_eps=AUROSTD_NAN; // DX
   a.sym_eps_calculated=FALSE; // DX
-  a.sym_eps_change_count=0; // DX20180221 - added tolerance count specific to structure
+  a.sym_eps_change_count=0; // DX20180222 - added tolerance count specific to structure
   // DX and CO - END
   a.iatoms_calculated=FALSE;
   a.pgroup_calculated=FALSE;
@@ -5719,12 +5719,12 @@ void xstructure::AddAtom(const _atom& atom) {
             //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
             // DX and CO -START    
             // DX if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
-            if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ // DX2012/1/17 - Added (*this).sym_eps>1e-10 // DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
+            if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ // DX20171201 - Added (*this).sym_eps>1e-10 // DX20180215 - added (*this).sym_eps<AUROSTD_NAN (needed) 
               if(aurostd::modulus((*this).f2c*(atoms.at(iat).fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; // DX
             }
             else { 
               //if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; // DX
-              if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; // DX2012/1/17
+              if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; // DX20171201
             }
             // DX and CO - END
           }
@@ -5758,7 +5758,7 @@ void xstructure::AddAtom(const _atom& atom) {
   }
   if(btom.name_is_given) {
     btom.CleanName();
-    // DX20180921 - Need to keep spin info  btom.CleanSpin();
+    // DX20170921 - Need to keep spin info  btom.CleanSpin();
   }
   GetStoich();  //170724 - CO
 
@@ -7536,7 +7536,7 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
 // GetSpaceGroupHall
 // ***************************************************************************
 string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
-  // DX Hall distinguishes space group setting.  This table assumes the first 
+  // DX - Hall distinguishes space group setting.  This table assumes the first 
   //      setting that appears in the ITC.
   //      For more settings, they need to be hard-coded here.
   string soliloquy = "aflow_xatom.cpp::GetSpaceGroupHall()"; //DX20190708 - for xerror
@@ -9153,11 +9153,11 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
   // str_in.CalculateSymmetryPointGroup(TRUE);
   // str_in.CalculateSymmetryFactorGroup(TRUE);
   // str_in.CalculateSymmetryPointGroupCrystal(TRUE);
-  // DX START
+  // DX - START
   bool same_eps = false;
   uint count = 0;
   while(same_eps == false && count++ < 100){
-    // DX END
+    // DX - END
     if(0) {
       LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
       // LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0001,0.001);
@@ -9200,7 +9200,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     // DX and CO - START
     this->sym_eps=str_reciprocal_in.sym_eps=str_reciprocal_sp.sym_eps=str_reciprocal_sc.sym_eps=str_sp.sym_eps; // DX
     this->sym_eps_calculated=str_reciprocal_in.sym_eps_calculated=str_reciprocal_sp.sym_eps_calculated=str_reciprocal_sc.sym_eps_calculated=str_sp.sym_eps_calculated; // DX
-    this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; // DX20180221 - added sym_eps change count
+    this->sym_eps_change_count=str_reciprocal_in.sym_eps_change_count=str_reciprocal_sp.sym_eps_change_count=str_reciprocal_sc.sym_eps_change_count=str_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
     // DX and CO - END
     _atom atom;str_reciprocal_in.AddAtom(atom);
     //LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //STEFANO OLD VERSION
@@ -9219,15 +9219,15 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     // DX20180426 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_xtal_calculated=str_reciprocal_sp.pgroup_xtal_calculated=str_reciprocal_sc.pgroup_xtal_calculated=str_sp.pgroup_calculated;
     // DX20170814 - END
     LATTICE::Standard_Lattice_StructureDefault(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,false); // DX // DX20180226 - do not need to do full sym for recip
-    // DX START
+    // DX - START
     if(str_sp.sym_eps == str_reciprocal_sp.sym_eps){
       same_eps = true;
     }
     else {
       str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_reciprocal_sp.sym_eps;
-      str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; // DX20180221 - added sym_eps change count
+      str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_reciprocal_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
     }
-    // DX END
+    // DX - END
     this->reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
     this->reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [6]" << endl;
@@ -9255,19 +9255,19 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     // DX and CO - START
     str_superlattice_in.sym_eps=str_superlattice_sp.sym_eps=str_superlattice_sc.sym_eps=str_sp.sym_eps; // DX
     str_superlattice_in.sym_eps_calculated=str_superlattice_sp.sym_eps_calculated=str_superlattice_sc.sym_eps_calculated=str_sp.sym_eps_calculated; // DX
-    str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; // DX20180221 - added sym_eps change count
+    str_superlattice_in.sym_eps_change_count=str_superlattice_sp.sym_eps_change_count=str_superlattice_sc.sym_eps_change_count=str_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
     // DX and CO - END
     // DX LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_); //JUNKAI
     LATTICE::Standard_Lattice_StructureDefault(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,false); // DX // DX20180226 - do not need to do full sym for superlattice
-    // DX START
+    // DX - START
     if(str_sp.sym_eps == str_superlattice_sp.sym_eps){
       same_eps = true;
     }
     else {
       str_sp.sym_eps = str_superlattice_sp.sym_eps;
-      str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; // DX20180221 - added sym_eps change count
+      str_sp.sym_eps_change_count = str_superlattice_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
     }
-    // DX END
+    // DX - END
     if(VERBOSE) cerr << "xstructure::GetLatticeType: [12]" << endl;
     this->bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
     this->bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
@@ -9570,7 +9570,7 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
     for(int j=0;j<num_each_type.at(itype);j++) {
       atoms.at(iatom).name=itype_species;    // CONVASP_MODE
       atoms.at(iatom).CleanName();
-      // DX20180921 - Need to keep spin info atoms.at(iatom).CleanSpin();
+      // DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
       atoms.at(iatom).name_is_given=TRUE;
       iatom++;
     }
@@ -9652,7 +9652,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   //  double RENORM=1E+6;  // DANE not used
   int MAXITER=100000;
-  double TOL=_ZERO_TOL_; // DX20180211 - from 1e-15 to 1e-10
+  double TOL=_ZERO_TOL_; // DX20180212 - from 1e-15 to 1e-10
 
   // Initialize matrices for tranformations (3x3).
   xmatrix<double> m1(3,3);
@@ -9766,7 +9766,7 @@ LoopHead:
 
   // Step 4
   // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
-  if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=-TOL))  // DX20180211 - if any are zero, then, ksi*eta*zeta is zero
+  if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=-TOL))  // DX20180212 - if any are zero, then, ksi*eta*zeta is zero
     //if(ksi*eta*zeta<=TOL) // DX20180209 - more robust; precision
   { //CO200106 - patching for auto-indenting
     m4(1,1)=-(SignNoZero(ksi));
@@ -9821,7 +9821,7 @@ LoopHead:
     eta=temp3;
     // tpx
     // _sdebug_GetNiggliCell(6,cnt,a,b,c,ksi,eta,zeta,cout);
-    goto LoopHead; // DX20180211 - this was missing
+    goto LoopHead; // DX20180212 - this was missing
   }
 
   // Step 7
@@ -10622,7 +10622,7 @@ xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper
 // -------------------------------------------------------------------
 // _atom (change in place, update fpos only) 
 void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, double lower_bound) { //DX20190904
-  xvector<double> orig_fpos = atom.fpos; //DX needed for ijk later
+  xvector<double> orig_fpos = atom.fpos; //DX - needed for ijk later
   BringInCellInPlace(atom.fpos, tolerance, upper_bound, lower_bound);
 
   // update ijk
@@ -12376,7 +12376,7 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
   return FALSE;
 }
 
-// DX START
+// DX - START
 //DX20191125 [OBSOLETE - GENERALIZED BELOW] bool inCell(xvector<double>& pos_vec){
 //DX20191125 [OBSOLETE - GENERALIZED BELOW]   //DX20180726 [OBSOLETE] if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0-_ZERO_TOL_ &&
 //DX20191125 [OBSOLETE - GENERALIZED BELOW]   //DX20180726 [OBSOLETE]    pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0-_ZERO_TOL_ &&
@@ -12389,7 +12389,7 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
 //DX20191125 [OBSOLETE - GENERALIZED BELOW]   return FALSE;
 //DX20191125 [OBSOLETE - GENERALIZED BELOW] }
 //DX20191125 [OBSOLETE - GENERALIZED BELOW] }
-// DX END
+// DX - END
 
 // ***************************************************************************
 // atomInCell() 
@@ -13273,7 +13273,7 @@ void xstructure::ClearSymmetry(void) {
   for(uint i=0;i<atoms.size();i++){atoms[i].ClearSymmetry();} //CO20190219
 }
 
-// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetry
@@ -13360,7 +13360,7 @@ bool CalculateSymmetry(xstructure& str) {
   return CalculateSymmetry(str,FALSE,cout,FALSE,_calculate_symmetry_default_sgroup_radius_*MaxStructureLattice(str));
 }
 
-// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryPointGroup
@@ -13407,7 +13407,7 @@ void CalculateSymmetryPointGroup(xstructure& str) {
   CalculateSymmetryPointGroup(str,FALSE,cout,FALSE);
 }
 
-// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupCrystal
@@ -13462,7 +13462,7 @@ void CalculateSymmetryPointGroupCrystal(xstructure& str) {
   CalculateSymmetryPointGroupCrystal(str,FALSE,cout,FALSE);
 }
 
-// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryFactorGroup
@@ -13511,7 +13511,7 @@ void CalculateSymmetryFactorGroup(xstructure& str) {
   CalculateSymmetryFactorGroup(str,FALSE,cout,FALSE);
 }
 
-// DX Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
+// DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
 // ***************************************************************************
 // Function CalculateSymmetryPointGroupKlattice
@@ -13763,7 +13763,7 @@ void xstructure::FakeNames(void) {
         if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
         //	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
         atoms.at(iatom).CleanName();
-        // DX20180921 - Need to keep spin info atoms.at(iatom).CleanSpin();
+        // DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
         atoms.at(iatom).name_is_given=TRUE;
       }
       iatom++;

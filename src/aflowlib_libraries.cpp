@@ -1261,25 +1261,28 @@ namespace aflowlib {
         cout << "aflowlib::LIB2RAW: AURL  = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl; 
         cout << "aflowlib::LIB2RAW: AUID  = " << aurostd::PaddedPOST(aflowlib_data.auid,60) << endl;//"   " << directory_LIB << endl;
         cout << "aflowlib::LIB2RAW: VAUID = " << aflowlib::auid2directory(aflowlib_data.auid) << endl;
-        // ME20190125 BEGIN - Build the title of the calculation
-        vector<string> tokens;
-        aurostd::string2tokens(aflowlib_data.aurl, tokens, "/");
-        if (aurostd::substring2bool(aflowlib_data.aurl, "ICSD")) {
-          aflowlib_data.title = tokens.back();
-        } else {
-          // ME20190821 - Made more general
-          // [OBSOLETE] aflowlib_data.title = tokens[tokens.size() - 2] + "." + tokens[tokens.size() - 1];
-          uint i = 0;
-          vector<string> vtitle;
-          for (i = 0; i < tokens.size(); i++) {
-            if (tokens[i] == "AFLOWDATA") break;
-          }
-          for (uint j = i + 2; j < tokens.size(); j++) {  // i + 2 to skip AFLOWDATA/LIBX_RAW/
-            vtitle.push_back(tokens[j]);
-          }
-          aflowlib_data.title = aurostd::joinWDelimiter(vtitle, ".");
-        }
-        // ME20190125 - END
+        // ME20200207 - the system name is the canonical title
+        aflowlib_data.title = KBIN::ExtractSystemName(directory_LIB);  // ME20200207
+
+        //[OBSOLETE] // ME20190125 BEGIN - Build the title of the calculation
+        //[OBSOLETE] vector<string> tokens;
+        //[OBSOLETE] aurostd::string2tokens(aflowlib_data.aurl, tokens, "/");
+        //[OBSOLETE] if (aurostd::substring2bool(aflowlib_data.aurl, "ICSD")) {
+        //[OBSOLETE]   aflowlib_data.title = tokens.back();
+        //[OBSOLETE] } else {
+        //[OBSOLETE]   // ME20190821 - Made more general
+        //[OBSOLETE]   // [OBSOLETE] aflowlib_data.title = tokens[tokens.size() - 2] + "." + tokens[tokens.size() - 1];
+        //[OBSOLETE]   uint i = 0;
+        //[OBSOLETE]   vector<string> vtitle;
+        //[OBSOLETE]   for (i = 0; i < tokens.size(); i++) {
+        //[OBSOLETE]     if (tokens[i] == "AFLOWDATA") break;
+        //[OBSOLETE]   }
+        //[OBSOLETE]   for (uint j = i + 2; j < tokens.size(); j++) {  // i + 2 to skip AFLOWDATA/LIBX_RAW/
+        //[OBSOLETE]     vtitle.push_back(tokens[j]);
+        //[OBSOLETE]   }
+        //[OBSOLETE]   aflowlib_data.title = aurostd::joinWDelimiter(vtitle, ".");
+        //[OBSOLETE] }
+        //[OBSOLETE] // ME20190125 - END
         if(LDEBUG) cerr << "aflowlib::LIB2RAW: [AUID=2]" << endl;
         cout << "aflowlib::LIB2RAW: CATALOG = " << aurostd::PaddedPOST(aflowlib_data.catalog,60) << endl;//"   " << directory_LIB << endl;
         if(LDEBUG) cerr << "aflowlib::LIB2RAW: [AUID=3]" << endl;
@@ -2388,9 +2391,9 @@ namespace aflowlib {
 
     xstructure str_orig,str_relax1,str_relax;
 
-    // DX START
+    // DX - START
     // DX20180526 [OBSOLETE] str_orig.directory = str_relax1.directory = str_relax.directory = aflags.Directory;
-    // DX END
+    // DX - END
 
     vector<string> tokens;
 
@@ -3465,9 +3468,9 @@ namespace aflowlib {
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing orig (POSCAR.orig) text format: " << directory_RAW << endl;
         // [OBSOLETE] aurostd::execute("cd \""+directory_RAW+"\" && cat POSCAR.orig | aflow --edata > "+DEFAULT_FILE_EDATA_ORIG_OUT);
         str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX20191220 - uppercase to lowercase clear
-        // DX START
+        // DX - START
         //DX20180526 [OBSOLETE] str.directory = str_sp.directory = str_sc.directory = aflags.Directory;
-        // DX END
+        // DX - END
         stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
         xstructure str_sym=str; // CO20171027 // DX20180226 - set equal str
         aurostd::xoption vpflow_edata_orig; //DX20180823 - added xoption
