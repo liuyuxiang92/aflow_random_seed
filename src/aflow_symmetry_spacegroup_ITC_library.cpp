@@ -693,7 +693,7 @@ namespace SYM {
 namespace SYM {
   void Glide::get_glide_direct(xvector<double> n, xvector<double> p, xvector<double> trans) {
     //n = n;
-    n = n+n;  //CO190329 - keep n busy, it's not needed //compiler doesn't like n=n;
+    n = n+n;  //CO20190329 - keep n busy, it's not needed //compiler doesn't like n=n;
     DIRECT = true;
     plane_point = p;
     T = trans;

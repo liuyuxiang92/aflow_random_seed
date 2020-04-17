@@ -2680,6 +2680,10 @@ LATTICES = (the ones with "")
         Give the list of prototypes (file LIST.txt) from the DMQC-HTQC
         project (SC oct 08)
 
+  aflow --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=
+       Returns unique identification information about the
+       pseudopotentials used for the calculations.   
+ 
   aflow [--server=XXXXXXXX] --prototypes_icsd[=N] | --protos_icsd[=N]                                  
         Give the list of prototypes from the ICSD database included in the code.   
         If N is passed, then it returns ONLY the N-ary compounds.

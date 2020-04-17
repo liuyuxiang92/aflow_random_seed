@@ -9,7 +9,7 @@
 #define _AFLOW_CLASSES_CPP
 #include "aflow.h"
 
-#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO191112 - this file is not compiled like the rest
+#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO20191112 - this file is not compiled like the rest
 
 // ***************************************************************************
 // ***************************************************************************
@@ -27,8 +27,9 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   TEST=FALSE;
   DEBUG=FALSE;
   MPI=FALSE;
-  GENERATE_AFLOWIN_ONLY=FALSE;  //CT 180719
-  POSTPROCESS=FALSE;  //CT 181212
+  GENERATE_AFLOWIN_ONLY=FALSE;  // CT20180719
+  POSTPROCESS=FALSE;  // CT20181212
+  PSEUDOPOTENTIAL_GENERATOR=FALSE; // SC20200327
   hostname="";
   machine_type="";
   tmpfs="";
@@ -112,7 +113,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   SKEW_TEST=FALSE; // DX20171019
   SKEW_TOL=AUROSTD_NAN; // DX20171019
   // WEB
-  WEB_MODE=FALSE; //CO190402
+  WEB_MODE=FALSE; //CO20190402
 };
 
 _XHOST::~_XHOST() { // destructor PUBLIC
@@ -126,8 +127,9 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   TEST=b.TEST;
   DEBUG=b.DEBUG;
   MPI=b.MPI;
-  GENERATE_AFLOWIN_ONLY=b.GENERATE_AFLOWIN_ONLY;  //CT 180719
-  POSTPROCESS=b.POSTPROCESS;  //CT 181212
+  GENERATE_AFLOWIN_ONLY=b.GENERATE_AFLOWIN_ONLY;  // CT20180719
+  POSTPROCESS=b.POSTPROCESS;  // CT20181212
+  PSEUDOPOTENTIAL_GENERATOR=b.PSEUDOPOTENTIAL_GENERATOR; // SC20200327
   hostname=b.hostname;
   machine_type=b.machine_type;
   tmpfs=b.tmpfs;
@@ -198,7 +200,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   SKEW_TEST=b.SKEW_TEST; // DX20171019
   SKEW_TOL=b.SKEW_TOL; // DX20171019
   // WEB
-  WEB_MODE=b.WEB_MODE;  //CO190402
+  WEB_MODE=b.WEB_MODE;  //CO20190402
 }
 
 const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
@@ -250,7 +252,7 @@ void _XHOST::clear() {  // clear PRIVATE
 pthread_mutex_t mutex_XAFLOW_XHOST=PTHREAD_MUTEX_INITIALIZER;
 
 std::string _XHOST::command(const string& command) {
-  string soliloquy="_XHOST::command():";  //CO190629
+  string soliloquy="_XHOST::command():";  //CO20190629
   string _command=command;
 #ifdef _MACOSX_
   if(command=="beep") return string("echo -ne '\007'");
@@ -286,15 +288,15 @@ std::string _XHOST::command(const string& command) {
     }
   }
   //CO20180705 - STOP
-  //[CO190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
+  //[CO20190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 
 bool _XHOST::is_command(const string& command) {
-  try{string path=_XHOST::command(command);return !path.empty();}    //CO190629 - using xerror now
-  catch(aurostd::xerror& excpt){return false;}  //CO190629 - using xerror now
-  //[CO190629 - using xerror now]return !_XHOST::command(command).empty(); //CO20180705
+  try{string path=_XHOST::command(command);return !path.empty();}    //CO20190629 - using xerror now
+  catch(aurostd::xerror& excpt){return false;}  //CO20190629 - using xerror now
+  //[CO20190629 - using xerror now]return !_XHOST::command(command).empty(); //CO20180705
   //[CO20180705 OBSOLETE]string _command=command;
   //[CO20180705 OBSOLETE]#ifdef _MACOSX_
   //[CO20180705 OBSOLETE]if(command=="beep") return TRUE;
@@ -334,9 +336,9 @@ _aflags::_aflags() {
   KBIN_GEN_VASP_FROM_AFLOWIN            = FALSE;
   KBIN_GEN_AIMS_FROM_AFLOWIN            = FALSE;
   KBIN_GEN_AFLOWIN_FROM_VASP            = FALSE;
-  // DX - START
+  // DX START
   KBIN_GEN_SYMMETRY_OF_AFLOWIN          = FALSE;
-  // DX - END
+  // DX END
   KBIN_DELETE_AFLOWIN                   = FALSE;
   AFLOW_FORCE_MPI                       = FALSE;
   AFLOW_FORCE_SERIAL                    = FALSE;
@@ -385,9 +387,9 @@ void _aflags::copy(const _aflags& b) {
   KBIN_GEN_VASP_FROM_AFLOWIN            = b.KBIN_GEN_VASP_FROM_AFLOWIN;
   KBIN_GEN_AIMS_FROM_AFLOWIN            = b.KBIN_GEN_AIMS_FROM_AFLOWIN;
   KBIN_GEN_AFLOWIN_FROM_VASP            = b.KBIN_GEN_AFLOWIN_FROM_VASP;
-  // DX - START
+  // DX START
   KBIN_GEN_SYMMETRY_OF_AFLOWIN          = b.KBIN_GEN_SYMMETRY_OF_AFLOWIN;
-  // DX - END
+  // DX END
   KBIN_DELETE_AFLOWIN                   = b.KBIN_DELETE_AFLOWIN;
   AFLOW_FORCE_MPI                       = b.AFLOW_FORCE_MPI;
   AFLOW_FORCE_SERIAL                    = b.AFLOW_FORCE_SERIAL;
@@ -485,7 +487,7 @@ _kflags::_kflags() {
   KBIN_QSUB_MODE_IMPLICIT                          = FALSE;
   KBIN_QSUB_FILE                                   = FALSE;
   KBIN_SYMMETRY_CALCULATION                        = FALSE;
-  // DX - START
+  // DX START
   KBIN_SYMMETRY_NO_SCAN                            = FALSE;
   KBIN_SYMMETRY_EPS                                = AUROSTD_NAN;
   KBIN_SYMMETRY_CALCULATE_PGROUP                   = TRUE; // DX20170814 - Specify what to calculate/verify
@@ -495,7 +497,7 @@ _kflags::_kflags() {
   KBIN_SYMMETRY_CALCULATE_IATOMS                   = TRUE; // DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_AGROUP                   = TRUE; // DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_SGROUP                   = TRUE; // DX20170814 - Specify what to calculate/verify
-  // DX - END
+  // DX END
   KBIN_SYMMETRY_PGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_PGROUP_XTAL_WRITE                  = FALSE;
   KBIN_SYMMETRY_PGROUPK_WRITE                      = FALSE;
@@ -510,7 +512,7 @@ _kflags::_kflags() {
   KBIN_NEIGHBOURS_DRADIUS                          = 0.0;
   KBIN_POCC                                        = FALSE;
   KBIN_POCC_CALCULATION                            = FALSE;
-  KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO191110
+  KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO20191110
   KBIN_FROZSL                                      = FALSE;
   KBIN_FROZSL_DOWNLOAD                             = FALSE;
   KBIN_FROZSL_FILE                                 = FALSE;
@@ -605,7 +607,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_QSUB_MODE_IMPLICIT                          = b.KBIN_QSUB_MODE_IMPLICIT;
   KBIN_QSUB_FILE                                   = b.KBIN_QSUB_FILE;
   KBIN_SYMMETRY_CALCULATION                        = b.KBIN_SYMMETRY_CALCULATION;
-  // DX - START
+  // DX START
   KBIN_SYMMETRY_NO_SCAN                            = b.KBIN_SYMMETRY_NO_SCAN;
   KBIN_SYMMETRY_EPS                                = b.KBIN_SYMMETRY_EPS;
   KBIN_SYMMETRY_CALCULATE_PGROUP                   = b.KBIN_SYMMETRY_CALCULATE_PGROUP; // DX20170814 - Specify what to calculate/verify
@@ -615,7 +617,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_SYMMETRY_CALCULATE_IATOMS                   = b.KBIN_SYMMETRY_CALCULATE_IATOMS; // DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_AGROUP                   = b.KBIN_SYMMETRY_CALCULATE_AGROUP; // DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_SGROUP                   = b.KBIN_SYMMETRY_CALCULATE_SGROUP; // DX20170814 - Specify what to calculate/verify
-  // DX - END
+  // DX END
   KBIN_SYMMETRY_PGROUP_WRITE                       = b.KBIN_SYMMETRY_PGROUP_WRITE;
   KBIN_SYMMETRY_PGROUP_XTAL_WRITE                  = b.KBIN_SYMMETRY_PGROUP_XTAL_WRITE;
   KBIN_SYMMETRY_PGROUPK_WRITE                      = b.KBIN_SYMMETRY_PGROUPK_WRITE;
@@ -629,8 +631,8 @@ void _kflags::copy(const _kflags& b) {
   KBIN_NEIGHBOURS_RADIUS                           = b.KBIN_NEIGHBOURS_RADIUS;
   KBIN_NEIGHBOURS_DRADIUS                          = b.KBIN_NEIGHBOURS_DRADIUS;
   KBIN_POCC                                        = b.KBIN_POCC;
-  KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO191110
-  KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO191110
+  KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO20191110
+  KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO20191110
   KBIN_FROZSL                                      = b.KBIN_FROZSL;
   KBIN_FROZSL_DOWNLOAD                             = b.KBIN_FROZSL_DOWNLOAD;
   KBIN_FROZSL_FILE                                 = b.KBIN_FROZSL_FILE;
@@ -865,7 +867,7 @@ _vflags::_vflags() {
   // KBIN_VASP_INCAR_FILE
   KBIN_VASP_INCAR_FILE.clear();                                  // all false
   KBIN_VASP_INCAR_EXPLICIT.clear(); //ME20181226
-  KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); //ME20181226 //CO190401 - clear ss with .str("")
+  KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); //ME20181226 //CO20190401 - clear ss with .str("")
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_KEYWORD                     = FALSE;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_SYSTEM_AUTO                 = FALSE;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_FILE                        = FALSE;
@@ -875,7 +877,7 @@ _vflags::_vflags() {
   // KBIN_VASP_KPOINTS_FILE
   KBIN_VASP_KPOINTS_FILE.clear();                                // all false
   KBIN_VASP_KPOINTS_EXPLICIT.clear(); //ME20181226
-  KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(""); //ME20181226 //CO190401 - clear ss with .str("")
+  KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(""); //ME20181226 //CO20190401 - clear ss with .str("")
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_KEYWORD                   = FALSE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_FILE                      = FALSE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_COMMAND                   = FALSE;
@@ -1037,7 +1039,7 @@ void _vflags::copy(const _vflags& b) {
   // KBIN_VASP_INCAR_FILE
   KBIN_VASP_INCAR_FILE                                           = b.KBIN_VASP_INCAR_FILE;
   KBIN_VASP_INCAR_EXPLICIT.clear(); KBIN_VASP_INCAR_EXPLICIT << b.KBIN_VASP_INCAR_EXPLICIT.str(); //ME20181226
-  KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); KBIN_VASP_INCAR_EXPLICIT_START_STOP << b.KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(); //ME20181226 //CO190401 - clear ss with .str("")
+  KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); KBIN_VASP_INCAR_EXPLICIT_START_STOP << b.KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(); //ME20181226 //CO20190401 - clear ss with .str("")
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_KEYWORD                     = b.KBIN_VASP_INCAR_FILE_KEYWORD;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_SYSTEM_AUTO                 = b.KBIN_VASP_INCAR_FILE_SYSTEM_AUTO;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_FILE                        = b.KBIN_VASP_INCAR_FILE_FILE;
@@ -1047,7 +1049,7 @@ void _vflags::copy(const _vflags& b) {
   // KBIN_VASP_KPOINTS_FILE
   KBIN_VASP_KPOINTS_FILE                                         = b.KBIN_VASP_KPOINTS_FILE;
   KBIN_VASP_KPOINTS_EXPLICIT.clear(); KBIN_VASP_KPOINTS_EXPLICIT << b.KBIN_VASP_KPOINTS_EXPLICIT.str(); //ME20181226
-  KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(""); KBIN_VASP_KPOINTS_EXPLICIT_START_STOP << b.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(); //ME20181226 //CO190401 - clear ss with .str("")
+  KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(""); KBIN_VASP_KPOINTS_EXPLICIT_START_STOP << b.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str(); //ME20181226 //CO20190401 - clear ss with .str("")
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_KEYWORD                   = b.KBIN_VASP_KPOINTS_FILE_KEYWORD;
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_FILE                      = b.KBIN_VASP_KPOINTS_FILE_FILE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_FILE_COMMAND                   = b.KBIN_VASP_KPOINTS_FILE_COMMAND;
@@ -1151,6 +1153,7 @@ _xvasp::_xvasp() {
   POTCAR_ENMIN                = 0.0;
   POTCAR_PAW                  = FALSE;
   POTCAR_POTENTIALS.str(std::string());
+  POTCAR_AUID.clear();        // md5sums
   NCPUS                       = 1;
   NRELAX                      = 0;
   NRELAXING                   = 0;
@@ -1238,9 +1241,9 @@ _xvasp::_xvasp() {
   aopts.flag("FLAG::EXTRA_INCAR",FALSE);                 // DEFAULT VALUES
   AVASP_EXTRA_INCAR.str("");                             // DEFAULT VALUES  // ME20190614  clear ss with .str("")
   AVASP_INCAR_KEYWORD.clear();                           // DEFAULT VALUES  // ME20180601
-  AVASP_INCAR_EXPLICIT_START_STOP.str("");               // DEFAULT VALUES  // ME20180601  //CO190401 - clear ss with .str("")
+  AVASP_INCAR_EXPLICIT_START_STOP.str("");               // DEFAULT VALUES  // ME20180601  //CO20190401 - clear ss with .str("")
   AVASP_KPOINTS_KEYWORD.clear();                         // DEFAULT VALUES  // ME20180601
-  AVASP_KPOINTS_EXPLICIT_START_STOP.str("");             // DEFAULT VALUES  // ME20180601  //CO190401 - clear ss with .str("")
+  AVASP_KPOINTS_EXPLICIT_START_STOP.str("");             // DEFAULT VALUES  // ME20180601  //CO20190401 - clear ss with .str("")
   AVASP_POTCAR_KEYWORD.clear();                          // DEFAULT VALUES  // CO20170601
   AVASP_flag_MPI=FALSE;                                  // DEFAULT VALUES
   AVASP_flag_RUN_RELAX=TRUE;                             // DEFAULT VALUES
@@ -1310,6 +1313,7 @@ void _xvasp::copy(const _xvasp& b) {
   POTCAR_ENMIN                             = b.POTCAR_ENMIN;
   POTCAR_PAW                               = b.POTCAR_PAW;
   POTCAR_POTENTIALS.str(std::string()); POTCAR_POTENTIALS << b.POTCAR_POTENTIALS.str();
+  POTCAR_AUID.clear();for(uint i=0;i<b.POTCAR_AUID.size();i++) POTCAR_AUID.push_back(b.POTCAR_AUID.at(i));
   NCPUS                                    = b.NCPUS;
   NRELAX                                   = b.NRELAX;
   NRELAXING                                = b.NRELAXING;
@@ -1375,9 +1379,9 @@ void _xvasp::copy(const _xvasp& b) {
   // [OBSOLETE] AVASP_flag_EXTRA_INCAR                   = b.AVASP_flag_EXTRA_INCAR;
   AVASP_EXTRA_INCAR.clear(); AVASP_EXTRA_INCAR << b.AVASP_EXTRA_INCAR.str();
   AVASP_INCAR_KEYWORD                      = b.AVASP_INCAR_KEYWORD;  // ME20180601
-  AVASP_INCAR_EXPLICIT_START_STOP.str(""); AVASP_INCAR_EXPLICIT_START_STOP << b.AVASP_INCAR_EXPLICIT_START_STOP.str(); // ME20180601 //CO190401 - clear ss with .str("")
+  AVASP_INCAR_EXPLICIT_START_STOP.str(""); AVASP_INCAR_EXPLICIT_START_STOP << b.AVASP_INCAR_EXPLICIT_START_STOP.str(); // ME20180601 //CO20190401 - clear ss with .str("")
   AVASP_KPOINTS_KEYWORD                    = b.AVASP_KPOINTS_KEYWORD; // ME20180601
-  AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); AVASP_KPOINTS_EXPLICIT_START_STOP << b.AVASP_KPOINTS_EXPLICIT_START_STOP.str(); // ME20180601 //CO190401 - clear ss with .str("")
+  AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); AVASP_KPOINTS_EXPLICIT_START_STOP << b.AVASP_KPOINTS_EXPLICIT_START_STOP.str(); // ME20180601 //CO20190401 - clear ss with .str("")
   AVASP_POTCAR_KEYWORD                    = b.AVASP_POTCAR_KEYWORD; // CO20170601
   // [OBSOLETE] AVASP_flag_LSDAU                         = b.AVASP_flag_LSDAU;
   // [OBSOLETE] AVASP_Get_LDAU2_ParametersU_MODE         = b.AVASP_Get_LDAU2_ParametersU_MODE;
@@ -1991,15 +1995,15 @@ const _xqsub& _xqsub::operator=(const _xqsub& b) {  // operator=
 
 // constructors
 xStream::xStream() : p_FileMESSAGE(NULL),f_new_ofstream(false) {} //{free();}
-xStream::~xStream() {free();} //{freeAll();} //CO190318
-//void xStream::free() {} //CO190318 - not necessary
+xStream::~xStream() {free();} //{freeAll();} //CO20190318
+//void xStream::free() {} //CO20190318 - not necessary
 void xStream::free() {
   p_oss=NULL;
   if(f_new_ofstream){delete p_FileMESSAGE;}  //first delete, then set to null
   p_FileMESSAGE=NULL;
   f_new_ofstream=false;
 }
-//void xStream::freeAll(){free();free();}  //CO190318 - not necessary
+//void xStream::freeAll(){free();free();}  //CO20190318 - not necessary
 void xStream::copy(const xStream& b){
   //must handle this very carefully
   //first, since we are interested in copying the stream from b, we must delete the new pointer of self (if it's new)
@@ -2012,8 +2016,8 @@ void xStream::copy(const xStream& b){
   else {p_FileMESSAGE=b.p_FileMESSAGE;}
   f_new_ofstream=b.f_new_ofstream;  //very important! seg faults otherwise
 }
-ostream* xStream::getOSS() const {return p_oss;} //CO191110
-ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO191110
+ostream* xStream::getOSS() const {return p_oss;} //CO20191110
+ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
 

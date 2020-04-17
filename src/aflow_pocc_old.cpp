@@ -37,7 +37,7 @@ const double KCAL_TO_EV =4.336443203200000E-002; // 1(kcal/mol) = 4.33644E-2 eV
 //const double KJ_TO_EV =1.0357416650425146E-002 ; // 1 (KJ/mol) = 0.010357 eV
 //const double KCAL_TO_KJ = 4.1868; // 1 Kilocalories (Kcal) = 4.1868 Kilojoules (Kj)
 
-bool PRINT_AVG_IDOS=false; //CO190808 - quick patch for IDOS, keep this off in general
+bool PRINT_AVG_IDOS=false; //CO20190808 - quick patch for IDOS, keep this off in general
 
 // ***************************************************************************
 // pflow::POCC_INPUT(void)
@@ -124,7 +124,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
       _kflags kflags;
       pocc::POccCalculator pcalc(xstr_pocc,aflags,kflags,FileMESSAGE,cout);
       if(!pcalc.m_initialized){exit(1);}
-      //[CO190131 - OBSOLETE]if(!pcalc.calculate()){exit(1);}
+      //[CO20190131 - OBSOLETE]if(!pcalc.calculate()){exit(1);}
       pcalc.calculate();
 
       //vector<xstructure> vecgroupxstr_sorted = pcalc.getUniqueDerivativeStructures(); //too much memory
@@ -3017,13 +3017,13 @@ namespace pocc {
     int NumCell=cRangeFrac.at(0).at(2)/nDFull;
     if(NumCell>nMax) {nMax=NumCell;}
     if(!CheckPartialOccupation(xstr)) {nMax=1;}
-    //[CO191112 - OBSOLETE]char *cur_dir_name = getcwd(NULL, 0);
+    //[CO20191112 - OBSOLETE]char *cur_dir_name = getcwd(NULL, 0);
     string cur_dir_name=aurostd::getPWD();
     string tmpdir=aurostd::TmpDirectoryCreate("PartialOccupation");
-    //[CO191112 - OBSOLETE]char new_dir_name[1024];
-    //[CO191112 - OBSOLETE]strcpy(new_dir_name, tmpdir.c_str());
-    //[CO191112 - OBSOLETE]chdir(new_dir_name);
-    chdir(tmpdir.c_str());  //CO191112
+    //[CO20191112 - OBSOLETE]char new_dir_name[1024];
+    //[CO20191112 - OBSOLETE]strcpy(new_dir_name, tmpdir.c_str());
+    //[CO20191112 - OBSOLETE]chdir(new_dir_name);
+    chdir(tmpdir.c_str());  //CO20191112
 
     __aflow_call_enum_MOD_aflow_pass_parameter(parLV, &nDFull,dFull,&rdFull,&cdFull,&k, &nMin, &nMax, pLatTyp,&eps, &full, labelFull,&rlabelFull,&clabelFull,digitFull,&ndigitFull,equivalencies,&nequivalencies,&conc_check,cRange,&rcRange,&ccRange);
 
@@ -3096,7 +3096,7 @@ namespace pocc {
     ss_cmd << "rm -rf " << tmpdir << endl;
     aurostd::execute(ss_cmd);
 
-    chdir(cur_dir_name.c_str());  //CO191112
+    chdir(cur_dir_name.c_str());  //CO20191112
     return groupxstr;
   }
 }
@@ -3684,7 +3684,7 @@ namespace pocc {
 // void pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS)
 // ***************************************************************************
 namespace pocc {
-  void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS) {   //CO190808 - one without IDOS and one with
+  void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS) {   //CO20190808 - one without IDOS and one with
     string soliloquy="pocc::POCC_COMBINE_TDOS_PDOS_ONEDOS():";
     if(TDOS.size()!=PDOS.size()) {cerr << " TDOS and PDOS have different size! Aborting! " << endl; exit(1);}
     vector<double> vtmp;
@@ -3697,8 +3697,8 @@ namespace pocc {
         }
         vtmp.push_back(TDOS.at(i).at(1)); //TDOS
         DOS.push_back(vtmp);
-        vtmp.push_back(TDOS.at(i).at(2));   //CO190808 - IDOS
-        DOS_IDOS.push_back(vtmp); //CO190808 - IDOS
+        vtmp.push_back(TDOS.at(i).at(2));   //CO20190808 - IDOS
+        DOS_IDOS.push_back(vtmp); //CO20190808 - IDOS
       }
     }
     else if(TDOS.at(0).size()==5) { //spin
@@ -3711,8 +3711,8 @@ namespace pocc {
         vtmp.push_back(TDOS.at(i).at(1)); //TDOS up
         vtmp.push_back(TDOS.at(i).at(2)); //TDOS dn
         DOS.push_back(vtmp);
-        vtmp.push_back(TDOS.at(i).at(3));vtmp.push_back(TDOS.at(i).at(4));   //CO190808 - IDOS up/down
-        DOS_IDOS.push_back(vtmp);  //CO190808 - IDOS up/down
+        vtmp.push_back(TDOS.at(i).at(3));vtmp.push_back(TDOS.at(i).at(4));   //CO20190808 - IDOS up/down
+        DOS_IDOS.push_back(vtmp);  //CO20190808 - IDOS up/down
       }
     }
     else {
@@ -3810,7 +3810,7 @@ namespace pocc {
     //produce DOS data
     if(!XHOST.is_command("gnuplot")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - pocc::POCC_GENERATE_OUTPUT ERROR gnuplot is necessary." << endl;exit(1);}; 
     if(!XHOST.is_command("convert")) {cerr << "AFLOW V" << string(AFLOW_VERSION) << " - pocc::POCC_GENERATE_OUTPUT ERROR convert is necessary." << endl;exit(1);}; 
-    vector<vector<double> > TDOS_ONLY, PDOS_ONLY, DOS, DOS_IDOS;  vector<double> vEfermi,Egap,vprob; double mag,Egap_net; //CO190808 - DOS_IDOS
+    vector<vector<double> > TDOS_ONLY, PDOS_ONLY, DOS, DOS_IDOS;  vector<double> vEfermi,Egap,vprob; double mag,Egap_net; //CO20190808 - DOS_IDOS
     if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
     POCC_GENERATE_DOSDATA(directory,T,TDOS_ONLY,PDOS_ONLY,vEfermi,mag,Egap_net,Egap,vprob);
     if(LDEBUG) {cerr << soliloquy << " POCC_GENERATE_DOSDATA done" << endl;}
@@ -3835,10 +3835,10 @@ namespace pocc {
     double DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(DOS, DOS_Emin, DOS_Emax);
 
     //write 2D vector into files
-    vector<vector<double> >* p_DOS2FILE=&DOS;             //CO190808 - write out DOS_IDOS if desired
-    if(PRINT_AVG_IDOS){p_DOS2FILE=&DOS_IDOS;}             //CO190808 - write out DOS_IDOS if desired
-    const vector<vector<double> >& DOS2FILE=*p_DOS2FILE;  //CO190808 - write out DOS_IDOS if desired
-    string str_dos = aurostd::vector2string(DOS2FILE);    //CO190808 - write out DOS_IDOS if desired
+    vector<vector<double> >* p_DOS2FILE=&DOS;             //CO20190808 - write out DOS_IDOS if desired
+    if(PRINT_AVG_IDOS){p_DOS2FILE=&DOS_IDOS;}             //CO20190808 - write out DOS_IDOS if desired
+    const vector<vector<double> >& DOS2FILE=*p_DOS2FILE;  //CO20190808 - write out DOS_IDOS if desired
+    string str_dos = aurostd::vector2string(DOS2FILE);    //CO20190808 - write out DOS_IDOS if desired
     string dosdatafile = "DOSDATA_" + aurostd::utype2string(T) + "K";
     aurostd::string2file(str_dos, dosdatafile);
 

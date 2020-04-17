@@ -22,8 +22,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ***************************************************************************
-
-VERSNUMBER=3.2.1
+ 
+VERSNUMBER=3.2.2
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -121,14 +121,14 @@ AFLOWLIB_HPP = aflowlib.h
 
 
 AFLOW_CLASS_SRC = aflow_xclasses.cpp 
-AFLOW_FUNCS_SRC = aflow_aflowrc.cpp aflow_init.cpp aflow_xatom.cpp aflow_xelement.cpp aflow_kbin.cpp aflow_ialien.cpp aflow_kalien.cpp aflow_kvasp.cpp aflow_ivasp.cpp aflow_avasp.cpp aflow_ovasp.cpp aflow_kaims.cpp aflow_iaims.cpp aflow_oaims.cpp aflow_lattice.cpp aflow_spacegroup.cpp aflow_mix.cpp aflow_nomix.cpp aflow_qsub.cpp aflow_pthreads.cpp aflow_symmetry.cpp aflow_neighbours.cpp aflow_surface.cpp aflow_defects.cpp aflow_wyckoff.cpp aflow_xproto.cpp aflow_xproto_gus.cpp aflow_matlab.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_ifrozsl.cpp aflow_modules.cpp aflow_xelement.cpp
+AFLOW_FUNCS_SRC = aflow_aflowrc.cpp aflow_init.cpp aflow_xatom.cpp aflow_kbin.cpp aflow_ialien.cpp aflow_kalien.cpp aflow_kvasp.cpp aflow_ivasp.cpp aflow_avasp.cpp aflow_ovasp.cpp aflow_kaims.cpp aflow_iaims.cpp aflow_oaims.cpp aflow_lattice.cpp aflow_spacegroup.cpp aflow_mix.cpp aflow_nomix.cpp aflow_qsub.cpp aflow_pthreads.cpp aflow_symmetry.cpp aflow_neighbours.cpp aflow_surface.cpp aflow_defects.cpp aflow_wyckoff.cpp aflow_xproto.cpp aflow_xproto_gus.cpp aflow_matlab.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_ifrozsl.cpp aflow_modules.cpp aflow_xelement.cpp aflow_xpseudopotentials.cpp
 # aflow_ifrozsl.cpp
 PFLOW_FUNCS_SRC = aflow_aconvasp_main.cpp aflow_pflow_funcs.cpp aflow_pflow_print.cpp aflow_aconvasp.cpp 
 ESTRUCTURE_FUNCS_SRC = aflow_estructure.cpp aflow_plotter.cpp
 #[OBSOLETE] [KESONG] POCCUPATION_FUNCS_SRC = aflow_poccupation_params.cpp aflow_poccupation_edos.cpp aflow_poccupation_forcefield.cpp 
 POCCUPATION_FUNCS_SRC = aflow_pocc_old.cpp
 APENNSY_FUNCS_SRC = aflow_apennsy_gndstate.cpp aflow_apennsy_structures.cpp aflow_apennsy.cpp aflow_apennsy_phases.cpp aflow_apennsy_main.cpp aflow_apennsy_vaspin.cpp
-LIBRARIES_FUNCS_SRC = aflowlib_libraries.cpp 
+LIBRARIES_FUNCS_SRC = aflowlib_libraries.cpp aflowlib_libraries_scrubber.cpp 
 CALCULATED_SRC = aflow_data_calculated.cpp
 AFLOWLIB_SRC = aflowlib_web_interface.cpp aflowlib_web_outreach.cpp aflowlib_database.cpp SQLITE/aflow_sqlite.cpp
 #DX and CO - START

@@ -21,11 +21,11 @@
 //COMMON TOLERANCES
 #define _ZERO_TOL_ 1e-10 // DX
 #define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75
-#define _XPROTO_ZERO_VOL_ 1.0e-6  //CO190218
+#define _XPROTO_ZERO_VOL_ 1.0e-6  //CO20190218
 
 //ME20190628 BEGIN - moved from CHULL for broader access
 // Output formats
-enum filetype {   //CO190629
+enum filetype {   //CO20190629
   //GENERAL FILE TYPES
   txt_ft,         //general plain text
   json_ft,
@@ -38,25 +38,25 @@ enum filetype {   //CO190629
   chull_apool_ft,
   chull_web_ft,
 };
-//[CO190629 - obsolete with enum filetype]#define _apool_         'a'  // apool
-//[CO190629 - obsolete with enum filetype]#define _json_          'j'  // standard json
-//[CO190629 - obsolete with enum filetype]#define _pdf_           'p'  // pdf
-//[CO190629 - obsolete with enum filetype]#define _txt_           't'  // plain text
-//[CO190629 - obsolete with enum filetype]#define _web_           'w'  // web json
-//[CO190629 - obsolete with enum filetype]#define _latex_         'l'  // latex
-//[CO190629 - obsolete with enum filetype]#define _gnuplot_       'g'  // gnuplot
-//[CO190629 - obsolete with enum filetype]#define _jupyterthree_  'y'  // jupyter python 3
-//[CO190629 - obsolete with enum filetype]#define _jupytertwo_    'z'  // jupyter python 2
+//[CO20190629 - obsolete with enum filetype]#define _apool_         'a'  // apool
+//[CO20190629 - obsolete with enum filetype]#define _json_          'j'  // standard json
+//[CO20190629 - obsolete with enum filetype]#define _pdf_           'p'  // pdf
+//[CO20190629 - obsolete with enum filetype]#define _txt_           't'  // plain text
+//[CO20190629 - obsolete with enum filetype]#define _web_           'w'  // web json
+//[CO20190629 - obsolete with enum filetype]#define _latex_         'l'  // latex
+//[CO20190629 - obsolete with enum filetype]#define _gnuplot_       'g'  // gnuplot
+//[CO20190629 - obsolete with enum filetype]#define _jupyterthree_  'y'  // jupyter python 3
+//[CO20190629 - obsolete with enum filetype]#define _jupytertwo_    'z'  // jupyter python 2
 
 // Vector reduction types
-enum vector_reduction_type {   //CO190629
+enum vector_reduction_type {   //CO20190629
   frac_vrt,   //reduce to fractions (normalized to 1)
   gcd_vrt,    //reduce by gcd
   no_vrt,     //no reduction
 };
-//[CO190629 - obsolete with enum vector_reduction_type]#define _frac_          'f'  //fractional
-//[CO190629 - obsolete with enum vector_reduction_type]#define _gcd_           'g'  //gcd
-//[CO190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
+//[CO20190629 - obsolete with enum vector_reduction_type]#define _frac_          'f'  //fractional
+//[CO20190629 - obsolete with enum vector_reduction_type]#define _gcd_           'g'  //gcd
+//[CO20190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
 // ME20190628 END
 
 //compound specification is how a compound is specified
@@ -67,13 +67,13 @@ enum compound_designation {
   pp_string,
 };
 
-//CO190712 - see VASP_PseudoPotential_CleanName_InPlace() in aflow_ivasp.cpp
-const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
-",_GW"    //CO190712 - potpaw_PBE/potpaw_PBE.20100506/As_GW
-",_ZORA"  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Pt_ZORA
-",_LDApU" //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Zn_sv_LDApU
-",_AE"    //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
-",_NC2"   //CO190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
+//CO20190712 - see VASP_PseudoPotential_CleanName_InPlace() in aflow_ivasp.cpp
+const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+",_GW"    //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/As_GW
+",_ZORA"  //CO20190712 - potpaw_PBE/potpaw_PBE.20100506/Pt_ZORA
+",_LDApU" //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Zn_sv_LDApU
+",_AE"    //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+",_NC2"   //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
 ",_200eV"
 "";
 
@@ -83,7 +83,7 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO190712 - potpaw_LDA/potpaw_LD
 #define _AFLOW_POCC_ZERO_TOL_ pow(10,-_AFLOW_POCC_PRECISION_) 
 
 //XRD
-#define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO190622
+#define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO20190622
 
 //moved from avasp.cpp for broader access (chull.cpp)
 #define SPECIE_TRANSITION_METALS string("Ag,Au,Cd,Co,Cr_pv,Cu_pv,Fe_pv,Hf_pv,Hg,Ir,La,Mn_pv,Mo_pv,Nb_sv,Ni_pv,Os_pv,Pd_pv,Pt,Re_pv,Rh_pv,Ru_pv,Sc_sv,Ta_pv,Tc_pv,Ti_sv,V_sv,W_pv,Y_sv,Zn,Zr_sv")
@@ -281,7 +281,7 @@ using aurostd::xvector;
 using aurostd::xoption;
 using aurostd::xcombos;
 
-//BANDGAP  //CO191110
+//BANDGAP  //CO20191110
 #define _METALGAP_ -1.0*AUROSTD_NAN
 #define _METALEDGE_ -1.0
 
@@ -299,8 +299,9 @@ class _XHOST {
     ostringstream ostrPID; // aflow.cpp
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
-    bool GENERATE_AFLOWIN_ONLY; //CT 180719
-    bool POSTPROCESS; //CT 181212
+    bool GENERATE_AFLOWIN_ONLY; // CT20180719
+    bool POSTPROCESS; // CT20181212
+    bool PSEUDOPOTENTIAL_GENERATOR; // SC20200327
     // HARDWARE/SOFTWARE
     string hostname,machine_type,tmpfs,user,group,home,shell,progname;
     string Find_Parameters;
@@ -375,7 +376,7 @@ class _XHOST {
     bool SKEW_TEST; // DX20171019
     double SKEW_TOL; // DX20171019
     // WEB MODE
-    bool WEB_MODE;  //CO190401
+    bool WEB_MODE;  //CO20190401
   private:                                                //
     void free();                                           // free space
     void copy(const _XHOST& b);                            //
@@ -452,10 +453,10 @@ class _XHOST {
 #define XHOST_README_AFLOW_AEL_TXT                     XHOST.vGlobal_string.at(51)
 #define XHOST_README_AFLOW_ANRL_TXT                    XHOST.vGlobal_string.at(52)
 #define XHOST_README_AFLOW_COMPARE_TXT                 XHOST.vGlobal_string.at(53)
-#define XHOST_README_AFLOW_GFA_TXT                     XHOST.vGlobal_string.at(53)  //CO190401
+#define XHOST_README_AFLOW_GFA_TXT                     XHOST.vGlobal_string.at(53)  //CO20190401
 #define XHOST_README_AFLOW_SYM_TXT                     XHOST.vGlobal_string.at(54)
-#define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO190620
-#define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO190620
+#define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO20190620
+#define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO20190620
 #define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57) //ME20180705
 #define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(58)
 #define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(59)
@@ -566,9 +567,9 @@ class _aflags {
     bool KBIN_GEN_VASP_FROM_AFLOWIN;
     bool KBIN_GEN_AIMS_FROM_AFLOWIN;
     bool KBIN_GEN_AFLOWIN_FROM_VASP;
-    // DX - START
+    // DX START
     bool KBIN_GEN_SYMMETRY_OF_AFLOWIN;
-    // DX - END 
+    // DX END 
     bool KBIN_DELETE_AFLOWIN;
     bool AFLOW_FORCE_MPI;     // not yet implemented
     bool AFLOW_FORCE_SERIAL;  // not yet implemented
@@ -728,7 +729,7 @@ class _kflags {
     bool   KBIN_QSUB_FILE;
     // symmetry operation lists
     bool  KBIN_SYMMETRY_CALCULATION;
-    // DX - START
+    // DX START
     bool  KBIN_SYMMETRY_NO_SCAN;
     double KBIN_SYMMETRY_EPS;
     bool  KBIN_SYMMETRY_CALCULATE_PGROUP;       // DX20170814 - Specify what to calculate/verify
@@ -739,7 +740,7 @@ class _kflags {
     bool  KBIN_SYMMETRY_CALCULATE_IATOMS;       // DX20170814 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_AGROUP;       // DX20170814 - Specify what to calculate/verify
     bool  KBIN_SYMMETRY_CALCULATE_SGROUP;       // DX20170814 - Specify what to calculate/verify
-    // DX - END
+    // DX END
     bool  KBIN_SYMMETRY_PGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUPK_WRITE;     // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUP_XTAL_WRITE; // taken TRUE by default
@@ -757,7 +758,7 @@ class _kflags {
     // pocc operation lists
     bool   KBIN_POCC;
     bool   KBIN_POCC_CALCULATION;
-    string KBIN_POCC_TEMPERATURE_STRING;  //CO191114
+    string KBIN_POCC_TEMPERATURE_STRING;  //CO20191114
     // frozsl operation lists
     bool   KBIN_FROZSL;
     bool   KBIN_FROZSL_DOWNLOAD;
@@ -1098,7 +1099,7 @@ class _atom { // simple class.. nothing fancy
     vector<string> fpos_equation;                          // DX20180607 - lattice equation for atomic position 
     vector<string> cpos_equation;                          // DX20180607 - Cartesian equation for atomic position 
     double spin;                                           // spin along z in VASP MODE
-    bool spin_is_given;                                    // TRUE if spin has been set // DX 9/21/17
+    bool spin_is_given;                                    // TRUE if spin has been set // DX20170921
     xvector<double> noncoll_spin;                          // non-collinear spin                // DX20171205
     bool noncoll_spin_is_given;                            // TRUE if noncoll_spin has been set // DX20171205
     double mass;                                           // mass 
@@ -1135,7 +1136,7 @@ class _atom { // simple class.. nothing fancy
     friend ostream& operator<<(ostream &,const _atom&);    // print
     void CleanName(void);                                  // function to clean up the name
     void CleanSpin(void);                                  // function to clean up the spin from EZ vasp script
-    void ClearSymmetry(void);                              // clears symmetry //CO190219
+    void ClearSymmetry(void);                              // clears symmetry //CO20190219
   private:                                                //
     void free();                                           // free space
     void copy(const _atom& b); //
@@ -1288,10 +1289,10 @@ class _sym_op {
     const _sym_op& operator=(const _sym_op& b);
     friend ostream& operator<<(ostream &,const _sym_op&);
 
-    void setUc(const xmatrix<double>& Uc,const xmatrix<double>& lattice);  //CO190321
-    void setUf(const xmatrix<double>& Uf,const xmatrix<double>& lattice);  //CO190321
-    void setctau(const xmatrix<double>& Uc,const xmatrix<double>& lattice);  //CO190321
-    void setftau(const xmatrix<double>& Uf,const xmatrix<double>& lattice);  //CO190321
+    void setUc(const xmatrix<double>& Uc,const xmatrix<double>& lattice);  //CO20190321
+    void setUf(const xmatrix<double>& Uf,const xmatrix<double>& lattice);  //CO20190321
+    void setctau(const xmatrix<double>& Uc,const xmatrix<double>& lattice);  //CO20190321
+    void setftau(const xmatrix<double>& Uf,const xmatrix<double>& lattice);  //CO20190321
 
   private:
     void free();
@@ -1417,7 +1418,7 @@ class AtomEnvironment{
 bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
 bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
 bool sortAtomsDist(const _atom& a1,const _atom& a2);		// sort atoms by dist  // CO20180420
-bool sortAtomsEquiv(const _atom& a1,const _atom& a2); // cluster by equivalent atoms //CO190116
+bool sortAtomsEquiv(const _atom& a1,const _atom& a2); // cluster by equivalent atoms //CO20190116
 
 class xstructure {
   public:
@@ -1432,7 +1433,7 @@ class xstructure {
     ~xstructure();                                                // destructor
     // I/O, mutators                                              // --------------------------------------
     bool GetStoich(void);                                         // get stoich_each_type - 170724 CO
-    bool sortAtomsEquivalent(void);                               // sort by equivalent atoms - CO190116
+    bool sortAtomsEquivalent(void);                               // sort by equivalent atoms - CO20190116
     bool FixLattices(void);                                       // Reciprocal/f2c/c2f
     void SetCoordinates(const int& mode);                         // change coordinates
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
@@ -1482,7 +1483,7 @@ class xstructure {
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale
     void SetVolume(const double &in_volume);                      // Change volume
-    void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO191010
+    void SetAutoVolume(bool use_AFLOW_defaults_in=false);         // Change volume to sum of atoms  //CO20191010
     void InflateLattice(const double &coefficient);               // Inflate lattice
     void InflateVolume(const double &coefficient);                // Inflate volume
     string platon2print(bool,bool,double,double,double,double);   // Create Platon input file >=51108
@@ -1812,13 +1813,13 @@ class xStream {
     //NECESSARY PUBLIC CLASS METHODS - END
 
     //getters
-    ostream* getOSS() const; //CO191110
-    ofstream* getOFStream() const; //CO191110
+    ostream* getOSS() const; //CO20191110
+    ofstream* getOFStream() const; //CO20191110
   protected:
     //NECESSARY private CLASS METHODS - START
-    //void free();  //CO190318 - not necessary
+    //void free();  //CO20190318 - not necessary
     void free();
-    //void freeAll(); //CO190318 - not necessary
+    //void freeAll(); //CO20190318 - not necessary
     void copy(const xStream& b);
     //NECESSARY END CLASS METHODS - END
     //logger variables
@@ -1863,7 +1864,7 @@ class _xvasp {
     string       Directory;
     string       AnalyzeLabel;
     _xqsub       xqsub;
-    xoption aopts;
+    xoption      aopts;
     // --------------------------------
     // VASP INPUT CONTENT
     // [OBSOLETE] bool         AFLOWIN_FLAG::VASP;
@@ -1891,6 +1892,7 @@ class _xvasp {
     double       POTCAR_ENMIN;
     bool         POTCAR_PAW;
     stringstream POTCAR_POTENTIALS;
+    deque<string> POTCAR_AUID; // md5sum one line by one line of the POTCAR
     // --------------------------------
     // VASP INPUT CONTENT
     stringstream OUTCAR;  // OUTPUT
@@ -2135,9 +2137,9 @@ string GetElementName(string stringin);
 string GetSpaceGroupName(int spacegroupnumber, string directory=""); //DX20180526 - add directory
 int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory=""); //DX20190708
 string GetSpaceGroupLabel(int spacegroupnumber);
-string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); // DX 9/1/17 //DX20180526 - add directory
-string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); // DX 9/1/17 //DX20180526 - add directory //DX20180806 - added setting
-string GetLaueLabel(string& point_group); // DX 9/1/17 //DX20180526 - add directory
+string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); // DX20170901 //DX20180526 - add directory
+string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); // DX20170901 //DX20180526 - add directory //DX20180806 - added setting
+string GetLaueLabel(string& point_group); // DX20170901 //DX20180526 - add directory
 
 #define RADIANTS 0
 #define DEGREES  1
@@ -2267,9 +2269,9 @@ xmatrix<double> MinkowskiBasisReduction(const xmatrix<double>& lattice);
 xstructure LatticeReduction(const xstructure& a);
 xmatrix<double> LatticeReduction(const xmatrix<double>& lattice);
 // CO20170807 - START
-//DX20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew); //CO190520 - removed pointers for bools and doubles, added const where possible
-deque<_atom> foldAtomsInCell(const xstructure& a, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - added check_min_dists bool
-deque<_atom> foldAtomsInCell(const deque<_atom>& atoms, const xmatrix<double>& lattice_orig, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
+//DX20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew); //CO20190520 - removed pointers for bools and doubles, added const where possible
+deque<_atom> foldAtomsInCell(const xstructure& a, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - added check_min_dists bool
+deque<_atom> foldAtomsInCell(const deque<_atom>& atoms, const xmatrix<double>& lattice_orig, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
 xstructure GetPrimitiveVASP(const xstructure& a);
 xstructure GetPrimitiveVASP(const xstructure& a,double tol);
 // CO20170807 - STOP
@@ -2321,11 +2323,11 @@ xstructure GetSuperCell(const xstructure& a,const xvector<int>& sc);
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33);
 xstructure GetSuperCell(const xstructure& a,const int& sc1,const int& sc2,const int& sc3);
 //corey START
-xstructure GetSuperCell(const xstructure& a,const xmatrix<double>& sc,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix //CO190409 - added force_strict_pc2scMap
-xstructure GetSuperCell(const xstructure& a,const xvector<double>& sc,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix //CO190409 - added force_strict_pc2scMap
-xstructure GetSuperCell(const xstructure& a,const xvector<int>& sc,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
-xstructure GetSuperCell(const xstructure& a,const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix //CO190409 - added force_strict_pc2scMap
-xstructure GetSuperCell(const xstructure& a,const int& sc1,const int& sc2,const int& sc3,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+xstructure GetSuperCell(const xstructure& a,const xmatrix<double>& sc,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix //CO20190409 - added force_strict_pc2scMap
+xstructure GetSuperCell(const xstructure& a,const xvector<double>& sc,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix //CO20190409 - added force_strict_pc2scMap
+xstructure GetSuperCell(const xstructure& a,const xvector<int>& sc,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
+xstructure GetSuperCell(const xstructure& a,const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix //CO20190409 - added force_strict_pc2scMap
+xstructure GetSuperCell(const xstructure& a,const int& sc1,const int& sc2,const int& sc3,vector<int>& sc2pcMap,vector<int>& pc2scMap,bool get_symmetry, bool get_full_basis, bool force_supercell_matrix=false,bool force_strict_pc2scMap=false); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
 //corey END
 bool CalculateSymmetry(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose,double radius);
 bool CalculateSymmetry(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);
@@ -2559,9 +2561,9 @@ namespace anrl {
   uint getANRLSettingChoice(int spacegroup); //DX20191031 - removed reference
   string structure2anrl(istream& input, aurostd::xoption& vpflow);           // xoption
   string structure2anrl(xstructure& xstr, bool recalculate_symmetry=true);   // use default options //DX20191031 - added recalculate_symmetry
-  string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO20190520 - removed pointers for bools and doubles, added const where possible
   string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
-  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
+  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
   xstructure rhl2hex(xstructure& str, double& a, double& c); 
 }
 
@@ -2653,8 +2655,8 @@ namespace KBIN {
   void StartStopCheck(const string &AflowIn,string str1,bool &flag,bool &flagS);
   bool Legitimate_aflowin(string aflowindir,const bool& osswrite,ostringstream& oss);
   bool Legitimate_aflowin(string aflowindir);
-  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO191110
-  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO191110
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
 }
 
 // ----------------------------------------------------------------------------
@@ -2781,6 +2783,10 @@ namespace KBIN {
   bool VASP_Produce_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false);
   bool VASP_Modify_INPUT(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags);
   bool VASP_Produce_and_Modify_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false); // CO20180418
+  bool VASP_Write_AUID_FILE(const string& directory,const vector<string>& vAUIDs,const vector<string>& species);
+  bool VASP_Write_AUID_FILE(const string& directory,const deque<string>& vAUIDs,const deque<string>& species);
+  bool VASP_Write_AUID_AFLOWIN(const string& directory,const vector<string>& vAUIDs,const vector<string>& species);
+  bool VASP_Write_AUID_AFLOWIN(const string& directory,const deque<string>& vAUIDs,const deque<string>& species);
   bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags);
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
@@ -2794,16 +2800,16 @@ namespace KBIN {
   bool VASP_Produce_KPOINTS(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_KPOINTS(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
   bool VASP_Reread_KPOINTS(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
-  bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar);
-  bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar);
+  bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar);
+  bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar);
   bool VASP_Produce_POTCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_POTCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
   bool VASP_Reread_POTCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   string VASP_PseudoPotential_CleanName(const string& specieIN);
-  string VASP_PseudoPotential_CleanName_190712(const string& specieIN); //CO190712
-  string VASP_PseudoPotential_CleanName_190101(const string& specieIN); //CO190712
-  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO190712
-  bool VASP_PseudoPotential_CleanName_TEST(void); //CO190712
+  string VASP_PseudoPotential_CleanName_190712(const string& specieIN); //CO20190712
+  string VASP_PseudoPotential_CleanName_190101(const string& specieIN); //CO20190712
+  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO20190712
+  bool VASP_PseudoPotential_CleanName_TEST(void); //CO20190712
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX);
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX);
   bool VASP_SplitAlloySpecies(string alloy_in, string &specieA, string &specieB);
@@ -2872,7 +2878,7 @@ namespace KBIN {
 // aflow_avasp.cpp
 #define _AVASP_PSEUDOPOTENTIAL_AUTO_ string("AUTO")
 #define _AVASP_PSEUDOPOTENTIAL_DELIMITER_ string(":")
-#define _AVASP_PSEUDOPOTENTIAL_POTENTIAL_TYPE_ string("TYPE") //CO191020
+#define _AVASP_PSEUDOPOTENTIAL_POTENTIAL_TYPE_ string("TYPE") //CO20191020
 #define _AVASP_PSEUDOPOTENTIAL_POTENTIAL_COMPLETE_ string("COMPLETE")
 
 struct _AVASP_PROTO{
@@ -2923,7 +2929,7 @@ class xIBZKPT;
 class xKPOINTS;
 class xCHGCAR;
 class xVASPOUT;
-class xQMVASP;  //CO190803
+class xQMVASP;  //CO20190803
 namespace aflowlib { class _aflowlib_entry;}
 
 // -------------------------------------------------------------------------------------------------
@@ -2970,18 +2976,30 @@ class xOUTCAR {
     // Intra band minimization
     double WEIMIN,EBREAK,DEPER,TIME;  // for aflowlib_libraries.cpp
     // begin shared xPOTCAR
-    double ENMAX;deque<double> vENMAX;                            // eV
-    double ENMIN;deque<double> vENMIN;                            // eV
-    double POMASS_sum,POMASS_min,POMASS_max;deque<double> vPOMASS;// mass
-    double ZVAL_sum,ZVAL_min,ZVAL_max;deque<double> vZVAL;        // valence
-    double EATOM_min,EATOM_max;deque<double> vEATOM;              // eV
-    double RCORE_min,RCORE_max;deque<double> vRCORE;              // outmost cutoff radius
-    double RWIGS_min,RWIGS_max;deque<double> vRWIGS;              // wigner-seitz radius (au A)
-    double EAUG_min,EAUG_max;deque<double> vEAUG;                 // augmentation
+    double ENMAX;vector<double> vENMAX;                            // eV
+    double ENMIN;vector<double> vENMIN;                            // eV
+    double POMASS_sum,POMASS_min,POMASS_max;vector<double> vPOMASS;// mass
+    double ZVAL_sum,ZVAL_min,ZVAL_max;vector<double> vZVAL;   // valence
+    double EATOM_min,EATOM_max;vector<double> vEATOM;        // eV
+    double RCORE_min,RCORE_max;vector<double> vRCORE;        // outmost cutoff radius
+    double RWIGS_min,RWIGS_max;vector<double> vRWIGS;        // wigner-seitz radius (au A)
+    double EAUG_min,EAUG_max;vector<double> vEAUG;            // augmentation
+    double RAUG_min,RAUG_max;vector<double> vRAUG;            // augmentation
+    double RMAX_min,RMAX_max;vector<double> vRMAX;            // unicity
+    vector<string> vTITEL;                                         // unicity
+    vector<string> vLEXCH;                                         // unicity
     // end shared xPOTCAR
     string pp_type;
-    deque<string> species,species_pp,species_pp_type,species_pp_version; // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
-    deque<deque<double> > species_pp_vLDAU;  // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species;                                        // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<int>    species_Z;                                      // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp;                                     // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_type;                                // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_version;                             // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_AUID;                                // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_AUID_collisions;                     // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<double> species_pp_groundstate_energy;                  // meV/atom
+    vector<string> species_pp_groundstate_structure;               // name that we have, maybe ANRL
+    deque<deque<double> > species_pp_vLDAU;                       // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
     bool isKIN;                                                   // METAGGA
     bool isMETAGGA;string METAGGA;                                // METAGGA
     string string_LDAU;                                           // for aflowlib_libraries.cpp
@@ -3059,10 +3077,12 @@ class xOUTCAR {
     //int number_bands,number_kpoints; // CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 // CO20171006 - camilo garbage
     //int spin;  // CO20171006 - camilo garbage
-  private:                       //
+    friend ostream& operator<<(ostream&, const xOUTCAR&);  // ME20190623
+ private:                       //
     void free();                 // free space
     void copy(const xOUTCAR& b); //
 };
+
 //-------------------------------------------------------------------------------------------------
 class xDOSCAR {
   public:
@@ -3103,26 +3123,26 @@ class xDOSCAR {
     bool lmResolved;  // Is it lm-resolved?
     string carstring;  // The fourth line of the DOSCAR
     // ME20190620 - END
-    string ERROR; //CO191004
-    vector<double> conduction_band_min;     //CO191004
-    double         conduction_band_min_net; //CO191004
-    vector<double> valence_band_max;        //CO191004
-    double         valence_band_max_net;    //CO191004
-    vector<double> Egap;                    //CO191004
-    double         Egap_net;                //CO191004
-    vector<double> Egap_fit;                //CO191004
-    double         Egap_fit_net;            //CO191004
-    vector<string> Egap_type;               //CO191004
-    string         Egap_type_net;           //CO191004
+    string ERROR; //CO20191004
+    vector<double> conduction_band_min;     //CO20191004
+    double         conduction_band_min_net; //CO20191004
+    vector<double> valence_band_max;        //CO20191004
+    double         valence_band_max_net;    //CO20191004
+    vector<double> Egap;                    //CO20191004
+    double         Egap_net;                //CO20191004
+    vector<double> Egap_fit;                //CO20191004
+    double         Egap_fit_net;            //CO20191004
+    vector<string> Egap_type;               //CO20191004
+    string         Egap_type_net;           //CO20191004
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-    void convertSpinOFF2ON(); //CO191217 - copies everything from spin channel 1 to spin channel 2
-    bool checkDOS(string& ERROR_out) const;  //CO191010
-    bool GetBandGap(double EFERMI=AUROSTD_NAN,double efermi_tol=AUROSTD_NAN,double energy_tol=1e-3,double occ_tol=1e-4); //CO191110
-    deque<deque<deque<deque<double> > > > GetVDOSSpecies(const xstructure& xstr) const; //vDOS.at(species).at(spin).at(energy_number)  //CO191110
-    deque<deque<deque<deque<double> > > > GetVDOSSpecies(deque<int> num_each_type) const; //vDOS.at(species).at(spin).at(energy_number)  //CO191110
+    void convertSpinOFF2ON(); //CO20191217 - copies everything from spin channel 1 to spin channel 2
+    bool checkDOS(string& ERROR_out) const;  //CO20191010
+    bool GetBandGap(double EFERMI=AUROSTD_NAN,double efermi_tol=AUROSTD_NAN,double energy_tol=1e-3,double occ_tol=1e-4); //CO20191110
+    deque<deque<deque<deque<double> > > > GetVDOSSpecies(const xstructure& xstr) const; //vDOS.at(species).at(spin).at(energy_number)  //CO20191110
+    deque<deque<deque<deque<double> > > > GetVDOSSpecies(deque<int> num_each_type) const; //vDOS.at(species).at(spin).at(energy_number)  //CO20191110
     friend ostream& operator<<(ostream&, const xDOSCAR&);  // ME20190623
   private:                                                        //
     void free();                                                  // free space
@@ -3172,29 +3192,58 @@ class xPOTCAR {
     const xPOTCAR& operator=(const xPOTCAR &b);                   // copy
     void clear(void);                                             // clear
     // CONTENT
-    string content;vector<string> vcontent;string filename;       // the content, and lines of it
+    string content;vector<string> vcontent;                       // the content and the lines
+    string filename;                                              // the filename - THIS IS A GLOBAL PROPERTY OF THE WHOLE POTCAR
     string title;
     bool   POTCAR_PAW;
     string POTCAR_TYPE;
     bool   POTCAR_KINETIC;
-    double ENMAX;deque<double> vENMAX;                            // eV
-    double ENMIN;deque<double> vENMIN;                            // eV
-    double POMASS_sum,POMASS_min,POMASS_max;deque<double> vPOMASS;// mass
-    double ZVAL_sum,ZVAL_min,ZVAL_max;deque<double> vZVAL;        // valence
-    double EATOM_min,EATOM_max;deque<double> vEATOM;              // eV
-    double RCORE_min,RCORE_max;deque<double> vRCORE;              // outmost cutoff radius
-    double RWIGS_min,RWIGS_max;deque<double> vRWIGS;              // wigner-seitz radius (au A)
-    double EAUG_min,EAUG_max;deque<double> vEAUG;                 // augmentation
+    bool   POTCAR_GW;
+    bool   POTCAR_AE;
+    double ENMAX;vector<double> vENMAX;                            // eV
+    double ENMIN;vector<double> vENMIN;                            // eV
+    double POMASS_sum,POMASS_min,POMASS_max;vector<double> vPOMASS;// mass
+    double ZVAL_sum,ZVAL_min,ZVAL_max;vector<double> vZVAL;        // valence
+    double EATOM_min,EATOM_max;vector<double> vEATOM;              // eV
+    double RCORE_min,RCORE_max;vector<double> vRCORE;              // outmost cutoff radius
+    double RWIGS_min,RWIGS_max;vector<double> vRWIGS;              // wigner-seitz radius (au A)
+    double EAUG_min,EAUG_max;vector<double> vEAUG;                 // augmentation
+    double RAUG_min,RAUG_max;vector<double> vRAUG;                 // augmentation
+    double RMAX_min,RMAX_max;vector<double> vRMAX;                 // unicity
+    vector<string> vTITEL;                                         // unicity
+    vector<string> vLEXCH;                                         // unicity
     string pp_type;
-    deque<string> species,species_pp,species_pp_type,species_pp_version; // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species;                                        // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<int>    species_Z;                                      // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp;                                     // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_type;                                // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_version;                             // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_AUID;                                // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_AUID_collisions;                     // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<double> species_pp_groundstate_energy;                  // meV/atom
+    vector<string> species_pp_groundstate_structure;               // name that we have, maybe ANRL
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-  private:                                                        //
-    void free();                                                  // free space
-    void copy(const xPOTCAR& b);                                  //
+    // objects/functions for references energies defined only with one specie
+    // [OBSOLETE] vector<string> vsymbol;                                        // Ta 
+    // [OBSOLETE] vector<string> vname;                                          // Ta_pv // FIX COPY CONSTRUCTOR   
+    // [OBSOLETE] vector<string> vdate;                            // 07Sep2000  // FIX COPY CONSTRUCTOR
+    string AUID;                                                   // crc32 - THIS IS A GLOBAL PROPERTY OF THE WHOLE POTCAR
+    friend ostream& operator<<(ostream &,const xPOTCAR&);          // print // FIX COPY CONSTRUCTOR
+    // xPOTCAR xPOTCAR_initialize(uint Z);                         // function to clean up the name // FIX COPY CONSTRUCTOR
+  private:                                                         //
+    void free();                                                   // free space
+    void copy(const xPOTCAR& b);                                   //
 };
+
+extern std::vector<xPOTCAR> vxpseudopotential;        // store starting from ONE
+uint xPOTCAR_Initialize(void);
+bool xPOTCAR_PURE_Printer(xPOTCAR& xPOT,ostream& oss,bool LVERBOSE=FALSE);
+xPOTCAR xPOTCAR_Finder(vector<string>& species_pp_AUID,vector<string>& species_pp_AUID_collisions,const string& TITEL,const string& LEXCH,const double& EATOM,const double& RMAX,bool LVERBOSE=FALSE);
+xPOTCAR xPOTCAR_Finder(const string& AUID,bool LVERBOSE=FALSE);
+
 // -------------------------------------------------------------------------------------------------
 class xVASPRUNXML {
   public:
@@ -3303,7 +3352,7 @@ class xCHGCAR {
     void copy(const xCHGCAR& b); //
 };
 
-class xQMVASP {  //CO191110
+class xQMVASP {  //CO20191110
   public:
     xQMVASP();                                                     // default, just allocate
     ~xQMVASP();                                                    // kill everything
@@ -3315,7 +3364,7 @@ class xQMVASP {  //CO191110
     string content;vector<string> vcontent;string filename;        // the content, and lines of it
     double H_atom_relax;
     double H_atom_static;
-    vector<aurostd::xvector<double> > vforces;                     // for APL - only one (no relax vs. static), get most relaxed forces  //CO191112
+    vector<aurostd::xvector<double> > vforces;                     // for APL - only one (no relax vs. static), get most relaxed forces  //CO20191112
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
@@ -3377,7 +3426,7 @@ class xAIMSOUT {
 };
 // -----------------------------------------------------------------------------------------------
 bool PrintBandGap       (string& WorkDir, ostream &oss);
-bool PrintBandGap_DOS   (string& WorkDir, ostream &oss); //CO191110
+bool PrintBandGap_DOS   (string& WorkDir, ostream &oss); //CO20191110
 bool PrintEffectiveMass (string& WorkDir, ostream &oss);
 bool PrintEigCurv       (string& WorkDir, ostream &oss);
 // -----------------------------------------------------------------------------------------------
@@ -3438,21 +3487,21 @@ namespace plotter {
   vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  // ME20190813
   vector<double> getCompositionFromANRLPrototype(const string&);
   string formatDefaultTitlePOCC(const aurostd::xoption&);
-  string formatDefaultTitlePOCC_191004(const aurostd::xoption&); //CO191110
+  string formatDefaultTitlePOCC_191004(const aurostd::xoption&); //CO20191110
   string formatDefaultTitlePOCC_190101(const aurostd::xoption&);
   vector<double> getCompositionFromPoccString(const string&, bool&);
 
   // Electronic structure ----------------------------------------------------
-  void patchDefaultTitleAFLOWIN(xoption& plotoptions);  //CO191110
+  void patchDefaultTitleAFLOWIN(xoption& plotoptions);  //CO20191110
   // Plot functions
   void PLOT_DOS(aurostd::xoption&);
-  void PLOT_DOS(aurostd::xoption&,const xDOSCAR&); //CO191110
+  void PLOT_DOS(aurostd::xoption&,const xDOSCAR&); //CO20191110
   void PLOT_DOS(aurostd::xoption&, stringstream&);
-  void PLOT_DOS(aurostd::xoption&, stringstream&,const xDOSCAR&);  //CO191110
+  void PLOT_DOS(aurostd::xoption&, stringstream&,const xDOSCAR&);  //CO20191110
   void PLOT_PDOS(aurostd::xoption&);
-  void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&); //CO191110
+  void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&); //CO20191110
   void PLOT_PDOS(aurostd::xoption&, stringstream&);
-  void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&);  //CO191110
+  void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&);  //CO20191110
   void PLOT_BAND(aurostd::xoption&);
   void PLOT_BAND(aurostd::xoption&, stringstream&);
   void BANDDOS2JSON(ostream&, string);
@@ -3460,7 +3509,7 @@ namespace plotter {
   void PLOT_BANDDOS(aurostd::xoption&, stringstream&);
 
   // Helper functions
-  xstructure getStructureWithNames(const aurostd::xoption&, const string& carstring="CAR");  //CO191110
+  xstructure getStructureWithNames(const aurostd::xoption&, const string& carstring="CAR");  //CO20191110
   string getLatticeFromKpointsTitle(const string&);
   void shiftEfermiToZero(xEIGENVAL&, double);
   void setEMinMax(aurostd::xoption&, double, double);
@@ -3687,7 +3736,7 @@ namespace SYM {
   bool AtomsEquivalent_20161115(xstructure& str,_atom& atom1,_atom& atom2); // DX
   bool AtomsEquivalent_20160101(xstructure& str,_atom& atom1,_atom& atom2); // DX
   bool AtomsEquivalent(xstructure& str, _atom& atom1, _atom& atom2,double& eps); // DX
-  bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol); // DX //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool AtomsEquivalent(xstructure& str, _atom& a, _atom& b, bool skew, double tol); // DX //CO20190520 - removed pointers for bools and doubles, added const where possible
   bool AtomsEquivalent_20161115(xstructure& str,_atom& atom1,_atom& atom2,double& eps); // DX
   bool AtomsEquivalent_20160101(xstructure& str,_atom& atom1,_atom& atom2,double& eps); // DX
   bool AtomsEquivalent_Basis(xstructure& str, int atom1_indx,int atom2_indx);
@@ -3766,34 +3815,34 @@ namespace SYM {
   bool PointGroupLookUpTable(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format);
   // DX and CO -END
   void CalculateSitePointGroup2(xstructure &a,bool ComMidss); // for --agroup2 and --agroup2m
-  // DX - START
+  // DX START
   //xstructure and _sym_op
   bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,vector<int>& basis_atoms_map,vector<int>& basis_types_map);
-  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
   //atoms, c2f, f2c and _sym_op
-  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool getFullSymBasis_20170729(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
-  //bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& Uf, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tolerance, vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
-  //bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& Uf, xmatrix<double>& c2f, xmatrix<double>& f2c, string& str_Hermann_Mauguin, bool skew, double tolerance, vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
-  //bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& Uf, xmatrix<double>& c2f, xmatrix<double>& f2c, xvector<double>& ftau, bool skew, double tolerance, vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
-  //bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& Uf, xmatrix<double>& c2f, xmatrix<double>& f2c, string& str_Hermann_Mauguin, xvector<double>& ftau, bool skew, double tolerance, vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis_20170729(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  //bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& Uf, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tolerance, vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  //bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& Uf, xmatrix<double>& c2f, xmatrix<double>& f2c, string& str_Hermann_Mauguin, bool skew, double tolerance, vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  //bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& Uf, xmatrix<double>& c2f, xmatrix<double>& f2c, xvector<double>& ftau, bool skew, double tolerance, vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  //bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& Uf, xmatrix<double>& c2f, xmatrix<double>& f2c, string& str_Hermann_Mauguin, xvector<double>& ftau, bool skew, double tolerance, vector<int>& basis_atoms_map,vector<int>& basis_types_map); //CO20190520 - removed pointers for bools and doubles, added const where possible
   bool CalculateFactorGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");
-  // DX - END
+  // DX END
   bool CalculateFactorGroup(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");     // FACTOR GROUP     _FGROUP_
   bool CalculateFactorGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");      // FACTOR GROUP      _FGROUP_
-  // DX - START
+  // DX START
   bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, bool skew, double tol); //DX20190620
-  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol);   //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol);   //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
   xvector<double> minimizeDistanceCartesianMethod(const xvector<double>& cpos1, const xvector<double>& cpos2, const xmatrix<double>& lattice); //DX20190613
   xvector<double> minimizeDistanceCartesianMethod(const xvector<double>& cpos1, const xvector<double>& cpos2, const xmatrix<double>& lattice, xvector<int>& ijk); //DX20190613
   xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fpos1, const xvector<double>& fpos2); //DX20190613
   xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff); //DX20190613
   xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff, xvector<int>& ijk); //DX20190613
-  //DX20190613 [OBOSLETE] bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-  //DX20190613 [OBOSLETE] bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
+  //DX20190613 [OBOSLETE] bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  //DX20190613 [OBOSLETE] bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible
   //DX20190613 [OBOSLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice);
   //DX20190613 [OBOSLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice,xvector<double>& min_vec,xvector<int>& ijk);
   //DX20190613 [OBOSLETE] xvector<double> minimumCartesianVector(const xvector<double>&, const xvector<double>&,
@@ -3802,45 +3851,45 @@ namespace SYM {
   //DX20190613 [OBOSLETE]                                        const xmatrix<double>&, xvector<int>&);  // ME20180730
   //DX20190613 [OBOSLETE] bool PBC(xvector<double>& v_in, xvector<int>& ijk, bool& restriction);
   //DX20190613 [OBOSLETE] bool PBC(xvector<double>& v_in);
-  xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,bool skew=false);  //CO190525
-  xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew=false);  //CO190525
+  xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,bool skew=false);  //CO20190525
+  xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew=false);  //CO20190525
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,bool skew=false);  //DX20190620
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew=false); //DX20190620
 
-  bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, bool skew, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
   bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //DX20190620 - overload
-  bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, bool skew, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
   bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //DX20190620 - overload 
-  bool FPOSMatch(const xvector<double>& atom1, const xvector<double>& atom2, const xmatrix<double>& lattice, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool FPOSMatch(const xvector<double>& atom1, const xvector<double>& atom2, const xmatrix<double>& lattice, bool skew, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
   bool FPOSMatch(const xvector<double>& atom1, const xvector<double>& atom2, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //DX20190620 - overload 
-  bool validateAtomPosition(const _atom& atom,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_); //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool validateAtomPosition(const _atom& atom,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_); //CO20190520 - removed pointers for bools and doubles, added const where possible
   bool MapAtom(const deque<_atom>& a_vec, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol); //DX20190620
-  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
   bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol); //DX20190620
-  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
   bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, bool skew, double tol); //DX20190620
-  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
   bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol); //DX20190620 
-  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
   bool BringInCellTolABC(xstructure& a, xvector<double> tol_abc_res);
-  //[CO190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(vector<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol,bool fast=true);    //CO190520 - removed pointers for bools and doubles, added const where possible
+  //[CO20190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(vector<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol,bool fast=true);    //CO20190520 - removed pointers for bools and doubles, added const where possible
   bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, bool skew, double tol, uint& mapped_index,bool fast=true); //DX20190620
-  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast=true);   //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
-  //[CO190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(deque<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol,bool fast=true); //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast=true);   //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input
+  //[CO20190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(deque<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol,bool fast=true); //CO20190520 - removed pointers for bools and doubles, added const where possible
   bool MapAtomWithBasis(const deque<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, bool skew, double tol, uint& mapped_index,bool fast=true); //DX20190620
-  bool MapAtomWithBasis(const deque<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast=true); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
-  bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtomWithBasis(const deque<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast=true); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - lattice and f2c as input, remove "Atom" prefix from name
+  bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol); //CO20190520 - removed pointers for bools and doubles, added const where possible
   double minimumDistance(const xstructure& xstr);
-  double minimumDistance(const deque<_atom>& atoms);  //CO190808 - for NON periodic systems
+  double minimumDistance(const deque<_atom>& atoms);  //CO20190808 - for NON periodic systems
   double minimumDistance(const deque<_atom>& atoms, const xmatrix<double>& lattice,double scale=1.0);
   double defaultTolerance(const xstructure& xstr);
-  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, double tolerance); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, bool& is_deg, double tolerance); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, double tolerance); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, bool& is_deg, double tolerance); //CO190520 - removed pointers for bools and doubles, added const where possible
-  // DX20170509 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance, int& count , double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190524 - need pointer for tolerance, otherwise it will not update
+  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, double tolerance); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, bool& is_deg, double tolerance); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, double tolerance); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, bool& is_deg, double tolerance); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  // DX20170509 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance, int& count , double& min_dist, bool& no_scan); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190524 - need pointer for tolerance, otherwise it will not update
   deque<deque<_atom> > break_up_by_type(deque<_atom>& expanded_crystal);
   vector<vector<_atom> > break_up_by_type(vector<_atom> expanded_crystal);
   //DX20190905 [OBSOLETE] double mod_one(double d); // DX 
@@ -3852,7 +3901,7 @@ namespace SYM {
   bool CalculateFactorGroup_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_);      // FACTOR GROUP      _FGROUP_
   bool CalculateSpaceGroup_20160101(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,bool _write_,const bool& osswrite,ostream& oss);      // SPACE GROUP      _SGROUP_
   bool CalculateSpaceGroup_20160801(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");      // SPACE GROUP      _SGROUP_
-  // DX - END
+  // DX END
   bool CalculateSpaceGroup(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");      // SPACE GROUP      _SGROUP_
 
   bool CalculateInequivalentAtoms(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt"); // EQUIVALENT ATOMS _IATOMS_
@@ -3939,10 +3988,10 @@ namespace LATTICE {
   //bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,int mode);
   bool Bravais_Lattice_Structure(xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang); // calculate everything
   bool Bravais_Lattice_StructureDefault(xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym=true); // calculate everything
-  // DX - START
+  // DX START
   bool Bravais_Lattice_StructureDefault_20170401(xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym=true); // calculate everything
   bool Bravais_Lattice_StructureDefault_20160101(xstructure& str_in,xstructure& str_sp,xstructure& str_sc); // calculate everything
-  // DX - END
+  // DX END
   bool Lattice(const xmatrix<double>& lattice,xmatrix<double>& lattice_sp,xmatrix<double>& lattice_sc,string& bravais_lattice_type,string& bravais_lattice_variation_type,string& bravais_lattice_system,double eps,double epsang);
   string Bravais_Lattice_Type(const xmatrix<double>& lattice,xmatrix<double>& lattice_sp,xmatrix<double>& lattice_sc,double eps,double epsang);
   string Bravais_Lattice_Type(const xmatrix<double>& lattice,xmatrix<double>& lattice_sp,xmatrix<double>& lattice_sc);
@@ -4016,94 +4065,94 @@ namespace slab { // ROMAN CHEPULSKYY
   double hkl_CartCoord_Length(xvector<double>& hkl_CartCoord,const xvector<double>& hkl);
 } // namespace slab
 
-#define DEFAULT_TOTAL_LAYERS 10 //CO190601 - move to .aflow.rc eventually
-#define DEFAULT_V3_ANGLE_DEVIATION 5.0  //CO190803 - move to .aflow.rc eventually
-namespace slab { //CO190601
-  xvector<double> HKLPlane2Normal(const xstructure& xstr_in,int h,int k,int l);  //CO190321
-  xvector<double> HKLPlane2Normal(const xmatrix<double>& lattice,int h,int k,int l); //CO190321
-  xvector<double> HKLPlane2Normal(const xstructure& xstr_in,const xvector<int>& hkl);  //CO190321
-  xvector<double> HKLPlane2Normal(const xmatrix<double>& lattice,const xvector<int>& hkl); //CO190321
-  bool Normal2HKLPlane(const xstructure& xstr_in,const xvector<double>& n,xvector<int>& hkl);  //CO190321
-  bool Normal2HKLPlane(const xmatrix<double>& lattice,const xvector<double>& n,xvector<int>& hkl); //CO190321
-  vector<xvector<double> > getHKLPlaneIntercepts(const xstructure& xstr_in,int h,int k,int l); //CO190321
-  vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,int h,int k,int l);  //CO190321
-  vector<xvector<double> > getHKLPlaneIntercepts(const xstructure& xstr_in,const xvector<int>& hkl); //CO190321
-  vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,const xvector<int>& hkl);  //CO190321
-  double getSpacingHKLPlane(const xstructure& xstr_in,int h,int k,int l);  //CO190321
-  double getSpacingHKLPlane(const xmatrix<double>& lattice,int h,int k,int l); //CO190321
-  double getSpacingHKLPlane(const xstructure& xstr_in,const xvector<int>& hkl);  //CO190321
-  double getSpacingHKLPlane(const xmatrix<double>& lattice,const xvector<int>& hkl); //CO190321
-  double getAngleHKLPlanes(const xstructure& xstr_in,int h1,int k1,int l1,int h2,int k2,int l2);  //CO190321
-  double getAngleHKLPlanes(const xmatrix<double>& lattice,int h1,int k1,int l1,int h2,int k2,int l2); //CO190321
-  double getAngleHKLPlanes(const xstructure& xstr_in,const xvector<int>& hkl1,const xvector<int>& hkl2);  //CO190321
-  double getAngleHKLPlanes(const xmatrix<double>& lattice,const xvector<int>& hkl1,const xvector<int>& hkl2); //CO190321
+#define DEFAULT_TOTAL_LAYERS 10 //CO20190601 - move to .aflow.rc eventually
+#define DEFAULT_V3_ANGLE_DEVIATION 5.0  //CO20190803 - move to .aflow.rc eventually
+namespace slab { //CO20190601
+  xvector<double> HKLPlane2Normal(const xstructure& xstr_in,int h,int k,int l);  //CO20190321
+  xvector<double> HKLPlane2Normal(const xmatrix<double>& lattice,int h,int k,int l); //CO20190321
+  xvector<double> HKLPlane2Normal(const xstructure& xstr_in,const xvector<int>& hkl);  //CO20190321
+  xvector<double> HKLPlane2Normal(const xmatrix<double>& lattice,const xvector<int>& hkl); //CO20190321
+  bool Normal2HKLPlane(const xstructure& xstr_in,const xvector<double>& n,xvector<int>& hkl);  //CO20190321
+  bool Normal2HKLPlane(const xmatrix<double>& lattice,const xvector<double>& n,xvector<int>& hkl); //CO20190321
+  vector<xvector<double> > getHKLPlaneIntercepts(const xstructure& xstr_in,int h,int k,int l); //CO20190321
+  vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,int h,int k,int l);  //CO20190321
+  vector<xvector<double> > getHKLPlaneIntercepts(const xstructure& xstr_in,const xvector<int>& hkl); //CO20190321
+  vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,const xvector<int>& hkl);  //CO20190321
+  double getSpacingHKLPlane(const xstructure& xstr_in,int h,int k,int l);  //CO20190321
+  double getSpacingHKLPlane(const xmatrix<double>& lattice,int h,int k,int l); //CO20190321
+  double getSpacingHKLPlane(const xstructure& xstr_in,const xvector<int>& hkl);  //CO20190321
+  double getSpacingHKLPlane(const xmatrix<double>& lattice,const xvector<int>& hkl); //CO20190321
+  double getAngleHKLPlanes(const xstructure& xstr_in,int h1,int k1,int l1,int h2,int k2,int l2);  //CO20190321
+  double getAngleHKLPlanes(const xmatrix<double>& lattice,int h1,int k1,int l1,int h2,int k2,int l2); //CO20190321
+  double getAngleHKLPlanes(const xstructure& xstr_in,const xvector<int>& hkl1,const xvector<int>& hkl2);  //CO20190321
+  double getAngleHKLPlanes(const xmatrix<double>& lattice,const xvector<int>& hkl1,const xvector<int>& hkl2); //CO20190321
   void BringInBoundary(xvector<double>& vec,double padding=0.0);
-  //[CO190520 - plugged into BringInBoundary() with no padding]void Bring2OppositeBoundary(xvector<double>& vec);
-  xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double>& l_cpos,const xvector<double>& cpos_starting,vector<uint>& atoms2skip,uint& loop_iteration,bool outside_current_cell=false); //CO190321
-  double getDistanceBetweenImages(const xstructure& xstr_in,const xvector<double>& n,bool outside_cell=false);  //CO190321
-  bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& n,double& distance_between_images,bool outside_cell=false);  //CO190321
-  bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<double>& n,double& distance_between_images,bool outside_cell=false);  //CO190321
+  //[CO20190520 - plugged into BringInBoundary() with no padding]void Bring2OppositeBoundary(xvector<double>& vec);
+  xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double>& l_cpos,const xvector<double>& cpos_starting,vector<uint>& atoms2skip,uint& loop_iteration,bool outside_current_cell=false); //CO20190321
+  double getDistanceBetweenImages(const xstructure& xstr_in,const xvector<double>& n,bool outside_cell=false);  //CO20190321
+  bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& n,double& distance_between_images,bool outside_cell=false);  //CO20190321
+  bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<double>& n,double& distance_between_images,bool outside_cell=false);  //CO20190321
 
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //easy inputs
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //load from xoptions
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout);  //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout);  //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321  
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout);  //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //input directly
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321  
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout);  //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout);  //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout); //CO190321
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout);  //CO190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //easy inputs
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //load from xoptions
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout);  //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout);  //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321  
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //input directly
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321  
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss=cout);  //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout); //CO20190321
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss=cout);  //CO20190321
 
-  xmatrix<double> getSlabLattice(istream& input,const xvector<int>& hkl,xmatrix<double>& lattice_slab_origbasis,double ang_dev=DEFAULT_V3_ANGLE_DEVIATION,double vlen_max_strict=AUROSTD_MAX_DOUBLE); //CO190321
-  xmatrix<double> getSlabLattice(const xstructure& _xstr_in,const xvector<int>& hkl,xmatrix<double>& lattice_slab_origbasis,double ang_dev=DEFAULT_V3_ANGLE_DEVIATION,double vlen_max_strict=AUROSTD_MAX_DOUBLE); //CO190321
+  xmatrix<double> getSlabLattice(istream& input,const xvector<int>& hkl,xmatrix<double>& lattice_slab_origbasis,double ang_dev=DEFAULT_V3_ANGLE_DEVIATION,double vlen_max_strict=AUROSTD_MAX_DOUBLE); //CO20190321
+  xmatrix<double> getSlabLattice(const xstructure& _xstr_in,const xvector<int>& hkl,xmatrix<double>& lattice_slab_origbasis,double ang_dev=DEFAULT_V3_ANGLE_DEVIATION,double vlen_max_strict=AUROSTD_MAX_DOUBLE); //CO20190321
   //easy inputs
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
   //load from xoptions
-  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO190321
-  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO190321
-  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321  
-  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO190321
-  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
+  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321  
+  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
   //input directly
-  xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321  
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO190321
-  xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO190321
-  xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO190321
-  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO190321
+  xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321  
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
+  xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
+  xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
+  xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
 
-  bool slabTest(ostream& oss=cout);  //CO190520
-  bool slabTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO190520
+  bool slabTest(ostream& oss=cout);  //CO20190520
+  bool slabTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20190520
 } // namespace slab
 
 // ----------------------------------------------------------------------------
@@ -4236,7 +4285,7 @@ xvector<double> GetCDispFromOrigin(const _atom& atom);
 double GetDistFromOrigin(const _atom& atom);
 //void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 _atom ConvertAtomToLat(const _atom& in_at,const xmatrix<double>& lattice);
-double GetXrayScattFactor(const string& name,double lambda=XRAY_RADIATION_COPPER_Kalpha,bool clean=true); //CO190322
+double GetXrayScattFactor(const string& name,double lambda=XRAY_RADIATION_COPPER_Kalpha,bool clean=true); //CO20190322
 xmatrix<double> RecipLat(const xmatrix<double>& lat);
 double Normal(const double& x,const double& mu,const double& sigma);
 xstructure SetLat(const xstructure& a,const xmatrix<double>& in_lat);
@@ -4338,6 +4387,9 @@ xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 // ----------------------------------------------------------------------------
 // aflow_xelement.h stuff
 #include "aflow_xelement.h"
+
+
+
 
 #endif
 // ***************************************************************************

@@ -607,9 +607,9 @@ namespace init {
         aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
         aurostd::args2attachedflag(argv,cmds,"--run=") ||
         aurostd::args2flag(argv,cmds,"--generate_vasp_from_aflowin|--generate_aflowin_from_vasp"));
-    // DX - START
+    // DX START
     XHOST.vflag_control.flag("AFLOWIN_SYM",aurostd::args2flag(argv,cmds,"--generate_symmetry|--generate_sym")); // DX
-    // DX - END
+    // DX END
     // [OBSOLETE]    XHOST.vflag_control.flag("SWITCH_AFLOWLIB",aurostd::args2flag(argv,cmds,"--aflowlib") || aurostd::args2attachedflag(argv,cmds,"--aflowlib="));
     XHOST.vflag_control.flag("SWITCH_APENNSY1",aurostd::args2flag(argv,cmds,"--apennsy|--lib2|--lib2u|--lib2pgm|--LIB2|--LIB2U|--LIB2PGM|--libraryX|--libraryU|--libraryPGM|--alloy"));
     XHOST.vflag_control.flag("SWITCH_APENNSY2",aurostd::args2flag(argv,cmds,"--apool|--apool_private|--apool_test|--library2|-simpls|--simpls|--VASPIN|--energy|--psenergy"));
@@ -638,6 +638,8 @@ namespace init {
     if(!directory_clean.empty()){XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
     if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
     //CO20190402 STOP - cleaning directory, giving us something to print with logger
+
+    // LOGICS to intercept --file= => XHOST.vflag_control.flag("FILE") XHOST.vflag_control.getattachedscheme("FILE")
     // FILE NEEDS A SPECIAL TREATMENT
     string file_default="xxxx",file=file_default;
     found=FALSE;
@@ -645,7 +647,9 @@ namespace init {
     if(!found&&(found=aurostd::args2attachedflag(argv,cmds,"--FILE=|--file=|--F=|--f="))) {file=aurostd::args2attachedstring(argv,"--FILE=|--file=|--F=|--f=",file_default);if(INIT_VERBOSE) cerr << "--FILE=" << file << " " << endl;}
     XHOST.vflag_control.flag("FILE",found);  // if found
     if(XHOST.vflag_control.flag("FILE")) XHOST.vflag_control.push_attached("FILE",file);
-    if(XHOST.vflag_control.flag("FILE")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"FILE\")=[" << XHOST.vflag_control.getattachedscheme("FILE") << "]" << endl; 
+    if(XHOST.vflag_control.flag("FILE")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"FILE\")=[" << XHOST.vflag_control.getattachedscheme("FILE") << "]" << endl;
+
+    
     // VFILES NEEDS A SPECIAL TREATMENT
     string dirs_default="xxxx",dirs=dirs_default;
     vector<string> vdir;
@@ -841,17 +845,35 @@ namespace init {
     }
 
     // USEFUL shortcuts // SC20200319
-    deque<string> vshort; aurostd::string2tokens("1,2,4,6,8,10,12,14,16,20,24,28,32,48,52,64",vshort,",");
-    for(uint ishort=0;ishort<vshort.size();ishort++) {
-      if(!aurostd::args2attachedflag(argv,"--np=") && aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  // SC20200319
-	//if(INIT_VERBOSE)
-	cerr << "init::InitMachine: FOUND ishort=" << ishort << "  vshort.at(ishort)=" << vshort.at(ishort) << endl;
-	XHOST.vflag_control.flag("MULTI=SH",TRUE);
-	XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
-	XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",vshort.at(ishort));
+    if(!aurostd::args2attachedflag(argv,"--np=")) {
+      deque<string> vshort; aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,32,48,52,64",vshort,",");
+      for(uint ishort=0;ishort<vshort.size();ishort++) {
+	if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  // SC20200319
+	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
+	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
+	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",vshort.at(ishort));
+	  //	  if(INIT_VERBOSE)
+	  cerr << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+	}
       }
     }
-    
+    // USEFUL shortcuts // SC20200323 
+    if(!XHOST.vflag_control.flag("FILE")) { // not specified file
+      deque<string> vshort; aurostd::string2tokens("0,1,2,3,4,5,6,7,8,9",vshort,",");
+      for(uint ishort=0;ishort<vshort.size();ishort++) {
+	if(aurostd::args2flag(argv,cmds,"--multi=x.lib"+vshort.at(ishort)) || aurostd::args2flag(argv,cmds,"--multi=./x.lib"+vshort.at(ishort))) {  // SC20200323
+	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
+	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
+	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","16");
+	  XHOST.vflag_control.flag("FILE",TRUE);  // if found
+	  XHOST.vflag_control.push_attached("FILE","x.lib"+vshort.at(ishort));
+	  cerr << "init::InitMachine: FOUND FILE=" << XHOST.vflag_control.getattachedscheme("FILE") << endl;
+	  cerr << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+	}
+      }
+    }
+
+   
     // ME20181103 - set MPI when number of threads is larger than 1
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX") || 
         (aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS")) > 1)) {

@@ -118,7 +118,7 @@ namespace bader_functions {
       return FALSE;
     }
     oss << soliloquy << "using " << outcar_file << " to extract system name, species, and valence charges." << endl;
-    xOUTCAR outcar(outcar_file);  //can handle compressed files, automatically pulls in system, species (strings), and vZVAL (deque<doubles>)
+    xOUTCAR outcar(outcar_file);  //can handle compressed files, automatically pulls in system, species (strings), and vZVAL (vector<doubles>)
     //[OBSOLETE as it is automatic now]outcar.GetProperties();                       //we need SYSTEM
 
     // get number of each species and valence charges from POSCAR
@@ -287,7 +287,7 @@ namespace bader_functions {
   bool BaderCalc(aurostd::xoption& vpflow,
       const string& bader_options,
       const string& prototype,
-      const deque<string>& vspecies,
+      const vector<string>& vspecies,
       const deque<int>& num_each_type,
       const vector<double>& vZVAL,
       const vector<double>& cutoffs,
@@ -300,7 +300,7 @@ namespace bader_functions {
     string soliloquy_empty = "                                 ";  // so you know who's speaking
 
     // CO20180220 moved up from below
-    string execution_path = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     FixDirectory(directory);
     oss << soliloquy << "working within " << directory << "." << endl;
 
@@ -344,7 +344,7 @@ namespace bader_functions {
     //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // translate "./" into a full path, might be done twice
-    //[CO20180220 - moved up]string execution_path = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    //[CO20180220 - moved up]string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     //[CO20180220 - moved up]FixDirectory(directory);
 
     //NO LONGER AN ISSUE, corey
@@ -532,7 +532,7 @@ namespace bader_functions {
     }
     string BADER_RUN_DIRECTORY = aurostd::TmpDirectoryCreate("BADER");
     oss << soliloquy << "changing directories to " << BADER_RUN_DIRECTORY << " to execute bader command." << endl;
-    string work_dir=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    string work_dir=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     chdir(BADER_RUN_DIRECTORY.c_str());
     //FORTRAN has a problem with strings/paths longer than 128 characters, so make everything local
     aurostd::CopyFile(required_files.at(0), "CHGCAR");
@@ -1367,7 +1367,7 @@ namespace bader_functions {
 namespace bader_functions {
   bool BaderCalc(const string& bader_options,
       const string& prototype,
-      const deque<string>& vspecies,
+      const vector<string>& vspecies,
       const deque<int>& num_each_type,
       const vector<double>& vZVAL,
       const vector<double>& cutoffs,
@@ -1386,7 +1386,7 @@ namespace bader_functions {
 namespace bader_functions {
   void FixDirectory(string& directory) {
     string soliloquy = "bader_functions::FixDirectory():  ";  // so you know who's speaking
-    string execution_path = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    string execution_path = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     // translate "./" into a full path
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << soliloquy << "CHECK DIRECTORY" << endl;
@@ -2052,7 +2052,7 @@ namespace bader_functions {
     }
     if(LDEBUG) cerr << soliloquy << "GATHER CHGCAR_FILES" << endl;
     vector<string> chgcar_files;
-    string directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+    string directory = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     string input = vpflow.getattachedscheme("PREPARE_CHGCAR_4_JMOL");
     if(aurostd::substring2bool(input, ",")) {
       aurostd::string2tokens(input, chgcar_files, ",");
@@ -2928,7 +2928,7 @@ namespace pflow {
 
     // exchange "./" for an explicit path
     if(directory == "./") {
-      directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+      directory = aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
     }
 
     // announce the directory to be searched for phonon data

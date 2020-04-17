@@ -1,3 +1,30 @@
+3.2.2 - 2020/03/30
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.2.tar.xz
+	-- sum up all the previous updates - ready to run now (SC)
+3.2.1k - 2020/03/29
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.1*.tar.xz
+        -- species_pp_groundstate_energy and species_pp_groundstate_structure 1k (SC)
+        -- VASP_Write_AUID_FILE and VASP_Write_AUID_AUID in ivasp 1j (SC)
+	-- removed vsymbol vname vdate in xPOTCAR, moved vZ into species_Z (unnecessary)
+	-- LIB2RAW_Loop_PATCH in aflowlib* 1j (SC)
+	-- needed RAUG too 1i (SC)
+	-- --pseudopotentials_check for OUTCARS 1i (SC)
+	-- operator << xOUTCAR 1i (SC)
+	-- removed TITEL LEXCH symbol name date Z .... and made them dynamical vectors 1h (SC)
+	-- --pseudopotentials_check --pp_check --ppk in aconvasp_main.cpp 1h (SC)
+	-- unicity of PSEUDOPOTENTIALS nailed in xPOTCAR and xOUTCAR 1g (SC)
+	-- wrapVecEntries and wrapDeqEntries overloads 1g (SC)
+	-- adding pp information in aflolwib entries and AUROSTD 1g (SC)
+	-- dealing with PP collision in aflow.h aflow_ovasp.cpp 1g (SC)
+	-- removed WEB_Aflowlib_Entry_PHP aflowlib_web_interface.cpp 1f (SC)
+	-- added aflowlib_libraries_scrubber.cpp aflow_xpseudopotentials.cpp (SC)
+	-- added much to xPOTCAR (SC)
+	-- AUROSTD deque/vector string2file  (SC)
+	-- AUROSTD bool2string file2md5sum  (SC)
+	-- modifications in aflow.h aflow_xclasses.cpp and aflow_ivasp.cpp for POTCAR_AUID (SC)
+3.2.1c - 2020/03/22
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.1c.tar.xz
+	-- fixes for lib2raw and and error checking in uploading calculations (SC)
 3.2.1 - 2020/03/17
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
 	-- Fixes times stamp in bug fixes (SC)

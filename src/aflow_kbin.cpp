@@ -233,8 +233,8 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO191110
-  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO191110
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO20191110
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO20191110
     string soliloquy="getAflowInFromAFlags():";
     AflowIn_file=string(aflags.Directory+"/"+_AFLOWIN_);
     if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
@@ -256,7 +256,7 @@ namespace KBIN {
     ostringstream aus;
     ifstream FileAUS;
     _aflags aflags;
-    aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");  //CO190629 - a good default until we get down into vDirectory
+    aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");  //CO20190629 - a good default until we get down into vDirectory
     aurostd::StringstreamClean(aus);
     bool _VERBOSE_=FALSE;
     int XHOST_AFLOW_RUNXnumber_multiplier=3;
@@ -462,8 +462,8 @@ namespace KBIN {
       if(LDEBUG) { for(uint i=0;i<vruns.size();i++) cerr << "KBIN::Main: vruns.at(i)=" << vruns.at(i) << endl;}
     } else {
       if(!aflags.AFLOW_PERFORM_FILE)
-        vruns.push_back(aurostd::getPWD()); //CO191112
-      //[CO191112 - OBSOLETE]vruns.push_back(aurostd::execute2string(XHOST.command("pwd")));
+        vruns.push_back(aurostd::getPWD()); //CO20191112
+      //[CO20191112 - OBSOLETE]vruns.push_back(aurostd::execute2string(XHOST.command("pwd")));
       // vruns.push_back(aurostd::execute2string(XHOST.command("pwd"))+" ./");
     }
     // if file found
@@ -942,7 +942,7 @@ namespace KBIN {
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE001; DX added 20190509
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE002; DX added 20190509
-        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER"))  kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;;  // DX20190107 - CMU EULER // with CMU_EULER force NCPUS //DX181113
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER"))  kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;;  // DX20190107 - CMU EULER // with CMU_EULER force NCPUS //DX20181113
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;           // MACHINE2 has only NCPUS //CO20181113
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;          // MACHINE1 has only NCPUS //CO20181113
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU"))  kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS;        // with FULTON_MARYLOU force NCPUS
@@ -1394,13 +1394,13 @@ namespace KBIN {
             if(kflags.AFLOW_MODE_VASP && !aflags.KBIN_GEN_VASP_FROM_AFLOWIN){aflags.KBIN_GEN_VASP_FROM_AFLOWIN=true;} //do vasp last, default
           }
           kflags.KBIN_SYMMETRY_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_SYMMETRY]CALC",TRUE);
-          // DX - START
+          // DX START
           kflags.KBIN_SYMMETRY_NO_SCAN  = aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]NO_SCAN",TRUE);
           //cerr << kflags.KBIN_SYMMETRY_EPS << endl;
           if(aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]SYM_EPS=",TRUE)){
             kflags.KBIN_SYMMETRY_EPS      = aurostd::substring2utype<double>(AflowIn,"[AFLOW_SYMMETRY]SYM_EPS=",TRUE);
           }
-          // DX - END
+          // DX END
           // ---------------------------------------------------------
           // parameters for AAPL - CO - 170601
           // to make backwards compatible, we need to not only look for substring, but need to see if "KAPPA=y"
@@ -1561,13 +1561,13 @@ namespace KBIN {
             aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
           }
           if(kflags.KBIN_POCC_CALCULATION) {kflags.KBIN_POCC=TRUE;} // CO20180419
-          if(kflags.KBIN_POCC){ //CO191110
-            kflags.KBIN_POCC_TEMPERATURE_STRING=aurostd::substring2string(AflowIn,"[AFLOW_POCC]TEMPERATURE=");  //CO191110
-            if(kflags.KBIN_POCC_TEMPERATURE_STRING.empty()){  //CO191110
-              kflags.KBIN_POCC_TEMPERATURE_STRING=DEFAULT_POCC_TEMPERATURE_STRING;  //CO191110
+          if(kflags.KBIN_POCC){ //CO20191110
+            kflags.KBIN_POCC_TEMPERATURE_STRING=aurostd::substring2string(AflowIn,"[AFLOW_POCC]TEMPERATURE=");  //CO20191110
+            if(kflags.KBIN_POCC_TEMPERATURE_STRING.empty()){  //CO20191110
+              kflags.KBIN_POCC_TEMPERATURE_STRING=DEFAULT_POCC_TEMPERATURE_STRING;  //CO20191110
             }
-            aus << "00000  MESSAGE POCC_TEMPERATURE_STRING=" << kflags.KBIN_POCC_TEMPERATURE_STRING << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  //CO191110
-            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);  //CO191110
+            aus << "00000  MESSAGE POCC_TEMPERATURE_STRING=" << kflags.KBIN_POCC_TEMPERATURE_STRING << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  //CO20191110
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);  //CO20191110
           }
           // ---------------------------------------------------------
           // parameters for FROZSL

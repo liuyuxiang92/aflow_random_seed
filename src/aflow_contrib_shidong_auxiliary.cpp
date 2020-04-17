@@ -61,7 +61,7 @@ void CalculateNewStateAFLOW(string & SL_name) {
   //int pwd_old_size;
 
   string pwd,pwd_old;
-  pwd=pwd_old=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
+  pwd=pwd_old=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd");
   //pwd_old = getcwd(NULL, 0);  //CO20181019 - avoid strncat warning of size()
   //pwd_old_size = strlen(pwd_old);
   //pwd = new char[strlen(pwd_old) + SL_name.size()+2]; //CO20181019 - avoid strncat warning of size()

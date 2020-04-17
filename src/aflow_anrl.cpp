@@ -3565,8 +3565,8 @@ namespace anrl {
                 if(LDEBUG) { oss << "DEBUG: (anrl::PrototypeANRL) volume=" << volume << "  (" << vvolumeX[i] << ")" << endl; }
               }
             }
-            //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-            str.SetVolume(volume);  //CO190205 - more robust
+            //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+            str.SetVolume(volume);  //CO20190205 - more robust
             str.neg_scale=TRUE;
           }
           //DX20181205 - Volume scaling by atomic species - END
@@ -4033,7 +4033,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, double tolerance){  //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, double tolerance){  //CO20190520 - removed pointers for bools and doubles, added const where possible
     // determine anrl label, parameters, and parameter values of the input structure
     uint setting=SG_SETTING_ANRL; //anrl setting choice is default
     return structure2anrl(xstr,tolerance,setting);
@@ -4051,7 +4051,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry){  //CO190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
+  string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry){  //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(false || XHOST.DEBUG);
 

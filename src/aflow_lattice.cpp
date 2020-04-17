@@ -674,7 +674,7 @@ namespace LATTICE {
 }
 
 // ***************************************************************************
-// DX - START
+// DX START
 namespace LATTICE {
   bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
     return LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym);
@@ -687,7 +687,7 @@ namespace LATTICE {
 //bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
 //return LATTICE::Standard_Lattice_StructureNormal(str_in,str_sp,str_sc);}
 //}
-// DX - END
+// DX END
 
 //**************************JUNKAI EDITED START****************************
 namespace LATTICE {
@@ -744,8 +744,8 @@ namespace LATTICE {
     str_sp=str_in; // copy it
 
     //DX20190304 - moved above GetPrimitive - START
-    str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX20181024  //CO190520
-    str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO190520
+    str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
+    str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
     //DX20190304 - moved above GetPrimitive - END
 
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [1]" << endl;
@@ -770,8 +770,8 @@ namespace LATTICE {
 
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [3]" << endl;
 
-    //[DX190307 - moved up]str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX20181024  //CO190520
-    //[DX190307 - moved up]str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO190520
+    //[DX20190307 - moved up]str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
+    //[DX20190307 - moved up]str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //DX20181024  //CO20190520
 
     str_sp.ReScale(1.0);     // get it off the way, I might save and plug it back but it is not necessary now
     str_sp.neg_scale=FALSE;  // get it off the way, I might save and plug it back but it is not necessary now
@@ -784,7 +784,7 @@ namespace LATTICE {
       str_sp.transform_coordinates_original2new=str_sp.lattice*aurostd::inverse(prim_lattice); 
     }
     else {
-      str_sp.rotate_lattice_original2new=aurostd::inverse(prim_lattice)*str_sp.lattice;   //DX190307
+      str_sp.rotate_lattice_original2new=aurostd::inverse(prim_lattice)*str_sp.lattice;   //DX20190307
     }
     //DX20181024 - save transformation - END
 
@@ -798,7 +798,7 @@ namespace LATTICE {
 
     string crystal_system="none";
     bool SYS_VERBOSE=FALSE;
-    // DX - START
+    // DX START
     // DX20170814 - if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {  //[CO200106 - close bracket for indenting]}
     if(str_sp.crystal_system=="") {
       ofstream FileDevNull("/dev/null");
@@ -929,7 +929,7 @@ namespace LATTICE {
             rlattice[1][2]*rlattice[2][1]*rlattice[3][3]-rlattice[1][1]*rlattice[2][3]*rlattice[3][2];        // FAST
           if(abs(vaus)>eps_volume){ // DX20170904 - Otherwise, Getabc_angles may fail if vaus=0.0
             if(abs(vaus-1.0*volume)<eps_volume || abs(vaus-2.0*volume)<eps_volume || abs(vaus-4.0*volume)<eps_volume) { // DX
-              //DX ORIG 5/22/18 only do rdata when you have to rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
+              //DX20180522 only do rdata when you have to rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
               // DX if(abs(vaus-volume)<eps)
               if(abs(vaus-volume)<eps_volume) // DX
               { //CO200106 - patching for auto-indenting
@@ -1217,7 +1217,7 @@ namespace LATTICE {
                 plattice[3][1]= ac/2.0;plattice[3][2]= ac/2.0;plattice[3][3]=-cc/2.0; // make the standard primitive bct
                 LATTICE::fix_sts_sp(str_sp,rlattice,plattice);  // project out of rlattice and in plattice
                 if(cc<ac) {str_sp.bravais_lattice_variation_type="BCT1";}
-                // DX - 9/7/17 - Need to include a=c if(ac<cc) {str_sp.bravais_lattice_variation_type="BCT2";}
+                // DX20170907 - Need to include a=c if(ac<cc) {str_sp.bravais_lattice_variation_type="BCT2";}
                 if(ac<=cc) {str_sp.bravais_lattice_variation_type="BCT2";} // DX20170907 - Add a=c case; pick BCT2 since less high sym points 
                 // do the STANDARD CONVENTIONAL
                 // C=supercell*P => supercell = C*inv(P)
@@ -2047,10 +2047,10 @@ namespace LATTICE {
           cerr << aurostd::det(str_in.scale*str_in.lattice) << " vs " << aurostd::det(str_sp.scale*str_sp.lattice) << " eps vol: " << eps_volume << endl;
         }
         str_sp.volume_changed_original2new = true;
-        str_sp.transform_coordinates_new2original = aurostd::eye<double>(); //CO190520
-        str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //CO190520
-        str_sp.rotate_lattice_new2original = aurostd::eye<double>(); //CO190520
-        str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //CO190520
+        str_sp.transform_coordinates_new2original = aurostd::eye<double>(); //CO20190520
+        str_sp.transform_coordinates_original2new = aurostd::eye<double>(); //CO20190520
+        str_sp.rotate_lattice_new2original = aurostd::eye<double>(); //CO20190520
+        str_sp.rotate_lattice_original2new = aurostd::eye<double>(); //CO20190520
       }
     }
     //DX20181105 - check if transformations are valid - END
@@ -2138,7 +2138,7 @@ namespace LATTICE {
        if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(SYS_VERBOSE);
        */
 
-    // DX - START
+    // DX START
     if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {
       ofstream FileDevNull("/dev/null");
       _aflags aflags;
@@ -2210,7 +2210,7 @@ namespace LATTICE {
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4d]" << endl;
     //  cerr << "[4]" << endl;
     */ //OLD (DX)
-    // DX - END
+    // DX END
     //**************************JUNKAI EDITED END****************************
 
     // http://en.wikipedia.org/wiki/Crystal_system  table from bottom to top
@@ -3265,7 +3265,7 @@ namespace LATTICE {
   }
 }
 
-// DX - START 
+// DX START 
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault(xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
     return Bravais_Lattice_StructureDefault_20170401(str_in,str_sp,str_sc,full_sym);
@@ -3274,7 +3274,7 @@ namespace LATTICE {
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault_20170401(xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); // DX20180426 - added LDEBUG
-    string directory=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX20180426 - added current working directory 
+    string directory=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX20180426 - added current working directory 
     bool same_eps = false;
     bool no_scan = false;
     bool ignore_checks = false;
@@ -3345,9 +3345,9 @@ namespace LATTICE {
     return TRUE;
   }
 }
-// DX - END
+// DX END
 
-// DX - START
+// DX START
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault_20160101(xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
     LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
@@ -3370,7 +3370,7 @@ namespace LATTICE {
     return TRUE;
   }
 }
-// DX - END
+// DX END
 
 namespace LATTICE {
   bool Lattice(const xmatrix<double>& lattice,xmatrix<double>& lattice_sp,xmatrix<double>& lattice_sc,string& bravais_lattice_type,string& bravais_lattice_variation_type,string& bravais_lattice_system,double eps,double epsang) {
@@ -6515,7 +6515,7 @@ namespace LATTICE {
 // ***************************************************************************************************
 namespace LATTICE {
   string KPOINTS_Directions(string lattice_type,xmatrix<double> sp, double _grid,int iomode,bool &foundBZ) {
-    xmatrix<double> transformation_matrix = aurostd::eye<double>(); //CO190520
+    xmatrix<double> transformation_matrix = aurostd::eye<double>(); //CO20190520
     return KPOINTS_Directions(lattice_type,sp,transformation_matrix,_grid,iomode,foundBZ);
   }
 }
