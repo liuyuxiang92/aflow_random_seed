@@ -1231,6 +1231,11 @@ DEFAULT_APL_HARMIFC_FILE
   type: string
   default: "harmonicIFCs.xml"
 
+DEFAULT_APL_POLAR_FILE
+  description: Output file for the Born effective charge tensors and the dielectric tensor.
+  type: string
+  default: "polar.xml"
+
 DEFAULT_APL_HSKPTS_FILE
   description: Output file for the high-symmetry k-points in APL.
   type: string
