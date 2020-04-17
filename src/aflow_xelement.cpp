@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2007-2019
@@ -30,6 +30,7 @@ void clear();
 // content                                             // content
 bool verbose;
 // [AFLOW]START=DECLARATION
+int Z; 
 string symbol;                          // http://periodictable.com      // DU 2019/05/17
 string name;                            // http://periodictable.com      // DU 2019/05/17
 double Period;                          // http://periodictable.com      // DU 2019/05/17
@@ -68,8 +69,8 @@ double radii_Pyykko;                     // (pm) single bond covalent radii  Che
 double electrical_conductivity;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      // DU 2019/05/17
 double electronegativity_vec;           // Saxena
 double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       // DU 2019/05/17
-double electronegativityPearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      // DU 2019/05/17
-double electronegativityGhosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      // DU 2019/05/17
+double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      // DU 2019/05/17
+double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      // DU 2019/05/17
 double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       // DU 2019/05/17
 double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
 double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
@@ -168,11 +169,14 @@ namespace pflow {
     if(LDEBUG) cerr << "Z=" << Z << endl;
     oss << "AFLOW element property finder" << endl;
     if(Z>0) {
-      oss << "Element Z=" << Z << " - " << xelement(Z).symbol << " - " << xelement(Z).name << endl;
+      oss << "Element Z=" << xelement(Z).Z << " - " << xelement(Z).symbol << " - " << xelement(Z).name << endl;
       string space="        ";
     
       // found
     
+      //      cerr <<  xelement(3).name << endl;
+      //      cerr <<  xelement("Li").name << endl;
+      //      cerr <<  xelement("LiThIuM").name << endl;
       
       // now look at properties
       if(tokens.size()>=2) {
@@ -181,8 +185,9 @@ namespace pflow {
 	  vector<string> vs; uint len=52;
 	  vs.clear();
 	  int prec=10;
-	  if(c=="ALL" || c==aurostd::toupper("symbol")) vs.push_back(aurostd::PaddedPOST("symbol="+xelement(Z).symbol,len));
 	  if(c=="ALL" || c==aurostd::toupper("name")) vs.push_back(aurostd::PaddedPOST("name="+xelement(Z).name,len));
+	  if(c=="ALL" || c==aurostd::toupper("symbol")) vs.push_back(aurostd::PaddedPOST("symbol="+xelement(Z).symbol,len));
+	  if(c=="ALL" || c==aurostd::toupper("Z")) vs.push_back(aurostd::PaddedPOST("Z="+aurostd::utype2string(xelement(Z).Z),len));
 	  if(c=="ALL" || c==aurostd::toupper("Period")) vs.push_back(aurostd::PaddedPOST("Period="+aurostd::utype2string(xelement(Z).Period),len));
 	  if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement(Z).Group),len));
 	  if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement(Z).Series,len));
@@ -200,7 +205,6 @@ namespace pflow {
 	  if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement(Z).space_group,len));
 	  if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement(Z).space_group_number),len));
 
-
 	  if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement(Z).Pearson_coefficient,prec),len));
 	  if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
 	  if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
@@ -217,48 +221,48 @@ namespace pflow {
 	  if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
 	  if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement(Z).electronegativity_vec,prec),len));
 	  if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativityPearson")) vs.push_back(aurostd::PaddedPOST("electronegativityPearson="+aurostd::utype2string(xelement(Z).electronegativityPearson,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativityGhosh")) vs.push_back(aurostd::PaddedPOST("electronegativityGhosh="+aurostd::utype2string(xelement(Z).electronegativityGhosh,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
-	  if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement(Z).Pettifor_scale,prec),len)); 
-	  if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement(Z).boiling_point,prec),len)+"// (Celsius)");
-	  if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement(Z).melting_point,prec),len)+"// (Celsius)");
-	  if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement(Z).specific_heat_PT,prec),len)+"// (J/(kg.K))");
-	  if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement(Z).critical_Pressure,prec),len)+"// (Atm) "); 
-	  if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
-	  if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
-	  if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
-	  if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement(Z).Mohs_hardness,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("Hardness_Pearson="+aurostd::utype2string(xelement(Z).Hardness_Pearson,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_Putz")) vs.push_back(aurostd::PaddedPOST("Hardness_Putz="+aurostd::utype2string(xelement(Z).Hardness_Putz,prec),len)+"// (eV/atom)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_RB")) vs.push_back(aurostd::PaddedPOST("Hardness_RB="+aurostd::utype2string(xelement(Z).Hardness_RB,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("shear_modulus")) vs.push_back(aurostd::PaddedPOST("shear_modulus="+aurostd::utype2string(xelement(Z).shear_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Young_modulus")) vs.push_back(aurostd::PaddedPOST("Young_modulus="+aurostd::utype2string(xelement(Z).Young_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement(Z).Poisson_ratio_PT,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
+	    if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
+	    if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
+	    if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
+	    if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
+	    if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
+	    if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
+	    if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement(Z).Pettifor_scale,prec),len)); 
+	    if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement(Z).boiling_point,prec),len)+"// (Celsius)");
+	    if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement(Z).melting_point,prec),len)+"// (Celsius)");
+	    if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
+	    if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement(Z).specific_heat_PT,prec),len)+"// (J/(kg.K))");
+	    if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement(Z).critical_Pressure,prec),len)+"// (Atm) "); 
+	    if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
+	    if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
+	    if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
+	    if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
+	    if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement(Z).Mohs_hardness,prec),len));
+	    if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
+	    if(c=="ALL" || c==aurostd::toupper("Hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("Hardness_Pearson="+aurostd::utype2string(xelement(Z).Hardness_Pearson,prec),len)+"// (eV)");
+	    if(c=="ALL" || c==aurostd::toupper("Hardness_Putz")) vs.push_back(aurostd::PaddedPOST("Hardness_Putz="+aurostd::utype2string(xelement(Z).Hardness_Putz,prec),len)+"// (eV/atom)");
+	    if(c=="ALL" || c==aurostd::toupper("Hardness_RB")) vs.push_back(aurostd::PaddedPOST("Hardness_RB="+aurostd::utype2string(xelement(Z).Hardness_RB,prec),len)+"// (eV)");
+	    if(c=="ALL" || c==aurostd::toupper("shear_modulus")) vs.push_back(aurostd::PaddedPOST("shear_modulus="+aurostd::utype2string(xelement(Z).shear_modulus,prec),len)+"// (GPa)");
+	    if(c=="ALL" || c==aurostd::toupper("Young_modulus")) vs.push_back(aurostd::PaddedPOST("Young_modulus="+aurostd::utype2string(xelement(Z).Young_modulus,prec),len)+"// (GPa)");
+	    if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
+	    if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement(Z).Poisson_ratio_PT,prec),len));
+	    if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
 
-	  if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement(Z).Magnetic_Type_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
-	  if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement(Z).Curie_point,prec),len)+"// (K)");
+	    if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement(Z).Magnetic_Type_PT,len));
+	    if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
+	    if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
+	    if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
+	    if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement(Z).Curie_point,prec),len)+"// (K)");
 	
-	  if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement(Z).refractive_index,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement(Z).color_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement(Z).HHIP,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement(Z).HHIR,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement(Z).xray_scatt,prec),len)+"// shift+1");
+	    if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement(Z).refractive_index,prec),len));
+	    if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement(Z).color_PT,len));
+	    if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement(Z).HHIP,prec),len));
+	    if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement(Z).HHIR,prec),len));
+	    if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement(Z).xray_scatt,prec),len)+"// shift+1");
 
-	 if(vs.size())
-	  for(uint j=0;j<vs.size();j++)
-	      oss << vs.at(j) << endl;
+	    if(vs.size())
+	      for(uint j=0;j<vs.size();j++)
+		oss << vs.at(j) << endl;
 	}
       }
     }
@@ -273,25 +277,25 @@ void elements_initialize(void) {
   }
   
   /*
-std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
-std::vector<string> vatom_name(NUM_ELEMENTS);   // store starting from ONE // DONE
-std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // DONE
-std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
-std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
-std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-// for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
-std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE// DX and CO - 9/4/17 
-std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
-std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   // ME181020 Pearson mass deviation coefficient
+    std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
+    std::vector<string> vatom_name(NUM_ELEMENTS);   // store starting from ONE // DONE
+    std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // DONE
+    std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
+    std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
+    std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
+    std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
+    std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+    std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+    std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+    std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+    // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
+    std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
+    std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE// DX and CO - 9/4/17 
+    std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
+    std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
+    std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
+    std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+    std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   // ME181020 Pearson mass deviation coefficient
 
   */
   
@@ -299,21 +303,22 @@ std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   // ME181020 Pears
 
 // constructors
 xelement::xelement() {
- // DEFAULT
+  // DEFAULT
   verbose=FALSE;
- // [AFLOW]START=CONSTRUCTOR
+  // [AFLOW]START=CONSTRUCTOR
+  Z=0;
   symbol="XX";//"UNDEFINED";
   name="UNDEFINED";
   Period=NNN;
   Group=NNN; 
   Series="UNDEFINED";
   Block="nnn";      
- //                                          
+  //                                          
   mass=NNN;//  AMU2KILOGRAM goes inside.
   MolarVolume=NNN;  
   volume=NNN;      
   Miedema_Vm=NNN;      
- //
+  //
   valence_std=NNN;  
   valence_iupac=NNN;
   valence_PT=NNN;       
@@ -334,19 +339,19 @@ xelement::xelement() {
   radii_Ghosh08=NNN;         
   radii_Slatter=NNN;         
   radii_Pyykko=NNN;          
- //                                          
+  //                                          
   electrical_conductivity=NNN;
   electronegativity_vec=NNN;    
   hardness_Ghosh=NNN;            
-  electronegativityPearson=NNN;           
-  electronegativityGhosh=NNN;             
+  electronegativity_Pearson=NNN;           
+  electronegativity_Ghosh=NNN;             
   electron_affinity_PT=NNN;      
   Miedema_phi_star=NNN;         
   Miedema_nws=NNN;              
   Miedema_gamma_s=NNN;          
- //
+  //
   Pettifor_scale=NNN;          
- //
+  //
   boiling_point=NNN;         
   melting_point=NNN;         
   vaporization_heat_PT=NNN;     
@@ -355,7 +360,7 @@ xelement::xelement() {
   critical_Temperature_PT=NNN;  
   thermal_expansion=NNN;     
   thermal_conductivity=NNN;  
- //                                         
+  //                                         
   Brinelll_hardness=NNN;
   Mohs_hardness=NNN;    
   Vickers_hardness=NNN; 
@@ -367,20 +372,20 @@ xelement::xelement() {
   bulk_modulus=NNN;     
   Poisson_ratio_PT=NNN;    
   Miedema_BVm=NNN;        
- //
+  //
   Magnetic_Type_PT="UNDEFINED";     
   Mass_Magnetic_Susceptibility=NNN;
   Volume_Magnetic_Susceptibility=NNN;
   Molar_Magnetic_Susceptibility=NNN; 
   Curie_point=NNN;                  
- //
+  //
   refractive_index=NNN;             
   color_PT="UNDEFINED";               
- //
+  //
   HHIP=NNN;                           
   HHIR=NNN;                           
   xray_scatt=NNN;   
- // [AFLOW]STOP=CONSTRUCTOR
+  // [AFLOW]STOP=CONSTRUCTOR
 }
 
 // destructor
@@ -389,29 +394,30 @@ xelement::~xelement() {
 }
 
 void xelement::free() {
- // will populate
- // [AFLOW]START=FREE
- // [AFLOW]STOP=FREE
+  // will populate
+  // [AFLOW]START=FREE
+  // [AFLOW]STOP=FREE
 }
 
 const xelement& xelement::operator=(const xelement& b) {      // operator=
   if(this != &b) {
     free();
-   // will populate
+    // will populate
     verbose=b.verbose;
-   // [AFLOW]START=ASSIGNMENT
+    // [AFLOW]START=ASSIGNMENT
+    Z=b.Z;
     symbol=b.symbol;
     name=b.name;
     Period=b.Period;
     Group=b.Group; 
     Series=b.Series;
     Block=b.Block;      
-   //                                          
+    //                                          
     mass=b.mass;
     MolarVolume=b.MolarVolume;  
     volume=b.volume;      
     Miedema_Vm=b.Miedema_Vm;      
-   //
+    //
     valence_std=b.valence_std;  
     valence_iupac=b.valence_iupac;
     valence_PT=b.valence_PT;       
@@ -432,19 +438,19 @@ const xelement& xelement::operator=(const xelement& b) {      // operator=
     radii_Ghosh08=b.radii_Ghosh08;         
     radii_Slatter=b.radii_Slatter;         
     radii_Pyykko=b.radii_Pyykko;          
-   //                                          
+    //                                          
     electrical_conductivity=b.electrical_conductivity;
     electronegativity_vec=b.electronegativity_vec;    
     hardness_Ghosh=b.hardness_Ghosh;            
-    electronegativityPearson=b.electronegativityPearson;           
-    electronegativityGhosh=b.electronegativityGhosh;             
+    electronegativity_Pearson=b.electronegativity_Pearson;           
+    electronegativity_Ghosh=b.electronegativity_Ghosh;             
     electron_affinity_PT=b.electron_affinity_PT;      
     Miedema_phi_star=b.Miedema_phi_star;         
     Miedema_nws=b.Miedema_nws;              
     Miedema_gamma_s=b.Miedema_gamma_s;          
-   //
+    //
     Pettifor_scale=b.Pettifor_scale;          
-   //
+    //
     boiling_point=b.boiling_point;         
     melting_point=b.melting_point;         
     vaporization_heat_PT=b.vaporization_heat_PT;     
@@ -453,7 +459,7 @@ const xelement& xelement::operator=(const xelement& b) {      // operator=
     critical_Temperature_PT=b.critical_Temperature_PT;  
     thermal_expansion=b.thermal_expansion;     
     thermal_conductivity=b.thermal_conductivity;  
-   //                                         
+    //                                         
     Brinelll_hardness=b.Brinelll_hardness;
     Mohs_hardness=b.Mohs_hardness;    
     Vickers_hardness=b.Vickers_hardness; 
@@ -465,20 +471,20 @@ const xelement& xelement::operator=(const xelement& b) {      // operator=
     bulk_modulus=b.bulk_modulus;     
     Poisson_ratio_PT=b.Poisson_ratio_PT;    
     Miedema_BVm=b.Miedema_BVm;        
-   //
+    //
     Magnetic_Type_PT=b.Magnetic_Type_PT;
     Mass_Magnetic_Susceptibility=b.Mass_Magnetic_Susceptibility;
     Volume_Magnetic_Susceptibility=b.Volume_Magnetic_Susceptibility;
     Molar_Magnetic_Susceptibility=b.Molar_Magnetic_Susceptibility; 
     Curie_point=b.Curie_point;                  
-   //
+    //
     refractive_index=b.refractive_index;             
     color_PT=b.color_PT;         
-   //
+    //
     HHIP=b.HHIP;                           
     HHIR=b.HHIR;                           
     xray_scatt=b.xray_scatt;    
-   // [AFLOW]STOP=ASSIGNMENT
+    // [AFLOW]STOP=ASSIGNMENT
   }
   return *this;
 }
@@ -490,35 +496,59 @@ void xelement::clear(){
 ostream& operator<<(ostream& oss,const xelement& element) {
   oss.setf(std::ios::fixed,std::ios::floatfield);
   oss.precision(10);
- // [AFLOW]START=COUT
+  // [AFLOW]START=COUT
   oss << "verbose=" << element.verbose << endl;
- // [AFLOW]STOP=COUT
+  // [AFLOW]STOP=COUT
   return oss;
 }
  
 
 
-// constructors
-xelement::xelement(uint Z) {
+// ********************************************************************************************************************************************************
+// constructor by name or symbol
+xelement::xelement(string element) {
   free();
- // DEFAULT
+  // DEFAULT
+  verbose=FALSE;
+  uint Z=0;
+  
+  // try with symbol
+  if(Z==0) {
+    for(uint i=1;i<=103;i++)
+      if(aurostd::toupper(element)==aurostd::toupper(xelement(i).symbol)) Z=i;
+  }
+  // try with name
+  if(Z==0) {
+    for(uint i=1;i<=103;i++)
+      if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
+  }
+  if(Z!=0) (*this)=xelement(Z);
+
+}
+
+// ********************************************************************************************************************************************************
+// constructor by Z
+xelement::xelement(uint ZZ) {
+  free();
+  // DEFAULT
   verbose=FALSE;
 
- // OFFSET
-  if(Z==0) {
+  // OFFSET
+  if(ZZ==0) {
     xelement a;
     (*this)=a;
     mass=0.0;// override
     valence_iupac=0;// override
     valence_std=0;// override
   }
- // ROW 1
- // s-electron systems
+  // ROW 1
+  // s-electron systems
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Hydrogen
- // Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen
-  if(Z==1) { // Hydrogen
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Hydrogen
+  // Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen
+  if(ZZ==1) { // Hydrogen
+    Z=ZZ;
     symbol="H";
     name="Hydrogen";
     Period=1;
@@ -552,8 +582,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=2.10;
     hardness_Ghosh=6.4299;
-    electronegativityPearson=7.18;
-    electronegativityGhosh=7.178;
+    electronegativity_Pearson=7.18;
+    electronegativity_Ghosh=7.178;
     electron_affinity_PT=72.8;
     Miedema_phi_star=5.2;
     Miedema_nws=1.5;
@@ -588,15 +618,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     xray_scatt=1.000;
-   // H volume wrong *dimer* MIEDEMA =PAUL VAN DER PUT book
+    // H volume wrong *dimer* MIEDEMA =PAUL VAN DER PUT book
   }
- // [AFLOW]STOP=Hydrogen
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Hydrogen
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Helium
- // Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium
-  if(Z==2) { // Helium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Helium
+  // Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium
+  if(ZZ==2) { // Helium
+    Z=ZZ;
     symbol="He";
     name="Helium";
     Period=1;
@@ -630,8 +661,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=12.5449;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=12.046;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=12.046;
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -666,17 +697,18 @@ xelement::xelement(uint Z) {
     HHIP=3200;
     HHIR=3900;
     xray_scatt=2.000;
-   // He
+    // He
   }
- // [AFLOW]STOP=Helium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Helium
+  // ********************************************************************************************************************************************************
 
- // ROW2
- // s-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Lithium
- // Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium
-  if(Z==3) { // Lithium
+  // ROW2
+  // s-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Lithium
+  // Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium
+  if(ZZ==3) { // Lithium
+    Z=ZZ;
     symbol="Li";
     name="Lithium";
     Period=2;
@@ -710,8 +742,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.1E7;
     electronegativity_vec=0.98;
     hardness_Ghosh=2.3746;
-    electronegativityPearson=3.01;
-    electronegativityGhosh=2.860;
+    electronegativity_Pearson=3.01;
+    electronegativity_Ghosh=2.860;
     electron_affinity_PT=59.6;
     Miedema_phi_star=2.85;
     Miedema_nws=0.98;
@@ -746,15 +778,16 @@ xelement::xelement(uint Z) {
     HHIP=2900;
     HHIR=4200;
     xray_scatt=3.00145;
-   // Li
+    // Li
   }
- // [AFLOW]STOP=Lithium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Lithium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Beryllium
- // Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium
-  if(Z==4) { // Beryllium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Beryllium
+  // Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium
+  if(ZZ==4) { // Beryllium
+    Z=ZZ;
     symbol="Be";
     name="Beryllium";
     Period=2;
@@ -788,8 +821,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.5E7;
     electronegativity_vec=1.57;
     hardness_Ghosh=3.4968;
-    electronegativityPearson=4.90;
-    electronegativityGhosh=3.945;
+    electronegativity_Pearson=4.90;
+    electronegativity_Ghosh=3.945;
     electron_affinity_PT=0;
     Miedema_phi_star=4.20;
     Miedema_nws=1.60;
@@ -824,16 +857,17 @@ xelement::xelement(uint Z) {
     HHIP=8000;
     HHIR=4000;
     /*xray_scatt=NNN;*/
-   // Be
+    // Be
   }
- // [AFLOW]STOP=Beryllium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Beryllium
+  // ********************************************************************************************************************************************************
 
- // p-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Boron
- // Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron
-  if(Z==5) { // Boron
+  // p-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Boron
+  // Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron
+  if(ZZ==5) { // Boron
+    Z=ZZ;
     symbol="B";
     name="Boron";
     Period=2;
@@ -867,8 +901,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=0.0001;
     electronegativity_vec=2.04;
     hardness_Ghosh=4.6190;
-    electronegativityPearson=4.29;
-    electronegativityGhosh=5.031;
+    electronegativity_Pearson=4.29;
+    electronegativity_Ghosh=5.031;
     electron_affinity_PT=26.7;
     Miedema_phi_star=4.75;
     Miedema_nws=1.55;
@@ -903,15 +937,16 @@ xelement::xelement(uint Z) {
     HHIP=2900;
     HHIR=2000;
     /*xray_scatt=NNN;*/
-   // B
+    // B
   }
- // [AFLOW]STOP=Boron
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Boron
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Carbon
- // Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon
-  if(Z==6) { // Carbon
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Carbon
+  // Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon
+  if(ZZ==6) { // Carbon
+    Z=ZZ;
     symbol="C";
     name="Carbon";
     Period=2;
@@ -945,8 +980,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=100000;
     electronegativity_vec=2.55;
     hardness_Ghosh=5.7410;
-    electronegativityPearson=6.27;
-    electronegativityGhosh=6.116;
+    electronegativity_Pearson=6.27;
+    electronegativity_Ghosh=6.116;
     electron_affinity_PT=153.9;
     Miedema_phi_star=6.20;
     Miedema_nws=1.90;
@@ -981,15 +1016,16 @@ xelement::xelement(uint Z) {
     HHIP=500;
     HHIR=500;
     xray_scatt=6.019;
-   // C//DX and CO -9/4/17 radius_covalent uses sp3 hybridization (most common)
+    // C//DX and CO -9/4/17 radius_covalent uses sp3 hybridization (most common)
   }
- // [AFLOW]STOP=Carbon
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Carbon
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Nitrogen
- // Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen
-  if(Z==7) { // Nitrogen
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Nitrogen
+  // Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen
+  if(ZZ==7) { // Nitrogen
+    Z=ZZ;
     symbol="N";
     name="Nitrogen";
     Period=2;
@@ -1023,8 +1059,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=3.04;
     hardness_Ghosh=6.8625;
-    electronegativityPearson=7.30;
-    electronegativityGhosh=7.209;
+    electronegativity_Pearson=7.30;
+    electronegativity_Ghosh=7.209;
     electron_affinity_PT=7;
     Miedema_phi_star=7.00;
     Miedema_nws=1.60;
@@ -1059,15 +1095,16 @@ xelement::xelement(uint Z) {
     HHIP=1300;
     HHIR=500;
     /*xray_scatt=NNN;*/
-   //N JUNKAI CHANGED VALENCE
+    //N JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Nitrogen
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Nitrogen
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Oxygen
- // Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen
-  if(Z==8) { // Oxygen
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Oxygen
+  // Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen
+  if(ZZ==8) { // Oxygen
+    Z=ZZ;
     symbol="O";
     name="Oxygen";
     Period=2;
@@ -1101,8 +1138,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=3.44;
     hardness_Ghosh=7.9854;
-    electronegativityPearson=7.54;
-    electronegativityGhosh=8.287;
+    electronegativity_Pearson=7.54;
+    electronegativity_Ghosh=8.287;
     electron_affinity_PT=141;
     Miedema_phi_star=6.97;
     Miedema_nws=1.70;
@@ -1137,15 +1174,16 @@ xelement::xelement(uint Z) {
     HHIP=500;
     HHIR=500;
     xray_scatt=8.052;
-   // O Table 27 of JUNKAI
+    // O Table 27 of JUNKAI
   }
- // [AFLOW]STOP=Oxygen
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Oxygen
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Fluorine
- // Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine
-  if(Z==9) { // Fluorine
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Fluorine
+  // Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine
+  if(ZZ==9) { // Fluorine
+    Z=ZZ;
     symbol="F";
     name="Fluorine";
     Period=2;
@@ -1179,8 +1217,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=3.98;
     hardness_Ghosh=9.1065;
-    electronegativityPearson=10.41;
-    electronegativityGhosh=9.372;
+    electronegativity_Pearson=10.41;
+    electronegativity_Ghosh=9.372;
     electron_affinity_PT=328;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -1215,15 +1253,16 @@ xelement::xelement(uint Z) {
     HHIP=1500;
     HHIR=1500;
     /*xray_scatt=NNN;*/
-   //F
+    //F
   }
- // [AFLOW]STOP=Fluorine
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Fluorine
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Neon
- // Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon
-  if(Z==10) { // Neon
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Neon
+  // Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon
+  if(ZZ==10) { // Neon
+    Z=ZZ;
     symbol="Ne";
     name="Neon";
     Period=2;
@@ -1257,8 +1296,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=10.2303;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=10.459;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=10.459;
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -1293,17 +1332,18 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Ne volume calculated with fcc-pawpbe
+    //Ne volume calculated with fcc-pawpbe
   }
- // [AFLOW]STOP=Neon
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Neon
+  // ********************************************************************************************************************************************************
 
- // ROW3
- // s-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Sodium
- // Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium
-  if(Z==11) { // Sodium
+  // ROW3
+  // s-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Sodium
+  // Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium
+  if(ZZ==11) { // Sodium
+    Z=ZZ;
     symbol="Na";
     name="Sodium";
     Period=3;
@@ -1337,8 +1377,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.1E7;
     electronegativity_vec=0.93;
     hardness_Ghosh=2.4441;
-    electronegativityPearson=2.85;
-    electronegativityGhosh=2.536;
+    electronegativity_Pearson=2.85;
+    electronegativity_Ghosh=2.536;
     electron_affinity_PT=52.8;
     Miedema_phi_star=2.70;
     Miedema_nws=0.82;
@@ -1373,15 +1413,16 @@ xelement::xelement(uint Z) {
     HHIP=1100;
     HHIR=500;
     /*xray_scatt=NNN;*/
-   // Na
+    // Na
   }
- // [AFLOW]STOP=Sodium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Sodium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Magnesium
- // Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium
-  if(Z==12) { // Magnesium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Magnesium
+  // Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium
+  if(ZZ==12) { // Magnesium
+    Z=ZZ;
     symbol="Mg";
     name="Magnesium";
     Period=3;
@@ -1415,8 +1456,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.3E7;
     electronegativity_vec=1.31;
     hardness_Ghosh=3.0146;
-    electronegativityPearson=3.75;
-    electronegativityGhosh=3.310;
+    electronegativity_Pearson=3.75;
+    electronegativity_Ghosh=3.310;
     electron_affinity_PT=0;
     Miedema_phi_star=3.45;
     Miedema_nws=1.17;
@@ -1451,16 +1492,17 @@ xelement::xelement(uint Z) {
     HHIP=5300;
     HHIR=500;
     /*xray_scatt=NNN;*/
-   //Mg
+    //Mg
   }
- // [AFLOW]STOP=Magnesium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Magnesium
+  // ********************************************************************************************************************************************************
 
- // p-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Aluminium
- //Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium
-  if(Z==13) { // Aluminium
+  // p-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Aluminium
+  //Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium
+  if(ZZ==13) { // Aluminium
+    Z=ZZ;
     symbol="Al";
     name="Aluminium";
     Period=3;
@@ -1494,8 +1536,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=3.8E7;
     electronegativity_vec=1.61;
     hardness_Ghosh=3.5849;
-    electronegativityPearson=3.23;
-    electronegativityGhosh=4.084;
+    electronegativity_Pearson=3.23;
+    electronegativity_Ghosh=4.084;
     electron_affinity_PT=42.5;
     Miedema_phi_star=4.20;
     Miedema_nws=1.39;
@@ -1530,15 +1572,16 @@ xelement::xelement(uint Z) {
     HHIP=1600;
     HHIR=1000;
     /*xray_scatt=NNN;*/
-   //Al
+    //Al
   }
- // [AFLOW]STOP=Aluminium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Aluminium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Silicon
- // Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon
-  if(Z==14) { // Silicon
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Silicon
+  // Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon
+  if(ZZ==14) { // Silicon
+    Z=ZZ;
     symbol="Si";
     name="Silicon";
     Period=3;
@@ -1572,8 +1615,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1000;
     electronegativity_vec=1.90;
     hardness_Ghosh=4.1551;
-    electronegativityPearson=4.77;
-    electronegativityGhosh=4.857;
+    electronegativity_Pearson=4.77;
+    electronegativity_Ghosh=4.857;
     electron_affinity_PT=133.6;
     Miedema_phi_star=4.70;
     Miedema_nws=1.50;
@@ -1608,15 +1651,16 @@ xelement::xelement(uint Z) {
     HHIP=4700;
     HHIR=1000;
     xray_scatt=14.43;
-   //Si ???
+    //Si ???
   }
- // [AFLOW]STOP=Silicon
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Silicon
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Phosphorus
- // Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus
-  if(Z==15) { // Phosphorus
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Phosphorus
+  // Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus
+  if(ZZ==15) { // Phosphorus
+    Z=ZZ;
     symbol="P";
     name="Phosphorus";
     Period=3;
@@ -1650,8 +1694,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1E7;
     electronegativity_vec=2.19;
     hardness_Ghosh=4.7258;
-    electronegativityPearson=5.62;
-    electronegativityGhosh=5.631;
+    electronegativity_Pearson=5.62;
+    electronegativity_Ghosh=5.631;
     electron_affinity_PT=71;
     Miedema_phi_star=5.5;
     Miedema_nws=1.65;
@@ -1686,15 +1730,16 @@ xelement::xelement(uint Z) {
     HHIP=2000;
     HHIR=5100;
     xray_scatt=15.3133;
-   //P MIEDEMA =PAUL VAN DER PUT book
+    //P MIEDEMA =PAUL VAN DER PUT book
   }
- // [AFLOW]STOP=Phosphorus
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Phosphorus
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Sulphur
- // Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur
-  if(Z==16) { // Sulphur
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Sulphur
+  // Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur
+  if(ZZ==16) { // Sulphur
+    Z=ZZ;
     symbol="S";
     name="Sulphur";
     Period=3;
@@ -1728,8 +1773,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1E-15;
     electronegativity_vec=2.58;
     hardness_Ghosh=5.2960;
-    electronegativityPearson=6.22;
-    electronegativityGhosh=6.420;
+    electronegativity_Pearson=6.22;
+    electronegativity_Ghosh=6.420;
     electron_affinity_PT=200;
     Miedema_phi_star=5.6;
     Miedema_nws=1.46;
@@ -1764,15 +1809,16 @@ xelement::xelement(uint Z) {
     HHIP=700;
     HHIR=1000;
     /*xray_scatt=NNN;*/
-   //S Table 27 of JUNKAI
+    //S Table 27 of JUNKAI
   }
- // [AFLOW]STOP=Sulphur
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Sulphur
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Chlorine
- // Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine
-  if(Z==17) { // Chlorine
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Chlorine
+  // Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine
+  if(ZZ==17) { // Chlorine
+    Z=ZZ;
     symbol="Cl";
     name="Chlorine";
     Period=3;
@@ -1806,8 +1852,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=0.01;
     electronegativity_vec=3.16;
     hardness_Ghosh=5.8662;
-    electronegativityPearson=8.30;
-    electronegativityGhosh=7.178;
+    electronegativity_Pearson=8.30;
+    electronegativity_Ghosh=7.178;
     electron_affinity_PT=349;
     Miedema_phi_star=5.32;
     Miedema_nws=0.34;
@@ -1842,15 +1888,16 @@ xelement::xelement(uint Z) {
     HHIP=1500;
     HHIR=1500;
     /*xray_scatt=NNN;*/
-   //Cl interpolation phi_star, nws, Vm, gamma JUNKAI CHANGED VALENCE
+    //Cl interpolation phi_star, nws, Vm, gamma JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Chlorine
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Chlorine
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Argon
- //Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon
-  if(Z==18) { // Argon
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Argon
+  //Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon
+  if(ZZ==18) { // Argon
+    Z=ZZ;
     symbol="Ar";
     name="Argon";
     Period=3;
@@ -1884,8 +1931,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=6.4366;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=7.951;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=7.951;
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -1920,17 +1967,18 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Ar guessed volume, must double check from results JUNKAI CHANGED VALENCE
+    //Ar guessed volume, must double check from results JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Argon
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Argon
+  // ********************************************************************************************************************************************************
 
- // ROW4
- // s-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Potassium
- // Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium
-  if(Z==19) { // Potassium
+  // ROW4
+  // s-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Potassium
+  // Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium
+  if(ZZ==19) { // Potassium
+    Z=ZZ;
     symbol="K";
     name="Potassium";
     Period=4;
@@ -1964,8 +2012,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.4E7;
     electronegativity_vec=0.82;
     hardness_Ghosh=2.3273;
-    electronegativityPearson=2.42;
-    electronegativityGhosh=2.672;
+    electronegativity_Pearson=2.42;
+    electronegativity_Ghosh=2.672;
     electron_affinity_PT=48.4;
     Miedema_phi_star=2.25;
     Miedema_nws=0.65;
@@ -2000,15 +2048,16 @@ xelement::xelement(uint Z) {
     HHIP=1700;
     HHIR=7200;
     /*xray_scatt=NNN;*/
-   //K
+    //K
   }
- // [AFLOW]STOP=Potassium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Potassium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Calcium
- // Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium
-  if(Z==20) { // Calcium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Calcium
+  // Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium
+  if(ZZ==20) { // Calcium
+    Z=ZZ;
     symbol="Ca";
     name="Calcium";
     Period=4;
@@ -2042,8 +2091,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.9E7;
     electronegativity_vec=1.00;
     hardness_Ghosh=2.7587;
-    electronegativityPearson=2.2;
-    electronegativityGhosh=3.140;
+    electronegativity_Pearson=2.2;
+    electronegativity_Ghosh=3.140;
     electron_affinity_PT=2.37;
     Miedema_phi_star=2.55;
     Miedema_nws=0.91;
@@ -2078,16 +2127,17 @@ xelement::xelement(uint Z) {
     HHIP=3900;
     HHIR=1500;
     /*xray_scatt=NNN;*/
-   //Ca
+    //Ca
   }
- // [AFLOW]STOP=Calcium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Calcium
+  // ********************************************************************************************************************************************************
 
- // d-electron systems: transition metals
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Scandium
- // Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium
-  if(Z==21) { // Scandium
+  // d-electron systems: transition metals
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Scandium
+  // Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium
+  if(ZZ==21) { // Scandium
+    Z=ZZ;
     symbol="Sc";
     name="Scandium";
     Period=4;
@@ -2121,8 +2171,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.8E6;
     electronegativity_vec=1.36;
     hardness_Ghosh=2.8582;
-    electronegativityPearson=3.34;
-    electronegativityGhosh=3.248;
+    electronegativity_Pearson=3.34;
+    electronegativity_Ghosh=3.248;
     electron_affinity_PT=18.1;
     Miedema_phi_star=3.25;
     Miedema_nws=1.27;
@@ -2157,15 +2207,16 @@ xelement::xelement(uint Z) {
     HHIP=5500;
     HHIR=4500;
     xray_scatt=21.34;
-   //Sc
+    //Sc
   }
- // [AFLOW]STOP=Scandium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Scandium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Titanium
- // Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium
-  if(Z==22) { // Titanium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Titanium
+  // Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium
+  if(ZZ==22) { // Titanium
+    Z=ZZ;
     symbol="Ti";
     name="Titanium";
     Period=4;
@@ -2199,8 +2250,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.5E6;
     electronegativity_vec=1.54;
     hardness_Ghosh=2.9578;
-    electronegativityPearson=3.45;
-    electronegativityGhosh=3.357;
+    electronegativity_Pearson=3.45;
+    electronegativity_Ghosh=3.357;
     electron_affinity_PT=7.6;
     Miedema_phi_star=3.65;
     Miedema_nws=1.47;
@@ -2235,15 +2286,16 @@ xelement::xelement(uint Z) {
     HHIP=1100;
     HHIR=1600;
     xray_scatt=22.24;
-   //Ti
+    //Ti
   }
- // [AFLOW]STOP=Titanium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Titanium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Vanadium
- // Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium
-  if(Z==23) { // Vanadium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Vanadium
+  // Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium
+  if(ZZ==23) { // Vanadium
+    Z=ZZ;
     symbol="V";
     name="Vanadium";
     Period=4;
@@ -2277,8 +2329,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=5E6;
     electronegativity_vec=1.63;
     hardness_Ghosh=3.0573;
-    electronegativityPearson=3.6;
-    electronegativityGhosh=3.465;
+    electronegativity_Pearson=3.6;
+    electronegativity_Ghosh=3.465;
     electron_affinity_PT=50.6;
     Miedema_phi_star=4.25;
     Miedema_nws=1.64;
@@ -2313,15 +2365,16 @@ xelement::xelement(uint Z) {
     HHIP=3300;
     HHIR=3400;
     /*xray_scatt=NNN;*/
-   //V
+    //V
   }
- // [AFLOW]STOP=Vanadium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Vanadium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Chromium
- // Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium
-  if(Z==24) { // Chromium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Chromium
+  // Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium
+  if(ZZ==24) { // Chromium
+    Z=ZZ;
     symbol="Cr";
     name="Chromium";
     Period=4;
@@ -2355,8 +2408,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=7.9E6;
     electronegativity_vec=1.66;
     hardness_Ghosh=3.1567;
-    electronegativityPearson=3.72;
-    electronegativityGhosh=3.573;
+    electronegativity_Pearson=3.72;
+    electronegativity_Ghosh=3.573;
     electron_affinity_PT=64.3;
     Miedema_phi_star=4.65;
     Miedema_nws=1.74;
@@ -2391,15 +2444,16 @@ xelement::xelement(uint Z) {
     HHIP=3100;
     HHIR=4100;
     xray_scatt=23.84;
-   //Cr
+    //Cr
   }
- // [AFLOW]STOP=Chromium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Chromium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Manganese
- // Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese
-  if(Z==25) { // Manganese
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Manganese
+  // Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese
+  if(ZZ==25) { // Manganese
+    Z=ZZ;
     symbol="Mn";
     name="Manganese";
     Period=4;
@@ -2433,8 +2487,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=620000;
     electronegativity_vec=1.55;
     hardness_Ghosh=3.2564;
-    electronegativityPearson=3.72;
-    electronegativityGhosh=3.681;
+    electronegativity_Pearson=3.72;
+    electronegativity_Ghosh=3.681;
     electron_affinity_PT=0;
     Miedema_phi_star=4.45;
     Miedema_nws=1.61;
@@ -2469,15 +2523,16 @@ xelement::xelement(uint Z) {
     HHIP=1600;
     HHIR=1800;
     xray_scatt=24.46;
-   //xray_scatt=24.3589; Mn JUNKAI CHANGED VALENCE// DX and CO- 9/4/17 radius_covalent[i] uses high spin configuration (most frequent)
+    //xray_scatt=24.3589; Mn JUNKAI CHANGED VALENCE// DX and CO- 9/4/17 radius_covalent[i] uses high spin configuration (most frequent)
   }
- // [AFLOW]STOP=Manganese
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Manganese
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Iron
- // Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron
-  if(Z==26) { // Iron
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Iron
+  // Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron
+  if(ZZ==26) { // Iron
+    Z=ZZ;
     symbol="Fe";
     name="Iron";
     Period=4;
@@ -2511,8 +2566,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1E7;
     electronegativity_vec=1.83;
     hardness_Ghosh=3.3559;
-    electronegativityPearson=4.06;
-    electronegativityGhosh=3.789;
+    electronegativity_Pearson=4.06;
+    electronegativity_Ghosh=3.789;
     electron_affinity_PT=15.7;
     Miedema_phi_star=4.93;
     Miedema_nws=1.77;
@@ -2547,15 +2602,16 @@ xelement::xelement(uint Z) {
     HHIP=2400;
     HHIR=1400;
     xray_scatt=24.85;
-   //xray_scatt=24.6830; Fe JUNKAI CHANGED VALENCE// DX and CO - 9/4/17 radius_covalent[i] uses high spin configuration (most frequent)
+    //xray_scatt=24.6830; Fe JUNKAI CHANGED VALENCE// DX and CO - 9/4/17 radius_covalent[i] uses high spin configuration (most frequent)
   }
- // [AFLOW]STOP=Iron
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Iron
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Cobalt
- // Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt
-  if(Z==27) { // Cobalt
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Cobalt
+  // Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt
+  if(ZZ==27) { // Cobalt
+    Z=ZZ;
     symbol="Co";
     name="Cobalt";
     Period=4;
@@ -2589,8 +2645,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.7E7;
     electronegativity_vec=1.88;
     hardness_Ghosh=3.4556;
-    electronegativityPearson=4.3;
-    electronegativityGhosh=3.897;
+    electronegativity_Pearson=4.3;
+    electronegativity_Ghosh=3.897;
     electron_affinity_PT=63.7;
     Miedema_phi_star=5.10;
     Miedema_nws=1.75;
@@ -2625,15 +2681,16 @@ xelement::xelement(uint Z) {
     HHIP=3100;
     HHIR=2700;
     xray_scatt=24.59;
-   //Co JUNKAI CHANGED VALENCE// DX and CO - 9/4/17 radius_covalent[i] uses low spin configuration (most frequent)
+    //Co JUNKAI CHANGED VALENCE// DX and CO - 9/4/17 radius_covalent[i] uses low spin configuration (most frequent)
   }
- // [AFLOW]STOP=Cobalt
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Cobalt
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Nickel
- // Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel
-  if(Z==28) { // Nickel
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Nickel
+  // Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel
+  if(ZZ==28) { // Nickel
+    Z=ZZ;
     symbol="Ni";
     name="Nickel";
     Period=4;
@@ -2667,8 +2724,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.4E7;
     electronegativity_vec=1.91;
     hardness_Ghosh=3.5550;
-    electronegativityPearson=4.40;
-    electronegativityGhosh=4.005;
+    electronegativity_Pearson=4.40;
+    electronegativity_Ghosh=4.005;
     electron_affinity_PT=112;
     Miedema_phi_star=5.20;
     Miedema_nws=1.75;
@@ -2703,15 +2760,16 @@ xelement::xelement(uint Z) {
     HHIP=1000;
     HHIR=1500;
     xray_scatt=25.02;
-   //Ni
+    //Ni
   }
- // [AFLOW]STOP=Nickel
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Nickel
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Copper
- // Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper
-  if(Z==29) { // Copper
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Copper
+  // Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper
+  if(ZZ==29) { // Copper
+    Z=ZZ;
     symbol="Cu";
     name="Copper";
     Period=4;
@@ -2745,8 +2803,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=5.9E7;
     electronegativity_vec=1.90;
     hardness_Ghosh=3.6544;
-    electronegativityPearson=4.48;
-    electronegativityGhosh=4.113;
+    electronegativity_Pearson=4.48;
+    electronegativity_Ghosh=4.113;
     electron_affinity_PT=118.4;
     Miedema_phi_star=4.55;
     Miedema_nws=1.47;
@@ -2781,15 +2839,16 @@ xelement::xelement(uint Z) {
     HHIP=1600;
     HHIR=1500;
     xray_scatt=27.03;
-   //Cu JUNKAI CHANGED VALENCE
+    //Cu JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Copper
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Copper
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Zinc
- // Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc
-  if(Z==30) { // Zinc
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Zinc
+  // Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc
+  if(ZZ==30) { // Zinc
+    Z=ZZ;
     symbol="Zn";
     name="Zinc";
     Period=4;
@@ -2823,8 +2882,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.7E7;
     electronegativity_vec=1.65;
     hardness_Ghosh=3.7542;
-    electronegativityPearson=4.45;
-    electronegativityGhosh=4.222;
+    electronegativity_Pearson=4.45;
+    electronegativity_Ghosh=4.222;
     electron_affinity_PT=0;
     Miedema_phi_star=4.10;
     Miedema_nws=1.32;
@@ -2859,16 +2918,17 @@ xelement::xelement(uint Z) {
     HHIP=1600;
     HHIR=1900;
     xray_scatt=28.44;
-   //Zn
+    //Zn
   }
- // [AFLOW]STOP=Zinc
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Zinc
+  // ********************************************************************************************************************************************************
 
- // p-electron systems 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Gallium
- // Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium
-  if(Z==31) { // Gallium
+  // p-electron systems 
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Gallium
+  // Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium
+  if(ZZ==31) { // Gallium
+    Z=ZZ;
     symbol="Ga";
     name="Gallium";
     Period=4;
@@ -2902,8 +2962,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=7.1E6;
     electronegativity_vec=1.81;
     hardness_Ghosh=4.1855;
-    electronegativityPearson=3.2;
-    electronegativityGhosh=4.690;
+    electronegativity_Pearson=3.2;
+    electronegativity_Ghosh=4.690;
     electron_affinity_PT=28.9;
     Miedema_phi_star=4.10;
     Miedema_nws=1.31;
@@ -2938,15 +2998,16 @@ xelement::xelement(uint Z) {
     HHIP=5500;
     HHIR=1900;
     /*xray_scatt=NNN;*/
-   //Ga
+    //Ga
   }
- // [AFLOW]STOP=Gallium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Gallium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Germanium
- // Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium
-  if(Z==32) { // Germanium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Germanium
+  // Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium
+  if(ZZ==32) { // Germanium
+    Z=ZZ;
     symbol="Ge";
     name="Germanium";
     Period=4;
@@ -2980,8 +3041,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2000;
     electronegativity_vec=2.01;
     hardness_Ghosh=4.6166;
-    electronegativityPearson=4.6;
-    electronegativityGhosh=5.159;
+    electronegativity_Pearson=4.6;
+    electronegativity_Ghosh=5.159;
     electron_affinity_PT=119;
     Miedema_phi_star=4.55;
     Miedema_nws=1.37;
@@ -3016,15 +3077,16 @@ xelement::xelement(uint Z) {
     HHIP=5300;
     HHIR=1900;
     /*xray_scatt=NNN;*/
-   //Ge
+    //Ge
   }
- // [AFLOW]STOP=Germanium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Germanium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Arsenic
- // Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic
-  if(Z==33) { // Arsenic
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Arsenic
+  // Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic
+  if(ZZ==33) { // Arsenic
+    Z=ZZ;
     symbol="As";
     name="Arsenic";
     Period=4;
@@ -3058,8 +3120,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=3.3E6;
     electronegativity_vec=2.18;
     hardness_Ghosh=5.0662;
-    electronegativityPearson=5.3;
-    electronegativityGhosh=5.628;
+    electronegativity_Pearson=5.3;
+    electronegativity_Ghosh=5.628;
     electron_affinity_PT=78;
     Miedema_phi_star=4.80;
     Miedema_nws=1.44;
@@ -3094,15 +3156,16 @@ xelement::xelement(uint Z) {
     HHIP=3300;
     HHIR=4000;
     /*xray_scatt=NNN;*/
-   //As
+    //As
   }
- // [AFLOW]STOP=Arsenic
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Arsenic
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Selenium
- // Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium
-  if(Z==34) { // Selenium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Selenium
+  // Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium
+  if(ZZ==34) { // Selenium
+    Z=ZZ;
     symbol="Se";
     name="Selenium";
     Period=4;
@@ -3136,8 +3199,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=2.55;
     hardness_Ghosh=5.4795;
-    electronegativityPearson=5.89;
-    electronegativityGhosh=6.096;
+    electronegativity_Pearson=5.89;
+    electronegativity_Ghosh=6.096;
     electron_affinity_PT=195;
     Miedema_phi_star=5.17;
     Miedema_nws=1.40;
@@ -3172,15 +3235,16 @@ xelement::xelement(uint Z) {
     HHIP=2200;
     HHIR=1900;
     /*xray_scatt=NNN;*/
-   //Se Table 27 of JUNKAI
+    //Se Table 27 of JUNKAI
   }
- // [AFLOW]STOP=Selenium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Selenium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Bromine
- // Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine
-  if(Z==35) { // Bromine
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Bromine
+  // Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine
+  if(ZZ==35) { // Bromine
+    Z=ZZ;
     symbol="Br";
     name="Bromine";
     Period=4;
@@ -3214,8 +3278,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1E-10;
     electronegativity_vec=2.96;
     hardness_Ghosh=5.9111;
-    electronegativityPearson=7.59;
-    electronegativityGhosh=6.565;
+    electronegativity_Pearson=7.59;
+    electronegativity_Ghosh=6.565;
     electron_affinity_PT=324.6;
     Miedema_phi_star=5.20;
     Miedema_nws=1.35;
@@ -3250,15 +3314,16 @@ xelement::xelement(uint Z) {
     HHIP=3300;
     HHIR=6900;
     /* xray_scatt=NNN;*/
-   //Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE
+    //Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Bromine
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Bromine
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Krypton
- // Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton
-  if(Z==36) { // Krypton
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Krypton
+  // Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton
+  if(ZZ==36) { // Krypton
+    Z=ZZ;
     symbol="Kr";
     name="Krypton";
     Period=4;
@@ -3292,8 +3357,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=3;
     hardness_Ghosh=6.3418;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=7.033;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=7.033;
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -3328,17 +3393,18 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Kr
+    //Kr
   }
- // [AFLOW]STOP=Krypton
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Krypton
+  // ********************************************************************************************************************************************************
 
- // ROW5
- // s-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Rubidium
- // Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium
-  if(Z==37) { // Rubidium
+  // ROW5
+  // s-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Rubidium
+  // Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium
+  if(ZZ==37) { // Rubidium
+    Z=ZZ;
     symbol="Rb";
     name="Rubidium";
     Period=5;
@@ -3372,8 +3438,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=8.3E6;
     electronegativity_vec=0.82;
     hardness_Ghosh=2.1204;
-    electronegativityPearson=2.34;
-    electronegativityGhosh=2.849;
+    electronegativity_Pearson=2.34;
+    electronegativity_Ghosh=2.849;
     electron_affinity_PT=46.9;
     Miedema_phi_star=2.10;
     Miedema_nws=0.60;
@@ -3408,15 +3474,16 @@ xelement::xelement(uint Z) {
     HHIP=6000;
     HHIR=6000;
     /*xray_scatt=NNN;*/
-   //Rb
+    //Rb
   }
- // [AFLOW]STOP=Rubidium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Rubidium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Strontium
- // Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium
-  if(Z==38) { // Strontium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Strontium
+  // Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium
+  if(ZZ==38) { // Strontium
+    Z=ZZ;
     symbol="Sr";
     name="Strontium";
     Period=5;
@@ -3450,8 +3517,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=7.7E6;
     electronegativity_vec=0.95;
     hardness_Ghosh=2.5374;
-    electronegativityPearson=2.0;
-    electronegativityGhosh=3.225;
+    electronegativity_Pearson=2.0;
+    electronegativity_Ghosh=3.225;
     electron_affinity_PT=5.03;
     Miedema_phi_star=2.40;
     Miedema_nws=0.84;
@@ -3486,16 +3553,17 @@ xelement::xelement(uint Z) {
     HHIP=4200;
     HHIR=3000;
     /*xray_scatt=NNN;*/
-   //Sr
+    //Sr
   }
- // [AFLOW]STOP=Strontium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Strontium
+  // ********************************************************************************************************************************************************
 
- // d-electron systems: transition metals
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Yttrium
- // Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium
-  if(Z==39) { // Yttrium
+  // d-electron systems: transition metals
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Yttrium
+  // Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium
+  if(ZZ==39) { // Yttrium
+    Z=ZZ;
     symbol="Y";
     name="Yttrium";
     Period=5;
@@ -3529,8 +3597,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.8E6;
     electronegativity_vec=1.22;
     hardness_Ghosh=2.6335;
-    electronegativityPearson=3.19;
-    electronegativityGhosh=3.311;
+    electronegativity_Pearson=3.19;
+    electronegativity_Ghosh=3.311;
     electron_affinity_PT=29.6;
     Miedema_phi_star=3.20;
     Miedema_nws=1.21;
@@ -3565,15 +3633,16 @@ xelement::xelement(uint Z) {
     HHIP=9800;
     HHIR=2600;
     /*xray_scatt=NNN;*/
-   //Y
+    //Y
   }
- // [AFLOW]STOP=Yttrium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Yttrium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Zirconium
- // Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium
-  if(Z==40) { // Zirconium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Zirconium
+  // Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium
+  if(ZZ==40) { // Zirconium
+    Z=ZZ;
     symbol="Zr";
     name="Zirconium";
     Period=5;
@@ -3607,8 +3676,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.4E6;
     electronegativity_vec=1.33;
     hardness_Ghosh=2.7298;
-    electronegativityPearson=3.64;
-    electronegativityGhosh=3.398;
+    electronegativity_Pearson=3.64;
+    electronegativity_Ghosh=3.398;
     electron_affinity_PT=41.1;
     Miedema_phi_star=3.40;
     Miedema_nws=1.39;
@@ -3643,15 +3712,16 @@ xelement::xelement(uint Z) {
     HHIP=3400;
     HHIR=2600;
     /*xray_scatt=NNN;*/
-   //Zr
+    //Zr
   }
- // [AFLOW]STOP=Zirconium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Zirconium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Niobium
- // Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium
-  if(Z==41) { // Niobium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Niobium
+  // Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium
+  if(ZZ==41) { // Niobium
+    Z=ZZ;
     symbol="Nb";
     name="Niobium";
     Period=5;
@@ -3685,8 +3755,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=6.7E6;
     electronegativity_vec=1.60;
     hardness_Ghosh=2.8260;
-    electronegativityPearson=4.0;
-    electronegativityGhosh=3.485;
+    electronegativity_Pearson=4.0;
+    electronegativity_Ghosh=3.485;
     electron_affinity_PT=86.1;
     Miedema_phi_star=4.00;
     Miedema_nws=1.62;
@@ -3721,15 +3791,16 @@ xelement::xelement(uint Z) {
     HHIP=8500;
     HHIR=8800;
     /*xray_scatt=NNN;*/
-   //Nb
+    //Nb
   }
- // [AFLOW]STOP=Niobium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Niobium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Molybdenum
- // Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum
-  if(Z==42) { // Molybdenum
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Molybdenum
+  // Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum
+  if(ZZ==42) { // Molybdenum
+    Z=ZZ;
     symbol="Mo";
     name="Molybdenum";
     Period=5;
@@ -3763,8 +3834,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2E7;
     electronegativity_vec=2.16;
     hardness_Ghosh=2.9221;
-    electronegativityPearson=3.9;
-    electronegativityGhosh=3.572;
+    electronegativity_Pearson=3.9;
+    electronegativity_Ghosh=3.572;
     electron_affinity_PT=71.9;
     Miedema_phi_star=4.65;
     Miedema_nws=1.77;
@@ -3799,15 +3870,16 @@ xelement::xelement(uint Z) {
     HHIP=2400;
     HHIR=5300;
     /*xray_scatt=NNN;*/
-   //Mo
+    //Mo
   }
- // [AFLOW]STOP=Molybdenum
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Molybdenum
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Technetium
- // Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium
-  if(Z==43) { // Technetium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Technetium
+  // Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium
+  if(ZZ==43) { // Technetium
+    Z=ZZ;
     symbol="Tc";
     name="Technetium";
     Period=5;
@@ -3841,8 +3913,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=5E6;
     electronegativity_vec=1.90;
     hardness_Ghosh=3.0184;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=3.659;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=3.659;
     electron_affinity_PT=53;
     Miedema_phi_star=5.30;
     Miedema_nws=1.81;
@@ -3877,15 +3949,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Tc JUNKAI CHANGED VALENCE
+    //Tc JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Technetium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Technetium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Ruthenium
- // Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium
-  if(Z==44) { // Ruthenium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Ruthenium
+  // Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium
+  if(ZZ==44) { // Ruthenium
+    Z=ZZ;
     symbol="Ru";
     name="Ruthenium";
     Period=5;
@@ -3919,8 +3992,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.4E7;
     electronegativity_vec=2.20;
     hardness_Ghosh=3.1146;
-    electronegativityPearson=4.5;
-    electronegativityGhosh=3.745;
+    electronegativity_Pearson=4.5;
+    electronegativity_Ghosh=3.745;
     electron_affinity_PT=101.3;
     Miedema_phi_star=5.40;
     Miedema_nws=1.83;
@@ -3955,15 +4028,16 @@ xelement::xelement(uint Z) {
     HHIP=3200;
     HHIR=8000;
     /*xray_scatt=NNN;*/
-   //Ru JUNKAI CHANGED VALENCE
+    //Ru JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Ruthenium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Ruthenium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Rhodium
- // Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium
-  if(Z==45) { // Rhodium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Rhodium
+  // Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium
+  if(ZZ==45) { // Rhodium
+    Z=ZZ;
     symbol="Rh";
     name="Rhodium";
     Period=5;
@@ -3997,8 +4071,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.3E7;
     electronegativity_vec=2.28;
     hardness_Ghosh=3.2108;
-    electronegativityPearson=4.3;
-    electronegativityGhosh=3.832;
+    electronegativity_Pearson=4.3;
+    electronegativity_Ghosh=3.832;
     electron_affinity_PT=109.7;
     Miedema_phi_star=5.40;
     Miedema_nws=1.76;
@@ -4033,15 +4107,16 @@ xelement::xelement(uint Z) {
     HHIP=3200;
     HHIR=8000;
     /*xray_scatt=NNN;*/
-   //Rh
+    //Rh
   }
- // [AFLOW]STOP=Rhodium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Rhodium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Palladium
- // Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium
-  if(Z==46) { // Palladium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Palladium
+  // Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium
+  if(ZZ==46) { // Palladium
+    Z=ZZ;
     symbol="Pd";
     name="Palladium";
     Period=5;
@@ -4075,8 +4150,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1E7;
     electronegativity_vec=2.20;
     hardness_Ghosh=3.3069;
-    electronegativityPearson=4.45;
-    electronegativityGhosh=3.919;
+    electronegativity_Pearson=4.45;
+    electronegativity_Ghosh=3.919;
     electron_affinity_PT=53.7;
     Miedema_phi_star=5.45;
     Miedema_nws=1.67;
@@ -4111,15 +4186,16 @@ xelement::xelement(uint Z) {
     HHIP=3200;
     HHIR=8000;
     /*xray_scatt=NNN;*/
-   //Pd
+    //Pd
   }
- // [AFLOW]STOP=Palladium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Palladium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Silver
- // Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver
-  if(Z==47) { // Silver
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Silver
+  // Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver
+  if(ZZ==47) { // Silver
+    Z=ZZ;
     symbol="Ag";
     name="Silver";
     Period=5;
@@ -4153,8 +4229,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=6.2E7;
     electronegativity_vec=1.93;
     hardness_Ghosh=3.4032;
-    electronegativityPearson=4.44;
-    electronegativityGhosh=4.006;
+    electronegativity_Pearson=4.44;
+    electronegativity_Ghosh=4.006;
     electron_affinity_PT=125.6;
     Miedema_phi_star=4.45;
     Miedema_nws=1.39;
@@ -4189,15 +4265,16 @@ xelement::xelement(uint Z) {
     HHIP=1200;
     HHIR=1400;
     xray_scatt=47.18;
-   //Ag JUNKAI CHANGED VALENCE
+    //Ag JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Silver
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Silver
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Cadmium
- // Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium
-  if(Z==48) { // Cadmium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Cadmium
+  // Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium
+  if(ZZ==48) { // Cadmium
+    Z=ZZ;
     symbol="Cd";
     name="Cadmium";
     Period=5;
@@ -4231,8 +4308,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.4E7;
     electronegativity_vec=1.69;
     hardness_Ghosh=3.4994;
-    electronegativityPearson=4.33;
-    electronegativityGhosh=4.093;
+    electronegativity_Pearson=4.33;
+    electronegativity_Ghosh=4.093;
     electron_affinity_PT=0;
     Miedema_phi_star=4.05;
     Miedema_nws=1.24;
@@ -4267,16 +4344,17 @@ xelement::xelement(uint Z) {
     HHIP=1700;
     HHIR=1300;
     /*xray_scatt=NNN;*/
-   //Cd
+    //Cd
   }
- // [AFLOW]STOP=Cadmium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Cadmium
+  // ********************************************************************************************************************************************************
 
- // p-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Indium
- // Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium
-  if(Z==49) { // Indium
+  // p-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Indium
+  // Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium
+  if(ZZ==49) { // Indium
+    Z=ZZ;
     symbol="In";
     name="Indium";
     Period=5;
@@ -4310,8 +4388,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.2E7;
     electronegativity_vec=1.78;
     hardness_Ghosh=3.9164;
-    electronegativityPearson=3.1;
-    electronegativityGhosh=4.469;
+    electronegativity_Pearson=3.1;
+    electronegativity_Ghosh=4.469;
     electron_affinity_PT=28.9;
     Miedema_phi_star=3.90;
     Miedema_nws=1.17;
@@ -4346,15 +4424,16 @@ xelement::xelement(uint Z) {
     HHIP=3300;
     HHIR=2000;
     /*xray_scatt=NNN;*/
-   //In
+    //In
   }
- // [AFLOW]STOP=Indium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Indium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Tin
- // Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin
-  if(Z==50) { // Tin
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Tin
+  // Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin
+  if(ZZ==50) { // Tin
+    Z=ZZ;
     symbol="Sn";
     name="Tin";
     Period=5;
@@ -4388,8 +4467,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=9.1E6;
     electronegativity_vec=1.96;
     hardness_Ghosh=4.3332;
-    electronegativityPearson=4.3;
-    electronegativityGhosh=4.845;
+    electronegativity_Pearson=4.3;
+    electronegativity_Ghosh=4.845;
     electron_affinity_PT=107.3;
     Miedema_phi_star=4.15;
     Miedema_nws=1.24;
@@ -4424,15 +4503,16 @@ xelement::xelement(uint Z) {
     HHIP=2600;
     HHIR=1600;
     /*xray_scatt=NNN;*/
-   //Sn
+    //Sn
   }
- // [AFLOW]STOP=Tin
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Tin
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Antimony
- // Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony
-  if(Z==51) { // Antimony
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Antimony
+  // Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony
+  if(ZZ==51) { // Antimony
+    Z=ZZ;
     symbol="Sb";
     name="Antimony";
     Period=5;
@@ -4466,8 +4546,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.5E6;
     electronegativity_vec=2.05;
     hardness_Ghosh=4.7501;
-    electronegativityPearson=4.85;
-    electronegativityGhosh=5.221;
+    electronegativity_Pearson=4.85;
+    electronegativity_Ghosh=5.221;
     electron_affinity_PT=103.2;
     Miedema_phi_star=4.40;
     Miedema_nws=1.26;
@@ -4502,15 +4582,16 @@ xelement::xelement(uint Z) {
     HHIP=7900;
     HHIR=3400;
     /*xray_scatt=NNN;*/
-   //Sb
+    //Sb
   }
- // [AFLOW]STOP=Antimony
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Antimony
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Tellurium
- // Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium
-  if(Z==52) { // Tellurium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Tellurium
+  // Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium
+  if(ZZ==52) { // Tellurium
+    Z=ZZ;
     symbol="Te";
     name="Tellurium";
     Period=5;
@@ -4544,8 +4625,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=10000;
     electronegativity_vec=2.10;
     hardness_Ghosh=5.1670;
-    electronegativityPearson=5.49;
-    electronegativityGhosh=5.597;
+    electronegativity_Pearson=5.49;
+    electronegativity_Ghosh=5.597;
     electron_affinity_PT=190.2;
     Miedema_phi_star=4.72;
     Miedema_nws=1.31;
@@ -4580,15 +4661,16 @@ xelement::xelement(uint Z) {
     HHIP=2900;
     HHIR=4900;
     /*xray_scatt=NNN;*/
-   //Te Table 27 of JUNKAI
+    //Te Table 27 of JUNKAI
   }
- // [AFLOW]STOP=Tellurium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Tellurium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Iodine
- // Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine
-  if(Z==53) { // Iodine
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Iodine
+  // Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine
+  if(ZZ==53) { // Iodine
+    Z=ZZ;
     symbol="I";
     name="Iodine";
     Period=5;
@@ -4622,8 +4704,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1E-7;
     electronegativity_vec=2.66;
     hardness_Ghosh=5.5839;
-    electronegativityPearson=6.76;
-    electronegativityGhosh=5.973;
+    electronegativity_Pearson=6.76;
+    electronegativity_Ghosh=5.973;
     electron_affinity_PT=295.2;
     Miedema_phi_star=5.33;
     Miedema_nws=0.17;
@@ -4658,15 +4740,16 @@ xelement::xelement(uint Z) {
     HHIP=4900;
     HHIR=4800;
     /*xray_scatt=NNN;*/
-   //I interpolation phi_star, nws, Vm,
+    //I interpolation phi_star, nws, Vm,
   }
- // [AFLOW]STOP=Iodine
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Iodine
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Xenon
- // Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon
-  if(Z==54) { // Xenon
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Xenon
+  // Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon
+  if(ZZ==54) { // Xenon
+    Z=ZZ;
     symbol="Xe";
     name="Xenon";
     Period=5;
@@ -4700,8 +4783,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=2.60;
     hardness_Ghosh=6.0009;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=6.349;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=6.349;
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -4736,17 +4819,18 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Xe JUNKAI CHANGED VALENCE
+    //Xe JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Xenon
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Xenon
+  // ********************************************************************************************************************************************************
 
- // ROW6
- // s-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Cesium
- // Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium
-  if(Z==55) { // Cesium
+  // ROW6
+  // s-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Cesium
+  // Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium
+  if(ZZ==55) { // Cesium
+    Z=ZZ;
     symbol="Cs";
     name="Cesium";
     Period=6;
@@ -4780,8 +4864,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=5E6;
     electronegativity_vec=0.79;
     hardness_Ghosh=0.6829;
-    electronegativityPearson=2.18;
-    electronegativityGhosh=4.196;
+    electronegativity_Pearson=2.18;
+    electronegativity_Ghosh=4.196;
     electron_affinity_PT=45.5;
     Miedema_phi_star=1.95;
     Miedema_nws=0.55;
@@ -4816,15 +4900,16 @@ xelement::xelement(uint Z) {
     HHIP=6000;
     HHIR=6000;
     /*xray_scatt=NNN;*/
-   //Cs
+    //Cs
   }
- // [AFLOW]STOP=Cesium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Cesium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Barium
- // Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium
-  if(Z==56) { // Barium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Barium
+  // Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium
+  if(ZZ==56) { // Barium
+    Z=ZZ;
     symbol="Ba";
     name="Barium";
     Period=6;
@@ -4858,8 +4943,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.9E6;
     electronegativity_vec=0.89;
     hardness_Ghosh=0.9201;
-    electronegativityPearson=2.4;
-    electronegativityGhosh=4.318;
+    electronegativity_Pearson=2.4;
+    electronegativity_Ghosh=4.318;
     electron_affinity_PT=13.95;
     Miedema_phi_star=2.32;
     Miedema_nws=0.81;
@@ -4894,16 +4979,17 @@ xelement::xelement(uint Z) {
     HHIP=3000;
     HHIR=2300;
     /*xray_scatt=NNN;*/
-   //Ba
+    //Ba
   }
- // [AFLOW]STOP=Barium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Barium
+  // ********************************************************************************************************************************************************
 
- // d-electron systems: transition metals
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Lanthanium
- // Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium
-  if(Z==57) { // Lanthanium
+  // d-electron systems: transition metals
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Lanthanium
+  // Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium
+  if(ZZ==57) { // Lanthanium
+    Z=ZZ;
     symbol="La";
     name="Lanthanium";
     Period=6;
@@ -4937,8 +5023,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.6E6;
     electronegativity_vec=1.10;
     hardness_Ghosh=1.1571;
-    electronegativityPearson=3.1;
-    electronegativityGhosh=4.439;
+    electronegativity_Pearson=3.1;
+    electronegativity_Ghosh=4.439;
     electron_affinity_PT=48;
     Miedema_phi_star=3.05;
     Miedema_nws=1.09;
@@ -4973,16 +5059,17 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //La
+    //La
   }
- // [AFLOW]STOP=Lanthanium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Lanthanium
+  // ********************************************************************************************************************************************************
 
- // lantanidies
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Cerium
- // Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium
-  if(Z==58) { // Cerium
+  // lantanidies
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Cerium
+  // Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium
+  if(ZZ==58) { // Cerium
+    Z=ZZ;
     symbol="Ce";
     name="Cerium";
     Period=6;
@@ -5016,8 +5103,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.4E6;
     electronegativity_vec=1.12;
     hardness_Ghosh=1.3943;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=4.561;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=4.561;
     electron_affinity_PT=50;
     Miedema_phi_star=3.18;
     Miedema_nws=1.19;
@@ -5052,15 +5139,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Ce Pettifor linear interpolation// Miedema from Alonso-March.
+    //Ce Pettifor linear interpolation// Miedema from Alonso-March.
   }
- // [AFLOW]STOP=Cerium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Cerium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Praseodymium
- // Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium
-  if(Z==59) { // Praseodymium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Praseodymium
+  // Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium
+  if(ZZ==59) { // Praseodymium
+    Z=ZZ;
     symbol="Pr";
     name="Praseodymium";
     Period=6;
@@ -5094,8 +5182,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.4E6;
     electronegativity_vec=1.13;
     hardness_Ghosh=1.6315;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=4.682;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=4.682;
     electron_affinity_PT=50;
     Miedema_phi_star=3.19;
     Miedema_nws=1.20;
@@ -5130,15 +5218,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Pr Pettifor linear interpolation
+    //Pr Pettifor linear interpolation
   }
- // [AFLOW]STOP=Praseodymium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Praseodymium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Neodymium
- // Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium
-  if(Z==60) { // Neodymium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Neodymium
+  // Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium
+  if(ZZ==60) { // Neodymium
+    Z=ZZ;
     symbol="Nd";
     name="Neodymium";
     Period=6;
@@ -5172,8 +5261,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.6E6;
     electronegativity_vec=1.14;
     hardness_Ghosh=1.8684;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=4.804;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=4.804;
     electron_affinity_PT=50;
     Miedema_phi_star=3.19;
     Miedema_nws=1.20;
@@ -5208,15 +5297,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Nd Pettifor linear interpolation JUNKAI CHANGED VALENCE
+    //Nd Pettifor linear interpolation JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Neodymium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Neodymium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Promethium
- // Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium
-  if(Z==61) { // Promethium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Promethium
+  // Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium
+  if(ZZ==61) { // Promethium
+    Z=ZZ;
     symbol="Pm";
     name="Promethium";
     Period=6;
@@ -5250,8 +5340,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.3E6;
     electronegativity_vec=1.13;
     hardness_Ghosh=2.1056;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=4.925;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=4.925;
     electron_affinity_PT=50;
     Miedema_phi_star=3.19;
     Miedema_nws=1.21;
@@ -5286,15 +5376,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   // Pm Pettifor linear interpolation
+    // Pm Pettifor linear interpolation
   }
- // [AFLOW]STOP=Promethium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Promethium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Samarium
- // Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium
-  if(Z==62) { // Samarium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Samarium
+  // Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium
+  if(ZZ==62) { // Samarium
+    Z=ZZ;
     symbol="Sm";
     name="Samarium";
     Period=6;
@@ -5328,8 +5419,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.1E6;
     electronegativity_vec=1.17;
     hardness_Ghosh=2.3427;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.047;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.047;
     electron_affinity_PT=50;
     Miedema_phi_star=3.20;
     Miedema_nws=1.21;
@@ -5364,15 +5455,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Sm Pettifor linear interpolation
+    //Sm Pettifor linear interpolation
   }
- // [AFLOW]STOP=Samarium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Samarium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Europium
- // Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium
-  if(Z==63) { // Europium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Europium
+  // Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium
+  if(ZZ==63) { // Europium
+    Z=ZZ;
     symbol="Eu";
     name="Europium";
     Period=6;
@@ -5406,8 +5498,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.1E6;
     electronegativity_vec=1.20;
     hardness_Ghosh=2.5798;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.168;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.168;
     electron_affinity_PT=50;
     Miedema_phi_star=3.20;
     Miedema_nws=1.21;
@@ -5442,15 +5534,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Eu Pettifor linear interpolation
+    //Eu Pettifor linear interpolation
   }
- // [AFLOW]STOP=Europium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Europium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Gadolinium
- // Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium
-  if(Z==64) { // Gadolinium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Gadolinium
+  // Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium
+  if(ZZ==64) { // Gadolinium
+    Z=ZZ;
     symbol="Gd";
     name="Gadolinium";
     Period=6;
@@ -5484,8 +5577,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=770000;
     electronegativity_vec=1.20;
     hardness_Ghosh=2.8170;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.290;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.290;
     electron_affinity_PT=50;
     Miedema_phi_star=3.20;
     Miedema_nws=1.21;
@@ -5520,15 +5613,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   // Gd Pettifor linear interpolation
+    // Gd Pettifor linear interpolation
   }
- // [AFLOW]STOP=Gadolinium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Gadolinium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Terbium
- // Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium
-  if(Z==65) { // Terbium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Terbium
+  // Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium
+  if(ZZ==65) { // Terbium
+    Z=ZZ;
     symbol="Tb";
     name="Terbium";
     Period=6;
@@ -5562,8 +5656,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=830000;
     electronegativity_vec=1.10;
     hardness_Ghosh=3.0540;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.411;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.411;
     electron_affinity_PT=50;
     Miedema_phi_star=3.21;
     Miedema_nws=1.22;
@@ -5598,15 +5692,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   // Tb Pettifor linear interpolation
+    // Tb Pettifor linear interpolation
   }
- // [AFLOW]STOP=Terbium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Terbium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Dysprosium
- // Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium
-  if(Z==66) { // Dysprosium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Dysprosium
+  // Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium
+  if(ZZ==66) { // Dysprosium
+    Z=ZZ;
     symbol="Dy";
     name="Dysprosium";
     Period=6;
@@ -5640,8 +5735,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.1E6;
     electronegativity_vec=1.22;
     hardness_Ghosh=3.2912;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.533;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.533;
     electron_affinity_PT=50;
     Miedema_phi_star=3.21;
     Miedema_nws=1.22;
@@ -5676,15 +5771,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Dy Pettifor linear interpolation JUNKAI CHANGED VALENCE
+    //Dy Pettifor linear interpolation JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Dysprosium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Dysprosium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Holmium
- // Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium
-  if(Z==67) { // Holmium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Holmium
+  // Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium
+  if(ZZ==67) { // Holmium
+    Z=ZZ;
     symbol="Ho";
     name="Holmium";
     Period=6;
@@ -5718,8 +5814,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.1E6;
     electronegativity_vec=1.23;
     hardness_Ghosh=3.5283;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.654;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.654;
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.22;
@@ -5754,15 +5850,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Ho Pettifor linear interpolation
+    //Ho Pettifor linear interpolation
   }
- // [AFLOW]STOP=Holmium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Holmium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Erbium
- // Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium
-  if(Z==68) { // Erbium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Erbium
+  // Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium
+  if(ZZ==68) { // Erbium
+    Z=ZZ;
     symbol="Er";
     name="Erbium";
     Period=6;
@@ -5796,8 +5893,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.2E6;
     electronegativity_vec=1.24;
     hardness_Ghosh=3.7655;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.776;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.776;
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.23;
@@ -5832,15 +5929,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Er Pettifor linear interpolation
+    //Er Pettifor linear interpolation
   }
- // [AFLOW]STOP=Erbium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Erbium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Thulium
- // Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium
-  if(Z==69) { // Thulium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Thulium
+  // Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium
+  if(ZZ==69) { // Thulium
+    Z=ZZ;
     symbol="Tm";
     name="Thulium";
     Period=6;
@@ -5874,8 +5972,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.4E6;
     electronegativity_vec=1.25;
     hardness_Ghosh=4.0026;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.897;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.897;
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.23;
@@ -5910,15 +6008,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Tm Pettifor linear interpolation JUNKAI CHANGED VALENCE
+    //Tm Pettifor linear interpolation JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Thulium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Thulium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Ytterbium
- // Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium
-  if(Z==70) { // Ytterbium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Ytterbium
+  // Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium
+  if(ZZ==70) { // Ytterbium
+    Z=ZZ;
     symbol="Yb";
     name="Ytterbium";
     Period=6;
@@ -5952,8 +6051,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=3.6E6;
     electronegativity_vec=1.10;
     hardness_Ghosh=4.2395;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=6.019;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=6.019;
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.23;
@@ -5988,15 +6087,16 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Yb Pettifor linear interpolation
+    //Yb Pettifor linear interpolation
   }
- // [AFLOW]STOP=Ytterbium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Ytterbium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Lutetium
- // Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium
-  if(Z==71) { // Lutetium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Lutetium
+  // Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium
+  if(ZZ==71) { // Lutetium
+    Z=ZZ;
     symbol="Lu";
     name="Lutetium";
     Period=6;
@@ -6030,8 +6130,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.8E6;
     electronegativity_vec=1.27;
     hardness_Ghosh=4.4766;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=6.140;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=6.140;
     electron_affinity_PT=50;
     Miedema_phi_star=3.22;
     Miedema_nws=1.24;
@@ -6066,16 +6166,17 @@ xelement::xelement(uint Z) {
     HHIP=9500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Lu
+    //Lu
   }
- // [AFLOW]STOP=Lutetium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Lutetium
+  // ********************************************************************************************************************************************************
 
- // d-electron systems: transition metals
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Hafnium
- // Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium
-  if(Z==72) { // Hafnium
+  // d-electron systems: transition metals
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Hafnium
+  // Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium
+  if(ZZ==72) { // Hafnium
+    Z=ZZ;
     symbol="Hf";
     name="Hafnium";
     Period=6;
@@ -6109,8 +6210,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=3.3E6;
     electronegativity_vec=1.30;
     hardness_Ghosh=4.7065;
-    electronegativityPearson=3.8;
-    electronegativityGhosh=6.258;
+    electronegativity_Pearson=3.8;
+    electronegativity_Ghosh=6.258;
     electron_affinity_PT=0;
     Miedema_phi_star=3.55;
     Miedema_nws=1.43;
@@ -6145,15 +6246,16 @@ xelement::xelement(uint Z) {
     HHIP=3400;
     HHIR=2600;
     /*xray_scatt=NNN;*/
-   //Hf
+    //Hf
   }
- // [AFLOW]STOP=Hafnium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Hafnium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Tantalum
- // Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum
-  if(Z==73) { // Tantalum
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Tantalum
+  // Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum
+  if(ZZ==73) { // Tantalum
+    Z=ZZ;
     symbol="Ta";
     name="Tantalum";
     Period=6;
@@ -6187,8 +6289,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=7.7E6;
     electronegativity_vec=1.50;
     hardness_Ghosh=4.9508;
-    electronegativityPearson=4.11;
-    electronegativityGhosh=6.383;
+    electronegativity_Pearson=4.11;
+    electronegativity_Ghosh=6.383;
     electron_affinity_PT=31;
     Miedema_phi_star=4.05;
     Miedema_nws=1.63;
@@ -6223,15 +6325,16 @@ xelement::xelement(uint Z) {
     HHIP=2300;
     HHIR=4800;
     /*xray_scatt=NNN;*/
-   //Ta
+    //Ta
   }
- // [AFLOW]STOP=Tantalum
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Tantalum
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Tungsten
- // Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten
-  if(Z==74) { // Tungsten
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Tungsten
+  // Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten
+  if(ZZ==74) { // Tungsten
+    Z=ZZ;
     symbol="W";
     name="Tungsten";
     Period=6;
@@ -6265,8 +6368,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2E7;
     electronegativity_vec=2.36;
     hardness_Ghosh=5.1879;
-    electronegativityPearson=4.40;
-    electronegativityGhosh=6.505;
+    electronegativity_Pearson=4.40;
+    electronegativity_Ghosh=6.505;
     electron_affinity_PT=78.6;
     Miedema_phi_star=4.80;
     Miedema_nws=1.81;
@@ -6301,15 +6404,16 @@ xelement::xelement(uint Z) {
     HHIP=7000;
     HHIR=4300;
     /*xray_scatt=NNN;*/
-   //W
+    //W
   }
- // [AFLOW]STOP=Tungsten
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Tungsten
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Rhenium
- // Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium
-  if(Z==75) { // Rhenium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Rhenium
+  // Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium
+  if(ZZ==75) { // Rhenium
+    Z=ZZ;
     symbol="Re";
     name="Rhenium";
     Period=6;
@@ -6343,8 +6447,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=5.6E6;
     electronegativity_vec=1.90;
     hardness_Ghosh=5.4256;
-    electronegativityPearson=4.02;
-    electronegativityGhosh=6.626;
+    electronegativity_Pearson=4.02;
+    electronegativity_Ghosh=6.626;
     electron_affinity_PT=14.5;
     Miedema_phi_star=5.40;
     Miedema_nws=1.86;
@@ -6379,15 +6483,16 @@ xelement::xelement(uint Z) {
     HHIP=3300;
     HHIR=3300;
     /*xray_scatt=NNN;*/
-   //Re
+    //Re
   }
- // [AFLOW]STOP=Rhenium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Rhenium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Osmium
- // Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium
-  if(Z==76) { // Osmium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Osmium
+  // Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium
+  if(ZZ==76) { // Osmium
+    Z=ZZ;
     symbol="Os";
     name="Osmium";
     Period=6;
@@ -6421,8 +6526,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1.2E7;
     electronegativity_vec=2.20;
     hardness_Ghosh=5.6619;
-    electronegativityPearson=4.9;
-    electronegativityGhosh=6.748;
+    electronegativity_Pearson=4.9;
+    electronegativity_Ghosh=6.748;
     electron_affinity_PT=106.1;
     Miedema_phi_star=5.40;
     Miedema_nws=1.85;
@@ -6457,15 +6562,16 @@ xelement::xelement(uint Z) {
     HHIP=5500;
     HHIR=9100;
     /*xray_scatt=NNN;*/
-   //Os JUNKAI CHANGED VALENCE
+    //Os JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Osmium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Osmium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Iridium
- // Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium
-  if(Z==77) { // Iridium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Iridium
+  // Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium
+  if(ZZ==77) { // Iridium
+    Z=ZZ;
     symbol="Ir";
     name="Iridium";
     Period=6;
@@ -6499,8 +6605,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.1E7;
     electronegativity_vec=2.20;
     hardness_Ghosh=5.9000;
-    electronegativityPearson=5.4;
-    electronegativityGhosh=6.831;
+    electronegativity_Pearson=5.4;
+    electronegativity_Ghosh=6.831;
     electron_affinity_PT=151;
     Miedema_phi_star=5.55;
     Miedema_nws=1.83;
@@ -6535,15 +6641,16 @@ xelement::xelement(uint Z) {
     HHIP=5500;
     HHIR=9100;
     /*xray_scatt=NNN;*/
-   //Ir JUNKAI CHANGED VALENCE
+    //Ir JUNKAI CHANGED VALENCE
   }
- // [AFLOW]STOP=Iridium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Iridium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Platinum
- // Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum
-  if(Z==78) { // Platinum
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Platinum
+  // Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum
+  if(ZZ==78) { // Platinum
+    Z=ZZ;
     symbol="Pt";
     name="Platinum";
     Period=6;
@@ -6577,8 +6684,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=9.4E6;
     electronegativity_vec=2.28;
     hardness_Ghosh=6.1367;
-    electronegativityPearson=5.6;
-    electronegativityGhosh=6.991;
+    electronegativity_Pearson=5.6;
+    electronegativity_Ghosh=6.991;
     electron_affinity_PT=205.3;
     Miedema_phi_star=5.65;
     Miedema_nws=1.78;
@@ -6613,15 +6720,16 @@ xelement::xelement(uint Z) {
     HHIP=5500;
     HHIR=9100;
     /*xray_scatt=NNN;*/
-   //Pt
+    //Pt
   }
- // [AFLOW]STOP=Platinum
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Platinum
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Gold
- // Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold
-  if(Z==79) { // Gold
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Gold
+  // Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold
+  if(ZZ==79) { // Gold
+    Z=ZZ;
     symbol="Au";
     name="Gold";
     Period=6;
@@ -6655,8 +6763,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=4.5E7;
     electronegativity_vec=2.54;
     hardness_Ghosh=6.3741;
-    electronegativityPearson=5.77;
-    electronegativityGhosh=7.112;
+    electronegativity_Pearson=5.77;
+    electronegativity_Ghosh=7.112;
     electron_affinity_PT=222.8;
     Miedema_phi_star=5.15;
     Miedema_nws=1.57;
@@ -6691,15 +6799,16 @@ xelement::xelement(uint Z) {
     HHIP=1100;
     HHIR=1000;
     xray_scatt=74.99;
-   //Au
+    //Au
   }
- // [AFLOW]STOP=Gold
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Gold
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Mercury
- // Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury
-  if(Z==80) { // Mercury
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Mercury
+  // Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury
+  if(ZZ==80) { // Mercury
+    Z=ZZ;
     symbol="Hg";
     name="Mercury";
     Period=6;
@@ -6733,8 +6842,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1E6;
     electronegativity_vec=2.00;
     hardness_Ghosh=6.6103;
-    electronegativityPearson=4.91;
-    electronegativityGhosh=7.233;
+    electronegativity_Pearson=4.91;
+    electronegativity_Ghosh=7.233;
     electron_affinity_PT=0;
     Miedema_phi_star=4.20;
     Miedema_nws=1.24;
@@ -6769,16 +6878,17 @@ xelement::xelement(uint Z) {
     HHIP=5500;
     HHIR=3100;
     /*xray_scatt=NNN;*/
-   //Hg
+    //Hg
   }
- // [AFLOW]STOP=Mercury
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Mercury
+  // ********************************************************************************************************************************************************
 
- // p-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Thallium
- // Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium
-  if(Z==81) { // Thallium
+  // p-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Thallium
+  // Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium
+  if(ZZ==81) { // Thallium
+    Z=ZZ;
     symbol="Tl";
     name="Thallium";
     Period=6;
@@ -6812,8 +6922,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=6.7E6;
     electronegativity_vec=1.62;
     hardness_Ghosh=1.7043;
-    electronegativityPearson=3.2;
-    electronegativityGhosh=4.719;
+    electronegativity_Pearson=3.2;
+    electronegativity_Ghosh=4.719;
     electron_affinity_PT=19.2;
     Miedema_phi_star=3.90;
     Miedema_nws=1.12;
@@ -6848,15 +6958,16 @@ xelement::xelement(uint Z) {
     HHIP=6500;
     HHIR=6500;
     /*xray_scatt=NNN;*/
-   //Tl
+    //Tl
   }
- // [AFLOW]STOP=Thallium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Thallium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Lead
- // Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead
-  if(Z==82) { // Lead
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Lead
+  // Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead
+  if(ZZ==82) { // Lead
+    Z=ZZ;
     symbol="Pb";
     name="Lead";
     Period=6;
@@ -6890,8 +7001,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=4.8E6;
     electronegativity_vec=2.33;
     hardness_Ghosh=1.9414;
-    electronegativityPearson=3.90;
-    electronegativityGhosh=4.841;
+    electronegativity_Pearson=3.90;
+    electronegativity_Ghosh=4.841;
     electron_affinity_PT=35.1;
     Miedema_phi_star=4.10;
     Miedema_nws=1.15;
@@ -6926,15 +7037,16 @@ xelement::xelement(uint Z) {
     HHIP=2700;
     HHIR=1800;
     /*xray_scatt=NNN;*/
-   //Pb
+    //Pb
   }
- // [AFLOW]STOP=Lead
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Lead
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Bismuth
- // Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth
-  if(Z==83) { // Bismuth
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Bismuth
+  // Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth
+  if(ZZ==83) { // Bismuth
+    Z=ZZ;
     symbol="Bi";
     name="Bismuth";
     Period=6;
@@ -6968,8 +7080,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=770000;
     electronegativity_vec=2.02;
     hardness_Ghosh=2.1785;
-    electronegativityPearson=4.69;
-    electronegativityGhosh=4.962;
+    electronegativity_Pearson=4.69;
+    electronegativity_Ghosh=4.962;
     electron_affinity_PT=91.2;
     Miedema_phi_star=4.15;
     Miedema_nws=1.16;
@@ -7004,15 +7116,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Bi
+    //Bi
   }
- // [AFLOW]STOP=Bismuth
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Bismuth
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Polonium
- // Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium
-  if(Z==84) { // Polonium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Polonium
+  // Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium
+  if(ZZ==84) { // Polonium
+    Z=ZZ;
     symbol="Po";
     name="Polonium";
     Period=6;
@@ -7046,8 +7159,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=2.3E6;
     electronegativity_vec=2.00;
     hardness_Ghosh=2.4158;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.084;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.084;
     electron_affinity_PT=183.3;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7082,15 +7195,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Po
+    //Po
   }
- // [AFLOW]STOP=Polonium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Polonium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Astatine
- // Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine
-  if(Z==85) { // Astatine
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Astatine
+  // Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine
+  if(ZZ==85) { // Astatine
+    Z=ZZ;
     symbol="At";
     name="Astatine";
     Period=6;
@@ -7124,8 +7238,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=2.20;
     hardness_Ghosh=2.6528;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.206;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.206;
     electron_affinity_PT=270.1;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7160,15 +7274,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //At
+    //At
   }
- // [AFLOW]STOP=Astatine
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Astatine
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Radon
- // Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon
-  if(Z==86) { // Radon
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Radon
+  // Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon
+  if(ZZ==86) { // Radon
+    Z=ZZ;
     symbol="Rn";
     name="Radon";
     Period=6;
@@ -7202,8 +7317,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=2.2;
     hardness_Ghosh=2.8900;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.327;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.327;
     electron_affinity_PT=0;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7238,17 +7353,18 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Rn
+    //Rn
   }
- // [AFLOW]STOP=Radon
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Radon
+  // ********************************************************************************************************************************************************
 
- // ROW7
- // s-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Francium
- // Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium
-  if(Z==87) { // Francium
+  // ROW7
+  // s-electron systems
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Francium
+  // Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium
+  if(ZZ==87) { // Francium
+    Z=ZZ;
     symbol="Fr";
     name="Francium";
     Period=7;
@@ -7282,8 +7398,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=0.70;
     hardness_Ghosh=0.9882;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=2.376;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=2.376;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7318,15 +7434,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Fr
+    //Fr
   }
- // [AFLOW]STOP=Francium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Francium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Radium
- // Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium
-  if(Z==88) { // Radium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Radium
+  // Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium
+  if(ZZ==88) { // Radium
+    Z=ZZ;
     symbol="Ra";
     name="Radium";
     Period=7;
@@ -7360,8 +7477,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=1E6;
     electronegativity_vec=0.89;
     hardness_Ghosh=1.2819;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=2.664;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=2.664;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7396,16 +7513,17 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Ra
+    //Ra
   }
- // [AFLOW]STOP=Radium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Radium
+  // ********************************************************************************************************************************************************
 
- // d-electron systems: transition metals
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Actinium
- // Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium
-  if(Z==89) { // Actinium
+  // d-electron systems: transition metals
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Actinium
+  // Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium
+  if(ZZ==89) { // Actinium
+    Z=ZZ;
     symbol="Ac";
     name="Actinium";
     Period=7;
@@ -7439,8 +7557,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=1.10;
     hardness_Ghosh=1.3497;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=2.730;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=2.730;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7475,16 +7593,17 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Ac
+    //Ac
   }
- // [AFLOW]STOP=Actinium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Actinium
+  // ********************************************************************************************************************************************************
 
- // actinidies
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Thorium
- // Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium
-  if(Z==90) { // Thorium
+  // actinidies
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Thorium
+  // Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium
+  if(ZZ==90) { // Thorium
+    Z=ZZ;
     symbol="Th";
     name="Thorium";
     Period=7;
@@ -7518,8 +7637,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=6.7E6;
     electronegativity_vec=1.30;
     hardness_Ghosh=1.4175;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=2.796;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=2.796;
     electron_affinity_PT=NNN;
     Miedema_phi_star=3.30;
     Miedema_nws=1.28;
@@ -7554,15 +7673,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     xray_scatt=86.64;
-   //Th
+    //Th
   }
- // [AFLOW]STOP=Thorium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Thorium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Protoactinium
- // Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium
-  if(Z==91) { // Protoactinium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Protoactinium
+  // Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium
+  if(ZZ==91) { // Protoactinium
+    Z=ZZ;
     symbol="Pa";
     name="Protoactinium";
     Period=7;
@@ -7596,8 +7716,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=5.6E6;
     electronegativity_vec=1.50;
     hardness_Ghosh=1.9369;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=3.306;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=3.306;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7632,15 +7752,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Pa
+    //Pa
   }
- // [AFLOW]STOP=Protoactinium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Protoactinium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Uranium
- // Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium
-  if(Z==92) { // Uranium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Uranium
+  // Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium
+  if(ZZ==92) { // Uranium
+    Z=ZZ;
     symbol="U";
     name="Uranium";
     Period=7;
@@ -7674,8 +7795,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=3.6E6;
     electronegativity_vec=1.38;
     hardness_Ghosh=2.2306;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=3.594;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=3.594;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7710,15 +7831,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //U
+    //U
   }
- // [AFLOW]STOP=Uranium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Uranium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Neptunium
- // Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium
-  if(Z==93) { // Neptunium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Neptunium
+  // Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium
+  if(ZZ==93) { // Neptunium
+    Z=ZZ;
     symbol="Np";
     name="Neptunium";
     Period=7;
@@ -7752,8 +7874,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=830000;
     electronegativity_vec=NNN;
     hardness_Ghosh=2.5241;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=3.882;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=3.882;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7788,15 +7910,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Np
+    //Np
   }
- // [AFLOW]STOP=Neptunium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Neptunium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Plutonium
- // Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium
-  if(Z==94) { // Plutonium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Plutonium
+  // Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium
+  if(ZZ==94) { // Plutonium
+    Z=ZZ;
     symbol="Pu";
     name="Plutonium";
     Period=7;
@@ -7830,8 +7953,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=670000;
     electronegativity_vec=NNN;
     hardness_Ghosh=3.0436;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=4.391;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=4.391;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7866,15 +7989,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Pu
+    //Pu
   }
- // [AFLOW]STOP=Plutonium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Plutonium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Americium
- // Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium
-  if(Z==95) { // Americium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Americium
+  // Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium
+  if(ZZ==95) { // Americium
+    Z=ZZ;
     symbol="Am";
     name="Americium";
     Period=7;
@@ -7908,8 +8032,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=3.4169;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=4.678;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=4.678;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -7944,15 +8068,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Am
+    //Am
   }
- // [AFLOW]STOP=Americium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Americium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Curium
- // Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium
-  if(Z==96) { // Curium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Curium
+  // Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium
+  if(ZZ==96) { // Curium
+    Z=ZZ;
     symbol="Cm";
     name="Curium";
     Period=7;
@@ -7986,8 +8111,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=3.4050;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=4.745;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=4.745;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8022,15 +8147,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Cm
+    //Cm
   }
- // [AFLOW]STOP=Curium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Curium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Berkelium
- // Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium
-  if(Z==97) { // Berkelium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Berkelium
+  // Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium
+  if(ZZ==97) { // Berkelium
+    Z=ZZ;
     symbol="Bk";
     name="Berkelium";
     Period=7;
@@ -8064,8 +8190,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=3.9244;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.256;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.256;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8100,15 +8226,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Bk
+    //Bk
   }
- // [AFLOW]STOP=Berkelium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Berkelium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Californium
- // Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium
-  if(Z==98) { // Californium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Californium
+  // Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium
+  if(ZZ==98) { // Californium
+    Z=ZZ;
     symbol="Cf";
     name="Californium";
     Period=7;
@@ -8142,8 +8269,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=4.2181;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.542;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.542;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8178,15 +8305,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Cf
+    //Cf
   }
- // [AFLOW]STOP=Californium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Californium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Einsteinium
- // Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium
-  if(Z==99) { // Einsteinium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Einsteinium
+  // Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium
+  if(ZZ==99) { // Einsteinium
+    Z=ZZ;
     symbol="Es";
     name="Einsteinium";
     Period=7;
@@ -8220,8 +8348,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=4.5116;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=5.830;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=5.830;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8256,15 +8384,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Es
+    //Es
   }
- // [AFLOW]STOP=Einsteinium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Einsteinium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Fermium
- // Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium
-  if(Z==100) { // Fermium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Fermium
+  // Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium
+  if(ZZ==100) { // Fermium
+    Z=ZZ;
     symbol="Fm";
     name="Fermium";
     Period=7;
@@ -8298,8 +8427,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=4.8051;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=6.118;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=6.118;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8334,15 +8463,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Fm
+    //Fm
   }
- // [AFLOW]STOP=Fermium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Fermium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Mendelevium
- // Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium
-  if(Z==101) { // Mendelevium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Mendelevium
+  // Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium
+  if(ZZ==101) { // Mendelevium
+    Z=ZZ;
     symbol="Md";
     name="Mendelevium";
     Period=7;
@@ -8376,8 +8506,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=5.0990;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=6.406;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=6.406;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8412,15 +8542,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Md
+    //Md
   }
- // [AFLOW]STOP=Mendelevium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Mendelevium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Nobelium
- // Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium
-  if(Z==102) { // Nobelium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Nobelium
+  // Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium
+  if(ZZ==102) { // Nobelium
+    Z=ZZ;
     symbol="No";
     name="Nobelium";
     Period=7;
@@ -8454,8 +8585,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=5.3926;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=6.694;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=6.694;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8490,15 +8621,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //No
+    //No
   }
- // [AFLOW]STOP=Nobelium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Nobelium
+  // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Lawrencium
- // Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium
-  if(Z==103) { // Lawrencium
+  // ********************************************************************************************************************************************************
+  // [AFLOW]START=Lawrencium
+  // Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium
+  if(ZZ==103) { // Lawrencium
+    Z=ZZ;
     symbol="Lr";
     name="Lawrencium";
     Period=7;
@@ -8532,8 +8664,8 @@ xelement::xelement(uint Z) {
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;
     hardness_Ghosh=5.4607;
-    electronegativityPearson=NNN;
-    electronegativityGhosh=6.760;
+    electronegativity_Pearson=NNN;
+    electronegativity_Ghosh=6.760;
     electron_affinity_PT=NNN;
     Miedema_phi_star=NNN;
     Miedema_nws=NNN;
@@ -8568,16 +8700,16 @@ xelement::xelement(uint Z) {
     HHIP=NNN;
     HHIR=NNN;
     /*xray_scatt=NNN;*/
-   //Lr
+    //Lr
   }
- // [AFLOW]STOP=Lawrencium
- // ********************************************************************************************************************************************************
+  // [AFLOW]STOP=Lawrencium
+  // ********************************************************************************************************************************************************
 }
 
 #endif // _AFLOW_X(*THIS)_CPP
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

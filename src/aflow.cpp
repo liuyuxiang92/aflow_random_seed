@@ -1170,7 +1170,7 @@ namespace aflow {
     strstream << endl;
     strstream << "***************************************************************************" << endl;
     strstream << "*                                                                         *" << endl;
-    strstream << "*           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+    strstream << "*           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
     strstream << "*                                                                         *" << endl;
     strstream << "***************************************************************************" << endl;
     strstream << "Copyright 2003-2019 - Stefano Curtarolo - AFLOW.ORG consortium" << endl;

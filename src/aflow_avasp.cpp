@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // A1,A2,A3 for all potpaw_GGA
@@ -5190,9 +5190,9 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
     if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) {nspecies=nspeciesHTQC=PARAMS->ucell.size()-1;}  //CO181226 - I patched nspecies to work for ICSD robustly
     if(PARAMS->ucell.size()==1) { //this must be OLD as _ICSD_ passes through the AVASP_MakePrototypeICSD_AFLOWIN() not here, probably obsolete, but we keep for history
       vector<string> austokens,austokens2;
-      aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
-      aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
-      aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
+      PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
+      PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
+      PARAMS->ucell.at(0)=aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
       KBIN::VASP_SplitAlloySpecies(austokens.at(0),austokens2);
       nspecies=austokens2.size()+1;  // backward, //CO181226 it would be nice to have an example to see why this works... it probably should be austokens2.size() (not +1)
       if(nspeciesHTQC==3) nspecies=3;       // new
@@ -6083,8 +6083,8 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
 
   if(PARAMS->ucell.size()==1) {
     vector<string> austokens;
-    aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
-    aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
+    PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
+    PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
     aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
     KBIN::VASP_SplitAlloySpecies(austokens.at(0),specieX_raw);
     nspecies=specieX_raw.size()+1;  // backward
@@ -7105,7 +7105,7 @@ string AVASP_Shortcuts_for_Ternaries(string &label) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

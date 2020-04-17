@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo 
@@ -7118,7 +7118,7 @@ namespace pflow {
               return false;
             }
             else {
-              string magmom_values = aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
+              string magmom_values=aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
               vector<string> mag_tokens;
               aurostd::string2tokens(magmom_values,mag_tokens);
               for(uint m=0;m<mag_tokens.size();m++){
@@ -7212,7 +7212,7 @@ namespace pflow {
               return false;
             }
             else {
-              string magmom_values = aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
+              string magmom_values=aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
               vector<string> mag_tokens;
               aurostd::string2tokens(magmom_values,mag_tokens);
               // INCAR allows multiplication of elements to describe magnetic moment (i.e. 2*2.0)
@@ -9094,7 +9094,7 @@ namespace pflow {
       //make robust so input can be "LIB2" or "2"
       if(aurostd::substring2bool(LIB, "LIB")) {
         lib_name = LIB;
-        lib_count_string = aurostd::RemoveSubString(LIB, "LIB");
+        lib_count_string=aurostd::RemoveSubString(LIB, "LIB");
       } else {
         lib_name = "LIB" + LIB;
         lib_count_string = LIB;
@@ -15966,6 +15966,6 @@ namespace pflow {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

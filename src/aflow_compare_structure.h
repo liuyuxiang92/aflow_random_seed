@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *           Aflow DAVID HICKS - Duke University 2014-2019                 *
 // *                                                                         *
 // ***************************************************************************

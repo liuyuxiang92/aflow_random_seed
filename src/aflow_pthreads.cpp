@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -566,7 +566,7 @@ namespace AFLOW_PTHREADS {
     // cerr << numzips << endl; exit(0);
     // cerr << sysconf(_SC_ARG_MAX)  << endl;//exit(0);
     for(i=0;i<(uint) numzips;i++) {
-      command="zip -0rmv "+prefix+"_"+aurostd::utype2string(i+ishift)+".zip";
+      command="zip -0rmv "+prefix+"_"+aurostd::utype2string(i+ishift)+"_of_"+aurostd::utype2string(numzips)+".zip"; // SC20200303
       // command="zip -9rv "+prefix+"_"+aurostd::utype2string(i+ishift)+".zip";
       for(uint j=0;j<(uint) size;j++) {
 	if(i*size+j < vdirs.size()) {
@@ -979,6 +979,6 @@ vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

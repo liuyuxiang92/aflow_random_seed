@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 2013-2014
@@ -302,6 +302,18 @@ namespace aurostd {
         return TRUE;
       }
     }
+    // SC20200310 // THIS IS INCORRECT 
+    // SC20200310 // check attached schemes list going through vxsghost 2 by 2  // SC 20191227
+    // SC20200310 for(uint i=0;i<vxsghost.size();i+=2) {
+    // SC20200310   //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;  
+    // SC20200310   a=aurostd::toupper(vxsghost.at(i));                         // shortcuts
+    // SC20200310   b=aurostd::toupper(check);                                  // shortcuts
+    // SC20200310   if(a==b) {
+    // SC20200310     //	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;  
+    // SC20200310    return TRUE;
+    // SC20200310   }
+    // SC20200310 }
+    // SC20200310 // nor in scheme nor in attached scheme... exit
     return FALSE;
   }
 
@@ -488,6 +500,6 @@ namespace aurostd {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

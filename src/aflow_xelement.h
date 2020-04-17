@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2007-2019
@@ -22,13 +22,15 @@ class xelement { // simple class.. nothing fancy
 public:
   // constructor destructor                              // constructor/destructor
   xelement();                                            // default, just allocate
-  xelement(uint);                                            // default, just allocate
+  xelement(uint);                                        // look at it by Z
+  xelement(string);                                      // look at it by symbol or name
   ~xelement();                                           // kill everything
   const xelement& operator=(const xelement &b);          // copy
   void clear();
   // content                                             // content
   bool verbose;
   // [AFLOW]START=DECLARATION
+  int Z;                                  // Z
   string symbol;                          // http://periodictable.com      // DU 2019/05/17   // DONE SC(2019/05/24)
   string name;                            // http://periodictable.com      // DU 2019/05/17   // DONE SC(2019/05/24)
   double Period;                          // http://periodictable.com      // DU 2019/05/17
@@ -65,8 +67,8 @@ public:
   double electrical_conductivity;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      // DU 2019/05/17
   double electronegativity_vec;           // Saxena
   double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       // DU 2019/05/17
-  double electronegativityPearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      // DU 2019/05/17
-  double electronegativityGhosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      // DU 2019/05/17
+  double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      // DU 2019/05/17
+  double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      // DU 2019/05/17
   double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       // DU 2019/05/17
   double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
   double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
