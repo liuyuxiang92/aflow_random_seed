@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
  
-VERSNUMBER=3.2.2
+VERSNUMBER=3.2.2j
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -475,21 +475,14 @@ $(ICSD_LIB)/README_LIBRARY_ICSD9.TXT:
 ############################################################################################################
 aflow_data_calculated.cpp: Makefile
 	rm -rf aflow_data_calculated.cpp
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then echo "// aflow_data_calculated.cpp automatic generated from CALCULATED/vAUID.dat" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then echo "#include <string>" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then echo "std::string vAUID=\"\\" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then echo "// aflow_data_calculated.cpp automatic generated from CALCULATED/vAURL.dat" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then echo "#include <string>" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then echo "std::string vAURL=\"\\" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "// aflow_data_calculated.cpp automatic generated from CALCULATED/vLOOP.dat" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "#include <string>" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "std::string vLOOP=\"\\" >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
-	if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
+	# vLIBS	
+	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "// aflow_data_calculated.cpp automatic generated from CALCULATED/vLIBS.dat" >> aflow_data_calculated.cpp ; fi
+	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "#include <string>" >> aflow_data_calculated.cpp ; fi
+	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "std::string vAUID,vAURL,vLOOP;" >> aflow_data_calculated.cpp ; fi
+	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "std::string vLIBS=\"\\" >> aflow_data_calculated.cpp ; fi
+	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
+	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
+	# done
 	if [ ! -f aflow_data_calculated.cpp ]; then rm -rf aflow_data_calculated.cpp.xz*; wget http://materials.duke.edu/AFLOW/AFLOW3_FREE/aflow_data_calculated.cpp.xz && xz -dv aflow_data_calculated.cpp.xz ; fi
 	touch $@
 aflow_data_htqc.cpp: README_LIBRARY_HTQC.TXT Makefile
@@ -1207,6 +1200,9 @@ realclean: clean
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then rm -fv ../AFLOW3_NONFREE/EXTRA/FROZSL/*conflic*; fi
 	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR realclean; fi
+dataclean:
+	rm -f aflow_data aflow_data_*
+data: aflow_data
 clean_autogen:
 	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
 # ****************************************************************************

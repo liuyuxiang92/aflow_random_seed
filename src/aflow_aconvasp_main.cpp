@@ -13184,7 +13184,7 @@ namespace pflow {
     //organize zip formats, e.g., bzip2, xz
     vector<string> vext,vcmd_cat,vcmd_zip;
     aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_back("");
-    aurostd::string2tokens("bzcat,xzcat,zcat,cat",vcmd_cat,",");
+    aurostd::string2tokens("bzcat,xzcat,gzcat,cat",vcmd_cat,",");
     aurostd::string2tokens("bzip2,xz,gzip",vcmd_zip,",");vcmd_zip.push_back("");
     bool look_static=vpflow.flag("QMVASP::STATIC");
     bool found_run=false; //i.e., found COMPLETE run, all files must be .static or all .relax2, no mix match

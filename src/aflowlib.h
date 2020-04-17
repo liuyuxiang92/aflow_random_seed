@@ -122,6 +122,7 @@ namespace aflowlib {
       string species_pp_version;vector<string> vspecies_pp_version;
       string species_pp_ZVAL;vector<double> vspecies_pp_ZVAL;
       string species_pp_AUID;vector<string> vspecies_pp_AUID;
+      string METAGGA; // empty if none, potential type is in xPOTCAR/xOUTCAR
       double spin_cell,spin_atom;
       string spinD;vector<double> vspinD;
       string spinD_magmom_orig;vector<double> vspinD_magmom_orig;
@@ -224,7 +225,6 @@ namespace aflowlib {
       double ael_average_external_pressure; // (GPa) //CT181212
       xmatrix<double> ael_stiffness_tensor;  // ME20191105
       xmatrix<double> ael_compliance_tensor;  // ME20191105
-
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3
@@ -293,7 +293,8 @@ namespace aflowlib {
 
 // ***************************************************************************
 namespace aflowlib {
-  uint auid2present(string="");
+  bool json2aflowlib(const string& json,string key,string& value); // Marco I do not understand why you have out this function as a private member... it would have been simpler to be able to use everywhere
+  uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);
   string AFLUXCall(aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
@@ -427,6 +428,7 @@ class _outreach {
     string place,date;
     string type;   // ARTICLE PRESENTATION_TALK PRESENTATION_SEMINAR PRESENTATION_COLLOQUIUM PRESENTATION_KEYNOTE PRESENTATION_PLENARY PRESENTATION_TUTORIAL PRESENTATION_CONTRIBUTED PRESENTATION_POSTER
     bool _isinvited;       // YES
+    bool _isonline;       // YES
     string host;           // who invited
     string abstract;       // if available and in LaTeX
     string pdf;

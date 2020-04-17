@@ -75,36 +75,44 @@ namespace KBIN {
 
 
 namespace KBIN {
-  bool VASP_Write_AUID_FILE(const string& directory,const vector<string>& vAUIDs,const vector<string>& species) {
+  bool VASP_Write_ppAUID_FILE(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species) {
     vector<string> vWRITE;
-    vWRITE.push_back("AFLOW: AUID of pseudopotentials: NAUID="+aurostd::utype2string<uint>(vAUIDs.size()));
-    if(vAUIDs.size()!=species.size()) return FALSE;
-    for(uint i=0;i<vAUIDs.size();i++)
-      vWRITE.push_back(vAUIDs.at(i)+" "+aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(species.at(i)),3));
+    vWRITE.push_back("AFLOW: AUID of pseudopotentials: NAUID="+aurostd::utype2string<uint>(vppAUIDs.size()));
+    if(vppAUIDs.size()!=species.size()) {
+      cout << "WARNING: KBIN::VASP_Write_ppAUID_FILE: vppAUIDs.size()=" << vppAUIDs.size() << "!=species.size()=" << species.size() << endl;
+      cerr << "WARNING: KBIN::VASP_Write_ppAUID_FILE: vppAUIDs.size()=" << vppAUIDs.size() << "!=species.size()=" << species.size() << endl;
+      return FALSE;
+    }
+    for(uint i=0;i<vppAUIDs.size();i++)
+      vWRITE.push_back(vppAUIDs.at(i)+" "+aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(species.at(i)),3));
     aurostd::vectorstring2file(vWRITE,directory+"/"+DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT);
     return TRUE;
   }
-  bool VASP_Write_AUID_FILE(const string& directory,const deque<string>& vAUIDs,const deque<string>& species) {
-    return VASP_Write_AUID_FILE(directory,aurostd::deque2vector(vAUIDs),aurostd::deque2vector(species));
+  bool VASP_Write_ppAUID_FILE(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species) {
+    return VASP_Write_ppAUID_FILE(directory,aurostd::deque2vector(vppAUIDs),aurostd::deque2vector(species));
   }
-  bool VASP_Write_AUID_AFLOWIN(const string& directory,const vector<string>& vAUIDs,const vector<string>& species) {
-    if(vAUIDs.size()!=species.size()) return FALSE;
-    struct stat fileInfo;
+  bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species) {
+   if(vppAUIDs.size()!=species.size()) {
+      cout << "WARNING: KBIN::VASP_Write_ppAUID_AFLOWIN: vppAUIDs.size()=" << vppAUIDs.size() << "!=species.size()=" << species.size() << endl;
+      cerr << "WARNING: KBIN::VASP_Write_ppAUID_AFLOWIN: vppAUIDs.size()=" << vppAUIDs.size() << "!=species.size()=" << species.size() << endl;
+      return FALSE;
+    }
+     struct stat fileInfo;
     stat(string(directory+"/"+_AFLOWIN_).c_str(), &fileInfo);
     string date=std::ctime(&fileInfo.st_mtime);
     if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
 
     string WRITE="[VASP_POTCAR_AUID]";
-    for(uint i=0;i<vAUIDs.size();i++) {
-      WRITE+=vAUIDs.at(i);
-      if(i<vAUIDs.size()-1) WRITE+=",";
+    for(uint i=0;i<vppAUIDs.size();i++) {
+      WRITE+=vppAUIDs.at(i);
+      if(i<vppAUIDs.size()-1) WRITE+=",";
     }
     aurostd::execute("echo \""+WRITE+"\" >> "+directory+"/"+_AFLOWIN_);
     aurostd::execute("touch -m --date=\""+date+"\" "+directory+"/"+_AFLOWIN_);
     return TRUE;
   }
-  bool VASP_Write_AUID_AFLOWIN(const string& directory,const deque<string>& vAUIDs,const deque<string>& species) {
-    return VASP_Write_AUID_AFLOWIN(directory,aurostd::deque2vector(vAUIDs),aurostd::deque2vector(species));
+  bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species) {
+    return VASP_Write_ppAUID_AFLOWIN(directory,aurostd::deque2vector(vppAUIDs),aurostd::deque2vector(species));
   }
 }
 
@@ -126,8 +134,8 @@ namespace KBIN {
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")));
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.POTCAR,string(xvasp.Directory+"/POTCAR")));
-    if(Krun) Krun=(Krun && VASP_Write_AUID_FILE(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
-    if(Krun) Krun=(Krun && VASP_Write_AUID_AFLOWIN(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
+    if(Krun) Krun=(Krun && VASP_Write_ppAUID_FILE(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
+    if(Krun) Krun=(Krun && VASP_Write_ppAUID_AFLOWIN(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
     
     // VASP BACKUP VASP WRITE
     if(Krun && xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR_orig,string(xvasp.Directory+"/POSCAR.orig")));
@@ -1755,6 +1763,10 @@ namespace KBIN {
   bool VASP_Convert_Unit_Cell(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, ofstream& FileMESSAGE, ostringstream& aus) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool Krun = true;
+
+    if(LDEBUG) aus << "00000  MESSAGE-OPTION  KBIN::VASP_Convert_Unit_Cell: BEGIN " << endl;  // SC20200410
+    if(LDEBUG) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);                      // SC20200410
+
     if(Krun && vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.isentry) {        /*************** POSCAR **************/
       //    aus << "00000  MESSAGE POSCAR  [VASP_FORCE_OPTION]CONVERT_UNIT_CELL=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]CONVERT_UNIT_CELL=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -1937,6 +1949,10 @@ namespace KBIN {
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_generated",TRUE);
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed",TRUE);
     }
+
+    if(LDEBUG) aus << "00000  MESSAGE-OPTION  KBIN::VASP_Convert_Unit_Cell: END " << endl;  // SC20200410
+    if(LDEBUG) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);                    // SC20200410
+
     return Krun;
   }
 }
@@ -2050,8 +2066,7 @@ namespace KBIN {
     }
     // IMPLICIT **************************************************
     // kpoints implicit through string xvasp.KPOINTS
-    if(Krun && vflags.KBIN_VASP_KPOINTS_MODE.flag("IMPLICIT")) // IT MIGHT NOT CONTAIN OPTION SO IT IS ALL DEFAULT && vflags.KBIN_VASP_KPOINTS_FILE)  // [VASP_KPOINTS_MODE_IMPLICIT] construction
-    { //CO200106 - patching for auto-indenting
+    if(Krun && vflags.KBIN_VASP_KPOINTS_MODE.flag("IMPLICIT")) { // IT MIGHT NOT CONTAIN OPTION SO IT IS ALL DEFAULT && vflags.KBIN_VASP_KPOINTS_FILE)  // [VASP_KPOINTS_MODE_IMPLICIT] construction
       IMPLICIT=TRUE;
       aus << "00000  MESSAGE KPOINTS generation IMPLICIT file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2135,7 +2150,8 @@ namespace KBIN {
           xvasp.str.GetLatticeType();
           aus << "00000  MESSAGE " << STRING_KPOINTS_TO_SHOW << " Found Lattice=" << xvasp.str.bravais_lattice_variation_type << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           xvasp.str.kpoints_kscheme="Monkhorst-Pack";
-          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";
+	  //          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";  // also add RHL
+          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";
           aus << "00000  MESSAGE " << STRING_KPOINTS_TO_SHOW << "_KSCHEME=\"" << xvasp.str.kpoints_kscheme << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
@@ -2341,7 +2357,8 @@ namespace KBIN {
       xvasp.str.GetLatticeType();
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSCHEME_AUTO  Found Lattice=" << xvasp.str.bravais_lattice_variation_type << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       xvasp.str.kpoints_kscheme="Monkhorst-Pack";
-      if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";
+      //     if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma"; // add RHL
+      if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSCHEME_" << xvasp.str.kpoints_kscheme << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,xvasp.str.kpoints_kscheme);
@@ -2521,6 +2538,7 @@ namespace KBIN {
     ostringstream aus;
     bool Krun=TRUE;
     xvasp.POTCAR.str(std::string());
+    xvasp.POTCAR_AUID.clear();
     xvasp.aopts.flag("FLAG::XVASP_POTCAR_generated",FALSE);
     xvasp.aopts.flag("FLAG::XVASP_POTCAR_changed",FALSE);
     xvasp.POTCAR_POTENTIALS.str(std::string());
@@ -3518,8 +3536,7 @@ namespace KBIN {
       xvasp.INCAR << aurostd::PaddedPOST("PREC=High",_incarpad_) << "# avoid wrap around errors" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("ENMAX="+aurostd::utype2string(xvasp.POTCAR_ENMAX*DEFAULT_VASP_PREC_ENMAX_HIGH,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << "# " << DEFAULT_VASP_PREC_ENMAX_HIGH << "*ENMAX (" << xvasp.POTCAR_ENMAX << ") of pseudopotentials " << endl;
     };
-    if(vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme=="ACCURATE") // || vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme=="HIGH")
-    { //CO200106 - patching for auto-indenting
+    if(vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme=="ACCURATE") {// || vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme=="HIGH")
       xvasp.INCAR << aurostd::PaddedPOST("PREC=Accurate",_incarpad_) << "# avoid wrap around errors" << endl;
       xvasp.INCAR << aurostd::PaddedPOST("ENMAX="+aurostd::utype2string(xvasp.POTCAR_ENMAX*DEFAULT_VASP_PREC_ENMAX_ACCURATE,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << "# " << DEFAULT_VASP_PREC_ENMAX_ACCURATE << "*ENMAX (" << xvasp.POTCAR_ENMAX << ") of pseudopotentials " << endl;
       xvasp.INCAR << aurostd::PaddedPOST("LREAL=.FALSE.",_incarpad_) << "# reciprocal space projection technique " << endl;
@@ -3711,9 +3728,8 @@ namespace KBIN {
 // ***************************************************************************
 // KBIN::XVASP_INCAR_PSTRESS
 namespace KBIN {
-  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_vflags& vflags,string svalue,int ivalue,double dvalue,bool OPTION)
-    //  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,string svalue,int ivalue,double dvalue,bool OPTION)
-  { //CO200106 - patching for auto-indenting
+  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_vflags& vflags,string svalue,int ivalue,double dvalue,bool OPTION) {
+    //  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,string svalue,int ivalue,double dvalue,bool OPTION) {
     bool DONE=FALSE;
     bool LDEBUG=FALSE;
     string FileContent,strline;
