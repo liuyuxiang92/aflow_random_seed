@@ -1,3 +1,7 @@
+3.2.1 - 2020/03/17
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+	-- Fixes times stamp in bug fixes (SC)
+	-- Updates on pthread.cpp and libraries.cpp for error checking in uploading calculations  (SC)
 3.2.0 - 2020/02/10
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.0.tar.xz
 	-- New release, finally aflow 3.2 (SC)

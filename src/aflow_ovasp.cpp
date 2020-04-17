@@ -37,7 +37,7 @@ xOUTCAR::xOUTCAR() {
   mag_cell=0.0;                 // for aflowlib_libraries.cpp
   mag_atom=0.0;                 // for aflowlib_libraries.cpp
   vmag.clear();                 // for aflowlib_libraries.cpp
-  vmag_noncoll.clear();         // DX 12/5/17 - non-collinear magnetization 
+  vmag_noncoll.clear();         // DX20171205 - non-collinear magnetization 
   volume_cell=0.0;              // for aflowlib_libraries.cpp
   volume_atom=0.0;              // for aflowlib_libraries.cpp
   pressure=0.0;                 // for aflowlib_libraries.cpp // copy of PSTRESS
@@ -102,7 +102,7 @@ xOUTCAR::xOUTCAR() {
   mass_hole_conduction.clear(); // for aflowlib_libraries.cpp 
   //------------------------------------------------------------------------------
   // GetBandGap
-  xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+  xstr.clear(); //DX20191220 - uppercase to lowercase clear
   conduction_band_min.clear();  // for aflowlib_libraries.cpp 
   valence_band_max.clear();     // for aflowlib_libraries.cpp 
   Egap_type.clear();            // for aflowlib_libraries.cpp 
@@ -127,7 +127,7 @@ void xOUTCAR::free() {
   // GetProperties
   vcontent.clear();                    // for aflowlib_libraries.cpp
   vmag.clear();                        // for aflowlib_libraries.cpp
-  vmag_noncoll.clear();                // DX 12/5/17 - non-collinear magnetization 
+  vmag_noncoll.clear();                // DX20171205 - non-collinear magnetization 
   vforces.clear();                     // for aflowlib_libraries.cpp
   vpositions_cartesian.clear();        // for aflowlib_libraries.cpp
   // begin shared xPOTCAR
@@ -164,7 +164,7 @@ void xOUTCAR::free() {
   mass_hole_conduction.clear();        // for aflowlib_libraries.cpp
   //------------------------------------------------------------------------------
   // GetBandGap
-  xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+  xstr.clear(); //DX20191220 - uppercase to lowercase clear
   conduction_band_min.clear();         // for aflowlib_libraries.cpp
   valence_band_max.clear();            // for aflowlib_libraries.cpp
   Egap_type.clear();                   // for aflowlib_libraries.cpp
@@ -192,7 +192,7 @@ void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
   mag_cell=b.mag_cell;                          // for aflowlib_libraries.cpp
   mag_atom=b.mag_atom;                          // for aflowlib_libraries.cpp
   vmag.clear(); for(uint i=0;i<b.vmag.size();i++) vmag.push_back(b.vmag.at(i));  // for aflowlib_libraries.cpp
-  vmag_noncoll.clear(); for(uint i=0;i<b.vmag_noncoll.size();i++) vmag_noncoll.push_back(b.vmag_noncoll.at(i));  // DX 12/5/17
+  vmag_noncoll.clear(); for(uint i=0;i<b.vmag_noncoll.size();i++) vmag_noncoll.push_back(b.vmag_noncoll.at(i));  // DX20171205
   volume_cell=b.volume_cell;                    // for aflowlib_libraries.cpp
   volume_atom=b.volume_atom;                    // for aflowlib_libraries.cpp
   pressure=b.pressure;                          // for aflowlib_libraries.cpp
@@ -710,7 +710,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD SPIN DECOMPOSITION DATA" << endl;
   line="";
   uint mline=0;
-  // DX 12/5/17 - Check for magnetization z (non-collinear) - START
+  // DX20171205 - Check for magnetization z (non-collinear) - START
   vector<double> vmag_z;
   bool found_magz_line=false;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
@@ -729,8 +729,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         vmag_z.push_back(aurostd::string2utype<double>(tokens.at(tokens.size()-1)));
     }
   }
-  // DX 12/5/17 - Check for magnetization z (non-collinear) - END
-  // DX 12/5/17 - Check for magnetization y (non-collinear) - START
+  // DX20171205 - Check for magnetization z (non-collinear) - END
+  // DX20171205 - Check for magnetization y (non-collinear) - START
   vector<double> vmag_y;
   bool found_magy_line=false;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
@@ -749,8 +749,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         vmag_y.push_back(aurostd::string2utype<double>(tokens.at(tokens.size()-1)));
     }
   }
-  // DX 12/5/17 - Check for magnetization y (non-collinear) - END
-  vector<double> vmag_x;  // DX 12/5/17
+  // DX20171205 - Check for magnetization y (non-collinear) - END
+  vector<double> vmag_x;  // DX20171205
   bool found_magx_line=false;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"magnetization"))
@@ -765,10 +765,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     for(uint iline=mline;iline<mline+natoms;iline++) {
       aurostd::string2tokens(vcontent.at(iline),tokens," ");
       if(tokens.size()>=5)
-        vmag_x.push_back(aurostd::string2utype<double>(tokens.at(tokens.size()-1))); // DX 12/5/17 vmag to vmag_x
+        vmag_x.push_back(aurostd::string2utype<double>(tokens.at(tokens.size()-1))); // DX20171205 vmag to vmag_x
     }
   }
-  // DX 12/5/17 - Non-collinear vs collinear - START
+  // DX20171205 - Non-collinear vs collinear - START
   if(found_magx_line && found_magy_line && found_magz_line){ //non-collinear calculation
     if(LVERBOSE) cerr << "xOUTCAR::GetProperties: non-collinear magnetization found." << endl; 
     if(vmag_x.size()!=vmag_y.size() || vmag_x.size()!=vmag_z.size()){
@@ -1019,6 +1019,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
   // ----------------------------------------------------------------------
   // PSEUDOPOTENTIAL DATA
+  // LVERBOSE=1;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA" << endl;
   vline.clear();
@@ -1062,6 +1063,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp.size()=" << species_pp.size() << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << endl;
+  // exit(0);
   // ----------------------------------------------------------------------
   // LDAU DATA
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
@@ -1391,7 +1393,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //-------------------------------------------------------------------------------------------------
 bool xOUTCAR::GetXStructure() {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+  xstr.clear(); //DX20191220 - uppercase to lowercase clear
 
   if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: Trying to build the xstructure from the OUTCAR" << endl;}
 
@@ -2038,9 +2040,9 @@ double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<doubl
   return dist_dcart;
 }
 
-bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,double occ_tol) { // CO 171004 - redoing camilo's function more robustly
+bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,double occ_tol) { // CO20171004 - redoing camilo's function more robustly
 
-  //some nice examples when debugging - validated by CO 171006
+  //some nice examples when debugging - validated by CO20171006
   //corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/RHL/Ag1Ni1O2_ICSD_73974
   //System        :   Ag1Ni1O2_ICSD_73974
   //Spin tag      :   2
@@ -2130,7 +2132,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 
   // GET FERMI LEVEL
   if(EFERMI==AUROSTD_NAN){
-    //VERY IMPORTANT - CO 171009 from discussion with SC
+    //VERY IMPORTANT - CO20171009 from discussion with SC
     //we strongly prefer to use Efermi from OUTCAR.static, not OUTCAR.bands
     //bands is not self-consistent (ICHARG=11), only used to determine energy states
     //since it is not self-consistent, it does not fill in states correctly
@@ -2261,7 +2263,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     }
   }
 
-  // CO 171007 - this code can handle empty types (returning empty(-partial))
+  // CO20171007 - this code can handle empty types (returning empty(-partial))
   //but after talking with Stefano, I decided to simply return false!
   //these runs should be rerun - they are garbage!
   if(empty_channel[0]==1 || (ISPIN==2 && empty_channel[1]==1)){
@@ -2597,13 +2599,13 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
   string line0, line1, line2, line3, line4, line5;
   vector<string> tokens1, tokens2, tokens3, tokens4, tokens5;
   vector<double> CBB, VBT;
-  xmatrix<double> KlatticeTmp(3,3), direct_lattice(3,3), metric_tensor(3,3);  // CO 171002
+  xmatrix<double> KlatticeTmp(3,3), direct_lattice(3,3), metric_tensor(3,3);  // CO20171002
   uint NBANDS, ISPIN, NKPT, NSW;
   //bool c_nkpt=TRUE, c_nbands=TRUE, c_system=TRUE, c_ispin=TRUE, c_efermi=TRUE;
   bool c_nkpt=TRUE, c_nbands=TRUE, c_ispin=TRUE, c_efermi=TRUE;
   bool c_nsw=TRUE, c_cellvol=TRUE, c_dlattice=TRUE;
   bool SPIN_UP = FALSE, SPIN_DN = FALSE;
-  //double  CELLVOL=0; CELLVOLCUTOFF=0,   // CO 171002 - GARBAGE A != A^-1
+  //double  CELLVOL=0; CELLVOLCUTOFF=0,   // CO20171002 - GARBAGE A != A^-1
   double EMIN = -100.0, EMAX = 100.0;
   //[CO191004]double _METALGAP = -1.0E+09, _METALEDGE = -1.0; 
   double _ENER_EPS = 1.0E-08, _ELEC_EPS = 1.0E-02, _ZERO = 0.0;
@@ -2686,7 +2688,7 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
         aurostd::string2tokens(line0,tokens1);
         if((tokens1.at(1) == "of") and (tokens1.at(2) == "cell")) {
           //CELLVOL = aurostd::string2utype<double>(tokens1.at(4));
-          //CELLVOLCUTOFF = 0.05*pow(CELLVOL,1.0/3.0);  // CO 171002 - GARBAGE A != A^-1
+          //CELLVOLCUTOFF = 0.05*pow(CELLVOL,1.0/3.0);  // CO20171002 - GARBAGE A != A^-1
           c_cellvol = FALSE;
           tagcount++;
         }
@@ -2758,7 +2760,7 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
         KlatticeTmp(3,3) = aurostd::string2utype<double>(tokens1.at(5));
         //KlatticeTmp = ReciprocalLattice(direct_lattice); // scale is 1  // CO already fetched
 
-        // CO 171002
+        // CO20171002
         metric_tensor=MetricTensor(direct_lattice,1.0);
 
         if(c_dlattice) { // CO increment tagcount once
@@ -2792,7 +2794,7 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
   //-------------------------------------------------------------------------------------------------
   // SPIN UNPOLARIZED
   if(ISPIN == 1) {
-    xvector<double> kptdist(ISPIN); // CO 171002 - changing this to be in ANGSTROMS!
+    xvector<double> kptdist(ISPIN); // CO20171002 - changing this to be in ANGSTROMS!
     vector<uint> strtkpt, band_ndx;
     for(uint ii=0; ii<vcontent.size(); ii++) {
       if(aurostd::substring2bool(vcontent.at(ii),"k-point   1")) {
@@ -2881,14 +2883,14 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
             vdist_kcart_min=vdist_kcart;
             dist_min=dist;
           }
-          // CO 171002
+          // CO20171002
           // kptdist is basically an energy 
           //kptdist(1) = min(kptdist(1),modulus(vbt_kpoints(1)-cbb_kpoints(1) + 
           //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
         }
       }
     }
-    // CO 171002
+    // CO20171002
     xvector<double> vdist_dcart;
     vdist_dcart(1)=sum(metric_tensor(1)*vdist_kcart_min(1));  //remember metric_tensor is symmetric!
     vdist_dcart(2)=sum(metric_tensor(2)*vdist_kcart_min(2));  //remember metric_tensor is symmetric!
@@ -2901,8 +2903,8 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
       conduction_band_min_net = conduction_band_min.at(0);
       valence_band_max_net = valence_band_max.at(0);
       if(CBB.at(0)-VBT.at(0) > _ENER_EPS) { // u1
-        //[ CO 171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+        //[ CO20171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+        //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
         if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
         else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
         Egap_type_net = Egap_type.at(0);
@@ -2910,8 +2912,8 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
         Egap_net      = Egap.at(0);
       }
       else if((abs(CBB.at(0)-VBT.at(0)) <= _ENER_EPS) and (abs(CBB.at(0)-VBT.at(0)) >= 0)) { // u2
-        //[ CO 171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+        //[ CO20171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+        //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
         if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
         else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
         Egap_type_net = Egap_type.at(0);
@@ -2942,7 +2944,7 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
     bool SPIN_UP_ALRT = FALSE;
     bool SPIN_DN_ALRT = FALSE;
     vector<uint> band_ndx_up, band_ndx_dn;
-    xvector<double> kptdist(2*ISPIN); // CO 171002 - changing this to be in ANGSTROMS!
+    xvector<double> kptdist(2*ISPIN); // CO20171002 - changing this to be in ANGSTROMS!
     for(int ii=1; ii<=2*(int)ISPIN; ii++) { kptdist(ii) = 1.0E09; }
     // SPIN UP
     for(uint ii=0; ii<vcontent.size(); ii++) {
@@ -3095,7 +3097,7 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
         break;
       }
     }
-    // CO 171002
+    // CO20171002
     xvector<double> vdist1_kcart,vdist1_kcart_min,vdist2_kcart,vdist2_kcart_min,vdist3_kcart,vdist3_kcart_min,vdist4_kcart,vdist4_kcart_min;
     double dist1,dist2,dist3,dist4,dist1_min,dist2_min,dist3_min,dist4_min;
     dist1_min=dist2_min=dist3_min=dist4_min=AUROSTD_MAX_DOUBLE;
@@ -3129,7 +3131,7 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
             vdist4_kcart_min=vdist4_kcart;
             dist4_min=dist4;
           }
-          // CO 171002
+          // CO20171002
           //// within spin channels
           //kptdist(1) = min(kptdist(1),modulus(vbt_kpoints(1)-cbb_kpoints(1) + 
           //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
@@ -3143,7 +3145,7 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
         }
       }
     }
-    // CO 171002
+    // CO20171002
     xvector<double> vdist1_dcart,vdist2_dcart,vdist3_dcart,vdist4_dcart;
     vdist1_dcart(1)=sum(metric_tensor(1)*vdist1_kcart_min(1));  //remember metric_tensor is symmetric!
     vdist1_dcart(2)=sum(metric_tensor(2)*vdist1_kcart_min(2));  //remember metric_tensor is symmetric!
@@ -3174,8 +3176,8 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
       if(SPIN_DN_ALRT) {
         if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
         else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        //[ CO 171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+        //[ CO20171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+        //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
         if(CBB.at(0)-VBT.at(0) > _ENER_EPS) {
           conduction_band_min.at(0) = CBB.at(0) - Efermi;
           valence_band_max.at(0)    = VBT.at(0) - Efermi;
@@ -3217,8 +3219,8 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
       else if(SPIN_UP_ALRT) {
         if      (kptdist(2) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
         else if(kptdist(2) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        //[ CO 171002 - GARBAGE A != A^-1 ]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+        //[ CO20171002 - GARBAGE A != A^-1 ]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+        //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
         if(CBB.at(1)-VBT.at(1) > _ENER_EPS) {
           conduction_band_min.at(0) = CBB.at(1) - Efermi;
           valence_band_max.at(0)    = VBT.at(1) - Efermi;
@@ -3279,10 +3281,10 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
         else if(kptdist(1) > kpt_tol) Egap_type.at(0) = "insulator_indirect";
         if      (kptdist(2) <= kpt_tol) Egap_type.at(1) = "insulator_direct";
         else if(kptdist(2) >  kpt_tol) Egap_type.at(1) = "insulator_indirect";
-        //[ CO 171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
-        //[ CO 171002 - GARBAGE A != A^-1 ]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(1) = "insulator_direct";
-        //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(1) = "insulator_indirect";
+        //[ CO20171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+        //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+        //[ CO20171002 - GARBAGE A != A^-1 ]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(1) = "insulator_direct";
+        //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(1) = "insulator_indirect";
         ///////////////////////////////////////////////////
         // SET 1: VBT1<CBB1 && VBT2=CBB2
         if((CBB.at(0)-VBT.at(0)>_ENER_EPS) and (abs(CBB.at(1)-VBT.at(1))<_ENER_EPS)) {
@@ -3295,9 +3297,9 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
             if  (abs(kptdist(1)-kptdist(3)) < kpt_tol) Egap_type_net = Egap_type.at(1);
             else if(kptdist(1)-kptdist(3)  < kpt_tol) Egap_type_net = Egap_type.at(1);
             else if(kptdist(1)-kptdist(3)  > kpt_tol) {
-              //[ CO 171002 - GARBAGE A != A^-1 ]if  (abs(kptdist(1)-kptdist(3)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
-              //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(3)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
-              //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(3)  > CELLVOLCUTOFF) {  //[CO200106 - close bracket for indenting]}
+              //[ CO20171002 - GARBAGE A != A^-1 ]if  (abs(kptdist(1)-kptdist(3)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
+              //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(3)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
+              //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(3)  > CELLVOLCUTOFF) {  //[CO200106 - close bracket for indenting]}
               if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
               else if(Egap_type.at(0) == "insulator_direct")   Egap_type_net = "insulator_indirect";
             }
@@ -3313,9 +3315,9 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
             if  (abs(kptdist(2)-kptdist(4)) < kpt_tol) Egap_type_net = Egap_type.at(1);
             else if(kptdist(2)-kptdist(4)  < kpt_tol) Egap_type_net = Egap_type.at(1);
             else if(kptdist(2)-kptdist(4)  > kpt_tol) {
-              //[ CO 171002 - GARBAGE A != A^-1 ]if  (abs(kptdist(2)-kptdist(4)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
-              //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(2)-kptdist(4)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
-              //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(2)-kptdist(4)  > CELLVOLCUTOFF) {  //[CO200106 - close bracket for indenting]}
+              //[ CO20171002 - GARBAGE A != A^-1 ]if  (abs(kptdist(2)-kptdist(4)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
+              //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(2)-kptdist(4)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
+              //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(2)-kptdist(4)  > CELLVOLCUTOFF) {  //[CO200106 - close bracket for indenting]}
               if      (Egap_type.at(1) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
               else if(Egap_type.at(1) == "insulator_direct")   Egap_type_net = "insulator_indirect";
             }
@@ -3340,9 +3342,9 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
             if  (abs(kptdist(1)-kptdist(4)) < kpt_tol) Egap_type_net = Egap_type.at(0);
             else if(kptdist(1)-kptdist(4)  < kpt_tol) Egap_type_net = Egap_type.at(0);
             else if(kptdist(1)-kptdist(4)  > kpt_tol) {
-              //[ CO 171002 - GARBAGE A != A^-1 ]if  (abs(kptdist(1)-kptdist(4)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
-              //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(4)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
-              //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(4)  > CELLVOLCUTOFF) {  //[CO200106 - close bracket for indenting]}
+              //[ CO20171002 - GARBAGE A != A^-1 ]if  (abs(kptdist(1)-kptdist(4)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
+              //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(4)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
+              //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(4)  > CELLVOLCUTOFF) {  //[CO200106 - close bracket for indenting]}
               if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
               else if(Egap_type.at(0) == "insulator_direct")   Egap_type_net = "insulator_indirect";
             }
@@ -3358,9 +3360,9 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
             if  (abs(kptdist(1)-kptdist(3)) < kpt_tol) Egap_type_net = Egap_type.at(0);
             else if(kptdist(1)-kptdist(3)  < kpt_tol) Egap_type_net = Egap_type.at(0);
             else if(kptdist(1)-kptdist(3)  > kpt_tol) {
-              //[ CO 171002 - GARBAGE A != A^-1 ]if  (abs(kptdist(1)-kptdist(3)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
-              //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(3)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
-              //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(3)  > CELLVOLCUTOFF) {  //[CO200106 - close bracket for indenting]}
+              //[ CO20171002 - GARBAGE A != A^-1 ]if  (abs(kptdist(1)-kptdist(3)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
+              //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(3)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
+              //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1)-kptdist(3)  > CELLVOLCUTOFF) {  //[CO200106 - close bracket for indenting]}
               if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
               else if(Egap_type.at(0) == "insulator_direct"  ) Egap_type_net = "insulator_indirect";
             }
@@ -3384,8 +3386,8 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
           else if( (abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS) ) { // 3b // CAMILOFIX
             if((kptdist(1)<=kpt_tol) or (kptdist(2)<=kpt_tol) or
                 (kptdist(3)<=kpt_tol) or (kptdist(4)<=kpt_tol)) {
-              //[ CO 171002 - GARBAGE A != A^-1 ]if((kptdist(1)<=CELLVOLCUTOFF) or (kptdist(2)<=CELLVOLCUTOFF) or
-              //[ CO 171002 - GARBAGE A != A^-1 ]   (kptdist(3)<=CELLVOLCUTOFF) or (kptdist(4)<=CELLVOLCUTOFF)) { //[CO200106 - close bracket for indenting]}
+              //[ CO20171002 - GARBAGE A != A^-1 ]if((kptdist(1)<=CELLVOLCUTOFF) or (kptdist(2)<=CELLVOLCUTOFF) or
+              //[ CO20171002 - GARBAGE A != A^-1 ]   (kptdist(3)<=CELLVOLCUTOFF) or (kptdist(4)<=CELLVOLCUTOFF)) { //[CO200106 - close bracket for indenting]}
               Egap_type_net = "insulator_direct";
             }
             else Egap_type_net = "insulator_indirect";
@@ -3413,56 +3415,56 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
           }
           else if(abs(VBT.at(0)-CBB.at(1))<_ENER_EPS) { // 4c
             if(kptdist(3)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(3)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(3)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = _ZERO;
             Egap_fit_net = 1.348 * Egap_net + 0.913;
           }
           else if(abs(VBT.at(1)-CBB.at(0))<_ENER_EPS) { // 4d
             if(kptdist(4)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(4)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(4)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = _ZERO;
             Egap_fit_net = 1.348 * Egap_net + 0.913;
           }
           else if((CBB.at(0)-CBB.at(1)>_ENER_EPS) and (VBT.at(0)-VBT.at(1)>_ENER_EPS)) { // 4e
             if(kptdist(3)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(3)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(3)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net   = "insulator_indirect";
             Egap_net     = CBB.at(1) - VBT.at(0);
             Egap_fit_net = 1.348 * Egap_net + 0.913;
           }
           else if((CBB.at(1)-CBB.at(0)>_ENER_EPS) and (VBT.at(1)-VBT.at(0)>_ENER_EPS)) { // 4f
             if(kptdist(4)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(4)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(4)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = CBB.at(0) - VBT.at(1);
             Egap_fit_net = 1.348 * Egap_net + 0.913;
           }
           else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS)) { // 4g
             if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = CBB.at(0) - VBT.at(0);
             Egap_fit_net = 1.348 * Egap_net + 0.913;
           }
           else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS)) { // 4h
             if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = CBB.at(1) - VBT.at(1);
             Egap_fit_net = 1.348 * Egap_net + 0.913;
           }
           else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 4i
             if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = CBB.at(0) - VBT.at(0);
             Egap_fit_net = 1.348 * Egap_net + 0.913;
           }
           else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 4j
             if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = CBB.at(1) - VBT.at(1);
             Egap_fit_net = 1.348 * Egap_net + 0.913;
@@ -3470,8 +3472,8 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
           else if( (abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS) ) { // 4k // CAMILOFIX
             if((kptdist(1)<=kpt_tol) or (kptdist(2)<=kpt_tol) or
                 (kptdist(3)<=kpt_tol) or (kptdist(4)<=kpt_tol)) {
-              //[ CO 171002 - GARBAGE A != A^-1 ]if((kptdist(1)<=CELLVOLCUTOFF) or (kptdist(2)<=CELLVOLCUTOFF) or
-              //[ CO 171002 - GARBAGE A != A^-1 ]   (kptdist(3)<=CELLVOLCUTOFF) or (kptdist(4)<=CELLVOLCUTOFF)) { //[CO200106 - close bracket for indenting]}
+              //[ CO20171002 - GARBAGE A != A^-1 ]if((kptdist(1)<=CELLVOLCUTOFF) or (kptdist(2)<=CELLVOLCUTOFF) or
+              //[ CO20171002 - GARBAGE A != A^-1 ]   (kptdist(3)<=CELLVOLCUTOFF) or (kptdist(4)<=CELLVOLCUTOFF)) { //[CO200106 - close bracket for indenting]}
               Egap_type_net = "insulator_direct";
             }
             else Egap_type_net = "insulator_indirect";
@@ -3480,14 +3482,14 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
           }
           else if((abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 4l
             if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = CBB.at(0) - VBT.at(0);
             Egap_fit_net = 1.348 * Egap_net + 0.913;
           }
           else if((abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 4m
             if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[ CO 171002 - GARBAGE A != A^-1 ]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+            //[ CO20171002 - GARBAGE A != A^-1 ]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
             else Egap_type_net = "insulator_indirect";
             Egap_net     = CBB.at(1) - VBT.at(1);
             Egap_fit_net = 1.348 * Egap_net + 0.913;
@@ -3497,8 +3499,8 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
       else if( SPIN_UP and !SPIN_DN) { // m1
         if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
         else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        //[ CO 171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+        //[ CO20171002 - GARBAGE A != A^-1 ]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+        //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
         conduction_band_min.at(1) = _METALEDGE_;
         valence_band_max.at(1)    = _METALEDGE_;
         conduction_band_min_net = conduction_band_min.at(1);
@@ -3516,8 +3518,8 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
       else if(!SPIN_UP and  SPIN_DN) { // m2
         if      (kptdist(2) <= kpt_tol) Egap_type.at(1) = "insulator_direct";
         else if(kptdist(2) >  kpt_tol) Egap_type.at(1) = "insulator_indirect";
-        //[ CO 171002 - GARBAGE A != A^-1 ]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(1) = "insulator_direct";
-        //[ CO 171002 - GARBAGE A != A^-1 ]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(1) = "insulator_indirect";
+        //[ CO20171002 - GARBAGE A != A^-1 ]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(1) = "insulator_direct";
+        //[ CO20171002 - GARBAGE A != A^-1 ]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(1) = "insulator_indirect";
         conduction_band_min.at(0) = _METALEDGE_;
         valence_band_max.at(0)    = _METALEDGE_;
         conduction_band_min_net = conduction_band_min.at(0);
@@ -3586,14 +3588,14 @@ void xDOSCAR::free() {  //CO191110
   energy_min=0.0;
   number_energies=0;
   number_atoms=0; //CO191010
-  partial=false;  // ME190614
+  partial=false;  // ME20190614
   denergy=0.0;
   venergy.clear();
   venergy.clear();
   vDOS.clear();viDOS.clear();
-  // vDOSs.clear();vDOSp.clear();vDOSd.clear(); OBSOLETE ME190614 - not used
-  isLSCOUPLING = false;  // ME190620
-  lmResolved = false;  // ME190620
+  // vDOSs.clear();vDOSp.clear();vDOSd.clear(); OBSOLETE ME20190614 - not used
+  isLSCOUPLING = false;  // ME20190620
+  lmResolved = false;  // ME20190620
   carstring=""; //CO191010
   ERROR="";
   conduction_band_min.clear();
@@ -3626,7 +3628,7 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
   energy_min=b.energy_min;
   number_energies=b.number_energies;
   number_atoms=b.number_atoms;  //CO191010
-  partial = b.partial;  // ME190614
+  partial = b.partial;  // ME20190614
   denergy=b.denergy;  
   venergy.clear(); for(uint ienergy=0;ienergy<b.venergy.size();ienergy++) venergy.push_back(b.venergy[ienergy]);  //CO191004
   venergyEf.clear(); for(uint ienergy=0;ienergy<b.venergyEf.size();ienergy++) venergyEf.push_back(b.venergyEf[ienergy]); //CO191004
@@ -3635,7 +3637,7 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
     viDOS.push_back(deque<double>(0));
     for(uint ienergy=0;ienergy<b.viDOS[ispin].size();ienergy++) viDOS[ispin].push_back(b.viDOS[ispin][ienergy]);
   }
-  vDOS.clear();   // ME190614
+  vDOS.clear();   // ME20190614
   for(uint iatom=0;iatom<b.vDOS.size();iatom++){ //CO191004
     vDOS.push_back(deque<deque<deque<double> > >(0));
     for(uint iorbital=0;iorbital<b.vDOS[iatom].size();iorbital++){
@@ -3646,13 +3648,13 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
       }
     }
   }
-  //vDOS.clear(); for(uint i=0;i<b.vDOS.size();i++) vDOS.push_back(b.vDOS.at(i)); OBSOLETE ME190614
-  //vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));  OBSOLETE ME190614 - not used
-  //vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));  OBSOLETE ME190614 - not used
-  //vDOSp.clear(); for(uint i=0;i<b.vDOSp.size();i++) vDOSp.push_back(b.vDOSp.at(i));  OBSOLETE ME190614 - not used
-  //vDOSd.clear(); for(uint i=0;i<b.vDOSd.size();i++) vDOSd.push_back(b.vDOSd.at(i));  OBSOLETE ME190614 - not used
-  isLSCOUPLING = b.isLSCOUPLING;  // ME190620
-  lmResolved = b.lmResolved;  // ME190620
+  //vDOS.clear(); for(uint i=0;i<b.vDOS.size();i++) vDOS.push_back(b.vDOS.at(i)); OBSOLETE ME20190614
+  //vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));  OBSOLETE ME20190614 - not used
+  //vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));  OBSOLETE ME20190614 - not used
+  //vDOSp.clear(); for(uint i=0;i<b.vDOSp.size();i++) vDOSp.push_back(b.vDOSp.at(i));  OBSOLETE ME20190614 - not used
+  //vDOSd.clear(); for(uint i=0;i<b.vDOSd.size();i++) vDOSd.push_back(b.vDOSd.at(i));  OBSOLETE ME20190614 - not used
+  isLSCOUPLING = b.isLSCOUPLING;  // ME20190620
+  lmResolved = b.lmResolved;  // ME20190620
   carstring=b.carstring;  //CO191010
   ERROR=b.ERROR;
   conduction_band_min.clear(); for(uint ispin=0;ispin<b.conduction_band_min.size();ispin++){conduction_band_min.push_back(b.conduction_band_min[ispin]);}
@@ -3721,25 +3723,25 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   vector<string> vline,tokens;
   aurostd::string2vectorstring(content,vcontent);
   string line;
-  uint ndos = 1;  // ME190614
+  uint ndos = 1;  // ME20190614
   if(filename=="") filename="stringstream";
-  // ME190812 - Add checks for broken DOSCARs
+  // ME20190812 - Add checks for broken DOSCARs
   if (vcontent.size() < 7) {
     string function = "xDOSCAR::GetProperties()";
     string message = "Broken DOSCAR: no content.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
-  for(uint iline = 0; iline < 7;iline++) { // ME190614 - Read header
+  for(uint iline = 0; iline < 7;iline++) { // ME20190614 - Read header
     aurostd::string2tokens(vcontent.at(iline),tokens);
     // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
     // WRONG if(iline==0 && tokens.size()==4)  spin=aurostd::string2utype<int>(tokens.at(tokens.size()-1))-1;
-    // ME190614 - START
+    // ME20190614 - START
     if (iline == 0 && tokens.size() >= 4) {
       number_atoms = aurostd::string2utype<uint>(tokens[1]);
       partial = aurostd::string2utype<bool>(tokens[2]);
       if (partial) ndos += number_atoms;
     }
-    // ME190614 - END
+    // ME20190614 - END
     if(iline==1 && tokens.size()>=5) {
       uint i=0;
       Vol=aurostd::string2utype<double>(tokens.at(i++));
@@ -3749,8 +3751,8 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       POTIM=aurostd::string2utype<double>(tokens.at(i++));
     }
     if(iline==2) temperature=aurostd::string2utype<double>(vcontent.at(iline));
-    if(iline==3) carstring = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190620 - what kind of DOSCAR?
-    if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190508 - clean title
+    if(iline==3) carstring = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME20190620 - what kind of DOSCAR?
+    if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME20190508 - clean title
     if(iline==5) {
       // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
       energy_max=aurostd::string2utype<double>(tokens.at(0));
@@ -3760,15 +3762,15 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
     if(iline==6 && tokens.size()==4) {spin=0;RWIGS=TRUE;}
     if(iline==6 && tokens.size()==7) {spin=1;RWIGS=TRUE;}
-    // ME190614 - START
+    // ME20190614 - START
     if (iline == 6) {
       if (tokens.size() == 3) spin = 0;
       if (tokens.size() == 5) spin = 1;
     }
-    // ME190614 - END
+    // ME20190614 - END
   }
   // Done reading header
-  // ME190614 - START
+  // ME20190614 - START
   uint norbitals = 0;
   int d = 0, e = 0;
   double dos;
@@ -3856,7 +3858,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       lmResolved = true;
     }
   }
-  if (isLSCOUPLING) {  // ME190620 - LSCOUPLING has four spin channels
+  if (isLSCOUPLING) {  // ME20190620 - LSCOUPLING has four spin channels
     vDOS.assign(ndos, deque<deque<deque<double> > >(norbitals + 1, deque<deque<double> >(4, deque<double>(number_energies, 0.0))));
   } else {
     vDOS.assign(ndos, deque<deque<deque<double> > >(norbitals + 1, deque<deque<double> >(spin + 1, deque<double>(number_energies, 0.0))));
@@ -3867,7 +3869,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   for (uint iline = 6; iline < vcontent.size(); iline++) {
     if (iline == (d + 1) * number_energies + 6 + d) {
       d++;
-      // ME190810 - Safeguard against DOSCARs with additional lines
+      // ME20190810 - Safeguard against DOSCARs with additional lines
       if (d == (int) ndos) {
         string message = "DOSCAR contains more lines than the header suggests."
           " xDOSCAR object may not be properly populated.";
@@ -3884,7 +3886,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           viDOS[i][e] = aurostd::string2utype<double>(tokens[i + spin + 2]);
         }
         e++;
-      } else if (isLSCOUPLING) {  // ME190620 - LSCOUPLING has four spin channels
+      } else if (isLSCOUPLING) {  // ME20190620 - LSCOUPLING has four spin channels
         for (uint i = 0; i < 4 * norbitals; i++) {
           dos = aurostd::string2utype<double>(tokens[i + 1]);
           vDOS[d][i/4 + 1][i % 4][e] = dos;
@@ -3901,7 +3903,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         }
         e++;
       }
-      // ME190614 - The procedure below makes too many assumptions about how the
+      // ME20190614 - The procedure below makes too many assumptions about how the
       // DOSCAR file is structured and fails for f-elements.
       //[OBSOLETE]    if(iline>=6 && iline < number_energies + 6 ) {
       //[OBSOLETE]      aurostd::string2tokens(vcontent.at(iline),tokens);
@@ -3910,7 +3912,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       //[OBSOLETE]	RWIGS=FALSE;
       //[OBSOLETE]	if(tokens.size()==3) spin=0;
       //[OBSOLETE]	if(tokens.size()==5) spin=1;
-      //[OBSOLETE]	if (venergy.size() <= number_energies) venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));  // ME190507
+      //[OBSOLETE]	if (venergy.size() <= number_energies) venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));  // ME20190507
       //[OBSOLETE]	//vDOS
       //[OBSOLETE]	deque<double> entryDOS;
       //[OBSOLETE]	entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
@@ -3941,10 +3943,10 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       //[OBSOLETE]      }
       //[OBSOLETE]    }
     }
-    // ME190614 - END
+    // ME20190614 - END
   }
-  // ME190812 - Safeguard against broken DOSCARs
-  if ((d + 1 < (int) ndos) || (e < (int) number_energies)) {  // ME191010: needs to be d + 1
+  // ME20190812 - Safeguard against broken DOSCARs
+  if ((d + 1 < (int) ndos) || (e < (int) number_energies)) {  // ME20191010: needs to be d + 1
     string function = "xDOSCAR::GetProperties()";
     string message = "Broken DOSCAR: not enough lines.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
@@ -4005,15 +4007,15 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: energy_max=" << energy_max << " energy_min=" << energy_min << endl;
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: denergy=" << denergy << endl;
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  // ME190614 - new vDOS format
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  // ME190614 - new viDOS format
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME190614
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME190614
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME190614
+  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  // ME20190614 - new vDOS format
+  if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  // ME20190614 - new viDOS format
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME20190614
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME20190614
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME20190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME190614
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME20190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME190614
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME20190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
@@ -4137,7 +4139,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 
   // GET FERMI LEVEL
   if(EFERMI==AUROSTD_NAN){
-    //VERY IMPORTANT - CO 171009 from discussion with SC
+    //VERY IMPORTANT - CO20171009 from discussion with SC
     //we strongly prefer to use Efermi from DOSCAR.static, not DOSCAR.bands
     //bands is not self-consistent (ICHARG=11), only used to determine energy states
     //since it is not self-consistent, it does not fill in states correctly
@@ -4388,7 +4390,7 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
 
 }
 
-// ME190623 - BEGIN
+// ME20190623 - BEGIN
 ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
   // Header
   oss << std::setw(4) << xdos.number_atoms
@@ -4440,7 +4442,7 @@ ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
   }
   return oss;
 }
-// ME190623 - END
+// ME20190623 - END
 
 // ***************************************************************************
 // ***************************************************************************
@@ -4460,14 +4462,14 @@ xEIGENVAL::xEIGENVAL() {
   number_electrons=0;
   number_kpoints=0;
   number_bands=0;
-  energy_max = -1e30;  // ME190614
-  energy_min = 1e30;  // ME190614
+  energy_max = -1e30;  // ME20190614
+  energy_min = 1e30;  // ME20190614
   vweight.clear();
   vkpoint.clear();
   venergy.clear();
-  carstring = "";  // ME190620
-  number_atoms = 0;  // ME190623
-  number_loops = 0;  // ME190623
+  carstring = "";  // ME20190620
+  number_atoms = 0;  // ME20190623
+  number_loops = 0;  // ME20190623
 }  
 
 xEIGENVAL::~xEIGENVAL() {
@@ -4503,8 +4505,8 @@ void xEIGENVAL::copy(const xEIGENVAL& b) { // copy PRIVATE
   number_electrons=b.number_electrons;
   number_kpoints=b.number_kpoints;
   number_bands=b.number_bands;
-  energy_min = b.energy_min;  // ME190614
-  energy_max = b.energy_max;  // ME190614
+  energy_min = b.energy_min;  // ME20190614
+  energy_max = b.energy_max;  // ME20190614
   vweight.clear(); 
   for(uint i=0;i<b.vweight.size();i++) vweight.push_back(b.vweight.at(i));
   vkpoint.clear(); 
@@ -4516,9 +4518,9 @@ void xEIGENVAL::copy(const xEIGENVAL& b) { // copy PRIVATE
       temp.push_back(b.venergy.at(i).at(j));
     venergy.push_back(temp);
   }  
-  carstring = b.carstring;  // ME190620
-  number_atoms = b.number_atoms;  // ME190623
-  number_loops = b.number_loops;  // ME190623
+  carstring = b.carstring;  // ME20190620
+  number_atoms = b.number_atoms;  // ME20190623
+  number_loops = b.number_loops;  // ME20190623
 }
 
 const xEIGENVAL& xEIGENVAL::operator=(const xEIGENVAL& b) {  // operator= PUBLIC
@@ -4584,8 +4586,8 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     aurostd::string2tokens(vcontent.at(iline),tokens);
     //    cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
     if(iline==0 && tokens.size()==4) {
-      number_atoms = aurostd::string2utype<int>(tokens[0]);  // ME190623
-      number_loops = aurostd::string2utype<int>(tokens[2]);  // ME190623
+      number_atoms = aurostd::string2utype<int>(tokens[0]);  // ME20190623
+      number_loops = aurostd::string2utype<int>(tokens[2]);  // ME20190623
       spin=aurostd::string2utype<int>(tokens.at(tokens.size()-1))-1;
     }
     if(iline==1 && tokens.size()>=5) {
@@ -4597,8 +4599,8 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       POTIM=aurostd::string2utype<double>(tokens.at(i++));
     }
     if(iline==2) temperature=aurostd::string2utype<double>(vcontent.at(iline));
-    if(iline==3) carstring = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline)); // ME190620 - what kind of EIGENVAL file?
-    if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190614 - clean title
+    if(iline==3) carstring = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline)); // ME20190620 - what kind of EIGENVAL file?
+    if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME20190614 - clean title
     if(iline==5 && tokens.size()>=3) {
       uint i=0;
       number_electrons=aurostd::string2utype<uint>(tokens.at(i++));
@@ -4620,18 +4622,18 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         iline++; // move to energies
         deque<double> keigenval;
         deque<deque<double> > knenergy;
-        double eigen;  // ME190614
+        double eigen;  // ME20190614
         for(uint kline=0;kline<number_bands&&iline<vcontent.size();kline++,iline++) {
           aurostd::string2tokens(vcontent.at(iline),tokens);
           keigenval.clear();
           for(uint i=1;i<tokens.size();i++) {
-            // ME190614 - START
+            // ME20190614 - START
             eigen = aurostd::string2utype<double>(tokens[i]);
             if (eigen < energy_min) energy_min = eigen;
             if (eigen > energy_max) energy_max = eigen;
             keigenval.push_back(eigen);
             //[OBSOLETE] keigenval.push_back(aurostd::string2utype<double>(tokens.at(i)));  // build one eigenvalue
-            // ME190614 - END
+            // ME20190614 - END
           }
           knenergy.push_back(keigenval);
         }
@@ -5238,12 +5240,12 @@ bool PrintBandGap(string& directory, ostream &oss) {
     return FALSE;
   }
 
-  // CO 171002 - using tolerance from symmetry calc - START
+  // CO20171002 - using tolerance from symmetry calc - START
   //double tol;
   //if(xstr.CalculateSymmetry()){tol=xstr.sym_eps;}
   //else {tol=SYM::defaultTolerance(xstr);}
   //cerr << tol << endl;
-  // CO 171002 - using tolerance from symmetry calc - STOP
+  // CO20171002 - using tolerance from symmetry calc - STOP
 
   if(!xoutcar_bands.GetProperties(ss_outcar_bands)){
     oss << "WARNING " << soliloquy << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
@@ -5526,11 +5528,11 @@ bool PrintEffectiveMass(string& directory, ostream &oss) {
   xoutcar.GetProperties(file_OUTCAR);
   xstructure xstr(path_POSCAR,IOVASP_POSCAR);
 
-  // CO 171002 - using tolerance from symmetry calc - START
+  // CO20171002 - using tolerance from symmetry calc - START
   double tol;
   if(xstr.CalculateSymmetry()){tol=xstr.sym_eps;}
   else {tol=SYM::defaultTolerance(xstr);}
-  // CO 171002 - using tolerance from symmetry calc - STOP
+  // CO20171002 - using tolerance from symmetry calc - STOP
 
   xoutcar.GetBandGap(tol);
   xdoscar.GetProperties(file_DOSCAR);
@@ -5682,11 +5684,11 @@ bool PrintEigCurv(string& directory, ostream &oss) {
 
   xstructure xstr(path_POSCAR,IOVASP_POSCAR);
 
-  // CO 171002 - using tolerance from symmetry calc - START
+  // CO20171002 - using tolerance from symmetry calc - START
   double tol;
   if(xstr.CalculateSymmetry()){tol=xstr.sym_eps;}
   else {tol=SYM::defaultTolerance(xstr);}
-  // CO 171002 - using tolerance from symmetry calc - STOP
+  // CO20171002 - using tolerance from symmetry calc - STOP
 
   xoutcar.GetBandGap(tol) ;
   if(xoutcar.Egap_net >= _ZERO) {
@@ -7394,7 +7396,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   return TRUE;
 }
 
-// ME 190204 - BEGIN
+// ME20190204 - BEGIN
 // GetForces just grabs the forces from the vasprun file with a much faster
 // algorithm than in GetProperties. This is significant for APL and AAPL which
 // process many large vasprun files.
@@ -7439,7 +7441,7 @@ bool xVASPRUNXML::GetForces(stringstream& stringstreamIN, bool QUIET) {
   if (!QUIET) cerr << "xVASPRUNXML::GetForces: forces not found" << endl;
   return false;
 }
-// ME 190204 - END
+// ME20190204 - END
 
 //---------------------------------------------------------------------------------
 // class xIBZKPT
@@ -7654,7 +7656,7 @@ xKPOINTS::xKPOINTS() {
   path_mode="";                 // for aflowlib_libraries.cpp
   path="";                      // for aflowlib_libraries.cpp
   vpath.clear();                // for aflowlib_libraries.cpp
-  vkpoints.clear();             // ME190614
+  vkpoints.clear();             // ME20190614
   path_grid=0;                  // for aflowlib_libraries.cpp
 }        
 
@@ -7668,7 +7670,7 @@ void xKPOINTS::free() {
   nnn_kpoints.clear();          // for aflowlib_libraries.cpp
   ooo_kpoints.clear();          // for aflowlib_libraries.cpp
   vpath.clear();                // for aflowlib_libraries.cpp
-  vkpoints.clear();             // ME190614
+  vkpoints.clear();             // ME20190614
 }
 
 void xKPOINTS::copy(const xKPOINTS& b) { // copy PRIVATE
@@ -7687,7 +7689,7 @@ void xKPOINTS::copy(const xKPOINTS& b) { // copy PRIVATE
   path_mode=b.path_mode;
   path=b.path;
   vpath=b.vpath;
-  vkpoints = b.vkpoints;  // ME190614
+  vkpoints = b.vkpoints;  // ME20190614
   path_grid=b.path_grid;
 }
 
@@ -7804,7 +7806,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       path_grid=aurostd::string2utype<int>(vcontent.at(1));
       grid_type=vcontent.at(2);
       path_mode=vcontent.at(3);
-      xvector<double> kpt(3);  // ME190614
+      xvector<double> kpt(3);  // ME20190614
       for(uint iline=4;iline<vcontent.size();iline++) {
         aurostd::StringSubst(vcontent.at(iline),"!","@");
         if(aurostd::substring2bool(vcontent.at(iline),"@")) { // avoid removing ! as comment
@@ -7814,11 +7816,11 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             for(uint k=0;k<tokens.size();k++) {
               if(tokens.at(k)=="@" && k+1<tokens.size()) {
                 vpath.push_back(tokens.at(k+1));
-              } else if (k < 3) {  // ME190614
+              } else if (k < 3) {  // ME20190614
                 kpt[k+1] = aurostd::string2utype<double>(tokens[k]);
               }
             }
-            vkpoints.push_back(kpt);  // ME190614
+            vkpoints.push_back(kpt);  // ME20190614
           }
         }
       }
@@ -7883,7 +7885,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   return TRUE;
 }
 
-// ME190623 - BEGIN
+// ME20190623 - BEGIN
 ostream& operator<<(ostream& oss, const xKPOINTS& xkpts) {
   if (xkpts.is_KPOINTS_NNN) {
     oss << xkpts.title << std::endl;
@@ -7955,7 +7957,7 @@ string xKPOINTS::createStandardTitlePath(const xstructure& xstr) {
   return stdtitle;
 }
 
-// ME190623 - END
+// ME20190623 - END
 
 //---------------------------------------------------------------------------------
 // class xCHGCAR
@@ -8102,26 +8104,26 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xCHGCAR::GetProperties: vvalues.rows=" << vvalues.rows << endl;
   // ----------------------------------------------------------------------
   if(LVERBOSE) cerr << "xCHGCAR::GetProperties: LOAD TVALUES " << endl;
-  //[OBSOLETE ME180705]xtensor3<double> tvalues_aus(grid(1),grid(2),grid(3));
-  xtensor<double> tvalues_aus(grid); //ME180705
+  //[OBSOLETE ME20180705]xtensor3<double> tvalues_aus(grid(1),grid(2),grid(3));
+  xtensor<double> tvalues_aus(grid); //ME20180705
   int iii=0;
   for(int i3=1;i3<=grid(3);i3++) {  // CO - x is fastest, z is slowest
     for(int i2=1;i2<=grid(2);i2++) {
       for(int i1=1;i1<=grid(1);i1++) {  // CO - x is fastest, z is slowest
         iii++;
-        tvalues_aus[i1][i2][i3]=vvalues(iii); //ME180705
-        //[OBSOLETE ME180705]tvalues_aus(i1,i2,i3)=vvalues(iii);
+        tvalues_aus[i1][i2][i3]=vvalues(iii); //ME20180705
+        //[OBSOLETE ME20180705]tvalues_aus(i1,i2,i3)=vvalues(iii);
       }
     }
   }
 
   tvalues=tvalues_aus;
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[1]=" << tvalues.shape[1] << endl; //ME180705
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[2]=" << tvalues.shape[2] << endl; //ME180705
-  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[3]=" << tvalues.shape[3] << endl; //ME180705
-  //[OBSOLETE ME180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[1]=" << tvalues.index[1] << endl;
-  //[OBSOLETE ME180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[2]=" << tvalues.index[2] << endl;
-  //[OBSOLETE ME180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[3]=" << tvalues.index[3] << endl;
+  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[1]=" << tvalues.shape[1] << endl; //ME20180705
+  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[2]=" << tvalues.shape[2] << endl; //ME20180705
+  if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.shape[3]=" << tvalues.shape[3] << endl; //ME20180705
+  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[1]=" << tvalues.index[1] << endl;
+  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[2]=" << tvalues.index[2] << endl;
+  //[OBSOLETE ME20180705]if(LVERBOSE) cerr << "xCHGCAR::GetProperties: tvalues.index[3]=" << tvalues.index[3] << endl;
   // ----------------------------------------------------------------------   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
@@ -8241,14 +8243,14 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
           if(inside_relax){H_atom_relax=aurostd::string2utype<double>(tokens2[0]);}
           else if(inside_static){H_atom_static=aurostd::string2utype<double>(tokens2[0]);}
         }
-        // ME191218 - substring2bool ignores comments and TOTAL-FORCE is in a comment line
+        // ME20191218 - substring2bool ignores comments and TOTAL-FORCE is in a comment line
       }
-      // [OBSOLETE - ME191219] else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")) //CO191112 - forces for APL
+      // [OBSOLETE - ME20191219] else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")) //CO191112 - forces for APL
       else if(vcontent[iline].find("TOTAL-FORCE") != string::npos)
       { //CO200106 - patching for auto-indenting
         vforces.clear();
         iline++;  //skip first [AFLOW]
-        // ME191219 - ++iline needs to be in the while statement or the loop
+        // ME20191219 - ++iline needs to be in the while statement or the loop
         // will never start
         while(iline<vcontent.size() && aurostd::substring2bool(vcontent[++iline],"[AFLOW]")==FALSE){
           vforces.push_back(xvector<double>(3));

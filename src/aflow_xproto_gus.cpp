@@ -23,10 +23,10 @@ namespace aflowlib {
 namespace aflowlib {
   xstructure PrototypeBinaryGUS(ostream &FileMESSAGE,string label,string atomA,string atomB) {
     double atomvolumeA,atomvolumeB;
-    //[CO181106]atomvolumeA=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomA)); //CO181128
-    //[CO181106]atomvolumeB=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomB)); //CO181128
-    atomvolumeA=GetAtomVolume(atomA); //CO181128
-    atomvolumeB=GetAtomVolume(atomB); //CO181128
+    //[CO20181106]atomvolumeA=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomA)); //CO20181128
+    //[CO20181106]atomvolumeB=GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomB)); //CO20181128
+    atomvolumeA=GetAtomVolume(atomA); //CO20181128
+    atomvolumeB=GetAtomVolume(atomB); //CO20181128
     return aflowlib::PrototypeBinaryGUS(FileMESSAGE,label,atomA,atomvolumeA,atomB,atomvolumeB,0.0);
   }
 } // namespace aflowlib

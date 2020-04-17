@@ -51,14 +51,14 @@ public:
   string CrystalStr_PT;                   // http://periodictable.com      // DU 2019/05/17
   string space_group;                     // http://periodictable.com      // DU 2019/05/17
   uint space_group_number;                // http://periodictable.com      // DU 2019/05/17
-  double Pearson_coefficient;             // Pearson mass deviation coefficient // ME181020
+  double Pearson_coefficient;             // Pearson mass deviation coefficient // ME20181020
   xvector<double> lattice_constant;       // (pm) http://periodictable.com      // DU 2019/05/17
   xvector<double> lattice_angle;          // (rad) http://periodictable.com      // DU 2019/05/17
   string phase;                           //      http://periodictable.com      // DU 2019/05/17
   double radius;                          // Saxena (nm)
   double radius_PT;                       // (pm)       http://periodictable.com      // DU 2019/05/17
   double radius_covalent_PT;              // (pm)       http://periodictable.com      // DU 2019/05/17
-  double radius_covalent;                 // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) // DX and CO - 9/4/17
+  double radius_covalent;                 // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) // DX and CO -20170904
   double radius_VanDerWaals_PT;           // (pm)       http://periodictable.com      // DU 2019/05/17
   double radii_Ghosh08;                    // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      // DU 2019/05/17
   double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      // DU 2019/05/17

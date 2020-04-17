@@ -464,7 +464,7 @@ namespace plotter {
         break;
       }
       catch(aurostd::xerror& excpt){
-        xstr.clear(); //DX 20191220 - uppercase to lowercase clear
+        xstr.clear(); //DX20191220 - uppercase to lowercase clear
         t=elements_prototype_str.find('.',t+1);
         continue;
       }
@@ -486,7 +486,7 @@ namespace plotter {
 
     string new_title="";
     string clean_specie="";
-    int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO181226
+    int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
     for(uint ispecies=0;ispecies<xstr.species.size();ispecies++){
       clean_specie=KBIN::VASP_PseudoPotential_CleanName(xstr.species[ispecies]);
       if(LDEBUG){cerr << soliloquy << " species[ispecies=" << ispecies << "]=" << clean_specie << endl;}
