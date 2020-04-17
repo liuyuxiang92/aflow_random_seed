@@ -42,7 +42,7 @@ namespace apl {
     initialize(_xstr);
   }
 
-  // ME200212 - read from a state file
+  // ME20200212 - read from a state file
   Supercell::Supercell(const string& filename, ofstream& mf, ostream& os, string directory) {
     free();
     messageFile = &mf;
