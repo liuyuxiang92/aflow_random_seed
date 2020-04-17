@@ -826,15 +826,15 @@ namespace surface {
             if(search_trivial)  oss << "TRIVIAL SEARCH" << endl;
             if(search_complete) oss << "COMPLETE SEARCH" << endl;
             str.LatticeReduction_avoid=TRUE;  // DOES NOT DO LATTICE REDUCTION // NIGGLI and MINK
-            str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                      // CO 171024 - new sym framework
-            _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO 171024 - new sym framework
-            pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO 171024 - new sym framework
-            pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO 171024 - new sym framework
-            //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 // CO 171024 - new sym framework
-            //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             // CO 171024 - new sym framework
-            //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                // CO 171024 - new sym framework
-            //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    // CO 171024 - new sym framework
-            //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    // CO 171024 - new sym framework
+            str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                      // CO20171024 - new sym framework
+            _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO20171024 - new sym framework
+            pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO20171024 - new sym framework
+            pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO20171024 - new sym framework
+            //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 // CO20171024 - new sym framework
+            //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             // CO20171024 - new sym framework
+            //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                // CO20171024 - new sym framework
+            //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    // CO20171024 - new sym framework
+            //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    // CO20171024 - new sym framework
             //   oss << banner << endl; // ----------------------------------------------------------------
             oss << surface::PrintNNdists(num_types,num_types_combinations,bbfrac,nndist,nndists);
             oss << "hklmax=" << hklmax << endl;
@@ -914,14 +914,14 @@ namespace surface {
     if(search_complete) oss << "COMPLETE SEARCH" << endl;
     str.LatticeReduction_avoid=TRUE;
     str.sgroup_radius=1.05*RadiusSphereLattice(lattice);
-    _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO 171024 - new sym framework
-    pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO 171024 - new sym framework
-    pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO 171024 - new sym framework
-    //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 // CO 171024 - new sym framework
-    //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             // CO 171024 - new sym framework
-    //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                // CO 171024 - new sym framework
-    //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    // CO 171024 - new sym framework
-    //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    // CO 171024 - new sym framework
+    _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO20171024 - new sym framework
+    pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO20171024 - new sym framework
+    pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO20171024 - new sym framework
+    //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 // CO20171024 - new sym framework
+    //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             // CO20171024 - new sym framework
+    //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                // CO20171024 - new sym framework
+    //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    // CO20171024 - new sym framework
+    //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    // CO20171024 - new sym framework
     // oss
     oss << banner << endl; // ----------------------------------------------------------------
     oss << "HKL CALCULATION" << endl;
@@ -1220,7 +1220,7 @@ namespace slab {
     int i=0,j=0,k=0;
     //  options[0-2]="h" "k" "l" options[3-4]="NumFilledLayers" "NumEmptyLayers"
 
-    //CO 180724 START - AddAtom() requires atom types AND names, so assign fake names if necessary, then remove later
+    //CO20180724 START - AddAtom() requires atom types AND names, so assign fake names if necessary, then remove later
     string specie;
     xstructure str_in=_str_in;
     bool assigning_fake_names=false;
@@ -1241,7 +1241,7 @@ namespace slab {
         }
       }
     }
-    //CO 180724 STOP - AddAtom() requires atom types AND names, so assign fake names if necessary, then remove later
+    //CO20180724 STOP - AddAtom() requires atom types AND names, so assign fake names if necessary, then remove later
 
     xvector<double> hkl(3);
     hkl(1)=1;hkl(2)=1;hkl(3)=1; 
@@ -1925,14 +1925,14 @@ namespace slab {
         str_out.lattice(i,j)=Slab_Basis_CartCoord(i,j);
       }
     }
-    str_out.FixLattices();  // CO 180202
+    str_out.FixLattices();  // CO20180202
 
     //str_out.num_each_type.clear();
     //str_out.comp_each_type.clear();
 
 
 
-    if(0){ //CO 180727 - see atom names
+    if(0){ //CO20180727 - see atom names
       for(uint i=0;i<str_in.atoms.size();i++){cerr << "\"" << str_in.atoms[i].name << "\"" << endl;}
     }
 
@@ -1943,25 +1943,25 @@ namespace slab {
         for(i=1;i<=NumInLayer[OrderLayers[Layer]];i++) {
           if(AtomInLayer[OrderLayers[Layer]][i][1]==k) {
             iatom++;
-            newatom.type=k-1;	//CO 180724 - assign type needed for AddAtom()
-            specie=str_in.SpeciesLabel(k-1);	//CO 180724 - this should be NON-empty as per assigning_fake_names above
+            newatom.type=k-1;	//CO20180724 - assign type needed for AddAtom()
+            specie=str_in.SpeciesLabel(k-1);	//CO20180724 - this should be NON-empty as per assigning_fake_names above
             if(specie.empty() || aurostd::substring2bool(specie,"name not given")){
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ERROR! Species label not found!",_FILE_WRONG_FORMAT_); //CO 180724
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ERROR! Species label not found!",_FILE_WRONG_FORMAT_); //CO20180724
             }
-            newatom.name=specie;         //CO 180724 - assign name needed for AddAtom()
-            newatom.name_is_given=TRUE;  //CO 180724 - assign name needed for AddAtom()
+            newatom.name=specie;         //CO20180724 - assign name needed for AddAtom()
+            newatom.name_is_given=TRUE;  //CO20180724 - assign name needed for AddAtom()
             for(j=1;j<=3;j++) {
               newatom.fpos[j]=ListSiteDirectCoordWRTslab[k][AtomInLayer[OrderLayers[Layer]][i][2]][j];
             }
-            newatom.cpos=F2C(str_out.scale,str_out.lattice,newatom.fpos); // CO 180202
+            newatom.cpos=F2C(str_out.scale,str_out.lattice,newatom.fpos); // CO20180202
             str_out.AddAtom(newatom);
           }
         }
       }
     }
-    if(assigning_fake_names){for(uint i=0;i<str_out.atoms.size();i++){str_out.atoms[i].name_is_given=false;}}	//CO 180724 - since these are fake names, don't print out them out
+    if(assigning_fake_names){for(uint i=0;i<str_out.atoms.size();i++){str_out.atoms[i].name_is_given=false;}}	//CO20180724 - since these are fake names, don't print out them out
 
-    // CO 180202
+    // CO20180202
     if(LDEBUG) {
       cerr << "PRINTING OUT STRUCTURE ATTRIBUTES" << endl;
       cerr << "str_out.atoms.size()=" << str_out.atoms.size() << endl;
@@ -1974,7 +1974,7 @@ namespace slab {
     }
 
     ////////////////////////////////////////////////////////////
-    //CO + DU 180705 START
+    //CO + DU20180705 START
     //everything here (below AddAtom()) is a HACK and needs to be
     //fixed
     //AddAtom() must handle names/num_each_type/comp_each_type
@@ -1984,35 +1984,35 @@ namespace slab {
     //xstructure (newatom=str_in.atoms[XX]), otherwise
     //we lose type + name which is absolutely critical for AddAtom()
 
-    // CO 180202 - this is obsolete, it is done INSIDE AddAtom()
-    // DU 180705 - putting back as it doesn't work without it
+    // CO20180202 - this is obsolete, it is done INSIDE AddAtom()
+    // DU20180705 - putting back as it doesn't work without it
     // we need to add type + name before AddAtom()
     // this is a temporary patch, fix later
-    //[OBSOLETE CO 180727]str_out.num_each_type.clear();
-    //[OBSOLETE CO 180727]str_out.comp_each_type.clear();
-    //[OBSOLETE CO 180727]for(i=0;i<NumberElements;i++) {
-    //[OBSOLETE CO 180727]  str_out.num_each_type.push_back(NumSites[i+1]);
-    //[OBSOLETE CO 180727]  str_out.comp_each_type.push_back((double) NumSites[i+1]);
-    //[OBSOLETE CO 180727]}
-    //[OBSOLETE CO 180727]
-    //[OBSOLETE CO 180727]for(i=0;i<int(str_out.atoms.size());i++) {
-    //[OBSOLETE CO 180727]  //str_out.atoms.at(i).name=str_in.SpeciesLabel(i);
-    //[OBSOLETE CO 180727]  //  cout << str_out.atoms.at(i)<<endl;
-    //[OBSOLETE CO 180727]  str_out.atoms.at(i).name_is_given=TRUE;
-    //[OBSOLETE CO 180727]}
-    //[OBSOLETE CO 180727]
-    //[OBSOLETE CO 180727]for(j=0;j<NumberElements;j++) {
-    //[OBSOLETE CO 180727]  for(i=NumSites[j];i<NumSites[j+1]+NumSites[j];i++) {
-    //[OBSOLETE CO 180727]    // CO 180202 - added safety
-    //[OBSOLETE CO 180727]    if(i>(int)str_out.atoms.size()-1){
-    //[OBSOLETE CO 180727]      cerr << "pflow::MAKE_SLAB: ERROR - not as many atoms were created as cxpected (likely a problem with AddAtom())" << endl;
-    //[OBSOLETE CO 180727]      cerr << "Exiting!" << endl;
-    //[OBSOLETE CO 180727]      exit(1);
-    //[OBSOLETE CO 180727]    }
-    //[OBSOLETE CO 180727]str_out.atoms.at(i).name=str_in.SpeciesLabel(j);
-    //[OBSOLETE CO 180727]  }
-    //[OBSOLETE CO 180727]}
-    //CO + DU 180705 STOP
+    //[OBSOLETE CO20180727]str_out.num_each_type.clear();
+    //[OBSOLETE CO20180727]str_out.comp_each_type.clear();
+    //[OBSOLETE CO20180727]for(i=0;i<NumberElements;i++) {
+    //[OBSOLETE CO20180727]  str_out.num_each_type.push_back(NumSites[i+1]);
+    //[OBSOLETE CO20180727]  str_out.comp_each_type.push_back((double) NumSites[i+1]);
+    //[OBSOLETE CO20180727]}
+    //[OBSOLETE CO20180727]
+    //[OBSOLETE CO20180727]for(i=0;i<int(str_out.atoms.size());i++) {
+    //[OBSOLETE CO20180727]  //str_out.atoms.at(i).name=str_in.SpeciesLabel(i);
+    //[OBSOLETE CO20180727]  //  cout << str_out.atoms.at(i)<<endl;
+    //[OBSOLETE CO20180727]  str_out.atoms.at(i).name_is_given=TRUE;
+    //[OBSOLETE CO20180727]}
+    //[OBSOLETE CO20180727]
+    //[OBSOLETE CO20180727]for(j=0;j<NumberElements;j++) {
+    //[OBSOLETE CO20180727]  for(i=NumSites[j];i<NumSites[j+1]+NumSites[j];i++) {
+    //[OBSOLETE CO20180727]    // CO20180202 - added safety
+    //[OBSOLETE CO20180727]    if(i>(int)str_out.atoms.size()-1){
+    //[OBSOLETE CO20180727]      cerr << "pflow::MAKE_SLAB: ERROR - not as many atoms were created as cxpected (likely a problem with AddAtom())" << endl;
+    //[OBSOLETE CO20180727]      cerr << "Exiting!" << endl;
+    //[OBSOLETE CO20180727]      exit(1);
+    //[OBSOLETE CO20180727]    }
+    //[OBSOLETE CO20180727]str_out.atoms.at(i).name=str_in.SpeciesLabel(j);
+    //[OBSOLETE CO20180727]  }
+    //[OBSOLETE CO20180727]}
+    //CO + DU20180705 STOP
     ////////////////////////////////////////////////////////////
 
     //for(i=0;i<NumberElements;i++)
@@ -2421,7 +2421,7 @@ namespace slab {
     uint starting_atom=AUROSTD_MAX_UINT;
     for(uint i=0;i<atoms.size();i++){
       if(LDEBUG){cerr << soliloquy << " checking atoms[i=" << i << "].fpos=" << atoms[i].fpos << endl;}
-      if(SYM::FPOSMatch(fpos_starting,atoms[i].fpos,lattice,f2c,skew,sym_eps)){starting_atom=i;break;} //DX 20190619 - lattice and f2c as input
+      if(SYM::FPOSMatch(fpos_starting,atoms[i].fpos,lattice,f2c,skew,sym_eps)){starting_atom=i;break;} //DX20190619 - lattice and f2c as input
     }
     if(starting_atom==AUROSTD_MAX_UINT){
       if(!atoms2skip.empty()){starting_atom=atoms2skip.back();}
@@ -2495,7 +2495,7 @@ namespace slab {
         if(LDEBUG){cerr << soliloquy << " dist_rorigin=" << dist_rorigin << endl;}
         cpos_final+=cdiff;
         fpos_final=BringInCell(c2f*cpos_final);
-        dist_rorigin_new=aurostd::modulus(f2c*SYM::FPOSDistFromFPOS(fpos_final,atoms[ind_min].fpos,lattice,c2f,f2c,skew));  //using fpos_final as a check //DX 20190620 - changed function name
+        dist_rorigin_new=aurostd::modulus(f2c*SYM::FPOSDistFromFPOS(fpos_final,atoms[ind_min].fpos,lattice,c2f,f2c,skew));  //using fpos_final as a check //DX20190620 - changed function name
         if(LDEBUG){
           cerr << soliloquy << " cpos_final(post)=" << cpos_final << endl;
           cerr << soliloquy << " fpos_final(post)=" << fpos_final << endl;
@@ -3141,7 +3141,7 @@ namespace slab {
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ReScale(1.0);
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.BringInCell();
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
+  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //tests of stupidity
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> alat_pre=xstr_bulk.lattice(1);xvector<double> blat_pre=xstr_bulk.lattice(2);xvector<double> clat_pre=xstr_bulk.lattice(3);
@@ -3164,7 +3164,7 @@ namespace slab {
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]xstr_slab_newbasis.FixLattices();
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]for(uint i=0;i<xstr_slab_newbasis.atoms.size();i++){xstr_slab_newbasis.atoms[i].cpos=f2c*xstr_slab_newbasis.atoms[i].fpos;}
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
+  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " xstr_slab_newbasis(rotation_only)=" << endl;cerr << xstr_slab_newbasis << endl;}
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
@@ -3213,7 +3213,7 @@ namespace slab {
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ReScale(1.0);
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.BringInCell();
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
+  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(check_min_dist){ //sanity check as we rotate structure/atoms
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      min_dist=xstr_slab_newbasis.MinDist();
@@ -3271,7 +3271,7 @@ namespace slab {
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ReScale(1.0);
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ShifOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.BringInCell();
-  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX 20191220 - uppercase to lowercase clean
+  //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX20191220 - uppercase to lowercase clean
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //set title
   //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  stringstream title;
@@ -3806,7 +3806,7 @@ namespace slab {
     }
 
     stringstream title;
-    xstr_slab_newbasis.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_slab_newbasis.clear(); //DX20191220 - uppercase to lowercase clear
     xstructure xstr_slab_origbasis;
     xstr_slab_newbasis.lattice=getSlabLattice(xstr_bulk,hkl_i,xstr_slab_origbasis.lattice,DEFAULT_V3_ANGLE_DEVIATION,v3len_max_strict);xstr_slab_newbasis.FixLattices();  //ang_dev==5.0 is standard (DEFAULT_V3_ANGLE_DEVIATION), the vlen_max_strict is very important here, as the test from Sun et al. takes a shortcut here
     rotation=trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_slab_origbasis.lattice));
@@ -3844,7 +3844,7 @@ namespace slab {
     xstr_slab_origbasis.ReScale(1.0);
     xstr_slab_origbasis.ShifOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
     xstr_slab_origbasis.BringInCell();
-    xstr_slab_origbasis.clean(); //DX 20191220 - uppercase to lowercase clean
+    xstr_slab_origbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
     //set title
     title.str("");
@@ -3864,7 +3864,7 @@ namespace slab {
     xstr_slab_newbasis.ReScale(1.0);
     xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
     xstr_slab_newbasis.BringInCell();
-    xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
+    xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
 
     //set title
     title.str("");
@@ -3931,7 +3931,7 @@ namespace slab {
     xstr_slab.ReScale(1.0);
     xstr_slab.ShifOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
     xstr_slab.BringInCell();
-    //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX 20191220 - uppercase to lowercase clean
+    //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX20191220 - uppercase to lowercase clean
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // STOP - create supercell

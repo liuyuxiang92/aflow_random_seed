@@ -81,12 +81,12 @@ class SymmetryInformationITC {
     void copy(const SymmetryInformationITC& b);
 };
 
-//DX 20190215 [OBSOLETE] // ******************************************************************************
-//DX 20190215 [OBSOLETE] // Tolerance Functions
-//DX 20190215 [OBSOLETE] // ******************************************************************************
-//DX 20190215 [OBSOLETE] namespace SYM{
-//DX 20190215 [OBSOLETE]   void SetTolerance(const double& starting_tol);
-//DX 20190215 [OBSOLETE]}
+//DX20190215 [OBSOLETE] // ******************************************************************************
+//DX20190215 [OBSOLETE] // Tolerance Functions
+//DX20190215 [OBSOLETE] // ******************************************************************************
+//DX20190215 [OBSOLETE] namespace SYM{
+//DX20190215 [OBSOLETE]   void SetTolerance(const double& starting_tol);
+//DX20190215 [OBSOLETE]}
 
 // ******************************************************************************
 // Class Declarations
@@ -406,7 +406,7 @@ namespace SYM {
 // ******************************************************************************
 //MAIN FUNCITONS
 namespace SYM {
-  void calculateSpaceGroups(vector<xstructure>& vxstrs, uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX 20191230 add setting option
+  void calculateSpaceGroups(vector<xstructure>& vxstrs, uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX20191230 add setting option
   string OrthoDefect(istream& cin);
   xstructure SpaceGroup(istream& cin);
   void rgcd(vector<string> num);
@@ -418,10 +418,10 @@ namespace SYM {
   void printWyccar(ofstream& FileMESSAGE, xstructure& str, const bool& osswrite, ostream& oss);
 
   //LINEAR ALGEBRA FUNCTIONS
-  bool solve_overdetermined_system(vector<xvector<double> >& LHS, vector<double>& RHS, xvector<double>& SOL, xmatrix<double>& lattice, double& min_dist, double& tol); //DX 20190215
-  void ReducedRowEchelonForm(xmatrix<double>& M, double& tol); //DX 20190215
-  bool find_solution_UD(xmatrix<double> M, xvector<double>& SOL, double& tol);  //check if underdetermined system has a solution, and get a particular solution. //DX 20190215
-  bool checkLinearSystem(vector<xvector<double> >& LHS, vector<double>& RHS, xmatrix<double>& lattice, double& tol); //DX 20190215
+  bool solve_overdetermined_system(vector<xvector<double> >& LHS, vector<double>& RHS, xvector<double>& SOL, xmatrix<double>& lattice, double& min_dist, double& tol); //DX20190215
+  void ReducedRowEchelonForm(xmatrix<double>& M, double& tol); //DX20190215
+  bool find_solution_UD(xmatrix<double> M, xvector<double>& SOL, double& tol);  //check if underdetermined system has a solution, and get a particular solution. //DX20190215
+  bool checkLinearSystem(vector<xvector<double> >& LHS, vector<double>& RHS, xmatrix<double>& lattice, double& tol); //DX20190215
   //WYCKOFF FUNCITONS
   vector<double> system_solve(vector<double> numeric, vector<vector<sdouble> > variable);
   vector<vector<double> > wyckoff_solve(vector<vector<vector<sdouble> > > win, vector<eqatoms> pin);
@@ -448,16 +448,16 @@ namespace SYM {
   vector<int> get_multiplicities(string sg);
   vector<string> get_symmetry_symbols(string sg);
 
-  vector<string> get_wyckoff_equation(string spaceg, int mult);  // DX 8/30/17
+  vector<string> get_wyckoff_equation(string spaceg, int mult);  // DX20170830
   vector<vector<vector<string> > > get_wyckoff_pos(string spaceg, int mult);
   vector<vector<vector<string> > > get_wyckoff_pos(string spaceg, int mult, bool getcentering);
-  vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter); //DX 20190129
+  vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter); //DX20190129
   vector<string> get_minimum_enumerated_Wyckoff_letters(string spacegroupstring, vector<int>& multiplicities, vector<string> site_symmetries);
   int enumerate_wyckoff_letter(string& wyckoff_letter);
-  vector<int> enumerate_wyckoff_letters(vector<string>& wyckoff_letters); //DX 20180927
+  vector<int> enumerate_wyckoff_letters(vector<string>& wyckoff_letters); //DX20180927
   void get_all_wyckoff_for_site_symmetry(string spaceg, int mult, string site_symmetry, vector<vector<string> >& all_positions);
   void get_Wyckoff_from_letter(uint space_group_number, string& space_group_setting,
-      string& Wyckoff_letter, uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions); //DX 20191029
+      string& Wyckoff_letter, uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions); //DX20191029
   void get_Wyckoff_from_letter(string& spaceg, string& Wyckoff_letter, 
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions);
   xvector<double> Wyckoff_position_string2xvector(string& string_position);
@@ -466,10 +466,10 @@ namespace SYM {
   void getGeneralWyckoffMultiplicityAndPosition(uint space_group_number, string& space_group_setting, int& general_wyckoff_multiplicity, vector<string>& general_wyckoff_position);
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity);
   vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting,
-      string& Wyckoff_letter, uint Wyckoff_multiplicity); //DX 20191029
-  vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multplicity); //DX 20190128 
-  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate); //DX 20190723
-  string reorderWyckoffPosition(const string& orig_position); //DX 20190708
+      string& Wyckoff_letter, uint Wyckoff_multiplicity); //DX20191029
+  vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multplicity); //DX20190128 
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate); //DX20190723
+  string reorderWyckoffPosition(const string& orig_position); //DX20190708
   bool shiftWyckoffPositions(deque<deque<_atom> >& equivalent_atoms_shifted, xvector<double>& previous_shift, xvector<double>& new_shift);
   bool findWyckoffPositions(xstructure& CCell, deque<_atom>& atomicbasis, vector<vector<vector<string> > >& tmpvvvstring,
       deque<deque<_atom> >& equivalent_atoms, deque<deque<_atom> >& equivalent_atoms_shifted,
@@ -478,16 +478,16 @@ namespace SYM {
       deque<_atom>& wyckoffPositionsVector, vector<string>& wyckoffSymbols, ostringstream& woss,
       bool& obverse_force_transformed);
 
-  vector<vector<string> > getWyckoffEquations(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX 20191030
-  vector<vector<string> > getWyckoffEquations(const string& Wyckoff_string, const string& Wyckoff_letter); //DX 20191030
-  uint getWyckoffMultiplicity(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX 20191030
-  uint getWyckoffMultiplicity(const string& Wyckoff_string, const string& Wyckoff_letter); //DX 20191030
-  string getWyckoffSiteSymmetry(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX 20191030
-  string getWyckoffSiteSymmetry(const string& Wyckoff_string, const string& Wyckoff_letter); //DX 20191030
+  vector<vector<string> > getWyckoffEquations(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX20191030
+  vector<vector<string> > getWyckoffEquations(const string& Wyckoff_string, const string& Wyckoff_letter); //DX20191030
+  uint getWyckoffMultiplicity(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX20191030
+  uint getWyckoffMultiplicity(const string& Wyckoff_string, const string& Wyckoff_letter); //DX20191030
+  string getWyckoffSiteSymmetry(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX20191030
+  string getWyckoffSiteSymmetry(const string& Wyckoff_string, const string& Wyckoff_letter); //DX20191030
   void getWyckoffInformation(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter,
-      uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions); //DX 20191030
+      uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions); //DX20191030
   void getWyckoffInformation(const string& Wyckoff_string, const string& Wyckoff_letter,
-      uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions); //DX 20191030
+      uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions); //DX20191030
 
   vector<vector<vector<string> > > GetSameSymmetryWyckoffLetters(uint space_group_number, vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint setting);
   void print_wyckoff_pos(vector<vector<vector<string> > > wyckoff_positions);
@@ -495,17 +495,17 @@ namespace SYM {
   void convert_wyckoff_pos(vector<vector<vector<string> > > wyckoff_positions);
   vector<vector<string> > get_centering(string spaceg);
 
-  vector<double> ExtractLatticeParametersFromWyccar(const vector<string>& wyccar_ITC); //DX 20191030 - added const
-  string ExtractWyckoffAttributesString(const vector<string>& wyccar_ITC, uint attribute_index); //DX 201780823 //DX 20191030 - added const 
-  string ExtractWyckoffLettersString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
-  string ExtractWyckoffMultiplicitiesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
-  string ExtractWyckoffSiteSymmetriesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
+  vector<double> ExtractLatticeParametersFromWyccar(const vector<string>& wyccar_ITC); //DX20191030 - added const
+  string ExtractWyckoffAttributesString(const vector<string>& wyccar_ITC, uint attribute_index); //DX201780823 //DX20191030 - added const 
+  string ExtractWyckoffLettersString(const vector<string>& wyccar_ITC); //DX201780823 //DX20191030 - added const
+  string ExtractWyckoffMultiplicitiesString(const vector<string>& wyccar_ITC); //DX201780823 //DX20191030 - added const
+  string ExtractWyckoffSiteSymmetriesString(const vector<string>& wyccar_ITC); //DX201780823 //DX20191030 - added const
   vector<vector<vector<string> > > getWyckoffLettersWithSameMultiplcityAndSiteSymmetry(uint& space_group_number, 
-      vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice); //DX 20190201  
-  vector<string> splitSiteSymmetry(const string& site_symmetry); //DX 20190219 //DX 20190730 - added const
+      vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice); //DX20190201  
+  vector<string> splitSiteSymmetry(const string& site_symmetry); //DX20190219 //DX20190730 - added const
 
   //TOPOLOGY FUNCTIONS
-  vector<xvector<double> > find_vectors_inplane(const vector<xvector<double> >& big_expanded, const xvector<double>& perp_to_vec, double& tol); //DX 20190215
+  vector<xvector<double> > find_vectors_inplane(const vector<xvector<double> >& big_expanded, const xvector<double>& perp_to_vec, double& tol); //DX20190215
 
   //check if three distances can define a screw translation
   //shortest vectors. "m" specifies how many you want (e.g., 2 --> the smallest 2)
@@ -514,16 +514,16 @@ namespace SYM {
   //[OBSOLETE] xvector<double> closest_point(xvector<double> norm, xmatrix<double> Linv, xmatrix<double> L);
   xmatrix<double> get_mod_angle_tensor(vector<xvector<double> >& points);  //Points is a vector of points (ordered pair, triplet, etc.);
   //Check if two points are equivalent under the lattice L
-  bool points_equivalent(xmatrix<double>& c2f, xmatrix<double>& f2c, xvector<double> P1, xvector<double> P2, xvector<double>& lattice_vector, double& radius, bool& skew, double& tol); //DX 20190215
+  bool points_equivalent(xmatrix<double>& c2f, xmatrix<double>& f2c, xvector<double> P1, xvector<double> P2, xvector<double>& lattice_vector, double& radius, bool& skew, double& tol); //DX20190215
   //Check if the candidate operation is a symmetry of the crystal C
-  bool symmetry_axis_equivalent(xmatrix<double> L, xmatrix<double> Linv, xvector<double> P1, xvector<double> N1, xvector<double> P2, xvector<double> N2, double& tol); //DX 20190215
+  bool symmetry_axis_equivalent(xmatrix<double> L, xmatrix<double> Linv, xvector<double> P1, xvector<double> N1, xvector<double> P2, xvector<double> N2, double& tol); //DX20190215
   bool screw_equivalent(Screw S1, Screw S2);
   bool mirror_plane_equivalent(xvector<double> normal);
   xvector<double> next_point_on_line(xvector<double> P, xmatrix<double> L);
   void add_3d_point(vector<xvector<double> >& points, double x, double y, double z);
-  char discern_rot_sym(xmatrix<double> m, double& tol); //DX 20190215
+  char discern_rot_sym(xmatrix<double> m, double& tol); //DX20190215
   bool allsame(vector<double> v);
-  bool is_lattice_point(xmatrix<double> L, xvector<double> point, xvector<double>& lattice_vector, double& radius, bool& skew, double& tol); //DX 20190215
+  bool is_lattice_point(xmatrix<double> L, xvector<double> point, xvector<double>& lattice_vector, double& radius, bool& skew, double& tol); //DX20190215
   bool in_cell(xmatrix<double> Linv, xvector<double> point);
   bool in_cell(xvector<double> P);                     //For use
   bool in_cell(xvector<double> P, xvector<double> N);  //Check if in cell modulo the direction of N (normal)
@@ -544,7 +544,7 @@ namespace SYM {
   char whichchar(string str_in);
   double whichnum(string str_in);
   double frac2dbl(string str);  //expand to cover case when input is e.g., ".5"
-  //DX 20190724 [MOVED TO AUROSTD] string dbl2frac(double a, bool sign_prefix=true);
+  //DX20190724 [MOVED TO AUROSTD] string dbl2frac(double a, bool sign_prefix=true);
   void multiply(vector<string> A, vector<string> B);
   void xstring(ostream& output, xmatrix<double> a);
   void cleanupstring(string& str);  //eliminates blank spaces before and after string
@@ -557,12 +557,12 @@ namespace SYM {
 
   // Used to check atomic basis
   bool GCD_conventional_atomic_basis(deque<_atom>& conventional_basis_atoms, deque<deque<_atom> >& prim_split_atom_types, int& prim_GCD);
-  //[CO 180409 - moved to xatom]deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew);
-  //[CO 180409 - moved to xatom]deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew, double& tol);
-  bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
-  bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
+  //[CO20180409 - moved to xatom]deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew);
+  //[CO20180409 - moved to xatom]deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew, double& tol);
+  bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX20190619 - changed c2f_orig and f2c_new to lattice_new
+  bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX20190619 - changed c2f_orig and f2c_new to lattice_new
   deque<deque<_atom> > groupSymmetryEquivalentAtoms(deque<_atom>& atoms, xmatrix<double>& lattice, vector<xmatrix<double> >& sym_ops,
-      vector<xvector<double> >& translations, double& min_dist, double& tol); //DX 20190215
+      vector<xvector<double> >& translations, double& min_dist, double& tol); //DX20190215
   deque<deque<_atom> > shiftSymmetryEquivalentAtoms(deque<deque<_atom> >& equivalent_atoms, xmatrix<double>& lattice, xvector<double>& translation, double& min_dist, double& tol);
 
   // ******************************************************************************
@@ -570,7 +570,7 @@ namespace SYM {
   // ******************************************************************************
   //  namespace rstd {
   typedef std::map<int, xvector<double> > hash;
-  //DX 20190905 [OBSOLETE] xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
+  //DX20190905 [OBSOLETE] xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
   double DotPro(xvector<double> a, xvector<double> b);
   //  double modulus(xvector<double> a);
   double modulus(vector<double> a);
@@ -581,8 +581,8 @@ namespace SYM {
   xmatrix<double> concatenate(vector<xvector<double> >& V);
   xmatrix<double> concatenate(vector<xmatrix<double> >& V);
 
-  //DX 20190905 [OBSOLETE] void normalize(xvector<double>& v);
-  //DX 20190905 [OBSOLETE] void normalize(vector<double>& v);
+  //DX20190905 [OBSOLETE] void normalize(xvector<double>& v);
+  //DX20190905 [OBSOLETE] void normalize(vector<double>& v);
   xmatrix<double> xvec2xmat(xvector<double> a, xvector<double> b, xvector<double> c);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V, vector<double> R);
@@ -597,16 +597,16 @@ namespace SYM {
   bool vec_compare(xvector<double> a, xvector<double> b);
 
   //SYMMETRY OPERATIONS FUNCTIONS
-  //DX 20190215 [OBSOLETE] symfolder check_ccell(xstructure& xstr);
-  symfolder check_ccell(xstructure& xstr, SymmetryInformationITC& ITC_sym_info); //DX 20190215
+  //DX20190215 [OBSOLETE] symfolder check_ccell(xstructure& xstr);
+  symfolder check_ccell(xstructure& xstr, SymmetryInformationITC& ITC_sym_info); //DX20190215
   vector<xvector<double> > expand_space_group_on_point(int sg, xvector<double> point);
   vector<xvector<double> > grid(double t);
   xvector<double> find_inversion_point(double tol, vector<eqatoms> poscar_atoms);
   vector<xvector<double> > symmetry_directions(char lattice_type);
 
-  vector<Glide> mirror_operations(vector<xvector<double> > expanded_lattice, vector<xvector<double> > expanded_cell, xmatrix<double> L, xmatrix<double> Linv, vector<xvector<double> >& lattice_vectors, double& radius, bool& skew, double& tol); //DX 20190215 - added tol
-  vector<Screw> triplet_operations(vector<xvector<double> > expanded_lattice, vector<xvector<double> > expanded_cell, xmatrix<double> L, xmatrix<double> Linv, vector<xvector<double> >& lattice_vectors, double& radius, bool& skew, double& tol); //DX 20190215 - added tol
-  vector<Screw> twofold_operations(vector<xvector<double> > expanded_lattice, vector<xvector<double> > expanded_cell, xmatrix<double> L, xmatrix<double> Linv, vector<xvector<double> >& lattice_vectors, double& radius, bool& skew, double& tol); //DX 20190215 - added tol
+  vector<Glide> mirror_operations(vector<xvector<double> > expanded_lattice, vector<xvector<double> > expanded_cell, xmatrix<double> L, xmatrix<double> Linv, vector<xvector<double> >& lattice_vectors, double& radius, bool& skew, double& tol); //DX20190215 - added tol
+  vector<Screw> triplet_operations(vector<xvector<double> > expanded_lattice, vector<xvector<double> > expanded_cell, xmatrix<double> L, xmatrix<double> Linv, vector<xvector<double> >& lattice_vectors, double& radius, bool& skew, double& tol); //DX20190215 - added tol
+  vector<Screw> twofold_operations(vector<xvector<double> > expanded_lattice, vector<xvector<double> > expanded_cell, xmatrix<double> L, xmatrix<double> Linv, vector<xvector<double> >& lattice_vectors, double& radius, bool& skew, double& tol); //DX20190215 - added tol
   vector<xvector<double> > getLatticeVectorsFromOriginalMirrorOperations(vector<Glide>& old_mirrors, vector<Glide>& new_mirrors,
       vector<xvector<double> >& lattice_vectors, bool& all_matched);
   vector<xvector<double> > getLatticeVectorsFromOriginalRotationOperations(vector<Screw>& old_rotations_twofold,
@@ -615,7 +615,7 @@ namespace SYM {
       vector<xvector<double> >& rot_lattice_vectors, bool& all_matched);
 
   // COMBINATORICS FUNCTIONS
-  void reduce_atom_deques(deque<_atom>& expanded, xmatrix<double>& lattice, double& min_dist, double& sym_tol); //DX 20190215
+  void reduce_atom_deques(deque<_atom>& expanded, xmatrix<double>& lattice, double& min_dist, double& sym_tol); //DX20190215
   //NOT IN SYM  vector<int> AllCombination41(int num, int total_num, int index);
   //NOT IN SYM  vector<int> AllCombination42(int num, int total_num, vector<int>& str_in);
   //NOT IN SYM  unsigned long int CombinationNr(int num, int total_num);
@@ -626,12 +626,12 @@ namespace SYM {
   double orthogonality_defect(xmatrix<double> xmat);
 
   //NUMBER THEORY FUNCTIONS
-  //DX 20191202 [OBSOLETE] long long int gcd(long long int u, long long int v);                             //Euclid's
-  //DX 20191202 [OBSOLETE] unsigned long long int gcd(unsigned long long int u, unsigned long long int v);  //Dijkstra's GCD Algorithm
-  //DX 20191202 [OBSOLETE] int gcdD(int u, int v);
+  //DX20191202 [OBSOLETE] long long int gcd(long long int u, long long int v);                             //Euclid's
+  //DX20191202 [OBSOLETE] unsigned long long int gcd(unsigned long long int u, unsigned long long int v);  //Dijkstra's GCD Algorithm
+  //DX20191202 [OBSOLETE] int gcdD(int u, int v);
   //[OBSOLETE]long long int cast2int(double d, long long int prec);
   //modulo reduce
-  //DX 20190905 [OBSOLETE] double mod_one(double d);
+  //DX20190905 [OBSOLETE] double mod_one(double d);
   double smallest_gt_min(double min, vector<double> vec);
   int smallest_gt_min_index(double min, int not_index1, int not_index2, vector<double> vec);
 
@@ -689,28 +689,28 @@ namespace SYM {
       vector<int>& lattice_pgroups, vector<xmatrix<double> >& lattice_sym_mats,
       vector<xmatrix<double> >& crystal_sym_mats, bool& symmetry_found);
   bool findCubicLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec,
-      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX20190215 - added tol
   bool findTrigonalLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec, vector<xvector<double> >& big_expanded,
-      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX20190215 - added tol
   bool findTetragonalLattice(vector<xvector<double> >& rot_lattice_vectors, vector<xvector<double> >& twofold_lattice_vectors,
       vector<Screw>& rot_ops_vec, vector<Screw>& twofold_ops_vec, vector<xvector<double> >& big_expanded,
-      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX20190215
   bool findMonoclinicLattice(vector<xvector<double> >& mirror_lattice_vectors, vector<xvector<double> >& twofold_lattice_vectors,
       vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
-      vector<char>& candidate_lattice_chars, int& cell_choice, double& tol); //DX 20180816 - added cell_choice //DX 20190215 - added tol
+      vector<char>& candidate_lattice_chars, int& cell_choice, double& tol); //DX20180816 - added cell_choice //DX20190215 - added tol
   bool findTriclinicLattice(xmatrix<double>& lattice, vector<xmatrix<double> >& candidate_lattice_vectors,
       vector<char>& candidate_lattice_chars);
   bool findOrthorhombicLattice(vector<xvector<double> >& twofold_lattice_vectors, vector<xvector<double> >& mirror_lattice_vectors,
-      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX20190215 - added tol
   bool findRhombohedralLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec,
-      vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol); //DX20190215 - added tol
   bool findRhombohedralSetting(vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
-      vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
-  bool determineLatticeCentering(vector<xvector<double> >& bravais_basis, int& bravais_count, xmatrix<double>& c2f, xmatrix<double>& f2c, bool& skew, vector<xvector<double> >& big_expanded, string& crystalsystem, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
+      vector<char>& candidate_lattice_chars, double& tol); //DX20190215 - added tol
+  bool determineLatticeCentering(vector<xvector<double> >& bravais_basis, int& bravais_count, xmatrix<double>& c2f, xmatrix<double>& f2c, bool& skew, vector<xvector<double> >& big_expanded, string& crystalsystem, vector<char>& candidate_lattice_chars, double& tol); //DX20190215 - added tol
   string getPearsonSymbol(char& centering, char& lattice_char, deque<_atom> atoms);
-  uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX 20181010
+  uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX20181010
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num);
-  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice); //DX 20190805 - return to void
+  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice); //DX20190805 - return to void
 
   //RHOMBOHEDRAL OBVERSE/REVERSE FUNCTIONS
   bool isObverseSetting(xstructure& xstr, double& tolerance);
@@ -728,68 +728,68 @@ namespace SYM {
   bool nullVector(xvector<double>& vec, double& tol);
 } //namespace SYM
 
-//DX 20190215 [OBSOLETE] // external variables
-//DX 20190215 [OBSOLETE] namespace SYM {
-//DX 20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE]   extern thread_local vector<xvector<double> > glideplanes;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<xvector<double> > glidetrans;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<string> glidesymbols;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<xmatrix<double> > sym_mats;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<string> symbol;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<string> dirparam;
-//DX 20190215 [OBSOLETE]   extern thread_local hash sym_mats_direction;
-//DX 20190215 [OBSOLETE]   extern thread_local hash sym_mats_direction_hex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<xmatrix<double> > sym_mats_hex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<string> symbol_hex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<string> dirparam_hex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<xvector<double> > glideplanes_hex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<xvector<double> > glidetrans_hex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<string> glidesymbols_hex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> index_cubic;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> index_hex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> index_rhom;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> index_tetr;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> index_ortho;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> index_mono_b;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> index_mono_c;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> index_tric;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<vector<symop> > generators;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<int> sgindex;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<xmatrix<double> > sym_mats;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<string> symbol;
-//DX 20190215 [OBSOLETE]   extern thread_local hash sym_mats_direction;
-//DX 20190215 [OBSOLETE]   extern thread_local vector<string> gl_sgs;
-//DX 20190215 [OBSOLETE] #else
-//DX 20190215 [OBSOLETE]   extern vector<xvector<double> > glideplanes;
-//DX 20190215 [OBSOLETE]   extern vector<xvector<double> > glidetrans;
-//DX 20190215 [OBSOLETE]   extern vector<string> glidesymbols;
-//DX 20190215 [OBSOLETE]   extern vector<xmatrix<double> > sym_mats;
-//DX 20190215 [OBSOLETE]   extern vector<string> symbol;
-//DX 20190215 [OBSOLETE]   extern vector<string> dirparam;
-//DX 20190215 [OBSOLETE]   extern hash sym_mats_direction;
-//DX 20190215 [OBSOLETE]   extern hash sym_mats_direction_hex;
-//DX 20190215 [OBSOLETE]   extern vector<xmatrix<double> > sym_mats_hex;
-//DX 20190215 [OBSOLETE]   extern vector<string> symbol_hex;
-//DX 20190215 [OBSOLETE]   extern vector<string> dirparam_hex;
-//DX 20190215 [OBSOLETE]   extern vector<xvector<double> > glideplanes_hex;
-//DX 20190215 [OBSOLETE]   extern vector<xvector<double> > glidetrans_hex;
-//DX 20190215 [OBSOLETE]   extern vector<string> glidesymbols_hex;
-//DX 20190215 [OBSOLETE]   extern vector<int> index_cubic;
-//DX 20190215 [OBSOLETE]   extern vector<int> index_hex;
-//DX 20190215 [OBSOLETE]   extern vector<int> index_rhom;
-//DX 20190215 [OBSOLETE]   extern vector<int> index_tetr;
-//DX 20190215 [OBSOLETE]   extern vector<int> index_ortho;
-//DX 20190215 [OBSOLETE]   extern vector<int> index_mono_b;
-//DX 20190215 [OBSOLETE]   extern vector<int> index_mono_c;
-//DX 20190215 [OBSOLETE]   extern vector<int> index_tric;
-//DX 20190215 [OBSOLETE]   extern vector<vector<symop> > generators;
-//DX 20190215 [OBSOLETE]   extern vector<int> sgindex;
-//DX 20190215 [OBSOLETE]   extern vector<xmatrix<double> > sym_mats;
-//DX 20190215 [OBSOLETE]   extern vector<string> symbol;
-//DX 20190215 [OBSOLETE]   extern hash sym_mats_direction;
-//DX 20190215 [OBSOLETE]   extern vector<string> gl_sgs;
-//DX 20190215 [OBSOLETE] 
-//DX 20190215 [OBSOLETE] #endif
-//DX 20190215 [OBSOLETE] }
+//DX20190215 [OBSOLETE] // external variables
+//DX20190215 [OBSOLETE] namespace SYM {
+//DX20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+//DX20190215 [OBSOLETE]   extern thread_local vector<xvector<double> > glideplanes;
+//DX20190215 [OBSOLETE]   extern thread_local vector<xvector<double> > glidetrans;
+//DX20190215 [OBSOLETE]   extern thread_local vector<string> glidesymbols;
+//DX20190215 [OBSOLETE]   extern thread_local vector<xmatrix<double> > sym_mats;
+//DX20190215 [OBSOLETE]   extern thread_local vector<string> symbol;
+//DX20190215 [OBSOLETE]   extern thread_local vector<string> dirparam;
+//DX20190215 [OBSOLETE]   extern thread_local hash sym_mats_direction;
+//DX20190215 [OBSOLETE]   extern thread_local hash sym_mats_direction_hex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<xmatrix<double> > sym_mats_hex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<string> symbol_hex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<string> dirparam_hex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<xvector<double> > glideplanes_hex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<xvector<double> > glidetrans_hex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<string> glidesymbols_hex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> index_cubic;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> index_hex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> index_rhom;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> index_tetr;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> index_ortho;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> index_mono_b;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> index_mono_c;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> index_tric;
+//DX20190215 [OBSOLETE]   extern thread_local vector<vector<symop> > generators;
+//DX20190215 [OBSOLETE]   extern thread_local vector<int> sgindex;
+//DX20190215 [OBSOLETE]   extern thread_local vector<xmatrix<double> > sym_mats;
+//DX20190215 [OBSOLETE]   extern thread_local vector<string> symbol;
+//DX20190215 [OBSOLETE]   extern thread_local hash sym_mats_direction;
+//DX20190215 [OBSOLETE]   extern thread_local vector<string> gl_sgs;
+//DX20190215 [OBSOLETE] #else
+//DX20190215 [OBSOLETE]   extern vector<xvector<double> > glideplanes;
+//DX20190215 [OBSOLETE]   extern vector<xvector<double> > glidetrans;
+//DX20190215 [OBSOLETE]   extern vector<string> glidesymbols;
+//DX20190215 [OBSOLETE]   extern vector<xmatrix<double> > sym_mats;
+//DX20190215 [OBSOLETE]   extern vector<string> symbol;
+//DX20190215 [OBSOLETE]   extern vector<string> dirparam;
+//DX20190215 [OBSOLETE]   extern hash sym_mats_direction;
+//DX20190215 [OBSOLETE]   extern hash sym_mats_direction_hex;
+//DX20190215 [OBSOLETE]   extern vector<xmatrix<double> > sym_mats_hex;
+//DX20190215 [OBSOLETE]   extern vector<string> symbol_hex;
+//DX20190215 [OBSOLETE]   extern vector<string> dirparam_hex;
+//DX20190215 [OBSOLETE]   extern vector<xvector<double> > glideplanes_hex;
+//DX20190215 [OBSOLETE]   extern vector<xvector<double> > glidetrans_hex;
+//DX20190215 [OBSOLETE]   extern vector<string> glidesymbols_hex;
+//DX20190215 [OBSOLETE]   extern vector<int> index_cubic;
+//DX20190215 [OBSOLETE]   extern vector<int> index_hex;
+//DX20190215 [OBSOLETE]   extern vector<int> index_rhom;
+//DX20190215 [OBSOLETE]   extern vector<int> index_tetr;
+//DX20190215 [OBSOLETE]   extern vector<int> index_ortho;
+//DX20190215 [OBSOLETE]   extern vector<int> index_mono_b;
+//DX20190215 [OBSOLETE]   extern vector<int> index_mono_c;
+//DX20190215 [OBSOLETE]   extern vector<int> index_tric;
+//DX20190215 [OBSOLETE]   extern vector<vector<symop> > generators;
+//DX20190215 [OBSOLETE]   extern vector<int> sgindex;
+//DX20190215 [OBSOLETE]   extern vector<xmatrix<double> > sym_mats;
+//DX20190215 [OBSOLETE]   extern vector<string> symbol;
+//DX20190215 [OBSOLETE]   extern hash sym_mats_direction;
+//DX20190215 [OBSOLETE]   extern vector<string> gl_sgs;
+//DX20190215 [OBSOLETE] 
+//DX20190215 [OBSOLETE] #endif
+//DX20190215 [OBSOLETE] }
 
 #endif

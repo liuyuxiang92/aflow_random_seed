@@ -205,7 +205,7 @@ namespace AGL_functions {
     outfile << "[AFLOW_MODE_ZIP=" << _kbinFlags.KZIP_BIN << "]" << std::endl;
     if(SPACES) { outfile << std::endl; }
 
-    // CO 180130 - START
+    // CO20180130 - START
     //adding aflow.rc stuff
     outfile << "[AFLOW_MODE_BINARY=";
     if(!_kbinFlags.KBIN_BIN.empty()){outfile << _kbinFlags.KBIN_BIN;}
@@ -226,9 +226,9 @@ namespace AGL_functions {
     else {outfile << DEFAULT_VASP_MPI_BIN;}
     outfile << "\"" << std::endl;
     outfile << AFLOWIN_SEPARATION_LINE << std::endl;
-    // CO 180130 - STOP
+    // CO20180130 - STOP
 
-    // CO 180130 - making obsolete with lines above
+    // CO20180130 - making obsolete with lines above
     //[OBSOLETE]if( _kbinFlags.KBIN_MPI ) {
     //[OBSOLETE]  outfile << AFLOWIN_SEPARATION_LINE << std::endl;
     //[OBSOLETE]  outfile << "[AFLOW_MODE_BINARY=" << _kbinFlags.KBIN_BIN << "]" << std::endl;

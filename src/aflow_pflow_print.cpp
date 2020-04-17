@@ -11,7 +11,7 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
-#include "aflow_symmetry_spacegroup.h" //DX 20180823
+#include "aflow_symmetry_spacegroup.h" //DX20180823
 
 // ***************************************************************************
 string _CleanElementName(const string& name) {
@@ -470,12 +470,12 @@ namespace pflow {
     oss << "_cell_angle_beta  " << setw(9) << data(5) <<endl;
     oss << "_cell_angle_gamma  " << setw(9) << data(6) <<endl;
     if(str.wyccar_ITC.size()!=0){
-      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(spacegroupnumber,str.directory) << "'" << endl; //DX 20180526 - add directory
+      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(spacegroupnumber,str.directory) << "'" << endl; //DX20180526 - add directory
       oss << "_symmetry_Int_Tables_Number  " << spacegroupnumber << endl;
     }
     else {
       // Output space group - Use P1 for now
-      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(1,str.directory) << "'" << endl; //DX 20180526 - add directory
+      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(1,str.directory) << "'" << endl; //DX20180526 - add directory
       oss << "_symmetry_Int_Tables_Number  " << 1 << endl;
     }
     oss << "loop_" << endl;
@@ -485,7 +485,7 @@ namespace pflow {
 
     // if the Wyckoff positions are stored/calculated
     if(str.wyccar_ITC.size()!=0){
-      //DX 20180801 - grab general Wyckoff equations
+      //DX20180801 - grab general Wyckoff equations
       string setting_string = aurostd::utype2string<uint>(setting);
       int general_wyckoff_multiplicity=0; // general Wyckoff position multiplicity
       vector<string> general_wyckoff_position; // general Wyckoff position equations
@@ -515,8 +515,8 @@ namespace pflow {
         aurostd::string2tokens(str.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");
         string wyckoff_multiplicity = tokens[0];
         string wyckoff_letter = tokens[1];
-        //DX 20191010 [OBOSLETE] oss << str.wyckoff_sites_ITC[i].type << i+1 << " 1.0 "
-        oss << str.wyckoff_sites_ITC[i].type << i+1 << " " << str.wyckoff_sites_ITC[i].site_occupation << " " //DX 20191010
+        //DX20191010 [OBOSLETE] oss << str.wyckoff_sites_ITC[i].type << i+1 << " 1.0 "
+        oss << str.wyckoff_sites_ITC[i].type << i+1 << " " << str.wyckoff_sites_ITC[i].site_occupation << " " //DX20191010
           << setw(12) << str.wyckoff_sites_ITC[i].coord(1) <<" "
           << setw(12) << str.wyckoff_sites_ITC[i].coord(2) <<" "
           << setw(12) << str.wyckoff_sites_ITC[i].coord(3) <<" "
@@ -559,8 +559,8 @@ namespace pflow {
 
       oss.precision(10);
       for(uint i=0;i<str.atoms.size();i++) {
-        //DX 20191010 [OBSOLETE] oss << str.atoms.at(i).cleanname.c_str() << i+1 << " 1.0 "
-        oss << str.atoms.at(i).cleanname.c_str() << i+1 << " " << str.atoms.at(i).partial_occupation_value << " " //DX 20191010
+        //DX20191010 [OBSOLETE] oss << str.atoms.at(i).cleanname.c_str() << i+1 << " 1.0 "
+        oss << str.atoms.at(i).cleanname.c_str() << i+1 << " " << str.atoms.at(i).partial_occupation_value << " " //DX20191010
           << setw(12) << str.atoms.at(i).fpos(1) <<" "
           << setw(12) << str.atoms.at(i).fpos(2) <<" "
           << setw(12) << str.atoms.at(i).fpos(3) <<" "
@@ -910,25 +910,25 @@ namespace pflow {
 // This funtion prints out structural data.
 // Stefano Curtarolo
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, const string& format,bool already_calculated) { // CO171027 //DX 20180806 - added space group setting
-    // DX 12/15/18 [OBSOLETE] double tolerance = AUROSTD_NAN;
-    double tolerance = SYM::defaultTolerance(str_sym); // DX 2/15/18 - start with default tolerance // DX 2/26/18 - str_sym not str_sp
-    if(already_calculated){tolerance=str_sp.sym_eps;} // CO 171025
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, const string& format,bool already_calculated) { // CO20171027 //DX20180806 - added space group setting
+    // DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
+    double tolerance = SYM::defaultTolerance(str_sym); // DX20180215 - start with default tolerance // DX20180226 - str_sym not str_sp
+    if(already_calculated){tolerance=str_sp.sym_eps;} // CO20171025
     bool no_scan = false;
     int sg_setting = 1;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format,already_calculated); // CO171027
+    PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format,already_calculated); // CO20171027
   }
 }
 
-//DX 20180822 - add xoption - START
+//DX20180822 - add xoption - START
 namespace pflow {
   void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, aurostd::xoption& vpflow, const string& format,bool already_calculated) {
-    // DX 12/15/18 [OBSOLETE] double tolerance = AUROSTD_NAN;
-    double tolerance = SYM::defaultTolerance(str_sym); // DX 2/15/18 - start with default tolerance // DX 2/26/18 - str_sym not str_sp
-    if(already_calculated){tolerance=str_sp.sym_eps;} // CO 171025
+    // DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
+    double tolerance = SYM::defaultTolerance(str_sym); // DX20180215 - start with default tolerance // DX20180226 - str_sym not str_sp
+    if(already_calculated){tolerance=str_sp.sym_eps;} // CO20171025
     bool no_scan = false;
     int sg_setting = 1;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,vpflow,tolerance,no_scan,sg_setting,format,already_calculated); // CO171027
+    PrintData(str,str_sym,str_sp,str_sc,oss,smode,vpflow,tolerance,no_scan,sg_setting,format,already_calculated); // CO20171027
   }
 }
 
@@ -939,9 +939,9 @@ namespace pflow {
   }
 }
 
-//DX 20180822 - add xoption - END
+//DX20180822 - add xoption - END
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) { // CO171027 //DX 20180822 -added xoption
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) { // CO20171027 //DX20180822 -added xoption
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::PrintData: BEGIN" << endl;
     // smode=="DATA" or "EDATA"
@@ -954,9 +954,9 @@ namespace pflow {
     bool symmetry_commensurate = false;
     bool force_perform = true;  // Force a result to be found at the end, even if incommensurate 
     double orig_tolerance = tolerance;
-    uint sym_eps_change_count = 0; // DX 2/26/18 - added sym eps change count
+    uint sym_eps_change_count = 0; // DX20180226 - added sym eps change count
 
-    xstructure str_aus(str);//,str_sp,str_sc; // CO171027
+    xstructure str_aus(str);//,str_sp,str_sc; // CO20171027
     while(symmetry_commensurate == false){
       if(smode!="EDATA" || no_scan){
         symmetry_commensurate=true;
@@ -979,22 +979,22 @@ namespace pflow {
         }
         oss << " Real space Volume: " << vol << endl;
         oss << " Real space c/a = " << data(3)/data(1) << endl;
-        str_aus=str;//,str_sp,str_sc; // CO171027
+        str_aus=str;//,str_sp,str_sc; // CO20171027
         // DX 9/1/17 -Add tolerance - START
         str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
-        str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+        str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; // DX20180226 - added sym eps change count
         // DX 9/1/17 -Add tolerance - END
         if(smode=="EDATA") {
           // str_aus.CalculateSymmetryPointGroup(FALSE);
           // str_aus.CalculateSymmetryFactorGroup(FALSE);
           // str_aus.CalculateSymmetryPointGroupCrystal(FALSE);
-          if(!already_calculated){  // CO 171025
+          if(!already_calculated){  // CO20171025
             str_aus.GetLatticeType(str_sp,str_sc);
             if(orig_tolerance == AUROSTD_NAN){
               orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
             }
             tolerance = str_sp.sym_eps;
-            sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+            sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX20180226 - added sym eps change count
           }
           oss << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
@@ -1011,19 +1011,19 @@ namespace pflow {
           oss << " Real space: Point Group Type                 = " << str_aus.point_group_type << endl;
           oss << " Real space: Point Group Order                = " << str_aus.point_group_order << endl;
           oss << " Real space: Point Group Structure            = " << str_aus.point_group_structure << endl;
-          PrintSGData(str_aus,tolerance,oss,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX 8/31/17 - SGDATA // CO 171025 // CO171027 //DX 20180823 - added xoption
-          //DX 20180608 - recalculate GetLatticeType() before changing tolerance - START
+          PrintSGData(str_aus,tolerance,oss,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX20170831 - SGDATA // CO20171025 // CO20171027 //DX20180823 - added xoption
+          //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
           if(sym_eps_change_count != str_aus.sym_eps_change_count){
             if(LDEBUG) {
-              cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+              cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
             sym_eps_change_count = str_aus.sym_eps_change_count;
             str_aus.ClearSymmetry();
             oss.str("");
             continue;
           }
-          //DX 20180608 - recalculate GetLatticeType() before changing tolerance - END
-          sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+          //DX20180608 - recalculate GetLatticeType() before changing tolerance - END
+          sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
           // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
           int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
           bool derivative_structure=false;
@@ -1032,7 +1032,7 @@ namespace pflow {
           }
           else {
             if(LDEBUG) {
-              cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+              cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
             }
             str_aus.ClearSymmetry();
             oss.str("");
@@ -1052,7 +1052,7 @@ namespace pflow {
             else {
               str_aus.ClearSymmetry();
               oss.str("");
-              sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+              sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
               continue;
             }
           }
@@ -1134,16 +1134,16 @@ namespace pflow {
           sscontent_json << "\"c_over_a\":" << data(3)/data(1) << eendl;
           vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-          str_aus=str;//,str_sp,str_sc; // CO171027
+          str_aus=str;//,str_sp,str_sc; // CO20171027
           str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
           if(smode=="EDATA") {
-            if(!already_calculated){  // CO 171025
+            if(!already_calculated){  // CO20171025
               str_aus.GetLatticeType(str_sp,str_sc);
               if(orig_tolerance == AUROSTD_NAN){
                 orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
               }
               tolerance = str_sp.sym_eps;
-              sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+              sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX20180226 - added sym eps change count
             }
 
             // Real space: bravais lattice primitive
@@ -1251,11 +1251,11 @@ namespace pflow {
             vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
             // SGDATA
-            PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX 8/31/17 - SGDATA // CO171027 //DX 20180823 - added xoption
-            //DX 20180608 - recalculate GetLatticeType() before changing tolerance - START
+            PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX20170831 - SGDATA // CO20171027 //DX20180823 - added xoption
+            //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
             if(sym_eps_change_count != str_aus.sym_eps_change_count){
               if(LDEBUG) {
-                cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+                cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX20180526 - add directory
               }
               sym_eps_change_count = str_aus.sym_eps_change_count;
               str_aus.ClearSymmetry();
@@ -1263,15 +1263,15 @@ namespace pflow {
               vcontent_json.clear();
               continue;
             }
-            //DX 20180608 - recalculate GetLatticeType() before changing tolerance - END
-            sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+            //DX20180608 - recalculate GetLatticeType() before changing tolerance - END
+            sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
             vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
             // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
             int multiplicity_of_primitive =str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
             bool derivative_structure=false;
             if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan == true){
               symmetry_commensurate=true;
-            } else { // CO171027
+            } else { // CO20171027
               if(LDEBUG) {
                 cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
               }
@@ -1297,7 +1297,7 @@ namespace pflow {
                 str_aus.ClearSymmetry();
                 sscontent_json.str("");
                 vcontent_json.clear();
-                sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+                sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
                 continue;
               }
             }
@@ -1410,9 +1410,9 @@ namespace pflow {
         }
       }
       oss_final << oss.str();
-      str_sym=str_aus; // CO171027
-      //DX 20180822 - put attributes into vpflow - START
-      if(vpflow.flag("EDATA::CALCULATED")){ // DX 20180823 - if calculated remove
+      str_sym=str_aus; // CO20171027
+      //DX20180822 - put attributes into vpflow - START
+      if(vpflow.flag("EDATA::CALCULATED")){ // DX20180823 - if calculated remove
         vpflow.pop_attached("EDATA::LATTICE_PARAMETERS"); 
         vpflow.pop_attached("EDATA::COVERA"); 
         vpflow.pop_attached("EDATA::VOLUME"); 
@@ -1443,7 +1443,7 @@ namespace pflow {
         vpflow.pop_attached("EDATA::SPRIM"); 
         vpflow.pop_attached("EDATA::SCONV"); 
       }
-      //DX 20180823 - now populate xoption
+      //DX20180823 - now populate xoption
       vpflow.flag("EDATA::CALCULATED",TRUE);
       xvector<double> data(6);
       data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
@@ -1479,24 +1479,24 @@ namespace pflow {
       vpflow.push_attached("EDATA::SPRIM",ss_str_sp.str()); 
       stringstream ss_str_sc; ss_str_sc << str_sc << endl;
       vpflow.push_attached("EDATA::SCONV",ss_str_sc.str()); 
-      //DX 20180822 - put attributes into vpflow - END
+      //DX20180822 - put attributes into vpflow - END
     }
   } // namespace pflow
 
   namespace pflow {
     void PrintData(const xstructure& str,ostream& oss,string smode, const string& format) {
-      xstructure str_sym,str_sp,str_sc; // CO171027
+      xstructure str_sym,str_sp,str_sc; // CO20171027
       double tolerance = AUROSTD_NAN;
       bool no_scan = false;
       int sg_setting = 1;
-      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO171027
+      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO20171027
     }
   } // namespace pflow
 
   namespace pflow {
     void PrintData(const xstructure& str,ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting, const string& format) {
-      xstructure str_sym,str_sp,str_sc; // CO171027
-      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO171027
+      xstructure str_sym,str_sp,str_sc; // CO20171027
+      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO20171027
     }
   } // namespace pflow
 
@@ -2671,7 +2671,7 @@ void PrintRSM(const xstructure& str, ostream& oss) {
   //%CONECTxxxxxyyyyy^M
 }
 
-// DX 8/30/17 - SGDATA
+// DX20170830 - SGDATA
 // ***************************************************************************
 // pflow::PrintSGData
 // ***************************************************************************
@@ -2680,24 +2680,24 @@ void PrintRSM(const xstructure& str, ostream& oss) {
 namespace pflow {
   bool PrintSGData(xstructure& str_sg, ostream& oss, bool standalone, const string& format,bool already_calculated) {
     double tolerance=SYM::defaultTolerance(str_sg);
-    if(already_calculated){tolerance=str_sg.sym_eps;} // CO 171025
+    if(already_calculated){tolerance=str_sg.sym_eps;} // CO20171025
     bool no_scan=false;
     int setting=1;
     return PrintSGData(str_sg,tolerance,oss,no_scan,setting,standalone,format,already_calculated);
   }
 }
 
-//DX 20180822 - add xoption - START
+//DX20180822 - add xoption - START
 namespace pflow {
   bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss, bool no_scan, const int& sg_setting, bool standalone, const string& format,bool already_calculated) { 
     aurostd::xoption vpflow;
     return PrintSGData(str_sg,tolerance,oss,vpflow,no_scan,sg_setting,standalone,format,already_calculated);
   }
 }
-//DX 20180822 - add xoption - END
+//DX20180822 - add xoption - END
 
 namespace pflow {
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { // DX 2/26/18 - added & to tolerance
+  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { // DX20180226 - added & to tolerance
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::PrintSGData: BEGIN" << endl;
     stringstream oss;
@@ -2705,14 +2705,14 @@ namespace pflow {
     // Print out structural data
     oss.setf(std::ios::fixed,std::ios::floatfield);
     // DX TEST str_sg.SpaceGroup_ITC(tolerance);
-    if(!already_calculated){str_sg.SpaceGroup_ITC(tolerance, -1, setting, no_scan);} // CO 171025
+    if(!already_calculated){str_sg.SpaceGroup_ITC(tolerance, -1, setting, no_scan);} // CO20171025
     // FORMAT = TXT
     if(format=="txt"){
       oss << "SPACE GROUP OF THE CRYSTAL" << endl;
       oss << " Space group number                           = " << str_sg.space_group_ITC << endl;
-      oss << " Space group label (Hermann Mauguin)          = " << GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory) << endl; //DX 20180526 - add directory
-      oss << " Space group label (Hall)                     = " << GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory) << endl; //DX 20180526 - add directory
-      oss << " Space group label (Schoenflies)              = " << GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory) << endl; //DX 20180526 - add directory
+      oss << " Space group label (Hermann Mauguin)          = " << GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory) << endl; //DX20180526 - add directory
+      oss << " Space group label (Hall)                     = " << GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory) << endl; //DX20180526 - add directory
+      oss << " Space group label (Schoenflies)              = " << GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory) << endl; //DX20180526 - add directory
       oss << " Laue class                                   = " << GetLaueLabel(str_sg.point_group_ITC) << endl;
       oss << " Crystal class                                = " << str_sg.point_group_ITC << endl;
       oss << "ITC REPRESENTATION OF CRYSTAL" << endl;
@@ -2734,7 +2734,7 @@ namespace pflow {
       for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
         wss << str_sg.wyccar_ITC[i] << endl;
       }
-      if(str_sg.wyccar_ITC.size()!=0){ //DX 20180526 - skip if fails
+      if(str_sg.wyccar_ITC.size()!=0){ //DX20180526 - skip if fails
         xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
         oss << xstr_wyccar << endl;
       }
@@ -2756,7 +2756,7 @@ namespace pflow {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // space group label (HM)
-      string sg_HM = GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory); //DX 20180526 - add directory
+      string sg_HM = GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory); //DX20180526 - add directory
       if(sg_HM.size()){
         sscontent_json << "\"space_group_Hermann_Mauguin\":\"" << sg_HM << "\"" << eendl;
       } else {
@@ -2765,7 +2765,7 @@ namespace pflow {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // space group label (Hall)
-      string sg_Hall = GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory); //DX 20180526 - add directory
+      string sg_Hall = GetSpaceGroupHall(str_sg.space_group_ITC, setting, str_sg.directory); //DX20180526 - add directory
       if(sg_Hall.size()){
         sscontent_json << "\"space_group_Hall\":\"" << sg_Hall << "\"" << eendl;
       } else {
@@ -2774,7 +2774,7 @@ namespace pflow {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       // space group label (Schoenflies)
-      string sg_Schoenflies = GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory); //DX 20180526 - add directory
+      string sg_Schoenflies = GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory); //DX20180526 - add directory
       if(sg_Schoenflies.size()){
         sscontent_json << "\"space_group_Schoenflies\":\"" << sg_Schoenflies << "\"" << eendl;
       } else {
@@ -2912,8 +2912,8 @@ namespace pflow {
       }
     }
     oss_final << oss.str();
-    //DX 20180822 - put attributes into vpflow - START
-    if(vpflow.flag("SGDATA::CALCULATED")){ //DX 20180823 - if calculated, remove
+    //DX20180822 - put attributes into vpflow - START
+    if(vpflow.flag("SGDATA::CALCULATED")){ //DX20180823 - if calculated, remove
       vpflow.pop_attached("SGDATA::SPACE_GROUP_NUMBER"); 
       vpflow.pop_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN"); 
       vpflow.pop_attached("SGDATA::SPACE_GROUP_HALL"); 
@@ -2929,7 +2929,7 @@ namespace pflow {
       vpflow.pop_attached("SGDATA::WYCKOFF_POSITIONS"); 
       vpflow.pop_attached("SGDATA::WYCCAR"); 
     }
-    // DX 20180823 - now populate xoption
+    // DX20180823 - now populate xoption
     vpflow.flag("SGDATA::CALCULATED");
     vpflow.push_attached("SGDATA::SPACE_GROUP_NUMBER",aurostd::utype2string<uint>(str_sg.space_group_ITC)); 
     vpflow.push_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN",GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory)); 
@@ -2965,11 +2965,11 @@ namespace pflow {
     vpflow.push_attached("SGDATA::WYCKOFF_SITE_SYMMETRIES",SYM::ExtractWyckoffSiteSymmetriesString(str_sg.wyccar_ITC));
     vpflow.push_attached("SGDATA::WYCKOFF_POSITIONS",Wyckoff_positions.str()); 
     vpflow.push_attached("SGDATA::WYCCAR",wyccar.str()); 
-    //DX 20180822 - put attributes into vpflow - END
+    //DX20180822 - put attributes into vpflow - END
     return true;
   }
 }      
-// DX 8/30/17 - SGDATA
+// DX20170830 - SGDATA
 
 // **************************************************************************
 // PrintShell PrintShell

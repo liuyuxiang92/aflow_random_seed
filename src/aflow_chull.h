@@ -16,20 +16,20 @@ const char _std_ = 'S';  // standard aflow/vasp units
 const char _m_ = 'm';    // convert to milli-
 
 // FORMATS
-//[ME190628 - moved to aflow.h] const char _apool_ = 'a';  // apool
-//[ME190628 - moved to aflow.h] const char _json_ = 'j';   // standard json
-//[ME190628 - moved to aflow.h] const char _pdf_ = 'p';    // pdf
-//[ME190628 - moved to aflow.h] const char _txt_ = 't';    // plain text
-//[ME190628 - moved to aflow.h] const char _web_ = 'w';    // web json
-//[ME190628 - moved to aflow.h] const char _latex_ = 'l';    // latex
-//[ME190628 - moved to aflow.h] const char _gnuplot_ = 'g';  // gnuplot
-//[ME190628 - moved to aflow.h] const char _jupyterthree_ = 'y';  // jupyter python 3
-//[ME190628 - moved to aflow.h] const char _jupytertwo_ = 'z'; // jupyter python 2
+//[ME20190628 - moved to aflow.h] const char _apool_ = 'a';  // apool
+//[ME20190628 - moved to aflow.h] const char _json_ = 'j';   // standard json
+//[ME20190628 - moved to aflow.h] const char _pdf_ = 'p';    // pdf
+//[ME20190628 - moved to aflow.h] const char _txt_ = 't';    // plain text
+//[ME20190628 - moved to aflow.h] const char _web_ = 'w';    // web json
+//[ME20190628 - moved to aflow.h] const char _latex_ = 'l';    // latex
+//[ME20190628 - moved to aflow.h] const char _gnuplot_ = 'g';  // gnuplot
+//[ME20190628 - moved to aflow.h] const char _jupyterthree_ = 'y';  // jupyter python 3
+//[ME20190628 - moved to aflow.h] const char _jupytertwo_ = 'z'; // jupyter python 2
 
 // REDUCTION MODES
-//[ME190628 - moved to aflow.h] const char _frac_ = 'f';  //fractional
-//[ME190628 - moved to aflow.h] const char _gcd_ = 'g';   //gcd
-//[ME190628 - moved to aflow.h] const char _none_ = 'n';  //none
+//[ME20190628 - moved to aflow.h] const char _frac_ = 'f';  //fractional
+//[ME20190628 - moved to aflow.h] const char _gcd_ = 'g';   //gcd
+//[ME20190628 - moved to aflow.h] const char _none_ = 'n';  //none
 
 // DEFAULTS
 const int CHULL_PRECISION = 8;                          //must be less than _precision_ in aflow_xatom.cpp, which is currently set to 14
@@ -41,9 +41,9 @@ const double ZERO_FULL_TOL = pow(10,-FULL_PRECISION);
 const double ZERO_COEF_TOL = pow(10,-COEF_PRECISION);
 const double ENERGY_TOL = 0.015;                        //eV, CO NOTES - structures within this thresold may be equivalent, I've seen as large as 5meV, keep at 15 to be safe
 const int ZERO_RANGE_TOL = 1;
-//[CO 180316 - moved to aflowrc]const uint BINARY_ENTRIES_THRESHOLD = 200;
+//[CO20180316 - moved to aflowrc]const uint BINARY_ENTRIES_THRESHOLD = 200;
 
-// CO 180419 - moved to AFLOWRuntimeError and AFLOWLogicError
+// CO20180419 - moved to AFLOWRuntimeError and AFLOWLogicError
 //namespace chull {
 //  class CHullRuntimeError : public std::runtime_error {
 //    public:
@@ -72,10 +72,10 @@ namespace chull {
   ////////////////////////////////////////////////////////////////////////////////
   // gets path to redirect output
   string getPath(bool add_backslash=true);
-  string getPath(const aurostd::xoption& vpflow, ostream& oss=cout, bool silent=true); // CO 180220
-  string getPath(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& oss=cout, bool silent=true);  // CO 180220
-  string getPath(string _path, ostream& oss=cout, bool silent=true); // CO 180220
-  string getPath(string _path, ofstream& FileMESSAGE, ostream& oss=cout, bool silent=true);  // CO 180220
+  string getPath(const aurostd::xoption& vpflow, ostream& oss=cout, bool silent=true); // CO20180220
+  string getPath(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& oss=cout, bool silent=true);  // CO20180220
+  string getPath(string _path, ostream& oss=cout, bool silent=true); // CO20180220
+  string getPath(string _path, ofstream& FileMESSAGE, ostream& oss=cout, bool silent=true);  // CO20180220
   ////////////////////////////////////////////////////////////////////////////////
   //logs which flags are on
   void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ostream& oss=cout, bool silent=false);
@@ -116,7 +116,7 @@ namespace chull {
   bool correctSignVerticalDistance(double dist_2_hull,bool should_be_positive);
 } // namespace chull
 
-// CO 180420 - moved to xStream (aflow.h)
+// CO20180420 - moved to xStream (aflow.h)
 //namespace chull {
 //  class ChullClassTemplate {
 //    public:
@@ -849,8 +849,8 @@ namespace chull {
       //writer functions
       string prettyPrintCompound(const ChullPoint& point,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
       string prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
-      //[ME190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
-      //[ME190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
+      //[ME20190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
+      //[ME20190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
       string getICSDNumber(uint i_point,bool remove_suffix=true) const;
       string getICSDNumber(const ChullPoint& point,bool remove_suffix=true) const;
       string getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix=true) const;

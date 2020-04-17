@@ -65,7 +65,7 @@ namespace pocc {
     //aflags
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO 180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
 
     //aflow.in
     string AflowIn_file,AflowIn;
@@ -3197,7 +3197,7 @@ namespace pocc {
     //xstructure bb("/home/corey/work/work/pranab/POCC/new_tests/new_sets_test_new_pocc/test/sc_test/POSCAR2",IOAFLOW_AUTO);
     //cerr << aa << endl;
     //cerr << bb << endl;
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX 1/23/18 - added fast_match = true // DX 190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX20180123 - added fast_match = true // DX20190318 - not fast_match but optimized_match=false
     //cerr << are_equivalent << endl;
     //exit(1);
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
@@ -3385,7 +3385,7 @@ namespace pocc {
     message << "Calculating unique supercells. Please be patient";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
-    ////[CO181226 - need to experiment]double energy_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out corey, only works if energy radius = 10
+    ////[CO20181226 - need to experiment]double energy_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out corey, only works if energy radius = 10
     //double energy_radius=DEFAULT_UFF_CLUSTER_RADIUS;
     ////if(SET_KESONG_STANDARD_DIST){energy_radius=ENERGY_RADIUS;}
     //if(COMPARE_WITH_KESONG){energy_radius=ENERGY_RADIUS;}
@@ -3614,7 +3614,7 @@ namespace pocc {
 
   unsigned long long int POccCalculator::getUniqueSuperCellsCount() const {return l_supercell_sets.size();}
 
-  //int getZeroPadding(unsigned long long int num){return int(log10(num))+1;} ME 190108 - moved to aurostd
+  //int getZeroPadding(unsigned long long int num){return int(log10(num))+1;} ME20190108 - moved to aurostd
 
   string POccCalculator::getARUNString(unsigned long long int i) {return pocc::getARUNString(l_supercell_sets,i);}
 
@@ -3634,7 +3634,7 @@ namespace pocc {
       bool include_strgrp) {
     stringstream ARUN;
 
-    //[CO181226 - done automatically in AVASP_populateXVASP()]ARUN << "ARUN.POCC_";
+    //[CO20181226 - done automatically in AVASP_populateXVASP()]ARUN << "ARUN.POCC_";
     ARUN << std::setfill('0') << std::setw(aurostd::getZeroPadding(vstructure_groups_size)) << index_structure_group+1 << "_";  //+1 so we start at 1, not 0 (count)
     if(include_strgrp){ARUN << std::setfill('0') << std::setw(aurostd::getZeroPadding(vstructures_size)) << index_structure+1 << "_";}
     ARUN << "H";
@@ -4345,10 +4345,10 @@ namespace pocc {
   POccCalculatorTemplate::~POccCalculatorTemplate() {free();}
 
   void POccCalculatorTemplate::free() {
-    xstr_pocc.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_pocc.clear(); //DX20191220 - uppercase to lowercase clear
     m_p_flags.clear();
     stoich_each_type.clear();
-    xstr_nopocc.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_nopocc.clear(); //DX20191220 - uppercase to lowercase clear
     types2pc_map.clear();
     m_species_redecoration.clear();
     //types2uffparams_map.clear();
@@ -4422,7 +4422,7 @@ namespace pocc {
   m_initialized=false;
   m_aflags.clear();
   m_kflags.clear();
-  xstr_sym.clear(); //DX 20191220 - uppercase to lowercase clear
+  xstr_sym.clear(); //DX20191220 - uppercase to lowercase clear
   n_hnf=0;
   for(uint site=0;site<m_pocc_sites.size();site++){m_pocc_sites[site].clear();} m_pocc_sites.clear();
   pocc_atoms_total=0;
@@ -4655,7 +4655,7 @@ namespace pocc {
         if(LDEBUG) {cerr << soliloquy << " starting structure[" << isupercell << "]" << endl;}
 
         //do first so we only need to run getUniqueSuperCell() once
-        xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+        xvasp.str.clear(); //DX20191220 - uppercase to lowercase clear
         xvasp.str=getUniqueSuperCell(isupercell);
 
         //populate POCC_UNIQUE_SUPERCELLS_FILE
@@ -4671,7 +4671,7 @@ namespace pocc {
 
         xvasp.Directory=m_aflags.Directory; //arun_directory;
         xvasp.AVASP_arun=true;
-        xvasp.AVASP_arun_mode = "POCC"; //CO181226
+        xvasp.AVASP_arun_mode = "POCC"; //CO20181226
         xvasp.AVASP_arun_runname = getARUNString(isupercell);
         xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE); //[CO191110]high-entropy offers increased solubility over binaries
 
@@ -4703,7 +4703,7 @@ namespace pocc {
     xstr_pocc.ReScale(1.0);
     xstr_pocc.ShifOriginToAtom(0);
     xstr_pocc.BringInCell();
-    xstr_pocc.clean(); //DX 20191220 - uppercase to lowercase clean
+    xstr_pocc.clean(); //DX20191220 - uppercase to lowercase clean
 
     if(LDEBUG) {
       cerr << soliloquy << " cleaned PARTCAR" << endl;
@@ -4830,14 +4830,14 @@ namespace pocc {
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ostream& oss) {
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO 180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) {ofstream FileMESSAGE;return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);}
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) {
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO 180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
@@ -5314,7 +5314,7 @@ namespace pocc {
     */
 
     xstr_nopocc.title="Parent structure";
-    xstr_nopocc.clean();    //real true clean //DX 20191220 - uppercase to lowercase clean
+    xstr_nopocc.clean();    //real true clean //DX20191220 - uppercase to lowercase clean
     if(LDEBUG) {
       cerr << soliloquy << " final non-pocc structure" << endl;
       cerr << xstr_nopocc << endl;
@@ -5583,7 +5583,7 @@ namespace pocc {
           //output - START
           ss_header << "| ";
           ss_header << aurostd::PaddedCENTER("pocc_atom = " + aurostd::utype2string(pocc_atom) + "/" + aurostd::utype2string(pocc_atoms_total) + (!atom_name.empty()?" ["+atom_name+"]":""),getHNFTableColumnPadding()+2);  //need to +2, bug in PaddedCENTER()
-          ss_header << " " ;  // CO 170629
+          ss_header << " " ;  // CO20170629
           //output - END
           pocc_atom++;
         }
@@ -5826,10 +5826,10 @@ namespace pocc {
     m_exploration_radius=AUROSTD_MAX_DOUBLE;
     distance_matrix.clear();
     v_dist_nn.clear();
-    xstr_ss.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_ss.clear(); //DX20191220 - uppercase to lowercase clear
     sc2pc_map.clear();
     pc2sc_map.clear();
-    xstr_cluster.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_cluster.clear(); //DX20191220 - uppercase to lowercase clear
     for(uint i=0;i<v_bonded_atom_indices.size();i++){v_bonded_atom_indices[i].clear();} v_bonded_atom_indices.clear();
     for(uint i=0;i<v_nonbonded_atom_indices.size();i++){v_nonbonded_atom_indices[i].clear();} v_nonbonded_atom_indices.clear();
     has_vacancies=false;
@@ -6019,14 +6019,14 @@ namespace pocc {
     xmatrix<double> _distance_matrix(xstr.atoms.size()-1,xstr.atoms.size()-1,0,0); distance_matrix=_distance_matrix;
 
     //get distance matrix first, then find nearest-neighbor distances
-    //DX 20190619 [OBSOLETE] xvector<double> min_vec; xvector<int> ijk;  //dummy
+    //DX20190619 [OBSOLETE] xvector<double> min_vec; xvector<int> ijk;  //dummy
 
     //get distance matrix first
     for(uint atom1=0;atom1<xstr.atoms.size();atom1++){
       if(isVacancy(v_vacancies,atom1)){continue;}
       for(uint atom2=atom1+1;atom2<xstr.atoms.size();atom2++){
         if(isVacancy(v_vacancies,atom2)){continue;}
-        distance_matrix(atom1,atom2)=distance_matrix(atom2,atom1)=aurostd::modulus(SYM::minimizeDistanceCartesianMethod(xstr.atoms[atom1].cpos,xstr.atoms[atom2].cpos,xstr.lattice)); //DX 20190619 - updated function name and take the modulus of minimum cpos distance
+        distance_matrix(atom1,atom2)=distance_matrix(atom2,atom1)=aurostd::modulus(SYM::minimizeDistanceCartesianMethod(xstr.atoms[atom1].cpos,xstr.atoms[atom2].cpos,xstr.lattice)); //DX20190619 - updated function name and take the modulus of minimum cpos distance
       }
     }
 
@@ -6059,7 +6059,7 @@ namespace pocc {
   }
 
   void POccUFFEnergyAnalyzer::setExplorationRadius(){
-    //[CO181226 - need to experiment]double m_exploration_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out corey, only works if energy radius = 10
+    //[CO20181226 - need to experiment]double m_exploration_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out corey, only works if energy radius = 10
     m_exploration_radius=DEFAULT_UFF_CLUSTER_RADIUS;
     //if(SET_KESONG_STANDARD_DIST){m_exploration_radius=ENERGY_RADIUS;}
     if(COMPARE_WITH_KESONG){m_exploration_radius=ENERGY_RADIUS;}

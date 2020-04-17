@@ -28,7 +28,7 @@ double DebyeWallerFactor(double theta,
     double temp, double debye_temp,
     double mass,double lambda) {
   double st=sin(theta);
-  double h=PLANCKSCONSTANT_h; //ME181020
+  double h=PLANCKSCONSTANT_h; //ME20181020
   double twoB=h*h*temp*12.0/(mass*KBOLTZ*debye_temp*debye_temp);
   double twoM=twoB*st*st/(lambda*lambda);
   double DWfact=exp(-1.0*twoM/2.0); // Use e^-M, not e^-2M.
@@ -43,11 +43,11 @@ string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO190520
   uint iat=0;
   //if any names missing from atoms, lets use generic names
   bool atom_names=true;
-  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].name.empty()){atom_names=false;}} // CO 180316 - use pp names
+  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].name.empty()){atom_names=false;}} // CO20180316 - use pp names
   for(uint itype=0;itype<xstr.num_each_type.size();itype++){
     for(uint j=0;j<(uint)xstr.num_each_type.at(itype);j++) {
       if(j==0){
-        if(atom_names){title+=xstr.atoms.at(iat).name;} // CO 180316 - use pp names
+        if(atom_names){title+=xstr.atoms.at(iat).name;} // CO20180316 - use pp names
         else {title+=char('A'+itype);}
         if(latex){title+="$_{"+aurostd::utype2string(xstr.num_each_type.at(itype))+"}$";}
         else {title+=aurostd::utype2string(xstr.num_each_type.at(itype));}
@@ -62,7 +62,7 @@ string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO190520
 // balanceEquation()
 // ***************************************************************************
 xvector<double> balanceChemicalEquation(const vector<xvector<double> >& lhs,const vector<xvector<double> >& rhs,
-    bool normalize,double tol){ //CO 180801
+    bool normalize,double tol){ //CO20180801
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="balanceChemicalEquation():";
   xvector<double> dummy;
@@ -84,24 +84,24 @@ xvector<double> balanceChemicalEquation(const vector<xvector<double> >& lhs,cons
     cerr << endl;
   }
 
-  //[OBSOLETE CO 180801]vector<xvector<double> > lhs;
-  //[OBSOLETE CO 180801]vector<xvector<double> > rhs;
-  //[OBSOLETE CO 180801]if(reduce){
-  //[OBSOLETE CO 180801]  for(uint i=0;i<_lhs.size();i++){lhs.push_back(aurostd::reduceByGCD(_lhs[i],tol));}
-  //[OBSOLETE CO 180801]  for(uint i=0;i<_rhs.size();i++){rhs.push_back(aurostd::reduceByGCD(_rhs[i],tol));}
-  //[OBSOLETE CO 180801]  if(LDEBUG) {
-  //[OBSOLETE CO 180801]    cerr << soliloquy << " lhs REDUCED=";
-  //[OBSOLETE CO 180801]    for(uint i=0;i<lhs.size();i++){
-  //[OBSOLETE CO 180801]      cerr << lhs[i] << (i!=lhs.size()-1?", ":"");
-  //[OBSOLETE CO 180801]    }
-  //[OBSOLETE CO 180801]    cerr << endl;
-  //[OBSOLETE CO 180801]    cerr << soliloquy << " rhs REDUCED=";
-  //[OBSOLETE CO 180801]    for(uint i=0;i<rhs.size();i++){
-  //[OBSOLETE CO 180801]      cerr << rhs[i] << (i!=rhs.size()-1?", ":"");
-  //[OBSOLETE CO 180801]    }
-  //[OBSOLETE CO 180801]    cerr << endl;
-  //[OBSOLETE CO 180801]  }
-  //[OBSOLETE CO 180801]} else {lhs=_lhs;rhs=_rhs;}
+  //[OBSOLETE CO20180801]vector<xvector<double> > lhs;
+  //[OBSOLETE CO20180801]vector<xvector<double> > rhs;
+  //[OBSOLETE CO20180801]if(reduce){
+  //[OBSOLETE CO20180801]  for(uint i=0;i<_lhs.size();i++){lhs.push_back(aurostd::reduceByGCD(_lhs[i],tol));}
+  //[OBSOLETE CO20180801]  for(uint i=0;i<_rhs.size();i++){rhs.push_back(aurostd::reduceByGCD(_rhs[i],tol));}
+  //[OBSOLETE CO20180801]  if(LDEBUG) {
+  //[OBSOLETE CO20180801]    cerr << soliloquy << " lhs REDUCED=";
+  //[OBSOLETE CO20180801]    for(uint i=0;i<lhs.size();i++){
+  //[OBSOLETE CO20180801]      cerr << lhs[i] << (i!=lhs.size()-1?", ":"");
+  //[OBSOLETE CO20180801]    }
+  //[OBSOLETE CO20180801]    cerr << endl;
+  //[OBSOLETE CO20180801]    cerr << soliloquy << " rhs REDUCED=";
+  //[OBSOLETE CO20180801]    for(uint i=0;i<rhs.size();i++){
+  //[OBSOLETE CO20180801]      cerr << rhs[i] << (i!=rhs.size()-1?", ":"");
+  //[OBSOLETE CO20180801]    }
+  //[OBSOLETE CO20180801]    cerr << endl;
+  //[OBSOLETE CO20180801]  }
+  //[OBSOLETE CO20180801]} else {lhs=_lhs;rhs=_rhs;}
 
   // needs to organized in the following way
   // [[Mn=2,Cu=1,Fe=0],   //left_hand_side
@@ -241,7 +241,7 @@ namespace pflow {
     }
 
     bool convert_sconv=true;
-    if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX 20191220 - uppercase to lowercase clean
+    if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX20191220 - uppercase to lowercase clean
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_bulk.MinDist();
       if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
@@ -255,7 +255,7 @@ namespace pflow {
     xstr_bulk.ReScale(1.0);
     xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
     xstr_bulk.BringInCell();
-    xstr_bulk.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
+    xstr_bulk.clean();  //clear origin! //DX20191220 - uppercase to lowercase clean
     if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
     //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
 
@@ -415,7 +415,7 @@ namespace pflow {
     //[CO190408 - do rotation last!]  xstr_slab_newbasis.FixLattices();
     //[CO190408 - do rotation last!]  const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
     //[CO190408 - do rotation last!]  for(uint i=0;i<xstr_slab_newbasis.atoms.size();i++){xstr_slab_newbasis.atoms[i].cpos=f2c*xstr_slab_newbasis.atoms[i].fpos;}
-    //[CO190408 - do rotation last!]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
+    //[CO190408 - do rotation last!]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.clean(); //DX20191220 - uppercase to lowercase clean
     //[CO190408 - do rotation last!]}
     //[CO190408 - do rotation last!]if(LDEBUG) {cerr << soliloquy << " xstr_slab_newbasis=" << endl;cerr << xstr_slab_newbasis << endl;}
     //[CO190408 - do rotation last!]if(check_min_dist){ //sanity check as we rotate structure/atoms
@@ -1038,7 +1038,7 @@ namespace pflow {
         //}
 
         //load in xstructure
-        xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+        xvasp.str.clear(); //DX20191220 - uppercase to lowercase clear
         xvasp.str=xstr_shear;
 
         //create directory name
@@ -1163,7 +1163,7 @@ namespace pflow {
     }
 
     bool convert_sconv=true;
-    if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX 20191220 - uppercase to lowercase clean
+    if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX20191220 - uppercase to lowercase clean
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_bulk.MinDist();
       if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
@@ -1177,7 +1177,7 @@ namespace pflow {
     xstr_bulk.ReScale(1.0);
     xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
     xstr_bulk.BringInCell();
-    xstr_bulk.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
+    xstr_bulk.clean();  //clear origin! //DX20191220 - uppercase to lowercase clean
     if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
     //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
 
@@ -1305,14 +1305,14 @@ namespace pflow {
       xvasp.clear();
 
       //load in xstructure
-      xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+      xvasp.str.clear(); //DX20191220 - uppercase to lowercase clear
       xvasp.str=xstr_bulk;
       if(convert_sprim){
         xvasp.str=Standard_Primitive_UnitCellForm(xvasp.str);
         xvasp.str.ReScale(1.0);
         xvasp.str.ShifOriginToAtom(0);xvasp.str.origin=0.0; //reset origin
         xvasp.str.BringInCell();
-        xvasp.str.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
+        xvasp.str.clean();  //clear origin! //DX20191220 - uppercase to lowercase clean
       }
       xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
 
@@ -1503,7 +1503,7 @@ namespace pflow {
 
       xvasp.clear();
       //load in xstructure
-      xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+      xvasp.str.clear(); //DX20191220 - uppercase to lowercase clear
       xvasp.str=xstr_slab;
       xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
 
@@ -2131,7 +2131,7 @@ namespace pflow {
     double dw,theta;
 
     // Get scattering factors and masses and Debye-Waller 2B values.
-    double h=PLANCKSCONSTANT_h;  //ME181020
+    double h=PLANCKSCONSTANT_h;  //ME20181020
     for(int i=0;i<num_atoms;i++) {
       //_atom atom=sstr.atoms.at(i); atom.CleanName();  //CO190322 - why make another copy of atom if we already made copy of xstructure??
       _atom& atom=sstr.atoms[i]; atom.CleanName();
@@ -6304,7 +6304,7 @@ namespace pflow {
     vector<string> vcontent, sum_tokens, line_tokens;
     vector<int> ngrid_compare;
     content=chgcar_ss.str();
-    aurostd::string2vectorstring(content,vcontent,true,true); //consecutive=true, trim_edges=true, CO 170613, we have issues with "\n \n" vs. "\n\n", we want both to be separated
+    aurostd::string2vectorstring(content,vcontent,true,true); //consecutive=true, trim_edges=true, CO20170613, we have issues with "\n \n" vs. "\n\n", we want both to be separated
     stringstream poscar;
     chgcar_header.str("");
     int grid_point=0;
@@ -6338,7 +6338,7 @@ namespace pflow {
     line_tokens.clear();
     if(LDEBUG) oss << soliloquy << "FORMAT FOR LATTICE VECTORS LOOKS OK" << endl;
 
-    //DX 20190618 - check for VASP5 - START
+    //DX20190618 - check for VASP5 - START
     //mirrors check in aflow_xatom.cpp
     bool is_vasp_4_poscar = true; //VASP4 (default)
     uint poscar_header_count = 7 ; // VASP4 (default)
@@ -6353,21 +6353,21 @@ namespace pflow {
     }
     line_tokens.clear();
     if(LDEBUG) oss << soliloquy << "IS VASP4 FORMAT = " << is_vasp_4_poscar << endl;
-    //DX 20190618 - check for VASP5 - END
+    //DX20190618 - check for VASP5 - END
 
     //if we get here, assume CHGCAR is formatted correctly for now
     //read in header, scaling factor, lattice vectors, number of atoms, coordinate type
     if(LDEBUG) oss << soliloquy << "READING POSCAR" << endl;
-    //DX 20190618 [OBSOLETE] for(uint i=0;i<7;i++)
-    for(uint i=0;i<poscar_header_count;i++) //DX 20190618
+    //DX20190618 [OBSOLETE] for(uint i=0;i<7;i++)
+    for(uint i=0;i<poscar_header_count;i++) //DX20190618
     { //CO200106 - patching for auto-indenting
       poscar << vcontent.at(i) << endl;
       chgcar_header << vcontent.at(i) << endl;
       linecount=i;
     }
     //read in number of atoms
-    //DX 20190618 aurostd::string2tokens(vcontent.at(5),sum_tokens," ");
-    aurostd::string2tokens(vcontent.at(species_line_number),sum_tokens," "); //DX 20190618
+    //DX20190618 aurostd::string2tokens(vcontent.at(5),sum_tokens," ");
+    aurostd::string2tokens(vcontent.at(species_line_number),sum_tokens," "); //DX20190618
     for(uint i=0;i<sum_tokens.size();i++) {
       natoms+=aurostd::string2utype<uint>(sum_tokens.at(i));
     }
@@ -7327,7 +7327,7 @@ namespace pflow {
 }
 
 
-// ME190628 - BEGIN
+// ME20190628 - BEGIN
 // prettyPrintCompound
 namespace pflow {
 
@@ -7357,9 +7357,9 @@ namespace pflow {
       return output.str();
     }
     xvector<double> comp=vcomposition;
-    xvector<double> final_comp=comp; //DX 20191125
-    //DX 20191125 [OBSOLETE] if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-    if(vred==gcd_vrt){aurostd::reduceByGCD(comp,final_comp,ZERO_TOL);} //DX 20191125 - new function form
+    xvector<double> final_comp=comp; //DX20191125
+    //DX20191125 [OBSOLETE] if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+    if(vred==gcd_vrt){aurostd::reduceByGCD(comp,final_comp,ZERO_TOL);} //DX20191125 - new function form
     else if(vred==frac_vrt){final_comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
     else if(vred==no_vrt){;}
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}

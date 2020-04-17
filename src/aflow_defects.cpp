@@ -585,18 +585,18 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
   if(AFLOW_PTHREADS::FLAG) FFF << "THREADS - AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
   oss << banner << endl; // ---------------------------------
   FFF << banner << endl; // ---------------------------------
-  str.sgroup_radius=1.5*RadiusSphereLattice(str.lattice);                                   // CO 171024 - new sym framework
-  _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO 171024 - new sym framework
-  pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO 171024 - new sym framework
-  pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO 171024 - new sym framework
-  // str.LatticeReduction_avoid=TRUE;                                                       // CO 171024 - new sym framework
-  /*SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.pgroup.size()=" << str.pgroup.size() << endl;                   // CO 171024 - new sym framework
-  /*str.BringInCell();*/                                                                                                                                  // CO 171024 - new sym framework
-  /*SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.agroup.size()=" << str.agroup.size() << endl;               // CO 171024 - new sym framework
-  /*SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.fgroup.size()=" << str.fgroup.size() << endl;                  // CO 171024 - new sym framework
-  /*SYM::CalculatePointGroupCrystal(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.pgroup_xtal.size()=" << str.pgroup_xtal.size() << endl;  // CO 171024 - new sym framework
-  /*str.sgroup_radius=1.5*RadiusSphereLattice(str.lattice);*/                                                                                             // CO 171024 - new sym framework
-  /*SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);*/ oss << "str.sgroup.size()=" << str.sgroup.size() << endl;                      // CO 171024 - new sym framework
+  str.sgroup_radius=1.5*RadiusSphereLattice(str.lattice);                                   // CO20171024 - new sym framework
+  _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO20171024 - new sym framework
+  pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO20171024 - new sym framework
+  pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO20171024 - new sym framework
+  // str.LatticeReduction_avoid=TRUE;                                                       // CO20171024 - new sym framework
+  /*SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.pgroup.size()=" << str.pgroup.size() << endl;                   // CO20171024 - new sym framework
+  /*str.BringInCell();*/                                                                                                                                  // CO20171024 - new sym framework
+  /*SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.agroup.size()=" << str.agroup.size() << endl;               // CO20171024 - new sym framework
+  /*SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.fgroup.size()=" << str.fgroup.size() << endl;                  // CO20171024 - new sym framework
+  /*SYM::CalculatePointGroupCrystal(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);*/ oss << "str.pgroup_xtal.size()=" << str.pgroup_xtal.size() << endl;  // CO20171024 - new sym framework
+  /*str.sgroup_radius=1.5*RadiusSphereLattice(str.lattice);*/                                                                                             // CO20171024 - new sym framework
+  /*SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);*/ oss << "str.sgroup.size()=" << str.sgroup.size() << endl;                      // CO20171024 - new sym framework
   oss << banner << endl; // ---------------------------------
   FFF << banner << endl; // ---------------------------------
   oss << "REFERENCE STRUCTURE BELOW" << endl; // STRUCTURE TO USE

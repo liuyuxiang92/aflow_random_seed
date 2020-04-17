@@ -511,7 +511,7 @@ namespace AGL_functions {
     // OBSOLETE kth = kboltz * acousticthetaD / hbar;
 
     // OBSOLETE double hbar = PLANKSCONSTANT_h / (2 * pi);
-    double hbar = PLANCKSCONSTANT_hbar;  // ME 181020
+    double hbar = PLANCKSCONSTANT_hbar;  // ME20181020
 
     kth = KBOLTZ * acousticthetaD / hbar;
     kths = kth * kth;

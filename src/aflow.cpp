@@ -45,15 +45,15 @@
 // #include <linux/kd.h>
 //   0x00004B2F   KIOCSOUND     int
 
-// CO 180729 - OBSOLETE - use xerror
-//[OBSOLETE]// CO 180419 - global exception handling - START
+// CO20180729 - OBSOLETE - use xerror
+//[OBSOLETE]// CO20180419 - global exception handling - START
 //[OBSOLETE]AFLOWRuntimeError::AFLOWRuntimeError(const std::string& function,const std::string& message) : std::runtime_error(message),f_name(function) {}  // I/O or computer type errors (no entries loaded)
 //[OBSOLETE]AFLOWRuntimeError::AFLOWRuntimeError(const std::string& function,std::stringstream& message) : std::runtime_error(message.str()),f_name(function) {message.str("");}  // I/O or computer type errors (no entries loaded)
 //[OBSOLETE]string AFLOWRuntimeError::where(){return f_name;}
 //[OBSOLETE]AFLOWLogicError::AFLOWLogicError(const std::string& function,const std::string& message) : std::logic_error(message),f_name(function) {}    //errors in logic, unintended (and insurmountable) use of functionality
 //[OBSOLETE]AFLOWLogicError::AFLOWLogicError(const std::string& function,std::stringstream& message) : std::logic_error(message.str()),f_name(function) {message.str("");}    //errors in logic, unintended (and insurmountable) use of functionality
 //[OBSOLETE]string AFLOWLogicError::where(){return f_name;}
-//[OBSOLETE]// CO 180419 - global exception handling - STOP
+//[OBSOLETE]// CO20180419 - global exception handling - STOP
 
 namespace aflowlib {
   bool aflowlib2stream(const aflowlib::_aflowlib_entry& data,const string& file,stringstream& stream,bool VERBOSE) {
@@ -115,8 +115,8 @@ namespace aflowlib {
       sort(list2found.begin(),list2found.end());
       //     cerr << "aflowlib::LIB2SCRUB list2found.size()=" << list2found.size() << endl;
 
-      vector<string> listLIB2RAW,listRM,listANRL,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK;
-      stringstream ossLIB2RAW,ossRM,ossANRL,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK;
+      vector<string> listLIB2RAW,listRM,listANRL,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK,listZIPNOMIX;
+      stringstream ossLIB2RAW,ossRM,ossANRL,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK,ossZIPNOMIX;
 
       vector<string> tokens;
       vector<string> vremoveALL;
@@ -128,7 +128,8 @@ namespace aflowlib {
       bool LIB2AUID=FALSE;//TRUE;
       bool REMOVE_MARYLOU=TRUE;
       bool ICSD2LINK=TRUE;//TRUE;
-
+      bool ZIPNOMIX=TRUE;
+      
       for(uint j=0;j<list2found.size();j++) {
         string directory_LIB=list2found.at(j);
         aurostd::StringSubst(directory_LIB,"/"+_AFLOWIN_,"");
@@ -171,7 +172,7 @@ namespace aflowlib {
         }
 
 
-        // check LIB2AUID MISSING	
+        // check REMOVE MARYLOU	
         if(REMOVE_MARYLOU) {
           if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
             string directory_MARYLOU="~/LIBS/"+directory_LIB;
@@ -186,44 +187,59 @@ namespace aflowlib {
           }
         }	
 
-        // check LIB2AUID MISSING	
-        if(LIB2AUID) {
-          if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) ||
-              aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-            if(aflowlib::LIB2AUID(directory_LIB,TRUE,FALSE)) {	    
-              //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-              listLIB2AUID.push_back(directory_LIB);
-              if(_AFLOWIN_=="aflow.in") {
-                ossLIB2AUID << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --lib2auid=\"" << directory_LIB << "\"" << endl;
-                fixes++;
-              }
-              //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
-              if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
-              { //CO200106 - patching for auto-indenting
-                ossLIB2AUID << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --lib2auid=\"" << directory_LIB << "\"" << endl;
-                fixes++;
-              }
-            }
-          }
-        }
 
+	// check aflow.immiscibility.out   // SC20200318
+	if(ZIPNOMIX) { // COREY IS TRASHY    // SC20200318
+	  if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
+	    if(aurostd::FileExist(directory_LIB+"/"+"aflow.immiscibility.out")) {
+	      //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+	      listZIPNOMIX.push_back(directory_LIB);
+	      ossZIPNOMIX << "zip -9rmv /common/" << vlib.at(i) << "/nomix.zip \"" << directory_LIB << "\"" << endl;
+	      fixes++;
+	    }
+	  }
+	}
+	
+	// check LIB2AUID MISSING	
+	if(LIB2AUID) {
+	  if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) ||
+	     aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+	    if(aflowlib::LIB2AUID(directory_LIB,TRUE,FALSE)) {	    
+	      //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+	     listLIB2AUID.push_back(directory_LIB);
+	     if(_AFLOWIN_=="aflow.in") {
+	       ossLIB2AUID << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --lib2auid=\"" << directory_LIB << "\"" << endl;
+	       fixes++;
+	     }
+	     //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
+	     if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
+	       { //CO200106 - patching for auto-indenting
+		 ossLIB2AUID << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --lib2auid=\"" << directory_LIB << "\"" << endl;
+		 fixes++;
+	       }
+	   }
+	 }
+       }
+       
         // check LIB2RAW MISSING	
         if(!aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) ||
             !aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) ||
             !aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) {
-          //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-          listLIB2RAW.push_back(directory_LIB);
-          if(_AFLOWIN_=="aflow.in") {
-            ossLIB2RAW << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
-            fixes++;
-          }
-          //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
-          if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
-          { //CO200106 - patching for auto-indenting
-            ossLIB2RAW << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
-            fixes++;
-          }
-        }
+	    if(!aurostd::FileExist(directory_LIB+"/"+"aflow.immiscibility.out")) {
+	      //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+	      listLIB2RAW.push_back(directory_LIB);
+	      if(_AFLOWIN_=="aflow.in") {
+		ossLIB2RAW << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
+		fixes++;
+	      }
+	      //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
+	      if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
+		{ //CO200106 - patching for auto-indenting
+		  ossLIB2RAW << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
+		  fixes++;
+		}
+	    }
+	}
         // check LIB2RAW EXISTANT BUT MESSED UP
         if(aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) && 
             aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
@@ -328,6 +344,11 @@ namespace aflowlib {
       if(listICSD2LINK.size()) {
         aurostd::stringstream2file(ossICSD2LINK,XHOST.tmpfs+"/xscrubber_ICSD2LINK."+vlib.at(i));
         aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ICSD2LINK."+vlib.at(i));
+      }
+      cerr << "aflowlib::LIB2SCRUB listZIPNOMIX.size()=" << listZIPNOMIX.size() << endl;
+      if(listZIPNOMIX.size()) {
+        aurostd::stringstream2file(ossZIPNOMIX,XHOST.tmpfs+"/xscrubber_ZIPNOMIX."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ZIPNOMIX."+vlib.at(i));
       }
       cerr << "aflowlib::LIB2SCRUB listLIB2AUID.size()=" << listLIB2AUID.size() << endl;
       if(listLIB2AUID.size()) {
@@ -590,7 +611,7 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   }
 
   message << "gcd test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-  return TRUE; // CO 180419
+  return TRUE; // CO20180419
 }
 
 bool smithTest(ostream& oss){ofstream FileMESSAGE;return smithTest(FileMESSAGE,oss);}  //CO190520
@@ -677,12 +698,12 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   }
 
   message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-  return TRUE; // CO 180419
+  return TRUE; // CO20180419
 }
 
 int main(int _argc,char **_argv) {
-  string soliloquy="main():"; // CO 180419
-  ostream& oss=cout;  // CO 180419
+  string soliloquy="main():"; // CO20180419
+  ostream& oss=cout;  // CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
     if(LDEBUG) cerr << "AFLOW-MAIN [1]" << endl;
@@ -775,7 +796,7 @@ int main(int _argc,char **_argv) {
         if(m==0) {y--;m+=12;} 
       }
       //exit(0);
-      return 0; // CO 180419
+      return 0; // CO20180419
     }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO190601
@@ -813,7 +834,7 @@ int main(int _argc,char **_argv) {
         cerr << _tokens[i] << endl;
       }
       //exit(0);
-      return 0; // CO 180419
+      return 0; // CO20180419
       // COREY START 170614 - some SQLITE tests
       //http://zetcode.com/db/sqlitec/ - more tests here
       //this will create test.db file
@@ -885,7 +906,7 @@ int main(int _argc,char **_argv) {
       aus << "************************   00000  MESSAGE KPOINTS KSHIFT=[" << 1 << " " << 2 << " " << 3 << "]" << " ************************ " << endl;
       cout << aus.str() << endl;
       //exit(0);
-      return 0; // CO 180419
+      return 0; // CO20180419
     }
 
     if(!Arun && aurostd::args2attachedflag(argv,"--bin2base64=")) {
@@ -896,21 +917,21 @@ int main(int _argc,char **_argv) {
     }
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=POTCAR|--test=POTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=POTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=POTCAR.static"+DEFAULT_KZIP_EXT+"|--test=POTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xPOTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=DOSCAR|--test=DOSCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.static"+DEFAULT_KZIP_EXT+"|--test=DOSCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xDOSCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xDOSCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=EIGENVAL|--test=EIGENVAL.relax1"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.relax2"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.static"+DEFAULT_KZIP_EXT+"|--test=EIGENVAL.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xEIGENVAL(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xEIGENVAL(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=OUTCAR|--test=OUTCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.static"+DEFAULT_KZIP_EXT+"|--test=OUTCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xOUTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xOUTCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=KPOINTS|--test=KPOINTS.relax1"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.relax2"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.static"+DEFAULT_KZIP_EXT+"|--test=KPOINTS.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xKPOINTS(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;}  // CO 180419
+      XHOST.DEBUG=TRUE;xKPOINTS(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;}  // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=vasprun|--test=vasprun.xml.relax1"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.relax2"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.static"+DEFAULT_KZIP_EXT+"|--test=vasprun.xml.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xVASPRUNXML(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xVASPRUNXML(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=IBZKPT|--test=IBZKPT.relax1"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.relax2"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.static"+DEFAULT_KZIP_EXT+"|--test=IBZKPT.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xIBZKPT(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xIBZKPT(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
     if(!Arun && aurostd::args2flag(argv,cmds,"--test=CHGCAR|--test=CHGCAR.relax1"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.relax2"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.static"+DEFAULT_KZIP_EXT+"|--test=CHGCAR.bands"+DEFAULT_KZIP_EXT+"")) {
-      XHOST.DEBUG=TRUE;xCHGCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO 180419
+      XHOST.DEBUG=TRUE;xCHGCAR(aurostd::args2attachedstring(argv,"--test=",""));/*exit(0)*/return 0;} // CO20180419
 
     if(!Arun && (aurostd::args2flag(argv,cmds,"--scrub") || aurostd::args2attachedflag(argv,"--scrub="))) {
       //  XHOST.DEBUG=TRUE;
@@ -968,7 +989,7 @@ int main(int _argc,char **_argv) {
         }
       }
       //exit(0);
-      return 0; // CO 180419
+      return 0; // CO20180419
     }
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
@@ -1003,98 +1024,98 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     // intercept commands
-    if(!Arun && XHOST.vflag_control.flag("MULTI=SH")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_sh(argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bzip2",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BUNZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gzip",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gunzip",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=XZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xz",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=XUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xunzip",argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=BZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_bz2xz(argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=GZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_gz2xz(argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MULTI=ZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_zip(argv);/*exit(0)*/return 0;}  // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("MONITOR")) {Arun=TRUE;AFLOW_monitor(argv);/*exit(0)*/return 0;} // CO 180419
-    if(!Arun && XHOST.vflag_control.flag("GETTEMP")) {Arun=TRUE;AFLOW_getTEMP(argv);/*exit(0)*/return 0;} // CO 180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=SH")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_sh(argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bzip2",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BUNZIP2")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gzip",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("gunzip",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=XZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xz",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=XUNZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_compress("xunzip",argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=BZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_bz2xz(argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=GZ2XZ")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_gz2xz(argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MULTI=ZIP")) {Arun=TRUE;AFLOW_PTHREADS::MULTI_zip(argv);/*exit(0)*/return 0;}  // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("MONITOR")) {Arun=TRUE;AFLOW_monitor(argv);/*exit(0)*/return 0;} // CO20180419
+    if(!Arun && XHOST.vflag_control.flag("GETTEMP")) {Arun=TRUE;AFLOW_getTEMP(argv);/*exit(0)*/return 0;} // CO20180419
 
     // **************************************************************
     // INTERCEPT HELP
     if(XHOST.vflag_control.flag("AFLOW_HELP")) {
       cout << aflow::Banner("BANNER_BIG") << endl << aflow::Intro_HELP("aflow") << aflow::Banner("BANNER_BIG") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("AFLOW_EXCEPTIONS")) {
       cout << aflow::Banner("BANNER_BIG") << endl << aflow::Banner("EXCEPTIONS") << endl;
       return 0;
-    }  // ME180531
+    }  // ME20180531
     if(XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3"))  {
       cout << aflow::License_Preamble_aflow() << endl;
       cout << " " << endl;
       cout << init::InitGlobalObject("README_AFLOW_LICENSE_GPL3_TXT") << endl;
       cout << " " << endl;
       cout << "*************************************************************************** " << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW_VERSIONS_HISTORY"))  {
       cout << init::InitGlobalObject("README_AFLOW_VERSIONS_HISTORY_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AFLOW_PFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_PFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_FROZSL"))  {
       cout << init::InitGlobalObject("README_AFLOW_FROZSL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_APL"))  {
       cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_QHA"))  {
       cout << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AAPL"))  {
       cout << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AGL"))  {
       cout << init::InitGlobalObject("README_AFLOW_AGL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AEL"))  {
       cout << init::InitGlobalObject("README_AFLOW_AEL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_ANRL"))  {
       cout << init::InitGlobalObject("README_AFLOW_ANRL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_COMPARE"))  { //CO190401
       cout << init::InitGlobalObject("README_AFLOW_COMPARE_TXT") << endl; //CO190401
-      /*exit(1)*/return 0;} // << endl; // CO 190401
+      /*exit(1)*/return 0;} // << endl; // CO20190401
     if(XHOST.vflag_control.flag("README_GFA"))  {
       cout << init::InitGlobalObject("README_AFLOW_GFA_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
       cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_CCE"))  {
       cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_CHULL"))  {
       cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION")) {
       cout << init::InitGlobalObject("README_AFLOW_POCC_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_APENNSY"))  {
       cout << init::InitGlobalObject("README_AFLOW_APENNSY_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_SCRIPTING"))  {
       cout << init::InitGlobalObject("README_AFLOW_SCRIPTING_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_EXCEPTIONS"))  {
       cout << init::InitGlobalObject("README_AFLOW_EXCEPTIONS_TXT") << endl;
-      return 0;}  // ME 180531
+      return 0;}  // ME20180531
     if(XHOST.vflag_control.flag("README_XAFLOW"))  {
       cout << init::InitGlobalObject("README_AFLOW_XAFLOW_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
     if(XHOST.vflag_control.flag("README_AFLOWRC"))  {
       cout << init::InitGlobalObject("README_AFLOW_AFLOWRC_TXT") << endl;
-      /*exit(1)*/return 0;} // << endl; // CO 180419
+      /*exit(1)*/return 0;} // << endl; // CO20180419
 
     // **************************************************************
     // PHP-WEB AND CURRICULUM AND HIGH-THROUGHPUT STUFF
@@ -1103,8 +1124,8 @@ int main(int _argc,char **_argv) {
 
     // **************************************************************
     bool VVERSION=aurostd::args2flag(argv,cmds,"-v|--version");
-    if(!Arun && VVERSION)  {Arun=TRUE; cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY // CO 180419
-    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl; /*exit(0)*/return 0;} // CO 180419
+    if(!Arun && VVERSION)  {Arun=TRUE; cout << aflow::Banner("AFLOW_VERSION");/*exit(0)*/return 0;} // look for version IMMEDIATELY // CO20180419
+    if(!Arun && XHOST.TEST) { Arun=TRUE;cerr << "test" << endl; /*exit(0)*/return 0;} // CO20180419
 
     // [OBSOLETE]  if(!Arun && (aurostd::substring2bool(XHOST.progname,"aflow1") || aurostd::substring2bool(XHOST.progname,"aflowd1"))) {
     // [OBSOLETE]  Arun=TRUE;AFLOW_main1(argv,cmds);}
@@ -1132,7 +1153,7 @@ int main(int _argc,char **_argv) {
     // END
     return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO190629 - more explicit return 0
   }
-  // CO 180729 - OBSOLETE - use xerror
+  // CO20180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
   //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
   //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), oss, _LOGGER_ERROR_);
@@ -1157,7 +1178,7 @@ int AFLOW_main(vector<string> &argv) {
   if(!XHOST.QUIET) cout << aflow::Banner("INTRODUCTION");// << endl;
   KBIN::KBIN_Main(argv);
   // if(!XHOST.QUIET) cout << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << "  " << endl;
-  return 0; //1;  // CO 180419 - return 0 is normal
+  return 0; //1;  // CO20180419 - return 0 is normal
 }
 
 // ***************************************************************************
@@ -1503,7 +1524,7 @@ namespace aflow {
     cerr << "aflow::Banner type=" << type << " not found..." << endl;
     oss << "aflow::Banner type=" << type << " not found..." << endl;
     //exit(0);
-    return 0; // CO 180419
+    return 0; // CO20180419
     return oss.str();
   }
 } // namespace aflow
