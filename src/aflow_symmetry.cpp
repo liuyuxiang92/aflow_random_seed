@@ -456,7 +456,7 @@ namespace SYM {
     // DX [OBSOLETE]	  tolerance = orig_tolerance + sign*(times*tol_increment);
     // DX [OBSOLETE]          call_count +=1;
     // DX [OBSOLETE]	}
-    // DX [OBSOLETE]	// DXif(tolerance < 0.0){
+    // DX [OBSOLETE]	// DX if(tolerance < 0.0){
     // DX [OBSOLETE]	if(tolerance < _ZERO_TOL_){
     // DX [OBSOLETE]	  sign = 1.0;
     // DX [OBSOLETE]	  call_count += 1;
