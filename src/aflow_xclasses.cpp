@@ -1174,6 +1174,7 @@ _xvasp::_xvasp() {
   AVASP_arun_runname = "";  // ME20181019
   aplopts.clear();  // ME20181025
   aaplopts.clear();  // ME20181025
+  qhaopts.clear(); // AS20200302
   AVASP_dirbase="";
   AVASP_libbase="";
   AVASP_label="";
@@ -1335,6 +1336,7 @@ void _xvasp::copy(const _xvasp& b) {
   AVASP_arun_runname                       = b.AVASP_arun_runname;    // ME20181019
   aplopts                                  = b.aplopts;               // ME20181025
   aaplopts                                 = b.aaplopts;              // ME20181025
+  qhaopts                                  = b.qhaopts;               // AS20200302
   AVASP_dirbase                            = b.AVASP_dirbase;
   AVASP_libbase                            = b.AVASP_libbase;
   AVASP_label                              = b.AVASP_label;
