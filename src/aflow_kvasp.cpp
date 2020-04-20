@@ -858,7 +858,7 @@ namespace KBIN {
     // APL ENTRIES
     if(LDEBUG) cerr << "DEBUG: KBIN::VASP_Get_Vflags_from_AflowIN (APL)" << endl;
 
-    // CO - START 170601
+    // CO170601 - START
     // CO make backwards and forwards compatible with all possible workflows
     vflags.KBIN_VASP_KPOINTS_PHONONS_KPPRA.options2entry(AflowIn,"[AFLOW_APL]KPPRA=|[AFLOW_QHA]KPPRA=|[AFLOW_AAPL]KPPRA=|[AFLOW_PHONONS]KPPRA=",
         FALSE,vflags.KBIN_VASP_KPOINTS_PHONONS_KPPRA.xscheme); // scheme already loaded in aflow_xclasses.cpp is "1"
@@ -883,7 +883,7 @@ namespace KBIN {
     //[ME181216]      {vflags.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.push("ODD");}
     //[ME181216]    //  vflags.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY_EVEN=aurostd::substring2bool(AflowIn,"[AFLOW_PHONONS]KPOINTS=EVEN",TRUE)||aurostd::substring2bool(AflowIn,"[AFLOW_PHONONS]KPOINTS_EVEN",TRUE);
     //[ME181216]    // vflags.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY_ODD=aurostd::substring2bool(AflowIn,"[AFLOW_PHONONS]KPOINTS=ODD",TRUE)||aurostd::substring2bool(AflowIn,"[AFLOW_PHONONS]KPOINTS_ODD",TRUE);
-    // CO - END 170601
+    // CO170601 - END
 
     // FROZSL ENTRIES
     if(LDEBUG) cerr << "DEBUG: KBIN::VASP_Get_Vflags_from_AflowIN (FROZSL)" << endl;
@@ -1199,7 +1199,7 @@ namespace KBIN {
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_APL " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.NRELAX=-3;}
-          // CO - START 170601
+          // CO170601 - START
           else if(kflags.KBIN_PHONONS_CALCULATION_QHA) {  // RUN PHONONS QHA ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_QHA " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1208,7 +1208,7 @@ namespace KBIN {
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AAPL " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.NRELAX=-3;}
-          // CO - END 170601
+          // CO170601 - END
           else if(kflags.KBIN_PHONONS_CALCULATION_AGL) {  // RUN PHONONS AGL ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AGL (Debye Model) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

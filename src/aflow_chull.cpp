@@ -11071,7 +11071,7 @@ namespace chull {
     // creating name of output file
     input=aurostd::joinWDelimiter(m_velements,"");
     //input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
-    main_JSON_file="aflow_"+input+"_hull_web.json"; //WilSch190620
+    main_JSON_file="aflow_"+input+"_hull_web.json"; //WSCHMITT190620
     species_data_JSON_ss << aurostd::joinWDelimiter(aurostd::wrapVecEntries(m_velements,"\""),",");
     //for (uint i = 0; i < m_velements.size(); i++) {
     //  main_JSON_file.append(m_velements[i]);
@@ -11205,7 +11205,7 @@ namespace chull {
         if(!point.m_has_entry) {
           data_helper_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\"";  //unary, so "" delimiter doesn't play a role
           if(point.m_is_g_state) {hull_points_data_JSON_ss << data_helper_ss.str();}
-          data_helper_ss.str(""); //WilSch190731 - patching quaternary hull writer issues
+          data_helper_ss.str(""); //WSCHMITT190731 - patching quaternary hull writer issues
         } else {
           data_helper_ss << "\"" << entry.auid << "\"";
           points_data_JSON_vs.push_back(data_helper_ss.str());

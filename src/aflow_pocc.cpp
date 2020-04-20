@@ -3193,8 +3193,6 @@ namespace pocc {
       cerr << "========================================== vs. ==========================================" << endl;
       cerr << b;
     }
-    //xstructure aa("/home/corey/work/work/pranab/POCC/new_tests/new_sets_test_new_pocc/test/sc_test/POSCAR1",IOAFLOW_AUTO);
-    //xstructure bb("/home/corey/work/work/pranab/POCC/new_tests/new_sets_test_new_pocc/test/sc_test/POSCAR2",IOAFLOW_AUTO);
     //cerr << aa << endl;
     //cerr << bb << endl;
     bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX 1/23/18 - added fast_match = true // DX 190318 - not fast_match but optimized_match=false
