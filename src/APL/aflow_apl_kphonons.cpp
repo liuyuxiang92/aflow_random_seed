@@ -370,7 +370,7 @@ namespace KBIN {
     string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO20190114 - initialize everything
     bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false, USER_ZEROSTATE_CHGCAR = false; //CO20190114 - initialize everything
     bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO20190114 - initialize everything
-    bool USER_DOS_PROJECT = false;  // ME20200213
+    bool USER_DOS_PROJECT = false, USER_DISPLACEMENTS = false;  // ME20200213
     double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO20190114 - initialize everything  
     int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO20190114 - initialize everything
     vector<int> USER_DOS_MESH(3);
@@ -415,6 +415,7 @@ namespace KBIN {
       if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME20190625
       if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME20190625
       if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
+      if (key == "DISPLACEMENTS") {USER_DISPLACEMENTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "TPT") {USER_TPT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
     }
 
@@ -2077,9 +2078,11 @@ namespace KBIN {
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
         tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
 
-        apl::AtomicDisplacements ad(phcalc);
-        ad.calculateMeanSquareDisplacements(qmesh, USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
-        ad.writeMeanSquareDisplacementsToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE);
+        if (USER_DISPLACEMENTS) {
+          apl::AtomicDisplacements ad(phcalc);
+          ad.calculateMeanSquareDisplacements(qmesh, USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
+          ad.writeMeanSquareDisplacementsToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE);
+        }
         //QHA/SCQHA/QHA3P START //PN180705
         //calculate Gruneisen
         // ME20190428 - START

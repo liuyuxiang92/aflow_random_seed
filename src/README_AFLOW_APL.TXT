@@ -42,7 +42,9 @@ Table of Contents:
 3.2.    Phonon Density of States
 3.3.    Thermodynamic Properties
 3.4.    Plotting Phonon Properties
-3.5.    Visualizing Phonon Displacements
+3.5.    Atomic Displacements
+3.5.1.    Mean Square Displacements
+3.5.2.    Visualizing Phonon Displacements
 
 4.    Saving and Loading APL Results (Hibernation)
 
@@ -562,7 +564,22 @@ This command outputs four separate files for the internal energy, vibrational fr
 vibrational entropy, and isochoral heat capacity. The file aflow.apl.thermal_properties.out must be
 present in the directory.
 
-3.5. Visualizing Phonon Displacements
+
+3.5. Atomic Displacements
+
+3.5.1. Mean Square Displacements
+
+AFLOW can calculate the mean square displacement vectors for each atom in the unit cell by adding
+the following to the aflow.in file:
+
+    [AFLOW_APL]DISPLACEMENTS=ON
+
+This is also the default option.
+
+The temperature range is taken from the parameter TPT (see section 3.3.) and the mesh density from
+DOS_MESH (see section 3.2.).
+
+3.5.2. Visualizing Phonon Displacements
 
 APL provides an interface to the following output formats that can be used to visualize atomic
 displacements:

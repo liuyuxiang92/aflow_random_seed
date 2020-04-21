@@ -1,7 +1,7 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- Added state writer and reader for the force constant calculators. (ME)
-        -- Mean square displacements now always calculated along with thermal properties. (ME)
+        -- Redesigned mean square displacement calculations. (ME)
         -- Added interfaces to XCRYSDEN and V_SIM to visualize phonon displacements. (ME)
         -- Separated harmonic force constants and Born effective charges/dielectric tensor into separate hibernate files. (ME)
         -- APL will not always read harmonic force constants when HIBERNATE=ON. (ME)
