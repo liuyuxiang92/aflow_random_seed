@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2016           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Richard H. Taylor
@@ -19,23 +19,23 @@
 
 using namespace std;
 
-//DX 20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE] extern thread_local double _SYM_TOL_;
-//DX 20190215 [OBSOLETE] #else
-//DX 20190215 [OBSOLETE] extern double _SYM_TOL_;
-//DX 20190215 [OBSOLETE] #endif
+//DX20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+//DX20190215 [OBSOLETE] extern thread_local double _SYM_TOL_;
+//DX20190215 [OBSOLETE] #else
+//DX20190215 [OBSOLETE] extern double _SYM_TOL_;
+//DX20190215 [OBSOLETE] #endif
 
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // **********************************************************************************************************************
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // normalize (Overloaded)
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // **********************************************************************************************************************
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] namespace SYM {
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]   void normalize(xvector<double>& v) {
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     double mod = aurostd::modulus(v);
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     for (int i = 1; i <= v.urows; i++) {
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]       v(i) = v(i) / mod;
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     }
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]   }
-//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] } //namespace SYM
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // **********************************************************************************************************************
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // normalize (Overloaded)
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // **********************************************************************************************************************
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()] namespace SYM {
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()]   void normalize(xvector<double>& v) {
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     double mod = aurostd::modulus(v);
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     for (int i = 1; i <= v.urows; i++) {
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()]       v(i) = v(i) / mod;
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     }
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()]   }
+//DX20190905 [OBSOLETE - use explicit division by aurostd::modulus()] } //namespace SYM
 //// **********************************************************************************************************************
 //// normalize (Overloaded)
 //// **********************************************************************************************************************
@@ -280,13 +280,13 @@ namespace SYM{
     xvector<double> dir_vec = point_2 - point_1;
     //cerr << "dir vec: " << dir_vec << endl;
     double n = aurostd::modulus(dir_vec);
-    //DX 20191028 [OBSOLETE] if(aurostd::abs(n) < 1e-8) { cerr << "SYM::Screw::get_A(): PROBLEM WITH DIR VEC ( Screw::get_A() ) " << endl; }
-    //DX 20191028 - if modulus is zero, then do no rotate - START
+    //DX20191028 [OBSOLETE] if(aurostd::abs(n) < 1e-8) { cerr << "SYM::Screw::get_A(): PROBLEM WITH DIR VEC ( Screw::get_A() ) " << endl; }
+    //DX20191028 - if modulus is zero, then do no rotate - START
     if(aurostd::abs(n) < _ZERO_TOL_) {
       A = aurostd::eye<double>(4,4);
       return;
     }
-    //DX 20191028 - if modulus is zero, then do no rotate - END
+    //DX20191028 - if modulus is zero, then do no rotate - END
     dir_vec = 1 / n * dir_vec;
     one_point = point_2;  //a point on the line to pass around
     //double u = dir_vec[1];
@@ -325,13 +325,13 @@ namespace SYM{
     xvector<double> dir_vec = axis_dir;
     double n = aurostd::modulus(dir_vec);
     angle = 2 * Pi_r / order;
-    //DX 20191028 [OBSOLETE] if(aurostd::abs(n) < 1e-8) { cerr << "SYM::get_screw_direct: PROBLEM WITH DIR VEC ( Screw::get_screw_direct() )" << endl; }
-    //DX 20191028 - if modulus is zero, then do no rotate - START
+    //DX20191028 [OBSOLETE] if(aurostd::abs(n) < 1e-8) { cerr << "SYM::get_screw_direct: PROBLEM WITH DIR VEC ( Screw::get_screw_direct() )" << endl; }
+    //DX20191028 - if modulus is zero, then do no rotate - START
     if(aurostd::abs(n) < _ZERO_TOL_) {
       A = aurostd::eye<double>(4,4);
       return;
     }
-    //DX 20191028 - if modulus is zero, then do no rotate - END
+    //DX20191028 - if modulus is zero, then do no rotate - END
     dir_vec = 1 / n * dir_vec;
     direction_vector = dir_vec;
     one_point = point;  //a point on the line to pass around
@@ -693,7 +693,7 @@ namespace SYM {
 namespace SYM {
   void Glide::get_glide_direct(xvector<double> n, xvector<double> p, xvector<double> trans) {
     //n = n;
-    n = n+n;  //CO190329 - keep n busy, it's not needed //compiler doesn't like n=n;
+    n = n+n;  //CO20190329 - keep n busy, it's not needed //compiler doesn't like n=n;
     DIRECT = true;
     plane_point = p;
     T = trans;
@@ -744,21 +744,21 @@ namespace SYM {
 // reduce_atom_deques
 // **********************************************************************************************************************
 namespace SYM {
-  void reduce_atom_deques(deque<_atom>& expanded, xmatrix<double>& lattice, double& min_dist, double& sym_tol) { //DX 20190215 -added sym_tol
+  void reduce_atom_deques(deque<_atom>& expanded, xmatrix<double>& lattice, double& min_dist, double& sym_tol) { //DX20190215 -added sym_tol
     deque<_atom> tmpvec;
     for (uint i = 0; i < expanded.size(); i++) {
       for (int j = 1; j < 4; j++) {
-        //DX 20190905 [OBSOLETE - no more mod_one] expanded[i].fpos[j] = SYM::mod_one(expanded[i].fpos[j]);
-        BringInCellInPlace(expanded[i].fpos[j]); //DX 20190905
+        //DX20190905 [OBSOLETE - no more mod_one] expanded[i].fpos[j] = SYM::mod_one(expanded[i].fpos[j]);
+        BringInCellInPlace(expanded[i].fpos[j]); //DX20190905
       }
     }
     //double min_mod = find_min_lattice_vector(xvec2xmat(expanded[0],expanded[1],expanded[2]));
     xmatrix<double> f2c = trasp(lattice);
-    //DX 20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
-    bool skew = SYM::isLatticeSkewed(lattice, min_dist, sym_tol); //DX 20190215
+    //DX20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
+    bool skew = SYM::isLatticeSkewed(lattice, min_dist, sym_tol); //DX20190215
 
     for (uint i = 0; i < expanded.size(); i++) {
-      if(!SYM::MapAtom(tmpvec, expanded[i], TRUE, lattice, f2c, skew, sym_tol)) {  //CAN I USE JUST 1 HERE //DX 20190215 //DX 20190619 - lattice and f2c as input
+      if(!SYM::MapAtom(tmpvec, expanded[i], TRUE, lattice, f2c, skew, sym_tol)) {  //CAN I USE JUST 1 HERE //DX20190215 //DX20190619 - lattice and f2c as input
         tmpvec.push_back(expanded[i]);
       }
     }
@@ -768,23 +768,23 @@ namespace SYM {
     }
   }
 } //namespace SYM
-//DX 20190215 [OBSOLETE] namespace SYM {
-//DX 20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE]thread_local vector<xvector<double> > glideplanes;
-//DX 20190215 [OBSOLETE]thread_local vector<xvector<double> > glideplanes_hex;
-//DX 20190215 [OBSOLETE]thread_local vector<xvector<double> > glidetrans;
-//DX 20190215 [OBSOLETE]thread_local vector<xvector<double> > glidetrans_hex;
-//DX 20190215 [OBSOLETE]thread_local vector<string> glidesymbols;
-//DX 20190215 [OBSOLETE]thread_local vector<string> glidesymbols_hex;
-//DX 20190215 [OBSOLETE]#else
-//DX 20190215 [OBSOLETE]vector<xvector<double> > glideplanes;
-//DX 20190215 [OBSOLETE]vector<xvector<double> > glideplanes_hex;
-//DX 20190215 [OBSOLETE]vector<xvector<double> > glidetrans;
-//DX 20190215 [OBSOLETE]vector<xvector<double> > glidetrans_hex;
-//DX 20190215 [OBSOLETE]vector<string> glidesymbols;
-//DX 20190215 [OBSOLETE]vector<string> glidesymbols_hex;
-//DX 20190215 [OBSOLETE]#endif
-//DX 20190215 [OBSOLETE]} //namespace SYM
+//DX20190215 [OBSOLETE] namespace SYM {
+//DX20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+//DX20190215 [OBSOLETE]thread_local vector<xvector<double> > glideplanes;
+//DX20190215 [OBSOLETE]thread_local vector<xvector<double> > glideplanes_hex;
+//DX20190215 [OBSOLETE]thread_local vector<xvector<double> > glidetrans;
+//DX20190215 [OBSOLETE]thread_local vector<xvector<double> > glidetrans_hex;
+//DX20190215 [OBSOLETE]thread_local vector<string> glidesymbols;
+//DX20190215 [OBSOLETE]thread_local vector<string> glidesymbols_hex;
+//DX20190215 [OBSOLETE]#else
+//DX20190215 [OBSOLETE]vector<xvector<double> > glideplanes;
+//DX20190215 [OBSOLETE]vector<xvector<double> > glideplanes_hex;
+//DX20190215 [OBSOLETE]vector<xvector<double> > glidetrans;
+//DX20190215 [OBSOLETE]vector<xvector<double> > glidetrans_hex;
+//DX20190215 [OBSOLETE]vector<string> glidesymbols;
+//DX20190215 [OBSOLETE]vector<string> glidesymbols_hex;
+//DX20190215 [OBSOLETE]#endif
+//DX20190215 [OBSOLETE]} //namespace SYM
 // **********************************************************************************************************************
 // initglides
 // **********************************************************************************************************************
@@ -1081,51 +1081,51 @@ bool SymmetryInformationITC::initglides() {
 
   return true;
 }
-//DX 20190215 [OBSOLETE]} //namespace SYM
+//DX20190215 [OBSOLETE]} //namespace SYM
 
 //sym_mats gives the symmetry matrices. The directions are specified by the map
-//DX 20190215 [OBSOLETE]namespace SYM {
-//DX 20190215 [OBSOLETE]  //counting FROM ZERO
-//DX 20190215 [OBSOLETE]#ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE]  thread_local vector<int> index_cubic;
-//DX 20190215 [OBSOLETE]  thread_local vector<int> index_hex;  //To be used with the *_hex vectors
-//DX 20190215 [OBSOLETE]  thread_local vector<int> index_rhom;
-//DX 20190215 [OBSOLETE]  thread_local vector<int> index_tetr;
-//DX 20190215 [OBSOLETE]  thread_local vector<int> index_ortho;
-//DX 20190215 [OBSOLETE]  thread_local vector<int> index_mono_b;
-//DX 20190215 [OBSOLETE]  thread_local vector<int> index_mono_c;
-//DX 20190215 [OBSOLETE]  thread_local vector<int> index_tric;
-//DX 20190215 [OBSOLETE]
-//DX 20190215 [OBSOLETE]  thread_local vector<xmatrix<double> > sym_mats;
-//DX 20190215 [OBSOLETE]  thread_local vector<string> symbol;
-//DX 20190215 [OBSOLETE]  thread_local vector<string> dirparam;
-//DX 20190215 [OBSOLETE]  thread_local hash sym_mats_direction;
-//DX 20190215 [OBSOLETE]
-//DX 20190215 [OBSOLETE]  thread_local vector<xmatrix<double> > sym_mats_hex;
-//DX 20190215 [OBSOLETE]  thread_local vector<string> symbol_hex;
-//DX 20190215 [OBSOLETE]  thread_local vector<string> dirparam_hex;
-//DX 20190215 [OBSOLETE]  thread_local hash sym_mats_direction_hex;
-//DX 20190215 [OBSOLETE]#else
-//DX 20190215 [OBSOLETE]  vector<int> index_cubic;
-//DX 20190215 [OBSOLETE]  vector<int> index_hex;  //To be used with the *_hex vectors
-//DX 20190215 [OBSOLETE]  vector<int> index_rhom;
-//DX 20190215 [OBSOLETE]  vector<int> index_tetr;
-//DX 20190215 [OBSOLETE]  vector<int> index_ortho;
-//DX 20190215 [OBSOLETE]  vector<int> index_mono_b;
-//DX 20190215 [OBSOLETE]  vector<int> index_mono_c;
-//DX 20190215 [OBSOLETE]  vector<int> index_tric;
-//DX 20190215 [OBSOLETE]
-//DX 20190215 [OBSOLETE]  vector<xmatrix<double> > sym_mats;
-//DX 20190215 [OBSOLETE]  vector<string> symbol;
-//DX 20190215 [OBSOLETE]  vector<string> dirparam;
-//DX 20190215 [OBSOLETE]  hash sym_mats_direction;
-//DX 20190215 [OBSOLETE]
-//DX 20190215 [OBSOLETE]  vector<xmatrix<double> > sym_mats_hex;
-//DX 20190215 [OBSOLETE]  vector<string> symbol_hex;
-//DX 20190215 [OBSOLETE]  vector<string> dirparam_hex;
-//DX 20190215 [OBSOLETE]  hash sym_mats_direction_hex;
-//DX 20190215 [OBSOLETE]#endif
-//DX 20190215 [OBSOLETE]} //namespace SYM
+//DX20190215 [OBSOLETE]namespace SYM {
+//DX20190215 [OBSOLETE]  //counting FROM ZERO
+//DX20190215 [OBSOLETE]#ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+//DX20190215 [OBSOLETE]  thread_local vector<int> index_cubic;
+//DX20190215 [OBSOLETE]  thread_local vector<int> index_hex;  //To be used with the *_hex vectors
+//DX20190215 [OBSOLETE]  thread_local vector<int> index_rhom;
+//DX20190215 [OBSOLETE]  thread_local vector<int> index_tetr;
+//DX20190215 [OBSOLETE]  thread_local vector<int> index_ortho;
+//DX20190215 [OBSOLETE]  thread_local vector<int> index_mono_b;
+//DX20190215 [OBSOLETE]  thread_local vector<int> index_mono_c;
+//DX20190215 [OBSOLETE]  thread_local vector<int> index_tric;
+//DX20190215 [OBSOLETE]
+//DX20190215 [OBSOLETE]  thread_local vector<xmatrix<double> > sym_mats;
+//DX20190215 [OBSOLETE]  thread_local vector<string> symbol;
+//DX20190215 [OBSOLETE]  thread_local vector<string> dirparam;
+//DX20190215 [OBSOLETE]  thread_local hash sym_mats_direction;
+//DX20190215 [OBSOLETE]
+//DX20190215 [OBSOLETE]  thread_local vector<xmatrix<double> > sym_mats_hex;
+//DX20190215 [OBSOLETE]  thread_local vector<string> symbol_hex;
+//DX20190215 [OBSOLETE]  thread_local vector<string> dirparam_hex;
+//DX20190215 [OBSOLETE]  thread_local hash sym_mats_direction_hex;
+//DX20190215 [OBSOLETE]#else
+//DX20190215 [OBSOLETE]  vector<int> index_cubic;
+//DX20190215 [OBSOLETE]  vector<int> index_hex;  //To be used with the *_hex vectors
+//DX20190215 [OBSOLETE]  vector<int> index_rhom;
+//DX20190215 [OBSOLETE]  vector<int> index_tetr;
+//DX20190215 [OBSOLETE]  vector<int> index_ortho;
+//DX20190215 [OBSOLETE]  vector<int> index_mono_b;
+//DX20190215 [OBSOLETE]  vector<int> index_mono_c;
+//DX20190215 [OBSOLETE]  vector<int> index_tric;
+//DX20190215 [OBSOLETE]
+//DX20190215 [OBSOLETE]  vector<xmatrix<double> > sym_mats;
+//DX20190215 [OBSOLETE]  vector<string> symbol;
+//DX20190215 [OBSOLETE]  vector<string> dirparam;
+//DX20190215 [OBSOLETE]  hash sym_mats_direction;
+//DX20190215 [OBSOLETE]
+//DX20190215 [OBSOLETE]  vector<xmatrix<double> > sym_mats_hex;
+//DX20190215 [OBSOLETE]  vector<string> symbol_hex;
+//DX20190215 [OBSOLETE]  vector<string> dirparam_hex;
+//DX20190215 [OBSOLETE]  hash sym_mats_direction_hex;
+//DX20190215 [OBSOLETE]#endif
+//DX20190215 [OBSOLETE]} //namespace SYM
 
 // **********************************************************************************************************************
 // initsymmats
@@ -1634,17 +1634,17 @@ bool SymmetryInformationITC::initsymmats() {
   return true;
 }
 //} //namespace SYM
-//DX 20190215 [OBSOLETE]#ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE]thread_local vector<string> sym_ops;
-//DX 20190215 [OBSOLETE]#else
-//DX 20190215 [OBSOLETE]vector<string> sym_ops;
-//DX 20190215 [OBSOLETE]#endif
+//DX20190215 [OBSOLETE]#ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+//DX20190215 [OBSOLETE]thread_local vector<string> sym_ops;
+//DX20190215 [OBSOLETE]#else
+//DX20190215 [OBSOLETE]vector<string> sym_ops;
+//DX20190215 [OBSOLETE]#endif
 // **********************************************************************************************************************
 // initsymops
 // **********************************************************************************************************************
-//DX 20190215 [OBSOLETE] namespace SYM {
+//DX20190215 [OBSOLETE] namespace SYM {
 bool SymmetryInformationITC::initsymops() {
-  //DX 20190215 [OBSOLETE]extern vector<string> sgs;
+  //DX20190215 [OBSOLETE]extern vector<string> sgs;
   vector<string> temp;
 
   string so1 = "H 1(0 0 0)";
@@ -2206,14 +2206,14 @@ namespace SYM {
       if(aurostd::abs(a.shift(i)) < tol) {
         shift_string.push_back("");
       } else {
-        shift_string.push_back(aurostd::dbl2frac(a.shift(i))); //DX 20190724 - now namespace aurostd
+        shift_string.push_back(aurostd::dbl2frac(a.shift(i))); //DX20190724 - now namespace aurostd
       }
     }
     for (uint i = 1; i < 4; i++) {
       if(aurostd::abs(a.screwglide(i)) < tol) {
         screwglide_string.push_back("0");
       } else {
-        screwglide_string.push_back(aurostd::dbl2frac(a.screwglide(i))); //DX 20190724 - now namespace aurostd
+        screwglide_string.push_back(aurostd::dbl2frac(a.screwglide(i))); //DX20190724 - now namespace aurostd
       }
     }
     if(!havechar(a.symbol, 'm') && !havechar(a.symbol, 'n') && !havechar(a.symbol, 'd') && !havechar(a.symbol, 'a') && !havechar(a.symbol, 'c') && !havechar(a.symbol, 'b')) {
@@ -2296,7 +2296,7 @@ namespace SYM {
       if(a.symbol == "-1") {
         output << a.symbol << " " << screwglide_string[0] << "," << screwglide_string[1] << "," << screwglide_string[2];
       } else if(a.symbol == "1") {
-        output << a.symbol << " " << aurostd::dbl2frac(a.shift(1)) << "," << aurostd::dbl2frac(a.shift(2)) << "," << aurostd::dbl2frac(a.shift(3)); //DX 20190724 - now namespace aurostd
+        output << a.symbol << " " << aurostd::dbl2frac(a.shift(1)) << "," << aurostd::dbl2frac(a.shift(2)) << "," << aurostd::dbl2frac(a.shift(3)); //DX20190724 - now namespace aurostd
       } else {
         output << a.symbol << " " << diross.str() << ";" << screwglide_string[0] << "," << screwglide_string[1] << "," << screwglide_string[2];
       }
@@ -2393,7 +2393,7 @@ namespace SYM {
   }
 } //namespace SYM
 
-//DX 20190215 - moved higher up -START
+//DX20190215 - moved higher up -START
 // **********************************************************************************************************************
 // symop::clear
 // **********************************************************************************************************************
@@ -2405,24 +2405,24 @@ namespace SYM {
     shift.clear();
   }
 } //namespace SYM
-//DX 20190215 - moved higher up -END
+//DX20190215 - moved higher up -END
 
-//DX 20190215 [OBSOLETE] namespace SYM {
-//DX 20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE]   thread_local vector<vector<symop> > generators;
-//DX 20190215 [OBSOLETE]   thread_local vector<int> sgindex;
-//DX 20190215 [OBSOLETE] #else
-//DX 20190215 [OBSOLETE]   vector<vector<symop> > generators;
-//DX 20190215 [OBSOLETE]   vector<int> sgindex;
-//DX 20190215 [OBSOLETE] #endif
-//DX 20190215 [OBSOLETE] }
+//DX20190215 [OBSOLETE] namespace SYM {
+//DX20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+//DX20190215 [OBSOLETE]   thread_local vector<vector<symop> > generators;
+//DX20190215 [OBSOLETE]   thread_local vector<int> sgindex;
+//DX20190215 [OBSOLETE] #else
+//DX20190215 [OBSOLETE]   vector<vector<symop> > generators;
+//DX20190215 [OBSOLETE]   vector<int> sgindex;
+//DX20190215 [OBSOLETE] #endif
+//DX20190215 [OBSOLETE] }
 // **********************************************************************************************************************
 // initgenerators
 // **********************************************************************************************************************
 bool SymmetryInformationITC::initgenerators(string axis_cell) {
-  string setting_1 = aurostd::utype2string<int>(SG_SETTING_1); //DX 20190131
-  string setting_2 = aurostd::utype2string<int>(SG_SETTING_2); //DX 20190131
-  string setting_anrl = aurostd::utype2string<int>(SG_SETTING_ANRL); //DX 20190131
+  string setting_1 = aurostd::utype2string<int>(SG_SETTING_1); //DX20190131
+  string setting_2 = aurostd::utype2string<int>(SG_SETTING_2); //DX20190131
+  string setting_anrl = aurostd::utype2string<int>(SG_SETTING_ANRL); //DX20190131
 
   xvector<double> d000;
   xvector<double> d100;
@@ -2493,12 +2493,12 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //////////////////
   //SPACE GROUP 1
   //////////////////
-  tmp.symbol = "1"; //DX 20180614 - added so that sg=1 is not a special case in Wyckoff determination
-  tmp.direction = 0.0 * d000; //DX 20180614 - added so that sg=1 is not a special case in Wyckoff determination
-  tmp.screwglide = 0.0 * d000; //DX 20180614 - added so that sg=1 is not a special case in Wyckoff determination
-  tmp.shift = 0.0 * d000; //DX 20180614 - added so that sg=1 is not a special case in Wyckoff determination
-  tmpv.push_back(tmp); //DX 20180614 - added so that sg=1 is not a special case in Wyckoff determination
-  tmp.clear(); //DX 20180614 - added so that sg=1 is not a special case in Wyckoff determination
+  tmp.symbol = "1"; //DX20180614 - added so that sg=1 is not a special case in Wyckoff determination
+  tmp.direction = 0.0 * d000; //DX20180614 - added so that sg=1 is not a special case in Wyckoff determination
+  tmp.screwglide = 0.0 * d000; //DX20180614 - added so that sg=1 is not a special case in Wyckoff determination
+  tmp.shift = 0.0 * d000; //DX20180614 - added so that sg=1 is not a special case in Wyckoff determination
+  tmpv.push_back(tmp); //DX20180614 - added so that sg=1 is not a special case in Wyckoff determination
+  tmp.clear(); //DX20180614 - added so that sg=1 is not a special case in Wyckoff determination
   generators.push_back(tmpv);
   tmp.clear();
   tmpv.clear();
@@ -2521,7 +2521,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //SPACE GROUP 3
   //////////////////
   //**************
-  //DX 20180816 - added cell choice options - START
+  //DX20180816 - added cell choice options - START
   if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl){
     tmp.symbol = "2";
     tmp.direction = d010;
@@ -2558,12 +2558,12 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
     tmpv.clear();
     sgindex.push_back(3);
   }
-  //DX 20180816 - added cell choice options - END
+  //DX20180816 - added cell choice options - END
   //////////////////
   //SPACE GROUP 4
   //////////////////
   //**************
-  //DX 20180816 - added cell choice options - START
+  //DX20180816 - added cell choice options - START
   if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl){
     tmp.symbol = "2";
     tmp.direction = d010;
@@ -2600,7 +2600,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
     tmpv.clear();
     sgindex.push_back(4);
   }
-  //DX 20180816 - added cell choice options - END
+  //DX20180816 - added cell choice options - END
   //////////////////
   //SPACE GROUP 5
   //////////////////
@@ -2625,7 +2625,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
     tmpv.clear();
     sgindex.push_back(5);
   }
-  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180817 - added option 2
+  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180817 - added option 2
     //**************
     if(includecentering == true) {
       tmp.symbol = "1";
@@ -2719,7 +2719,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //SPACE GROUP 6
   //////////////////
   //**************
-  //DX 20180816 - added cell choice options - START
+  //DX20180816 - added cell choice options - START
   if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl){
     tmp.symbol = "m";
     tmp.direction = d010;
@@ -2756,13 +2756,13 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
     tmpv.clear();
     sgindex.push_back(6);
   }
-  //DX 20180816 - added cell choice options - END
+  //DX20180816 - added cell choice options - END
   //////////////////
   //SPACE GROUP 7
   //////////////////
   //**************
   //CELL CHOICE 1
-  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     tmp.symbol = "c";
     tmp.direction = d010;
     tmp.screwglide = 0.5 * d001;
@@ -2777,7 +2777,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //**************
   //**************
   //CELL CHOICE 1
-  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added option 2
     tmp.symbol = "a";
     tmp.direction = d001;
     tmp.screwglide = 0.5 * d100;
@@ -2832,7 +2832,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //SPACE GROUP 8
   //////////////////
   //CELL CHOICE 1
-  if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     if(includecentering == true) {
       tmp.symbol = "1";
       tmp.direction = 0.0 * d000;
@@ -2896,7 +2896,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
 
   //**************
   //CELL CHOICE 1
-  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added option 2
     if(includecentering == true) {
       tmp.symbol = "1";
       tmp.direction = 0.0 * d000;
@@ -2991,7 +2991,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //SPACE GROUP 9
   //////////////////
   //CELL CHOICE 1
-  if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     if(includecentering == true) {
       tmp.symbol = "1";
       tmp.direction = 0.0 * d000;
@@ -3054,7 +3054,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   }
 
   //////////////////
-  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added option 2
     //**************
     //CELL CHOICE 1
     if(includecentering == true) {
@@ -3146,7 +3146,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //////////////////
   //SPACE GROUP 10
   //////////////////
-  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     //**************
     tmp.symbol = "2";
     tmp.direction = d010;
@@ -3166,7 +3166,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
     tmpv.clear();
     sgindex.push_back(10);
   }
-  if(axis_cell == "m1" || axis_cell == "m2" || axis_cell == "m3" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  if(axis_cell == "m1" || axis_cell == "m2" || axis_cell == "m3" || axis_cell==setting_2) { //DX20180816 - added option 2
     //**************
     tmp.symbol = "2";
     tmp.direction = d001;
@@ -3208,7 +3208,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //////////////////
   //SPACE GROUP 11
   //////////////////
-  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     //**************
     tmp.symbol = "2";
     tmp.direction = d010;
@@ -3229,7 +3229,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
     sgindex.push_back(11);
   }
 
-  if(axis_cell == "m1" || axis_cell == "m2" || axis_cell == "m3" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  if(axis_cell == "m1" || axis_cell == "m2" || axis_cell == "m3" || axis_cell==setting_2) { //DX20180816 - added option 2
     //**************
     tmp.symbol = "2";
     tmp.direction = d001;
@@ -3274,7 +3274,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //////////////////
   //**************
   //CELL CHOICE 1
-  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     if(includecentering == true) {
       tmp.symbol = "1";
       tmp.direction = 0.0 * d000;
@@ -3306,7 +3306,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
 
   //**************
   //CELL CHOICE 1
-  if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added option 2
     if(includecentering == true) {
       tmp.symbol = "1";
       tmp.direction = 0.0 * d000;
@@ -3425,7 +3425,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //SPACE GROUP 13
   //////////////////
   //CELL CHOICE 1
-  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     //**************
     tmp.symbol = "2";
     tmp.direction = d010;
@@ -3447,7 +3447,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   }
   //CELL CHOICE 1
   //**************
-  if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added option 2
     tmp.symbol = "2";
     tmp.direction = d001;
     tmp.screwglide = 0.0 * d000;
@@ -3534,7 +3534,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //////////////////
   //CELL CHOICE 1
   //**************
-  if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     tmp.symbol = "2";
     tmp.direction = d010;
     tmp.screwglide = .5 * d010;
@@ -3597,7 +3597,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
 
   //CELL CHOICE 1
   //**************
-  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added option 2
     tmp.symbol = "2";
     tmp.direction = d001;
     tmp.screwglide = .5 * d001;
@@ -3683,7 +3683,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   //////////////////
   //CELL CHOICE 1
   //**************
-  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX 20180816 - added option 1
+  if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) { //DX20180816 - added option 1
     if(includecentering == true) {
       tmp.symbol = "1";
       tmp.direction = 0.0 * d000;
@@ -3714,7 +3714,7 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
 
   //CELL CHOICE 1
   //**************
-  if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added option 2
+  if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added option 2
     if(includecentering == true) {
       tmp.symbol = "1";
       tmp.direction = 0.0 * d000;
@@ -10873,24 +10873,24 @@ bool SymmetryInformationITC::initgenerators(string axis_cell) {
   return true;
 }
 
-//DX 20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
-//DX 20190215 [OBSOLETE]   thread_local vector<string> gl_sgs;
-//DX 20190215 [OBSOLETE] #else
-//DX 20190215 [OBSOLETE]   vector<string> gl_sgs;
-//DX 20190215 [OBSOLETE] #endif
+//DX20190215 [OBSOLETE] #ifdef AFLOW_SYMMETRY_MULTITHREADS_ENABLE
+//DX20190215 [OBSOLETE]   thread_local vector<string> gl_sgs;
+//DX20190215 [OBSOLETE] #else
+//DX20190215 [OBSOLETE]   vector<string> gl_sgs;
+//DX20190215 [OBSOLETE] #endif
 bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string setting_1 = aurostd::utype2string<int>(SG_SETTING_1);
   string setting_2 = aurostd::utype2string<int>(SG_SETTING_2);
   string setting_anrl = aurostd::utype2string<int>(SG_SETTING_ANRL);
-  //DX 20190215 [OBSOLETE]extern vector<string> sgs;
+  //DX20190215 [OBSOLETE]extern vector<string> sgs;
   vector<string> sgs;
 
   string sg1 = "Space Group 1\n (0,0,0) \n 1 a 1 (x,y,z) \n ";
 
   string sg2 = "Space Group 2\n  (0,0,0) \n 2 i 1 (x,y,z) (-x,-y,-z) \n 1 h -1 (.5,.5,.5) \n 1 g -1 (0,.5,.5) \n 1 f -1 (.5,0.,.5) \n 1 e -1 (.5,.5,0) \n 1 d -1 (.5,0,0) \n 1 c -1 (0,.5,0) \n 1 b -1 (0,0,.5) \n 1 a -1 (0,0,0) \n ";
 
-  //DX 20180818 - added unique axis choices - START
+  //DX20180818 - added unique axis choices - START
   string sg3 = "";
   if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl){
     sg3 = "Space Group 3\n (0,0,0) \n 2 e 1 (x,y,z) (-x,y,-z) \n 1 d 2 (.5,y,.5) \n 1 c 2 (.5,y,0) \n 1 b 2 (0,y,.5) \n 1 a 2 (0,y,0) \n ";
@@ -10899,9 +10899,9 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
   } else {
     sg3 = "Space Group 3\n (0,0,0) \n 2 e 1 (x,y,z) (-x,y,-z) \n 1 d 2 (.5,y,.5) \n 1 c 2 (.5,y,0) \n 1 b 2 (0,y,.5) \n 1 a 2 (0,y,0) \n ";
   }
-  //DX 20180818 - added unique axis choices - END
+  //DX20180818 - added unique axis choices - END
 
-  //DX 20180818 - added unique axis choices - START
+  //DX20180818 - added unique axis choices - START
   string sg4 = "";
   if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl){
     sg4 = "Space Group 4\n  (0,0,0) \n 2 a 1 (x,y,z) (-x,y+.5,-z) \n ";
@@ -10910,7 +10910,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
   } else {
     sg4 = "Space Group 4\n  (0,0,0) \n 2 a 1 (x,y,z) (-x,y+.5,-z) \n ";
   }
-  //DX 20180818 - added unique axis choices - END
+  //DX20180818 - added unique axis choices - END
 
   string sg5 = "";
   if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl) {
@@ -10919,7 +10919,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg5 = "Space Group 5b2\n (0,0,0) (0,.5,.5) \n 4 c 1 (x,y,z) (-x,y,-z) \n 2 b 2 (.5,y,.5) \n 2 a 2 (0,y,0) \n ";
   } else if(axis_cell == "b3") {
     sg5 = "Space Group 5b3\n (0,0,0) (.5,.5,.5) \n 4 c 1 (x,y,z) (-x,y,-z) \n 2 b 2 (.5,y,0) \n 2 a 2 (0,y,0) \n ";
-  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg5 = "Space Group 5c1\n (0,0,0) (0,.5,.5) \n 4 c 1 (x,y,z) (-x,-y,z) \n 2 b 2 (.5,0,z) \n 2 a 2 (0,0,z) \n ";
   } else if(axis_cell == "m2") {
     sg5 = "Space Group 5c2\n (0,0,0) (.5,0,.5) \n 4 c 1 (x,y,z) (-x,-y,z) \n 2 b 2 (.5,.5,z) \n 2 a 2 (0,0,z) \n ";
@@ -10929,7 +10929,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg5 = "Space Group 5\n (0,0,0) (.5,.5,0) \n 4 c 1 (x,y,z) (-x,y,-z) \n 2 b 2 (0,y,.5) \n 2 a 2 (0,y,0) \n ";
   }
 
-  //DX 20180818 - added unique axis choices - START
+  //DX20180818 - added unique axis choices - START
   string sg6 = "";
   if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl){
     sg6 = "Space Group 6\n (0,0,0) \n 2 c 1 (x,y,z) (x,-y,z) \n 1 b m (x,.5,z) \n 1 a m (x,0,z) \n ";
@@ -10938,7 +10938,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
   } else {
     sg6 = "Space Group 6\n (0,0,0) \n 2 c 1 (x,y,z) (x,-y,z) \n 1 b m (x,.5,z) \n 1 a m (x,0,z) \n ";
   }
-  //DX 20180818 - added unique axis choices - END
+  //DX20180818 - added unique axis choices - END
 
   string sg7 = "";
   if(axis_cell == "b1" || axis_cell==setting_1 || axis_cell==setting_anrl) {
@@ -10947,7 +10947,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg7 = "Space Group 7b2\n (0,0,0) \n 2 a 1 (x,y,z) (x+.5,-y,z+.5) \n ";
   } else if(axis_cell == "b3") {
     sg7 = "Space Group 7b3\n (0,0,0) \n 2 a 1 (x,y,z) (x+.5,-y,z) \n ";
-  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg7 = "Space Group 7c1\n (0,0,0) \n 2 a 1 (x,y,z) (x+.5,y,-z) \n ";
   } else if(axis_cell == "m2") {
     sg7 = "Space Group 7c2\n (0,0,0) \n 2 a 1 (x,y,z) (x+.5,y+.5,-z) \n ";
@@ -10964,7 +10964,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg8 = "Space Group 8\n (0,0,0) (0,.5,.5) \n 4 b 1 (x,y,z) (x,-y,z) \n 2 a m (x,0,z) \n ";
   } else if(axis_cell == "b3") {
     sg8 = "Space Group 8\n (0,0,0) (.5,.5,.5) \n 4 b 1 (x,y,z) (x,-y,z) \n 2 a m (x,0,z) \n ";
-  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg8 = "Space Group 8\n (0,0,0) (0,.5,.5) \n 4 b 1 (x,y,z) (x,y,-z) \n 2 a m (x,y,0) \n ";
   } else if(axis_cell == "m2") {
     sg8 = "Space Group 8\n (0,0,0) (.5,0,.5) \n 4 b 1 (x,y,z) (x,y,-z) \n 2 a m (x,y,0) \n ";
@@ -10981,7 +10981,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg9 = "Space Group 9b2\n (0,0,0) (0,.5,.5) \n 4 a 1 (x,y,z) (x+.5,-y,z+.5) \n ";
   } else if(axis_cell == "b3") {
     sg9 = "Space Group 9b3\n (0,0,0) (.5,.5,.5) \n 4 a 1 (x,y,z) (x+.5,-y,z) \n ";
-  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg9 = "Space Group 9c1\n (0,0,0) (0,.5,.5) \n 4 a 1 (x,y,z) (x+.5,y,-z) \n ";
   } else if(axis_cell == "m2") {
     sg9 = "Space Group 9c2\n (0,0,0) (.5,0,.5) \n 4 a 1 (x,y,z) (x+.5,y+.5,-z) \n ";
@@ -10994,7 +10994,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
   string sg10 = "";
   if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) {
     sg10 = "Space Group 10\n (0,0,0) \n 4 o 1 (x,y,z) (-x,y,-z) (-x,-y,-z) (x,-y,z) \n 2 n m (x,.5,z) (-x,.5,-z) \n 2 m m (x,0,z) (-x,0,-z) \n 2 l 2 (.5,y,.5) (.5,-y,.5) \n 2 k 2 (0,y,.5) (0,-y,.5) \n 2 j 2 (.5,y,0) (.5,-y,0) \n 2 i 2 (0,y,0) (0,-y,0) \n 1 h 2/m (.5,.5,.5) \n 1 g 2/m (.5,0,.5) \n 1 f 2/m (0,.5,.5) \n 1 e 2/m (.5,.5,0) \n 1 d 2/m (.5,0,0) \n 1 c 2/m (0,0,.5) \n 1 b 2/m (0,.5,0) \n 1 a 2/m (0,0,0) \n ";
-  } else if(axis_cell == "m1" || axis_cell == "m2" || axis_cell == "m3" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell == "m2" || axis_cell == "m3" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg10 = "Space Group 10\n (0,0,0) \n 4 o 1 (x,y,z) (-x,-y,z) (-x,-y,-z) (x,y,-z) \n 2 n m (x,y,.5) (-x,-y,.5) \n 2 m m (x,y,0) (-x,-y,0) \n 2 l 2 (.5,.5,z) (.5,.5,-z) \n 2 k 2 (.5,0,z) (.5,0,-z) \n 2 j 2 (0,.5,z) (0,.5,-z) \n 2 i 2 (0,0,z) (0,0,-z) \n 1 h 2/m (.5,.5,.5) \n 1 g 2/m (.5,.5,0) \n 1 f 2/m (.5,0,.5) \n 1 e 2/m (0,.5,.5) \n 1 d 2/m (0,.5,0) \n 1 c 2/m (.5,0,0) \n 1 b 2/m (0,0,.5) \n 1 a 2/m (0,0,0) \n ";
   } else {
     sg10 = "Space Group 10\n (0,0,0) \n 4 o 1 (x,y,z) (-x,y,-z) (-x,-y,-z) (x,-y,z) \n 2 n m (x,.5,z) (-x,.5,-z) \n 2 m m (x,0,z) (-x,0,-z) \n 2 l 2 (.5,y,.5) (.5,-y,.5) \n 2 k 2 (0,y,.5) (0,-y,.5) \n 2 j 2 (.5,y,0) (.5,-y,0) \n 2 i 2 (0,y,0) (0,-y,0) \n 1 h 2/m (.5,.5,.5) \n 1 g 2/m (.5,0,.5) \n 1 f 2/m (0,.5,.5) \n 1 e 2/m (.5,.5,0) \n 1 d 2/m (.5,0,0) \n 1 c 2/m (0,0,.5) \n 1 b 2/m (0,.5,0) \n 1 a 2/m (0,0,0) \n ";
@@ -11003,7 +11003,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
   string sg11 = "";
   if(axis_cell == "b1" || axis_cell == "b2" || axis_cell == "b3" || axis_cell==setting_1 || axis_cell==setting_anrl) {
     sg11 = "Space Group 11\n (0,0,0) \n 4 f 1 (x,y,z) (-x,y+.5,-z) (-x,-y,-z) (x,-y+.5,z) \n 2 e m (x,.25,z) (-x,.75,-z) \n 2 d -1 (.5,0,.5) (.5,.5,.5) \n 2 c -1 (0,0,.5) (0,.5,.5) \n 2 b -1 (.5,0,0) (.5,.5,0) \n 2 a -1 (0,0,0) (0,.5,0) \n ";
-  } else if(axis_cell == "m1" || axis_cell == "m2" || axis_cell == "m3" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell == "m2" || axis_cell == "m3" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg11 = "Space Group 11\n (0,0,0) \n 4 f 1 (x,y,z) (-x,-y,z+.5) (-x,-y,-z) (x,y,-z+.5) \n 2 e m (x,y,.25) (-x,-y,.75) \n 2 d -1 (.5,.5,0) (.5,.5,.5) \n 2 c -1 (.5,0,0) (.5,0,.5) \n 2 b -1 (0,.5,0) (0,.5,.5) \n 2 a -1 (0,0,0) (0,0,.5) \n ";
   } else {
     sg11 = "Space Group 11\n (0,0,0) \n 4 f 1 (x,y,z) (-x,y+.5,-z) (-x,-y,-z) (x,-y+.5,z) \n 2 e m (x,.25,z) (-x,.75,-z) \n 2 d -1 (.5,0,.5) (.5,.5,.5) \n 2 c -1 (0,0,.5) (0,.5,.5) \n 2 b -1 (.5,0,0) (.5,.5,0) \n 2 a -1 (0,0,0) (0,.5,0) \n ";
@@ -11016,7 +11016,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg12 = "Space Group 12b2\n (0,0,0) (0,.5,.5) \n 8 j 1 (x,y,z) (-x,y,-z) (-x,-y,-z) (x,-y,z) \n 4 i m (x,0,z) (-x,0,-z) \n 4 h 2 (.5,y,.5) (.5,-y,.5) \n 4 g 2 (0,y,0) (0,-y,0) \n 4 f -1 (.5,.25,.75) (.5,.25,.25) \n 4 e -1 (0,.25,.25) (0,.25,.75) \n 2 d 2/m (.5,.5,.5) \n 2 c 2/m (.5,0,.5) \n 2 b 2/m (0,.5,0) \n 2 a 2/m (0,0,0) \n ";
   } else if(axis_cell == "b3") {
     sg12 = "Space Group 12b3\n (0,0,0) (.5,.5,.5) \n 8 j 1 (x,y,z) (-x,y,-z) (-x,-y,-z) (x,-y,z) \n 4 i m (x,0,z) (-x,0,-z) \n 4 h 2 (.5,y,0) (.5,-y,0) \n 4 g 2 (0,y,0) (0,-y,0) \n 4 f -1 (.25,.25,.75) (.75,.25,.25) \n 4 e -1 (.75,.25,.75) (.25,.25,.25) \n 2 d 2/m (.5,.5,0) \n 2 c 2/m (.5,0,0) \n 2 b 2/m (0,.5,0) \n 2 a 2/m (0,0,0) \n ";
-  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg12 = "Space Group 12c1\n (0,0,0) (0,.5,.5) \n 8 j 1 (x,y,z) (-x,-y,z) (-x,-y,-z) (x,y,-z) \n 4 i m (x,y,0) (-x,-y,0) \n 4 h 2 (.5,0,z) (.5,0,-z) \n 4 g 2 (0,0,z) (0,0,-z) \n 4 f -1 (.5,.25,.25) (.5,.75,.25) \n 4 e -1 (0,.25,.25) (0,.75,.25) \n 2 d 2/m (.5,0,.5) \n 2 c 2/m (.5,0,0) \n 2 b 2/m (0,0,.5) \n 2 a 2/m (0,0,0) \n ";
   } else if(axis_cell == "m2") {
     sg12 = "Space Group 12c2\n (0,0,0) (.5,0,.5) \n 8 j 1 (x,y,z) (-x,-y,z) (-x,-y,-z) (x,y,-z) \n 4 i m (x,y,0) (-x,-y,0) \n 4 h 2 (.5,.5,z) (.5,.5,-z) \n 4 g 2 (0,0,z) (0,0,-z) \n 4 f -1 (.75,.5,.25) (.25,.5,.25) \n 4 e -1 (.25,0,.25) (.75,0,.25) \n 2 d 2/m (.5,.5,.5) \n 2 c 2/m (.5,.5,0) \n 2 b 2/m (0,0,.5) \n 2 a 2/m (0,0,0) \n ";
@@ -11033,7 +11033,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg13 = "Space Group 13b2\n (0,0,0) \n 4 g 1 (x,y,z) (-x+.5,y,-z+.5) (-x,-y,-z) (x+.5,-y,z+.5) \n 2 f 2 (.75,y,.25) (.25,-y,.75) \n 2 e 2 (.75,y,.75) (.25,-y,.25) \n 	2 d -1 (0,0,.5) (.5,0,0) \n 2 c -1 (0,.5,0) (.5,.5,.5) \n 2 b -1 (0,.5,.5) (.5,.5,0) \n 2 a -1 (0,0,0) (.5,0,.5) \n ";
   } else if(axis_cell == "b3") {
     sg13 = "Space Group 13b3\n (0,0,0) \n 4 g 1 (x,y,z) (-x+.5,y,-z) (-x,-y,-z) (x+.5,-y,z) \n 2 f 2 (.75,y,.5) (.25,-y,.5) \n 2 e 2 (.25,y,0) (.75,-y,0) \n 2 d -1 (.5,0,.5) (0,0,.5) \n 2 c -1 (0,.5,0) (.5,.5,0) \n 2 b -1 (.5,.5,.5) (0,.5,.5) \n 2 a -1 (0,0,0) (.5,0,0) \n ";
-  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg13 = "Space Group 13c1\n (0,0,0) \n 4 g 1 (x,y,z) (-x+.5,-y,z) (-x,-y,-z) (x+.5,y,-z) \n 2 f 2 (.25,.5,z) (.75,.5,-z) \n 2 e 2 (.25,0,z) (.75,0,-z) \n 2 d -1 (0,.5,0) (.5,.5,0) \n 2 c -1 (0,0,.5) (.5,0,.5) \n 2 b -1 (0,.5,.5) (.5,.5,.5) \n 2 a -1 (0,0,0) (.5,0,0) \n ";
   } else if(axis_cell == "m2") {
     sg13 = "Space Group 13c2\n (0,0,0) \n 4 g 1 (x,y,z) (-x+.5,-y+.5,z) (-x,-y,-z) (x+.5,y+.5,-z) \n 2 f 2 (.25,.75,z) (.75,.25,-z) \n 2 e 2 (.75,.75,z) (.25,.25,-z) \n 	2 d -1 (.5,0,0) (0,.5,0) \n 2 c -1 (0,0,.5) (.5,.5,.5) \n 2 b -1 (.5,0,.5) (0,.5,.5) \n 2 a -1 (0,0,0) (.5,.5,0) \n ";
@@ -11050,7 +11050,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg14 = "Space Group 14\n  (0,0,0) \n 4 e 1 (x,y,z) (-x+.5,y+.5,-z+.5) (-x,-y,-z) (x+.5,-y+.5,z+.5) \n 2 d -1 (.5,0,0) (0,.5,.5) \n 2 c -1 (.5,0,.5) (0,.5,0) \n 2 b -1 (0,0,.5) (.5,.5,0) \n 2 a -1 (0,0,0) (.5,.5,.5) \n ";
   } else if(axis_cell == "b3") {
     sg14 = "Space Group 14\n  (0,0,0) \n 4 e 1 (x,y,z) (-x+.5,y+.5,-z) (-x,-y,-z) (x+.5,-y+.5,z) \n 2 d -1 (0,0,.5) (.5,.5,.5) \n 2 c -1 (.5,0,0) (0,.5,0) \n 2 b -1 (.5,0,.5) (0,.5,.5) \n 2 a -1 (0,0,0) (.5,.5,0) \n ";
-  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg14 = "Space Group 14\n  (0,0,0) \n 4 e 1 (x,y,z) (-x+.5,-y,z+.5) (-x,-y,-z) (x+.5,y,-z+.5) \n 2 d -1 (.5,.5,0) (0,.5,.5) \n 2 c -1 (.5,0,0) (0,0,.5) \n 2 b -1 (0,.5,0) (.5,.5,.5) \n 2 a -1 (0,0,0) (.5,0,.5) \n ";
   } else if(axis_cell == "m2") {
     sg14 = "Space Group 14\n  (0,0,0) \n 4 e 1 (x,y,z) (-x+.5,-y+.5,z+.5) (-x,-y,-z) (x+.5,y+.5,-z+.5) \n 2 d -1 (0,.5,0) (.5,0,.5) \n 2 c -1 (.5,.5,0) (0,0,.5) \n 2 b -1 (.5,0,0) (0,.5,.5) \n 2 a -1 (0,0,0) (.5,.5,.5) \n ";
@@ -11067,7 +11067,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg15 = "Space Group 15b2\n (0,0,0) (0,.5,.5) \n 8 f 1 (x,y,z) (-x+.5,y,-z+.5) (-x,-y,-z) (x+.5,-y,z+.5) \n 4 e 2 (.75,y,.75) (.25,-y,.25) \n 4 d -1 (.5,.25,.75) (0,.25,.75) \n 4 c -1 (0,.25,.25) (.5,.25,.25) \n 4 b -1 (0,.5,0) (.5,.5,.5) \n 4 a -1 (0,0,0) (.5,0,.5) \n ";
   } else if(axis_cell == "b3") {
     sg15 = "Space Group 15b3\n (0,0,0) (.5,.5,.5) \n 8 f 1 (x,y,z) (-x+.5,y,-z) (-x,-y,-z) (x+.5,-y,z) \n 4 e 2 (.25,y,0) (.75,-y,0) \n 4 d -1 (.25,.25,.75) (.25,.25,.25) \n 4 c -1 (.75,.25,.75) (.75,.25,.25) \n 4 b -1 (0,.5,0) (.5,.5,0) \n 4 a -1 (0,0,0) (.5,0,0) \n ";
-  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX 20180816 - added axis-c as option 2
+  } else if(axis_cell == "m1" || axis_cell==setting_2) { //DX20180816 - added axis-c as option 2
     sg15 = "Space Group 15c1\n (0,0,0) (0,.5,.5) \n 8 f 1 (x,y,z) (-x+.5,-y,z) (-x,-y,-z) (x+.5,y,-z) \n 4 e 2 (.25,0,z) (.75,0,-z) \n 4 d -1 (.5,.25,.25) (0,.75,.25) \n 4 c -1 (0,.25,.25) (.5,.75,.25) \n 4 b -1 (0,0,.5) (.5,0,.5) \n 4 a -1 (0,0,0) (.5,0,0) \n ";
   } else if(axis_cell == "m2") {
     sg15 = "Space Group 15c2\n (0,0,0) (.5,0,.5) \n 8 f 1 (x,y,z) (-x+.5,-y+.5,z) (-x,-y,-z) (x+.5,y+.5,-z) \n 4 e 2 (.75,.75,z) (.25,.25,-z) \n 4 d -1 (.75,.5,.25) (.75,0,.25) \n 4 c -1 (.25,0,.25) (.25,.5,.25) \n 4 b -1 (0,0,.5) (.5,.5,.5) \n 4 a -1 (0,0,0) (.5,.5,0) \n ";
@@ -11141,7 +11141,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg47 = "Space Group 47\n (0,0,0) \n 8 alpha 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (-x,-y,-z) (x,y,-z) (x,-y,z) (-x,y,z) \n 4 z ..m (x,y,.5) (-x,-y,.5) (-x,y,.5) (x,-y,.5) \n 4 y ..m (x,y,0) (-x,-y,0) (-x,y,0) (x,-y,0) \n 4 x .m. (x,.5,z) (-x,.5,z) (-x,.5,-z) (x,.5,-z) \n 4 w .m. (x,0,z) (-x,0,z) (-x,0,-z) (x,0,-z) \n 4 v m.. (.5,y,z) (.5,-y,z) (.5,y,-z) (.5,-y,-z) \n 4 u m.. (0,y,z) (0,-y,z) (0,y,-z) (0,-y,-z) \n 2 t mm2 (.5,.5,z) (.5,.5,-z) \n 2 s mm2 (.5,0,z) (.5,0,-z) \n 2 r mm2 (0,.5,z) (0,.5,-z) \n 2 q mm2 (0,0,z) (0,0,-z) \n 2 p m2m (.5,y,.5) (.5,-y,.5) \n 2 o m2m (.5,y,0) (.5,-y,0) \n 2 n m2m (0,y,.5) (0,-y,.5) \n 2 m m2m (0,y,0) (0,-y,0) \n 2 l 2mm (x,.5,.5) (-x,.5,.5) \n 2 k 2mm (x,.5,0 ) (-x,.5,0) \n 2 j 2mm (x,0,.5) (-x,0,.5) \n 2 i 2mm (x,0,0) (-x,0,0) \n 1 h mmm (.5,.5,.5) \n 1 g mmm (0,.5,.5) \n 1 f mmm (.5,.5,0) \n 1 e mmm (0,.5,0) \n 1 d mmm (.5,0,.5) \n 1 c mmm (0,0,.5) \n 1 b mmm (.5,0,0) \n 1 a mmm (0,0,0) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg48 = "";
   if(axis_cell==setting_1){
     sg48 = "Space Group 48\n (0,0,0) \n 8 m 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) \n 4 l ..2 (0,.5,z) (0,.5,-z) (.5,0,-z+.5) (.5,0,z+.5) \n 4 k ..2 (0,0,z) (0,0,-z) (.5,.5,-z+.5) (.5,.5,z+.5) \n 4 j .2. (.5,y,0) (.5,-y,0) (0,-y+.5,.5) (0,y+.5,.5) \n 4 i .2. (0,y,0) (0,-y,0) (.5,-y+.5,.5) (.5,y+.5,.5) \n 4 h 2.. (x,0,.5) (-x,0,.5) (-x+.5,.5,0) (x+.5,.5,0) \n 4 g 2.. (x,0,0) (-x,0,0) (-x+.5,.5,.5) (x+.5,.5,.5) \n 4 f -1 (.75,.75,.75) (.25,.25,.75) (.25,.75,.25) (.75,.25,.25) \n 4 e -1 (.25,.25,.25) (.75,.75,.25) (.75,.25,.75) (.25,.75,.75) \n 2 d 222 (0,.5,0) (.5,0,.5) \n 2 c 222 (0,0,.5) (.5,.5,0) \n 2 b 222 (.5,0,0) (0,.5,.5) \n 2 a 222 (0,0,0) (.5,.5,.5) \n ";
@@ -11155,13 +11155,13 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg49 = "Space Group 49\n (0,0,0) \n 8 r 1 (x,y,z) (-x,-y,z) (-x,y,-z+.5) (x,-y,-z+.5) (-x,-y,-z) (x,y,-z) (x,-y,z+.5) (-x,y,z+.5) \n 4 q ..m (x,y,0) (-x,-y,0) (-x,y,.5) (x,-y,.5) \n 4 p ..2 (.5,0,z) (.5,0,-z+.5) (.5,0,-z) (.5,0,z+.5) \n 4 o ..2 (0,.5,z) (0,.5,-z+.5) (0,.5,-z) (0,.5,z+.5) \n 4 n ..2 (.5,.5,z) (.5,.5,-z+.5) (.5,.5,-z) (.5,.5,z+.5) \n 4 m ..2 (0,0,z) (0,0,-z+.5) (0,0,-z) (0,0,z+.5) \n 4 l .2. (.5,y,.25) (.5,-y,.25) (.5,-y,.75) (.5,y,.75) \n 4 k .2. (0,y,.25) (0,-y,.25) (0,-y,.75) (0,y,.75) \n 4 j 2.. (x,.5,.25) (-x,.5,.25) (-x,.5,.75) (x,.5,.75) \n 4 i 2.. (x,0,.25) (-x,0,.25) (-x,0,.75) (x,0,.75) \n 2 h 222 (.5,.5,.25) (.5,.5,.75) \n 2 g 222 (0,.5,.25) (0,.5,.75) \n 2 f 222 (.5,.0,.25) (.5,0,.75) \n 2 e 222 (0,0,.25) (0,0,.75) \n 2 d ..2/m (.5,0,0) (.5,0,.5) \n 2 c ..2/m (0,.5,0) (0,.5,.5) \n 2 b ..2/m (.5,.5,0) (.5,.5,.5) \n 2 a ..2/m (0,0,0) (0,0,.5) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg50 = "";
   if(axis_cell==setting_1){
     sg50 = "Space Group 50\n (0,0,0) \n 8 m 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (x+.5,-y+.5,z) (-x+.5,y+.5,z) \n 4 l ..2 (0,.5,z) (0,.5,-z) (.5,0,-z) (.5,0,z) \n 4 k ..2 (0,0,z) (0,0,-z) (.5,.5,-z) (.5,.5,z) \n 4 j .2. (0,y,.5) (0,-y,.5) (.5,-y+.5,.5) (.5,y+.5,.5) \n 4 i .2. (0,y,0) (0,-y,0) (.5,-y+.5,0) (.5,y+.5,0) \n 4 h 2.. (x,0,.5) (-x,0,.5) (-x+.5,.5,.5) (x+.5,.5,.5) \n 4 g 2.. (x,0,0) (-x,0,0) (-x+.5,.5,0) (x+.5,.5,0) \n 4 f -1 (.25,.25,.5) (.75,.75,.5) (.75,.25,.5) (.25,.75,.5) \n 4 e -1 (.25,.25,0) (.75,.75,0) (.75,.25,0) (.25,.75,0) \n 2 d 222 (0,0,.5) (.5,.5,.5) \n 2 c 222 (.5,.0,.5) (0,.5,.5) \n 2 b 222 (.5,0,0) (0,.5,0) \n 2 a 222 (0,0,0) (.5,.5,0) \n ";
   }
   else if(axis_cell==setting_2 || axis_cell==setting_anrl){
-    sg50 = "Space Group 50\n (0,0,0) \n 8 m 1 (x,y,z) (-x+.5,-y+.5,z) (-x+.5,y,-z) (x,-y+.5,-z) (-x,-y,-z) (x+.5,y+.5,-z) (x+.5,-y,z) (-x,y+.5,z) \n 4 l ..2 (.25,.75,z) (.25,.75,-z) (.75,.25,-z) (.75,.25,z) \n 4 k ..2 (.25,.25,z) (.25,.25,-z) (.75,.75,-z) (.75,.75,z) \n 4 j .2. (.25,y,.5) (.25,-y+.5,.5) (.75,-y,.5) (.75,y+.5,.5) \n 4 i .2. (.25,y,0) (.25,-y+.5,0) (.75,-y,0) (.75,y+.5,0) \n 4 h 2.. (x,.25,.5) (-x+.5,.25,.5) (-x,.75,.5) (x+.5,.75,.5) \n 4 g 2.. (x,.25,0) (-x+.5,.25,0) (-x,.75,0) (x+.5,.75,0) \n 4 f -1 (0,0,.5) (.5,.5,.5) (.5,0,.5) (0,.5,.5) \n 4 e -1 (0,0,0) (.5,.5,0) (.5,0,0) (0,.5,0) \n 2 d 222 (.25,.25,.5) (.75,.75,.5) \n 2 c 222 (.75,.25,.5) (.25,.75,.5) \n 2 b 222 (.75,.25,0) (.25,.75,0) \n 2 a 222 (.25,.25,0) (.75,.75,0) \n "; //DX 20180806 - third position in 4f is (.5,0,.5) not (.5,0,.25)
+    sg50 = "Space Group 50\n (0,0,0) \n 8 m 1 (x,y,z) (-x+.5,-y+.5,z) (-x+.5,y,-z) (x,-y+.5,-z) (-x,-y,-z) (x+.5,y+.5,-z) (x+.5,-y,z) (-x,y+.5,z) \n 4 l ..2 (.25,.75,z) (.25,.75,-z) (.75,.25,-z) (.75,.25,z) \n 4 k ..2 (.25,.25,z) (.25,.25,-z) (.75,.75,-z) (.75,.75,z) \n 4 j .2. (.25,y,.5) (.25,-y+.5,.5) (.75,-y,.5) (.75,y+.5,.5) \n 4 i .2. (.25,y,0) (.25,-y+.5,0) (.75,-y,0) (.75,y+.5,0) \n 4 h 2.. (x,.25,.5) (-x+.5,.25,.5) (-x,.75,.5) (x+.5,.75,.5) \n 4 g 2.. (x,.25,0) (-x+.5,.25,0) (-x,.75,0) (x+.5,.75,0) \n 4 f -1 (0,0,.5) (.5,.5,.5) (.5,0,.5) (0,.5,.5) \n 4 e -1 (0,0,0) (.5,.5,0) (.5,0,0) (0,.5,0) \n 2 d 222 (.25,.25,.5) (.75,.75,.5) \n 2 c 222 (.75,.25,.5) (.25,.75,.5) \n 2 b 222 (.75,.25,0) (.25,.75,0) \n 2 a 222 (.25,.25,0) (.75,.75,0) \n "; //DX20180806 - third position in 4f is (.5,0,.5) not (.5,0,.25)
   }
   else {
     sg50 = "Space Group 50\n (0,0,0) \n 8 m 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (x+.5,-y+.5,z) (-x+.5,y+.5,z) \n 4 l ..2 (0,.5,z) (0,.5,-z) (.5,0,-z) (.5,0,z) \n 4 k ..2 (0,0,z) (0,0,-z) (.5,.5,-z) (.5,.5,z) \n 4 j .2. (0,y,.5) (0,-y,.5) (.5,-y+.5,.5) (.5,y+.5,.5) \n 4 i .2. (0,y,0) (0,-y,0) (.5,-y+.5,0) (.5,y+.5,0) \n 4 h 2.. (x,0,.5) (-x,0,.5) (-x+.5,.5,.5) (x+.5,.5,.5) \n 4 g 2.. (x,0,0) (-x,0,0) (-x+.5,.5,0) (x+.5,.5,0) \n 4 f -1 (.25,.25,.5) (.75,.75,.5) (.75,.25,.5) (.25,.75,.5) \n 4 e -1 (.25,.25,0) (.75,.75,0) (.75,.25,0) (.25,.75,0) \n 2 d 222 (0,0,.5) (.5,.5,.5) \n 2 c 222 (.5,.0,.5) (0,.5,.5) \n 2 b 222 (.5,0,0) (0,.5,0) \n 2 a 222 (0,0,0) (.5,.5,0) \n ";
@@ -11185,7 +11185,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg58 = "Space Group 58\n (0,0,0) \n 8 h 1 (x,y,z) (-x,-y,z) (-x+.5,y+.5,-z+.5) (x+.5,-y+.5,-z+.5) (-x,-y,-z) (x,y,-z) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) \n 4 g ..m (x,y,0) (-x,-y,0) (-x+.5,y+.5,.5) (x+.5,-y+.5,.5) \n 4 f ..2 (0,.5,z) (.5,0,-z+.5) (0,.5,-z) (.5,0,z+.5) \n 4 e ..2 (0,0,z) (.5,.5,-z+.5) (0,0,-z) (.5,.5,z+.5) \n 2 d ..2/m (0,.5,.5) (.5,0,0) \n 2 c ..2/m (0,.5,0) (.5,0,.5) \n 2 b ..2/m (0,0,.5) (.5,.5,0) \n 2 a ..2/m (0,0,0) (.5,.5,.5) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg59 = "";
   if(axis_cell==setting_1){
     sg59 = "Space Group 59\n (0,0,0) \n 8 g 1 (x,y,z) (-x,-y,z) (-x+.5,y+.5,-z) (x+.5,-y+.5,-z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (x,-y,z) (-x,y,z) \n 4 f .m. (x,0,z) (-x,0,z) (-x+.5,.5,-z) (x+.5,.5,-z) \n 4 e m.. (0,y,z) (0,-y,z) (.5,y+.5,-z) (.5,-y+.5,-z) \n 4 d -1 (.25,.25,.5) (.75,.75,.5) (.25,.75,.5) (.75,.25,.5) \n 4 c -1 (.25,.25,0) (.75,.75,0) (.25,.75,0) (.75,.25,0) \n 2 b mm2 (0,.5,z) (.5,0,-z) \n 2 a mm2 (0,0,z) (.5,.5,-z) \n ";
@@ -11201,7 +11201,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg61 = "Space Group 61\n (0,0,0) \n 8 c 1 (x,y,z) (-x+.5,-y,z+.5) (-x,y+.5,-z+.5) (x+.5,-y+.5,-z) (-x,-y,-z) (x+.5,y,-z+.5) (x,-y+.5,z+.5) (-x+.5,y+.5,z) \n 4 b -1 (0,0,.5) (.5,0,0) (0,.5,0) (.5,.5,.5) \n 4 a -1 (0,0,0) (.5,0,.5) (0,.5,.5) (.5,.5,0) \n ";
 
-  //DX 5/10/18 [OBSOLETE] - 8 d 1 not 8 e 1 - string sg62 = "Space Group 62\n (0,0,0) \n 8 e 1 (x,y,z) (-x+.5,-y,z+.5) (-x,y+.5,-z) (x+.5,-y+.5,-z+.5) (-x,-y,-z) (x+.5,y,-z+.5) (x,-y+.5,z) (-x+.5,y+.5,z+.5) \n 4 c .m. (x,.25,z) (-x+.5,.75,z+.5) (-x,.75,-z) (x+.5,.25,-z+.5) \n 4 b -1 (0,0,.5) (.5,0,0) (0,.5,.5) (.5,.5,0) \n 4 a -1 (0,0,0) (.5,0,.5) (0,.5,0) (.5,.5,.5) \n ";
+  //DX20180510 [OBSOLETE] - 8 d 1 not 8 e 1 - string sg62 = "Space Group 62\n (0,0,0) \n 8 e 1 (x,y,z) (-x+.5,-y,z+.5) (-x,y+.5,-z) (x+.5,-y+.5,-z+.5) (-x,-y,-z) (x+.5,y,-z+.5) (x,-y+.5,z) (-x+.5,y+.5,z+.5) \n 4 c .m. (x,.25,z) (-x+.5,.75,z+.5) (-x,.75,-z) (x+.5,.25,-z+.5) \n 4 b -1 (0,0,.5) (.5,0,0) (0,.5,.5) (.5,.5,0) \n 4 a -1 (0,0,0) (.5,0,.5) (0,.5,0) (.5,.5,.5) \n ";
   string sg62 = "Space Group 62\n (0,0,0) \n 8 d 1 (x,y,z) (-x+.5,-y,z+.5) (-x,y+.5,-z) (x+.5,-y+.5,-z+.5) (-x,-y,-z) (x+.5,y,-z+.5) (x,-y+.5,z) (-x+.5,y+.5,z+.5) \n 4 c .m. (x,.25,z) (-x+.5,.75,z+.5) (-x,.75,-z) (x+.5,.25,-z+.5) \n 4 b -1 (0,0,.5) (.5,0,0) (0,.5,.5) (.5,.5,0) \n 4 a -1 (0,0,0) (.5,0,.5) (0,.5,0) (.5,.5,.5) \n ";
 
   string sg63 = "Space Group 63\n (0,0,0) (.5,.5,0)  \n 16 h 1 (x,y,z) (-x,-y,z+.5) (-x,y,-z+.5) (x,-y,-z) (-x,-y,-z) (x,y,-z+.5) (x,-y,z+.5) (-x,y,z) \n 8 g ..m (x,y,.25) (-x,-y,.75) (-x,y,.25) (x,-y,.75) \n 8 f m.. (0,y,z) (0,-y,z+.5) (0,y,-z+.5) (0,-y,-z) \n 8 e 2.. (x,0,0) (-x,0,.5) (-x,0,0) (x,0,.5) \n 8 d -1 (.25,.25,0) (.75,.75,.5) (.75,.25,.5) (.25,.75,0) \n 4 c m2m (0,y,.25) (0,-y,.75) \n 4 b 2/m.. (0,.5,0) (0,.5,.5) \n 4 a 2/m.. (0,0,0) (0,0,.5) \n ";
@@ -11214,7 +11214,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg67 = "Space Group 67\n (0,0,0) (.5,.5,0) \n 16 o 1 (x,y,z) (-x,-y+.5,z) (-x,y+.5,-z) (x,-y,-z) (-x,-y,-z) (x,y+.5,-z) (x,-y+.5,z) (-x,y,z) \n 8 n .m. (x,.25,z) (-x,.25,z) (-x,.75,-z) (x,.75,-z) \n 8 m m.. (0,y,z) (0,-y+.5,z) (0,y+.5,-z) (0,-y,-z) \n 8 l ..2 (.25,0,z) (.75,.5,-z) (.75,0,-z) (.25,.5,z) \n 8 k .2. (.25,y,.5) (.75,-y+.5,.5) (.75,-y,.5) (.25,y+.5,.5) \n 8 j .2. (.25,y,0) (.75,-y+.5,0) (.75,-y,0) (.25,y+.5,0) \n 8 i 2.. (x,0,.5) (-x,.5,.5) (-x,0,.5) (x,.5,.5) \n 8 h 2.. (x,0,0) (-x,.5,0) (-x,0,0) (x,.5,0) \n 4 g mm2 (0,.25,z) (0,.75,-z) \n 4 f .2/m. (.25,.25,.5) (.75,.25,.5) \n 4 e .2/m. (.25,.25,0) (.75,.25,0) \n 4 d 2/m.. (0,0,.5) (0,.5,.5) \n 4 c 2/m.. (0,0,0) (0,.5,0) \n 4 b 222 (.25,0,.5) (.75,0,.5) \n 4 a 222 (.25,0,0) (.75,0,0) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg68 = "";
   if(axis_cell==setting_1){
     sg68 = "Space Group 68\n (0,0,0) (.5,.5,0) \n 16 i 1 (x,y,z) (-x+.5,-y+.5,z) (-x,y,-z) (x+.5,-y+.5,-z) (-x,-y+.5,-z+.5) (x+.5,y,-z+.5) (x,-y+.5,z+.5) (-x+.5,y,z+.5) \n 8 h ..2 (.25,.25,z) (.75,.25,-z) (.75,.25,-z+.5) (.25,.25,z+.5) \n 8 g ..2 (0,0,z) (0,0,-z) (0,.5,-z+.5) (0,.5,z+.5) \n 8 f .2. (0,y,0) (.5,-y+.5,0) (0,-y+.5,.5) (.5,y,.5) \n 8 e 2.. (x,0,0) (-x+.5,.5,0) (-x,.5,.5) (x+.5,0,.5) \n 8 d -1 (0,.25,.25) (.5,.25,.25) (0,.25,.75) (.5,.25,.75) \n 8 c -1 (.25,0,.25) (.25,.5,.25) (.75,0,.75) (.75,.5,.75) \n 4 b 222 (0,0,.5) (0,.5,0) \n 4 a 222 (0,0,0) (0,.5,.5) \n ";
@@ -11228,7 +11228,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg69 = "Space Group 69\n (0,0,0) (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 32 p 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (-x,-y,-z) (x,y,-z) (x,-y,z) (-x,y,z) \n 16 o ..m (x,y,0) (-x,-y,0) (-x,y,0) (x,-y,0) \n 16 n .m. (x,0,z) (-x,0,z) (-x,0,-z) (x,0,-z) \n 16 m m.. (0,y,z) (0,-y,z) (0,y,-z) (0,-y,-z) \n 16 l 2.. (x,.25,.25) (-x,.75,.25) (-x,.75,.75) (x,.25,.75) \n 16 k .2. (.25,y,.25) (.75,-y,.25) (.75,-y,.75) (.25,y,.75) \n 16 j ..2 (.25,.25,z) (.75,.25,-z) (.75,.75,-z) (.25,.75,z) \n 8 i mm2 (0,0,z) (0,0,-z) \n 8 h m2m (0,y,0) (0,-y,0) \n 8 g 2mm (x,0,0) (-x,0,0) \n 8 f 222 (.25,.25,.25) (.75,.75,.75) \n 8 e ..2/m (.25,.25,0) (.75,.25,0) \n 8 d .2/m. (.25,0,.25) (.75,0,.25) \n 8 c 2/m.. (0,.25,.25) (0,.75,.25) \n 4 b mmm (0,0,.5) \n 4 a mmm (0,0,0) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg70 = "";
   if(axis_cell==setting_1){
     sg70 = "Space Group 70\n (0,0,0) (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 32 h 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (-x+.25,-y+.25,-z+.25) (x+.25,y+.25,-z+.25) (x+.25,-y+.25,z+.25) (-x+.25,y+.25,z+.25) \n 16 g ..2 (0,0,z) (0,0,-z) (.25,.25,-z+.25) (.25,.25,z+.25) \n 16 f .2. (0,y,0) (0,-y,0) (.25,-y+.25,.25) (.25,y+.25,.25) \n 16 e 2.. (x,0,0) (-x,0,0) (-x+.25,.25,.25) (x+.25,.25,.25) \n 16 d -1 (.625,.625,.625) (.375,.375,.625) (.375,.625,.375) (.625,.375,.375) \n 16 c -1 (.125,.125,.125) (.875,.875,.125) (.875,.125,.875) (.125,.875,.875) \n 8 b 222 (0,0,.5) (.25,.25,.75) \n 8 a 222 (0,0,0) (.25,.25,.25) \n ";
@@ -11268,7 +11268,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg84 = "Space Group 84\n (0,0,0) \n 8 k 1 (x,y,z) (-x,-y,z) (-y,x,z+.5) (y,-x,z+.5) (-x,-y,-z) (x,y,-z) (y,-x,-z+.5) (-y,x,-z+.5) \n 4 j m.. (x,y,0) (-x,-y,0) (-y,x,.5) (y,-x,.5) \n 4 i 2.. (0,.5,z) (.5,0,z+.5) (0,.5,-z) (.5,0,-z+.5) \n 4 h 2.. (.5,.5,z) (.5,.5,z+.5) (.5,.5,-z) (.5,.5,-z+.5) \n 4 g 2.. (0,0,z) (0,0,z+.5) (0,0,-z) (0,0,-z+.5) \n 2 f -4.. (.5,.5,.25) (.5,.5,.75) \n 2 e -4.. (0,0,.25) (0,0,.75) \n 2 d 2/m.. (0,.5,.5) (.5,0,0) \n 2 c 2/m.. (0,.5,0) (.5,0,.5) \n 2 b 2/m.. (.5,.5,0) (.5,.5,.5) \n 2 a 2/m.. (0,0,0) (0,0,.5) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg85 = "";
   if(axis_cell==setting_1){
     sg85 = "Space Group 85\n (0,0,0) \n 8 g 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z) (y+.5,-x+.5,z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (y,-x,-z) (-y,x,-z) \n 4 f 2.. (0,0,z) (.5,.5,z) (.5,.5,-z) (0,0,-z) \n 4 e -1 (.25,.25,.5) (.75,.75,.5) (.25,.75,.5) (.75,.25,.5) \n 4 d -1 (.25,.25,0) (.75,.75,0) (.25,.75,0) (.75,.25,0) \n 2 c 4.. (0,.5,z) (.5,0,-z) \n 2 b -4.. (0,0,.5) (.5,.5,.5) \n 2 a -4.. (0,0,0) (.5,.5,0) \n ";
@@ -11280,7 +11280,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg85 = "Space Group 85\n (0,0,0) \n 8 g 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z) (y+.5,-x+.5,z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (y,-x,-z) (-y,x,-z) \n 4 f 2.. (0,0,z) (.5,.5,z) (.5,.5,-z) (0,0,-z) \n 4 e -1 (.25,.25,.5) (.75,.75,.5) (.25,.75,.5) (.75,.25,.5) \n 4 d -1 (.25,.25,0) (.75,.75,0) (.25,.75,0) (.75,.25,0) \n 2 c 4.. (0,.5,z) (.5,0,-z) \n 2 b -4.. (0,0,.5) (.5,.5,.5) \n 2 a -4.. (0,0,0) (.5,.5,0) \n ";
   }
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg86 = "";
   if(axis_cell==setting_1){
     sg86 = "Space Group 86\n (0,0,0) \n 8 g 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y,-x,-z) (-y,x,-z) \n 4 f 2.. (0,0,z) (.5,.5,z+.5) (.5,.5,-z+.5) (0,0,-z) \n 4 e 2.. (0,.5,z) (0,.5,z+.5) (.5,0,-z+.5) (.5,0,-z) \n 4 d -1 (.25,.25,.75) (.75,.75,.75) (.25,.75,.25) (.75,.25,.25) \n 4 c -1 (.25,.25,.25) (.75,.75,.25) (.25,.75,.75) (.75,.25,.75) \n 2 b -4.. (0,0,.5) (.5,.5,0) \n 2 a -4.. (0,0,0) (.5,.5,.5) \n ";
@@ -11294,13 +11294,13 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg87 = "Space Group 87\n (0,0,0) (.5,.5,.5) \n 16 i 1 (x,y,z) (-x,-y,z) (-y,x,z) (y,-x,z) (-x,-y,-z) (x,y,-z) (y,-x,-z) (-y,x,-z) \n 8 h m.. (x,y,0) (-x,-y,0) (-y,x,0) (y,-x,0) \n 8 g 2.. (0,.5,z) (.5,0,z) (0,.5,-z) (.5,0,-z) \n 8 f -1 (.25,.25,.25) (.75,.75,.25) (.75,.25,.25) (.25,.75,.25) \n 4 e 4.. (0,0,z) (0,0,-z) \n 4 d -4.. (0,.5,.25) (.5,0,.25) \n 4 c 2/m.. (0,.5,0) (.5,0,0) \n 2 b 4/m.. (0,0,.5) \n 2 a 4/m.. (0,0,0) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg88 = "";
   if(axis_cell==setting_1){
     sg88 = "Space Group 88\n (0,0,0) (.5,.5,.5) \n 16 f 1 (x,y,z) (-x+.5,-y+.5,z+.5) (-y,x+.5,z+.25) (y+.5,-x,z+.75) (-x,-y+.5,-z+.25) (x+.5,y,-z+.75) (y,-x,-z) (-y+.5,x+.5,-z+.5) \n 8 e 2.. (0,0,z) (0,.5,z+.25) (0,.5,-z+.25) (0,0,-z) \n 8 d -1 (0,.25,.625) (.5,.25,.125) (.75,.5,.875) (.75,0,.375) \n 8 c -1 (0,.25,.125) (.5,.25,.625) (.75,.5,.375) (.75,0,.875) \n 4 b -4.. (0,0,.5) (0,.5,.75) \n 4 a -4.. (0,0,0) (0,.5,.25) \n ";
   }
   else if(axis_cell==setting_2 || axis_cell==setting_anrl){
-    sg88 = "Space Group 88\n (0,0,0) (.5,.5,.5) \n 16 f 1 (x,y,z) (-x+.5,-y,z+.5) (-y+.75,x+.25,z+.25) (y+.75,-x+.75,z+.75) (-x,-y,-z) (x+.5,y,-z+.5) (y+.25,-x+.75,-z+.75) (-y+.25,x+.25,-z+.25) \n 8 e 2.. (0,.25,z) (.5,.25,z+.25) (0,.75,-z) (.5,.75,-z+.75) \n 8 d -1 (0,0,.5) (.5,0,0) (.75,.25,.75) (.75,.75,.25) \n 8 c -1 (0,0,0) (.5,0,.5) (.75,.25,.25) (.75,.75,.75) \n 4 b -4.. (0,.25,.625) (.5,.25,.875) \n 4 a -4.. (0,.25,.125) (.5,.25,.375) \n "; //DX 20180806 first position for 8 d is (0,0,.5) not (0,0,5)
+    sg88 = "Space Group 88\n (0,0,0) (.5,.5,.5) \n 16 f 1 (x,y,z) (-x+.5,-y,z+.5) (-y+.75,x+.25,z+.25) (y+.75,-x+.75,z+.75) (-x,-y,-z) (x+.5,y,-z+.5) (y+.25,-x+.75,-z+.75) (-y+.25,x+.25,-z+.25) \n 8 e 2.. (0,.25,z) (.5,.25,z+.25) (0,.75,-z) (.5,.75,-z+.75) \n 8 d -1 (0,0,.5) (.5,0,0) (.75,.25,.75) (.75,.75,.25) \n 8 c -1 (0,0,0) (.5,0,.5) (.75,.25,.25) (.75,.75,.75) \n 4 b -4.. (0,.25,.625) (.5,.25,.875) \n 4 a -4.. (0,.25,.125) (.5,.25,.375) \n "; //DX20180806 first position for 8 d is (0,0,.5) not (0,0,5)
   }
   else {
     sg88 = "Space Group 88\n (0,0,0) (.5,.5,.5) \n 16 f 1 (x,y,z) (-x+.5,-y+.5,z+.5) (-y,x+.5,z+.25) (y+.5,-x,z+.75) (-x,-y+.5,-z+.25) (x+.5,y,-z+.75) (y,-x,-z) (-y+.5,x+.5,-z+.5) \n 8 e 2.. (0,0,z) (0,.5,z+.25) (0,.5,-z+.25) (0,0,-z) \n 8 d -1 (0,.25,.625) (.5,.25,.125) (.75,.5,.875) (.75,0,.375) \n 8 c -1 (0,.25,.125) (.5,.25,.625) (.75,.5,.375) (.75,0,.875) \n 4 b -4.. (0,0,.5) (0,.5,.75) \n 4 a -4.. (0,0,0) (0,.5,.25) \n ";
@@ -11380,7 +11380,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg124 = "Space Group 124\n (0,0,0) \n 16 n 1 (x,y,z) (-x,-y,z) (-y,x,z) (y,-x,z) (-x,y,-z+.5) (x,-y,-z+.5) (y,x,-z+.5) (-y,-x,-z+.5) (-x,-y,-z) (x,y,-z) (y,-x,-z) (-y,x,-z) (x,-y,z+.5) (-x,y,z+.5) (-y,-x,z+.5) (y,x,z+.5) \n 8 m m.. (x,y,0) (-x,-y,0) (-y,x,0) (y,-x,0) (-x,y,.5) (x,-y,.5) (y,x,.5) (-y,-x,.5) \n 8 l .2. (x,.5,.25) (-x,.5,.25) (.5,x,.25) (.5,-x,.25) (-x,.5,.75) (x,.5,.75) (.5,-x,.75) (.5,x,.75) \n 8 k .2. (x,0,.25) (-x,0,.25) (0,x,.25) (0,-x,.25) (-x,0,.75) (x,0,.75) (0,-x,.75) (0,x,.75) \n 8 j ..2 (x,x,.25) (-x,-x,.25) (-x,x,.25) (x,-x,.25) (-x,-x,.75) (x,x,.75) (x,-x,.75) (-x,x,.75) \n 8 i 2.. (0,.5,z) (.5,0,z) (0,.5,-z+.5) (.5,0,-z+.5) (0,.5,-z) (.5,0,-z) (0,.5,z+.5) (.5,0,z+.5) \n 4 h 4.. (.5,.5,z) (.5,.5,-z+.5) (.5,.5,-z) (.5,.5,z+.5) \n 4 g 4.. (0,0,z) (0,0,-z+.5) (0,0,-z) (0,0,z+.5) \n 4 f 222. (0,.5,.25) (.5,0,.25) (0,.5,.75) (.5,0,.75) \n 4 e 2/m.. (0,.5,0) (.5,0,0) (0,.5,.5) (.5,0,.5) \n 2 d 4/m.. (.5,.5,0) (.5,.5,.5) \n 2 c 422 (.5,.5,.25) (.5,.5,.75) \n 2 b 4/m.. (0,0,0) (0,0,.5) \n 2 a 422 (0,0,.25) (0,0,.75) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg125 = "";
   if(axis_cell==setting_1){
     sg125 = "Space Group 125\n (0,0,0) \n 16 n 1 (x,y,z) (-x,-y,z) (-y,x,z) (y,-x,z) (-x,y,-z) (x,-y,-z) (y,x,-z) (-y,-x,-z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (y+.5,-x+.5,-z) (-y+.5,x+.5,-z) (x+.5,-y+.5,z) (-x+.5,y+.5,z) (-y+.5,-x+.5,z) (y+.5,x+.5,z) \n 8 m ..m (x,x+.5,z) (-x,-x+.5,z) (-x+.5,x,z) (x+.5,-x,z) (-x,x+.5,-z) (x,-x+.5,-z) (x+.5,x,-z) (-x+.5,-x,-z) \n 8 l .2. (x,0,.5) (-x,0,.5) (0,x,.5) (0,-x,.5) (-x+.5,.5,.5) (x+.5,.5,.5) (.5,-x+.5,.5) (.5,x+.5,.5) \n 8 k .2. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (-x+.5,.5,0) (x+.5,.5,0) (.5,-x+.5,0) (.5,x+.5,0) \n 8 j ..2 (x,x,.5) (-x,-x,.5) (-x,x,.5) (x,-x,.5) (-x+.5,-x+.5,.5) (x+.5,x+.5,.5) (x+.5,-x+.5,.5) (-x+.5,x+.5,.5) \n 8 i ..1 (x,x,0) (-x,-x,0) (-x,x,0) (x,-x,0) (-x+.5,-x+.5,0) (x+.5,x+.5,0) (x+.5,-x+.5,0) (-x+.5,x+.5,0) \n 4 h 2.mm (0,.5,z) (.5,0,z) (0,.5,-z) (.5,0,-z) \n 4 g 4.. (0,0,z) (0,0,-z) (.5,.5,-z) (.5,.5,z) \n 4 f ..2/m (.25,.25,.5) (.75,.75,.5) (.75,.25,.5) (.25,.75,.5) \n 4 e ..2/m (.25,.25,0) (.75,.75,0) (.75,.25,0) (.25,.75,0) \n 2 d -42m (0,.5,.5) (.5,0,.5) \n 2 c -42m (0,.5,.0) (.5,0,0) \n 2 b 422 (0,0,.5) (.5,.5,.5) \n 2 a 422 (0,0,0) (.5,.5,0) \n ";
@@ -11392,7 +11392,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg125 = "Space Group 125\n (0,0,0) \n 16 n 1 (x,y,z) (-x,-y,z) (-y,x,z) (y,-x,z) (-x,y,-z) (x,-y,-z) (y,x,-z) (-y,-x,-z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (y+.5,-x+.5,-z) (-y+.5,x+.5,-z) (x+.5,-y+.5,z) (-x+.5,y+.5,z) (-y+.5,-x+.5,z) (y+.5,x+.5,z) \n 8 m ..m (x,x+.5,z) (-x,-x+.5,z) (-x+.5,x,z) (x+.5,-x,z) (-x,x+.5,-z) (x,-x+.5,-z) (x+.5,x,-z) (-x+.5,-x,-z) \n 8 l .2. (x,0,.5) (-x,0,.5) (0,x,.5) (0,-x,.5) (-x+.5,.5,.5) (x+.5,.5,.5) (.5,-x+.5,.5) (.5,x+.5,.5) \n 8 k .2. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (-x+.5,.5,0) (x+.5,.5,0) (.5,-x+.5,0) (.5,x+.5,0) \n 8 j ..2 (x,x,.5) (-x,-x,.5) (-x,x,.5) (x,-x,.5) (-x+.5,-x+.5,.5) (x+.5,x+.5,.5) (x+.5,-x+.5,.5) (-x+.5,x+.5,.5) \n 8 i ..1 (x,x,0) (-x,-x,0) (-x,x,0) (x,-x,0) (-x+.5,-x+.5,0) (x+.5,x+.5,0) (x+.5,-x+.5,0) (-x+.5,x+.5,0) \n 4 h 2.mm (0,.5,z) (.5,0,z) (0,.5,-z) (.5,0,-z) \n 4 g 4.. (0,0,z) (0,0,-z) (.5,.5,-z) (.5,.5,z) \n 4 f ..2/m (.25,.25,.5) (.75,.75,.5) (.75,.25,.5) (.25,.75,.5) \n 4 e ..2/m (.25,.25,0) (.75,.75,0) (.75,.25,0) (.25,.75,0) \n 2 d -42m (0,.5,.5) (.5,0,.5) \n 2 c -42m (0,.5,.0) (.5,0,0) \n 2 b 422 (0,0,.5) (.5,.5,.5) \n 2 a 422 (0,0,0) (.5,.5,0) \n ";
   }
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg126 = "";
   if(axis_cell==setting_1){
     sg126 = "Space Group 126\n (0,0,0) \n 16 k 1 (x,y,z) (-x,-y,z) (-y,x,z) (y,-x,z) (-x,y,-z) (x,-y,-z) (y,x,-z) (-y,-x,-z) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y+.5,-x+.5,-z+.5) (-y+.5,x+.5,-z+.5) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) (-y+.5,-x+.5,z+.5) (y+.5,x+.5,z+.5) \n 8 j .2. (x,0,.5) (-x,0,.5) (0,x,.5) (0,-x,.5) (-x+.5,.5,0) (x+.5,.5,0) (.5,-x+.5,0) (.5,x+.5,0) \n 8 i .2. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (-x+.5,.5,.5) (x+.5,.5,.5) (.5,-x+.5,.5) (.5,x+.5,.5) \n 8 h ..2 (x,x,0) (-x,-x,0) (-x,x,0) (x,-x,0) (-x+.5,-x+.5,.5) (x+.5,x+.5,.5) (x+.5,-x+.5,.5) (-x+.5,x+.5,.5) \n 8 g 2.. (.5,0,z) (0,.5,z) (.5,0,-z) (0,.5,-z) (0,.5,-z+.5) (.5,0,-z+.5) (0,.5,z+.5) (.5,0,z+.5) \n 8 f -1 (.25,.25,.25) (.75,.75,.25) (.75,.25,.25) (.25,.75,.25) (.75,.25,.75) (.25,.75,.75) (.25,.25,.75) (.75,.75,.75) \n 4 e 4.. (0,0,z) (0,0,-z) (.5,.5,-z+.5) (.5,.5,z+.5) \n 4 d -4.. (.5,0,.25) (0,.5,.25) (.5,0,.75) (0,.5,.75) \n 4 c 222. (.5,0,0) (0,.5,0) (0,.5,.5) (.5,0,.5) \n 2 b 422 (0,0,.5) (.5,.5,0) \n 2 a 422 (0,0,0) (.5,.5,.5) \n ";
@@ -11408,7 +11408,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg128 = "Space Group 128\n (0,0,0) \n 16 i 1 (x,y,z) (-x,-y,z) (-y,x,z) (y,-x,z) (-x+.5,y+.5,-z+.5) (x+.5,-y+.5,-z+.5) (y+.5,x+.5,-z+.5) (-y+.5,-x+.5,-z+.5) (-x,-y,-z) (x,y,-z) (y,-x,-z) (-y,x,-z) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) (-y+.5,-x+.5,z+.5) (y+.5,x+.5,z+.5) \n 8 h m.. (x,y,0) (-x,-y,0) (-y,x,0) (y,-x,0) (-x+.5,y+.5,.5) (x+.5,-y+.5,.5) (y+.5,x+.5,.5) (-y+.5,-x+.5,.5) \n 8 g ..2 (x,x+.5,.25) (-x,-x+.5,.25) (-x+.5,x,.25) (x+.5,-x,.25)(-x,-x+.5,.75) (x,x+.5,.75) (x+.5,-x,.75) (-x+.5,x,.75) \n 8 f 2.. (0,.5,z) (.5,0,z) (.5,0,-z+.5) (0,.5,-z+.5) (0,.5,-z) (.5,0,-z) (.5,0,z+.5) (0,.5,z+.5) \n 4 e 4.. (0,0,z) (.5,.5,-z+.5) (0,0,-z) (.5,.5,z+.5) \n 4 d 2.22 (0,.5,.25) (.5,0,.25) (0,.5,.75) (.5,0,.75) \n 4 c 2/m.. (0,.5,0) (.5,0,0) (.5,0,.5) (0,.5,.5) \n 2 b 4/m.. (0,0,.5) (.5,.5,0) \n 2 a 4/m.. (0,0,0) (.5,.5,.5) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg129 = "";
   if(axis_cell==setting_1){
     sg129 = "Space Group 129\n (0,0,0) \n 16 k 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z) (y+.5,-x+.5,z) (-x+.5,y+.5,-z) (x+.5,-y+.5,-z) (y,x,-z) (-y,-x,-z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (y,-x,-z) (-y,x,-z) (x,-y,z) (-x,y,z) (-y+.5,-x+.5,z) (y+.5,x+.5,z) \n 8 j ..m (x,x+.5,z) (-x,-x+.5,z) (-x,x+.5,z) (x,-x+.5,z) (-x+.5,x,-z) (x+.5,-x,-z) (x+.5,x,-z) (-x+.5,-x,-z) \n 8 i .m. (0,y,z) (0,-y,z) (-y+.5,.5,z) (y+.5,.5,z) (.5,y+.5,-z) (.5,-y+.5,-z) (y,0,-z) (-y,0,-z) \n 8 h ..2 (x,x,.5) (-x,-x,.5) (-x+.5,x+.5,.5) (x+.5,-x+.5,.5) (-x+.5,-x+.5,.5) (x+.5,x+.5,.5) (x,-x,.5) (-x,x,.5) \n 8 g ..2 (x,x,0) (-x,-x,0) (-x+.5,x+.5,0) (x+.5,-x+.5,0) (-x+.5,-x+.5,0) (x+.5,x+.5,0) (x,-x,0) (-x,x,0) \n 4 f 2mm. (0,0,z) (.5,.5,z) (.5,.5,-z) (0,0,-z) \n 4 e ..2/m (.25,.25,.5) (.75,.75,.5) (.25,.75,.5) (.75,.25,.5) \n 4 d ..2/m (.25,.25,0) (.75,.75,0) (.25,.75,0) (.75,.25,0) \n 2 c 4mm (0,.5,z) (.5,0,-z) \n 2 b -4m2 (0,0,.5) (.5,.5,.5) \n 2 a -42m (0,0,0) (.5,.5,0) \n ";
@@ -11420,7 +11420,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg129 = "Space Group 129\n (0,0,0) \n 16 k 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z) (y+.5,-x+.5,z) (-x+.5,y+.5,-z) (x+.5,-y+.5,-z) (y,x,-z) (-y,-x,-z) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (y,-x,-z) (-y,x,-z) (x,-y,z) (-x,y,z) (-y+.5,-x+.5,z) (y+.5,x+.5,z) \n 8 j ..m (x,x+.5,z) (-x,-x+.5,z) (-x,x+.5,z) (x,-x+.5,z) (-x+.5,x,-z) (x+.5,-x,-z) (x+.5,x,-z) (-x+.5,-x,-z) \n 8 i .m. (0,y,z) (0,-y,z) (-y+.5,.5,z) (y+.5,.5,z) (.5,y+.5,-z) (.5,-y+.5,-z) (y,0,-z) (-y,0,-z) \n 8 h ..2 (x,x,.5) (-x,-x,.5) (-x+.5,x+.5,.5) (x+.5,-x+.5,.5) (-x+.5,-x+.5,.5) (x+.5,x+.5,.5) (x,-x,.5) (-x,x,.5) \n 8 g ..2 (x,x,0) (-x,-x,0) (-x+.5,x+.5,0) (x+.5,-x+.5,0) (-x+.5,-x+.5,0) (x+.5,x+.5,0) (x,-x,0) (-x,x,0) \n 4 f 2mm. (0,0,z) (.5,.5,z) (.5,.5,-z) (0,0,-z) \n 4 e ..2/m (.25,.25,.5) (.75,.75,.5) (.25,.75,.5) (.75,.25,.5) \n 4 d ..2/m (.25,.25,0) (.75,.75,0) (.25,.75,0) (.75,.25,0) \n 2 c 4mm (0,.5,z) (.5,0,-z) \n 2 b -4m2 (0,0,.5) (.5,.5,.5) \n 2 a -42m (0,0,0) (.5,.5,0) \n ";
   }
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg130 = "";
   if(axis_cell==setting_1){
     sg130 = "Space Group 130\n (0,0,0) \n 16 g 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z) (y+.5,-x+.5,z) (-x+.5,y+.5,-z+.5) (x+.5,-y+.5,-z+.5) (y,x,-z+.5) (-y,-x,-z+.5) (-x+.5,-y+.5,-z) (x+.5,y+.5,-z) (y,-x,-z) (-y,x,-z) (x,-y,z+.5) (-x,y,z+.5) (-y+.5,-x+.5,z+.5) (y+.5,x+.5,z+.5) \n 8 f ..2 (x,x,.25) (-x,-x,.25) (-x+.5,x+.5,.25) (x+.5,-x+.5,.25) (-x+.5,-x+.5,.75) (x+.5,x+.5,.75) (x,-x,.75) (-x,x,.75) \n 8 e 2.. (0,0,z) (.5,.5,z) (.5,.5,-z+.5) (0,0,-z+.5) (.5,.5,-z) (0,0,-z) (0,0,z+.5) (.5,.5,z+.5) \n 8 d -1 (.25,.25,0) (.75,.75,0) (.25,.75,0) (.75,.25,0) (.25,.75,.5) (.75,.25,.5) (.25,.25,.5) (.75,.75,.5) \n 4 c 4.. (0,.5,z) (.5,0,-z+.5) (.5,0,-z) (0,.5,z+.5) \n 4 b -4.. (0,0,0) (.5,.5,0) (.5,.5,.5) (0,0,.5) \n 4 a 2.22 (0,0,.25) (.5,.5,.25) (.5,.5,.75) (0,0,.75) \n ";
@@ -11436,7 +11436,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg132 = "Space Group 132\n (0,0,0) \n 16 p 1 (x,y,z) (-x,-y,z) (-y,x,z+.5) (y,-x,z+.5) (-x,y,-z+.5) (x,-y,-z+.5) (y,x,-z) (-y,-x,-z) (-x,-y,-z) (x,y,-z) (y,-x,-z+.5) (-y,x,-z+.5) (x,-y,z+.5) (-x,y,z+.5) (-y,-x,z) (y,x,z) \n 8 o ..m (x,x,z) (-x,-x,z) (-x,x,z+.5) (x,-x,z+.5) (-x,x,-z+.5) (x,-x,-z+.5) (x,x,-z) (-x,-x,-z) \n 8 n m.. (x,y,0) (-x,-y,0) (-y,x,.5) (y,-x,.5) (-x,y,.5) (x,-y,.5) (y,x,0) (-y,-x,0) \n 8 m .2. (x,.5,.25) (-x,.5,.25) (.5,x,.75) (.5,-x,.75) (-x,.5,.75) (x,.5,.75) (.5,-x,.25) (.5,x,.25) \n 8 l .2. (x,0,.25) (-x,0,.25) (0,x,.75) (0,-x,.75) (-x,0,.75) (x,0,.75) (0,-x,.25) (0,x,.25) \n 8 k 2.. (0,.5,z) (.5,0,z+.5) (0,.5,-z+.5) (.5,0,-z) (0,.5,-z) (.5,0,-z+.5) (0,.5,z+.5) (.5,0,z) \n 4 j m.2m (x,x,.5) (-x,-x,.5) (-x,x,0) (x,-x,0) \n 4 i m.2m (x,x,0) (-x,-x,0) (-x,x,.5) (x,-x,.5) \n 4 h 2.mm (.5,.5,z) (.5,.5,z+.5) (.5,.5,-z+.5) (.5,.5,-z) \n 4 g 2.mm (0,0,z) (0,0,z+.5) (0,0,-z+.5) (0,0,-z) \n 4 f 2/m.. (0,.5,0) (.5,0,.5) (0,.5,.5) (.5,0,0) \n 4 e 222. (0,.5,.25) (.5,0,.75) (0,.5,.75) (.5,0,.25) \n 2 d -42m (.5,.5,.25) (.5,.5,.75) \n 2 c m.mm (.5,.5,0) (.5,.5,.5) \n 2 b -42m (0,0,.25) (0,0,.75) \n 2 a m.mm (0,0,0) (0,0,.5) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg133 = "";
   if(axis_cell==setting_1){
     sg133 = "Space Group 133\n (0,0,0) \n 16 k 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x,y,-z+.5) (x,-y,-z+.5) (y+.5,x+.5,-z) (-y+.5,-x+.5,-z) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y,-x,-z) (-y,x,-z) (x+.5,-y+.5,z) (-x+.5,y+.5,z) (-y,-x,z+.5) (y,x,z+.5) \n 8 j ..2 (x,x+.5,0) (-x,-x+.5,0) (-x,x+.5,.5) (x,-x+.5,.5) (-x+.5,-x,.5) (x+.5,x,.5) (x+.5,-x,0) (-x+.5,x,0) \n 8 i .2. (x,0,.75) (-x,0,.75) (.5,x+.5,.25) (.5,-x+.5,.25) (-x+.5,.5,.75) (x+.5,.5,.75) (0,-x,.25) (0,x,.25) \n 8 h .2. (x,0,.25) (-x,0,.25) (.5,x+.5,.75) (.5,-x+.5,.75) (-x+.5,.5,.25) (x+.5,.5,.25) (0,-x,.75) (0,x,.75) \n 8 g 2.. (0,0,z) (.5,.5,z+.5) (0,0,-z+.5) (.5,.5,-z) (.5,.5,-z+.5) (0,0,-z) (.5,.5,z) (0,0,z+.5) \n 8 f 2.. (0,.5,z) (0,.5,z+.5) (0,.5,-z+.5) (0,.5,-z) (.5,0,-z+.5) (.5,0,-z) (.5,0,z) (.5,0,z+.5) \n 8 e -1 (.25,.25,.25) (.75,.75,.25) (.25,.75,.75) (.75,.25,.25) (.25,.75,.25) (.75,.75,.75) (.25,.25,.75) \n 4 d -4.. (0,0,0) (.5,.5,.5) (0,0,.5) (.5,.5,0) \n 4 c 2.22 (0,.5,0) (0,.5,.5) (.5,0,.5) (.5,0,0) \n 4 b 222. (0,0,.25) (.5,.5,.75) (.5,.5,.25) (0,0,.75) \n 4 a 222. (0,.5,.25) (0,.5,.75) (.5,0,.25) (.5,0,.75) \n ";
@@ -11448,7 +11448,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg133 = "Space Group 133\n (0,0,0) \n 16 k 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x,y,-z+.5) (x,-y,-z+.5) (y+.5,x+.5,-z) (-y+.5,-x+.5,-z) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y,-x,-z) (-y,x,-z) (x+.5,-y+.5,z) (-x+.5,y+.5,z) (-y,-x,z+.5) (y,x,z+.5) \n 8 j ..2 (x,x+.5,0) (-x,-x+.5,0) (-x,x+.5,.5) (x,-x+.5,.5) (-x+.5,-x,.5) (x+.5,x,.5) (x+.5,-x,0) (-x+.5,x,0) \n 8 i .2. (x,0,.75) (-x,0,.75) (.5,x+.5,.25) (.5,-x+.5,.25) (-x+.5,.5,.75) (x+.5,.5,.75) (0,-x,.25) (0,x,.25) \n 8 h .2. (x,0,.25) (-x,0,.25) (.5,x+.5,.75) (.5,-x+.5,.75) (-x+.5,.5,.25) (x+.5,.5,.25) (0,-x,.75) (0,x,.75) \n 8 g 2.. (0,0,z) (.5,.5,z+.5) (0,0,-z+.5) (.5,.5,-z) (.5,.5,-z+.5) (0,0,-z) (.5,.5,z) (0,0,z+.5) \n 8 f 2.. (0,.5,z) (0,.5,z+.5) (0,.5,-z+.5) (0,.5,-z) (.5,0,-z+.5) (.5,0,-z) (.5,0,z) (.5,0,z+.5) \n 8 e -1 (.25,.25,.25) (.75,.75,.25) (.25,.75,.75) (.75,.25,.25) (.25,.75,.25) (.75,.75,.75) (.25,.25,.75) \n 4 d -4.. (0,0,0) (.5,.5,.5) (0,0,.5) (.5,.5,0) \n 4 c 2.22 (0,.5,0) (0,.5,.5) (.5,0,.5) (.5,0,0) \n 4 b 222. (0,0,.25) (.5,.5,.75) (.5,.5,.25) (0,0,.75) \n 4 a 222. (0,.5,.25) (0,.5,.75) (.5,0,.25) (.5,0,.75) \n ";
   }
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg134 = "";
   if(axis_cell==setting_1){
     sg134 = "Space Group 134\n (0,0,0) \n 16 n 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x,y,-z) (x,-y,-z) (y+.5,x+.5,-z+.5) (-y+.5,-x+.5,-z+.5) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y,-x,-z) (-y,x,-z) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) (-y,-x,z) (y,x,z) \n 8 m ..m (x,x,z) (-x,-x,z) (-x+.5,x+.5,z+.5) (x+.5,-x+.5,z+.5) (-x,x,-z) (x,-x,-z) (x+.5,x+.5,-z+.5) (-x+.5,-x+.5,-z+.5) \n 8 l ..2 (x,x+.5,.75) (-x,-x+.5,.75) (-x,x+.5,.25) (x,-x+.5,.25) (-x+.5,-x,.75) (x+.5,x,.75) (x+.5,-x,.25) (-x+.5,x,.25) \n 8 k ..2 (x,x+.5,.25) (-x,-x+.5,.25) (-x,x+.5,.75) (x,-x+.5,.75) (-x+.5,-x,.25) (x+.5,x,.25) (x+.5,-x,.75) (-x+.5,x,.75) \n 8 j .2. (x,0,.5) (-x,0,.5) (.5,x+.5,0) (.5,-x+.5,0) (-x+.5,.5,0) (x+.5,.5,0) (0,-x,.5) (0,x,.5) \n 8 i .2. (x,0,0) (-x,0,0) (.5,x+.5,.5) (.5,-x+.5,.5) (-x+.5,.5,.5) (x+.5,.5,.5) (0,-x,0) (0,x,0) \n 8 h 2.. (0,.5,z) (0,.5,z+.5) (0,.5,-z) (0,.5,-z+.5) (.5,0,-z+.5) (.5,0,-z) (.5,0,z+.5) (.5,0,z) \n 8 g 2.mm (0,0,z) (.5,.5,z+.5) (0,0,-z) (.5,.5,-z+.5) \n 4 f ..2/m (.75,.75,.75) (.25,.25,.75) (.75,.25,.25) (.25,.75,.25) \n 4 e ..2/m (.25,.25,.25) (.75,.75,.25) (.25,.75,.75) (.75,.25,.75) \n 4 d 2.22 (0,.5,.25) (0,.5,.75) (.5,0,.25) (.5,0,.75) \n 4 c 222. (0,.5,0) (0,.5,.5) (.5,0,.5) (.5,0,0) \n 2 b -42m (0,0,.5) (.5,.5,0) \n 2 a -42m (0,0,0) (.5,.5,.5) \n ";
@@ -11464,7 +11464,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg136 = "Space Group 136\n (0,0,0) \n 16 k 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x+.5,y+.5,-z+.5) (x+.5,-y+.5,-z+.5) (y,x,-z) (-y,-x,-z) (-x,-y,-z) (x,y,-z) (y+.5,-x+.5,-z+.5) (-y+.5,x+.5,-z+.5) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) (-y,-x,z) (y,x,z) \n 8 j ..m (x,x,z) (-x,-x,z) (-x+.5,x+.5,z+.5) (x+.5,-x+.5,z+.5) (-x+.5,x+.5,-z+.5) (x+.5,-x+.5,-z+.5) (x,x,-z) (-x,-x,-z) \n 8 i m.. (x,y,0) (-x,-y,0) (-y+.5,x+.5,.5) (y+.5,-x+.5,.5) (-x+.5,y+.5,.5) (x+.5,-y+.5,.5) (y,x,0) (-y,-x,0) \n 8 h 2.. (0,.5,z) (0,.5,z+.5) (.5,0,-z+.5) (.5,0,-z) (0,.5,-z) (0,.5,-z+.5) (.5,0,z+.5) (.5,0,z) \n 4 g m.2m (x,-x,0) (-x,x,0) (x+.5,x+.5,.5) (-x+.5,-x+.5,.5) \n 4 f m.2m (x,x,0) (-x,-x,0) (-x+.5,x+.5,.5) (x+.5,-x+.5,.5) \n 4 e 2.mm (0,0,z) (.5,.5,z+.5) (.5,.5,-z+.5) (0,0,-z) \n 4 d -4.. (0,.5,.25) (0,.5,.75) (.5,0,.25) (.5,0,.75) \n 4 c 2/m.. (0,.5,0) (0,.5,.5) (.5,0,.5) (.5,0,0) \n 2 b m.mm (0,0,.5) (.5,.5,0) \n 2 a m.mm (0,0,0) (.5,.5,.5) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg137 = "";
   if(axis_cell==setting_1){
     sg137 = "Space Group 137\n (0,0,0) \n 16 h 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x+.5,y+.5,-z+.5) (x+.5,-y+.5,-z+.5) (y,x,-z) (-y,-x,-z) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y,-x,-z) (-y,x,-z) (x,-y,z) (-x,y,z) (-y+.5,-x+.5,z+.5) (y+.5,x+.5,z+.5) \n 8 g .m. (0,y,z) (0,-y,z) (-y+.5,.5,z+.5) (y+.5,.5,z+.5) (.5,y+.5,-z+.5) (.5,-y+.5,-z+.5) (y,0,-z) (-y,0,-z) \n 8 f ..2 (x,x,0) (-x,-x,0) (-x+.5,x+.5,.5) (x+.5,-x+.5,.5) (-x+.5,-x+.5,.5) (x+.5,x+.5,.5) (x,-x,0) (-x,x,0) \n 8 e -1 (.25,.25,.25) (.75,.75,.25) (.25,.75,.75) (.75,.25,.75) (.25,.75,.25) (.75,.25,.25) (.25,.25,.75) (.75,.75,.75) \n 4 d 2mm. (0,.5,z) (0,.5,z+.5) (.5,0,-z+.5) (.5,0,-z) \n 4 c 2mm. (0,0,z) (.5,.5,z+.5) (.5,.5,-z+.5) (0,0,-z) \n 2 b -4m2 (0,0,.5) (.5,.5,0) \n 2 a -4m2 (0,0,0) (.5,.5,.5) \n ";
@@ -11476,13 +11476,13 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg137 = "Space Group 137\n (0,0,0) \n 16 h 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x+.5,y+.5,-z+.5) (x+.5,-y+.5,-z+.5) (y,x,-z) (-y,-x,-z) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y,-x,-z) (-y,x,-z) (x,-y,z) (-x,y,z) (-y+.5,-x+.5,z+.5) (y+.5,x+.5,z+.5) \n 8 g .m. (0,y,z) (0,-y,z) (-y+.5,.5,z+.5) (y+.5,.5,z+.5) (.5,y+.5,-z+.5) (.5,-y+.5,-z+.5) (y,0,-z) (-y,0,-z) \n 8 f ..2 (x,x,0) (-x,-x,0) (-x+.5,x+.5,.5) (x+.5,-x+.5,.5) (-x+.5,-x+.5,.5) (x+.5,x+.5,.5) (x,-x,0) (-x,x,0) \n 8 e -1 (.25,.25,.25) (.75,.75,.25) (.25,.75,.75) (.75,.25,.75) (.25,.75,.25) (.75,.25,.25) (.25,.25,.75) (.75,.75,.75) \n 4 d 2mm. (0,.5,z) (0,.5,z+.5) (.5,0,-z+.5) (.5,0,-z) \n 4 c 2mm. (0,0,z) (.5,.5,z+.5) (.5,.5,-z+.5) (0,0,-z) \n 2 b -4m2 (0,0,.5) (.5,.5,0) \n 2 a -4m2 (0,0,0) (.5,.5,.5) \n ";
   }
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg138 = "";
   if(axis_cell==setting_1){
     sg138 = "Space Group 138\n (0,0,0) \n 16 j 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x+.5,y+.5,-z) (x+.5,-y+.5,-z) (y,x,-z+.5) (-y,-x,-z+.5) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y,-x,-z) (-y,x,-z) (x,-y,z+.5) (-x,y,z+.5) (-y+.5,-x+.5,z) (y+.5,x+.5,z) \n 8 i ..m (x,x+.5,z) (-x,-x+.5,z) (-x,x+.5,z+.5) (x,-x+.5,z+.5) (-x+.5,x,-z) (x+.5,-x,-z) (x+.5,x,-z+.5) (-x+.5,-x,-z+.5) \n 8 h ..2 (x,x,.75) (-x,-x,.75) (-x+.5,x+.5,.25) (x+.5,-x+.5,.25) (-x+.5,-x+.5,.75) (x+.5,x+.5,.75) (x,-x,.25) (-x,x,.25) \n 8 g ..2 (x,x,.25) (-x,-x,.25) (-x+.5,x+.5,.75) (x+.5,-x+.5,.75) (-x+.5,-x+.5,.25) (x+.5,x+.5,.25) (x,-x,.75) (-x,x,.75) \n 8 f 2.. (0,0,z) (.5,.5,z+.5) (.5,.5,-z) (0,0,-z+.5) (.5,.5,-z+.5) (0,0,-z) (0,0,z+.5) (.5,.5,z) \n 4 e 2.mm (0,.5,z) (0,.5,z+.5) (.5,0,-z) (.5,0,-z+.5) \n 4 d ..2/m (.25,.25,.75) (.75,.75,.75) (.25,.75,.25) (.75,.25,.25)\n 4 c ..2/m (.25,.25,.25) (.75,.75,.25) (.25,.75,.75) (.75,.25,.75) \n 4 b -4.. (0,0,0) (.5,.5,.5) (.5,.5,0) (0,0,.5) \n 4 a 2.22 (0,0,.25) (.5,.5,.75) (.5,.5,.25) (0,0,.75) \n ";
   }
   else if(axis_cell==setting_2 || axis_cell==setting_anrl){
-    sg138 = "Space Group 138\n (0,0,0) \n 16 j 1 (x,y,z) (-x+.5,-y+.5,z) (-y+.5,x,z+.5) (y,-x+.5,z+.5) (-x,y+.5,-z+.5) (x+.5,-y,-z+.5) (y+.5,x+.5,-z) (-y,-x,-z) (-x,-y,-z) (x+.5,y+.5,-z) (y+.5,-x,-z+.5) (-y,x+.5,-z+.5) (x,-y+.5,z+.5) (-x+.5,y,z+.5) (-y+.5,-x+.5,z) (y,x,z) \n 8 i ..m (x,x,z) (-x+.5,-x+.5,z) (-x+.5,x,z+.5) (x,-x+.5,z+.5) (-x,x+.5,-z+.5) (x+.5,-x,-z+.5) (x+.5,x+.5,-z) (-x,-x,-z) \n 8 h ..2 (x,-x,0) (-x+.5,x+.5,0) (x+.5,x,.5) (-x,-x+.5,.5) (-x,x,0) (x+.5,-x+.5,0) (-x+.5,-x,.5) (x,x+.5,.5) \n 8 g ..2 (x,-x,.5) (-x+.5,x+.5,.5) (x+.5,x,0) (-x,-x+.5,0) (-x,x,.5) (x+.5,-x+.5,.5) (-x+.5,-x,0) (x,x+.5,0) \n 8 f 2.. (.75,.25,z) (.25,.75,z+.5) (.25,.75,-z+.5) (.75,.25,-z) (.25,.75,-z) (.75,.25,-z+.5) (.75,.25,z+.5) (.25,.75,z) \n 4 e 2.mm (.25,.25,z) (.25,.25,z+.5) (.75,.75,-z+.5) (.75,.75,-z) \n 4 d ..2/m (0,0,0) (.5,.5,0) (.5,0,.5) (0,.5,.5)\n 4 c ..2/m (0,0,.5) (.5,.5,.5) (.5,0,0) (0,.5,0) \n 4 b -4.. (.75,.25,.75) (.25,.75,.25) (.25,.75,.75) (.75,.25,.25) \n 4 a 2.22 (.75,.25,0) (.25,.75,.5) (.25,.75,0) (.75,.25,.5) \n "; //DX 20180806 - second 8 h is (-x+.5,x+.5,0)  not (-x+.5,-x+.5,0)
+    sg138 = "Space Group 138\n (0,0,0) \n 16 j 1 (x,y,z) (-x+.5,-y+.5,z) (-y+.5,x,z+.5) (y,-x+.5,z+.5) (-x,y+.5,-z+.5) (x+.5,-y,-z+.5) (y+.5,x+.5,-z) (-y,-x,-z) (-x,-y,-z) (x+.5,y+.5,-z) (y+.5,-x,-z+.5) (-y,x+.5,-z+.5) (x,-y+.5,z+.5) (-x+.5,y,z+.5) (-y+.5,-x+.5,z) (y,x,z) \n 8 i ..m (x,x,z) (-x+.5,-x+.5,z) (-x+.5,x,z+.5) (x,-x+.5,z+.5) (-x,x+.5,-z+.5) (x+.5,-x,-z+.5) (x+.5,x+.5,-z) (-x,-x,-z) \n 8 h ..2 (x,-x,0) (-x+.5,x+.5,0) (x+.5,x,.5) (-x,-x+.5,.5) (-x,x,0) (x+.5,-x+.5,0) (-x+.5,-x,.5) (x,x+.5,.5) \n 8 g ..2 (x,-x,.5) (-x+.5,x+.5,.5) (x+.5,x,0) (-x,-x+.5,0) (-x,x,.5) (x+.5,-x+.5,.5) (-x+.5,-x,0) (x,x+.5,0) \n 8 f 2.. (.75,.25,z) (.25,.75,z+.5) (.25,.75,-z+.5) (.75,.25,-z) (.25,.75,-z) (.75,.25,-z+.5) (.75,.25,z+.5) (.25,.75,z) \n 4 e 2.mm (.25,.25,z) (.25,.25,z+.5) (.75,.75,-z+.5) (.75,.75,-z) \n 4 d ..2/m (0,0,0) (.5,.5,0) (.5,0,.5) (0,.5,.5)\n 4 c ..2/m (0,0,.5) (.5,.5,.5) (.5,0,0) (0,.5,0) \n 4 b -4.. (.75,.25,.75) (.25,.75,.25) (.25,.75,.75) (.75,.25,.25) \n 4 a 2.22 (.75,.25,0) (.25,.75,.5) (.25,.75,0) (.75,.25,.5) \n "; //DX20180806 - second 8 h is (-x+.5,x+.5,0)  not (-x+.5,-x+.5,0)
   }
   else {
     sg138 = "Space Group 138\n (0,0,0) \n 16 j 1 (x,y,z) (-x,-y,z) (-y+.5,x+.5,z+.5) (y+.5,-x+.5,z+.5) (-x+.5,y+.5,-z) (x+.5,-y+.5,-z) (y,x,-z+.5) (-y,-x,-z+.5) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (y,-x,-z) (-y,x,-z) (x,-y,z+.5) (-x,y,z+.5) (-y+.5,-x+.5,z) (y+.5,x+.5,z) \n 8 i ..m (x,x+.5,z) (-x,-x+.5,z) (-x,x+.5,z+.5) (x,-x+.5,z+.5) (-x+.5,x,-z) (x+.5,-x,-z) (x+.5,x,-z+.5) (-x+.5,-x,-z+.5) \n 8 h ..2 (x,x,.75) (-x,-x,.75) (-x+.5,x+.5,.25) (x+.5,-x+.5,.25) (-x+.5,-x+.5,.75) (x+.5,x+.5,.75) (x,-x,.25) (-x,x,.25) \n 8 g ..2 (x,x,.25) (-x,-x,.25) (-x+.5,x+.5,.75) (x+.5,-x+.5,.75) (-x+.5,-x+.5,.25) (x+.5,x+.5,.25) (x,-x,.75) (-x,x,.75) \n 8 f 2.. (0,0,z) (.5,.5,z+.5) (.5,.5,-z) (0,0,-z+.5) (.5,.5,-z+.5) (0,0,-z) (0,0,z+.5) (.5,.5,z) \n 4 e 2.mm (0,.5,z) (0,.5,z+.5) (.5,0,-z) (.5,0,-z+.5) \n 4 d ..2/m (.25,.25,.75) (.75,.75,.75) (.25,.75,.25) (.75,.25,.25)\n 4 c ..2/m (.25,.25,.25) (.75,.75,.25) (.25,.75,.75) (.75,.25,.75) \n 4 b -4.. (0,0,0) (.5,.5,.5) (.5,.5,0) (0,0,.5) \n 4 a 2.22 (0,0,.25) (.5,.5,.75) (.5,.5,.25) (0,0,.75) \n ";
@@ -11492,19 +11492,19 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg140 = "Space Group 140\n (0,0,0) (.5,.5,.5) \n 32 m 1 (x,y,z) (-x,-y,z) (-y,x,z) (y,-x,z) (-x,y,-z+.5) (x,-y,-z+.5) (y,x,-z+.5) (-y,-x,-z+.5) (-x,-y,-z) (x,y,-z) (y,-x,-z) (-y,x,-z) (x,-y,z+.5) (-x,y,z+.5) (-y,-x,z+.5) (y,x,z+.5) \n 16 l ..m (x,x+.5,z) (-x,-x+.5,z) (-x+.5,x,z) (x+.5,-x,z) (-x,x+.5,-z+.5) (x,-x+.5,-z+.5) (x+.5,x,-z+.5) (-x+.5,-x,-z+.5) \n 16 k m.. (x,y,0) (-x,-y,0) (-y,x,0) (y,-x,0) (-x,y,.5) (x,-y,.5) (y,x,.5) (-y,-x,.5) \n 16 j .2. (x,0,.25) (-x,0,.25) (0,x,.25) (0,-x,.25) (-x,0,.75) (x,0,.75) (0,-x,.75) (0,x,.75) \n 16 i ..2 (x,x,.25) (-x,-x,.25) (-x,x,.25) (x,-x,.25) (-x,-x,.75) (x,x,.75) (x,-x,.75) (-x,x,.75) \n 8 h m.2m (x,x+.5,0) (-x,-x+.5,0) (-x+.5,x,0) (x+.5,-x,0) \n 8 g 2.mm (0,.5,z) (.5,0,z) (0,.5,-z+.5) (.5,0,-z+.5) \n 8 f 4.. (0,0,z) (0,0,-z+.5) (0,0,-z) (0,0,z+.5) \n 8 e ..2/m (.25,.25,.25) (.75,.75,.25) (.75,.25,.25) (.25,.75,.25) \n 4 d m.mm (0,.5,0) (.5,0,0) \n 4 c 4/m.. (0,0,0) (0,0,.5) \n 4 b -42m (0,.5,.25) (.5,0,.25) \n 4 a 422 (0,0,.25) (0,0,.75) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg141 = "";
   if(axis_cell==setting_1){
     sg141 = "Space Group 141\n (0,0,0) (.5,.5,.5) \n 32 i 1 (x,y,z) (-x+.5,-y+.5,z+.5) (-y,x+.5,z+.25) (y+.5,-x,z+.75) (-x+.5,y,-z+.75) (x,-y+.5,-z+.25) (y+.5,x+.5,-z+.5) (-y,-x,-z) (-x,-y+.5,-z+.25) (x+.5,y,-z+.75) (y,-x,-z) (-y+.5,x+.5,-z+.5) (x+.5,-y+.5,z+.5) (-x,y,z) (-y+.5,-x,z+.75) (y,x+.5,z+.25) \n 16 h .m. (0,y,z) (.5,-y+.5,z+.5) (-y,.5,z+.25) (y+.5,0,z+.75) (.5,y,-z+.75) (0,-y+.5,-z+.25) (y+.5,.5,-z+.5) (-y,0,-z) \n 16 g ..2 (x,x,0) (-x+.5,-x+.5,.5) (-x,x+.5,.25) (x+.5,-x,.75) (-x,-x+.5,.25) (x+.5,x,.75) (x,-x,0) (-x+.5,x+.5,.5) \n 16 f .2. (x,.25,.125) (-x+.5,.25,.625) (.75,x+.5,.375) (.75,-x,.875) (-x,.25,.125) (x+.5,.25,.625) (.25,-x,.875) (.25,x+.5,.375) \n 8 e 2mm. (0,0,z) (0,.5,z+.25) (.5,0,-z+.75) (.5,.5,-z+.5) \n 8 d .2/m. (0,.25,.625) (.5,.25,.125) (.75,.5,.875) (.75,0,.375) \n 8 c .2/m. (0,.25,.125) (.5,.25,.625) (.75,.5,.375) (.75,0,.875) \n 4 b -4m2 (0,0,.5) (0,.5,.75) \n 4 a -4m2 (0,0,0) (0,.5,.25) \n ";
   }
   else if(axis_cell==setting_2 || axis_cell==setting_anrl){
-    sg141 = "Space Group 141\n (0,0,0) (.5,.5,.5) \n 32 i 1 (x,y,z) (-x+.5,-y,z+.5) (-y+.25,x+.75,z+.25) (y+.25,-x+.25,z+.75) (-x+.5,y,-z+.5) (x,-y,-z) (y+.25,x+.75,-z+.25) (-y+.25,-x+.25,-z+.75) (-x,-y,-z) (x+.5,y,-z+.5) (y+.75,-x+.25,-z+.75) (-y+.75,x+.75,-z+.25) (x+.5,-y,z+.5) (-x,y,z) (-y+.75,-x+.25,z+.75) (y+.75,x+.75,z+.25) \n 16 h .m. (0,y,z) (.5,-y,z+.5) (-y+.25,.75,z+.25) (y+.25,.25,z+.75) (.5,y,-z+.5) (0,-y,-z) (y+.25,.75,-z+.25) (-y+.25,.25,-z+.75) \n 16 g ..2 (x,x+.25,.875) (-x+.5,-x+.75,.375) (-x,x+.75,.125) (x+.5,-x+.25,.625) (-x,-x+.75,.125) (x+.5,x+.25,.625) (x,-x+.25,.875) (-x+.5,x+.75,.375) \n 16 f .2. (x,0,0) (-x+.5,0,.5) (.25,x+.75,.25) (.25,-x+.25,.75) (-x,0,0) (x+.5,0,.5) (.75,-x+.25,.75) (.75,x+.75,.25) \n 8 e 2mm. (0,.25,z) (0,.75,z+.25) (.5,.25,-z+.5) (.5,.75,-z+.25) \n 8 d .2/m. (0,0,.5) (.5,0,0) (.25,.75,.75) (.25,.25,.25) \n 8 c .2/m. (0,0,0) (.5,0,.5) (.25,.75,.25) (.25,.25,.75) \n 4 b -4m2 (0,.25,.375) (0,.75,.625) \n 4 a -4m2 (0,.75,.125) (.5,.75,.375) \n "; //DX 20180806 - changed 4 b -4m2 (0,.25,.375) (0,.625,.75) to 4 b -4m2 (0,.25,.375) (0,.75,.625)
+    sg141 = "Space Group 141\n (0,0,0) (.5,.5,.5) \n 32 i 1 (x,y,z) (-x+.5,-y,z+.5) (-y+.25,x+.75,z+.25) (y+.25,-x+.25,z+.75) (-x+.5,y,-z+.5) (x,-y,-z) (y+.25,x+.75,-z+.25) (-y+.25,-x+.25,-z+.75) (-x,-y,-z) (x+.5,y,-z+.5) (y+.75,-x+.25,-z+.75) (-y+.75,x+.75,-z+.25) (x+.5,-y,z+.5) (-x,y,z) (-y+.75,-x+.25,z+.75) (y+.75,x+.75,z+.25) \n 16 h .m. (0,y,z) (.5,-y,z+.5) (-y+.25,.75,z+.25) (y+.25,.25,z+.75) (.5,y,-z+.5) (0,-y,-z) (y+.25,.75,-z+.25) (-y+.25,.25,-z+.75) \n 16 g ..2 (x,x+.25,.875) (-x+.5,-x+.75,.375) (-x,x+.75,.125) (x+.5,-x+.25,.625) (-x,-x+.75,.125) (x+.5,x+.25,.625) (x,-x+.25,.875) (-x+.5,x+.75,.375) \n 16 f .2. (x,0,0) (-x+.5,0,.5) (.25,x+.75,.25) (.25,-x+.25,.75) (-x,0,0) (x+.5,0,.5) (.75,-x+.25,.75) (.75,x+.75,.25) \n 8 e 2mm. (0,.25,z) (0,.75,z+.25) (.5,.25,-z+.5) (.5,.75,-z+.25) \n 8 d .2/m. (0,0,.5) (.5,0,0) (.25,.75,.75) (.25,.25,.25) \n 8 c .2/m. (0,0,0) (.5,0,.5) (.25,.75,.25) (.25,.25,.75) \n 4 b -4m2 (0,.25,.375) (0,.75,.625) \n 4 a -4m2 (0,.75,.125) (.5,.75,.375) \n "; //DX20180806 - changed 4 b -4m2 (0,.25,.375) (0,.625,.75) to 4 b -4m2 (0,.25,.375) (0,.75,.625)
   }
   else {
     sg141 = "Space Group 141\n (0,0,0) (.5,.5,.5) \n 32 i 1 (x,y,z) (-x+.5,-y+.5,z+.5) (-y,x+.5,z+.25) (y+.5,-x,z+.75) (-x+.5,y,-z+.75) (x,-y+.5,-z+.25) (y+.5,x+.5,-z+.5) (-y,-x,-z) (-x,-y+.5,-z+.25) (x+.5,y,-z+.75) (y,-x,-z) (-y+.5,x+.5,-z+.5) (x+.5,-y+.5,z+.5) (-x,y,z) (-y+.5,-x,z+.75) (y,x+.5,z+.25) \n 16 h .m. (0,y,z) (.5,-y+.5,z+.5) (-y,.5,z+.25) (y+.5,0,z+.75) (.5,y,-z+.75) (0,-y+.5,-z+.25) (y+.5,.5,-z+.5) (-y,0,-z) \n 16 g ..2 (x,x,0) (-x+.5,-x+.5,.5) (-x,x+.5,.25) (x+.5,-x,.75) (-x,-x+.5,.25) (x+.5,x,.75) (x,-x,0) (-x+.5,x+.5,.5) \n 16 f .2. (x,.25,.125) (-x+.5,.25,.625) (.75,x+.5,.375) (.75,-x,.875) (-x,.25,.125) (x+.5,.25,.625) (.25,-x,.875) (.25,x+.5,.375) \n 8 e 2mm. (0,0,z) (0,.5,z+.25) (.5,0,-z+.75) (.5,.5,-z+.5) \n 8 d .2/m. (0,.25,.625) (.5,.25,.125) (.75,.5,.875) (.75,0,.375) \n 8 c .2/m. (0,.25,.125) (.5,.25,.625) (.75,.5,.375) (.75,0,.875) \n 4 b -4m2 (0,0,.5) (0,.5,.75) \n 4 a -4m2 (0,0,0) (0,.5,.25) \n ";
   }
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg142 = "";
   if(axis_cell==setting_1){
     sg142 = "Space Group 142\n (0,0,0) (.5,.5,.5) \n 32 g 1 (x,y,z) (-x+.5,-y+.5,z+.5) (-y,x+.5,z+.25) (y+.5,-x,z+.75) (-x+.5,y,-z+.25) (x,-y+.5,-z+.75) (y+.5,x+.5,-z) (-y,-x,-z+.5) (-x,-y+.5,-z+.25) (x+.5,y,-z+.75) (y,-x,-z) (-y+.5,x+.5,-z+.5) (x+.5,-y+.5,z) (-x,y,z+.5) (-y+.5,-x,z+.25) (y,x+.5,z+.75) \n 16 f ..2 (x,x,.25) (-x+.5,-x+.5,.75) (-x,x+.5,.5) (x+.5,-x,0) (-x,-x+.5,0) (x+.5,x,.5) (x,-x,.75) (-x+.5,x+.5,.25) \n 16 e .2. (.25,y,.125) (.25,-y+.5,.625) (-y,.75,.375) (y+.5,.75,.875) (.75,-y+.5,.125) (.75,y,.625) (y,.75,.875) (-y+.5,.75,.375) \n 16 d 2.. (0,0,z) (0,.5,z+.25) (.5,0,-z+.25) (.5,.5,-z) (0,.5,-z+.25) (0,0,-z) (.5,.5,z) (.5,0,z+.25) \n 16 c -1 (0,.25,.125) (.5,.25,.625) (.75,.5,.375) (.75,0,.875) (.5,.25,.125) (0,.25,.625) (.75,.5,.875) (.75,0,.375) \n 8 b 2.22 (0,0,.25) (0,.5,.5) (0,.5,0) (0,0,.75) \n 8 a -4.. (0,0,0) (0,.5,.25) (.5,0,.25) (.5,.5,0) \n ";
@@ -11522,7 +11522,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg145 = "Space Group 145\n (0,0,0) \n 3 a 1 (x,y,z) (-y,x-y,z+2/3) (-x+y,-x,z+1/3) \n ";
 
-  //DX 20180723 - added rhombohedral setting
+  //DX20180723 - added rhombohedral setting
   string sg146 = "";
   if(axis_cell==setting_2){
     sg146 = "Space Group 146\n (0,0,0) (2/3,1/3,1/3) (1/3,2/3,2/3) \n 9 b 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) \n 3 a 3. (0,0,z) \n ";
@@ -11537,7 +11537,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg147 = "Space Group 147\n (0,0,0) \n 6 g 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (-x,-y,-z) (y,-x+y,-z) (x-y,x,-z) \n 3 f -1 (.5,0,.5) (0,.5,.5) (.5,.5,.5) \n 3 e -1 (.5,0,0) (0,.5,0) (.5,.5,0) \n 2 d 3.. (1/3,2/3,z) (2/3,1/3,-z) \n 2 c 3.. (0,0,z) (0,0,-z) \n 1 b -3.. (0,0,.5) \n 1 a -3.. (0,0,0) \n ";
 
-  //DX 20180723 - added rhombohedral setting
+  //DX20180723 - added rhombohedral setting
   string sg148 = "";
   if(axis_cell==setting_2){
     sg148 = "Space Group 148\n (0,0,0) (2/3,1/3,1/3) (1/3,2/3,2/3) \n 18 f 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (-x,-y,-z) (y,-x+y,-z) (x-y,x,-z) \n 9 e -1 (.5,0,0) (0,.5,0) (.5,.5,0) \n 9 d -1 (.5,0,.5) (0,.5,.5) (.5,.5,.5) \n 6 c 3. (0,0,z) (0,0,-z) \n 3 b -3. (0,0,.5) \n 3 a -3. (0,0,0) \n ";
@@ -11562,7 +11562,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg154 = "Space Group 154\n (0,0,0) \n 6 c 1 (x,y,z) (-y,x-y,z+2/3) (-x+y,-x,z+1/3) (y,x,-z) (x-y,-y,-z+1/3) (-x,-x+y,-z+2/3) \n 3 b .2. (x,0,1/6) (0,x,5/6) (-x,-x,.5) \n 3 a .2. (x,0,2/3) (0,x,1/3) (-x,-x,0) \n ";
 
-  //DX 20180723 - added rhombohedral setting
+  //DX20180723 - added rhombohedral setting
   string sg155 = "";
   if(axis_cell==setting_2){
     sg155 = "Space Group 155\n (0,0,0) (2/3,1/3,1/3) (1/3,2/3,2/3) \n 18 f 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (y,x,-z) (x-y,-y,-z) (-x,-x+y,-z) \n 9 e .2 (x,0,.5) (0,x,.5) (-x,-x,.5) \n 9 d .2 (x,0,0) (0,x,0) (-x,-x,0) \n 6 c 3. (0,0,z) (0,0,-z) \n 3 b 32 (0,0,.5) \n 3 a 32 (0,0,0) \n ";
@@ -11583,7 +11583,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg159 = "Space Group 159\n (0,0,0) \n 6 c 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (y,x,z+.5) (x-y,-y,z+.5) (-x,-x+y,z+.5) \n 2 b 3.. (1/3,2/3,z) (2/3,1/3,z+.5) \n 2 a 3.. (0,0,z) (0,0,z+.5) \n ";
 
-  //DX 20180723 - added rhombohedral setting
+  //DX20180723 - added rhombohedral setting
   string sg160 = "";
   if(axis_cell==setting_2){
     sg160 = "Space Group 160\n (0,0,0) (2/3,1/3,1/3) (1/3,2/3,2/3) \n 18 c 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (-y,-x,z) (-x+y,y,z) (x,x-y,z) \n 9 b .m (x,-x,z) (x,2*x,z) (-2*x,-x,z) \n 3 a 3m (0,0,z) \n ";
@@ -11596,7 +11596,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
   }
   //string sg160R = "Space Group 160R\n (0,0,0) \n 6 c 1 (x,y,z) (z,x,y) (y,z,x) (z,y,x) (y,x,z) (x,z,y) \n 3 b .m (x,x,z) (z,x,x) (x,z,x) \n 1 a 3m (x,x,x) \n ";
 
-  //DX 20180723 - added rhombohedral setting
+  //DX20180723 - added rhombohedral setting
   string sg161 = "";
   if(axis_cell==setting_2){
     sg161 = "Space Group 161\n (0,0,0) (2/3,1/3,1/3) (1/3,2/3,2/3) \n 18 b 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (-y,-x,z+.5) (-x+y,y,z+.5) (x,x-y,z+.5) \n 6 a 3. (0,0,z) (0,0,z+.5) \n ";
@@ -11617,7 +11617,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg165 = "Space Group 165\n (0,0,0) \n 12 g 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (y,x,-z+.5) (x-y,-y,-z+.5) (-x,-x+y,-z+.5) (-x,-y,-z) (y,-x+y,-z) (x-y,x,-z) (-y,-x,z+.5) (-x+y,y,z+.5) (x,x-y,z+.5) \n 6 f .2. (x,0,.25) (0,x,.25) (-x,-x,.25) (-x,0,.75) (0,-x,.75) (x,x,.75) \n 6 e -1 (.5,0,0) (0,.5,0) (.5,.5,0) (0,.5,.5) (.5,0,.5) (.5,.5,.5) \n 4 d 3.. (1/3,2/3,z) (2/3,1/3,-z+.5) (2/3,1/3,-z) (1/3,2/3,z+.5) \n 4 c 3.. (0,0,z) (0,0,-z+.5) (0,0,-z) (0,0,z+.5) \n 2 b -3.. (0,0,0) (0,0,.5) \n 2 a 32. (0,0,.25) (0,0,.75) \n ";
 
-  //DX 20180723 - added rhombohedral setting
+  //DX20180723 - added rhombohedral setting
   string sg166 = "";
   if(axis_cell==setting_2){
     sg166 = "Space Group 166\n (0,0,0) (2/3,1/3,1/3) (1/3,2/3,2/3) \n 36 i 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (y,x,-z) (x-y,-y,-z) (-x,-x+y,-z) (-x,-y,-z) (y,-x+y,-z) (x-y,x,-z) (-y,-x,z) (-x+y,y,z) (x,x-y,z) \n 18 h .m (x,-x,z) (x,2*x,z) (-2*x,-x,z) (-x,x,-z) (2*x,x,-z) (-x,-2*x,-z) \n 18 g .2 (x,0,.5) (0,x,.5) (-x,-x,.5) (-x,0,.5) (0,-x,.5) (x,x,.5) \n 18 f .2 (x,0,0) (0,x,0) (-x,-x,0) (-x,0,0) (0,-x,0) (x,x,0) \n 9 e .2/m (.5,0,0) (0,.5,0) (.5,.5,0) \n 9 d .2/m (.5,0,.5) (0,.5,.5) (.5,.5,.5) \n 6 c 3m (0,0,z) (0,0,-z) \n 3 b -3m (0,0,.5) \n 3 a -3m (0,0,0) \n ";
@@ -11630,7 +11630,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
   }
   //string sg166R = "Space Group 166R\n (0,0,0) \n 12 i 1 (x,y,z) (z,x,y) (y,z,x) (-z,-y,-x) (-y,-x,-z) (-x,-z,-y) (-x,-y,-z) (-z,-x,-y) (-y,-z,-x) (z,y,x) (y,x,z) (x,z,y) \n 6 h .m (x,x,z) (z,x,x) (x,z,x) (-z,-x,-x) (-x,-x,-z) (-x,-z,-x) \n 6 g .2 (x,-x,.5) (.5,x,-x) (-x,.5,x) (-x,x,.5) (.5,-x,x) (x,.5,-x) \n 6 f .2 (x,-x,0) (0,x,-x) (-x,0,x) (-x,x,0) (0,-x,x) (x,0,-x) \n 3 e .2/m (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 3 d .2/m (.5,0,0) (0,.5,0) (0,0,.5) \n 2 c 3m (x,x,x) (-x,-x,-x) \n 1 b -3m (.5,.5,.5) \n 1 a -3m (0,0,0) \n ";
 
-  //DX 20180723 - added rhombohedral setting
+  //DX20180723 - added rhombohedral setting
   string sg167 = "";
   if(axis_cell==setting_2){
     sg167 = "Space Group 167\n (0,0,0) (2/3,1/3,1/3) (1/3,2/3,2/3) \n 36 f 1 (x,y,z) (-y,x-y,z) (-x+y,-x,z) (y,x,-z+.5) (x-y,-y,-z+.5) (-x,-x+y,-z+.5) (-x,-y,-z) (y,-x+y,-z) (x-y,x,-z) (-y,-x,z+.5) (-x+y,y,z+.5) (x,x-y,z+.5) \n 18 e .2 (x,0,.25) (0,x,.25) (-x,-x,.25) (-x,0,.75) (0,-x,.75) (x,x,.75) \n 18 d -1 (.5,0,0) (0,.5,0) (.5,.5,0) (0,.5,.5) (.5,0,.5) (.5,.5,.5) \n 12 c 3. (0,0,z) (0,0,-z+.5) (0,0,-z) (0,0,z+.5) \n 6 b -3. (0,0,0) (0,0,.5) \n 6 a 32 (0,0,.25) (0,0,.75) \n ";
@@ -11709,7 +11709,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg200 = "Space Group 200 \n (0,0,0) \n 24 l 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (-x,-y,-z) (x,y,-z) (x,-y,z) (-x,y,z) (-z,-x,-y) (-z,x,y) (z,x,-y) (z,-x,y) (-y,-z,-x) (y,-z,x) (-y,z,x) (y,z,-x) \n 12 k m.. (.5,y,z) (.5,-y,z) (.5,y,-z) (.5,-y,-z) (z,.5,y) (z,.5,-y) (-z,.5,y) (-z,.5,-y) (y,z,.5) (-y,z,.5) (y,-z,.5) (-y,-z,.5) \n 12 j m.. (0,y,z) (0,-y,z) (0,y,-z) (0,-y,-z) (z,0,y) (z,0,-y) (-z,0,y) (-z,0,-y) (y,z,0) (-y,z,0) (y,-z,0) (-y,-z,0) \n 8 i .3. (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (-x,-x,-x) (x,x,-x) (x,-x,x) (-x,x,x) \n 6 h mm2.. (x,.5,.5) (-x,.5,.5) (.5,x,.5) (.5,-x,.5) (.5,.5,x) (.5,.5,-x) \n 6 g mm2.. (x,.5,0) (-x,.5,0) (0,x,.5) (0,-x,.5) (.5,0,x) (.5,0,-x) \n 6 f mm2.. (x,0,.5) (-x,0,.5) (.5,x,0) (.5,-x,0) (0,.5,x) (0,.5,-x) \n 6 e mm2.. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) \n 3 d mmm.. (.5,0,0) (0,.5,0) (0,0,.5) \n 3 c mmm.. (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 1 b m-3. (.5,.5,.5) \n 1 a m-3. (0,0,0) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg201 = "";
   if(axis_cell==setting_1){
     sg201 = "Space Group 201 \n (0,0,0) \n 24 h 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) (-z+.5,-x+.5,-y+.5) (-z+.5,x+.5,y+.5) (z+.5,x+.5,-y+.5) (z+.5,-x+.5,y+.5) (-y+.5,-z+.5,-x+.5) (y+.5,-z+.5,x+.5) (-y+.5,z+.5,x+.5) (y+.5,z+.5,-x+.5) \n 12 g 2.. (x,.5,0) (-x,.5,0) (0,x,.5) (0,-x,.5) (.5,0,x) (.5,0,-x) (-x+.5,0,.5) (x+.5,0,.5) (.5,-x+.5,0) (.5,x+.5,0) (0,.5,-x+.5) (0,.5,x+.5) \n 12 f 2.. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) (-x+.5,.5,.5) (x+.5,.5,.5) (.5,-x+.5,.5) (.5,x+.5,.5) (.5,.5,-x+.5) (.5,.5,x+.5) \n 8 e .3. (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (-x+.5,-x+.5,-x+.5) (x+.5,x+.5,-x+.5) (x+.5,-x+.5,x+.5) (-x+.5,x+.5,x+.5) \n 6 d 222.. (0,.5,.5) (.5,0,.5) (.5,.5,0) (.5,0,0) (0,.5,0) (0,0,.5) \n 4 c .-3. (.75,.75,.75) (.25,.25,.75) (.25,.75,.25) (.75,.25,.25) \n 4 b .-3. (.25,.25,.25) (.75,.75,.25) (.75,.25,.75) (.25,.75,.75) \n 2 a 23. (0,0,0) (.5,.5,.5) \n ";
@@ -11723,7 +11723,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg202 = "Space Group 202 \n (0,0,0) (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 96 i 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (-x,-y,-z) (x,y,-z) (x,-y,z) (-x,y,z) (-z,-x,-y) (-z,x,y) (z,x,-y) (z,-x,y) (-y,-z,-x) (y,-z,x) (-y,z,x) (y,z,-x) \n 48 h m.. (0,y,z) (0,-y,z) (0,y,-z) (0,-y,-z) (z,0,y) (z,0,-y) (-z,0,y) (-z,0,-y) (y,z,0) (-y,z,0) (y,-z,0) (-y,-z,0) \n 48 g 2.. (x,.25,.25) (-x,.75,.25) (.25,x,.25) (.25,-x,.75) (.25,.25,x) (.75,.25,-x) (-x,.75,.75) (x,.25,.75) (.75,-x,.75) (.75,x,.25) (.75,.75,-x) (.25,.75,x) \n 32 f .3. (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (-x,-x,-x) (x,x,-x) (x,-x,x) (-x,x,x) \n 24 e mm2.. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) \n 24 d 2/m.. (0,.25,.25) (0,.75,.25) (.25,0,.25) (.25,0,.75) (.25,.25,0) (.75,.25,0) \n 8 c 23. (.25,.25,.25) (.75,.75,.75) \n 4 b m-3. (.5,.5,.5) \n 4 a m-3. (0,0,0) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg203 = "";
   if(axis_cell==setting_1){
     sg203 = "Space Group 203 \n (0,0,0) (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 96 g 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (-x+.25,-y+.25,-z+.25) (x+.25,y+.25,-z+.25) (x+.25,-y+.25,z+.25) (-x+.25,y+.25,z+.25) (-z+.25,-x+.25,-y+.25) (-z+.25,x+.25,y+.25) (z+.25,x+.25,-y+.25) (z+.25,-x+.25,y+.25) (-y+.25,-z+.25,-x+.25) (y+.25,-z+.25,x+.25) (-y+.25,z+.25,x+.25) (y+.25,z+.25,-x+.25) \n 48 f 2.. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) (-x+.25,.25,.25) (x+.25,.25,.25) (.25,-x+.25,.25) (.25,x+.25,.25) (.25,.25,-x+.25) (.25,.25,x+.25) \n 32 e .3. (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (-x+.25,-x+.25,-x+.25) (x+.25,x+.25,-x+.25) (x+.25,-x+.25,x+.25) (-x+.25,x+.25,x+.25) \n 16 d .-3. (.625,.625,.625) (.375,.375,.625) (.375,.625,.375) (.625,.375,.375) \n 16 c .-3. (.125,.125,.125) (.875,.875,.125) (.875,.125,.875) (.125,.875,.875) \n 8 b 23. (.5,.5,.5) (.75,.75,.75) \n 8 a 23. (0,0,0) (.25,.25,.25) \n ";
@@ -11773,7 +11773,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg221 = "Space Group 221 \n (0,0,0) \n 48 n 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (y,x,-z) (-y,-x,-z) (y,-x,z) (-y,x,z) (x,z,-y) (-x,z,y) (-x,-z,-y) (x,-z,y) (z,y,-x) (z,-y,x) (-z,y,x) (-z,-y,-x) (-x,-y,-z) (x,y,-z) (x,-y,z) (-x,y,z) (-z,-x,-y) (-z,x,y) (z,x,-y) (z,-x,y) (-y,-z,-x) (y,-z,x) (-y,z,x) (y,z,-x) (-y,-x,z) (y,x,z) (-y,x,-z) (y,-x,-z) (-x,-z,y) (x,-z,-y) (x,z,y) (-x,z,-y) (-z,-y,x) (-z,y,-x) (z,-y,-x) (z,y,x) \n 24 m ..m (x,x,z) (-x,-x,z) (-x,x,-z) (x,-x,-z) (z,x,x) (z,-x,-x) (-z,-x,x) (-z,x,-x) (x,z,x) (-x,z,-x) (x,-z,-x) (-x,-z,x) (x,x,-z) (-x,-x,-z) (x,-x,z) (-x,x,z) (x,z,-x) (-x,z,x) (-x,-z,-x) (x,-z,x) (z,x,-x) (z,-x,x) (-z,x,x) (-z,-x,-x) \n 24 l m.. (.5,y,z) (.5,-y,z) (.5,y,-z) (.5,-y,-z) (z,.5,y) (z,.5,-y) (-z,.5,y) (-z,.5,-y) (y,z,.5) (-y,z,.5) (y,-z,.5) (-y,-z,.5) (y,.5,-z) (-y,.5,-z) (y,.5,z) (-y,.5,z) (.5,z,-y) (.5,z,y) (.5,-z,-y) (.5,-z,y) (z,y,.5) (z,-y,.5) (-z,y,.5) (-z,-y,.5) \n 24 k m.. (0,y,z) (0,-y,z) (0,y,-z) (0,-y,-z) (z,0,y) (z,0,-y) (-z,0,y) (-z,0,-y) (y,z,0) (-y,z,0) (y,-z,0) (-y,-z,0) (y,0,-z) (-y,0,-z) (y,0,z) (-y,0,z) (0,z,-y) (0,z,y) (0,-z,-y) (0,-z,y) (z,y,0) (z,-y,0) (-z,y,0) (-z,-y,0) \n 12 j m.m2 (.5,y,y) (.5,-y,y) (.5,y,-y) (.5,-y,-y) (y,.5,y) (y,.5,-y) (-y,.5,y) (-y,.5,-y) (y,y,.5) (-y,y,.5) (y,-y,.5) (-y,-y,.5) \n 12 i m.m2 (0,y,y) (0,-y,y) (0,y,-y) (0,-y,-y) (y,0,y) (y,0,-y) (-y,0,y) (-y,0,-y) (y,y,0) (-y,y,0) (y,-y,0) (-y,-y,0) \n 12 h mm2.. (x,.5,0) (-x,.5,0) (0,x,.5) (0,-x,.5) (.5,0,x) (.5,0,-x) (.5,x,0) (.5,-x,0) (x,0,.5) (-x,0,.5) (0,.5,-x) (0,.5,x) \n 8 g .3m (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (x,x,-x) (-x,-x,-x) (x,-x,x) (-x,x,x) \n 6 f 4m.m (x,.5,.5) (-x,.5,.5) (.5,x,.5) (.5,-x,.5) (.5,.5,x) (.5,.5,-x) \n 6 e 4m.m (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) \n 3 d 4/mm.m (.5,0,0) (0,.5,0) (0,0,.5) \n 3 c 4/mm.m (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 1 b m-3m (.5,.5,.5) \n 1 a m-3m (0,0,0) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg222 = "";
   if(axis_cell==setting_1){
     sg222 = "Space Group 222 \n (0,0,0) \n 48 i 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (y,x,-z) (-y,-x,-z) (y,-x,z) (-y,x,z) (x,z,-y) (-x,z,y) (-x,-z,-y) (x,-z,y) (z,y,-x) (z,-y,x) (-z,y,x) (-z,-y,-x) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) (-z+.5,-x+.5,-y+.5) (-z+.5,x+.5,y+.5) (z+.5,x+.5,-y+.5) (z+.5,-x+.5,y+.5) (-y+.5,-z+.5,-x+.5) (y+.5,-z+.5,x+.5) (-y+.5,z+.5,x+.5) (y+.5,z+.5,-x+.5) (-y+.5,-x+.5,z+.5) (y+.5,x+.5,z+.5) (-y+.5,x+.5,-z+.5) (y+.5,-x+.5,-z+.5) (-x+.5,-z+.5,y+.5) (x+.5,-z+.5,-y+.5) (x+.5,z+.5,y+.5) (-x+.5,z+.5,-y+.5) (-z+.5,-y+.5,x+.5) (-z+.5,y+.5,-x+.5) (z+.5,-y+.5,-x+.5) (z+.5,y+.5,x+.5) \n 24 h ..2 (0,y,y) (0,-y,y) (0,y,-y) (0,-y,-y) (y,0,y) (y,0,-y) (-y,0,y) (-y,0,-y) (y,y,0) (-y,y,0) (y,-y,0) (-y,-y,0) (.5,-y+.5,-y+.5) (.5,y+.5,-y+.5) (.5,-y+.5,y+.5) (.5,y+.5,y+.5) (-y+.5,.5,-y+.5) (-y+.5,.5,y+.5) (y+.5,.5,-y+.5) (y+.5,.5,y+.5) (-y+.5,-y+.5,.5) (y+.5,-y+.5,.5) (-y+.5,y+.5,.5) (y+.5,y+.5,.5) \n 24 g 2.. (x,0,.5) (-x,0,.5) (.5,x,0) (.5,-x,0) (0,.5,x) (0,.5,-x) (0,x,.5) (0,-x,.5) (x,.5,0) (-x,.5,0) (.5,0,-x) (.5,0,x) (-x+.5,.5,0) (x+.5,.5,0) (0,-x+.5,.5) (0,x+.5,.5) (.5,0,-x+.5) (.5,0,x+.5) (.5,-x+.5,0) (.5,x+.5,0) (-x+.5,0,.5) (x+.5,0,.5) (0,.5,x+.5) (0,.5,-x+.5) \n 16 f .3. (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (x,x,-x) (-x,-x,-x) (x,-x,x) (-x,x,x) (-x+.5,-x+.5,-x+.5) (x+.5,x+.5,-x+.5) (x+.5,-x+.5,x+.5) (-x+.5,x+.5,x+.5) (-x+.5,-x+.5,x+.5) (x+.5,x+.5,x+.5) (-x+.5,x+.5,-x+.5) (x+.5,-x+.5,-x+.5) \n 12 e 4.. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) (-x+.5,.5,.5) (x+.5,.5,.5) (.5,-x+.5,.5) (.5,x+.5,.5) (.5,.5,-x+.5) (.5,.5,x+.5) \n 12 d -4.. (.25,0,.5) (.75,0,.5) (.5,.25,0) (.5,.75,0) (0,.5,.25) (0,.5,.75) (0,.25,.5) (0,.75,.5) (.25,.5,0) (.75,.5,0) (.5,0,.75) (.5,0,.25) \n 8 c .-3. (.25,.25,.25) (.75,.75,.25) (.75,.25,.75) (.25,.75,.75) (.25,.25,.75) (.75,.75,.75) (.25,.75,.25) (.75,.25,.25) \n 6 b 42.2 (0,.5,.5) (.5,0,.5) (.5,.5,0) (.5,0,0) (0,.5,0) (0,0,.5) \n 2 a 432 (0,0,0) (.5,.5,.5) \n ";
@@ -11788,7 +11788,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg223 = "Space Group 223 \n (0,0,0) \n 48 l 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (y+.5,x+.5,-z+.5) (-y+.5,-x+.5,-z+.5) (y+.5,-x+.5,z+.5) (-y+.5,x+.5,z+.5) (x+.5,z+.5,-y+.5) (-x+.5,z+.5,y+.5) (-x+.5,-z+.5,-y+.5) (x+.5,-z+.5,y+.5) (z+.5,y+.5,-x+.5) (z+.5,-y+.5,x+.5) (-z+.5,y+.5,x+.5) (-z+.5,-y+.5,-x+.5) (-x,-y,-z) (x,y,-z) (x,-y,z) (-x,y,z)  (-z,-x,-y) (-z,x,y) (z,x,-y) (z,-x,y)  (-y,-z,-x) (y,-z,x) (-y,z,x) (y,z,-x)  (-y+.5,-x+.5,z+.5) (y+.5,x+.5,z+.5) (-y+.5,x+.5,-z+.5) (y+.5,-x+.5,-z+.5) (-x+.5,-z+.5,y+.5) (x+.5,-z+.5,-y+.5) (x+.5,z+.5,y+.5) (-x+.5,z+.5,-y+.5) (-z+.5,-y+.5,x+.5) (-z+.5,y+.5,-x+.5) (z+.5,-y+.5,-x+.5) (z+.5,y+.5,x+.5) \n 24 k m.. (0,y,z) (0,-y,z) (0,y,-z) (0,-y,-z) (z,0,y) (z,0,-y) (-z,0,y) (-z,0,-y) (y,z,0) (-y,z,0) (y,-z,0) (-y,-z,0) (y+.5,.5,-z+.5) (-y+.5,.5,-z+.5) (y+.5,.5,z+.5) (-y+.5,.5,z+.5)(.5,z+.5,-y+.5) (.5,z+.5,y+.5) (.5,-z+.5,-y+.5) (.5,-z+.5,y+.5) (z+.5,y+.5,.5) (z+.5,-y+.5,.5) (-z+.5,y+.5,.5) (-z+.5,-y+.5,.5) \n 24 j ..2 (.25,y,y+.5) (.75,-y,y+.5) (.75,y,-y+.5) (.25,-y,-y+.5) (y+.5,.25,y) (y+.5,.75,-y) (-y+.5,.75,y) (-y+.5,.25,-y) (y,y+.5,.25) (-y,y+.5,.75) (y,-y+.5,.75) (-y,-y+.5,.25) (.75,-y,-y+.5) (.25,y,-y+.5) (.25,-y,y+.5) (.75,y,y+.5) (-y+.5,.75,-y) (-y+.5,.25,y) (y+.5,.25,-y) (y+.5,.75,y) (-y,-y+.5,.75) (y,-y+.5,.25) (-y,y+.5,.25) (y,y+.5,.75) \n 16 i .3. (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (x+.5,x+.5,-x+.5) (-x+.5,-x+.5,-x+.5) (x+.5,-x+.5,x+.5) (-x+.5,x+.5,x+.5) (-x,-x,-x) (x,x,-x) (x,-x,x) (-x,x,x) (-x+.5,-x+.5,x+.5) (x+.5,x+.5,x+.5) (-x+.5,x+.5,-x+.5) (x+.5,-x+.5,-x+.5) \n 12 h mm2.. (x,.5,0) (-x,.5,0) (0,x,.5) (0,-x,.5) (.5,0,x) (.5,0,-x) (0,x+.5,.5) (0,-x+.5,.5) (x+.5,.5,0) (-x+.5,.5,0) (.5,0,-x+.5) (.5,0,x+.5) \n 12 g mm2.. (x,0,.5) (-x,0,.5) (.5,x,0) (.5,-x,0) (0,.5,x) (0,.5,-x) (.5,x+.5,0) (.5,-x+.5,0) (x+.5,0,.5) (-x+.5,0,.5) (0,.5,-x+.5) (0,.5,x+.5) \n 12 f mm2.. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) (.5,x+.5,.5) (.5,-x+.5,.5) (x+.5,.5,.5) (-x+.5,.5,.5) (.5,.5,-x+.5) (.5,.5,x+.5) \n 8 e .32 (.25,.25,.25) (.75,.75,.25) (.75,.25,.75) (.25,.75,.75) (.75,.75,.75) (.25,.25,.75) (.25,.75,.25) (.75,.25,.25) \n 6 d -4m.2 (.25,.5,0) (.75,.5,0) (0,.25,.5) (0,.75,.5) (.5,0,.25) (.5,0,.75) \n 6 c -4m.2 (.25,0,.5) (.75,0,.5) (.5,.25,0) (.5,.75,0) (0,.5,.25) (0,.5,.75) \n 6 b mmm.. (0,.5,.5) (.5,0,.5) (.5,.5,0) (0,.5,0) (.5,0,0) (0,0,.5) \n 2 a m-3. (0,0,0) (.5,.5,.5) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg224 = "";
   if(axis_cell==setting_1){
     sg224 = "Space Group 224 \n (0,0,0) \n 48 l 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (y+.5,x+.5,-z+.5) (-y+.5,-x+.5,-z+.5) (y+.5,-x+.5,z+.5) (-y+.5,x+.5,z+.5) (x+.5,z+.5,-y+.5) (-x+.5,z+.5,y+.5) (-x+.5,-z+.5,-y+.5) (x+.5,-z+.5,y+.5) (z+.5,y+.5,-x+.5) (z+.5,-y+.5,x+.5) (-z+.5,y+.5,x+.5) (-z+.5,-y+.5,-x+.5) (-x+.5,-y+.5,-z+.5) (x+.5,y+.5,-z+.5) (x+.5,-y+.5,z+.5) (-x+.5,y+.5,z+.5) (-z+.5,-x+.5,-y+.5) (-z+.5,x+.5,y+.5) (z+.5,x+.5,-y+.5) (z+.5,-x+.5,y+.5) (-y+.5,-z+.5,-x+.5) (y+.5,-z+.5,x+.5) (-y+.5,z+.5,x+.5) (y+.5,z+.5,-x+.5) (-y,-x,z) (y,x,z) (-y,x,-z) (y,-x,-z) (-x,-z,y) (x,-z,-y) (x,z,y) (-x,z,-y) (-z,-y,x) (-z,y,-x) (z,-y,-x) (z,y,x) \n 24 k ..m (x,x,z) (-x,-x,z) (-x,x,-z) (x,-x,-z) (z,x,x) (z,-x,-x) (-z,-x,x) (-z,x,-x) (x,z,x) (-x,z,-x) (x,-z,-x) (-x,-z,x) (x+.5,x+.5,-z+.5) (-x+.5,-x+.5,-z+.5) (x+.5,-x+.5,z+.5) (-x+.5,x+.5,z+.5) (x+.5,z+.5,-x+.5) (-x+.5,z+.5,x+.5) (-x+.5,-z+.5,-x+.5) (x+.5,-z+.5,x+.5) (z+.5,x+.5,-x+.5) (z+.5,-x+.5,x+.5) (-z+.5,x+.5,x+.5) (-z+.5,-x+.5,-x+.5) \n 24 j ..2 (.25,y,y+.5) (.75,-y,y+.5) (.75,y,-y+.5) (.25,-y,-y+.5) (y+.5,.25,y) (y+.5,.75,-y) (-y+.5,.75,y) (-y+.5,.25,-y) (y,y+.5,.25) (-y,y+.5,.75) (y,-y+.5,.75) (-y,-y+.5,.25) (.25,-y+.5,-y) (.75,y+.5,-y) (.75,-y+.5,y) (.25,y+.5,y) (-y,.25,-y+.5) (-y,.75,y+.5) (y,.75,-y+.5) (y,.25,y+.5) (-y+.5,-y,.25) (y+.5,-y,.75) (-y+.5,y,.75) (y+.5,y,.25) \n 24 i ..2 (.25,y,-y+.5) (.75,-y,-y+.5) (.75,y,y+.5) (.25,-y,y+.5) (-y+.5,.25,y) (-y+.5,.75,-y) (y+.5,.75,y) (y+.5,.25,-y) (y,-y+.5,.25) (-y,-y+.5,.75) (y,y+.5,.75) (-y,y+.5,.25) (.25,-y+.5,y) (.75,y+.5,y) (.75,-y+.5,-y) (.25,y+.5,-y) (y,.25,-y+.5) (y,.75,y+.5) (-y,.75,-y+.5) (-y,.25,y+.5) (-y+.5,y,.25) (y+.5,y,.75) (-y+.5,-y,.75) (y+.5,-y,.25) \n 24 h 2.. (x,0,.5) (-x,0,.5) (.5,x,0) (.5,-x,0) (0,.5,x) (0,.5,-x) (.5,x+.5,0) (.5,-x+.5,0) (x+.5,0,.5) (-x+.5,0,.5) (0,.5,-x+.5) (0,.5,x+.5) (-x+.5,.5,0) (x+.5,.5,0) (0,-x+.5,.5) (0,x+.5,.5) (.5,0,-x+.5) (.5,0,x+.5) (0,-x,.5) (0,x,.5) (-x,.5,0) (x,.5,0) (.5,0,x) (.5,0,-x) \n 12 g 2.mm (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) (.5,x+.5,.5) (.5,-x+.5,.5) (x+.5,.5,.5) (-x+.5,.5,.5) (.5,.5,-x+.5) (.5,.5,x+.5) \n 12 f 2.22 (.25,0,.5) (.75,0,.5) (.5,.25,0) (.5,.75,0) (0,.5,.25) (0,.5,.75) (.25,.5,0) (.75,.5,0) (0,.25,.5) (0,.75,.5) (.5,0,.25) (.5,0,.75) \n 8 e .3m (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (x+.5,x+.5,-x+.5) (-x+.5,-x+.5,-x+.5) (x+.5,-x+.5,x+.5) (-x+.5,x+.5,x+.5) \n 6 d -42.m (0,.5,.5) (.5,0,.5) (.5,.5,0) (0,.5,0) (.5,0,0) (0,0,.5) \n 4 c .-3m (.75,.75,.75) (.25,.25,.75) (.25,.75,.25) (.75,.25,.25) \n 4 b .-3m (.25,.25,.25) (.75,.75,.25) (.75,.25,.75) (.25,.75,.75) \n 2 a -43m (0,0,0) (.5,.5,.5) \n ";
@@ -11804,7 +11804,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
 
   string sg226 = "Space Group 226 \n (0,0,0) (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 192 j 1 (x,y,z) (-x,-y,z) (-x,y,-z) (x,-y,-z) (z,x,y) (z,-x,-y) (-z,-x,y) (-z,x,-y) (y,z,x) (-y,z,-x) (y,-z,-x) (-y,-z,x) (y+.5,x+.5,-z+.5) (-y+.5,-x+.5,-z+.5) (y+.5,-x+.5,z+.5) (-y+.5,x+.5,z+.5) (x+.5,z+.5,-y+.5) (-x+.5,z+.5,y+.5) (-x+.5,-z+.5,-y+.5) (x+.5,-z+.5,y+.5) (z+.5,y+.5,-x+.5) (z+.5,-y+.5,x+.5) (-z+.5,y+.5,x+.5) (-z+.5,-y+.5,-x+.5) (-x,-y,-z) (x,y,-z) (x,-y,z) (-x,y,z) (-z,-x,-y) (-z,x,y) (z,x,-y) (z,-x,y) (-y,-z,-x) (y,-z,x) (-y,z,x) (y,z,-x) (-y+.5,-x+.5,z+.5) (y+.5,x+.5,z+.5) (-y+.5,x+.5,-z+.5) (y+.5,-x+.5,-z+.5) (-x+.5,-z+.5,y+.5) (x+.5,-z+.5,-y+.5) (x+.5,z+.5,y+.5) (-x+.5,z+.5,-y+.5) (-z+.5,-y+.5,x+.5) (-z+.5,y+.5,-x+.5) (z+.5,-y+.5,-x+.5) (z+.5,y+.5,x+.5) \n 96 i m.. (0,y,z) (0,-y,z) (0,y,-z) (0,-y,-z) (z,0,y) (z,0,-y) (-z,0,y) (-z,0,-y) (y,z,0) (-y,z,0) (y,-z,0) (-y,-z,0) (y+.5,.5,-z+.5) (-y+.5,.5,-z+.5) (y+.5,.5,z+.5) (-y+.5,.5,z+.5) (.5,z+.5,-y+.5) (.5,z+.5,y+.5) (.5,-z+.5,-y+.5) (.5,-z+.5,y+.5) (z+.5,y+.5,.5) (z+.5,-y+.5,.5) (-z+.5,y+.5,.5) (-z+.5,-y+.5,.5) \n 96 h ..2 (.25,y,y) (.75,-y,y) (.75,y,-y) (.25,-y,-y) (y,.25,y) (y,.75,-y) (-y,.75,y) (-y,.25,-y) (y,y,.25) (-y,y,.75) (y,-y,.75) (-y,-y,.25) (.75,-y,-y) (.25,y,-y) (.25,-y,y) (.75,y,y) (-y,.75,-y) (-y,.25,y) (y,.25,-y) (y,.75,y) (-y,-y,.75) (y,-y,.25) (-y,y,.25) (y,y,.75) \n 64 g .3. (x,x,x) (-x,-x,x) (-x,x,-x) (x,-x,-x) (x+.5,x+.5,-x+.5) (-x+.5,-x+.5,-x+.5) (x+.5,-x+.5,x+.5) (-x+.5,x+.5,x+.5) (-x,-x,-x) (x,x,-x) (x,-x,x) (-x,x,x) (-x+.5,-x+.5,x+.5) (x+.5,x+.5,x+.5) (-x+.5,x+.5,-x+5) (x+.5,-x+.5,-x+.5) \n 48 f 4.. (x,.25,.25) (-x,.75,.25) (.25,x,.25) (.25,-x,.75) (.25,.25,x) (.75,.25,-x) (-x,.75,.75) (x,.25,.75) (.75,-x,.75) (.75,x,.25) (.75,.75,-x) (.25,.75,x) \n 48 e mm2.. (x,0,0) (-x,0,0) (0,x,0) (0,-x,0) (0,0,x) (0,0,-x) (.5,x+.5,.5) (.5,-x+.5,.5) (x+.5,.5,.5) (-x+.5,.5,.5) (.5,.5,-x+.5) (.5,.5,x+.5) \n 24 d 4/m.. (0,.25,.25) (0,.75,.25) (.25,0,.25) (.25,0,.75) (.25,.25,0) (.75,.25,0) \n 24 c -4m.2 (.25,0,0) (.75,0,0) (0,.25,0) (0,.75,0) (0,0,.25) (0,0,.75) \n 8 b m-3. (0,0,0) (.5,.5,.5) \n 8 a 432 (.25,.25,.25) (.75,.75,.75) \n ";
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg227 = "";
   if(axis_cell==setting_1){
     sg227 = "Space Group 227 \n (0,0,0) (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 192 i 1 (x,y,z) (-x,-y+.5,z+.5) (-x+.5,y+.5,-z) (x+.5,-y,-z+.5) (z,x,y) (z+.5,-x,-y+.5) (-z,-x+.5,y+.5) (-z+.5,x+.5,-y) (y,z,x) (-y+.5,z+.5,-x) (y+.5,-z,-x+.5) (-y,-z+.5,x+.5) (y+.75,x+.25,-z+.75) (-y+.25,-x+.25,-z+.25) (y+.25,-x+.75,z+.75) (-y+.75,x+.75,z+.25) (x+.75,z+.25,-y+.75) (-x+.75,z+.75,y+.25) (-x+.25,-z+.25,-y+.25) (x+.25,-z+.75,y+.75) (z+.75,y+.25,-x+.75) (z+.25,-y+.75,x+.75) (-z+.75,y+.75,x+.25) (-z+.25,-y+.25,-x+.25) (-x+.25,-y+.25,-z+.25) (x+.25,y+.75,-z+.75) (x+.75,-y+.75,z+.25) (-x+.75,y+.25,z+.75) (-z+.25,-x+.25,-y+.25) (-z+.75,x+.25,y+.75) (z+.25,x+.75,-y+.75) (z+.75,-x+.75,y+.25) (-y+.25,-z+.25,-x+.25) (y+.75,-z+.75,x+.25) (-y+.75,z+.25,x+.75) (y+.25,z+.75,-x+.75) (-y+.5,-x,z+.5) (y,x,z) (-y,x+.5,-z+.5) (y+.5,-x+.5,-z) (-x+.5,-z,y+.5) (x+.5,-z+.5,-y) (x,z,y) (-x,z+.5,-y+.5) (-z+.5,-y,x+.5) (-z,y+.5,-x+.5) (z+.5,-y+.5,-x) (z,y,x) \n 96 h ..2 (.125,y,-y+.25) (.875,-y+.5,-y+.75) (.375,y+.5,y+.75) (.625,-y,y+.25) (-y+.25,.125,y) (-y+.75,.875,-y+.5) (y+.75,.375,y+.5) (y+.25,.625,-y) (y,-y+.25,.125) (-y+.5,-y+.75,.875) (y+.5,y+.75,.375) (-y,y+.25,.625) (.125,-y+.25,y) (.375,y+.75,y+.5) (.875,-y+.75,-y+.5) (.625,y+.25,-y) (y,.125,-y+.25) (y+.5,.375,y+.75) (-y+.5,.875,-y+.75) (-y,.625,y+.25) (-y+.25,y,.125) (y+.75,y+.5,.375) (-y+.75,-y+.5,.875) (y+.25,-y,.625) \n 96 g ..m (x,x,z) (-x,-x+.5,z+.5) (-x+.5,x+.5,-z) (x+.5,-x,-z+.5) (z,x,x) (z+.5,-x,-x+.5) (-z,-x+.5,x+.5) (-z+.5,x+.5,-x) (x,z,x) (-x+.5,z+.5,-x) (x+.5,-z,-x+.5) (-x,-z+.5,x+.5) (x+.75,x+.25,-z+.75) (-x+.25,-x+.25,-z+.25) (x+.25,-x+.75,z+.75) (-x+.75,x+.75,z+.25) (x+.75,z+.25,-x+.75) (-x+.75,z+.75,x+.25) (-x+.25,-z+.25,-x+.25) (x+.25,-z+.75,x+.75) (z+.75,x+.25,-x+.75) (z+.25,-x+.75,x+.75) (-z+.75,x+.75,x+.25) (-z+.25,-x+.25,-x+.25) \n 48 f 2.mm (x,0,0) (-x,.5,.5) (0,x,0) (.5,-x,.5) (0,0,x) (.5,.5,-x) (.75,x+.25,.75) (.25,-x+.25,.25) (x+.75,.25,.75) (-x+.75,.75,.25) (.75,.25,-x+.75) (.25,.75,x+.75) \n 32 e .3m (x,x,x) (-x,-x+.5,x+.5) (-x+.5,x+.5,-x) (x+.5,-x,-x+.5) (x+.75,x+.25,-x+.75) (-x+.25,-x+.25,-x+.25) (x+.25,-x+.75,x+.75) (-x+.75,x+.75,x+.25) \n 16 d .-3m (.625,.625,.625) (.375,.875,.125) (.875,.125,.375) (.125,.375,.875) \n 16 c .-3m (.125,.125,.125) (.875,.375,.625) (.375,.625,.875) (.625,.875,.375) \n 8 b -43m (.5,.5,.5) (.25,.75,.25) \n 8 a -43m (0,0,0) (.75,.25,.75) \n ";
@@ -11816,7 +11816,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
     sg227 = "Space Group 227 \n (0,0,0) (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 192 i 1 (x,y,z) (-x,-y+.5,z+.5) (-x+.5,y+.5,-z) (x+.5,-y,-z+.5) (z,x,y) (z+.5,-x,-y+.5) (-z,-x+.5,y+.5) (-z+.5,x+.5,-y) (y,z,x) (-y+.5,z+.5,-x) (y+.5,-z,-x+.5) (-y,-z+.5,x+.5) (y+.75,x+.25,-z+.75) (-y+.25,-x+.25,-z+.25) (y+.25,-x+.75,z+.75) (-y+.75,x+.75,z+.25) (x+.75,z+.25,-y+.75) (-x+.75,z+.75,y+.25) (-x+.25,-z+.25,-y+.25) (x+.25,-z+.75,y+.75) (z+.75,y+.25,-x+.75) (z+.25,-y+.75,x+.75) (-z+.75,y+.75,x+.25) (-z+.25,-y+.25,-x+.25) (-x+.25,-y+.25,-z+.25) (x+.25,y+.75,-z+.75) (x+.75,-y+.75,z+.25) (-x+.75,y+.25,z+.75) (-z+.25,-x+.25,-y+.25) (-z+.75,x+.25,y+.75) (z+.25,x+.75,-y+.75) (z+.75,-x+.75,y+.25) (-y+.25,-z+.25,-x+.25) (y+.75,-z+.75,x+.25) (-y+.75,z+.25,x+.75) (y+.25,z+.75,-x+.75) (-y+.5,-x,z+.5) (y,x,z) (-y,x+.5,-z+.5) (y+.5,-x+.5,-z) (-x+.5,-z,y+.5) (x+.5,-z+.5,-y) (x,z,y) (-x,z+.5,-y+.5) (-z+.5,-y,x+.5) (-z,y+.5,-x+.5) (z+.5,-y+.5,-x) (z,y,x) \n 96 h ..2 (.125,y,-y+.25) (.875,-y+.5,-y+.75) (.375,y+.5,y+.75) (.625,-y,y+.25) (-y+.25,.125,y) (-y+.75,.875,-y+.5) (y+.75,.375,y+.5) (y+.25,.625,-y) (y,-y+.25,.125) (-y+.5,-y+.75,.875) (y+.5,y+.75,.375) (-y,y+.25,.625) (.125,-y+.25,y) (.375,y+.75,y+.5) (.875,-y+.75,-y+.5) (.625,y+.25,-y) (y,.125,-y+.25) (y+.5,.375,y+.75) (-y+.5,.875,-y+.75) (-y,.625,y+.25) (-y+.25,y,.125) (y+.75,y+.5,.375) (-y+.75,-y+.5,.875) (y+.25,-y,.625) \n 96 g ..m (x,x,z) (-x,-x+.5,z+.5) (-x+.5,x+.5,-z) (x+.5,-x,-z+.5) (z,x,x) (z+.5,-x,-x+.5) (-z,-x+.5,x+.5) (-z+.5,x+.5,-x) (x,z,x) (-x+.5,z+.5,-x) (x+.5,-z,-x+.5) (-x,-z+.5,x+.5) (x+.75,x+.25,-z+.75) (-x+.25,-x+.25,-z+.25) (x+.25,-x+.75,z+.75) (-x+.75,x+.75,z+.25) (x+.75,z+.25,-x+.75) (-x+.75,z+.75,x+.25) (-x+.25,-z+.25,-x+.25) (x+.25,-z+.75,x+.75) (z+.75,x+.25,-x+.75) (z+.25,-x+.75,x+.75) (-z+.75,x+.75,x+.25) (-z+.25,-x+.25,-x+.25) \n 48 f 2.mm (x,0,0) (-x,.5,.5) (0,x,0) (.5,-x,.5) (0,0,x) (.5,.5,-x) (.75,x+.25,.75) (.25,-x+.25,.25) (x+.75,.25,.75) (-x+.75,.75,.25) (.75,.25,-x+.75) (.25,.75,x+.75) \n 32 e .3m (x,x,x) (-x,-x+.5,x+.5) (-x+.5,x+.5,-x) (x+.5,-x,-x+.5) (x+.75,x+.25,-x+.75) (-x+.25,-x+.25,-x+.25) (x+.25,-x+.75,x+.75) (-x+.75,x+.75,x+.25) \n 16 d .-3m (.625,.625,.625) (.375,.875,.125) (.875,.125,.375) (.125,.375,.875) \n 16 c .-3m (.125,.125,.125) (.875,.375,.625) (.375,.625,.875) (.625,.875,.375) \n 8 b -43m (.5,.5,.5) (.25,.75,.25) \n 8 a -43m (0,0,0) (.75,.25,.75) \n ";
   }
 
-  //DX 20180723 - added origin choice 2
+  //DX20180723 - added origin choice 2
   string sg228 = "";
   if(axis_cell==setting_1){
     sg228 = "Space Group 228 \n (0,0,0) (0,.5,.5) (.5,0,.5) (.5,.5,0) \n 192 h 1 (x,y,z) (-x,-y+.5,z+.5) (-x+.5,y+.5,-z) (x+.5,-y,-z+.5) (z,x,y) (z+.5,-x,-y+.5) (-z,-x+.5,y+.5) (-z+.5,x+.5,-y) (y,z,x) (-y+.5,z+.5,-x) (y+.5,-z,-x+.5) (-y,-z+.5,x+.5) (y+.75,x+.25,-z+.75) (-y+.25,-x+.25,-z+.25) (y+.25,-x+.75,z+.75) (-y+.75,x+.75,z+.25) (x+.75,z+.25,-y+.75) (-x+.75,z+.75,y+.25) (-x+.25,-z+.25,-y+.25) (x+.25,-z+.75,y+.75) (z+.75,y+.25,-x+.75) (z+.25,-y+.75,x+.75) (-z+.75,y+.75,x+.25) (-z+.25,-y+.25,-x+.25) (-x+.75,-y+.75,-z+.75) (x+.75,y+.25,-z+.25) (x+.25,-y+.25,z+.75) (-x+.25,y+.75,z+.25) (-z+.75,-x+.75,-y+.75) (-z+.25,x+.75,y+.25) (z+.75,x+.25,-y+.25) (z+.25,-x+.25,y+.75) (-y+.75,-z+.75,-x+.75) (y+.25,-z+.25,x+.75) (-y+.25,z+.75,x+.25) (y+.75,z+.25,-x+.25) (-y,-x+.5,z) (y+.5,x+.5,z+.5) (-y+.5,x,-z) (y,-x,-z+.5) (-x,-z+.5,y) (x,-z,-y+.5) (x+.5,z+.5,y+.5) (-x+.5,z,-y) (-z,-y+.5,x) (-z+.5,y,-x) (z,-y,-x+.5) (z+.5,y+.5,x+.5) \n 96 g ..2 (.125,y,-y+.25) (.875,-y+.5,-y+.75) (.375,y+.5,y+.75) (.625,-y,y+.25) (-y+.25,.125,y) (-y+.75,.875,-y+.5) (y+.75,.375,y+.5) (y+.25,.625,-y) (y,-y+.25,.125) (-y+.5,-y+.75,.875) (y+.5,y+.75,.375) (-y,y+.25,.625) (.625,-y+.75,y+.5) (.875,y+.25,y) (.375,-y+.25,-y) (.125,y+.75,-y+.5) (y+.5,.625,-y+.75) (y,.875,y+.25) (-y,.375,-y+.25) (-y+.5,.125,y+.75) (-y+.75,y+.5,.625) (y+.25,y,.875) (-y+.25,-y,.375) (y+.75,-y+.5,.125) \n 96 f 2.. (x,0,0) (-x,.5,.5) (0,x,0) (.5,-x,.5) (0,0,x) (.5,.5,-x) (.75,x+.25,.75) (.25,-x+.25,.25) (x+.75,.25,.75) (-x+.75,.75,.25) (.75,.25,-x+.75) (.25,.75,x+.75) (-x+.75,.75,.75) (x+.75,.25,.25) (.75,-x+.75,.75) (.25,x+.75,.25) (.75,.75,-x+.75) (.25,.25,x+.75) (0,-x+.5,0) (.5,x+.5,.5) (-x,.5,0) (x,0,.5) (0,.5,x) (.5,0,-x) \n 64 e .3. (x,x,x) (-x,-x+.5,x+.5) (-x+.5,x+.5,-x) (x+.5,-x,-x+.5) (x+.75,x+.25,-x+.75) (-x+.25,-x+.25,-x+.25) (x+.25,-x+.75,x+.75) (-x+.75,x+.75,x+.25) (-x+.75,-x+.75,-x+.75) (x+.75,x+.25,-x+.25) (x+.25,-x+.25,x+.75) (-x+.25,x+.75,x+.25) (-x,-x+.5,x) (x+.5,x+.5,x+.5) (-x+.5,x,-x) (x,-x,-x+.5) \n 48 d -4.. (.25,0,0) (.75,.5,.5) (0,.25,0) (.5,.75,.5) (0,0,.25) (.5,.5,.75) (.75,.5,.75) (.25,0,.25) (0,.25,.75) (.5,.75,.5) (.75,.25,.5) (.25,.75,0) \n 32 c .-3. (.375,.375,.375) (.625,.125,.875) (.125,.875,.625) (.875,.625,.125) (.125,.625,.375) (.875,.875,.875) (.625,.375,.125) (.375,.125,.625) \n 32 b .32 (.125,.125,.125) (.875,.375,.625) (.375,.625,.875) (.625,.875,.375) (.625,.625,.625) (.875,.375,.125) (.375,.125,.875) (.125,.875,.375) \n 16 a 23. (0,0,0) (.75,.25,.75) (.75,.75,.75) (0,.5,0) \n ";

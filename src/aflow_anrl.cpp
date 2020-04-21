@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2016
@@ -498,7 +498,7 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A_hP9_154_bc(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 198
   uint PrototypeANRL_AB2_hP9_156_b2c_3a2bc(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 199
   uint PrototypeANRL_AB_hP12_156_2ab3c_2ab3c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 200
-  uint PrototypeANRL_AB_hP4_156_ab_ab(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 201 //DX 20180925 - changed label
+  uint PrototypeANRL_AB_hP4_156_ab_ab(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 201 //DX20180925 - changed label
   uint PrototypeANRL_A5B6C2_hP13_157_2ac_2c_b(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 202
   uint PrototypeANRL_A3B_hP8_158_d_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 203
   uint PrototypeANRL_A2B3_hP20_159_bc_2c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 204
@@ -528,9 +528,9 @@ namespace anrl { // put them in order
   uint PrototypeANRL_ABC_hP12_174_cj_fk_aj(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 228
   uint PrototypeANRL_A8B7C6_hP21_175_ck_aj_k(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 229
   uint PrototypeANRL_ABC_hP36_175_jk_jk_jk(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 230
-  uint PrototypeANRL_A3B2_hP10_176_h_bc(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 231 //DX 20180925 - changed label
-  uint PrototypeANRL_A3B3C_hP14_176_h_h_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 232 //DX 20180925 - changed label
-  uint PrototypeANRL_A3B_hP8_176_h_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 233 //DX 20180925 - changed label
+  uint PrototypeANRL_A3B2_hP10_176_h_bc(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 231 //DX20180925 - changed label
+  uint PrototypeANRL_A3B3C_hP14_176_h_h_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 232 //DX20180925 - changed label
+  uint PrototypeANRL_A3B_hP8_176_h_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 233 //DX20180925 - changed label
   uint PrototypeANRL_A2B_hP36_177_j2lm_n(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 234
   uint PrototypeANRL_AB3_hP24_178_b_ac(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 235
   uint PrototypeANRL_A_hP6_178_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 236
@@ -545,7 +545,7 @@ namespace anrl { // put them in order
   uint PrototypeANRL_AB3_hP24_185_c_ab2c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 245
   uint PrototypeANRL_A3B7_hP20_186_c_b2c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 246
   uint PrototypeANRL_AB3_hP4_187_e_fh(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 247
-  uint PrototypeANRL_A3BC_hP10_188_k_c_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 248 //DX 20180925 - changed label
+  uint PrototypeANRL_A3BC_hP10_188_k_c_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 248 //DX20180925 - changed label
   uint PrototypeANRL_AB9C4_hP28_188_e_kl_ak(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 249
   uint PrototypeANRL_A8BC3D6_hP18_189_bfh_a_g_i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 250
   uint PrototypeANRL_A9BC3D5_hP18_189_fi_a_g_bh(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 251
@@ -562,12 +562,12 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A12B2C_cF60_196_h_bc_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 262
   uint PrototypeANRL_ABC3_cP20_198_a_a_b(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 263
   uint PrototypeANRL_A2B11_cP39_200_f_aghij(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 264
-  uint PrototypeANRL_AB3C_cP60_201_be_fh_g(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 265 //DX 20180925 - changed label
+  uint PrototypeANRL_AB3C_cP60_201_be_fh_g(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 265 //DX20180925 - changed label
   uint PrototypeANRL_A6B6C_cF104_202_h_h_c(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 266
   uint PrototypeANRL_A_cF240_202_h2i(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 267
   uint PrototypeANRL_A2BCD3E6_cF208_203_e_c_d_f_g(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 268
   uint PrototypeANRL_A4B2C6D16E_cF232_203_e_d_f_eg_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 269
-  uint PrototypeANRL_AB3C16_cF160_203_a_bc_eg(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 270 //DX 20180925 - changed label
+  uint PrototypeANRL_AB3C16_cF160_203_a_bc_eg(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 270 //DX20180925 - changed label
   uint PrototypeANRL_A2B3C6_cP264_205_2d_ab2c2d_6d(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 271
   uint PrototypeANRL_A_cP240_205_10d(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 272
   uint PrototypeANRL_AB3C2_cI96_206_c_e_ad(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 273
@@ -600,7 +600,7 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A4B_cI10_229_c_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 300
   uint PrototypeANRL_A7B3_cI40_229_df_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 301
   uint PrototypeANRL_A2B3C12D3_cI160_230_a_c_h_d(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 302
-  //DX 20181130 - add Ohad's SQS structures - START
+  //DX20181130 - add Ohad's SQS structures - START
   // -------------------------------------------------------------------------
   // SQS (from O. Levy)
   // -------------------------------------------------------------------------
@@ -611,10 +611,10 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A3B13_oC32_38_ac_a2bcdef(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 5
   uint PrototypeANRL_A3B5_oC32_38_abce_abcdf(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 6
   uint PrototypeANRL_AB7_hR16_166_c_c2h(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 7
-  //DX 20181130 - add Ohad's SQS structures - END
-  //DX 20181211 - add Corey's kesterite structure - START
+  //DX20181130 - add Ohad's SQS structures - END
+  //DX20181211 - add CO's kesterite structure - START
   uint PrototypeANRL_A2BCD4_tI16_82_ac_b_d_g(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 1
-  //DX 20181211 - add Corey's kesterite structure - END
+  //DX20181211 - add CO's kesterite structure - END
   // -------------------------------------------------------------------------
   // misc prototypes (from Y. Lederer)
   // -------------------------------------------------------------------------
@@ -721,7 +721,7 @@ namespace anrl {
     string label_permutations=""; deque<uint> vpermutation;
     vector<string> tokens;
 
-    string number_id = ""; //for predefined anrls //DX 20191207
+    string number_id = ""; //for predefined anrls //DX20191207
 
     // ---------------------------------------------------------------------------
     // search for label_permutations
@@ -732,7 +732,7 @@ namespace anrl {
     if(tokens.size()==1) { label_anrl=tokens.at(0); }
     if(tokens.size()==2) { label_anrl=tokens.at(0); label_permutations=tokens.at(1); }
 
-    // DX 20181207 - add predefined protos - START
+    //DX20181207 - add predefined protos - START
     if(aurostd::substring2bool(label,"-")){
       vector<string> tokens;
       aurostd::string2tokens(label,tokens,"-");
@@ -790,7 +790,7 @@ namespace anrl {
       message << "vproto_nspecies.at(ifound)=" << vproto_nspecies.at(ifound) << endl;
       message << "vpermutation.size()=" << vpermutation.size() << endl;
       message << "vpermutation ="; for(uint i=0;i<vpermutation.size();i++) {message << " " << vpermutation.at(i);} message << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_); //DX 20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_); //DX20200207 - exit -> throw
     }
     // ---------------------------------------------------------------------------
     // check for vatomX size and errors
@@ -800,7 +800,7 @@ namespace anrl {
       message << "vproto_nspecies.at(ifound)=" << vproto_nspecies.at(ifound) << endl;
       message << "vatomX.size()=" << vatomX.size() << endl;
       message << "vatomX ="; for(uint i=0;i<vatomX.size();i++) {message << " " << vatomX.at(i);} message << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_); //DX 20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_NUMBER_); //DX20200207 - exit -> throw
     }
 
     for(uint i=0;i<vproto_nspecies.at(ifound);i++) { // number of species
@@ -813,18 +813,18 @@ namespace anrl {
     }
 
     // ---------------------------------------------------------------------------
-    // explicit equations - DX 20180615 
+    // explicit equations - DX20180615 
     uint print_mode = 0; // no equations
     if(XHOST.vflag_pflow.flag("PROTO::EQUATIONS_ONLY")) {
       print_mode = 1; // equations only
-      str.symbolic_math_representation_only=TRUE;  //DX 20180618 print symbolic math representation only
+      str.symbolic_math_representation_only=TRUE;  //DX20180618 print symbolic math representation only
     }
     else if(XHOST.vflag_pflow.flag("PROTO::ADD_EQUATIONS")) {
       print_mode = 2; // equations + parameters
-      str.constrained_symmetry_calculation=TRUE;  //DX 20180618 appends information to geometry file for calculation
+      str.constrained_symmetry_calculation=TRUE;  //DX20180618 appends information to geometry file for calculation
     }
 
-    //DX 20190227 - 
+    //DX20190227 - 
     // -------------------------------------------------------------------------
     // check if using original anrl lattice parameter value when using the 
     // preset parameter functionality
@@ -839,7 +839,7 @@ namespace anrl {
     bool scale_volume_by_species = false;
     vector<string> vparameters;
     // ---------------------------------------------------------------------------
-    // get prototype parameters if not given - DX 20181207
+    // get prototype parameters if not given - DX20181207
     if(parameters.size()==0){
       int choice = -1;
       if(vproto_params.at(ifound) == "a"){
@@ -848,7 +848,7 @@ namespace anrl {
         if(number_id.size()!=0){ 
           stringstream message;
           message << vlabel.at(ifound) << " only has one degree of freedom (lattice parameter), i.e., no enumerated suffix necessary." << endl; 
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX 20200207 - exit -> throw
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20200207 - exit -> throw
         }
       }
       // if number ID is given, i.e., 001, 002, etc.
@@ -859,12 +859,12 @@ namespace anrl {
       parameters=all_possible_vparameters[0];
     }
     aurostd::string2tokens(parameters,vparameters,",");
-    if(vparameters.size()==0){  //CO181226 david fix
+    if(vparameters.size()==0){  //CO20181226 DX fix
       stringstream message;
       message << "no parameters provided; add parameter values with --params=... or use tabulated enumeration suffix (see aflow --protos)" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX 20200207 - exit -> throw
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20200207 - exit -> throw
     }
-    if(aurostd::string2utype<double>(vparameters[0])<=0.0){ //CO181226 forget signbit, also include 0
+    if(aurostd::string2utype<double>(vparameters[0])<=0.0){ //CO20181226 forget signbit, also include 0
       scale_volume_by_species=true;
       vparameters[0]="1.0"; //fix
       parameters=aurostd::joinWDelimiter(vparameters,",");
@@ -3098,11 +3098,11 @@ namespace anrl {
     // 200 // ./aflow --proto=AB_hP12_156_2ab3c_2ab3c --params=4.2499813346,4.90823529409,0.375,0.70833,0.5,0.83333,0.04167,0.16667,0.45833,0.79167,0.125,0.33333,0.66667,0.0
     if(vlabel.at(ifound)=="AB_hP12_156_2ab3c_2ab3c")
       PrototypeANRL_AB_hP12_156_2ab3c_2ab3c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - START
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - START
     // 201 // ./aflow --proto=AB_hP4_156_ab_ab --params=4.2794836776,1.67515774714,0.636,0.0,0.894,0.5 
     if(found && vlabel.at(ifound)=="AB_hP4_156_ab_ab")
       PrototypeANRL_AB_hP4_156_ab_ab(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - END
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - END
     // 202 // ./aflow --proto=A5B6C2_hP13_157_2ac_2c_b --params=5.939,1.08233709379,0.264,0.736,0.022,0.5,0.522,0.603,0.215,0.397,0.829
     if(vlabel.at(ifound)=="A5B6C2_hP13_157_2ac_2c_b")
       PrototypeANRL_A5B6C2_hP13_157_2ac_2c_b(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3226,7 +3226,7 @@ namespace anrl {
     // 230 // ./aflow --proto=ABC_hP36_175_jk_jk_jk --params=11.5799622371,0.317895264089,0.255,0.0598,0.1323,0.416,0.3483,0.0762,0.2334,0.5727,0.4279,0.0715,0.1367,0.5046
     if(vlabel.at(ifound)=="ABC_hP36_175_jk_jk_jk")
       PrototypeANRL_ABC_hP36_175_jk_jk_jk(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - START
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - START
     // 231 // ./aflow --proto=A3B2_hP10_176_h_bc --params=7.8700439404,0.50025412961,0.3847,0.0915
     if(found && vlabel.at(ifound)=="A3B2_hP10_176_h_bc")
       PrototypeANRL_A3B2_hP10_176_h_bc(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3238,7 +3238,7 @@ namespace anrl {
     // 233 // ./aflow --proto=A3B_hP8_176_h_c --params=7.4429335392,0.580545478976,0.375,0.083 
     if(found && vlabel.at(ifound)=="A3B_hP8_176_h_c")
       PrototypeANRL_A3B_hP8_176_h_c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - END
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - END
     // 234 // ./aflow --proto=A2B_hP36_177_j2lm_n --params=12.7835,0.291064262526,0.61855,0.39242,0.79257,0.44445,0.52169,0.86952,0.16458
     if(vlabel.at(ifound)=="A2B_hP36_177_j2lm_n")
       PrototypeANRL_A2B_hP36_177_j2lm_n(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3294,11 +3294,11 @@ namespace anrl {
     // 247 // ./aflow --proto=AB3_hP4_187_e_fh --params=2.8065,2.53411722786,0.198
     if(vlabel.at(ifound)=="AB3_hP4_187_e_fh")
       PrototypeANRL_AB3_hP4_187_e_fh(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - START
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - START
     // 248 // ./aflow --proto=A3BC_hP10_188_k_c_a --params=7.2864263258,0.928891999832,0.0041,0.32685
     if(found && vlabel.at(ifound)=="A3BC_hP10_188_k_c_a")
       PrototypeANRL_A3BC_hP10_188_k_c_a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - END
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - END
     // 249 // ./aflow --proto=AB9C4_hP28_188_e_kl_ak --params=6.4953629976,1.43896355826,0.07103,0.48306,0.12023,0.75436,0.22923,0.00127,0.6032
     if(vlabel.at(ifound)=="AB9C4_hP28_188_e_kl_ak")
       PrototypeANRL_AB9C4_hP28_188_e_kl_ak(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3368,11 +3368,11 @@ namespace anrl {
     // 264 // ./aflow --proto=A2B11_cP39_200_f_aghij --params=8.5520223662,0.18,0.34,0.265,0.278,0.157,0.257
     if(vlabel.at(ifound)=="A2B11_cP39_200_f_aghij")
       PrototypeANRL_A2B11_cP39_200_f_aghij(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - START
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - START
     // 265 // ./aflow --proto=AB3C_cP60_201_be_fh_g --params=9.5599167841,0.3889,0.6111,0.0972,0.0389,0.0972,0.75
     if(found && vlabel.at(ifound)=="AB3C_cP60_201_be_fh_g")
       PrototypeANRL_AB3C_cP60_201_be_fh_g(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - START
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - START
     // 266 // ./aflow --proto=A6B6C_cF104_202_h_h_c --params=10.6100296668,0.5827,0.6359,0.638,0.72
     if(vlabel.at(ifound)=="A6B6C_cF104_202_h_h_c")
       PrototypeANRL_A6B6C_cF104_202_h_h_c(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3388,11 +3388,11 @@ namespace anrl {
     // 269 // ./aflow --proto=A4B2C6D16E_cF232_203_e_d_f_eg_a --params=13.9038,0.28207,0.06362,0.34379,0.26626,0.22529,0.35333
     if(vlabel.at(ifound)=="A4B2C6D16E_cF232_203_e_d_f_eg_a")
       PrototypeANRL_A4B2C6D16E_cF232_203_e_d_f_eg_a(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - START
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - START
     // 270 // ./aflow --proto=AB3C16_cF160_203_a_bc_eg --params=16.6600284675,0.20516,0.01201,0.111,0.42978
     if(found && vlabel.at(ifound)=="AB3C16_cF160_203_a_bc_eg")
       PrototypeANRL_AB3C16_cF160_203_a_bc_eg(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - changed label/params - END
+    // --------------------------------------------------------------------------- //DX20180925 - changed label/params - END
     // 271 // ./aflow --proto=A2B3C6_cP264_205_2d_ab2c2d_6d --params=15.263,0.2561,0.375,0.2526,0.0133,0.0197,0.2444,0.2335,0.0046,0.1386,0.3763,0.1272,0.38,0.3838,0.1209,0.2777,0.1241,0.0103,0.4835,0.1315,0.2536,0.2664,0.2841,0.1049,0.235,0.4047,0.2921,0.3491,-0.0385,-0.1074,0.1509,-0.0104,-0.0242
     if(vlabel.at(ifound)=="A2B3C6_cP264_205_2d_ab2c2d_6d")
       PrototypeANRL_A2B3C6_cP264_205_2d_ab2c2d_6d(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3420,11 +3420,11 @@ namespace anrl {
     // 277 // ./aflow --proto=A24BC_cF104_209_j_a_b --params=7.7099775082,0.043,0.109,0.165
     if(vlabel.at(ifound)=="A24BC_cF104_209_j_a_b")
       PrototypeANRL_A24BC_cF104_209_j_a_b(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - new proto (used to be SG #196) - START
+    // --------------------------------------------------------------------------- //DX20180925 - new proto (used to be SG #196) - START
     // 278 // ./aflow --proto=A12B36CD12_cF488_210_h_3h_a_fg --params=16.4321054599,0.12536,0.51382,0.55423,0.58845,0.50025,0.5008,0.59,0.3557,0.5123,0.5411,0.1708,0.5347,0.2125,0.5888
     if(found && vlabel.at(ifound)=="A12B36CD12_cF488_210_h_3h_a_fg")
       PrototypeANRL_A12B36CD12_cF488_210_h_3h_a_fg(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    // --------------------------------------------------------------------------- //DX 20180925 - new proto (used to be SG #196) - END
+    // --------------------------------------------------------------------------- //DX20180925 - new proto (used to be SG #196) - END
     // 279 // ./aflow --proto=A12B6C_cF608_210_4h_2h_e --params=16.4321054599,0.3771,0.0157,0.2009,0.1224,0.5287,0.1425,0.0068,0.0949,0.2596,0.2225,0.6117,0.1785,0.0224,0.0928,0.2607,0.1616,0.0194,0.0793,0.3503
     if(vlabel.at(ifound)=="A12B6C_cF608_210_4h_2h_e")
       PrototypeANRL_A12B6C_cF608_210_4h_2h_e(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3520,7 +3520,7 @@ namespace anrl {
     // 302 // ./aflow --proto=A2B3C12D3_cI160_230_a_c_h_d --params=11.4597,0.3471,0.4664,0.0512
     if(vlabel.at(ifound)=="A2B3C12D3_cI160_230_a_c_h_d")
       PrototypeANRL_A2B3C12D3_cI160_230_a_c_h_d(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    //DX 20181130 - add Ohad's SQS structures - START
+    //DX20181130 - add Ohad's SQS structures - START
     // -------------------------------------------------------------------------
     // SQS (from O. Levy)
     // -------------------------------------------------------------------------
@@ -3552,9 +3552,9 @@ namespace anrl {
     // 7 // ./aflow --proto=AB7_hR16_166_c_c2h --params=9.2519726786,1.22474487138,0.875,0.625,1.625,0.1250000001,1.125,1.6249999999
     if(found && vlabel.at(ifound)=="AB7_hR16_166_c_c2h")
       PrototypeANRL_AB7_hR16_166_c_c2h(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    //DX 20181130 - add Ohad's SQS structures - END
+    //DX20181130 - add Ohad's SQS structures - END
 
-    //DX 20181211 - add Corey's kesterite structure - START
+    //DX20181211 - add CO's kesterite structure - START
     // -------------------------------------------------------------------------
     // Kesterite (from C. Oses)
     // -------------------------------------------------------------------------
@@ -3562,7 +3562,7 @@ namespace anrl {
     // 1 // ./aflow --proto=A2BCD4_tI16_82_ac_b_d_g --params=5.427,2.00313248572,0.7434,0.256,0.6278
     if(found && vlabel.at(ifound)=="A2BCD4_tI16_82_ac_b_d_g")
       PrototypeANRL_A2BCD4_tI16_82_ac_b_d_g(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    //DX 20181211 - add Corey's kesterite structure - END
+    //DX20181211 - add CO's kesterite structure - END
 
     // -------------------------------------------------------------------------
     // misc prototypes (from Y. Lederer)
@@ -3811,7 +3811,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
 
 
-    // DAVID PUT THEM HERE WITH THE ORDER OF THE PAPER
+    //DX PUT THEM HERE WITH THE ORDER OF THE PAPER
 
     //if(vlabel.at(ifound)=="YYY") {
     //  PrototypeANRL_YYY(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3819,7 +3819,7 @@ namespace anrl {
 
     // after you generate them you should try them with aflowSG  and if they are small with the pearson
 
-    // DX NOT NEEDED: Parameters are always in RHL if(XHOST.vflag_pflow.flag("PROTO::RHL")) cout << "DAVID WE GOT RHL"<< endl;
+    //DX NOT NEEDED: Parameters are always in RHL if(XHOST.vflag_pflow.flag("PROTO::RHL")) cout << "DX WE GOT RHL"<< endl;
     if(XHOST.vflag_pflow.flag("PROTO::HEX") && vproto_Pearson_symbol[ifound][1] == 'R') {
       vector<double> vparameters;
       aurostd::string2tokens(parameters,vparameters,",");
@@ -3834,7 +3834,7 @@ namespace anrl {
       str.atoms.at(iat).name_is_given=TRUE;
       str.atoms.at(iat).number=iat;//iat;    // reference position for convasp
       str.atoms.at(iat).basis=iat;//iat;     // position in the basis
-      if(print_mode!=1){ //equations only //DX 20180618
+      if(print_mode!=1){ //equations only //DX20180618
         str.atoms.at(iat).cpos=F2C(str.lattice,str.atoms.at(iat).fpos);
       }
       str.num_each_type.at(str.atoms.at(iat).type)++;
@@ -3844,7 +3844,7 @@ namespace anrl {
 
     // ---------------------------------------------------------------------------
     // DONE
-    if(print_mode!=1){ //equations only //DX 20180618
+    if(print_mode!=1){ //equations only //DX20180618
       xvector<double> data(6);
       data=Getabc_angles(str.lattice,DEGREES);
       str.a=data[1];str.b=data[2];str.c=data[3];str.alpha=data[4];str.beta=data[5];str.gamma=data[6];
@@ -3861,7 +3861,7 @@ namespace anrl {
       if(LDEBUG) { cerr << function_name << ": ATOMX" << endl;}
       if(LDEBUG) { cerr << function_name << ": vatomX.size()=" << vatomX.size() << endl;}
       if(LDEBUG) { cerr << function_name << ": vatomX ="; for(uint i=0;i<vatomX.size();i++) {cerr << " " << vatomX.at(i);} cerr << endl;}
-      if(print_mode!=1){ //equations only //DX 20180618
+      if(print_mode!=1){ //equations only //DX20180618
         std::deque<_atom> atoms;
         atoms=str.atoms;
         // STRIP ALL ATOMS
@@ -3873,7 +3873,7 @@ namespace anrl {
           if(vpermutation.size()>0 || vatomX.size()>0) { atoms.at(i).name=vatomX.at(atoms.at(i).type); }  // PERMUTATIONS AND ATOMX
           //	atoms.at(i).name=aurostd::mod(label_permutations.at(type)-65,32)+65;
           str.AddAtom(atoms.at(i));
-          //DX 20181205 - Volume scaling by atomic species - START
+          //DX20181205 - Volume scaling by atomic species - START
           // if a=1.0 for prototype (i.e., no scaling factor), use atomic species to get volume
           if(scale_volume_by_species==true){
             double volume=0.0;
@@ -3883,38 +3883,38 @@ namespace anrl {
                 if(LDEBUG) { oss << "DEBUG: (anrl::PrototypeANRL) volume=" << volume << "  (" << vvolumeX[i] << ")" << endl; }
               }
             }
-            //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-            str.SetVolume(volume);  //CO190205 - more robust
+            //[CO20190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+            str.SetVolume(volume);  //CO20190205 - more robust
             str.neg_scale=TRUE;
           }
-          //DX 20181205 - Volume scaling by atomic species - END
+          //DX20181205 - Volume scaling by atomic species - END
         }
       }
       str.SpeciesPutAlphabetic();
     }
 
-    //DX 20200207 [OBSOLETE] if(XHOST.vflag_control.flag("WWW")) {
-    //DX 20200207 [OBSOLETE]   cout << web.str() << endl;
-    //DX 20200207 [OBSOLETE]   exit(0);
-    //DX 20200207 [OBSOLETE] }
+    //DX20200207 [OBSOLETE] if(XHOST.vflag_control.flag("WWW")) {
+    //DX20200207 [OBSOLETE]   cout << web.str() << endl;
+    //DX20200207 [OBSOLETE]   exit(0);
+    //DX20200207 [OBSOLETE] }
 
-    //CO181216 - fudging until real fix goes in - DAVID REMOVE
-    //DX 20190227 [OBSOLETE]    aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too
-    //DX 20190227 [OBSOLETE]    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");}
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B5_oC32_38_abce_abcdf-001")) aurostd::StringSubst(str.title,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001"); //A3B5_oC32_38_abce_abcdf ohad bccSQS
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_12a-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001"); //AB3_mC32_8_4a_12a ohad bccSQS
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A5B11_mP16_6_2abc_2a3b3c-001")) aurostd::StringSubst(str.title,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001"); //A5B11_mP16_6_2abc_2a3b3c ohad bccSQS
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B13_oC32_38_ac_a2bcdef-001")) aurostd::StringSubst(str.title,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001"); //A3B13_oC32_38_ac_a2bcdef ohad bccSQS
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_4a4b-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001"); //AB3_mC32_8_4a_4a4b ohad bccSQS
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB_aP16_2_4i_4i-001")) aurostd::StringSubst(str.title,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001"); //AB_aP16_2_4i_4i ohad bccSQS
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB7_hR16_166_c_c2h-001")) aurostd::StringSubst(str.title,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001"); //AB7_hR16_166_c_c2h ohad bccSQS
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A2BCD4_tI16_82_ac_b_d_g-001")) aurostd::StringSubst(str.title,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001"); //A2BCD4_tI16_82_ac_b_d_g natalio kesterite
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_tI4_141_a-001")) aurostd::StringSubst(str.title,"A_tI4_141_a","A_tI4_141_a-001"); //A_tI4_141_a mike Sn
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_hP1_191_a-001")) aurostd::StringSubst(str.title,"A_hP1_191_a","A_hP1_191_a-001"); //A_hP1_191_a mike Sn
-    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB2_hP3_191_a_d-001")) aurostd::StringSubst(str.title,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001"); //AB2_hP3_191_a_d pranab 6-metal-boride
+    //CO20181216 - fudging until real fix goes in - DX REMOVE
+    //DX20190227 [OBSOLETE]    aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too
+    //DX20190227 [OBSOLETE]    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");}
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B5_oC32_38_abce_abcdf-001")) aurostd::StringSubst(str.title,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001"); //A3B5_oC32_38_abce_abcdf ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_12a-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001"); //AB3_mC32_8_4a_12a ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A5B11_mP16_6_2abc_2a3b3c-001")) aurostd::StringSubst(str.title,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001"); //A5B11_mP16_6_2abc_2a3b3c ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B13_oC32_38_ac_a2bcdef-001")) aurostd::StringSubst(str.title,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001"); //A3B13_oC32_38_ac_a2bcdef ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_4a4b-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001"); //AB3_mC32_8_4a_4a4b ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB_aP16_2_4i_4i-001")) aurostd::StringSubst(str.title,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001"); //AB_aP16_2_4i_4i ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB7_hR16_166_c_c2h-001")) aurostd::StringSubst(str.title,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001"); //AB7_hR16_166_c_c2h ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A2BCD4_tI16_82_ac_b_d_g-001")) aurostd::StringSubst(str.title,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001"); //A2BCD4_tI16_82_ac_b_d_g natalio kesterite
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_tI4_141_a-001")) aurostd::StringSubst(str.title,"A_tI4_141_a","A_tI4_141_a-001"); //A_tI4_141_a mike Sn
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_hP1_191_a-001")) aurostd::StringSubst(str.title,"A_hP1_191_a","A_hP1_191_a-001"); //A_hP1_191_a mike Sn
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB2_hP3_191_a_d-001")) aurostd::StringSubst(str.title,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001"); //AB2_hP3_191_a_d pranab 6-metal-boride
 
-    aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too //CO181216
-    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");} //CO181216
+    aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too //CO20181216
+    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");} //CO20181216
     return str;
   }
 }
@@ -3924,8 +3924,8 @@ namespace anrl {
 namespace anrl {
   bool PrototypeANRL_Consistency(uint vparameters_size, 
       uint nparameters,string prototype,string label,string Strukturbericht,
-      string Pearson_symbol,uint spacegroup,string params,uint print_mode) { //DX 20180710 - added print_mode info //DX 20200207 - oss no longer needed
-    if(vparameters_size!=nparameters && print_mode!=1) { //DX 20180710 - if equations only (print_mode==1), we do not need the parameters
+      string Pearson_symbol,uint spacegroup,string params,uint print_mode) { //DX20180710 - added print_mode info //DX20200207 - oss no longer needed
+    if(vparameters_size!=nparameters && print_mode!=1) { //DX20180710 - if equations only (print_mode==1), we do not need the parameters
       string function_name = "PrototypeANRL_Consistency()";
       stringstream message;
       message << "anrl::PrototypeANRL" << endl;
@@ -3937,7 +3937,7 @@ namespace anrl {
       message << " Space group symbol          : " << spacegroup << endl;
       message << " AFLOW prototype command     : aflow --proto=" << label << endl;
       message << "                                     --params=" << params << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _INPUT_NUMBER_); //DX 20200207 - return FALSE -> throw (throw here instead of in another function)
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _INPUT_NUMBER_); //DX20200207 - return FALSE -> throw (throw here instead of in another function)
     }
     return TRUE;
   }
@@ -3970,7 +3970,7 @@ namespace anrl {
   }
 }
 
-//DX 20190208 - for making ANRL label -START
+//DX20190208 - for making ANRL label -START
 // *************************************************************************** 
 // extractStoichiometry 
 namespace anrl {
@@ -3999,7 +3999,7 @@ namespace anrl {
     return stoichiometry;
   }
 }
-//DX 20190208 - for making ANRL label - END
+//DX20190208 - for making ANRL label - END
 
 // *************************************************************************** 
 // RHL to HEX transformation
@@ -4064,7 +4064,7 @@ namespace anrl {
   }
 }
 
-//DX 20190208 - for making ANRL label -START
+//DX20190208 - for making ANRL label -START
 // *************************************************************************** 
 namespace anrl {
   string groupedWyckoffPosition2ANRLString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize){
@@ -4238,7 +4238,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  uint getANRLSettingChoice(int spacegroup){ //DX 20191031 - remove reference
+  uint getANRLSettingChoice(int spacegroup){ //DX20191031 - remove reference
     // ANRL setting choice
     // rhl: rhombohedral setting: setting=1
     // monoclinic: unique axis-b: setting=1
@@ -4266,7 +4266,7 @@ namespace anrl {
     string function_name = "anrl::structure2anrl()";
 
     string directory="";
-    bool recalculate_symmetry = true; //DX 20191030
+    bool recalculate_symmetry = true; //DX20191030
     uint setting=SG_SETTING_ANRL; //anrl setting choice is default
 
     string usage="aflow --anrl|--convert2anrl|--structure2anrl|--struct2anrl < POSCAR";
@@ -4275,7 +4275,7 @@ namespace anrl {
     // load structure
     xstructure xstr(input,IOAFLOW_AUTO);
 
-    //DX 20191217 - START
+    //DX20191217 START
     // ---------------------------------------------------------------------------
     // print format 
     string format = "text";
@@ -4286,7 +4286,7 @@ namespace anrl {
       format = "json";
     }
 
-    //DX 20191030 - add force Wyckoff choice option - START
+    //DX20191030 - add force Wyckoff choice option - START
     // check if forcing certain Wyckoff convention 
     // Wyckoff positions must be provided (either in CIF, Wyccar, or in Wyckoff object)
     if(vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF")){
@@ -4300,7 +4300,7 @@ namespace anrl {
       setting = xstr.spacegroupnumberoption;
       recalculate_symmetry = false;
     }
-    //DX 20191030 - add force Wyckoff choice option - END
+    //DX20191030 - add force Wyckoff choice option - END
 
     // symmetry tolerance
     double tolerance = AUROSTD_NAN;
@@ -4325,15 +4325,15 @@ namespace anrl {
       if(aurostd::tolower(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING")) == "anrl"){
         setting=SG_SETTING_ANRL;
       }
-      else { //DX 20190318 - added else
+      else { //DX20190318 - added else
         int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING"));
         if(user_setting==1){setting=SG_SETTING_1;}
         else if(user_setting==2){setting=SG_SETTING_2;}
-        if(user_setting!=SG_SETTING_1 && user_setting!=SG_SETTING_2){  //DX 20190318
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_); //DX 20191030
-          //DX 20191030 [OBSOLETE] cerr << function_name << "::ERROR: Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl; //DX 20190318
-          //DX 20191030 [OBSOLETE] return "";
-        } //DX 20190318
+        if(user_setting!=SG_SETTING_1 && user_setting!=SG_SETTING_2){  //DX20190318
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_); //DX20191030
+          //DX20191030 [OBSOLETE] cerr << function_name << "::ERROR: Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl; //DX20190318
+          //DX20191030 [OBSOLETE] return "";
+        } //DX20190318
       }
     }
     return structure2anrl(xstr,tolerance,setting,recalculate_symmetry);
@@ -4342,17 +4342,17 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, bool recalculate_symmetry){ //DX 20190829 - added recalculate_symmetry
+  string structure2anrl(xstructure& xstr, bool recalculate_symmetry){ //DX20190829 - added recalculate_symmetry
     // determine anrl label, parameters, and parameter values of the input structure
     double default_tolerance=SYM::defaultTolerance(xstr); 
     uint setting=SG_SETTING_ANRL; //anrl setting choice is default
-    return structure2anrl(xstr,default_tolerance,setting, recalculate_symmetry); //DX 20190829 - added recalculate_symmetry
+    return structure2anrl(xstr,default_tolerance,setting, recalculate_symmetry); //DX20190829 - added recalculate_symmetry
   }
 }
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, double tolerance){  //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, double tolerance){  //CO20190520 - removed pointers for bools and doubles, added const where possible
     // determine anrl label, parameters, and parameter values of the input structure
     uint setting=SG_SETTING_ANRL; //anrl setting choice is default
     return structure2anrl(xstr,tolerance,setting);
@@ -4361,7 +4361,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, uint setting){ //DX 20191031 - removed reference
+  string structure2anrl(xstructure& xstr, uint setting){ //DX20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     double default_tolerance=SYM::defaultTolerance(xstr); 
     return structure2anrl(xstr,default_tolerance,setting);
@@ -4370,7 +4370,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry){  //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190829 - added recalculate_symmetry //DX 20191031 - removed reference
+  string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry){  //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(false || XHOST.DEBUG);
 
@@ -4379,20 +4379,20 @@ namespace anrl {
     stringstream message;
     ofstream FileMESSAGE;
 
-    uint setting = input_setting; //DX 20191230 - if symmetry already calculated, we want to store true setting
+    uint setting = input_setting; //DX20191230 - if symmetry already calculated, we want to store true setting
 
     // Calculate symmetry
     uint space_group_number=0;
-    if((xstr.space_group_ITC==0 && xstr.spacegroupnumber==0) || recalculate_symmetry){ //DX 20190829 - added if-statement; don't recalculate, it is faster
+    if((xstr.space_group_ITC==0 && xstr.spacegroupnumber==0) || recalculate_symmetry){ //DX20190829 - added if-statement; don't recalculate, it is faster
       space_group_number = xstr.SpaceGroup_ITC(tolerance,input_setting);
     }
     else if(xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){
       space_group_number = xstr.space_group_ITC;
-      setting=xstr.setting_ITC; //DX 20191230
+      setting=xstr.setting_ITC; //DX20191230
     }
     else if(xstr.spacegroupnumber>=1 && xstr.spacegroupnumber<=230){
       space_group_number = xstr.spacegroupnumber;
-      setting=xstr.spacegroupnumberoption; //DX 20191230
+      setting=xstr.spacegroupnumberoption; //DX20191230
     }
 
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
@@ -4401,7 +4401,7 @@ namespace anrl {
     // ===== Determine ANRL label ===== //
     // stoichiometry
     xstructure tmp_xstr=xstr; // make new one so we do not override atom names
-    ReScale(tmp_xstr,1.0); //DX 20191031
+    ReScale(tmp_xstr,1.0); //DX20191031
     bool remove_ones=true;
     compare::fakeAtomsName(tmp_xstr);
     string reduced_stoichiometry = compare::getCompoundName(tmp_xstr,remove_ones);
@@ -4411,9 +4411,9 @@ namespace anrl {
     for(uint i=0;i<xstr.wyckoff_sites_ITC.size();i++){
       conventional_cell_atoms_count += xstr.wyckoff_sites_ITC[i].multiplicity;
     }
-    //DX 20191031 [OBSOLETE] char lattice_type = xstr.lattice_label_ITC;
-    //DX 20191031 [OBSOLETE] char lattice_centering = xstr.bravais_label_ITC;
-    string lattice_type_and_centering = LATTICE::SpaceGroup2LatticeTypeAndCentering(space_group_number); //DX 20191031
+    //DX20191031 [OBSOLETE] char lattice_type = xstr.lattice_label_ITC;
+    //DX20191031 [OBSOLETE] char lattice_centering = xstr.bravais_label_ITC;
+    string lattice_type_and_centering = LATTICE::SpaceGroup2LatticeTypeAndCentering(space_group_number); //DX20191031
     char lattice_type = lattice_type_and_centering[0];
     char lattice_centering = lattice_type_and_centering[1];
 
@@ -4462,10 +4462,10 @@ namespace anrl {
     for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){
       bool contains_x=false; bool contains_y=false; bool contains_z=false;
       if(ordered_Wyckoff_sites_ITC[i].equations.size()>0){
-        for(uint j=0;j<ordered_Wyckoff_sites_ITC[i].equations[0].size();j++){ //DX 20190311 - used ordered Wyckoff variable
-          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"x")){ contains_x=true; } //DX 20190311 - used ordered Wyckoff variable
-          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"y")){ contains_y=true; } //DX 20190311 - used ordered Wyckoff variable
-          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"z")){ contains_z=true; } //DX 20190311 - used ordered Wyckoff variable
+        for(uint j=0;j<ordered_Wyckoff_sites_ITC[i].equations[0].size();j++){ //DX20190311 - used ordered Wyckoff variable
+          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"x")){ contains_x=true; } //DX20190311 - used ordered Wyckoff variable
+          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"y")){ contains_y=true; } //DX20190311 - used ordered Wyckoff variable
+          if(aurostd::substring2bool(ordered_Wyckoff_sites_ITC[i].equations[0][j],"z")){ contains_z=true; } //DX20190311 - used ordered Wyckoff variable
         }
         // store 
         string variable_designation="";
@@ -4540,13 +4540,13 @@ namespace anrl {
     return oss.str();
   }
 }
-//DX 20190208 - for making ANRL label - END
+//DX20190208 - for making ANRL label - END
 
 #endif // _AFLOW_ANRL_CPP
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2016

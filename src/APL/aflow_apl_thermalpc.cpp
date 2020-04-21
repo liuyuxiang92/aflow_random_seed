@@ -8,8 +8,8 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ThermalPropertiesCalculator::ThermalPropertiesCalculator(IDOSCalculator& dosc, Logger& l)  OBSOLETE ME190423
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(DOSCalculator& dosc, Logger& l)  // ME190423
+  // ThermalPropertiesCalculator::ThermalPropertiesCalculator(IDOSCalculator& dosc, Logger& l)  OBSOLETE ME20190423
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(DOSCalculator& dosc, Logger& l)  //ME20190423
     : _dosc(dosc), _logger(l) {
       // Copy to us, since it is more quick than call these function again and again
       _bins = _dosc.getBins();  //_bins == omega
@@ -19,7 +19,7 @@ namespace apl {
       if (_bins.size() > 2)
         _stepDOS = _bins[1] - _bins[0];
       else {
-        // ME191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("ThermalPropertiesCalculator::ThermalPropertiesCalculator(); Problem to obtain the step of DOS.");
         string function = "ThermalPropertiesCalculator::ThermalPropertiesCalculator()";
         string message = "Problem in obtaining the step of the phonon DOS.";
@@ -140,20 +140,20 @@ namespace apl {
   void ThermalPropertiesCalculator::writeTHERMO(double USER_TP_TSTART, double USER_TP_TEND,
       double USER_TP_TSTEP, const string& directory) {
     // The output file THERMO
-    //CO - START
+    //CO START
     //ofstream outfile("THERMO",ios_base::out);
     stringstream outfile;
     //if( !outfile.is_open() )
     //{
     //    throw apl::APLRuntimeError("ThermalPropertiesCalculator::writeTHERMO(); Cannot open output THERMO file.");
     //}
-    //CO - END
+    //CO END
 
-    string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE); //ME181226
-    _logger << "Writing thermodynamic properties into file " << filename << "." << apl::endl; //ME181226
-    outfile << AFLOWIN_SEPARATION_LINE << std::endl;  // ME190614
-    if (!_dosc._system.empty()) outfile << "[APL_THERMO]SYSTEM=" << _dosc._system << std::endl;  // ME190614
-    outfile << "[APL_THERMO]START" << std::endl;  // ME190614
+    string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE); //ME20181226
+    _logger << "Writing thermodynamic properties into file " << filename << "." << apl::endl; //ME20181226
+    outfile << AFLOWIN_SEPARATION_LINE << std::endl;  //ME20190614
+    if (!_dosc._system.empty()) outfile << "[APL_THERMO]SYSTEM=" << _dosc._system << std::endl;  //ME20190614
+    outfile << "[APL_THERMO]START" << std::endl;  //ME20190614
     outfile << "#  T(K)     U0(meV/cell)    U(meV/cell)     F(meV/cell)      S(kB/cell)      Cv(kB/cell)" << std::endl;
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
     int n = (int)((USER_TP_TEND - USER_TP_TSTART) / USER_TP_TSTEP);
@@ -172,19 +172,19 @@ namespace apl {
         << setw(15) << Svib << "\t"
         << setw(15) << Cv << std::endl;
     }
-    outfile << "[APL_THERMO]STOP" << std::endl;  // ME190614
-    outfile << AFLOWIN_SEPARATION_LINE << std::endl;  // ME190614
-    //CO - START
-    aurostd::stringstream2file(outfile, filename); //ME181226
-    if (!aurostd::FileExist(filename)) { //ME181226
+    outfile << "[APL_THERMO]STOP" << std::endl;  //ME20190614
+    outfile << AFLOWIN_SEPARATION_LINE << std::endl;  //ME20190614
+    //CO START
+    aurostd::stringstream2file(outfile, filename); //ME20181226
+    if (!aurostd::FileExist(filename)) { //ME20181226
       string function = "ThermalPropertiesCalculator::writeTHERMO()";
-      string message = "Cannot open output file " + filename + "."; //ME181226
+      string message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("ThermalPropertiesCalculator::writeTHERMO(); Cannot open output THERMO file.");
     }
     //outfile.clear();
     //outfile.close();
-    //CO - START
+    //CO START
   }
 
   // ///////////////////////////////////////////////////////////////////////////

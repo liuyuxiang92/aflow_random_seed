@@ -99,7 +99,7 @@ namespace anrl {
     if(LDEBUG) { cerr << "anrl::PrototypeANRL_A_mP32_14_8e: sin(beta)=" << sin(deg2rad*beta)  << endl;}
         
     str.iomode=IOVASP_AUTO;
-    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO190520
+    str.title=label+" params="+parameters+" SG="+aurostd::utype2string(spacegroup)+DOI_ANRL; //CO20190520
     str.scale=1.0;
 
     a1=a*xn;

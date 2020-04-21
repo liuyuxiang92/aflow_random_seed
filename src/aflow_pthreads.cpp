@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -936,7 +936,7 @@ namespace sflow {
 
 //////////////////////////////////////////////////////////////////////////////
 
-// getThreadDistribution - ME 180801
+// getThreadDistribution - ME20180801
 // Calculates the start and end indices for each thread for multi-thread
 // calculations. Note that the end index is not included in each thread.
 vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads) {
@@ -979,6 +979,6 @@ vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

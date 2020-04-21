@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *              AFlow STEFANO CURTAROLO  Duke University 2003-2019         *
-// *              AFlow COREY OSES  Duke University 2013-2019                *
+// *              AFlow STEFANO CURTAROLO  Duke University 2003-2020         *
+// *              AFlow COREY OSES  Duke University 2013-2020                *
 // *                                                                         *
 // ***************************************************************************
 // aflow_pocc.cpp
@@ -21,8 +21,8 @@
 #include "aflow_pocc.h"
 #include "aflow_compare_structure.h"
 
-#define _DEBUG_POCC_ false  //CO190116
-#define _DEBUG_POCC_CLUSTER_ANALYSIS_ false && _DEBUG_POCC_  //CO190116
+#define _DEBUG_POCC_ false  //CO20190116
+#define _DEBUG_POCC_CLUSTER_ANALYSIS_ false && _DEBUG_POCC_  //CO20190116
 
 const string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
 const string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //no-period is important
@@ -64,8 +64,8 @@ namespace pocc {
 
     //aflags
     _aflags aflags;
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO 180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
 
     //aflow.in
     string AflowIn_file,AflowIn;
@@ -1018,7 +1018,7 @@ namespace pocc {
     cmdline_opts.push_attached("PLOTTER::PRINT", "png");
     plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
     plot_opts.push_attached("DIRECTORY",m_aflags.Directory);
-    if(1){  //turn off for marco - POCC+APL
+    if(1){  //turn off for ME - POCC+APL
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_orbitals_T"+getTemperatureString(temperature)+"K");
@@ -1043,7 +1043,7 @@ namespace pocc {
           plotter::PLOT_PDOS(plot_opts,m_xdoscar);
         }
       }
-    }else{  //marco!
+    }else{  //ME!
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.push_attached("PROJECTION","ATOMS");
       //plot_opts.push_attached("EXTENSION","dos_atoms_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
@@ -2233,7 +2233,7 @@ namespace pocc {
   //    xstr_pocc.comp_each_type[xstr_pocc.atoms[i].type] += xstr_pocc.atoms[i].partial_occupation_value;
   //  }
   //
-  //  //corey add check for if all sites are fully occupied
+  //  //CO add check for if all sites are fully occupied
   //  return true;
   //}
 
@@ -2288,21 +2288,21 @@ namespace pocc {
     for(int a=a_start;a<=n_hnf;a++){
       starting_config=(a==a_start);
       for(int c=( starting_config ? c_start : C_START );c<=n_hnf/a;c++) //for(int c=( a==a_start ? c_start : C_START );c<=n_hnf/a;c++) //for(int c=c_start;c<=n_hnf/a;c++)
-      {   //CO200106 - patching for auto-indenting
+      {   //CO20200106 - patching for auto-indenting
         starting_config=(starting_config && (c==c_start));
         for(int f=( starting_config ? f_start : F_START );f<=n_hnf/a/c;f++) //for(int f=( (a==a_start && c==c_start) ? f_start : F_START );f<=n_hnf/a/c;f++) //for(int f=f_start;f<=n_hnf/a/c;f++)
-        { //CO200106 - patching for auto-indenting
+        { //CO20200106 - patching for auto-indenting
           if(a*c*f==n_hnf){
             //found new viable diagonal set, now enumerate based on off-diagonals
             starting_config=(starting_config && (f==f_start));
             for(int b=( starting_config ? b_start : B_START );b<c;b++) //for(int b=( (a==a_start && c==c_start && f==f_start) ? b_start : B_START );b<c;b++) //for(int b=b_start;b<c;b++)
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               starting_config=(starting_config && (b==b_start));
               for(int d=( starting_config ? d_start : D_START );d<f;d++) //for(int d=( (a==a_start && c==c_start && f==f_start && b==b_start) ? d_start : D_START );d<f;d++) //for(int d=d_start;d<f;d++)
-              { //CO200106 - patching for auto-indenting
+              { //CO20200106 - patching for auto-indenting
                 starting_config=(starting_config && (d==d_start));
                 for(int e=( starting_config ? e_start : E_START );e<f;e++) //for(int e=( (a==a_start && c==c_start && f==f_start && b==b_start && d==d_start) ? e_start : E_START );e<f;e++) //for(int e=e_start;e<f;e++)
-                { //CO200106 - patching for auto-indenting
+                { //CO20200106 - patching for auto-indenting
                   if(LDEBUG) {
                     cerr << " a=" << a << "(max=n_hnf=" << n_hnf << ")";
                     cerr << " c=" << c << "(max=n_hnf/a=" << n_hnf/a << ")";
@@ -2433,7 +2433,7 @@ namespace pocc {
     v_config_order=getConfigOrder(v_types_config);
   }
 
-  //CO190205 - come back!
+  //CO20190205 - come back!
   //we do config_order based on count of vacancies
   //not sure this is optimal
   //we want to do it based on which vacancy configurations are most similar (so as to not recalculate the cluster bonding)
@@ -2656,7 +2656,7 @@ namespace pocc {
     //CalculateHNF(p_str.xstr_pocc,p_str.n_hnf);
 
     //cerr << endl;
-    //cerr << "START COREY " << endl;
+    //cerr << "START CO " << endl;
     //resetMaxSLRadius();
     hnf_count=0;
     resetHNFMatrices();
@@ -2680,9 +2680,9 @@ namespace pocc {
     //vector<vector<int> > v_types_config;
     //vector<int> v_config_iterators; //, v_site_iterators;
 
-    //while(getNextSiteConfiguration(v_types_config,v_config_iterators,v_site_iterators)){  //[CO200106 - close bracket for indenting]}
+    //while(getNextSiteConfiguration(v_types_config,v_config_iterators,v_site_iterators)){  //[CO20200106 - close bracket for indenting]}
 
-    // COREY MAKE THIS A TRUE CALCULATOR, simply go through each site, add between configs, 
+    //CO MAKE THIS A TRUE CALCULATOR, simply go through each site, add between configs, 
     //multiple across sites
     types_config_permutations_count=0;   //per hnf matrix
     unsigned long long int str_config_permutations_count;
@@ -3030,13 +3030,13 @@ namespace pocc {
     //  cerr << "LOOK start " << std::distance(l_supercell_sets.begin(),i_start) << " " << (*i_start).getUFFEnergy() << endl;
     //  cerr << "LOOK end " << std::distance(l_supercell_sets.begin(),i_end) << " " << (*i_end).getUFFEnergy() << endl;
     if(i_start==i_end) //std::distance(i_start,i_end)==0)
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       //    cerr << "start==stop" << endl;
       //
       if(i_start==l_supercell_sets.end()){--i_start;}
 
       if(areEquivalentStructuresByUFF(i_start,psc)) //aurostd::isequal(psc.energy,(*i_start).getUFFEnergy(),m_energy_uff_tolerance))
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         //      cerr << "found degeneracy with " << std::distance(l_supercell_sets.begin(),i_start) << endl;
         (*i_start).m_psc_set.push_back(psc);
         //(*i_start).m_degeneracy++;
@@ -3058,7 +3058,7 @@ namespace pocc {
     //  cerr << "Looking at middle=" << std::distance(l_supercell_sets.begin(),i_middle) << " " << (*i_middle).getUFFEnergy() << endl;
     //cerr << "SEE HERE " << i_middle << endl;
     if(areEquivalentStructuresByUFF(i_middle,psc)) //aurostd::isequal(psc.energy,(*i_middle).getUFFEnergy(),m_energy_uff_tolerance))
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       //    cerr << "found degeneracy with " << std::distance(l_supercell_sets.begin(),i_middle) << endl;
       (*i_middle).m_psc_set.push_back(psc);
       //(*i_middle).m_degeneracy++;
@@ -3130,7 +3130,7 @@ namespace pocc {
   }
 
   void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-    if(XHOST.WEB_MODE){return;} //CO190520 - no progress bar for web stuff
+    if(XHOST.WEB_MODE){return;} //CO20190520 - no progress bar for web stuff
     double progress = (double)current/(double)end;
     int pos = BAR_WIDTH * progress;
 
@@ -3195,7 +3195,7 @@ namespace pocc {
     }
     //cerr << aa << endl;
     //cerr << bb << endl;
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX 1/23/18 - added fast_match = true // DX 190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     //cerr << are_equivalent << endl;
     //exit(1);
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
@@ -3383,7 +3383,7 @@ namespace pocc {
     message << "Calculating unique supercells. Please be patient";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
-    ////[CO181226 - need to experiment]double energy_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out corey, only works if energy radius = 10
+    ////[CO20181226 - need to experiment]double energy_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out CO, only works if energy radius = 10
     //double energy_radius=DEFAULT_UFF_CLUSTER_RADIUS;
     ////if(SET_KESONG_STANDARD_DIST){energy_radius=ENERGY_RADIUS;}
     //if(COMPARE_WITH_KESONG){energy_radius=ENERGY_RADIUS;}
@@ -3612,7 +3612,7 @@ namespace pocc {
 
   unsigned long long int POccCalculator::getUniqueSuperCellsCount() const {return l_supercell_sets.size();}
 
-  //int getZeroPadding(unsigned long long int num){return int(log10(num))+1;} ME 190108 - moved to aurostd
+  //int getZeroPadding(unsigned long long int num){return int(log10(num))+1;} ME20190108 - moved to aurostd
 
   string POccCalculator::getARUNString(unsigned long long int i) {return pocc::getARUNString(l_supercell_sets,i);}
 
@@ -3632,7 +3632,7 @@ namespace pocc {
       bool include_strgrp) {
     stringstream ARUN;
 
-    //[CO181226 - done automatically in AVASP_populateXVASP()]ARUN << "ARUN.POCC_";
+    //[CO20181226 - done automatically in AVASP_populateXVASP()]ARUN << "ARUN.POCC_";
     ARUN << std::setfill('0') << std::setw(aurostd::getZeroPadding(vstructure_groups_size)) << index_structure_group+1 << "_";  //+1 so we start at 1, not 0 (count)
     if(include_strgrp){ARUN << std::setfill('0') << std::setw(aurostd::getZeroPadding(vstructures_size)) << index_structure+1 << "_";}
     ARUN << "H";
@@ -4343,10 +4343,10 @@ namespace pocc {
   POccCalculatorTemplate::~POccCalculatorTemplate() {free();}
 
   void POccCalculatorTemplate::free() {
-    xstr_pocc.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_pocc.clear(); //DX20191220 - uppercase to lowercase clear
     m_p_flags.clear();
     stoich_each_type.clear();
-    xstr_nopocc.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_nopocc.clear(); //DX20191220 - uppercase to lowercase clear
     types2pc_map.clear();
     m_species_redecoration.clear();
     //types2uffparams_map.clear();
@@ -4420,7 +4420,7 @@ namespace pocc {
   m_initialized=false;
   m_aflags.clear();
   m_kflags.clear();
-  xstr_sym.clear(); //DX 20191220 - uppercase to lowercase clear
+  xstr_sym.clear(); //DX20191220 - uppercase to lowercase clear
   n_hnf=0;
   for(uint site=0;site<m_pocc_sites.size();site++){m_pocc_sites[site].clear();} m_pocc_sites.clear();
   pocc_atoms_total=0;
@@ -4648,12 +4648,12 @@ namespace pocc {
 
       //for(unsigned long long int i=0;i<getUniqueSuperCellsCount();i++)
       for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         isupercell=std::distance(l_supercell_sets.begin(),it);
         if(LDEBUG) {cerr << soliloquy << " starting structure[" << isupercell << "]" << endl;}
 
         //do first so we only need to run getUniqueSuperCell() once
-        xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+        xvasp.str.clear(); //DX20191220 - uppercase to lowercase clear
         xvasp.str=getUniqueSuperCell(isupercell);
 
         //populate POCC_UNIQUE_SUPERCELLS_FILE
@@ -4669,9 +4669,9 @@ namespace pocc {
 
         xvasp.Directory=m_aflags.Directory; //arun_directory;
         xvasp.AVASP_arun=true;
-        xvasp.AVASP_arun_mode = "POCC"; //CO181226
+        xvasp.AVASP_arun_mode = "POCC"; //CO20181226
         xvasp.AVASP_arun_runname = getARUNString(isupercell);
-        xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE); //[CO191110]high-entropy offers increased solubility over binaries
+        xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE); //[CO20191110]high-entropy offers increased solubility over binaries
 
         XHOST.QUIET=true;
 
@@ -4701,7 +4701,7 @@ namespace pocc {
     xstr_pocc.ReScale(1.0);
     xstr_pocc.ShifOriginToAtom(0);
     xstr_pocc.BringInCell();
-    xstr_pocc.clean(); //DX 20191220 - uppercase to lowercase clean
+    xstr_pocc.clean(); //DX20191220 - uppercase to lowercase clean
 
     if(LDEBUG) {
       cerr << soliloquy << " cleaned PARTCAR" << endl;
@@ -4769,7 +4769,7 @@ namespace pocc {
     //no need to assign fake names to xstr_pocc, we already do in xstr_nopocc
 
     //clean atom/species names
-    pflow::fixEmptyAtomNames(xstr_pocc, false); //true);  //aflow likes pp info //corey come back - use fakenames() too if needed
+    pflow::fixEmptyAtomNames(xstr_pocc, false); //true);  //aflow likes pp info //CO come back - use fakenames() too if needed
     //add here fakenames()
 
     //quick tests of stupidity
@@ -4827,15 +4827,15 @@ namespace pocc {
 
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ostream& oss) {
     _aflags aflags;
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO 180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) {ofstream FileMESSAGE;return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);}
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) {
     _aflags aflags;
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO 180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
@@ -5076,7 +5076,7 @@ namespace pocc {
 
   //void POccStructure::getSiteCountConfigurations(int i_hnf, double& min_stoich_error)
   void POccCalculator::getSiteCountConfigurations(int i_hnf)
-  { //CO200106 - patching for auto-indenting
+  { //CO20200106 - patching for auto-indenting
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::getSiteCountConfigurations():";
     //return these values, do not necessarily store as "global" values
@@ -5141,11 +5141,11 @@ namespace pocc {
     xvector<double> stoich_each_type_new;
     double stoich_error;
     double eps=1.0; //(double)m_pocc_sites.size();   //number of sites
-    //cerr << "COREY START" << endl;
+    //cerr << "CO START" << endl;
     //std::vector<double>::iterator it_max_stoich;
     //while(getNextSiteConfiguration(vv_count_configs,v_config_order,v_config_iterators,v_types_config))
     while(pocc::getNextSiteConfiguration(vv_count_configs,v_config_iterators,v_types_config))
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       stoich_each_type_new=calculateStoichEachType(v_types_config);
       stoich_error=aurostd::max(aurostd::abs(stoich_each_type-stoich_each_type_new));
       //stoich_error=calculateStoichDiff(stoich_each_type,xstr_pocc.stoich_each_type);
@@ -5185,7 +5185,7 @@ namespace pocc {
         v_str_configs.back().max_stoich_error=stoich_error;
       }
     }
-    //cerr << "COREY Stop" << endl;
+    //cerr << "CO STOP" << endl;
 
     //vector<int> starting_config;
     //for(uint str_config=0;str_config<v_str_configs.size();str_config++){
@@ -5240,7 +5240,7 @@ namespace pocc {
     for(uint site=0;site<pocc_sites.size();site++){
       if(pocc_sites[site].partial_occupation_flag){
         //test of stupidity
-        //[COREY COME BACK, add another reasonable check that includes vacancies]if(pocc_sites[site].v_occupants.size()<2){return false;}
+        //[CO COME BACK, add another reasonable check that includes vacancies]if(pocc_sites[site].v_occupants.size()<2){return false;}
         //set the 0th index to non-pocc status
         xstr_nopocc.atoms[pocc_sites[site].v_occupants[0]].partial_occupation_value=1.0;
         xstr_nopocc.atoms[pocc_sites[site].v_occupants[0]].partial_occupation_flag=false;
@@ -5312,7 +5312,7 @@ namespace pocc {
     */
 
     xstr_nopocc.title="Parent structure";
-    xstr_nopocc.clean();    //real true clean //DX 20191220 - uppercase to lowercase clean
+    xstr_nopocc.clean();    //real true clean //DX20191220 - uppercase to lowercase clean
     if(LDEBUG) {
       cerr << soliloquy << " final non-pocc structure" << endl;
       cerr << xstr_nopocc << endl;
@@ -5406,31 +5406,31 @@ namespace pocc {
       xstructure xstr_pocc_tmp(xstr_pocc);
       xstr_pocc_tmp.SetSpecies(aurostd::vector2deque(species)); //do NOT change order of species assignment
 
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]deque<_atom> atoms;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint iatom=0;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint ispec=0;ispec<xstr_pocc_tmp.num_each_type.size();ispec++){ //re-label all atoms
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  for(uint i=0;i<(uint)xstr_pocc_tmp.num_each_type[ispec];i++){
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    if(LDEBUG) {cerr << soliloquy << " converting " << xstr_pocc_tmp.atoms[iatom].name << " to " << species[ispec] << endl;}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.push_back(xstr_pocc_tmp.atoms[iatom++]);
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().name=species[ispec];
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().CleanName();
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().name_is_given=(!atoms.back().name.empty());
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  }
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]std::stable_sort(atoms.begin(),atoms.end(),sortAtomsNames); //safe because we do AddAtom() below
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]//assign types
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint itype=0;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms[0].type=itype;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=1;i<atoms.size();i++){
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]	if(atoms[i].name!=atoms[i-1].name){itype++;}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]	atoms[i].type=itype;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=xstr_pocc_tmp.atoms.size()-1;i<xstr_pocc_tmp.atoms.size();i--){  //remove atoms
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  xstr_pocc_tmp.RemoveAtom(i);
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=0;i<atoms.size();i++){xstr_pocc_tmp.AddAtom(atoms[i]);}
-      //[CO190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms.clear();
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]deque<_atom> atoms;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint iatom=0;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint ispec=0;ispec<xstr_pocc_tmp.num_each_type.size();ispec++){ //re-label all atoms
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  for(uint i=0;i<(uint)xstr_pocc_tmp.num_each_type[ispec];i++){
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    if(LDEBUG) {cerr << soliloquy << " converting " << xstr_pocc_tmp.atoms[iatom].name << " to " << species[ispec] << endl;}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.push_back(xstr_pocc_tmp.atoms[iatom++]);
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().name=species[ispec];
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().CleanName();
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]    atoms.back().name_is_given=(!atoms.back().name.empty());
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  }
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]std::stable_sort(atoms.begin(),atoms.end(),sortAtomsNames); //safe because we do AddAtom() below
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]//assign types
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]uint itype=0;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms[0].type=itype;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=1;i<atoms.size();i++){
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]	if(atoms[i].name!=atoms[i-1].name){itype++;}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]	atoms[i].type=itype;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=xstr_pocc_tmp.atoms.size()-1;i<xstr_pocc_tmp.atoms.size();i--){  //remove atoms
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]  xstr_pocc_tmp.RemoveAtom(i);
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]for(uint i=0;i<atoms.size();i++){xstr_pocc_tmp.AddAtom(atoms[i]);}
+      //[CO20190317 - do NOT sort atoms (AddAtom()), this will confuse the order that pseudonames are assigned]atoms.clear();
 
       if(LDEBUG) {
         cerr << soliloquy << " xstr_pocc_tmp" << endl;
@@ -5499,7 +5499,7 @@ namespace pocc {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::calculateSymNonPOccStructure():";
     stringstream message;
-    // CO - default should always be to turn everything on, modify input
+    //CO - default should always be to turn everything on, modify input
     //get ROBUST symmetry determination
     xstr_sym=xstr_nopocc; //make copy to avoid carrying extra sym_ops (heavy) if not needed
     pflow::defaultKFlags4SymCalc(m_kflags,true);
@@ -5542,7 +5542,7 @@ namespace pocc {
   void POccCalculator::propagateEquivalentAtoms2POccStructure() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::propagateEquivalentAtoms2POccStructure():";
-    // CO - default should always be to turn everything on, modify input
+    //CO - default should always be to turn everything on, modify input
     //assign iatoms info to pocc structure as well, allows sorting later
     //remember, the 0th occupant of xstr_pocc remains in xstr_sym (xstr_nopocc)
     for(uint site=0;site<m_pocc_sites.size();site++){
@@ -5581,7 +5581,7 @@ namespace pocc {
           //output - START
           ss_header << "| ";
           ss_header << aurostd::PaddedCENTER("pocc_atom = " + aurostd::utype2string(pocc_atom) + "/" + aurostd::utype2string(pocc_atoms_total) + (!atom_name.empty()?" ["+atom_name+"]":""),getHNFTableColumnPadding()+2);  //need to +2, bug in PaddedCENTER()
-          ss_header << " " ;  // CO 170629
+          ss_header << " " ;  //CO20170629
           //output - END
           pocc_atom++;
         }
@@ -5589,7 +5589,7 @@ namespace pocc {
     }
     ss_header << " | " << getHeaderMaxSiteError(); //header_max_site_error;
     ss_header << " | " << getHeaderMaxStoichError(); //header_max_stoich_error;
-    //ss_header << " | " << getHeaderStoichiometry(); //CO190131 - fix later
+    //ss_header << " | " << getHeaderStoichiometry(); //CO20190131 - fix later
     ss_header << " " << endl;
 
     return ss_header.str();
@@ -5615,7 +5615,7 @@ namespace pocc {
     site_error=v_str_configs[str_config].max_site_error;
     if(LDEBUG) {
       if(v_str_configs.size()>1){
-        //cerr << "COREY CHECK IT OUT" << endl;
+        //cerr << "CO CHECK IT OUT" << endl;
         for(uint str_config=0;str_config<v_str_configs.size();str_config++){
           cerr << "config " << str_config << endl;
           for(uint site=0;site<v_str_configs[str_config].site_configs.size();site++){
@@ -5664,8 +5664,8 @@ namespace pocc {
     tmp_ss.str(""); tmp_ss << stoich_error;
     line_output << " | " << aurostd::PaddedPOST(tmp_ss.str(),getHeaderMaxStoichError().size()); //header_max_stoich_error.size()//getHNFTableErrorPadding());
     tmp_ss.str(""); tmp_ss << stoich_error;
-    //line_output << " | " << aurostd::PaddedPOST(tmp_ss.str(),getHeaderStoichiometry().size()); //CO190131 - fix later
-    //tmp_ss.str(""); tmp_ss << stoich_error; //CO190131 - fix later
+    //line_output << " | " << aurostd::PaddedPOST(tmp_ss.str(),getHeaderStoichiometry().size()); //CO20190131 - fix later
+    //tmp_ss.str(""); tmp_ss << stoich_error; //CO20190131 - fix later
     line_output << " " << endl;
 
     return line_output.str();
@@ -5824,10 +5824,10 @@ namespace pocc {
     m_exploration_radius=AUROSTD_MAX_DOUBLE;
     distance_matrix.clear();
     v_dist_nn.clear();
-    xstr_ss.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_ss.clear(); //DX20191220 - uppercase to lowercase clear
     sc2pc_map.clear();
     pc2sc_map.clear();
-    xstr_cluster.clear(); //DX 20191220 - uppercase to lowercase clear
+    xstr_cluster.clear(); //DX20191220 - uppercase to lowercase clear
     for(uint i=0;i<v_bonded_atom_indices.size();i++){v_bonded_atom_indices[i].clear();} v_bonded_atom_indices.clear();
     for(uint i=0;i<v_nonbonded_atom_indices.size();i++){v_nonbonded_atom_indices[i].clear();} v_nonbonded_atom_indices.clear();
     has_vacancies=false;
@@ -6017,14 +6017,14 @@ namespace pocc {
     xmatrix<double> _distance_matrix(xstr.atoms.size()-1,xstr.atoms.size()-1,0,0); distance_matrix=_distance_matrix;
 
     //get distance matrix first, then find nearest-neighbor distances
-    //DX 20190619 [OBSOLETE] xvector<double> min_vec; xvector<int> ijk;  //dummy
+    //DX20190619 [OBSOLETE] xvector<double> min_vec; xvector<int> ijk;  //dummy
 
     //get distance matrix first
     for(uint atom1=0;atom1<xstr.atoms.size();atom1++){
       if(isVacancy(v_vacancies,atom1)){continue;}
       for(uint atom2=atom1+1;atom2<xstr.atoms.size();atom2++){
         if(isVacancy(v_vacancies,atom2)){continue;}
-        distance_matrix(atom1,atom2)=distance_matrix(atom2,atom1)=aurostd::modulus(SYM::minimizeDistanceCartesianMethod(xstr.atoms[atom1].cpos,xstr.atoms[atom2].cpos,xstr.lattice)); //DX 20190619 - updated function name and take the modulus of minimum cpos distance
+        distance_matrix(atom1,atom2)=distance_matrix(atom2,atom1)=aurostd::modulus(SYM::minimizeDistanceCartesianMethod(xstr.atoms[atom1].cpos,xstr.atoms[atom2].cpos,xstr.lattice)); //DX20190619 - updated function name and take the modulus of minimum cpos distance
       }
     }
 
@@ -6057,7 +6057,7 @@ namespace pocc {
   }
 
   void POccUFFEnergyAnalyzer::setExplorationRadius(){
-    //[CO181226 - need to experiment]double m_exploration_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out corey, only works if energy radius = 10
+    //[CO20181226 - need to experiment]double m_exploration_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out CO, only works if energy radius = 10
     m_exploration_radius=DEFAULT_UFF_CLUSTER_RADIUS;
     //if(SET_KESONG_STANDARD_DIST){m_exploration_radius=ENERGY_RADIUS;}
     if(COMPARE_WITH_KESONG){m_exploration_radius=ENERGY_RADIUS;}
@@ -6199,7 +6199,7 @@ namespace pocc {
     //}
     //}
     uint atom1;
-    double uff_bonding_distance=DEFAULT_UFF_BONDING_DISTANCE; //CO190208 - remember, this is not a raw distance, but a distance to within the nn distance
+    double uff_bonding_distance=DEFAULT_UFF_BONDING_DISTANCE; //CO20190208 - remember, this is not a raw distance, but a distance to within the nn distance
     for(uint sc_atom1=0;sc_atom1<xstr_ss.atoms.size();sc_atom1++){
       if(isVacancy(m_vacancies,sc_atom1)){continue;}
       atom1=xstr_cluster.grid_atoms_pc2scMap[sc_atom1];
@@ -6207,7 +6207,7 @@ namespace pocc {
         if(atom1!=atom2){
           //distij=AtomDist(xstr_cluster.atoms[atom1],xstr_cluster.atoms[atom2]);
           distij=AtomDist(xstr_cluster.grid_atoms[atom1],xstr_cluster.grid_atoms[atom2]);
-          if(distij<=m_exploration_radius){ //kesong (via stefano) used <= as well (GetNeighData)
+          if(distij<=m_exploration_radius){ //kesong (via SC) used <= as well (GetNeighData)
             //  cerr << "OK cluster atom 1 " << atom1 << " " << xstr_cluster.grid_atoms[atom1].cpos << endl;
             //  cerr << "OK cluster atom 2 " << atom2 << " " << xstr_cluster.grid_atoms[atom2].cpos << endl;
             if(abs(distij-v_dist_nn[(this->*NNDistancesMap)(atom1)])<=uff_bonding_distance){  //kesong only looked at <, not <= (ExtractBonds)
@@ -6923,7 +6923,7 @@ ostream& operator<<(ostream& oss, const pocc::POccStructuresFile& psf) {
 
 // ***************************************************************************
 // *                                                                         *
-// *              AFlow STEFANO CURTAROLO  Duke University 2003-2019         *
-// *              AFlow COREY OSES  Duke University 2013-2019                *
+// *              AFlow STEFANO CURTAROLO  Duke University 2003-2020         *
+// *              AFlow COREY OSES  Duke University 2013-2020                *
 // *                                                                         *
 // ***************************************************************************

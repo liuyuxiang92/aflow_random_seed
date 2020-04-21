@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow COREY OSES - Duke University 2013-2019                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow COREY OSES - Duke University 2013-2020                  *
 // *                                                                         *
 // ***************************************************************************
 
@@ -61,8 +61,8 @@ namespace aurostd {
     m_input.clear();
     n_choices=0;
     m_choose=0;
-    m_mode = '\0'; // ME180529
-    m_sets.clear(); // ME180529
+    m_mode = '\0'; //ME20180529
+    m_sets.clear(); //ME20180529
     m_sort=FALSE;
     m_started=FALSE;
     m_exhausted=FALSE;
@@ -71,7 +71,7 @@ namespace aurostd {
     m_p.clear();
     m_x=0;
     m_y=0;
-    m_repeat = false; // ME180509
+    m_repeat = false; //ME20180509
   }
 
   void xcombos::copy(const xcombos& b) {  //copy PRIVATE
@@ -79,8 +79,8 @@ namespace aurostd {
     m_input=b.m_input;
     n_choices=b.n_choices;
     m_choose=b.m_choose;
-    m_indices = b.m_indices; // ME 180620
-    m_mode = b.m_mode; // ME 180529
+    m_indices = b.m_indices; //ME20180620
+    m_mode = b.m_mode; //ME20180529
     m_sets = b.m_sets;
     m_sort=b.m_sort;
     m_started=b.m_started;
@@ -89,7 +89,7 @@ namespace aurostd {
     m_p=b.m_p;
     m_x=b.m_x;
     m_y=b.m_y;
-    m_repeat = b.m_repeat; // ME 180509
+    m_repeat = b.m_repeat; //ME20180509
   }
 
   const xcombos& xcombos::operator=(const xcombos& other) {
@@ -141,7 +141,7 @@ namespace aurostd {
     initialize();
   }
 
-  // ME 180509 - Implemented combinations with repetitions
+  //ME20180509 - Implemented combinations with repetitions
   void xcombos::reset(int choice_count,int choose_count, char mode, bool rpt) {
     free();
     m_mode = mode;
@@ -153,7 +153,7 @@ namespace aurostd {
     } else {
       n_choices=choice_count;
       m_choose=choose_count;
-      //[OBSOLETE ME180705]m_permutation=FALSE;
+      //[OBSOLETE ME20180705]m_permutation=FALSE;
       m_started=FALSE;
       m_repeat = rpt;
       if (m_mode == 'c') {m_mode = 'C';}
@@ -166,7 +166,7 @@ namespace aurostd {
     }
   }
 
-  // ME 180529 - Enumerations
+  //ME20180529 - Enumerations
   void xcombos::reset(std::vector<int> vec, char mode) {
     free();
     m_mode = mode;
@@ -196,13 +196,13 @@ namespace aurostd {
     initialize();
   }
 
-  // ME 180509 - Implemented combinations with repetitions
+  //ME20180509 - Implemented combinations with repetitions
   void xcombos::initialize() {
     bool LDEBUG=(FALSE || XHOST.DEBUG||_DEBUG_XCOMBOS_);
     if(m_mode == 'P') {
       m_current=m_input;
       if(m_sort) {std::sort(m_current.begin(),m_current.end());}
-      // ME 180620
+      //ME20180620
       m_indices.resize(m_input.size());
       for (uint i = 0; i < m_indices.size(); i++) {
         m_indices[i] = i;
@@ -232,7 +232,7 @@ namespace aurostd {
     m_initialized=TRUE;
   }
 
-  const std::vector<int>& xcombos::getCombo() const {return m_current;} // ME190703 - use const & (faster)
+  const std::vector<int>& xcombos::getCombo() const {return m_current;} //ME20190703 - use const & (faster)
   int xcombos::getN() const {return n_choices;}
   int xcombos::getM() const {return m_choose;}
 
@@ -295,15 +295,15 @@ namespace aurostd {
     for(int j=0;j<(int)m_current.size();j++) {if(m_current[_i-1]<m_current[j]&&(j>_j)){_j=j;}}
     if(LDEBUG) {cerr << "xcombos::incrementPermutation(): i=" << _i << "  j=" << _j << " " << endl;}
     std::swap(m_current[_i-1],m_current[_j]);
-    std::swap(m_indices[_i-1], m_indices[_j]); // ME 180620
+    std::swap(m_indices[_i-1], m_indices[_j]); //ME20180620
     for(int i=0;i<((int)m_current.size()-_i+1)/2;i++) {std::swap(m_current[_i+i],m_current[m_current.size()-i-1]);}
   }
 
-  // ME 180509 - Implemented combinations with repetitions
+  //ME20180509 - Implemented combinations with repetitions
   void xcombos::incrementCombinations() {
     if(m_exhausted) {return;}
-    //[OBSOLETE ME180705]if (repeat) { getNextRepeatCombination(); }
-    //[OBSOLETE ME180705]else { //[CO200106 - close bracket for indenting]}
+    //[OBSOLETE ME20180705]if (repeat) { getNextRepeatCombination(); }
+    //[OBSOLETE ME20180705]else { //[CO20200106 - close bracket for indenting]}
     setCombinationsIncrementParameters();
     m_current[m_x]=1;
     m_current[m_y]=0;
@@ -411,7 +411,7 @@ namespace aurostd {
     return;
   }
 
-  // ME 180529
+  //ME20180529
   // Creates the next enumeration in lexicographical order
   void xcombos::getNextEnumeration() {
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_XCOMBOS_);
@@ -457,7 +457,7 @@ namespace aurostd {
 #endif  // _AUROSTD_XCOMBOS_CPP_
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow COREY OSES - Duke University 2013-2019                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow COREY OSES - Duke University 2013-2020                  *
 // *                                                                         *
 // ***************************************************************************

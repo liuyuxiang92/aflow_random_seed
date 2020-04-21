@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2015           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow PINKU NATH - Duke University 2014-2018             *
 // *                                                                         *
 // ***************************************************************************
@@ -210,7 +210,7 @@ namespace apl
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
-    //    int qpointsPerCPU = _freq0.size() / ncpus;  OBSOLETE ME180801
+    //    int qpointsPerCPU = _freq0.size() / ncpus;  OBSOLETE ME20180801
     // Show info 
     if( ncpus == 1 )
       _logger.initProgressBar("Calculating taylor coefficients for QHA3POINTS");
@@ -227,7 +227,7 @@ namespace apl
       threads.push_back( new std::thread(&QHA3POINTS::calculate_derivative,this,startIndex,endIndex) );
     }
 
-    // OBSOLETE ME180801
+    // OBSOLETE ME20180801
     // for(int icpu = 0; icpu < ncpus; icpu++) {
     // startIndex = icpu * qpointsPerCPU;
     // endIndex = startIndex + qpointsPerCPU;
@@ -475,7 +475,7 @@ namespace apl
     string FVTfile =  "aflow.qha3P.FVT.out";
     if(!_include_ele){
       if(!aurostd::stringstream2file(osfvt, FVTfile, "WRITE")) {
-        // ME191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("Cannot write aflow.qha3P.FVT.out");
         string function = "QHA3POINTS::qha3pts_temperature_loop()";
         string message = "Cannot write " + FVTfile;
@@ -489,7 +489,7 @@ namespace apl
     outfile<<"[AFLOW] "<<STAR130<<"\n";
     FVTfile="aflow.qha3P.thermo.out";
     if(!aurostd::stringstream2file(outfile, FVTfile, "WRITE")) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.qha3P.thermo.out");
       string function = "QHA3POINTS::qha3pts_temperature_loop()";
       string message = "Cannot write " + FVTfile;
@@ -512,10 +512,10 @@ namespace apl
   { 
 
     if(omeg< 0.001){
-      // ME190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error <<"Frequency too small (<0.001 THz) for U_vib(T)"<<apl::endl;
       //exit(0);
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for U_vib(T)");
       string function = "QHA3POINTS::internal_energy()";
       string message = "Frequency too small (<0.001 THz) for U_vib(T)";
@@ -532,10 +532,10 @@ namespace apl
   {
     if(omeg<0.001)
     {
-      // ME190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error<<"Frequency too small (<0.001 THz) for F_vib(T)"<<apl::endl;
       //exit(0);
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for F_vib(T)");
       string function = "QHA3POINTS::free_energy()";
       string message = "Frequency too small (<0.001 THz) for F_vib(T)";
@@ -551,10 +551,10 @@ namespace apl
   double QHA3POINTS::entropy(const double omeg, const double temp)
   {
     if(omeg<0.001){
-      // ME190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error<< "Frequency too small (<0.001 THz) for S_vib(T)" <<apl::endl;
       //exit(0);
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for S_vib(T)");
       string function = "QHA3POINTS::entropy()";
       string message = "Frequency too small (<0.001 THz) for S_vib(T)";
@@ -570,10 +570,10 @@ namespace apl
   {
     if(omeg<0.001)
     {
-      // ME190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error<<"Frequency too small (<0.001 THz) for Cv(T)" <<apl::endl;
       //exit(0);
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for Cv(T)");
       string function = "QHA3POINTS::heat_capacity()";
       string message = "Frequency too small (<0.001 THz) for Cv(T)";
@@ -654,7 +654,7 @@ namespace apl
     outfile<<"[AFLOW] "<<STAR50<<"\n";
     string file="aflow.qha3P.enthalpy.out";
     if(!aurostd::stringstream2file(outfile, file, "WRITE")) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.qha3P.enthalpy.out");
       string function = "QHA3POINTS::total_enthalpy()";
       string message = "Cannot write " + file;
@@ -738,7 +738,7 @@ namespace apl
 
     string FVTfile =  "aflow.qha3P.FVT.out";
     if(!aurostd::stringstream2file(osfvt, FVTfile, "WRITE")) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.qha3P.FVT.out");
       string function = "QHA3POINTS::enthalpy_including_ele()";
       string message = "Cannot write " + FVTfile;
@@ -777,7 +777,7 @@ namespace apl
     outfile<<"[AFLOW] "<<STAR50<<"\n";
     string file="aflow.qha3P.enthalpy.out";
     if(!aurostd::stringstream2file(outfile, file, "WRITE")) {
-      // ME191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.qha3P.enthalpy.out");
       string function = "QHA3POINTS::enthalpy_including_ele()";
       string message = "Cannot write " + file;
@@ -837,7 +837,7 @@ namespace apl
   //Fermi-Dirac distribution function
   double QHA3POINTS::fermi_dirac_distribution(const double delE, const double t)
   {
-    double beta=1.0/(KBOLTZEV*t); // (_kB*t); //CO181019
+    double beta=1.0/(KBOLTZEV*t); // (_kB*t); //CO20181019
     double x=(delE)*beta;
     x=exp(x)+1.0;
     return 1.0/x;

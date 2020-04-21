@@ -39,7 +39,7 @@ bool get_species_string(string& outcar_file, string& species_string, const strin
 bool prepare_CHGCAR_4_Jmol(const string& _chgcar_file, string& species_header, bool zip_file, ostream& oss);
 bool prepare_CHGCAR_4_Jmol(string& _chgcar_file, string& species_header, ostream& oss);
 bool prepare_CHGCAR_4_Jmol(string& _chgcar_file, string& species_header);
-//[CO 180220 - moved to aurostd]bool efile2tempfile(string _FileNameIn, string& FileNameOut);
+//[CO20180220 - moved to aurostd]bool efile2tempfile(string _FileNameIn, string& FileNameOut);
 }
 
 //CHGCAR2JVXL function

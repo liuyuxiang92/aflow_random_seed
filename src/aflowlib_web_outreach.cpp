@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo - Duke
@@ -1178,7 +1178,7 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
 	if((aurostd::substring2bool(ptmp.type,"ARTICLE") || aurostd::substring2bool(ptmp.type,"PUBLICATION")) && (aurostd::substring2bool(what2print,"ARTICLE") || aurostd::substring2bool(what2print,"PUBLICATION")))
 	  voutreach.push_back(ptmp);
 	if(aurostd::substring2bool(ptmp.type,"PRESENTATION") && aurostd::substring2bool(what2print,"PRESENTATION")) {
-	  if(ptmp.vauthor.size()==0) ptmp.vauthor.push_back("S. Curtarolo");  // for stefano CV
+	  if(ptmp.vauthor.size()==0) ptmp.vauthor.push_back("S. Curtarolo");  // for SC CV
 	  voutreach.push_back(ptmp);
 	}
  	if(aurostd::substring2bool(ptmp.type,"EDUCATION") && aurostd::substring2bool(what2print,"EDUCATION")) voutreach.push_back(ptmp);
@@ -1403,6 +1403,6 @@ void center_print(uint mode, ostream& oss) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

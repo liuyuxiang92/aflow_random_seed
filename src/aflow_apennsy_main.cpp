@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -1100,10 +1100,10 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
     oss << endl;
     // for(i1=0;i1<this->ZLibrary.at(k).size();i1++)
     for(uint i1=0;i1<this->ZLibrary.at(k).size();i1++)
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       //	  for(i2=i1;i2<this->ZLibrary.at(k).size();i2++)
       for(uint i2=i1+1;i2<this->ZLibrary.at(k).size();i2++)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         if(AlloyStructureIdentity.at(k).at(i1).at(i2)==TRUE) {
           if(XHOST.vflag_control.flag("APENNSY::LATEX_OUTPUT")) oss << Verbatim(TRUE);
           normAA1=std::pow((double) ZLibrary.at(k).at(i1).volume_cell,(double) 1.0/3.0);
@@ -1179,7 +1179,7 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
           uint ii=RankLib.at(k).at(j).at(i);
           // FIX  if(ZLibrary.at(k).at(ii).stoich_b==ZConcentrations.at(k).at(j))
           if(aurostd::isequal(ZLibrary.at(k).at(ii).stoich_b,ZConcentrations.at(k).at(j),CEPSILON))
-          { //CO200106 - patching for auto-indenting
+          { //CO20200106 - patching for auto-indenting
             dHf=ZLibrary.at(k).at(ii).enthalpy_formation_atom-ZLibrary.at(k).at(RankLib.at(k).at(j).at(0)).enthalpy_formation_atom;
             if(dHf<0.015) {
               oss << Verbatim(TRUE);
@@ -1421,7 +1421,7 @@ string APENNSY_Parameters::APENNSY_UNCLE(bool _verbose,_aflags &aflags) {
       uint ii=structures_lattice.at(j);
       if(LDEBUG) cerr << "ii=" << ii << endl;  
       if(LDEBUG) cerr << "ZLibrary.at(k).at(ii).vstr.size()=" << ZLibrary.at(k).at(ii).vstr.size() << endl;
-      {// && ii<40) { //[CO200106 - close bracket for indenting]}
+      {// && ii<40) { //[CO20200106 - close bracket for indenting]}
         cerr << "Loading " << alloys.at(k) << "/" << ZLibrary.at(k).at(ii).structure_name << endl;
         deque<string> _vspecies;_vspecies.push_back(speciesA.at(k));_vspecies.push_back(speciesB.at(k));
         str=aflowlib::PrototypeLibraries(cerr,aurostd::RemoveCharacter(ZLibrary.at(k).at(ii).structure_name,'/'),"",_vspecies,LIBRARY_MODE_HTQC);
@@ -1475,7 +1475,7 @@ string APENNSY_Parameters::APENNSY_UNCLE(bool _verbose,_aflags &aflags) {
 string APENNSY_Parameters::APENNSY_Web(bool _verbose,_aflags &aflags) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   stringstream oss;
-  uint _precision_=14; //was 16 stefano 10 dane
+  uint _precision_=14; //was 16 SC 10 DM
   oss.setf(std::ios::fixed,std::ios::floatfield);
   oss.precision(_precision_);
   double H_cell,H_atom,Hf_atom,spin_atom,volume_atom,stoich_a,stoich_b;
@@ -1526,7 +1526,7 @@ string APENNSY_Parameters::APENNSY_Web(bool _verbose,_aflags &aflags) {
       if(LDEBUG) cerr << "ii=" << ii << endl;  
       if(LDEBUG) cerr << "ZLibrary.at(k).at(ii).vstr.size()=" << ZLibrary.at(k).at(ii).vstr.size() << endl;
       // HTQC
-      {// && ii<40) { //[CO200106 - close bracket for indenting]}
+      {// && ii<40) { //[CO20200106 - close bracket for indenting]}
         strPRE=ZLibrary.at(k).at(ii).vstr.front();strPRE.BringInCell();
         strMID=ZLibrary.at(k).at(ii).vstr.at(1);strMID.BringInCell();
         strPOST=ZLibrary.at(k).at(ii).vstr.back();strPOST.BringInCell();
@@ -1897,7 +1897,7 @@ string APENNSY_Parameters::APENNSY_ConvexHull(bool _verbose,_aflags &aflags,uint
       oss << "plot(Cb ,EF ,'b+-','LineWidth',0.5*LINEWIDTH);hold on;axis([0 1 " << minE << " " << maxE << "]);";oss << "  % " << alloys.at(k) << endl;
       // for(uint i=0;i<this->ZLibrary.at(k).size();i++)
       for(int i=this->ZLibrary.at(k).size()-1;i>=0;i--)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         xbool=TRUE;
         for(uint j=1;j<ZConcentrations.at(k).size();j++)
           if(i==(int) ZGNDlibrary.at(k).at(j)) xbool=FALSE;
@@ -2037,7 +2037,7 @@ string APENNSY_Parameters::APENNSY_ConvexHull(bool _verbose,_aflags &aflags,uint
       count=0;
       // if(abs(AvEn)<1.0e-12) // RICHARD a double can not be ==0
       if(abs(AvEn)<0.001) // RICHARD a double can not be ==0  we might have better
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         immi=true;
         for(int i=this->ZLibrary.at(k).size()-1;i>=0;i--) {
           xbool=TRUE;
@@ -2507,7 +2507,7 @@ string APENNSY_Parameters::APENNSY_HistogramList(_aflags &aflags) {
   cerr << "**********************************************************" << endl;
   // oss << max(EFDlibrary) << endl;
   xvector<int> EFDhistogram(0,1000);
-  EFDhistogram.reset(); //CO190808 reset sets all to 0
+  EFDhistogram.reset(); //CO20190808 reset sets all to 0
   uint i,j,k;
 
   for(j=0;j<alloys.size();j++) {
@@ -3075,7 +3075,7 @@ string APENNSY_Parameters::APENNSY_Miscibility(_aflags &aflags) {
   // ************************************************************************
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   oss << "// Stefano Curtarolo - 2009 Duke" << endl;
@@ -3137,7 +3137,7 @@ string APENNSY_Parameters::APENNSY_Miscibility(_aflags &aflags) {
   oss << " " << endl;
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   // done
@@ -3154,7 +3154,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Experiments(_aflags &aflags) {
   // ************************************************************************
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   oss << "// Ohad Levy - 2009 Duke" << endl;
@@ -3198,7 +3198,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Experiments(_aflags &aflags) {
   oss << " " << endl;
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   // done
@@ -3215,7 +3215,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Miedema(_aflags &aflags) {
   // ************************************************************************
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   // HERE
@@ -3242,7 +3242,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_HumeRothery(_aflags &aflags) {
   // ************************************************************************
   oss << "// ***************************************************************************" << endl;
   oss << "// *                                                                         *" << endl;
-  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  oss << "// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   oss << "// *                                                                         *" << endl;
   oss << "// ***************************************************************************" << endl;
   for(uint k=0;k<alloys.size();k++) {
@@ -3267,7 +3267,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Table(_aflags &aflags) {
   // ************************************************************************
   oss << "%% ***************************************************************************" << endl;
   oss << "%% *                                                                         *" << endl;
-  oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   oss << "%% *                                                                         *" << endl;
   oss << "%% ***************************************************************************" << endl;
   oss << "\\begin{table}[htb]" << endl;
@@ -3298,7 +3298,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Table(_aflags &aflags) {
   oss << "\\end{table} " << endl;
   oss << "%% ***************************************************************************" << endl;
   oss << "%% *                                                                         *" << endl;
-  oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   oss << "%% *                                                                         *" << endl;
   oss << "%% ***************************************************************************" << endl;
   // done
@@ -3317,7 +3317,7 @@ string APENNSY_Parameters::APENNSY_Miscibility_Statistics(_aflags &aflags) {
   // ************************************************************************
   // oss << "%% ***************************************************************************" << endl;
   // oss << "%% *                                                                         *" << endl;
-  // oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *" << endl;
+  // oss << "%% *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *" << endl;
   // oss << "%% *                                                                         *" << endl;
   // oss << "%% ***************************************************************************" << endl;
   //#define MISCIBILITY_SYSTEM_NOT_STUDIED
@@ -3639,6 +3639,6 @@ string APENNSY_Parameters::APENNSY_Miscibility_Statistics(_aflags &aflags) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
