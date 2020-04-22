@@ -104,80 +104,63 @@ namespace aurostd {
 
     // found something
     if(library!=LIBRARY_NOTHING) {
+      init::InitLoadString("vLIBS");
       tokens.clear();
       string tmp;
       vector<string> vLibrary;
       if(library==XHOST_LIBRARY_LIB0) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB0" << endl;
-	// [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_RAW"),tokens,"\n");
-	init::InitLoadString("vLIBS");
 	tokens=XHOST_Library_CALCULATED_LIB0_RAW;
       }
       if(library==XHOST_LIBRARY_LIB1) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB1" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_RAW"),tokens,"\n");
- 	init::InitLoadString("vLIBS");
 	tokens=XHOST_Library_CALCULATED_LIB1_RAW;
-     }
+      }
       if(library==XHOST_LIBRARY_LIB2) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB2" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_RAW"),tokens,"\n");
- 	init::InitLoadString("vLIBS");
 	tokens=XHOST_Library_CALCULATED_LIB2_RAW;
       }
       if(library==XHOST_LIBRARY_LIB3) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB3" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
- 	init::InitLoadString("vLIBS");
 	tokens=XHOST_Library_CALCULATED_LIB3_RAW;
       }
       if(library==XHOST_LIBRARY_LIB4) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB4" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
- 	init::InitLoadString("vLIBS");
-	tokens=XHOST_Library_CALCULATED_LIB4_RAW;
+ 	tokens=XHOST_Library_CALCULATED_LIB4_RAW;
       }
       if(library==XHOST_LIBRARY_LIB5) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB5" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
-	init::InitLoadString("vLIBS");
 	tokens=XHOST_Library_CALCULATED_LIB5_RAW;
-       }
+      }
       if(library==XHOST_LIBRARY_LIB6) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB6" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
- 	init::InitLoadString("vLIBS");
-	tokens=XHOST_Library_CALCULATED_LIB6_RAW;
+ 	tokens=XHOST_Library_CALCULATED_LIB6_RAW;
       }
       if(library==XHOST_LIBRARY_LIB7) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB7" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
- 	init::InitLoadString("vLIBS");
-	tokens=XHOST_Library_CALCULATED_LIB7_RAW;
+ 	tokens=XHOST_Library_CALCULATED_LIB7_RAW;
       }
       if(library==XHOST_LIBRARY_LIB8) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB8" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
- 	init::InitLoadString("vLIBS");
-	tokens=XHOST_Library_CALCULATED_LIB8_RAW;
+ 	tokens=XHOST_Library_CALCULATED_LIB8_RAW;
       }
       if(library==XHOST_LIBRARY_LIB9) {
         if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB9" << endl;
-        // [OBSOLETE] aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
- 	init::InitLoadString("vLIBS");
 	tokens=XHOST_Library_CALCULATED_LIB9_RAW;
       }
-      for(uint i=0;i<tokens.size();i++)
+      for(uint i=0;i<tokens.size();i++) {
         if(aurostd::substring2bool(tokens.at(i),"/")) {
           tmp=tokens.at(i);
           aurostd::StringSubst(tmp," ","");
           vLibrary.push_back(tmp);
         }
-      for(int i=vLibrary.size()-1;i>=0;i--)
+      }
+      for(int i=vLibrary.size()-1;i>=0;i--) {
         if(tmp_directory==vLibrary.at(i)) {
           already_in_database=TRUE;
           if(LDEBUG) cerr << vLibrary.at(i) << " FOUND .." << endl; // NEW
         }
+      }
     }
 
     if(LDEBUG) cerr << "DONE..." << endl;

@@ -3541,17 +3541,15 @@ namespace pflow {
     if(tokens.size()==1) {directory="";operation=tokens.at(0);}
     if(tokens.size()==2) {directory=tokens.at(0)+"/";operation=tokens.at(1);}
     if(operation!="") {
-      for(uint i=0; i<vfile.size();i++) {
+      for(uint i=0;i<vfile.size();i++) {
         string from="",to="",f=aurostd::CleanFileName(directory+vfile.at(i));
-        deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
-        deque<string> vcmd; aurostd::string2tokens("bzip2,xz,gzip",vcmd,",");
-        for(uint j=0;j<vext.size();j++) {
-          if(aurostd::FileExist(f+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+vext.at(j));}
-          if(aurostd::FileExist(f+".relax1"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".relax1"+vext.at(j));}
-          if(aurostd::FileExist(f+".relax2"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".relax2"+vext.at(j));}
-          if(aurostd::FileExist(f+".relax3"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".relax3"+vext.at(j));}
-          if(aurostd::FileExist(f+".static"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".static"+vext.at(j));}
-          if(aurostd::FileExist(f+".bands"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".bands"+vext.at(j));}
+        for(uint iext=1;iext<XHOST.vext.size();iext++) {  // SKIP uncompressed
+          if(aurostd::FileExist(f+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".relax1"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".relax1"+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".relax2"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".relax2"+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".relax3"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".relax3"+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".static"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".static"+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".bands"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".bands"+XHOST.vext.at(iext));}
         }
         if(aurostd::substring2bool(operation,"n2") || aurostd::substring2bool(operation,"none2") || aurostd::substring2bool(operation,"normal2")) from="";
         if(aurostd::substring2bool(operation,"r12") || aurostd::substring2bool(operation,"relax12")) from=".relax1";
@@ -13162,8 +13160,7 @@ namespace pflow {
 // ***************************************************************************
 // CO20180703 - revamped for vpflow, and fixed INCAR search issue
 namespace pflow {
-  bool QMVASP(aurostd::xoption& vpflow) //vector<string> argv)  //CO20180703
-  { //CO200106 - patching for auto-indenting
+  bool QMVASP(aurostd::xoption& vpflow) { //vector<string> argv)  //CO20180703
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="pflow::QMVASP:";
 
@@ -13182,29 +13179,26 @@ namespace pflow {
     aurostd::string2tokens("CONTCAR,OUTCAR,INCAR,vasprun.xml",vCARs,","); //look in aflow_kvasp, KBIN::VASP_Analyze()
 
     //organize zip formats, e.g., bzip2, xz
-    vector<string> vext,vcmd_cat,vcmd_zip;
-    aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_back("");
-    aurostd::string2tokens("bzcat,xzcat,gzcat,cat",vcmd_cat,",");
-    aurostd::string2tokens("bzip2,xz,gzip",vcmd_zip,",");vcmd_zip.push_back("");
+    
     bool look_static=vpflow.flag("QMVASP::STATIC");
     bool found_run=false; //i.e., found COMPLETE run, all files must be .static or all .relax2, no mix match
     bool found_CAR=true;
 
     //search to see if files exist in any capacity
     for(uint i=0;i<vCARs.size();i++){
-      if(LDEBUG) {cerr << soliloquy << " looking for " << directory+"/"+vCARs[i] << endl;}
+      if(LDEBUG) {cerr << soliloquy << " looking for " << directory+"/"+vCARs.at(i) << endl;}
       found_CAR=false;
       for(uint j=0;j<vruns.size()&&!found_CAR;j++){
-        for(uint k=0;k<vext.size()&&!found_CAR;k++){
-          if(aurostd::FileExist(directory+"/"+vCARs[i]+vruns[j]+vext[k])){
-            if(LDEBUG) {cerr << soliloquy << " found " << directory+"/"+vCARs[i]+vruns[j]+vext[k] << endl;}
+        for(uint k=0;k<XHOST.vext.size()&&!found_CAR;k++){
+          if(aurostd::FileExist(directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k))){
+            if(LDEBUG) {cerr << soliloquy << " found " << directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k) << endl;}
             found_CAR=true;
           }
         }
       }
       if(!found_CAR){
-        if(look_static && vCARs[i]==".static"){
-          cerr << soliloquy << " --static ON but " << directory+"/"+vCARs[i] << ".static does not exist (zipped or otherwise)" << endl;
+        if(look_static && vCARs.at(i)==".static"){
+          cerr << soliloquy << " --static ON but " << directory+"/"+vCARs.at(i) << ".static does not exist (zipped or otherwise)" << endl;
           return FALSE;
         }
         continue;
@@ -13215,9 +13209,9 @@ namespace pflow {
     if(found_run){
       //first check that we can safely write CONTCAR.static to CONTCAR
       for(uint i=0;i<vCARs.size();i++){
-        if(aurostd::FileExist(directory+"/"+vCARs[i])){
-          cerr << soliloquy << directory+"/"+vCARs[i] << " already exists, cannot overwrite with relax2/static variant. ";
-          cerr << "Do not want to overwrite. Please delete: " << directory+"/"+vCARs[i] << endl;
+        if(aurostd::FileExist(directory+"/"+vCARs.at(i))){
+          cerr << soliloquy << directory+"/"+vCARs.at(i) << " already exists, cannot overwrite with relax2/static variant. ";
+          cerr << "Do not want to overwrite. Please delete: " << directory+"/"+vCARs.at(i) << endl;
           return FALSE;
         }
       }
@@ -13225,11 +13219,11 @@ namespace pflow {
       for(uint i=0;i<vCARs.size();i++){
         found_CAR=false;
         for(uint j=0;j<vruns.size()&&!found_CAR;j++){
-          for(uint k=0;k<vext.size()&&!found_CAR;k++){
-            if(aurostd::FileExist(directory+"/"+vCARs[i]+vruns[j]+vext[k])){
-              aurostd::execute(XHOST.command(vcmd_cat[k])+" "+directory+"/"+vCARs[i]+vruns[j]+vext[k]+ " > "+directory+"/"+vCARs[i]);
-              if(aurostd::FileEmpty(directory+"/"+vCARs[i])){
-                cerr << soliloquy << " " << directory+"/"+vCARs[i] << " is missing/empty" << endl;
+          for(uint k=0;k<XHOST.vext.size()&&!found_CAR;k++){
+            if(aurostd::FileExist(directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k))){
+              aurostd::execute(XHOST.command(XHOST.vcat.at(k))+" "+directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k)+ " > "+directory+"/"+vCARs.at(i));
+              if(aurostd::FileEmpty(directory+"/"+vCARs.at(i))){
+                cerr << soliloquy << " " << directory+"/"+vCARs.at(i) << " is missing/empty" << endl;
                 return FALSE;
               }
               found_CAR=true;
@@ -13242,8 +13236,8 @@ namespace pflow {
 
     //check that all files found
     for(uint i=0;i<vCARs.size();i++){
-      if(!aurostd::FileExist(directory+"/"+vCARs[i])){
-        cerr << soliloquy << directory+"/"+vCARs[i] << " does not exist." << endl;
+      if(!aurostd::FileExist(directory+"/"+vCARs.at(i))){
+        cerr << soliloquy << directory+"/"+vCARs.at(i) << " does not exist." << endl;
         return FALSE;
       }
     }
@@ -13278,11 +13272,9 @@ namespace pflow {
     //[OBSOLETE CO20180703]if(!found) return FALSE; // error
     //[OBSOLETE CO20180703]for(uint i=0;i<vCARS_relax.size();i++) {
     //[OBSOLETE CO20180703]  //      cerr <<  vCARS_relax.at(i) << endl;
-    //[OBSOLETE CO20180703]  deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front(""); // cheat for void string
-    //[OBSOLETE CO20180703]  deque<string> vcmd; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcmd,",");
-    //[OBSOLETE CO20180703]  for(uint iext=0;iext<vext.size();iext++) {
-    //[OBSOLETE CO20180703]if(aurostd::FileExist(directory+"/"+vCARS_relax.at(i)+vext.at(iext)))
-    //[OBSOLETE CO20180703]aurostd::execute(XHOST.command(vcmd.at(iext))+" "+directory+"/"+vCARS_relax.at(i)+vext.at(iext)+ " > "+directory+"/"+vCARS.at(i));
+    //[OBSOLETE CO20180703]  for(uint iext=0;iext<XHOST.vext.size();iext++) {
+    //[OBSOLETE CO20180703]if(aurostd::FileExist(directory+"/"+vCARS_relax.at(i)+XHOST.vext.at(iext)))
+    //[OBSOLETE CO20180703]aurostd::execute(XHOST.command(vcmd.at(iext))+" "+directory+"/"+vCARS_relax.at(i)+XHOST.vext.at(iext)+ " > "+directory+"/"+vCARS.at(i));
     //[OBSOLETE CO20180703]  }
     //[OBSOLETE CO20180703]}
 
@@ -13298,14 +13290,14 @@ namespace pflow {
       return FALSE;
     }
     if(found_run){
-      for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(directory+"/"+vCARs[i]);} //aurostd::RemoveFile(directory+"/"+vCARS.at(i)); }
+      for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(directory+"/"+vCARs.at(i));} //aurostd::RemoveFile(directory+"/"+vCARS.at(i)); }
   }
   for(uint i=0;i<vCARs.size();i++){
     for(uint j=0;j<vruns.size();j++){
-      for(uint k=0;k<vext.size();k++){
-        if(aurostd::FileExist(directory+"/"+vCARs[i]+vruns[j]+vext[k])){
-          if(!vcmd_zip[k].empty()){
-            aurostd::execute(XHOST.command(vcmd_zip[k])+" -9qf "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
+      for(uint k=0;k<XHOST.vext.size();k++){
+        if(aurostd::FileExist(directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k))){
+          if(!XHOST.vzip.at(k).empty()){
+            aurostd::execute(XHOST.command(XHOST.vzip.at(k))+" -9qf "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
             return TRUE;
           }
         }
@@ -13314,11 +13306,9 @@ namespace pflow {
   }
 
   //[OBSOLETE CO20180703]aurostd::execute(XHOST.command(vcmd.at(iext))+" -9q "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
-  //[OBSOLETE CO20180703]deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
-  //[OBSOLETE CO20180703]deque<string> vcmd; aurostd::string2tokens("bzip2,xz,gzip",vcmd,",");
-  //[OBSOLETE CO20180703]for(uint iext=0;iext<vext.size();iext++) {
-  //[OBSOLETE CO20180703]  if(aurostd::FileExist(directory+"/"+vCARS_relax.at(0)+vext.at(iext))) {
-  //aurostd::RemoveFile(xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT+vext.at(iext)); //CO20180703 - why delete before you zip????
+  //[OBSOLETE CO20180703]for(uint iext=0;iext<XHOST.vext.size();iext++) {
+  //[OBSOLETE CO20180703]  if(aurostd::FileExist(directory+"/"+vCARS_relax.at(0)+XHOST.vext.at(iext))) {
+  //aurostd::RemoveFile(xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext)); //CO20180703 - why delete before you zip????
   //[OBSOLETE CO20180703]aurostd::execute(XHOST.command(vcmd.at(iext))+" -9q "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
   //[OBSOLETE CO20180703]  }
   //[OBSOLETE CO20180703]}

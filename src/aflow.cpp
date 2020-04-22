@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *         aflow - Automatic FLOW for materials discovery project          *
-// *             Stefano Curtarolo - Duke University - 2003-2019             *
+// *             Stefano Curtarolo - Duke University - 2003-2020             *
 // *                                                                         *
 // ***************************************************************************
 //
@@ -312,13 +312,11 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
+      
+      if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - aflow.cpp:main: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
-      deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
-      deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-      if(vext.size()!=vcat.size()) { cerr << "ERROR - aflow.cpp:main: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
-
-      for(uint iext=0;iext<vext.size();iext++) { 
-        cout << "\"" << vext.at(iext) << "\"" << " " << "\"" << vcat.at(iext) << "\"" << endl;
+      for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+        cout << "\"" << XHOST.vext.at(iext) << "\"" << " " << "\"" << XHOST.vcat.at(iext) << "\"" << endl;
       }
 
       int dim=7;

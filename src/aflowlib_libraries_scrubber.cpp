@@ -64,8 +64,8 @@ namespace aflowlib {
       sort(list2found.begin(),list2found.end());
       //     cerr << "aflowlib::LIB2SCRUB list2found.size()=" << list2found.size() << endl;
 
-      vector<string> listLIB2RAW,listRM,listANRL,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK,listZIPNOMIX,listBROKEN;
-      stringstream ossLIB2RAW,ossRM,ossANRL,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK,ossZIPNOMIX,ossBROKEN;
+      vector<string> listLIB2RAW,listRM,listANRL,listppAUID,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK,listZIPNOMIX,listBROKEN;
+      stringstream ossLIB2RAW,ossRM,ossANRL,ossppAUID,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK,ossZIPNOMIX,ossBROKEN;
 
       vector<string> tokens;
       vector<string> vremoveALL;
@@ -75,14 +75,12 @@ namespace aflowlib {
       aurostd::string2tokens("CHGCAR,CHG,EIGENVAL,PROCAR",vremoveLIB6_LIB7,",");
 
       bool LIB2AUID=FALSE;//TRUE;
-      bool REMOVE_MARYLOU=TRUE;
+      bool REMOVE_MARYLOU=FALSE;//TRUE;
       bool ICSD2LINK=TRUE;//TRUE;
       bool ZIPNOMIX=TRUE;
       bool BROKEN=FALSE;//TRUE; // VERY VERY SLOW
 
-      //     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
       deque<string> vext; aurostd::string2tokens(".xz",vext,",");
-      //  deque<string> vcmd; aurostd::string2tokens("bzcat,xzcat,zcat",vcmd,",");
       deque<string> vcmd; aurostd::string2tokens("xzcat",vcmd,",");
       //  deque<string> vrelax; aurostd::string2tokens(".relax1,.relax2,.relax3,.static,.bands",vrelax,",");
       deque<string> vrelax; aurostd::string2tokens(".relax1",vrelax,",");
@@ -157,7 +155,7 @@ namespace aflowlib {
 	  }
 	}
 	
-	// check aflow.immiscibility.out   // SC20200319
+	// check BROKEN   // SC20200319
 	if(BROKEN) {    // SC20200319
 	  if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
 	    bool failed=FALSE;
@@ -293,9 +291,24 @@ namespace aflowlib {
           }	
         }
 
-        // RETOUCHING DATE OF AFLOW.IN TO REPRESENT AFLOW.END.OUT
-        if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) && 
-            aurostd::FileExist(directory_LIB+"/aflow.end.out")) {
+        // check LIB2RAW - ppAUID	
+        if(aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_) &&aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+	  if(!aurostd::substring2bool(directory_LIB,"LDAU2")) {
+	    //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
+	    if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"enthalpy_formation_atom")) {
+	      //	    cerr << "aflowlib::LIB2SCRUB ppAUID FOUND = " << directory_RAW << "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
+	    } else {
+	      //	    cerr << "aflowlib::LIB2SCRUB ppAUID NOT FOUND = " << directory_RAW << "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << endl;
+	      listppAUID.push_back(directory_LIB);
+	      ossppAUID << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
+	      fixes++;
+	    }	
+	  }
+	}
+	
+	// RETOUCHING DATE OF AFLOW.IN TO REPRESENT AFLOW.END.OUT
+	if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) && 
+	   aurostd::FileExist(directory_LIB+"/aflow.end.out")) {
           struct stat fileInfo_IN,fileInfo_OUT;
           stat(string(directory_LIB+"/"+_AFLOWIN_).c_str(), &fileInfo_IN);
           stat(string(directory_LIB+"/aflow.end.out").c_str(), &fileInfo_OUT);
@@ -313,7 +326,7 @@ namespace aflowlib {
             //  cout << "FIXED " << directory_LIB << endl;
           }
         }
-
+ 
         // some step debug
         aurostd::ProgressBar(cerr,"aflowlib::LIB2SCRUB ",j,list2found.size(),1,1,1);
       }
@@ -356,6 +369,11 @@ namespace aflowlib {
       if(listANRL.size()) {
         aurostd::stringstream2file(ossANRL,XHOST.tmpfs+"/xscrubber_ANRL."+vlib.at(i));
         aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ANRL."+vlib.at(i));
+      }
+      cerr << "aflowlib::LIB2SCRUB listppAUID.size()=" << listppAUID.size() << endl;
+      if(listppAUID.size()) {
+        aurostd::stringstream2file(ossppAUID,XHOST.tmpfs+"/xscrubber_ppAUID."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ppAUID."+vlib.at(i));
       }
       cerr << "aflowlib::LIB2SCRUB listINCOMPLETE.size()=" << listINCOMPLETE.size() << endl;
       if(listINCOMPLETE.size()) {

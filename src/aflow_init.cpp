@@ -976,12 +976,17 @@ namespace init {
     bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
     string soliloquy="init::InitLoadString:";
     if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
+
+    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()==3) return ""; // intercept before it reloads it again
+
     if(!XHOST.is_command("aflow_data")) {
       cerr << "AFLOW Error: " << "aflow_data" << " is not in the path... exiting.." << endl;
       exit(0);
     } 
     if(LDEBUG) cerr << "00000  MESSAGE AFLOW INIT Loading data = [" << str2load << "]";
     if(LDEBUG) cerr.flush();
+
+ 
     string out;
     string aflow_data_path=aurostd::args2attachedstring(XHOST.argv,"--aflow_data_path=",(string) "");
     if(aflow_data_path=="") {
