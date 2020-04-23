@@ -55,7 +55,7 @@ namespace aurostd {
       return *this;
     }
 
-  // ME200107 - BEGIN
+  //ME200107 - BEGIN
   template<class utype>
     bool identical(const xcomplex<utype>& a, const xcomplex<utype>&b, utype _tol_) {
       return (identical(a.re, b.re, _tol_) && identical(a.im, b.im, _tol_));
@@ -80,7 +80,7 @@ namespace aurostd {
     bool isequal(const xcomplex<utype>& a, const xcomplex<utype>&b) {
       return identical(a, b, (utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     }
-  // ME200107 - END
+  //ME200107 - END
 
   // namespace aurostd
   //   template<class utype>                            // operator <<  xcomplex<>

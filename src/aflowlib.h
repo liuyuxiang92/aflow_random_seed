@@ -51,7 +51,7 @@ namespace aflowlib {
       string auid;                                              // AFLOW UNIQUE IDENTIFIER
       deque<string> vauid;                                      // AFLOW UNIQUE IDENTIFIER SPLIT
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
-      string title;                                             // ME20190125 - title of the calculation
+      string title;                                             //ME20190125 - title of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
       string aflowlib_date,aflowlib_version;                    // version/creation
       string aflowlib_entries;vector<string> vaflowlib_entries; // this contains the subdirectories that can be associated
@@ -100,7 +100,7 @@ namespace aflowlib {
       string geometry_orig;vector<double> vgeometry_orig; // a,b,c and unit_cell_angles (b,c) (a,c) (a,b) //DX20190124 - add original crystal info
       string lattice_system_orig,lattice_variation_orig,lattice_system_relax,lattice_variation_relax;
       string ldau_TLUJ;
-      vector<vector<double> > vLDAU;  // ME20190124
+      vector<vector<double> > vLDAU;  //ME20190124
       uint natoms;
       uint natoms_orig; //DX20190124 - add original crystal info
       string nbondxx;vector<double> vnbondxx;
@@ -115,7 +115,7 @@ namespace aflowlib {
       string prototype;
       double PV_cell,PV_atom;
       double scintillation_attenuation_length;
-      string sg,sg2;vector<string> vsg,vsg2; // CO20180101
+      string sg,sg2;vector<string> vsg,vsg2; //CO20180101
       string spacegroup_orig,spacegroup_relax;
       string species;vector<string> vspecies;
       string species_pp;vector<string> vspecies_pp;
@@ -223,8 +223,8 @@ namespace aflowlib {
       double ael_debye_temperature;// (K) //CT181212
       double ael_applied_pressure;// (GPa) //CT181212
       double ael_average_external_pressure; // (GPa) //CT181212
-      xmatrix<double> ael_stiffness_tensor;  // ME20191105
-      xmatrix<double> ael_compliance_tensor;  // ME20191105
+      xmatrix<double> ael_stiffness_tensor;  //ME20191105
+      xmatrix<double> ael_compliance_tensor;  //ME20191105
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3
@@ -255,10 +255,10 @@ namespace aflowlib {
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
       bool directory2auid(string directory);                                                // from directory and AURL gives AUID and VAUID
-      void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         // CO20171202 - apennsy fixes
-      void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   // CO20171202 - apennsy fixes
-      bool ignoreBadDatabase() const;                                                       // CO20171202 - apennsy fixes
-      bool ignoreBadDatabase(string& reason) const;                                         // CO20171202 - apennsy fixes
+      void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         //CO20171202 - apennsy fixes
+      void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
+      bool ignoreBadDatabase() const;                                                       //CO20171202 - apennsy fixes
+      bool ignoreBadDatabase(string& reason) const;                                         //CO20171202 - apennsy fixes
       string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
       string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
     private:                                                     //
@@ -279,13 +279,13 @@ namespace aflowlib {
     private:
       struct sockaddr_in client;
       int sock;
-      int PORT;// = 80; // CO20180401
+      int PORT;// = 80; //CO20180401
       string Summons;
       string API_Path;
       string Domain;
       bool establish();
     public:
-      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; // CO20181226
+      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
       void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
       friend ostream& operator<<( ostream& output, APIget& a );
   };
@@ -301,9 +301,9 @@ namespace aflowlib {
   string AFLUXCall(vector<string>& matchbook); //DX20190206 - add AFLUX functionality
   string AFLUXCall(string& summons); //DX20190206 - add AFLUX functionality 
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX20190206 - get properties from AFLUX response
-  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); // SC2020327
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC2020327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
-  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  // SC20190813
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813
 }
 
 // ***************************************************************************
@@ -375,7 +375,7 @@ namespace aflowlib {
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
   bool LIB2RAW(string options,bool overwrite,bool LOCAL=false);
   bool XPLUG(vector<string> argv);
-  bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); // CO20171025
+  bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); //CO20171025
   bool LIB2RAW_Loop_Thermodynamics(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE,bool LOCAL=false);
   // [OBSOLETE]  bool LIB2RAW_Loop_DATA(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
   bool LIB2RAW_Loop_Bands(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
@@ -494,7 +494,7 @@ bool AlloyAlphabeticLIBRARY(const string& system);
 // ***************************************************************************
 
 // ***************************************************************************
-// ME20191001
+//ME20191001
 // AflowDB class
 
 namespace aflowlib {

@@ -828,10 +828,10 @@ uint xstructure::GetPrimitiveCell(void) {
     //DX20191011 [OBSOLETE] tmp_atom.fpos = (*this).atoms[i].fpos;
     //DX20191011 [OBSOLETE] tmp_atom.cpos = (*this).atoms[i].cpos;
     //DX20191011 [OBSOLETE] tmp_atom.type = (*this).atoms[i].type;
-    //DX20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; // DX20170921 - magnetic sym
-    //DX20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; // DX20170921 - magnetic sym
-    //DX20191011 [OBSOLETE] tmp_atom.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-    //DX20191011 [OBSOLETE] tmp_atom.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
+    //DX20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; //DX20170921 - magnetic sym
+    //DX20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; //DX20170921 - magnetic sym
+    //DX20191011 [OBSOLETE] tmp_atom.noncoll_spin = (*this).atoms[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+    //DX20191011 [OBSOLETE] tmp_atom.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
     string tmpname = (*this).atoms[i].name;
     SYM::cleanupstring(tmpname);
     tmp_atom.name = tmpname;
@@ -888,10 +888,10 @@ uint xstructure::GetPrimitiveCell(void) {
       tmp.fpos = ::BringInCell(atomic_basis_[i].fpos); //DX20190905 - new BringInCell function and go outside xstructure scope
       //DX20191011 [OBSOLETE] tmp.name = atomic_basis_[i].name;
       //DX20191011 [OBSOLETE] tmp.type = atomic_basis_[i].type;
-      //DX20191011 [OBSOLETE] tmp.spin = atomic_basis_[i].spin; // DX20170921 - magnetic sym
-      //DX20191011 [OBSOLETE] tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX20170921 - magnetic sym
-      //DX20191011 [OBSOLETE] tmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-      //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
+      //DX20191011 [OBSOLETE] tmp.spin = atomic_basis_[i].spin; //DX20170921 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp.spin_is_given = atomic_basis_[i].spin_is_given; //DX20170921 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp.noncoll_spin = atomic_basis_[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+      //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
       full_basis.push_back(tmp);
     }
     vector<xvector<double> > diff_vectors;
@@ -922,10 +922,10 @@ uint xstructure::GetPrimitiveCell(void) {
         BringInCellInPlace(atmp.fpos); //DX20190905
         //DX20191011 [OBSOLETE] atmp.name = atomic_basis_[i].name;
         //DX20191011 [OBSOLETE] atmp.type = atomic_basis_[i].type;
-        //DX20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-        //DX20191011 [OBSOLETE] atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
         if(SYM::MapAtom(atomic_basis_, atmp, TRUE, lattice_basis_xmat, f2c, skew, (*this).sym_eps)) { //DX20190215 - _SYM_TOL_ to (*this).sym_eps //DX20190619 - lattice_basis_xmat and f2c as input
           count += 1;
         }
@@ -1027,8 +1027,8 @@ uint xstructure::GetPrimitiveCell(void) {
       xmatrix<double> PL_inv = aurostd::inverse(prim_lattice);
       double same_atom_tol = (*this).dist_nn_min - 0.1;  //min_dist itself will consider nn atom to be the same, needs to be slightly smaller.`
       //Now get atoms inside of new, reduced basis:
-      //[CO20190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); // CO20180409
-      newbasis = foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); // CO20180409 //DX20190619 - false->do not check min dists (expensive)
+      //[CO20190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); //CO20180409
+      newbasis = foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); //CO20180409 //DX20190619 - false->do not check min dists (expensive)
       //DEBUG
       //cerr << "newbasis.size(): " << newbasis.size() << endl;
       //for(uint n=0;n<newbasis.size();n++){
@@ -1074,15 +1074,15 @@ uint xstructure::GetPrimitiveCell(void) {
       //DX20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
       //DX20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
       //DX20191011 [OBSOLETE] tmp_atom.name_is_given = true;
-      //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; // DX20170921 - magnetic sym
-      tmp_atom.spin_is_given = false; // DX20170921 - magnetic sym
+      //DX20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; //DX20170921 - magnetic sym
+      tmp_atom.spin_is_given = false; //DX20170921 - magnetic sym
       if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
-        tmp_atom.spin_is_given = true; // DX20170921 - magnetic sym
+        tmp_atom.spin_is_given = true; //DX20170921 - magnetic sym
       }
-      tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-      tmp_atom.noncoll_spin_is_given = false; // DX20171205 - magnetic sym (non-collinear)
+      tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+      tmp_atom.noncoll_spin_is_given = false; //DX20171205 - magnetic sym (non-collinear)
       if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
-        tmp_atom.noncoll_spin_is_given = true; // DX20171205 - magnetic sym (non-collinear) //DX20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
+        tmp_atom.noncoll_spin_is_given = true; //DX20171205 - magnetic sym (non-collinear) //DX20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
       }
       (*this).AddAtom(tmp_atom);
     }
@@ -1163,10 +1163,10 @@ namespace SYM {
         tmp.cpos = expanded_lattice_points[i] + F2C(L, xstr.atoms[j].fpos);
         //DX20191011 [OBSOLETE] tmp.name = xstr.atoms[j].name;
         //DX20191011 [OBSOLETE] tmp.type = xstr.atoms[j].type;
-        //DX20191011 [OBSOLETE] tmp.spin = xstr.atoms[j].spin; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin = xstr.atoms[j].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = xstr.atoms[j].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.spin = xstr.atoms[j].spin; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = xstr.atoms[j].spin_is_given; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin = xstr.atoms[j].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = xstr.atoms[j].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
         out.push_back(tmp);
       }
     }
@@ -1293,9 +1293,9 @@ namespace SYM {
     double radius = 2.0 * RadiusSphereLattice(L);
 
     // ========== Determine symmetry operations consistent with the lattice ==========//
-    // DX20170926 [OBSOLETE] mirror_ops_vec = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew);
-    // DX20170926 [OBSOLETE] rot_ops_vec = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew);
-    // DX20170926 [OBSOLETE] twofold_ops_vec = twofold_operations(expanded_lattice_1, expanded_cell_1, L, Linv, twofold_lattice_vectors, radius, skew);
+    //DX20170926 [OBSOLETE] mirror_ops_vec = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew);
+    //DX20170926 [OBSOLETE] rot_ops_vec = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew);
+    //DX20170926 [OBSOLETE] twofold_ops_vec = twofold_operations(expanded_lattice_1, expanded_cell_1, L, Linv, twofold_lattice_vectors, radius, skew);
     mirror_ops_vec = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew, sym_tol); //DX20190215 - added sym_tol
     for(uint m=0;m<mirror_ops_vec.size();m++){
       Screw candidate_rotation;
@@ -1777,9 +1777,9 @@ namespace SYM {
           twofold_lattice_vectors.clear();
 
           double radius = RadiusSphereLattice(L);
-          // DX20170926 [OBSOLETE] vector<Glide> mirror_ops_vec_new = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew);
-          // DX20170926 [OBSOLETE] vector<Screw> rot_ops_vec_new = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew);
-          // DX20170926 [OBSOLETE] vector<Screw> twofold_ops_vec_new = twofold_operations(expanded_lattice_1, expanded_cell_1, L, Linv, twofold_lattice_vectors, radius, skew);
+          //DX20170926 [OBSOLETE] vector<Glide> mirror_ops_vec_new = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew);
+          //DX20170926 [OBSOLETE] vector<Screw> rot_ops_vec_new = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew);
+          //DX20170926 [OBSOLETE] vector<Screw> twofold_ops_vec_new = twofold_operations(expanded_lattice_1, expanded_cell_1, L, Linv, twofold_lattice_vectors, radius, skew);
           vector<Glide> mirror_ops_vec_new = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew, sym_tol); //DX20190215 - added sym_tol
           vector<Screw> twofold_ops_vec_new;
           for(uint m=0;m<mirror_ops_vec_new.size();m++){
@@ -2244,9 +2244,9 @@ namespace SYM {
     xvector<double> tranvec_g;
 
     for (uint h = 0; h < possible_h_lats.size(); h++) {
-      vector<xvector<double> > possible_efg_vectors; // DX20180110 - scoping issue; place here, not outside for loop
-      vector<vector<int> > index;  // DX20180110 - scoping issue; place here, not outside for loop
-      vector<double> total_mod;  // DX20180110 - scoping issue; place here, not outside for loop
+      vector<xvector<double> > possible_efg_vectors; //DX20180110 - scoping issue; place here, not outside for loop
+      vector<vector<int> > index;  //DX20180110 - scoping issue; place here, not outside for loop
+      vector<double> total_mod;  //DX20180110 - scoping issue; place here, not outside for loop
       if(LDEBUG) {
         cerr << "SYM::findMonoclinicLattice: Testing choice " << h+1  << ": " << possible_h_lats[h] << endl; 
       }
@@ -2369,9 +2369,9 @@ namespace SYM {
         total_mod.clear();
         continue;
       }
-      // DX20171211 - Consider all possible unique axis choices - else {
-      // DX20171211 - Consider all possible unique axis choices -   break;
-      // DX20171211 - Consider all possible unique axis choices - }
+      //DX20171211 - Consider all possible unique axis choices - else {
+      //DX20171211 - Consider all possible unique axis choices -   break;
+      //DX20171211 - Consider all possible unique axis choices - }
 
       int e = index[smallest_gt_min_index(0, -1, -1, total_mod)][0];
       tranvec_e = possible_efg_vectors[e];
@@ -2481,7 +2481,7 @@ namespace SYM {
         candidate_lattice_vectors.push_back(CL);
         candidate_lattice_chars.push_back('m'); //unique axis c; use 'm' since 'c' is reserved for cubic
       }
-    } // DX20171211 - Consider all possible unique axis choices 
+    } //DX20171211 - Consider all possible unique axis choices 
     return true;
   }
 } //namespace SYM
@@ -3272,11 +3272,11 @@ namespace SYM {
 // AFLOW2SG:: Prints space group in string format (Void Input)
 // ********************************************************************************************************************************
 string xstructure::aflow2sg(void) {
-  // DX20170509 - [OBSOLETE] int change_sym_count = 1;
+  //DX20170509 - [OBSOLETE] int change_sym_count = 1;
   double use_tol = SYM::defaultTolerance((*this));
-  // DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
+  //DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
   bool no_scan = false;
-  // DX20170509 - [OBSOLETE] uint sgroup = (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
+  //DX20170509 - [OBSOLETE] uint sgroup = (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
   uint sgroup = (*this).SpaceGroup_ITC(use_tol, -1, 0, no_scan); //DX20180806 - added setting; 0 means default
   return GetSpaceGroupName(sgroup,(*this).directory) + " #" + aurostd::utype2string(sgroup); //DX20180526 - add directory
 }
@@ -3285,10 +3285,10 @@ string xstructure::aflow2sg(void) {
 // AFLOW2SG:: Prints space group in string format (Tolerance Input)
 // ********************************************************************************************************************************
 string xstructure::aflow2sg(double& use_tol) {
-  // DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
-  // DX20170509 - [OBSOLETE] int change_sym_count = 1;
+  //DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
+  //DX20170509 - [OBSOLETE] int change_sym_count = 1;
   bool no_scan = false;
-  // DX20170509 - [OBSOLETE] uint sgroup = (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
+  //DX20170509 - [OBSOLETE] uint sgroup = (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
   uint sgroup = (*this).SpaceGroup_ITC(use_tol, -1, 0, no_scan); //DX20180806 - added setting; 0 means default
   return GetSpaceGroupName(sgroup,(*this).directory) + " #" + aurostd::utype2string(sgroup); //DX20180526 - add directory
 }
@@ -3297,10 +3297,10 @@ string xstructure::aflow2sg(double& use_tol) {
 // AFLOW2SG:: Prints space group in string format (Tolerance Input and Manual Input)
 // ********************************************************************************************************************************
 string xstructure::aflow2sg(double& use_tol, const int& manual_it) {
-  // DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
-  // DX20170509 - [OBSOLETE] int change_sym_count = 1;
+  //DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
+  //DX20170509 - [OBSOLETE] int change_sym_count = 1;
   bool no_scan = false;
-  // DX20170509 - [OBSOLETE] uint sgroup = (*this).SpaceGroup_ITC(use_tol, orig_tolerance, manual_it, change_sym_count, no_scan);
+  //DX20170509 - [OBSOLETE] uint sgroup = (*this).SpaceGroup_ITC(use_tol, orig_tolerance, manual_it, change_sym_count, no_scan);
   uint sgroup = (*this).SpaceGroup_ITC(use_tol, manual_it, 0, no_scan); //DX20180806 - added setting; 0 means default
   return GetSpaceGroupName(sgroup,(*this).directory) + " #" + aurostd::utype2string(sgroup); //DX20180526 - add directory
 }
@@ -3310,10 +3310,10 @@ string xstructure::aflow2sg(double& use_tol, const int& manual_it) {
 // ********************************************************************************************************************************
 uint xstructure::SpaceGroup_ITC(void) {
   double use_tol = SYM::defaultTolerance((*this));
-  // DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
-  // DX20170509 - [OBSOLETE] int change_sym_count = 1;
+  //DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
+  //DX20170509 - [OBSOLETE] int change_sym_count = 1;
   bool no_scan = false;
-  // DX20170509 - [OBSOLETE] return (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
+  //DX20170509 - [OBSOLETE] return (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
   return (*this).SpaceGroup_ITC(use_tol, -1, 0, no_scan); //DX20180806 - added setting; 0 means default
 }
 
@@ -3321,10 +3321,10 @@ uint xstructure::SpaceGroup_ITC(void) {
 // FUNCTION OVERLOADING: Tolerance Input
 // ********************************************************************************************************************************
 uint xstructure::SpaceGroup_ITC(double& use_tol) {
-  // DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
-  // DX20170509 - [OBSOLETE] int change_sym_count = 1;
+  //DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
+  //DX20170509 - [OBSOLETE] int change_sym_count = 1;
   bool no_scan = false;
-  // DX20170509 - [OBSOLETE] return (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
+  //DX20170509 - [OBSOLETE] return (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
   return (*this).SpaceGroup_ITC(use_tol, -1, 0, no_scan); //DX20180806 - added setting; 0 means default
 }
 
@@ -3332,9 +3332,9 @@ uint xstructure::SpaceGroup_ITC(double& use_tol) {
 // FUNCTION OVERLOADING: Tolerance Input
 // ********************************************************************************************************************************
 uint xstructure::SpaceGroup_ITC(double& use_tol, bool& no_scan) {
-  // DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
-  // DX20170509 - [OBSOLETE] int change_sym_count = 1;
-  // DX20170509 - [OBSOLETE] return (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
+  //DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
+  //DX20170509 - [OBSOLETE] int change_sym_count = 1;
+  //DX20170509 - [OBSOLETE] return (*this).SpaceGroup_ITC(use_tol, orig_tolerance, -1, change_sym_count, no_scan);
   return (*this).SpaceGroup_ITC(use_tol, -1, 0, no_scan); //DX20180806 - added setting; 0 means default
 }
 
@@ -3342,10 +3342,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, bool& no_scan) {
 //// FUNCTION OVERLOADING: Tolerance Input
 //// ********************************************************************************************************************************
 //uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it) {
-//  // DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
-//  // DX20170509 - [OBSOLETE] int change_sym_count = 1;
+//  //DX20170509 - [OBSOLETE] double orig_tolerance = use_tol;
+//  //DX20170509 - [OBSOLETE] int change_sym_count = 1;
 //  bool no_scan = false;
-//  // DX20170509 - [OBSOLETE] return (*this).SpaceGroup_ITC(use_tol, orig_tolerance, manual_it, change_sym_count, no_scan);
+//  //DX20170509 - [OBSOLETE] return (*this).SpaceGroup_ITC(use_tol, orig_tolerance, manual_it, change_sym_count, no_scan);
 //  return (*this).SpaceGroup_ITC(use_tol, manual_it, 0, no_scan); //DX20180806 - added setting; 0 means default
 //}
 
@@ -3367,7 +3367,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& setting) {
 // ********************************************************************************************************************************
 // MAIN FUNCTION:: Space group consistent with the International Tables of Crystallography
 // ********************************************************************************************************************************
-// DX20170509 - [OBSOLETE] uint xstructure::SpaceGroup_ITC(double& use_tol, double& orig_tolerance, const int& manual_it, int& change_sym_count, bool& no_scan)
+//DX20170509 - [OBSOLETE] uint xstructure::SpaceGroup_ITC(double& use_tol, double& orig_tolerance, const int& manual_it, int& change_sym_count, bool& no_scan)
 uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int& setting, bool& no_scan) //DX20180806 - added setting
 { //CO200106 - patching for auto-indenting
   if(use_tol < _ZERO_TOL_) {
@@ -3390,7 +3390,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   ITC_sym_info.initsymmats(); //DX20190215
   ITC_sym_info.initglides(); //DX20190215
   ITC_sym_info.initsymops(); //DX20190215
-  // DX20190215 [OBSOLETE] SYM::SetTolerance(use_tol);
+  //DX20190215 [OBSOLETE] SYM::SetTolerance(use_tol);
   (*this).sym_eps = use_tol; //DX20190215 - replace SYM::SetTolerance() 
   bool LDEBUG = (FALSE || XHOST.DEBUG);
 
@@ -3510,8 +3510,8 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
 
   string crystalsystem_prev = "";  //Correct conventional cell
 
-  double sym_eps = xstr.sym_eps; // DX20190314 - added sym eps temp variable
-  uint sym_eps_change_count = 0; // DX20180226 - added sym eps change count
+  double sym_eps = xstr.sym_eps; //DX20190314 - added sym eps temp variable
+  uint sym_eps_change_count = 0; //DX20180226 - added sym eps change count
 
   //********************************************************************************************************************************************
   // Space Group Loop
@@ -3525,11 +3525,11 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     ///// PUT IN STANDARD PRIMITIVE FORM /////
     // ========== Make the xstructure in primitive form if this is the first iteration, or the tolerance has been changed ========== //
     if(first_run_or_new_tol == true) {
-      sym_eps = xstr.sym_eps; // DX20180226 - added sym eps temp variable
-      sym_eps_change_count = xstr.sym_eps_change_count; // DX20180226 - added sym eps change count
+      sym_eps = xstr.sym_eps; //DX20180226 - added sym eps temp variable
+      sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
       xstr = xstr_orig;
-      xstr.sym_eps = sym_eps; // DX20190314 - need to update sym_eps, since the structure was overwritten 
-      xstr.sym_eps_change_count = sym_eps_change_count; // DX20180423 - need to update change count, since the structure was overwritten 
+      xstr.sym_eps = sym_eps; //DX20190314 - need to update sym_eps, since the structure was overwritten 
+      xstr.sym_eps_change_count = sym_eps_change_count; //DX20180423 - need to update change count, since the structure was overwritten 
       CCell.free();
       xstr.MinkowskiBasisReduction();
       xstr.GetPrimitiveCell();
@@ -3550,7 +3550,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       crystal_sym_mats.clear();
       if(!no_scan){
         SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
-        sym_eps_change_count = xstr.sym_eps_change_count; // DX20180226 - added sym eps change count
+        sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
       }
       else {
         return 0;
@@ -3591,7 +3591,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
         crystal_sym_mats.clear();
         if(!no_scan){
           SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
-          sym_eps_change_count = xstr.sym_eps_change_count; // DX20180226 - added sym eps change count
+          sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
         }
         else {
           return 0;
@@ -3615,7 +3615,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
         crystal_sym_mats.clear();
         if(!no_scan){
           SYM::change_tolerance(xstr,xstr.sym_eps, min_dist, no_scan); //DX20190215 - _SYM_TOL_ to xstr.sym_eps
-          sym_eps_change_count = xstr.sym_eps_change_count; // DX20180226 - added sym eps change count
+          sym_eps_change_count = xstr.sym_eps_change_count; //DX20180226 - added sym eps change count
         }
         else {
           return 0;
@@ -3986,7 +3986,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
               spacegroupstring = ITC_sym_info.gl_sgs[spacegroup - 1];
               wyckoffmult = SYM::get_multiplicities(spacegroupstring);
               //print(wyckoffmult);
-              general_wyckoff_position = SYM::findGeneralWyckoffPosition(spacegroupstring, wyckoffmult[1]); // DX20170831
+              general_wyckoff_position = SYM::findGeneralWyckoffPosition(spacegroupstring, wyckoffmult[1]); //DX20170831
               wyckoffsymbols = SYM::get_symmetry_symbols(spacegroupstring);
               //cerr << "WYCKOFFSYMBOLS: " << endl;
               //print(wyckoffsymbols);
@@ -4170,7 +4170,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     use_tol = CCell.sym_eps; //DX20190215 - _SYM_TOL to CCell.sym_eps
   }
   (*this).sym_eps = CCell.sym_eps; //DX20190215 - _SYM_TOL to CCell.sym_eps, redundant, but safe
-  (*this).sym_eps_change_count = sym_eps_change_count; // DX20180226 - added sym eps change count
+  (*this).sym_eps_change_count = sym_eps_change_count; //DX20180226 - added sym eps change count
 
   // ***********************************************************************************************************************************
   // Prepare/Create Wyccar
@@ -4264,9 +4264,9 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   (*this).standard_lattice_ITC = CCell.lattice;
   (*this).wyckoff_sites_ITC = wyckoffVariables;
   (*this).wyckoff_symbols_ITC = wyckoffSymbols;
-  (*this).setting_ITC = setting_choice; // DX20170830 - SGDATA
-  (*this).origin_ITC = OriginShift; // DX20170830 - SGDATA
-  (*this).general_position_ITC = general_wyckoff_position; // DX20170830 - SGDATA
+  (*this).setting_ITC = setting_choice; //DX20170830 - SGDATA
+  (*this).origin_ITC = OriginShift; //DX20170830 - SGDATA
+  (*this).general_position_ITC = general_wyckoff_position; //DX20170830 - SGDATA
   //cerr << "TOLERANCE USED: " << (*this).sym_eps << endl; //DX20190215 - _SYM_TOL to (*this).sym_eps
   return (uint)spacegroup;
 }
@@ -4364,7 +4364,7 @@ namespace SYM {
 // ***************************************************************************
 // Plot lattice
 // ***************************************************************************
-// DX20161222 - Is this function needed?  If so, need to switch over to xstructure
+//DX20161222 - Is this function needed?  If so, need to switch over to xstructure
 //string plot_lattice(vector<string> files){
 //
 //  int a = atoi(files[2].c_str());

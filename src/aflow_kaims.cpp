@@ -221,8 +221,8 @@ namespace KBIN{
     // ***************************************************************************
     // Some verbose
     if(kflags.KBIN_PHONONS_CALCULATION_APL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_APL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-    if(kflags.KBIN_PHONONS_CALCULATION_QHA) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_QHA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;   // CO20170601
-    if(kflags.KBIN_PHONONS_CALCULATION_AAPL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AAPL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // CO20170601
+    if(kflags.KBIN_PHONONS_CALCULATION_QHA) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_QHA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;   //CO20170601
+    if(kflags.KBIN_PHONONS_CALCULATION_AAPL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AAPL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //CO20170601
     if(kflags.KBIN_PHONONS_CALCULATION_AGL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AGL (Debye Model)" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     if(kflags.KBIN_PHONONS_CALCULATION_AEL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AEL (Elastic constants)" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_FROZSL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -338,8 +338,8 @@ namespace KBIN{
         // DX
         if(!(kflags.KBIN_PHONONS_CALCULATION_FROZSL || 
               kflags.KBIN_PHONONS_CALCULATION_APL ||
-              kflags.KBIN_PHONONS_CALCULATION_QHA||     // CO20170601
-              kflags.KBIN_PHONONS_CALCULATION_AAPL) ||  // CO20170601
+              kflags.KBIN_PHONONS_CALCULATION_QHA||     //CO20170601
+              kflags.KBIN_PHONONS_CALCULATION_AAPL) ||  //CO20170601
             aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN ) {  // CO, do internally
           // DX
           if(Krun) Krun=KBIN_StepSymmetryPerform(xaims.str,AflowIn,FileMESSAGE,aflags,kflags,TRUE,cout); // DO THE SYMMETRY CALCULATION
@@ -410,9 +410,9 @@ namespace KBIN{
               KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
             // ***************************************************************************
             // PHONONIC PHONONIC PHONONIC
-            if(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL) { // CO20170601
+            if(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL) { //CO20170601
               _xinput xinput(xaims);
-              readModulesFromAflowIn(AflowIn, kflags, xinput);  // ME20181027
+              readModulesFromAflowIn(AflowIn, kflags, xinput);  //ME20181027
               _xflags xflags(aimsflags);
               KBIN::RunPhonons_APL(xinput,AflowIn,aflags,kflags,xflags,FileMESSAGE);  //now it's general
               //KBIN::RunPhonons_APL(xaims,AflowIn,aflags,kflags,aimsflags,FileMESSAGE);

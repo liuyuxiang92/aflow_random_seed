@@ -68,9 +68,9 @@ namespace AFLOW_PTHREADS {
     bool fnpmax=aurostd::args2flag(argv,"--npmax");
     bool multi_sh=aurostd::args2flag(argv,"--multi=sh|--multi=sh");
     if(!fnp && !fnpmax) {AFLOW_PTHREADS::MAX_PTHREADS=1;}
-    if(fnp && !fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);}; // SC20200319
+    if(fnp && !fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);}; //SC20200319
     if(!fnp && fnpmax)  {AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();}
-    if(fnp && fnpmax)   {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);}; // SC20200319
+    if(fnp && fnpmax)   {AFLOW_PTHREADS::MAX_PTHREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));} // aurostd::args2attachedutype<int>(argv,"--np=",0);}; //SC20200319
     if(multi_sh && !fnp && !fnpmax) {AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();}
 
     if(AFLOW_PTHREADS::MAX_PTHREADS>1) {
@@ -565,7 +565,7 @@ namespace AFLOW_PTHREADS {
     // cerr << numzips << endl; exit(0);
     // cerr << sysconf(_SC_ARG_MAX)  << endl;//exit(0);
     for(i=0;i<(uint) numzips;i++) {
-      command="zip -0rmv "+prefix+"_"+aurostd::utype2string(i+ishift)+"_of_"+aurostd::utype2string(numzips)+".zip"; // SC20200303
+      command="zip -0rmv "+prefix+"_"+aurostd::utype2string(i+ishift)+"_of_"+aurostd::utype2string(numzips)+".zip"; //SC20200303
       // command="zip -9rv "+prefix+"_"+aurostd::utype2string(i+ishift)+".zip";
       for(uint j=0;j<(uint) size;j++) {
 	if(i*size+j < vdirs.size()) {

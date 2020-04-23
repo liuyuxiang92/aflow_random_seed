@@ -989,7 +989,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // load compatible aflow prototypes
 
-    // DX20190830 - to avoid multiple threads being spun-up (here and in aflow_xproto.cpp), turn of aflow_pthreads
+    //DX20190830 - to avoid multiple threads being spun-up (here and in aflow_xproto.cpp), turn of aflow_pthreads
     uint uint_backup=AFLOW_PTHREADS::MAX_PTHREADS;
     AFLOW_PTHREADS::MAX_PTHREADS=1;
 
@@ -1023,11 +1023,11 @@ namespace pflow {
     message << "Comparisons complete ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
 
-    AFLOW_PTHREADS::MAX_PTHREADS = uint_backup; // DX20190830 - set back to original setting
+    AFLOW_PTHREADS::MAX_PTHREADS = uint_backup; //DX20190830 - set back to original setting
 
     // ---------------------------------------------------------------------------
     // return if there are no similar structures
-    if(final_prototypes.size()==0){ return final_prototypes; } // DX20190314 originally : return oss.str()
+    if(final_prototypes.size()==0){ return final_prototypes; } //DX20190314 originally : return oss.str()
 
     comparison_schemes.clear();
 
@@ -1612,7 +1612,7 @@ namespace pflow {
 // pflow::compareDatabaseEntries - compares database entries
 // ***************************************************************************
 namespace pflow {
-  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream){ // DX20191125 - added ofstream overload and added ostream as input
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream){ //DX20191125 - added ofstream overload and added ostream as input
     ofstream FileMESSAGE;
     return compareDatabaseEntries(vpflow, FileMESSAGE, logstream);
   }

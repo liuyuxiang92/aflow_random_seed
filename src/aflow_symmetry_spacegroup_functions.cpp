@@ -357,7 +357,7 @@ namespace SYM {
 // ******************************************************************************
 // Update atom positions after screw operation
 namespace SYM {
-  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice) { // DX20190905 - return to void 
+  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice) { //DX20190905 - return to void 
     for (uint a = 0; a < atoms.size(); a++) {
       atoms[a].cpos = S * atoms[a].cpos;
       //DX20190905 [OBSOLETE-no more mod_one_xvec] atoms[a].fpos = SYM::mod_one_xvec(C2F(lattice, atoms[a].cpos));
@@ -1892,8 +1892,8 @@ namespace SYM {
         xb();  
       }
     }
-    for (uint s = 0; s < same_site_symmetry_positions.size(); s++) {  // DX20170911 - Check all shifts not just minimum (minimum may not work) 
-      for (uint t = 0; t < same_site_symmetry_positions[s].size(); t++) {  // DX20170911 - Check all shifts not just minimum (minimum may not work)
+    for (uint s = 0; s < same_site_symmetry_positions.size(); s++) {  //DX20170911 - Check all shifts not just minimum (minimum may not work) 
+      for (uint t = 0; t < same_site_symmetry_positions[s].size(); t++) {  //DX20170911 - Check all shifts not just minimum (minimum may not work)
         xvector<double> candidate_shift = SYM::Wyckoff_position_string2xvector(same_site_symmetry_positions[s][t]); 
         bool stored_shift=false; 
         for(uint p=0;p<possible_shifts.size();p++){
@@ -1905,7 +1905,7 @@ namespace SYM {
         if(!stored_shift){
           //DX20190905 [OBSOLETE-no more mod_one_xvec] possible_shifts.push_back(SYM::mod_one_xvec(candidate_shift));
           possible_shifts.push_back(BringInCell(candidate_shift)); //DX20190905
-          // DX20180228 - Consider difference of two shifts - START
+          //DX20180228 - Consider difference of two shifts - START
           bool stored_other_shift =false;
           for(uint p=0;p<possible_shifts.size();p++){
             for(uint q=0;q<possible_shifts.size();q++){
@@ -1921,7 +1921,7 @@ namespace SYM {
               possible_shifts.push_back(BringInCell(candidate_shift-possible_shifts[p])); //DX20190905
             }
           }
-          // DX20180228 - Consider difference of two shifts - END
+          //DX20180228 - Consider difference of two shifts - END
         }
       }
     }
@@ -1962,7 +1962,7 @@ namespace SYM {
 } //namespace SYM
 
 // ******************************************************************************
-// get_wyckoff_equations (Obtain Wyckoff Equationss from ITC) // DX20170831
+// get_wyckoff_equations (Obtain Wyckoff Equationss from ITC) //DX20170831
 // ******************************************************************************
 //Function to get wyckoff data in individual lines (vector<string>). The string input is the space group data contained in the wyckoff library. Mult specifies the degeneracy of interest. For example, if you are looking for all wyckoff data with multiplicity 2 in a certain space group.
 namespace SYM {
@@ -2370,9 +2370,9 @@ namespace SYM {
     }
     vector<string> singlets;
     vector<vector<string> > tuplets;
-    //vector<vector<vector<string> > > wyckoff_positions; // DX20170831
-    vector<vector<vector<string> > > wyckoff_set; // DX20170831
-    vector<vector<vector<vector<string> > > > all_wyckoff_sets; // DX20170831
+    //vector<vector<vector<string> > > wyckoff_positions; //DX20170831
+    vector<vector<vector<string> > > wyckoff_set; //DX20170831
+    vector<vector<vector<vector<string> > > > all_wyckoff_sets; //DX20170831
 
     uint start = 0; //DX20180514 - added initialization
 
@@ -2404,12 +2404,12 @@ namespace SYM {
         }
         if(sg_lines[l][i] == ')') {
           temp1.str("");
-          wyckoff_set.push_back(tuplets); // DX20170831 - wyckoff_positions to wyckoff_set
+          wyckoff_set.push_back(tuplets); //DX20170831 - wyckoff_positions to wyckoff_set
           tuplets.clear();
         }
       }
-      all_wyckoff_sets.push_back(wyckoff_set); // DX20170831
-      wyckoff_set.clear(); // DX20170831
+      all_wyckoff_sets.push_back(wyckoff_set); //DX20170831
+      wyckoff_set.clear(); //DX20170831
     }
 
     //DISPLAY CENTRING
@@ -2432,7 +2432,7 @@ namespace SYM {
     int reg = 0;   //Counter for tuplets
     int breg = 0;  //Counter for multiplicity blocks
 
-    // DX20170831 - Altered scheme to store unshifted positions first, then the shifted positions -START
+    //DX20170831 - Altered scheme to store unshifted positions first, then the shifted positions -START
     for (uint w = 0; w < all_wyckoff_sets.size(); w++){
       for (uint ii = 0; ii < get_centering(spaceg).size(); ii++) {
         for (uint k = 0; k < all_wyckoff_sets[w].size(); k++) {
@@ -2462,7 +2462,7 @@ namespace SYM {
         }
       }
     }
-    // DX20170831 - Altered scheme to store unshifted positions first, then the shifted positions -END
+    //DX20170831 - Altered scheme to store unshifted positions first, then the shifted positions -END
     //cerr << "outvec.size(): " << outvec.size() << endl;
     //for (uint l=0;l<outvec.size(); l++){
     //	cerr << "outvec[l].size(): " << outvec[l].size() << endl;
@@ -2629,7 +2629,7 @@ namespace SYM {
 } //namespace SYM
 
 // ******************************************************************************
-// retunrGeneralWyckoffPosition // DX20170831
+// retunrGeneralWyckoffPosition //DX20170831
 // ******************************************************************************
 namespace SYM {
   void getGeneralWyckoffMultiplicityAndPosition(uint space_group_number, string& space_group_setting, int& general_wyckoff_multiplicity, vector<string>& general_wyckoff_position){
@@ -2650,7 +2650,7 @@ namespace SYM {
 }
 
 // ******************************************************************************
-// findGeneralWyckoffPosition // DX20170831
+// findGeneralWyckoffPosition //DX20170831
 // ******************************************************************************
 namespace SYM {
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity){
@@ -2718,7 +2718,7 @@ namespace SYM {
 } //namespace SYM
 //DX20190128 -END
 
-// DX20190723 - START
+//DX20190723 - START
 // ******************************************************************************
 // formatWyckoffPosition
 // ******************************************************************************
@@ -2729,7 +2729,7 @@ namespace SYM {
     // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
     // convert doubles to fractions, if possible (e.g., 0.5 -> 1/2)
     // this function will be circumvented when symbolic math is integrated
-    // DX20190723
+    //DX20190723
 
     string soliloquy = "SYM::formatWyckoffPosition()";
 
@@ -2801,7 +2801,7 @@ namespace SYM {
   }
 }
 
-// DX20190708 - START
+//DX20190708 - START
 // ******************************************************************************
 // reorderWyckoffPosition
 // ******************************************************************************
@@ -2813,7 +2813,7 @@ namespace SYM {
     // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
     // convert doubles to fractions, if possible (e.g., 0.5 -> 1/2)
     // this function will be circumvented when symbolic math is integrated
-    // DX20190708
+    //DX20190708
 
     string soliloquy = "SYM::reorderWyckoffPosition()";
     stringstream message;
@@ -2843,7 +2843,7 @@ namespace SYM {
     return reordered_position;
   }
 }
-// DX20190708 - END
+//DX20190708 - END
 
 // ******************************************************************************
 // shiftWyckoffPositions 
@@ -3091,7 +3091,7 @@ namespace SYM {
                   //cerr << endl;
                   first_wyckoff = false;
                   // ========== Store Wyckoff Position ========== //
-                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX20171211 - need to updated coord to include non-parametrized Wyckoff positions
+                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; //DX20171211 - need to updated coord to include non-parametrized Wyckoff positions
                   tmp_Wyckoff_site.type = tmp_equivalent_atoms_shifted[ix].name;
                   //DX20191010 - update partial occupation value - START
                   if(CCell.partial_occupation_flag){
@@ -3225,7 +3225,7 @@ namespace SYM {
           atomicbasis = atoms_tmp;
           CCell.atoms = atoms_tmp;
           i = -1;
-          found_position=0; // DX20170911
+          found_position=0; //DX20170911
         } 
         else {
           break;
@@ -4448,7 +4448,7 @@ namespace SYM {
 // Fold atoms into cell
 // ******************************************************************************
 // Folds atoms into the cell
-// CO20180409 - moved to xatom
+//CO20180409 - moved to xatom
 //[CO20180409 - moved to xatom]namespace SYM {
 //[CO20180409 - moved to xatom]  deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew) {
 //[CO20180409 - moved to xatom]    double tol = _SYM_TOL_;
@@ -4567,10 +4567,10 @@ namespace SYM {
         tmp.cpos = f2c * tmp.fpos;
         //DX20191011 [OBSOLETE] tmp.name = atoms[k].name;
         //DX20191011 [OBSOLETE] tmp.type = atoms[k].type;
-        //DX20191011 [OBSOLETE] tmp.spin = atoms[k].spin; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = atoms[k].spin_is_given; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin = atoms[k].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.spin = atoms[k].spin; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = atoms[k].spin_is_given; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin = atoms[k].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
         bool contained = false;
         for (uint j = 0; j < equivalent_atoms.size(); j++) {
           if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, lattice, f2c, skew, tol)) { //DX20190215 //DX20190619 - lattice and f2c as input
@@ -4625,10 +4625,10 @@ namespace SYM {
         tmp.cpos = f2c * tmp.fpos;
         //DX20191011 [OBSOLETE] tmp.name = equivalent_atoms[i][j].name;
         //DX20191011 [OBSOLETE] tmp.type = equivalent_atoms[i][j].type;
-        //DX20191011 [OBSOLETE] tmp.spin = equivalent_atoms[i][j].spin; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin = equivalent_atoms[i][j].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = equivalent_atoms[i][j].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.spin = equivalent_atoms[i][j].spin; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin = equivalent_atoms[i][j].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = equivalent_atoms[i][j].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
         if(one_shifted_group.size() == 0) {
           one_shifted_group.push_back(tmp);
         } else {

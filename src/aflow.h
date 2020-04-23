@@ -57,7 +57,7 @@ enum vector_reduction_type {   //CO20190629
 //[CO20190629 - obsolete with enum vector_reduction_type]#define _frac_          'f'  //fractional
 //[CO20190629 - obsolete with enum vector_reduction_type]#define _gcd_           'g'  //gcd
 //[CO20190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
-// ME20190628 END
+//ME20190628 END
 
 //compound specification is how a compound is specified
 //composition (Mn2Pt3) is ORTHOGONAL to pseudopotential string (Mn_pvPt)
@@ -97,8 +97,8 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 //Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg - not in order!
 #define SPECIE_RAW_LIB4 SPECIE_TRANSITION_METALS
 
-// CO20180729 - OBSOLETE - use xerror
-//[OBSOLETE]// CO20180419 - global exception handling - START
+//CO20180729 - OBSOLETE - use xerror
+//[OBSOLETE]//CO20180419 - global exception handling - START
 //[OBSOLETE]class AFLOWRuntimeError : public std::runtime_error {
 //[OBSOLETE]  public:
 //[OBSOLETE]    AFLOWRuntimeError(const std::string& function,const std::string& message);
@@ -117,7 +117,7 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 //[OBSOLETE]  private:
 //[OBSOLETE]    string f_name;  //cannot be const &, as it goes out of scope //const string& f_name;
 //[OBSOLETE]};
-//[OBSOLETE]// CO20180419 - global exception handling - STOP
+//[OBSOLETE]//CO20180419 - global exception handling - STOP
 
 // --------------------------------------------------------------------------
 // definitions for MULTHREADS
@@ -225,19 +225,19 @@ extern uint LIBRARY_AUID,LIBRARY_ICSD,LIBRARY_LIB0,LIBRARY_LIB1,LIBRARY_LIB2,LIB
 // [OBSOLETE] #define DEFAULT_AFLOW_PGROUP_OUT               string("aflow.pgroup.out") // moved to aflow_aflowrc.cpp in V3.1.189 
 // [OBSOLETE] #define DEFAULT_AFLOW_PGROUP_XTAL_OUT          string("aflow.pgroup_xtal.out") // moved to aflow_aflowrc.cpp in V3.1.189 
 // [OBSOLETE] #define DEFAULT_AFLOW_PGROUPK_OUT              string("aflow.pgroupk.out") // moved to aflow_aflowrc.cpp in V3.1.189 
-// [OBSOLETE] #define DEFAULT_AFLOW_PGROUPK_XTAL_OUT         string("aflow.pgroupk_xtal.out") // moved to aflow_aflowrc.cpp in V3.1.189  // DX20171205 - Added pgroupk_xtal
+// [OBSOLETE] #define DEFAULT_AFLOW_PGROUPK_XTAL_OUT         string("aflow.pgroupk_xtal.out") // moved to aflow_aflowrc.cpp in V3.1.189  //DX20171205 - Added pgroupk_xtal
 // [OBSOLETE] #define DEFAULT_AFLOW_FGROUP_OUT               string("aflow.fgroup.out") // moved to aflow_aflowrc.cpp in V3.1.189 
 // [OBSOLETE] #define DEFAULT_AFLOW_SGROUP_OUT               string("aflow.sgroup.out") // moved to aflow_aflowrc.cpp in V3.1.189 
 // [OBSOLETE] #define DEFAULT_AFLOW_AGROUP_OUT               string("aflow.agroup.out") // moved to aflow_aflowrc.cpp in V3.1.189 
 // [OBSOLETE] #define DEFAULT_AFLOW_IATOMS_OUT               string("aflow.iatoms.out") // moved to aflow_aflowrc.cpp in V3.1.189 
-// [OBSOLETE] #define DEFAULT_AFLOW_PGROUP_JSON              string("aflow.pgroup.json") // moved to aflow_aflowrc.cpp in V3.1.189       // DX20170801 - Add JSON
-// [OBSOLETE] #define DEFAULT_AFLOW_PGROUP_XTAL_JSON         string("aflow.pgroup_xtal.json") // moved to aflow_aflowrc.cpp in V3.1.189  // DX20170801 - Add JSON
-// [OBSOLETE] #define DEFAULT_AFLOW_PGROUPK_JSON             string("aflow.pgroupk.json")  // moved to aflow_aflowrc.cpp in V3.1.189     // DX20170801 - Add JSON
-// [OBSOLETE] #define DEFAULT_AFLOW_PGROUPK_XTAL_JSON        string("aflow.pgroupk_xtal.json") // moved to aflow_aflowrc.cpp in V3.1.189 // DX20170801 - Add JSON // DX20171205 - Added pgroupk_xtal
-// [OBSOLETE] #define DEFAULT_AFLOW_FGROUP_JSON              string("aflow.fgroup.json") // moved to aflow_aflowrc.cpp in V3.1.189       // DX20170801 - Add JSON
-// [OBSOLETE] #define DEFAULT_AFLOW_SGROUP_JSON              string("aflow.sgroup.json")  // moved to aflow_aflowrc.cpp in V3.1.189      // DX20170801 - Add JSON
-// [OBSOLETE] #define DEFAULT_AFLOW_AGROUP_JSON              string("aflow.agroup.json")  // moved to aflow_aflowrc.cpp in V3.1.189      // DX20170801 - Add JSON
-// [OBSOLETE] #define DEFAULT_AFLOW_IATOMS_JSON              string("aflow.iatoms.json")  // moved to aflow_aflowrc.cpp in V3.1.189      // DX20170801 - Add JSON
+// [OBSOLETE] #define DEFAULT_AFLOW_PGROUP_JSON              string("aflow.pgroup.json") // moved to aflow_aflowrc.cpp in V3.1.189       //DX20170801 - Add JSON
+// [OBSOLETE] #define DEFAULT_AFLOW_PGROUP_XTAL_JSON         string("aflow.pgroup_xtal.json") // moved to aflow_aflowrc.cpp in V3.1.189  //DX20170801 - Add JSON
+// [OBSOLETE] #define DEFAULT_AFLOW_PGROUPK_JSON             string("aflow.pgroupk.json")  // moved to aflow_aflowrc.cpp in V3.1.189     //DX20170801 - Add JSON
+// [OBSOLETE] #define DEFAULT_AFLOW_PGROUPK_XTAL_JSON        string("aflow.pgroupk_xtal.json") // moved to aflow_aflowrc.cpp in V3.1.189 //DX20170801 - Add JSON //DX20171205 - Added pgroupk_xtal
+// [OBSOLETE] #define DEFAULT_AFLOW_FGROUP_JSON              string("aflow.fgroup.json") // moved to aflow_aflowrc.cpp in V3.1.189       //DX20170801 - Add JSON
+// [OBSOLETE] #define DEFAULT_AFLOW_SGROUP_JSON              string("aflow.sgroup.json")  // moved to aflow_aflowrc.cpp in V3.1.189      //DX20170801 - Add JSON
+// [OBSOLETE] #define DEFAULT_AFLOW_AGROUP_JSON              string("aflow.agroup.json")  // moved to aflow_aflowrc.cpp in V3.1.189      //DX20170801 - Add JSON
+// [OBSOLETE] #define DEFAULT_AFLOW_IATOMS_JSON              string("aflow.iatoms.json")  // moved to aflow_aflowrc.cpp in V3.1.189      //DX20170801 - Add JSON
 // [OBSOLETE] #define DEFAULT_AFLOW_PHONON_FILE  string("aflow.phonons.out") // abandoned
 // [OBSOLETE] #define DEFAULT_AFLOW_ICAGES_OUT               string("aflow.icages.out")  // moved to aflow_aflowrc.cpp in V3.1.189 
 // [OBSOLETE] #define DEFAULT_AFLOW_SURFACE_OUT              string("aflow.surface.out") // moved to aflow_aflowrc.cpp in V3.1.189 
@@ -299,9 +299,9 @@ class _XHOST {
     ostringstream ostrPID; // aflow.cpp
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
-    bool GENERATE_AFLOWIN_ONLY; // CT20180719
-    bool POSTPROCESS; // CT20181212
-    bool PSEUDOPOTENTIAL_GENERATOR; // SC20200327
+    bool GENERATE_AFLOWIN_ONLY; //CT20180719
+    bool POSTPROCESS; //CT20181212
+    bool PSEUDOPOTENTIAL_GENERATOR; //SC20200327
     // HARDWARE/SOFTWARE
     string hostname,machine_type,tmpfs,user,group,home,shell,progname;
     string Find_Parameters;
@@ -377,8 +377,8 @@ class _XHOST {
     vector<string> vaflowrc;  
     xoption adefault;            // default  xoption
     // AFLOWSYM
-    bool SKEW_TEST; // DX20171019
-    double SKEW_TOL; // DX20171019
+    bool SKEW_TEST; //DX20171019
+    double SKEW_TOL; //DX20171019
     // WEB MODE
     bool WEB_MODE;  //CO20190401
   private:                                                //
@@ -568,7 +568,7 @@ class _aflags {
     bool AFLOW_MODE_QSUB_MODE3;                         // TODO OVVERRIDE all _AFLOWIN_
     // general flags to operate in the directory
     bool KBIN_RUN_AFLOWIN;
-    bool KBIN_GEN_GENERAL; // CO20180409
+    bool KBIN_GEN_GENERAL; //CO20180409
     bool KBIN_GEN_VASP_FROM_AFLOWIN;
     bool KBIN_GEN_AIMS_FROM_AFLOWIN;
     bool KBIN_GEN_AFLOWIN_FROM_VASP;
@@ -648,7 +648,7 @@ class _aflags {
     void copy(const _aflags& b);                        //
 };
 
-// ME20181026 - Container for APL options
+//ME20181026 - Container for APL options
 struct _moduleOptions {
   _moduleOptions() : minatoms_restricted(false) {;}  //CO20181226
   // APL
@@ -707,7 +707,7 @@ class _kflags {
     bool AFLOW_MODE_EMAIL;
     // normal binary
     string KBIN_BIN;
-    string KBIN_SERIAL_BIN; // ME20190107
+    string KBIN_SERIAL_BIN; //ME20190107
     string KZIP_BIN;
     bool   KZIP_COMPRESS;
     // MPI binaries and flags
@@ -737,19 +737,19 @@ class _kflags {
     // DX START
     bool  KBIN_SYMMETRY_NO_SCAN;
     double KBIN_SYMMETRY_EPS;
-    bool  KBIN_SYMMETRY_CALCULATE_PGROUP;       // DX20170814 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_PGROUPK;      // DX20170814 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_FGROUP;       // DX20170814 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL;  // DX20170814 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL; // DX20171205 - Specify what to calculate/verify; Added pgroupk_xtal
-    bool  KBIN_SYMMETRY_CALCULATE_IATOMS;       // DX20170814 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_AGROUP;       // DX20170814 - Specify what to calculate/verify
-    bool  KBIN_SYMMETRY_CALCULATE_SGROUP;       // DX20170814 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_PGROUP;       //DX20170814 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_PGROUPK;      //DX20170814 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_FGROUP;       //DX20170814 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL;  //DX20170814 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL; //DX20171205 - Specify what to calculate/verify; Added pgroupk_xtal
+    bool  KBIN_SYMMETRY_CALCULATE_IATOMS;       //DX20170814 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_AGROUP;       //DX20170814 - Specify what to calculate/verify
+    bool  KBIN_SYMMETRY_CALCULATE_SGROUP;       //DX20170814 - Specify what to calculate/verify
     // DX END
     bool  KBIN_SYMMETRY_PGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUPK_WRITE;     // taken TRUE by default
     bool  KBIN_SYMMETRY_PGROUP_XTAL_WRITE; // taken TRUE by default
-    bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE;// DX20171205 - Added pgroupk_xtal
+    bool  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE;//DX20171205 - Added pgroupk_xtal
     bool  KBIN_SYMMETRY_FGROUP_WRITE;      // taken TRUE by default
     bool  KBIN_SYMMETRY_SGROUP_WRITE;
     bool  KBIN_SYMMETRY_AGROUP_WRITE;      // taken TRUE by default
@@ -802,7 +802,7 @@ class _kflags {
     bool   KBIN_PHONONS_CALCULATION_FROZSL;
     string KBIN_PHONONS_CALCULATION_FROZSL_output;
     string KBIN_PHONONS_CALCULATION_FROZSL_poscars;
-    _moduleOptions KBIN_MODULE_OPTIONS;  // ME20181027
+    _moduleOptions KBIN_MODULE_OPTIONS;  //ME20181027
   private:                                             //
     void free();                                        // free space
     void copy(const _kflags& b);                        //
@@ -821,7 +821,7 @@ class _vflags {
     void clear(void);                                     // clear
     // CONTENT
     // in this struct we put all the flags which are used on LOCAL DIRECTORIES in VASP MODE
-    xoption AFLOW_SYSTEM;                         // ME20181121
+    xoption AFLOW_SYSTEM;                         //ME20181121
     int KBIN_VASP_RUN_NRELAX;
     xoption KBIN_VASP_RUN;                        // GENERATE, STATIC, KPOINTS, RELAX, RELAX_STATIC, RELAX_STATIC_BANDS, STATIC_BANDS, DIELECTRIC_STATIC, DIELECTRIC_DYNAMIC, DSCF
     xoption KBIN_VASP_REPEAT;                     // REPEAT_BANDS REPEAT_STATIC_BANDS REPEAT_DELSOL
@@ -863,7 +863,7 @@ class _vflags {
     xoption KBIN_VASP_FORCE_OPTION_SYM;           // SYM
     xoption KBIN_VASP_FORCE_OPTION_WAVECAR;       // WAVECAR
     xoption KBIN_VASP_FORCE_OPTION_CHGCAR;        // CHGCAR
-    xoption KBIN_VASP_FORCE_OPTION_CHGCAR_FILE;   // ME20191028
+    xoption KBIN_VASP_FORCE_OPTION_CHGCAR_FILE;   //ME20191028
     xoption KBIN_VASP_FORCE_OPTION_LSCOUPLING;    // LSCOUPLING
     xoption KBIN_VASP_FORCE_OPTION_LDAU0;         // LDAU0
     xoption KBIN_VASP_FORCE_OPTION_LDAU1;         // LDAU1
@@ -914,11 +914,11 @@ class _vflags {
     xoption KBIN_VASP_POTCAR_MODE;  // EXPLICIT, IMPLICIT, EXTERNAL;
     bool KBIN_VASP_INCAR_VERBOSE;   // VERBOSITY
     xoption KBIN_VASP_INCAR_FILE;   // KEYWORD, SYSTEM_AUTO, FILE, COMMAND
-    stringstream KBIN_VASP_INCAR_EXPLICIT;  // ME20181127
-    stringstream KBIN_VASP_INCAR_EXPLICIT_START_STOP;  // ME20181127
+    stringstream KBIN_VASP_INCAR_EXPLICIT;  //ME20181127
+    stringstream KBIN_VASP_INCAR_EXPLICIT_START_STOP;  //ME20181127
     xoption KBIN_VASP_KPOINTS_FILE; // KEYWORD, FILE, COMMAND
-    stringstream KBIN_VASP_KPOINTS_EXPLICIT;  // ME20181127
-    stringstream KBIN_VASP_KPOINTS_EXPLICIT_START_STOP;  // ME20181127
+    stringstream KBIN_VASP_KPOINTS_EXPLICIT;  //ME20181127
+    stringstream KBIN_VASP_KPOINTS_EXPLICIT_START_STOP;  //ME20181127
     xoption KBIN_VASP_POSCAR_FILE;  // KEYWORD, PROTOTYPE, FILE, COMMAND
     xoption KBIN_VASP_POSCAR_FILE_VOLUME; // EQUAL_EQUAL, MULTIPLY_EQUAL PLUS_EQUAL
     xoption KBIN_VASP_POTCAR_FILE; // KEYWORD, SYSTEM_AUTO, PREFIX, SUFFIX, FILE, COMMAND, WRITE
@@ -1101,12 +1101,12 @@ class _atom { // simple class.. nothing fancy
     xvector<double> cpos;                                  // so if fpos/cpos is outside a cell, you can shift
     xvector<double> corigin;                               // origin for convasp purposes
     xvector<double> coord;                                 // general coordinate for symmetry routines (RHT)
-    vector<string> fpos_equation;                          // DX20180607 - lattice equation for atomic position 
-    vector<string> cpos_equation;                          // DX20180607 - Cartesian equation for atomic position 
+    vector<string> fpos_equation;                          //DX20180607 - lattice equation for atomic position 
+    vector<string> cpos_equation;                          //DX20180607 - Cartesian equation for atomic position 
     double spin;                                           // spin along z in VASP MODE
-    bool spin_is_given;                                    // TRUE if spin has been set // DX20170921
-    xvector<double> noncoll_spin;                          // non-collinear spin                // DX20171205
-    bool noncoll_spin_is_given;                            // TRUE if noncoll_spin has been set // DX20171205
+    bool spin_is_given;                                    // TRUE if spin has been set //DX20170921
+    xvector<double> noncoll_spin;                          // non-collinear spin                //DX20171205
+    bool noncoll_spin_is_given;                            // TRUE if noncoll_spin has been set //DX20171205
     double mass;                                           // mass 
     int    type;                                           // with bringincell, which adjust cpos/fpos and ijk as well
     string name;                                           // the name read from the INPUT
@@ -1176,7 +1176,7 @@ extern std::vector<double> vatom_electronegativity;  // store starting from ONE 
 extern std::vector<string> vatom_crystal;            // store starting from ONE - Ashcroft Mermin
 extern std::vector<double> vatom_xray_scatt;              // store starting from ONE
 extern std::vector<double> vatom_pettifor_scale;              // store starting from ONE - Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-extern std::vector<double> vatom_pearson_coefficient;         // ME20181020
+extern std::vector<double> vatom_pearson_coefficient;         //ME20181020
 
 void atoms_initialize(void);
 uint GetAtomNumber(const string& symbol);
@@ -1242,8 +1242,8 @@ vector<uint> composition2stoichiometry(string& composition); //DX20181009
 // neighbour things
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 
-string xstructure2json(xstructure& xstr); // DX20170831 - xstructure2json
-string atom2json(_atom& atom, int coord_flag, int poccupation); // DX20170831 - atom2json
+string xstructure2json(xstructure& xstr); //DX20170831 - xstructure2json
+string atom2json(_atom& atom, int coord_flag, int poccupation); //DX20170831 - atom2json
 
 // --------------------------------------------------------------------------
 class _sym_op {
@@ -1257,9 +1257,9 @@ class _sym_op {
     xmatrix<double>  Uc;            // 3x3                        // uniques (not irreducible) operations on positions (Uc cartesian)
     xmatrix<double>  Uf;            // 3x3                        // uniques (not irreducible) operations on indices   (Uf fractional)
     xmatrix<double>  generator;     // 3x3                        // generator A, U=exp(A*theta)
-    xvector<double>  generator_coefficients;                      // generator coefficients on Lx, Ly, Lz basis // DX20171206
-    xmatrix<xcomplex<double> > SU2_matrix; // 2x2                 // SU(2) 2x2 complex matrix // DX20180115
-    xvector<xcomplex<double> > su2_coefficients;                  // su(2) coefficients on sigma_1, sigma_2, sigma_3 basis (Pauli matrices) // DX20180115
+    xvector<double>  generator_coefficients;                      // generator coefficients on Lx, Ly, Lz basis //DX20171206
+    xmatrix<xcomplex<double> > SU2_matrix; // 2x2                 // SU(2) 2x2 complex matrix //DX20180115
+    xvector<xcomplex<double> > su2_coefficients;                  // su(2) coefficients on sigma_1, sigma_2, sigma_3 basis (Pauli matrices) //DX20180115
     double           angle;                                       // angle axis
     xvector<double>  axis;          // 3                          // (1,2,3)=axis
     xvector<double>  quaternion_vector;				//GEENA
@@ -1274,7 +1274,7 @@ class _sym_op {
     // for _PGROUPK_
     bool             is_pgroupk;                                  // bool is_pgroupk
     // for _PGROUPK_XTAL_                  
-    bool             is_pgroupk_xtal;                             // bool is_pgroupk_xtal // DX20171205 - Added pgroupk_xtal
+    bool             is_pgroupk_xtal;                             // bool is_pgroupk_xtal //DX20171205 - Added pgroupk_xtal
     // for _FGROUP_
     xvector<double>  ctau;          // 3                          // translation in CARTESIAN       // FACTOR GROUP only, [0,1[
     xvector<double>  ftau;          // 3                          // translation in FRACTIONAL      // FACTOR GROUP only, [0,1[
@@ -1288,7 +1288,7 @@ class _sym_op {
     bool             is_sgroup;                                   // bool is_sgroup
     // operators
     // for _AGROUP_
-    uint             site;                                        // uint site          // site index // DX20170803
+    uint             site;                                        // uint site          // site index //DX20170803
     bool             is_agroup;                                   // bool is_agroup     // for site operation point group
 
     const _sym_op& operator=(const _sym_op& b);
@@ -1422,7 +1422,7 @@ class AtomEnvironment{
 
 bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
 bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
-bool sortAtomsDist(const _atom& a1,const _atom& a2);		// sort atoms by dist  // CO20180420
+bool sortAtomsDist(const _atom& a1,const _atom& a2);		// sort atoms by dist  //CO20180420
 bool sortAtomsEquiv(const _atom& a1,const _atom& a2); // cluster by equivalent atoms //CO20190116
 
 class xstructure {
@@ -1442,7 +1442,7 @@ class xstructure {
     bool FixLattices(void);                                       // Reciprocal/f2c/c2f
     void SetCoordinates(const int& mode);                         // change coordinates
     void MakeBasis(void);                                         // make basis for atoms (basis and number)
-    void MakeTypes(void);                                         // refresh types based on num_each_type  // CO20180420
+    void MakeTypes(void);                                         // refresh types based on num_each_type  //CO20180420
     void AddAtom(const _atom& atom);                              // adding an atom
     void AddAtom_POCC(const _atom& atom);                         // adding an atom FOR POCC ONLY
     void RemoveAtom(const uint& iat);                             // deleting an atom (index)
@@ -1546,9 +1546,9 @@ class xstructure {
     // int num_atoms=atoms.size();                                // old useless stuff
     bool neg_scale;                                               // flag for negative scale (for printing)
     double scale;                                                 // scale (always linear A)
-    bool neg_scale_second;                                        // POCC (hnf vs. tol) // CO20180409
-    double scale_second;                                          // POCC hnf/stoich tol/site tol // CO20180409
-    aurostd::xoption scale_third;                                 // if there is a third scale number provided, we use isentry and content_double // CO20170803 - site tol
+    bool neg_scale_second;                                        // POCC (hnf vs. tol) //CO20180409
+    double scale_second;                                          // POCC hnf/stoich tol/site tol //CO20180409
+    aurostd::xoption scale_third;                                 // if there is a third scale number provided, we use isentry and content_double //CO20170803 - site tol
     char coord_type[2];                                           // type of coordinates
     bool coord_flag;                                              // _COORDS_FRACTIONAL_ (0) fractional, _COORDS_CARTESIAN_ (1) cartesian.
     bool isd;                                                     // TRUE=Selective dynamics; FALSE=no selective dynamics.
@@ -1630,8 +1630,8 @@ class xstructure {
     // ----------------------------------------------------------------------------------------
     // PARTIAL OCCUPATION                                         // partial occupation for xstructure
     bool partial_occupation_flag;                                 // flags for partial occupation TRUE/FALSE
-    double partial_occupation_site_tol;                           // tolerance for partial occupation site >=0.0 <=1.0   // CO20180409
-    double partial_occupation_stoich_tol;                         // tolerance for partial occupation stoich >=0.0 <=1.0 // CO20180409
+    double partial_occupation_site_tol;                           // tolerance for partial occupation site >=0.0 <=1.0   //CO20180409
+    double partial_occupation_stoich_tol;                         // tolerance for partial occupation stoich >=0.0 <=1.0 //CO20180409
     int partial_occupation_HNF;                                   // volume HNF size
     vector<int> partial_occupation_sublattice;                    // contains the information about the specie# of the sublattice in the partial occupation otherwise _pocc_no_sublattice_
     // ----------------------------------------------------------------------------------------
@@ -1670,7 +1670,7 @@ class xstructure {
     // SYMMETRY TOLERANCE ----------------------------
     bool sym_eps_calculated;                                      // was it calculated automatically per symmetry operations (aflowSYM)?
     double sym_eps;                                               // universal tolerance for symmetry (dictates resolution and mapping tolerances)                     
-    uint sym_eps_change_count;                                  // universal tolerance count for symmetry // DX20180223 - added count to xstructure
+    uint sym_eps_change_count;                                  // universal tolerance count for symmetry //DX20180223 - added count to xstructure
     // DX and CO - END
     // POINT GROUP                                                // POINT GROUP LATTICE
     std::vector<_sym_op> pgroup;                                  // rotations/inversions operations
@@ -1722,9 +1722,9 @@ class xstructure {
     char lattice_label_ITC;                                       // aflow_symmetry_spacegroup.cpp (RHT)
     uint space_group_ITC;                                         // aflow_symmetry_spacegroup.cpp (RHT)
     string wyckoff_library_entry_ITC;                             // aflow_symmetry_spacegroup.cpp (RHT)
-    int setting_ITC;                                              // aflow_symmetry_spacegroup.cpp (RHT) // DX20170830 - SGDATA
-    xvector<double> origin_ITC;                                   // aflow_symmetry_spacegroup.cpp (RHT) // DX20170830 - SGDATA
-    vector<string> general_position_ITC;                          // aflow_symmetry_spacegroup.cpp (RHT) // DX20170830 - SGDATA
+    int setting_ITC;                                              // aflow_symmetry_spacegroup.cpp (RHT) //DX20170830 - SGDATA
+    xvector<double> origin_ITC;                                   // aflow_symmetry_spacegroup.cpp (RHT) //DX20170830 - SGDATA
+    vector<string> general_position_ITC;                          // aflow_symmetry_spacegroup.cpp (RHT) //DX20170830 - SGDATA
     // DX and CO - END
     // double volume;  USE double GetVolume(const xstructure& a);  and SetVolume //
     //  int number_of_atoms; USE (int) atoms.size();  looks you do not need.
@@ -1739,7 +1739,7 @@ class xstructure {
     uint SpaceGroup_ITC(double& use_tol, bool& no_scan);          // aflow_symmetry_spacegroup.cpp (RHT)
     //uint SpaceGroup_ITC(double& use_tol, const int& manual_it);// aflow_symmetry_spacegroup.cpp (RHT)
     uint SpaceGroup_ITC(double& use_tol, const int& setting);// aflow_symmetry_spacegroup.cpp (RHT) //DX20180806
-    // DX20170509 - [OBSOLETE] uint SpaceGroup_ITC(double& use_tol, double& orig_tolerance, const int& manual_it,int& change_sym_count,bool& no_scan);// aflow_symmetry_spacegroup.cpp (RHT)
+    //DX20170509 - [OBSOLETE] uint SpaceGroup_ITC(double& use_tol, double& orig_tolerance, const int& manual_it,int& change_sym_count,bool& no_scan);// aflow_symmetry_spacegroup.cpp (RHT)
     //uint SpaceGroup_ITC(double& use_tol,const int& manual_it,bool& no_scan);// aflow_symmetry_spacegroup.cpp (RHT)
     uint SpaceGroup_ITC(double& use_tol,const int& setting,bool& no_scan);// aflow_symmetry_spacegroup.cpp (RHT) //DX20180806
     uint SpaceGroup_ITC(double& use_tol,const int& manual_it,const int& setting,bool& no_scan);// aflow_symmetry_spacegroup.cpp (RHT) //DX20180806
@@ -1806,7 +1806,7 @@ class xstructure {
     void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
 
-// CO20180420
+//CO20180420
 //for stream management with objects
 class xStream {
   public:
@@ -1924,11 +1924,11 @@ class _xvasp {
     // --------------------------------
     // content for AVASP generation
     bool   AVASP_aflowin_only_if_missing;                          //
-    bool AVASP_arun;  // ME20181019
-    string AVASP_arun_mode;  // ME20181019
-    string AVASP_arun_runname;  // ME20181019
-    xoption aplopts;  // ME20181025
-    xoption aaplopts;  // ME20181025
+    bool AVASP_arun;  //ME20181019
+    string AVASP_arun_mode;  //ME20181019
+    string AVASP_arun_runname;  //ME20181019
+    xoption aplopts;  //ME20181025
+    xoption aaplopts;  //ME20181025
     string AVASP_dirbase;
     string AVASP_libbase;
     string AVASP_label;
@@ -2142,18 +2142,18 @@ string GetElementName(string stringin);
 string GetSpaceGroupName(int spacegroupnumber, string directory=""); //DX20180526 - add directory
 int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory=""); //DX20190708
 string GetSpaceGroupLabel(int spacegroupnumber);
-string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); // DX20170901 //DX20180526 - add directory
-string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); // DX20170901 //DX20180526 - add directory //DX20180806 - added setting
-string GetLaueLabel(string& point_group); // DX20170901 //DX20180526 - add directory
+string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); //DX20170901 //DX20180526 - add directory
+string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); //DX20170901 //DX20180526 - add directory //DX20180806 - added setting
+string GetLaueLabel(string& point_group); //DX20170901 //DX20180526 - add directory
 
 #define RADIANTS 0
 #define DEGREES  1
 #define _calculate_symmetry_default_sgroup_radius_   2.0
 
-xmatrix<double> MetricTensor(const xstructure& a); // CO20180409
-xmatrix<double> MetricTensor(const xmatrix<double>& lattice,double scale=1.0); // CO20180409
-xmatrix<double> ReciprocalLattice(const xstructure& a); // CO20180409
-xmatrix<double> ReciprocalLattice(const xmatrix<double>& rlattice,double scale=1.0); // CO20180409
+xmatrix<double> MetricTensor(const xstructure& a); //CO20180409
+xmatrix<double> MetricTensor(const xmatrix<double>& lattice,double scale=1.0); //CO20180409
+xmatrix<double> ReciprocalLattice(const xstructure& a); //CO20180409
+xmatrix<double> ReciprocalLattice(const xmatrix<double>& rlattice,double scale=1.0); //CO20180409
 string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& NK);
 string KPPRA(xstructure& str,const int& _NK);
 string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const double& DK);
@@ -2185,8 +2185,8 @@ xvector<double> Sortabc_angles(const xmatrix<double>& lat,const int& mode);
 xmatrix<double> GetClat(const xvector<double>& abc_angles);
 xmatrix<double> GetClat(const double &a,const double &b,const double &c,const double &alpha,const double &beta,const double &gamma);
 xstructure GetIntpolStr(xstructure strA,xstructure strB,const double& f,const string& path_flag);
-double RadiusSphereLattice(const xmatrix<double>& lattice,double scale=1.0); // CO20180409
-xvector<int> LatticeDimensionSphere(const xmatrix<double>& lattice,double radius,double scale=1.0); // CO20180409
+double RadiusSphereLattice(const xmatrix<double>& lattice,double scale=1.0); //CO20180409
+xvector<int> LatticeDimensionSphere(const xmatrix<double>& lattice,double radius,double scale=1.0); //CO20180409
 xvector<int> LatticeDimensionSphere(const xstructure& str,double radius);
 void resetLatticeDimensions(const xmatrix<double>& lattice, double radius, xvector<int>& dims,
     vector<xvector<double> >& l1, vector<xvector<double> >& l2, 
@@ -2212,7 +2212,7 @@ xmatrix<double> FF2CC(const double& scale,const xmatrix<double>& lattice,const x
 xmatrix<double> FF2CC(const xmatrix<double>& lattice,const xmatrix<double>& fmat);                      // fmat is an operation in F coordinates
 xmatrix<double> CC2FF(const double& scale,const xmatrix<double>& lattice,const xmatrix<double>& cmat);  // cmat is an operation in C coordinates
 xmatrix<double> CC2FF(const xmatrix<double>& lattice,const xmatrix<double>& cmat);                      // cmat is an operation in C coordinates
-// DX20190905 - START
+//DX20190905 - START
 //BringInCellInPlace() overloads
 void BringInCellInPlace(double&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX20190409
 void BringInCellInPlace(xvector<double>&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX20190409
@@ -2228,7 +2228,7 @@ xstructure BringInCell(const xstructure& xstr_in, double tolerance=_ZERO_TOL_, d
 //BringInCellFPOS overloads
 void BringInCellInPlaceFPOS(_atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX20190904
 _atom BringInCellFPOS(const _atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX20190904
-// DX20190905 - END
+//DX20190905 - END
 // DX and CO - START
 //DX20190905 [OBSOLETE] double BringInCell(const double& x);
 //DX20190905 [OBSOLETE] double BringInCell_20161115(const double& x);
@@ -2249,8 +2249,8 @@ xstructure IdenticalAtoms(const xstructure& a);                                /
 //string SpeciesLabel(const xstructure& a,const uint& A);                        // Returns the Label of the specie A (if available)
 //string SpeciesString(const xstructure& a);                                           // Gives a string with the list of all the species
 bool GetNiggliCell(const xmatrix<double>& in_lat,xmatrix<double>& niggli_lat,xmatrix<double>& P,xmatrix<double>& Q);
-bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggli_lat,xmatrix<double>& P,xmatrix<double>& Q); // DX20180213 - new dated function
-bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggli_lat,xmatrix<double>& P,xmatrix<double>& Q); // DX20180213 - old dated function
+bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggli_lat,xmatrix<double>& P,xmatrix<double>& Q); //DX20180213 - new dated function
+bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggli_lat,xmatrix<double>& P,xmatrix<double>& Q); //DX20180213 - old dated function
 // standard lattice reduction and type
 string GetLatticeType(xmatrix<double> lattice);
 string GetLatticeType(xvector<double> data);
@@ -2273,13 +2273,13 @@ xmatrix<double> MinkowskiBasisReduction(const xmatrix<double>& lattice);
 // optimal lattice reduction
 xstructure LatticeReduction(const xstructure& a);
 xmatrix<double> LatticeReduction(const xmatrix<double>& lattice);
-// CO20170807 - START
+//CO20170807 - START
 //DX20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew); //CO20190520 - removed pointers for bools and doubles, added const where possible
 deque<_atom> foldAtomsInCell(const xstructure& a, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 - added check_min_dists bool
 deque<_atom> foldAtomsInCell(const deque<_atom>& atoms, const xmatrix<double>& lattice_orig, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
 xstructure GetPrimitiveVASP(const xstructure& a);
 xstructure GetPrimitiveVASP(const xstructure& a,double tol);
-// CO20170807 - STOP
+//CO20170807 - STOP
 // bring cell in,compact, wigner seitz
 //DX20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
 //DX20190905 [OBSOLETE] // DX and CO - START
@@ -2319,8 +2319,8 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms);
 bool alreadyInCell(_atom& atom, deque<_atom> atoms);
 //DX20180726 - END
 // DX and CO - START
-bool atomInCell(const _atom& atom, double tolerance=_ZERO_TOL_); // DX20191125
-bool inCell(const xvector<double>& pos_vec, double tolerance=_ZERO_TOL_); // DX20191125 - added tolerance
+bool atomInCell(const _atom& atom, double tolerance=_ZERO_TOL_); //DX20191125
+bool inCell(const xvector<double>& pos_vec, double tolerance=_ZERO_TOL_); //DX20191125 - added tolerance
 // DX and CO - END
 xstructure GetSuperCell(const xstructure& a,const xmatrix<double>& sc);
 xstructure GetSuperCell(const xstructure& a,const xvector<double>& sc);
@@ -2369,7 +2369,7 @@ double AtomDist(const xstructure& str,const _atom& atom1,const _atom& atom2);
 bool SameAtom(const xstructure& str,const _atom& atom1,const _atom& atom2);
 bool SameAtom(const _atom& atom1,const _atom& atom2);
 bool DifferentAtom(const xstructure& str,const _atom& atom1,const _atom& atom2);
-xmatrix<double> GetDistMatrix(const xstructure& a); // CO20171025
+xmatrix<double> GetDistMatrix(const xstructure& a); //CO20171025
 vector<double> GetNBONDXX(const xstructure& a);
 int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
 int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX20191218 [ORIG]
@@ -2640,7 +2640,7 @@ namespace sflow {
   void QDEL(string options);
   void QDEL(string options,string cmd);
 }
-vector<vector<int> > getThreadDistribution(const int&, const int&);  // ME20190218
+vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20190218
 
 // ----------------------------------------------------------------------------
 // aflow_kbin.cpp
@@ -2666,7 +2666,7 @@ namespace KBIN {
 
 // ----------------------------------------------------------------------------
 // aflow_modules.cpp
-// ME20181027
+//ME20181027
 namespace KBIN {
   void setModules(_xvasp&);
   void setModules(_xinput&);
@@ -2676,7 +2676,7 @@ namespace KBIN {
   bool writeFlagAPL(const string& key,const xoption& xopt); //CO20181226  //ME20190113
   void readParametersAPL(const string&, _moduleOptions&, _xinput&);
   vector<aurostd::xoption> loadDefaultsAAPL();
-  bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO20181226  // ME20190113
+  bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO20181226  //ME20190113
   void readParametersAAPL(const string&, _moduleOptions&, _xinput&);
   vector<aurostd::xoption> loadDefaultsAEL();
   bool writeFlagAEL(const string& key,const xoption& xopt); 
@@ -2779,7 +2779,7 @@ namespace KBIN {
   bool VASP_CheckUnconvergedOSZICAR(string dir);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
-  string getVASPVersionString(const string&);  // ME20190219
+  string getVASPVersionString(const string&);  //ME20190219
 }
 
 // ----------------------------------------------------------------------------
@@ -2787,7 +2787,7 @@ namespace KBIN {
 namespace KBIN {
   bool VASP_Produce_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false);
   bool VASP_Modify_INPUT(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags);
-  bool VASP_Produce_and_Modify_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false); // CO20180418
+  bool VASP_Produce_and_Modify_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false); //CO20180418
   bool VASP_Write_ppAUID_FILE(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
   bool VASP_Write_ppAUID_FILE(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
   bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
@@ -2799,7 +2799,7 @@ namespace KBIN {
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp);
   bool VASP_Modify_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
-  void convertPOSCARFormat(_xvasp&, const _kflags&);  // ME20190220
+  void convertPOSCARFormat(_xvasp&, const _kflags&);  //ME20190220
   bool VASP_Convert_Unit_Cell(_xvasp&, _vflags&, _aflags&, ofstream&, ostringstream&); //ME20181216
   bool VASP_Reread_POSCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   bool VASP_Produce_KPOINTS(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
@@ -2843,7 +2843,7 @@ namespace KBIN {
   bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
   //  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
   // ALGO, ENMAX_MULTIPLY, IMIX, IALGO, TYPE, PAW_CORRECTIONS, NBANDS, PSTRESS, EDIFFG, POTIM, SPIN, LS_COUPLING, AUTO_MAGMOM, NWS, SYM, WAVECAR, CHGCAR
-  void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  // ME20191028
+  void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
   void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
   void XVASP_INCAR_LDAU_OFF(_xvasp& xvasp,bool VERBOSE);
@@ -2908,10 +2908,10 @@ string AVASP_Get_PseudoPotential_PBE(string species);
 string AVASP_Get_PseudoPotential_GGA(string species);
 string AVASP_Get_PseudoPotential_LDA(string species);
 bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,_xvasp& xvasp);
-void AVASP_populateXVASP_ARUN(const _aflags&,const _kflags&, const _vflags&,_xvasp&);  // ME20181030
-void setStatic(_xvasp&);  // ME20181102
-void setPreserveUnitCell(_xvasp&);   // ME20181102
-void AVASP_fix_volumes_masses_XVASP(_xvasp&,bool skip_volume=false); // ME20181103 //CO20181226
+void AVASP_populateXVASP_ARUN(const _aflags&,const _kflags&, const _vflags&,_xvasp&);  //ME20181030
+void setStatic(_xvasp&);  //ME20181102
+void setPreserveUnitCell(_xvasp&);   //ME20181102
+void AVASP_fix_volumes_masses_XVASP(_xvasp&,bool skip_volume=false); //ME20181103 //CO20181226
 bool AVASP_MakeSingleAFLOWIN(_xvasp& xvaspin,stringstream &_aflowin,bool flag_WRITE,int=-1,bool flag_PRINT=TRUE);   // last is pthread number, if <0 then serial
 bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvaspin,stringstream &_aflowin,bool flag_WRITE,int=-1,bool flag_PRINT=TRUE);   // last is pthread number, if <0 then serial
 bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvaspin,stringstream &_aflowin,bool flag_WRITE,int=-1,bool flag_PRINT=TRUE);   // last is pthread number, if <0 then serial
@@ -2960,7 +2960,7 @@ class xOUTCAR {
     xmatrix<double> stress;                                       // for aflowlib_libraries.cpp
     double mag_cell,mag_atom;                                     // for aflowlib_libraries.cpp
     vector<double> vmag;                                          // for aflowlib_libraries.cpp
-    vector<xvector<double> > vmag_noncoll;                        // DX20171205 - non-collinear
+    vector<xvector<double> > vmag_noncoll;                        //DX20171205 - non-collinear
     double volume_cell,volume_atom;                               // for aflowlib_libraries.cpp
     double pressure;                                              // for aflowlib_libraries.cpp // SAME AS PSTRESS
     double pressure_residual;                                     // for aflowlib_libraries.cpp
@@ -3065,7 +3065,7 @@ class xOUTCAR {
     enum EMPTY_TYPES {empty_all,empty_partial};                 //bandgap types
     enum INSULATOR_TYPES {insulator_direct,insulator_indirect}; //bandgap types
     enum GAP_TYPES {zero_gap,non_zero_gap};                     //bandgap types
-    //bool GetBandGap(void); // CO20171002 - need POSCAR for kpt_tol
+    //bool GetBandGap(void); //CO20171002 - need POSCAR for kpt_tol
     bool GetBandGap(double EFERMI=AUROSTD_NAN,double efermi_tol=AUROSTD_NAN,double energy_tol=1e-4,double occ_tol=1e-5);
     bool GetBandGap_Camilo(double kpt_tol);
     vector<double> conduction_band_min;
@@ -3079,10 +3079,10 @@ class xOUTCAR {
     vector<string> Egap_type;
     string         Egap_type_net;
     string ERROR;
-    //int number_bands,number_kpoints; // CO20171006 - camilo garbage
-    //int ISPIN; // turn this into spin = 0 if ISPIN = 1 // CO20171006 - camilo garbage
-    //int spin;  // CO20171006 - camilo garbage
-    friend ostream& operator<<(ostream&, const xOUTCAR&);  // ME20190623
+    //int number_bands,number_kpoints; //CO20171006 - camilo garbage
+    //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
+    //int spin;  //CO20171006 - camilo garbage
+    friend ostream& operator<<(ostream&, const xOUTCAR&);  //ME20190623
  private:                       //
     void free();                 // free space
     void copy(const xOUTCAR& b); //
@@ -3110,24 +3110,24 @@ class xDOSCAR {
     double energy_max;
     double energy_min;
     uint number_energies;
-    uint number_atoms;  // ME20190614
-    bool partial;  // ME20190614
+    uint number_atoms;  //ME20190614
+    bool partial;  //ME20190614
     double denergy;
     deque<double> venergy;                                        // venergy.at(energy_number) 
     deque<double> venergyEf;                                      // venergyEf.at(energy_number) 
-    // ME20190614 - BEGIN
+    //ME20190614 - BEGIN
     //[OBSOLETE]  deque<deque<double> > vDOS;                                   // vDOS.at(energy_number).at(spin)
     deque<deque<double> > viDOS;                                  // viDOS.at(spin).at(energy_number)
     //[OBSOLETE]  deque<deque<double> > vDOSs;                                  // vDOSs.at(energy_number).at(spin)
     //[OBSOLETE]  deque<deque<double> > vDOSp;                                  // vDOSp.at(energy_number).at(spin)
     //[OBSOLETE]  deque<deque<double> > vDOSd;                                  // vDOSd.at(energy_number).at(spin)
     deque<deque<deque<deque<double> > > > vDOS;                   // vDOS.at(atom).at(orbital).at(spin).at(energy_number); 0 = total for atoms and orbitals
-    // ME20190614 - END
-    // ME20190620 - BEGIN
+    //ME20190614 - END
+    //ME20190620 - BEGIN
     bool isLSCOUPLING;  // Contains spin-orbit coupling
     bool lmResolved;  // Is it lm-resolved?
     string carstring;  // The fourth line of the DOSCAR
-    // ME20190620 - END
+    //ME20190620 - END
     string ERROR; //CO20191004
     vector<double> conduction_band_min;     //CO20191004
     double         conduction_band_min_net; //CO20191004
@@ -3148,7 +3148,7 @@ class xDOSCAR {
     bool GetBandGap(double EFERMI=AUROSTD_NAN,double efermi_tol=AUROSTD_NAN,double energy_tol=1e-3,double occ_tol=1e-4); //CO20191110
     deque<deque<deque<deque<double> > > > GetVDOSSpecies(const xstructure& xstr) const; //vDOS.at(species).at(spin).at(energy_number)  //CO20191110
     deque<deque<deque<deque<double> > > > GetVDOSSpecies(deque<int> num_each_type) const; //vDOS.at(species).at(spin).at(energy_number)  //CO20191110
-    friend ostream& operator<<(ostream&, const xDOSCAR&);  // ME20190623
+    friend ostream& operator<<(ostream&, const xDOSCAR&);  //ME20190623
   private:                                                        //
     void free();                                                  // free space
     void copy(const xDOSCAR& b);                                  //
@@ -3165,8 +3165,8 @@ class xEIGENVAL {
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string title;
-    uint number_atoms;  // ME20190623
-    uint number_loops;  // ME20190623
+    uint number_atoms;  //ME20190623
+    uint number_loops;  //ME20190623
     uint spin;
     double Vol,POTIM;
     xvector<double> lattice;
@@ -3175,14 +3175,14 @@ class xEIGENVAL {
     deque<double> vweight;                                        // vweight.at(kpoint number)
     deque<xvector<double> > vkpoint;                              // vkpoint.at(kpoint number)[1,2,3]=xyz.
     deque<deque<deque<double> > > venergy;                        // venergy.at(kpoint number).at(band number).at(spin number)
-    string carstring;  // ME20190620 - the fourth line of the EIGENVAL file
+    string carstring;  //ME20190620 - the fourth line of the EIGENVAL file
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-    double energy_max;  // ME20190614
-    double energy_min;  // ME20190614
-    friend ostream& operator<<(ostream&, const xEIGENVAL&);  // ME20190623
+    double energy_max;  //ME20190614
+    double energy_min;  //ME20190614
+    friend ostream& operator<<(ostream&, const xEIGENVAL&);  //ME20190623
   private:                                                        //
     void free();                                                  // free space
     void copy(const xEIGENVAL& b);                                //
@@ -3271,9 +3271,9 @@ class xVASPRUNXML {
     bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-    bool GetForces(const string&, bool=true);  // ME20190204
-    bool GetForcesFile(const string&, bool=true);  // ME20190204
-    bool GetForces(stringstream&, bool=true);  // ME20190204
+    bool GetForces(const string&, bool=true);  //ME20190204
+    bool GetForcesFile(const string&, bool=true);  //ME20190204
+    bool GetForces(stringstream&, bool=true);  //ME20190204
   private:                       //
     void free();                 // free space
     void copy(const xVASPRUNXML& b); //
@@ -3323,13 +3323,13 @@ class xKPOINTS {
     xvector<double> ooo_kpoints; // ORIGIN                         // triplet of origin
     int nkpoints;                                                  // total kpoints
     string path_mode,path;vector<string> vpath;int path_grid;      // path if any
-    vector<xvector<double> > vkpoints;                             // ME20190614 - k-point coordinates of the path
+    vector<xvector<double> > vkpoints;                             //ME20190614 - k-point coordinates of the path
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-    friend ostream& operator<<(ostream&, const xKPOINTS&);  // ME20190623
-    string createStandardTitlePath(const xstructure&);  // ME20190623
+    friend ostream& operator<<(ostream&, const xKPOINTS&);  //ME20190623
+    string createStandardTitlePath(const xstructure&);  //ME20190623
   private:                       //
     void free();                 // free space
     void copy(const xKPOINTS& b); //
@@ -3477,7 +3477,7 @@ bool is_equal_position_kEn_str      (const kEn_st& k1, const kEn_st& k2);
 bool near_to                        (const xvector<double> & k1, const xvector<double> & k2, const vector<double> & max_distance);
 // [OBSOLETE] bool GetEffectiveMass(xOUTCAR& outcar,xDOSCAR& doscar,xEIGENVAL& eigenval,xstructure xstr,ostream& oss,const bool& osswrite);
 //-------------------------------------------------------------------------------------------------
-// ME20190614 - plotter functions
+//ME20190614 - plotter functions
 namespace plotter {
   // Plot setup --------------------------------------------------------------
   // Plot options
@@ -3491,7 +3491,7 @@ namespace plotter {
   void setFileName(aurostd::xoption&, string="");
   void setTitle(aurostd::xoption&);
   string formatDefaultPlotTitle(const aurostd::xoption&);
-  vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  // ME20190813
+  vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  //ME20190813
   vector<double> getCompositionFromANRLPrototype(const string&);
   string formatDefaultTitlePOCC(const aurostd::xoption&);
   string formatDefaultTitlePOCC_191004(const aurostd::xoption&); //CO20191110
@@ -3572,14 +3572,14 @@ namespace aurostd {
 
 namespace estructure {
   string PEDOS_GENERATE_GNUPLOTSCRIPT(const string&,const string&,const double&,const double&,const double&,const double&,const int&,const vector<vector<vector<double> > >&,const string&);
-  bool isSpecialKPOINT(string kpoint);  // CO20170830
-  string fixSpecialKPOINT_GNUPLOT(string kpoint,bool json=false);  // CO20170830
-  string fixSpecialKPOINT_HTML(string kpoint);  // CO20170830
-  string fixSpecialKPOINT_LATEX(string kpoint);  // CO20170830
-  string fixKPOINT_GNUPLOT(string kpoint,bool json=false);  // CO20170830
-  string fixKPOINT_HTML(string kpoint);  // CO20170830
-  string fixKPOINT_LATEX(string kpoint);  // CO20170830
-  string fixKPOINT_SPECIALONLY(string kpoint);  // CO20170830
+  bool isSpecialKPOINT(string kpoint);  //CO20170830
+  string fixSpecialKPOINT_GNUPLOT(string kpoint,bool json=false);  //CO20170830
+  string fixSpecialKPOINT_HTML(string kpoint);  //CO20170830
+  string fixSpecialKPOINT_LATEX(string kpoint);  //CO20170830
+  string fixKPOINT_GNUPLOT(string kpoint,bool json=false);  //CO20170830
+  string fixKPOINT_HTML(string kpoint);  //CO20170830
+  string fixKPOINT_LATEX(string kpoint);  //CO20170830
+  string fixKPOINT_SPECIALONLY(string kpoint);  //CO20170830
   void PLOT_BANDDOS(string options);
   void PLOT_BAND(string options);
   void PLOT_DOS(string options);
@@ -3600,9 +3600,9 @@ namespace estructure {
   double GET_PDOSDATA(const string& str_dir, vector<vector<vector<double> > >& PDOS);
   double GET_PDOSDATA(stringstream& ss_dosfile, stringstream& ss_outfile, vector<vector<vector<double> > >& PDOS);
   // [OBSOLETE]  void GET_DOS_DATA(vector<string>& argv);
-  bool GET_DOS_DATA(stringstream& ss_dosfile, stringstream& ss_outfile, double& Efermi, vector<vector<double> >& TDOS, vector<vector<double> >& TOTALPDOS); // CO20180216
-  bool GET_DOS_DATA(const string& str_dir,   double& Efermi, vector<vector<double> >& TDOS, vector<vector<double> >& TOTALPDOS, vector<vector<vector<double> > >& PDOS);  // CO20180216
-  bool GET_DOS_DATA(stringstream& ss_dosfile, stringstream& ss_outfile,   double& Efermi, vector<vector<double> >& TDOS, vector<vector<double> >& TOTALPDOS, vector<vector<vector<double> > >& PDOS); // CO20180216
+  bool GET_DOS_DATA(stringstream& ss_dosfile, stringstream& ss_outfile, double& Efermi, vector<vector<double> >& TDOS, vector<vector<double> >& TOTALPDOS); //CO20180216
+  bool GET_DOS_DATA(const string& str_dir,   double& Efermi, vector<vector<double> >& TDOS, vector<vector<double> >& TOTALPDOS, vector<vector<vector<double> > >& PDOS);  //CO20180216
+  bool GET_DOS_DATA(stringstream& ss_dosfile, stringstream& ss_outfile,   double& Efermi, vector<vector<double> >& TDOS, vector<vector<double> >& TOTALPDOS, vector<vector<vector<double> > >& PDOS); //CO20180216
   void FormatSpinofPDOS(vector<vector<vector<double> > >& vvva);
 
   // Functions for serializing bands data to JSON
@@ -3754,11 +3754,11 @@ namespace SYM {
   bool FposEquivalent(const xstructure& str,const xvector<double>& fpos1,const xvector<double>& fpos2);
   bool TypePointGroupOperation(const xmatrix<double>& Uc,const xmatrix<double>& Uf,string& _string,bool& _inversion,double& _angle,
       xvector<double>& _axis,xmatrix<double>& _generator, xvector<double>& _generator_coefficients, 
-      xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_);  // calculate the symmetry inversion,type,axis,generator // DX20171206 - Added generator coefficients // DX20171207 - Added Uf // DX20180117 - Added SU2 and su2 coefficients
+      xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_);  // calculate the symmetry inversion,type,axis,generator //DX20171206 - Added generator coefficients //DX20171207 - Added Uf //DX20180117 - Added SU2 and su2 coefficients
   bool TypePointGroupOperationInternational(const xmatrix<double>& Uc,string& _stringHM,string& _stringSC,
       const bool& _inversion,const double& _angle,
       const xvector<double>& _axis,const xmatrix<double>& _generator, xvector<double>& _generator_coefficients, 
-      xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_);  // International symbol = Hermann-Mauguin notation & Schonflies notation // DX20171206 - Added generator coefficients // DX20180117 - Added SU2 and su2 coefficients
+      xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_);  // International symbol = Hermann-Mauguin notation & Schonflies notation //DX20171206 - Added generator coefficients //DX20180117 - Added SU2 and su2 coefficients
   // DX and CO - START
   uint AddSymmetryToStructure(xstructure &a,const uint& iat,
       const xmatrix<double> &Uc,const xmatrix<double> &Uf,const xvector<double> &ctau,const xvector<double> &ftau,
@@ -3784,11 +3784,11 @@ namespace SYM {
       const std::vector<int> &basis_atoms_map,const std::vector<int> &basis_types_map,bool basis_map_calculated,char group); // DX
   uint AddSymmetryToStructure(xstructure &a,const xmatrix<double> &Uc,const xmatrix<double> &Uf,
       const std::vector<int> &basis_atoms_map,const std::vector<int> &basis_types_map,bool basis_map_calculated,char group,bool roff); // DX
-  bool PointGroupsIdentical(const vector<_sym_op>& vpg1,const vector<_sym_op>& vpg2, double eps, bool is_same_lattice=false); // DX20171207 - added is_same_lattice
+  bool PointGroupsIdentical(const vector<_sym_op>& vpg1,const vector<_sym_op>& vpg2, double eps, bool is_same_lattice=false); //DX20171207 - added is_same_lattice
   //GEENA START
   bool CalculateQuaternion(_sym_op& a);
   //GEENA STOP
-  bool ComplexSU2Rotations(xmatrix<xcomplex<double> > & _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double& theta, xvector<double>& _axis); // DX20180117 - add SU(2) and su(2) coefficients
+  bool ComplexSU2Rotations(xmatrix<xcomplex<double> > & _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double& theta, xvector<double>& _axis); //DX20180117 - add SU(2) and su(2) coefficients
   // DX and CO - END
   bool CalculatePointGroup(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");      // POINT GROUP      _PGROUP_
   uint CalculatePointGroup(const xmatrix<double>& lattice, vector<_sym_op > pgroup, ofstream &FileMESSAGE,bool _write_,const bool& osswrite,ostream& oss,double _eps_);
@@ -3801,9 +3801,9 @@ namespace SYM {
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); // DX
   // DX and CO - END
   bool CalculatePointGroupKlattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KLATTICE     _PGROUPK_
-  bool CalculatePointGroupKCrystal(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KCRYSTAL     _PGROUPK_XTAL_ // DX20171205 - New group: reciprocal space counterpart of pgroup_xtal
+  bool CalculatePointGroupKCrystal(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KCRYSTAL     _PGROUPK_XTAL_ //DX20171205 - New group: reciprocal space counterpart of pgroup_xtal
   bool TransformSymmetryFromRealToReciprocal(ofstream &FileMESSAGE, xstructure& real_space_crystal, xstructure& reciprocal_space,
-      _aflags& aflags, const bool& osswrite, ostream& oss, string& pgroup_type); // DX20170808 - New klattice routine // DX20171205 - Added pgroup_type option to account for pgroupk_xtal
+      _aflags& aflags, const bool& osswrite, ostream& oss, string& pgroup_type); //DX20170808 - New klattice routine //DX20171205 - Added pgroup_type option to account for pgroupk_xtal
   bool CalculateSitePointGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // SITE POINT GROUP _AGROUP_
   // DX and CO - START
   bool CalculateSitePointGroup(ofstream &FileMESSAGE,xstructure &a,int CALCULATION_MODE,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt"); // SITE POINT GROUP _AGROUP_
@@ -3818,7 +3818,7 @@ namespace SYM {
   bool CalculatePointGroupCrystal_20170814(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");      // POINT GROUP      _PGROUP_ // DX
   bool CalculatePointGroupCrystal_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");      // POINT GROUP      _PGROUP_ // DX
   bool CalculatePointGroupCrystal_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_);      // POINT GROUP      _PGROUP_ // DX
-  bool PointGroupMap(xstructure& a, string& pgname, string& operations, char group); // DX20170906
+  bool PointGroupMap(xstructure& a, string& pgname, string& operations, char group); //DX20170906
   bool PointGroupLookUpTable(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format);
   // DX and CO -END
   void CalculateSitePointGroup2(xstructure &a,bool ComMidss); // for --agroup2 and --agroup2m
@@ -3853,9 +3853,9 @@ namespace SYM {
   //DX20190613 [OBOSLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice);
   //DX20190613 [OBOSLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice,xvector<double>& min_vec,xvector<int>& ijk);
   //DX20190613 [OBOSLETE] xvector<double> minimumCartesianVector(const xvector<double>&, const xvector<double>&,
-  //DX20190613 [OBOSLETE]                                        const xmatrix<double>&);  // ME20180730
+  //DX20190613 [OBOSLETE]                                        const xmatrix<double>&);  //ME20180730
   //DX20190613 [OBOSLETE] xvector<double> minimumCartesianVector(const xvector<double>&, const xvector<double>&,
-  //DX20190613 [OBOSLETE]                                        const xmatrix<double>&, xvector<int>&);  // ME20180730
+  //DX20190613 [OBOSLETE]                                        const xmatrix<double>&, xvector<int>&);  //ME20180730
   //DX20190613 [OBOSLETE] bool PBC(xvector<double>& v_in, xvector<int>& ijk, bool& restriction);
   //DX20190613 [OBOSLETE] bool PBC(xvector<double>& v_in);
   xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,bool skew=false);  //CO20190525
@@ -3895,7 +3895,7 @@ namespace SYM {
   bool checkAngle(xvector<double>& v1, xvector<double>& v2, double input_angle, bool& is_deg, double tolerance); //CO20190520 - removed pointers for bools and doubles, added const where possible
   bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, double tolerance); //CO20190520 - removed pointers for bools and doubles, added const where possible
   bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, bool& is_deg, double tolerance); //CO20190520 - removed pointers for bools and doubles, added const where possible
-  // DX20170509 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance, int& count , double& min_dist, bool& no_scan); //CO20190520 - removed pointers for bools and doubles, added const where possible
+  //DX20170509 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance, int& count , double& min_dist, bool& no_scan); //CO20190520 - removed pointers for bools and doubles, added const where possible
   bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan); //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190524 - need pointer for tolerance, otherwise it will not update
   deque<deque<_atom> > break_up_by_type(deque<_atom>& expanded_crystal);
   vector<vector<_atom> > break_up_by_type(vector<_atom> expanded_crystal);
@@ -3920,12 +3920,12 @@ namespace SYM {
   bool CalculateInequivalentAtoms_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss); // EQUIVALENT ATOMS _IATOMS_ // DX
   // DX and CO - END
 }
-string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode); // DX20170803 - For Python wrapper
-string EquivalentAtomsToJson(vector<vector<int> >& iatoms); // DX20170803 - For Python wrapper
-string SymmetryToJson(vector<_sym_op>& group, char& mode); // DX20170803 - For Python wrapper
+string AgroupSymmetryToJson(vector<vector<_sym_op> >& group, char& mode); //DX20170803 - For Python wrapper
+string EquivalentAtomsToJson(vector<vector<int> >& iatoms); //DX20170803 - For Python wrapper
+string SymmetryToJson(vector<_sym_op>& group, char& mode); //DX20170803 - For Python wrapper
 bool KBIN_SymmetryWrite(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,char group,const bool& osswrite,ostream& oss,const string& format="txt");
-//bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss); // DX20170803 - For Python wrapper
-bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode='\0'); // DX20170821 - For Python wrapper
+//bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss); //DX20170803 - For Python wrapper
+bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mode='\0'); //DX20170821 - For Python wrapper
 bool KBIN_StepSymmetryPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss);
 // DX and CO - START
 bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss); // DX
@@ -4213,14 +4213,14 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
     vector<acage>& cagesirreducible,vector<acage>& cagesreducible,vector<acage>& cages4,
     vector<acage>& cages3,vector<acage>& cages2,const double& _roughness,const bool& osswrite,ostream& oss);
 // ----------------------------------------------------------------------------
-// aflow_pocc // CO20180502
+// aflow_pocc //CO20180502
 namespace KBIN {
   void VASP_RunPOCC(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE);
 }
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  // ME20181107
+  bool relaxStructureAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20181107
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general
   void RunPhonons_APL_181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general //CO20181216

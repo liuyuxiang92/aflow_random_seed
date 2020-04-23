@@ -68,7 +68,7 @@ const double LATEX_RIGHT_MARGIN_LETTER_STD = 0.5;  //inches
 const double LATEX_TABCOLSEP_STD = 6;  //pt
 const double LATEX_ARRAYRULEWIDTH_STD = .4;  //pt
 
-// CO20180419 - moved to aurostd::xerror and aurostd::xerror
+//CO20180419 - moved to aurostd::xerror and aurostd::xerror
 //namespace chull {
 //  aurostd::xerror::aurostd::xerror(_AFLOW_FILE_NAME_,const std::string& function,const std::string& message) : std::runtime_error(message),f_name(function) {}  // I/O or computer type errors (no entries loaded)
 //  aurostd::xerror::aurostd::xerror(_AFLOW_FILE_NAME_,const std::string& function,std::stringstream& message) : std::runtime_error(message.str()),f_name(function) {message.str("");}  // I/O or computer type errors (no entries loaded)
@@ -336,7 +336,7 @@ namespace chull {
       alloy=aurostd::joinWDelimiter(velements,"");
       if(vpflow.flag("CHULL::LOG")) {
         log_name = "aflow_" + aurostd::joinWDelimiter(velements,"") + "_hull.log";
-        string log_destination = directory + log_name;  // no output before banner // CO20180220
+        string log_destination = directory + log_name;  // no output before banner //CO20180220
         FileMESSAGE.open(log_destination.c_str());
       }
       // spit out banner for only the first request
@@ -344,7 +344,7 @@ namespace chull {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_, true);  //i //no screen, first to be logged
       message << "Starting " << aurostd::joinWDelimiter(velements,"") << " " << pflow::arity_string(velements.size(),false,false) << " convex hull";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-      getPath(vpflow, FileMESSAGE, oss, false); // CO20180220 - directory stuff for logging
+      getPath(vpflow, FileMESSAGE, oss, false); //CO20180220 - directory stuff for logging
       chull::flagCheck(vpflow, velements, FileMESSAGE, oss, i);  // spit out all flag options
 
       ////////////////////////////////////////////////////////////////////////////
@@ -713,7 +713,7 @@ namespace chull {
       string pwd = getPath();
       if(!silent){
         message << "Directing output to current directory: " << pwd;
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_OPTION_); //, silent);  // CO20180220 - silent now means print AT ALL
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_OPTION_); //, silent);  //CO20180220 - silent now means print AT ALL
       }
       return pwd;
     }
@@ -771,7 +771,7 @@ namespace chull {
 
     if(!silent){
       message << "Directing output to " << path;
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_OPTION_); //, silent);  // CO20180220 - silent now means print AT AL
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_OPTION_); //, silent);  //CO20180220 - silent now means print AT AL
     }
     return path;
   }
@@ -1180,7 +1180,7 @@ namespace chull {
 
 } // namespace chull
 
-// CO20180420 - moved to xStream (xclasses.cpp)
+//CO20180420 - moved to xStream (xclasses.cpp)
 //namespace chull {
 ////--------------------------------------------------------------------------------
 //// class ChullClassTemplate
@@ -2242,7 +2242,7 @@ namespace chull {
     m_ridges.clear();
     if(!m_vertices.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Facet has no vertices");}
     for(uint fl_size_i=m_vertices.size(),i=(fl_size_i-1);i<fl_size_i;i--){  //wrap around to HUGE number
-      m_ridges.push_back(ChullFacet(*p_FileMESSAGE,*p_oss));  // CO20180305
+      m_ridges.push_back(ChullFacet(*p_FileMESSAGE,*p_oss));  //CO20180305
       for(uint j=0,fl_size_j=m_vertices.size();j<fl_size_j;j++){
         if(i!=j){m_ridges.back().addVertex(m_vertices[j]);}
       }
@@ -4388,7 +4388,7 @@ namespace chull {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="ConvexHull::getInitialExtremePoints():";
     if(LDEBUG) {cerr << soliloquy << " start" << endl;}
-    ChullFacet facet(*p_FileMESSAGE,*p_oss);  // CO20180305
+    ChullFacet facet(*p_FileMESSAGE,*p_oss);  //CO20180305
     string error;
     //get first h_dim points from just the extremes, and plug into facet
     //BAD CASE: fewer than h_dim points, this is NOT hull-able
@@ -4515,7 +4515,7 @@ namespace chull {
         for(uint i=0,fl_size_i=indices.size();i<fl_size_i;i++){cerr << indices[i] << (i!=indices.size()-1?",":"");}
         cerr << endl;
       }
-      h_facets.push_back(ChullFacet(*p_FileMESSAGE,*p_oss));  // CO20180305
+      h_facets.push_back(ChullFacet(*p_FileMESSAGE,*p_oss));  //CO20180305
       for(uint i=0,fl_size_i=indices.size();i<fl_size_i;i++){
         if(indices[i]==1){h_facets.back().addVertex(initial_extreme_points[i]);}
       }
@@ -5633,7 +5633,7 @@ namespace chull {
       cerr << soliloquy << " structure 2" << endl;
       cerr << b;
     }
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX20180123 - added fast_match = true // DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
   }
@@ -6446,7 +6446,7 @@ namespace chull {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       return entry.compound;
     }
-    return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  // ME20190628
+    return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  //ME20190628
   }
 
   //[ME20190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
@@ -7867,7 +7867,7 @@ namespace chull {
     doc_header_TEX_ss << "\\usepackage[utf8x]{inputenc}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usepackage[table,dvipsnames]{xcolor}" << " \%HEADER" << endl;
     if(helvetica_font) {
-      //doc_header_TEX_ss << "\\usepackage[scaled]{helvet}" << " \%HEADER" << endl;  // CO20180301
+      //doc_header_TEX_ss << "\\usepackage[scaled]{helvet}" << " \%HEADER" << endl;  //CO20180301
       doc_header_TEX_ss << "\\renewcommand\\familydefault{\\sfdefault}" << " \%HEADER" << endl;
       doc_header_TEX_ss << "\\usepackage{sansmath}" << " \%HEADER" << endl;
       doc_header_TEX_ss << "\\sansmath" << " \%HEADER" << endl; //enable sans-serif math for rest of document
@@ -8138,7 +8138,7 @@ namespace chull {
       if(image_only){extra_padding_multiplier*=1.5;}
 
       point_range = max_point - min_point;
-      //bool set_max_tick_spacing_2D=false;//true; //max space between ticks=XX (in yticklabel style),  // CO20180227  //this hardly works, we need to set it exactly, COMPLETELY REMOVED
+      //bool set_max_tick_spacing_2D=false;//true; //max space between ticks=XX (in yticklabel style),  //CO20180227  //this hardly works, we need to set it exactly, COMPLETELY REMOVED
       //int max_tick_spacing=1;
       bool set_y_range_exactly=true;
       double y_tick_distance=0.25;
@@ -8246,7 +8246,7 @@ namespace chull {
         else {
           ymin=min_point;
           if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
-            if(m_formation_energy_hull){ymin-=extra_padding;}  // CO20180227 - we need to avoid labels here
+            if(m_formation_energy_hull){ymin-=extra_padding;}  //CO20180227 - we need to avoid labels here
             ymin=roundDouble(ymin,(int)round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN //CO20190724 - explicit double->int conversion (floor is fine)
           }
         }
@@ -8256,7 +8256,7 @@ namespace chull {
         else {
           ymax=max_point;
           if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
-            if(!m_formation_energy_hull){ymax+=extra_padding;}  // CO20180227 - we need to avoid labels here
+            if(!m_formation_energy_hull){ymax+=extra_padding;}  //CO20180227 - we need to avoid labels here
             ymax=roundDouble(ymax,(int)round_to_value,true);  //we want max to be MORE POSITIVE, so round UP  //CO20190724 - explicit double->int conversion (floor is fine)
           }
         }
@@ -10148,7 +10148,7 @@ namespace chull {
       else {num_compile = 2;}
     }
     if(!show_latex_output) {command << "1>/dev/null ";}
-    message << "Attempting to compile " << main_TEX_file;  // CO20180220 //the .tex file";
+    message << "Attempting to compile " << main_TEX_file;  //CO20180220 //the .tex file";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     if(show_latex_output) {
@@ -10164,7 +10164,7 @@ namespace chull {
       if(print_aflow_logo_full){files_2_move.push_back(aflow_logo_full_file);}
       if(print_logo_2){files_2_move.push_back(logo_file_2);}
 
-      message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; // CO20180220 - current directory";
+      message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; //CO20180220 - current directory";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       message << "Try running \"" << aurostd::RemoveWhiteSpacesFromTheBack(clean_command.str()) << "\"";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
@@ -10189,7 +10189,7 @@ namespace chull {
           resolution=default_resolution;
         }
       }
-      message << "Attempting to convert " << main_PDF_file << " to " << main_PNG_file;  // CO20180220 //the .tex file";
+      message << "Attempting to convert " << main_PDF_file << " to " << main_PNG_file;  //CO20180220 //the .tex file";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       command << XHOST.command("convert") << " -density " << resolution << " " << main_PDF_file << " " << main_PNG_file;
       clean_command << XHOST.command("convert") << " -density " << resolution << " " << main_PDF_file << " " << main_PNG_file;
@@ -10202,7 +10202,7 @@ namespace chull {
         files_2_move.clear(); //only move these files
         files_2_move.push_back(main_PDF_file);
 
-        message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; // CO20180220 - current directory";
+        message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; //CO20180220 - current directory";
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
         message << "Try running \"" << aurostd::RemoveWhiteSpacesFromTheBack(clean_command.str()) << "\"";
         pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
@@ -10220,7 +10220,7 @@ namespace chull {
       if(!doc_only){files_2_move.push_back(aflow_logo_skinny_file);}
       if(print_aflow_logo_full){files_2_move.push_back(aflow_logo_full_file);} //files_2_move.push_back(aflow_logo_skinny_file);
       if(print_logo_2){files_2_move.push_back(logo_file_2);}
-      message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; // CO20180220 - current directory";
+      message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; //CO20180220 - current directory";
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
     if(!aurostd::file2directory(files_2_move, path)) {
@@ -10631,7 +10631,7 @@ namespace chull {
         if(point.isGState()){
           tmp_precision=precision;
           if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getRelativeStabilityCriterion(),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  // CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          value=aurostd::utype2string(point.getRelativeStabilityCriterion(),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
         }
       }
     }
@@ -10641,7 +10641,7 @@ namespace chull {
         if(point.isGState()){
           tmp_precision=precision;
           if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
-          value=aurostd::utype2string(point.getNPlus1EnergyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  // CO20180409 - not showing as fraction anymore, not necessarily out of 100%
+          value=aurostd::utype2string(point.getNPlus1EnergyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  //CO20180409 - not showing as fraction anymore, not necessarily out of 100%
         }
       }
     }

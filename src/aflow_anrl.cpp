@@ -670,7 +670,7 @@ namespace anrl {
     if(tokens.size()==1) { label_anrl=tokens.at(0); }
     if(tokens.size()==2) { label_anrl=tokens.at(0); label_permutations=tokens.at(1); }
 
-    // DX20181207 - add predefined protos - START
+    //DX20181207 - add predefined protos - START
     if(aurostd::substring2bool(label,"-")){
       vector<string> tokens;
       aurostd::string2tokens(label,tokens,"-");

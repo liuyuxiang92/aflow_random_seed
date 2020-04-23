@@ -151,9 +151,9 @@ xPOTCAR xPOTCAR_Finder(const string& AUID,bool LVERBOSE) {
 }
 
 bool xPOTCAR_PURE_Printer(xPOTCAR& xPOT,ostream& oss,bool LVERBOSE) {
-  if(XHOST.PSEUDOPOTENTIAL_GENERATOR && xPOT.species.size()==1) {  // SC20200326
+  if(XHOST.PSEUDOPOTENTIAL_GENERATOR && xPOT.species.size()==1) {  //SC20200326
     string comment="";
-    // objects/functions for references energies  // SC20200326
+    // objects/functions for references energies  //SC20200326
     //   vector<string> tokens;
     //   aurostd::string2tokens(xPOT.species_pp_version.at(0),tokens,":");
     // [OBSOLETE] if(tokens.size()>0) {vdate.clear();vdate.push_back(tokens.at(tokens.size()-1));};
@@ -172,52 +172,52 @@ bool xPOTCAR_PURE_Printer(xPOTCAR& xPOT,ostream& oss,bool LVERBOSE) {
     comment=xPOT.species_pp_version.at(0);
     xPOT.vTITEL.at(0)=aurostd::RemoveWhiteSpaces(xPOT.vTITEL.at(0));
     xPOT.vLEXCH.at(0)=aurostd::RemoveWhiteSpaces(xPOT.vLEXCH.at(0));
-    if(LVERBOSE) {cerr << "xPOTCAR_PURE_Printer: vTITEL.at(0)=" << xPOT.vTITEL.at(0) << endl;}   // SC20200326
-    if(LVERBOSE) {cerr << "xPOTCAR_PURE_Printer: species.at(0)=" << xPOT.species.at(0) << endl;}   // SC20200326
-    if(LVERBOSE) {cerr << "xPOTCAR_PURE_Printer: species_Z.at(0)=" << xPOT.species_Z.at(0) << endl;}    // SC20200326
+    if(LVERBOSE) {cerr << "xPOTCAR_PURE_Printer: vTITEL.at(0)=" << xPOT.vTITEL.at(0) << endl;}   //SC20200326
+    if(LVERBOSE) {cerr << "xPOTCAR_PURE_Printer: species.at(0)=" << xPOT.species.at(0) << endl;}   //SC20200326
+    if(LVERBOSE) {cerr << "xPOTCAR_PURE_Printer: species_Z.at(0)=" << xPOT.species_Z.at(0) << endl;}    //SC20200326
     oss << "  " << endl;
     oss << "  // ******************************************************************************************************************************************************** " << endl;
     //   oss << "  // [AFLOW]START=" << comment << " " << endl;
     oss << "  // " << comment << " " << comment << " " << comment << " " << comment << " " << endl;
-    oss << "  // " << xPOT.filename << endl;    // SC20200326
-    oss << "  " << aurostd::PaddedPOST("{",PSEUDOPOTENTIAL_GENERATOR_pad) << "      // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("xPOTCAR x;",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.filename=\""+xPOT.filename+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.AUID=\""+xPOT.AUID+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.vTITEL.push_back(\""+xPOT.vTITEL.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.pp_type=\""+xPOT.pp_type+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.species.push_back(\""+xPOT.species.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.species_Z.push_back("+aurostd::utype2string<int>(xPOT.species_Z.at(0))+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.species_pp.push_back(\""+xPOT.species_pp.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.species_pp_type.push_back(\""+xPOT.species_pp_type.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.species_pp_version.push_back(\""+xPOT.species_pp_version.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.species_pp_AUID.push_back(\""+xPOT.AUID+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    if(!found) oss << "    " << aurostd::PaddedPOST("x.species_pp_groundstate_energy.push_back("+aurostd::utype2string<double>(groundstate_energy,10)+");//"+xPOT.AUID,PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    if(found)  oss << "    " << aurostd::PaddedPOST("x.species_pp_groundstate_energy.push_back("+aurostd::utype2string<double>(groundstate_energy,10)+");//",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.species_pp_groundstate_structure.push_back(\""+groundstate_structure+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_PAW="+aurostd::bool2string(xPOT.POTCAR_PAW)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_TYPE=\""+xPOT.POTCAR_TYPE+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_KINETIC="+aurostd::bool2string(xPOT.POTCAR_KINETIC)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_GW="+aurostd::bool2string(xPOT.POTCAR_GW)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_AE="+aurostd::bool2string(xPOT.POTCAR_AE)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
+    oss << "  // " << xPOT.filename << endl;    //SC20200326
+    oss << "  " << aurostd::PaddedPOST("{",PSEUDOPOTENTIAL_GENERATOR_pad) << "      // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("xPOTCAR x;",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.filename=\""+xPOT.filename+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.AUID=\""+xPOT.AUID+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.vTITEL.push_back(\""+xPOT.vTITEL.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.pp_type=\""+xPOT.pp_type+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.species.push_back(\""+xPOT.species.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.species_Z.push_back("+aurostd::utype2string<int>(xPOT.species_Z.at(0))+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.species_pp.push_back(\""+xPOT.species_pp.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.species_pp_type.push_back(\""+xPOT.species_pp_type.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.species_pp_version.push_back(\""+xPOT.species_pp_version.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.species_pp_AUID.push_back(\""+xPOT.AUID+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    if(!found) oss << "    " << aurostd::PaddedPOST("x.species_pp_groundstate_energy.push_back("+aurostd::utype2string<double>(groundstate_energy,10)+");//"+xPOT.AUID,PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    if(found)  oss << "    " << aurostd::PaddedPOST("x.species_pp_groundstate_energy.push_back("+aurostd::utype2string<double>(groundstate_energy,10)+");//",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.species_pp_groundstate_structure.push_back(\""+groundstate_structure+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_PAW="+aurostd::bool2string(xPOT.POTCAR_PAW)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_TYPE=\""+xPOT.POTCAR_TYPE+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_KINETIC="+aurostd::bool2string(xPOT.POTCAR_KINETIC)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_GW="+aurostd::bool2string(xPOT.POTCAR_GW)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.POTCAR_AE="+aurostd::bool2string(xPOT.POTCAR_AE)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
     // EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX LEXCH
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vENMAX.push_back("+aurostd::utype2string<double>(xPOT.vENMAX.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vENMIN.push_back("+aurostd::utype2string<double>(xPOT.vENMIN.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vPOMASS.push_back("+aurostd::utype2string<double>(xPOT.vPOMASS.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vZVAL.push_back("+aurostd::utype2string<double>(xPOT.vZVAL.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.vEATOM.push_back("+aurostd::utype2string<double>(xPOT.vEATOM.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vRCORE.push_back("+aurostd::utype2string<double>(xPOT.vRCORE.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vRWIGS.push_back("+aurostd::utype2string<double>(xPOT.vRWIGS.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vEAUG.push_back("+aurostd::utype2string<double>(xPOT.vEAUG.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vRAUG.push_back("+aurostd::utype2string<double>(xPOT.vRAUG.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.vRMAX.push_back("+aurostd::utype2string<double>(xPOT.vRMAX.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("x.vLEXCH.push_back(\""+xPOT.vLEXCH.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vxpseudopotential.push_back(x);",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "  " << aurostd::PaddedPOST("}",PSEUDOPOTENTIAL_GENERATOR_pad) << "      // " << comment << endl;    // SC20200326
-    oss << "  // " << xPOT.filename << endl;    // SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vENMAX.push_back("+aurostd::utype2string<double>(xPOT.vENMAX.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vENMIN.push_back("+aurostd::utype2string<double>(xPOT.vENMIN.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vPOMASS.push_back("+aurostd::utype2string<double>(xPOT.vPOMASS.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vZVAL.push_back("+aurostd::utype2string<double>(xPOT.vZVAL.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.vEATOM.push_back("+aurostd::utype2string<double>(xPOT.vEATOM.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vRCORE.push_back("+aurostd::utype2string<double>(xPOT.vRCORE.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vRWIGS.push_back("+aurostd::utype2string<double>(xPOT.vRWIGS.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vEAUG.push_back("+aurostd::utype2string<double>(xPOT.vEAUG.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    // [NON_NECESSARY] oss << "    " << aurostd::PaddedPOST("x.vRAUG.push_back("+aurostd::utype2string<double>(xPOT.vRAUG.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.vRMAX.push_back("+aurostd::utype2string<double>(xPOT.vRMAX.at(0),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("x.vLEXCH.push_back(\""+xPOT.vLEXCH.at(0)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vxpseudopotential.push_back(x);",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "  " << aurostd::PaddedPOST("}",PSEUDOPOTENTIAL_GENERATOR_pad) << "      // " << comment << endl;    //SC20200326
+    oss << "  // " << xPOT.filename << endl;    //SC20200326
     //   oss << "  // [AFLOW]STOP=" << comment << " " << endl;
     oss << "  // ******************************************************************************************************************************************************** " << endl;
-    oss << endl;    // SC20200326
+    oss << endl;    //SC20200326
     return TRUE;
   }
   return FALSE;
@@ -231,36 +231,36 @@ ostream& operator<<(ostream& oss,const xPOTCAR& xPOT) {
     oss << "  // ******************************************************************************************************************************************************** " << endl;
     oss << "  // [AFLOW]START=" << comment << " " << endl;
     oss << "  // " << comment << " " << comment << " " << comment << " " << comment << " " << endl;
-    oss << "  // " << xPOT.filename << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("filename=\""+xPOT.filename+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("AUID=\""+xPOT.AUID+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vTITEL.push_back(\""+xPOT.vTITEL.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("pp_type=\""+xPOT.pp_type+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("species.push_back(\""+xPOT.species.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("species_Z.push_back("+aurostd::utype2string<int>(xPOT.species_Z.at(i))+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("species_pp.push_back(\""+xPOT.species_pp.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("species_pp_type.push_back(\""+xPOT.species_pp_type.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("species_pp_version.push_back(\""+xPOT.species_pp_version.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("species_pp_AUID.push_back(\""+xPOT.species_pp_AUID.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("species_pp_groundstate_energy.push_back("+aurostd::utype2string<double>(xPOT.species_pp_groundstate_energy.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("species_pp_groundstate_structure.push_back(\""+xPOT.species_pp_groundstate_structure.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("POTCAR_PAW="+aurostd::bool2string(xPOT.POTCAR_PAW)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("POTCAR_TYPE=\""+xPOT.POTCAR_TYPE+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("POTCAR_KINETIC="+aurostd::bool2string(xPOT.POTCAR_KINETIC)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("POTCAR_GW="+aurostd::bool2string(xPOT.POTCAR_GW)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("POTCAR_AE="+aurostd::bool2string(xPOT.POTCAR_AE)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vENMAX.push_back("+aurostd::utype2string<double>(xPOT.vENMAX.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vENMIN.push_back("+aurostd::utype2string<double>(xPOT.vENMIN.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vPOMASS.push_back("+aurostd::utype2string<double>(xPOT.vPOMASS.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vZVAL.push_back("+aurostd::utype2string<double>(xPOT.vZVAL.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vEATOM.push_back("+aurostd::utype2string<double>(xPOT.vEATOM.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vRCORE.push_back("+aurostd::utype2string<double>(xPOT.vRCORE.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vRWIGS.push_back("+aurostd::utype2string<double>(xPOT.vRWIGS.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vEAUG.push_back("+aurostd::utype2string<double>(xPOT.vEAUG.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;   // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vRAUG.push_back("+aurostd::utype2string<double>(xPOT.vRAUG.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;   // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vRMAX.push_back("+aurostd::utype2string<double>(xPOT.vRMAX.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "    " << aurostd::PaddedPOST("vLEXCH.push_back(\""+xPOT.vLEXCH.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    // SC20200326
-    oss << "  // " << xPOT.filename << endl;    // SC20200326
+    oss << "  // " << xPOT.filename << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("filename=\""+xPOT.filename+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("AUID=\""+xPOT.AUID+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vTITEL.push_back(\""+xPOT.vTITEL.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("pp_type=\""+xPOT.pp_type+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("species.push_back(\""+xPOT.species.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("species_Z.push_back("+aurostd::utype2string<int>(xPOT.species_Z.at(i))+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("species_pp.push_back(\""+xPOT.species_pp.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("species_pp_type.push_back(\""+xPOT.species_pp_type.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("species_pp_version.push_back(\""+xPOT.species_pp_version.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("species_pp_AUID.push_back(\""+xPOT.species_pp_AUID.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("species_pp_groundstate_energy.push_back("+aurostd::utype2string<double>(xPOT.species_pp_groundstate_energy.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("species_pp_groundstate_structure.push_back(\""+xPOT.species_pp_groundstate_structure.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("POTCAR_PAW="+aurostd::bool2string(xPOT.POTCAR_PAW)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("POTCAR_TYPE=\""+xPOT.POTCAR_TYPE+"\";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("POTCAR_KINETIC="+aurostd::bool2string(xPOT.POTCAR_KINETIC)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("POTCAR_GW="+aurostd::bool2string(xPOT.POTCAR_GW)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("POTCAR_AE="+aurostd::bool2string(xPOT.POTCAR_AE)+";",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vENMAX.push_back("+aurostd::utype2string<double>(xPOT.vENMAX.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vENMIN.push_back("+aurostd::utype2string<double>(xPOT.vENMIN.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vPOMASS.push_back("+aurostd::utype2string<double>(xPOT.vPOMASS.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vZVAL.push_back("+aurostd::utype2string<double>(xPOT.vZVAL.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vEATOM.push_back("+aurostd::utype2string<double>(xPOT.vEATOM.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vRCORE.push_back("+aurostd::utype2string<double>(xPOT.vRCORE.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vRWIGS.push_back("+aurostd::utype2string<double>(xPOT.vRWIGS.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vEAUG.push_back("+aurostd::utype2string<double>(xPOT.vEAUG.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;   //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vRAUG.push_back("+aurostd::utype2string<double>(xPOT.vRAUG.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;   //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vRMAX.push_back("+aurostd::utype2string<double>(xPOT.vRMAX.at(i),10)+");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "    " << aurostd::PaddedPOST("vLEXCH.push_back(\""+xPOT.vLEXCH.at(i)+"\");",PSEUDOPOTENTIAL_GENERATOR_pad) << "    // " << comment << endl;    //SC20200326
+    oss << "  // " << xPOT.filename << endl;    //SC20200326
     oss << "  // [AFLOW]STOP=" << comment << " " << endl;
     oss << "  // ******************************************************************************************************************************************************** " << endl;
   }

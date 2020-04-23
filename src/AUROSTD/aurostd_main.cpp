@@ -3961,7 +3961,7 @@ namespace aurostd {
   // aurostd::file2md5sum
   //***************************************************************************//
   // Stefano Curtarolo
-  string file2md5sum(const string& file) { // SC20200326
+  string file2md5sum(const string& file) { //SC20200326
     vector<string> vtokens;
     if(aurostd::FileExist(file)) {
       aurostd::string2tokens(aurostd::execute2string("md5sum "+file),vtokens," ");
@@ -3974,7 +3974,7 @@ namespace aurostd {
   // aurostd::file2auid
   //***************************************************************************//
   // Stefano Curtarolo
-  string file2auid(const string& file) { // SC20200326
+  string file2auid(const string& file) { //SC20200326
     vector<string> vtokens;
     if(aurostd::FileExist(file)) {
     uint64_t crc=0;
@@ -6442,7 +6442,7 @@ namespace aurostd {
   // [OBSOLETE]   return vout;
   // [OBSOLETE] }
   // [OBSOLETE]  deque<string> deqDouble2deqString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {  // USE OVERLOADING
-  deque<string> vecDouble2vecString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) { // SC20200330
+  deque<string> vecDouble2vecString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) { //SC20200330
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
       //double tmp = vin.at(i); // DX 8/22/17 - add roundoff

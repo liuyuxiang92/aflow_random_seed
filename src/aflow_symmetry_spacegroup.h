@@ -448,7 +448,7 @@ namespace SYM {
   vector<int> get_multiplicities(string sg);
   vector<string> get_symmetry_symbols(string sg);
 
-  vector<string> get_wyckoff_equation(string spaceg, int mult);  // DX20170830
+  vector<string> get_wyckoff_equation(string spaceg, int mult);  //DX20170830
   vector<vector<vector<string> > > get_wyckoff_pos(string spaceg, int mult);
   vector<vector<vector<string> > > get_wyckoff_pos(string spaceg, int mult, bool getcentering);
   vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter); //DX20190129

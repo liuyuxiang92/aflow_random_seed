@@ -20,7 +20,7 @@
 #include "aflow_compare_structure.h" //DX20181009
 
 #define _EPS_ 0.02
-//#define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75 // CO20171023 - see aflow.h
+//#define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75 //CO20171023 - see aflow.h
 #define AFLOWLIB_SERVER_DEFAULT string("aflowlib.duke.edu")
 
 using aurostd::isdifferent;
@@ -399,9 +399,9 @@ namespace aflowlib {
 // ***************************************************************************
 // ***************************************************************************
 namespace aflowlib {
-  uint PrototypeLibrariesSpeciesNumber(const string& _label,ostream& oss) { // CO20181226
+  uint PrototypeLibrariesSpeciesNumber(const string& _label,ostream& oss) { //CO20181226
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aflowlib::PrototypeLibrariesSpeciesNumber():"; // CO20181226
+    string soliloquy="aflowlib::PrototypeLibrariesSpeciesNumber():"; //CO20181226
     bool silent=false;  //CO20181226
     if(LDEBUG) cerr << "aflowlib::PrototypeLibrariesSpeciesNumber: label=" << _label << endl;
     // search for _ICSD_XXXX or ICSD_XXXX
@@ -414,7 +414,7 @@ namespace aflowlib {
     aurostd::string2tokens(_label,labeltokens,",");
     if(labeltokens.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"label empty [2]",_VALUE_ILLEGAL_);}
     string label=labeltokens[0];
-    if(aurostd::substring2bool(label,"ICSD_")) { // found ICSD // CO20181226
+    if(aurostd::substring2bool(label,"ICSD_")) { // found ICSD //CO20181226
       vector<string> vline,tokens;
       string _label=label;
       //grab just XXXX of _ICSD_XXXX or ICSD_XXXX
@@ -437,7 +437,7 @@ namespace aflowlib {
         }
       }
     }
-    if(aurostd::substring2bool(label,"_ICSD_")) { // if we get here, then it was not found in our current ICSD_List_txt, could be old, so derive based in compound input // CO20181226
+    if(aurostd::substring2bool(label,"_ICSD_")) { // if we get here, then it was not found in our current ICSD_List_txt, could be old, so derive based in compound input //CO20181226
       vector<string> tokens;
       aurostd::string2tokens(label,tokens,"_");
       if(tokens.size()==3){  //compound_ICSD_XXXXXX
@@ -447,7 +447,7 @@ namespace aflowlib {
         if(valloy.size()>0){return valloy.size();}
       }
     }
-    if(aurostd::substring2bool(label,"ICSD_")){ //last shot, SCAN... // CO20181226
+    if(aurostd::substring2bool(label,"ICSD_")){ //last shot, SCAN... //CO20181226
       vector<string> tokens;
       string _label1=label,_label2;
       //grab just XXXX of _ICSD_XXXX or ICSD_XXXX
@@ -621,7 +621,7 @@ namespace aflowlib {
     vector<string> vlabel_ANRL;
     if(aurostd::string2tokens(label,vlabel_ANRL,"_")>=4) {
       if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: ANRL=" << 1 << endl; }
-      // DX20190708 - START 
+      //DX20190708 - START 
       // add default permutation to label if not included in input //DX20190708
       vector<string> perm_tokens;
       if(aurostd::string2tokens(label,perm_tokens,".")==1) {
@@ -629,7 +629,7 @@ namespace aflowlib {
         label += "."+default_permutation;
         if(LDEBUG) cerr << soliloquy << " added default permutation designation to ANRL label; label=" << label << endl;
       }
-      // DX20190708 - END
+      //DX20190708 - END
       return anrl::PrototypeANRL(oss,label,parameters,vatomX,vvolumeX,volume_in,mode,flip_option);
     }
     // done

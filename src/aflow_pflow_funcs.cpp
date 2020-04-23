@@ -43,11 +43,11 @@ string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO2019052
   uint iat=0;
   //if any names missing from atoms, lets use generic names
   bool atom_names=true;
-  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].name.empty()){atom_names=false;}} // CO20180316 - use pp names
+  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].name.empty()){atom_names=false;}} //CO20180316 - use pp names
   for(uint itype=0;itype<xstr.num_each_type.size();itype++){
     for(uint j=0;j<(uint)xstr.num_each_type.at(itype);j++) {
       if(j==0){
-        if(atom_names){title+=xstr.atoms.at(iat).name;} // CO20180316 - use pp names
+        if(atom_names){title+=xstr.atoms.at(iat).name;} //CO20180316 - use pp names
         else {title+=char('A'+itype);}
         if(latex){title+="$_{"+aurostd::utype2string(xstr.num_each_type.at(itype))+"}$";}
         else {title+=aurostd::utype2string(xstr.num_each_type.at(itype));}
@@ -7327,7 +7327,7 @@ namespace pflow {
 }
 
 
-// ME20190628 - BEGIN
+//ME20190628 - BEGIN
 // prettyPrintCompound
 namespace pflow {
 

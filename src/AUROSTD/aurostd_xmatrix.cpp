@@ -3581,7 +3581,7 @@ namespace aurostd {
           z[ip]=0.0;
         }
       }
-      // ME200106 - replace with xerror
+      //ME200106 - replace with xerror
       //cerr << _AUROSTD_XLIBS_ERROR_ << "JACOBI: Too many iterations in routine jacobi" << endl;
       //exit(0);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, "xmatrix::jacobi()", "Too many iterations.", _RUNTIME_ERROR_);

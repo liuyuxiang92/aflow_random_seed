@@ -1005,7 +1005,7 @@ namespace pflow {
         if(b.atoms.at(iat).name.size()) {
           b.atoms.at(iat).name_is_given=TRUE;
           b.atoms.at(iat).CleanName();
-          // DX20170921 - Need to keep spin info b.atoms.at(iat).CleanSpin();
+          //DX20170921 - Need to keep spin info b.atoms.at(iat).CleanSpin();
         }
       }
       return b;
@@ -1015,7 +1015,7 @@ namespace pflow {
         b.atoms.at(iat).name=in.at(iat);
         b.atoms.at(iat).name_is_given=TRUE;
         b.atoms.at(iat).CleanName();
-        // DX20170921 - Need to keep spin info b.atoms.at(iat).CleanSpin();
+        //DX20170921 - Need to keep spin info b.atoms.at(iat).CleanSpin();
       }
       return b;
     }

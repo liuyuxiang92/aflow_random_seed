@@ -588,8 +588,8 @@ namespace aurostd {
   bool file2directory(const string& _file,const string& destination);
   bool file2directory(const vector<string>& files,const string& destination);
   bool file2file(const string& _file,const string& destination); //CO 171025
-  string file2md5sum(const string& _file); // SC20200326
-  string file2auid(const string& _file); // SC20200326  
+  string file2md5sum(const string& _file); //SC20200326
+  string file2auid(const string& _file); //SC20200326  
   bool IsDirectory(string path);
   bool IsFile(string path);
   //CO - END
@@ -1282,8 +1282,8 @@ namespace aurostd {
 namespace aurostd {
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap);
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end);
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap);                          // SC20200329 nice overload to deal with Marco
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end);    // SC20200329 nice overload to deal with Marco
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap);                          //SC20200329 nice overload to deal with Marco
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end);    //SC20200329 nice overload to deal with Marco
  }
 
 //base64 stuff

@@ -11,8 +11,8 @@
 #ifndef _AFLOWLIB_WEB_INTERFACE_CPP_
 #define _AFLOWLIB_WEB_INTERFACE_CPP_
 #include "aflow.h"
-#include "aflowlib_webapp_entry.cpp"  // CO20170622 - bob hanson JMOL stuff
-#include "aflowlib_webapp_bands.cpp"  // CO20180305 - geena bands stuff
+#include "aflowlib_webapp_entry.cpp"  //CO20170622 - bob hanson JMOL stuff
+#include "aflowlib_webapp_bands.cpp"  //CO20180305 - geena bands stuff
 
 const string _DEVIL_PROTOTYPES_STRING_ = "64,65,549,550,f8269,f9083,f8819";
 
@@ -81,7 +81,7 @@ namespace aflowlib {
     geometry_orig.clear();vgeometry_orig.clear(); //DX20190124 - add original crystal info
     lattice_system_orig.clear();lattice_variation_orig.clear();lattice_system_relax.clear();lattice_variation_relax.clear();
     ldau_TLUJ.clear();
-    vLDAU.resize(4);  // ME20190129
+    vLDAU.resize(4);  //ME20190129
     natoms=AUROSTD_NAN;
     natoms_orig=AUROSTD_NAN; //DX20190124 - add original crystal info
     nbondxx.clear();vnbondxx.clear();
@@ -96,7 +96,7 @@ namespace aflowlib {
     prototype.clear();
     PV_cell=AUROSTD_NAN;PV_atom=AUROSTD_NAN;
     scintillation_attenuation_length=AUROSTD_NAN;
-    sg.clear();sg2.clear();vsg.clear();vsg2.clear();  // CO20171202
+    sg.clear();sg2.clear();vsg.clear();vsg2.clear();  //CO20171202
     spacegroup_orig.clear();spacegroup_relax.clear();
     species.clear();vspecies.clear();
     species_pp.clear();vspecies_pp.clear();
@@ -204,8 +204,8 @@ namespace aflowlib {
     ael_debye_temperature=AUROSTD_NAN; //CT181212
     ael_applied_pressure=AUROSTD_NAN; //CT181212
     ael_average_external_pressure=AUROSTD_NAN; //CT181212
-    ael_stiffness_tensor.clear();  // ME20191105
-    ael_compliance_tensor.clear();  // ME20191105
+    ael_stiffness_tensor.clear();  //ME20191105
+    ael_compliance_tensor.clear();  //ME20191105
     // BADER
     bader_net_charges.clear();vbader_net_charges.clear();
     bader_atomic_volumes.clear();vbader_atomic_volumes.clear();
@@ -287,7 +287,7 @@ namespace aflowlib {
     lattice_system_orig=b.lattice_system_orig;lattice_variation_orig=b.lattice_variation_orig;
     lattice_system_relax=b.lattice_system_relax;lattice_variation_relax=b.lattice_variation_relax;
     ldau_TLUJ=b.ldau_TLUJ;
-    vLDAU=b.vLDAU;  // ME20190129
+    vLDAU=b.vLDAU;  //ME20190129
     natoms=b.natoms;
     natoms_orig=b.natoms_orig; //DX20190124 - add original crystal info
     nbondxx=b.nbondxx;vnbondxx.clear();for(uint i=0;i<b.vnbondxx.size();i++) vnbondxx.push_back(b.vnbondxx.at(i));
@@ -302,7 +302,7 @@ namespace aflowlib {
     prototype=b.prototype;
     PV_cell=b.PV_cell;PV_atom=b.PV_atom;
     scintillation_attenuation_length=b.scintillation_attenuation_length;
-    sg=b.sg;sg2=b.sg2;vsg.clear();for(uint i=0;i<b.vsg.size();i++){vsg.push_back(b.vsg[i]);} vsg2.clear();for(uint i=0;i<b.vsg2.size();i++){vsg2.push_back(b.vsg2[i]);}  // CO20171202
+    sg=b.sg;sg2=b.sg2;vsg.clear();for(uint i=0;i<b.vsg.size();i++){vsg.push_back(b.vsg[i]);} vsg2.clear();for(uint i=0;i<b.vsg2.size();i++){vsg2.push_back(b.vsg2[i]);}  //CO20171202
     spacegroup_orig=b.spacegroup_orig;spacegroup_relax=b.spacegroup_relax;
     species=b.species;vspecies.clear();for(uint i=0;i<b.vspecies.size();i++) vspecies.push_back(b.vspecies.at(i));
     species_pp=b.species_pp;vspecies_pp.clear();for(uint i=0;i<b.vspecies_pp.size();i++) vspecies_pp.push_back(b.vspecies_pp.at(i));
@@ -410,8 +410,8 @@ namespace aflowlib {
     ael_debye_temperature=b.ael_debye_temperature; //CT181212
     ael_applied_pressure=b.ael_applied_pressure; //CT181212
     ael_average_external_pressure=b.ael_average_external_pressure; //CT181212
-    ael_stiffness_tensor = b.ael_stiffness_tensor;  // ME20191105
-    ael_compliance_tensor = b.ael_compliance_tensor;  // ME20191105
+    ael_stiffness_tensor = b.ael_stiffness_tensor;  //ME20191105
+    ael_compliance_tensor = b.ael_compliance_tensor;  //ME20191105
     // BADER
     bader_net_charges=b.bader_net_charges;vbader_net_charges.clear();for(uint i=0;i<b.vbader_net_charges.size();i++) vbader_net_charges.push_back(b.vbader_net_charges.at(i));
     bader_atomic_volumes=b.bader_atomic_volumes;vbader_atomic_volumes.clear();for(uint i=0;i<b.vbader_atomic_volumes.size();i++) vbader_atomic_volumes.push_back(b.vbader_atomic_volumes.at(i));
@@ -504,7 +504,7 @@ namespace aflowlib {
 
   // file2aflowlib
   uint _aflowlib_entry::file2aflowlib(const string& file,ostream& oss) {
-    if(!aurostd::FileExist(file)) {cerr << "ERROR - _aflowlib_entry::file2aflowlib: " << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << " not found =" << file << endl;return 0;} //exit(0); // CO20170609, this is a dud
+    if(!aurostd::FileExist(file)) {cerr << "ERROR - _aflowlib_entry::file2aflowlib: " << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << " not found =" << file << endl;return 0;} //exit(0); //CO20170609, this is a dud
     string entry;
     aurostd::efile2string(file,entry);
     return Load(entry,oss);
@@ -520,7 +520,7 @@ namespace aflowlib {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="_aflowlib_entry::url2aflowlib():";
     string url=_url;
-    if(url.empty()) {cerr << "ERROR - _aflowlib_entry::url2aflowlib: url.empty()" << endl;return 0;} //exit(0); // CO20170609, this is a dud
+    if(url.empty()) {cerr << "ERROR - _aflowlib_entry::url2aflowlib: url.empty()" << endl;return 0;} //exit(0); //CO20170609, this is a dud
     string entry;
     if(aurostd::substring2bool(url,"index") || aurostd::substring2bool(url,"format")) {
       aurostd::StringSubst(url,"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,"");
@@ -535,10 +535,10 @@ namespace aflowlib {
 
   // Load overload
   uint _aflowlib_entry::Load(const string& _entry,ostream& oss) {
-    string function = "aflowlib::_aflowlib_entry::Load()";  // ME20191119
+    string function = "aflowlib::_aflowlib_entry::Load()";  //ME20191119
     clear(); // start from clean
     entry=_entry; // start from loading it up !
-    if(entry.empty()) {cerr << "ERROR - _aflowlib_entry::Load: entry.empty()" << endl;return 0;} //exit(0);  // CO20170609, this is a dud 
+    if(entry.empty()) {cerr << "ERROR - _aflowlib_entry::Load: entry.empty()" << endl;return 0;} //exit(0);  //CO20170609, this is a dud 
     vector<string> tokens,stokens;
     string keyword,content,line;
     aurostd::string2tokens(entry,ventry,"|");
@@ -547,18 +547,18 @@ namespace aflowlib {
       aurostd::string2tokens(line,tokens,"=");
       if(tokens.size()>0) {
         keyword=tokens.at(0);
-        if(tokens.size()>1) {content=tokens.at(1);} else {continue;} //{content="";}  // CO20180319, content="" screws up string2double(), better to leave as AUROSTD_NAN
-        if(content.empty()){continue;}  // CO20180319
-        if(content=="null"){continue;}  // CO20180319 - aflux integration!
+        if(tokens.size()>1) {content=tokens.at(1);} else {continue;} //{content="";}  //CO20180319, content="" screws up string2double(), better to leave as AUROSTD_NAN
+        if(content.empty()){continue;}  //CO20180319
+        if(content=="null"){continue;}  //CO20180319 - aflux integration!
         aurostd::string2tokens(content,stokens,",");
         if(keyword=="auid") {
           auid=content; // AUID
           vauid.clear();aflowlib::auid2vauid(auid,vauid);
           // create VAUID
         }
-        // CO20180409 - added the else if's for speed, no need to go through more checks than necessary
+        //CO20180409 - added the else if's for speed, no need to go through more checks than necessary
         else if(keyword=="aurl") {aurl=content;aurostd::string2tokens(content,stokens,":");for(uint j=0;j<stokens.size();j++) vaurl.push_back(stokens.at(j));}
-        else if(keyword=="title") {title=content;}  // ME20190129
+        else if(keyword=="title") {title=content;}  //ME20190129
         else if(keyword=="keywords") {keywords=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vkeywords.push_back(stokens.at(j));}
         else if(keyword=="aflowlib_date") {aflowlib_date=content;}
         else if(keyword=="aflowlib_version") {aflowlib_version=content;}
@@ -601,10 +601,10 @@ namespace aflowlib {
         else if(keyword=="nkpoints_irreducible") {nkpoints_irreducible=aurostd::string2utype<uint>(content);}
         else if(keyword=="kppra") {kppra=aurostd::string2utype<uint>(content);}
         else if(keyword=="kpoints") {kpoints=content;}
-        else if(keyword=="kpoints_relax") {vector<int> tokens;aurostd::string2tokens(content,tokens,",");kpoints_nnn_relax=aurostd::vector2xvector(tokens);}  // ME20190129
-        else if(keyword=="kpoints_static") {vector<int> tokens;aurostd::string2tokens(content,tokens,",");kpoints_nnn_static=aurostd::vector2xvector(tokens);}  // ME20190129
-        else if(keyword=="kpoints_bands_path"){aurostd::string2tokens(content,kpoints_pairs,",");}  // ME20190129
-        else if(keyword=="kpoints_bands_nkpts"){kpoints_bands_path_grid=aurostd::string2utype<int>(content);}  // ME20190129
+        else if(keyword=="kpoints_relax") {vector<int> tokens;aurostd::string2tokens(content,tokens,",");kpoints_nnn_relax=aurostd::vector2xvector(tokens);}  //ME20190129
+        else if(keyword=="kpoints_static") {vector<int> tokens;aurostd::string2tokens(content,tokens,",");kpoints_nnn_static=aurostd::vector2xvector(tokens);}  //ME20190129
+        else if(keyword=="kpoints_bands_path"){aurostd::string2tokens(content,kpoints_pairs,",");}  //ME20190129
+        else if(keyword=="kpoints_bands_nkpts"){kpoints_bands_path_grid=aurostd::string2utype<int>(content);}  //ME20190129
         else if(keyword=="enthalpy_cell") {enthalpy_cell=aurostd::string2utype<double>(content);}
         else if(keyword=="enthalpy_atom") {enthalpy_atom=aurostd::string2utype<double>(content);}
         else if(keyword=="enthalpy_formation_cell") {enthalpy_formation_cell=aurostd::string2utype<double>(content);}
@@ -634,10 +634,10 @@ namespace aflowlib {
         else if(keyword=="lattice_system_relax") {lattice_system_relax=content;}
         else if(keyword=="lattice_variation_relax") {lattice_variation_relax=content;}
         else if(keyword=="ldau_TLUJ") {ldau_TLUJ=content;}
-        else if(keyword=="ldau_type") {vLDAU[0].push_back(aurostd::string2utype<double>(content));}  // ME20190129
-        else if(keyword=="ldau_l") {for(uint j=0; j<stokens.size();j++) vLDAU[1].push_back(aurostd::string2utype<double>(stokens[j]));}  // ME20190129
-        else if(keyword=="ldau_u") {for(uint j=0; j<stokens.size();j++) vLDAU[2].push_back(aurostd::string2utype<double>(stokens[j]));}  // ME20190129
-        else if(keyword=="ldau_j") {for(uint j=0; j<stokens.size();j++) vLDAU[3].push_back(aurostd::string2utype<double>(stokens[j]));}  // ME20190129
+        else if(keyword=="ldau_type") {vLDAU[0].push_back(aurostd::string2utype<double>(content));}  //ME20190129
+        else if(keyword=="ldau_l") {for(uint j=0; j<stokens.size();j++) vLDAU[1].push_back(aurostd::string2utype<double>(stokens[j]));}  //ME20190129
+        else if(keyword=="ldau_u") {for(uint j=0; j<stokens.size();j++) vLDAU[2].push_back(aurostd::string2utype<double>(stokens[j]));}  //ME20190129
+        else if(keyword=="ldau_j") {for(uint j=0; j<stokens.size();j++) vLDAU[3].push_back(aurostd::string2utype<double>(stokens[j]));}  //ME20190129
         else if(keyword=="natoms") {natoms=aurostd::string2utype<int>(content);}
         else if(keyword=="natoms_orig") {natoms_orig=aurostd::string2utype<int>(content);} //DX20190124 - add original crystal info
         else if(keyword=="nbondxx") {nbondxx=content;for(uint j=0;j<stokens.size();j++) vnbondxx.push_back(aurostd::string2utype<double>(stokens.at(j)));}
@@ -660,8 +660,8 @@ namespace aflowlib {
         else if(keyword=="PV_cell") {PV_cell=aurostd::string2utype<double>(content);}
         else if(keyword=="PV_atom") {PV_atom=aurostd::string2utype<double>(content);}
         else if(keyword=="scintillation_attenuation_length") {scintillation_attenuation_length=aurostd::string2utype<double>(content);}
-        else if(keyword=="sg") {sg=content;for(uint j=0;j<stokens.size();j++) vsg.push_back(stokens.at(j));} // CO20180101
-        else if(keyword=="sg2") {sg2=content;for(uint j=0;j<stokens.size();j++) vsg2.push_back(stokens.at(j));} // CO20180101
+        else if(keyword=="sg") {sg=content;for(uint j=0;j<stokens.size();j++) vsg.push_back(stokens.at(j));} //CO20180101
+        else if(keyword=="sg2") {sg2=content;for(uint j=0;j<stokens.size();j++) vsg2.push_back(stokens.at(j));} //CO20180101
         else if(keyword=="spacegroup_orig") {spacegroup_orig=content;}
         else if(keyword=="spacegroup_relax") {spacegroup_relax=content;}
         else if(keyword=="species") {species=content;for(uint j=0;j<stokens.size();j++) vspecies.push_back(stokens.at(j));}
@@ -788,7 +788,7 @@ namespace aflowlib {
         else if(keyword=="ael_debye_temperature") {ael_debye_temperature=aurostd::string2utype<double>(content);} //CT181212
         else if(keyword=="ael_applied_pressure") {ael_applied_pressure=aurostd::string2utype<double>(content);} //CT181212
         else if(keyword=="ael_average_external_pressure") {ael_average_external_pressure=aurostd::string2utype<double>(content);} //CT181212
-        // ME20191105 - BEGIN
+        //ME20191105 - BEGIN
         else if(keyword=="ael_stiffness_tensor") {
           xmatrix<double> tensor(6,6);
           vector<string> rows;
@@ -844,13 +844,13 @@ namespace aflowlib {
           }
           ael_compliance_tensor = tensor;
         }
-        // ME20191105 - END
+        //ME20191105 - END
         // BADER
         else if(keyword=="bader_net_charges") {bader_net_charges=content;aurostd::string2tokens<double>(content,vbader_net_charges,",");}
         else if(keyword=="bader_atomic_volumes") {bader_atomic_volumes=content;aurostd::string2tokens<double>(content,vbader_atomic_volumes,",");}
       }
     }
-    // ME20190129 - FIX vLDAU
+    //ME20190129 - FIX vLDAU
     if (vLDAU[0].size()) vLDAU[0].assign(vLDAU[1].size(), vLDAU[0][0]);
     // FIX LOOP
     loop="";
@@ -884,7 +884,7 @@ namespace aflowlib {
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;
       oss << "aurl=" << aurl << (html?"<br>":"") << endl;
-      oss << "title=" << title << (html?"<br>":"") << endl;  // ME20190129
+      oss << "title=" << title << (html?"<br>":"") << endl;  //ME20190129
       oss << "keywords=" << keywords << (html?"<br>":"") << "  vkeywords= ";for(uint j=0;j<vkeywords.size();j++) oss << vkeywords.at(j) << " "; oss << (html?"<br>":"") << endl;
       oss << "Optional controls keywords (alphabetic order)" << endl;
       oss << "aflowlib_date=" << aflowlib_date << (html?"<br>":"") << endl; 
@@ -929,10 +929,10 @@ namespace aflowlib {
       oss << "nkpoints=" << nkpoints << (html?"<br>":"") << endl; 
       oss << "nkpoints_irreducible=" << nkpoints_irreducible << (html?"<br>":"") << endl; 
       oss << "kppra=" << kppra << (html?"<br>":"") << endl; 
-      oss << "kpoints_relax=" << aurostd::joinWDelimiter(kpoints_nnn_relax, ",") << (html?"<br>":"") << endl;  // ME20190129
-      oss << "kpoints_static=" << aurostd::joinWDelimiter(kpoints_nnn_static, ",") << (html?"<br>":"") << endl;  // ME20190129
-      oss << "kpoints_bands_path=" << aurostd::joinWDelimiter(kpoints_pairs, " | ") << endl;  // ME20190129
-      oss << "kpoints_bands_nkpts=" << kpoints_bands_path_grid << (html?"<br>":"") << endl;  // ME20190129
+      oss << "kpoints_relax=" << aurostd::joinWDelimiter(kpoints_nnn_relax, ",") << (html?"<br>":"") << endl;  //ME20190129
+      oss << "kpoints_static=" << aurostd::joinWDelimiter(kpoints_nnn_static, ",") << (html?"<br>":"") << endl;  //ME20190129
+      oss << "kpoints_bands_path=" << aurostd::joinWDelimiter(kpoints_pairs, " | ") << endl;  //ME20190129
+      oss << "kpoints_bands_nkpts=" << kpoints_bands_path_grid << (html?"<br>":"") << endl;  //ME20190129
       oss << "kpoints=" << kpoints << (html?"<br>":"") << endl;      
       oss << "enthalpy_cell=" << enthalpy_cell << (html?"<br>":"") << endl; 
       oss << "enthalpy_atom=" << enthalpy_atom << (html?"<br>":"") << endl; 
@@ -951,10 +951,10 @@ namespace aflowlib {
       oss << "lattice_system_relax" << lattice_system_relax << (html?"<br>":"") << endl;
       oss << "lattice_variation_relax" << lattice_variation_relax << (html?"<br>":"") << endl;
       oss << "ldau_TLUJ=" << ldau_TLUJ << (html?"<br>":"") << endl;      
-      if (vLDAU[0].size()) {oss << "ldau_type=" << ((int) vLDAU[0][0]) << (html?"<br>":"") << endl;}  // ME20190129
-      if (vLDAU[1].size()) {oss << "ldau_l="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << (html?"<br>":"") << endl;}  // ME20190129
-      if (vLDAU[2].size()) {oss << "ldau_u="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << (html?"<br>":"") << endl;}  // ME20190129
-      if (vLDAU[3].size()) {oss << "ldau_j="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << (html?"<br>":"") << endl;}  // ME20190129
+      if (vLDAU[0].size()) {oss << "ldau_type=" << ((int) vLDAU[0][0]) << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU[1].size()) {oss << "ldau_l="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU[2].size()) {oss << "ldau_u="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
+      if (vLDAU[3].size()) {oss << "ldau_j="; oss << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << (html?"<br>":"") << endl;}  //ME20190129
       oss << "natoms=" << natoms << (html?"<br>":"") << endl;
       oss << "natoms_orig=" << natoms_orig << (html?"<br>":"") << endl; //DX20190124 - add original crystal info
       oss << "nbondxx=" << nbondxx << "  vnbondxx= ";for(uint j=0;j<vnbondxx.size();j++) oss << vnbondxx.at(j) << " "; oss << (html?"<br>":"") << endl;
@@ -1085,10 +1085,10 @@ namespace aflowlib {
       oss << "ael_debye_temperature" << ael_debye_temperature << (html?"<br>":"") << endl; //CT181212 
       oss << "ael_applied_pressure" << ael_applied_pressure << (html?"<br>":"") << endl; //CT181212 
       oss << "ael_average_external_pressure" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT181212 
-      // ME20191105 - BEGIN
-      oss << "ael_stiffness_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} // ME20191105
-      oss << "ael_compliance_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} // ME20191105
-      // ME20191105 - END
+      //ME20191105 - BEGIN
+      oss << "ael_stiffness_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_compliance_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      //ME20191105 - END
       // BADER
       oss << "bader_net_charges" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
       oss << "bader_atomic_volumes" << bader_atomic_volumes << "  vbader_atomic_volumes= ";for(uint j=0;j<vbader_atomic_volumes.size();j++) oss << vbader_atomic_volumes.at(j) << " "; oss << (html?"<br>":"") << endl; 
@@ -1112,7 +1112,7 @@ namespace aflowlib {
       if(auid.size()) sss << "" << "aurl=" << aurl << eendl;
       if(auid.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "auid=" << auid << eendl;
       if(data_api.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_api=" << data_api << eendl;
-      if(!title.empty()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "title=" << title << eendl;  // ME20190125
+      if(!title.empty()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "title=" << title << eendl;  //ME20190125
       if(data_source.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_source=" << data_source << eendl;
       if(data_language.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "data_language=" << data_language << eendl;
       if(error_status.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "error_status=" << error_status << eendl;
@@ -1143,14 +1143,14 @@ namespace aflowlib {
       if(species_pp_ZVAL.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_ZVAL=" << species_pp_ZVAL << eendl;
       if(species_pp_AUID.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_AUID=" << species_pp_AUID << eendl;
       if(METAGGA.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "metagga=" << METAGGA << eendl;
-      // ME20190124 - add more detailed LDAU information
+      //ME20190124 - add more detailed LDAU information
       if(ldau_TLUJ.size()) {
-        // ME20190124 - BEGIN
+        //ME20190124 - BEGIN
         sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_type=" << vLDAU[0][0] << eendl;
         sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_l=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << eendl;
         sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_u=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << eendl;
         sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_j=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << eendl;
-        // ME20190124 - END
+        //ME20190124 - END
         sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_TLUJ=" << ldau_TLUJ << eendl;
       }
       if(valence_cell_iupac!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "valence_cell_iupac=" << valence_cell_iupac << eendl;
@@ -1176,12 +1176,12 @@ namespace aflowlib {
       // [NOT_PRINTED]     if(nkpoints!=0) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "nkpoints=" << nkpoints << eendl;
       // [NOT_PRINTED]     if(nkpoints_irreducible!=0) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "nkpoints_irreducible=" << nkpoints_irreducible << eendl;
       // [NOT_PRINTED]     if(kppra!=0) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "kppra=" << kppra << eendl;
-      // ME20190124 BEGIN - Add the individual pieces of "kpoints" to the out file
+      //ME20190124 BEGIN - Add the individual pieces of "kpoints" to the out file
       if ((kpoints_nnn_relax.rows == 3) && (sum(kpoints_nnn_relax) > 0)) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "kpoints_relax=" << aurostd::joinWDelimiter(kpoints_nnn_relax, ",") << eendl;
       if ((kpoints_nnn_static.rows == 3) && (sum(kpoints_nnn_static) > 0)) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "kpoints_static=" << aurostd::joinWDelimiter(kpoints_nnn_static, ",") << eendl;
       if (kpoints_pairs.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "kpoints_bands_path=" << aurostd::joinWDelimiter(kpoints_pairs, ",") << eendl;
       if (kpoints_bands_path_grid > 0) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "kpoints_bands_nkpts=" << ((int) kpoints_bands_path_grid) << eendl;
-      // ME20190124 - END
+      //ME20190124 - END
       if(kpoints.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "kpoints=" << kpoints << eendl;
       if(enthalpy_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_cell=" << enthalpy_cell << eendl;
       if(enthalpy_atom!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "enthalpy_atom=" << enthalpy_atom << eendl;
@@ -1308,7 +1308,7 @@ namespace aflowlib {
       if(ael_debye_temperature!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_debye_temperature=" << ael_debye_temperature << eendl; //CT181212
       if(ael_applied_pressure!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_applied_pressure=" << ael_applied_pressure << eendl; //CT181212
       if(ael_average_external_pressure!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_average_external_pressure=" << ael_average_external_pressure << eendl; //CT181212
-      // ME20191105 - BEGIN
+      //ME20191105 - BEGIN
       sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_stiffness_tensor=";
       if ((ael_stiffness_tensor.rows == 6) && (ael_stiffness_tensor.cols == 6)) {
         for (int i = 1; i <= 6; i++) {
@@ -1325,7 +1325,7 @@ namespace aflowlib {
           sss << ((i < 6)?";":"") << eendl;
         }
       }
-      // ME20191105 - END
+      //ME20191105 - END
       // BADER
       if(bader_net_charges.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_net_charges=" << bader_net_charges << eendl;
       if(bader_atomic_volumes.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_atomic_volumes=" << bader_atomic_volumes << eendl;
@@ -1380,7 +1380,7 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
 
-      // ME20190125 - BEGIN
+      //ME20190125 - BEGIN
       //////////////////////////////////////////////////////////////////////////
       if(!title.empty()) {
         sscontent_json << "\"title\":\"" << title << "\"" << eendl;
@@ -1389,7 +1389,7 @@ namespace aflowlib {
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
-      // ME20190125 - END
+      //ME20190125 - END
 
       //////////////////////////////////////////////////////////////////////////
       if(data_api.size()) {
@@ -1614,22 +1614,22 @@ namespace aflowlib {
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
-      // ME20190124 - Modified to include more detailed LDAU information
+      //ME20190124 - Modified to include more detailed LDAU information
       if(ldau_TLUJ.size()) {
         ss_helper.str("");
         vs.clear();
         //only string is available, so we have to parse really fast
         //would be nice if we have vldau_TLUJ already
-        // ME20190124 - vLDAU is now available
+        //ME20190124 - vLDAU is now available
         //[OBSOLETE ME20190124 - use vLDAU] vector<string> ldau_TLUJ_tokens;
         //[OBSOLETE ME20190124 - use vLDAU] aurostd::string2tokens(ldau_TLUJ,ldau_TLUJ_tokens,";");
         //[OBSOLETE ME20190124 - use vLDAU] if(ldau_TLUJ_tokens.size()==4){
         //[OBSOLETE ME20190124 - use vLDAU] conversion to double ENSURES that these are numbers
         //[OBSOLETE ME20190124 - use vLDAU] non-numbers without "" will break json
         //[OBSOLETE ME20190124 - use vLDAU] int T=aurostd::string2utype<int>(ldau_TLUJ_tokens.at(0));
-        int T = (int) vLDAU[0][0]; // ME20190124
-        vector<int> L(vLDAU[1].begin(), vLDAU[1].end());  // ME20190124
-        vector<double> U = vLDAU[2],J = vLDAU[3];  // ME20190124
+        int T = (int) vLDAU[0][0]; //ME20190124
+        vector<int> L(vLDAU[1].begin(), vLDAU[1].end());  //ME20190124
+        vector<double> U = vLDAU[2],J = vLDAU[3];  //ME20190124
         //[OBSOLETE ME20190124 - NOT USED] vector<string> ldau_TLUJ_tokens2;
         //[OBSOLETE ME20190124 - use vLDAU] breaking up not necessary, but a nice check that we don't have hanging commas
         //[OBSOLETE ME20190124 - use vLDAU] the extra space at the end will be removed by joinWDelimiter()
@@ -1643,18 +1643,18 @@ namespace aflowlib {
           vs.push_back("["+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(U,9),",")+"]");
           vs.push_back("["+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(J,9),",")+"]");
           ss_helper << aurostd::joinWDelimiter(vs,",") << eendl;
-          vector<string> ldau_keys;  // ME20190124
-          aurostd::string2tokens("ldau_type,ldau_l,ldau_u,ldau_j", ldau_keys, ",");  // ME20190124
-          for (uint i = 0; i < ldau_keys.size(); i++) {  // ME20190124
-            sscontent_json << "\"" << ldau_keys[i] << "\":" << vs[i] << eendl;  // ME20190124
-            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  // ME20190124
+          vector<string> ldau_keys;  //ME20190124
+          aurostd::string2tokens("ldau_type,ldau_l,ldau_u,ldau_j", ldau_keys, ",");  //ME20190124
+          for (uint i = 0; i < ldau_keys.size(); i++) {  //ME20190124
+            sscontent_json << "\"" << ldau_keys[i] << "\":" << vs[i] << eendl;  //ME20190124
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
           }
           vs.clear();
         }
         //} ME20190124
         vs.clear();
       }
-      if(!ss_helper.str().empty()){ // CO20180216 - !empty() is better for strings than !size()
+      if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
         sscontent_json << "\"ldau_TLUJ\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
       } else {
         if(PRINT_NULL) sscontent_json << "\"ldau_TLUJ\":null" << eendl;
@@ -1881,21 +1881,21 @@ namespace aflowlib {
         //this one is a bit complicated, so we will test if the string was created, and then recreate the json array on the spot
         ss_helper.str("");
         vs.clear();
-        // ME20190124 - Add the individual pieces of "kpoints" to the json file
-        if ((kpoints_nnn_relax.rows==3) && (sum(kpoints_nnn_relax) > 0)) {  // ME20190128
+        //ME20190124 - Add the individual pieces of "kpoints" to the json file
+        if ((kpoints_nnn_relax.rows==3) && (sum(kpoints_nnn_relax) > 0)) {  //ME20190128
           vs.push_back("["+aurostd::joinWDelimiter(kpoints_nnn_relax,",")+"]");
-          sscontent_json << "\"kpoints_relax\":" << vs.back() << eendl;  // ME20190124
-        } else if (PRINT_NULL) {  // ME20190124
-          sscontent_json << "\"kpoints_relax\":null" << eendl;  // ME20190124
+          sscontent_json << "\"kpoints_relax\":" << vs.back() << eendl;  //ME20190124
+        } else if (PRINT_NULL) {  //ME20190124
+          sscontent_json << "\"kpoints_relax\":null" << eendl;  //ME20190124
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  // ME20190124
-        if ((kpoints_nnn_static.rows==3) && (sum(kpoints_nnn_static) > 0)) {  // ME20190128
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
+        if ((kpoints_nnn_static.rows==3) && (sum(kpoints_nnn_static) > 0)) {  //ME20190128
           vs.push_back("["+aurostd::joinWDelimiter(kpoints_nnn_static,",")+"]");
-          if (sum(kpoints_nnn_static) > 0) sscontent_json << "\"kpoints_static\":" << vs.back() << eendl;  // ME20190124
-        } else if (PRINT_NULL) {  // ME20190124
-          sscontent_json << "\"kpoints_static\":null" << eendl;  // ME20190124
+          if (sum(kpoints_nnn_static) > 0) sscontent_json << "\"kpoints_static\":" << vs.back() << eendl;  //ME20190124
+        } else if (PRINT_NULL) {  //ME20190124
+          sscontent_json << "\"kpoints_static\":null" << eendl;  //ME20190124
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  // ME20190124
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
         if(kpoints_pairs.size()){
           //first for escape characters in \Gamma or \Sigma
           vector<string> kpoints_pairs_new;
@@ -1906,24 +1906,24 @@ namespace aflowlib {
             kpoints_pairs_new.push_back(aurostd::StringSubst(kpoints_pairs.at(i),issue_ss.str(),fix_s));
           }
           vs.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(kpoints_pairs_new,"\""),",")+"]");
-          sscontent_json << "\"kpoints_bands_path\":" << vs.back() << eendl;  // ME20190124
-        } else if (PRINT_NULL) {  // ME20190124
-          sscontent_json << "\"kpoints_bands_path\":null" << eendl;  // ME20190124
+          sscontent_json << "\"kpoints_bands_path\":" << vs.back() << eendl;  //ME20190124
+        } else if (PRINT_NULL) {  //ME20190124
+          sscontent_json << "\"kpoints_bands_path\":null" << eendl;  //ME20190124
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  // ME20190124
-        ss_helper << aurostd::joinWDelimiter(vs, ",");  // ME20190128
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
+        ss_helper << aurostd::joinWDelimiter(vs, ",");  //ME20190128
         if(kpoints_bands_path_grid!=0){
-          // ME20190128 - This causes kpoints to only be written when the band structure
+          //ME20190128 - This causes kpoints to only be written when the band structure
           // was calculated. This is inconsistent with the aflowlib.out file
           // [OBSOLETE ME20190128] ss_helper << aurostd::joinWDelimiter(vs,",") << "," << aurostd::utype2string(kpoints_bands_path_grid);
           ss_helper << "," << aurostd::utype2string(kpoints_bands_path_grid);
-          sscontent_json << "\"kpoints_bands_nkpts\":" << ((int) kpoints_bands_path_grid) << eendl;  // ME20190124
-        } else if (PRINT_NULL) {  // ME20190124
-          sscontent_json << "\"kpoints_bands_nkpts\":null" << eendl;  // ME20190124
+          sscontent_json << "\"kpoints_bands_nkpts\":" << ((int) kpoints_bands_path_grid) << eendl;  //ME20190124
+        } else if (PRINT_NULL) {  //ME20190124
+          sscontent_json << "\"kpoints_bands_nkpts\":null" << eendl;  //ME20190124
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  // ME20190124
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");  //ME20190124
       }
-      if(!ss_helper.str().empty()){ // CO20180216 - !empty() is better for strings than !size()
+      if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
         sscontent_json << "\"kpoints\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
       } else {
         if(PRINT_NULL) sscontent_json << "\"kpoints\":null" << eendl;
@@ -2173,7 +2173,7 @@ namespace aflowlib {
         vs.clear();
         vvs.clear();
       }
-      if(!ss_helper.str().empty()){ // CO20180216 - !empty() is better for strings than !size()
+      if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
         sscontent_json << "\"forces\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
       } else {
         if(PRINT_NULL) sscontent_json << "\"forces\":null" << eendl;
@@ -2207,7 +2207,7 @@ namespace aflowlib {
         vs.clear();
         vvs.clear();
       }
-      if(!ss_helper.str().empty()){ // CO20180216 - !empty() is better for strings than !size()
+      if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
         sscontent_json << "\"positions_cartesian\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
       } else {
         if(PRINT_NULL) sscontent_json << "\"positions_cartesian\":null" << eendl;
@@ -2241,7 +2241,7 @@ namespace aflowlib {
         vs.clear();
         vvs.clear();
       }
-      if(!ss_helper.str().empty()){ // CO20180216 - !empty() is better for strings than !size()
+      if(!ss_helper.str().empty()){ //CO20180216 - !empty() is better for strings than !size()
         sscontent_json << "\"positions_fractional\":[" << ss_helper.str() << "]" << eendl; ss_helper.str("");
       } else {
         if(PRINT_NULL) sscontent_json << "\"positions_fractional\":null" << eendl;
@@ -3196,7 +3196,7 @@ namespace aflowlib {
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
-      sscontent_json << "\"aflowlib_version\":\"" << string(AFLOW_VERSION) << "\"" << eendl;  // CO20170613
+      sscontent_json << "\"aflowlib_version\":\"" << string(AFLOW_VERSION) << "\"" << eendl;  //CO20170613
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
 
@@ -3222,7 +3222,7 @@ namespace aflowlib {
   }
 }
 
-// CO20171202 - apennsy fixes!
+//CO20171202 - apennsy fixes!
 namespace aflowlib {
   void _aflowlib_entry::correctBadDatabase(bool verbose,ostream& oss){
     ofstream FileMESSAGE;
@@ -3661,7 +3661,7 @@ namespace aflowlib {
     return TRUE;
   }
 
-  bool json2aflowlib(const string& json,string key,string& value) { // SC20200415
+  bool json2aflowlib(const string& json,string key,string& value) { //SC20200415
     // return TRUE if something has been found
     value="";
     key="\""+key+"\":";
@@ -3981,7 +3981,7 @@ namespace aflowlib {
   bool APIget::establish(){
     struct hostent * host = gethostbyname( Domain.c_str() );
 
-    //[CO20181226 - OBSOLETE]PORT=80;  // CO20180401
+    //[CO20181226 - OBSOLETE]PORT=80;  //CO20180401
 
     if ( (host == NULL) || (host->h_addr == NULL) ) {
       cerr << "Error retrieving DNS information." << endl;
@@ -4600,7 +4600,7 @@ namespace aflowlib {
           title+=" (ICSD# "+tokens.at(2)+")";//+directory;
         }
       }
-      if(vflags.flag("FLAG::ELECTRONIC")){ // CO20180502
+      if(vflags.flag("FLAG::ELECTRONIC")){ //CO20180502
         oss.setf(std::ios::fixed,std::ios::floatfield);
         oss.precision(4);
         oss << "<script type=\"text/javascript\">" << endl;
@@ -4659,12 +4659,12 @@ namespace aflowlib {
         //[OBSOLETE CO20170628 - per Bob/JMOL]}
         oss << "<!-- jmol: BEGIN -->" << endl;
         oss << "<!--div class = \"jmol\"-->" << endl;
-        //[OBSOLETE CO20170628 - per Bob/JMOL]oss << "<script type=\"text/javascript\" src=\"/search/Lib/JS/JSmol.min.js\"></script>" << endl;  // CO20170622
+        //[OBSOLETE CO20170628 - per Bob/JMOL]oss << "<script type=\"text/javascript\" src=\"/search/Lib/JS/JSmol.min.js\"></script>" << endl;  //CO20170622
         //[OBSOLETE CO20170628 - per Bob/JMOL]string JMOL_PATH="http://aflowlib.duke.edu/users/jmolers/test/jsmol";
         string JMOL_PATH="http://aflowlib.duke.edu/search/Lib/JS/JSMol";
-        oss << "<script type=\"text/javascript\" src=\"" << JMOL_PATH << "/JSmol.min.js\"></script>" << endl;  // CO20170622
+        oss << "<script type=\"text/javascript\" src=\"" << JMOL_PATH << "/JSmol.min.js\"></script>" << endl;  //CO20170622
         oss << "<script type=\"text/javascript\">" << endl;
-        // CO20170622 - START
+        //CO20170622 - START
         //build our standard AFLOW object, add from aentry as needed
         oss << "AFLOW={};" << endl;
         oss << "AFLOW.version = \"" << string(AFLOW_VERSION) << "\";" << endl;
@@ -4721,7 +4721,7 @@ namespace aflowlib {
 
         //adding bob's stuff
         //string aflow_entry_js=AFLOW_ENTRY_JS;
-        oss << AFLOW_WEBAPP_ENTRY_JS;  // CO20170622 
+        oss << AFLOW_WEBAPP_ENTRY_JS;  //CO20170622 
 
         oss << "</script>" << endl;
         oss << "</td></tr></table>" << endl;
@@ -4730,7 +4730,7 @@ namespace aflowlib {
       }
       if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::ELECTRONIC") && !directory.empty()) {
         oss << "<!-- geena bands: BEGIN -->" << endl;
-        oss << "<script type=\"text/javascript\" src=\"./Lib/JS/d3.min.js\"></script>" << endl;  // CO20170622  ///www/search/Lib/JS/d3.min.js
+        oss << "<script type=\"text/javascript\" src=\"./Lib/JS/d3.min.js\"></script>" << endl;  //CO20170622  ///www/search/Lib/JS/d3.min.js
         oss << "<script type=\"text/javascript\">" << endl;
         oss << AFLOW_WEBAPP_BANDS_JS; //PC 180515
         oss << "</script>" << endl;
@@ -5121,8 +5121,8 @@ namespace aflowlib {
               oss << "<h5 class=\"value-name\"> Brillouin Zone " << art058_link<< "</h5>" << endl; //JPO 180731
               // [OBSOLETE] oss << "</div>" << endl; //JPO 180731
               // [OBSOLETE] oss << "<div class=\"picture_BZ\">" << endl; //JPO 180731
-              // [OBSOLETE] oss << "<img class=\"pic_BZ\" src=\"../SCIENCE/images/brillouin/" << aurostd::RemoveWhiteSpaces(Lattice_Real_space_Lattice_Variation) << ".PNG\" alt=\"Brillouin Zone of " << label << "\" />" << endl; // CO20170621 - relative path
-              oss << "<img class=\"BZ-img\" src=\"http://aflowlib.duke.edu/SCIENCE/images/brillouin/" << aurostd::RemoveWhiteSpaces(Lattice_Real_space_Lattice_Variation) << ".PNG\" alt=\"Brillouin Zone of " << label << "\" />" << endl; // CO20170621 - abs path WORKS  //JPO 180731
+              // [OBSOLETE] oss << "<img class=\"pic_BZ\" src=\"../SCIENCE/images/brillouin/" << aurostd::RemoveWhiteSpaces(Lattice_Real_space_Lattice_Variation) << ".PNG\" alt=\"Brillouin Zone of " << label << "\" />" << endl; //CO20170621 - relative path
+              oss << "<img class=\"BZ-img\" src=\"http://aflowlib.duke.edu/SCIENCE/images/brillouin/" << aurostd::RemoveWhiteSpaces(Lattice_Real_space_Lattice_Variation) << ".PNG\" alt=\"Brillouin Zone of " << label << "\" />" << endl; //CO20170621 - abs path WORKS  //JPO 180731
               oss << "</div></div>" << endl; //JPO 180731
             }
             //[MOVED UP JPO 180731]// [OBSOLETE] oss << "<hr />" << endl; //JPO 180731
@@ -5510,12 +5510,12 @@ namespace aflowlib {
 
         if(aentry.vfiles_WEB.size()>0) 
           for(uint i=0;i<aentry.vfiles_WEB.size();i++)
-            if((aentry.vfiles_WEB.at(i)==label+".png") || (aentry.vfiles_WEB.at(i) == label + "_banddos.png"))  // ME20190621 - include new file naming convention 
+            if((aentry.vfiles_WEB.at(i)==label+".png") || (aentry.vfiles_WEB.at(i) == label + "_banddos.png"))  //ME20190621 - include new file naming convention 
               oss << "<div class = \"picture_band\" id=\"band_dos_pic\"><a id=\"imgPopup\"><img class=\"pic\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of " << label << "\" style='display:block;background:white; margin: 0 auto;' /></a></div>" << endl;
         oss << "<div id=\"small_figure\" style=\'display:flex;justify-content:center;\'>" << endl;
         if(aentry.vfiles_WEB.size()>0) 
           for(uint i=0;i<aentry.vfiles_WEB.size();i++)
-            if((aurostd::substring2bool(aentry.vfiles_WEB.at(i),"_PEDOS_") || aurostd::substring2bool(aentry.vfiles_WEB.at(i), "_dos_")) && aurostd::substring2bool(aentry.vfiles_WEB.at(i),".png"))  // ME20190621 - include new file name convention
+            if((aurostd::substring2bool(aentry.vfiles_WEB.at(i),"_PEDOS_") || aurostd::substring2bool(aentry.vfiles_WEB.at(i), "_dos_")) && aurostd::substring2bool(aentry.vfiles_WEB.at(i),".png"))  //ME20190621 - include new file name convention
               oss << "<img class=\"pic_small\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of pdos_" << label << "\" style='background:white; margin: 0 auto;height:0%;' >" << endl;
         oss << "</div>" << endl;
         oss << "</li></ul>" << endl;
@@ -5534,7 +5534,7 @@ namespace aflowlib {
         oss << "<a id=\"backwardArrow\">" << endl;
         oss << "<img src=\"img/backwardArrow.png\" alt=\"backward arrow\" ></a>" << endl;
         oss << "<ul class=\"pic_popup_list\">" << endl;
-        // ME20190621 - BEGIN
+        //ME20190621 - BEGIN
         // Include new file naming convention
         if(aentry.vfiles_WEB.size()>0) {
           for(uint i=0;i<aentry.vfiles_WEB.size();i++) {
@@ -5552,10 +5552,10 @@ namespace aflowlib {
             }
           }
         }
-        // ME20190621 - END
+        //ME20190621 - END
         if(aentry.vfiles_WEB.size()>0) 
           for(uint iline=0;iline<aentry.vfiles_WEB.size();iline++)
-            if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"PEDOS") || aurostd::substring2bool(aentry.vfiles_WEB.at(iline), "_dos_"))  // ME20190621 - include new file name convention
+            if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"PEDOS") || aurostd::substring2bool(aentry.vfiles_WEB.at(iline), "_dos_"))  //ME20190621 - include new file name convention
               if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"png"))
                 oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(iline) << "\" alt=\"Band Structure of pdos_" << label << "\"  ></li>" << endl;
         oss << "</ul>" << endl;
@@ -6097,7 +6097,7 @@ namespace aflowlib {
         aflowlib_json << "," << "\"XHOST.FLAG::BADER\":" << (vflags.flag("FLAG::BADER")?"true":"false");
         aflowlib_out << " | " << "XHOST.FLAG::BADER=" << (vflags.flag("FLAG::BADER")?"1":"0");
 
-        // ME20191004 - START
+        //ME20191004 - START
         // Grab compressed files
         if(XHOST.vflag_control.flag("PRINT_MODE::JSON") || !XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
           string content;
@@ -6116,16 +6116,16 @@ namespace aflowlib {
           }
           aflowlib_json << ", \"bandsdata\":" << (content.empty()?"null":content);
         }
-        // ME201901004 - STOP
+        //ME201901004 - STOP
       }
 
-      // ME20191217 - START
+      //ME20191217 - START
       // additional web output
       aflowlib_json << "," << "\"aflow_version\":\"" << AFLOW_VERSION << "\"";
       aflowlib_out << "|" << "aflow_version=" << AFLOW_VERSION;
       aflowlib_json << "," << "\"aflow_date\":\"" << TODAY << "\"";
       aflowlib_out << "|" << "aflow_date=" << TODAY;
-      // ME20191217 - STOP
+      //ME20191217 - STOP
 
       // XHOST.machine_type
       aflowlib_json << "," << "\"XHOST.machine_type\":" << "\"" << XHOST.machine_type << "\"";

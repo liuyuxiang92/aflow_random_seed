@@ -58,7 +58,7 @@
 #define _ICSD_DIRBASE_ "ICSD"
 
 #define _aflowinpad_ 60
-#define _incarpad_ 48  // ME20181024
+#define _incarpad_ 48  //ME20181024
 
 string lattices[]={"","BCC","FCC","CUB","HEX","RHL","BCT","TET","ORC","ORCC","ORCF","ORCI","MCL","MCLC","TRI","XXX"};
 
@@ -684,15 +684,15 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   // KZIP/VASP/MPI
   xvasp.aopts.flag("AFLOWIN_FLAG::KZIP_BIN", !kflags.KZIP_BIN.empty()); //CO20181226
   if (!kflags.KZIP_BIN.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::KZIP_BIN", kflags.KZIP_BIN);}
-  xvasp.aopts.flag("AFLOWIN_FLAG::KBIN_SERIAL_BIN", !kflags.KBIN_SERIAL_BIN.empty()); //CO20181226 // ME20190107
-  if (!kflags.KBIN_BIN.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::KBIN_SERIAL_BIN", kflags.KBIN_SERIAL_BIN);} // ME20190107
+  xvasp.aopts.flag("AFLOWIN_FLAG::KBIN_SERIAL_BIN", !kflags.KBIN_SERIAL_BIN.empty()); //CO20181226 //ME20190107
+  if (!kflags.KBIN_BIN.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::KBIN_SERIAL_BIN", kflags.KBIN_SERIAL_BIN);} //ME20190107
   xvasp.aopts.flag("AFLOWIN_FLAG::MPI_COMMAND", !kflags.KBIN_MPI_COMMAND.empty()); //CO20181226
   if (!kflags.KBIN_MPI_COMMAND.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::MPI_COMMAND", kflags.KBIN_MPI_COMMAND);}
   xvasp.aopts.flag("AFLOWIN_FLAG::MPI_BIN", !kflags.KBIN_MPI_BIN.empty());
   if (!kflags.KBIN_MPI_BIN.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::MPI_BIN", kflags.KBIN_MPI_BIN);}
   xvasp.aopts.flag("AFLOWIN_FLAG::MPI_NUM_CPUS", !kflags.KBIN_MPI_NCPUS_STRING.empty());
   if (!kflags.KBIN_MPI_NCPUS_STRING.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::MPI_NUM_CPUS", kflags.KBIN_MPI_NCPUS_STRING);}
-  xvasp.AVASP_flag_MPI=((kflags.KBIN_MPI_NCPUS > 1) || kflags.KBIN_MPI);  // ME20190201
+  xvasp.AVASP_flag_MPI=((kflags.KBIN_MPI_NCPUS > 1) || kflags.KBIN_MPI);  //ME20190201
 
   // System
   xvasp.aopts.flag("AFLOWIN_FLAG::SYSTEM", vflags.AFLOW_SYSTEM.isentry); //CO20181226
@@ -832,7 +832,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
     xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC", vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.isentry);
     xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF", vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry);
   }
-  xvasp.AVASP_LDAU_PARAMETERS_STRING = vflags.KBIN_VASP_LDAU_PARAMETERS;  // ME20191010
+  xvasp.AVASP_LDAU_PARAMETERS_STRING = vflags.KBIN_VASP_LDAU_PARAMETERS;  //ME20191010
 
   // INCAR
   xvasp.aopts.flag("FLAG::INCAR_MODE_IMPLICIT", vflags.KBIN_VASP_INCAR_MODE.flag("IMPLICIT"));
@@ -887,7 +887,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   // Output files
   xvasp.aopts.flag("FLAG::AVASP_BADER", vflags.KBIN_VASP_FORCE_OPTION_BADER.option);
   xvasp.aopts.flag("FLAG::AVASP_CHGCAR", vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option);
-  if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) xvasp.aopts.push_attached("AFLOWIN_FLAG::CHGCAR_FILE", vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string);  // ME20191028
+  if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) xvasp.aopts.push_attached("AFLOWIN_FLAG::CHGCAR_FILE", vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string);  //ME20191028
   xvasp.aopts.flag("FLAG::AVASP_ELF", vflags.KBIN_VASP_FORCE_OPTION_ELF.option);
   xvasp.aopts.flag("FLAG::AVASP_WAVECAR", vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option);
 
@@ -941,7 +941,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::CIF\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CIF") << endl;} //DX20190123 - add CIF
-  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::CHGCAR_FILE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CHGCAR_FILE") << endl;}  // ME20191028
+  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::CHGCAR_FILE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CHGCAR_FILE") << endl;}  //ME20191028
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::CONVERT_UNIT_CELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::ENMAX_MULTIPLY\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY") << endl;}
@@ -1028,7 +1028,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   return true;
 }
 
-// ME20181030 - Set parameters for ARUNs
+//ME20181030 - Set parameters for ARUNs
 void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,_xvasp& xvasp) {
   // Prevent compiler warnings
   if(aflags.QUIET){}
@@ -1045,8 +1045,8 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
 
   if (xvasp.AVASP_arun_mode == "APL" || xvasp.AVASP_arun_mode == "AAPL") {
     // Unset writing APL and AAPL parameters since the child aflow.in files don't need them
-    xvasp.aopts.flag("FLAG::AVASP_AGL=OFF", true);  // ME20190112
-    xvasp.aopts.flag("FLAG::AVASP_AEL=OFF", true);  // ME20190112
+    xvasp.aopts.flag("FLAG::AVASP_AGL=OFF", true);  //ME20190112
+    xvasp.aopts.flag("FLAG::AVASP_AEL=OFF", true);  //ME20190112
     xvasp.aopts.flag("FLAG::AVASP_APL=OFF", true);
     xvasp.aopts.flag("FLAG::AVASP_AAPL=OFF", true);
     xvasp.aopts.flag("FLAG::AVASP_QHA=OFF", true);
@@ -1093,9 +1093,9 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       } else {
         if (DEFAULT_APL_USE_LEPSILON) {
           xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("IBRION=8",_incarpad_) << "# Linear Response method" << std::endl;
-          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LEPSILON=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  // ME20190109
+          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LEPSILON=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  //ME20190109
         } else {
-          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LCALCEPS=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  // ME20190109
+          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LCALCEPS=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  //ME20190109
         }
       }
       xvasp.AVASP_EXTRA_INCAR << "# Added by [AFLOW_APL] end" << std::endl;
@@ -1109,11 +1109,11 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
         // Born charges need a denser k-point grid. Increase by 25%. ME20190207 - set to 10,000
         //int kpts = aurostd::string2utype<int>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));
         //kpts = (5 * kpts)/4;
-        xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", "10000");  // ME20190207 - modified
+        xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", "10000");  //ME20190207 - modified
       }
     }
 
-    // ME20191029 - ZEROSTATE CHGCAR
+    //ME20191029 - ZEROSTATE CHGCAR
     if (xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR")) {
       xvasp.aopts.pop_attached("AFLOWIN_FLAG::CHGCAR_FILE");
       if (xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE")) xvasp.aopts.flag("FLAG::AVASP_CHGCAR", true);
@@ -1128,7 +1128,7 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
   }
 }
 
-// ME20181102 - Set static run
+//ME20181102 - Set static run
 void setStatic(_xvasp& xvasp) {
   xvasp.AVASP_flag_RUN_RELAX = false;
   xvasp.AVASP_flag_RUN_RELAX_STATIC = false;
@@ -1141,7 +1141,7 @@ void setStatic(_xvasp& xvasp) {
   }
 }
 
-// ME20181102 - Do not convert unit cell
+//ME20181102 - Do not convert unit cell
 void setPreserveUnitCell(_xvasp& xvasp) {
   xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL", false);
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_PRESERVE", true);
@@ -1224,10 +1224,10 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_FORCE_NOLDAU\")=" << xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::PSTRESS\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::PSTRESS\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::PSTRESS") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MODULE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MODULE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  //CO20180214
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::POTIM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::POTIM") << endl;
@@ -1240,8 +1240,8 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::METAGGA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::METAGGA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::IVDW") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::IVDW") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE") << endl;  //CO20180214
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_MODE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_MODE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_COUNT\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_COUNT") << endl;
@@ -1256,7 +1256,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::VOLUME_PLUS_EQUAL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"FLAG::VOLUME_PRESERVED\")=" << xvasp.aopts.flag("FLAG::VOLUME_PRESERVED") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"FLAG::VOLUME_PRESERVED\")=" << xvasp.aopts.flag("FLAG::VOLUME_PRESERVED") << endl;  //CO20180214
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA") << endl;
@@ -1355,7 +1355,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   //CO20181226 - Marco, don't fix volume of ICSD's, these volumes are provided by experiment (of the cell)
   //and hence we cannot say what the volume of the atoms are individually
   bool skip_volume=(xvasp_in.AVASP_prototype_mode==LIBRARY_MODE_ICSD || xvasp_in.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD); //CO20181226
-  AVASP_fix_volumes_masses_XVASP(xvasp,skip_volume);  // ME20181103  //CO20181226
+  AVASP_fix_volumes_masses_XVASP(xvasp,skip_volume);  //ME20181103  //CO20181226
   deque<double> vmass(xvasp.str.species_mass); // BACKUP
   //  for(uint i=0;i<xvasp.str.species.size();i++) cerr << "xvasp.str.species_mass=" << xvasp.str.species_mass.at(i) << endl;
 
@@ -1698,10 +1698,10 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0));species_pp_backup.push_back(xvasp.str.species_pp.at(0));  // to prevent mess up of species
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0));species_volume.push_back(xvasp.str.species_volume.at(0));
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0));species_mass.push_back(xvasp.str.species_mass.at(0));
-        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); // DX20180118 - instead of adding 2 (see above)
-        //[CO20181226 OBSOLETE]deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); // DX20180118 - instead of adding 2 (see above)
+        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); //DX20180118 - instead of adding 2 (see above)
+        //[CO20181226 OBSOLETE]deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); //DX20180118 - instead of adding 2 (see above)
         //	xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in); // FOR HTQC
         xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in,xvasp_in.AVASP_prototype_mode); 
         xstr_orig = xvasp.str; //DX20190326 - mirror saving unpocc'd structure
@@ -1806,7 +1806,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       system+="/"+xvasp.Directory;
     }
     aurostd::StringSubst(system,"/./","/");aurostd::StringSubst(system,"//","/");
-    // ME20181121
+    //ME20181121
     if (xvasp.AVASP_prototype_mode==LIBRARY_MODE_ARUN && xvasp.aopts.flag("AFLOWIN_FLAG::SYSTEM")) {
       system = xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::SYSTEM");
     }
@@ -1819,7 +1819,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   bool AFLOWIN_OLD=FALSE;
   bool AFLOWIN_NEW=TRUE;
 
-  // DX20190326 - moved up and added if-statement cases - START
+  //DX20190326 - moved up and added if-statement cases - START
   // check for ANRL
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS")==TRUE) {
     //DX [OBSOLETE] string anrl_add_on=""; //":ANRL="+xvasp.AVASP_parameters; //CO20181226 - we ignore this
@@ -1859,7 +1859,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A_hP1_191_a-001")) {aurostd::StringSubst(system,"A_hP1_191_a","A_hP1_191_a-001");aurostd::StringSubst(directory,"A_hP1_191_a","A_hP1_191_a-001");aurostd::StringSubst(xvasp.AVASP_label,"A_hP1_191_a","A_hP1_191_a-001");} //A_hP1_191_a mike Sn
     //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB2_hP3_191_a_d-001")) {aurostd::StringSubst(system,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");aurostd::StringSubst(directory,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");aurostd::StringSubst(xvasp.AVASP_label,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");} //AB2_hP3_191_a_d pranab 6-metal-boride
   }
-  // DX20190326 - moved up and added if-statement cases - END
+  //DX20190326 - moved up and added if-statement cases - END
 
   if(pocc){ //CO20181226
     string pocc_params_add_on=":POCC_"+xvasp.AVASP_pocc_parameters;
@@ -1870,7 +1870,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     }
   }
 
-  //DX20190326 - moved up [OBSOLETE]  // DX20180123 - Add ANRL parameters to label - START
+  //DX20190326 - moved up [OBSOLETE]  //DX20180123 - Add ANRL parameters to label - START
   //DX20190326 - moved up [OBSOLETE]  // check for ANRL
   //DX20190326 - moved up [OBSOLETE]  if(xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS")==TRUE) {
   //DX20190326 - moved up [OBSOLETE]    //DX [OBSOLETE] string anrl_add_on=""; //":ANRL="+xvasp.AVASP_parameters; //CO20181226 - we ignore this
@@ -1910,7 +1910,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A_hP1_191_a-001")) {aurostd::StringSubst(system,"A_hP1_191_a","A_hP1_191_a-001");aurostd::StringSubst(directory,"A_hP1_191_a","A_hP1_191_a-001");aurostd::StringSubst(xvasp.AVASP_label,"A_hP1_191_a","A_hP1_191_a-001");} //A_hP1_191_a mike Sn
   //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB2_hP3_191_a_d-001")) {aurostd::StringSubst(system,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");aurostd::StringSubst(directory,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");aurostd::StringSubst(xvasp.AVASP_label,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");} //AB2_hP3_191_a_d pranab 6-metal-boride
   //DX20190326 - moved up [OBSOLETE]  }
-  //DX20190326 - moved up [OBSOLETE]  // DX20180123 - Add ANRL parameters to label - END
+  //DX20190326 - moved up [OBSOLETE]  //DX20180123 - Add ANRL parameters to label - END
 
   // check for PSTRESS/PRESSURE   //  if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS",TRUE)) xvasp.aopts.push_attached("AFLOWIN_FLAG::PSTRESS","7.65");
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS")==TRUE) {
@@ -1923,7 +1923,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     }
   }
 
-  // ME20191031 - no need to add LDAU to ARUNs as it should already be in the parent system name
+  //ME20191031 - no need to add LDAU to ARUNs as it should already be in the parent system name
   if (!xvasp.AVASP_arun) {
     // check for LDAU1
     if(0 && xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !aurostd::substring2bool(system,"_ICSD")) {
@@ -1938,7 +1938,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       system+=ldau2_add_on;directory+=ldau2_add_on;xvasp.AVASP_label+=ldau2_add_on;
     }
 
-    // ME20181121
+    //ME20181121
     if (xvasp.AVASP_prototype_mode == LIBRARY_MODE_ARUN) {
       string arun_add_on=":" + ARUN_DIRECTORY_PREFIX + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname; //CO20181226
       system+=arun_add_on;
@@ -1995,7 +1995,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << "#[AFLOW_MODE_MPI]" << endl;
   }
   string NCPUS_VAL="MAX";  // Modified - ME20181113
-  if(xvasp.aopts.flag("AFLOWIN_FLAG::MPI_NUM_CPUS")) NCPUS_VAL=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MPI_NUM_CPUS");  // ME20181113
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::MPI_NUM_CPUS")) NCPUS_VAL=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MPI_NUM_CPUS");  //ME20181113
   if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) NCPUS_VAL=XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS");
   if (!NCPUS_VAL.empty()) aflowin << "[AFLOW_MODE_MPI_MODE]NCPUS=" << NCPUS_VAL << " " << endl;  // Modified - ME20181113
 #ifdef MPI_LAM
@@ -2012,9 +2012,9 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // SYMMETRY WRITE
   if(!xvasp.aopts.flag("FLAG::AVASP_SYMMETRY=OFF")) {
-    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
     //aflowin << "[AFLOW_SYMMETRY]CALC " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_WRITE " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
@@ -2022,9 +2022,9 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
   // NEIGHBOURS WRITE
   if(!xvasp.aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF")) {
-    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
     //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
     //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
     //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
@@ -2035,7 +2035,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // This would set CONVERT_UNIT_CELL=PRES for aflow_proto.
   // Setting to PRES should only be done for ARUNs and thus set in
   // AVASP_populateXVASP_ARUN
-  // ME20190107
+  //ME20190107
   //if (MODULE == "APL" || MODULE == "AAPL") {
   //  // (A)APL should not convert the unit cell as this would lead to discrepancies between the
   //  // structure in the aflow.in file and the supercell.
@@ -2043,15 +2043,15 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // }
 
   // APL WRITING - ME20181027
-  if(!xvasp.aopts.flag("FLAG::AVASP_APL=OFF")) { // CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
-    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; // CO20180214
+  if(!xvasp.aopts.flag("FLAG::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
+    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; //CO20180214
     //[ME20181216] - OLD SCHEME
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]// DX and CO - START
     //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string(""):string("#"))+"[AFLOW_APL]SUPERCELL="+
-    //[ME20181216]    (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  // CO20180214
+    //[ME20181216]    (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  //CO20180214
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
@@ -2063,7 +2063,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_APL]";
     //vector<string> vkeys = xvasp.aplopts.getattachedschemekeys();
-    std::sort(xvasp.aplopts.vxscheme.begin(), xvasp.aplopts.vxscheme.end());  // ME20190114
+    std::sort(xvasp.aplopts.vxscheme.begin(), xvasp.aplopts.vxscheme.end());  //ME20190114
     const vector<string>& vkeys=xvasp.aplopts.vxscheme;
     for (uint i = 0; i < vkeys.size(); i++) {
       xvaspflag = vkeys[i];
@@ -2118,7 +2118,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_AAPL]";
     //vector<string> vkeys = xvasp.aaplopts.getattachedschemekeys();
-    std::sort(xvasp.aaplopts.vxscheme.begin(), xvasp.aaplopts.vxscheme.end());  // ME20190114
+    std::sort(xvasp.aaplopts.vxscheme.begin(), xvasp.aaplopts.vxscheme.end());  //ME20190114
     const vector<string>& vkeys=xvasp.aaplopts.vxscheme;
     for (uint i = 0; i < vkeys.size(); i++) {
       xvaspflag = vkeys[i];
@@ -2234,19 +2234,19 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(xvasp.aopts.flag("FLAG::AVASP_WAVECAR")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
   } else {
-    // ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
+    //ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
   }
 
   // CHGCAR WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_CHGCAR")) {
-    // ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
+    //ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
   } else {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
   }
 
-  // ME20191028 - CHGCAR_FILE
+  //ME20191028 - CHGCAR_FILE
   if (!xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE").empty()) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR_FILE="+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE"),_aflowinpad_) << std::endl;
   }
@@ -2295,7 +2295,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // NBANDS WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS",_aflowinpad_) << "// Estimate Bands (better than VASP)" << endl;
-  } else if (xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS_EQUAL")) {  // ME20181128
+  } else if (xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS_EQUAL")) {  //ME20181128
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS=" + xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::NBANDS_EQUAL"),_aflowinpad_) << "// Number of bands" << endl;
   } else {
     // aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]NBANDS",_aflowinpad_) << "// Estimate Bands (better than VASP)" << endl;
@@ -2385,18 +2385,18 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
 
   // RELAX_TYPE + RELAX WRITING
-  // CO20181226 - I modified because RELAX_ALL is different than RELAX_MODE
+  //CO20181226 - I modified because RELAX_ALL is different than RELAX_MODE
   // one sets isif
   // the other sets other associated flags, like ediffg (see ivasp)
   if(!(xvasp.AVASP_flag_RUN_STATIC==TRUE || xvasp.AVASP_flag_RUN_STATIC_BANDS==TRUE)){
-    if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  // CO20180214
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  //CO20180214
       aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_aflowinpad_);
       aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
     } else {
       if(xvasp.aopts.flag("FLAG::VOLUME_PRESERVED")==FALSE){
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_ALL",_aflowinpad_);
         aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
-      } // CO20181226 - melding from below - I am interpreting this as: if not volume_preserved, then you probably want RELAX_ALL
+      } //CO20181226 - melding from below - I am interpreting this as: if not volume_preserved, then you probably want RELAX_ALL
     }
     // RELAX_MODE
     if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE")) {
@@ -2429,7 +2429,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=HIGH",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='A' || PRECISION.at(0)=='a')
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=ACCURATE",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
-      // ME20181022
+      //ME20181022
       if(PRECISION.at(0)=='P' || PRECISION.at(0)=='p')
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=PHONONS",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       aflowin << "#[VASP_FORCE_OPTION]PREC_preserved " << endl;
@@ -2447,7 +2447,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
         vstr.push_back("HIGH");
       if(PRECISION.at(0)=='A' || PRECISION.at(0)=='a')
         vstr.push_back("ACCURATE");
-      // ME20181022
+      //ME20181022
       if(PRECISION.at(0)=='P' || PRECISION.at(0)=='p')
         vstr.push_back("PHONONS");
       if(xvasp.aopts.flag("FLAG::PRECISION_PRESERVED")) vstr.push_back("PRESERVED");
@@ -2589,7 +2589,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   //[CO20181226 - melding with above]// RELAX WRITING
   //[CO20181226 - melding with above]if(xvasp.aopts.flag("FLAG::VOLUME_PRESERVED")==TRUE || xvasp.AVASP_flag_RUN_STATIC==TRUE || xvasp.AVASP_flag_RUN_STATIC_BANDS==TRUE) {
   //[CO20181226 - melding with above]} else {
-  //[CO20181226 - melding with above]  if(!xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")) aflowin << "[VASP_FORCE_OPTION]RELAX_ALL " << endl; // CO20180214
+  //[CO20181226 - melding with above]  if(!xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")) aflowin << "[VASP_FORCE_OPTION]RELAX_ALL " << endl; //CO20180214
   //[CO20181226 - melding with above]}
 
   // NOTUNE WRITING - Modified ME20181128
@@ -2761,7 +2761,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // INCAR
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
-  // ME20181128 - Added remaining INCAR modes
+  //ME20181128 - Added remaining INCAR modes
   if (xvasp.aopts.flag("FLAG::INCAR_MODE_MODE_IMPLICIT")) {aflowin << "[VASP_INCAR_MODE_IMPLICIT]" << endl;}
   else if (xvasp.aopts.flag("FLAG::INCAR_MODE_EXPLICIT") && xvasp.aopts.flag("FLAG::INCAR_KEYWORD")) {aflowin << "[VASP_INCAR_MODE_EXPLICIT]" << endl;}
   else if (xvasp.aopts.flag("FLAG::INCAR_MODE_EXTERNAL")) {aflowin << "[VASP_INCAR_MODE_EXTERNAL]" << endl;}
@@ -2779,7 +2779,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     if(xvasp.aopts.flag("FLAG::EXTRA_INCAR")==TRUE) {
       aflowin << xvasp.AVASP_EXTRA_INCAR.str(); // << endl;
     }
-    if (xvasp.aopts.flag("FLAG::INCAR_EXPLICIT_START_STOP")) {  // ME20181128
+    if (xvasp.aopts.flag("FLAG::INCAR_EXPLICIT_START_STOP")) {  //ME20181128
       //[CO20181226 OBSOLETE - need to remove system]aflowin << xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str();
       //CO20181226 - START
       vector<string> vlines;
@@ -2804,7 +2804,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.11]" << endl;
 
   // KPOINTS
-  // ME20181128 - Added remaining KPOINTS modes
+  //ME20181128 - Added remaining KPOINTS modes
   bool skip_implicit = (!xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT") &&
       (xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") || xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") || xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL")));  //CO20190401 - start/stop
   if (!skip_implicit) {
@@ -2842,7 +2842,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     //    }
     //  }
 
-    bool write_all = false;  // ME20181023
+    bool write_all = false;  //ME20181023
     // HTQC do AUTO
     if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD || xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) {
       write_all = true;
@@ -2861,13 +2861,13 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     // PROTOTYPE check the stuff out
     if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
       write_all = true;
-      if (LDEBUG) cerr << "DEBUG - AVASP calculating parameters for bands" << endl;  // ME20190107 - added LDEBUG
+      if (LDEBUG) cerr << "DEBUG - AVASP calculating parameters for bands" << endl;  //ME20190107 - added LDEBUG
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC;                           
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;
       // kpoints for the brillouin zone
       xvasp.str.GetLatticeType(); // takes care of everything
       xvasp.AVASP_path_BANDS=xvasp.str.bravais_lattice_variation_type;  // ICSD BASTARDS
-      if(LDEBUG) cerr << "DEBUG - AVASP xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;  // ME20190107 - added LDEBUG
+      if(LDEBUG) cerr << "DEBUG - AVASP xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;  //ME20190107 - added LDEBUG
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;                               
       if(xvasp.AVASP_path_BANDS=="HEX" || xvasp.AVASP_path_BANDS=="FCC") {
         xvasp.AVASP_KSCHEME="G";           // HEXAGONAL/FCC SYSTEMS GET GAMMA KPOINTS GRID
@@ -2890,7 +2890,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME="G";
     }
 
-    // ME20181023 - Write the k-points into the aflow.in file
+    //ME20181023 - Write the k-points into the aflow.in file
     if (!xvasp.AVASP_flag_RUN_STATIC || write_all) {
       aflowin << "[VASP_KPOINTS_FILE]KSCHEME=" << xvasp.AVASP_KSCHEME << endl;
       aflowin << "[VASP_KPOINTS_FILE]KPPRA=" << xvasp.AVASP_value_KPPRA << endl;
@@ -2936,7 +2936,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // STRUCTURE VASP
   if(xvasp.aopts.flag("AFLOWIN_FLAG::VASP")) {
     if(pocc){
-      aflowin << aurostd::PaddedPOST("[AFLOW_POCC]CALC ",_aflowinpad_) << "// README_AFLOW_POCC.TXT" << endl; // CO20180214
+      aflowin << aurostd::PaddedPOST("[AFLOW_POCC]CALC ",_aflowinpad_) << "// README_AFLOW_POCC.TXT" << endl; //CO20180214
       aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     }
     if(pocc){aflowin << "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE " << endl;}
@@ -3261,10 +3261,10 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_FORCE_NOLDAU\")=" << xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::PSTRESS\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::PSTRESS\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::PSTRESS") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MODULE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MODULE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  //CO20180214
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::POTIM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::POTIM") << endl;
@@ -3277,8 +3277,8 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::METAGGA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::METAGGA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::IVDW") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::IVDW") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE") << endl;  //CO20180214
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_MODE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_MODE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::TYPE") << endl;
@@ -3289,7 +3289,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::VOLUME_PLUS_EQUAL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT") << endl;  //CO20180214
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA") << endl;
@@ -3703,10 +3703,10 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0));species_pp_backup.push_back(xvasp.str.species_pp.at(0));  // to prevent mess up of species
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0));species_volume.push_back(xvasp.str.species_volume.at(0));
         // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0));species_mass.push_back(xvasp.str.species_mass.at(0));
-        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); // DX20180118 - instead of adding 2 (see above)
+        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); //DX20180118 - instead of adding 2 (see above)
         //	xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in); // FOR HTQC
         xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in,xvasp_in.AVASP_prototype_mode); 
         for(uint i=0;i<xvasp.str.species_pp.size()&&i<species_pp_backup.size();i++) xvasp.str.species_pp.at(i)=species_pp_backup.at(i); // to restore mess up of species
@@ -3800,13 +3800,13 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   bool AFLOWIN_OLD=FALSE;
   bool AFLOWIN_NEW=TRUE;
 
-  // DX20180123 - Add ANRL parameters to label - START
+  //DX20180123 - Add ANRL parameters to label - START
   // check for ANRL
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS")==TRUE) {
     string anrl_add_on=":ANRL="+xvasp.AVASP_parameters;
     system+=anrl_add_on;directory+=anrl_add_on;xvasp.AVASP_label+=anrl_add_on;
   }
-  // DX20180123 - Add ANRL parameters to label - END
+  //DX20180123 - Add ANRL parameters to label - END
 
   // check for PSTRESS/PRESSURE   //  if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS",TRUE)) xvasp.aopts.push_attached("AFLOWIN_FLAG::PSTRESS","7.65");
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS")==TRUE) {
@@ -3890,9 +3890,9 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // SYMMETRY WRITE
   if(!xvasp.aopts.flag("FLAGS::AVASP_SYMMETRY=OFF")) {
-    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
     //aflowin << "[AFLOW_SYMMETRY]CALC " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_WRITE " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
@@ -3900,9 +3900,9 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
   // NEIGHBOURS WRITE
   if(!xvasp.aopts.flag("FLAGS::AVASP_NEIGHBOURS=OFF")) {
-    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
     //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
     //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
     //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
@@ -3910,14 +3910,14 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
   string MODULE = aurostd::toupper(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE"));
   // APL WRITING
-  if(!xvasp.aopts.flag("FLAGS::AVASP_APL=OFF")) { // CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
-    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; // CO20180214
+  if(!xvasp.aopts.flag("FLAGS::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
+    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; //CO20180214
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     // DX and CO - START
     aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string(""):string("#"))+"[AFLOW_APL]SUPERCELL="+
-        (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  // CO20180214
+        (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  //CO20180214
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
@@ -4127,7 +4127,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
 
   // RELAX_TYPE
-  if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  // CO20180214
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  //CO20180214
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_aflowinpad_);
     aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
   } else {
@@ -4312,7 +4312,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // RELAX WRITING
   if(xvasp.aopts.flag("FLAG::VOLUME_PRESERVED")==TRUE || xvasp.AVASP_flag_RUN_STATIC==TRUE || xvasp.AVASP_flag_RUN_STATIC_BANDS==TRUE) {
   } else {
-    if(!xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")) aflowin << "[VASP_FORCE_OPTION]RELAX_ALL " << endl; // CO20180214
+    if(!xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")) aflowin << "[VASP_FORCE_OPTION]RELAX_ALL " << endl; //CO20180214
   }
 
   // NOTUNE WRITING
@@ -4990,7 +4990,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
 
   _xvasp xvasp;
   AVASP_DefaultValuesBinary_AFLOWIN(xvasp);
-  KBIN::setModules(xvasp);  // ME20181105
+  KBIN::setModules(xvasp);  //ME20181105
   xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_COUNT")){ //CO20190219
     xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_COUNT",TRUE);
@@ -5045,7 +5045,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   }
 
   bool reverse=PARAMS->vparams.flag("AFLOWIN_FLAG::REVERSE"); //CO20181226
-  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); // DX20180118 - added parameters to AVASP
+  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); //DX20180118 - added parameters to AVASP
   //DX20190227 - START
   // default without parameters is to use the atomic volume scaling method (i.e., a=-1)
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
@@ -5079,23 +5079,23 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC_ICSD;
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BADER")) xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BADER")) xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC"));}
@@ -5103,7 +5103,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); // DX20180123 - added ANRL parameters to PARAMS
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); //DX20180123 - added ANRL parameters to PARAMS
 
   string string_POTENTIAL=PARAMS->vparams.getattachedscheme("AFLOWIN_STRING::POTENTIAL");
   if(LDEBUG)  cerr << "DEBUG - " << soliloquy << " string_POTENTIAL=" << string_POTENTIAL << endl;
@@ -5154,7 +5154,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //get label_raw, may contain ","
   string label_raw=(reverse?PARAMS->ucell.back():PARAMS->ucell.front());
 
-  // DX20190708 - START 
+  //DX20190708 - START 
   // add default permutation to label if not included in input //DX20190708
   vector<string> orig_labels, new_labels, anrl_tokens, perm_tokens;
   aurostd::string2tokens(label_raw,orig_labels,",");
@@ -5170,7 +5170,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
     else{ new_labels.push_back(orig_labels[i]); }
   }
   label_raw = aurostd::joinWDelimiter(new_labels,",");
-  // DX20190708 - END
+  //DX20190708 - END
 
   //get nspecies //CO20191110 - NOTE: nspeciesHTQC is what is expected from label (proto), nspecies is REAL input number of species separated by colons, not commas (different for pocc)
   uint nspeciesHTQC=aflowlib::PrototypeLibrariesSpeciesNumber(label_raw),nspecies=nspeciesHTQC; //PARAMS->ucell.at(0)); //CO20181226
@@ -5954,7 +5954,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
   _xvasp xvasp;
   AVASP_DefaultValuesBinary_AFLOWIN(xvasp);
   xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); // DX20180118 - added parameters to AVASP
+  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); //DX20180118 - added parameters to AVASP
   //DX20190227 - START
   // default without parameters is to use the atomic volume scaling method (i.e., a=-1)
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
@@ -5976,27 +5976,27 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC_ICSD;
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT")) xvasp.aopts.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT",TRUE); // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT")) xvasp.aopts.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); // DX20180123 - added ANRL parameters to PARAMS
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")) xvasp.aopts.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM",TRUE); // DX20190227 - add anrl lattice parameter flag 
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); //DX20180123 - added ANRL parameters to PARAMS
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")) xvasp.aopts.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM",TRUE); //DX20190227 - add anrl lattice parameter flag 
 
   string string_POTENTIAL=PARAMS->vparams.getattachedscheme("AFLOWIN_STRING::POTENTIAL");
   if(LDEBUG)  cerr << "DEBUG - " << soliloquy << " string_POTENTIAL=" << string_POTENTIAL << endl;
@@ -6703,20 +6703,20 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}

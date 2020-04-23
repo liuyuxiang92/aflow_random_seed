@@ -48,7 +48,7 @@ _XHOST XHOST;  // GLOBAL
 // init::InitMachine
 // ***************************************************************************
 namespace init {
-  int GetCPUCores() { // CO20180124
+  int GetCPUCores() { //CO20180124
     int ncpus=sysconf(_SC_NPROCESSORS_ONLN);
     if(ncpus==96) ncpus=48; // fix the hyperthreading lie
     if(ncpus<1) ncpus=1;
@@ -70,7 +70,7 @@ namespace init {
     XHOST.QUIET=aurostd::args2flag(argv,cmds,"--quiet|-q");
     XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
     XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
-    XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); // DX20171025
+    XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); //DX20171025
     XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
     XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
 
@@ -642,7 +642,7 @@ namespace init {
     // exit(0); 
 
     XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"-h|--help"));
-    XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  // ME20180531
+    XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  //ME20180531
     XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3",aurostd::args2flag(argv,cmds,"-l|--license"));
     XHOST.vflag_control.flag("README_AFLOW",aurostd::args2flag(argv,cmds,"--readme=run|--readme=aflow|--readme_aflow"));
     XHOST.vflag_control.flag("README_AFLOW_PFLOW",aurostd::args2flag(argv,cmds,"--readme=pflow|--readme=processor|--readme=aconvasp|--readme_aconvasp"));
@@ -661,7 +661,7 @@ namespace init {
     XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION",aurostd::args2flag(argv,cmds,"--readme=partial_occupation|--readme=pocc|--readme_pocc"));
     XHOST.vflag_control.flag("README_APENNSY",aurostd::args2flag(argv,cmds,"--readme=apennsy|--readme_apennsy"));
     XHOST.vflag_control.flag("README_SCRIPTING",aurostd::args2flag(argv,cmds,"--readme=scripting|--readme_scripting|--readme=script|--readme_script"));
-    XHOST.vflag_control.flag("README_EXCEPTIONS", aurostd::args2flag(argv, cmds, "--readme=errors|--readme_errors|--readme=exceptions|--readme_exceptions"));  // ME20180531
+    XHOST.vflag_control.flag("README_EXCEPTIONS", aurostd::args2flag(argv, cmds, "--readme=errors|--readme_errors|--readme=exceptions|--readme_exceptions"));  //ME20180531
     XHOST.vflag_control.flag("README_HTRESOURCES",aurostd::args2flag(argv,cmds,"--readme=htresources|--readme_htresources|--readme=resources|--readme_resources"));
     XHOST.vflag_control.flag("README_XAFLOW",aurostd::args2flag(argv,cmds,"--readme=xaflow|--readme_xaflow"));
     XHOST.vflag_control.flag("README_AFLOWRC",aurostd::args2flag(argv,cmds,"--readme=aflowrc|--readme_aflowrc"));
@@ -684,12 +684,12 @@ namespace init {
           XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") ||
           XHOST.vflag_control.flag("README_APENNSY") ||
           XHOST.vflag_control.flag("README_SCRIPTING") ||
-          XHOST.vflag_control.flag("README_EXCEPTIONS") ||  // ME20180531
+          XHOST.vflag_control.flag("README_EXCEPTIONS") ||  //ME20180531
           XHOST.vflag_control.flag("README_HTRESOURCES") ||
           XHOST.vflag_control.flag("README_XAFLOW") ||
           XHOST.vflag_control.flag("README_AFLOWRC") ||
-          FALSE)){  // CO20180306 - need to catch --readme such that it doesn't interfere with --readme=
-            XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  // CO20180306
+          FALSE)){  //CO20180306 - need to catch --readme such that it doesn't interfere with --readme=
+            XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  //CO20180306
           }
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AFLOW_HELP\")=" << XHOST.vflag_control.flag("AFLOW_HELP") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_AFLOW_LICENSE_GPL3\")=" << XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3") << endl;
@@ -737,7 +737,7 @@ namespace init {
 
     XHOST.vflag_control.flag("PRINT_MODE::HTML",aurostd::args2flag(XHOST.argv,cmds,"--print=html|--print_html")); 
     XHOST.vflag_control.flag("PRINT_MODE::TXT",aurostd::args2flag(XHOST.argv,cmds,"--print=txt|--print_txt")); 
-    XHOST.vflag_control.flag("PRINT_MODE::JSON",aurostd::args2flag(XHOST.argv,cmds,"--print=json|--print_json")); // DX20170907 - Add json
+    XHOST.vflag_control.flag("PRINT_MODE::JSON",aurostd::args2flag(XHOST.argv,cmds,"--print=json|--print_json")); //DX20170907 - Add json
     XHOST.vflag_control.flag("PRINT_MODE::LATEX",aurostd::args2flag(XHOST.argv,cmds,"--print=latex|--print_latex"));
     XHOST.vflag_control.flag("PRINT_MODE::YEAR",aurostd::args2flag(XHOST.argv,cmds,"--print=year|--print_year"));
     XHOST.vflag_control.flag("PRINT_MODE::DOI",aurostd::args2flag(XHOST.argv,cmds,"--print=doi|--print_doi"));
@@ -755,7 +755,7 @@ namespace init {
     XHOST.vflag_control.flag("OSS::CERR",aurostd::args2flag(XHOST.argv,cmds,"--oss=cerr|--oss_cerr|--CERR|--cerr"));
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::HTML\")=" << XHOST.vflag_control.flag("PRINT_MODE::HTML") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::TXT\")=" << XHOST.vflag_control.flag("PRINT_MODE::TXT") << endl;
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl; // DX20170907 - Add json
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl; //DX20170907 - Add json
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::LATEX\")=" << XHOST.vflag_control.flag("PRINT_MODE::LATEX") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::YEAR\")=" << XHOST.vflag_control.flag("PRINT_MODE::YEAR") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::DOI\")=" << XHOST.vflag_control.flag("PRINT_MODE::DOI") << endl;
@@ -806,18 +806,18 @@ namespace init {
     if(XHOST.vflag_control.flag("XPLUG_NUM_SIZE")) XHOST.vflag_control.push_attached("XPLUG_NUM_SIZE",aurostd::args2attachedstring(argv,"--nsize=",""));
     if(!XHOST.vflag_control.flag("XPLUG_NUM_SIZE")) XHOST.vflag_control.push_attached("XPLUG_NUM_SIZE",aurostd::utype2string(128));
     XHOST.vflag_control.flag("XPLUG_NUM_THREADS",aurostd::args2attachedflag(argv,"--np="));
-    XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX",aurostd::args2attachedflag(argv,"--npmax")); // CO20180124
-    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=","0")); // SC20200319
+    XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX",aurostd::args2attachedflag(argv,"--npmax")); //CO20180124
+    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=","0")); //SC20200319
     if(!XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")) { //ME20181113
       XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME20181113
       //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO200106 - close bracket for indenting]}
     }
 
-    // USEFUL shortcuts // SC20200319
+    // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
       deque<string> vshort; aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,32,48,52,64",vshort,",");
       for(uint ishort=0;ishort<vshort.size();ishort++) {
-	if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  // SC20200319
+	if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  //SC20200319
 	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
 	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
 	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",vshort.at(ishort));
@@ -826,11 +826,11 @@ namespace init {
 	}
       }
     }
-    // USEFUL shortcuts // SC20200323 
+    // USEFUL shortcuts //SC20200323 
     if(!XHOST.vflag_control.flag("FILE")) { // not specified file
       deque<string> vshort; aurostd::string2tokens("0,1,2,3,4,5,6,7,8,9",vshort,",");
       for(uint ishort=0;ishort<vshort.size();ishort++) {
-	if(aurostd::args2flag(argv,cmds,"--multi=x.lib"+vshort.at(ishort)) || aurostd::args2flag(argv,cmds,"--multi=./x.lib"+vshort.at(ishort))) {  // SC20200323
+	if(aurostd::args2flag(argv,cmds,"--multi=x.lib"+vshort.at(ishort)) || aurostd::args2flag(argv,cmds,"--multi=./x.lib"+vshort.at(ishort))) {  //SC20200323
 	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
 	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
 	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","16");
@@ -843,7 +843,7 @@ namespace init {
     }
 
    
-    // ME20181103 - set MPI when number of threads is larger than 1
+    //ME20181103 - set MPI when number of threads is larger than 1
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX") || 
         (aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS")) > 1)) {
       XHOST.MPI = true;
@@ -1227,7 +1227,7 @@ namespace init {
     if(str=="README_AFLOW_SYM_TXT") { if(XHOST_README_AFLOW_SYM_TXT.empty()) { return XHOST_README_AFLOW_SYM_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_SYM_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_CCE_TXT") { if(XHOST_README_AFLOW_CCE_TXT.empty()) { return XHOST_README_AFLOW_CCE_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CCE_TXT;}} // LOADED TXTS  //CO20190620
     if(str=="README_AFLOW_CHULL_TXT") { if(XHOST_README_AFLOW_CHULL_TXT.empty()) { return XHOST_README_AFLOW_CHULL_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CHULL_TXT;}} // LOADED TXTS  //CO20190620
-    if(str=="README_AFLOW_EXCEPTIONS_TXT") {if(XHOST_README_AFLOW_EXCEPTIONS_TXT.empty()){ return XHOST_README_AFLOW_EXCEPTIONS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_EXCEPTIONS_TXT;}}  // ME20180531
+    if(str=="README_AFLOW_EXCEPTIONS_TXT") {if(XHOST_README_AFLOW_EXCEPTIONS_TXT.empty()){ return XHOST_README_AFLOW_EXCEPTIONS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_EXCEPTIONS_TXT;}}  //ME20180531
     if(str=="README_PROTO_TXT") { if(XHOST_README_PROTO_TXT.empty()) { return XHOST_README_PROTO_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_PROTO_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_XAFLOW_TXT") { if(XHOST_README_AFLOW_XAFLOW_TXT.empty()) { return XHOST_README_AFLOW_XAFLOW_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_XAFLOW_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_AFLOWRC_TXT") { if(XHOST_README_AFLOW_AFLOWRC_TXT.empty()) { return XHOST_README_AFLOW_AFLOWRC_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_AFLOWRC_TXT;}} // LOADED TXTS
@@ -1660,12 +1660,12 @@ string Message(string list2print) {
   if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME")) oss << " - [date=" << aflow_get_time_string() << "]";
   if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";
   //  if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0)
-  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; // CO20170628 - slow otherwise!!!
+  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
   if(XHOST.vTemperatureCore.size()>0) if(max(XHOST.vTemperatureCore)>AFLOW_CORE_TEMPERATURE_BEEP) oss << " - [ERROR_TEMPERATURE=" << max(XHOST.vTemperatureCore) << ">" << AFLOW_CORE_TEMPERATURE_BEEP << "@ host=" << XHOST.hostname<< "]";
   // oss << endl;
   pthread_mutex_unlock(&mutex_INIT_Message);
   // do some killing
-  //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  // CO20170628 - this is already run above, very slow
+  //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  //CO20170628 - this is already run above, very slow
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("aflow",XHOST.maxmem);
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("clamd",XHOST.maxmem);
   return oss.str();

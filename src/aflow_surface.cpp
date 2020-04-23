@@ -826,15 +826,15 @@ namespace surface {
             if(search_trivial)  oss << "TRIVIAL SEARCH" << endl;
             if(search_complete) oss << "COMPLETE SEARCH" << endl;
             str.LatticeReduction_avoid=TRUE;  // DOES NOT DO LATTICE REDUCTION // NIGGLI and MINK
-            str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                      // CO20171024 - new sym framework
-            _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO20171024 - new sym framework
-            pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO20171024 - new sym framework
-            pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO20171024 - new sym framework
-            //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 // CO20171024 - new sym framework
-            //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             // CO20171024 - new sym framework
-            //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                // CO20171024 - new sym framework
-            //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    // CO20171024 - new sym framework
-            //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    // CO20171024 - new sym framework
+            str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                      //CO20171024 - new sym framework
+            _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                //CO20171024 - new sym framework
+            pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  //CO20171024 - new sym framework
+            pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   //CO20171024 - new sym framework
+            //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 //CO20171024 - new sym framework
+            //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             //CO20171024 - new sym framework
+            //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                //CO20171024 - new sym framework
+            //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    //CO20171024 - new sym framework
+            //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    //CO20171024 - new sym framework
             //   oss << banner << endl; // ----------------------------------------------------------------
             oss << surface::PrintNNdists(num_types,num_types_combinations,bbfrac,nndist,nndists);
             oss << "hklmax=" << hklmax << endl;
@@ -914,14 +914,14 @@ namespace surface {
     if(search_complete) oss << "COMPLETE SEARCH" << endl;
     str.LatticeReduction_avoid=TRUE;
     str.sgroup_radius=1.05*RadiusSphereLattice(lattice);
-    _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO20171024 - new sym framework
-    pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO20171024 - new sym framework
-    pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO20171024 - new sym framework
-    //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 // CO20171024 - new sym framework
-    //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             // CO20171024 - new sym framework
-    //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                // CO20171024 - new sym framework
-    //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    // CO20171024 - new sym framework
-    //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    // CO20171024 - new sym framework
+    _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                //CO20171024 - new sym framework
+    pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  //CO20171024 - new sym framework
+    pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   //CO20171024 - new sym framework
+    //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 //CO20171024 - new sym framework
+    //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             //CO20171024 - new sym framework
+    //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                //CO20171024 - new sym framework
+    //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    //CO20171024 - new sym framework
+    //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    //CO20171024 - new sym framework
     // oss
     oss << banner << endl; // ----------------------------------------------------------------
     oss << "HKL CALCULATION" << endl;
@@ -1925,7 +1925,7 @@ namespace slab {
         str_out.lattice(i,j)=Slab_Basis_CartCoord(i,j);
       }
     }
-    str_out.FixLattices();  // CO20180202
+    str_out.FixLattices();  //CO20180202
 
     //str_out.num_each_type.clear();
     //str_out.comp_each_type.clear();
@@ -1953,7 +1953,7 @@ namespace slab {
             for(j=1;j<=3;j++) {
               newatom.fpos[j]=ListSiteDirectCoordWRTslab[k][AtomInLayer[OrderLayers[Layer]][i][2]][j];
             }
-            newatom.cpos=F2C(str_out.scale,str_out.lattice,newatom.fpos); // CO20180202
+            newatom.cpos=F2C(str_out.scale,str_out.lattice,newatom.fpos); //CO20180202
             str_out.AddAtom(newatom);
           }
         }
@@ -1961,7 +1961,7 @@ namespace slab {
     }
     if(assigning_fake_names){for(uint i=0;i<str_out.atoms.size();i++){str_out.atoms[i].name_is_given=false;}}	//CO20180724 - since these are fake names, don't print out them out
 
-    // CO20180202
+    //CO20180202
     if(LDEBUG) {
       cerr << "PRINTING OUT STRUCTURE ATTRIBUTES" << endl;
       cerr << "str_out.atoms.size()=" << str_out.atoms.size() << endl;
@@ -1984,7 +1984,7 @@ namespace slab {
     //xstructure (newatom=str_in.atoms[XX]), otherwise
     //we lose type + name which is absolutely critical for AddAtom()
 
-    // CO20180202 - this is obsolete, it is done INSIDE AddAtom()
+    //CO20180202 - this is obsolete, it is done INSIDE AddAtom()
     // DU20180705 - putting back as it doesn't work without it
     // we need to add type + name before AddAtom()
     // this is a temporary patch, fix later
@@ -2003,7 +2003,7 @@ namespace slab {
     //[OBSOLETE CO20180727]
     //[OBSOLETE CO20180727]for(j=0;j<NumberElements;j++) {
     //[OBSOLETE CO20180727]  for(i=NumSites[j];i<NumSites[j+1]+NumSites[j];i++) {
-    //[OBSOLETE CO20180727]    // CO20180202 - added safety
+    //[OBSOLETE CO20180727]    //CO20180202 - added safety
     //[OBSOLETE CO20180727]    if(i>(int)str_out.atoms.size()-1){
     //[OBSOLETE CO20180727]      cerr << "pflow::MAKE_SLAB: ERROR - not as many atoms were created as cxpected (likely a problem with AddAtom())" << endl;
     //[OBSOLETE CO20180727]      cerr << "Exiting!" << endl;

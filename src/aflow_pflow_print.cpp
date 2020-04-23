@@ -910,25 +910,25 @@ namespace pflow {
 // This funtion prints out structural data.
 // Stefano Curtarolo
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, const string& format,bool already_calculated) { // CO20171027 //DX20180806 - added space group setting
-    // DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
-    double tolerance = SYM::defaultTolerance(str_sym); // DX20180215 - start with default tolerance // DX20180226 - str_sym not str_sp
-    if(already_calculated){tolerance=str_sp.sym_eps;} // CO20171025
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, const string& format,bool already_calculated) { //CO20171027 //DX20180806 - added space group setting
+    //DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
+    double tolerance = SYM::defaultTolerance(str_sym); //DX20180215 - start with default tolerance //DX20180226 - str_sym not str_sp
+    if(already_calculated){tolerance=str_sp.sym_eps;} //CO20171025
     bool no_scan = false;
     int sg_setting = 1;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format,already_calculated); // CO20171027
+    PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format,already_calculated); //CO20171027
   }
 }
 
 //DX20180822 - add xoption - START
 namespace pflow {
   void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss,string smode, aurostd::xoption& vpflow, const string& format,bool already_calculated) {
-    // DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
-    double tolerance = SYM::defaultTolerance(str_sym); // DX20180215 - start with default tolerance // DX20180226 - str_sym not str_sp
-    if(already_calculated){tolerance=str_sp.sym_eps;} // CO20171025
+    //DX20181215 [OBSOLETE] double tolerance = AUROSTD_NAN;
+    double tolerance = SYM::defaultTolerance(str_sym); //DX20180215 - start with default tolerance //DX20180226 - str_sym not str_sp
+    if(already_calculated){tolerance=str_sp.sym_eps;} //CO20171025
     bool no_scan = false;
     int sg_setting = 1;
-    PrintData(str,str_sym,str_sp,str_sc,oss,smode,vpflow,tolerance,no_scan,sg_setting,format,already_calculated); // CO20171027
+    PrintData(str,str_sym,str_sp,str_sc,oss,smode,vpflow,tolerance,no_scan,sg_setting,format,already_calculated); //CO20171027
   }
 }
 
@@ -941,7 +941,7 @@ namespace pflow {
 
 //DX20180822 - add xoption - END
 namespace pflow {
-  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) { // CO20171027 //DX20180822 -added xoption
+  void PrintData(const xstructure& str,xstructure& str_sym,xstructure& str_sp,xstructure& str_sc, ostream& oss_final,string smode, aurostd::xoption& vpflow, double tolerance, bool no_scan, const int& sg_setting, const string& format,bool already_calculated) { //CO20171027 //DX20180822 -added xoption
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::PrintData: BEGIN" << endl;
     // smode=="DATA" or "EDATA"
@@ -954,9 +954,9 @@ namespace pflow {
     bool symmetry_commensurate = false;
     bool force_perform = true;  // Force a result to be found at the end, even if incommensurate 
     double orig_tolerance = tolerance;
-    uint sym_eps_change_count = 0; // DX20180226 - added sym eps change count
+    uint sym_eps_change_count = 0; //DX20180226 - added sym eps change count
 
-    xstructure str_aus(str);//,str_sp,str_sc; // CO20171027
+    xstructure str_aus(str);//,str_sp,str_sc; //CO20171027
     while(symmetry_commensurate == false){
       if(smode!="EDATA" || no_scan){
         symmetry_commensurate=true;
@@ -979,22 +979,22 @@ namespace pflow {
         }
         oss << " Real space Volume: " << vol << endl;
         oss << " Real space c/a = " << data(3)/data(1) << endl;
-        str_aus=str;//,str_sp,str_sc; // CO20171027
-        // DX20170901 -Add tolerance - START
+        str_aus=str;//,str_sp,str_sc; //CO20171027
+        //DX20170901 -Add tolerance - START
         str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
-        str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; // DX20180226 - added sym eps change count
-        // DX20170901 -Add tolerance - END
+        str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; //DX20180226 - added sym eps change count
+        //DX20170901 -Add tolerance - END
         if(smode=="EDATA") {
           // str_aus.CalculateSymmetryPointGroup(FALSE);
           // str_aus.CalculateSymmetryFactorGroup(FALSE);
           // str_aus.CalculateSymmetryPointGroupCrystal(FALSE);
-          if(!already_calculated){  // CO20171025
+          if(!already_calculated){  //CO20171025
             str_aus.GetLatticeType(str_sp,str_sc);
             if(orig_tolerance == AUROSTD_NAN){
               orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
             }
             tolerance = str_sp.sym_eps;
-            sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX20180226 - added sym eps change count
+            sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180226 - added sym eps change count
           }
           oss << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
@@ -1011,7 +1011,7 @@ namespace pflow {
           oss << " Real space: Point Group Type                 = " << str_aus.point_group_type << endl;
           oss << " Real space: Point Group Order                = " << str_aus.point_group_order << endl;
           oss << " Real space: Point Group Structure            = " << str_aus.point_group_structure << endl;
-          PrintSGData(str_aus,tolerance,oss,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX20170831 - SGDATA // CO20171025 // CO20171027 //DX20180823 - added xoption
+          PrintSGData(str_aus,tolerance,oss,vpflow,no_scan,sg_setting,false,format,already_calculated);  //DX20170831 - SGDATA //CO20171025 //CO20171027 //DX20180823 - added xoption
           //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
           if(sym_eps_change_count != str_aus.sym_eps_change_count){
             if(LDEBUG) {
@@ -1023,8 +1023,8 @@ namespace pflow {
             continue;
           }
           //DX20180608 - recalculate GetLatticeType() before changing tolerance - END
-          sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
-          // DX20170901 - Add consistency check for input symmetry method and ITC method - START
+          sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
+          //DX20170901 - Add consistency check for input symmetry method and ITC method - START
           int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
           bool derivative_structure=false;
           if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan){
@@ -1052,11 +1052,11 @@ namespace pflow {
             else {
               str_aus.ClearSymmetry();
               oss.str("");
-              sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
+              sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
               continue;
             }
           }
-          // DX20170901 - Add consistency check for input symmetry method and ITC method - END
+          //DX20170901 - Add consistency check for input symmetry method and ITC method - END
           oss << "BRAVAIS LATTICE OF THE LATTICE (pgroup)" << endl;
           oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_lattice_type << endl;// " " << str.title << endl;
           oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_lattice_variation_type << endl;//wahyu mod
@@ -1134,16 +1134,16 @@ namespace pflow {
           sscontent_json << "\"c_over_a\":" << data(3)/data(1) << eendl;
           vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-          str_aus=str;//,str_sp,str_sc; // CO20171027
+          str_aus=str;//,str_sp,str_sc; //CO20171027
           str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
           if(smode=="EDATA") {
-            if(!already_calculated){  // CO20171025
+            if(!already_calculated){  //CO20171025
               str_aus.GetLatticeType(str_sp,str_sc);
               if(orig_tolerance == AUROSTD_NAN){
                 orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
               }
               tolerance = str_sp.sym_eps;
-              sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX20180226 - added sym eps change count
+              sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180226 - added sym eps change count
             }
 
             // Real space: bravais lattice primitive
@@ -1251,7 +1251,7 @@ namespace pflow {
             vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
             // SGDATA
-            PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX20170831 - SGDATA // CO20171027 //DX20180823 - added xoption
+            PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  //DX20170831 - SGDATA //CO20171027 //DX20180823 - added xoption
             //DX20180608 - recalculate GetLatticeType() before changing tolerance - START
             if(sym_eps_change_count != str_aus.sym_eps_change_count){
               if(LDEBUG) {
@@ -1264,14 +1264,14 @@ namespace pflow {
               continue;
             }
             //DX20180608 - recalculate GetLatticeType() before changing tolerance - END
-            sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
+            sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
             vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-            // DX20170901 - Add consistency check for input symmetry method and ITC method - START
+            //DX20170901 - Add consistency check for input symmetry method and ITC method - START
             int multiplicity_of_primitive =str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
             bool derivative_structure=false;
             if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan == true){
               symmetry_commensurate=true;
-            } else { // CO20171027
+            } else { //CO20171027
               if(LDEBUG) {
                 cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
               }
@@ -1297,11 +1297,11 @@ namespace pflow {
                 str_aus.ClearSymmetry();
                 sscontent_json.str("");
                 vcontent_json.clear();
-                sym_eps_change_count = str_aus.sym_eps_change_count; // DX20180226 - added sym eps change count
+                sym_eps_change_count = str_aus.sym_eps_change_count; //DX20180226 - added sym eps change count
                 continue;
               }
             }
-            // DX20170901 - Add consistency check for input symmetry method and ITC method - END
+            //DX20170901 - Add consistency check for input symmetry method and ITC method - END
 
             // Real space: bravais lattice lattice type
             if(str_aus.bravais_lattice_lattice_type.size()){
@@ -1410,9 +1410,9 @@ namespace pflow {
         }
       }
       oss_final << oss.str();
-      str_sym=str_aus; // CO20171027
+      str_sym=str_aus; //CO20171027
       //DX20180822 - put attributes into vpflow - START
-      if(vpflow.flag("EDATA::CALCULATED")){ // DX20180823 - if calculated remove
+      if(vpflow.flag("EDATA::CALCULATED")){ //DX20180823 - if calculated remove
         vpflow.pop_attached("EDATA::LATTICE_PARAMETERS"); 
         vpflow.pop_attached("EDATA::COVERA"); 
         vpflow.pop_attached("EDATA::VOLUME"); 
@@ -1485,18 +1485,18 @@ namespace pflow {
 
   namespace pflow {
     void PrintData(const xstructure& str,ostream& oss,string smode, const string& format) {
-      xstructure str_sym,str_sp,str_sc; // CO20171027
+      xstructure str_sym,str_sp,str_sc; //CO20171027
       double tolerance = AUROSTD_NAN;
       bool no_scan = false;
       int sg_setting = 1;
-      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO20171027
+      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); //CO20171027
     }
   } // namespace pflow
 
   namespace pflow {
     void PrintData(const xstructure& str,ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting, const string& format) {
-      xstructure str_sym,str_sp,str_sc; // CO20171027
-      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO20171027
+      xstructure str_sym,str_sp,str_sc; //CO20171027
+      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); //CO20171027
     }
   } // namespace pflow
 
@@ -2671,7 +2671,7 @@ void PrintRSM(const xstructure& str, ostream& oss) {
   //%CONECTxxxxxyyyyy^M
 }
 
-// DX20170830 - SGDATA
+//DX20170830 - SGDATA
 // ***************************************************************************
 // pflow::PrintSGData
 // ***************************************************************************
@@ -2680,7 +2680,7 @@ void PrintRSM(const xstructure& str, ostream& oss) {
 namespace pflow {
   bool PrintSGData(xstructure& str_sg, ostream& oss, bool standalone, const string& format,bool already_calculated) {
     double tolerance=SYM::defaultTolerance(str_sg);
-    if(already_calculated){tolerance=str_sg.sym_eps;} // CO20171025
+    if(already_calculated){tolerance=str_sg.sym_eps;} //CO20171025
     bool no_scan=false;
     int setting=1;
     return PrintSGData(str_sg,tolerance,oss,no_scan,setting,standalone,format,already_calculated);
@@ -2697,7 +2697,7 @@ namespace pflow {
 //DX20180822 - add xoption - END
 
 namespace pflow {
-  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { // DX20180226 - added & to tolerance
+  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { //DX20180226 - added & to tolerance
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::PrintSGData: BEGIN" << endl;
     stringstream oss;
@@ -2705,7 +2705,7 @@ namespace pflow {
     // Print out structural data
     oss.setf(std::ios::fixed,std::ios::floatfield);
     // DX TEST str_sg.SpaceGroup_ITC(tolerance);
-    if(!already_calculated){str_sg.SpaceGroup_ITC(tolerance, -1, setting, no_scan);} // CO20171025
+    if(!already_calculated){str_sg.SpaceGroup_ITC(tolerance, -1, setting, no_scan);} //CO20171025
     // FORMAT = TXT
     if(format=="txt"){
       oss << "SPACE GROUP OF THE CRYSTAL" << endl;
@@ -2929,7 +2929,7 @@ namespace pflow {
       vpflow.pop_attached("SGDATA::WYCKOFF_POSITIONS"); 
       vpflow.pop_attached("SGDATA::WYCCAR"); 
     }
-    // DX20180823 - now populate xoption
+    //DX20180823 - now populate xoption
     vpflow.flag("SGDATA::CALCULATED");
     vpflow.push_attached("SGDATA::SPACE_GROUP_NUMBER",aurostd::utype2string<uint>(str_sg.space_group_ITC)); 
     vpflow.push_attached("SGDATA::SPACE_GROUP_HERMANN_MAUGUIN",GetSpaceGroupName(str_sg.space_group_ITC, str_sg.directory)); 
@@ -2969,7 +2969,7 @@ namespace pflow {
     return true;
   }
 }      
-// DX20170830 - SGDATA
+//DX20170830 - SGDATA
 
 // **************************************************************************
 // PrintShell PrintShell

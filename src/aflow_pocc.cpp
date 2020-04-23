@@ -65,7 +65,7 @@ namespace pocc {
     //aflags
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
 
     //aflow.in
     string AflowIn_file,AflowIn;
@@ -3197,7 +3197,7 @@ namespace pocc {
     //xstructure bb("/home/corey/work/work/pranab/POCC/new_tests/new_sets_test_new_pocc/test/sc_test/POSCAR2",IOAFLOW_AUTO);
     //cerr << aa << endl;
     //cerr << bb << endl;
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX20180123 - added fast_match = true // DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     //cerr << are_equivalent << endl;
     //exit(1);
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
@@ -4830,14 +4830,14 @@ namespace pocc {
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ostream& oss) {
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) {ofstream FileMESSAGE;return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);}
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) {
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
@@ -5583,7 +5583,7 @@ namespace pocc {
           //output - START
           ss_header << "| ";
           ss_header << aurostd::PaddedCENTER("pocc_atom = " + aurostd::utype2string(pocc_atom) + "/" + aurostd::utype2string(pocc_atoms_total) + (!atom_name.empty()?" ["+atom_name+"]":""),getHNFTableColumnPadding()+2);  //need to +2, bug in PaddedCENTER()
-          ss_header << " " ;  // CO20170629
+          ss_header << " " ;  //CO20170629
           //output - END
           pocc_atom++;
         }

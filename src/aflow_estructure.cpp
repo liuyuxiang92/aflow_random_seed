@@ -56,10 +56,10 @@ namespace estructure {
     ss_gnuplot << "set term postscript eps enhanced color font \"Helvetica, 40\" size 18, 10.125" << endl;
     ss_gnuplot << "set output " << "\"" << plot_pdosname << ".eps" << "\"" << endl;
     ss_gnuplot << "set title \"" <<PEDOStitle << endl;
-    //ss_gnuplot << "set border lw 5" << endl; // CO20170830 - thick border
-    ss_gnuplot << "unset border" << endl; // CO20170830 - looks better
-    ss_gnuplot << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-    ss_gnuplot << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+    //ss_gnuplot << "set border lw 5" << endl; //CO20170830 - thick border
+    ss_gnuplot << "unset border" << endl; //CO20170830 - looks better
+    ss_gnuplot << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+    ss_gnuplot << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
     ss_gnuplot << endl;
 
     ss_gnuplot << "#DOS PLOT" << endl;
@@ -78,8 +78,8 @@ namespace estructure {
     ss_gnuplot << "set xlabel 'energy (eV)' offset graph 0.00" << endl;
     ss_gnuplot << "set ylabel 'peDOS (states/eV)' offset graph 0.00" << endl;
     ss_gnuplot << "set label '{/Helvetica-Oblique E}_F'  at 0.05, graph 0.95" << endl;
-    ss_gnuplot << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl; // CO20170830 - originally lt 3 lw 1.5
-    ss_gnuplot << "set arrow from 0, 0 to first 0, graph 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl; // CO20170830 - originally lt 3 lw 1.5
+    ss_gnuplot << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl; //CO20170830 - originally lt 3 lw 1.5
+    ss_gnuplot << "set arrow from 0, 0 to first 0, graph 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl; //CO20170830 - originally lt 3 lw 1.5
     ss_gnuplot << endl;
     ss_gnuplot << "plot[][] \\" << endl;
     if(PDOS[Natom_pdos].at(0).size()==4) { // Only works for s, p and d orbitals  
@@ -132,7 +132,7 @@ namespace estructure {
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:8 w l lt 1 lc rgb '#4C72B0' lw 6 title '{/Helvetica-Oblique d}_{z^2}', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:9 w l lt 1 lc rgb '#55A868' lw 6 title '{/Helvetica-Oblique d}_{xz}', \\"  << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:10 w l lt 1 lc rgb '#C44E52' lw 6 title '{/Helvetica-Oblique d}_{x^2-y^2}',\\" << endl;
-      ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:11 w l lt 1 lc rgb '#8172B2' lw 6 title '{/Helvetica-Oblique f}_1', \\" << endl; // CO20170830 - originally lw 12 (why?)
+      ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:11 w l lt 1 lc rgb '#8172B2' lw 6 title '{/Helvetica-Oblique f}_1', \\" << endl; //CO20170830 - originally lw 12 (why?)
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:12 w l lt 1 lc rgb '#CCB974' lw 6 title '{/Helvetica-Oblique f}_2', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:13 w l lt 1 lc rgb '#64B5CD' lw 6 title '{/Helvetica-Oblique f}_3', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:14 w l lt 1 lc rgb '#4C72B0' lw 6 title '{/Helvetica-Oblique f}_4', \\" << endl;
@@ -179,7 +179,7 @@ namespace estructure {
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:17 w l lt 1 lc rgb '#55A868' lw 6 notitle, \\"  << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:18 w l lt 1 lc rgb '#C44E52' lw 6 title '{/Helvetica-Oblique d}_{x^2-y^2}', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:19 w l lt 1 lc rgb '#C44E52' lw 6 notitle, \\" << endl;
-      ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:20 w l lt 1 lc rgb '#8172B2' lw 6 title '{/Helvetica-Oblique f}_1', \\" << endl; // CO20170830 - originally lw 12 (why?)
+      ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:20 w l lt 1 lc rgb '#8172B2' lw 6 title '{/Helvetica-Oblique f}_1', \\" << endl; //CO20170830 - originally lw 12 (why?)
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:21 w l lt 1 lc rgb '#8172B2' lw 6 notitle, \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:22 w l lt 1 lc rgb '#CCB974' lw 6 title '{/Helvetica-Oblique f}_2', \\" << endl;
       ss_gnuplot << "\"" << pdosdatafile << "\"" << " u 1:23 w l lt 1 lc rgb '#CCB974' lw 6 notitle, \\" << endl;
@@ -254,7 +254,7 @@ namespace estructure {
     vector<vector<double> > TDOS;
     vector<vector<double> >  TOTALPDOS;
     double Efermi;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -282,10 +282,10 @@ namespace estructure {
     fin << "set term postscript eps enhanced color font \"Helvetica, 40\" size 18, 10.125" << endl;
     fin << "set output " << "\"" << ICSDName <<"_DOS.eps" << "\"" << endl;
     fin << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << "\""<< endl;
-    //fin << "set border lw 5" << endl; // CO20170830 - thick border
-    fin << "unset border" << endl; // CO20170830 - looks better
-    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+    //fin << "set border lw 5" << endl; //CO20170830 - thick border
+    fin << "unset border" << endl; //CO20170830 - looks better
+    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
     fin << endl;
 
     fin << "#DOS PLOT" << endl;
@@ -310,8 +310,8 @@ namespace estructure {
     fin << "set xlabel 'energy (eV)' offset graph 0.00" << endl;
     fin << "set ylabel 'eDOS (states/eV)' offset graph 0.00" << endl;
     fin << "set label '{/Helvetica-Oblique E}_F' at 0.05, graph 0.95" << endl;
-    fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
-    fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << endl;
     fin << "plot[][] \\" << endl;
     if(TOTALPDOS.at(0).size()==4) { // Only works for s, p and d orbitals	a
@@ -1179,10 +1179,10 @@ namespace estructure {
       fin << "set term postscript eps enhanced color font \"Helvetica, 40\" size 18, 10.125" << endl;
       fin << "set output " << "\"" << ICSDName <<"_DOS.eps" << "\"" << endl;
       fin << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << "\""<< endl;
-      //fin << "set border lw 5" << endl; // CO20170830 - thick border
-      fin << "unset border" << endl; // CO20170830 - looks better
-      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+      //fin << "set border lw 5" << endl; //CO20170830 - thick border
+      fin << "unset border" << endl; //CO20170830 - looks better
+      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
       fin << endl;
 
       fin << "#DOS PLOT" << endl;
@@ -1208,8 +1208,8 @@ namespace estructure {
       fin << "set ylabel 'eDOS (states/eV)' offset graph 0.00" << endl;
       //fin << "set label 'Written by Kesong Yang [kesong.yang@gmail.com]' at graph 0.02, graph 0.98 font \"Helvetica, 28\" tc rgb 'white'" << endl;
       fin << "set label '{/Helvetica-Oblique E}_F' at 0.05, graph 0.95" << endl;
-      fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
-      fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       fin << endl;
       fin << "plot[][] \\" << endl;
       if(TOTALPDOS.at(0).size()==4) { // Only works for s, p and d orbitals	
@@ -1314,10 +1314,10 @@ namespace estructure {
       fin << "set term postscript eps enhanced color font \"Helvetica, 40\" size 18, 10.125" << endl;
       fin << "set output " << "\"" << ICSDName <<"_DOS.eps" << "\"" << endl;
       fin << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << "\""<< endl;
-      //fin << "set border lw 5" << endl; // CO20170830 - thick border
-      fin << "unset border" << endl; // CO20170830 - looks better
-      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+      //fin << "set border lw 5" << endl; //CO20170830 - thick border
+      fin << "unset border" << endl; //CO20170830 - looks better
+      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
       fin << endl;
 
       fin << "#DOS PLOT" << endl;
@@ -1344,18 +1344,18 @@ namespace estructure {
       fin << "set ylabel 'eDOS (states/eV)' offset graph 0.00" << endl;
       //fin << "set label 'Written by Kesong Yang [kesong.yang@gmail.com]' at graph 0.02, graph 0.98 font \"Helvetica, 28\" tc rgb 'white'" << endl;
       fin << "set label '{/Helvetica-Oblique E}_F' at 0.05, graph 0.95" << endl;
-      fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
-      fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to first 0, graph 1 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to first 0, graph 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       fin << endl;
       fin << "plot[][] \\" << endl;
       if(TDOS.at(0).size()==3) { // non-spin-polarized
-	//fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt -1 lw 6 title 'total'" << endl;  // CO20170830 - MAKE DOS DISTINCT
+	//fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt -1 lw 6 title 'total'" << endl;  //CO20170830 - MAKE DOS DISTINCT
 	fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt 1 lc rgb '#8172B2' lw 6 title 'total'" << endl;
       }
       if(TDOS.at(0).size()==5) { // spin-polarized
-	//fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt -1 lw 6 title 'total spin up', \\" << endl;                // CO20170830 - MAKE SPIN UP DISTINCT
-	fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt 1 lc rgb '#8172B2' lw 6 title 'total spin up', \\" << endl;                // CO20170830 - total spin\\_UP
-	fin << "\"" << dosdatafile << "\"" << " u 1:3 w l lt 1 lc rgb '#C44E52' lw 6 title 'total spin down'" << endl;  // CO20170830 - total spin\\_DN
+	//fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt -1 lw 6 title 'total spin up', \\" << endl;                //CO20170830 - MAKE SPIN UP DISTINCT
+	fin << "\"" << dosdatafile << "\"" << " u 1:2 w l lt 1 lc rgb '#8172B2' lw 6 title 'total spin up', \\" << endl;                //CO20170830 - total spin\\_UP
+	fin << "\"" << dosdatafile << "\"" << " u 1:3 w l lt 1 lc rgb '#C44E52' lw 6 title 'total spin down'" << endl;  //CO20170830 - total spin\\_DN
       }
       fin << endl;
       fin << endl;
@@ -1683,7 +1683,7 @@ namespace estructure {
     //Judge whether a proper parameter is input
     if(!( numatom[0] >= '0' && numatom[0] <= '9')) {
       cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
-      // CO20170830 - let's not insult the user?
+      //CO20170830 - let's not insult the user?
       //cout << "I HOPE YOU KNOW, WHAT YOU ARE  DOING! You had better read the manual of aconvasp carefully!" << endl;
       //cout << "I REFUSE TO CONTINUE WITH THIS SICK JOB...,BYE!!!<----" << endl;
       //cout << "Anyway, I still give you a promot, the second input must be a digit!"<< endl;
@@ -1694,7 +1694,7 @@ namespace estructure {
     if(Natom > NIONS) {
       cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
       cout << "The number you put excceds the number of ions (" << NIONS << ")!" << endl;
-      // CO20170830 - let's not insult the user?
+      //CO20170830 - let's not insult the user?
       //cout << "The number you put excceds the number of ions (" << NIONS << ")!!" << endl;
       //cout << "How silly you are!!!" << endl;
       exit(0);
@@ -1702,7 +1702,7 @@ namespace estructure {
     if(Natom==0) {
       cout << "ERROR - estructure::PLOT_PEDOS: " << endl;
       cout << "No input! If you want to plot TDOS, use 'aflow --plotdos " + directory +"'" << endl;
-      // CO20170830 - let's not insult the user?
+      //CO20170830 - let's not insult the user?
       //cout << "You input 0! I guess you want to plot TDOS, so I recommend you to use 'aflow --plotdos " + directory +"'" << endl;
       //cout << "I do not want to produce TDOS in this way! BYE!!!..." << endl;
       exit(0);
@@ -1965,7 +1965,7 @@ namespace estructure {
     if(LDEBUG) cerr << "estructure::PLOT_BAND [4b]" << endl;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -1978,7 +1978,7 @@ namespace estructure {
     if(LDEBUG) cerr << "estructure::PLOT_BAND [5]" << endl;
   
     //Writing into file
-    string str_PDOS = aurostd::vector2string(vvDOS); //TOTALPDOS);  // CO20170830 - plot both tdos and pdos!
+    string str_PDOS = aurostd::vector2string(vvDOS); //TOTALPDOS);  //CO20170830 - plot both tdos and pdos!
     string dosdatafile = ICSDName + "_DOS.dat";
     ofstream dosfin;
     dosfin.open(dosdatafile.c_str());
@@ -1987,7 +1987,7 @@ namespace estructure {
   
     //Finding the maxmium value of s, p, d or f orbitals
     //-----------------------------------------------------------------------
-    //DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(TOTALPDOS, DOS_Emin, DOS_Emax);  // CO20170830 - we want max for TOTAL now
+    //DOSMAX = aurostd::FindMaxIn2DvectorExcept1stColumn(TOTALPDOS, DOS_Emin, DOS_Emax);  //CO20170830 - we want max for TOTAL now
     //-------------------------------------------------------------------------------------------------------------------------------------------------
     if(LDEBUG) cerr << "estructure::PLOT_BAND [6]" << endl;
   
@@ -2080,7 +2080,7 @@ namespace estructure {
       count = j;
     }
     //*******************************Redefine the symbols of special kpoints
-    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  // CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  //CO20170831 - fix all at once
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma")==0) kpointslabel[i]="Sigm";
@@ -2091,8 +2091,8 @@ namespace estructure {
     //Combine the Labels of special kpoints	
     for (int i=1; i< (count-1); i=i+2) {
       if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); // CO20170830 - if subscript, extra space looks ODD!
-        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  // CO20170830 - italics and make space for first italics
+        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); //CO20170830 - if subscript, extra space looks ODD!
+        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
 	kpointslabel[i] = newlabel;
 	kpointslabel[i+1] = newlabel;
       }
@@ -2147,7 +2147,7 @@ namespace estructure {
     }
 
     //*******************************Redefine the symbols of special kpoints
-    // CO20170830 - already done above ?? - not sure why we do twice...
+    //CO20170830 - already done above ?? - not sure why we do twice...
     //[OBSOLETE]for (int i=0; i< count; i++) {
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
@@ -2159,12 +2159,12 @@ namespace estructure {
     //[OBSOLETE]//Combine the Labels of special kpoints	
     //[OBSOLETE]for (int i=1; i< (count-1); i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  // CO20170830 - italics and make space for first italics
+    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  //CO20170830 - italics and make space for first italics
     //[OBSOLETE]    kpointslabel[i] = newlabel;
     //[OBSOLETE]    kpointslabel[i+1] = newlabel;
     //[OBSOLETE]  } else {
-    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); // CO20170830 - italics
-    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); // CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); //CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); //CO20170830 - italics
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //*******************************Redefine the symbols of special kpoints
@@ -2209,7 +2209,7 @@ namespace estructure {
 	}
 
       for (int ik=0;ik<NKPOINTS;ik++) {
-        if(ik&&!(ik%KPOINTSGRID)){bandsfin << endl << endl;}  // CO20170831 - make sure there is NO continuation between KPOINTS, not valid assumption
+        if(ik&&!(ik%KPOINTSGRID)){bandsfin << endl << endl;}  //CO20170831 - make sure there is NO continuation between KPOINTS, not valid assumption
 	for (int ib=0; ib<Nbands+1; ib++) {
 	  bandsfin << bandsdata[ik][ib] << "  " ;
 	}
@@ -2229,7 +2229,7 @@ namespace estructure {
 	  bandsdata[i][2*ib+2]=datadn[i][ib]-Efermi;  //Zero point Shifts to Efermi
 	}
       for (int ik=0;ik<NKPOINTS;ik++) {
-        if(ik&&!(ik%KPOINTSGRID)){bandsfin << endl << endl;}  // CO20170831 - make sure there is NO continuation between KPOINTS, not valid assumption
+        if(ik&&!(ik%KPOINTSGRID)){bandsfin << endl << endl;}  //CO20170831 - make sure there is NO continuation between KPOINTS, not valid assumption
 	for (int ib=0; ib<2*Nbands+1; ib++) {
 	  bandsfin << bandsdata[ik][ib] << "  " ;
 	}
@@ -2248,10 +2248,10 @@ namespace estructure {
     fin << "set output " << "\"" << ICSDName <<".eps" << "\"" << endl;
     fin << "set multiplot title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ")" << "\""<< endl;
     fin << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-    //fin << "set border lw 5" << endl; // CO20170830 - thick border
-    fin << "unset border" << endl; // CO20170830 - looks better
-    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+    //fin << "set border lw 5" << endl; //CO20170830 - thick border
+    fin << "unset border" << endl; //CO20170830 - looks better
+    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
     //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
     fin << endl;
 
@@ -2264,7 +2264,7 @@ namespace estructure {
     fin << "set xtics " << endl;
     //fin << "unset ytics" << endl;
     fin << "set ytics " << endl;
-    fin << "set format y \"\"" << endl; // CO20170830 - keep grid
+    fin << "set format y \"\"" << endl; //CO20170830 - keep grid
     fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     if(TOTALPDOS.at(0).size()==9||(TOTALPDOS.at(0).size()==7)) {
       if(DOSMAX*DOSSCALE!=0) {
@@ -2280,8 +2280,8 @@ namespace estructure {
       }
     }
     fin << endl;
-    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
-    fin << "set arrow from 0, 0 to graph 0, first 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 0, first 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << "set key font \"Helvetica, 40\"" << endl; 	
     fin << endl;
     fin << "plot[][] \\" << endl;
@@ -2332,7 +2332,7 @@ namespace estructure {
     fin << "unset title" << endl;
     fin << "unset key" << endl;
     fin << "unset xtics" << endl;
-    // CO20170830 - add tics at the right spot, but leave labels out - START
+    //CO20170830 - add tics at the right spot, but leave labels out - START
     fin << "set xtics (";
     for (int i=0; i< count; i=i+2) {
       fin << "\"" << kpointslabel[i] <<"\"";
@@ -2342,13 +2342,13 @@ namespace estructure {
     fin << " " << std::setprecision(BANDS_PRECISION) << SPKPOINTScart_LABEL[count-1] << ")" << endl;  //needs to match bandsdatafile
     fin << "set format x \"\"" << endl;
     fin << "unset format y" << endl;
-    // CO20170830 - add tics at the right spot, but leave labels out - STOP
+    //CO20170830 - add tics at the right spot, but leave labels out - STOP
     fin << "set ytics" << endl;
     fin << "set xrange [* : *]" << endl;
     fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     fin << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
     fin << endl;
-    // CO20170831 - now we do with xtics - START
+    //CO20170831 - now we do with xtics - START
     //[OBSOLETE]for (int i=0; i< count; i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare("G")==0) {
     //[OBSOLETE]fin << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -2364,14 +2364,14 @@ namespace estructure {
     //[OBSOLETE]}
     //[OBSOLETE]}
     //[OBSOLETE]fin << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-    // CO20170831 - now we do with xtics - STOP
-    // CO20170830 - manual grid not needed - START
+    //CO20170831 - now we do with xtics - STOP
+    //CO20170830 - manual grid not needed - START
     //for (int i=0; i< count; i=i+2) {
     //  fin << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
     //}
-    // CO20170830 - manual grid not needed - STOP
+    //CO20170830 - manual grid not needed - STOP
     fin << endl;
-    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << endl;
     fin << "plot[][] \\" << endl;
     if(ISPIN==1) {
@@ -2498,7 +2498,7 @@ namespace estructure {
     aflowlib::vaspfile2stringstream(directory, "DOSCAR", ss_doscar);
     vector<vector<double> > TDOS;
     vector<vector<double> >  TOTALPDOS_SPIN;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS_SPIN) && TOTALPDOS_SPIN.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -2629,7 +2629,7 @@ namespace estructure {
       count = j;
     }
     //*******************************Redefine the symbols of special kpoints
-    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  // CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  //CO20170831 - fix all at once
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma")==0) kpointslabel[i]="Sigm";
@@ -2640,8 +2640,8 @@ namespace estructure {
     //Combine the Labels of special kpoints	
     for (int i=1; i< (count-1); i=i+2) {
       if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); // CO20170830 - if subscript, extra space looks ODD!
-        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  // CO20170830 - italics and make space for first italics
+        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); //CO20170830 - if subscript, extra space looks ODD!
+        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
 	kpointslabel[i] = newlabel;
 	kpointslabel[i+1] = newlabel;
       }
@@ -2691,7 +2691,7 @@ namespace estructure {
     }
 
     //*******************************Redefine the symbols of special kpoints
-    // CO20170830 - already done above ?? - not sure why we do twice...
+    //CO20170830 - already done above ?? - not sure why we do twice...
     //[OBSOLETE]for (int i=0; i< count; i++) {
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
@@ -2703,12 +2703,12 @@ namespace estructure {
     //[OBSOLETE]//Combine the Labels of special kpoints	
     //[OBSOLETE]for (int i=1; i< (count-1); i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  // CO20170830 - italics and make space for first italics
+    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  //CO20170830 - italics and make space for first italics
     //[OBSOLETE]    kpointslabel[i] = newlabel;
     //[OBSOLETE]    kpointslabel[i+1] = newlabel;
     //[OBSOLETE]  } else {
-    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); // CO20170830 - italics
-    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); // CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); //CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); //CO20170830 - italics
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //*******************************Redefine the symbols of special kpoints
@@ -2790,10 +2790,10 @@ namespace estructure {
     fin << "set output " << "\"" << ICSDName <<".eps" << "\"" << endl;
     fin << "set multiplot title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ")" << "\""<< endl;
     fin << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-    //fin << "set border lw 5" << endl; // CO20170830 - thick border
-    fin << "unset border" << endl; // CO20170830 - looks better
-    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+    //fin << "set border lw 5" << endl; //CO20170830 - thick border
+    fin << "unset border" << endl; //CO20170830 - looks better
+    fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+    fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
     //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
     fin << endl;
 
@@ -2806,7 +2806,7 @@ namespace estructure {
     fin << "set xtics " << endl;
     //fin << "unset ytics" << endl;
     fin << "set ytics " << endl;
-    fin << "set format y \"\"" << endl; // CO20170830 - keep grid
+    fin << "set format y \"\"" << endl; //CO20170830 - keep grid
     fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     if(TOTALPDOS.at(0).size()==9||(TOTALPDOS.at(0).size()==7)) {
       if(DOSMAX*DOSSCALE!=0) {
@@ -2822,8 +2822,8 @@ namespace estructure {
       }
     }
     fin << endl;
-    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
-    fin << "set arrow from 0, 0 to graph 0, first 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 0, first 0 nohead lt 3 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << "set key font \"Helvetica, 40\"" << endl; 	
     fin << endl;
     fin << "plot[][] \\" << endl;
@@ -2850,7 +2850,7 @@ namespace estructure {
     fin << "unset title" << endl;
     fin << "unset key" << endl;
     fin << "unset xtics" << endl;
-    // CO20170830 - add tics at the right spot, but leave labels out - START
+    //CO20170830 - add tics at the right spot, but leave labels out - START
     fin << "set xtics (";
     for (int i=0; i< count; i=i+2) {
       fin << "\"" << kpointslabel[i] <<"\"";
@@ -2860,13 +2860,13 @@ namespace estructure {
     fin << " " << SPKPOINTScart_LABEL[count-1] << ")" << endl;
     fin << "set format x \"\"" << endl;
     fin << "unset format y" << endl;
-    // CO20170830 - add tics at the right spot, but leave labels out - STOP
+    //CO20170830 - add tics at the right spot, but leave labels out - STOP
     fin << "set ytics" << endl;
     fin << "set xrange [* : *]" << endl;
     fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
     fin << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
     fin << endl;
-    // CO20170831 - now we do with xtics - START
+    //CO20170831 - now we do with xtics - START
     //[OBSOLETE]for (int i=0; i< count; i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare("G")==0) {
     //[OBSOLETE]fin << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -2882,14 +2882,14 @@ namespace estructure {
     //[OBSOLETE]}
     //[OBSOLETE]}
     //[OBSOLETE]fin << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-    // CO20170831 - now we do with xtics - STOP
-    // CO20170830 - manual grid not needed - START
+    //CO20170831 - now we do with xtics - STOP
+    //CO20170830 - manual grid not needed - START
     //for (int i=0; i< count; i=i+2) {
     //  fin << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
     //}
-    // CO20170830 - manual grid not needed - STOP
+    //CO20170830 - manual grid not needed - STOP
     fin << endl;
-    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+    fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
     fin << endl;
     fin << "plot[][] \\" << endl;
     for (unsigned int i=1; i<(bandsdata.at(0).size()-1); i++) {
@@ -3119,7 +3119,7 @@ namespace estructure {
       count = j;
     }
     //*******************************Redefine the symbols of special kpoints
-    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  // CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_GNUPLOT(kpointslabel[i]);}  //CO20170831 - fix all at once
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Sigma")==0) kpointslabel[i]="Sigm";
@@ -3130,8 +3130,8 @@ namespace estructure {
     //Combine the Labels of special kpoints	
     for (int i=1; i< (count-1); i=i+2) {
       if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); // CO20170830 - if subscript, extra space looks ODD!
-        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  // CO20170830 - italics and make space for first italics
+        bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); //CO20170830 - if subscript, extra space looks ODD!
+        string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
 	kpointslabel[i] = newlabel;
 	kpointslabel[i+1] = newlabel;
       }
@@ -3183,7 +3183,7 @@ namespace estructure {
     }
 
     //*******************************Redefine the symbols of special kpoints
-    // CO20170830 - already done above ?? - not sure why we do twice...
+    //CO20170830 - already done above ?? - not sure why we do twice...
     //[OBSOLETE]for (int i=0; i< count; i++) {
     //[OBSOLETE]  if(kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]  if(kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
@@ -3195,12 +3195,12 @@ namespace estructure {
     //[OBSOLETE]//Combine the Labels of special kpoints	
     //[OBSOLETE]for (int i=1; i< (count-1); i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  // CO20170830 - italics and make space for first italics
+    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  //CO20170830 - italics and make space for first italics
     //[OBSOLETE]    kpointslabel[i] = newlabel;
     //[OBSOLETE]    kpointslabel[i+1] = newlabel;
     //[OBSOLETE]  } else {
-    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); // CO20170830 - italics
-    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); // CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); //CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); //CO20170830 - italics
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //*******************************Redefine the symbols of special kpoints
@@ -3284,10 +3284,10 @@ namespace estructure {
       fin << "set output " << "\"" << ICSDName <<"_BANDS.eps" << "\"" << endl;
       fin << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ") " << "\""<< endl;
       fin << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-      //fin << "set border lw 5" << endl; // CO20170830 - thick border
-      fin << "unset border" << endl; // CO20170830 - looks better
-      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+      //fin << "set border lw 5" << endl; //CO20170830 - thick border
+      fin << "unset border" << endl; //CO20170830 - looks better
+      fin << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      fin << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
       //fin << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
       fin << endl;
       fin << "set tmargin at screen 0.94" << endl;
@@ -3295,7 +3295,7 @@ namespace estructure {
 
       fin << "unset key" << endl;
       fin << "unset xtics" << endl;
-      // CO20170830 - add tics at the right spot, but leave labels out - START
+      //CO20170830 - add tics at the right spot, but leave labels out - START
       fin << "set xtics (";
       for (int i=0; i< count; i=i+2) {
         fin << "\"" << kpointslabel[i] <<"\"";
@@ -3305,13 +3305,13 @@ namespace estructure {
       fin << " " << SPKPOINTScart_LABEL[count-1] << ")" << endl;
       fin << "set format x \"\"" << endl;
       fin << "unset format y" << endl;
-      // CO20170830 - add tics at the right spot, but leave labels out - STOP
+      //CO20170830 - add tics at the right spot, but leave labels out - STOP
       fin << "set ytics" << endl;
       fin << "set xrange [* : *]" << endl;
       fin << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
       fin << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
       fin << endl;
-      // CO20170831 - now we do with xtics - START
+      //CO20170831 - now we do with xtics - START
       //[OBSOLETE]for (int i=0; i< count; i=i+2) {
       //[OBSOLETE]if(kpointslabel[i].compare("G")==0) {
       //[OBSOLETE]fin << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -3327,14 +3327,14 @@ namespace estructure {
       //[OBSOLETE]}
       //[OBSOLETE]}
       //[OBSOLETE]fin << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-      // CO20170831 - now we do with xtics - STOP
-      // CO20170830 - manual grid not needed - START
+      //CO20170831 - now we do with xtics - STOP
+      //CO20170830 - manual grid not needed - START
       //for (int i=0; i< count; i=i+2) {
       //  fin << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
       //}
-      // CO20170830 - manual grid not needed - STOP
+      //CO20170830 - manual grid not needed - STOP
       fin << endl;
-      fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+      fin << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       fin << endl;
       fin << "plot[][] \\" << endl;
       for (unsigned int i=1; i<(bandsdata.at(0).size()-1); i++) {
@@ -3357,10 +3357,10 @@ namespace estructure {
       finup << "set output " << "\"" << ICSDName <<"_BANDS_UP.eps" << "\"" << endl;
       finup << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ") BANDS\\\\_UP" << "\""<< endl;
       finup << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-      //finup << "set border lw 5" << endl; // CO20170830 - thick border
-      finup << "unset border" << endl; // CO20170830 - looks better
-      finup << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-      finup << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+      //finup << "set border lw 5" << endl; //CO20170830 - thick border
+      finup << "unset border" << endl; //CO20170830 - looks better
+      finup << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      finup << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
       //finup << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
       finup << endl;
       finup << "set tmargin at screen 0.94" << endl;
@@ -3368,7 +3368,7 @@ namespace estructure {
 
       finup << "unset key" << endl;
       finup << "unset xtics" << endl;
-      // CO20170830 - add tics at the right spot, but leave labels out - START
+      //CO20170830 - add tics at the right spot, but leave labels out - START
       finup << "set xtics (";
       for (int i=0; i< count; i=i+2) {
         finup << "\"" << kpointslabel[i] <<"\"";
@@ -3378,13 +3378,13 @@ namespace estructure {
       finup << " " << SPKPOINTScart_LABEL[count-1] << ")" << endl;
       finup << "set format x \"\"" << endl;
       finup << "unset format y" << endl;
-      // CO20170830 - add tics at the right spot, but leave labels out - STOP
+      //CO20170830 - add tics at the right spot, but leave labels out - STOP
       finup << "set ytics" << endl;
       finup << "set xrange [* : *]" << endl;
       finup << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
       finup << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
       finup << endl;
-      // CO20170831 - now we do with xtics - START
+      //CO20170831 - now we do with xtics - START
       //[OBSOLETE]for (int i=0; i< count; i=i+2) {
       //[OBSOLETE]if(kpointslabel[i].compare("G")==0) {
       //[OBSOLETE]finup << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -3400,14 +3400,14 @@ namespace estructure {
       //[OBSOLETE]}
       //[OBSOLETE]}
       //[OBSOLETE]finup << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-      // CO20170831 - now we do with xtics - STOP
-      // CO20170830 - manual grid not needed - START
+      //CO20170831 - now we do with xtics - STOP
+      //CO20170830 - manual grid not needed - START
       //for (int i=0; i< count; i=i+2) {
       //  finup << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
       //}
-      // CO20170830 - manual grid not needed - STOP
+      //CO20170830 - manual grid not needed - STOP
       finup << endl;
-      finup << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+      finup << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       finup << endl;
       finup << "plot[][] \\" << endl;
       for (unsigned int i=1; i<(bandsdata.at(0).size()-2); i=i+2) {
@@ -3425,10 +3425,10 @@ namespace estructure {
       findn << "set output " << "\"" << ICSDName <<"_BANDS_DN.eps" << "\"" << endl;
       findn << "set title \"" << estructure::changeICSDNameGunplot(ICSDName) << " (" << LattName << ") BANDS\\\\_DN" << "\""<< endl;
       findn << "set label '" << AFLOWLIB_CONSORTIUM_STRING << "' at screen 0.75, 0.02 font \"Helvetica, 32\"" << endl;
-      //findn << "set border lw 5" << endl; // CO20170830 - thick border
-      findn << "unset border" << endl; // CO20170830 - looks better
-      findn << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  // CO20170830 - gray background
-      findn << "set grid back lt 1 lc rgb 'white' lw 5" << endl; // CO20170830 - white grid
+      //findn << "set border lw 5" << endl; //CO20170830 - thick border
+      findn << "unset border" << endl; //CO20170830 - looks better
+      findn << "set object 1 rectangle from graph 0,0 to graph 1,1 fc rgb '#E4E4E4' behind fs noborder" << endl;  //CO20170830 - gray background
+      findn << "set grid back lt 1 lc rgb 'white' lw 5" << endl; //CO20170830 - white grid
       //findn << "set label 'Generated by AFLOW (Kesong Yang \\& Stefano Cutarolo)' at screen 0.985, 0.5 font \"Helvetica, 22\" rotate by -90 center " << endl;
       findn << endl;
 
@@ -3436,7 +3436,7 @@ namespace estructure {
       findn << "set bmargin at screen 0.08" << endl;
       findn << "unset key" << endl;
       findn << "unset xtics" << endl;
-      // CO20170830 - add tics at the right spot, but leave labels out - START
+      //CO20170830 - add tics at the right spot, but leave labels out - START
       findn << "set xtics (";
       for (int i=0; i< count; i=i+2) {
         findn << "\"" << kpointslabel[i] <<"\"";
@@ -3446,13 +3446,13 @@ namespace estructure {
       findn << " " << SPKPOINTScart_LABEL[count-1] << ")" << endl;
       findn << "set format x \"\"" << endl;
       findn << "unset format y" << endl;
-      // CO20170830 - add tics at the right spot, but leave labels out - STOP
+      //CO20170830 - add tics at the right spot, but leave labels out - STOP
       findn << "set ytics" << endl;
       findn << "set xrange [* : *]" << endl;
       findn << "set yrange [" << DOS_Emin << ":" << DOS_Emax << "]" << endl;
       findn << "set ylabel 'energy (eV)' offset graph 0.002" << endl;
       findn << endl;
-      // CO20170831 - now we do with xtics - START
+      //CO20170831 - now we do with xtics - START
       //[OBSOLETE]for (int i=0; i< count; i=i+2) {
       //[OBSOLETE]if(kpointslabel[i].compare("G")==0) {
       //[OBSOLETE]findn << "set label " << "\"{/Symbol G}\"" << " center at " << SPKPOINTScart_LABEL[i] <<", " << "graph - 0.03" << endl;	
@@ -3465,14 +3465,14 @@ namespace estructure {
       //[OBSOLETE]}
       //[OBSOLETE]}
       //[OBSOLETE]findn << "set label " << "\"" << kpointslabel[count-1] <<"\"" << " center at " << SPKPOINTScart_LABEL[count-1] <<", " << "graph - 0.03" << endl;	
-      // CO20170831 - now we do with xtics - STOP
-      // CO20170830 - manual grid not needed - START
+      //CO20170831 - now we do with xtics - STOP
+      //CO20170830 - manual grid not needed - START
       //for (int i=0; i< count; i=i+2) {
       //  findn << "set arrow from first  " << SPKPOINTScart[i] <<", graph 0 to first " << SPKPOINTScart[i] <<", graph 1 nohead lt 1 lc rgb 'white' lw 5" << endl;
       //}
-      // CO20170830 - manual grid not needed - STOP
+      //CO20170830 - manual grid not needed - STOP
       findn << endl;
-      findn << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  // CO20170830 - originally lt 3 lw 1.5
+      findn << "set arrow from 0, 0 to graph 1, first 0 nohead lt 1 lc rgb '#0000FF' lw 10" << endl;  //CO20170830 - originally lt 3 lw 1.5
       findn << endl;
       findn << "plot[][] \\" << endl;
       if(ISPIN==2) {
@@ -3577,7 +3577,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3594,7 +3594,7 @@ namespace estructure {
     double  Efermi;
     vector<vector<double> > TDOS;
     vector<vector<vector<double> > > PDOS;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3611,7 +3611,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TOTALPDOS;
     vector<vector<vector<double> > > PDOS;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3628,7 +3628,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<double> > TOTALPDOS;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3645,7 +3645,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TDOS;
     vector<vector<vector<double> > > PDOS;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3662,7 +3662,7 @@ namespace estructure {
     double Efermi;
     vector<vector<double> > TOTALPDOS;
     vector<vector<vector<double> > > PDOS;
-    // CO20180216 - this function needs PDOS
+    //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
       cerr << "ERROR: DOSCAR extraction failed, perhaps there is no PDOS" << endl;
       exit(1);
@@ -3703,7 +3703,7 @@ namespace estructure {
     bool isLSCOUPLING = false;
     double Emax=0.0, Emin=0.0;
     Efermi=0;
-    // CO20180216 - reset EVERYTHING, so if we return false, there's no garbage inside
+    //CO20180216 - reset EVERYTHING, so if we return false, there's no garbage inside
     for(uint i=0;i<TDOS.size();i++){TDOS[i].clear();} TDOS.clear();
     for(uint i=0;i<TOTALPDOS.size();i++){TOTALPDOS[i].clear();} TOTALPDOS.clear();
     for(uint i=0;i<PDOS.size();i++){for(uint j=0;j<PDOS[i].size();j++){PDOS[i][j].clear();} PDOS[i].clear();} PDOS.clear();
@@ -3726,16 +3726,16 @@ namespace estructure {
 
     int TotNoDOSCAR = aurostd::GetNLinesString(ss_dosfile);
     //int TotNoDOSCAR = CountofLinesinStringstream(ss_dosfile);
-    // CO20180217 - I added the (-6) because header is 6 lines
+    //CO20180217 - I added the (-6) because header is 6 lines
     //usually, DOSGRID is 301, and TotNoDOSCAR is 307, so 307-6 == 301 ! conservation of lines
     //therefore TotNoDOSCAR-6 should never be less than DOSGRID, but at least equal
-    if(TotNoDOSCAR-6 < DOSGRID) {cerr << "DOSCAR is cut-off, likely an IO problem" << endl; return false;} //"DOSCAR is not intergrated!" << endl; /*exit(1)*/return false;}  // CO20180216
+    if(TotNoDOSCAR-6 < DOSGRID) {cerr << "DOSCAR is cut-off, likely an IO problem" << endl; return false;} //"DOSCAR is not intergrated!" << endl; /*exit(1)*/return false;}  //CO20180216
     bool FLAG_PDOS = false;
     if(NIONS==0) NIONS = (int (TotNoDOSCAR-5)/(DOSGRID+1))-1; //if OUTCAR does not exist
-    // CO20180217
+    //CO20180217
     //DOSGRID 301, and TotNoDOSCAR is 301*2+6+1=609, the +1 is for the next DOSGRID line
     //because of +1 line, TotNoDOSCAR-6 must be greater, never equal
-    if(TotNoDOSCAR-6 > 2*DOSGRID) FLAG_PDOS = true; // CO20180217
+    if(TotNoDOSCAR-6 > 2*DOSGRID) FLAG_PDOS = true; //CO20180217
 
     //----------------------GETTING TDOS DATA-----------------------
     TDOS.resize(DOSGRID);
@@ -3789,7 +3789,7 @@ namespace estructure {
     //************************************************************************************************************************
     //----------------------GETTING PDOS DATA-------------------------
     //vector<vector<vector<double> > > PDOS(NIONS);
-    //if(!FLAG_PDOS) { cerr << "Partial DOS has not been calculated yet or your DOSCAR file is damaged!" << endl; /*exit(1)*/return false;} // CO20180216 //we may not have PDOS in static anymore, see AGL
+    //if(!FLAG_PDOS) { cerr << "Partial DOS has not been calculated yet or your DOSCAR file is damaged!" << endl; /*exit(1)*/return false;} //CO20180216 //we may not have PDOS in static anymore, see AGL
     if(FLAG_PDOS) {
       PDOS.resize(NIONS);
       getline(ss_dosfile, line); //Negelecting the title line after the TDOS
@@ -4506,10 +4506,10 @@ namespace estructure{
     for(uint i=0;i<directories.size();i++){
       directory=directories[i];
       if(LDEBUG) cerr << "estructure::DOSDATA_JSON: working in directory=" << directory << endl;
-      //oss << "{" << std::endl;  // CO20171025
-      SUCCESS = SUCCESS && DOSDATA_JSON(vpflow,directory,json,true); // CO20171025
+      //oss << "{" << std::endl;  //CO20171025
+      SUCCESS = SUCCESS && DOSDATA_JSON(vpflow,directory,json,true); //CO20171025
       oss << json.str(); json.str("");
-      //oss <<std::endl  << "}"; // CO20171025
+      //oss <<std::endl  << "}"; //CO20171025
       if(i!=directories.size()-1){oss<<",";}
       oss << std::endl;
     }
@@ -4518,7 +4518,7 @@ namespace estructure{
   }
     
   //Takes in a ofstream and spits out the revelevent JSON about the DOS. 
-  bool DOSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ // CO20171025
+  bool DOSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ //CO20171025
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     //bool isLSCOUPLING=FALSE;
     int DOSGRID; //, NIONS;
@@ -4575,7 +4575,7 @@ namespace estructure{
       //exit(0);
     }
         
-    // CO20171025 - START
+    //CO20171025 - START
     //READ POSCAR.static
     string POSCAR_file="";
 
@@ -4610,7 +4610,7 @@ namespace estructure{
     vector<double> number;
     for(uint i=0;i<xstr.num_each_type.size();i++){number.push_back(xstr.num_each_type[i]);}
 
-    // CO20171018 - do NOT read iatoms file, this comes pre-relaxation
+    //CO20171018 - do NOT read iatoms file, this comes pre-relaxation
     //aflow has a habit of shrinking the structure between relax2 and static IF POSSIBLE
     //[OBSOLETE]  //READ iatoms.out file
     //[OBSOLETE]  bool iatomsfound=FALSE;
@@ -4652,13 +4652,13 @@ namespace estructure{
     //[OBSOLETE]  //for(uint i=0;i<number.size();i++) cerr << number.at(i) << endl;
     //[OBSOLETE]  //cerr << "inequilvent atoms : " << endl;
     //[OBSOLETE]  //for(uint i=0;i<iatoms.size();i++) cerr << iatoms.at(i) << endl;
-    // CO20171025 - STOP
+    //CO20171025 - STOP
 
     vector<vector<double> > TDOS, TOTALPDOS;
     vector<vector<vector<double> > > PDOS;
     GET_DOS_DATA(directory, Efermi, TDOS, TOTALPDOS, PDOS);       
  
-    // CO20180216
+    //CO20180216
     bool found_TDOS=(TDOS.size()>0 && TDOS[0].size()>0);
     bool found_PDOS=(PDOS.size()>0 && PDOS[0].size()>0 && PDOS[0][0].size()>0);
 
@@ -4666,32 +4666,32 @@ namespace estructure{
     /*dosfile >> ICSDName;*/ getline(dosfile,stmp);
     dosfile >> Emax >> Emin >> DOSGRID >> Efermi >> stmp; getline(dosfile, stmp);
         
-    if(wrapping_brackets){json << "{" << std::endl;}  // CO20171025
+    if(wrapping_brackets){json << "{" << std::endl;}  //CO20171025
     json << "     \"name\": " << "\"" << name << "\"," <<endl;
     json << "     \"species\": [" << "\"" << vspecies[0] << "\"";
     for(uint i=1;i<vspecies.size();i++) json << ", \"" << vspecies[i] << "\"";
     json << "]," << endl;
-    json << "     \"composition\": [" << number[0]; // CO20171025
+    json << "     \"composition\": [" << number[0]; //CO20171025
     for(uint i=1;i<number.size();i++) json << ", " << number[i];
     json << "]," << endl;
     json << "     \"Emin\": " << Emin << "," << std::endl;
     json << "     \"Emax\": " << Emax << "," << std::endl;
     json << "     \"Efermi\": " << Efermi << "," << std::endl;
-    json << "     \"DOS_grid\": " << DOSGRID << ((found_TDOS||found_PDOS)?string(","):string("")) << std::endl; // CO20171025
+    json << "     \"DOS_grid\": " << DOSGRID << ((found_TDOS||found_PDOS)?string(","):string("")) << std::endl; //CO20171025
     //*******************************************************************
     //********************          DOS           ***********************
     //*******************************************************************
        
     //--------------------    (non-polarized)     -----------------------
-    if(found_TDOS){  // CO20180216
+    if(found_TDOS){  //CO20180216
       if(TDOS[0].size() == 3){
-	json << "     \"tDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"tDOS_data\": {" << std::endl; //CO20171025
 	json << "          \"energy\": [";
 	json << TDOS[0][0];
 	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][0];    
 	json << "]," << std::endl;
 
-	json << "          \"tDOS\": ["; // CO20171025
+	json << "          \"tDOS\": ["; //CO20171025
 	json << TDOS[0][1];
 	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][1];    
 	json << "]," << std::endl;
@@ -4700,12 +4700,12 @@ namespace estructure{
 	json << TDOS[0][2];
 	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][2];    
 	json << "]" << std::endl;
-	json << "     }" << (found_PDOS?string(","):string("")) << std::endl; // CO20180216
+	json << "     }" << (found_PDOS?string(","):string("")) << std::endl; //CO20180216
       }
 
       //--------------------      (polarized)       -----------------------
       if(TDOS[0].size() == 5){
-	json << "     \"tDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"tDOS_data\": {" << std::endl; //CO20171025
 	json << "          \"energy\": [";
 	json << TDOS[0][0];
 	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][0];    
@@ -4731,7 +4731,7 @@ namespace estructure{
 	for (int i=1; i <DOSGRID; i++)json << "," << TDOS[i][4];    
 	json << "]" << std::endl;
 
-	json << "     }" << (found_PDOS?string(","):string("")) << std::endl;   // CO20180216
+	json << "     }" << (found_PDOS?string(","):string("")) << std::endl;   //CO20180216
       }
     }
         
@@ -4742,7 +4742,7 @@ namespace estructure{
     //--------------------s, p , d (non-polarized)-----------------------
     if(found_PDOS){
       if(PDOS[0][0].size()==4){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
 	json << "          \"spin_polarized\": false," << std::endl;
@@ -4770,7 +4770,7 @@ namespace estructure{
         
       //--------------------s, p, d, f (non-polarized)-----------------------
       if(PDOS[0][0].size()==5){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
 	json << "          \"spin_polarized\": false," << std::endl;
@@ -4802,7 +4802,7 @@ namespace estructure{
         
       //--------------------s, p , d (polarized)-----------------------
       if(PDOS[0][0].size()==7){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
 	json << "          \"spin_polarized\": true," << std::endl;
@@ -4842,7 +4842,7 @@ namespace estructure{
        
       //--------------------s, p, d, f (polarized)-----------------------
       if(PDOS[0][0].size()==9){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
 	json << "          \"spin_polarized\": true," << std::endl;
@@ -4890,7 +4890,7 @@ namespace estructure{
         
       //--------------------s, py, pz, px, dxy, dyz, dz2, dxz, dx2-y2 (non-spin-polarized)-----
       if(PDOS[0][0].size()==10){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
 	json << "          \"spin_polarized\": false," << std::endl;
@@ -4918,7 +4918,7 @@ namespace estructure{
         
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... (LS COUPLINT)------------
       if(PDOS[0][0].size()==13){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
 	json << "          \"spin_polarized\": false," << std::endl;
@@ -4948,7 +4948,7 @@ namespace estructure{
       //--------------------                        OR                           ------------------------
       //--------------------stotal, sx, sy, xz, ptotal, px, py, pz ... ftotal ..(LS COUPLINT)------------
       if(PDOS[0][0].size()==17){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
 	json << "          \"spin_polarized\": false," << std::endl;
@@ -4980,7 +4980,7 @@ namespace estructure{
         
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn (spin-polarized)-----
       if(PDOS[0][0].size()==19){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\"]," << std::endl;
 	json << "          \"spin_polarized\": true," << std::endl;
@@ -5020,7 +5020,7 @@ namespace estructure{
 
       //--------------------s, (py, pz, px)_spin_up_dn, (dxy, dyz, dz2, dxz, dx2-y2)_spin_up_dn, (f1, f2, f3...) (spin-polarized)-----
       if(PDOS[0][0].size()==33){
-	json << "     \"pDOS_data\": {" << std::endl; // CO20171025
+	json << "     \"pDOS_data\": {" << std::endl; //CO20171025
             
 	json << "          \"orbitals\": [\"s\", \"p\", \"d\", \"f\"]," << std::endl;
 	json << "          \"spin_polarized\": true," << std::endl;
@@ -5066,7 +5066,7 @@ namespace estructure{
 	json << "     }";
       }
     }
-    if(wrapping_brackets){json << std::endl << "}";} // CO20171025
+    if(wrapping_brackets){json << std::endl << "}";} //CO20171025
     return TRUE; //tokens.size();    
   }
 
@@ -5494,10 +5494,10 @@ namespace estructure {
     for(uint i=0;i<directories.size();i++){
       directory=directories[i];
       if(LDEBUG) cerr << "estructure::BANDSDATA_JSON: working in directory=" << directory << endl;
-      //oss << "{" << std::endl; // CO20171025
-      SUCCESS = SUCCESS && BANDSDATA_JSON(vpflow,directory,json,true); // CO20171025
+      //oss << "{" << std::endl; //CO20171025
+      SUCCESS = SUCCESS && BANDSDATA_JSON(vpflow,directory,json,true); //CO20171025
       oss << json.str(); json.str("");
-      //oss <<std::endl  << "}"; // CO20171025
+      //oss <<std::endl  << "}"; //CO20171025
       if(i!=directories.size()-1){oss<<",";}
       oss << std::endl;
     }
@@ -5505,7 +5505,7 @@ namespace estructure {
     return SUCCESS;
   }
 
-  bool BANDSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ // CO20171025
+  bool BANDSDATA_JSON(aurostd::xoption& vpflow, string directory, stringstream& json,bool wrapping_brackets){ //CO20171025
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "estructure::BANDSDATA_JSON: BEGIN" << endl;
         
@@ -5627,7 +5627,7 @@ namespace estructure {
     // Get special kpoints from KPOINTS.bands
     // Get Lables of KPOINTS from KPOINTS.bands
     vector<vector<double> > kpoints;  
-    vector<string> kpointslabel,kpointslabel_html,kpointslabel_gnuplot,kpointslabel_latex; // CO20171025
+    vector<string> kpointslabel,kpointslabel_html,kpointslabel_gnuplot,kpointslabel_latex; //CO20171025
     int count=0, j=0; //count is the number of rows of kpoints
     // cout << ss_kpoints.str() << endl;
     while(getline(ss_kpoints, line)){
@@ -5643,18 +5643,18 @@ namespace estructure {
 	kpt_tmp.push_back(a3);
 	kpoints.push_back(kpt_tmp);
 	kpointslabel.push_back(a5);
-	kpointslabel_html.push_back(a5); // CO20171025
-	kpointslabel_gnuplot.push_back(a5); // CO20171025
-	kpointslabel_latex.push_back(a5); // CO20171025
+	kpointslabel_html.push_back(a5); //CO20171025
+	kpointslabel_gnuplot.push_back(a5); //CO20171025
+	kpointslabel_latex.push_back(a5); //CO20171025
 	j++;
       }
       count = j;
     }
     //*******************************Redefine the symbols of special kpoints
-    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_SPECIALONLY(kpointslabel[i]);}//fixKPOINT(kpointslabel[i]);}  // CO20170831 - fix all at once
-    for (int i=0; i< count; i++) {kpointslabel_html[i]=fixKPOINT_HTML(kpointslabel_html[i]);}//fixKPOINT(kpointslabel[i]);}  // CO20170831 - fix all at once
-    for (int i=0; i< count; i++) {kpointslabel_gnuplot[i]=fixKPOINT_SPECIALONLY(fixKPOINT_GNUPLOT(kpointslabel_gnuplot[i],true));}//fixKPOINT(kpointslabel[i]);}  // CO20170831 - fix all at once
-    for (int i=0; i< count; i++) {kpointslabel_latex[i]=fixKPOINT_SPECIALONLY(fixKPOINT_LATEX(kpointslabel_latex[i]));}//fixKPOINT(kpointslabel[i]);}  // CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel[i]=fixKPOINT_SPECIALONLY(kpointslabel[i]);}//fixKPOINT(kpointslabel[i]);}  //CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel_html[i]=fixKPOINT_HTML(kpointslabel_html[i]);}//fixKPOINT(kpointslabel[i]);}  //CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel_gnuplot[i]=fixKPOINT_SPECIALONLY(fixKPOINT_GNUPLOT(kpointslabel_gnuplot[i],true));}//fixKPOINT(kpointslabel[i]);}  //CO20170831 - fix all at once
+    for (int i=0; i< count; i++) {kpointslabel_latex[i]=fixKPOINT_SPECIALONLY(fixKPOINT_LATEX(kpointslabel_latex[i]));}//fixKPOINT(kpointslabel[i]);}  //CO20170831 - fix all at once
     //[OBSOLETE]    if (kpointslabel[i].compare("\\Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]    if (kpointslabel[i].compare("Gamma")==0) kpointslabel[i]="G";
     //[OBSOLETE]    if (kpointslabel[i].compare("\\Sigma")==0) kpointslabel[i]="Sigm";
@@ -5666,22 +5666,22 @@ namespace estructure {
     string newlabel;
     for (int i=1; i< (count-1); i=i+2){
       if (kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-	bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); // CO20170830 - if subscript, extra space looks ODD!
-	//string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  // CO20170830 - italics and make space for first italics
-	newlabel = aurostd::attach(kpointslabel[i],kpointslabel[i+1]);  // CO20170830 - italics and make space for first italics
+	bool need_space=!aurostd::substring2bool(kpointslabel[i],"_"); //CO20170830 - if subscript, extra space looks ODD!
+	//string newlabel = aurostd::attach(kpointslabel[i]+(need_space?" ":""),kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
+	newlabel = aurostd::attach(kpointslabel[i],kpointslabel[i+1]);  //CO20170830 - italics and make space for first italics
 	kpointslabel[i] = newlabel;
 	kpointslabel[i+1] = newlabel;
-	// CO20171025 - START
-	newlabel = aurostd::attach(kpointslabel_html[i]+(need_space?" ":""),kpointslabel_html[i+1]);  // CO20170830 - italics and make space for first italics
+	//CO20171025 - START
+	newlabel = aurostd::attach(kpointslabel_html[i]+(need_space?" ":""),kpointslabel_html[i+1]);  //CO20170830 - italics and make space for first italics
 	kpointslabel_html[i] = newlabel;
 	kpointslabel_html[i+1] = newlabel;
-	newlabel = aurostd::attach(kpointslabel_gnuplot[i]+(need_space?" ":""),kpointslabel_gnuplot[i+1]);  // CO20170830 - italics and make space for first italics
+	newlabel = aurostd::attach(kpointslabel_gnuplot[i]+(need_space?" ":""),kpointslabel_gnuplot[i+1]);  //CO20170830 - italics and make space for first italics
 	kpointslabel_gnuplot[i] = newlabel;
 	kpointslabel_gnuplot[i+1] = newlabel;
-	newlabel = aurostd::attach(kpointslabel_latex[i]+(need_space?" ":""),kpointslabel_latex[i+1]);  // CO20170830 - italics and make space for first italics
+	newlabel = aurostd::attach(kpointslabel_latex[i]+(need_space?" ":""),kpointslabel_latex[i+1]);  //CO20170830 - italics and make space for first italics
 	kpointslabel_latex[i] = newlabel;
 	kpointslabel_latex[i+1] = newlabel;
-	// CO20171025 - STOP
+	//CO20171025 - STOP
       }
     }
     //*******************************Redefine the symbols of special kpoints
@@ -5745,12 +5745,12 @@ namespace estructure {
     //[OBSOLETE]//Combine the Labels of special kpoints 
     //[OBSOLETE]for (int i=1; i< (count-1); i=i+2) {
     //[OBSOLETE]  if(kpointslabel[i].compare(kpointslabel[i+1])!=0) {
-    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  // CO20170830 - italics and make space for first italics
+    //[OBSOLETE]    string newlabel = aurostd::attach(fixKPOINT(kpointslabel[i])+" ",fixKPOINT(kpointslabel[i+1]));  //CO20170830 - italics and make space for first italics
     //[OBSOLETE]    kpointslabel[i] = newlabel;
     //[OBSOLETE]    kpointslabel[i+1] = newlabel;
     //[OBSOLETE]  } else {
-    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); // CO20170830 - italics
-    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); // CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i] = fixKPOINT(kpointslabel[i]); //CO20170830 - italics
+    //[OBSOLETE]    kpointslabel[i+1] = fixKPOINT(kpointslabel[i+1]); //CO20170830 - italics
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //*******************************Redefine the symbols of special kpoints
@@ -5783,7 +5783,7 @@ namespace estructure {
     // bandsfin.setf(ios_base::fixed,ios_base::floatfield);  //Formating output
     //bandsfin.precision(4);
     vector<vector<double> > bandsdata(NKPOINTS);
-    if(wrapping_brackets){json << "{" << std::endl;} // CO20171025
+    if(wrapping_brackets){json << "{" << std::endl;} //CO20171025
     //Writing bands data into file
     if (ISPIN==1) { 
       for (int i=0; i<NKPOINTS; i++){
@@ -5795,32 +5795,32 @@ namespace estructure {
 	  bandsdata[i][ib+1]=dataup[i][ib]-Efermi;  //Zero point Shifts to Efermi
 	}
       //json << "{" << endl;
-      DOSDATA_JSON(vpflow,directory,json,false); // CO20171025
+      DOSDATA_JSON(vpflow,directory,json,false); //CO20171025
       json << "," << endl;
-      json << "     \"title\": \"" << ICSDName << " (" << LattName << ")\"," << endl; // CO20171025
-      json << "     \"n_kpoints\": " << NKPOINTS << "," << endl; // CO20171025
-      json << "     \"n_bands\": " << Nbands << "," << endl; // CO20171025
+      json << "     \"title\": \"" << ICSDName << " (" << LattName << ")\"," << endl; //CO20171025
+      json << "     \"n_kpoints\": " << NKPOINTS << "," << endl; //CO20171025
+      json << "     \"n_bands\": " << Nbands << "," << endl; //CO20171025
             
-      json << "     \"kpoint_labels\": ["; // CO20171025
+      json << "     \"kpoint_labels\": ["; //CO20171025
       json << "\"" << kpointslabel[0] << "\"";
       for(int i=2;i<count;i=i+2) json << ",\"" <<  kpointslabel[i] << "\"";
       json << ",\"" << kpointslabel[count-1] << "\"";
       json << "]," << endl;
             
       /*
-	json << "     \"kpoint_labels_html\": ["; // CO20171025
+	json << "     \"kpoint_labels_html\": ["; //CO20171025
 	if(kpointslabel[0]=="G") json << "\"&Gamma;\""; else if(kpointslabel[0]=="Sigm") json << "\"&Sigma;\""; else if(kpointslabel[0]=="Sigm_1") json << "\"&Sigma;<sub>1</sub>\""; else if(kpointslabel[0]=="Y_1") json << "\"Y<sub>1</sub>\""; else if(kpointslabel[0]=="Z_1") json << "\"Z<sub>1</sub>\""; else json << "\"" << kpointslabel[0] << "\"";
 	for(int i=2;i<count;i=i+2) if(kpointslabel[i]=="G") json << ",\"&Gamma;\""; else if(kpointslabel[i]=="Sigm") json << ",\"&Sigma;\""; else if(kpointslabel[i]=="Sigm_1") json << ",\"&Sigma;<sub>1</sub>\""; else if(kpointslabel[i]=="Y_1") json << ",\"Y<sub>1</sub>\""; else if(kpointslabel[i]=="Z_1") json << ",\"Z<sub>1</sub>\""; else json << ",\"" << kpointslabel[i] << "\"";
 	json << "]," << endl;
       */
 
-      json << "     \"kpoint_labels_latex\": ["; // CO20171025
-      json << "\"" << kpointslabel_latex[0] << "\""; // CO20171025
-      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_latex[i] <<"\""; // CO20171025
-      json << ",\"" << kpointslabel_latex[count-1] << "\""; // CO20171025
+      json << "     \"kpoint_labels_latex\": ["; //CO20171025
+      json << "\"" << kpointslabel_latex[0] << "\""; //CO20171025
+      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_latex[i] <<"\""; //CO20171025
+      json << ",\"" << kpointslabel_latex[count-1] << "\""; //CO20171025
       json << "]," << endl;
 
-      // CO20171025 - START
+      //CO20171025 - START
       json << "     \"kpoint_labels_gnuplot\": [";
       json << "\"" << kpointslabel_gnuplot[0] << "\"";
       for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_gnuplot[i] <<"\"";
@@ -5843,7 +5843,7 @@ namespace estructure {
       json << "[" << bandsdata[0][0];
       for(int i=1; i<Nbands+1;i++) json <<"," <<  bandsdata[0][i];
       json << "]," << endl;
-      // CO20171025 - STOP
+      //CO20171025 - STOP
 
       for (int ik=1;ik<NKPOINTS;ik++){
 	json << "          [";
@@ -5874,43 +5874,43 @@ namespace estructure {
 	}
             
       //json << "{" << endl;
-      DOSDATA_JSON(vpflow,directory,json,false);  // CO20180216 - removed erroneous wrapping brackets
+      DOSDATA_JSON(vpflow,directory,json,false);  //CO20180216 - removed erroneous wrapping brackets
       json << "," << endl;
-      json << "     \"title\": \"" << ICSDName << " (" << LattName << ")\"," << endl; // CO20171025
-      json << "     \"n_kpoints\": " << NKPOINTS << "," << endl; // CO20171025
-      json << "     \"n_bands\": " << Nbands << "," << endl; // CO20171025
+      json << "     \"title\": \"" << ICSDName << " (" << LattName << ")\"," << endl; //CO20171025
+      json << "     \"n_kpoints\": " << NKPOINTS << "," << endl; //CO20171025
+      json << "     \"n_bands\": " << Nbands << "," << endl; //CO20171025
             
-      json << "     \"kpoint_labels\": ["; // CO20171025
+      json << "     \"kpoint_labels\": ["; //CO20171025
       json << "\"" << kpointslabel[0] << "\"";
       for(int i=2;i<count;i=i+2) json << ",\"" <<  kpointslabel[i] << "\"";
       json << ",\"" << kpointslabel[count-1] << "\"";
       json << "]," << endl;
            
-      json << "     \"kpoint_labels_latex\": ["; // CO20171025
-      json << "\"" << kpointslabel_latex[0] << "\""; // CO20171025
-      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_latex[i]<<"\""; // CO20171025
-      json << ",\"" << kpointslabel_latex[count-1] << "\""; // CO20171025
-      json << "]," << endl; // CO20171025
+      json << "     \"kpoint_labels_latex\": ["; //CO20171025
+      json << "\"" << kpointslabel_latex[0] << "\""; //CO20171025
+      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_latex[i]<<"\""; //CO20171025
+      json << ",\"" << kpointslabel_latex[count-1] << "\""; //CO20171025
+      json << "]," << endl; //CO20171025
         
-      json << "     \"kpoint_labels_gnuplot\": ["; // CO20171025
-      json << "\"" << kpointslabel_gnuplot[0] << "\""; // CO20171025
-      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_gnuplot[i]<<"\""; // CO20171025
-      json << ",\"" << kpointslabel_gnuplot[count-1] << "\""; // CO20171025
-      json << "]," << endl; // CO20171025
+      json << "     \"kpoint_labels_gnuplot\": ["; //CO20171025
+      json << "\"" << kpointslabel_gnuplot[0] << "\""; //CO20171025
+      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_gnuplot[i]<<"\""; //CO20171025
+      json << ",\"" << kpointslabel_gnuplot[count-1] << "\""; //CO20171025
+      json << "]," << endl; //CO20171025
         
-      json << "     \"kpoint_labels_html\": ["; // CO20171025
-      json << "\"" << kpointslabel_html[0] << "\""; // CO20171025
-      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_html[i]<<"\""; // CO20171025
-      json << ",\"" << kpointslabel_html[count-1] << "\""; // CO20171025
+      json << "     \"kpoint_labels_html\": ["; //CO20171025
+      json << "\"" << kpointslabel_html[0] << "\""; //CO20171025
+      for(int i=2;i<count;i=i+2) json <<",\"" << kpointslabel_html[i]<<"\""; //CO20171025
+      json << ",\"" << kpointslabel_html[count-1] << "\""; //CO20171025
       json << "]," << endl;
         
-      json << "     \"kpoint_positions\": ["; // CO20171025
+      json << "     \"kpoint_positions\": ["; //CO20171025
       json <<  SPKPOINTScart[0];
       for(int i=2;i<count;i=i+2) json << "," <<  SPKPOINTScart[i];
       json << "," << SPKPOINTScart[count-1];
       json << "]," << endl;
 
-      json << "     \"bands_data_majority\": ["; // CO20171025
+      json << "     \"bands_data_majority\": ["; //CO20171025
       json << "[" << bandsdata[0][0];
       for(int i=1; i<Nbands+1;i++) json <<"," <<  bandsdata[0][i];
       json << "]," << endl;
@@ -5926,7 +5926,7 @@ namespace estructure {
       }
       json << "     ]," << endl;
             
-      json << "     \"bands_data_minority\": ["; // CO20171025
+      json << "     \"bands_data_minority\": ["; //CO20171025
       json << "[" << bandsdata_dn[0][0];
       for(int i=1; i<Nbands+1;i++) json <<"," <<  bandsdata_dn[0][i];
       json << "]," << endl;
@@ -5943,7 +5943,7 @@ namespace estructure {
       json << "     ]"; // << endl;
       //json << "}" << endl;
     }
-    if(wrapping_brackets){json << std::endl << "}";} // CO20171025
+    if(wrapping_brackets){json << std::endl << "}";} //CO20171025
     return TRUE;//tokens.size();
   }
    
