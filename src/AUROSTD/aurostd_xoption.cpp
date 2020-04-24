@@ -303,7 +303,7 @@ namespace aurostd {
       }
     }
     //SC20200310 // THIS IS INCORRECT 
-    //SC20200310 // check attached schemes list going through vxsghost 2 by 2  // SC 20191227
+    //SC20200310 // check attached schemes list going through vxsghost 2 by 2  //SC20191227
     //SC20200310 for(uint i=0;i<vxsghost.size();i+=2) {
     //SC20200310   //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;  
     //SC20200310   a=aurostd::toupper(vxsghost.at(i));                         // shortcuts

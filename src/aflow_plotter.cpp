@@ -191,7 +191,7 @@ namespace plotter {
   void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
     string soliloquy="plotter::savePlotGNUPLOT():";
-    //ME20200327 -Check that all required binaries are available
+    //ME20200327 - Check that all required binaries are available
     // Check that gnuplot is version 5+
     if (XHOST.is_command("gnuplot")) {
       string versionstring = aurostd::execute2string(XHOST.command("gnuplot") + " --version");

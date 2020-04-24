@@ -161,145 +161,145 @@ namespace pflow {
     // try with symbol
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).symbol)) Z=i;
+        if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).symbol)) Z=i;
     }
     // try with name
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).name)) Z=i;
+        if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).name)) Z=i;
     }
-    
+
     if(LDEBUG) cerr << "Z=" << Z << endl;
     oss << "AFLOW element property finder" << endl;
     if(Z>0) {
       oss << "Element Z=" << xelement::xelement(Z).Z << " - " << xelement::xelement(Z).symbol << " - " << xelement::xelement(Z).name << endl;
       string space="        ";
-    
+
       // found
-    
+
       //      cerr <<  xelement::xelement(3).name << endl;
       //      cerr <<  xelement::xelement("Li").name << endl;
       //      cerr <<  xelement::xelement("LiThIuM").name << endl;
-      
+
       // now look at properties
       if(tokens.size()>=2) {
-	for(uint i=1;i<tokens.size();i++) {
-	  string c=aurostd::toupper(tokens.at(i));
-	  vector<string> vs; uint len=52;
-	  vs.clear();
-	  int prec=10;
-	  if(c=="ALL" || c==aurostd::toupper("name")) vs.push_back(aurostd::PaddedPOST("name="+xelement::xelement(Z).name,len));
-	  if(c=="ALL" || c==aurostd::toupper("symbol")) vs.push_back(aurostd::PaddedPOST("symbol="+xelement::xelement(Z).symbol,len));
-	  if(c=="ALL" || c==aurostd::toupper("Z")) vs.push_back(aurostd::PaddedPOST("Z="+aurostd::utype2string(xelement::xelement(Z).Z),len));
-	  if(c=="ALL" || c==aurostd::toupper("Period")) vs.push_back(aurostd::PaddedPOST("Period="+aurostd::utype2string(xelement::xelement(Z).Period),len));
-	  if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement::xelement(Z).Group),len));
-	  if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement::xelement(Z).Series,len));
-	  if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement::xelement(Z).Block,len));
-	  if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,prec),len)+"// (kg)");
-	  if(c=="ALL" || c==aurostd::toupper("MolarVolume")) vs.push_back(aurostd::PaddedPOST("MolarVolume="+aurostd::utype2string(xelement::xelement(Z).MolarVolume,prec),len)+"// (m^3/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,prec),len)+"// A^3");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_Vm")) vs.push_back(aurostd::PaddedPOST("Miedema_Vm="+aurostd::utype2string(xelement::xelement(Z).Miedema_Vm,prec),len)+"// (V_m^{2/3} in (cm^2))");
-	  if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement::xelement(Z).valence_std),len));
-	  if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement::xelement(Z).valence_iupac),len));
-	  if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement::xelement(Z).valence_PT),len));
-	  if(c=="ALL" || c==aurostd::toupper("Density_PT")) vs.push_back(aurostd::PaddedPOST("Density_PT="+aurostd::utype2string(xelement::xelement(Z).Density_PT,prec),len)+"// (g/cm^3)");
-	  if(c=="ALL" || c==aurostd::toupper("crystal")) vs.push_back(aurostd::PaddedPOST("crystal="+xelement::xelement(Z).crystal,len));
-	  if(c=="ALL" || c==aurostd::toupper("CrystalStr_PT")) vs.push_back(aurostd::PaddedPOST("CrystalStr_PT="+xelement::xelement(Z).CrystalStr_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement::xelement(Z).space_group,len));
-	  if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement::xelement(Z).space_group_number),len));
+        for(uint i=1;i<tokens.size();i++) {
+          string c=aurostd::toupper(tokens.at(i));
+          vector<string> vs; uint len=52;
+          vs.clear();
+          int prec=10;
+          if(c=="ALL" || c==aurostd::toupper("name")) vs.push_back(aurostd::PaddedPOST("name="+xelement::xelement(Z).name,len));
+          if(c=="ALL" || c==aurostd::toupper("symbol")) vs.push_back(aurostd::PaddedPOST("symbol="+xelement::xelement(Z).symbol,len));
+          if(c=="ALL" || c==aurostd::toupper("Z")) vs.push_back(aurostd::PaddedPOST("Z="+aurostd::utype2string(xelement::xelement(Z).Z),len));
+          if(c=="ALL" || c==aurostd::toupper("Period")) vs.push_back(aurostd::PaddedPOST("Period="+aurostd::utype2string(xelement::xelement(Z).Period),len));
+          if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement::xelement(Z).Group),len));
+          if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement::xelement(Z).Series,len));
+          if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement::xelement(Z).Block,len));
+          if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,prec),len)+"// (kg)");
+          if(c=="ALL" || c==aurostd::toupper("MolarVolume")) vs.push_back(aurostd::PaddedPOST("MolarVolume="+aurostd::utype2string(xelement::xelement(Z).MolarVolume,prec),len)+"// (m^3/mol)");
+          if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,prec),len)+"// A^3");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_Vm")) vs.push_back(aurostd::PaddedPOST("Miedema_Vm="+aurostd::utype2string(xelement::xelement(Z).Miedema_Vm,prec),len)+"// (V_m^{2/3} in (cm^2))");
+          if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement::xelement(Z).valence_std),len));
+          if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement::xelement(Z).valence_iupac),len));
+          if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement::xelement(Z).valence_PT),len));
+          if(c=="ALL" || c==aurostd::toupper("Density_PT")) vs.push_back(aurostd::PaddedPOST("Density_PT="+aurostd::utype2string(xelement::xelement(Z).Density_PT,prec),len)+"// (g/cm^3)");
+          if(c=="ALL" || c==aurostd::toupper("crystal")) vs.push_back(aurostd::PaddedPOST("crystal="+xelement::xelement(Z).crystal,len));
+          if(c=="ALL" || c==aurostd::toupper("CrystalStr_PT")) vs.push_back(aurostd::PaddedPOST("CrystalStr_PT="+xelement::xelement(Z).CrystalStr_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement::xelement(Z).space_group,len));
+          if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement::xelement(Z).space_group_number),len));
 
-	  if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement::xelement(Z).Pearson_coefficient,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement::xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement::xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
-	  if(c=="ALL" || c==aurostd::toupper("phase")) vs.push_back(aurostd::PaddedPOST("phase="+xelement::xelement(Z).phase,len));
-	  if(c=="ALL" || c==aurostd::toupper("radius")) vs.push_back(aurostd::PaddedPOST("radius="+aurostd::utype2string(xelement::xelement(Z).radius,prec),len)+"// (nm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_PT")) vs.push_back(aurostd::PaddedPOST("radius_PT="+aurostd::utype2string(xelement::xelement(Z).radius_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_covalent_PT")) vs.push_back(aurostd::PaddedPOST("radius_covalent_PT="+aurostd::utype2string(xelement::xelement(Z).radius_covalent_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_covalent")) vs.push_back(aurostd::PaddedPOST("radius_covalent="+aurostd::utype2string(xelement::xelement(Z).radius_covalent,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement::xelement(Z).radius_VanDerWaals_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement::xelement(Z).Pearson_coefficient,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement::xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement::xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
+          if(c=="ALL" || c==aurostd::toupper("phase")) vs.push_back(aurostd::PaddedPOST("phase="+xelement::xelement(Z).phase,len));
+          if(c=="ALL" || c==aurostd::toupper("radius")) vs.push_back(aurostd::PaddedPOST("radius="+aurostd::utype2string(xelement::xelement(Z).radius,prec),len)+"// (nm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_PT")) vs.push_back(aurostd::PaddedPOST("radius_PT="+aurostd::utype2string(xelement::xelement(Z).radius_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_covalent_PT")) vs.push_back(aurostd::PaddedPOST("radius_covalent_PT="+aurostd::utype2string(xelement::xelement(Z).radius_covalent_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_covalent")) vs.push_back(aurostd::PaddedPOST("radius_covalent="+aurostd::utype2string(xelement::xelement(Z).radius_covalent,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement::xelement(Z).radius_VanDerWaals_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,prec),len)+"// (pm)");
 
-	  if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement::xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
-	    if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
-	    if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
-	    if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
-	    if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement::xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
-	    if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement::xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
-	    if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement::xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
-	    if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement::xelement(Z).Pettifor_scale,prec),len)); 
-	    if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement::xelement(Z).boiling_point,prec),len)+"// (Celsius)");
-	    if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement::xelement(Z).melting_point,prec),len)+"// (Celsius)");
-	    if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
-	    if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,prec),len)+"// (J/(kg.K))");
-	    if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement::xelement(Z).critical_Pressure,prec),len)+"// (Atm) "); 
-	    if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
-	    if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
-	    if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement::xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
-	    if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement::xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
-	    if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement::xelement(Z).Mohs_hardness,prec),len));
-	    if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement::xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
-	    if(c=="ALL" || c==aurostd::toupper("Hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("Hardness_Pearson="+aurostd::utype2string(xelement::xelement(Z).Hardness_Pearson,prec),len)+"// (eV)");
-	    if(c=="ALL" || c==aurostd::toupper("Hardness_Putz")) vs.push_back(aurostd::PaddedPOST("Hardness_Putz="+aurostd::utype2string(xelement::xelement(Z).Hardness_Putz,prec),len)+"// (eV/atom)");
-	    if(c=="ALL" || c==aurostd::toupper("Hardness_RB")) vs.push_back(aurostd::PaddedPOST("Hardness_RB="+aurostd::utype2string(xelement::xelement(Z).Hardness_RB,prec),len)+"// (eV)");
-	    if(c=="ALL" || c==aurostd::toupper("shear_modulus")) vs.push_back(aurostd::PaddedPOST("shear_modulus="+aurostd::utype2string(xelement::xelement(Z).shear_modulus,prec),len)+"// (GPa)");
-	    if(c=="ALL" || c==aurostd::toupper("Young_modulus")) vs.push_back(aurostd::PaddedPOST("Young_modulus="+aurostd::utype2string(xelement::xelement(Z).Young_modulus,prec),len)+"// (GPa)");
-	    if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement::xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
-	    if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,prec),len));
-	    if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement::xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
+          if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement::xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement::xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement::xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement::xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
+          if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement::xelement(Z).Pettifor_scale,prec),len)); 
+          if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement::xelement(Z).boiling_point,prec),len)+"// (Celsius)");
+          if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement::xelement(Z).melting_point,prec),len)+"// (Celsius)");
+          if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
+          if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,prec),len)+"// (J/(kg.K))");
+          if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement::xelement(Z).critical_Pressure,prec),len)+"// (Atm) "); 
+          if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
+          if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
+          if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement::xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
+          if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement::xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
+          if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement::xelement(Z).Mohs_hardness,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement::xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("Hardness_Pearson="+aurostd::utype2string(xelement::xelement(Z).Hardness_Pearson,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_Putz")) vs.push_back(aurostd::PaddedPOST("Hardness_Putz="+aurostd::utype2string(xelement::xelement(Z).Hardness_Putz,prec),len)+"// (eV/atom)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_RB")) vs.push_back(aurostd::PaddedPOST("Hardness_RB="+aurostd::utype2string(xelement::xelement(Z).Hardness_RB,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("shear_modulus")) vs.push_back(aurostd::PaddedPOST("shear_modulus="+aurostd::utype2string(xelement::xelement(Z).shear_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("Young_modulus")) vs.push_back(aurostd::PaddedPOST("Young_modulus="+aurostd::utype2string(xelement::xelement(Z).Young_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement::xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement::xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
 
-	    if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement::xelement(Z).Magnetic_Type_PT,len));
-	    if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
-	    if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
-	    if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
-	    if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement::xelement(Z).Curie_point,prec),len)+"// (K)");
-	
-	    if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,prec),len));
-	    if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement::xelement(Z).color_PT,len));
-	    if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,prec),len));
-	    if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,prec),len));
-	    if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,prec),len)+"// shift+1");
+          if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement::xelement(Z).Magnetic_Type_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
+          if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
+          if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement::xelement(Z).Curie_point,prec),len)+"// (K)");
 
-	    if(vs.size())
-	      for(uint j=0;j<vs.size();j++)
-		oss << vs.at(j) << endl;
-	}
+          if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement::xelement(Z).color_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,prec),len)+"// shift+1");
+
+          if(vs.size())
+            for(uint j=0;j<vs.size();j++)
+              oss << vs.at(j) << endl;
+        }
       }
     }
-    
+
     if(LDEBUG) cerr << "pflow::XelementPrint [END]" << endl;
   }
 }
 
 /*
-  std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
-  std::vector<string> vatom_name(NUM_ELEMENTS);   // store starting from ONE // DONE
-  std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // DONE
-  std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
-  std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-  std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-  std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
-  std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-  std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-  std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-  std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-  // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
-  std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
-  std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE//DX+CO20170904 
-  std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
-  std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
-  std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
-  std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-  std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   //ME20181020 Pearson mass deviation coefficient
-  
+   std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
+   std::vector<string> vatom_name(NUM_ELEMENTS);   // store starting from ONE // DONE
+   std::vector<double> vatom_mass(NUM_ELEMENTS);     // store starting from ONE // DONE
+   std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
+   std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
+   std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
+   std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
+   std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+   std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+   std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+   std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+// for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
+std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
+std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE//DX+CO20170904 
+std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
+std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
+std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
+std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   //ME20181020 Pearson mass deviation coefficient
+
 */
-  
+
 namespace xelement {
-  
-  
+
+
   // initialize them all
   void Initialize(void) { for(uint Z=0;Z<NUM_ELEMENTS;Z++) { velement.at(Z)=xelement(Z); } }
   string symbol2name(const string& symbol) { return xelement(symbol).name; }
@@ -395,121 +395,121 @@ namespace xelement {
     xray_scatt=NNN;   
     // [AFLOW]STOP=CONSTRUCTOR
   }
-  
+
   // destructor
   xelement::~xelement() {
-  free();
+    free();
   }
 
   void xelement::free() {
- // will populate
- // [AFLOW]START=FREE
- // [AFLOW]STOP=FREE
+    // will populate
+    // [AFLOW]START=FREE
+    // [AFLOW]STOP=FREE
   }
 
   const xelement& xelement::operator=(const xelement& b) {      // operator=
-  if(this != &b) {
-    free();
-   // will populate
-    verbose=b.verbose;
-   // [AFLOW]START=ASSIGNMENT
+    if(this != &b) {
+      free();
+      // will populate
+      verbose=b.verbose;
+      // [AFLOW]START=ASSIGNMENT
       Z=b.Z;
-    symbol=b.symbol;
-    name=b.name;
-    Period=b.Period;
-    Group=b.Group; 
-    Series=b.Series;
-    Block=b.Block;      
-   //                                          
-    mass=b.mass;
-    MolarVolume=b.MolarVolume;  
-    volume=b.volume;      
-    Miedema_Vm=b.Miedema_Vm;      
-   //
-    valence_std=b.valence_std;  
-    valence_iupac=b.valence_iupac;
-    valence_PT=b.valence_PT;       
-    Density_PT=b.Density_PT;       
-    crystal=b.crystal;    
-    CrystalStr_PT=b.CrystalStr_PT;
-    space_group=b.space_group;
-    space_group_number=b.space_group_number;    
-    Pearson_coefficient=b.Pearson_coefficient;
-    lattice_constant=b.lattice_constant; 
-    lattice_angle=b.lattice_angle;   
-    phase=b.phase;
-    radius=b.radius;         
-    radius_PT=b.radius_PT;          
-    radius_covalent_PT=b.radius_covalent_PT;   
-    radius_covalent=b.radius_covalent;  
-    radius_VanDerWaals_PT=b.radius_VanDerWaals_PT;
-    radii_Ghosh08=b.radii_Ghosh08;         
-    radii_Slatter=b.radii_Slatter;         
-    radii_Pyykko=b.radii_Pyykko;          
-   //                                          
-    electrical_conductivity=b.electrical_conductivity;
-    electronegativity_vec=b.electronegativity_vec;    
-    hardness_Ghosh=b.hardness_Ghosh;            
+      symbol=b.symbol;
+      name=b.name;
+      Period=b.Period;
+      Group=b.Group; 
+      Series=b.Series;
+      Block=b.Block;      
+      //                                          
+      mass=b.mass;
+      MolarVolume=b.MolarVolume;  
+      volume=b.volume;      
+      Miedema_Vm=b.Miedema_Vm;      
+      //
+      valence_std=b.valence_std;  
+      valence_iupac=b.valence_iupac;
+      valence_PT=b.valence_PT;       
+      Density_PT=b.Density_PT;       
+      crystal=b.crystal;    
+      CrystalStr_PT=b.CrystalStr_PT;
+      space_group=b.space_group;
+      space_group_number=b.space_group_number;    
+      Pearson_coefficient=b.Pearson_coefficient;
+      lattice_constant=b.lattice_constant; 
+      lattice_angle=b.lattice_angle;   
+      phase=b.phase;
+      radius=b.radius;         
+      radius_PT=b.radius_PT;          
+      radius_covalent_PT=b.radius_covalent_PT;   
+      radius_covalent=b.radius_covalent;  
+      radius_VanDerWaals_PT=b.radius_VanDerWaals_PT;
+      radii_Ghosh08=b.radii_Ghosh08;         
+      radii_Slatter=b.radii_Slatter;         
+      radii_Pyykko=b.radii_Pyykko;          
+      //                                          
+      electrical_conductivity=b.electrical_conductivity;
+      electronegativity_vec=b.electronegativity_vec;    
+      hardness_Ghosh=b.hardness_Ghosh;            
       electronegativity_Pearson=b.electronegativity_Pearson;           
       electronegativity_Ghosh=b.electronegativity_Ghosh;             
-    electron_affinity_PT=b.electron_affinity_PT;      
-    Miedema_phi_star=b.Miedema_phi_star;         
-    Miedema_nws=b.Miedema_nws;              
-    Miedema_gamma_s=b.Miedema_gamma_s;          
-   //
-    Pettifor_scale=b.Pettifor_scale;          
-   //
-    boiling_point=b.boiling_point;         
-    melting_point=b.melting_point;         
-    vaporization_heat_PT=b.vaporization_heat_PT;     
-    specific_heat_PT=b.specific_heat_PT;         
-    critical_Pressure=b.critical_Pressure;     
-    critical_Temperature_PT=b.critical_Temperature_PT;  
-    thermal_expansion=b.thermal_expansion;     
-    thermal_conductivity=b.thermal_conductivity;  
-   //                                         
-    Brinelll_hardness=b.Brinelll_hardness;
-    Mohs_hardness=b.Mohs_hardness;    
-    Vickers_hardness=b.Vickers_hardness; 
-    Hardness_Pearson=b.Hardness_Pearson;   
-    Hardness_Putz=b.Hardness_Putz;      
-    Hardness_RB=b.Hardness_RB;        
-    shear_modulus=b.shear_modulus;    
-    Young_modulus=b.Young_modulus;    
-    bulk_modulus=b.bulk_modulus;     
-    Poisson_ratio_PT=b.Poisson_ratio_PT;    
-    Miedema_BVm=b.Miedema_BVm;        
-   //
-    Magnetic_Type_PT=b.Magnetic_Type_PT;
-    Mass_Magnetic_Susceptibility=b.Mass_Magnetic_Susceptibility;
-    Volume_Magnetic_Susceptibility=b.Volume_Magnetic_Susceptibility;
-    Molar_Magnetic_Susceptibility=b.Molar_Magnetic_Susceptibility; 
-    Curie_point=b.Curie_point;                  
-   //
-    refractive_index=b.refractive_index;             
-    color_PT=b.color_PT;         
-   //
-    HHIP=b.HHIP;                           
-    HHIR=b.HHIR;                           
-    xray_scatt=b.xray_scatt;    
-   // [AFLOW]STOP=ASSIGNMENT
-  }
-  return *this;
+      electron_affinity_PT=b.electron_affinity_PT;      
+      Miedema_phi_star=b.Miedema_phi_star;         
+      Miedema_nws=b.Miedema_nws;              
+      Miedema_gamma_s=b.Miedema_gamma_s;          
+      //
+      Pettifor_scale=b.Pettifor_scale;          
+      //
+      boiling_point=b.boiling_point;         
+      melting_point=b.melting_point;         
+      vaporization_heat_PT=b.vaporization_heat_PT;     
+      specific_heat_PT=b.specific_heat_PT;         
+      critical_Pressure=b.critical_Pressure;     
+      critical_Temperature_PT=b.critical_Temperature_PT;  
+      thermal_expansion=b.thermal_expansion;     
+      thermal_conductivity=b.thermal_conductivity;  
+      //                                         
+      Brinelll_hardness=b.Brinelll_hardness;
+      Mohs_hardness=b.Mohs_hardness;    
+      Vickers_hardness=b.Vickers_hardness; 
+      Hardness_Pearson=b.Hardness_Pearson;   
+      Hardness_Putz=b.Hardness_Putz;      
+      Hardness_RB=b.Hardness_RB;        
+      shear_modulus=b.shear_modulus;    
+      Young_modulus=b.Young_modulus;    
+      bulk_modulus=b.bulk_modulus;     
+      Poisson_ratio_PT=b.Poisson_ratio_PT;    
+      Miedema_BVm=b.Miedema_BVm;        
+      //
+      Magnetic_Type_PT=b.Magnetic_Type_PT;
+      Mass_Magnetic_Susceptibility=b.Mass_Magnetic_Susceptibility;
+      Volume_Magnetic_Susceptibility=b.Volume_Magnetic_Susceptibility;
+      Molar_Magnetic_Susceptibility=b.Molar_Magnetic_Susceptibility; 
+      Curie_point=b.Curie_point;                  
+      //
+      refractive_index=b.refractive_index;             
+      color_PT=b.color_PT;         
+      //
+      HHIP=b.HHIP;                           
+      HHIR=b.HHIR;                           
+      xray_scatt=b.xray_scatt;    
+      // [AFLOW]STOP=ASSIGNMENT
+    }
+    return *this;
   }
 
   void xelement::clear(){
-  xelement a;(*this)=a;
+    xelement a;(*this)=a;
   }
 
   ostream& operator<<(ostream& oss,const xelement& element) {
-  oss.setf(std::ios::fixed,std::ios::floatfield);
-  oss.precision(10);
- // [AFLOW]START=COUT
-  oss << "verbose=" << element.verbose << endl;
- // [AFLOW]STOP=COUT
-  return oss;
+    oss.setf(std::ios::fixed,std::ios::floatfield);
+    oss.precision(10);
+    // [AFLOW]START=COUT
+    oss << "verbose=" << element.verbose << endl;
+    // [AFLOW]STOP=COUT
+    return oss;
   }
- 
+
 
   // ********************************************************************************************************************************************************
   // constructor by name or symbol
@@ -522,12 +522,12 @@ namespace xelement {
     // try with symbol
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(element)==aurostd::toupper(xelement(i).symbol)) Z=i;
+        if(aurostd::toupper(element)==aurostd::toupper(xelement(i).symbol)) Z=i;
     }
     // try with name
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
+        if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
     }
     if(Z!=0) (*this)=xelement(Z);
 
@@ -536,694 +536,694 @@ namespace xelement {
   // ********************************************************************************************************************************************************
   // constructor by Z
   xelement::xelement(uint ZZ) {
-  free();
- // DEFAULT
-  verbose=FALSE;
+    free();
+    // DEFAULT
+    verbose=FALSE;
 
- // OFFSET
+    // OFFSET
     if(ZZ==0) {
-    xelement a;
-    (*this)=a;
-    mass=0.0;// override
-    valence_iupac=0;// override
-    valence_std=0;// override
-  }
- // ROW 1
- // s-electron systems
+      xelement a;
+      (*this)=a;
+      mass=0.0;// override
+      valence_iupac=0;// override
+      valence_std=0;// override
+    }
+    // ROW 1
+    // s-electron systems
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Hydrogen
- // Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Hydrogen
+    // Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen
     if(ZZ==1) { // Hydrogen
       Z=ZZ;
-    symbol="H";
-    name="Hydrogen";
-    Period=1;
-    Group=1;
-    Series="Nonmetal";
-    Block="s";
-    mass=AMU2KILOGRAM*1.0079;
-    MolarVolume=0.01121;
-    volume=0.75110;
-    Miedema_Vm=NNN;
-    valence_std=1;
-    valence_iupac=1;
-    valence_PT=1;
-    Density_PT=0.899E-4;
-    crystal="hex";
-    CrystalStr_PT="Simple_Hexagonal";
-    space_group="P6_3/mmc";
-    space_group_number=194;
-    Pearson_coefficient=0.00011460743;
-    lattice_constant[1]=470;lattice_constant[2]=470;lattice_constant[3]=340;
-    lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=2*PI/3;
-    phase="Gas";
-    radius=0.046;
-    radius_PT=53;
-    radius_covalent=0.31;
-    radius_covalent_PT=31;
-    radius_VanDerWaals_PT=120;
-    radii_Ghosh08=0.5292;
-    radii_Slatter=0.25;
-    radii_Pyykko=0.32;
-    electrical_conductivity=NNN;
-    electronegativity_vec=2.10;
-    hardness_Ghosh=6.4299;
+      symbol="H";
+      name="Hydrogen";
+      Period=1;
+      Group=1;
+      Series="Nonmetal";
+      Block="s";
+      mass=AMU2KILOGRAM*1.0079;
+      MolarVolume=0.01121;
+      volume=0.75110;
+      Miedema_Vm=NNN;
+      valence_std=1;
+      valence_iupac=1;
+      valence_PT=1;
+      Density_PT=0.899E-4;
+      crystal="hex";
+      CrystalStr_PT="Simple_Hexagonal";
+      space_group="P6_3/mmc";
+      space_group_number=194;
+      Pearson_coefficient=0.00011460743;
+      lattice_constant[1]=470;lattice_constant[2]=470;lattice_constant[3]=340;
+      lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=2*PI/3;
+      phase="Gas";
+      radius=0.046;
+      radius_PT=53;
+      radius_covalent=0.31;
+      radius_covalent_PT=31;
+      radius_VanDerWaals_PT=120;
+      radii_Ghosh08=0.5292;
+      radii_Slatter=0.25;
+      radii_Pyykko=0.32;
+      electrical_conductivity=NNN;
+      electronegativity_vec=2.10;
+      hardness_Ghosh=6.4299;
       electronegativity_Pearson=7.18;
       electronegativity_Ghosh=7.178;
-    electron_affinity_PT=72.8;
-    Miedema_phi_star=5.2;
-    Miedema_nws=1.5;
-    Miedema_gamma_s=NNN;
-    Pettifor_scale=0;
-    boiling_point=-252.87;
-    melting_point=-259.14;
-    vaporization_heat_PT=0.452;
-    specific_heat_PT=14300;
-    critical_Pressure=12.76;
-    critical_Temperature_PT=32.97;
-    thermal_expansion=NNN;
-    thermal_conductivity=0.1805;
-    Brinelll_hardness=NNN;
-    Mohs_hardness=NNN;
-    Vickers_hardness=NNN;
-    Hardness_Pearson=6.43;
-    Hardness_Putz=6.45;
-    Hardness_RB=6.83;
-    shear_modulus=NNN;
-    Young_modulus=NNN;
-    bulk_modulus=NNN;
-    Poisson_ratio_PT=NNN;
-    Miedema_BVm=NNN;
-    Magnetic_Type_PT="Diamagnetic";
-    Mass_Magnetic_Susceptibility=-2.48E-8;
-    Volume_Magnetic_Susceptibility=-2.23E-9;
-    Molar_Magnetic_Susceptibility=-4.999E-11;
-    Curie_point=NNN;
-    color_PT="COLORLESS";
-    refractive_index=1.000132;
-    HHIP=NNN;
-    HHIR=NNN;
-    xray_scatt=1.000;
-   // H volume wrong *dimer* MIEDEMA =PAUL VAN DER PUT book
-  }
- // [AFLOW]STOP=Hydrogen
- // ********************************************************************************************************************************************************
+      electron_affinity_PT=72.8;
+      Miedema_phi_star=5.2;
+      Miedema_nws=1.5;
+      Miedema_gamma_s=NNN;
+      Pettifor_scale=0;
+      boiling_point=-252.87;
+      melting_point=-259.14;
+      vaporization_heat_PT=0.452;
+      specific_heat_PT=14300;
+      critical_Pressure=12.76;
+      critical_Temperature_PT=32.97;
+      thermal_expansion=NNN;
+      thermal_conductivity=0.1805;
+      Brinelll_hardness=NNN;
+      Mohs_hardness=NNN;
+      Vickers_hardness=NNN;
+      Hardness_Pearson=6.43;
+      Hardness_Putz=6.45;
+      Hardness_RB=6.83;
+      shear_modulus=NNN;
+      Young_modulus=NNN;
+      bulk_modulus=NNN;
+      Poisson_ratio_PT=NNN;
+      Miedema_BVm=NNN;
+      Magnetic_Type_PT="Diamagnetic";
+      Mass_Magnetic_Susceptibility=-2.48E-8;
+      Volume_Magnetic_Susceptibility=-2.23E-9;
+      Molar_Magnetic_Susceptibility=-4.999E-11;
+      Curie_point=NNN;
+      color_PT="COLORLESS";
+      refractive_index=1.000132;
+      HHIP=NNN;
+      HHIR=NNN;
+      xray_scatt=1.000;
+      // H volume wrong *dimer* MIEDEMA =PAUL VAN DER PUT book
+    }
+    // [AFLOW]STOP=Hydrogen
+    // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Helium
- // Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Helium
+    // Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium
     if(ZZ==2) { // Helium
       Z=ZZ;
-    symbol="He";
-    name="Helium";
-    Period=1;
-    Group=18;
-    Series="NobleGas";
-    Block="s";
-    mass=AMU2KILOGRAM*4.0026;
-    MolarVolume=0.022424;
-    volume=-1.000;
-    Miedema_Vm=NNN;
-    valence_std=0;
-    valence_iupac=0;
-    valence_PT=0;
-    Density_PT=1.785E-4;
-    crystal="hcp";
-    CrystalStr_PT="Face-centered_Cubic";
-    space_group="Fm_3m";
-    space_group_number=225;
-    Pearson_coefficient=8.32328E-8;
-    lattice_constant[1]=424.2;lattice_constant[2]=424.2;lattice_constant[3]=424.2;
-    lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=PI/2;
-    phase="Gas";
-    radius=NNN;
-    radius_PT=31;
-    radius_covalent=0.28;
-    radius_covalent_PT=28;
-    radius_VanDerWaals_PT=140;
-    radii_Ghosh08=0.3113;
-    radii_Slatter=NNN;
-    radii_Pyykko=0.46;
-    electrical_conductivity=NNN;
-    electronegativity_vec=NNN;
-    hardness_Ghosh=12.5449;
+      symbol="He";
+      name="Helium";
+      Period=1;
+      Group=18;
+      Series="NobleGas";
+      Block="s";
+      mass=AMU2KILOGRAM*4.0026;
+      MolarVolume=0.022424;
+      volume=-1.000;
+      Miedema_Vm=NNN;
+      valence_std=0;
+      valence_iupac=0;
+      valence_PT=0;
+      Density_PT=1.785E-4;
+      crystal="hcp";
+      CrystalStr_PT="Face-centered_Cubic";
+      space_group="Fm_3m";
+      space_group_number=225;
+      Pearson_coefficient=8.32328E-8;
+      lattice_constant[1]=424.2;lattice_constant[2]=424.2;lattice_constant[3]=424.2;
+      lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=PI/2;
+      phase="Gas";
+      radius=NNN;
+      radius_PT=31;
+      radius_covalent=0.28;
+      radius_covalent_PT=28;
+      radius_VanDerWaals_PT=140;
+      radii_Ghosh08=0.3113;
+      radii_Slatter=NNN;
+      radii_Pyykko=0.46;
+      electrical_conductivity=NNN;
+      electronegativity_vec=NNN;
+      hardness_Ghosh=12.5449;
       electronegativity_Pearson=NNN;
       electronegativity_Ghosh=12.046;
-    electron_affinity_PT=0;
-    Miedema_phi_star=NNN;
-    Miedema_nws=NNN;
-    Miedema_gamma_s=NNN;
-    Pettifor_scale=0;
-    boiling_point=-268.93;
-    melting_point=NNN;
-    vaporization_heat_PT=0.083;
-    specific_heat_PT=5193.1;
-    critical_Pressure=2.24;
-    critical_Temperature_PT=5.19;
-    thermal_expansion=NNN;
-    thermal_conductivity=0.1513;
-    Brinelll_hardness=NNN;
-    Mohs_hardness=NNN;
-    Vickers_hardness=NNN;
-    Hardness_Pearson=NNN;
-    Hardness_Putz=25.79;
-    Hardness_RB=16.88;
-    shear_modulus=NNN;
-    Young_modulus=NNN;
-    bulk_modulus=NNN;
-    Poisson_ratio_PT=NNN;
-    Miedema_BVm=NNN;
-    Magnetic_Type_PT="Diamagnetic";
-    Mass_Magnetic_Susceptibility=-5.9E-9;
-    Volume_Magnetic_Susceptibility=-1.05E-9;
-    Molar_Magnetic_Susceptibility=-2.36E-11;
-    Curie_point=NNN;
-    color_PT="COLORLESS";
-    refractive_index=1.000035;
-    HHIP=3200;
-    HHIR=3900;
-    xray_scatt=2.000;
-   // He
-  }
- // [AFLOW]STOP=Helium
- // ********************************************************************************************************************************************************
+      electron_affinity_PT=0;
+      Miedema_phi_star=NNN;
+      Miedema_nws=NNN;
+      Miedema_gamma_s=NNN;
+      Pettifor_scale=0;
+      boiling_point=-268.93;
+      melting_point=NNN;
+      vaporization_heat_PT=0.083;
+      specific_heat_PT=5193.1;
+      critical_Pressure=2.24;
+      critical_Temperature_PT=5.19;
+      thermal_expansion=NNN;
+      thermal_conductivity=0.1513;
+      Brinelll_hardness=NNN;
+      Mohs_hardness=NNN;
+      Vickers_hardness=NNN;
+      Hardness_Pearson=NNN;
+      Hardness_Putz=25.79;
+      Hardness_RB=16.88;
+      shear_modulus=NNN;
+      Young_modulus=NNN;
+      bulk_modulus=NNN;
+      Poisson_ratio_PT=NNN;
+      Miedema_BVm=NNN;
+      Magnetic_Type_PT="Diamagnetic";
+      Mass_Magnetic_Susceptibility=-5.9E-9;
+      Volume_Magnetic_Susceptibility=-1.05E-9;
+      Molar_Magnetic_Susceptibility=-2.36E-11;
+      Curie_point=NNN;
+      color_PT="COLORLESS";
+      refractive_index=1.000035;
+      HHIP=3200;
+      HHIR=3900;
+      xray_scatt=2.000;
+      // He
+    }
+    // [AFLOW]STOP=Helium
+    // ********************************************************************************************************************************************************
 
- // ROW2
- // s-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Lithium
- // Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium
+    // ROW2
+    // s-electron systems
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Lithium
+    // Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium
     if(ZZ==3) { // Lithium
       Z=ZZ;
-    symbol="Li";
-    name="Lithium";
-    Period=2;
-    Group=1;
-    Series="AlkaliMetal";
-    Block="s";
-    mass=AMU2KILOGRAM*6.941;
-    MolarVolume=0.00001297;
-    volume=20.24110;
-    Miedema_Vm=5.5;
-    valence_std=1;
-    valence_iupac=1;
-    valence_PT=1;
-    Density_PT=0.535;
-    crystal="bcc";
-    CrystalStr_PT="Body-centered_Cubic";
-    space_group="Im_3m";
-    space_group_number=229;
-    Pearson_coefficient=0.0014588232;
-    lattice_constant[1]=351;lattice_constant[2]=351;lattice_constant[3]=351;
-    lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=PI/2;
-    phase="Solid";
-    radius=0.152;
-    radius_PT=167;
-    radius_covalent=1.28;
-    radius_covalent_PT=128;
-    radius_VanDerWaals_PT=182;
-    radii_Ghosh08=1.6283;
-    radii_Slatter=1.45;
-    radii_Pyykko=1.33;
-    electrical_conductivity=1.1E7;
-    electronegativity_vec=0.98;
-    hardness_Ghosh=2.3746;
+      symbol="Li";
+      name="Lithium";
+      Period=2;
+      Group=1;
+      Series="AlkaliMetal";
+      Block="s";
+      mass=AMU2KILOGRAM*6.941;
+      MolarVolume=0.00001297;
+      volume=20.24110;
+      Miedema_Vm=5.5;
+      valence_std=1;
+      valence_iupac=1;
+      valence_PT=1;
+      Density_PT=0.535;
+      crystal="bcc";
+      CrystalStr_PT="Body-centered_Cubic";
+      space_group="Im_3m";
+      space_group_number=229;
+      Pearson_coefficient=0.0014588232;
+      lattice_constant[1]=351;lattice_constant[2]=351;lattice_constant[3]=351;
+      lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=PI/2;
+      phase="Solid";
+      radius=0.152;
+      radius_PT=167;
+      radius_covalent=1.28;
+      radius_covalent_PT=128;
+      radius_VanDerWaals_PT=182;
+      radii_Ghosh08=1.6283;
+      radii_Slatter=1.45;
+      radii_Pyykko=1.33;
+      electrical_conductivity=1.1E7;
+      electronegativity_vec=0.98;
+      hardness_Ghosh=2.3746;
       electronegativity_Pearson=3.01;
       electronegativity_Ghosh=2.860;
-    electron_affinity_PT=59.6;
-    Miedema_phi_star=2.85;
-    Miedema_nws=0.98;
-    Miedema_gamma_s=530;
-    Pettifor_scale=0.45;
-    boiling_point=1342;
-    melting_point=180.54;
-    vaporization_heat_PT=147;
-    specific_heat_PT=3570;
-    critical_Pressure=661.2;
-    critical_Temperature_PT=3223;
-    thermal_expansion=0.000046;
-    thermal_conductivity=85;
-    Brinelll_hardness=NNN;
-    Mohs_hardness=0.6;
-    Vickers_hardness=NNN;
-    Hardness_Pearson=2.39;
-    Hardness_Putz=0.65;
-    Hardness_RB=3.06;
-    shear_modulus=4.2;
-    Young_modulus=4.9;
-    bulk_modulus=11;
-    Poisson_ratio_PT=NNN;
-    Miedema_BVm=1.5;
-    Magnetic_Type_PT="Paramagnetic";
-    Mass_Magnetic_Susceptibility=2.56E-8;
-    Volume_Magnetic_Susceptibility=0.0000137;
-    Molar_Magnetic_Susceptibility=1.78E-10;
-    Curie_point=NNN;
-    color_PT="SILVER";
-    refractive_index=NNN;
-    HHIP=2900;
-    HHIR=4200;
-    xray_scatt=3.00145;
-   // Li
-  }
- // [AFLOW]STOP=Lithium
- // ********************************************************************************************************************************************************
+      electron_affinity_PT=59.6;
+      Miedema_phi_star=2.85;
+      Miedema_nws=0.98;
+      Miedema_gamma_s=530;
+      Pettifor_scale=0.45;
+      boiling_point=1342;
+      melting_point=180.54;
+      vaporization_heat_PT=147;
+      specific_heat_PT=3570;
+      critical_Pressure=661.2;
+      critical_Temperature_PT=3223;
+      thermal_expansion=0.000046;
+      thermal_conductivity=85;
+      Brinelll_hardness=NNN;
+      Mohs_hardness=0.6;
+      Vickers_hardness=NNN;
+      Hardness_Pearson=2.39;
+      Hardness_Putz=0.65;
+      Hardness_RB=3.06;
+      shear_modulus=4.2;
+      Young_modulus=4.9;
+      bulk_modulus=11;
+      Poisson_ratio_PT=NNN;
+      Miedema_BVm=1.5;
+      Magnetic_Type_PT="Paramagnetic";
+      Mass_Magnetic_Susceptibility=2.56E-8;
+      Volume_Magnetic_Susceptibility=0.0000137;
+      Molar_Magnetic_Susceptibility=1.78E-10;
+      Curie_point=NNN;
+      color_PT="SILVER";
+      refractive_index=NNN;
+      HHIP=2900;
+      HHIR=4200;
+      xray_scatt=3.00145;
+      // Li
+    }
+    // [AFLOW]STOP=Lithium
+    // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Beryllium
- // Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Beryllium
+    // Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium
     if(ZZ==4) { // Beryllium
       Z=ZZ;
-    symbol="Be";
-    name="Beryllium";
-    Period=2;
-    Group=2;
-    Series="AlkalineEarthMetal";
-    Block="s";
-    mass=AMU2KILOGRAM*9.0122;
-    MolarVolume=4.8767E-6;
-    volume=7.83290;
-    Miedema_Vm=2.9;
-    valence_std=2;
-    valence_iupac=2;
-    valence_PT=2;
-    Density_PT=1.848;
-    crystal="hcp";
-    CrystalStr_PT="Simple_Hexagonal";
-    space_group="P6_3/mmc";
-    space_group_number=194;
-    Pearson_coefficient=0.0;
-    lattice_constant[1]=228.58;lattice_constant[2]=228.58;lattice_constant[3]=358.43;
-    lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=2*PI/3;
-    phase="Solid";
-    radius=0.114;
-    radius_PT=112;
-    radius_covalent=0.96;
-    radius_covalent_PT=96;
-    radius_VanDerWaals_PT=NNN;
-    radii_Ghosh08=1.0855;
-    radii_Slatter=1.05;
-    radii_Pyykko=1.02;
-    electrical_conductivity=2.5E7;
-    electronegativity_vec=1.57;
-    hardness_Ghosh=3.4968;
+      symbol="Be";
+      name="Beryllium";
+      Period=2;
+      Group=2;
+      Series="AlkalineEarthMetal";
+      Block="s";
+      mass=AMU2KILOGRAM*9.0122;
+      MolarVolume=4.8767E-6;
+      volume=7.83290;
+      Miedema_Vm=2.9;
+      valence_std=2;
+      valence_iupac=2;
+      valence_PT=2;
+      Density_PT=1.848;
+      crystal="hcp";
+      CrystalStr_PT="Simple_Hexagonal";
+      space_group="P6_3/mmc";
+      space_group_number=194;
+      Pearson_coefficient=0.0;
+      lattice_constant[1]=228.58;lattice_constant[2]=228.58;lattice_constant[3]=358.43;
+      lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=2*PI/3;
+      phase="Solid";
+      radius=0.114;
+      radius_PT=112;
+      radius_covalent=0.96;
+      radius_covalent_PT=96;
+      radius_VanDerWaals_PT=NNN;
+      radii_Ghosh08=1.0855;
+      radii_Slatter=1.05;
+      radii_Pyykko=1.02;
+      electrical_conductivity=2.5E7;
+      electronegativity_vec=1.57;
+      hardness_Ghosh=3.4968;
       electronegativity_Pearson=4.90;
       electronegativity_Ghosh=3.945;
-    electron_affinity_PT=0;
-    Miedema_phi_star=4.20;
-    Miedema_nws=1.60;
-    Miedema_gamma_s=1900;
-    Pettifor_scale=1.50;
-    boiling_point=2470;
-    melting_point=1287;
-    vaporization_heat_PT=297;
-    specific_heat_PT=1820;
-    critical_Pressure=NNN;
-    critical_Temperature_PT=NNN;
-    thermal_expansion=0.0000113;
-    thermal_conductivity=190;
-    Brinelll_hardness=600;
-    Mohs_hardness=5.5;
-    Vickers_hardness=1670;
-    Hardness_Pearson=4.50;
-    Hardness_Putz=1.69;
-    Hardness_RB=5.16;
-    shear_modulus=132;
-    Young_modulus=287;
-    bulk_modulus=130;
-    Poisson_ratio_PT=0.032;
-    Miedema_BVm=4.9;
-    Magnetic_Type_PT="Diamagnetic";
-    Mass_Magnetic_Susceptibility=-1.26E-8;
-    Volume_Magnetic_Susceptibility=-0.00002328;
-    Molar_Magnetic_Susceptibility=-1.136E-10;
-    Curie_point=NNN;
-    color_PT="SLATEGRAY";
-    refractive_index=NNN;
-    HHIP=8000;
-    HHIR=4000;
-    /*xray_scatt=NNN;*/
-   // Be
-  }
- // [AFLOW]STOP=Beryllium
- // ********************************************************************************************************************************************************
+      electron_affinity_PT=0;
+      Miedema_phi_star=4.20;
+      Miedema_nws=1.60;
+      Miedema_gamma_s=1900;
+      Pettifor_scale=1.50;
+      boiling_point=2470;
+      melting_point=1287;
+      vaporization_heat_PT=297;
+      specific_heat_PT=1820;
+      critical_Pressure=NNN;
+      critical_Temperature_PT=NNN;
+      thermal_expansion=0.0000113;
+      thermal_conductivity=190;
+      Brinelll_hardness=600;
+      Mohs_hardness=5.5;
+      Vickers_hardness=1670;
+      Hardness_Pearson=4.50;
+      Hardness_Putz=1.69;
+      Hardness_RB=5.16;
+      shear_modulus=132;
+      Young_modulus=287;
+      bulk_modulus=130;
+      Poisson_ratio_PT=0.032;
+      Miedema_BVm=4.9;
+      Magnetic_Type_PT="Diamagnetic";
+      Mass_Magnetic_Susceptibility=-1.26E-8;
+      Volume_Magnetic_Susceptibility=-0.00002328;
+      Molar_Magnetic_Susceptibility=-1.136E-10;
+      Curie_point=NNN;
+      color_PT="SLATEGRAY";
+      refractive_index=NNN;
+      HHIP=8000;
+      HHIR=4000;
+      /*xray_scatt=NNN;*/
+      // Be
+    }
+    // [AFLOW]STOP=Beryllium
+    // ********************************************************************************************************************************************************
 
- // p-electron systems
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Boron
- // Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron
+    // p-electron systems
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Boron
+    // Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron
     if(ZZ==5) { // Boron
       Z=ZZ;
-    symbol="B";
-    name="Boron";
-    Period=2;
-    Group=13;
-    Series="Metalloid";
-    Block="p";
-    mass=AMU2KILOGRAM*10.81;
-    MolarVolume=4.3943E-6;
-    volume=5.88420;
-    Miedema_Vm=2.8;
-    valence_std=3;
-    valence_iupac=3;
-    valence_PT=3;
-    Density_PT=2.46;
-    crystal="tet";
-    CrystalStr_PT="Simple_Trigonal";
-    space_group="R_3m";
-    space_group_number=166;
-    Pearson_coefficient=0.00135391428;
-    lattice_constant[1]=506;lattice_constant[2]=506;lattice_constant[3]=506;
-    lattice_angle[1]=1.01334;lattice_angle[2]=1.01334;lattice_angle[3]=1.01334;
-    phase="Solid";
-    radius=0.097;
-    radius_PT=87;
-    radius_covalent=0.84;
-    radius_covalent_PT=85;
-    radius_VanDerWaals_PT=NNN;
-    radii_Ghosh08=0.8141;
-    radii_Slatter=0.85;
-    radii_Pyykko=0.85;
-    electrical_conductivity=0.0001;
-    electronegativity_vec=2.04;
-    hardness_Ghosh=4.6190;
+      symbol="B";
+      name="Boron";
+      Period=2;
+      Group=13;
+      Series="Metalloid";
+      Block="p";
+      mass=AMU2KILOGRAM*10.81;
+      MolarVolume=4.3943E-6;
+      volume=5.88420;
+      Miedema_Vm=2.8;
+      valence_std=3;
+      valence_iupac=3;
+      valence_PT=3;
+      Density_PT=2.46;
+      crystal="tet";
+      CrystalStr_PT="Simple_Trigonal";
+      space_group="R_3m";
+      space_group_number=166;
+      Pearson_coefficient=0.00135391428;
+      lattice_constant[1]=506;lattice_constant[2]=506;lattice_constant[3]=506;
+      lattice_angle[1]=1.01334;lattice_angle[2]=1.01334;lattice_angle[3]=1.01334;
+      phase="Solid";
+      radius=0.097;
+      radius_PT=87;
+      radius_covalent=0.84;
+      radius_covalent_PT=85;
+      radius_VanDerWaals_PT=NNN;
+      radii_Ghosh08=0.8141;
+      radii_Slatter=0.85;
+      radii_Pyykko=0.85;
+      electrical_conductivity=0.0001;
+      electronegativity_vec=2.04;
+      hardness_Ghosh=4.6190;
       electronegativity_Pearson=4.29;
       electronegativity_Ghosh=5.031;
-    electron_affinity_PT=26.7;
-    Miedema_phi_star=4.75;
-    Miedema_nws=1.55;
-    Miedema_gamma_s=NNN;
-    Pettifor_scale=2.00;
-    boiling_point=4000;
-    melting_point=2075;
-    vaporization_heat_PT=507;
-    specific_heat_PT=1030;
-    critical_Pressure=NNN;
-    critical_Temperature_PT=NNN;
-    thermal_expansion=6E-6;
-    thermal_conductivity=27;
-    Brinelll_hardness=NNN;
-    Mohs_hardness=9.3;
-    Vickers_hardness=49000;
-    Hardness_Pearson=4.01;
-    Hardness_Putz=3.46;
-    Hardness_RB=4.39;
-    shear_modulus=NNN;
-    Young_modulus=NNN;
-    bulk_modulus=320;
-    Poisson_ratio_PT=NNN;
-    Miedema_BVm=NNN;
-    Magnetic_Type_PT="Diamagnetic";
-    Mass_Magnetic_Susceptibility=-8.7E-9;
-    Volume_Magnetic_Susceptibility=-0.0000214;
-    Molar_Magnetic_Susceptibility=-9.41E-11;
-    Curie_point=NNN;
-    color_PT="BLACK";
-    refractive_index=NNN;
-    HHIP=2900;
-    HHIR=2000;
-    /*xray_scatt=NNN;*/
-   // B
-  }
- // [AFLOW]STOP=Boron
- // ********************************************************************************************************************************************************
+      electron_affinity_PT=26.7;
+      Miedema_phi_star=4.75;
+      Miedema_nws=1.55;
+      Miedema_gamma_s=NNN;
+      Pettifor_scale=2.00;
+      boiling_point=4000;
+      melting_point=2075;
+      vaporization_heat_PT=507;
+      specific_heat_PT=1030;
+      critical_Pressure=NNN;
+      critical_Temperature_PT=NNN;
+      thermal_expansion=6E-6;
+      thermal_conductivity=27;
+      Brinelll_hardness=NNN;
+      Mohs_hardness=9.3;
+      Vickers_hardness=49000;
+      Hardness_Pearson=4.01;
+      Hardness_Putz=3.46;
+      Hardness_RB=4.39;
+      shear_modulus=NNN;
+      Young_modulus=NNN;
+      bulk_modulus=320;
+      Poisson_ratio_PT=NNN;
+      Miedema_BVm=NNN;
+      Magnetic_Type_PT="Diamagnetic";
+      Mass_Magnetic_Susceptibility=-8.7E-9;
+      Volume_Magnetic_Susceptibility=-0.0000214;
+      Molar_Magnetic_Susceptibility=-9.41E-11;
+      Curie_point=NNN;
+      color_PT="BLACK";
+      refractive_index=NNN;
+      HHIP=2900;
+      HHIR=2000;
+      /*xray_scatt=NNN;*/
+      // B
+    }
+    // [AFLOW]STOP=Boron
+    // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Carbon
- // Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Carbon
+    // Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon
     if(ZZ==6) { // Carbon
       Z=ZZ;
-    symbol="C";
-    name="Carbon";
-    Period=2;
-    Group=14;
-    Series="Nonmetal";
-    Block="p";
-    mass=AMU2KILOGRAM*12.011;
-    MolarVolume=5.3146E-6;
-    volume=5.59490;
-    Miedema_Vm=1.8;
-    valence_std=4;
-    valence_iupac=4;
-    valence_PT=4;
-    Density_PT=2.26;
-    crystal="dia";
-    CrystalStr_PT="Simple_Hexagonal";
-    space_group="P6_3/mmc";
-    space_group_number=194;
-    Pearson_coefficient=0.00007387218;
-    lattice_constant[1]=246.4;lattice_constant[2]=246.4;lattice_constant[3]=671.1;
-    lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=2*PI/3;
-    phase="Solid";
-    radius=0.077;
-    radius_PT=67;
-    radius_covalent=0.76;
-    radius_covalent_PT=76;
-    radius_VanDerWaals_PT=170;
-    radii_Ghosh08=0.6513;
-    radii_Slatter=0.70;
-    radii_Pyykko=0.75;
-    electrical_conductivity=100000;
-    electronegativity_vec=2.55;
-    hardness_Ghosh=5.7410;
+      symbol="C";
+      name="Carbon";
+      Period=2;
+      Group=14;
+      Series="Nonmetal";
+      Block="p";
+      mass=AMU2KILOGRAM*12.011;
+      MolarVolume=5.3146E-6;
+      volume=5.59490;
+      Miedema_Vm=1.8;
+      valence_std=4;
+      valence_iupac=4;
+      valence_PT=4;
+      Density_PT=2.26;
+      crystal="dia";
+      CrystalStr_PT="Simple_Hexagonal";
+      space_group="P6_3/mmc";
+      space_group_number=194;
+      Pearson_coefficient=0.00007387218;
+      lattice_constant[1]=246.4;lattice_constant[2]=246.4;lattice_constant[3]=671.1;
+      lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=2*PI/3;
+      phase="Solid";
+      radius=0.077;
+      radius_PT=67;
+      radius_covalent=0.76;
+      radius_covalent_PT=76;
+      radius_VanDerWaals_PT=170;
+      radii_Ghosh08=0.6513;
+      radii_Slatter=0.70;
+      radii_Pyykko=0.75;
+      electrical_conductivity=100000;
+      electronegativity_vec=2.55;
+      hardness_Ghosh=5.7410;
       electronegativity_Pearson=6.27;
       electronegativity_Ghosh=6.116;
-    electron_affinity_PT=153.9;
-    Miedema_phi_star=6.20;
-    Miedema_nws=1.90;
-    Miedema_gamma_s=NNN;
-    Pettifor_scale=2.50;
-    boiling_point=4027;
-    melting_point=3550;
-    vaporization_heat_PT=715;
-    specific_heat_PT=710;
-    critical_Pressure=NNN;
-    critical_Temperature_PT=NNN;
-    thermal_expansion=7.1E-6;
-    thermal_conductivity=140;
-    Brinelll_hardness=NNN;
-    Mohs_hardness=0.5;
-    Vickers_hardness=NNN;
-    Hardness_Pearson=5.00;
-    Hardness_Putz=6.21;
-    Hardness_RB=5.49;
-    shear_modulus=NNN;
-    Young_modulus=NNN;
-    bulk_modulus=33;
-    Poisson_ratio_PT=NNN;
-    Miedema_BVm=NNN;
-    Magnetic_Type_PT="Diamagnetic";
-    Mass_Magnetic_Susceptibility=-6.2E-9;
-    Volume_Magnetic_Susceptibility=-0.000014;
-    Molar_Magnetic_Susceptibility=-7.45E-11;
-    Curie_point=NNN;
-    color_PT="BLACK";
-    refractive_index=2.417;
-    HHIP=500;
-    HHIR=500;
-    xray_scatt=6.019;
+      electron_affinity_PT=153.9;
+      Miedema_phi_star=6.20;
+      Miedema_nws=1.90;
+      Miedema_gamma_s=NNN;
+      Pettifor_scale=2.50;
+      boiling_point=4027;
+      melting_point=3550;
+      vaporization_heat_PT=715;
+      specific_heat_PT=710;
+      critical_Pressure=NNN;
+      critical_Temperature_PT=NNN;
+      thermal_expansion=7.1E-6;
+      thermal_conductivity=140;
+      Brinelll_hardness=NNN;
+      Mohs_hardness=0.5;
+      Vickers_hardness=NNN;
+      Hardness_Pearson=5.00;
+      Hardness_Putz=6.21;
+      Hardness_RB=5.49;
+      shear_modulus=NNN;
+      Young_modulus=NNN;
+      bulk_modulus=33;
+      Poisson_ratio_PT=NNN;
+      Miedema_BVm=NNN;
+      Magnetic_Type_PT="Diamagnetic";
+      Mass_Magnetic_Susceptibility=-6.2E-9;
+      Volume_Magnetic_Susceptibility=-0.000014;
+      Molar_Magnetic_Susceptibility=-7.45E-11;
+      Curie_point=NNN;
+      color_PT="BLACK";
+      refractive_index=2.417;
+      HHIP=500;
+      HHIR=500;
+      xray_scatt=6.019;
       // C//DX+CO20170904 radius_covalent uses sp3 hybridization (most common)
-  }
- // [AFLOW]STOP=Carbon
- // ********************************************************************************************************************************************************
+    }
+    // [AFLOW]STOP=Carbon
+    // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Nitrogen
- // Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Nitrogen
+    // Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen
     if(ZZ==7) { // Nitrogen
       Z=ZZ;
-    symbol="N";
-    name="Nitrogen";
-    Period=2;
-    Group=15;
-    Series="Nonmetal";
-    Block="p";
-    mass=AMU2KILOGRAM*14.0067;
-    MolarVolume=0.011197;
-    volume=7.59940;
-    Miedema_Vm=2.2;
-    valence_std=5;
-    valence_iupac=5;
-    valence_PT=3;
-    Density_PT=12.51E-4;
-    crystal="hex";
-    CrystalStr_PT="Simple_Hexagonal";
-    space_group="P6_3/mmc";
-    space_group_number=194;
-    Pearson_coefficient=0.00001857771;
-    lattice_constant[1]=386.1;lattice_constant[2]=386.1;lattice_constant[3]=626.5;
-    lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=2*PI/3;
-    phase="Gas";
-    radius=0.071;
-    radius_PT=56;
-    radius_covalent=0.71;
-    radius_covalent_PT=71;
-    radius_VanDerWaals_PT=155;
-    radii_Ghosh08=0.5428;
-    radii_Slatter=0.65;
-    radii_Pyykko=0.71;
-    electrical_conductivity=NNN;
-    electronegativity_vec=3.04;
-    hardness_Ghosh=6.8625;
+      symbol="N";
+      name="Nitrogen";
+      Period=2;
+      Group=15;
+      Series="Nonmetal";
+      Block="p";
+      mass=AMU2KILOGRAM*14.0067;
+      MolarVolume=0.011197;
+      volume=7.59940;
+      Miedema_Vm=2.2;
+      valence_std=5;
+      valence_iupac=5;
+      valence_PT=3;
+      Density_PT=12.51E-4;
+      crystal="hex";
+      CrystalStr_PT="Simple_Hexagonal";
+      space_group="P6_3/mmc";
+      space_group_number=194;
+      Pearson_coefficient=0.00001857771;
+      lattice_constant[1]=386.1;lattice_constant[2]=386.1;lattice_constant[3]=626.5;
+      lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=2*PI/3;
+      phase="Gas";
+      radius=0.071;
+      radius_PT=56;
+      radius_covalent=0.71;
+      radius_covalent_PT=71;
+      radius_VanDerWaals_PT=155;
+      radii_Ghosh08=0.5428;
+      radii_Slatter=0.65;
+      radii_Pyykko=0.71;
+      electrical_conductivity=NNN;
+      electronegativity_vec=3.04;
+      hardness_Ghosh=6.8625;
       electronegativity_Pearson=7.30;
       electronegativity_Ghosh=7.209;
-    electron_affinity_PT=7;
-    Miedema_phi_star=7.00;
-    Miedema_nws=1.60;
-    Miedema_gamma_s=NNN;
-    Pettifor_scale=3.00;
-    boiling_point=-195.79;
-    melting_point=-210.1;
-    vaporization_heat_PT=2.79;
-    specific_heat_PT=1040;
-    critical_Pressure=33.46;
-    critical_Temperature_PT=126.21;
-    thermal_expansion=NNN;
-    thermal_conductivity=0.02583;
-    Brinelll_hardness=NNN;
-    Mohs_hardness=NNN;
-    Vickers_hardness=NNN;
-    Hardness_Pearson=7.23;
-    Hardness_Putz=9.59;
-    Hardness_RB=8.59;
-    shear_modulus=NNN;
-    Young_modulus=NNN;
-    bulk_modulus=NNN;
-    Poisson_ratio_PT=NNN;
-    Miedema_BVm=NNN;
-    Magnetic_Type_PT="Diamagnetic";
-    Mass_Magnetic_Susceptibility=-5.4E-9;
-    Volume_Magnetic_Susceptibility=-6.8E-9;
-    Molar_Magnetic_Susceptibility=-1.5E-10;
-    Curie_point=NNN;
-    color_PT="COLORLESS";
-    refractive_index=1.000298;
-    HHIP=1300;
-    HHIR=500;
-    /*xray_scatt=NNN;*/
-   //N JUNKAI CHANGED VALENCE
-  }
- // [AFLOW]STOP=Nitrogen
- // ********************************************************************************************************************************************************
+      electron_affinity_PT=7;
+      Miedema_phi_star=7.00;
+      Miedema_nws=1.60;
+      Miedema_gamma_s=NNN;
+      Pettifor_scale=3.00;
+      boiling_point=-195.79;
+      melting_point=-210.1;
+      vaporization_heat_PT=2.79;
+      specific_heat_PT=1040;
+      critical_Pressure=33.46;
+      critical_Temperature_PT=126.21;
+      thermal_expansion=NNN;
+      thermal_conductivity=0.02583;
+      Brinelll_hardness=NNN;
+      Mohs_hardness=NNN;
+      Vickers_hardness=NNN;
+      Hardness_Pearson=7.23;
+      Hardness_Putz=9.59;
+      Hardness_RB=8.59;
+      shear_modulus=NNN;
+      Young_modulus=NNN;
+      bulk_modulus=NNN;
+      Poisson_ratio_PT=NNN;
+      Miedema_BVm=NNN;
+      Magnetic_Type_PT="Diamagnetic";
+      Mass_Magnetic_Susceptibility=-5.4E-9;
+      Volume_Magnetic_Susceptibility=-6.8E-9;
+      Molar_Magnetic_Susceptibility=-1.5E-10;
+      Curie_point=NNN;
+      color_PT="COLORLESS";
+      refractive_index=1.000298;
+      HHIP=1300;
+      HHIR=500;
+      /*xray_scatt=NNN;*/
+      //N JUNKAI CHANGED VALENCE
+    }
+    // [AFLOW]STOP=Nitrogen
+    // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Oxygen
- // Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Oxygen
+    // Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen
     if(ZZ==8) { // Oxygen
       Z=ZZ;
-    symbol="O";
-    name="Oxygen";
-    Period=2;
-    Group=16;
-    Series="Chalcogen";
-    Block="p";
-    mass=AMU2KILOGRAM*15.9994;
-    MolarVolume=0.011196;
-    volume=7.78230;
-    Miedema_Vm=2.656;
-    valence_std=6;
-    valence_iupac=2;
-    valence_PT=2;
-    Density_PT=14.29E-4;
-    crystal="cub";
-    CrystalStr_PT="Base-centered_Monoclinic";
-    space_group="C12/m1";
-    space_group_number=12;
-    Pearson_coefficient=0.00003358805;
-    lattice_constant[1]=540.3;lattice_constant[2]=342.9;lattice_constant[3]=508.6;
-    lattice_angle[1]=PI/2;lattice_angle[2]=2.313085;lattice_angle[3]=PI/2;
-    phase="Gas";
-    radius=0.060;
-    radius_PT=48;
-    radius_covalent=0.66;
-    radius_covalent_PT=66;
-    radius_VanDerWaals_PT=152;
-    radii_Ghosh08=0.4652;
-    radii_Slatter=0.60;
-    radii_Pyykko=0.63;
-    electrical_conductivity=NNN;
-    electronegativity_vec=3.44;
-    hardness_Ghosh=7.9854;
+      symbol="O";
+      name="Oxygen";
+      Period=2;
+      Group=16;
+      Series="Chalcogen";
+      Block="p";
+      mass=AMU2KILOGRAM*15.9994;
+      MolarVolume=0.011196;
+      volume=7.78230;
+      Miedema_Vm=2.656;
+      valence_std=6;
+      valence_iupac=2;
+      valence_PT=2;
+      Density_PT=14.29E-4;
+      crystal="cub";
+      CrystalStr_PT="Base-centered_Monoclinic";
+      space_group="C12/m1";
+      space_group_number=12;
+      Pearson_coefficient=0.00003358805;
+      lattice_constant[1]=540.3;lattice_constant[2]=342.9;lattice_constant[3]=508.6;
+      lattice_angle[1]=PI/2;lattice_angle[2]=2.313085;lattice_angle[3]=PI/2;
+      phase="Gas";
+      radius=0.060;
+      radius_PT=48;
+      radius_covalent=0.66;
+      radius_covalent_PT=66;
+      radius_VanDerWaals_PT=152;
+      radii_Ghosh08=0.4652;
+      radii_Slatter=0.60;
+      radii_Pyykko=0.63;
+      electrical_conductivity=NNN;
+      electronegativity_vec=3.44;
+      hardness_Ghosh=7.9854;
       electronegativity_Pearson=7.54;
       electronegativity_Ghosh=8.287;
-    electron_affinity_PT=141;
-    Miedema_phi_star=6.97;
-    Miedema_nws=1.70;
-    Miedema_gamma_s=NNN;
-    Pettifor_scale=3.50;
-    boiling_point=-182.9;
-    melting_point=-218.3;
-    vaporization_heat_PT=3.41;
-    specific_heat_PT=919;
-    critical_Pressure=49.77;
-    critical_Temperature_PT=154.59;
-    thermal_expansion=NNN;
-    thermal_conductivity=0.02658;
-    Brinelll_hardness=NNN;
-    Mohs_hardness=NNN;
-    Vickers_hardness=NNN;
-    Hardness_Pearson=6.08;
-    Hardness_Putz=13.27;
-    Hardness_RB=6.42;
-    shear_modulus=NNN;
-    Young_modulus=NNN;
-    bulk_modulus=NNN;
-    Poisson_ratio_PT=NNN;
-    Miedema_BVm=NNN;
-    Magnetic_Type_PT="Paramagnetic";
-    Mass_Magnetic_Susceptibility=1.335E-6;
-    Volume_Magnetic_Susceptibility=1.90772E-6;
-    Molar_Magnetic_Susceptibility=4.27184E-8;
-    Curie_point=NNN;
-    color_PT="COLORLESS";
-    refractive_index=1.000271;
-    HHIP=500;
-    HHIR=500;
-    xray_scatt=8.052;
-   // O Table 27 of JUNKAI
-  }
- // [AFLOW]STOP=Oxygen
- // ********************************************************************************************************************************************************
+      electron_affinity_PT=141;
+      Miedema_phi_star=6.97;
+      Miedema_nws=1.70;
+      Miedema_gamma_s=NNN;
+      Pettifor_scale=3.50;
+      boiling_point=-182.9;
+      melting_point=-218.3;
+      vaporization_heat_PT=3.41;
+      specific_heat_PT=919;
+      critical_Pressure=49.77;
+      critical_Temperature_PT=154.59;
+      thermal_expansion=NNN;
+      thermal_conductivity=0.02658;
+      Brinelll_hardness=NNN;
+      Mohs_hardness=NNN;
+      Vickers_hardness=NNN;
+      Hardness_Pearson=6.08;
+      Hardness_Putz=13.27;
+      Hardness_RB=6.42;
+      shear_modulus=NNN;
+      Young_modulus=NNN;
+      bulk_modulus=NNN;
+      Poisson_ratio_PT=NNN;
+      Miedema_BVm=NNN;
+      Magnetic_Type_PT="Paramagnetic";
+      Mass_Magnetic_Susceptibility=1.335E-6;
+      Volume_Magnetic_Susceptibility=1.90772E-6;
+      Molar_Magnetic_Susceptibility=4.27184E-8;
+      Curie_point=NNN;
+      color_PT="COLORLESS";
+      refractive_index=1.000271;
+      HHIP=500;
+      HHIR=500;
+      xray_scatt=8.052;
+      // O Table 27 of JUNKAI
+    }
+    // [AFLOW]STOP=Oxygen
+    // ********************************************************************************************************************************************************
 
- // ********************************************************************************************************************************************************
- // [AFLOW]START=Fluorine
- // Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine
+    // ********************************************************************************************************************************************************
+    // [AFLOW]START=Fluorine
+    // Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine
     if(ZZ==9) { // Fluorine
       Z=ZZ;
-    symbol="F";
-    name="Fluorine";
-    Period=2;
-    Group=17;
-    Series="Halogen";
-    Block="p";
-    mass=AMU2KILOGRAM*18.9984;
-    MolarVolume=0.011202;
-    volume=9.99090;
-    Miedema_Vm=NNN;
-    valence_std=7;
-    valence_iupac=1;
-    valence_PT=1;
-    Density_PT=16.96E-4;
-    crystal="mcl";
-    CrystalStr_PT="Base-centered_Monoclinic";
-    space_group="C12/c1";
-    space_group_number=15;
-    Pearson_coefficient=0.0;
-    lattice_constant[1]=550;lattice_constant[2]=328;lattice_constant[3]=728;
-    lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=PI/2;
-    phase="Gas";
-    radius=NNN;
-    radius_PT=42;
-    radius_covalent=0.57;
-    radius_covalent_PT=57;
-    radius_VanDerWaals_PT=147;
-    radii_Ghosh08=0.4071;
-    radii_Slatter=0.50;
-    radii_Pyykko=0.64;
-    electrical_conductivity=NNN;
-    electronegativity_vec=3.98;
-    hardness_Ghosh=9.1065;
+      symbol="F";
+      name="Fluorine";
+      Period=2;
+      Group=17;
+      Series="Halogen";
+      Block="p";
+      mass=AMU2KILOGRAM*18.9984;
+      MolarVolume=0.011202;
+      volume=9.99090;
+      Miedema_Vm=NNN;
+      valence_std=7;
+      valence_iupac=1;
+      valence_PT=1;
+      Density_PT=16.96E-4;
+      crystal="mcl";
+      CrystalStr_PT="Base-centered_Monoclinic";
+      space_group="C12/c1";
+      space_group_number=15;
+      Pearson_coefficient=0.0;
+      lattice_constant[1]=550;lattice_constant[2]=328;lattice_constant[3]=728;
+      lattice_angle[1]=PI/2;lattice_angle[2]=PI/2;lattice_angle[3]=PI/2;
+      phase="Gas";
+      radius=NNN;
+      radius_PT=42;
+      radius_covalent=0.57;
+      radius_covalent_PT=57;
+      radius_VanDerWaals_PT=147;
+      radii_Ghosh08=0.4071;
+      radii_Slatter=0.50;
+      radii_Pyykko=0.64;
+      electrical_conductivity=NNN;
+      electronegativity_vec=3.98;
+      hardness_Ghosh=9.1065;
       electronegativity_Pearson=10.41;
       electronegativity_Ghosh=9.372;
       electron_affinity_PT=328;

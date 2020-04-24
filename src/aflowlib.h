@@ -301,7 +301,7 @@ namespace aflowlib {
   string AFLUXCall(vector<string>& matchbook); //DX20190206 - add AFLUX functionality
   string AFLUXCall(string& summons); //DX20190206 - add AFLUX functionality 
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX20190206 - get properties from AFLUX response
-  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC2020327
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813
 }

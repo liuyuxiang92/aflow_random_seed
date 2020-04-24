@@ -496,10 +496,10 @@ namespace SYM {
   vector<vector<string> > get_centering(string spaceg);
 
   vector<double> ExtractLatticeParametersFromWyccar(const vector<string>& wyccar_ITC); //DX20191030 - added const
-  string ExtractWyckoffAttributesString(const vector<string>& wyccar_ITC, uint attribute_index); //DX 201780823 //DX20191030 - added const 
-  string ExtractWyckoffLettersString(const vector<string>& wyccar_ITC); //DX 201780823 //DX20191030 - added const
-  string ExtractWyckoffMultiplicitiesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX20191030 - added const
-  string ExtractWyckoffSiteSymmetriesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX20191030 - added const
+  string ExtractWyckoffAttributesString(const vector<string>& wyccar_ITC, uint attribute_index); //DX201780823 //DX20191030 - added const 
+  string ExtractWyckoffLettersString(const vector<string>& wyccar_ITC); //DX201780823 //DX20191030 - added const
+  string ExtractWyckoffMultiplicitiesString(const vector<string>& wyccar_ITC); //DX201780823 //DX20191030 - added const
+  string ExtractWyckoffSiteSymmetriesString(const vector<string>& wyccar_ITC); //DX201780823 //DX20191030 - added const
   vector<vector<vector<string> > > getWyckoffLettersWithSameMultiplcityAndSiteSymmetry(uint& space_group_number, 
       vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice); //DX20190201  
   vector<string> splitSiteSymmetry(const string& site_symmetry); //DX20190219 //DX20190730 - added const

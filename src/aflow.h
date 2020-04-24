@@ -461,7 +461,7 @@ class _XHOST {
 #define XHOST_README_AFLOW_SYM_TXT                     XHOST.vGlobal_string.at(54)
 #define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO20190620
 #define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO20190620
-#define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57) //ME20180705
+#define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57)  //ME20180705
 #define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(58)
 #define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(59)
 #define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(60)

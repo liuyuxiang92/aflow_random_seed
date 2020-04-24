@@ -1684,7 +1684,7 @@ namespace pflow {
   }
 }
 
-//DX COMPARE DATABASE ENTRIES - START
+//DX - COMPARE DATABASE ENTRIES - START
 // ***************************************************************************
 // pflow::compareDatabaseEntries - compares database entries
 // ***************************************************************************
@@ -2240,7 +2240,7 @@ namespace pflow {
   }
 }
 
-//DX COMPARE DATABASE ENTRIES - END
+//DX - COMPARE DATABASE ENTRIES - END
 
 //DX20190424 START
 // ***************************************************************************

@@ -1934,12 +1934,12 @@ namespace KBIN {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::CompressDirectory():";
     //DX+CO START
-    // [OBSOLETE]  aus << "cd " << aflags.Directory << " && ";
-    // [OBSOLETE]  aus << "ls | grep -v .EXT | ";                                //CO, skip anything with bzip extension
-    // [OBSOLETE]  aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";     //CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
-    // [OBSOLETE]  aus << "grep -v SKIP | ";
-    // [OBSOLETE]  aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
-    // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
+    // [OBSOLETE] aus << "cd " << aflags.Directory << " && ";
+    // [OBSOLETE] aus << "ls | grep -v .EXT | ";                                //CO, skip anything with bzip extension
+    // [OBSOLETE] aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";     //CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
+    // [OBSOLETE] aus << "grep -v SKIP | ";
+    // [OBSOLETE] aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
+    // [OBSOLETE] aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
     vector<string> _vfiles,vfiles;
     string compressed_variant;
     aurostd::DirectoryLS(aflags.Directory,_vfiles);
@@ -1980,20 +1980,20 @@ namespace KBIN {
       }
       // aus << kflags.KZIP_BIN << " " << aurostd::joinWDelimiter(vfiles," ") << endl; //AVOID, because if one fails, the whole command stops
       aurostd::execute(aus);
-    //  cerr << aus.str() << endl;
+      // cerr << aus.str() << endl;
     }
     // [OBSOLETE] aus << kflags.KZIP_BIN << " `find . " << XHOST.Find_Parameters << " -name \"*\" | grep -v LOCK | grep -v SKIP | grep \"./\"` " << endl;
     // [OBSOLETE] aus << kflags.KZIP_BIN << " `ls | grep -v LOCK | grep -v SKIP | grep -v " << KBIN_SUBDIRECTORIES << "| grep -v " << _AFLOWIN_ << " | grep -v apl.xml ` " << endl;
     // [OBSOLETE] apl.xml can now be zipped
     // [OBSOLETE] set up is slightly redundant (LOCK vs. agl.LOCK), but very safe
-    // [OBSOLETE] aus << kflags.KZIP_BIN << " `ls | grep -v .EXT | ";                 // CO, skip anything with bzip extension
-    // [OBSOLETE] aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";           // CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
+    // [OBSOLETE] aus << kflags.KZIP_BIN << " `ls | grep -v .EXT | ";                 //CO, skip anything with bzip extension
+    // [OBSOLETE] aus << "grep -v LOCK | grep -v " << _AFLOWLOCK_ << " | ";           //CO never zip LOCK or .LOCK (agl.LOCK) newly defined LOCK
     // [OBSOLETE] aus << "grep -v SKIP | ";
     // [OBSOLETE] aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
-    // [OBSOLETE] aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ` " << endl; // CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
+    // [OBSOLETE] aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ` " << endl; //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
     // [OBSOLETE] cerr << aus.str() << endl;
     // [OBSOLETE] aurostd::execute(aus);
-    // DX+CO END
+    //DX+CO END
     return TRUE;
   }
 }

@@ -1,4 +1,4 @@
-3.2.3   - 2020/05/01
+3.2.3 - 2020/05/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- Added check for required binaries to plotter. (ME)
@@ -8,16 +8,16 @@
         -- Fixed bug that deleted qmvasp files from previous runs instead of appending to them. (ME)
         -- Removed VASP k-mesh symmetry fixes when SYM=OFF. (ME)
         -- Changed database file name conventions. (ME)
-        -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
-        -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
-        -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
-        -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- added Patterson symmetry analysis; denoted "pgroupk_Patterson" (applies to reciprocal space only) (DX)
         -- compare Patterson point symmetry to Laue point group as consistency check (DX)
         -- added Patterson symmetry to full symmetry command (DX)
         -- added stand-alone Patterson symmetry command (DX)
         -- cleaned text/json if-statements in symmetry writing functions (DX)
         -- added Patterson symmetry usage to README_AFLOW_SYM.TXT and README_AFLOW_ACONVASP.TXT (DX)
+        -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
+        -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
+        -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
+        -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- added error for non-standard prototypes that create structures with atoms too close (CO+DX)
         -- added secondary wget location for AFLOW3_FREE files for make (CO)
 3.2.2j - 2020/04/02

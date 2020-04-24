@@ -441,19 +441,17 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="No"; vatom_name[i]="Nobelium";   vatom_mass[i]*=259.1;    vatom_volume[i]=NNN;     vatom_valence_std[i]=16; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // No
   i++; vatom_symbol[i]="Lr"; vatom_name[i]="Lawrencium"; vatom_mass[i]*=262.11;   vatom_volume[i]=NNN;     vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Lr
 
-  /*
-     int valence_wahyu[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
-     for(uint j=1;j<93;j++) {
-     int test=vatom_valence_std[j];
-     if(j<=9 && test>=5) {test=test-8;} // first row
-     if(j<=17 && test>=5) {test=test-8;} // second row
-  //   if(test!=valence_WSETYAWAN[j]) 
-  cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_wahyu[j];
-  if(test!=valence_wahyu[j]) cerr << "   ****   ";
-  cerr << endl;
-  }
-  exit(0);
-  */
+  //   int valence_WSETYAWAN[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
+  //   for(uint j=1;j<93;j++) {
+  //   int test=vatom_valence_std[j];
+  //   if(j<=9 && test>=5) {test=test-8;} // first row
+  //   if(j<=17 && test>=5) {test=test-8;} // second row
+  ////   if(test!=valence_WSETYAWAN[j]) 
+  //cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_WSETYAWAN[j];
+  //if(test!=valence_WSETYAWAN[j]) cerr << "   ****   ";
+  //cerr << endl;
+  //}
+  //exit(0);
 
 
   //   for(int i=1;i<90;i++) {
@@ -1341,7 +1339,7 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   oss << " (" << buf12_re << "," << buf12_im << ")" << endl; 
   oss << " (" << buf21_re << "," << buf21_im << ") "; 
   oss << " (" << buf22_re << "," << buf22_im << ")" << "  SU(2) complex matrix [(real,imaginary)]" << endl; 
-  //DX - formatting issues with complex: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
+  //DX - formatting issues with xcomplex: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
   char buf1_re[80],buf1_im[80],buf2_re[80],buf2_im[80],buf3_re[80],buf3_im[80];
   sprintf(buf1_re,iobuf.c_str(),symop.su2_coefficients(1).re);sprintf(buf1_im,iobuf.c_str(),symop.su2_coefficients(1).im);
   sprintf(buf2_re,iobuf.c_str(),symop.su2_coefficients(2).re);sprintf(buf2_im,iobuf.c_str(),symop.su2_coefficients(2).im);
@@ -1967,12 +1965,12 @@ void minimumCoordinationShell(const xstructure& xstr,
             tmp_coord = ab_component + l3[p];                 //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
             double tmp_mod = aurostd::modulus(tmp_coord);
             if(tmp_mod<min_dist){
-              //DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+              //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
               if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
               else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp_coord); } //initialize
               min_dist=tmp_mod;
             }
-            //DX FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
             else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
           }
         }

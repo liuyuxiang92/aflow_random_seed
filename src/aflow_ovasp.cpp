@@ -1248,13 +1248,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vEATOM.size()=" << vEATOM.size() << endl;
   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
-  if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO200106 - patching for auto-indenting
+  if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO200106 - patching for auto-indenting
+  if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO200106 - patching for auto-indenting
+  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO200106 - patching for auto-indenting
+  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO200106 - patching for auto-indenting
+  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO200106 - patching for auto-indenting
+  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO200106 - patching for auto-indenting
  
   for(uint j=0;j<vTITEL.size();j++) {
     if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SPECIES(" << j << ") " << endl;
@@ -7407,81 +7407,6 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA" << endl;
   
   vline.clear();
-  vENMAX.clear();vENMIN.clear();vPOMASS.clear();vZVAL.clear();vEATOM.clear();vRCORE.clear();vRWIGS.clear();vEAUG.clear();vRAUG.clear();vRMAX.clear();
-  for(uint iline=0;iline<vcontent.size();iline++) {
-    aurostd::StringSubst(vcontent.at(iline),"EMMIN","ENMIN"); // Kresseeeeeeeeeee
-    if(aurostd::substring2bool(vcontent.at(iline),"ENMAX") && aurostd::substring2bool(vcontent.at(iline),"ENMIN")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"POMASS") && aurostd::substring2bool(vcontent.at(iline),"ZVAL")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"EATOM") && aurostd::substring2bool(vcontent.at(iline),"eV")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"RCORE") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"RWIGS") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"EAUG")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"RAUG") && aurostd::substring2bool(vcontent.at(iline),"sphere")) vline.push_back(vcontent.at(iline));
-    if(aurostd::substring2bool(vcontent.at(iline),"RMAX") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
-    }
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO20200106 - patching for auto-indenting
-  for(uint j=0;j<vline.size();j++) {
-    aurostd::StringSubst(vline.at(j),"="," ");
-    aurostd::StringSubst(vline.at(j),";"," ");
-    //    if(LVERBOSE) cerr << vline.at(j) << endl;
-    aurostd::string2tokens(vline.at(j),tokens," ");
-    for(uint k=0;k<tokens.size();k++) {
-      if(tokens.at(k)=="ENMAX" && k+1<tokens.size()) vENMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="ENMIN" && k+1<tokens.size()) vENMIN.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="POMASS" && k+1<tokens.size()) vPOMASS.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="ZVAL" && k+1<tokens.size()) vZVAL.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="EATOM" && k+1<tokens.size()) vEATOM.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="RCORE" && k+1<tokens.size()) vRCORE.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="RWIGS" && k==0 && k+1<tokens.size()) vRWIGS.push_back(aurostd::string2utype<double>(tokens.at(k+1))); // pick the 1st
-      if(tokens.at(k)=="EAUG" && k+1<tokens.size()) vEAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="RAUG" && k+1<tokens.size()) vRAUG.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-      if(tokens.at(k)=="RMAX" && k+1<tokens.size()) vRMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
-    }
-  }
-  
-  if(vENMIN.size()<vENMAX.size()) vENMIN.push_back(0.0);  // ENMIN MIGHT NOT BE THERE
-  if(vRCORE.size()<vENMAX.size()) vRCORE.push_back(0.0);  // RCORE MIGHT NOT BE THERE
-  if(vRWIGS.size()<vENMAX.size()) vRWIGS.push_back(0.0);  // RWIGS MIGHT NOT BE THERE
-  if(vEAUG.size()<vENMAX.size()) vEAUG.push_back(0.0);    // EAUG MIGHT NOT BE THERE
-  if(vRAUG.size()<vENMAX.size()) vRAUG.push_back(0.0);    // RAUG MIGHT NOT BE THERE
-  if(vRMAX.size()<vENMAX.size()) vRMAX.push_back(0.0);    // RMAX MIGHT NOT BE THERE
-  
-  ENMAX=aurostd::max(vENMAX);
-  ENMIN=aurostd::min(vENMIN);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
-  
-  POMASS_sum=aurostd::sum(vPOMASS);POMASS_min=aurostd::min(vPOMASS);POMASS_max=aurostd::max(vPOMASS);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
-  
-  ZVAL_sum=aurostd::sum(vZVAL);ZVAL_min=aurostd::min(vZVAL);ZVAL_max=aurostd::max(vZVAL);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
-  
-  EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
-  
-  RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
-  
-  RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
-  
-  EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
-
-  RAUG_min=aurostd::min(vRAUG);RAUG_max=aurostd::max(vRAUG);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
-
-  RMAX_min=aurostd::min(vRMAX);RMAX_max=aurostd::max(vRMAX);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr << " " << endl;}
-
-   
-  // ----------------------------------------------------------------------
-  // PSEUDOPOTENTIAL DATA
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA" << endl;
-  
-  vline.clear();
   vTITEL.clear();
   vLEXCH.clear();
   for(uint iline=0;iline<vcontent.size();iline++)  {
@@ -7507,10 +7432,10 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
   if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
-  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}
+  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
+  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
+  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
+  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
   
   for(uint j=0;j<vTITEL.size();j++) {
     if(LVERBOSE) cerr << "xPOTCAR::GetProperties: SPECIES(" << j << ") " << endl;

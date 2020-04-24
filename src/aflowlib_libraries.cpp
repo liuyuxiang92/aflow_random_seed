@@ -2285,7 +2285,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Thermodynamics [-1]" << endl;
     // ZIP-AGNOSTIC
     if(XHOST.vext.size()!=XHOST.vzip.size()) { cerr << "ERROR - aflowlib::LIB2RAW_Loop_Thermodynamics: XHOST.vext.size()!=XHOST.vzip.size()" << endl;exit(0); }
-    // CO+DX START 20170713 - adding symmetry output to RAW
+    //CO+DX START 20170713 - adding symmetry output to RAW
     _aflags aflags;
     aflags.Directory=directory_RAW;
     ofstream FileMESSAGE; //dummy ofstream, not really used
