@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 // ***************************************************************************
 // 
@@ -193,7 +193,7 @@ namespace plotter {
   void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
     string soliloquy="plotter::savePlotGNUPLOT():";
-    // ME20200327 -Check that all required binaries are available
+    //ME20200327 - Check that all required binaries are available
     // Check that gnuplot is version 5+
     if (XHOST.is_command("gnuplot")) {
       string versionstring = aurostd::execute2string(XHOST.command("gnuplot") + " --version");
@@ -265,7 +265,7 @@ namespace plotter {
     if (filename.empty()) {
       string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
       if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
-      // ME200228 - Remove ANRL parameters
+      //ME20200228 - Remove ANRL parameters
       string::size_type t = default_title.find(":ANRL=");
       if (t != string::npos) {
         default_title = default_title.substr(0, t);
@@ -332,7 +332,7 @@ namespace plotter {
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, ".");
-      // ME200228 - title may contain ANRL parameters
+      //ME20200228 - title may contain ANRL parameters
       if ((tokens.size() > 2) && aurostd::substring2bool(tokens[2], "ANRL")) {
         string::size_type t = tokens[2].find_first_of(":");
         if (t != string::npos) {
@@ -550,7 +550,7 @@ namespace plotter {
 
     return new_title; //aurostd::fixStringLatex(new_title, false, false);  //substs $ for \\$
   }
-  string formatDefaultTitlePOCC_190101(const xoption& plotoptions) {  //ME version
+  string formatDefaultTitlePOCC_20190101(const xoption& plotoptions) {  //ME version
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
     string soliloquy="plotter::formatDefaultTitlePOCC():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
@@ -824,7 +824,7 @@ namespace plotter {
     }
 
     plotoptions.push_attached("DEFAULT_TITLE", xdos.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  //CO20191110 - MARCO, check out and let me know if we should apply everywhere
+    patchDefaultTitleAFLOWIN(plotoptions);  //CO20191110 - ME, check out and let me know if we should apply everywhere
     setFileName(plotoptions);
     setTitle(plotoptions,FileMESSAGE,oss); //CO20200404
 
@@ -972,7 +972,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  // ME200217
+    patchDefaultTitleAFLOWIN(plotoptions);  //ME20200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions,FileMESSAGE,oss); //CO20200404
@@ -1028,7 +1028,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  // ME200217
+    patchDefaultTitleAFLOWIN(plotoptions);  //ME20200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions,FileMESSAGE,oss); //CO20200404
@@ -1064,7 +1064,7 @@ namespace plotter {
     std::stringstream poscar;
     //if (plotoptions.getattachedscheme("EXTENSION") == "phdos")
     if (carstring == "PHON")
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       poscar_file=DEFAULT_APL_PHPOSCAR_FILE; //CO20200404
       aurostd::efile2stringstream(directory+"/"+poscar_file, poscar);  //CO20200404
     } else {
@@ -2276,7 +2276,7 @@ namespace plotter {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 // ***************************************************************************

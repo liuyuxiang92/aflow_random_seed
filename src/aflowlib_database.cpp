@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 
@@ -603,7 +603,7 @@ namespace aflowlib {
     string key = "";
     for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
       if(aurostd::substring2bool(XHOST.vschema.vxsghost[i], "::NAME:")) {
-        key = aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
+        key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
         keys.push_back(key);
       }
     }
@@ -919,9 +919,9 @@ namespace aflowlib {
     for (uint a = 0; a < arrays.size(); a++) {
       vector<string> tokens;
       arr = arrays[a];
-      arr = aurostd::RemoveSubString(arr, "[");
-      arr = aurostd::RemoveSubString(arr, "]");
-      arr = aurostd::RemoveSubString(arr, "\"");
+      arr=aurostd::RemoveSubString(arr, "[");
+      arr=aurostd::RemoveSubString(arr, "]");
+      arr=aurostd::RemoveSubString(arr, "\"");
       aurostd::string2tokens(arr, tokens, ", ");
       for (uint t = 0; t < tokens.size(); t++) {
         if (nunique == 0) {
@@ -1273,7 +1273,7 @@ namespace aflowlib {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

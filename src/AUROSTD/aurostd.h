@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -38,8 +38,8 @@
 #include <string.h>
 #include <string>
 #include <sys/stat.h>
-#ifndef __CYGWIN__  // ME20190327 - Cygwin support
-#include <sys/sysctl.h>
+#ifndef __CYGWIN__  //ME20190327 - Cygwin support
+//#include <sys/sysctl.h>
 #endif
 // #include <sys/sysinfo.h>
 #include <sys/time.h>
@@ -49,7 +49,7 @@
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
-#include <signal.h>  // ME20191125 - needed for AflowDB
+#include <signal.h>  //ME20191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO20170806 - need for POCC
 #include <netdb.h>  //CO20180321 - frisco needs for AFLUX
@@ -235,6 +235,9 @@ namespace aurostd {
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
+  long double get_mseconds(void);
+  long double get_mseconds(long double reference_useconds);
+  long double get_delta_mseconds(long double& useconds_begin);
   long double get_useconds(void);
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);
@@ -290,7 +293,7 @@ namespace aurostd {
   int getZeroPadding(long int num); //CO20191217
   int getZeroPadding(unsigned long int num);  //CO20191217
   int getZeroPadding(long long int num);  //CO20191217
-  int getZeroPadding(unsigned long long int num);  // ME20190108
+  int getZeroPadding(unsigned long long int num);  //ME20190108
   template<class utype> string PaddedPRE(utype,int,string=" ");
   string PaddedPRE(string,int,string=" ");
   template<class utype> string PaddedPOST(utype,int,string=" ");
@@ -310,8 +313,8 @@ namespace aurostd {
   string removeNullBytes(string in); //DX20190131
   bool RemoveBinaryCharactersFromFile(string directory, string filename); //DX20190211
   string CleanStringASCII(const string& s) __xprototype;
-  string CleanStringASCII_190712(const string& s) __xprototype; //CO20190712
-  string CleanStringASCII_190101(const string& s) __xprototype; //CO20190712
+  string CleanStringASCII_20190712(const string& s) __xprototype; //CO20190712
+  string CleanStringASCII_20190101(const string& s) __xprototype; //CO20190712
   void CleanStringASCII_InPlace(string& s) __xprototype;  //CO20190712
   string CGI_StringClean(const string& stringIN) __xprototype;
   string RemoveWhiteSpaces(const string& s) __xprototype;
@@ -326,15 +329,16 @@ namespace aurostd {
   string RemoveTabs(const string& s, const char toogle) __xprototype;
   string RemoveTabsFromTheBack(const string& s) __xprototype;
   string RemoveComments(const string& s) __xprototype;
-  vector<string> RemoveComments(const vector<string>&) __xprototype;  // ME20190614
+  vector<string> RemoveComments(const vector<string>&) __xprototype;  //ME20190614
+  deque<string> RemoveComments(const deque<string>&) __xprototype;  //ME20190614
   string RemoveCharacter(const string& s, const char character) __xprototype;
   void RemoveCharacterInPlace(string& s, const char character) __xprototype;  //CO20190712
   string RemoveCharacterFromTheBack(const string& s, const char character); __xprototype; //DX20190708
   string RemoveCharacterFromTheFront(const string& s, const char character); __xprototype; //DX20190708
   string RemoveCharacterFromTheFrontAndBack(const string& s, const char character); __xprototype; //DX20190708
   string RemoveNumbers(const string& s) __xprototype; //CO20190712
-  string RemoveNumbers_190712(const string& s) __xprototype;  //CO10712
-  string RemoveNumbers_190101(const string& s) __xprototype;  //CO20190712
+  string RemoveNumbers_20190712(const string& s) __xprototype;  //CO10712
+  string RemoveNumbers_20190101(const string& s) __xprototype;  //CO20190712
   void RemoveNumbersInPlace(string& s) __xprototype;  //CO20190712
   string RemoveRounding(const string& s) __xprototype;
   //string RemoveCharacter(const string& s, const char character, const char toogle) __xprototype;
@@ -347,6 +351,7 @@ namespace aurostd {
   bool SSH_DirectoryMake(string user, string machine,string Directory);
   bool DirectoryChmod(string chmod_string,string Directory);
   bool DirectoryLS(string Directory,vector<string> &vfiles);
+   bool DirectoryLS(string Directory,deque<string> &vfiles);
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
@@ -359,14 +364,14 @@ namespace aurostd {
   string ProperFileName(string fileIN);
   bool CopyFile(string file_from,string file_to);
   bool LinkFile(string file_from,string file_to);
-  //CO - START
+  //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
   bool efile2tempfile(string _FileNameIN, string& FileNameOUT); //CO20180220
   bool IsCompressed(string FileNameIn,string& FileNameOut);
   bool IsCompressed(string FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
-  //CO - END
+  //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
   bool CompressFile(const string& FileName,const string& command=AUROSTD_ZIP_BIN); // with default
   bool ZIP2ZIP(string dir,string from,string to,bool=TRUE);
@@ -377,14 +382,14 @@ namespace aurostd {
   // [OBSOLETE]  bool UnzipFile(const string& FileName);  bool ZipFile(const string& FileName);
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
-  unsigned long long int FileSize(const string& FileName);  // ME20191001
+  unsigned long long int FileSize(const string& FileName);  //ME20191001
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
   bool EFileEmpty(const string& FileName); //CO20190808
   bool EFileNotEmpty(const string& FileName); //CO20190808
-  long int FileModificationTime(const string&);  // ME20181712
-  unsigned int getFileCheckSum(const string&, const string&);  // ME20190219
-  unsigned int getFletcher32(unsigned short*, size_t);  // ME20190219
+  long int FileModificationTime(const string&);  //ME20180712
+  unsigned int getFileCheckSum(const string&, const string&);  //ME20190219
+  unsigned int getFletcher32(unsigned short*, size_t);  //ME20190219
   string FileToString(const string& FileName);
   void InFileExistCheck(const string& routine,const string& filename,ifstream& file_to_check,std::ostream& outf);
   bool IsCommandAvailable(const string& command);
@@ -525,23 +530,26 @@ namespace aurostd {
   uint zipfile2string(string _FileNameIN,string& StringIN); //CO
   uint efile2string(const string& FileNameIN,string& StringIN);  //CO20191110
   // file2vectorstring  
-  uint file2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint efile2vectorstring(string FileNameIN,vector<string>& vlines);
+  uint file2vectorstring(string FileNameIN,vector<string>& vline);
+  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline);
+  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline);
+  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline);
+  uint efile2vectorstring(string FileNameIN,vector<string>& vline);
+  bool vectorstring2file(const vector<string>& vline,string FileNameOUT);
   // file2dequestring  
-  uint file2dequestring(string FileNameIN,deque<string>& vlines);
-  uint bz2file2dequestring(string FileNameIN,deque<string>& vlines);
-  uint gzfile2dequestring(string FileNameIN,deque<string>& vlines);
-  uint xzfile2dequestring(string FileNameIN,deque<string>& vlines);
-  uint efile2dequestring(string FileNameIN,deque<string>& vlines);
-  // file2vectorstring overloading with deque
-  uint file2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint bz2file2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint gzfile2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint xzfile2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint efile2vectorstring(string FileNameIN,deque<string>& vlines);  
+  uint file2dequestring(string FileNameIN,deque<string>& vline);
+  uint bz2file2dequestring(string FileNameIN,deque<string>& vline);
+  uint gzfile2dequestring(string FileNameIN,deque<string>& vline);
+  uint xzfile2dequestring(string FileNameIN,deque<string>& vline);
+  uint efile2dequestring(string FileNameIN,deque<string>& vline);
+  bool dequestring2file(const deque<string>& vline,string FileNameOUT);
+ // file2vectorstring overloading with deque
+  uint file2vectorstring(string FileNameIN,deque<string>& vline);
+  uint bz2file2vectorstring(string FileNameIN,deque<string>& vline);
+  uint gzfile2vectorstring(string FileNameIN,deque<string>& vline);
+  uint xzfile2vectorstring(string FileNameIN,deque<string>& vline);
+  uint efile2vectorstring(string FileNameIN,deque<string>& vline);  
+  bool vectorstring2file(const deque<string>& vline,string FileNameOUT);
   // file2stringstream
   bool file2stringstream(string FileNameIN,stringstream& StringstreamIN);
   bool bz2file2stringstream(string FileNameIN,stringstream& StringstreamIN);
@@ -583,13 +591,15 @@ namespace aurostd {
   double getenv2double(const string& str);
   // about operating on files
   bool ChmodFile(string chmod_string,string FileNameOUTPUT);
-  //CO - START
+  //CO START
   bool file2directory(const string& _file,const string& destination);
   bool file2directory(const vector<string>& files,const string& destination);
   bool file2file(const string& _file,const string& destination); //CO20171025
+  string file2md5sum(const string& _file); //SC20200326
+  string file2auid(const string& _file); //SC20200326  
   bool IsDirectory(string path);
   bool IsFile(string path);
-  //CO - END
+  //CO END
   bool RemoveFile(string FileNameOUTPUT);
   bool RemoveFile(const vector<string>& files); //CO
   bool RemoveDirectory(const string& dir); //CO
@@ -645,6 +655,7 @@ namespace aurostd {
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);
+  string bool2string(bool from);
   // string utype2string(const string& from) __xprototype;
   // [OBSOLETE]  template<class u1> string utype2string(u1) __xprototype;
   // [OBSOLETE]  template<class u1, class u2> string utype2string(u1,u2) __xprototype;
@@ -673,7 +684,7 @@ namespace aurostd {
   string StringSubst(string &strstring, const string &strfind, const string &strreplace);
   //  string StringSubst(string &strstring, const string &strfind0, const string &strfind1, const string &strfind2, const string &strfind3, const string &strreplace);
   string StringSubst(string &strstring, const char &charfind, const char &charreplace);
-  void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  // ME20190128 - fixed type declaration
+  void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  //ME20190128 - fixed type declaration
   // about present substrings
   bool substring2bool(const string& strstream, const string& strsub1, bool CLEAN);
   bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN);
@@ -1250,13 +1261,13 @@ namespace aurostd {
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-// DX20180118 - Add xcomplex to json
+//DX20180118 - Add xcomplex to json
 namespace aurostd {
   template<typename utype> string _xcomplex2json(xcomplex<utype>& number) __xprototype;
   string xcomplex2json(xcomplex<double>& number);
 }
 
-// DX20170803 - Add Matrix print out
+//DX20170803 - Add Matrix print out
 namespace aurostd {
   // [OBSOLETE] string xmatDouble2String(const xmatrix<double>& xmat_in, bool roff=false);
   string xmatDouble2String(const xmatrix<double>& xmat_in, int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
@@ -1274,18 +1285,19 @@ namespace aurostd {
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff=false);
   vector<string> xvecDouble2vecString(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff=false);
-  deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  deque<string> vecDouble2vecString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  // deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
 }
 
 namespace aurostd {
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap);
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end);
-  deque<string> wrapDeqEntries(const deque<string>& vin,string wrap);
-  deque<string> wrapDeqEntries(const deque<string>& vin,string wrap_start,string wrap_end);
-}
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap);                          //SC20200329 nice overload to deal with ME
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end);    //SC20200329 nice overload to deal with ME
+ }
 
 //base64 stuff
-//CO - START
+//CO START
 namespace aurostd {
   //http://www.adp-gmbh.ch/cpp/common/base64.html for base64 encoding/decoding
   //http://stackoverflow.com/questions/535444/custom-manipulator-for-c-iostream for fancy stream manipulators
@@ -1365,12 +1377,12 @@ const std::string base64_chars =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 "abcdefghijklmnopqrstuvwxyz"
 "0123456789+/";
-//CO - END
+//CO END
 
 #endif
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

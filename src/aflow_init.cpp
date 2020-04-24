@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -48,7 +48,7 @@ _XHOST XHOST;  // GLOBAL
 // init::InitMachine
 // ***************************************************************************
 namespace init {
-  int GetCPUCores() { // CO20180124
+  int GetCPUCores() { //CO20180124
     int ncpus=sysconf(_SC_NPROCESSORS_ONLN);
     if(ncpus==96) ncpus=48; // fix the hyperthreading lie
     if(ncpus<1) ncpus=1;
@@ -70,17 +70,17 @@ namespace init {
     XHOST.QUIET=aurostd::args2flag(argv,cmds,"--quiet|-q");
     XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
     XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
-    XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); // DX20171025
+    XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); //DX20171025
     XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
     XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
 
     XHOST.tmpfs=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","/tmp");
     XHOST.tmpfs=aurostd::CleanFileName(XHOST.tmpfs+"/");
 
-    XHOST.user=aurostd::execute2string("whoami");  // AS SOON AS POSSIBLE
-    XHOST.home=aurostd::execute2string("cd && pwd");  // AS SOON AS POSSIBLE
-    XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT 180719
-    XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT 181212
+    XHOST.user=aurostd::execute2string("whoami");  //AS SOON AS POSSIBLE
+    XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
+    XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
+    XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     //  XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
@@ -359,7 +359,7 @@ namespace init {
       if(INIT_VERBOSE && XHOST.vTemperatureCore.size()) {
         oss << "--- TEMPERATURES --------------- " << endl;
         for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {oss << (i==0?"TEMP(C)=[":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]\n");}
-        //;if(i<XHOST.vTemperatureCore.size()-1) oss << ","; else oss << "]" << endl; //CO200106 - patching for auto-indenting
+        //;if(i<XHOST.vTemperatureCore.size()-1) oss << ","; else oss << "]" << endl; //CO20200106 - patching for auto-indenting
       }
     }
     // QUEUE STUFF
@@ -401,7 +401,7 @@ namespace init {
       oss << "MPI_OPTIONS_DUKE_QRATS_MPICH=" << MPI_OPTIONS_DUKE_QRATS_MPICH << "\"" << endl;
       oss << "MPI_COMMAND_DUKE_QRATS_MPICH=" << MPI_COMMAND_DUKE_QRATS_MPICH << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_QRATS_MPICH=" << MPI_BINARY_DIR_DUKE_QRATS_MPICH << "\"" << endl;
-      // CO - START
+      //CO START
       oss << "MPI_OPTIONS_DUKE_QFLOW_OPENMPI=" << MPI_OPTIONS_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
@@ -425,7 +425,7 @@ namespace init {
       oss << "MPI_NCPUS_MPCDF_HYDRA=" << MPI_NCPUS_MPCDF_HYDRA << "\"" << endl;
       oss << "MPI_HYPERTHREADING_MPCDF_HYDRA=" << MPI_HYPERTHREADING_MPCDF_HYDRA << "\"" << endl;
       oss << "MPI_BINARY_DIR_MPCDF_HYDRA=" << MPI_BINARY_DIR_MPCDF_HYDRA << "\"" << endl;
-      // CO - END
+      //CO END
       //DX20190509 - MACHINE001 - START
       oss << "MPI_OPTIONS_MACHINE001=" << MPI_OPTIONS_MACHINE001 << "\"" << endl;
       oss << "MPI_COMMAND_MACHINE001=" << MPI_COMMAND_MACHINE001 << "\"" << endl;
@@ -471,7 +471,7 @@ namespace init {
     // XHOST_LIBRARY_LIB2=LIBRARY_NOTHING;
     aurostd::string2tokens(DEFAULT_AFLOW_PROJECTS_DIRECTORIES,vstrs,",");// vAFLOW_PROJECTS_DIRECTORIES;
     // DEBUG  cerr << "vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl; 
-    for(uint i=0;i<vstrs.size();i++) { // oss << vstrs.at(i) << endl;
+    for(uint i=0;i<vstrs.size();i++) { //  cerr << vstrs.at(i) << endl;
       if(aurostd::FileExist(vstrs.at(i))) {
         if(aurostd::substring2bool(vstrs.at(i),"AUID")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_AUID=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
         if(aurostd::FileExist(vstrs.at(i)+"/LIB")) {
@@ -487,13 +487,18 @@ namespace init {
           if(aurostd::substring2bool(vstrs.at(i),"LIB8")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB8=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
           if(aurostd::substring2bool(vstrs.at(i),"LIB9")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB9=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
         }
-      }
+     }
     }
+
+    // get position JSONL
+    if(aurostd::EFileExist(DEFAULT_AFLOW_DB_DATA_PATH+"/aflow:00.jsonl") && aurostd::EFileExist(DEFAULT_AFLOW_DB_DATA_PATH+"/aflow:ff.jsonl")) {XHOST_LIBRARY_JSONL=DEFAULT_AFLOW_DB_DATA_PATH;} // check 00 and ff for being sure
     // DEBUG cerr << "vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl;
     // DEBUG   for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++) cerr << "vAFLOW_PROJECTS_DIRECTORIES.at(i)=" << vAFLOW_PROJECTS_DIRECTORIES.at(i) << endl;
-
+    
     if(INIT_VERBOSE) {
       oss << "--- PROJECTS @ " << XHOST.hostname << " --- " << endl;
+      oss << "DEFAULT_AFLOW_DB_DATA_PATH=" << DEFAULT_AFLOW_DB_DATA_PATH << endl;
+      oss << "XHOST_LIBRARY_JSONL=" << XHOST_LIBRARY_JSONL << endl;
       if(XHOST_LIBRARY_AUID!=LIBRARY_NOTHING) oss << "XHOST_LIBRARY_AUID=" << XHOST_LIBRARY_AUID << " : vAFLOW_PROJECTS_DIRECTORIES.at(" << XHOST_LIBRARY_AUID << ")=" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID) << endl;
       if(XHOST_LIBRARY_ICSD!=LIBRARY_NOTHING) oss << "XHOST_LIBRARY_ICSD=" << XHOST_LIBRARY_ICSD << " : vAFLOW_PROJECTS_DIRECTORIES.at(" << XHOST_LIBRARY_ICSD << ")=" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD) << endl;
       if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) oss << "XHOST_LIBRARY_LIB0=" << XHOST_LIBRARY_LIB0 << " : vAFLOW_PROJECTS_DIRECTORIES.at(" << XHOST_LIBRARY_LIB0 << ")=" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0) << endl;
@@ -507,54 +512,18 @@ namespace init {
       if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) oss << "XHOST_LIBRARY_LIB8=" << XHOST_LIBRARY_LIB8 << " : vAFLOW_PROJECTS_DIRECTORIES.at(" << XHOST_LIBRARY_LIB8 << ")=" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8) << endl;
       if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) oss << "XHOST_LIBRARY_LIB9=" << XHOST_LIBRARY_LIB9 << " : vAFLOW_PROJECTS_DIRECTORIES.at(" << XHOST_LIBRARY_LIB9 << ")=" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9) << endl;
 
-      //      if(XHOST_LIBRARY_AUID!=LIBRARY_NOTHING) {
-      // 	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_AUID_LIB"),tokens,"\n");
-      // 	oss << "Library_CALCULATED_AUID_LIB.size()=" << tokens.size() << endl;
-      //       }
-      if(XHOST_LIBRARY_ICSD!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_ICSD_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB0_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB1!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB1_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB2!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB2_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB3_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB4!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB4_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB5!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB5_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB6!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB6_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB7!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB7_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB8_LIB.size()=" << tokens.size() << endl;
-      }
-      if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) {
-        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
-        oss << "Library_CALCULATED_LIB9_LIB.size()=" << tokens.size() << endl;
-      }
+      init::InitLoadString("vLIBS");
+      if(XHOST_LIBRARY_ICSD!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_ICSD_LIB.size()=" << XHOST_Library_CALCULATED_ICSD_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB0_LIB.size()=" << XHOST_Library_CALCULATED_LIB0_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB1!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB1_LIB.size()=" << XHOST_Library_CALCULATED_LIB1_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB2!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB2_LIB.size()=" << XHOST_Library_CALCULATED_LIB2_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB3_LIB.size()=" << XHOST_Library_CALCULATED_LIB3_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB4!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB4_LIB.size()=" << XHOST_Library_CALCULATED_LIB4_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB5!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB5_LIB.size()=" << XHOST_Library_CALCULATED_LIB5_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB6!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB6_LIB.size()=" << XHOST_Library_CALCULATED_LIB6_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB7!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB7_LIB.size()=" << XHOST_Library_CALCULATED_LIB7_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB8_LIB.size()=" << XHOST_Library_CALCULATED_LIB8_LIB.size() << endl; }
+      if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) { oss << "Library_CALCULATED_LIB9_LIB.size()=" << XHOST_Library_CALCULATED_LIB9_LIB.size() << endl; }
     }
 
     // for(uint i=0;i<vAFLOW_PROJECTS_DIRECTORIES.size();i++) oss << vAFLOW_PROJECTS_DIRECTORIES.at(i) << endl;exit(0);
@@ -607,9 +576,9 @@ namespace init {
         aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
         aurostd::args2attachedflag(argv,cmds,"--run=") ||
         aurostd::args2flag(argv,cmds,"--generate_vasp_from_aflowin|--generate_aflowin_from_vasp"));
-    // DX - START
-    XHOST.vflag_control.flag("AFLOWIN_SYM",aurostd::args2flag(argv,cmds,"--generate_symmetry|--generate_sym")); // DX
-    // DX - END
+    //DX START
+    XHOST.vflag_control.flag("AFLOWIN_SYM",aurostd::args2flag(argv,cmds,"--generate_symmetry|--generate_sym")); //DX
+    //DX END
     // [OBSOLETE]    XHOST.vflag_control.flag("SWITCH_AFLOWLIB",aurostd::args2flag(argv,cmds,"--aflowlib") || aurostd::args2attachedflag(argv,cmds,"--aflowlib="));
     XHOST.vflag_control.flag("SWITCH_APENNSY1",aurostd::args2flag(argv,cmds,"--apennsy|--lib2|--lib2u|--lib2pgm|--LIB2|--LIB2U|--LIB2PGM|--libraryX|--libraryU|--libraryPGM|--alloy"));
     XHOST.vflag_control.flag("SWITCH_APENNSY2",aurostd::args2flag(argv,cmds,"--apool|--apool_private|--apool_test|--library2|-simpls|--simpls|--VASPIN|--energy|--psenergy"));
@@ -638,6 +607,8 @@ namespace init {
     if(!directory_clean.empty()){XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
     if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
     //CO20190402 STOP - cleaning directory, giving us something to print with logger
+
+    // LOGICS to intercept --file= => XHOST.vflag_control.flag("FILE") XHOST.vflag_control.getattachedscheme("FILE")
     // FILE NEEDS A SPECIAL TREATMENT
     string file_default="xxxx",file=file_default;
     found=FALSE;
@@ -645,7 +616,9 @@ namespace init {
     if(!found&&(found=aurostd::args2attachedflag(argv,cmds,"--FILE=|--file=|--F=|--f="))) {file=aurostd::args2attachedstring(argv,"--FILE=|--file=|--F=|--f=",file_default);if(INIT_VERBOSE) cerr << "--FILE=" << file << " " << endl;}
     XHOST.vflag_control.flag("FILE",found);  // if found
     if(XHOST.vflag_control.flag("FILE")) XHOST.vflag_control.push_attached("FILE",file);
-    if(XHOST.vflag_control.flag("FILE")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"FILE\")=[" << XHOST.vflag_control.getattachedscheme("FILE") << "]" << endl; 
+    if(XHOST.vflag_control.flag("FILE")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"FILE\")=[" << XHOST.vflag_control.getattachedscheme("FILE") << "]" << endl;
+
+    
     // VFILES NEEDS A SPECIAL TREATMENT
     string dirs_default="xxxx",dirs=dirs_default;
     vector<string> vdir;
@@ -669,7 +642,7 @@ namespace init {
     // exit(0); 
 
     XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"-h|--help"));
-    XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  // ME20180531
+    XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  //ME20180531
     XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3",aurostd::args2flag(argv,cmds,"-l|--license"));
     XHOST.vflag_control.flag("README_AFLOW",aurostd::args2flag(argv,cmds,"--readme=run|--readme=aflow|--readme_aflow"));
     XHOST.vflag_control.flag("README_AFLOW_PFLOW",aurostd::args2flag(argv,cmds,"--readme=pflow|--readme=processor|--readme=aconvasp|--readme_aconvasp"));
@@ -688,7 +661,7 @@ namespace init {
     XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION",aurostd::args2flag(argv,cmds,"--readme=partial_occupation|--readme=pocc|--readme_pocc"));
     XHOST.vflag_control.flag("README_APENNSY",aurostd::args2flag(argv,cmds,"--readme=apennsy|--readme_apennsy"));
     XHOST.vflag_control.flag("README_SCRIPTING",aurostd::args2flag(argv,cmds,"--readme=scripting|--readme_scripting|--readme=script|--readme_script"));
-    XHOST.vflag_control.flag("README_EXCEPTIONS", aurostd::args2flag(argv, cmds, "--readme=errors|--readme_errors|--readme=exceptions|--readme_exceptions"));  // ME20180531
+    XHOST.vflag_control.flag("README_EXCEPTIONS", aurostd::args2flag(argv, cmds, "--readme=errors|--readme_errors|--readme=exceptions|--readme_exceptions"));  //ME20180531
     XHOST.vflag_control.flag("README_HTRESOURCES",aurostd::args2flag(argv,cmds,"--readme=htresources|--readme_htresources|--readme=resources|--readme_resources"));
     XHOST.vflag_control.flag("README_XAFLOW",aurostd::args2flag(argv,cmds,"--readme=xaflow|--readme_xaflow"));
     XHOST.vflag_control.flag("README_AFLOWRC",aurostd::args2flag(argv,cmds,"--readme=aflowrc|--readme_aflowrc"));
@@ -707,16 +680,16 @@ namespace init {
           XHOST.vflag_control.flag("README_GFA") || //CO20190401
           XHOST.vflag_control.flag("README_SYMMETRY") ||
           XHOST.vflag_control.flag("README_CCE") || //CO20190620
-          XHOST.vflag_control.flag("README_CHULL") || //CO2019620
+          XHOST.vflag_control.flag("README_CHULL") || //CO20190620
           XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") ||
           XHOST.vflag_control.flag("README_APENNSY") ||
           XHOST.vflag_control.flag("README_SCRIPTING") ||
-          XHOST.vflag_control.flag("README_EXCEPTIONS") ||  // ME20180531
+          XHOST.vflag_control.flag("README_EXCEPTIONS") ||  //ME20180531
           XHOST.vflag_control.flag("README_HTRESOURCES") ||
           XHOST.vflag_control.flag("README_XAFLOW") ||
           XHOST.vflag_control.flag("README_AFLOWRC") ||
-          FALSE)){  // CO20180306 - need to catch --readme such that it doesn't interfere with --readme=
-            XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  // CO20180306
+          FALSE)){  //CO20180306 - need to catch --readme such that it doesn't interfere with --readme=
+            XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  //CO20180306
           }
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AFLOW_HELP\")=" << XHOST.vflag_control.flag("AFLOW_HELP") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_AFLOW_LICENSE_GPL3\")=" << XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3") << endl;
@@ -764,7 +737,7 @@ namespace init {
 
     XHOST.vflag_control.flag("PRINT_MODE::HTML",aurostd::args2flag(XHOST.argv,cmds,"--print=html|--print_html")); 
     XHOST.vflag_control.flag("PRINT_MODE::TXT",aurostd::args2flag(XHOST.argv,cmds,"--print=txt|--print_txt")); 
-    XHOST.vflag_control.flag("PRINT_MODE::JSON",aurostd::args2flag(XHOST.argv,cmds,"--print=json|--print_json")); // DX20170907 - Add json
+    XHOST.vflag_control.flag("PRINT_MODE::JSON",aurostd::args2flag(XHOST.argv,cmds,"--print=json|--print_json")); //DX20170907 - Add json
     XHOST.vflag_control.flag("PRINT_MODE::LATEX",aurostd::args2flag(XHOST.argv,cmds,"--print=latex|--print_latex"));
     XHOST.vflag_control.flag("PRINT_MODE::YEAR",aurostd::args2flag(XHOST.argv,cmds,"--print=year|--print_year"));
     XHOST.vflag_control.flag("PRINT_MODE::DOI",aurostd::args2flag(XHOST.argv,cmds,"--print=doi|--print_doi"));
@@ -782,7 +755,7 @@ namespace init {
     XHOST.vflag_control.flag("OSS::CERR",aurostd::args2flag(XHOST.argv,cmds,"--oss=cerr|--oss_cerr|--CERR|--cerr"));
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::HTML\")=" << XHOST.vflag_control.flag("PRINT_MODE::HTML") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::TXT\")=" << XHOST.vflag_control.flag("PRINT_MODE::TXT") << endl;
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl; // DX20170907 - Add json
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl; //DX20170907 - Add json
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::LATEX\")=" << XHOST.vflag_control.flag("PRINT_MODE::LATEX") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::YEAR\")=" << XHOST.vflag_control.flag("PRINT_MODE::YEAR") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::DOI\")=" << XHOST.vflag_control.flag("PRINT_MODE::DOI") << endl;
@@ -833,14 +806,44 @@ namespace init {
     if(XHOST.vflag_control.flag("XPLUG_NUM_SIZE")) XHOST.vflag_control.push_attached("XPLUG_NUM_SIZE",aurostd::args2attachedstring(argv,"--nsize=",""));
     if(!XHOST.vflag_control.flag("XPLUG_NUM_SIZE")) XHOST.vflag_control.push_attached("XPLUG_NUM_SIZE",aurostd::utype2string(128));
     XHOST.vflag_control.flag("XPLUG_NUM_THREADS",aurostd::args2attachedflag(argv,"--np="));
-    XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX",aurostd::args2attachedflag(argv,"--npmax")); // CO20180124
-    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=",""));
+    XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX",aurostd::args2attachedflag(argv,"--npmax")); //CO20180124
+    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=","0")); //SC20200319
     if(!XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")) { //ME20181113
       XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME20181113
-      //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO200106 - close bracket for indenting]}
+      //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO20200106 - close bracket for indenting]}
     }
 
-    // ME20181103 - set MPI when number of threads is larger than 1
+    // USEFUL shortcuts //SC20200319
+    if(!aurostd::args2attachedflag(argv,"--np=")) {
+      deque<string> vshort; aurostd::string2tokens("1,2,4,5,6,7,8,9,10,12,14,16,20,24,28,32,48,52,64",vshort,",");
+      for(uint ishort=0;ishort<vshort.size();ishort++) {
+	if(aurostd::args2flag(argv,cmds,"--multi="+vshort.at(ishort))) {  //SC20200319
+	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
+	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
+	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",vshort.at(ishort));
+	  //	  if(INIT_VERBOSE)
+	  cerr << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+	}
+      }
+    }
+    // USEFUL shortcuts //SC20200323 
+    if(!XHOST.vflag_control.flag("FILE")) { // not specified file
+      deque<string> vshort; aurostd::string2tokens("0,1,2,3,4,5,6,7,8,9",vshort,",");
+      for(uint ishort=0;ishort<vshort.size();ishort++) {
+	if(aurostd::args2flag(argv,cmds,"--multi=x.lib"+vshort.at(ishort)) || aurostd::args2flag(argv,cmds,"--multi=./x.lib"+vshort.at(ishort))) {  //SC20200323
+	  XHOST.vflag_control.flag("MULTI=SH",TRUE);
+	  XHOST.vflag_control.flag("XPLUG_NUM_THREADS",TRUE);
+	  XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","16");
+	  XHOST.vflag_control.flag("FILE",TRUE);  // if found
+	  XHOST.vflag_control.push_attached("FILE","x.lib"+vshort.at(ishort));
+	  cerr << "init::InitMachine: FOUND FILE=" << XHOST.vflag_control.getattachedscheme("FILE") << endl;
+	  cerr << "init::InitMachine: FOUND MULTI=SH with np=" << XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS") << endl;
+	}
+      }
+    }
+
+   
+    //ME20181103 - set MPI when number of threads is larger than 1
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX") || 
         (aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS")) > 1)) {
       XHOST.MPI = true;
@@ -973,56 +976,180 @@ namespace init {
     bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
     string soliloquy="init::InitLoadString:";
     if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
+
+    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()==3) return ""; // intercept before it reloads it again
+
     if(!XHOST.is_command("aflow_data")) {
       cerr << "AFLOW Error: " << "aflow_data" << " is not in the path... exiting.." << endl;
       exit(0);
     } 
     if(LDEBUG) cerr << "00000  MESSAGE AFLOW INIT Loading data = [" << str2load << "]";
     if(LDEBUG) cerr.flush();
+
+ 
     string out;
     string aflow_data_path=aurostd::args2attachedstring(XHOST.argv,"--aflow_data_path=",(string) "");
     if(aflow_data_path=="") {
-      if(XHOST.hostname=="nietzsche.mems.duke.edu"&&XHOST.user=="auro"&&aurostd::FileExist(XHOST.home+"/work/AFLOW3/aflow_data")) {  // CO, special stefano
+      if(XHOST.hostname=="nietzsche.mems.duke.edu"&&XHOST.user=="auro"&&aurostd::FileExist(XHOST.home+"/work/AFLOW3/aflow_data")) {  //CO, special SC
         out=aurostd::execute2string(string(XHOST.home+"/work/AFLOW3/aflow_data")+string(" ")+str2load);
         if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
-        if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
+	//       if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
         if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
-      } else {
+     } else {
         if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
         out=aurostd::execute2string(XHOST.command("aflow_data")+" "+str2load);
-      }
+       }
     } else { // cerr << string(aflow_data_path+"/"+XHOST.command("aflow_data")) << endl;
       out=aurostd::execute2string(aflow_data_path+"/"+XHOST.command("aflow_data")+" "+str2load);
-    }
-
-    if(LDEBUG) cerr << soliloquy << "  length=" << out.length() << endl;
+     }
+    if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
     if(LDEBUG) cerr.flush();
     //    if(LDEBUG) exit(0);
-    return out;
+    if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
+
+    if((str2load=="vLIBS" || str2load=="XHOST_vLIBS") && XHOST_vLIBS.size()!=3) {
+      for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
+      XHOST_vLIBS.clear();
+      XHOST_vLIBS.push_back(vector<string>()); // AURL
+      XHOST_vLIBS.push_back(vector<string>()); // AUID
+      XHOST_vLIBS.push_back(vector<string>()); // LOOP
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
+      vector<string> vout;
+      string aurl,auid,loop;
+      bool found=FALSE;
+      aurostd::string2vectorstring(out,vout);
+      for(uint i=0;i<vout.size();) {
+	aurl=vout.at(i);XHOST_vLIBS.at(0).push_back(vout.at(i++)); // AURL
+	auid=vout.at(i);XHOST_vLIBS.at(1).push_back(vout.at(i++)); // AUID
+	loop=vout.at(i);XHOST_vLIBS.at(2).push_back(vout.at(i++)); // LOOP
+	aurostd::StringSubst(aurl,"aflowlib.duke.edu:","");
+	aurostd::StringSubst(aurl,"materials.duke.edu:","");
+	found=FALSE;
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/ICSD")) { // XHOST_Library_CALCULATED_ICSD
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/ICSD_RAW/","");
+	    aurostd::StringSubst(aurl,"AFLOWDATA/ICSD_WEB/","");
+	    XHOST_Library_CALCULATED_ICSD_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_ICSD_RAW.push_back(aurl);
+	  }
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB0")) { // XHOST_Library_CALCULATED_LIB0
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB0_RAW/","");
+	    XHOST_Library_CALCULATED_LIB0_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB0_RAW.push_back(aurl);
+	  }
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB1")) { // XHOST_Library_CALCULATED_LIB1
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB1_RAW/","");
+	    XHOST_Library_CALCULATED_LIB1_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB1_RAW.push_back(aurl);
+	  }
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB2")) { // XHOST_Library_CALCULATED_LIB2
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB2_RAW/","");
+	    XHOST_Library_CALCULATED_LIB2_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB2_RAW.push_back(aurl);
+	  }
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB3")) { // XHOST_Library_CALCULATED_LIB3
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB3_RAW/","");
+	    XHOST_Library_CALCULATED_LIB3_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB3_RAW.push_back(aurl);
+	  }
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB4")) { // XHOST_Library_CALCULATED_LIB4
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB4_RAW/","");
+	    XHOST_Library_CALCULATED_LIB4_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB4_RAW.push_back(aurl);
+	  }
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB5")) { // XHOST_Library_CALCULATED_LIB5
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB5_RAW/","");
+	    XHOST_Library_CALCULATED_LIB5_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB5_RAW.push_back(aurl);
+	  }
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB6")) { // XHOST_Library_CALCULATED_LIB6
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB6_RAW/","");
+	    XHOST_Library_CALCULATED_LIB6_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB6_RAW.push_back(aurl);
+	  }
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB7")) { // XHOST_Library_CALCULATED_LIB7
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB7_RAW/","");
+	    XHOST_Library_CALCULATED_LIB7_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB7_RAW.push_back(aurl);
+	  }
+ 	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB8")) { // XHOST_Library_CALCULATED_LIB8
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB8_RAW/","");
+	    XHOST_Library_CALCULATED_LIB8_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB8_RAW.push_back(aurl);
+	  }
+	if(!found) if(aurostd::substring2bool(aurl,"AFLOWDATA/LIB9")) { // XHOST_Library_CALCULATED_LIB9
+	    found=TRUE;aurostd::StringSubst(aurl,"AFLOWDATA/LIB9_RAW/","");
+	    XHOST_Library_CALCULATED_LIB9_LIB.push_back(aurl);
+	    XHOST_Library_CALCULATED_LIB9_RAW.push_back(aurl);
+	  }
+      }
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.at(0).size()=" << XHOST_vLIBS.at(0).size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.at(1).size()=" << XHOST_vLIBS.at(1).size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.at(2).size()=" << XHOST_vLIBS.at(2).size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_ICSD_LIB.size()=" << XHOST_Library_CALCULATED_ICSD_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB0_LIB.size()=" << XHOST_Library_CALCULATED_LIB0_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB1_LIB.size()=" << XHOST_Library_CALCULATED_LIB1_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB2_LIB.size()=" << XHOST_Library_CALCULATED_LIB2_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB3_LIB.size()=" << XHOST_Library_CALCULATED_LIB3_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB4_LIB.size()=" << XHOST_Library_CALCULATED_LIB4_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB5_LIB.size()=" << XHOST_Library_CALCULATED_LIB5_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB6_LIB.size()=" << XHOST_Library_CALCULATED_LIB6_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB7_LIB.size()=" << XHOST_Library_CALCULATED_LIB7_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB8_LIB.size()=" << XHOST_Library_CALCULATED_LIB8_LIB.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_Library_CALCULATED_LIB9_LIB.size()=" << XHOST_Library_CALCULATED_LIB9_LIB.size() << endl;
+    }
+    return out; 
   }
 } // namespace init
 
-vector<string> vvAURL,vvAUID,vvLOOP;
-
-string vAURL_cutout(string cutout,bool LVERBOSE) {
-  bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
-  stringstream sss;
-  if(LDEBUG) cerr << "vAURL_cutout: XHOST_AURL.size()=" << XHOST_AURL.size() << "  " << "vvAURL.size()=" << vvAURL.size() << endl;
-  vector<string> tokens;
-  aurostd::string2tokens(cutout,tokens,"|");
-  if(!vvAURL.size()) aurostd::string2vectorstring(init::InitGlobalObject("vAURL","",LVERBOSE),vvAURL); // a bit of recursivity helps
-  for(uint i=0;i<tokens.size();i++) {
-    for(uint j=0;j<vvAURL.size();j++) {
-      if(aurostd::substring2bool(vvAURL.at(j),tokens.at(i))) {
-        aurostd::StringSubst(vvAURL.at(j),tokens.at(i),"");
-        aurostd::StringSubst(vvAURL.at(j),"aflowlib.duke.edu:","");
-        aurostd::StringSubst(vvAURL.at(j),"materials.duke.edu:","");
-        sss << vvAURL.at(j) << endl;
-      }
-    }
-  }
-  return sss.str();
-}
+// [OBSOLETE] bool vAURL_cutout(vector<string>& vvAURL,string cutout,bool LVERBOSE) {
+// [OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
+// [OBSOLETE]   stringstream sss;
+// [OBSOLETE]   if(LDEBUG) cerr << "vAUID_cutout: XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
+// [OBSOLETE]   if(LDEBUG) cerr << "vAURL_cutout: XHOST_vAURL.size()=" << XHOST_vAURL.size() << endl;
+// [OBSOLETE]   if(LDEBUG) cerr << "vLOOP_cutout: XHOST_vLOOP.size()=" << XHOST_vLOOP.size() << endl;
+// [OBSOLETE]   if(LDEBUG) cerr << "vLIBS_cutout: XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
+// [OBSOLETE]   vector<string> tokens;
+// [OBSOLETE]   aurostd::string2tokens(cutout,tokens,"|");
+// [OBSOLETE]   string aus;
+// [OBSOLETE]   if(!XHOST_vAURL.size()) init::InitLoadString("vLIBS",LVERBOSE);
+// [OBSOLETE]   for(uint i=0;i<tokens.size();i++) {
+// [OBSOLETE]     for(uint j=0;j<XHOST_vAURL.size();j++) {
+// [OBSOLETE]       aus=XHOST_vAURL.at(j);
+// [OBSOLETE]       if(aurostd::substring2bool(aus,tokens.at(i))) {
+// [OBSOLETE]         aurostd::StringSubst(aus,tokens.at(i),"");
+// [OBSOLETE]         aurostd::StringSubst(aus,"aflowlib.duke.edu:","");
+// [OBSOLETE]         aurostd::StringSubst(aus,"materials.duke.edu:","");
+// [OBSOLETE]         vvAURL.push_back(aus);
+// [OBSOLETE]       }
+// [OBSOLETE]     }
+// [OBSOLETE]   }
+// [OBSOLETE]   return true;
+// [OBSOLETE] }
+// [OBSOLETE] 
+// [OBSOLETE] string vAURL_cutout(string cutout,bool LVERBOSE) {
+// [OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG || LVERBOSE);
+// [OBSOLETE]   stringstream sss;
+// [OBSOLETE]   if(LDEBUG) cerr << "vAUID_cutout: XHOST_vAUID.size()=" << XHOST_vAUID.size() << endl;
+// [OBSOLETE]   if(LDEBUG) cerr << "vAURL_cutout: XHOST_vAURL.size()=" << XHOST_vAURL.size() << endl;
+// [OBSOLETE]   if(LDEBUG) cerr << "vLOOP_cutout: XHOST_vLOOP.size()=" << XHOST_vLOOP.size() << endl;
+// [OBSOLETE]   if(LDEBUG) cerr << "vLIBS_cutout: XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
+// [OBSOLETE]   vector<string> tokens;
+// [OBSOLETE]   aurostd::string2tokens(cutout,tokens,"|");
+// [OBSOLETE]   string aus;
+// [OBSOLETE]   if(!XHOST_vAURL.size()) init::InitLoadString("vLIBS",LVERBOSE);
+// [OBSOLETE]   for(uint i=0;i<tokens.size();i++) {
+// [OBSOLETE]     for(uint j=0;j<XHOST_vAURL.size();j++) {
+// [OBSOLETE]       aus=XHOST_vAURL.at(j);
+// [OBSOLETE]       if(aurostd::substring2bool(aus,tokens.at(i))) {
+// [OBSOLETE]         aurostd::StringSubst(aus,tokens.at(i),"");
+// [OBSOLETE]         aurostd::StringSubst(aus,"aflowlib.duke.edu:","");
+// [OBSOLETE]         aurostd::StringSubst(aus,"materials.duke.edu:","");
+// [OBSOLETE] 	sss << aus << endl;
+// [OBSOLETE]       }
+// [OBSOLETE]     }
+// [OBSOLETE]   }
+// [OBSOLETE]   return sss.str();
+// [OBSOLETE] }
 
 // ***************************************************************************
 // init::InitGlobalObject
@@ -1042,50 +1169,24 @@ namespace init {
       }
     } // FIX
     // FILES CALCULATED
-    // README_CALCULATED_ICSD
-    if(str=="Library_CALCULATED_ICSD_LIB") { if(XHOST_Library_CALCULATED_ICSD_LIB.empty()) { return XHOST_Library_CALCULATED_ICSD_LIB=vAURL_cutout("AFLOWDATA/ICSD_RAW/|AFLOWDATA/ICSD_WEB/",LVERBOSE);} else { return XHOST_Library_CALCULATED_ICSD_LIB;}} 
-    if(str=="Library_CALCULATED_ICSD_RAW") { if(XHOST_Library_CALCULATED_ICSD_RAW.empty()) { return XHOST_Library_CALCULATED_ICSD_RAW=vAURL_cutout("AFLOWDATA/ICSD_RAW/|AFLOWDATA/ICSD_WEB/",LVERBOSE);} else { return XHOST_Library_CALCULATED_ICSD_RAW;}}  
-    // README_CALCULATED_LIB0
-    if(str=="Library_CALCULATED_LIB0_LIB") { if(XHOST_Library_CALCULATED_LIB0_LIB.empty()) { return XHOST_Library_CALCULATED_LIB0_LIB=vAURL_cutout("AFLOWDATA/LIB0_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB0_LIB;}} 
-    if(str=="Library_CALCULATED_LIB0_RAW") { if(XHOST_Library_CALCULATED_LIB0_RAW.empty()) { return XHOST_Library_CALCULATED_LIB0_RAW=vAURL_cutout("AFLOWDATA/LIB0_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB0_RAW;}} 
-    // README_CALCULATED_LIB1
-    if(str=="Library_CALCULATED_LIB1_LIB") { if(XHOST_Library_CALCULATED_LIB1_LIB.empty()) { return XHOST_Library_CALCULATED_LIB1_LIB=vAURL_cutout("AFLOWDATA/LIB1_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB1_LIB;}} 
-    if(str=="Library_CALCULATED_LIB1_RAW") { if(XHOST_Library_CALCULATED_LIB1_RAW.empty()) { return XHOST_Library_CALCULATED_LIB1_RAW=vAURL_cutout("AFLOWDATA/LIB1_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB1_RAW;}} 
-    // README_CALCULATED_LIB2
-    if(str=="Library_CALCULATED_LIB2_LIB") { if(XHOST_Library_CALCULATED_LIB2_LIB.empty()) { return XHOST_Library_CALCULATED_LIB2_LIB=vAURL_cutout("AFLOWDATA/LIB2_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB2_LIB;}} 
-    if(str=="Library_CALCULATED_LIB2_RAW") { if(XHOST_Library_CALCULATED_LIB2_RAW.empty()) { return XHOST_Library_CALCULATED_LIB2_RAW=vAURL_cutout("AFLOWDATA/LIB2_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB2_RAW;}} 
-    // README_CALCULATED_LIB3
-    if(str=="Library_CALCULATED_LIB3_LIB") { if(XHOST_Library_CALCULATED_LIB3_LIB.empty()) { return XHOST_Library_CALCULATED_LIB3_LIB=vAURL_cutout("AFLOWDATA/LIB3_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB3_LIB;}} 
-    if(str=="Library_CALCULATED_LIB3_RAW") { if(XHOST_Library_CALCULATED_LIB3_RAW.empty()) { return XHOST_Library_CALCULATED_LIB3_RAW=vAURL_cutout("AFLOWDATA/LIB3_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB3_RAW;}} 
-    // README_CALCULATED_LIB4
-    if(str=="Library_CALCULATED_LIB4_LIB") { if(XHOST_Library_CALCULATED_LIB4_LIB.empty()) { return XHOST_Library_CALCULATED_LIB4_LIB=vAURL_cutout("AFLOWDATA/LIB4_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB4_LIB;}} 
-    if(str=="Library_CALCULATED_LIB4_RAW") { if(XHOST_Library_CALCULATED_LIB4_RAW.empty()) { return XHOST_Library_CALCULATED_LIB4_RAW=vAURL_cutout("AFLOWDATA/LIB4_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB4_RAW;}} 
-    // README_CALCULATED_LIB5
-    if(str=="Library_CALCULATED_LIB5_LIB") { if(XHOST_Library_CALCULATED_LIB5_LIB.empty()) { return XHOST_Library_CALCULATED_LIB5_LIB=vAURL_cutout("AFLOWDATA/LIB5_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB5_LIB;}} 
-    if(str=="Library_CALCULATED_LIB5_RAW") { if(XHOST_Library_CALCULATED_LIB5_RAW.empty()) { return XHOST_Library_CALCULATED_LIB5_RAW=vAURL_cutout("AFLOWDATA/LIB5_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB5_RAW;}} 
-    // README_CALCULATED_LIB6
-    if(str=="Library_CALCULATED_LIB6_LIB") { if(XHOST_Library_CALCULATED_LIB6_LIB.empty()) { return XHOST_Library_CALCULATED_LIB6_LIB=vAURL_cutout("AFLOWDATA/LIB6_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB6_LIB;}} 
-    if(str=="Library_CALCULATED_LIB6_RAW") { if(XHOST_Library_CALCULATED_LIB6_RAW.empty()) { return XHOST_Library_CALCULATED_LIB6_RAW=vAURL_cutout("AFLOWDATA/LIB6_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB6_RAW;}} 
-    // README_CALCULATED_LIB7
-    if(str=="Library_CALCULATED_LIB7_LIB") { if(XHOST_Library_CALCULATED_LIB7_LIB.empty()) { return XHOST_Library_CALCULATED_LIB7_LIB=vAURL_cutout("AFLOWDATA/LIB7_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB7_LIB;}} 
-    if(str=="Library_CALCULATED_LIB7_RAW") { if(XHOST_Library_CALCULATED_LIB7_RAW.empty()) { return XHOST_Library_CALCULATED_LIB7_RAW=vAURL_cutout("AFLOWDATA/LIB7_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB7_RAW;}} 
-    // README_CALCULATED_LIB8
-    if(str=="Library_CALCULATED_LIB8_LIB") { if(XHOST_Library_CALCULATED_LIB8_LIB.empty()) { return XHOST_Library_CALCULATED_LIB8_LIB=vAURL_cutout("AFLOWDATA/LIB8_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB8_LIB;}} 
-    if(str=="Library_CALCULATED_LIB8_RAW") { if(XHOST_Library_CALCULATED_LIB8_RAW.empty()) { return XHOST_Library_CALCULATED_LIB8_RAW=vAURL_cutout("AFLOWDATA/LIB8_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB8_RAW;}} 
-    // README_CALCULATED_LIB9
-    if(str=="Library_CALCULATED_LIB9_LIB") { if(XHOST_Library_CALCULATED_LIB9_LIB.empty()) { return XHOST_Library_CALCULATED_LIB9_LIB=vAURL_cutout("AFLOWDATA/LIB9_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB9_LIB;}} 
-    if(str=="Library_CALCULATED_LIB9_RAW") { if(XHOST_Library_CALCULATED_LIB9_RAW.empty()) { return XHOST_Library_CALCULATED_LIB9_RAW=vAURL_cutout("AFLOWDATA/LIB9_RAW/",LVERBOSE);} else { return XHOST_Library_CALCULATED_LIB9_RAW;}} 
-    // AUID AURL LOOP
-    if(str=="vAUID") { if(XHOST_AUID.empty()) {XHOST_AUID=aurostd::RemoveWhiteSpaces(init::InitLoadString(str,LVERBOSE));aurostd::string2vectorstring(XHOST_AUID,XHOST_vAUID);return XHOST_AUID;} else { return XHOST_AUID;}} // 
-    if(str=="vAURL") { if(XHOST_AURL.empty()) {XHOST_AURL=aurostd::RemoveWhiteSpaces(init::InitLoadString(str,LVERBOSE));aurostd::string2vectorstring(XHOST_AURL,XHOST_vAURL);return XHOST_AURL;} else { return XHOST_AURL;}} // 
-    if(str=="vLOOP") { if(XHOST_LOOP.empty()) {XHOST_LOOP=aurostd::RemoveWhiteSpaces(init::InitLoadString(str,LVERBOSE));aurostd::string2vectorstring(XHOST_LOOP,XHOST_vLOOP);return XHOST_LOOP;} else { return XHOST_LOOP;}} // 
-    // [OBSOLETE]   // TABLE PROTOTYPES
-    // [OBSOLETE]   if(str=="AFLOW_BinaryRead") { if(XHOST_AFLOW_BinaryRead.empty()) { return XHOST_AFLOW_BinaryRead=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_BinaryRead;}} //
-    // [OBSOLETE]   if(str=="AFLOW_Binary_Angle_Read") { if(XHOST_AFLOW_Binary_Angle_Read.empty()) { return XHOST_AFLOW_Binary_Angle_Read=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_Binary_Angle_Read;}} // 
+    if(str=="Library_CALCULATED_ICSD_LIB" || str=="Library_CALCULATED_ICSD_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB0_LIB" || str=="Library_CALCULATED_LIB0_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB1_LIB" || str=="Library_CALCULATED_LIB1_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB2_LIB" || str=="Library_CALCULATED_LIB2_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB3_LIB" || str=="Library_CALCULATED_LIB3_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB4_LIB" || str=="Library_CALCULATED_LIB4_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB5_LIB" || str=="Library_CALCULATED_LIB5_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB6_LIB" || str=="Library_CALCULATED_LIB6_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB7_LIB" || str=="Library_CALCULATED_LIB7_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB8_LIB" || str=="Library_CALCULATED_LIB8_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    if(str=="Library_CALCULATED_LIB9_LIB" || str=="Library_CALCULATED_LIB9_RAW") { init::InitLoadString("vLIBS",LVERBOSE); }
+    // AUID AURL LOOP LIBS
+    if(str=="vLIBS" || str=="XHOST_vLIBS") { init::InitLoadString("vLIBS",LVERBOSE);} // just make them all
     // AFLOWLIB THINGS
     // LOAD
     // if(str=="aflowlib_lib0") { if(XHOST_aflowlib_lib0.empty()) { return XHOST_aflowlib_lib0=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib0;}} // 
-    // if(str=="aflowlib_lib1") { if(XHOST_aflowlib_lib1.empty()) { return XHOST_aflowlib_lib1=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib1;}} //        // if(str=="aflowlib_lib2") { if(XHOST_aflowlib_lib2.empty()) { return XHOST_aflowlib_lib2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib2;}} //
+    // if(str=="aflowlib_lib1") { if(XHOST_aflowlib_lib1.empty()) { return XHOST_aflowlib_lib1=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib1;}} //
+    // if(str=="aflowlib_lib2") { if(XHOST_aflowlib_lib2.empty()) { return XHOST_aflowlib_lib2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib2;}} //
     // if(str=="aflowlib_lib3") { if(XHOST_aflowlib_lib3.empty()) { return XHOST_aflowlib_lib3=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib3;}} // 
     // if(str=="aflowlib_lib4") { if(XHOST_aflowlib_lib4.empty()) { return XHOST_aflowlib_lib4=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib4;}} // 
     // if(str=="aflowlib_lib5") { if(XHOST_aflowlib_lib5.empty()) { return XHOST_aflowlib_lib5=init::InitLoadString(str,LVERBOSE);} else { return XHOST_aflowlib_lib5;}} // 
@@ -1126,7 +1227,7 @@ namespace init {
     if(str=="README_AFLOW_SYM_TXT") { if(XHOST_README_AFLOW_SYM_TXT.empty()) { return XHOST_README_AFLOW_SYM_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_SYM_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_CCE_TXT") { if(XHOST_README_AFLOW_CCE_TXT.empty()) { return XHOST_README_AFLOW_CCE_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CCE_TXT;}} // LOADED TXTS  //CO20190620
     if(str=="README_AFLOW_CHULL_TXT") { if(XHOST_README_AFLOW_CHULL_TXT.empty()) { return XHOST_README_AFLOW_CHULL_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CHULL_TXT;}} // LOADED TXTS  //CO20190620
-    if(str=="README_AFLOW_EXCEPTIONS_TXT") {if(XHOST_README_AFLOW_EXCEPTIONS_TXT.empty()){ return XHOST_README_AFLOW_EXCEPTIONS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_EXCEPTIONS_TXT;}}  // ME20180531
+    if(str=="README_AFLOW_EXCEPTIONS_TXT") {if(XHOST_README_AFLOW_EXCEPTIONS_TXT.empty()){ return XHOST_README_AFLOW_EXCEPTIONS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_EXCEPTIONS_TXT;}}  //ME20180531
     if(str=="README_PROTO_TXT") { if(XHOST_README_PROTO_TXT.empty()) { return XHOST_README_PROTO_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_PROTO_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_XAFLOW_TXT") { if(XHOST_README_AFLOW_XAFLOW_TXT.empty()) { return XHOST_README_AFLOW_XAFLOW_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_XAFLOW_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_AFLOWRC_TXT") { if(XHOST_README_AFLOW_AFLOWRC_TXT.empty()) { return XHOST_README_AFLOW_AFLOWRC_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_AFLOWRC_TXT;}} // LOADED TXTS
@@ -1307,7 +1408,7 @@ namespace init {
           aurostd::StringSubst(vline_temp1.at(i),"temp1"," ");
           aurostd::StringSubst(vline_temp1.at(i),":"," ");aurostd::StringSubst(vline_temp1.at(i),"="," ");
           aurostd::StringSubst(vline_temp1.at(i),"("," ");aurostd::StringSubst(vline_temp1.at(i),")"," ");
-          //aurostd::StringSubst(vline_temp1.at(i),""," ");aurostd::StringSubst(vline_temp1.at(i),"C"," "); // CO, PREVIOUSLY DEGREE SYMBOL, removed to get rid of warnings on mac
+          //aurostd::StringSubst(vline_temp1.at(i),""," ");aurostd::StringSubst(vline_temp1.at(i),"C"," "); //CO, PREVIOUSLY DEGREE SYMBOL, removed to get rid of warnings on mac
           aurostd::StringSubst(vline_temp1.at(i),"\u00B0"," ");aurostd::StringSubst(vline_temp1.at(i),"C"," "); //\u00B0:  http://www.fileformat.info/info/unicode/char/b0/index.htm
           aurostd::StringSubst(vline_temp1.at(i),"+"," ");aurostd::StringSubst(vline_temp1.at(i),"-"," ");
           for(unsigned char j=1;j<255;j++)
@@ -1559,12 +1660,12 @@ string Message(string list2print) {
   if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME")) oss << " - [date=" << aflow_get_time_string() << "]";
   if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";
   //  if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0)
-  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; // CO20170628 - slow otherwise!!!
+  if(aurostd::substring2bool(list2print,"memory") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
   if(XHOST.vTemperatureCore.size()>0) if(max(XHOST.vTemperatureCore)>AFLOW_CORE_TEMPERATURE_BEEP) oss << " - [ERROR_TEMPERATURE=" << max(XHOST.vTemperatureCore) << ">" << AFLOW_CORE_TEMPERATURE_BEEP << "@ host=" << XHOST.hostname<< "]";
   // oss << endl;
   pthread_mutex_unlock(&mutex_INIT_Message);
   // do some killing
-  //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  // CO20170628 - this is already run above, very slow
+  //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  //CO20170628 - this is already run above, very slow
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("aflow",XHOST.maxmem);
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("clamd",XHOST.maxmem);
   return oss.str();
@@ -2599,7 +2700,7 @@ namespace init {
     nschema++;
 
     // read them as
-    LDEBUG=0; // david/corey put LDEBUG=1 so you seen how they answer
+    LDEBUG=0; //DX+CO put LDEBUG=1 so you seen how they answer
     if(LDEBUG) cerr << "XHOST.vschema.isdefined(\"SCHEMA::NAME:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
     if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::NAME:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.getattachedscheme("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS") << endl;  // content
     if(LDEBUG) cerr << "XHOST.vschema.isdefined(\"SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
@@ -2615,7 +2716,7 @@ namespace init {
 
     return nschema;
 
-    // since david gave me stuff in small letters, I used this to fix the text.. you can use it too if you have a bunch of them
+    // since DX gave me stuff in small letters, I used this to fix the text.. you can use it too if you have a bunch of them
 
     //SchemaFixName("ael_bulk_modulus_reuss","GPa","number");
     //SchemaFixName("ael_bulk_modulus_voigt","GPa","number");
@@ -2783,6 +2884,6 @@ namespace init {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

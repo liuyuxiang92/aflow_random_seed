@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 
@@ -56,7 +56,7 @@ namespace apl {
       _qpoints = that._qpoints;
       _recCell = that._recCell;
       _reduced = that._reduced;
-      _shifted = that._shifted;  // ME20190813
+      _shifted = that._shifted;  //ME20190813
       _shift = that._shift;
       _weights = that._weights;
     }
@@ -89,7 +89,7 @@ namespace apl {
     _recCell.f2c = zeroMatrix;
     _recCell.skewed = false;
     _recCell.pgroup.clear();
-    _shifted = false;  // ME20190701
+    _shifted = false;  //ME20190701
     _shift = zerodbl;
     _weights.clear();
   }
@@ -129,7 +129,7 @@ namespace apl {
     // Calculate the point group of the reciprocal cell. This requires some dummy
     // ofstream objects to parse into the function. These objects will be removed
     // when CalculatePointGroupKlattice is redesigned to work without ofstreams.
-    if (!xs.pgroupk_calculated) {  // ME20190625 - need pgroupk, not pgroupk_xtal since we look at the entire BZ
+    if (!xs.pgroupk_calculated) {  //ME20190625 - need pgroupk, not pgroupk_xtal since we look at the entire BZ
       ofstream FileDevNull("/dev/null");
       if (!FileDevNull.is_open()) {
         string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
@@ -140,17 +140,17 @@ namespace apl {
       _aflags aflags;
       aflags.QUIET = true;
       xs.LatticeReduction_avoid = true;
-      SYM::CalculatePointGroupKlattice(FileDevNull, xs, aflags, false,  // ME20190625
+      SYM::CalculatePointGroupKlattice(FileDevNull, xs, aflags, false,  //ME20190625
           false, _logger.getOutputStream());
       FileDevNull.clear();
       FileDevNull.close();
-      if (!xs.pgroupk_calculated) {  // ME20190625
+      if (!xs.pgroupk_calculated) {  //ME20190625
         string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
         string message = "Calculation of the point group of the reciprocal cell unsuccessful.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
-    _recCell.pgroup = xs.pgroupk;  // ME20190625
+    _recCell.pgroup = xs.pgroupk;  //ME20190625
   }
 
   //generateGridPoints//////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ namespace apl {
       gamma = true;
     }
     _isGammaCentered = gamma;
-    _shifted = !aurostd::iszero(shift);  // ME20190813
+    _shifted = !aurostd::iszero(shift);  //ME20190813
 
     // Obtain Cartesian coordinates
     if (!_shifted) {
@@ -226,16 +226,16 @@ namespace apl {
 
   //moveToBZ////////////////////////////////////////////////////////////////////
   // Moves a q-point into the first Brillouin zone.
-  // ME20190702 - made more robust
+  //ME20190702 - made more robust
   void QMesh::moveToBZ(xvector<double>& qpt) const {
     BringInCellInPlace(qpt, _ZERO_TOL_, 0.5, -0.5); //DX20190905 - removed SYM namespace
   }
 
   //makeIrreducible/////////////////////////////////////////////////////////////
   // Makes the q-point mesh irreducible
-  // ME20190813 - Changed algorithm to be much faster
+  //ME20190813 - Changed algorithm to be much faster
   void QMesh::makeIrreducible() {
-    if (_reduced) return;  // ME20190701 - don't reduce if it's already reduced
+    if (_reduced) return;  //ME20190701 - don't reduce if it's already reduced
 
     _ibzqpts.clear();
     _weights.clear();
@@ -341,7 +341,7 @@ namespace apl {
     return _qpoints[getQPointIndex(fpos)];
   }
 
-  // ME20190813
+  //ME20190813
   // Returns the index of the qpoint based on the fractional
   // position. It assumes that the point is already on the grid.
   int QMesh::getQPointIndex(xvector<double> fpos) const {
@@ -395,7 +395,7 @@ namespace apl {
     return _recCell;
   }
 
-  // ME20190813
+  //ME20190813
   bool QMesh::isShifted() const {
     return _shifted;
   }
@@ -504,7 +504,7 @@ namespace apl {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

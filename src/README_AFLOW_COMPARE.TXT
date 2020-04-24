@@ -1,6 +1,6 @@
 ********************************************************************************
 *                                                                              *
-*             Aflow STEFANO CURTAROLO - Duke University 2003-2019              *
+*             Aflow STEFANO CURTAROLO - Duke University 2003-2020              *
 *                High-Throughput ab-initio Materials Discovery                 *
 *                                                                              *
 ********************************************************************************
@@ -287,7 +287,7 @@ For additional information contact: David Hicks (david.hicks@duke.edu)
 
 ********************************************************************************
 *                                                                              *
-*             Aflow STEFANO CURTAROLO - Duke University 2003-2019              *
+*             Aflow STEFANO CURTAROLO - Duke University 2003-2020              *
 *                High-Throughput ab-initio Materials Discovery                 *
 *                                                                              *
 ********************************************************************************
