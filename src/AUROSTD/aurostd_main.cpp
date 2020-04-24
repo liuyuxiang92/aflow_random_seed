@@ -3759,7 +3759,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function eurl2string
   // ***************************************************************************
-  // CO200223
+  //CO20200223
   bool eurl2string(const string& url,string& stringIN,bool verbose) {
     stringIN="";
     string ext=GetCompressionExtension(url);
@@ -3833,7 +3833,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function eurl2stringstream
   // ***************************************************************************
-  // CO200223
+  //CO20200223
   bool eurl2stringstream(const string& url,stringstream& stringstreamIN,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::eurl2stringstream():";
@@ -3863,7 +3863,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function eurl2vectorstring
   // ***************************************************************************
-  // CO200223
+  //CO20200223
   bool eurl2vectorstring(const string& url,vector<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::eurl2vectorstring():";
@@ -3892,7 +3892,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function eurl2dequestring
   // ***************************************************************************
-  // CO200223
+  //CO20200223
   bool eurl2dequestring(const string& url,deque<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::eurl2dequestring():";
@@ -3922,7 +3922,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function eurl2tokens
   // ***************************************************************************
-  // CO200223
+  //CO20200223
   template<typename utype> uint eurl2tokens(const string& url,vector<utype>& tokens,const string& delimiters) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::url2tokens<utype>(vector):";
@@ -3980,7 +3980,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function eurl2tokens
   // ***************************************************************************
-  // CO200223
+  //CO20200223
   template<typename utype> uint eurl2tokens(const string& url,deque<utype>& tokens,const string& delimiters) {
     vector<utype> vtokens;
     aurostd::eurl2tokens(url,vtokens,delimiters);
@@ -4002,7 +4002,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function eurl2string
   // ***************************************************************************
-  // CO200223
+  //CO20200223
   string eurl2string(const string& url) {
     string stringIN="";    //CO20200404
     eurl2string(url,stringIN);
@@ -4716,7 +4716,7 @@ namespace aurostd {
     return WithinList(list, input, index);
   }
 
-  // ME20190813 - added versions that also determine the index of the item in the list
+  //ME20190813 - added versions that also determine the index of the item in the list
   bool WithinList(const vector<string>& list, const string& input, int& index) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input) {
@@ -4750,11 +4750,11 @@ namespace aurostd {
     return false;
   }
 
-  bool EWithinList(const vector<string>& list,const string& input) { //CO200223
+  bool EWithinList(const vector<string>& list,const string& input) { //CO20200223
     string output="";
     return EWithinList(list, input, output);
   }
-  bool EWithinList(const vector<string>& list, const string& input, string& output) { //CO200223
+  bool EWithinList(const vector<string>& list, const string& input, string& output) { //CO20200223
     output="";
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input){output=input;return true;}

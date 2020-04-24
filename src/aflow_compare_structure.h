@@ -158,7 +158,7 @@ class StructurePrototype{
 namespace compare{
 
   // ===== Main functions ===== //
-  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX20190425
+  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
   vector<StructurePrototype> compareStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
   vector<StructurePrototype> compareStructuresFromDirectory(string& directory, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
   vector<StructurePrototype> compareStructuresFromFile(string& filename, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX20200103 - condensed bools to xoptions
@@ -181,7 +181,7 @@ namespace compare{
   vector<matching_structure> matchingStructuresInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20200225
   vector<matching_structure> matchingStructuresInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20200225
   string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20200225
-  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout);  //CO200225
+  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout);  //CO20200225
   string printCompare2Database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20200225
   
   // ---------------------------------------------------------------------------
@@ -201,7 +201,7 @@ namespace compare{
 
   // ---------------------------------------------------------------------------
   // permutaion comparisons
-  string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX20181004
+  string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DX //DX20181004
   vector<string> getUniquePermutations(xstructure& xstr);
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc); // add number of threads
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc, bool& optimize_match); // add number of threads and optimize matches

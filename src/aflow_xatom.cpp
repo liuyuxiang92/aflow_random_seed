@@ -3097,7 +3097,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   //  ELK OUTPUT //DX20200315
   if(a_iomode==IOELK_AUTO || a_iomode==IOELK_GEOM) { // ELK
     oss << "# AFLOW::ELK BEGIN " << endl;
-    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 stefano 10 dane //CO20180515
+    uint _precision_=_AFLOW_XSTR_PRINT_PRECISION_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss << "# " << a.title <<endl;
@@ -3536,8 +3536,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
   if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
   if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
-  if(LDEBUG) if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  // DX20200310
-  if(LDEBUG) if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  // DX20200310
+  if(LDEBUG) if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
+  if(LDEBUG) if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
   if(LDEBUG) if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX20180723
 
   if(LDEBUG) cerr << soliloquy << " definitions" << endl;
@@ -5146,7 +5146,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       atoms_temp[i].corigin(1)=0.0;atoms_temp[i].corigin(2)=0.0;atoms_temp[i].corigin(3)=0.0; // inside the zero cell
       atoms_temp[i].coord(1)=0.0;atoms_temp[i].coord(2)=0.0;atoms_temp[i].coord(3)=0.0; // inside the zero cell
       atoms_temp[i].spin=0.0;
-      atoms_temp[i].noncoll_spin.clear(); // DX20171205 - non-collinear spin
+      atoms_temp[i].noncoll_spin.clear(); //DX20171205 - non-collinear spin
       // FIXED BELOW atom.type=itype;                // CONVASP_MODE if I want type 0,1,2,3,...
       atoms_temp[i].order_parameter_value=0;
       atoms_temp[i].order_parameter_atom=FALSE;

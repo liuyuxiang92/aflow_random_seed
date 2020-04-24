@@ -180,8 +180,8 @@ namespace SYM {
     vector<string> vs = splitstring(tstring.str());
 
     for (uint i = 0; i < vs.size(); i++)
-      // DX20200313 [OBSOLETE] out(i + 1) = frac2dbl(vs[i]);
-      out(i + 1) = aurostd::frac2dbl(vs[i]); // DX20200313
+      //DX20200313 [OBSOLETE] out(i + 1) = frac2dbl(vs[i]);
+      out(i + 1) = aurostd::frac2dbl(vs[i]); //DX20200313
 
     return out;
   }

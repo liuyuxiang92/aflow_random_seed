@@ -435,9 +435,9 @@ namespace plotter {
   // Converts a POCC-formatted title into a plot title. It currently only works
   // if the POCC string consists only of P-designations.
   string formatDefaultTitlePOCC(const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return formatDefaultTitlePOCC(plotoptions,FileMESSAGE,oss);} //CO20191110  //CO20200404
-  string formatDefaultTitlePOCC(const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {return formatDefaultTitlePOCC_191004(plotoptions,FileMESSAGE,oss);} //CO20191110  //CO20200404
-  string formatDefaultTitlePOCC_191004(const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return formatDefaultTitlePOCC_191004(plotoptions,FileMESSAGE,oss);}  //CO version //CO20191110  //CO20200404
-  string formatDefaultTitlePOCC_191004(const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO version //CO20191110  //CO20200404
+  string formatDefaultTitlePOCC(const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {return formatDefaultTitlePOCC_20191004(plotoptions,FileMESSAGE,oss);} //CO20191110  //CO20200404
+  string formatDefaultTitlePOCC_20191004(const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return formatDefaultTitlePOCC_20191004(plotoptions,FileMESSAGE,oss);}  //CO version //CO20191110  //CO20200404
+  string formatDefaultTitlePOCC_20191004(const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO version //CO20191110  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
     string soliloquy="plotter::formatDefaultTitlePOCC():";
     stringstream message;
@@ -1468,7 +1468,7 @@ namespace plotter {
     if (dos.size() == xdos.spin + 1) { // no need for key when only total DOS is plotted, NO-SPIN: xdos.spin==0, SPIN: xdos.spin==1  //CO20200404
       out << " unset key" << std::endl;
     } else {
-      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - MARCO LOOK HERE
+      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - ME LOOK HERE
         int maxcols=3;
         string maxcols_str=plotoptions.getattachedscheme("LEGEND_MAXCOLS");
         if(!maxcols_str.empty()){maxcols=aurostd::string2utype<int>(maxcols_str);}
@@ -2011,8 +2011,8 @@ namespace plotter {
       plotoptions.push_attached("KEYWORD", "AAPL_THERMAL_CONDUCTIVITY");
       plotoptions.flag("CONTRAVARIANT", true);
       plotoptions.push_attached("YMIN", "0");
-      plotoptions.flag("LEGEND_HORIZONTAL"); //CO20200404 - MARCO LOOK HERE, NO LONGER DEFAULT
-      plotoptions.push_attached("LEGEND_MAXCOLS","3");  //CO20200404 - MARCO LOOK HERE, NO LONGER DEFAULT
+      plotoptions.flag("LEGEND_HORIZONTAL"); //CO20200404 - ME LOOK HERE, NO LONGER DEFAULT
+      plotoptions.push_attached("LEGEND_MAXCOLS","3");  //CO20200404 - ME LOOK HERE, NO LONGER DEFAULT
       setPlotLabels(plotoptions, "T", "K", "\\kappa", "W/m K");
       plotMatrix(plotoptions, out,FileMESSAGE,oss);  //CO20200404
     } else {
@@ -2244,7 +2244,7 @@ namespace plotter {
     if (ndata == 1) {  // No need for legend if only one set of data to plot
       out << " unset key" << std::endl;
     } else {
-      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - MARCO LOOK HERE
+      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - ME LOOK HERE
         int maxcols=3;
         string maxcols_str=plotoptions.getattachedscheme("LEGEND_MAXCOLS");
         if(!maxcols_str.empty()){maxcols=aurostd::string2utype<int>(maxcols_str);}

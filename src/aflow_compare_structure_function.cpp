@@ -8250,7 +8250,7 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // volume of unit cell tolerance
-    // DX20200225 - tol_vol used to be 0.1;
+    //DX20200225 - tol_vol used to be 0.1;
     // this was increased to consider a larger volume range when searching for
     // potential lattice matches; it is necessary for supressing volume scaling
     // (i.e., --no_scale_volume) since it can find matches in the same family

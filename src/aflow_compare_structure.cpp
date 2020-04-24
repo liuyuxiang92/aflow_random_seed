@@ -1342,7 +1342,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // FLAG: specify the relaxation step to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
-    // DX TODO 
+    //DX TODO 
     uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
     bool load_most_relaxed_structure_only = true; 
     if(vpflow.flag("COMPARE2DATABASE::RELAXATION_STEP")) {
@@ -1763,7 +1763,7 @@ namespace compare {
 namespace compare {
   // load input structure
   string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO); ofstream FileMESSAGE; return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //DX20200225
-  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO);return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //CO200225
+  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO);return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //CO20200225
   string printCompare2Database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
     
     bool LDEBUG=(FALSE || XHOST.DEBUG);

@@ -101,13 +101,13 @@ namespace pflow {
   void COMPARE(string options);
   //DX20200225 [OBSOLETE - moved to XtalMatch header] string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20191125
   //DX20200225 [OBSOLETE - moved to XtalMatch header] string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20191125
-  //DX20200225 [OBSOLETE - moved to XtalMatch header] string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX20181004
-  //DX20190425 [OBSOLETE - moved to XtalMatch header] string compareStructureDirectory(aurostd::xoption& vpflow); //DAVID
-  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX20190425
-  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX20181004
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DX //DX20181004
+  //DX20190425 [OBSOLETE - moved to XtalMatch header] string compareStructureDirectory(aurostd::xoption& vpflow); //DX
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20181004
   //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20200225
-  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX20181004 //CO200225
-  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DAVID //DX20200225
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20181004 //CO20200225
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX //DX20200225
   //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
   //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
   //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20190314 - overloaded 
@@ -138,10 +138,10 @@ namespace pflow {
   string FROZSL_INPUT(void);
   string FROZSL_OUTPUT(void);
   string GEOMETRY(istream& input); //CO20191110
-  bool GetCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<double>& vmag); // DX20170927 - Magnetic symmetry //DX20191107 - int to uint
-  bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX20171205 - Magnetic symmetry non-collinear //DX20191107 - int to uint
+  bool GetCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<double>& vmag); //DX20170927 - Magnetic symmetry //DX20191107 - int to uint
+  bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll); //DX20171205 - Magnetic symmetry non-collinear //DX20191107 - int to uint
   //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX20190314 
-  void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF190329
+  void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF20190329
   void GULP(istream& input);
   void HKL(string options,_aflags &aflags,istream& input);
   void HKLSearch(string options,_aflags &aflags,istream& input,const string& smode);

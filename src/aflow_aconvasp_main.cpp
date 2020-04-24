@@ -1536,13 +1536,13 @@ namespace pflow {
           //if(aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),vinput,",")==2){cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
           //else {cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
           cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;
-        } //CO200106 - patching for auto-indenting
+        } //CO20200106 - patching for auto-indenting
         if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
         if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
       }
       //DX20190425 END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
-      if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF190329 - GFA
+      if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA
       //DX+CO START
       if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
       //DX+CO END
@@ -9787,7 +9787,7 @@ namespace pflow {
     if(is_url_path){aurostd::url2tokens(path + "/?files", files, ",");}
     else {aurostd::DirectoryLS(path,files);}
 
-    //CO200223 - substring2bool - > EWithinList()
+    //CO20200223 - substring2bool - > EWithinList()
     string efile="";
     if((!aurostd::EWithinList(files,"POSCAR.relax1",efile) &&
           !aurostd::EWithinList(files,"POSCAR.orig",efile) && !relaxed_only) ||

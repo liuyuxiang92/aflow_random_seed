@@ -3507,13 +3507,13 @@ namespace plotter {
   void setTitle(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   string formatDefaultPlotTitle(const aurostd::xoption&,ostream& oss=cout); //CO20200404
   string formatDefaultPlotTitle(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
-  vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  // ME20190813
+  vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  //ME20190813
   vector<double> getCompositionFromANRLPrototype(const string&);
   string formatDefaultTitlePOCC(const aurostd::xoption&,ostream& oss=cout); //CO20200404
   string formatDefaultTitlePOCC(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
-  string formatDefaultTitlePOCC_191004(const aurostd::xoption&,ostream& oss=cout); //CO20191110 //CO20200404
-  string formatDefaultTitlePOCC_191004(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110 //CO20200404
-  string formatDefaultTitlePOCC_190101(const aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  string formatDefaultTitlePOCC_20191004(const aurostd::xoption&,ostream& oss=cout); //CO20191110 //CO20200404
+  string formatDefaultTitlePOCC_20191004(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110 //CO20200404
+  string formatDefaultTitlePOCC_20190101(const aurostd::xoption&,ostream& oss=cout);  //CO20200404
   vector<double> getCompositionFromPoccString(const string&, bool&);
 
   // Electronic structure ----------------------------------------------------

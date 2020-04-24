@@ -6314,7 +6314,7 @@ namespace chull {
       //[OBSOLETE - this is a DISTANCE so it is always positive]i  //independent of lower/upper hull:  above hull is negative, below hull is positive
       //[OBSOLETE - this is a DISTANCE so it is always positive]i  if(m_lower_hull){
       //[OBSOLETE - this is a DISTANCE so it is always positive]    if(notPositive(scriterion,true)) //std::signbit(scriterion))
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    { //CO200106 - patching for auto-indenting
+      //[OBSOLETE - this is a DISTANCE so it is always positive]    { //CO20200106 - patching for auto-indenting
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << "(lower half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << " (i_point=" << i_point;
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
@@ -6323,7 +6323,7 @@ namespace chull {
       //[OBSOLETE - this is a DISTANCE so it is always positive]    }
       //[OBSOLETE - this is a DISTANCE so it is always positive]  } else {
       //[OBSOLETE - this is a DISTANCE so it is always positive]    if(notNegative(scriterion,true)) //!std::signbit(scriterion))
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    { //CO200106 - patching for auto-indenting
+      //[OBSOLETE - this is a DISTANCE so it is always positive]    { //CO20200106 - patching for auto-indenting
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << " (i_point=" << i_point;
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);

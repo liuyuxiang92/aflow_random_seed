@@ -565,19 +565,19 @@ namespace aurostd {
   string efile2string(string FileNameIN);
   // reading url to string/stringstream/tokens/vector/deque
   bool url2file(string url,string& fileIN,bool=FALSE)  __xprototype;   // bool = verbose
-  bool eurl2string(const string& url,string& stringIN,bool verbose=FALSE);  //CO200223
+  bool eurl2string(const string& url,string& stringIN,bool verbose=FALSE);  //CO20200223
   bool url2string(const string& url,string& stringIN,bool=FALSE)  __xprototype;   // bool = verbose
-  bool eurl2stringstream(const string& url,stringstream& stringstreamIN,bool=FALSE)  __xprototype;  // bool = verbose  //CO200223
+  bool eurl2stringstream(const string& url,stringstream& stringstreamIN,bool=FALSE)  __xprototype;  // bool = verbose  //CO20200223
   bool url2stringstream(const string& url,stringstream& stringstreamIN,bool=FALSE)  __xprototype;  // bool = verbose
-  bool eurl2vectorstring(const string& url,vector<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose  //CO200223
+  bool eurl2vectorstring(const string& url,vector<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose  //CO20200223
   bool url2vectorstring(const string& url,vector<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose
-  bool eurl2dequestring(const string& url,deque<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose  //CO200223
+  bool eurl2dequestring(const string& url,deque<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose  //CO20200223
   bool url2dequestring(const string& url,deque<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose
-  template<typename utype> uint eurl2tokens(const string& url,vector<utype>& tokens,const string& delimiters = " ")  __xprototype; //CO200223
+  template<typename utype> uint eurl2tokens(const string& url,vector<utype>& tokens,const string& delimiters = " ")  __xprototype; //CO20200223
   template<typename utype> uint url2tokens(const string& url,vector<utype>& tokens,const string& delimiters = " ")  __xprototype;
-  template<typename utype> uint eurl2tokens(const string& url,deque<utype>& tokens,const string& delimiters = " ")  __xprototype;  //CO200223
+  template<typename utype> uint eurl2tokens(const string& url,deque<utype>& tokens,const string& delimiters = " ")  __xprototype;  //CO20200223
   template<typename utype> uint url2tokens(const string& url,deque<utype>& tokens,const string& delimiters = " ")  __xprototype;
-  string eurl2string(const string& url)  __xprototype; //CO200223
+  string eurl2string(const string& url)  __xprototype; //CO20200223
   string url2string(const string& url)  __xprototype;
   // about istream/ostream
   string ostream2string(std::ostream& oss);
@@ -699,11 +699,11 @@ namespace aurostd {
   bool WithinList(const vector<string>& list,const string& input);  //CO20181010
   bool WithinList(const vector<int>& list,int input); //CO20181010
   bool WithinList(const vector<uint>& list,uint input); //CO20181010
-  bool WithinList(const vector<string>&, const string&, int&);  // ME20190905
-  bool WithinList(const vector<int>&, int, int&);  // ME20190905
-  bool WithinList(const vector<uint>&, uint, int&);  // ME20190905
-  bool EWithinList(const vector<string>& list,const string& input); //CO200223
-  bool EWithinList(const vector<string>& list, const string& input, string& output); //CO200223
+  bool WithinList(const vector<string>&, const string&, int&);  //ME20190905
+  bool WithinList(const vector<int>&, int, int&);  //ME20190905
+  bool WithinList(const vector<uint>&, uint, int&);  //ME20190905
+  bool EWithinList(const vector<string>& list,const string& input); //CO20200223
+  bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   bool substring_present_file(const string& FileName, const string& strsub1) ;
   bool substring_present_file_FAST(const string& FileName, const string& strsub1) ;
   // about present substrings and taking off the value

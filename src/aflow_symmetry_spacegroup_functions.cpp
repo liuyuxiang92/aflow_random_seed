@@ -3538,55 +3538,55 @@ namespace SYM {
 
 //DX20190724 [MOVED TO AUROSTD] - dbl2frac() Double to Fraction (Overloaded)
 
-// DX20200313 [reformatted and moved to AUROSTD]// ******************************************************************************
-// DX20200313 [reformatted and moved to AUROSTD]// dbl2frac Double to Fraction (Overloaded)
-// DX20200313 [reformatted and moved to AUROSTD]// ******************************************************************************
-// DX20200313 [reformatted and moved to AUROSTD]//NEED TO REWRITE/check FRAC2DBL
-// DX20200313 [reformatted and moved to AUROSTD]namespace SYM {
-// DX20200313 [reformatted and moved to AUROSTD]  double frac2dbl(string str) {  //string in the form "a/b" with minus if negative
-// DX20200313 [reformatted and moved to AUROSTD]    //  if(str[0]==' '){
-// DX20200313 [reformatted and moved to AUROSTD]    //str.erase(str.begin(),str.begin()+1);
-// DX20200313 [reformatted and moved to AUROSTD]    //}
-// DX20200313 [reformatted and moved to AUROSTD]
-// DX20200313 [reformatted and moved to AUROSTD]    double out = 0;
-// DX20200313 [reformatted and moved to AUROSTD]    bool neg = false;
-// DX20200313 [reformatted and moved to AUROSTD]    stringstream ss_num, ss_den;
-// DX20200313 [reformatted and moved to AUROSTD]    cleanupstring(str);
-// DX20200313 [reformatted and moved to AUROSTD]    if(str[0] == '-') {
-// DX20200313 [reformatted and moved to AUROSTD]      neg = true;
-// DX20200313 [reformatted and moved to AUROSTD]      str.erase(str.begin(), str.begin() + 1);
-// DX20200313 [reformatted and moved to AUROSTD]    }
-// DX20200313 [reformatted and moved to AUROSTD]    if(str[0] == '+') {
-// DX20200313 [reformatted and moved to AUROSTD]      str.erase(str.begin(), str.begin() + 1);
-// DX20200313 [reformatted and moved to AUROSTD]    }
-// DX20200313 [reformatted and moved to AUROSTD]    if(havechar(str, '/')) {
-// DX20200313 [reformatted and moved to AUROSTD]      double numerator = 0;
-// DX20200313 [reformatted and moved to AUROSTD]      double denominator = 0;
-// DX20200313 [reformatted and moved to AUROSTD]      uint slash = whereischar(str, '/');
-// DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < slash; i++)
-// DX20200313 [reformatted and moved to AUROSTD]        ss_num << str[i];
-// DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < (str.size() - slash); i++)
-// DX20200313 [reformatted and moved to AUROSTD]        ss_den << str[i + slash + 1];
-// DX20200313 [reformatted and moved to AUROSTD]      string num_string = ss_num.str();
-// DX20200313 [reformatted and moved to AUROSTD]      const char* num = num_string.c_str();
-// DX20200313 [reformatted and moved to AUROSTD]      numerator = atof(num);
-// DX20200313 [reformatted and moved to AUROSTD]      string den_string = ss_den.str();
-// DX20200313 [reformatted and moved to AUROSTD]      const char* den = den_string.c_str();
-// DX20200313 [reformatted and moved to AUROSTD]      denominator = atof(den);
-// DX20200313 [reformatted and moved to AUROSTD]      if(neg == true) {
-// DX20200313 [reformatted and moved to AUROSTD]        out = -numerator / denominator;
-// DX20200313 [reformatted and moved to AUROSTD]      } else {
-// DX20200313 [reformatted and moved to AUROSTD]        out = numerator / denominator;
-// DX20200313 [reformatted and moved to AUROSTD]      }
-// DX20200313 [reformatted and moved to AUROSTD]    } else {
-// DX20200313 [reformatted and moved to AUROSTD]      char dbl[256];
-// DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < str.size(); i++)
-// DX20200313 [reformatted and moved to AUROSTD]        dbl[i] = str[i];
-// DX20200313 [reformatted and moved to AUROSTD]      out = atof(dbl);
-// DX20200313 [reformatted and moved to AUROSTD]    }
-// DX20200313 [reformatted and moved to AUROSTD]    return out;
-// DX20200313 [reformatted and moved to AUROSTD]  }
-// DX20200313 [reformatted and moved to AUROSTD]}
+//DX20200313 [reformatted and moved to AUROSTD]// ******************************************************************************
+//DX20200313 [reformatted and moved to AUROSTD]// dbl2frac Double to Fraction (Overloaded)
+//DX20200313 [reformatted and moved to AUROSTD]// ******************************************************************************
+//DX20200313 [reformatted and moved to AUROSTD]//NEED TO REWRITE/check FRAC2DBL
+//DX20200313 [reformatted and moved to AUROSTD]namespace SYM {
+//DX20200313 [reformatted and moved to AUROSTD]  double frac2dbl(string str) {  //string in the form "a/b" with minus if negative
+//DX20200313 [reformatted and moved to AUROSTD]    //  if(str[0]==' '){
+//DX20200313 [reformatted and moved to AUROSTD]    //str.erase(str.begin(),str.begin()+1);
+//DX20200313 [reformatted and moved to AUROSTD]    //}
+//DX20200313 [reformatted and moved to AUROSTD]
+//DX20200313 [reformatted and moved to AUROSTD]    double out = 0;
+//DX20200313 [reformatted and moved to AUROSTD]    bool neg = false;
+//DX20200313 [reformatted and moved to AUROSTD]    stringstream ss_num, ss_den;
+//DX20200313 [reformatted and moved to AUROSTD]    cleanupstring(str);
+//DX20200313 [reformatted and moved to AUROSTD]    if(str[0] == '-') {
+//DX20200313 [reformatted and moved to AUROSTD]      neg = true;
+//DX20200313 [reformatted and moved to AUROSTD]      str.erase(str.begin(), str.begin() + 1);
+//DX20200313 [reformatted and moved to AUROSTD]    }
+//DX20200313 [reformatted and moved to AUROSTD]    if(str[0] == '+') {
+//DX20200313 [reformatted and moved to AUROSTD]      str.erase(str.begin(), str.begin() + 1);
+//DX20200313 [reformatted and moved to AUROSTD]    }
+//DX20200313 [reformatted and moved to AUROSTD]    if(havechar(str, '/')) {
+//DX20200313 [reformatted and moved to AUROSTD]      double numerator = 0;
+//DX20200313 [reformatted and moved to AUROSTD]      double denominator = 0;
+//DX20200313 [reformatted and moved to AUROSTD]      uint slash = whereischar(str, '/');
+//DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < slash; i++)
+//DX20200313 [reformatted and moved to AUROSTD]        ss_num << str[i];
+//DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < (str.size() - slash); i++)
+//DX20200313 [reformatted and moved to AUROSTD]        ss_den << str[i + slash + 1];
+//DX20200313 [reformatted and moved to AUROSTD]      string num_string = ss_num.str();
+//DX20200313 [reformatted and moved to AUROSTD]      const char* num = num_string.c_str();
+//DX20200313 [reformatted and moved to AUROSTD]      numerator = atof(num);
+//DX20200313 [reformatted and moved to AUROSTD]      string den_string = ss_den.str();
+//DX20200313 [reformatted and moved to AUROSTD]      const char* den = den_string.c_str();
+//DX20200313 [reformatted and moved to AUROSTD]      denominator = atof(den);
+//DX20200313 [reformatted and moved to AUROSTD]      if(neg == true) {
+//DX20200313 [reformatted and moved to AUROSTD]        out = -numerator / denominator;
+//DX20200313 [reformatted and moved to AUROSTD]      } else {
+//DX20200313 [reformatted and moved to AUROSTD]        out = numerator / denominator;
+//DX20200313 [reformatted and moved to AUROSTD]      }
+//DX20200313 [reformatted and moved to AUROSTD]    } else {
+//DX20200313 [reformatted and moved to AUROSTD]      char dbl[256];
+//DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < str.size(); i++)
+//DX20200313 [reformatted and moved to AUROSTD]        dbl[i] = str[i];
+//DX20200313 [reformatted and moved to AUROSTD]      out = atof(dbl);
+//DX20200313 [reformatted and moved to AUROSTD]    }
+//DX20200313 [reformatted and moved to AUROSTD]    return out;
+//DX20200313 [reformatted and moved to AUROSTD]  }
+//DX20200313 [reformatted and moved to AUROSTD]}
 
 // ******************************************************************************
 // distance_between_points
@@ -3692,7 +3692,7 @@ namespace SYM{
       if(!containschar(oss.str())) {
         if(havechar(oss.str(), '/')) {
           //DX20200313 [OBSOLETE] num += frac2dbl(oss.str());
-          num += aurostd::frac2dbl(oss.str()); // DX20200313
+          num += aurostd::frac2dbl(oss.str()); //DX20200313
         } else {
           num += atof(oss.str().c_str());
         }
@@ -3701,7 +3701,7 @@ namespace SYM{
         skip = true;
         if(havechar(oss.str(), '/')) {
           //DX20200313 [OBSOLETE] out.dbl = frac2dbl(oss.str());
-          out.dbl = aurostd::frac2dbl(oss.str()); // DX20200313
+          out.dbl = aurostd::frac2dbl(oss.str()); //DX20200313
         } else {
           out.dbl = whichnum(oss.str());
         }

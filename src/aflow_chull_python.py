@@ -11,11 +11,11 @@ class CHull:
 
     def aflow_command(self, cmd):
         try:
-            output = subprocess.check_output(   # MB20200409
+            output = subprocess.check_output(   #MB20200409
                 self.aflow_executable + cmd,
                 shell=True
             )
-            # MB20200409
+            #MB20200409
             if '<!DOCTYPE' in output.decode('utf-8'):
                 raise AssertionError('REST-API appears to be down')
             return output
