@@ -39,7 +39,7 @@
 #include <string>
 #include <sys/stat.h>
 #ifndef __CYGWIN__  //ME20190327 - Cygwin support
-#include <sys/sysctl.h>
+//#include <sys/sysctl.h>
 #endif
 // #include <sys/sysinfo.h>
 #include <sys/time.h>
@@ -235,6 +235,9 @@ namespace aurostd {
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
+  long double get_mseconds(void);
+  long double get_mseconds(long double reference_useconds);
+  long double get_delta_mseconds(long double& useconds_begin);
   long double get_useconds(void);
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);
@@ -327,6 +330,7 @@ namespace aurostd {
   string RemoveTabsFromTheBack(const string& s) __xprototype;
   string RemoveComments(const string& s) __xprototype;
   vector<string> RemoveComments(const vector<string>&) __xprototype;  //ME20190614
+  deque<string> RemoveComments(const deque<string>&) __xprototype;  //ME20190614
   string RemoveCharacter(const string& s, const char character) __xprototype;
   void RemoveCharacterInPlace(string& s, const char character) __xprototype;  //CO20190712
   string RemoveCharacterFromTheBack(const string& s, const char character); __xprototype; //DX20190708
@@ -347,6 +351,7 @@ namespace aurostd {
   bool SSH_DirectoryMake(string user, string machine,string Directory);
   bool DirectoryChmod(string chmod_string,string Directory);
   bool DirectoryLS(string Directory,vector<string> &vfiles);
+   bool DirectoryLS(string Directory,deque<string> &vfiles);
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
@@ -525,23 +530,26 @@ namespace aurostd {
   uint zipfile2string(string _FileNameIN,string& StringIN); //CO
   uint efile2string(const string& FileNameIN,string& StringIN);  //CO20191110
   // file2vectorstring  
-  uint file2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vlines);
-  uint efile2vectorstring(string FileNameIN,vector<string>& vlines);
+  uint file2vectorstring(string FileNameIN,vector<string>& vline);
+  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline);
+  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline);
+  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline);
+  uint efile2vectorstring(string FileNameIN,vector<string>& vline);
+  bool vectorstring2file(const vector<string>& vline,string FileNameOUT);
   // file2dequestring  
-  uint file2dequestring(string FileNameIN,deque<string>& vlines);
-  uint bz2file2dequestring(string FileNameIN,deque<string>& vlines);
-  uint gzfile2dequestring(string FileNameIN,deque<string>& vlines);
-  uint xzfile2dequestring(string FileNameIN,deque<string>& vlines);
-  uint efile2dequestring(string FileNameIN,deque<string>& vlines);
-  // file2vectorstring overloading with deque
-  uint file2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint bz2file2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint gzfile2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint xzfile2vectorstring(string FileNameIN,deque<string>& vlines);
-  uint efile2vectorstring(string FileNameIN,deque<string>& vlines);  
+  uint file2dequestring(string FileNameIN,deque<string>& vline);
+  uint bz2file2dequestring(string FileNameIN,deque<string>& vline);
+  uint gzfile2dequestring(string FileNameIN,deque<string>& vline);
+  uint xzfile2dequestring(string FileNameIN,deque<string>& vline);
+  uint efile2dequestring(string FileNameIN,deque<string>& vline);
+  bool dequestring2file(const deque<string>& vline,string FileNameOUT);
+ // file2vectorstring overloading with deque
+  uint file2vectorstring(string FileNameIN,deque<string>& vline);
+  uint bz2file2vectorstring(string FileNameIN,deque<string>& vline);
+  uint gzfile2vectorstring(string FileNameIN,deque<string>& vline);
+  uint xzfile2vectorstring(string FileNameIN,deque<string>& vline);
+  uint efile2vectorstring(string FileNameIN,deque<string>& vline);  
+  bool vectorstring2file(const deque<string>& vline,string FileNameOUT);
   // file2stringstream
   bool file2stringstream(string FileNameIN,stringstream& StringstreamIN);
   bool bz2file2stringstream(string FileNameIN,stringstream& StringstreamIN);
@@ -559,8 +567,8 @@ namespace aurostd {
   bool url2file(string url,string& fileIN,bool=FALSE)  __xprototype;   // bool = verbose
   bool url2string(string url,string& stringIN,bool=FALSE)  __xprototype;   // bool = verbose
   bool url2stringstream(string url,stringstream& stringstreamIN,bool=FALSE)  __xprototype;  // bool = verbose
-  bool url2vectorstring(string url,vector<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose
-  bool url2dequestring(string url,deque<string>& vlines,bool=FALSE)  __xprototype;  // bool = verbose
+  bool url2vectorstring(string url,vector<string>& vline,bool=FALSE)  __xprototype;  // bool = verbose
+  bool url2dequestring(string url,deque<string>& vline,bool=FALSE)  __xprototype;  // bool = verbose
   template<typename utype> uint url2tokens(string url,vector<utype>& tokens,const string& delimiters = " ")  __xprototype;
   template<typename utype> uint url2tokens(string url,deque<utype>& tokens,const string& delimiters = " ")  __xprototype;
   string url2string(string url)  __xprototype;
@@ -580,6 +588,8 @@ namespace aurostd {
   bool file2directory(const string& _file,const string& destination);
   bool file2directory(const vector<string>& files,const string& destination);
   bool file2file(const string& _file,const string& destination); //CO20171025
+  string file2md5sum(const string& _file); //SC20200326
+  string file2auid(const string& _file); //SC20200326  
   bool IsDirectory(string path);
   bool IsFile(string path);
   //CO END
@@ -638,6 +648,7 @@ namespace aurostd {
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);
+  string bool2string(bool from);
   // string utype2string(const string& from) __xprototype;
   // [OBSOLETE]  template<class u1> string utype2string(u1) __xprototype;
   // [OBSOLETE]  template<class u1, class u2> string utype2string(u1,u2) __xprototype;
@@ -1264,15 +1275,16 @@ namespace aurostd {
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff=false);
   vector<string> xvecDouble2vecString(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff=false);
-  deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  deque<string> vecDouble2vecString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  // deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
 }
 
 namespace aurostd {
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap);
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end);
-  deque<string> wrapDeqEntries(const deque<string>& vin,string wrap);
-  deque<string> wrapDeqEntries(const deque<string>& vin,string wrap_start,string wrap_end);
-}
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap);                          //SC20200329 nice overload to deal with Marco
+  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end);    //SC20200329 nice overload to deal with Marco
+ }
 
 //base64 stuff
 //CO START

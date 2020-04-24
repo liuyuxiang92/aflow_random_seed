@@ -118,7 +118,7 @@ namespace bader_functions {
       return FALSE;
     }
     oss << soliloquy << "using " << outcar_file << " to extract system name, species, and valence charges." << endl;
-    xOUTCAR outcar(outcar_file);  //can handle compressed files, automatically pulls in system, species (strings), and vZVAL (deque<doubles>)
+    xOUTCAR outcar(outcar_file);  //can handle compressed files, automatically pulls in system, species (strings), and vZVAL (vector<doubles>)
     //[OBSOLETE as it is automatic now]outcar.GetProperties();                       //we need SYSTEM
 
     // get number of each species and valence charges from POSCAR
@@ -287,7 +287,7 @@ namespace bader_functions {
   bool BaderCalc(aurostd::xoption& vpflow,
       const string& bader_options,
       const string& prototype,
-      const deque<string>& vspecies,
+      const vector<string>& vspecies,
       const deque<int>& num_each_type,
       const vector<double>& vZVAL,
       const vector<double>& cutoffs,
@@ -1367,7 +1367,7 @@ namespace bader_functions {
 namespace bader_functions {
   bool BaderCalc(const string& bader_options,
       const string& prototype,
-      const deque<string>& vspecies,
+      const vector<string>& vspecies,
       const deque<int>& num_each_type,
       const vector<double>& vZVAL,
       const vector<double>& cutoffs,

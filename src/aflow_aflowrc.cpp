@@ -77,6 +77,8 @@
 #define         DEFAULT_FILE_VOLDISTEVOLUTION_OUT       XHOST.adefault.getattachedscheme("DEFAULT_FILE_VOLDISTEVOLUTION_OUT")
 
 // FILENAMES FOR AFLOW OPERATION
+#define AFLOWRC_DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT  string("aflow.pseudopotential_auid.out") 
+#define         DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT  XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT")
 #define AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_OUT             string("aflow.prescript.out") 
 #define         DEFAULT_AFLOW_PRESCRIPT_OUT             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PRESCRIPT_OUT")
 #define AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_COMMAND         string("aflow.prescript.command") 
@@ -206,13 +208,13 @@
 #define         DEFAULT_BANDS_GRID                            XHOST.adefault.getattachedutype<int>("DEFAULT_BANDS_GRID") 
 #define AFLOWRC_DEFAULT_BANDS_LATTICE                         string("AUTO")
 #define         DEFAULT_BANDS_LATTICE                         XHOST.adefault.getattachedscheme("DEFAULT_BANDS_LATTICE")
-#define AFLOWRC_DEFAULT_KSCHEME                               string("M")
+#define AFLOWRC_DEFAULT_KSCHEME                               string("AUTO")  // WAS M but ivasp fixes
 #define         DEFAULT_KSCHEME                               XHOST.adefault.getattachedscheme("DEFAULT_KSCHEME")
 #define AFLOWRC_DEFAULT_KPPRA                                 6000
 #define         DEFAULT_KPPRA                                 XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA")
 #define AFLOWRC_DEFAULT_KPPRA_STATIC                          10000
 #define         DEFAULT_KPPRA_STATIC                          XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA_STATIC")
-#define AFLOWRC_DEFAULT_STATIC_KSCHEME                        string("M") //WSETYAWAN DEFAULT
+#define AFLOWRC_DEFAULT_STATIC_KSCHEME                        string("M") //WSETYAWAN DEFAULT // WAS M but ivasp fixes
 #define         DEFAULT_STATIC_KSCHEME                        XHOST.adefault.getattachedscheme("DEFAULT_STATIC_KSCHEME")
 #define AFLOWRC_DEFAULT_KPPRA_ICSD                            8000
 #define         DEFAULT_KPPRA_ICSD                            XHOST.adefault.getattachedutype<int>("DEFAULT_KPPRA_ICSD")
@@ -834,14 +836,14 @@
 #define AFLOWRC_MPI_BINARY_DIR_FULTON_MARYLOU                 string("/fslgroup/fslg_datamining/bin/") // FULTON_MARYLOU
 #define         MPI_BINARY_DIR_FULTON_MARYLOU                 XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_FULTON_MARYLOU")
 
-//DX - CMU EULER - START
+//DX CMU EULER - START
 #define AFLOWRC_MPI_OPTIONS_CMU_EULER                         string("") // CMU EULER
 #define         MPI_OPTIONS_CMU_EULER                         XHOST.adefault.getattachedscheme("MPI_OPTIONS_CMU_EULER")
 #define AFLOWRC_MPI_COMMAND_CMU_EULER                         string("mpirun -np") // CMU_EULER
 #define         MPI_COMMAND_CMU_EULER                         XHOST.adefault.getattachedscheme("MPI_COMMAND_CMU_EULER")
 #define AFLOWRC_MPI_BINARY_DIR_CMU_EULER                      string("/home/Tools/bin/") // CMU_EULER
 #define         MPI_BINARY_DIR_CMU_EULER                      XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_CMU_EULER")
-//DX - CMU EULEr - END
+//DX CMU EULEr - END
 
 #define AFLOWRC_MPI_OPTIONS_MACHINE1                          string("") // future expansions
 #define         MPI_OPTIONS_MACHINE1                          XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE1")
@@ -1017,6 +1019,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_FILE_VOLDISTEVOLUTION_OUT",AFLOWRC_DEFAULT_FILE_VOLDISTEVOLUTION_OUT);
 
     // FILENAMES FOR AFLOW OPERATION
+    aflowrc::load_default("DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT",AFLOWRC_DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_PRESCRIPT_OUT",AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_PRESCRIPT_COMMAND",AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_COMMAND);
     aflowrc::load_default("DEFAULT_AFLOW_POSTSCRIPT_OUT",AFLOWRC_DEFAULT_AFLOW_POSTSCRIPT_OUT);
@@ -1513,6 +1516,7 @@ namespace aflowrc {
 
     aflowrc << " " << endl;
     aflowrc << "// FILENAMES FOR AFLOW OPERATION" << endl;
+    aflowrc << "DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PRESCRIPT_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PRESCRIPT_COMMAND=\"" << AFLOWRC_DEFAULT_AFLOW_PRESCRIPT_COMMAND << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_POSTSCRIPT_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_POSTSCRIPT_OUT << "\"" << endl;
@@ -2001,6 +2005,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_FILE_VOLDISTEVOLUTION_OUT\")=\"" << DEFAULT_FILE_VOLDISTEVOLUTION_OUT << "\"" << endl;
 
     if(LDEBUG) oss << "// FILENAMES FOR AFLOW OPERATION" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT\")=\"" << DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PRESCRIPT_OUT\")=\"" << DEFAULT_AFLOW_PRESCRIPT_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PRESCRIPT_COMMAND\")=\"" << DEFAULT_AFLOW_PRESCRIPT_COMMAND << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_POSTSCRIPT_OUT\")=\"" << DEFAULT_AFLOW_POSTSCRIPT_OUT << "\"" << endl;

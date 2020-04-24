@@ -19,7 +19,7 @@
 #include "aflow_agl_debye.h"
 
 namespace AGL_functions {
-  // CHANGES BY PAT 20171224
+  // CHANGES BY PA20171224
   //
   // This function finds energy and mass density so that the following Hugoniot
   // expression is true: E - E0 = 0.5 * (P + P0)*(1.0/rho0 - 1.0/rho). If the
@@ -39,7 +39,7 @@ namespace AGL_functions {
   // default pressure of 0 GPa or the default temperature of 300 K, they can
   // change it by changing the parameters @p initial_pressure_external and
   // @p initial_temperature_external.
-  // END CHANGES BY PAT 20171224
+  // END CHANGES BY PA20171224
   //
   // Input for this function is organized as follows:
   // @param pressures_external The different pressures we will be using in GPa.
@@ -84,14 +84,14 @@ namespace AGL_functions {
   //               given in the input.
   //
   //
-  // CHANGES BY PAT 20170603
+  // CHANGES BY PA20170603
   // @return 0 on success and 1 on critical failure. Returns 2 if one of the
   //         data points was found to extrapolate too far. All of the data
   //         stored in the output variables will be valid, but not every
   //         requested data point will be there. As soon as an invalid
   //         data point is found, the function returns. So there won't be
   //         any "gaps" in the valid data.
-  // END CHANGES BY PAT 20170603
+  // END CHANGES BY PA20170603
   //
   uint runHugoniot(const std::vector<double>& pressures_external,
 		   const std::vector<double>& temperatures_external,
@@ -126,16 +126,16 @@ namespace AGL_functions {
     // First, find the best initial conditions
     double initial_mass_density_gcm3 = 0.0, initial_temperature_external = 0.0, initial_energyDFT_UIntVib_kJg = 0.0, initial_pressure_external = 0.0;
 
-    // CHANGES BY PAT 20171224
+    // CHANGES BY PA20171224
     if(0 != findBestInitialConditions(pressures_external, temperatures_external, mass_densities_gcm3, energies_pT_kJg, desired_initial_pressure_external, desired_initial_temperature_external, initial_mass_density_gcm3, initial_temperature_external, initial_energyDFT_UIntVib_kJg, initial_pressure_external, FileMESSAGE)) {
       return 1;
     }
-    // END CHANGES BY PAT 20171224
+    // END CHANGES BY PA20171224
 
     // Clear the output if anything was written to it
     hugoniotData.clear();
 
-    // CHANGES BY PAT 20171224
+    // CHANGES BY PA20171224
     // Now let's get all the data
     for(size_t i = 0; i < pressures_external.size(); ++i) {
       double pressure_external = pressures_external.at(i);
@@ -144,11 +144,11 @@ namespace AGL_functions {
       std::vector<double> tmp_mass_densities_gcm3;
       for(size_t j = 0; j < temperatures_external.size(); ++j)
         tmp_mass_densities_gcm3.push_back(mass_densities_gcm3.at(j).at(i));
-      // END CHANGES BY PAT 20171224
+      // END CHANGES BY PA20171224
 
       // Now calculate the Hugoniot!
       double hugoniot_density = 0.0, hugoniot_temperature = 0.0, hugoniot_energy = 0.0;
-      // CHANGES BY PAT 20170603
+      // CHANGES BY PA20170603
       uint ret = calculateHugoniotDataPoint(initial_mass_density_gcm3,
                                             initial_energyDFT_UIntVib_kJg,
                                             initial_pressure_external,
@@ -173,7 +173,7 @@ namespace AGL_functions {
         // collecting data. Just return. All data so far is valid.
         return ret;
       }
-      // END CHANGES BY PAT 20170603
+      // END CHANGES BY PA20170603
 
       // Store the results
       std::vector<double> results;
@@ -392,14 +392,14 @@ namespace AGL_functions {
 // @param initial_temperature_external The temperature at the initial
 //                                     conditions. Default is 300 K.
 //
-// CHANGES BY PAT 20170603
+// CHANGES BY PA20170603
 // @return 0 on success and 1 on critical failure. Returns 2 if one of the
 //         data points was found to extrapolate too far. All of the data
 //         stored in the output variables will be valid, but not every
 //         requested data point will be there. As soon as an invalid
 //         data point is found, the function returns. So there won't be
 //         any "gaps" in the valid data.
-// END CHANGES BY PAT 20170603
+// END CHANGES BY PA20170603
 //
 // OBSOLETE uint calculateHugoniot(const std::vector<std::vector<std::vector<double> > >& data,
 // OBSOLETE                      std::vector<std::vector<double> >& hugoniotData, ofstream& FileMESSAGE,
@@ -450,7 +450,7 @@ namespace AGL_functions {
 // OBSOLETE
 // Now calculate the Hugoniot!
 // OBSOLETE  double hugoniot_density = 0.0, hugoniot_temperature = 0.0, hugoniot_energy = 0.0;
-// CHANGES BY PAT 20170603
+// CHANGES BY PA20170603
 // OBSOLETE uint ret = calculateHugoniotDataPoint(initial_mass_density_gcm3,
 // OBSOLETE                                      initial_energyDFT_UIntVib_kJg,
 // OBSOLETE                                      initial_pressure_external,
@@ -472,7 +472,7 @@ namespace AGL_functions {
 // collecting data. Just return. All data so far is valid.
 // OBSOLETE return ret;
 // OBSOLETE }
-// END CHANGES BY PAT 20170603
+// END CHANGES BY PA20170603
 
 // Store the results
 // OBSOLETE std::vector<double> results;
@@ -542,10 +542,10 @@ namespace AGL_functions {
   //                       Hugoniot equation. This is an out variable - its
   //                       value will be overwritten if the function succeeds.
   //
-  // CHANGES BY PAT 20170603
+  // CHANGES BY PA20170603
   // @return 0 on success. 1 on a critical failure. 2 if the data point is
   //         extrapolated too much too be trusted.
-  // END CHANGES BY PAT 20170603
+  // END CHANGES BY PA20170603
   //
   uint calculateHugoniotDataPoint(double initial_mass_density_gcm3,
 				  double initial_energyDFT_UIntVib_kJg,
@@ -678,7 +678,7 @@ namespace AGL_functions {
     hugoniot_temperature = aurostd::abs(temperatures_external.at(ind1) - temperatures_external.at(ind2)) * fraction +
       temperatures_external.at(ind1);
 
-    // CHANGES BY PAT 20170603
+    // CHANGES BY PA20170603
     // If this temperature is more than 1.5 times greater than the nearest temperature
     // in the temperatures_external vector, we should assume that the data is invalid and
     // return 2. The answer will still be stored one function up for further analysis,
@@ -695,7 +695,7 @@ namespace AGL_functions {
       // OBSOLETE            << "was used.";
       return 2;
     }
-    // END CHANGES BY PAT 20170603
+    // END CHANGES BY PA20170603
 
     return 0;
   }
@@ -710,7 +710,7 @@ namespace AGL_functions {
   // desired_initial_temperature_external. It then sets the initial
   // conditions and returns 0.
   //
-  // CHANGES BY PAT 20171224  
+  // CHANGES BY PA20171224  
   uint findBestInitialConditions(const std::vector<double>& pressures_external,
 				 const std::vector<double>& temperatures_external,
 				 const std::vector<std::vector<double> >& mass_densities_gcm3,
@@ -758,12 +758,12 @@ namespace AGL_functions {
     // Otherwise, check the pressure. If it hasn't been set or it is
     // closer to the desired initial, keep it.
     // OBSOLETE double currentPressure = data.at(i).at(0).at(3);
-    // CHANGES BY PAT 20171224
+    // CHANGES BY PA20171224
     for(size_t i = 0; i < pressures_external.size(); ++i) {
       // Check the pressure. If it hasn't been set or it is
       // closer to the desired initial, keep it.
       double currentPressure = pressures_external.at(i);
-      // END CHANGES BY PAT 20171224
+      // END CHANGES BY PA20171224
       if(bestInitialPressureInd == -1 || aurostd::abs(currentPressure - desired_initial_pressure_external) < aurostd::abs(bestInitialPressure - desired_initial_pressure_external)) {
         bestInitialPressureInd = i;
         bestInitialPressure = currentPressure;
@@ -812,12 +812,12 @@ namespace AGL_functions {
     // Otherwise, check the temperature. If it hasn't been set or it is
     // closer to the desired initial, keep it.
     // OBSOLETE double currentTemperature = data.at(bestInitialPressureInd).at(i).at(1);
-    // CHANGES BY PAT 20171224
+    // CHANGES BY PA20171224
     for(size_t i = 0; i < temperatures_external.size(); ++i) {
       // Check the temperature. If it hasn't been set or it is
       // closer to the desired initial, keep it.
       double currentTemperature = temperatures_external.at(i);
-      // END CHANGES BY PAT 20171224   
+      // END CHANGES BY PA20171224   
       if(bestInitialTemperatureInd == -1 ||
 	 aurostd::abs(currentTemperature - desired_initial_temperature_external) <
 	 aurostd::abs(bestInitialTemperature - desired_initial_temperature_external)) {
@@ -1024,3 +1024,10 @@ namespace AGL_functions {
 } // namespace AGL_functions
 
 #endif // _AFLOW_AGL_HUGONIOT_CPP
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *               Aflow PATRICK AVERY - Duke University 2016-2018           *
+// *                                                                         *
+// ***************************************************************************

@@ -301,6 +301,7 @@ class _XHOST {
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
     bool POSTPROCESS; //CT20181212
+    bool PSEUDOPOTENTIAL_GENERATOR; //SC20200327
     // HARDWARE/SOFTWARE
     string hostname,machine_type,tmpfs,user,group,home,shell,progname;
     string Find_Parameters;
@@ -352,6 +353,7 @@ class _XHOST {
     vector<uint>   vGlobal_uint;      // parameters uint
     vector<string> vGlobal_string;    // parameters as strings
     vector<vector<string> > vvGlobal_string; // parameters as vector strings
+    vector<vector<string> > vvLIBS; // parameters as vector strings
     // vector<string> vLibrary_ICSD;     // ordered by #species (needs to be allocated)
     // vector<string> vLibrary_ICSD_ALL; // line by line
     // string Library_ICSD_ALL;          // the complete library
@@ -365,7 +367,10 @@ class _XHOST {
     aurostd::xoption vflag_outreach;  // argv/argc options following the xoption structure
     aurostd::xoption vflag_control;  // argv/argc options following the xoption structure
     aurostd::xoption vschema;        // keywords, names, units etc etc
-
+    // USUAL COMMANDS
+    vector<string> vcat; //     cat, bzcat, xzcat, gzcat
+    vector<string> vext; //      "",  .bz2,   .xz,   .gz
+    vector<string> vzip; //      "", bzip2,    xz,  gzip
     // AFLOWRC
     string aflowrc_filename;
     string aflowrc_content;
@@ -384,28 +389,6 @@ class _XHOST {
 
 #define XHOST_vGlobal_MAX                              256
 #define XHOST_Library_HTQC                             XHOST.vGlobal_string.at(0)
-#define XHOST_Library_CALCULATED_ICSD_LIB              XHOST.vGlobal_string.at(1)
-#define XHOST_Library_CALCULATED_ICSD_RAW              XHOST.vGlobal_string.at(2)
-#define XHOST_Library_CALCULATED_LIB0_LIB              XHOST.vGlobal_string.at(3)
-#define XHOST_Library_CALCULATED_LIB0_RAW              XHOST.vGlobal_string.at(4)
-#define XHOST_Library_CALCULATED_LIB1_LIB              XHOST.vGlobal_string.at(5)
-#define XHOST_Library_CALCULATED_LIB1_RAW              XHOST.vGlobal_string.at(6)
-#define XHOST_Library_CALCULATED_LIB2_LIB              XHOST.vGlobal_string.at(7)
-#define XHOST_Library_CALCULATED_LIB2_RAW              XHOST.vGlobal_string.at(8)
-#define XHOST_Library_CALCULATED_LIB3_LIB              XHOST.vGlobal_string.at(9)
-#define XHOST_Library_CALCULATED_LIB3_RAW              XHOST.vGlobal_string.at(10)
-#define XHOST_Library_CALCULATED_LIB4_LIB              XHOST.vGlobal_string.at(11)
-#define XHOST_Library_CALCULATED_LIB4_RAW              XHOST.vGlobal_string.at(12)
-#define XHOST_Library_CALCULATED_LIB5_LIB              XHOST.vGlobal_string.at(13)
-#define XHOST_Library_CALCULATED_LIB5_RAW              XHOST.vGlobal_string.at(14)
-#define XHOST_Library_CALCULATED_LIB6_LIB              XHOST.vGlobal_string.at(15)
-#define XHOST_Library_CALCULATED_LIB6_RAW              XHOST.vGlobal_string.at(16)
-#define XHOST_Library_CALCULATED_LIB7_LIB              XHOST.vGlobal_string.at(17)
-#define XHOST_Library_CALCULATED_LIB7_RAW              XHOST.vGlobal_string.at(18)
-#define XHOST_Library_CALCULATED_LIB8_LIB              XHOST.vGlobal_string.at(19)
-#define XHOST_Library_CALCULATED_LIB8_RAW              XHOST.vGlobal_string.at(20)
-#define XHOST_Library_CALCULATED_LIB9_LIB              XHOST.vGlobal_string.at(21)
-#define XHOST_Library_CALCULATED_LIB9_RAW              XHOST.vGlobal_string.at(22)
 #define XHOST_aflowlib_icsd                            XHOST.vGlobal_string.at(23)
 #define XHOST_aflowlib_lib0                            XHOST.vGlobal_string.at(24)
 #define XHOST_aflowlib_lib1                            XHOST.vGlobal_string.at(25)
@@ -417,24 +400,46 @@ class _XHOST {
 #define XHOST_aflowlib_lib7                            XHOST.vGlobal_string.at(31)
 #define XHOST_aflowlib_lib8                            XHOST.vGlobal_string.at(32)
 #define XHOST_aflowlib_lib9                            XHOST.vGlobal_string.at(33)
-#define XHOST_AUID                                     XHOST.vGlobal_string.at(34)
-#define XHOST_AURL                                     XHOST.vGlobal_string.at(35)
-#define XHOST_LOOP                                     XHOST.vGlobal_string.at(36)
-#define XHOST_Library_ICSD_ALL                         XHOST.vGlobal_string.at(37)
+//#define XHOST_AUID                                     XHOST.vGlobal_string.at(34)
+//#define XHOST_AURL                                     XHOST.vGlobal_string.at(35)
+//#define XHOST_LOOP                                     XHOST.vGlobal_string.at(36)
+#define XHOST_Library_ICSD_ALL                         XHOST.vGlobal_string.at(38)
 //  string Library_ICSD_ALL;          // the complete library
 
-#define XHOST_vAUID                                    XHOST.vvGlobal_string.at(0)
-#define XHOST_vAURL                                    XHOST.vvGlobal_string.at(1)
-#define XHOST_vLOOP                                    XHOST.vvGlobal_string.at(2)
-#define vAUID XHOST_vAUID
-#define vAURL XHOST_vAURL
-#define vLOOP XHOST_vLOOP
+#define XHOST_vLIBS XHOST.vvLIBS
+#define XHOST_vAURL XHOST.vvLIBS.at(0)
+#define XHOST_vAUID XHOST.vvLIBS.at(1)
+#define XHOST_vLOOP XHOST.vvLIBS.at(2)
+#define XHOST_LIBRARY_JSONL                            XHOST.vGlobal_string.at(3)
 
-#define vVASP_POTCAR_DIRECTORIES                       XHOST.vvGlobal_string.at(3)
-#define vAFLOW_LIBRARY_DIRECTORIES                     XHOST.vvGlobal_string.at(4)
-#define vAFLOW_PROJECTS_DIRECTORIES                    XHOST.vvGlobal_string.at(5)
-#define XHOST_vLibrary_ICSD                            XHOST.vvGlobal_string.at(6)
-#define XHOST_vLibrary_ICSD_ALL                        XHOST.vvGlobal_string.at(7)
+#define vVASP_POTCAR_DIRECTORIES                       XHOST.vvGlobal_string.at(4)
+#define vAFLOW_LIBRARY_DIRECTORIES                     XHOST.vvGlobal_string.at(5)
+#define vAFLOW_PROJECTS_DIRECTORIES                    XHOST.vvGlobal_string.at(6)
+#define XHOST_vLibrary_ICSD                            XHOST.vvGlobal_string.at(7)
+#define XHOST_vLibrary_ICSD_ALL                        XHOST.vvGlobal_string.at(8)
+#define XHOST_Library_CALCULATED_ICSD_LIB              XHOST.vvGlobal_string.at(9)
+#define XHOST_Library_CALCULATED_ICSD_RAW              XHOST.vvGlobal_string.at(10)
+#define XHOST_Library_CALCULATED_LIB0_LIB              XHOST.vvGlobal_string.at(11)
+#define XHOST_Library_CALCULATED_LIB0_RAW              XHOST.vvGlobal_string.at(12)
+#define XHOST_Library_CALCULATED_LIB1_LIB              XHOST.vvGlobal_string.at(13)
+#define XHOST_Library_CALCULATED_LIB1_RAW              XHOST.vvGlobal_string.at(14)
+#define XHOST_Library_CALCULATED_LIB2_LIB              XHOST.vvGlobal_string.at(15)
+#define XHOST_Library_CALCULATED_LIB2_RAW              XHOST.vvGlobal_string.at(16)
+#define XHOST_Library_CALCULATED_LIB3_LIB              XHOST.vvGlobal_string.at(17)
+#define XHOST_Library_CALCULATED_LIB3_RAW              XHOST.vvGlobal_string.at(18)
+#define XHOST_Library_CALCULATED_LIB4_LIB              XHOST.vvGlobal_string.at(19)
+#define XHOST_Library_CALCULATED_LIB4_RAW              XHOST.vvGlobal_string.at(20)
+#define XHOST_Library_CALCULATED_LIB5_LIB              XHOST.vvGlobal_string.at(21)
+#define XHOST_Library_CALCULATED_LIB5_RAW              XHOST.vvGlobal_string.at(22)
+#define XHOST_Library_CALCULATED_LIB6_LIB              XHOST.vvGlobal_string.at(23)
+#define XHOST_Library_CALCULATED_LIB6_RAW              XHOST.vvGlobal_string.at(24)
+#define XHOST_Library_CALCULATED_LIB7_LIB              XHOST.vvGlobal_string.at(25)
+#define XHOST_Library_CALCULATED_LIB7_RAW              XHOST.vvGlobal_string.at(26)
+#define XHOST_Library_CALCULATED_LIB8_LIB              XHOST.vvGlobal_string.at(27)
+#define XHOST_Library_CALCULATED_LIB8_RAW              XHOST.vvGlobal_string.at(28)
+#define XHOST_Library_CALCULATED_LIB9_LIB              XHOST.vvGlobal_string.at(29)
+#define XHOST_Library_CALCULATED_LIB9_RAW              XHOST.vvGlobal_string.at(30)
+
 //  vector<string> vLibrary_ICSD;     // ordered by #species
 //  vector<string> vLibrary_ICSD_ALL; // line by line
 
@@ -502,6 +507,7 @@ class _XHOST {
 #define XHOST_LIBRARY_LIB9                             XHOST.vGlobal_uint.at(9)
 #define XHOST_LIBRARY_ICSD                             XHOST.vGlobal_uint.at(10)
 #define XHOST_LIBRARY_AUID                             XHOST.vGlobal_uint.at(11)
+
 
 // max is 128
 extern _XHOST XHOST; // this will be global
@@ -1196,7 +1202,7 @@ int GetAtomValenceStd(const uint& atnum);
 double GetAtomRadius(const string& symbol);
 double GetAtomRadius(const uint& atnum);
 double GetAtomRadiusCovalent(const string& symbol); //DX+CO20170904
-double GetAtomRadiusCovalent(const uint& atnum); //DX and Co - 20170904
+double GetAtomRadiusCovalent(const uint& atnum); //DX+CO20170904
 double GetAtomElectronegativity(const string& symbol);
 double GetAtomElectronegativity(const uint& atnum);
 string GetAtomCrystal(const string& symbol);
@@ -1303,7 +1309,7 @@ class _sym_op {
     void copy(const _sym_op& b);
 };
 
-//DX 201801107 - add _kpoint class - START
+//DX201801107 - add _kpoint class - START
 // --------------------------------------------------------------------------
 class _kpoint {
   public:
@@ -1325,7 +1331,7 @@ class _kpoint {
   private:
     void free();
 };
-//DX 201801107 - add _kpoint class - END
+//DX201801107 - add _kpoint class - END
 
 // --------------------------------------------------------------------------
 class wyckoffsite_ITC { //Also for wyckoff sites
@@ -1871,7 +1877,7 @@ class _xvasp {
     string       Directory;
     string       AnalyzeLabel;
     _xqsub       xqsub;
-    xoption aopts;
+    xoption      aopts;
     // --------------------------------
     // VASP INPUT CONTENT
     // [OBSOLETE] bool         AFLOWIN_FLAG::VASP;
@@ -1899,6 +1905,7 @@ class _xvasp {
     double       POTCAR_ENMIN;
     bool         POTCAR_PAW;
     stringstream POTCAR_POTENTIALS;
+    deque<string> POTCAR_AUID; // md5sum one line by one line of the POTCAR
     // --------------------------------
     // VASP INPUT CONTENT
     stringstream OUTCAR;  // OUTPUT
@@ -2651,8 +2658,8 @@ namespace KBIN {
   void RUN_Directory(_aflags& aflags);
   void AFLOW_RUN_Directory(const _aflags& aflags);
   void RUN_DirectoryScript(const _aflags& aflags,const string& script,const string& output);
-  void CompressDirectory(const _aflags& aflags,const _kflags& kflags);
-  void CompressDirectory(const _aflags& aflags);
+  bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
+  bool CompressDirectory(const _aflags& aflags);
   void Clean(const _aflags& aflags);
   void Clean(const string directory);
   void XClean(string options);
@@ -2789,6 +2796,10 @@ namespace KBIN {
   bool VASP_Produce_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false);
   bool VASP_Modify_INPUT(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags);
   bool VASP_Produce_and_Modify_INPUT(_xvasp& xvasp,const string& AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,_vflags &vflags,bool load_POSCAR_from_xvasp=false); //CO20180418
+  bool VASP_Write_ppAUID_FILE(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
+  bool VASP_Write_ppAUID_FILE(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
+  bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species);
+  bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species);
   bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags);
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
@@ -2802,8 +2813,8 @@ namespace KBIN {
   bool VASP_Produce_KPOINTS(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_KPOINTS(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
   bool VASP_Reread_KPOINTS(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
-  bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar);
-  bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar);
+  bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar);
+  bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar);
   bool VASP_Produce_POTCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_POTCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
   bool VASP_Reread_POTCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
@@ -2980,18 +2991,30 @@ class xOUTCAR {
     // Intra band minimization
     double WEIMIN,EBREAK,DEPER,TIME;  // for aflowlib_libraries.cpp
     // begin shared xPOTCAR
-    double ENMAX;deque<double> vENMAX;                            // eV
-    double ENMIN;deque<double> vENMIN;                            // eV
-    double POMASS_sum,POMASS_min,POMASS_max;deque<double> vPOMASS;// mass
-    double ZVAL_sum,ZVAL_min,ZVAL_max;deque<double> vZVAL;        // valence
-    double EATOM_min,EATOM_max;deque<double> vEATOM;              // eV
-    double RCORE_min,RCORE_max;deque<double> vRCORE;              // outmost cutoff radius
-    double RWIGS_min,RWIGS_max;deque<double> vRWIGS;              // wigner-seitz radius (au A)
-    double EAUG_min,EAUG_max;deque<double> vEAUG;                 // augmentation
+    double ENMAX;vector<double> vENMAX;                            // eV
+    double ENMIN;vector<double> vENMIN;                            // eV
+    double POMASS_sum,POMASS_min,POMASS_max;vector<double> vPOMASS;// mass
+    double ZVAL_sum,ZVAL_min,ZVAL_max;vector<double> vZVAL;   // valence
+    double EATOM_min,EATOM_max;vector<double> vEATOM;        // eV
+    double RCORE_min,RCORE_max;vector<double> vRCORE;        // outmost cutoff radius
+    double RWIGS_min,RWIGS_max;vector<double> vRWIGS;        // wigner-seitz radius (au A)
+    double EAUG_min,EAUG_max;vector<double> vEAUG;            // augmentation
+    double RAUG_min,RAUG_max;vector<double> vRAUG;            // augmentation
+    double RMAX_min,RMAX_max;vector<double> vRMAX;            // unicity
+    vector<string> vTITEL;                                         // unicity
+    vector<string> vLEXCH;                                         // unicity
     // end shared xPOTCAR
     string pp_type;
-    deque<string> species,species_pp,species_pp_type,species_pp_version; // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
-    deque<deque<double> > species_pp_vLDAU;  // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species;                                        // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<int>    species_Z;                                      // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp;                                     // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_type;                                // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_version;                             // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_AUID;                                // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_AUID_collisions;                     // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<double> species_pp_groundstate_energy;                  // meV/atom
+    vector<string> species_pp_groundstate_structure;               // name that we have, maybe ANRL
+    deque<deque<double> > species_pp_vLDAU;                       // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
     bool isKIN;                                                   // METAGGA
     bool isMETAGGA;string METAGGA;                                // METAGGA
     string string_LDAU;                                           // for aflowlib_libraries.cpp
@@ -3069,10 +3092,12 @@ class xOUTCAR {
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
     //int spin;  //CO20171006 - camilo garbage
-  private:                       //
+    friend ostream& operator<<(ostream&, const xOUTCAR&);  //ME20190623
+ private:                       //
     void free();                 // free space
     void copy(const xOUTCAR& b); //
 };
+
 //-------------------------------------------------------------------------------------------------
 class xDOSCAR {
   public:
@@ -3182,29 +3207,60 @@ class xPOTCAR {
     const xPOTCAR& operator=(const xPOTCAR &b);                   // copy
     void clear(void);                                             // clear
     // CONTENT
-    string content;vector<string> vcontent;string filename;       // the content, and lines of it
+    string content;vector<string> vcontent;                       // the content and the lines
+    string filename;                                              // the filename - THIS IS A GLOBAL PROPERTY OF THE WHOLE POTCAR
     string title;
     bool   POTCAR_PAW;
     string POTCAR_TYPE;
     bool   POTCAR_KINETIC;
-    double ENMAX;deque<double> vENMAX;                            // eV
-    double ENMIN;deque<double> vENMIN;                            // eV
-    double POMASS_sum,POMASS_min,POMASS_max;deque<double> vPOMASS;// mass
-    double ZVAL_sum,ZVAL_min,ZVAL_max;deque<double> vZVAL;        // valence
-    double EATOM_min,EATOM_max;deque<double> vEATOM;              // eV
-    double RCORE_min,RCORE_max;deque<double> vRCORE;              // outmost cutoff radius
-    double RWIGS_min,RWIGS_max;deque<double> vRWIGS;              // wigner-seitz radius (au A)
-    double EAUG_min,EAUG_max;deque<double> vEAUG;                 // augmentation
+    bool   POTCAR_GW;
+    bool   POTCAR_AE;
+    double ENMAX;vector<double> vENMAX;                            // eV
+    double ENMIN;vector<double> vENMIN;                            // eV
+    double POMASS_sum,POMASS_min,POMASS_max;vector<double> vPOMASS;// mass
+    double ZVAL_sum,ZVAL_min,ZVAL_max;vector<double> vZVAL;        // valence
+    double EATOM_min,EATOM_max;vector<double> vEATOM;              // eV
+    double RCORE_min,RCORE_max;vector<double> vRCORE;              // outmost cutoff radius
+    double RWIGS_min,RWIGS_max;vector<double> vRWIGS;              // wigner-seitz radius (au A)
+    double EAUG_min,EAUG_max;vector<double> vEAUG;                 // augmentation
+    double RAUG_min,RAUG_max;vector<double> vRAUG;                 // augmentation
+    double RMAX_min,RMAX_max;vector<double> vRMAX;                 // unicity
+    vector<string> vTITEL;                                         // unicity
+    vector<string> vLEXCH;                                         // unicity
     string pp_type;
-    deque<string> species,species_pp,species_pp_type,species_pp_version; // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species;                                        // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<int>    species_Z;                                      // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp;                                     // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_type;                                // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_version;                             // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_AUID;                                // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<string> species_pp_AUID_collisions;                     // WARNING: we use starting from 0 // CAN BE THE ONES OF VASP5
+    vector<double> species_pp_groundstate_energy;                  // meV/atom
+    vector<string> species_pp_groundstate_structure;               // name that we have, maybe ANRL
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-  private:                                                        //
-    void free();                                                  // free space
-    void copy(const xPOTCAR& b);                                  //
+    // objects/functions for references energies defined only with one specie
+    // [OBSOLETE] vector<string> vsymbol;                                        // Ta 
+    // [OBSOLETE] vector<string> vname;                                          // Ta_pv // FIX COPY CONSTRUCTOR   
+    // [OBSOLETE] vector<string> vdate;                            // 07Sep2000  // FIX COPY CONSTRUCTOR
+    string AUID;                                                   // crc32 - THIS IS A GLOBAL PROPERTY OF THE WHOLE POTCAR
+    friend ostream& operator<<(ostream &,const xPOTCAR&);          // print // FIX COPY CONSTRUCTOR
+    // xPOTCAR xPOTCAR_initialize(uint Z);                         // function to clean up the name // FIX COPY CONSTRUCTOR
+  private:                                                         //
+    void free();                                                   // free space
+    void copy(const xPOTCAR& b);                                   //
 };
+
+extern std::vector<xPOTCAR> vxpseudopotential;        // store starting from ONE
+uint xPOTCAR_Initialize(void);
+bool xPOTCAR_PURE_Printer(xPOTCAR& xPOT,ostream& oss,bool LVERBOSE=FALSE);
+xPOTCAR xPOTCAR_Finder(vector<string>& species_pp_AUID,vector<string>& species_pp_AUID_collisions,const string& TITEL,const string& LEXCH,const double& EATOM,const double& RMAX,bool LVERBOSE=FALSE);
+xPOTCAR xPOTCAR_Finder(const string& AUID,bool LVERBOSE=FALSE);
+bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA=""); // returns if available
+bool xPOTCAR_EnthalpyReference_AUID(string AUID,string METAGGA,string& gs,double& enthalpy_atom,double& volume_atom,double& spin_atom);
+
 // -------------------------------------------------------------------------------------------------
 class xVASPRUNXML {
   public:
@@ -4350,6 +4406,9 @@ xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 // ----------------------------------------------------------------------------
 // aflow_xelement.h stuff
 #include "aflow_xelement.h"
+
+
+
 
 #endif
 // ***************************************************************************

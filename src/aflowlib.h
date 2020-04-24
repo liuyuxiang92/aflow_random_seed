@@ -121,6 +121,8 @@ namespace aflowlib {
       string species_pp;vector<string> vspecies_pp;
       string species_pp_version;vector<string> vspecies_pp_version;
       string species_pp_ZVAL;vector<double> vspecies_pp_ZVAL;
+      string species_pp_AUID;vector<string> vspecies_pp_AUID;
+      string METAGGA; // empty if none, potential type is in xPOTCAR/xOUTCAR
       double spin_cell,spin_atom;
       string spinD;vector<double> vspinD;
       string spinD_magmom_orig;vector<double> vspinD_magmom_orig;
@@ -223,7 +225,6 @@ namespace aflowlib {
       double ael_average_external_pressure; // (GPa) //CT20181212
       xmatrix<double> ael_stiffness_tensor;  //ME20191105
       xmatrix<double> ael_compliance_tensor;  //ME20191105
-
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3
@@ -292,16 +293,17 @@ namespace aflowlib {
 
 // ***************************************************************************
 namespace aflowlib {
-  uint auid2present(string="");
+  bool json2aflowlib(const string& json,string key,string& value); // Marco I do not understand why you have out this function as a private member... it would have been simpler to be able to use everywhere
+  uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);
   string AFLUXCall(aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
   string AFLUXCall(vector<string>& matchbook); //DX20190206 - add AFLUX functionality
   string AFLUXCall(string& summons); //DX20190206 - add AFLUX functionality 
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX20190206 - get properties from AFLUX response
-  uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss);
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC2020327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
-  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  // TEST SC20190813
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813
 }
 
 // ***************************************************************************
@@ -382,6 +384,7 @@ namespace aflowlib {
   bool LIB2RAW_Loop_AGL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
   bool LIB2RAW_Loop_AEL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
   bool LIB2RAW_Loop_LOCK(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
+  bool LIB2RAW_Loop_PATCH(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
   bool LIB2LIB(string options,bool overwrite,bool LOCAL=false); //CT20181212
 }
 
@@ -425,6 +428,7 @@ class _outreach {
     string place,date;
     string type;   // ARTICLE PRESENTATION_TALK PRESENTATION_SEMINAR PRESENTATION_COLLOQUIUM PRESENTATION_KEYNOTE PRESENTATION_PLENARY PRESENTATION_TUTORIAL PRESENTATION_CONTRIBUTED PRESENTATION_POSTER
     bool _isinvited;       // YES
+    bool _isonline;       // YES
     string host;           // who invited
     string abstract;       // if available and in LaTeX
     string pdf;
@@ -509,84 +513,96 @@ namespace aflowlib {
   };
 
   class AflowDB {
-    public:
-      AflowDB(const string&);
-      AflowDB(const string&, const string&, const string&);
-      AflowDB(const AflowDB&);
-      AflowDB& operator=(const AflowDB&);
-      ~AflowDB();
-      void clear();
+  public:
+    AflowDB(const string&);
+    AflowDB(const string&, const string&, const string&);
+    AflowDB(const AflowDB&);
+    AflowDB& operator=(const AflowDB&);
+    ~AflowDB();
+    void clear();
 
-      string data_path;
-      string database_file;
-      string lock_file;
+    string data_path;
+    string database_file;
+    string lock_file;
 
-      bool isTMP();
+    bool isTMP();
 
-      bool rebuildDatabase(bool=false);
-      void analyzeDatabase(const string&);
+    bool rebuildDatabase(bool=false);
+    void analyzeDatabase(const string&);
 
-      vector<string> getTables(string="");
-      vector<string> getTables(sqlite3*, string="");
+    vector<string> getTables(string="");
+    vector<string> getTables(sqlite3*, string="");
 
-      vector<string> getColumnNames(const string&);
-      vector<string> getColumnNames(sqlite3*, const string&);
-      vector<string> getColumnTypes(const string&);
-      vector<string> getColumnTypes(sqlite3*, const string&);
+    vector<string> getColumnNames(const string&);
+    vector<string> getColumnNames(sqlite3*, const string&);
+    vector<string> getColumnTypes(const string&);
+    vector<string> getColumnTypes(sqlite3*, const string&);
 
-      string getValue(const string&, const string&, string="");
-      string getValue(sqlite3*, const string&, const string&, string="");
-      string getProperty(const string&, const string&, const string&, string="");
-      string getProperty(sqlite3*, const string&, const string&, const string&, string="");
-      vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, string="");
-      vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, string="");
-      vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
-      vector<string> getSet(sqlite3*, const string&, const string&, bool=false, string="", int=0, string="");
-      vector<string> getSetMultiTables(const vector<string>&, const string&, bool=false, string="", int=0);
-      vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool=false, string="", int=0);
+    string getValue(const string&, const string&, string="");
+    string getValue(sqlite3*, const string&, const string&, string="");
+    string getProperty(const string&, const string&, const string&, string="");
+    string getProperty(sqlite3*, const string&, const string&, const string&, string="");
+    vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, string="");
+    vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, string="");
+    vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
+    vector<string> getSet(sqlite3*, const string&, const string&, bool=false, string="", int=0, string="");
+    vector<string> getSetMultiTables(const vector<string>&, const string&, bool=false, string="", int=0);
+    vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool=false, string="", int=0);
 
-      void transaction(bool);
+    void transaction(bool);
 
-    private:
-      void free();
-      void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
-      void close();
-      void copy(const AflowDB&);
+  private:
+    void free();
+    void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
+    void close();
+    void copy(const AflowDB&);
 
-      sqlite3* db;
-      bool is_tmp;
+    sqlite3* db;
+    bool is_tmp;
 
-      void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
-      bool closeTmpFile(bool=false, bool=false);
+    void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
+    bool closeTmpFile(bool=false, bool=false);
 
-      void rebuildDB();
-      void buildTables(int, int, const vector<string>&, const vector<string>&);
-      void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
+    void rebuildDB();
+    void buildTables(int, int, const vector<string>&, const vector<string>&);
+    void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
 
-      vector<string> getSchemaKeys();
-      vector<string> getDataTypes(const vector<string>&, bool);
-      vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
-      string extractJsonValueAflow(const string&, string);
+    vector<string> getSchemaKeys();
+    vector<string> getDataTypes(const vector<string>&, bool);
+    vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
+    string extractJsonValueAflow(const string&, string);
 
-      DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
-      void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
-          const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
-          vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
-      vector<string> getUniqueFromJsonArrays(const vector<string>&);
-      void writeStatsToJson(std::stringstream&, const DBStats&);
+    DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
+    void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
+		     const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
+		     vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
+    vector<string> getUniqueFromJsonArrays(const vector<string>&);
+    void writeStatsToJson(std::stringstream&, const DBStats&);
 
-      void createIndex(const string&, const string&, const string&);
-      void dropIndex(const string&);
-      void dropTable(const string&);
-      void createTable(const string&, const vector<string>&, const string&);
-      void createTable(const string&, const vector<string>&, const vector<string>&);
-      void insertValues(const string&, const vector<string>&);
-      void insertValues(const string&, const vector<string>&, const vector<string>&);
-      string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
-      string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
+    void createIndex(const string&, const string&, const string&);
+    void dropIndex(const string&);
+    void dropTable(const string&);
+    void createTable(const string&, const vector<string>&, const string&);
+    void createTable(const string&, const vector<string>&, const vector<string>&);
+    void insertValues(const string&, const vector<string>&);
+    void insertValues(const string&, const vector<string>&, const vector<string>&);
+    string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
+    string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
   };
-
 }  // namespace aflowlib
+
+// ----------------------------------------------------------------------------
+// aflowlib_libraries_scrubber.cpp
+
+// will be moved near LI2RAW
+namespace aflowlib {
+  uint MOSFET(int mode,bool VERBOSE);
+  uint MAIL2SCAN(string library,bool VERBOSE);
+  uint LIB2SCRUB(string library,bool VERBOSE);
+  bool LIB2AUID(string entry,bool TEST,bool _VERBOSE);
+}  // namespace aflowlib
+
+
 
 #endif //  _AFLOWLIB_H_
 

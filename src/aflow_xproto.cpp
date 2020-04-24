@@ -2220,53 +2220,8 @@ namespace aflowlib {
         }
         str_sp.bravais_lattice_type="X";
         //DX START
-        // [[JUNKAI OBSOLETE]]  uint step=0;
         //  while (str_sp.bravais_lattice_type!=str.bravais_lattice_type && str_sp.bravais_lattice_type!="UNKNOWN" && step<10) {  //[CO20200106 - close bracket for indenting]}
-        LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc); //DX
-        // [[JUNKAI OBSOLETE]]
-        // [[JUNKAI OBSOLETE]]while (str_sp.bravais_lattice_type!=str.bravais_lattice_type && str_sp.bravais_lattice_type!="UNKNOWN" && step<10) {
-        // [[JUNKAI OBSOLETE]]  step++;
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) (aflow_xproto.cpp): step=" << step << "  eps=" << eps << "  epsang=" << epsang << " "; }
-        // [[JUNKAI OBSOLETE]]  // LATTICE::Standard_Lattice_Structure(str,str_sp,str_sc,eps,epsang); //SC OLD VERSION
-        // [[JUNKAI OBSOLETE]]  int ss=0;
-        // [[JUNKAI OBSOLETE]]  LATTICE::Standard_Lattice_Structure(str,str_sp,str_sc,eps,epsang,ss,_EPS_);
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) { *voss << str.bravais_lattice_type << endl; }
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) { *voss << str_sp.bravais_lattice_type << endl; }
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) { *voss << str_sc.bravais_lattice_type << endl; }
-        // [[JUNKAI OBSOLETE]]  // *voss << str << endl; *voss << str_sp << endl; *voss << str_sc << endl;exit(0);
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) { *voss << str_sp.bravais_lattice_variation_type << endl; }
-        // [[JUNKAI OBSOLETE]]  // *voss << str_sp.bravais_lattice_type << " " << eps << " " << epsang << " " << endl;
-        // [[JUNKAI OBSOLETE]]  // if(str_sp.bravais_lattice_type!=str.bravais_lattice_type)  // try different option str.bravais_lattice_type known only for ICSD
-        // [[JUNKAI OBSOLETE]]  if(str_sp.bravais_lattice_type!=str.bravais_lattice_type)
-        // [[JUNKAI OBSOLETE]]  { //CO20200106 - patching for auto-indenting
-        // [[JUNKAI OBSOLETE]]    xstructure stropt=strw,stropt_sp=str,stropt_sc=str;
-        // [[JUNKAI OBSOLETE]]    stropt.spacegroupnumberoption=3-stropt.spacegroupnumberoption;
-        // [[JUNKAI OBSOLETE]]    if(stropt.spacegroupnumberoption==3) stropt.spacegroupnumberoption=2;
-        // [[JUNKAI OBSOLETE]]    stropt=WyckoffPOSITIONS(stropt.spacegroupnumber,stropt.spacegroupnumberoption,stropt);
-        // [[JUNKAI OBSOLETE]]    stropt.title=label_library+" "+"#"+aurostd::utype2string(stropt.spacegroupnumber)+" - "+"("+label+")";  // SG# AS WSETYAWAN wants
-        // [[JUNKAI OBSOLETE]]    stropt.title+=" - "+stropt.prototype+" "+_ICSD_STRING_;                                                // SG# as WSETYAWAN wants
-        // [[JUNKAI OBSOLETE]]    stropt.title=stropt.title+" (WICKOFF "+stropt.spacegroup+" "+stropt.spacegrouplabel+")";
-        // [[JUNKAI OBSOLETE]]    for(uint i=0;i<stropt.atoms.size();i++) {stropt.atoms.at(i).name=speciesX.at(stropt.atoms.at(i).type);stropt.atoms.at(i).CleanName();}
-        // [[JUNKAI OBSOLETE]]    // stropt=LATTICE::Conventional_Lattice_Structure(stropt); // put it in the right order...
-        // [[JUNKAI OBSOLETE]]    stropt.bravais_lattice_type=LATTICE::SpaceGroup2Lattice(stropt.spacegroupnumber);
-        // [[JUNKAI OBSOLETE]]    stropt.bravais_lattice_variation_type=LATTICE::SpaceGroup2LatticeVariation(stropt.spacegroupnumber,stropt);
-        // [[JUNKAI OBSOLETE]]    stropt.bravais_lattice_system=stropt.bravais_lattice_type; // FIX
-        // [[JUNKAI OBSOLETE]]    stropt.FixLattices();
-        // [[JUNKAI OBSOLETE]]    stropt_sp=stropt;stropt_sc=stropt;stropt_sp.bravais_lattice_type="X";  // so it creates species and stuff.
-        // [[JUNKAI OBSOLETE]]    step++;
-        // [[JUNKAI OBSOLETE]]    if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) (aflow_xproto.cpp): step=" << step << "  eps=" << eps << "  epsang=" << epsang << " "; }
-        // [[JUNKAI OBSOLETE]]    // LATTICE::Standard_Lattice_Structure(stropt,stropt_sp,stropt_sc,eps,epsang); //SC OLD VERSION
-        // [[JUNKAI OBSOLETE]]    ss=0; // JUNKAI
-        // [[JUNKAI OBSOLETE]]    LATTICE::Standard_Lattice_Structure(stropt,stropt_sp,stropt_sc,eps,epsang,ss,_EPS_); //JUNKAI
-        // [[JUNKAI OBSOLETE]]    if(LDEBUG) { *voss << str_sp.bravais_lattice_variation_type << endl; }
-        // [[JUNKAI OBSOLETE]]    if(stropt_sp.bravais_lattice_type==stropt.bravais_lattice_type) { // gotta a wrong OPTION
-        // [[JUNKAI OBSOLETE]]      *voss << "WARNING: (aflow_xproto.cpp): label=" << label << "  wrong option in lattice, put option=" << stropt.spacegroupnumberoption << endl;
-        // [[JUNKAI OBSOLETE]]      str=stropt;str_sp=stropt_sp;str_sc=stropt_sc;
-        // [[JUNKAI OBSOLETE]]    }
-        // [[JUNKAI OBSOLETE]]  }
-        // [[JUNKAI OBSOLETE]]  eps=eps/3.0;epsang=epsang/3.0;
-        // [[JUNKAI OBSOLETE]]}
-        //DX END
+        LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc); // DX
 
         if(str_sp.bravais_lattice_type!=str.bravais_lattice_type) {
           oss << "ERROR (aflow_xproto.cpp): label=" << label << "  " << str_sp.bravais_lattice_type << " " << str.bravais_lattice_type << " "
@@ -2577,17 +2532,26 @@ namespace aflowlib {
         aurostd::substring2bool(library,"lib8") || 
         aurostd::substring2bool(library,"lib9")) {
       vector<string> ltokens,vLibrary;
-      if(aurostd::substring2bool(library,"icsd")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib0")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib1")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib2")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib3")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib4")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib5")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib6")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib7")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib8")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),ltokens,"\n");
-      if(aurostd::substring2bool(library,"lib9")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),ltokens,"\n");
+      init::InitLoadString("vLIBS");
+      // [OBSOLETE] if(aurostd::substring2bool(library,"icsd")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),ltokens,"\n");
+      // [OBSOLETE] if(aurostd::substring2bool(library,"lib0")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_LIB"),ltokens,"\n");
+      // [OBSOLETE] if(aurostd::substring2bool(library,"lib1")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_LIB"),ltokens,"\n");
+      // [OBSOLETE] if(aurostd::substring2bool(library,"lib2")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_LIB"),ltokens,"\n");
+      // [OBSOLETE] if(aurostd::substring2bool(library,"lib3")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),ltokens,"\n");
+      // [OBSOLETE] if(aurostd::substring2bool(library,"lib4")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),ltokens,"\n");
+      // [OBSOLETE] if(aurostd::substring2bool(library,"lib5")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),ltokens,"\n");
+      // [OBSOLETE] if(aurostd::substring2bool(library,"lib6")) aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),ltokens,"\n");
+      if(aurostd::substring2bool(library,"icsd")) ltokens=XHOST_Library_CALCULATED_ICSD_LIB;
+      if(aurostd::substring2bool(library,"lib0")) ltokens=XHOST_Library_CALCULATED_LIB0_LIB;
+      if(aurostd::substring2bool(library,"lib1")) ltokens=XHOST_Library_CALCULATED_LIB1_LIB;
+      if(aurostd::substring2bool(library,"lib2")) ltokens=XHOST_Library_CALCULATED_LIB2_LIB;
+      if(aurostd::substring2bool(library,"lib3")) ltokens=XHOST_Library_CALCULATED_LIB3_LIB;
+      if(aurostd::substring2bool(library,"lib4")) ltokens=XHOST_Library_CALCULATED_LIB4_LIB;
+      if(aurostd::substring2bool(library,"lib5")) ltokens=XHOST_Library_CALCULATED_LIB5_LIB;
+      if(aurostd::substring2bool(library,"lib6")) ltokens=XHOST_Library_CALCULATED_LIB6_LIB;
+      if(aurostd::substring2bool(library,"lib7")) ltokens=XHOST_Library_CALCULATED_LIB7_LIB;
+      if(aurostd::substring2bool(library,"lib8")) ltokens=XHOST_Library_CALCULATED_LIB8_LIB;
+      if(aurostd::substring2bool(library,"lib9")) ltokens=XHOST_Library_CALCULATED_LIB9_LIB;
       for(uint i=0;i<ltokens.size();i++)
         if(aurostd::substring2bool(ltokens.at(i),"/"))
           vLibrary.push_back(ltokens.at(i));
@@ -2612,111 +2576,39 @@ namespace aflowlib {
     // LIBRARY_ALL
     if(aurostd::substring2bool(library,"all")) {
       out << "AFLOW V"<<string(AFLOW_VERSION)<< "  "  << TODAY << endl;
-      vector<string> ltokens,vLibrary_CALCULATED_ICSD,
-        vLibrary_CALCULATED_LIB0,
-        vLibrary_CALCULATED_LIB1,
-        vLibrary_CALCULATED_LIB2,
-        vLibrary_CALCULATED_LIB3,
-        vLibrary_CALCULATED_LIB4,
-        vLibrary_CALCULATED_LIB5,
-        vLibrary_CALCULATED_LIB6,
-        vLibrary_CALCULATED_LIB7,
-        vLibrary_CALCULATED_LIB8,
-        vLibrary_CALCULATED_LIB9;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_ICSD.push_back(ltokens.at(i));
-      out << "Library_ICSD_CALCULATED = " << vLibrary_CALCULATED_ICSD.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB0.push_back(ltokens.at(i));
-      out << "Library_LIB0_CALCULATED = " << vLibrary_CALCULATED_LIB0.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB1.push_back(ltokens.at(i));
-      out << "Library_LIB1_CALCULATED = " << vLibrary_CALCULATED_LIB1.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB2.push_back(ltokens.at(i));
-      out << "Library_LIB2_CALCULATED = " << vLibrary_CALCULATED_LIB2.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB3.push_back(ltokens.at(i));
-      out << "Library_LIB3_CALCULATED = " << vLibrary_CALCULATED_LIB3.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB4.push_back(ltokens.at(i));
-      out << "Library_LIB4_CALCULATED = " << vLibrary_CALCULATED_LIB4.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB5.push_back(ltokens.at(i));
-      out << "Library_LIB5_CALCULATED = " << vLibrary_CALCULATED_LIB5.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB6.push_back(ltokens.at(i));
-      out << "Library_LIB6_CALCULATED = " << vLibrary_CALCULATED_LIB6.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB7.push_back(ltokens.at(i));
-      out << "Library_LIB7_CALCULATED = " << vLibrary_CALCULATED_LIB7.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB8.push_back(ltokens.at(i));
-      out << "Library_LIB8_CALCULATED = " << vLibrary_CALCULATED_LIB8.size() << endl;
-
-      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),ltokens,"\n");
-      for(uint i=0;i<ltokens.size();i++)
-        if(aurostd::substring2bool(ltokens.at(i),"/"))
-          vLibrary_CALCULATED_LIB9.push_back(ltokens.at(i));
-      out << "Library_LIB9_CALCULATED = " << vLibrary_CALCULATED_LIB9.size() << endl;
+   
+      init::InitLoadString("vLIBS");
+      uint sICSD=XHOST_Library_CALCULATED_ICSD_LIB.size();
+      uint sLIB0=XHOST_Library_CALCULATED_LIB0_LIB.size();
+      uint sLIB1=XHOST_Library_CALCULATED_LIB1_LIB.size();
+      uint sLIB2=XHOST_Library_CALCULATED_LIB2_LIB.size();
+      uint sLIB3=XHOST_Library_CALCULATED_LIB3_LIB.size();
+      uint sLIB4=XHOST_Library_CALCULATED_LIB4_LIB.size();
+      uint sLIB5=XHOST_Library_CALCULATED_LIB5_LIB.size();
+      uint sLIB6=XHOST_Library_CALCULATED_LIB6_LIB.size();
+      uint sLIB7=XHOST_Library_CALCULATED_LIB7_LIB.size();
+      uint sLIB8=XHOST_Library_CALCULATED_LIB8_LIB.size();
+      uint sLIB9=XHOST_Library_CALCULATED_LIB9_LIB.size();
+      
+      out << "Library_ICSD_CALCULATED = " << sICSD << endl;
+      out << "Library_LIB0_CALCULATED = " << sLIB0 << endl;
+      out << "Library_LIB1_CALCULATED = " << sLIB1 << endl;
+      out << "Library_LIB2_CALCULATED = " << sLIB2 << endl;
+      out << "Library_LIB3_CALCULATED = " << sLIB3 << endl;
+      out << "Library_LIB4_CALCULATED = " << sLIB4 << endl;
+      out << "Library_LIB5_CALCULATED = " << sLIB5 << endl;
+      out << "Library_LIB6_CALCULATED = " << sLIB6 << endl;
+      out << "Library_LIB7_CALCULATED = " << sLIB7 << endl;
+      out << "Library_LIB8_CALCULATED = " << sLIB8 << endl;
+      out << "Library_LIB9_CALCULATED = " << sLIB9 << endl;
 
       out << "AFLOW V" 
-        << string(AFLOW_VERSION)
-        << " [date="  <<  aurostd::get_datetime() << "]" 
-        << " [built="  << TODAY << "]" 
-        << " Calcs=" 
-        << vLibrary_CALCULATED_ICSD.size() << "," 
-        << vLibrary_CALCULATED_LIB0.size() << "," 
-        << vLibrary_CALCULATED_LIB1.size() << "," 
-        << vLibrary_CALCULATED_LIB2.size() << "," 
-        << vLibrary_CALCULATED_LIB3.size() << "," 
-        << vLibrary_CALCULATED_LIB4.size() << "," 
-        << vLibrary_CALCULATED_LIB5.size() << "," 
-        << vLibrary_CALCULATED_LIB6.size() << "," 
-        << vLibrary_CALCULATED_LIB7.size() << "," 
-        << vLibrary_CALCULATED_LIB8.size() << "," 
-        << vLibrary_CALCULATED_LIB9.size() << "=" << 
-        vLibrary_CALCULATED_ICSD.size() +
-        vLibrary_CALCULATED_LIB0.size() +
-        vLibrary_CALCULATED_LIB1.size() +
-        vLibrary_CALCULATED_LIB2.size() +
-        vLibrary_CALCULATED_LIB3.size() +
-        vLibrary_CALCULATED_LIB4.size() +
-        vLibrary_CALCULATED_LIB5.size() +
-        vLibrary_CALCULATED_LIB6.size() +
-        vLibrary_CALCULATED_LIB7.size() +
-        vLibrary_CALCULATED_LIB8.size() +
-        vLibrary_CALCULATED_LIB9.size() << endl;
+	  << string(AFLOW_VERSION)
+	  << " [date="  <<  aurostd::get_datetime() << "]" 
+	  << " [built="  << TODAY << "]" 
+	  << " Calcs=" 
+	  << sICSD << "," << sLIB0 << "," << sLIB1 << "," << sLIB2 << "," << sLIB3 << "," << sLIB4 << "," << sLIB5 << "," << sLIB6 << "," << sLIB7 << "," << sLIB8 << "," << sLIB9 << "="
+	  << sICSD+sLIB0+sLIB1+sLIB2+sLIB3+sLIB4+sLIB5+sLIB6+sLIB7+sLIB8+sLIB9 << endl;
 
     }
     if(LDEBUG) { cerr << "aflowlib::CALCULATED: END" << endl; }
@@ -2731,10 +2623,10 @@ namespace aflowlib {
   string CALCULATED_ICSD_RANDOM(void) {
     stringstream out;
     vector<string> tokens,vLibrary;
-    aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),tokens,"\n");
-    for(uint i=0;i<tokens.size();i++)
-      if(aurostd::substring2bool(tokens.at(i),"/"))
-        vLibrary.push_back(tokens.at(i));
+    init::InitGlobalObject("vLIBS");
+    for(uint i=0;i<XHOST_Library_CALCULATED_ICSD_LIB.size();i++)
+      if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB.at(i),"/"))
+        vLibrary.push_back(XHOST_Library_CALCULATED_ICSD_LIB.at(i));
 
     uint index=(uint) floor(vLibrary.size()*aurostd::ran0());
     aurostd::string2tokens(vLibrary.at(index),tokens,"/");
@@ -4150,51 +4042,7 @@ namespace aflowlib {
         }
         str_sp.bravais_lattice_type="X";
         //DX START
-        // [[JUNKAI OBSOLETE]] uint step=0;
         LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc); //DX
-        // [[JUNKAI OBSOLETE]]
-        // [[JUNKAI OBSOLETE]]//  while (str_sp.bravais_lattice_type!=str.bravais_lattice_type && str_sp.bravais_lattice_type!="UNKNOWN" && step<10)
-        // [[JUNKAI OBSOLETE]]while (str_sp.bravais_lattice_type!=str.bravais_lattice_type && str_sp.bravais_lattice_type!="UNKNOWN" && step<10)
-        // [[JUNKAI OBSOLETE]]  { //CO20200106 - patching for auto-indenting
-        // [[JUNKAI OBSOLETE]]  step++;if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) (aflow_xproto.cpp): step=" << step << "  eps=" << eps << "  epsang=" << epsang << " ";
-        // [[JUNKAI OBSOLETE]]  // LATTICE::Standard_Lattice_Structure(str,str_sp,str_sc,eps,epsang); //SC OLD VERSION
-        // [[JUNKAI OBSOLETE]]  int ss=0;
-        // [[JUNKAI OBSOLETE]]  LATTICE::Standard_Lattice_Structure(str,str_sp,str_sc,eps,epsang,ss,_EPS_);
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) *voss << str.bravais_lattice_type << endl;
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) *voss << str_sp.bravais_lattice_type << endl;
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) *voss << str_sc.bravais_lattice_type << endl;
-        // [[JUNKAI OBSOLETE]]  // cerr << str << endl; cerr << str_sp << endl; cerr << str_sc << endl;exit(0);
-        // [[JUNKAI OBSOLETE]]  if(LDEBUG) *voss << str_sp.bravais_lattice_variation_type << endl;
-        // [[JUNKAI OBSOLETE]]  // *voss << str_sp.bravais_lattice_type << " " << eps << " " << epsang << " " << endl;
-        // [[JUNKAI OBSOLETE]]  // if(str_sp.bravais_lattice_type!=str.bravais_lattice_type)  // try different option str.bravais_lattice_type known only for ICSD
-        // [[JUNKAI OBSOLETE]]  if(str_sp.bravais_lattice_type!=str.bravais_lattice_type)
-        // [[JUNKAI OBSOLETE]]  { //CO20200106 - patching for auto-indenting
-        // [[JUNKAI OBSOLETE]]    xstructure stropt=strw,stropt_sp=str,stropt_sc=str;
-        // [[JUNKAI OBSOLETE]]    stropt.spacegroupnumberoption=3-stropt.spacegroupnumberoption;
-        // [[JUNKAI OBSOLETE]]    if(stropt.spacegroupnumberoption==3) stropt.spacegroupnumberoption=2;
-        // [[JUNKAI OBSOLETE]]    stropt=WyckoffPOSITIONS(stropt.spacegroupnumber,stropt.spacegroupnumberoption,stropt);
-        // [[JUNKAI OBSOLETE]]    stropt.title=label_library+" "+"#"+aurostd::utype2string(stropt.spacegroupnumber)+" - "+"("+PARAMS->label+")";  // SG# AS WSETYAWAN wants
-        // [[JUNKAI OBSOLETE]]    stropt.title+=" - "+stropt.prototype+" "+_ICSD_STRING_;                                                // SG# as WSETYAWAN wants
-        // [[JUNKAI OBSOLETE]]    stropt.title=stropt.title+" (WICKOFF "+stropt.spacegroup+" "+stropt.spacegrouplabel+")";
-        // [[JUNKAI OBSOLETE]]    for(uint i=0;i<stropt.atoms.size();i++) {stropt.atoms.at(i).name=speciesX.at(stropt.atoms.at(i).type);stropt.atoms.at(i).CleanName();}
-        // [[JUNKAI OBSOLETE]]    // stropt=LATTICE::Conventional_Lattice_Structure(stropt); // put it in the right order...
-        // [[JUNKAI OBSOLETE]]    stropt.bravais_lattice_type=LATTICE::SpaceGroup2Lattice(stropt.spacegroupnumber);
-        // [[JUNKAI OBSOLETE]]    stropt.bravais_lattice_variation_type=LATTICE::SpaceGroup2LatticeVariation(stropt.spacegroupnumber,stropt);
-        // [[JUNKAI OBSOLETE]]    stropt.bravais_lattice_system=stropt.bravais_lattice_type; // FIX
-        // [[JUNKAI OBSOLETE]]    stropt.FixLattices();
-        // [[JUNKAI OBSOLETE]]    stropt_sp=stropt;stropt_sc=stropt;stropt_sp.bravais_lattice_type="X";  // so it creates species and stuff.
-        // [[JUNKAI OBSOLETE]]    step++;if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) (aflow_xproto.cpp): step=" << step << "  eps=" << eps << "  epsang=" << epsang << " ";
-        // [[JUNKAI OBSOLETE]]    // LATTICE::Standard_Lattice_Structure(stropt,stropt_sp,stropt_sc,eps,epsang); //SC OLD VERSION
-        // [[JUNKAI OBSOLETE]]    ss=0; // JUNKAI
-        // [[JUNKAI OBSOLETE]]    LATTICE::Standard_Lattice_Structure(stropt,stropt_sp,stropt_sc,eps,epsang,ss,_EPS_); //JUNKAI
-        // [[JUNKAI OBSOLETE]]    if(LDEBUG) *voss << str_sp.bravais_lattice_variation_type << endl;
-        // [[JUNKAI OBSOLETE]]    if(stropt_sp.bravais_lattice_type==stropt.bravais_lattice_type) { // gotta a wrong OPTION
-        // [[JUNKAI OBSOLETE]]      *voss << "WARNING: (aflow_xproto.cpp): PARAMS->label=" << PARAMS->label << "  wrong option in lattice, put option=" << stropt.spacegroupnumberoption << endl;
-        // [[JUNKAI OBSOLETE]]      str=stropt;str_sp=stropt_sp;str_sc=stropt_sc;
-        // [[JUNKAI OBSOLETE]]    }
-        // [[JUNKAI OBSOLETE]]  }
-        // [[JUNKAI OBSOLETE]]  eps=eps/3.0;epsang=epsang/3.0;
-        // [[JUNKAI OBSOLETE]]}
 
         if(str_sp.bravais_lattice_type!=str.bravais_lattice_type) {
           oss << "ERROR (aflow_xproto.cpp): PARAMS->label=" << PARAMS->label << "  " << str_sp.bravais_lattice_type << " " << str.bravais_lattice_type << " "

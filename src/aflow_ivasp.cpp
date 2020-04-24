@@ -73,6 +73,49 @@ namespace KBIN {
   }
 }
 
+
+namespace KBIN {
+  bool VASP_Write_ppAUID_FILE(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species) {
+    vector<string> vWRITE;
+    vWRITE.push_back("AFLOW: AUID of pseudopotentials: NAUID="+aurostd::utype2string<uint>(vppAUIDs.size()));
+    if(vppAUIDs.size()!=species.size()) {
+      cout << "WARNING: KBIN::VASP_Write_ppAUID_FILE: vppAUIDs.size()=" << vppAUIDs.size() << "!=species.size()=" << species.size() << endl;
+      cerr << "WARNING: KBIN::VASP_Write_ppAUID_FILE: vppAUIDs.size()=" << vppAUIDs.size() << "!=species.size()=" << species.size() << endl;
+      return FALSE;
+    }
+    for(uint i=0;i<vppAUIDs.size();i++)
+      vWRITE.push_back(vppAUIDs.at(i)+" "+aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(species.at(i)),3));
+    aurostd::vectorstring2file(vWRITE,directory+"/"+DEFAULT_AFLOW_PSEUDOPOTENTIAL_AUID_OUT);
+    return TRUE;
+  }
+  bool VASP_Write_ppAUID_FILE(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species) {
+    return VASP_Write_ppAUID_FILE(directory,aurostd::deque2vector(vppAUIDs),aurostd::deque2vector(species));
+  }
+  bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const vector<string>& vppAUIDs,const vector<string>& species) {
+   if(vppAUIDs.size()!=species.size()) {
+      cout << "WARNING: KBIN::VASP_Write_ppAUID_AFLOWIN: vppAUIDs.size()=" << vppAUIDs.size() << "!=species.size()=" << species.size() << endl;
+      cerr << "WARNING: KBIN::VASP_Write_ppAUID_AFLOWIN: vppAUIDs.size()=" << vppAUIDs.size() << "!=species.size()=" << species.size() << endl;
+      return FALSE;
+    }
+     struct stat fileInfo;
+    stat(string(directory+"/"+_AFLOWIN_).c_str(), &fileInfo);
+    string date=std::ctime(&fileInfo.st_mtime);
+    if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
+
+    string WRITE="[VASP_POTCAR_AUID]";
+    for(uint i=0;i<vppAUIDs.size();i++) {
+      WRITE+=vppAUIDs.at(i);
+      if(i<vppAUIDs.size()-1) WRITE+=",";
+    }
+    aurostd::execute("echo \""+WRITE+"\" >> "+directory+"/"+_AFLOWIN_);
+    aurostd::execute("touch -m --date=\""+date+"\" "+directory+"/"+_AFLOWIN_);
+    return TRUE;
+  }
+  bool VASP_Write_ppAUID_AFLOWIN(const string& directory,const deque<string>& vppAUIDs,const deque<string>& species) {
+    return VASP_Write_ppAUID_AFLOWIN(directory,aurostd::deque2vector(vppAUIDs),aurostd::deque2vector(species));
+  }
+}
+
 namespace KBIN {
   bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     ifstream DirectoryStream;
@@ -91,6 +134,9 @@ namespace KBIN {
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR")));
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS")));
     if(Krun) Krun=(Krun && aurostd::stringstream2file(xvasp.POTCAR,string(xvasp.Directory+"/POTCAR")));
+    if(Krun) Krun=(Krun && VASP_Write_ppAUID_FILE(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
+    if(Krun) Krun=(Krun && VASP_Write_ppAUID_AFLOWIN(xvasp.Directory,xvasp.POTCAR_AUID,xvasp.str.species));
+    
     // VASP BACKUP VASP WRITE
     if(Krun && xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed"))  Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR_orig,string(xvasp.Directory+"/POSCAR.orig")));
     if(Krun && xvasp.aopts.flag("FLAG::XVASP_INCAR_changed"))   Krun=(Krun && aurostd::stringstream2file(xvasp.INCAR_orig,string(xvasp.Directory+"/INCAR.orig")));
@@ -1717,6 +1763,10 @@ namespace KBIN {
   bool VASP_Convert_Unit_Cell(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, ofstream& FileMESSAGE, ostringstream& aus) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool Krun = true;
+
+    if(LDEBUG) aus << "00000  MESSAGE-OPTION  KBIN::VASP_Convert_Unit_Cell: BEGIN " << endl;  //SC20200410
+    if(LDEBUG) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);                      //SC20200410
+
     if(Krun && vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.isentry) {        /*************** POSCAR **************/
       //    aus << "00000  MESSAGE POSCAR  [VASP_FORCE_OPTION]CONVERT_UNIT_CELL=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]CONVERT_UNIT_CELL=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -1899,6 +1949,10 @@ namespace KBIN {
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_generated",TRUE);
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed",TRUE);
     }
+
+    if(LDEBUG) aus << "00000  MESSAGE-OPTION  KBIN::VASP_Convert_Unit_Cell: END " << endl;  //SC20200410
+    if(LDEBUG) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);                    //SC20200410
+
     return Krun;
   }
 }
@@ -2097,7 +2151,8 @@ namespace KBIN {
           xvasp.str.GetLatticeType();
           aus << "00000  MESSAGE " << STRING_KPOINTS_TO_SHOW << " Found Lattice=" << xvasp.str.bravais_lattice_variation_type << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           xvasp.str.kpoints_kscheme="Monkhorst-Pack";
-          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";
+	  //          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";  // also add RHL
+          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";
           aus << "00000  MESSAGE " << STRING_KPOINTS_TO_SHOW << "_KSCHEME=\"" << xvasp.str.kpoints_kscheme << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
@@ -2303,7 +2358,8 @@ namespace KBIN {
       xvasp.str.GetLatticeType();
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSCHEME_AUTO  Found Lattice=" << xvasp.str.bravais_lattice_variation_type << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       xvasp.str.kpoints_kscheme="Monkhorst-Pack";
-      if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";
+      //     if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma"; // add RHL
+      if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSCHEME_" << xvasp.str.kpoints_kscheme << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,xvasp.str.kpoints_kscheme);
@@ -2350,7 +2406,7 @@ namespace KBIN {
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------
 // POTCAR
 namespace KBIN {
-  bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar) {
+  bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string pseudopotential="nothing";
     FilePotcar="";DataPotcar="";
@@ -2371,8 +2427,8 @@ namespace KBIN {
     if(aurostd::substring2bool(species_pp,"potpaw_PBE_KIN") || aurostd::substring2bool(species_pp,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN))
       pseudopotential=DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN;
 
-    if (LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: species_pp=" << species_pp << endl; 
-    if (LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: pseudopotential=" << pseudopotential << endl;
+    if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: species_pp=" << species_pp << endl; 
+    if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: pseudopotential=" << pseudopotential << endl;
     //    exit(0);
 
     bool found=FALSE;
@@ -2383,13 +2439,20 @@ namespace KBIN {
       found=TRUE;
       FilePotcar=init::InitLoadString(string2load_list,FALSE);
       DataPotcar=init::InitLoadString(string2load_data,FALSE);
-    }
+      string file_tmp=aurostd::TmpFileCreate("DataPotcar");
+      AUIDPotcar=aurostd::file2auid(file_tmp);
+      if(aurostd::FileExist(file_tmp)) aurostd::RemoveFile(file_tmp);
+
+      if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: species_pp=" << species_pp << endl; 
+      if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: pseudopotential=" << pseudopotential << endl;
+      if(LDEBUG) cerr << "[VASP_Find_DATA_POTCAR]: AUIDPotcar=" << AUIDPotcar << endl; 
+}
     return found;
   }
 }
 
 namespace KBIN {
-  bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar) {
+  bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string pseudopotential="nothing";
     FilePotcar="";DataPotcar="";
@@ -2410,8 +2473,8 @@ namespace KBIN {
     if(aurostd::substring2bool(species_pp,"potpaw_PBE_KIN") || aurostd::substring2bool(species_pp,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN))
       pseudopotential=DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN;
 
-    if (LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: species_pp=" << species_pp << endl; 
-    if (LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: pseudopotential=" << pseudopotential << endl;
+    if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: species_pp=" << species_pp << endl; 
+    if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: pseudopotential=" << pseudopotential << endl;
     //    exit(0);
 
     bool found=FALSE;
@@ -2454,7 +2517,13 @@ namespace KBIN {
       while (FileINPUT.get(c)) aus.put(c);
       FileINPUT.clear();FileINPUT.close();
       DataPotcar=aus.str();
+      
+      AUIDPotcar=aurostd::file2auid(FilePotcar);
+      if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: species_pp=" << species_pp << endl; 
+      if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: pseudopotential=" << pseudopotential << endl;
+      if(LDEBUG) cerr << "[VASP_Find_FILE_POTCAR]: AUIDPotcar=" << AUIDPotcar << endl; 
     }
+
     return found;
   }
 }
@@ -2470,11 +2539,10 @@ namespace KBIN {
     ostringstream aus;
     bool Krun=TRUE;
     xvasp.POTCAR.str(std::string());
+    xvasp.POTCAR_AUID.clear();
     xvasp.aopts.flag("FLAG::XVASP_POTCAR_generated",FALSE);
     xvasp.aopts.flag("FLAG::XVASP_POTCAR_changed",FALSE);
     xvasp.POTCAR_POTENTIALS.str(std::string());
-
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
 
     // IMPLICIT or EXPLICIT or EXTERNAL for POTCAR
     Krun=(Krun && (vflags.KBIN_VASP_POTCAR_MODE.flag("IMPLICIT") || vflags.KBIN_VASP_POTCAR_MODE.flag("EXPLICIT") || vflags.KBIN_VASP_POTCAR_MODE.flag("EXTERNAL")));
@@ -2499,7 +2567,7 @@ namespace KBIN {
       // Prepare POTCAR
       ifstream FileINPUT;
       vector<string> FilePotcars;
-      string FilePotcar,DataPotcar;
+      string FilePotcar,DataPotcar,AUIDPotcar;
       if(!vflags.KBIN_VASP_POTCAR_FILE.flag("SYSTEM_AUTO")) {
         subS2="[VASP_POTCAR_FILE]"; // STRING TO SEARCH
         subS1=AflowIn.substr(AflowIn.find(subS2));
@@ -2572,7 +2640,7 @@ namespace KBIN {
           aurostd::StringSubst(cleanname,"/POTCAR","");
           vector<string> tokens;aurostd::string2tokens(cleanname,tokens,"/");
           if(tokens.size()>0) cleanname=tokens.at(tokens.size()-1);
-          if (LDEBUG) cerr << "[VASP_Produce_POTCAR]: vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme << endl;
+          if(LDEBUG) cerr << "[VASP_Produce_POTCAR]: vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme << endl;
           if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme=="potpaw_PBE_KIN")
             FilePotcars.at(i)=DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/"+AVASP_Get_PseudoPotential_PAW_PBE_KIN(cleanname);
           if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme=="potpaw_LDA_KIN")
@@ -2596,8 +2664,8 @@ namespace KBIN {
           aurostd::string2tokens(FilePotcars[i], tokens, "/");
           if (tokens.size() > 0) xvasp.str.species_pp[i] = tokens.back();
 
-          if (LDEBUG) cerr << "[VASP_Produce_POTCAR]: cleanname=" << cleanname << endl;
-          if (LDEBUG) cerr << "[VASP_Produce_POTCAR]: FilePotcars.at(" << i << ")=" << FilePotcars.at(i) << endl;
+          if(LDEBUG) cerr << "[VASP_Produce_POTCAR]: cleanname=" << cleanname << endl;
+          if(LDEBUG) cerr << "[VASP_Produce_POTCAR]: FilePotcars.at(" << i << ")=" << FilePotcars.at(i) << endl;
         }
       }
 
@@ -2623,8 +2691,8 @@ namespace KBIN {
         // strip everything
         tokens.clear();
         FilePotcarNaked=FilePotcars.at(i);
-        for(uint iext=0;iext<vext.size();iext++) { 
-          FilePotcarNaked=aurostd::RemoveSubStringFirst(FilePotcarNaked,"/POTCAR"+vext.at(iext));
+        for(uint iext=0;iext<XHOST.vext.size();iext++) { 
+          FilePotcarNaked=aurostd::RemoveSubStringFirst(FilePotcarNaked,"/POTCAR"+XHOST.vext.at(iext));
         }
         aurostd::string2tokens(FilePotcarNaked,tokens,"/");
         xvasp.POTCAR_POTENTIALS << tokens.at(tokens.size()-1);
@@ -2633,24 +2701,26 @@ namespace KBIN {
         bool found_DATA=FALSE;
         bool found_FILE=FALSE;
         if(AFLOW_PSEUDOPOTENTIALS) {
-          found_DATA=KBIN::VASP_Find_DATA_POTCAR(FilePotcars.at(i),FilePotcar,DataPotcar);
+          found_DATA=KBIN::VASP_Find_DATA_POTCAR(FilePotcars.at(i),FilePotcar,DataPotcar,AUIDPotcar);
           if(found_DATA) {
-            aus << "00000  MESSAGE POTCAR  DATA: Found potcar FilePotcar=" << FilePotcar << " - DataPotcar.size()=" << DataPotcar.size() << " " << endl;
+            aus << "00000  MESSAGE POTCAR  DATA: Found potcar FilePotcar=" << FilePotcar << " - DataPotcar.size()=" << DataPotcar.size() << " - AUIDPotcar=" << AUIDPotcar << " " << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.POTCAR << DataPotcar << endl;
+	    xvasp.POTCAR_AUID.push_back(AUIDPotcar);
             // [OBSOLETE] aus << "00000  MESSAGE POTCAR  DATA: Found potcar xvasp.POTCAR.str().size()=" << xvasp.POTCAR.str().size() << " " << endl;
             // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	      
           }
         } else {
-          found_FILE=KBIN::VASP_Find_FILE_POTCAR(FilePotcars.at(i),FilePotcar,DataPotcar);
+          found_FILE=KBIN::VASP_Find_FILE_POTCAR(FilePotcars.at(i),FilePotcar,DataPotcar,AUIDPotcar);
           if(found_FILE) {
             // FileINPUT.clear();FileINPUT.open(FilePotcar.c_str(),std::ios::in);
             // char c;while (FileINPUT.get(c)) xvasp.POTCAR.put(c);
             // FileINPUT.clear();FileINPUT.close();
-            aus << "00000  MESSAGE POTCAR  FILE: Found potcar FilePotcar=" << FilePotcar << " - DataPotcar.size()=" << DataPotcar.size() << " " << endl;
+            aus << "00000  MESSAGE POTCAR  FILE: Found potcar FilePotcar=" << FilePotcar << " - DataPotcar.size()=" << DataPotcar.size() << " - AUIDPotcar=" << AUIDPotcar << " " << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.POTCAR << DataPotcar;// << endl; file has already new line
-            // [OBSOLETE] aus << "00000  MESSAGE POTCAR  FILE: Found potcar xvasp.POTCAR.str().size()=" << xvasp.POTCAR.str().size() << " " << endl;
+    	    xvasp.POTCAR_AUID.push_back(AUIDPotcar);
+        // [OBSOLETE] aus << "00000  MESSAGE POTCAR  FILE: Found potcar xvasp.POTCAR.str().size()=" << xvasp.POTCAR.str().size() << " " << endl;
             // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	      
           } else {
             aus << "EEEEE  POTCAR [" << FilePotcars.at(i).c_str() << "] not found! (aflow_ivasp.cpp) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -5517,9 +5587,8 @@ namespace KBIN {
 namespace KBIN {
   xstructure GetMostRelaxedStructure(string directory) {
     string POSCARfile;
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
-    deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - KBIN::ExtractAtomicSpecies: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+
+    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractAtomicSpecies: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //READ POSCAR.orig
@@ -5547,31 +5616,31 @@ namespace KBIN {
       found_POSCAR=TRUE;
       POSCARfile=directory+"/POSCAR";
     }
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found_POSCAR && aurostd::FileExist(directory+"/POSCAR.bands"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found_POSCAR && aurostd::FileExist(directory+"/POSCAR.bands"+XHOST.vext.at(iext))) {
         found_POSCAR=TRUE;
-        aurostd::execute(vcat.at(iext)+" "+directory+"/POSCAR.bands"+vext.at(iext)+" > "+file_poscar_tmp);
+        aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/POSCAR.bands"+XHOST.vext.at(iext)+" > "+file_poscar_tmp);
         POSCARfile=file_poscar_tmp;
       }
     }
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found_POSCAR && aurostd::FileExist(directory+"/POSCAR.static"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found_POSCAR && aurostd::FileExist(directory+"/POSCAR.static"+XHOST.vext.at(iext))) {
         found_POSCAR=TRUE;
-        aurostd::execute(vcat.at(iext)+" "+directory+"/POSCAR.static"+vext.at(iext)+" > "+file_poscar_tmp);
+        aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/POSCAR.static"+XHOST.vext.at(iext)+" > "+file_poscar_tmp);
         POSCARfile=file_poscar_tmp;
       }
     }
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found_POSCAR && aurostd::FileExist(directory+"/POSCAR.relax1"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found_POSCAR && aurostd::FileExist(directory+"/POSCAR.relax1"+XHOST.vext.at(iext))) {
         found_POSCAR=TRUE;
-        aurostd::execute(vcat.at(iext)+" "+directory+"/POSCAR.relax1"+vext.at(iext)+" > "+file_poscar_tmp);
+        aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/POSCAR.relax1"+XHOST.vext.at(iext)+" > "+file_poscar_tmp);
         POSCARfile=file_poscar_tmp;
       }
     }
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found_POSCAR && aurostd::FileExist(directory+"/POSCAR.relax2"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found_POSCAR && aurostd::FileExist(directory+"/POSCAR.relax2"+XHOST.vext.at(iext))) {
         found_POSCAR=TRUE;
-        aurostd::execute(vcat.at(iext)+" "+directory+"/POSCAR.relax2"+vext.at(iext)+" > "+file_poscar_tmp);
+        aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/POSCAR.relax2"+XHOST.vext.at(iext)+" > "+file_poscar_tmp);
         POSCARfile=file_poscar_tmp;
       }
     }
@@ -5594,9 +5663,7 @@ namespace KBIN {
     string OUTCARfile; //, POSCARfile;
     string file_outcar_tmp=aurostd::TmpFileCreate("OUTCAR.tmp");
 
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
-    deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - KBIN::ExtractAtomicSpecies: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractAtomicSpecies: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
     xstructure xstr_name=GetMostRelaxedStructure(directory); //CO20180626
 
@@ -5631,10 +5698,10 @@ namespace KBIN {
           found_OUTCAR=TRUE;
           OUTCARfile=directory+"/OUTCAR.static";
         }
-        for(uint iext=0;iext<vext.size();iext++) {
-          if(!found_OUTCAR && aurostd::FileExist(directory+"/OUTCAR.static"+vext.at(iext))) {
+        for(uint iext=0;iext<XHOST.vext.size();iext++) {
+          if(!found_OUTCAR && aurostd::FileExist(directory+"/OUTCAR.static"+XHOST.vext.at(iext))) {
             found_OUTCAR=TRUE;	  
-            aurostd::execute(vcat.at(iext)+" "+directory+"/OUTCAR.static"+vext.at(iext)+" > "+file_outcar_tmp);
+            aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/OUTCAR.static"+XHOST.vext.at(iext)+" > "+file_outcar_tmp);
             OUTCARfile=file_outcar_tmp;
           }
         }
@@ -5686,9 +5753,7 @@ namespace KBIN {
     string OUTCARfile, stmp, line;
     stringstream  strline;
 
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
-    deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - KBIN::ExtractEfermiOUTCAR: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractEfermiOUTCAR: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
     bool found_OUTCAR=FALSE;
 
@@ -5703,10 +5768,10 @@ namespace KBIN {
       found_OUTCAR=TRUE;
       OUTCARfile=directory+"/OUTCAR.static";
     }
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found_OUTCAR && aurostd::FileExist(directory+"/OUTCAR.static"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found_OUTCAR && aurostd::FileExist(directory+"/OUTCAR.static"+XHOST.vext.at(iext))) {
         found_OUTCAR=TRUE;
-        aurostd::execute(vcat.at(iext)+" "+directory+"/OUTCAR.static"+vext.at(iext)+" > "+file_outcar_tmp);
+        aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/OUTCAR.static"+XHOST.vext.at(iext)+" > "+file_outcar_tmp);
         OUTCARfile=file_outcar_tmp;
       }
     }
@@ -5777,9 +5842,7 @@ namespace KBIN {
 
     if(LDEBUG) {cerr << "KBIN::ExtractSystemName: directory=" << directory << endl;}
 
-    deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,","); vext.push_front(""); // cheat for void string
-    deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
-    if(vext.size()!=vcat.size()) { cerr << "ERROR - KBIN::ExtractSystemName: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractSystemName: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
 
     bool found=FALSE;
 
@@ -5795,10 +5858,10 @@ namespace KBIN {
       found=TRUE;
       DOSCARfile=directory+"/DOSCAR.static";
     }
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found && aurostd::FileExist(directory+"/DOSCAR.static"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found && aurostd::FileExist(directory+"/DOSCAR.static"+XHOST.vext.at(iext))) {
         found=TRUE;
-        aurostd::execute(vcat.at(iext)+" \""+directory+"/DOSCAR.static"+vext.at(iext)+"\""+" > "+doscarfile_tmp);
+        aurostd::execute(XHOST.vcat.at(iext)+" \""+directory+"/DOSCAR.static"+XHOST.vext.at(iext)+"\""+" > "+doscarfile_tmp);
         DOSCARfile=doscarfile_tmp;found=TRUE;
       } 
     }    
@@ -5873,19 +5936,19 @@ namespace KBIN {
     }
 
     // TRY OUTCAR.relax2
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found && aurostd::FileExist(directory+"/OUTCAR.relax2"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found && aurostd::FileExist(directory+"/OUTCAR.relax2"+XHOST.vext.at(iext))) {
         found=TRUE;
-        xOUTCAR outcar(directory+"/OUTCAR.relax2"+vext.at(iext));
+        xOUTCAR outcar(directory+"/OUTCAR.relax2"+XHOST.vext.at(iext));
         SystemName=outcar.SYSTEM;
         return SystemName;
       }
     }
     // TRY OUTCAR.relax1
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found && aurostd::FileExist(directory+"/OUTCAR.relax1"+vext.at(iext))) {
+    for(uint iext=0;iext<XHOST.vext.size();iext++) {
+      if(!found && aurostd::FileExist(directory+"/OUTCAR.relax1"+XHOST.vext.at(iext))) {
         found=TRUE;
-        xOUTCAR outcar(directory+"/OUTCAR.relax1"+vext.at(iext));
+        xOUTCAR outcar(directory+"/OUTCAR.relax1"+XHOST.vext.at(iext));
         SystemName=outcar.SYSTEM;
         return SystemName;
       }

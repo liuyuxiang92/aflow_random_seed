@@ -383,10 +383,10 @@ namespace pflow {
   void POSCAR2WYCKOFF(istream& input);
   string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX20190314 
   string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314 
+  bool PSEUDOPOTENTIALS_CHECK(aurostd::xoption vpflow,string file,ostream& oss=cout); //SC20200330
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO20180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); //DX20180123 - added more robust QE reader
-
 }
 bool RequestedAlphabeticLabeling(string &label);
 bool AlphabetizePrototypeLabelSpecies(deque<string> &species,deque<string> &species_pp,deque<double> &volumes,deque<double> &masses,string &label);

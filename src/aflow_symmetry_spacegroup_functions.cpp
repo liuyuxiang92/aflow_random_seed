@@ -1441,7 +1441,7 @@ namespace SYM {
 // ******************************************************************************
 // mod_one (Modify double by 1; to keep in unit cell)
 // ******************************************************************************
-//DX OBSOLETE? 20170908
+// [OBSOLETE] DX20170908
 //namespace SYM {
 //double mod_one(double d) {
 ////double delta=1e-6;

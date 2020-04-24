@@ -2342,3 +2342,9 @@ namespace AGL_functions {
 #endif // _AFLOW_AGL_RUNGIBBS_CPP
 
 
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *                                                                         *
+// ***************************************************************************

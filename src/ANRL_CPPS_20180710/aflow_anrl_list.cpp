@@ -634,7 +634,7 @@ namespace anrl {
     vproto.push_back("A3B13_oC32_38_ac_a2bcdef;2;16;38;4;18;oC32;a,b/a,c/a,z1,z2,z3,z4,x5,z5,x6,z6,y7,z7,y8,z8,x9,y9,z9;-;Ta3Ti13;Ta3Ti13");
     vproto.push_back("A3B5_oC32_38_abce_abcdf;2;16;38;4;18;oC32;a,b/a,c/a,z1,z2,z3,z4,x5,z5,x6,z6,y7,z7,y8,z8,x9,y9,z9;-;Ta3Ti5;Ta3Ti5");
     vproto.push_back("AB7_hR16_166_c_c2h;2;16;166;4;8;hR16;a,c/a,x1,x2,x3,z3,x4,z4;-;TaTi7;TaTi7");
-    //DX20181130 - add Ohad's SQS structures - END
+    //DX20181130 - add OL's SQS structures - END
     //DX20181211 - add CO's kesterite structure - START
     vproto.push_back("A2BCD4_tI16_82_ac_b_d_g;4;8;82;6;5;tI16;a,c/a,x5,y5,z5;-;Cu2(Zn,Fe)SnS4;Kesterite");
     //DX20181211 - add CO's kesterite structure - END

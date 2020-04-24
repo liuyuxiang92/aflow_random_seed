@@ -3791,7 +3791,7 @@ namespace compare{
 //DX [OBSOLETE]    // ========== Check final_prototypes ========== //
 //DX [OBSOLETE]    // It is possible that two prototypes are the same regardless 
 //DX [OBSOLETE]    // of having different space groups.
-//DX [OBSOLETE]    //DX - BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
+//DX [OBSOLETE]    //DX BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
 //DX [OBSOLETE] 
 //DX [OBSOLETE]    message << "Number of unique prototypes: " << final_prototypes.size() << " (out of " << vxstrs.size() << " structures).";
 //DX [OBSOLETE]    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
@@ -6070,7 +6070,7 @@ namespace compare{
           }
         }
         // Need to find the min distance; thus check distance between neighboring cells to find true minimum.
-        //DX - running vector in each loop saves computations; fewer duplicate operations
+        //DX running vector in each loop saves computations; fewer duplicate operations
         if(incell_mod>0.25){
           for(uint m=0;m<l1.size();m++){
             xvector<double> a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)

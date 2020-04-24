@@ -1548,9 +1548,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
             cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
             cerr << "DEBUG - " << soliloquy << " xvasp.str.species_pp[i=" << i << "]=" << xvasp.str.species_pp[i] << endl;
           }
-          string FilePotcar,DataPotcar;
+          string FilePotcar,DataPotcar,AUIDPotcar;
           if (!XHOST.GENERATE_AFLOWIN_ONLY) { //CO20190116
-            if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar)) {
+            if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
               cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
               return FALSE; // dont die
               //exit(0);
@@ -2806,7 +2806,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // KPOINTS
   //ME20181128 - Added remaining KPOINTS modes
   bool skip_implicit = (!xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT") &&
-      (xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") || xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") || xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL")));  //CO20190401 START/stop
+      (xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") || xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") || xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL")));  //CO20190401 START/STOP
   if (!skip_implicit) {
     aflowin << "[VASP_KPOINTS_MODE_IMPLICIT] " << endl;
     //[ME20181216]aflowin << "[VASP_KPOINTS_FILE]KSCHEME=" << xvasp.AVASP_KSCHEME << " " << endl;
@@ -3111,7 +3111,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   aflowin << "[AFLOW] AFLOW automatically generated (aflow_avasp.cpp) " << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
 
-  //CO20181226 - printing the directory in ARUN mode is problematic, as directory becomes full path, so we get /home/CO...
+  //CO20181226 - printing the directory in ARUN mode is problematic, as directory becomes full path, so we get /home/...
   string directory_to_print=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(directory);
   bool print_directory=(!directory_to_print.empty());
   if(print_directory && xvasp.AVASP_prototype_mode==LIBRARY_MODE_ARUN && directory_to_print[0]=='/'){print_directory=false;} //root directory
@@ -3568,8 +3568,8 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
         directory+=xvasp.str.species_pp.at(i);
         if(xvasp.POTCAR_TYPE_DATE_PRINT_flag) { // add potential type and date
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
-          string FilePotcar,DataPotcar;
-          if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar)) {
+          string FilePotcar,DataPotcar,AUIDPotcar;
+          if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
             cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
             return FALSE; // dont die
             //exit(0);
@@ -5190,9 +5190,9 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
     if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) {nspecies=nspeciesHTQC=PARAMS->ucell.size()-1;}  //CO20181226 - I patched nspecies to work for ICSD robustly
     if(PARAMS->ucell.size()==1) { //this must be OLD as _ICSD_ passes through the AVASP_MakePrototypeICSD_AFLOWIN() not here, probably obsolete, but we keep for history
       vector<string> austokens,austokens2;
-      aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
-      aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
-      aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
+      PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
+      PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
+      PARAMS->ucell.at(0)=aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
       KBIN::VASP_SplitAlloySpecies(austokens.at(0),austokens2);
       nspecies=austokens2.size()+1;  // backward, //CO20181226 it would be nice to have an example to see why this works... it probably should be austokens2.size() (not +1)
       if(nspeciesHTQC==3) nspecies=3;       // new
@@ -6083,8 +6083,8 @@ bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
 
   if(PARAMS->ucell.size()==1) {
     vector<string> austokens;
-    aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
-    aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
+    PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
+    PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
     aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
     KBIN::VASP_SplitAlloySpecies(austokens.at(0),specieX_raw);
     nspecies=specieX_raw.size()+1;  // backward
@@ -6742,18 +6742,24 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   if(LDEBUG) cerr << soliloquy << " 0d" << endl;
 
   if(xvasp.AVASP_aflowin_only_if_missing) { // this test is redundant, but since the Prototype generation is slow, it is nice to avoid unless you really need it
-    //  cerr << "[" << xvasp.AVASP_label << "]" << endl;
-    //  if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) cerr << "SKIPPISSIMO" << endl;
-    //     vector<string> austokens,vLibrary;
-    //     aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),austokens,"\n");
-    //     for(uint i=0;i<austokens.size();i++)
-    //       if(aurostd::substring2bool(austokens.at(i),"/"))
-    // 	vLibrary.push_back(austokens.at(i));
+    // [OBSOLETE] cerr << "[" << xvasp.AVASP_label << "]" << endl;
+    // [OBSOLETE]   if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) cerr << "SKIPPISSIMO" << endl;
+    // [OBSOLETE]      vector<string> austokens,vLibrary;
+    // [OBSOLETE]      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),austokens,"\n");
+    // [OBSOLETE]      for(uint i=0;i<austokens.size();i++)
+    // [OBSOLETE]        if(aurostd::substring2bool(austokens.at(i),"/"))
+    // [OBSOLETE]  	vLibrary.push_back(austokens.at(i));
 
     // TEST IF CALCULATED
-    if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) {if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl; return TRUE;}
+    init::InitGlobalObject("vLIBS");
+    // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) {
+    if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,xvasp.AVASP_label+" ")) {
+      if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl;
+      return TRUE;
+    }
     for(uint ilattice=1;ilattice<=14;ilattice++) {
-      if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+      // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+      if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
         if(DEBUG_SKIP) cerr << "SKIP (calculated): " << lattices[ilattice] << "/" << xvasp.AVASP_label << endl;
         return TRUE;
       }

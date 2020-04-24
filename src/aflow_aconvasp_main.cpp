@@ -75,8 +75,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("ANGLES",aurostd::args2flag(argv,cmds,"--angle|--angles"));
   vpflow.args2addattachedscheme(argv,cmds,"ANGLES","--angle=|--angles=","0.0");
 
-  vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB::ENTRY_PHP","--aflowlib=","");
-  vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB::ENTRY_JSON","--aflowlib2=","");  // TEST SC20190812
+  // [OBSOLETE]  vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB::ENTRY_PHP","--aflowlib=","");  //SC20200327
+  vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB::ENTRY_JSON","--aflowlib2=|--aflowlib=","");  //SC20190812
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AUID2AURL","--aflowlib_auid2aurl=|--auid2aurl=","");
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AURL2AUID","--aflowlib_aurl2auid=|--aurl2auid=","");
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AUID2LOOP","--aflowlib_auid2loop=|--auid2loop=","");
@@ -1076,6 +1076,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE]  vpflow.flag("PROTOTYPER_MULT",aurostd::args2flag(argv,cmds,"--prototypermult|--PROTOTYPERMULT"));
   vpflow.flag("PROTOINITIAL",aurostd::args2flag(argv,cmds,"--initial"));
 
+  // PSEUDOPOTENTIAL CHECK
+  vpflow.args2addattachedscheme(argv,cmds,"PSEUDOPOTENTIALS_CHECK","--pseudopotentials_check=|--pp_check|--ppk=","");
+  if(vpflow.flag("PSEUDOPOTENTIALS_CHECK")) {
+     vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
+  }
+  
+  // MOVE ON
   vpflow.flag("QE",aurostd::args2flag(argv,cmds,"--qe") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("ABCCAR",aurostd::args2flag(argv,cmds,"--abccar") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20190123 - moved ABCCAR to here
   vpflow.flag("ABINIT",aurostd::args2flag(argv,cmds,"--abinit") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
@@ -1584,8 +1591,8 @@ namespace pflow {
       if(vpflow.flag("ANGLES")) {pflow::ANGLES(vpflow.getattachedscheme("ANGLES"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("ALPHA_COMPOUND")) {cout << pflow::ALPHACompound(vpflow.getattachedscheme("ALPHA_COMPOUND")); _PROGRAMRUN=true;}
       if(vpflow.flag("ALPHA_SPECIES")) {cout << pflow::ALPHASpecies(vpflow.getattachedscheme("ALPHA_SPECIES")); _PROGRAMRUN=true;}
-      if(vpflow.flag("AFLOWLIB::ENTRY_PHP")) {aflowlib::WEB_Aflowlib_Entry_PHP(vpflow.getattachedscheme("AFLOWLIB::ENTRY_PHP"),cout); _PROGRAMRUN=true;} // TEST SC20190813
-      if(vpflow.flag("AFLOWLIB::ENTRY_JSON")) {aflowlib::WEB_Aflowlib_Entry(vpflow.getattachedscheme("AFLOWLIB::ENTRY_JSON"),cout); _PROGRAMRUN=true;} // TEST SC20190812
+      // [OBSOLETE] if(vpflow.flag("AFLOWLIB::ENTRY_PHP")) {aflowlib::WEB_Aflowlib_Entry_PHP(vpflow.getattachedscheme("AFLOWLIB::ENTRY_PHP"),cout); _PROGRAMRUN=true;} //SC20190813
+      if(vpflow.flag("AFLOWLIB::ENTRY_JSON")) {aflowlib::WEB_Aflowlib_Entry(vpflow.getattachedscheme("AFLOWLIB::ENTRY_JSON"),cout); _PROGRAMRUN=true;} //SC20190812
       if(vpflow.flag("AFLOWLIB_AUID2AURL")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2AURL"),"AFLOWLIB_AUID2AURL"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AURL2AUID")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2AUID"),"AFLOWLIB_AURL2AUID"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AUID2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2LOOP"),"AFLOWLIB_AUID2LOOP"); _PROGRAMRUN=true;}
@@ -1830,6 +1837,8 @@ namespace pflow {
       if(vpflow.flag("PRIM1")) {cout << pflow::PRIM(cin,1); _PROGRAMRUN=true;}
       if(vpflow.flag("PRIM2")) {cout << pflow::PRIM(cin,2); _PROGRAMRUN=true;}
       if(vpflow.flag("PRIM3")) {cout << pflow::PRIM(cin,3); _PROGRAMRUN=true;}
+      if(vpflow.flag("PSEUDOPOTENTIALS_CHECK")) {pflow::PSEUDOPOTENTIALS_CHECK(vpflow,vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),cout); _PROGRAMRUN=true;} 
+ 
       // Q
       if(vpflow.flag("QE")) {cout << input2QExstr(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("QDEL")) {sflow::QDEL(vpflow.getattachedscheme("QDEL")); _PROGRAMRUN=true;} // NEW
@@ -2340,6 +2349,7 @@ namespace pflow {
     strstream << tab << x << " --prim < POSCAR" << endl;
     strstream << tab << x << " --prim2 < POSCAR" << endl;
     strstream << tab << x << " --primr|--fastprimitivecell|--fprim < POSCAR" << endl;
+    strstream << tab << x << " --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=" << endl;
     strstream << tab << x << " --qe < POSCAR" << endl;
     strstream << tab << x << " --qmvasp [--static] [-D directory]" << endl;
     strstream << tab << x << " --rasmol[=n1[,n2[,n3]]] < POSCAR" << endl;
@@ -3599,17 +3609,15 @@ namespace pflow {
     if(tokens.size()==1) {directory="";operation=tokens.at(0);}
     if(tokens.size()==2) {directory=tokens.at(0)+"/";operation=tokens.at(1);}
     if(operation!="") {
-      for(uint i=0; i<vfile.size();i++) {
+      for(uint i=0;i<vfile.size();i++) {
         string from="",to="",f=aurostd::CleanFileName(directory+vfile.at(i));
-        deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
-        deque<string> vcmd; aurostd::string2tokens("bzip2,xz,gzip",vcmd,",");
-        for(uint j=0;j<vext.size();j++) {
-          if(aurostd::FileExist(f+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+vext.at(j));}
-          if(aurostd::FileExist(f+".relax1"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".relax1"+vext.at(j));}
-          if(aurostd::FileExist(f+".relax2"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".relax2"+vext.at(j));}
-          if(aurostd::FileExist(f+".relax3"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".relax3"+vext.at(j));}
-          if(aurostd::FileExist(f+".static"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".static"+vext.at(j));}
-          if(aurostd::FileExist(f+".bands"+vext.at(j))) {aurostd::execute(XHOST.command(vcmd.at(j))+" -dqf "+f+".bands"+vext.at(j));}
+        for(uint iext=1;iext<XHOST.vext.size();iext++) {  // SKIP uncompressed
+          if(aurostd::FileExist(f+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".relax1"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".relax1"+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".relax2"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".relax2"+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".relax3"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".relax3"+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".static"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".static"+XHOST.vext.at(iext));}
+          if(aurostd::FileExist(f+".bands"+XHOST.vext.at(iext))) {aurostd::execute(XHOST.command(XHOST.vzip.at(iext))+" -dqf "+f+".bands"+XHOST.vext.at(iext));}
         }
         if(aurostd::substring2bool(operation,"n2") || aurostd::substring2bool(operation,"none2") || aurostd::substring2bool(operation,"normal2")) from="";
         if(aurostd::substring2bool(operation,"r12") || aurostd::substring2bool(operation,"relax12")) from=".relax1";
@@ -7217,7 +7225,7 @@ namespace pflow {
               return false;
             }
             else {
-              string magmom_values = aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
+              string magmom_values=aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
               vector<string> mag_tokens;
               aurostd::string2tokens(magmom_values,mag_tokens);
               for(uint m=0;m<mag_tokens.size();m++){
@@ -7311,7 +7319,7 @@ namespace pflow {
               return false;
             }
             else {
-              string magmom_values = aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
+              string magmom_values=aurostd::RemoveSubString(vcontent[i],"MAGMOM=");
               vector<string> mag_tokens;
               aurostd::string2tokens(magmom_values,mag_tokens);
               // INCAR allows multiplication of elements to describe magnetic moment (i.e. 2*2.0)
@@ -8239,7 +8247,7 @@ namespace pflow {
     // sss << " Real space lattice variation           = " << a.bravais_lattice_lattice_variation_type << endl;//WSETYAWAN mod
     // sss << " Real space conventional lattice        = " << a.bravais_conventional_lattice_lattice_type << endl;
     // sss << " Real space Pearson symbol              = " << a.pearson_symbol << endl;
-    sss << str_sp.bravais_lattice_lattice_type << "," << str_sp.bravais_lattice_lattice_variation_type << endl; //WSETYAWAN mod /DX20170824 - a to str_sp
+    sss << str_sp.bravais_lattice_lattice_type << "," << str_sp.bravais_lattice_lattice_variation_type << endl; //WSETYAWAN mod //DX20170824 - a to str_sp
     //  sss << a.bravais_lattice_lattice_type << "," << a.bravais_conventional_lattice_lattice_type << endl;
     return sss.str();
   }
@@ -9193,7 +9201,7 @@ namespace pflow {
       //make robust so input can be "LIB2" or "2"
       if(aurostd::substring2bool(LIB, "LIB")) {
         lib_name = LIB;
-        lib_count_string = aurostd::RemoveSubString(LIB, "LIB");
+        lib_count_string=aurostd::RemoveSubString(LIB, "LIB");
       } else {
         lib_name = "LIB" + LIB;
         lib_count_string = LIB;
@@ -9619,8 +9627,7 @@ namespace pflow {
   //[OBSOLETE CO20180528]  }
   //[OBSOLETE CO20180528]}
 
-  vector<vector<string> > elementalCombinations(const vector<string>& velements,
-      uint nary) {
+  vector<vector<string> > elementalCombinations(const vector<string>& velements, uint nary) {
     // for given set of elements, will return nary combinations
     // binary combinations of MnPdPt: MnPd, MnPt, PdPt
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -9648,19 +9655,18 @@ namespace pflow {
   // let's you know if input (or elements) belongs on hull of velements
   // if sort_elements==True, will sort(elements) first before matching with velements, 
   // sorting is generally NOT preferred as it would match unsorted compounds from database (NOT good)
+ 
+  // vector
   bool compoundsBelong(const vector<string>& velements2check, const string& input, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements2check,input,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);
-  }
+    return compoundsBelong(velements2check,input,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database); }
   bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);
-  }
+    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);}
   bool compoundsBelong(const vector<string>& velements2check, const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
     vector<string> input_velements;
     vector<double> input_vcomposition;
-    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);
-  }
+    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);}
   bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="pflow::compoundsBelong():";
@@ -9715,7 +9721,11 @@ namespace pflow {
     }
     return true;
   }
+
+ 
 }  // namespace pflow
+
+
 
 // functions for loading entries
 namespace pflow {
@@ -10051,8 +10061,7 @@ namespace pflow {
   // oss,ofstream& FileMESSAGE)
   // ***************************************************************************
   // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input,
-      bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
+  vector<string> stringElements2VectorElements(const string& input,bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return stringElements2VectorElements(input, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
@@ -10063,8 +10072,7 @@ namespace pflow {
     return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
 
-  vector<string> stringElements2VectorElements(
-      const string& input, ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
+  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
     vector<double> vcomposition;
     return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
@@ -13177,6 +13185,58 @@ namespace pflow {
 } // namespace pflow
 
 // ***************************************************************************
+// pflow::PSEUDOPOTENTIALS_CHECK
+// ***************************************************************************
+
+namespace pflow {
+  bool PSEUDOPOTENTIALS_CHECK(aurostd::xoption vpflow,string file,ostream& oss) { // too many options
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::PSEUDOPOTENTIALS_CHECK():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl; 
+
+    // check usage
+    if(LDEBUG) cerr << soliloquy << " CHECK USAGE" << endl; 
+    if(vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") || file=="") {
+      init::ErrorOption(cout,vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),"pflow::PSEUDOPOTENTIALS_CHECK",
+     			aurostd::liststring2string("aflow [options] --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=",
+     						   "       options:",
+     						   "                --usage"));
+      exit(0);
+    }
+    if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PSEUDOPOTENTIALS_CHECK::USAGE\")=" << vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE") << endl;
+    //if(LDEBUG) cerr << soliloquy << " file=" << file << endl;
+    // now start
+    if(aurostd::substring2bool(file,"POTCAR")) {
+      XHOST.DEBUG=FALSE;
+      XHOST.PSEUDOPOTENTIAL_GENERATOR=FALSE;
+      xPOTCAR xPOT(file);
+      oss << xPOT << endl;
+    }
+   if(aurostd::substring2bool(file,"OUTCAR")) {
+      XHOST.DEBUG=FALSE;
+      XHOST.PSEUDOPOTENTIAL_GENERATOR=FALSE;
+      xOUTCAR xOUT(file);
+      xPOTCAR xPOT;
+      oss << " FROM OUTCAR" << endl;
+      oss << " vTITEL.size()=" << xOUT.vTITEL.size() << ": "; for(uint i=0;i<xOUT.vTITEL.size();i++) { oss << xOUT.vTITEL.at(i) << " "; } oss << endl;
+      oss << " SYSTEM=" << xOUT.SYSTEM << endl;
+      oss << " ERROR=" << xOUT.ERROR << endl;
+      oss << " pp_type=" << xOUT.pp_type << endl;
+      oss << " species.size()=" << xOUT.species.size() << ": "; for(uint i=0;i<xOUT.species.size();i++) { oss << xOUT.species.at(i) << " "; } oss << endl;
+      oss << " species_pp.size()=" << xOUT.species_pp.size() << ": "; for(uint i=0;i<xOUT.species_pp.size();i++) { oss << xOUT.species_pp.at(i) << " "; } oss << endl;
+      oss << " species_Z.size()=" << xOUT.species_Z.size() << ": "; for(uint i=0;i<xOUT.species_Z.size();i++) { oss << xOUT.species_Z.at(i) << " "; } oss << endl;
+      oss << " species_pp_type.size()=" << xOUT.species_pp_type.size() << ": "; for(uint i=0;i<xOUT.species_pp_type.size();i++) { oss << xOUT.species_pp_type.at(i) << " "; } oss << endl;
+      oss << " species_pp_version.size()=" << xOUT.species_pp_version.size() << ": "; for(uint i=0;i<xOUT.species_pp_version.size();i++) { oss << xOUT.species_pp_version.at(i) << " "; } oss << endl;
+      oss << " species_pp_AUID.size()=" << xOUT.species_pp_AUID.size() << ": "; for(uint i=0;i<xOUT.species_pp_AUID.size();i++) { oss << xOUT.species_pp_AUID.at(i) << " "; } oss << endl;
+      oss << " species_pp_AUID_collisions.size()=" << xOUT.species_pp_AUID_collisions.size() << ": "; for(uint i=0;i<xOUT.species_pp_AUID_collisions.size();i++) { oss << xOUT.species_pp_AUID_collisions.at(i) << " "; } oss << endl;
+   }
+    //
+    if(LDEBUG) cerr << soliloquy << " END" << endl;				      
+    return TRUE;
+  }
+} // namespace pflow
+
+// ***************************************************************************
 // pflow::STATDIEL // CAMILO
 // ***************************************************************************
 namespace pflow {
@@ -13219,29 +13279,26 @@ namespace pflow {
     aurostd::string2tokens("CONTCAR,OUTCAR,INCAR,vasprun.xml",vCARs,","); //look in aflow_kvasp, KBIN::VASP_Analyze()
 
     //organize zip formats, e.g., bzip2, xz
-    vector<string> vext,vcmd_cat,vcmd_zip;
-    aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_back("");
-    aurostd::string2tokens("bzcat,xzcat,zcat,cat",vcmd_cat,",");
-    aurostd::string2tokens("bzip2,xz,gzip",vcmd_zip,",");vcmd_zip.push_back("");
+    
     bool look_static=vpflow.flag("QMVASP::STATIC");
     bool found_run=false; //i.e., found COMPLETE run, all files must be .static or all .relax2, no mix match
     bool found_CAR=true;
 
     //search to see if files exist in any capacity
     for(uint i=0;i<vCARs.size();i++){
-      if(LDEBUG) {cerr << soliloquy << " looking for " << directory+"/"+vCARs[i] << endl;}
+      if(LDEBUG) {cerr << soliloquy << " looking for " << directory+"/"+vCARs.at(i) << endl;}
       found_CAR=false;
       for(uint j=0;j<vruns.size()&&!found_CAR;j++){
-        for(uint k=0;k<vext.size()&&!found_CAR;k++){
-          if(aurostd::FileExist(directory+"/"+vCARs[i]+vruns[j]+vext[k])){
-            if(LDEBUG) {cerr << soliloquy << " found " << directory+"/"+vCARs[i]+vruns[j]+vext[k] << endl;}
+        for(uint k=0;k<XHOST.vext.size()&&!found_CAR;k++){
+          if(aurostd::FileExist(directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k))){
+            if(LDEBUG) {cerr << soliloquy << " found " << directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k) << endl;}
             found_CAR=true;
           }
         }
       }
       if(!found_CAR){
-        if(look_static && vCARs[i]==".static"){
-          cerr << soliloquy << " --static ON but " << directory+"/"+vCARs[i] << ".static does not exist (zipped or otherwise)" << endl;
+        if(look_static && vCARs.at(i)==".static"){
+          cerr << soliloquy << " --static ON but " << directory+"/"+vCARs.at(i) << ".static does not exist (zipped or otherwise)" << endl;
           return FALSE;
         }
         continue;
@@ -13252,9 +13309,9 @@ namespace pflow {
     if(found_run){
       //first check that we can safely write CONTCAR.static to CONTCAR
       for(uint i=0;i<vCARs.size();i++){
-        if(aurostd::FileExist(directory+"/"+vCARs[i])){
-          cerr << soliloquy << directory+"/"+vCARs[i] << " already exists, cannot overwrite with relax2/static variant. ";
-          cerr << "Do not want to overwrite. Please delete: " << directory+"/"+vCARs[i] << endl;
+        if(aurostd::FileExist(directory+"/"+vCARs.at(i))){
+          cerr << soliloquy << directory+"/"+vCARs.at(i) << " already exists, cannot overwrite with relax2/static variant. ";
+          cerr << "Do not want to overwrite. Please delete: " << directory+"/"+vCARs.at(i) << endl;
           return FALSE;
         }
       }
@@ -13262,11 +13319,11 @@ namespace pflow {
       for(uint i=0;i<vCARs.size();i++){
         found_CAR=false;
         for(uint j=0;j<vruns.size()&&!found_CAR;j++){
-          for(uint k=0;k<vext.size()&&!found_CAR;k++){
-            if(aurostd::FileExist(directory+"/"+vCARs[i]+vruns[j]+vext[k])){
-              aurostd::execute(XHOST.command(vcmd_cat[k])+" "+directory+"/"+vCARs[i]+vruns[j]+vext[k]+ " > "+directory+"/"+vCARs[i]);
-              if(aurostd::FileEmpty(directory+"/"+vCARs[i])){
-                cerr << soliloquy << " " << directory+"/"+vCARs[i] << " is missing/empty" << endl;
+          for(uint k=0;k<XHOST.vext.size()&&!found_CAR;k++){
+            if(aurostd::FileExist(directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k))){
+              aurostd::execute(XHOST.command(XHOST.vcat.at(k))+" "+directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k)+ " > "+directory+"/"+vCARs.at(i));
+              if(aurostd::FileEmpty(directory+"/"+vCARs.at(i))){
+                cerr << soliloquy << " " << directory+"/"+vCARs.at(i) << " is missing/empty" << endl;
                 return FALSE;
               }
               found_CAR=true;
@@ -13279,8 +13336,8 @@ namespace pflow {
 
     //check that all files found
     for(uint i=0;i<vCARs.size();i++){
-      if(!aurostd::FileExist(directory+"/"+vCARs[i])){
-        cerr << soliloquy << directory+"/"+vCARs[i] << " does not exist." << endl;
+      if(!aurostd::FileExist(directory+"/"+vCARs.at(i))){
+        cerr << soliloquy << directory+"/"+vCARs.at(i) << " does not exist." << endl;
         return FALSE;
       }
     }
@@ -13315,11 +13372,9 @@ namespace pflow {
     //[OBSOLETE CO20180703]if(!found) return FALSE; // error
     //[OBSOLETE CO20180703]for(uint i=0;i<vCARS_relax.size();i++) {
     //[OBSOLETE CO20180703]  //      cerr <<  vCARS_relax.at(i) << endl;
-    //[OBSOLETE CO20180703]  deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front(""); // cheat for void string
-    //[OBSOLETE CO20180703]  deque<string> vcmd; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcmd,",");
-    //[OBSOLETE CO20180703]  for(uint iext=0;iext<vext.size();iext++) {
-    //[OBSOLETE CO20180703]if(aurostd::FileExist(directory+"/"+vCARS_relax.at(i)+vext.at(iext)))
-    //[OBSOLETE CO20180703]aurostd::execute(XHOST.command(vcmd.at(iext))+" "+directory+"/"+vCARS_relax.at(i)+vext.at(iext)+ " > "+directory+"/"+vCARS.at(i));
+    //[OBSOLETE CO20180703]  for(uint iext=0;iext<XHOST.vext.size();iext++) {
+    //[OBSOLETE CO20180703]if(aurostd::FileExist(directory+"/"+vCARS_relax.at(i)+XHOST.vext.at(iext)))
+    //[OBSOLETE CO20180703]aurostd::execute(XHOST.command(vcmd.at(iext))+" "+directory+"/"+vCARS_relax.at(i)+XHOST.vext.at(iext)+ " > "+directory+"/"+vCARS.at(i));
     //[OBSOLETE CO20180703]  }
     //[OBSOLETE CO20180703]}
 
@@ -13335,14 +13390,14 @@ namespace pflow {
       return FALSE;
     }
     if(found_run){
-      for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(directory+"/"+vCARs[i]);} //aurostd::RemoveFile(directory+"/"+vCARS.at(i)); }
+      for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(directory+"/"+vCARs.at(i));} //aurostd::RemoveFile(directory+"/"+vCARS.at(i)); }
   }
   for(uint i=0;i<vCARs.size();i++){
     for(uint j=0;j<vruns.size();j++){
-      for(uint k=0;k<vext.size();k++){
-        if(aurostd::FileExist(directory+"/"+vCARs[i]+vruns[j]+vext[k])){
-          if(!vcmd_zip[k].empty()){
-            aurostd::execute(XHOST.command(vcmd_zip[k])+" -9qf "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
+      for(uint k=0;k<XHOST.vext.size();k++){
+        if(aurostd::FileExist(directory+"/"+vCARs.at(i)+vruns.at(j)+XHOST.vext.at(k))){
+          if(!XHOST.vzip.at(k).empty()){
+            aurostd::execute(XHOST.command(XHOST.vzip.at(k))+" -9qf "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
             return TRUE;
           }
         }
@@ -13351,11 +13406,9 @@ namespace pflow {
   }
 
   //[OBSOLETE CO20180703]aurostd::execute(XHOST.command(vcmd.at(iext))+" -9q "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
-  //[OBSOLETE CO20180703]deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
-  //[OBSOLETE CO20180703]deque<string> vcmd; aurostd::string2tokens("bzip2,xz,gzip",vcmd,",");
-  //[OBSOLETE CO20180703]for(uint iext=0;iext<vext.size();iext++) {
-  //[OBSOLETE CO20180703]  if(aurostd::FileExist(directory+"/"+vCARS_relax.at(0)+vext.at(iext))) {
-  //aurostd::RemoveFile(xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT+vext.at(iext)); //CO20180703 - why delete before you zip????
+  //[OBSOLETE CO20180703]for(uint iext=0;iext<XHOST.vext.size();iext++) {
+  //[OBSOLETE CO20180703]  if(aurostd::FileExist(directory+"/"+vCARS_relax.at(0)+XHOST.vext.at(iext))) {
+  //aurostd::RemoveFile(xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT+XHOST.vext.at(iext)); //CO20180703 - why delete before you zip????
   //[OBSOLETE CO20180703]aurostd::execute(XHOST.command(vcmd.at(iext))+" -9q "+xvasp.Directory+"/"+DEFAULT_AFLOW_QMVASP_OUT);
   //[OBSOLETE CO20180703]  }
   //[OBSOLETE CO20180703]}

@@ -1442,7 +1442,7 @@ namespace KBIN {
                     // }
                   }
                 }
-              }
+	      }
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
               // --------------------------------------------------------------------------------------------------------------------
@@ -2110,7 +2110,7 @@ namespace KBIN {
                   aus << 11111*vrelax << "   END        - " << xvasp.Directory << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
                 }
-              }
+              } // KPOINTS KPOINTS KPOINTS
               // ***************************************************************************
               // POSTSCRIPT
               if(!vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT"))
@@ -2129,7 +2129,7 @@ namespace KBIN {
         aus << "00000  MESSAGE END loop in directory =" << xvasp.Directory << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // compress the subdirectories
-        if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+        if(Krun && kflags.KZIP_COMPRESS) Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
       }
       aflags=aflags_backup;kflags=kflags_backup; // RESTORE
     } // LOOP ixvasp
@@ -2141,6 +2141,7 @@ namespace KBIN {
         KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
     // ***************************************************************************
     FileAFLOWIN.clear();FileAFLOWIN.close();
+    // TEST    exit(0);
     return Krun;
   }
 } // namespace

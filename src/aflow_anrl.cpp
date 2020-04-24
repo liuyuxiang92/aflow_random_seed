@@ -600,7 +600,7 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A4B_cI10_229_c_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 300
   uint PrototypeANRL_A7B3_cI40_229_df_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 301
   uint PrototypeANRL_A2B3C12D3_cI160_230_a_c_h_d(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 302
-  //DX20181130 - add Ohad's SQS structures - START
+  //DX20181130 - add OL's SQS structures - START
   // -------------------------------------------------------------------------
   // SQS (from O. Levy)
   // -------------------------------------------------------------------------
@@ -611,7 +611,7 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A3B13_oC32_38_ac_a2bcdef(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 5
   uint PrototypeANRL_A3B5_oC32_38_abce_abcdf(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 6
   uint PrototypeANRL_AB7_hR16_166_c_c2h(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 7
-  //DX20181130 - add Ohad's SQS structures - END
+  //DX20181130 - add OL's SQS structures - END
   //DX20181211 - add CO's kesterite structure - START
   uint PrototypeANRL_A2BCD4_tI16_82_ac_b_d_g(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 1
   //DX20181211 - add CO's kesterite structure - END
@@ -3520,7 +3520,7 @@ namespace anrl {
     // 302 // ./aflow --proto=A2B3C12D3_cI160_230_a_c_h_d --params=11.4597,0.3471,0.4664,0.0512
     if(vlabel.at(ifound)=="A2B3C12D3_cI160_230_a_c_h_d")
       PrototypeANRL_A2B3C12D3_cI160_230_a_c_h_d(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    //DX20181130 - add Ohad's SQS structures - START
+    //DX20181130 - add OL's SQS structures - START
     // -------------------------------------------------------------------------
     // SQS (from O. Levy)
     // -------------------------------------------------------------------------
@@ -3552,7 +3552,7 @@ namespace anrl {
     // 7 // ./aflow --proto=AB7_hR16_166_c_c2h --params=9.2519726786,1.22474487138,0.875,0.625,1.625,0.1250000001,1.125,1.6249999999
     if(found && vlabel.at(ifound)=="AB7_hR16_166_c_c2h")
       PrototypeANRL_AB7_hR16_166_c_c2h(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    //DX20181130 - add Ohad's SQS structures - END
+    //DX20181130 - add OL's SQS structures - END
 
     //DX20181211 - add CO's kesterite structure - START
     // -------------------------------------------------------------------------

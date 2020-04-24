@@ -185,13 +185,11 @@ namespace apl
     //endIndex = _kpoints.size();
     //threads.push_back( new std::thread(&T_spectra_SCQHA_QHA3P::get_freqs_in_threads,this,startIndex,endIndex, icpu) );
     //}
-    
-    // Wait to finish all threads here!
-    for(uint i = 0; i < threads.size(); i++) {
-    threads[i]->join();
-    delete threads[i];
-    }
-    */
+    //// Wait to finish all threads here!
+    //for(uint i = 0; i < threads.size(); i++) {
+    //threads[i]->join();
+    //delete threads[i];
+    //}
 
     // Done
     _logger.finishProgressBar();
