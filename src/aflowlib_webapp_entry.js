@@ -4,10 +4,10 @@
 // called from aflow_web_interface2.cpp via
 // http://aflowlib.duke.edu/users/jmolers/test/entry.php?id=aflow:137d3cb39fa592d3
 
-// BH 5/21/2016 12:57:40 PM
-// BH 5/22/2016 10:03:22 PM finalized
-// CO 6/23/2017 12:02:22 PM minor changes
-// PC 7/23/2018 Add Symmetry Operations
+//BH20160521 12:57:40 PM
+//BH20160522 10:03:22 PM finalized
+//CO20170623 12:02:22 PM minor changes
+//PC20180723 Add Symmetry Operations
 
 //var jsmolDir = "http://aflowlib.duke.edu/users/jmolers/test/jsmol";
 
@@ -116,7 +116,7 @@ AFLOW.iso2oss = function(element, cutoff, index) {
 };
 
 // load command, with optional parameters
-// PC -- add a save command to reset the last loaded structure in symmetry part
+//PC -- add a save command to reset the last loaded structure in symmetry part
 AFLOW.load = function(root, loadparams) {
   var key = root + loadparams;
   return (
@@ -166,7 +166,7 @@ AFLOW.input = function(id, val) {
   );
 };
 
-//symetry operations -- PC 180723
+//symetry operations -- PC20180723
 //
 
 function printDigit(x) {
@@ -454,7 +454,7 @@ $(document).ready(function() {
   }
   //END BADER ISOSURFACES
 
-  //BEGIN SYMMETRY -- PC 180723
+  //BEGIN SYMMETRY -- PC20180723
   //
   var symProperties = "";
   if (AFLOW.sym2json) {
@@ -586,7 +586,7 @@ $(document).ready(function() {
       (id = "symop-reset")
     );
   }
-  // END SYMMETRY -- PC 180723
+  // END SYMMETRY -- PC20180723
 
   Jmol.setButtonCss(null, "style='width:140px'");
 
@@ -637,7 +637,7 @@ $(document).ready(function() {
     Jmol.script(jmolApplet0, scriptCommand);
   });
   $("#plane_button").click(function() {
-    // BH removed: key='';load '' {444 555 -1} packed;  -- why reload?
+    //BH removed: key='';load '' {444 555 -1} packed;  -- why reload?
     var scriptCommand =
       "isosurface ID 'hklplane' hkl {" +
       $("#plane_1").val() +

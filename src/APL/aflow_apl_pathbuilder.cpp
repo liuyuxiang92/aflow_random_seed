@@ -45,7 +45,7 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  // ME20190614
+  //ME20190614
   const apl::PathBuilder::StoreEnumType& PathBuilder::getStore() const {
     return _store;
   }
@@ -74,7 +74,7 @@ namespace apl {
     }
 
     if( p.rows != _pointsVectorDimension ) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::addPoint(); Wrong dimension of the point.");
       string function = "apl::PathBuilder::addPoint()";
       string message = "Wrong dimension of the point.";
@@ -104,7 +104,7 @@ namespace apl {
 
   void PathBuilder::setDensity(int n) {
     if( n < 0 ) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::setDensity(); The density should be >= 0.");
       string function = "apl::PathBuilder::setDensity()";
       string message = "The density should be >= 0.";
@@ -121,7 +121,7 @@ namespace apl {
 
     // Quick solution...
     if( _points.empty() ) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::buildPath; There are no points.");
       string function = "apl::PathBuilder::buildPath";
       string message ="There are no points.";
@@ -149,7 +149,7 @@ namespace apl {
     if( _mode == COUPLE_POINT_MODE ) {
       // If the number of points is odd -> escape
       if( _points.size() % 2 != 0 ) {
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::buildPath(); The number of points is odd.");
         string function = "apl::PathBuilder::buildPath()";
         string message = "The number of points is odd.";
@@ -194,7 +194,7 @@ namespace apl {
       return( ( _points.size() / 2 ) + 1 );
     }
 
-    // ME20191031 - use xerror
+    //ME20191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPointSize(); Unknown mode.");
     string function = "apl::PathBuilder::getPointSize()";
     string message = "Unknown mode.";
@@ -214,7 +214,7 @@ namespace apl {
     else if( _mode == COUPLE_POINT_MODE )
       npaths = _points.size()/2;
     else {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::getPointLength(); Unknown mode.");
       string function = "apl::PathBuilder::getPointLength()";
       string message = "Unknown mode.";
@@ -235,7 +235,7 @@ namespace apl {
 
   double PathBuilder::getPathLength(uint i) {
     if( i <= 0 ) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index. The index has to start from 1.");
       string function = "apl::PathBuilder::getPathLength()";
       string message = "Wrong index. The index has to start from 1.";
@@ -249,7 +249,7 @@ namespace apl {
     if( _mode == SINGLE_POINT_MODE ) {
       // Quick solution 2...
       if( i > _points.size() ) {
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
         string function = "apl::PathBuilder::getPathLength()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
@@ -265,7 +265,7 @@ namespace apl {
     else if( _mode == COUPLE_POINT_MODE ) {
       // Quick solution 2...
       if( i > _points.size()/2 ) {
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
         string function = "apl::PathBuilder::getPathLength()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
@@ -279,7 +279,7 @@ namespace apl {
       return length;
     }
 
-    // ME20191031 - use xerror
+    //ME20191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Unknown mode.");
     string function = "apl::PathBuilder::getPathLength()";
     string message = "Unknown mode.";
@@ -290,7 +290,7 @@ namespace apl {
 
   xvector<double> PathBuilder::getPoint(uint i) {
     if( i <= 0 ) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index. The index has to start from 1.");
       string function = "apl::PathBuilder::getPoint()";
       string message = "Wrong index. The index has to start from 1.";
@@ -298,7 +298,7 @@ namespace apl {
     }
     if( _mode == SINGLE_POINT_MODE ) {
       if( i > _points.size() ) {
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
         string function = "apl::PathBuilder::getPoint()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
@@ -307,7 +307,7 @@ namespace apl {
       return _points[i-1];
     } else if( _mode == COUPLE_POINT_MODE ) {
       if( i > (_points.size()/2)+1 ) {
-        // ME20191031 - use xerro
+        //ME20191031 - use xerro
         //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
         string function = "apl::PathBuilder::getPoint()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
@@ -318,7 +318,7 @@ namespace apl {
       return _points[2*i-3];
     }
 
-    // ME20191031 - use xerror
+    //ME20191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPoint(); Unknown mode.");
     string function = "apl::PathBuilder::getPoint()";
     string message = "Unknown mode.";
@@ -329,7 +329,7 @@ namespace apl {
 
   string PathBuilder::getPointLabel(uint i) {
     if( i <= 0 ) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index. The index has to start from 1.");
       string function = "apl::PathBuilder::getPointLabel()";
       string message = "Wrong index. The index has to start from 1.";
@@ -338,7 +338,7 @@ namespace apl {
 
     if( _mode == SINGLE_POINT_MODE ) {
       if( i > _labels.size() ) {
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
         string function = "apl::PathBuilder::getPointLabel()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
@@ -347,7 +347,7 @@ namespace apl {
       return _labels[i-1];
     } else if( _mode == COUPLE_POINT_MODE ) {
       if( i > (_labels.size()/2)+1 ) {
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
         string function = "apl::PathBuilder::getPointLabel()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
@@ -365,7 +365,7 @@ namespace apl {
         return(_labels[l]+"|"+_labels[h]);
     }
 
-    // ME20191031 - use xerror
+    //ME20191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Unknown mode.");
     string function = "apl::PathBuilder::getPointLabel()";
     string message = "Unknown mode.";
@@ -392,7 +392,7 @@ namespace apl {
         if( _labels[j].find(tokens.at(i)) != string::npos ) break;
       }
       if( j == _labels.size() ) {
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPath(); Undefined label of the point.");
         string function = "apl::PathBuilder::getPath()";
         string message = "Undefined label of the point.";
@@ -448,7 +448,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20190219 - OBSOLETE duplicate
+  //ME20190219 - OBSOLETE duplicate
   //void PathBuilder::tokenize(const string& str,vector<string>& tokens, string del) {
   //  string delimiters = del;
 
@@ -511,28 +511,28 @@ namespace apl {
     aurostd::string2tokens(labels,vlabels,",;");
 
     if(vcoords.empty()){
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); No input coordinates found");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "No input coordinates found";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vlabels.empty()){
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); No input labels found");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "No input labels found";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vcoords.size()!=vlabels.size()){
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Size of input coordinates does not match size of input labels");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "Size of input coordinates does not match size of input labels";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vcoords.size()<2){
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Path size should include at least two points");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "Path size should include at least two points";
@@ -542,7 +542,7 @@ namespace apl {
     for(uint i=0;i<vcoords.size();i++){
       aurostd::string2tokens<double>(vcoords[i],coordinate,",");
       if(coordinate.size()!=3){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Input coordinate["+aurostd::utype2string(i)+"] is not dimension==3");
         string function = "apl::PathBuilder::defineCustomPoints()";
         string message = "Input coordinate["+aurostd::utype2string(i)+"] is not dimension==3";
@@ -574,7 +574,7 @@ namespace apl {
     fileKPOINTS.flush();
 
     if( !foundBZ ) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::takeAflowElectronicPath(); The BZ not found for this lattice.");
       string function = "apl::PathBuilder::takeAflowElectronicPath()";
       string message = "The Brillouin zone was not found for this lattice.";
@@ -614,7 +614,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20190614
+  //ME20190614
   // Writes the k-points path into a VASP KPOINTS-formatted file
   xKPOINTS PathBuilder::createKPOINTS(const Supercell& sc) {
     vector<xvector<double> > points(2 * (_points.size() - 1), xvector<double>(3));

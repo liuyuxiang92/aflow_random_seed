@@ -40,7 +40,7 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
   // Wrapper function to run the linear response (force fields) calculation.
-  void LinearResponsePC::runVASPCalculationsFF(_xinput& xinp) {  // ME20190113
+  void LinearResponsePC::runVASPCalculationsFF(_xinput& xinp) {  //ME20190113
     runVASPCalculationsLRBE(xinp, false);
   }
 
@@ -53,7 +53,7 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
   // Wrapper function to calculate the Born effective charge tensor and the
   // dilectric tensor.
-  void PhononCalculator::runVASPCalculationsBE(_xinput& xinp, uint ncalcs) { // ME20190113
+  void PhononCalculator::runVASPCalculationsBE(_xinput& xinp, uint ncalcs) { //ME20190113
     runVASPCalculationsLRBE(xinp, true, ncalcs);
   }
 
@@ -61,7 +61,7 @@ namespace apl {
   // A unified function to handle Born effective charge and force fields
   // calculations. Both methods require similar treatment, so it is cleaner to
   // use only one function for both methods.
-  void PhononCalculator::runVASPCalculationsLRBE(_xinput& xInput, bool born, uint ncalcs) { // ME20190112
+  void PhononCalculator::runVASPCalculationsLRBE(_xinput& xInput, bool born, uint ncalcs) { //ME20190112
 
     //_xinput xInput(_xInput); OBSOLETE ME20190113
     if (born) {
@@ -70,7 +70,7 @@ namespace apl {
       xInput.setXStr(_supercell.getSupercellStructureLight());
     }
 
-    // ME20190108 - Added title
+    //ME20190108 - Added title
     xInput.getXStr().title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInput.getXStr().title);
     if(xInput.getXStr().title.empty()){xInput.getXStr().buildGenericTitle(true,false);}
     if (born) {
@@ -82,7 +82,7 @@ namespace apl {
     // For VASP, use the standardized aflow.in creator
     if(xInput.AFLOW_MODE_VASP) {
       if (born) {
-        // ME20190112 - add calculation index
+        //ME20190112 - add calculation index
         if (ncalcs == 0) {  // Linear response method
           xInput.xvasp.AVASP_arun_runname = "2_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_;
         } else {  // Direct method
@@ -123,7 +123,7 @@ namespace apl {
   void LinearResponsePC::calculateForceFields() {
     // Check if supercell is already built
     if (!_supercell.isConstructed()) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::LinearResponsePC::calculateForceFields(); The supercell structure has not been initialized yet.");
       string function = "apl::LinearResponsePC::calculateForceFields()";
       string message = "The supercell structure has not been initialized yet.";
@@ -178,14 +178,14 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void PhononCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  // ME20190113
+  void PhononCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  //ME20190113
     //string directory = string("./") + _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_; OBSOLETE ME20190113
-    string directory = xinp.xvasp.Directory;  // ME20190113
+    string directory = xinp.xvasp.Directory;  //ME20190113
 
     //if (!aurostd::FileExist(directory + string("/") + _AFLOWLOCK_))  //CO
     //  throw APLStageBreak();
 
-    //CO - START
+    //CO START
     string infilename = directory + string("/OUTCAR.static");
 
     if (!aurostd::EFileExist(infilename, infilename)) {
@@ -198,12 +198,12 @@ namespace apl {
     }
 
     // Open our file
-    //CO - START
+    //CO START
     vector<string> vlines;
     aurostd::efile2vectorstring(infilename, vlines);
     if (!vlines.size()) {
-      //CO - END
-      // ME20191029 - use xerror
+      //CO END
+      //ME20191029 - use xerror
       //  throw apl::APLLogicError("apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR(); Cannot open input OUTCAR.static file.");
       string function = "apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR()";
       string message = "Cannot open input file OUTCAR.static.";
@@ -221,13 +221,13 @@ namespace apl {
 
     while (true) {
       // Get line
-      //CO - START
+      //CO START
       //getline(infile,line);
       //if( infile.eof() )
       if (line_count == vlines.size())
-      { //CO200106 - patching for auto-indenting
-        //CO - END
-        // ME20191029 - use xerror
+      { //CO20200106 - patching for auto-indenting
+        //CO END
+        //ME20191029 - use xerror
         //throw apl::APLLogicError("apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR(); No information about Born effective charges in OUTCAR.");
         string function = "apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR()";
         string message = "No information on Born effective charges in OUTCAR file.";
@@ -242,7 +242,7 @@ namespace apl {
     // Read in all ...
     xmatrix<double> m(3, 3);
     vector<string> tokens;
-    //CO - START
+    //CO START
     //getline(infile,line); // Skip line "----------------...."
     line = vlines[line_count++];
     for (uint i = 0; i < _supercell.getInputStructure().atoms.size(); i++) {
@@ -272,21 +272,21 @@ namespace apl {
     // Clear used stuff
     //infile.clear();
     //infile.close();
-    //CO - END
+    //CO END
   }
 
   //////////////////////////////////////////////////////////////////////////////
   void PhononCalculator::symmetrizeBornEffectiveChargeTensors(void) {
-    //CO - START
+    //CO START
     // Test of stupidity...
     if (_supercell.getEPS() == AUROSTD_NAN) {
-      // ME20191029
+      //ME20191029
       //throw APLRuntimeError("apl::PhononCalculator::buildForceConstantMatrices(); Need to define symmetry tolerance.");
       string function = "apl::PhononCalculator::symmetrizeEffectiveChargeTensors()";
       string message = "Symmetry tolerance not defined.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
     }
-    //CO - END
+    //CO END
     // Show charges
     _logger << "Input born effective charge tensors (for primitive cell):" << apl::endl;
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++) {
@@ -314,19 +314,19 @@ namespace apl {
           const _sym_op& symOp = _supercell.getSymOpWhichMatchAtoms(_supercell.getUniqueAtomID(i, j), basedUniqueAtomID, _FGROUP_);
           sum += inverse(symOp.Uc) * _bornEffectiveChargeTensor[_supercell.sc2pcMap(_supercell.getUniqueAtomID(i, j))] * symOp.Uc;
         }
-        //CO - START
-        // ME20191031 - use xerror
+        //CO START
+        //ME20191031 - use xerror
         //catch (APLLogicError& e)
         catch (aurostd::xerror& e)
-        { //CO200106 - patching for auto-indenting
+        { //CO20200106 - patching for auto-indenting
           _logger << error << "Mapping problem " << _supercell.getUniqueAtomID(i, j) << " <-> " << basedUniqueAtomID << "?" << apl::endl;
-          // ME20191031 - use xerror
+          //ME20191031 - use xerror
           //throw APLLogicError("apl::PhononCalculator::symmetrizeBornEffectiveChargeTensors(); Mapping failed.");
           string function = "apl::PhononCalculator::symmetrizeBornEffectiveChargeTensors()";
           string message = "Mapping failed.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }
-        //CO - END
+        //CO END
       }
 
       sum = (1.0 / _supercell.getNumberOfEquivalentAtomsOfType(i)) * sum; //CO20190218
@@ -398,7 +398,7 @@ namespace apl {
     //  no need for all this preprocessing
     //  string directory = string("./") + _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_;
     //
-    //  //CO - START
+    //  //CO START
     //  string infilename = directory + string("/aims.out");
     //  if (!aurostd::EFileExist(infilename, infilename)) {
     //    //_logger << apl::warning << "The OUTCAR file in " << directory << " directory is missing." << apl::endl;
@@ -412,14 +412,14 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void PhononCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  // ME20190113
+  void PhononCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  //ME20190113
     //string directory = string("./") + _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_; OBSOLETE ME20190113
-    string directory = xinp.xvasp.Directory;  // ME20190113
+    string directory = xinp.xvasp.Directory;  //ME20190113
 
     //if (!aurostd::FileExist(directory + string("/") + _AFLOWLOCK_))  //CO
     //  throw APLStageBreak();
 
-    //CO - START
+    //CO START
     string infilename = directory + string("/OUTCAR.static");
     if (!aurostd::EFileExist(infilename, infilename)) {
       infilename = directory + string("/OUTCAR");
@@ -436,13 +436,13 @@ namespace apl {
     string line;
     aurostd::efile2vectorstring(infilename, vlines);
     if (!vlines.size()) {
-      // ME20191029 - use xerror
+      //ME20191029 - use xerror
       //throw apl::APLLogicError("LinearResponsePC::readDielectricTensorFromOUTCAR(); Cannot open input OUTCAR file.");
       string function = "apl::LinearResponsePC::readDielectricTensorFromOUTCAR()";
       string message = "Cannot open input file OUTCAR.";
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
-    //CO - END
+    //CO END
 
     // Find
     string KEY; //ME20181226
@@ -454,18 +454,18 @@ namespace apl {
 
     while (true) {
       // Get line
-      //CO - START
+      //CO START
       //getline(infile,line);
       //if( infile.eof() )
       if (line_count == vlines.size()) {
-        // ME20191029
+        //ME20191029
         //throw apl::APLLogicError("LinearResponsePC::readDielectricTensorFromOUTCAR(); No information about dielectric tensor in OUTCAR.");
         string function = "apl::LinearResponsePC::readDielectricTensorFromOUTCAR()";
         string message = "No information on dielectric tensor in OUTCAR.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       line = vlines[line_count++];
-      //CO - END
+      //CO END
 
       // Check for our key line
       if (line.size() < KEY.size()) continue;
@@ -473,7 +473,7 @@ namespace apl {
     }
 
     // Read in all ...
-    //CO - START
+    //CO START
     //getline(infile,line); // Skip line "----------------...."
     line = vlines[line_count++];
 
@@ -491,7 +491,7 @@ namespace apl {
 
     //???MACROSCOPIC STATIC DIELECTRIC TENSOR IONIC CONTRIBUTION
     //const string KEY2 = string("MACROSCOPIC STATIC DIELECTRIC TENSOR IONIC CONTRIBUTION");
-    //while( true ) { //[CO200106 - close bracket for indenting]}
+    //while( true ) { //[CO20200106 - close bracket for indenting]}
     //// Get line
     ////getline(infile,line);
     //line=vlines[line_count++];
@@ -523,7 +523,7 @@ namespace apl {
     // Clear used stuff
     //infile.clear();
     //infile.close();
-    //CO - END
+    //CO END
 
     // Symmetrize
     //const vector<_sym_op>& pgroup = _supercell.getSupercellStructure().pgroup;
@@ -536,9 +536,9 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  void LinearResponsePC::readForceFieldsFromDYNMAT(const _xinput& xinp) { // ME20190113
+  void LinearResponsePC::readForceFieldsFromDYNMAT(const _xinput& xinp) { //ME20190113
     // string directory = string("./") + _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_; ME20190113
-    string directory = xinp.xvasp.Directory; // ME20190113
+    string directory = xinp.xvasp.Directory; //ME20190113
 
     //if (!aurostd::FileExist(directory + string("/") + _AFLOWLOCK_))  //CO
     //  throw APLStageBreak();
@@ -558,14 +558,14 @@ namespace apl {
     clear();
 
     // Open our file
-    //CO - START
+    //CO START
     vector<string> vlines;
     aurostd::efile2vectorstring(infilename, vlines);
     //ifstream infile(infilename.c_str());
     //if( !infile.is_open() )
     if (!vlines.size())
-    { //CO200106 - patching for auto-indenting
-      // ME20191029 - use xerror
+    { //CO20200106 - patching for auto-indenting
+      //ME20191029 - use xerror
       //throw apl::APLRuntimeError("LinearResponsePC::readForceFieldsFromDYNMAT(); Cannot open input DYNMAT file.");
       string function = "apl::LinearResponsePC::readForceFieldsFromDYNMAT()";
       string message = "Cannot open input file DYNMAT.";
@@ -591,7 +591,7 @@ namespace apl {
     //  infile >> dtemp;
     //}
     line_count++;
-    //CO - END
+    //CO END
 
     // Get forces
     vector<xvector<double> > distortionsOfOneAtom;
@@ -608,7 +608,7 @@ namespace apl {
       if (line_count == vlines.size()) break;  //CO
 
       // Distortion ID
-      //CO - START
+      //CO START
       //int idir=values[1]; //not used
       //int idir;
       //infile >> idir;
@@ -621,7 +621,7 @@ namespace apl {
       //infile >> distortion(1);
       //infile >> distortion(2);
       //infile >> distortion(3);
-      //CO - END
+      //CO END
       double distortionLength = aurostd::modulus(distortion);
       DISTORTION_MAGNITUDE = distortionLength;
       distortion(1) = distortion(1) / distortionLength;
@@ -633,7 +633,7 @@ namespace apl {
       xvector<double> force(3);
       xvector<double> drift(3);
       for (int k = 0; k < natoms; k++) {
-        //CO - START
+        //CO START
         aurostd::string2tokens(vlines[line_count++], values);
         force(1) = values[0];
         force(2) = values[1];
@@ -641,7 +641,7 @@ namespace apl {
         //infile >> force(1);
         //infile >> force(2);
         //infile >> force(3);
-        //CO - END
+        //CO END
         qm_forces.push_back(force);
         drift = drift + force;
       }

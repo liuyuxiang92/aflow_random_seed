@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -64,7 +64,7 @@
 #define atom2mol                6.0221408E23                    //CO20180329
 #define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO20180329
 
-//ME200107 - (A)APL conversion factors
+//ME20200107 - (A)APL conversion factors
 #define THz2Hz                      1E12
 #define Hz2THz                      1/THz2Hz
 #define au2THz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
@@ -538,7 +538,7 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
