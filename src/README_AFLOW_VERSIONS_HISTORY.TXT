@@ -30,7 +30,6 @@
         -- cleaned text/json if-statements in symmetry writing functions (DX)
         -- added Patterson symmetry usage to README_AFLOW_SYM.TXT and README_AFLOW_ACONVASP.TXT (DX)
         -- added error for non-standard prototypes that create structures with atoms too close (CO+DX)
-        -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- throw error when lattice gives negative determinant (CO)
         -- fixed --kppra=XX collision with aflow_proto (CO)
         -- xaus.POTCAR_TYPE_PRINT_flag==FALSE for lib2 and lib3 even for pocc structures (CO)
@@ -53,6 +52,8 @@
         -- patched species-project dos plot issues: lacking species key and emax TOO high (CO)
         -- added logger objects to plotter functions (CO)
         -- patched BvolXXXX.dat increment issue (++atomCOUNT) (CO)
+        -- patched --kapth to take default values from .aflow.rc (CO)
+        -- changed default value for kgrid to AUTO (MP vs. Gamma) (CO)
 3.1.228 - 2020/01/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
