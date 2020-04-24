@@ -266,7 +266,7 @@ namespace KBIN{
         aus << "00000  MESSAGE Taking loop directory = " << xaims.Directory << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
-      // check for directory KESONG CHEC THIS (if Krun=FALSE, everything stops).
+      // check for directory KY CHECK THIS (if Krun=FALSE, everything stops).
       if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
         if(aurostd::FileExist(xaims.Directory)) {
           Krun=FALSE; // avoid rerunning

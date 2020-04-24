@@ -35,7 +35,7 @@ const string POCC_AFLOWIN_tag="[AFLOW_POCC]";
 const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000-3000K, looks weird if decimal is larger than non-decimal part of number //4;  //this is std::fixed
 
 //make defaults in AFLOW_RC
-const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with kesong
+const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with KY
 
 //some constants
 const int BAR_WIDTH = 70;
@@ -52,7 +52,7 @@ bool COMPARE_WITH_KESONG=false;
 bool ENUMERATE_ALL_HNF=false;
 
 namespace pocc {
-  //temporary function to replace kesong's code, but should never be called
+  //temporary function to replace KY's code, but should never be called
   //does NOT handle aflow.in generation well at all
   bool poccInput() {
     string soliloquy="pocc::poccInput():";
@@ -2283,7 +2283,7 @@ namespace pocc {
     // that way, we explore all possibilities efficiently without having to save the hnf's (only corresponding superlattices)
     // this iterative scheme helps save some memory, which we need elsewhere in the code
     // starting_config ensures we don't ALSO lose calculation iterations in recalculating hnf possibilities we already explored
-    // REMEMBER when comparing with kesong's hnf's, his are TRANSPOSED!
+    // REMEMBER when comparing with KY's hnf's, his are TRANSPOSED!
     bool starting_config;
     for(int a=a_start;a<=n_hnf;a++){
       starting_config=(a==a_start);
@@ -2651,8 +2651,8 @@ namespace pocc {
     xmatrix<double> hnf_mat;                            //really xmatrix of int's, but we rule for int * double in xmatrix, no big deal
     //vector<xmatrix<double> > v_unique_superlattices;    //only store locally, as we need to make comparisons
 
-    //START KESONG
-    //cerr << "START KESONG " << endl;
+    //START KY
+    //cerr << "START KY " << endl;
     //CalculateHNF(p_str.xstr_pocc,p_str.n_hnf);
 
     //cerr << endl;
@@ -2990,7 +2990,7 @@ namespace pocc {
 
   //[OBSOLETE]for(uint atom1=0;atom1<supercell.atoms.size();atom1++){
   //[OBSOLETE]  for(uint atom2=atom1+1;atom2<supercell.atoms.size();atom2++){
-  //[OBSOLETE]    if(abs(distance_matrix(atom1,atom2)-v_nn_dists[atom1])<0.5){  //kesong standard for bonding, keep for now
+  //[OBSOLETE]    if(abs(distance_matrix(atom1,atom2)-v_nn_dists[atom1])<0.5){  //KY standard for bonding, keep for now
   //[OBSOLETE]      v_bonded_atom_indices.push_back(vector<uint>(0));
   //[OBSOLETE]      v_bonded_atom_indices.back().push_back(atom1);
   //[OBSOLETE]      v_bonded_atom_indices.back().push_back(atom2);
@@ -6207,10 +6207,10 @@ namespace pocc {
         if(atom1!=atom2){
           //distij=AtomDist(xstr_cluster.atoms[atom1],xstr_cluster.atoms[atom2]);
           distij=AtomDist(xstr_cluster.grid_atoms[atom1],xstr_cluster.grid_atoms[atom2]);
-          if(distij<=m_exploration_radius){ //kesong (via SC) used <= as well (GetNeighData)
+          if(distij<=m_exploration_radius){ //KY (via SC) used <= as well (GetNeighData)
             //  cerr << "OK cluster atom 1 " << atom1 << " " << xstr_cluster.grid_atoms[atom1].cpos << endl;
             //  cerr << "OK cluster atom 2 " << atom2 << " " << xstr_cluster.grid_atoms[atom2].cpos << endl;
-            if(abs(distij-v_dist_nn[(this->*NNDistancesMap)(atom1)])<=uff_bonding_distance){  //kesong only looked at <, not <= (ExtractBonds)
+            if(abs(distij-v_dist_nn[(this->*NNDistancesMap)(atom1)])<=uff_bonding_distance){  //KY only looked at <, not <= (ExtractBonds)
               v_bonded_atom_indices.push_back(vector<uint>(0));
               v_bonded_atom_indices.back().push_back(atom1);
               v_bonded_atom_indices.back().push_back(atom2);

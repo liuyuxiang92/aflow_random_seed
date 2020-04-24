@@ -689,7 +689,7 @@ namespace LATTICE {
 //}
 //DX END
 
-//**************************JUNKAI EDITED START****************************
+//**************************JX EDITED START****************************
 namespace LATTICE {
   bool Standard_Lattice_StructureDefault(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {
     //DX OBSOLETEreturn LATTICE::Standard_Lattice_StructureMedium(str_in,str_sp,str_sc);}
@@ -711,7 +711,7 @@ namespace LATTICE {
     //int time=0;
     //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0004,0.004,time,_EPS_);} // epsabc //epsang
     }
-//**************************JUNKAI EDITED END****************************
+//**************************JX EDITED END****************************
 
 namespace LATTICE {
   //bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram) ;
@@ -725,7 +725,7 @@ namespace LATTICE {
 
 namespace LATTICE {
   // transformation to standardization
-  bool Standard_Lattice_Structure_20170718(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {//**************************JUNKAI EDITED*****************
+  bool Standard_Lattice_Structure_20170718(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {//**************************JX EDITED*****************
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     bool is_deg = true; //DX
@@ -1960,8 +1960,8 @@ namespace LATTICE {
       str_reciprocal_in.title="NO_RECURSION";
       _atom atom;str_reciprocal_in.AddAtom(atom);
       // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
-      int ss=0; //JUNKAI
-      LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JUNKAI
+      int ss=0; //JX
+      LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JX
       str_sp.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
       str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//WSETYAWAN mod
       //str_sp.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
@@ -1975,8 +1975,8 @@ namespace LATTICE {
       str_superlattice_in.IdenticalAtoms();
       str_superlattice_in.Minkowski_calculated=FALSE;
       //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //SC OLD VERSION
-      ss=0; //JUNKAI
-      LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JUNKAI
+      ss=0; //JX
+      LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JX
       str_sp.bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
       str_sp.bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
       str_sp.bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
@@ -2070,7 +2070,7 @@ namespace LATTICE {
 
 namespace LATTICE {
   // transformation to standardization
-  bool Standard_Lattice_Structure_20170101(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram)  //**************************JUNKAI EDITED*****************
+  bool Standard_Lattice_Structure_20170101(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram)  //**************************JX EDITED*****************
     //bool LATTICE::Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang)   //SC OLD VERSION
   { //CO20200106 - patching for auto-indenting
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -2163,9 +2163,9 @@ namespace LATTICE {
       pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
     }
 
-    //**************************JUNKAI EDITED START****************************
+    //**************************JX EDITED START****************************
     /* OLD (DX)
-    // JUNKAI CHECK THE POSCAR OF KESONG it has 1.21% strain and finds it cubic but is it tet ?
+    //JX CHECK THE POSCAR OF KY it has 1.21% strain and finds it cubic but is it tet ?
     //  cerr << "[1]" << endl;
     if(str_sp.pgroup_calculated==FALSE) {
     //   cerr << "str_sp.pgroup_calculated" << endl;
@@ -2219,7 +2219,7 @@ namespace LATTICE {
     //  cerr << "[4]" << endl;
     */ //OLD (DX)
     //DX END
-    //**************************JUNKAI EDITED END****************************
+    //**************************JX EDITED END****************************
 
     // http://en.wikipedia.org/wiki/Crystal_system  table from bottom to top
     //  if(str_sp.pgroup.size()==24 && str_sp.crystal_system=="") str_sp.crystal_system="hexagonal";
@@ -2291,7 +2291,7 @@ namespace LATTICE {
        }
        */
 
-    //**************************JUNKAI EDITED START****************************
+    //**************************JX EDITED START****************************
     if((lattice_found==FALSE || crystal_system=="none" || cutoff<=0.01)&&!histogram) {
       vector<double> tolerance;
       int ij;
@@ -2305,7 +2305,7 @@ namespace LATTICE {
       //   return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,aeps);
     }
 
-    //**************************JUNKAI EDITED END****************************  
+    //**************************JX EDITED END****************************  
 
     // crystal_system="all";cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);
 
@@ -3137,8 +3137,8 @@ namespace LATTICE {
         str_reciprocal_in.title="NO_RECURSION";
         _atom atom;str_reciprocal_in.AddAtom(atom);
         // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
-        int ss=0; //JUNKAI
-        LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JUNKAI
+        int ss=0; //JX
+        LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JX
         str_sp.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
         str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//WSETYAWAN mod
         //str_sp.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
@@ -3152,8 +3152,8 @@ namespace LATTICE {
         str_superlattice_in.IdenticalAtoms();
         str_superlattice_in.Minkowski_calculated=FALSE;
         //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //SC OLD VERSION
-        ss=0; //JUNKAI
-        LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JUNKAI
+        ss=0; //JX
+        LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JX
         str_sp.bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
         str_sp.bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
         str_sp.bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
@@ -3255,8 +3255,8 @@ namespace LATTICE {
 namespace LATTICE {
   bool Bravais_Lattice_Structure(xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang) {
     //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang);//SC OLD VERSION
-    int ss=0; //JUNKAI                                                                                                                                                                                                                                                
-    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JUNKAI
+    int ss=0; //JX                                                                                                                                                                                                                                                
+    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JX
     str_in.bravais_lattice_type=str_sp.bravais_lattice_type;
     str_in.bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
     str_in.bravais_lattice_system=str_sp.bravais_lattice_system;
@@ -3264,8 +3264,8 @@ namespace LATTICE {
     _str_in.lattice=str_in.lattice; _str_in.scale=1.0;
     _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
     //  LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang); //SC OLD VERSION
-    ss=0; //JUNKAI                                        
-    LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JUNKAI
+    ss=0; //JX                                        
+    LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JX
     str_in.bravais_lattice_lattice_type=_str_sp.bravais_lattice_type;
     str_in.bravais_lattice_lattice_variation_type=_str_sp.bravais_lattice_variation_type;
     str_in.bravais_lattice_lattice_system=_str_sp.bravais_lattice_system;
@@ -3386,8 +3386,8 @@ namespace LATTICE {
     str_in.lattice=lattice; str_in.scale=1.0;
     _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; str_in.AddAtom(atom);
     //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang); //SC OLD VERSION
-    int ss=0; //JUNKAI                                                                                                                                                                                                                                                
-    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_); //JUNKAI
+    int ss=0; //JX                                                                                                                                                                                                                                                
+    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_); //JX
     lattice_sp=str_sp.lattice;lattice_sc=str_sc.lattice;
     bravais_lattice_type=str_sp.bravais_lattice_type;
     bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;

@@ -888,7 +888,7 @@ namespace pflow {
   void cleanupstring(string & str);
 } // namespace pflow
 
-//from kesong's old files
+//from KY's old files
 namespace pflow {
   void BZMAX(istream& input);
 }

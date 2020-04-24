@@ -1872,7 +1872,7 @@ namespace aflowlib {
         }
       }
       // for(uint i=0;i<str.atoms.size();i++) *voss << str.atoms.at(i).type << " "; *voss << endl;
-      // JUNKAI
+      //JX
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
       str.SpeciesPutAlphabetic();
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
@@ -2221,7 +2221,7 @@ namespace aflowlib {
         str_sp.bravais_lattice_type="X";
         //DX START
         //  while (str_sp.bravais_lattice_type!=str.bravais_lattice_type && str_sp.bravais_lattice_type!="UNKNOWN" && step<10) {  //[CO20200106 - close bracket for indenting]}
-        LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc); // DX
+        LATTICE::Standard_Lattice_StructureDefault(str,str_sp,str_sc); //DX
 
         if(str_sp.bravais_lattice_type!=str.bravais_lattice_type) {
           oss << "ERROR (aflow_xproto.cpp): label=" << label << "  " << str_sp.bravais_lattice_type << " " << str.bravais_lattice_type << " "
@@ -3721,7 +3721,7 @@ namespace aflowlib {
         }
       }
       // for(uint i=0;i<str.atoms.size();i++) *voss << str.atoms.at(i).type << " "; *voss << endl;
-      // JUNKAI
+      //JX
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
       str.SpeciesPutAlphabetic();
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}

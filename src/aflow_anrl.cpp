@@ -3901,13 +3901,13 @@ namespace anrl {
     //CO20181216 - fudging until real fix goes in - DX REMOVE
     //DX20190227 [OBSOLETE]    aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too
     //DX20190227 [OBSOLETE]    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");}
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B5_oC32_38_abce_abcdf-001")) aurostd::StringSubst(str.title,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001"); //A3B5_oC32_38_abce_abcdf ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_12a-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001"); //AB3_mC32_8_4a_12a ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A5B11_mP16_6_2abc_2a3b3c-001")) aurostd::StringSubst(str.title,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001"); //A5B11_mP16_6_2abc_2a3b3c ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B13_oC32_38_ac_a2bcdef-001")) aurostd::StringSubst(str.title,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001"); //A3B13_oC32_38_ac_a2bcdef ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_4a4b-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001"); //AB3_mC32_8_4a_4a4b ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB_aP16_2_4i_4i-001")) aurostd::StringSubst(str.title,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001"); //AB_aP16_2_4i_4i ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB7_hR16_166_c_c2h-001")) aurostd::StringSubst(str.title,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001"); //AB7_hR16_166_c_c2h ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B5_oC32_38_abce_abcdf-001")) aurostd::StringSubst(str.title,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001"); //A3B5_oC32_38_abce_abcdf OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_12a-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001"); //AB3_mC32_8_4a_12a OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A5B11_mP16_6_2abc_2a3b3c-001")) aurostd::StringSubst(str.title,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001"); //A5B11_mP16_6_2abc_2a3b3c OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B13_oC32_38_ac_a2bcdef-001")) aurostd::StringSubst(str.title,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001"); //A3B13_oC32_38_ac_a2bcdef OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_4a4b-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001"); //AB3_mC32_8_4a_4a4b OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB_aP16_2_4i_4i-001")) aurostd::StringSubst(str.title,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001"); //AB_aP16_2_4i_4i OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB7_hR16_166_c_c2h-001")) aurostd::StringSubst(str.title,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001"); //AB7_hR16_166_c_c2h OL bccSQS
     //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A2BCD4_tI16_82_ac_b_d_g-001")) aurostd::StringSubst(str.title,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001"); //A2BCD4_tI16_82_ac_b_d_g natalio kesterite
     //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_tI4_141_a-001")) aurostd::StringSubst(str.title,"A_tI4_141_a","A_tI4_141_a-001"); //A_tI4_141_a mike Sn
     //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_hP1_191_a-001")) aurostd::StringSubst(str.title,"A_hP1_191_a","A_hP1_191_a-001"); //A_hP1_191_a mike Sn

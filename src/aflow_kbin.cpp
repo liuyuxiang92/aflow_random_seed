@@ -1332,7 +1332,7 @@ namespace KBIN {
             aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
             kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
           }
-          // ohad	
+          //OL	
           if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::OHAD") || //CO20181113
               aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE2") ||  // check MACHINE2
               aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE2"))   // check MACHINE2

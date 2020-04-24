@@ -108,7 +108,7 @@ namespace aflowlib {
               if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_) &&  // check aflow.in
                   aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) &&   // check aflowlib.out
                   aurostd::FileExist(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT))  // check aflowlib.out
-              { //CO200106 - patching for auto-indenting
+              { //CO20200106 - patching for auto-indenting
                 // cerr << directory_LIB << " " << directory_RAW << " " << directory_WEB << endl;
                 string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
                 if(!aurostd::FileExist(directory_ICSD2LINK+"/LIB")) {
@@ -144,7 +144,7 @@ namespace aflowlib {
         }
 
 	// check aflow.immiscibility.out   //SC20200318
-	if(ZIPNOMIX) { // COREY IS TRASHY    //SC20200318
+	if(ZIPNOMIX) { //SC20200318
 	  if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
 	    if(aurostd::FileExist(directory_LIB+"/"+"aflow.immiscibility.out")) {
 	      //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
@@ -193,7 +193,7 @@ namespace aflowlib {
 	     }
 	     //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
 	     if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
-	       { //CO200106 - patching for auto-indenting
+	       { //CO20200106 - patching for auto-indenting
 		 ossLIB2AUID << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --lib2auid=\"" << directory_LIB << "\"" << endl;
 		 fixes++;
 	       }
@@ -214,7 +214,7 @@ namespace aflowlib {
 	      }
 	      //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
 	      if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
-		{ //CO200106 - patching for auto-indenting
+		{ //CO20200106 - patching for auto-indenting
 		  ossLIB2RAW << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --beep --force --lib2raw=\"" << directory_LIB << "\"" << endl;
 		  fixes++;
 		}

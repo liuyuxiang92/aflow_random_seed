@@ -95,7 +95,7 @@ void AConvaspBandgaps(istream& bandsdir, ostream& oss) {
 
 void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
   // tmp safe, checked SC,JX 0512
-  //  void AConvaspBandgaps(istream& bandsdir) {  //JUNKAI
+  //  void AConvaspBandgaps(istream& bandsdir) {  //JX
 
   //Calculate band gap from bands run.
   //bandsdir contains directories of bands run, one directory per line
@@ -157,11 +157,11 @@ void AConvaspBandgaps(istream& bandsdir, ostringstream& oss) {
     aurostd::RemoveFile(file_tmp);
     //output to stdout
     oss << tag << " " << directory << " ";
-    //cout << tag << " " << s << " ";   //JUNKAI
+    //cout << tag << " " << s << " ";   //JX
     if(Egap<tiny6) oss << "0.0 (M)" << endl;
-    //if(Egap<tiny6) cout << "METAL" << endl; //JUNKAI
+    //if(Egap<tiny6) cout << "METAL" << endl; //JX
     else oss << Egap << " (" << gaptype << ")" << endl;
-    //else cout << Egap << " (" << gaptype << ")" << endl; //JUNKAI
+    //else cout << Egap << " (" << gaptype << ")" << endl; //JX
   }
 }
 // ***************************************************************************
@@ -1792,7 +1792,7 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
   float Egap,vbm,vbmup,vbmdw=-1e6,cbm,cbmup,cbmdw=-1e6;
   float maxtest,mintest,vbmtestup,vbmtestdw,cbmtestup,cbmtestdw;
 
-  //KESONG FIXES THIS BUG
+  //KY FIXES THIS BUG
   bool FLAG_HALF_BANDS_UP = false;
   bool FLAG_HALF_BANDS_DN = false;
   
@@ -1815,7 +1815,7 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
     }
   }
   //if vbmup and cmbup are both above or below Efermi
-  //KESONG FIXES THIS BUG
+  //KY FIXES THIS BUG
   //This includes the case:  vbmdw == cbmdwa && vbmdw == Efermi
   if(((vbmup-Efermi)<1E-8 && (cbmup-Efermi)<1E-8)||
      ((vbmup-Efermi)>1E-8 && (cbmup-Efermi)>1E-8)) {
@@ -1838,7 +1838,7 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
       }
     }
     //if vbmdw and cmbdw are both above or below Efermi
-    //KESONG FIXES THIS BUG
+    //KY FIXES THIS BUG
     //This includes the case:  vbmdw == cbmdwa && vbmdw == Efermi
     if(((vbmdw-Efermi)<1E-8 && (cbmdw-Efermi)<1E-8)||
        ((vbmdw-Efermi)>1E-8 && (cbmdw-Efermi)>1E-8)) {
@@ -1853,7 +1853,7 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
   vbm=vbmup;  cbm=cbmup;//for spin off
   vbmfromdw=false; cbmfromdw=false;
   if(ispin==2) {//for spin on, we need to check further
-    //KESONG FIXES THIS BUG
+    //KY FIXES THIS BUG
     if(!FLAG_HALF_BANDS_UP && FLAG_HALF_BANDS_DN) {
       vbm=vbmup;
       cbm=cbmup;

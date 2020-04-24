@@ -223,7 +223,7 @@ namespace aflowlib {
       }
     }
 
-    // JUNKAI THIS IS THE WAY TO READ vList_Hmin.at(ispecies) vList_Pmin.at(ispecies) vList_Imin.at(ispecies) right use of vList_tokens.at(0,1,2 A,AB,ABC).at(vList_Imin.at(ispecies)).at(TOKENS INDEX THAT YOU WANT)
+    //JX THIS IS THE WAY TO READ vList_Hmin.at(ispecies) vList_Pmin.at(ispecies) vList_Imin.at(ispecies) right use of vList_tokens.at(0,1,2 A,AB,ABC).at(vList_Imin.at(ispecies)).at(TOKENS INDEX THAT YOU WANT)
     // HOWEVER YOU CAN EXTRACT INFORMATION WITH TokenExtractAFLOWLIB(vList..at(j),"species=",species);
     for(uint ispecies=0;ispecies<nspecies;ispecies++) {
       if(LVERBOSE) cerr << vspecies.at(ispecies) << " " << vList_Hmin.at(ispecies) << " " << vList_Pmin.at(ispecies) << " " << vList_Imin.at(ispecies) << " " << vList_tokens.at(0).at(vList_Imin.at(ispecies)).at(0) << endl;
@@ -1137,7 +1137,6 @@ namespace aflowlib {
     }
 
 
-    //    directory_RAW="/home/junkai/RAW";
     // override for the web
     //    if(PROJECT_LIBRARY==init::AFLOW_Projects_Directories("ICSD")) directory_WEB=aurostd::CleanFileName(PROJECT_AFLOWLIB_WEB);
 
@@ -1295,7 +1294,7 @@ namespace aflowlib {
       }
       // ---------------------------------------------------------------------------------------------------------------------------------
       // do the MAGNETIC
-      if((perform_MAGNETIC || perform_BANDS)) { // JUNKAI
+      if((perform_MAGNETIC || perform_BANDS)) { //JX
         cout << "aflowlib::LIB2RAW: MAGNETIC LOOP ---------------------------------------------------------------------------------" << endl;
         aflowlib::LIB2RAW_Loop_Magnetic(directory_LIB,directory_RAW,vfile,aflowlib_data,"aflowlib::LIB2RAW (magnetic):"); 
       }
@@ -1857,7 +1856,7 @@ namespace aflowlib {
     stringstream aus_exec;
     // directories must exist already
     bool flag_DATA_BANDS_=FALSE;
-    bool flag_use_MATLAB=FALSE,flag_use_GNUPLOT=!flag_use_MATLAB;  // KESONG
+    bool flag_use_MATLAB=FALSE,flag_use_GNUPLOT=!flag_use_MATLAB;  //KY
     // bool flag_use_MATLAB=TRUE,flag_use_GNUPLOT=!flag_use_MATLAB;   //WSETYAWAN
     // [OBSOLETE]  bool flag_ORIG=FALSE;
 
@@ -1971,7 +1970,7 @@ namespace aflowlib {
       plotter::PLOT_PDOS(plotoptions);
       //ME20190614 END
 
-      // KESONG WRITE THE CODE HERE
+      //KY WRITE THE CODE HERE
       cout << MESSAGE << " GNUPLOT start: " << directory_RAW << endl;
       // WRITE plotbz.sh
       stringstream gnuplot_plotbz;
@@ -2026,7 +2025,7 @@ namespace aflowlib {
     }
 
     //[CO20191112] - NO PDF JPG detected in aflow_gnuplot_funcs.cpp, so this is useless anyway
-    //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]// Kesong adds it
+    //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]//KY adds it
     //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "cd \"" << directory_RAW << "\"" << endl;
     //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "rm -f *pdf *jpg " << endl;
     //[CO20191112 - dangerous command, will delete ANY pdf jpg created before this routine]aurostd::execute(command);
@@ -2845,7 +2844,7 @@ namespace aflowlib {
       }
     }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPIND (\\mu) = " << data.spinD << "   " << directory_LIB << endl;
-    //CO20180130 - STOP
+    //CO20180130 STOP
     data.energy_cutoff=xOUT.ENCUT;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENERGY_CUTOFF (eV) = " << data.energy_cutoff << endl;
     data.delta_electronic_energy_convergence=xOUT.total_energy_change;
@@ -3077,7 +3076,7 @@ namespace aflowlib {
       if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_Thermodynamics [FCALC=4]" << endl;
     }
 
-    if(1) { // ONLY TO GENERATE AUIDS - STEFANO ONLY DONT TOUCH
+    if(1) { // ONLY TO GENERATE AUIDS - SC ONLY DONT TOUCH
       if(data.nspecies==1) {
 	string s=str_relax.species.at(0),sv=str_relax.species_pp_version.at(0);
 	double gs=data.enthalpy_atom; double va=data.volume_atom; double sa=data.spin_atom;

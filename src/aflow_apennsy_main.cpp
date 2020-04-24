@@ -223,7 +223,7 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
   // aflags.vflag.flag("APENNSY::ENTHALPY_LIST",FALSE);
   if(aflags.vflag.flag("APENNSY::CONVEX_HULL") && !aflags.vflag.flag("APENNSY::MATLAB") && !aflags.vflag.flag("APENNSY::GNUPLOT"))
     // aflags.vflag.flag("APENNSY::MATLAB",TRUE);
-    aflags.vflag.flag("APENNSY::GNUPLOT",TRUE);  // RHT
+    aflags.vflag.flag("APENNSY::GNUPLOT",TRUE);  //RHT
   // ---------------------------------------------------------------
   // Introductions
   // cerr << aflow::Banner("BANNER_BIG");
@@ -370,12 +370,12 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
       aus << "export DISPLAY=:0.0" << endl << DEFAULT_KBIN_MATLAB_BIN << " -r " << string("apennsy") << endl;
       aurostd::execute(aus);
 
-      //JUNKAI aus << "export DISPLAY=:0.0" << endl << DEFAULT_KBIN_MATLAB_BIN << " -r " << string("apennsy") << endl;
-      //JUNKAI aurostd::execute(aus);
-      //JUNKAI aus.clear();aus.str(std::string());
-      //JUNKAI // aus << "mv *eps " << init::AFLOW_Projects_Directories("LIB2") << "/EPS/HULL/" << endl;
-      //JUNKAI aus << "rm -f apennsy.m" << endl;
-      //JUNKAI aurostd::execute(aus);
+      //JX aus << "export DISPLAY=:0.0" << endl << DEFAULT_KBIN_MATLAB_BIN << " -r " << string("apennsy") << endl;
+      //JX aurostd::execute(aus);
+      //JX aus.clear();aus.str(std::string());
+      //JX // aus << "mv *eps " << init::AFLOW_Projects_Directories("LIB2") << "/EPS/HULL/" << endl;
+      //JX aus << "rm -f apennsy.m" << endl;
+      //JX aurostd::execute(aus);
 
     }
 
@@ -2467,7 +2467,7 @@ string APENNSY_Parameters::MatlabGndStatesNamesConcentrations(bool _verbose) {  
         if(x>=1.0) {x+=0.01;y+=deltaE/15;}
         if(x>0.0 && x<1.0) y+=deltaE/40;
         // cerr << x << "," << y << endl;
-        if(x<=0.0 || x>=1.0) y+=deltaE/15; // RHT FIX THIS
+        if(x<=0.0 || x>=1.0) y+=deltaE/15; //RHT FIX THIS
         oss << "text(" << 100*x-0.5*strlen(ZLibrary.at(k).at(ZGNDlibrary.at(k).at(i)).structure_name.c_str()) << "," << y-deltaE/15 << ",'" << ZLibrary.at(k).at(ZGNDlibrary.at(k).at(i)).structure_name << "','fontsize',0.75*FONTDIM);" << endl;
       }
     oss << "text(" << -5.0 << "," << minE-deltaE/10 << ",'" << PhaseDiagramNameLeft.at(k) << "','fontsize',FONTDIM);" << endl;

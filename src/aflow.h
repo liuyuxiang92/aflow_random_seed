@@ -1115,7 +1115,7 @@ class _atom { // simple class.. nothing fancy
     string name;                                           // the name read from the INPUT
     bool   name_is_given;                                  // TRUE is atom name has been given
     string cleanname;                                      // a chemical clean version of the name
-    int info;                                              // container for misc. information  // RHT
+    int info;                                              // container for misc. information  //RHT
     int    atomic_number;                                  // 0 by defauls
     int    number;                                         // atom number reference for convasp, from zero to the sky
     string sd;                                             // ?
@@ -1138,7 +1138,7 @@ class _atom { // simple class.. nothing fancy
     int shell;                                             // neighbour shell number
     // printing
     bool   verbose;                                        // verbose in printing
-    bool   print_RHT;                                      // a printer for coord and name (general position)   // RHT
+    bool   print_RHT;                                      // a printer for coord and name (general position)   //RHT
     bool   print_cartesian;                                // print frac or cartesian
     // operators/functions                                 // operator/functions
     friend ostream& operator<<(ostream &,const _atom&);    // print
@@ -1226,7 +1226,7 @@ vector<string> GetGroupOfAtoms(string& group_name); //DX20181220
 double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
 double GetCompoundAttenuationLength(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
 //DX+CO START
-//DX20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  // RHT
+//DX20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  //RHT
 //DX+CO END
 // routines of general use
 string XATOM_AlphabetizationSpecies(string speciesA,string speciesB);
@@ -1488,7 +1488,7 @@ class xstructure {
     void GetPrimitive1(void);                                     // Make it primitive, if possible
     void GetPrimitive2(void);                                     // Make it primitive, if possible
     void GetPrimitive3(void);                                     // Make it primitive, if possible
-    uint GetPrimitiveCell(void);                                  // Make it primitive, if possible. Returns 1 if routine fails (RHT)   // RHT
+    uint GetPrimitiveCell(void);                                  // Make it primitive, if possible. Returns 1 if routine fails (RHT)   //RHT
     double MinDist(void);                                         // get minimum interatomic distance -- CO20171024
     void ReScale(const double &in_scale);                         // Change scale but keep volume fixed
     void SetScale(const double &in_scale);                        // Change scale

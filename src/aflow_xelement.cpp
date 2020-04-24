@@ -1102,7 +1102,7 @@ namespace xelement {
       HHIP=1300;
       HHIR=500;
       /*xray_scatt=NNN;*/
-      //N JUNKAI CHANGED VALENCE
+      //N JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Nitrogen
     // ********************************************************************************************************************************************************
@@ -1181,7 +1181,7 @@ namespace xelement {
       HHIP=500;
       HHIR=500;
       xray_scatt=8.052;
-      // O Table 27 of JUNKAI
+      // O Table 27 of JX
     }
     // [AFLOW]STOP=Oxygen
     // ********************************************************************************************************************************************************
@@ -1816,7 +1816,7 @@ namespace xelement {
       HHIP=700;
       HHIR=1000;
       /*xray_scatt=NNN;*/
-      //S Table 27 of JUNKAI
+      //S Table 27 of JX
     }
     // [AFLOW]STOP=Sulphur
     // ********************************************************************************************************************************************************
@@ -1895,7 +1895,7 @@ namespace xelement {
       HHIP=1500;
       HHIR=1500;
       /*xray_scatt=NNN;*/
-      //Cl interpolation phi_star, nws, Vm, gamma JUNKAI CHANGED VALENCE
+      //Cl interpolation phi_star, nws, Vm, gamma JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Chlorine
     // ********************************************************************************************************************************************************
@@ -1974,7 +1974,7 @@ namespace xelement {
       HHIP=NNN;
       HHIR=NNN;
       /*xray_scatt=NNN;*/
-      //Ar guessed volume, must double check from results JUNKAI CHANGED VALENCE
+      //Ar guessed volume, must double check from results JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Argon
     // ********************************************************************************************************************************************************
@@ -2530,7 +2530,7 @@ namespace xelement {
       HHIP=1600;
       HHIR=1800;
       xray_scatt=24.46;
-      //xray_scatt=24.3589; Mn JUNKAI CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.3589; Mn JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
     }
     // [AFLOW]STOP=Manganese
     // ********************************************************************************************************************************************************
@@ -2609,7 +2609,7 @@ namespace xelement {
       HHIP=2400;
       HHIR=1400;
       xray_scatt=24.85;
-      //xray_scatt=24.6830; Fe JUNKAI CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.6830; Fe JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
     }
     // [AFLOW]STOP=Iron
     // ********************************************************************************************************************************************************
@@ -2688,7 +2688,7 @@ namespace xelement {
       HHIP=3100;
       HHIR=2700;
       xray_scatt=24.59;
-      //Co JUNKAI CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
+      //Co JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
     }
     // [AFLOW]STOP=Cobalt
     // ********************************************************************************************************************************************************
@@ -2846,7 +2846,7 @@ namespace xelement {
       HHIP=1600;
       HHIR=1500;
       xray_scatt=27.03;
-      //Cu JUNKAI CHANGED VALENCE
+      //Cu JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Copper
     // ********************************************************************************************************************************************************
@@ -3242,7 +3242,7 @@ namespace xelement {
       HHIP=2200;
       HHIR=1900;
       /*xray_scatt=NNN;*/
-      //Se Table 27 of JUNKAI
+      //Se Table 27 of JX
     }
     // [AFLOW]STOP=Selenium
     // ********************************************************************************************************************************************************
@@ -3321,7 +3321,7 @@ namespace xelement {
       HHIP=3300;
       HHIR=6900;
       /* xray_scatt=NNN;*/
-      //Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE
+      //Br interpolation phi_star, nws, Vm, gamma, BVm JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Bromine
     // ********************************************************************************************************************************************************
@@ -3956,7 +3956,7 @@ namespace xelement {
       HHIP=NNN;
       HHIR=NNN;
       /*xray_scatt=NNN;*/
-      //Tc JUNKAI CHANGED VALENCE
+      //Tc JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Technetium
     // ********************************************************************************************************************************************************
@@ -4035,7 +4035,7 @@ namespace xelement {
       HHIP=3200;
       HHIR=8000;
       /*xray_scatt=NNN;*/
-      //Ru JUNKAI CHANGED VALENCE
+      //Ru JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Ruthenium
     // ********************************************************************************************************************************************************
@@ -4272,7 +4272,7 @@ namespace xelement {
       HHIP=1200;
       HHIR=1400;
       xray_scatt=47.18;
-      //Ag JUNKAI CHANGED VALENCE
+      //Ag JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Silver
     // ********************************************************************************************************************************************************
@@ -4668,7 +4668,7 @@ namespace xelement {
       HHIP=2900;
       HHIR=4900;
       /*xray_scatt=NNN;*/
-      //Te Table 27 of JUNKAI
+      //Te Table 27 of JX
     }
     // [AFLOW]STOP=Tellurium
     // ********************************************************************************************************************************************************
@@ -4826,7 +4826,7 @@ namespace xelement {
       HHIP=NNN;
       HHIR=NNN;
       /*xray_scatt=NNN;*/
-      //Xe JUNKAI CHANGED VALENCE
+      //Xe JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Xenon
     // ********************************************************************************************************************************************************
@@ -5304,7 +5304,7 @@ namespace xelement {
       HHIP=9500;
       HHIR=3100;
       /*xray_scatt=NNN;*/
-      //Nd Pettifor linear interpolation JUNKAI CHANGED VALENCE
+      //Nd Pettifor linear interpolation JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Neodymium
     // ********************************************************************************************************************************************************
@@ -5778,7 +5778,7 @@ namespace xelement {
       HHIP=9500;
       HHIR=3100;
       /*xray_scatt=NNN;*/
-      //Dy Pettifor linear interpolation JUNKAI CHANGED VALENCE
+      //Dy Pettifor linear interpolation JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Dysprosium
     // ********************************************************************************************************************************************************
@@ -6015,7 +6015,7 @@ namespace xelement {
       HHIP=9500;
       HHIR=3100;
       /*xray_scatt=NNN;*/
-      //Tm Pettifor linear interpolation JUNKAI CHANGED VALENCE
+      //Tm Pettifor linear interpolation JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Thulium
     // ********************************************************************************************************************************************************
@@ -6569,7 +6569,7 @@ namespace xelement {
       HHIP=5500;
       HHIR=9100;
       /*xray_scatt=NNN;*/
-      //Os JUNKAI CHANGED VALENCE
+      //Os JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Osmium
     // ********************************************************************************************************************************************************
@@ -6648,7 +6648,7 @@ namespace xelement {
       HHIP=5500;
       HHIR=9100;
       /*xray_scatt=NNN;*/
-      //Ir JUNKAI CHANGED VALENCE
+      //Ir JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Iridium
     // ********************************************************************************************************************************************************

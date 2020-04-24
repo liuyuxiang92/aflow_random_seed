@@ -59,7 +59,7 @@ namespace xelement {
     double radius;                          // Saxena (nm)
     double radius_PT;                       // (pm)       http://periodictable.com      //DU20190517
     double radius_covalent_PT;              // (pm)       http://periodictable.com      //DU20190517
-    double radius_covalent;                 // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) // DX+CO20170904
+    double radius_covalent;                 // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) //DX+CO20170904
     double radius_VanDerWaals_PT;           // (pm)       http://periodictable.com      //DU20190517
     double radii_Ghosh08;                    // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      //DU20190517
     double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      //DU20190517

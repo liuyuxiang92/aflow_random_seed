@@ -760,7 +760,7 @@ namespace estructure {
 	}
 	//Storing the DOSDATA of the 1st atom	
 	//
-	//KESONG UNFISNISHED
+	//KY UNFISNISHED
 	strline.clear();
 	strline.str(line);
 	strline >> PDOS[0][0][0]; //Energy
@@ -813,7 +813,7 @@ namespace estructure {
 	}
 	//Storing the DOSDATA of the 1st atom	
 	//
-	//KESONG UNFISNISHED
+	//KY UNFISNISHED
 	strline.clear();
 	strline.str(line);
 	strline >> PDOS[0][0][0]; //Energy
@@ -2393,7 +2393,7 @@ namespace estructure {
     //Call gnuplot to plot the bands structure	
     aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscript);
     aurostd::execute(XHOST.command("convert")+" -background white ./" + ICSDName + ".eps  ./" + ICSDName + ".png");
-    // KESONG in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
+    //KY in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
     if(aurostd::FileExist("bz_.eps")) aurostd::file2file("bz_.eps",ICSDName+"_BZ.eps");
     if(aurostd::FileExist("bz_.png")) aurostd::file2file("bz_.png",ICSDName+"_BZ.png");
     if(aurostd::FileExist("bz_"+ICSDName+".eps")) aurostd::file2file("bz_"+ICSDName+".eps",ICSDName+"_BZ.eps");
@@ -2902,7 +2902,7 @@ namespace estructure {
     //Call gnuplot to plot the bands structure	
     aurostd::execute(XHOST.command("gnuplot")+" " + gnuplotscript);
     aurostd::execute(XHOST.command("convert")+" -background white ./" + ICSDName + ".eps  ./" + ICSDName + ".png");
-    // KESONG in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
+    //KY in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
     if(aurostd::FileExist("bz_.eps")) aurostd::file2file("bz_.eps",ICSDName+"_BZ.eps");
     if(aurostd::FileExist("bz_.png")) aurostd::file2file("bz_.png",ICSDName+"_BZ.png");
     if(aurostd::FileExist("bz_"+ICSDName+".eps")) aurostd::file2file("bz_"+ICSDName+".eps",ICSDName+"_BZ.eps");
@@ -3497,7 +3497,7 @@ namespace estructure {
       }
     }
 
-    // KESONG in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
+    //KY in the future we can remove these 4 lines, but for now we need to patch plotbz.sh
     if(aurostd::FileExist("bz_.eps")) aurostd::file2file("bz_.eps",ICSDName+"_BZ.eps");
     if(aurostd::FileExist("bz_.png")) aurostd::file2file("bz_.png",ICSDName+"_BZ.png");
     if(aurostd::FileExist("bz_"+ICSDName+".eps")) aurostd::file2file("bz_"+ICSDName+".eps",ICSDName+"_BZ.eps");
@@ -4064,7 +4064,7 @@ namespace estructure {
 	}
 	//Storing the DOSDATA of the 1st atom	
 	//
-	//KESONG UNFISNISHED
+	//KY UNFISNISHED
 	ss_line.clear();
 	ss_line.str(line);
 	ss_line >> PDOS[0][0][0]; //Energy
@@ -4117,7 +4117,7 @@ namespace estructure {
 	}
 	//Storing the DOSDATA of the 1st atom	
 	//
-	//KESONG UNFISNISHED
+	//KY UNFISNISHED
 	ss_line.clear();
 	ss_line.str(line);
 	ss_line >> PDOS[0][0][0]; //Energy

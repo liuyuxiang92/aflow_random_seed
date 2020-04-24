@@ -3533,7 +3533,7 @@ namespace aurostd {
     string file=aurostd::CleanFileName(FileNameOUT);
     ofstream FileOUT;
     FileOUT.open(file.c_str(),std::ios::out);
-    bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
+    bool writable=FileOUT.is_open(); //CO20190808 - captures whether we can open/write file
     for(uint iline=0;iline<vline.size();iline++) FileOUT << vline.at(iline) << endl;
     // FileOUT << StringstreamOUT.rdbuf();
     FileOUT.flush();FileOUT.clear();FileOUT.close();
@@ -3568,7 +3568,7 @@ namespace aurostd {
     string file=aurostd::CleanFileName(FileNameOUT);
     ofstream FileOUT;
     FileOUT.open(file.c_str(),std::ios::out);
-    bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
+    bool writable=FileOUT.is_open(); //CO20190808 - captures whether we can open/write file
     for(uint iline=0;iline<vline.size();iline++)  FileOUT << vline.at(iline) << endl;
     // FileOUT << StringstreamOUT.rdbuf();
     FileOUT.flush();FileOUT.clear();FileOUT.close();
@@ -3604,7 +3604,7 @@ namespace aurostd {
     string file=aurostd::CleanFileName(FileNameOUT);
     ofstream FileOUT;
     FileOUT.open(file.c_str(),std::ios::out);
-    bool writable=FileOUT.is_open(); //CO190808 - captures whether we can open/write file
+    bool writable=FileOUT.is_open(); //CO20190808 - captures whether we can open/write file
     for(uint iline=0;iline<vline.size();iline++) FileOUT << vline.at(iline) << endl;
     // FileOUT << StringstreamOUT.rdbuf();
     FileOUT.flush();FileOUT.clear();FileOUT.close();

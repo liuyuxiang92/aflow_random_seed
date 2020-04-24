@@ -21,7 +21,7 @@ int MiscibilityExperimentsCheck(string system_in) {  // (nomix,unknown,mix)
   int NOMIX=MISCIBILITY_SYSTEM_NOMIX;
   if(system=="AcBe") return UNKNOWN; // Pauling
   if(system=="AgAu") return NOMIX; // Pauling
-  if(system=="AgBi") return COMPOUND; //Pauling JUNKAI
+  if(system=="AgBi") return COMPOUND; //Pauling JX
   if(system=="AgBe") return COMPOUND; // Pauling
   if(system=="AgCd") return COMPOUND; // Pauling
   if(system=="AgCo") return NOMIX; // Pauling
@@ -62,7 +62,7 @@ int MiscibilityExperimentsCheck(string system_in) {  // (nomix,unknown,mix)
   if(system=="AmBe") return COMPOUND; // Pauling
   if(system=="AsBe") return COMPOUND; // Pauling
   if(system=="AuBe") return COMPOUND; // Pauling
-  if(system=="AuBi") return COMPOUND; //Pauling JUNKAI
+  if(system=="AuBi") return COMPOUND; //Pauling JX
   if(system=="AuCd") return COMPOUND; // Pauling
   if(system=="AuCo") return NOMIX; // Pauling
   if(system=="AuCr") return COMPOUND; // Pauling
@@ -178,35 +178,35 @@ int MiscibilityExperimentsCheck(string system_in) {  // (nomix,unknown,mix)
   if(system=="BeYb") return COMPOUND; // Pauling
   if(system=="BeZn") return NOMIX; // Pauling
   if(system=="BeZr") return COMPOUND; // Pauling
-  if(system=="BiCd") return NOMIX; //Massalski JUNKAI
-  if(system=="BiCo") return NOMIX; //Massalski JUNKAI
-  if(system=="BiCr") return NOMIX; //Massalski JUNKAI
-  if(system=="BiCu") return NOMIX; //Massalski JUNKAI
-  if(system=="BiFe") return NOMIX; //Massalski JUNKAI
+  if(system=="BiCd") return NOMIX; //Massalski JX
+  if(system=="BiCo") return NOMIX; //Massalski JX
+  if(system=="BiCr") return NOMIX; //Massalski JX
+  if(system=="BiCu") return NOMIX; //Massalski JX
+  if(system=="BiFe") return NOMIX; //Massalski JX
   if(system=="BiHf") return COMPOUND; // Pauling
   if(system=="BiHg") return NOMIX; // Pauling
   if(system=="BiIn") return COMPOUND; // Pauling
   if(system=="BiIr") return COMPOUND; // Pauling
-  if(system=="BiLa") return COMPOUND; //Pauling JUNKAI
-  if(system=="BiMn") return COMPOUND; //Pauling JUNKAI
-  if(system=="BiMo") return NOMIX; //Massalski JUNKAI
-  if(system=="BiNb") return NOMIX; //Massalski JUNKAI
-  if(system=="BiNi") return COMPOUND; //Pauling JUNKAI
-  if(system=="BiOs") return NOMIX; //Massalski JUNKAI
-  if(system=="BiPd") return COMPOUND; //Pauling JUNKAI
-  if(system=="BiPt") return COMPOUND; //Pauling JUNKAI
-  if(system=="BiRe") return NOMIX; //Massalski JUNKAI
-  if(system=="BiRh") return COMPOUND; //Pauling JUNKAI
-  if(system=="BiRu") return NOMIX; //Massalski JUNKAI
-  if(system=="BiSc") return COMPOUND; //Pauling JUNKAI
-  if(system=="BiTa") return NOMIX; //Massalski JUNKAI
-  if(system=="BiTc") return UNKNOWN; //Massalski JUNKAI
-  if(system=="BiTi") return COMPOUND; //Pauling JUNKAI
-  if(system=="BiV") return NOMIX; //Massalski JUNKAI
-  if(system=="BiW") return UNKNOWN; //Massalski JUNKAI
-  if(system=="BiY") return COMPOUND; //Massalski JUNKAI
-  if(system=="BiZn") return NOMIX; //Massalski JUNKAI
-  if(system=="BiZr") return COMPOUND; //Pauling JUNKAI
+  if(system=="BiLa") return COMPOUND; //Pauling JX
+  if(system=="BiMn") return COMPOUND; //Pauling JX
+  if(system=="BiMo") return NOMIX; //Massalski JX
+  if(system=="BiNb") return NOMIX; //Massalski JX
+  if(system=="BiNi") return COMPOUND; //Pauling JX
+  if(system=="BiOs") return NOMIX; //Massalski JX
+  if(system=="BiPd") return COMPOUND; //Pauling JX
+  if(system=="BiPt") return COMPOUND; //Pauling JX
+  if(system=="BiRe") return NOMIX; //Massalski JX
+  if(system=="BiRh") return COMPOUND; //Pauling JX
+  if(system=="BiRu") return NOMIX; //Massalski JX
+  if(system=="BiSc") return COMPOUND; //Pauling JX
+  if(system=="BiTa") return NOMIX; //Massalski JX
+  if(system=="BiTc") return UNKNOWN; //Massalski JX
+  if(system=="BiTi") return COMPOUND; //Pauling JX
+  if(system=="BiV") return NOMIX; //Massalski JX
+  if(system=="BiW") return UNKNOWN; //Massalski JX
+  if(system=="BiY") return COMPOUND; //Massalski JX
+  if(system=="BiZn") return NOMIX; //Massalski JX
+  if(system=="BiZr") return COMPOUND; //Pauling JX
   if(system=="BHf")  return COMPOUND; // Pauling
   if(system=="CaHf") return UNKNOWN; // Pauling
   if(system=="CaMg") return COMPOUND; // Pauling

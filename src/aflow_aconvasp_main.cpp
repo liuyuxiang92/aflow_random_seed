@@ -17,8 +17,8 @@
 // [OBSOLETE] #include "aflow_contrib_roman_funcs.h"
 #include "aflow_contrib_shidong_main.h"
 #include "aflow_symmetry_spacegroup.h"
-// [OBSOLETE] [JUNKAI] #include "aflow_contrib_junkai_basic.h"
-// [OBSOLETE] [KESONG] #include "aflow_contrib_kesong.h"
+// [OBSOLETE] [JX] #include "aflow_contrib_junkai_basic.h"
+// [OBSOLETE] [KY] #include "aflow_contrib_kesong.h"
 #include "aflow_pocc.h"  //CO20181226
 #include "aflow_pocc_old.h"
 #include "aflow_bader.h"
@@ -230,7 +230,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX [OBSOLETE] - moved further up : //[CO20200106 - close bracket for indenting]}
   //DX [OBSOLETE] - moved further up :  
   //DX [OBSOLETE] - moved further up : DX20180806 - added symmetry option - END
-  // [OBSOLETE] vpflow.flag("CHANGESUFFIX",aurostd::args2attachedflag(argv,cmds,"--suffix=")); //KESONG DEC. 22ND, 2013
+  // [OBSOLETE] vpflow.flag("CHANGESUFFIX",aurostd::args2attachedflag(argv,cmds,"--suffix=")); //KY20131222
   // [OBSOLETE] if(vpflow.flag("CHANGESUFFIX")) vpflow.push_attached("CHANGESUFFIX",aurostd::args2attachedstring(argv,"--suffix=",""));
   vpflow.args2addattachedscheme(argv,cmds,"CHANGESUFFIX","--suffix=","./");
 
@@ -1629,7 +1629,7 @@ namespace pflow {
       if(vpflow.flag("CAGES") &&  AFLOW_PTHREADS::FLAG) {pflow::CAGES(aflags,vpflow.getattachedscheme("CAGES"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CART")) {cout << pflow::CART(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CHECKINTEGRITIY")) {pflow::CheckIntegritiy(); _PROGRAMRUN=true;}
-      if(vpflow.flag("CHANGESUFFIX")) {pflow::ChangeSuffix(vpflow.getattachedscheme("CHANGESUFFIX")); _PROGRAMRUN=true;} //KESONG Dec.22, 2013
+      if(vpflow.flag("CHANGESUFFIX")) {pflow::ChangeSuffix(vpflow.getattachedscheme("CHANGESUFFIX")); _PROGRAMRUN=true;} //KY20131222
       if(vpflow.flag("CIF") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")) {pflow::CIF(cin,vpflow); _PROGRAMRUN=true;} //DX20180806 - added vpflow
       if(vpflow.flag("CLEANALL")) {pflow::CLEANALL(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CORNERS")) {cout << pflow::CORNERS(cin); _PROGRAMRUN=true;}
@@ -1829,7 +1829,7 @@ namespace pflow {
         //else {pocc::poccInput();}    //NEW
         //cerr << "ERROR: This code is obsolete, run with '[AFLOW_POCC]RUN' in aflow.in and use 'aflow --run'" << endl;
         //exit(1);
-        pflow::POCC_INPUT();  //default to kesong code, until new post-processing is complete
+        pflow::POCC_INPUT();  //default to KY code, until new post-processing is complete
         _PROGRAMRUN=true;
       } //OLD - use [AFLOW_POCC]RUN for new code //CO20180409
       if(vpflow.flag("POSCAR2WYCKOFF")) {pflow::POSCAR2WYCKOFF(cin); _PROGRAMRUN=true;}
@@ -1898,8 +1898,8 @@ namespace pflow {
       if(vpflow.flag("STRUCTURE2JSON")) {xstructure xstr(cin,IOAFLOW_AUTO); cout << xstructure2json(xstr) << endl; _PROGRAMRUN=true;} //DX20190508
 
       // T
-      // [OBSOLETE] [JUNKAI] if(vpflow.flag("TERDATA")) {INPUTDATAFORTERPHASE(argv); _PROGRAMRUN=true;}
-      // [OBSOLETE] [JUNKAI] if(vpflow.flag("TERDATA_EXIST")) {GENERATESTABLELIST(argv); _PROGRAMRUN=true;}
+      // [OBSOLETE] [JX] if(vpflow.flag("TERDATA")) {INPUTDATAFORTERPHASE(argv); _PROGRAMRUN=true;}
+      // [OBSOLETE] [JX] if(vpflow.flag("TERDATA_EXIST")) {GENERATESTABLELIST(argv); _PROGRAMRUN=true;}
       // U
       if(vpflow.flag("UFFENERGY")) {pocc::UFFENERGY(cin); _PROGRAMRUN=true;}
       // V
@@ -2602,19 +2602,19 @@ namespace pflow {
   }
 }
 
-// [OBSOLETE] [JUNKAI] JUNKAI STUFF
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --magpara label" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --magpara_h label" << endl;
-// [OBSOLETE] [JUNKAI] strstream << " PROTOTYPE CHECKING (we are writing new codes so these instructions will disappear)" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --prototyper|--PROTOTYPER <POSCAR" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --prototyper_h|--PROTOTYPER_H < POSCAR" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --prototyper_m|--PROTOTYPER_M < POSCAR" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --prototypermult|--PROTOTYPERMULT < POSCAR" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --protoclassify < list" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --protoclassify name1,name2,name3" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --protoclassify_h < list" << endl;
-// [OBSOLETE] [JUNKAI] strstream << tab << x << " --protoclassify_m < list" << endl;
-// [OBSOLETE] [JUNKAI] strstream << endl;
+// [OBSOLETE] [JX] JX STUFF
+// [OBSOLETE] [JX] strstream << tab << x << " --magpara label" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --magpara_h label" << endl;
+// [OBSOLETE] [JX] strstream << " PROTOTYPE CHECKING (we are writing new codes so these instructions will disappear)" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --prototyper|--PROTOTYPER <POSCAR" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --prototyper_h|--PROTOTYPER_H < POSCAR" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --prototyper_m|--PROTOTYPER_M < POSCAR" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --prototypermult|--PROTOTYPERMULT < POSCAR" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --protoclassify < list" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --protoclassify name1,name2,name3" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --protoclassify_h < list" << endl;
+// [OBSOLETE] [JX] strstream << tab << x << " --protoclassify_m < list" << endl;
+// [OBSOLETE] [JX] strstream << endl;
 
 // ***************************************************************************
 // pflow::ABCCAR
@@ -3599,7 +3599,7 @@ namespace pflow {
 namespace pflow {
   void ChangeSuffix(string _operation) {
     // aflow --suffix=[directory,]"from2to"
-    //  Change the suffixes of VASP files. Easy conversion between AFLOW format and VASP format. (KESONG Dec. 22nd, 2013)
+    //  Change the suffixes of VASP files. Easy conversion between AFLOW format and VASP format. (KY20131222)
     //	Mnemonic: from2to with from/to =[n=none;r1=relax1;r2=relax2;r3=relax3;s=static;b=bands] or without abbreviations.
     vector<string> vfile,tokens;
     aurostd::string2tokens("AECCAR0,AECCAR1,AECCAR2,INCAR,POSCAR,POTCAR,KPOINTS,CONTCAR,OUTCAR,EIGENVAL,DOSCAR,IBZKPT,OSZICAR,PCDAT,XDATCAR,CHG,CHGCAR,PROCAR,ELFCAR,WAVECAR,LOCPOT,vasprun.xml,vasp.out",vfile,",");
@@ -6941,12 +6941,12 @@ namespace pflow {
     eigenval_new.clear();eigenval_new.str(std::string());
     for(uint i=0;i<=4;i++) eigenval_new << eigenval_old.at(i) << endl;
 
-    //Patch for EIGENVAL.new (Kesong adds it)
+    //Patch for EIGENVAL.new (KY adds it)
     int kpoints_NEW;
     kpoints_NEW = (kpoints_new_string.size()-3)*grid/3;
     eigenval_new << "   " << int(grid) << "  " << kpoints_NEW << "  " << nbands << endl;
     //eigenval_new << " " << endl; //Comment this, move the blank line before the bands data,
-    //Make the total lines of EIGENVAL.aflow exactly same with EIGENVAL.vasp, Kesong
+    //Make the total lines of EIGENVAL.aflow exactly same with EIGENVAL.vasp, KY
 
     for(uint ikpz=4;ikpz<kpoints_new_string.size();) {
       aurostd::string2tokens(kpoints_new_string.at(ikpz),tokens);
@@ -6988,7 +6988,7 @@ namespace pflow {
           }
           // in index there is the good point
 
-          eigenval_new << endl;  //Put the blank line before the bands data, Kesong
+          eigenval_new << endl;  //Put the blank line before the bands data, KY
           eigenval_new.precision(7);
           eigenval_new.setf(std::ios::scientific,std::ios::floatfield);
           eigenval_new << "  " << vbzpoint.at(index)[1] << "  " << vbzpoint.at(index)[2] << "  " << vbzpoint.at(index)[3] << "  " << pos4 << endl;
@@ -7000,7 +7000,7 @@ namespace pflow {
               eigenval_new << "   " << vbzband.at(index)[ivbands][ieig];
             eigenval_new << endl;
           }
-          //eigenval_new << endl;  //Remove the additional blank line, Put the blank line before the bands data, Kesong
+          //eigenval_new << endl;  //Remove the additional blank line, Put the blank line before the bands data, KY
           // new one
           kpoint_from=kpoint_from+kpoint_delta;
         }
@@ -13888,7 +13888,7 @@ namespace pflow {
     //DX20180124 [OBSOLETE] a.is_vasp4_poscar_format=TRUE; a.is_vasp5_poscar_format=FALSE;
     //   cerr << a << endl; exit(0);
     // AFLOW ENGINE RHT
-    if(mode=="AFLOW" || mode=="aflow") { // RHT
+    if(mode=="AFLOW" || mode=="aflow") { //RHT
       if(LDEBUG) cerr << "pflow::SG: aflow" << endl;
       //DX START
       a.ReScale(1.0);
@@ -13943,8 +13943,8 @@ namespace pflow {
       uint sgroup=a.SpaceGroup_ITC(tolerance,no_scan);
       // [OBSOLETE] uint sgroup=a.SpaceGroup_ITC(false,argv);    
       a.spacegroup=GetSpaceGroupName(sgroup,a.directory)+" #"+aurostd::utype2string(sgroup); //DX20190319 - put directory name
-      // [OBSOLETE] a.spacegroup=GetSpaceGroupName(a.SpaceGroup_ITC(false,argv))+" #"+aurostd::utype2string(a.SpaceGroup_ITC(false,argv)); // RHT
-      //  return a.spacegroup; // RHT
+      // [OBSOLETE] a.spacegroup=GetSpaceGroupName(a.SpaceGroup_ITC(false,argv))+" #"+aurostd::utype2string(a.SpaceGroup_ITC(false,argv)); //RHT
+      //  return a.spacegroup; //RHT
     }
 
     if(mode=="PLATON" || mode=="platon") {

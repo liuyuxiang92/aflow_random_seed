@@ -272,7 +272,7 @@ std::string _XHOST::command(const string& command) {
 #ifdef _MACOSX_
   if(command=="beep") return string("echo -ne '\007'");
 #endif
-  // for(uint i=0;i<vcmd.size();i++) if(aurostd::substring2bool(vcmd.at(i),_command)) return vcmd.at(i); // found before..  [KESONG]
+  // for(uint i=0;i<vcmd.size();i++) if(aurostd::substring2bool(vcmd.at(i),_command)) return vcmd.at(i); // found before..  [KY]
   // for(uint i=0;i<vcmd.size();i++) if(vcmd.at(i)==command || aurostd::substring2bool(vcmd.at(i),command)) return vcmd.at(i); // found before..
   //first check for EXACT match in vcmds  //CO20180705
   if(command=="aflow_data"&&aurostd::FileExist("./aflow_data")){return "./aflow_data";} //CO20180705 - hack for developers, prefer ./aflow_data over aflow_data in PATH, as it is probably newer (development)

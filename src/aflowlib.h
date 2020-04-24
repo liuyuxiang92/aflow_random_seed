@@ -13,7 +13,7 @@
 
 #include "aflow.h"
 #include "SQLITE/aflow_sqlite.h"
-//[OBSOLETE] [KESONG] #include "aflow_contrib_kesong.h" //CO20180515
+//[OBSOLETE] [KY] #include "aflow_contrib_kesong.h" //CO20180515
 
 using std::vector;
 using std::string;
@@ -293,7 +293,7 @@ namespace aflowlib {
 
 // ***************************************************************************
 namespace aflowlib {
-  bool json2aflowlib(const string& json,string key,string& value); // Marco I do not understand why you have out this function as a private member... it would have been simpler to be able to use everywhere
+  bool json2aflowlib(const string& json,string key,string& value); //ME I do not understand why you have out this function as a private member... it would have been simpler to be able to use everywhere
   uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);

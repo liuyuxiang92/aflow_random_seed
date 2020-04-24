@@ -427,7 +427,7 @@ namespace aurostd {
       if(a==(utype)0 && b==(utype)0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);}  //special case
       else if(a==(utype)0) {gcd=b;return;} //special case
       else if(b==(utype)0) {gcd=a;return;} //special case
-      // borrowed from Kesong aflow_contrib_kesong_pocc_basic.cpp
+      // borrowed from KY aflow_contrib_kesong_pocc_basic.cpp
       // calculate greatest common denominator of two integers
       if(a % b == (utype)0) {gcd=b;return;}
       else {return GCD(b, a % b, gcd);}

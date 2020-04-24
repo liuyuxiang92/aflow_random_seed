@@ -99,8 +99,8 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
     unsigned long long int Num_calculated;
     unsigned long long int Num_xstr;
 
-    if(1){  //OLD KESONG
-      vecgroupxstr_sorted = Partial2Supercell(xstr_pocc);  //CO20170721 - KESONG OLD code
+    if(1){  //OLD KY
+      vecgroupxstr_sorted = Partial2Supercell(xstr_pocc);  //CO20170721 - KY OLD code
       Num_xstr=vecgroupxstr_sorted.size();
 
       if(Num_xstr<MaxNumberPOSCAR) {
@@ -2405,7 +2405,7 @@ vector<xstructure> RemoveEquivalentXstr(vector<xstructure> vec_xstr, ofstream &F
     }
   }
 
-  //cerr << "KESONG TEST" << endl;
+  //cerr << "KY TEST" << endl;
   vector<int> vecDG; vecDG.clear(); //Degenracy
   for (uint i=0;i<vec_xstr_energy_final.size();i++) {
     int DGi =0;
@@ -3643,7 +3643,7 @@ namespace pocc {
         string doscar_file = vdoscar_files.at(i); stringstream ss_doscar; aurostd::efile2stringstream(doscar_file, ss_doscar); 
         string outcar_file = voutcar_files.at(i); stringstream ss_outcar; aurostd::efile2stringstream(outcar_file, ss_outcar);
         double Efermi; vector<vector<double> > TDOS, TOTALPDOS;
-        //CO20180218 - let's not mess around with kesong's functions too much
+        //CO20180218 - let's not mess around with KY's functions too much
         //for now, assume POCC runs have standard DOSCAR.static (PDOS in it)
         //if no PDOS, exit
         //I will fix later

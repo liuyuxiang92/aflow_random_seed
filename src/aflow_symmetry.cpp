@@ -12,8 +12,8 @@
 //#include "xlibs.h"
 
 #define cdebug cerr
-//#define _EPS_ 0.005   // messes up junkai monoclinics
-#define _EPS_ 0.02 // junkai
+//#define _EPS_ 0.005   // messes up JX monoclinics
+#define _EPS_ 0.02 //JX
 // #define _EPS_ 0.001 // shidong
 //#define _EPS_ 0.02  // seems to work in the mean time of a self correcting one
 #define _EPS_roundoff_ 1.0e-8
