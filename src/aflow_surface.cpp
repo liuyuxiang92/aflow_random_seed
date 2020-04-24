@@ -4024,7 +4024,10 @@ namespace slab {
     str_ss << "   0.66666666666667   0.01846437673106   0.08333333333333  O     " << endl;
     str_ss << "   0.33333333333333   0.35179771006440   0.41666666666667  O     " << endl;
     str_ss << "   0.00000000000000   0.68513104339773   0.75000000000000  O     " << endl;
-    xstructure xstr_in(str_ss);str_ss.str("");
+    xstructure xstr_in;
+    try{str_ss >> xstr_in;}           //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    str_ss.clear();str_ss.str("");    //CO20200404 - need clear() to reuse
     min_dist=min_dist_orig=xstr_in.MinDist();
     if(LDEBUG){
       cerr << soliloquy << " xstr_in=" << endl;cerr << xstr_in << endl;
@@ -4069,7 +4072,10 @@ namespace slab {
     str_ss << "   0.01846438      0.08333333     0.00000000   O " << endl;
     str_ss << "   0.35179771      0.41666667     0.00000000   O " << endl;
     str_ss << "   0.68513104      0.75000000     0.00000000   O " << endl;
-    xstructure xstr_slab_correct(str_ss);str_ss.str("");
+    xstructure xstr_slab_correct;
+    try{str_ss >> xstr_slab_correct;} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    str_ss.clear();str_ss.str("");    //CO20200404 - need clear() to reuse
     min_dist=xstr_slab_correct.MinDist();
     if(LDEBUG){
       cerr << soliloquy << " xstr_slab_correct=" << endl;cerr << xstr_slab_correct << endl;

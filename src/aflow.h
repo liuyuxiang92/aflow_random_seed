@@ -1504,8 +1504,8 @@ class xstructure {
     string findsym2execute(double tolerance=DEFAULT_FINDSYM_TOL);
     string findsym2print(double tolerance=DEFAULT_FINDSYM_TOL);
     //  string platon2sg(void);
-    double GetVolume(void);                                       // Return volume
-    double Volume(void);                                          // Return volume
+    double GetVolume(void) const;                                 // Return volume  //CO20200201
+    double Volume(void) const;                                    // Return volume  //CO20200201
     double GetZVAL(const vector<double>& vZVAL);                  // Given the ZVAL of each species, it returns total ZVAL of cell
     double GetPOMASS(const vector<double>& vPOMASS);              // Given the POMASS of each species, it returns total POMASS of cell
     void ClearSymmetry(void);                                     // Clear all the symmetry

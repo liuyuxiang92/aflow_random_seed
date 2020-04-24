@@ -316,7 +316,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
           vpflow.flag("CHULL::LATEX_DOC",TRUE);   //turn on default
         } else if(out_form.at(0)=='T'){
           vpflow.flag("CHULL::TEXT_DOC",TRUE);    //turn on
-        } else if(out_form.at(0)=='J'){  //MB 190305
+        } else if(out_form.at(0)=='J'){  //MB20190305
           if(out_form=="JUPYTER2"){vpflow.flag("CHULL::WRITE_JUPYTER2",TRUE);}
           else if(out_form=="JUPYTER3"){vpflow.flag("CHULL::WRITE_JUPYTER3",TRUE);}
           else if(out_form=="JUPYTER"){vpflow.flag("CHULL::WRITE_JUPYTER3",TRUE);}
@@ -1012,6 +1012,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::KSCHEME_STATIC")) vlist+="--kscheme_static="+vpflow.getattachedscheme("PROTO_AFLOW::KSCHEME_STATIC")+" ";   // recursion is GNU's pleasure (SC2017)  //CO20181226
 
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::KPPRA","--kppra=|--KPPRA=","");
+    if(vpflow.flag("PROTO_AFLOW::KPPRA") && vpflow.flag("KPOINTS")){vpflow.flag("KPOINTS",FALSE);}  //CO20200223 - --kppra collision
     if(vpflow.flag("PROTO_AFLOW::KPPRA")) vlist+="--kppra="+vpflow.getattachedscheme("PROTO_AFLOW::KPPRA")+" ";   // recursion is GNU's pleasure (SC2017)
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::KPPRA_STATIC","--kppra_static=|--KPPRA_STATIC=","");
     if(vpflow.flag("PROTO_AFLOW::KPPRA_STATIC")) vlist+="--kppra_static="+vpflow.getattachedscheme("PROTO_AFLOW::KPPRA_STATIC")+" ";   // recursion is GNU's pleasure (SC2017)

@@ -1815,7 +1815,8 @@ namespace compare {
     // DEBUG oss << ss_out.str();
     message << "Number of structures in database matching with the input structure: " << final_prototypes[0].structures_duplicate.size() << "." << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    
+
+    //DX20190429 - added screen only option - START
     // ---------------------------------------------------------------------------
     // write results to screen and return immediately (do not write file)
     if(screen_only){

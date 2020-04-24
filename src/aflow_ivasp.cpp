@@ -2097,7 +2097,7 @@ namespace KBIN {
           xvasp.str.GetLatticeType();
           aus << "00000  MESSAGE " << STRING_KPOINTS_TO_SHOW << " Found Lattice=" << xvasp.str.bravais_lattice_variation_type << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           xvasp.str.kpoints_kscheme="Monkhorst-Pack";
-          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";
+          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";  //CO20200404 - 3-fold symmetries REQUIRE Gamma-centered
           aus << "00000  MESSAGE " << STRING_KPOINTS_TO_SHOW << "_KSCHEME=\"" << xvasp.str.kpoints_kscheme << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
@@ -2303,7 +2303,7 @@ namespace KBIN {
       xvasp.str.GetLatticeType();
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSCHEME_AUTO  Found Lattice=" << xvasp.str.bravais_lattice_variation_type << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       xvasp.str.kpoints_kscheme="Monkhorst-Pack";
-      if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";
+      if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";  //CO20200404 - 3-fold symmetries REQUIRE Gamma-centered
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSCHEME_" << xvasp.str.kpoints_kscheme << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,xvasp.str.kpoints_kscheme);
