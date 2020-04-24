@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow RICO FRIEDRICH - Duke University 2018-2019              *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow RICO FRIEDRICH - Duke University 2018-2020              *
 // *                                                                         *
 // ***************************************************************************
 // Written by Rico Friedrich and Corey Oses
@@ -1563,7 +1563,7 @@ namespace pflow {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow RICO FRIEDRICH - Duke University 2018-2019              *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow RICO FRIEDRICH - Duke University 2018-2020              *
 // *                                                                         *
 // ***************************************************************************

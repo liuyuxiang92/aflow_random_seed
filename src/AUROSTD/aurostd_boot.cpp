@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -136,41 +136,41 @@ template<class utype> bool initialize_xcomplex(utype d) {
   x*x;x*r;r*x;x*=y;x*=r; // multiplication	//CO20190329 - clang doesn't like x=x, changing to x=y
   x/x;x/r;r/x;x/=y;x/=r; // division		//CO20190329 - clang doesn't like x=x, changing to x=y
   x=y;x=r;               // equal		//CO20190329 - clang doesn't like x=x, changing to x=y
-  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);// ME200107
+  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);//ME20200107
   x=abs(x)+arg(x)+polar(r,r)+conj(x)+norm(x)+cos(x)+cosh(x)+exp(x)+log(x)+pow(x,x)+pow(x,int(1))+pow(x,r)+pow(r,x)+sin(x)+sinh(x)+sqrt(x); // functions
-  r = magsqr(x);  // ME20180907
+  r = magsqr(x);  //ME20180907
 
-  aurostd::xvector<xcomplex<utype> > vxfirst,vx(2),vy(2),vbb=vxfirst,vcc(vxfirst),vxvx,vxvxvxvx(1,2),vb=vxfirst,vc(vxfirst); // DX20180115 - equal operator was missing		//CO20190329 - clang doesn't like x=x, changing to x=y
+  aurostd::xvector<xcomplex<utype> > vxfirst,vx(2),vy(2),vbb=vxfirst,vcc(vxfirst),vxvx,vxvxvxvx(1,2),vb=vxfirst,vc(vxfirst); //DX20180115 - equal operator was missing		//CO20190329 - clang doesn't like x=x, changing to x=y
   aurostd::xvector<utype> vr;
-  vx=vy;vx+vx;vx+=vy;vx-vx;vx-=vy;vx*vx; // DX20180117 - added vx=vx		//CO20190329 - clang doesn't like x=x, changing to x=y
-  //xvector<xcomplex<utype> > va,vb=va,vc(va); // DX20180115 - equal operator was missing
+  vx=vy;vx+vx;vx+=vy;vx-vx;vx-=vy;vx*vx; //DX20180117 - added vx=vx		//CO20190329 - clang doesn't like x=x, changing to x=y
+  //xvector<xcomplex<utype> > va,vb=va,vc(va); //DX20180115 - equal operator was missing
   sin(vx);sinh(vx);cos(vx);cosh(vx);exp(vx);log(vx);//sqrt(vx);
-  vx.clear(); // DX20180115 - clear was missing
-  cout << vx << endl; // DX20180115 - ostream was missing
-  conj(vx);  // ME20180904
+  vx.clear(); //DX20180115 - clear was missing
+  cout << vx << endl; //DX20180115 - ostream was missing
+  conj(vx);  //ME20180904
 
   aurostd::xmatrix<utype > mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO20190329 - clang doesn't like x=x, changing to x=y
-  mx=mx+mx;mx+=my;mx=mx-mx;mx-=my;mx=mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO20190329 - clang doesn't like x=x, changing to x=y  //CO200106 - set the result or clang complains
-  mx=sin(mx);mx=sinh(mx);mx=cos(mx);mx=cosh(mx);mx=exp(mx); //CO200106 - set the result or clang complains
+  mx=mx+mx;mx+=my;mx=mx-mx;mx-=my;mx=mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO20190329 - clang doesn't like x=x, changing to x=y  //CO20200106 - set the result or clang complains
+  mx=sin(mx);mx=sinh(mx);mx=cos(mx);mx=cosh(mx);mx=exp(mx); //CO20200106 - set the result or clang complains
   aurostd::ones_xv<utype>();aurostd::ones_xv<utype>(3);aurostd::ones_xv<utype>(3,3); //CO20190520
   aurostd::ones_xm<utype>();aurostd::ones_xm<utype>(3);aurostd::ones_xm<utype>(3,3);aurostd::ones_xm<utype>(1,2,3,4); //CO20190520
   aurostd::eye<utype>();aurostd::eye<utype>(3);aurostd::eye<utype>(3,3);aurostd::eye<utype>(1,2,3,4); //CO20190520
   aurostd::CMdet<utype>(mx);  //CO20180515
   mx=aurostd::getRotationMatrix3D(vr,vr);  //CO20190325 - quick declaration
-  cout << mx << endl;  // DX20180115 - ostream was missing
+  cout << mx << endl;  //DX20180115 - ostream was missing
 
   aurostd::xmatrix<xcomplex<utype> > a,b(1,1),c(1,2,3,4),m(2),n(2),e=a,f(a);		//CO20190329 - clang doesn't like x=x, changing to x=y
   x+=issymmetric(m)+isantisymmetric(m)+ishermitian(m)+isantihermitian(m);
-  trace(m); // DX20170115 - initialize trace for xcomplex
+  trace(m); //DX20170115 - initialize trace for xcomplex
   m(1,1)=n(1,1);m[1][1]=n[1][1];m=n;m=m+m;m=m*m;m=m-m;m.clear();//m=m*r;m=r*m;		//CO20190329 - clang doesn't like x=x, changing to x=y
-  m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1];mxmx=mx/my;mxmx/=my; // DX20180115 - operator and equal operator initialized for xcomplex		//CO20190329 - clang doesn't like x=x, changing to x=y
-  exp(m); // DX20180115 - add exponential or complex matrices
-  m=x*m;m=m/x; // DX20180117 - allow for xcomplex * xmatrix<xcomplex>
-  cout << m << endl; // DX20180115 - ostream
-  vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME20180904
-  bool tf=false;  //CO200106 - set the result or clang complains
-  m=mx*m;tf=bool(m==n);tf=bool(m!=n);jacobiHermitian(m);vx=m(1); // ME20190814  //CO200106 - set the result or clang complains
-  if(tf){;} //CO200106 - keep tf busy
+  m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1];mxmx=mx/my;mxmx/=my; //DX20180115 - operator and equal operator initialized for xcomplex		//CO20190329 - clang doesn't like x=x, changing to x=y
+  exp(m); //DX20180115 - add exponential or complex matrices
+  m=x*m;m=m/x; //DX20180117 - allow for xcomplex * xmatrix<xcomplex>
+  cout << m << endl; //DX20180115 - ostream
+  vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  //ME20180904
+  bool tf=false;  //CO20200106 - set the result or clang complains
+  m=mx*m;tf=bool(m==n);tf=bool(m!=n);jacobiHermitian(m);vx=m(1); //ME20190814  //CO20200106 - set the result or clang complains
+  if(tf){;} //CO20200106 - keep tf busy
 
   //  jacobi(m,vx,m);
 
@@ -243,8 +243,8 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   trasp(v);
   //  sin(v);sinh(v);cos(v);cosh(v);exp(v);
 
-  vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO2019062
-  vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO2019062
+  vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO20190629
+  vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO20190629
   std::sort(vvu.begin(),vvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
   std::sort(vxvu.begin(),vxvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
 
@@ -288,13 +288,13 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   reshape(v);reshape(v,v);reshape(v,v,v);reshape(v,v,v,v);reshape(v,v,v,v,v);reshape(v,v,v,v,v,v);
   reshape_rows(v);reshape_rows(v,v);reshape_rows(v,v,v);reshape_rows(v,v,v,v);reshape_rows(v,v,v,v,v);reshape_rows(v,v,v,v,v,v);
   reshape_cols(v);reshape_cols(v,v);reshape_cols(v,v,v);reshape_cols(v,v,v,v);reshape_cols(v,v,v,v,v);reshape_cols(v,v,v,v,v,v);
-  utype tol; // DX20171025
+  utype tol; //DX20171025
   o+=isequal(m,m)+isequal(m,m,(utype) 0)+isequal(m,m,x)+isdifferent(m,m)+isdifferent(m,m,x)+isinteger(m,x)+isdiagonal(m)+isdiagonal(m,tol)+issymmetric(m)+isantisymmetric(m);
   o+=isidentity(m); //CO
   swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);shiftlrows(m,1);shiftlcols(m,1);shiftlrowscols(m,1,1);  //CO20191201
   sin(m);sinh(m);cos(m);cosh(m);exp(m);
   aurostd::floor(m);aurostd::ceil(m);
-  // ME20190718 - norms
+  //ME20190718 - norms
   aurostd::l1_norm(m);aurostd::frobenius_norm(m);aurostd::l2_norm(m);aurostd::linf_norm(m);
   // aurostd::trunc(m);aurostd::round(m);
 
@@ -380,7 +380,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
   // return TRUE;
   // NEVER CALL THIS FUNCTION ... JUST TO INITIALIZE TEMPLATES
   // this function is called with aflow.cpp and it is used to create the various templates used in the whole code.
-  // do not call it but just leave it here. (stefano).
+  // do not call it but just leave it here. (SC).
   // if(flag) return TRUE; else return TRUE;
   if(flag) {
     //char* c=0;vector<string> vs=0;
@@ -618,7 +618,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

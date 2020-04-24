@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // A1,A2,A3 for all potpaw_GGA
@@ -29,7 +29,7 @@
 //aflow --noldau --potential=pot_GGA --potential_complete --aflow_proto=A4:Si,Si_h,Ge,C,C_s
 
 
-//OHAD 600 series
+//OL 600 series
 //aflow --neglect_nomix --aflow_proto=600.XXXXX:Ir:Nb,Ta,Mo &
 //aflow --neglect_nomix --aflow_proto=600.XXXXX:Mo,Nb:Os &
 //aflow --neglect_nomix --aflow_proto=600.XXXXX:Nb:Pd,Pt,Rh &
@@ -58,13 +58,13 @@
 #define _ICSD_DIRBASE_ "ICSD"
 
 #define _aflowinpad_ 60
-#define _incarpad_ 48  // ME20181024
+#define _incarpad_ 48  //ME20181024
 
 string lattices[]={"","BCC","FCC","CUB","HEX","RHL","BCT","TET","ORC","ORCC","ORCF","ORCI","MCL","MCLC","TRI","XXX"};
 
 #define _AVASP_DOUBLE2STRING_PRECISION_ 9
 
-// Lances tests show that: (07/13/2010)
+// Lances tests show that: (20100713)
 // * PREC=med and kppra of 6000 makes enthalpy errors of 2~3 meV or so. (Not good enough for a CE if the average enthalpy is ~10 meV)
 // * With PREC=high and *equivalent set* of around kppra=2000 (normally we go 2000-6000 depending on lattice and other issues), the errors are about 10 times smaller.
 // * PREC=high and a dense MP set of kppra of ~10000 is about as good as the equivalent set (with kppra ~2000)
@@ -147,13 +147,13 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(DLTYPE);vLDAUL.push_back(f);vLDAUU.push_back(6.5);vLDAUJ.push_back(1.0);return;}  // #Pr-f orbital,U eff, J parameter
   if(species=="Gd") { // REF J. Phys.:Condens. Matter 9, 767 (1997) PHYSICAL REVIEW B 73, 094410 (2006)
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(DLTYPE);vLDAUL.push_back(f);vLDAUU.push_back(6.7);vLDAUJ.push_back(0.7);return;}  // #Gd-f orbital,U eff, J parameter
-  if(species=="Nd") { // REF: wahyu fitting to XPS-BIS 4f levels: J. Phys. F Met. Phys. 11, 121 (1981)
+  if(species=="Nd") { // REF: WSETYAWAN fitting to XPS-BIS 4f levels: J. Phys. F Met. Phys. 11, 121 (1981)
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(DLTYPE);vLDAUL.push_back(f);vLDAUU.push_back(7.2);vLDAUJ.push_back(1.0);return;}  // #Nd-f orbital
-  if(species=="Sm") { // REF: wahyu fitting to XPS-BIS 4f levels: J. Phys. F Met. Phys. 11, 121 (1981)
+  if(species=="Sm") { // REF: WSETYAWAN fitting to XPS-BIS 4f levels: J. Phys. F Met. Phys. 11, 121 (1981)
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(DLTYPE);vLDAUL.push_back(f);vLDAUU.push_back(7.4);vLDAUJ.push_back(1.0);return;}  // #Sm-f orbital
-  if(species=="Eu") { // REF: wahyu fitting to XPS-BIS 4f levels: J. Phys. F Met. Phys. 11, 121 (1981)
+  if(species=="Eu") { // REF: WSETYAWAN fitting to XPS-BIS 4f levels: J. Phys. F Met. Phys. 11, 121 (1981)
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(DLTYPE);vLDAUL.push_back(f);vLDAUU.push_back(6.4);vLDAUJ.push_back(1.0);return;}  // #Eu-f orbital
-  if(species=="Tm") { // REF: wahyu fitting to XPS-BIS 4f levels: J. Phys. F Met. Phys. 11, 121 (1981)
+  if(species=="Tm") { // REF: WSETYAWAN fitting to XPS-BIS 4f levels: J. Phys. F Met. Phys. 11, 121 (1981)
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(DLTYPE);vLDAUL.push_back(f);vLDAUU.push_back(7.0);vLDAUJ.push_back(1.0);return;}  // #Tm-f orbital
   if(species=="Dy") { // {10.1016/j.physc.2009.06.003},
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(f);vLDAUU.push_back(5.6);vLDAUJ.push_back(0.0);return;}  // #Dy-f orbital
@@ -168,7 +168,7 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
   if(species=="U") { // http://cms.mpi.univie.ac.at/vasp-forum/forum_viewtopic.php?3.789
     //   LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(DLTYPE);vLDAUL.push_back(f);vLDAUU.push_back(4.5);vLDAUJ.push_back(0.51);return; // #U-f orbital,U eff  {10.1103/PhysRevB.84.014116},
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(f);vLDAUU.push_back(4.0);vLDAUJ.push_back(0.0);return; // #U-f orbital,U eff, J parameter
-  } //CO200106 - patching for auto-indenting
+  } //CO20200106 - patching for auto-indenting
   if(species=="Th") { // {10.1103/PhysRevB.80.014108},
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(f);vLDAUU.push_back(5.0);vLDAUJ.push_back(0.0);return;}  // #Th-f orbital
 
@@ -215,7 +215,7 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
     // LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(d);vLDAUU.push_back(4.0);vLDAUJ.push_back(0.0);return; // #Ag-d orbital,U eff  // guessed 4
     // LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(d);vLDAUU.push_back(1.5);vLDAUJ.push_back(0.0);return; // #Ag-d orbital,U eff // L. Wang, T. Maxisch, G. Ceder PRB 73 2006 19 WRONG
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(d);vLDAUU.push_back(5.8);vLDAUJ.push_back(0.0);return; // #Ag-d orbital,U eff // 10.1103/PhysRevB.83.035202
-  } //CO200106 - patching for auto-indenting
+  } //CO20200106 - patching for auto-indenting
   if(species=="Cd") { // [2] ZnO, CdO, GaN, InN, PRB 74, 045202 (2006)
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(d);vLDAUU.push_back(2.1);vLDAUJ.push_back(0.0);return;}  // #Cd-d orbital,U eff
 
@@ -251,7 +251,7 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(p);vLDAUU.push_back(0.0);vLDAUJ.push_back(0.0);return;}  // #p
   if(species=="Pb") { // ceder
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(p);vLDAUU.push_back(0.0);vLDAUJ.push_back(0.0);return;}  // #p
-  if(species=="Sn") { // [Sn d-orbital U = 3.5eV 10.1103/PhysRevLett.101.055502 //CO200106 - patching for auto-indenting
+  if(species=="Sn") { // [Sn d-orbital U = 3.5eV 10.1103/PhysRevLett.101.055502 //CO20200106 - patching for auto-indenting
     LDAU=TRUE;vLDAUspecies.push_back(species);vLDAUtype.push_back(2);vLDAUL.push_back(d);vLDAUU.push_back(3.5);vLDAUJ.push_back(0.0);return;}  // #p
 
   // ELSE
@@ -344,7 +344,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
   if(species=="Bi") return "Bi_d"; //           [PAW_PBE_KIN]
   if(species=="Br") return "Br"; // unique choice...           [PAW_PBE_KIN]
   if(species=="C")  return "C"; // vasp recommends           [PAW_PBE_KIN]
-  if(species=="Ca") return "Ca_sv"; // stefano           [PAW_PBE_KIN]
+  if(species=="Ca") return "Ca_sv"; //SC           [PAW_PBE_KIN]
   if(species=="Cd") return "Cd"; // unique choice..           [PAW_PBE_KIN]
   if(species=="Ce") return "Ce"; // right on the middle           [PAW_PBE_KIN]
   if(species=="Cl") return "Cl"; //           [PAW_PBE_KIN]
@@ -388,7 +388,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
   if(species=="Ni") return "Ni_pv"; //            [PAW_PBE_KIN]
   if(species=="Np") return "Np"; //  a harder one, NEVER USED JUST FOR COMPLETENESS           [PAW_PBE_KIN]
   if(species=="O")  return "O"; //           [PAW_PBE_KIN]
-  if(species=="Os") return "Os_pv"; // stefano           [PAW_PBE_KIN]
+  if(species=="Os") return "Os_pv"; //SC           [PAW_PBE_KIN]
   if(species=="P")  return "P"; //            [PAW_PBE_KIN]
   if(species=="Pa") return "Pa"; // UNTESTED  of Pa,Pa_s take the hardest one [Wed Nov 23 EST 2011]           [PAW_PBE_KIN]
   if(species=="Pb") return "Pb_d"; // the harder           [PAW_PBE_KIN]
@@ -470,105 +470,105 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
     }
   }
 
-  if(species=="Ac") return "Ac"; // UNTESTED STEFANO of Ac,Ac_s take the hardest one [Wed Nov 23 EST 2011]     [PAW_PBE]
+  if(species=="Ac") return "Ac"; // UNTESTED SC of Ac,Ac_s take the hardest one [Wed Nov 23 EST 2011]     [PAW_PBE]
   if(species=="Ag") return "Ag"; // unique choice...     [PAW_PBE]
-  if(species=="Al") return "Al"; // STEFANO Al_h has ghost states     [PAW_PBE]
+  if(species=="Al") return "Al"; //SC Al_h has ghost states     [PAW_PBE]
   if(species=="Ar") return "Ar"; // unique choice...     [PAW_PBE]
   if(species=="As") return "As"; // unique choice...     [PAW_PBE]
   if(species=="Au") return "Au"; // unique choice...     [PAW_PBE]
-  if(species=="B")  return "B_h"; // STEFANO     [PAW_PBE]
+  if(species=="B")  return "B_h"; //SC     [PAW_PBE]
   //if(species=="B")  return "B"; //vasp recommends     [PAW_PBE]
   if(species=="Ba") return "Ba_sv"; // unique choice...     [PAW_PBE]
-  if(species=="Be") return "Be_sv"; // STEFANO     [PAW_PBE]
-  if(species=="Bi") return "Bi_d"; //STEFANO,WAHYU     [PAW_PBE]
+  if(species=="Be") return "Be_sv"; //SC     [PAW_PBE]
+  if(species=="Bi") return "Bi_d"; //SC,WSETYAWAN     [PAW_PBE]
   if(species=="Br") return "Br"; // unique choice...     [PAW_PBE]
-  if(species=="C")  return "C"; // STEFANO, vasp recommends     [PAW_PBE]
-  if(species=="Ca") return "Ca_sv"; // STEFANO     [PAW_PBE]
+  if(species=="C")  return "C"; //SC, vasp recommends     [PAW_PBE]
+  if(species=="Ca") return "Ca_sv"; //SC     [PAW_PBE]
   if(species=="Cd") return "Cd"; // unique choice..     [PAW_PBE]
-  if(species=="Ce") return "Ce"; //WAHYU     [PAW_PBE]
-  if(species=="Cl") return "Cl"; //WAHYU     [PAW_PBE]
+  if(species=="Ce") return "Ce"; //WSETYAWAN     [PAW_PBE]
+  if(species=="Cl") return "Cl"; //WSETYAWAN     [PAW_PBE]
   if(species=="Co") return "Co"; // unique choice..     [PAW_PBE]
-  if(species=="Cr") return "Cr_pv"; // STEFANO     [PAW_PBE]
+  if(species=="Cr") return "Cr_pv"; //SC     [PAW_PBE]
   if(species=="Cs") return "Cs_sv"; // unique choice..     [PAW_PBE]
-  if(species=="Cu") return "Cu_pv"; // STEFANO     [PAW_PBE]
+  if(species=="Cu") return "Cu_pv"; //SC     [PAW_PBE]
   if(species=="Dy") return "Dy_3"; // unique choice...     [PAW_PBE]
-  if(species=="Er") return "Er_3"; // WAHYU, teragrid project     [PAW_PBE]
-  //  if(species=="Eu") return "Eu_3"; // WAHYU, frozen f     [PAW_PBE]
-  if(species=="Eu") return "Eu"; // WAHYU, with f-states, teragrid project     [PAW_PBE]
-  if(species=="F")  return "F"; // WAHYU     [PAW_PBE]
-  if(species=="Fe") return "Fe_pv"; // STEFANO     [PAW_PBE]
-  if(species=="Ga") return "Ga_h"; // STEFANO     [PAW_PBE]
-  if(species=="Ge") return "Ge_h"; // STEFANO     [PAW_PBE]
-  // if(species=="Ge") return "Ge_d"; // WAHYU     [PAW_PBE]
-  if(species=="Gd") return "Gd"; // WAHYU // LDAU     [PAW_PBE]
-  if(species=="H")  return "H"; // WAHYU     [PAW_PBE]
+  if(species=="Er") return "Er_3"; //WSETYAWAN, teragrid project     [PAW_PBE]
+  //  if(species=="Eu") return "Eu_3"; //WSETYAWAN, frozen f     [PAW_PBE]
+  if(species=="Eu") return "Eu"; //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
+  if(species=="F")  return "F"; //WSETYAWAN     [PAW_PBE]
+  if(species=="Fe") return "Fe_pv"; //SC     [PAW_PBE]
+  if(species=="Ga") return "Ga_h"; //SC     [PAW_PBE]
+  if(species=="Ge") return "Ge_h"; //SC     [PAW_PBE]
+  // if(species=="Ge") return "Ge_d"; //WSETYAWAN     [PAW_PBE]
+  if(species=="Gd") return "Gd"; //WSETYAWAN // LDAU     [PAW_PBE]
+  if(species=="H")  return "H"; //WSETYAWAN     [PAW_PBE]
   if(species=="He") return "He"; // unique choice...     [PAW_PBE]
-  if(species=="Hf") return "Hf_pv"; // STEFANO     [PAW_PBE]
+  if(species=="Hf") return "Hf_pv"; //SC     [PAW_PBE]
   if(species=="Hg") return "Hg"; // unique choice...     [PAW_PBE]
   if(species=="Ho") return "Ho_3"; // unique choice...     [PAW_PBE]
   if(species=="I")  return "I"; // unique choice...     [PAW_PBE]
-  if(species=="In") return "In_d"; // STEFANO     [PAW_PBE]
+  if(species=="In") return "In_d"; //SC     [PAW_PBE]
   if(species=="Ir") return "Ir"; // unique choice...     [PAW_PBE]
-  if(species=="K")  return "K_sv"; // STEFANO     [PAW_PBE]
+  if(species=="K")  return "K_sv"; //SC     [PAW_PBE]
   if(species=="Kr") return "Kr"; // unique choice...     [PAW_PBE]
-  if(species=="La") return "La"; // STEFANO,WAHYU // LDAU     [PAW_PBE]
-  if(species=="Li") return "Li_sv"; // STEFANO     [PAW_PBE]
-  //  if(species=="Lu") return "Lu_3"; // WAHYU, frozen f     [PAW_PBE]
-  if(species=="Lu") return "Lu"; //WAHYU, with f-states,  LDAU     [PAW_PBE]
-  if(species=="Mg") return "Mg_pv"; // STEFANO     [PAW_PBE]
-  if(species=="Mn") return "Mn_pv"; // STEFANO     [PAW_PBE]
-  if(species=="Mo") return "Mo_pv"; // STEFANO     [PAW_PBE]
-  if(species=="Na") return "Na_sv"; // was pv "; // STEFANO,WAHYU     [PAW_PBE]
+  if(species=="La") return "La"; //SC,WSETYAWAN // LDAU     [PAW_PBE]
+  if(species=="Li") return "Li_sv"; //SC     [PAW_PBE]
+  //  if(species=="Lu") return "Lu_3"; //WSETYAWAN, frozen f     [PAW_PBE]
+  if(species=="Lu") return "Lu"; //WSETYAWAN, with f-states,  LDAU     [PAW_PBE]
+  if(species=="Mg") return "Mg_pv"; //SC     [PAW_PBE]
+  if(species=="Mn") return "Mn_pv"; //SC     [PAW_PBE]
+  if(species=="Mo") return "Mo_pv"; //SC     [PAW_PBE]
+  if(species=="Na") return "Na_sv"; // was pv "; //SC,WSETYAWAN     [PAW_PBE]
   if(species=="N")  return "N"; // vasp recommends     [PAW_PBE]
-  if(species=="Nb") return "Nb_sv"; // STEFANO     [PAW_PBE]
-  //  if(species=="Nd") return "Nd_3"; // WAHYU, frozen f     [PAW_PBE]
-  if(species=="Nd") return "Nd"; // WAHYU, with f-states, teragrid project     [PAW_PBE]
+  if(species=="Nb") return "Nb_sv"; //SC     [PAW_PBE]
+  //  if(species=="Nd") return "Nd_3"; //WSETYAWAN, frozen f     [PAW_PBE]
+  if(species=="Nd") return "Nd"; //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
   if(species=="Ne") return "Ne"; // unique choice...     [PAW_PBE]
-  if(species=="Ni") return "Ni_pv"; // STEFANO     [PAW_PBE]
-  if(species=="Np") return "Np_s"; // STEFANO NEVER USED JUST FOR COMPLETENESS     [PAW_PBE]
-  if(species=="O")  return "O"; //WAHYU     [PAW_PBE]
-  if(species=="Os") return "Os_pv"; // STEFANO     [PAW_PBE]
-  if(species=="P")  return "P"; // WAHYU, teragrid project     [PAW_PBE]
-  if(species=="Pa") return "Pa"; // UNTESTED STEFANO of Pa,Pa_s take the hardest one [Wed Nov 23 EST 2011]     [PAW_PBE]
-  if(species=="Pb") return "Pb_d"; //STEFANO,WAHYU     [PAW_PBE]
-  if(species=="Pd") return "Pd_pv"; // STEFANO     [PAW_PBE]
-  //  if(species=="Pm") return "Pm_3"; // WAHYU, frozen f     [PAW_PBE]
-  if(species=="Pm") return "Pm"; // WAHYU, with f-states, teragrid project     [PAW_PBE]
-  if(species=="Pt") return "Pt"; // STEFANO     [PAW_PBE]
-  //  if(species=="Pr") return "Pr_3"; // WAHYU, frozen f     [PAW_PBE]
-  if(species=="Pr") return "Pr";  // WAHYU, with f-states, teragrid project     [PAW_PBE]
-  if(species=="Pu") return "Pu_s"; // STEFANO NEVER USED JUST FOR COMPLETENESS     [PAW_PBE]
+  if(species=="Ni") return "Ni_pv"; //SC     [PAW_PBE]
+  if(species=="Np") return "Np_s"; //SC NEVER USED JUST FOR COMPLETENESS     [PAW_PBE]
+  if(species=="O")  return "O"; //WSETYAWAN     [PAW_PBE]
+  if(species=="Os") return "Os_pv"; //SC     [PAW_PBE]
+  if(species=="P")  return "P"; //WSETYAWAN, teragrid project     [PAW_PBE]
+  if(species=="Pa") return "Pa"; // UNTESTED SC of Pa,Pa_s take the hardest one [Wed Nov 23 EST 2011]     [PAW_PBE]
+  if(species=="Pb") return "Pb_d"; //SC,WSETYAWAN     [PAW_PBE]
+  if(species=="Pd") return "Pd_pv"; //SC     [PAW_PBE]
+  //  if(species=="Pm") return "Pm_3"; //WSETYAWAN, frozen f     [PAW_PBE]
+  if(species=="Pm") return "Pm"; //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
+  if(species=="Pt") return "Pt"; //SC     [PAW_PBE]
+  //  if(species=="Pr") return "Pr_3"; //WSETYAWAN, frozen f     [PAW_PBE]
+  if(species=="Pr") return "Pr";  //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
+  if(species=="Pu") return "Pu_s"; //SC NEVER USED JUST FOR COMPLETENESS     [PAW_PBE]
   if(species=="Rb") return "Rb_sv"; // vasp recommends     [PAW_PBE]
-  if(species=="Re") return "Re_pv"; // STEFANO     [PAW_PBE]
-  if(species=="Rh") return "Rh_pv"; // STEFANO     [PAW_PBE]
-  if(species=="Ru") return "Ru_pv"; // STEFANO     [PAW_PBE]
-  if(species=="S")  return "S"; // WAHYU, teragrid project     [PAW_PBE]
+  if(species=="Re") return "Re_pv"; //SC     [PAW_PBE]
+  if(species=="Rh") return "Rh_pv"; //SC     [PAW_PBE]
+  if(species=="Ru") return "Ru_pv"; //SC     [PAW_PBE]
+  if(species=="S")  return "S"; //WSETYAWAN, teragrid project     [PAW_PBE]
   if(species=="Sb") return "Sb"; // unique choice...     [PAW_PBE]
   if(species=="Sc") return "Sc_sv"; // unique choice...     [PAW_PBE]
   if(species=="Se") return "Se"; // unique choice...     [PAW_PBE]
-  if(species=="Si") return "Si"; // was _h"; //STEFANO,WAHYU     [PAW_PBE]
-  //  if(species=="Sm") return "Sm_3"; // WAHYU, frozen f     [PAW_PBE]
-  if(species=="Sm") return "Sm"; // WAHYU, with f-states, teragrid project     [PAW_PBE]
-  if(species=="Sn") return "Sn"; //STEFANO     [PAW_PBE]
+  if(species=="Si") return "Si"; // was _h"; //SC,WSETYAWAN     [PAW_PBE]
+  //  if(species=="Sm") return "Sm_3"; //WSETYAWAN, frozen f     [PAW_PBE]
+  if(species=="Sm") return "Sm"; //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
+  if(species=="Sn") return "Sn"; //SC     [PAW_PBE]
   if(species=="Sr") return "Sr_sv"; // unique choice...     [PAW_PBE]
-  if(species=="Ta") return "Ta_pv"; // STEFANO     [PAW_PBE]
+  if(species=="Ta") return "Ta_pv"; //SC     [PAW_PBE]
   if(species=="Tb") return "Tb_3"; //  unique choice...     [PAW_PBE]
-  if(species=="Tc") return "Tc_pv"; // STEFANO     [PAW_PBE]
+  if(species=="Tc") return "Tc_pv"; //SC     [PAW_PBE]
   if(species=="Te") return "Te"; // unique choice...     [PAW_PBE]
-  if(species=="Th") return "Th_s"; // STEFANO NEVER USED JUST FOR COMPLETENESS     [PAW_PBE]
-  if(species=="Ti") return "Ti_sv"; // STEFANO     [PAW_PBE]
-  if(species=="Tl") return "Tl_d"; // STEFANO     [PAW_PBE]
-  //  if(species=="Tm") return "Tm_3"; // WAHYU, frozen f     [PAW_PBE]
-  if(species=="Tm") return "Tm";  // WAHYU, with f-states, teragrid project     [PAW_PBE]
-  if(species=="U") return "U"; // UNTESTED STEFANO of U,U_s take the hardest one [Wed Nov 23 EST 2011]     [PAW_PBE]
-  if(species=="V")  return "V_sv"; // STEFANO     [PAW_PBE]
-  if(species=="W")  return "W_pv"; // STEFANO     [PAW_PBE]
+  if(species=="Th") return "Th_s"; //SC NEVER USED JUST FOR COMPLETENESS     [PAW_PBE]
+  if(species=="Ti") return "Ti_sv"; //SC     [PAW_PBE]
+  if(species=="Tl") return "Tl_d"; //SC     [PAW_PBE]
+  //  if(species=="Tm") return "Tm_3"; //WSETYAWAN, frozen f     [PAW_PBE]
+  if(species=="Tm") return "Tm";  //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
+  if(species=="U") return "U"; // UNTESTED SC of U,U_s take the hardest one [Wed Nov 23 EST 2011]     [PAW_PBE]
+  if(species=="V")  return "V_sv"; //SC     [PAW_PBE]
+  if(species=="W")  return "W_pv"; //SC     [PAW_PBE]
   if(species=="Xe") return "Xe"; // unique choice...     [PAW_PBE]
   if(species=="Y")  return "Y_sv"; // unique choice...     [PAW_PBE]
-  //  if(species=="Yb") return "Yb_2"; // WAHYU, frozen f     [PAW_PBE]
-  if(species=="Yb") return "Yb";  // WAHYU, with f-states, teragrid project     [PAW_PBE]
+  //  if(species=="Yb") return "Yb_2"; //WSETYAWAN, frozen f     [PAW_PBE]
+  if(species=="Yb") return "Yb";  //WSETYAWAN, with f-states, teragrid project     [PAW_PBE]
   if(species=="Zn") return "Zn"; // unique choice...     [PAW_PBE]
-  if(species=="Zr") return "Zr_sv"; // STEFANO     [PAW_PBE]
+  if(species=="Zr") return "Zr_sv"; //SC     [PAW_PBE]
 
   if(species=="Po") {
     error="ERROR AVASP_Get_PseudoPotential_PAW_PBE: No pseudopotential available: "+species;
@@ -589,12 +589,12 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
 string AVASP_Get_PseudoPotential_PAW_GGA(string species) {
   if(species=="Gd") return "Gd_3"; // in potpaw_GGA only the Gd !!
 
-  if(species=="Pr") return "Pr"; //"Pr_3";  // wahyu, teragrid project  // same as potpaw_PBE, compatibility
-  if(species=="Lu") return "Lu"; //"Lu_3"; // wahyu // LDAU  // same as potpaw_PBE, compatibility
-  if(species=="Sm") return "Sm_3"; //"Sm_3"; // wahyu, teragrid project // same as potpaw_PBE, compatibility
-  if(species=="Nd") return "Nd"; //"Nd_3"; // wahyu, teragrid project // same as potpaw_PBE, compatibility
-  if(species=="Eu") return "Eu"; //"Eu_2"; // wahyu, teragrid project // same as potpaw_PBE, compatibility
-  if(species=="Pm") return "Pm"; //"Pm_3"; // wahyu, teragrid project // same as potpaw_PBE, compatibility
+  if(species=="Pr") return "Pr"; //"Pr_3";  //WSETYAWAN, teragrid project  // same as potpaw_PBE, compatibility
+  if(species=="Lu") return "Lu"; //"Lu_3"; //WSETYAWAN // LDAU  // same as potpaw_PBE, compatibility
+  if(species=="Sm") return "Sm_3"; //"Sm_3"; //WSETYAWAN, teragrid project // same as potpaw_PBE, compatibility
+  if(species=="Nd") return "Nd"; //"Nd_3"; //WSETYAWAN, teragrid project // same as potpaw_PBE, compatibility
+  if(species=="Eu") return "Eu"; //"Eu_2"; //WSETYAWAN, teragrid project // same as potpaw_PBE, compatibility
+  if(species=="Pm") return "Pm"; //"Pm_3"; //WSETYAWAN, teragrid project // same as potpaw_PBE, compatibility
   return AVASP_Get_PseudoPotential_PAW_PBE(species);
 }
 
@@ -612,51 +612,51 @@ string AVASP_Get_PseudoPotential_GGA(string species) {
   if(species=="Be") return "Be"; //  unique choice...    [GGA]
   if(species=="Bi") return "Bi"; //  unique choice...    [GGA]
 
-  if(species=="C")  return "C"; // stefano    [GGA]
-  if(species=="Ca") return "Ca_pv"; // stefano    [GGA]
+  if(species=="C")  return "C"; //SC    [GGA]
+  if(species=="Ca") return "Ca_pv"; //SC    [GGA]
   if(species=="Cl") return "Cl"; // unique choice..    [GGA]
   if(species=="Cr") return "Cr"; // unique choice..    [GGA]
   if(species=="Cs") return "Cs_pv"; // unique choice..    [GGA]
   if(species=="Cu") return "Cu"; // unique choice..    [GGA]
 
   if(species=="Fe") return "Fe"; // unique choice..    [GGA]
-  if(species=="Ga") return "Ga_d"; // stefano    [GGA]
-  if(species=="Ge") return "Ge"; // wahyu    [GGA]
-  if(species=="H")  return "H_soft"; // wahyu    [GGA]
+  if(species=="Ga") return "Ga_d"; //SC    [GGA]
+  if(species=="Ge") return "Ge"; //WSETYAWAN    [GGA]
+  if(species=="H")  return "H_soft"; //WSETYAWAN    [GGA]
   if(species=="Hf") return "Hf"; // unique choice...    [GGA]
   if(species=="Hg") return "Hg"; // unique choice...    [GGA]
 
-  if(species=="K")  return "K_pv"; // stefano    [GGA]
+  if(species=="K")  return "K_pv"; //SC    [GGA]
   if(species=="Kr") return "Kr"; // unique choice...    [GGA]
 
-  if(species=="Li") return "Li_pv"; // stefano    [GGA]
-  if(species=="Mg") return "Mg_pv"; // stefano    [GGA]
+  if(species=="Li") return "Li_pv"; //SC    [GGA]
+  if(species=="Mg") return "Mg_pv"; //SC    [GGA]
   if(species=="Mn") return "Mn"; // unique choice...    [GGA]
 
   if(species=="N")  return "N"; // vasp recommends    [GGA]
   if(species=="Na") return "Na_pv"; // there is no _sv in potGGA    [GGA]
-  if(species=="Nb") return "Nb_pv"; // stefano    [GGA]
+  if(species=="Nb") return "Nb_pv"; //SC    [GGA]
   if(species=="Ne") return "Ne"; // unique choice...    [GGA]
   if(species=="Ni") return "Ni"; // unique choice...    [GGA]
-  if(species=="O")  return "O"; //wahyu    [GGA]
+  if(species=="O")  return "O"; //WSETYAWAN    [GGA]
   if(species=="Os") return "Os"; // unique choice...    [GGA]
 
-  if(species=="Pd") return "Pd"; // stefano    [GGA]
-  if(species=="Pt") return "Pt"; // stefano    [GGA]
+  if(species=="Pd") return "Pd"; //SC    [GGA]
+  if(species=="Pt") return "Pt"; //SC    [GGA]
   if(species=="Rb") return "Rb_pv"; // vasp recommends    [GGA]
-  if(species=="Re") return "Re"; // stefano    [GGA]
-  if(species=="Rh") return "Rh"; // stefano    [GGA]
-  if(species=="Ru") return "Ru"; // stefano    [GGA]
+  if(species=="Re") return "Re"; //SC    [GGA]
+  if(species=="Rh") return "Rh"; //SC    [GGA]
+  if(species=="Ru") return "Ru"; //SC    [GGA]
   if(species=="Sc") return "Sc_pv"; // unique choice...    [GGA]
   if(species=="Sm") return "Sm_3"; //   [GGA]
   if(species=="Sr") return "Sr_pv"; // unique choice...    [GGA]
-  if(species=="Ta") return "Ta"; // stefano    [GGA]
-  if(species=="Tc") return "Tc"; // stefano    [GGA]
-  if(species=="Ti") return "Ti_pv"; // stefano    [GGA]
-  if(species=="V")  return "V_pv"; // stefano    [GGA]
-  if(species=="W")  return "W"; // stefano    [GGA]
+  if(species=="Ta") return "Ta"; //SC    [GGA]
+  if(species=="Tc") return "Tc"; //SC    [GGA]
+  if(species=="Ti") return "Ti_pv"; //SC    [GGA]
+  if(species=="V")  return "V_pv"; //SC    [GGA]
+  if(species=="W")  return "W"; //SC    [GGA]
   if(species=="Y")  return "Y_pv"; // unique choice...    [GGA]
-  if(species=="Zr") return "Zr_pv"; // stefano    [GGA]
+  if(species=="Zr") return "Zr_pv"; //SC    [GGA]
 
   return  AVASP_Get_PseudoPotential_PAW_PBE(species);
 }
@@ -684,15 +684,15 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   // KZIP/VASP/MPI
   xvasp.aopts.flag("AFLOWIN_FLAG::KZIP_BIN", !kflags.KZIP_BIN.empty()); //CO20181226
   if (!kflags.KZIP_BIN.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::KZIP_BIN", kflags.KZIP_BIN);}
-  xvasp.aopts.flag("AFLOWIN_FLAG::KBIN_SERIAL_BIN", !kflags.KBIN_SERIAL_BIN.empty()); //CO20181226 // ME20190107
-  if (!kflags.KBIN_BIN.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::KBIN_SERIAL_BIN", kflags.KBIN_SERIAL_BIN);} // ME20190107
+  xvasp.aopts.flag("AFLOWIN_FLAG::KBIN_SERIAL_BIN", !kflags.KBIN_SERIAL_BIN.empty()); //CO20181226 //ME20190107
+  if (!kflags.KBIN_BIN.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::KBIN_SERIAL_BIN", kflags.KBIN_SERIAL_BIN);} //ME20190107
   xvasp.aopts.flag("AFLOWIN_FLAG::MPI_COMMAND", !kflags.KBIN_MPI_COMMAND.empty()); //CO20181226
   if (!kflags.KBIN_MPI_COMMAND.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::MPI_COMMAND", kflags.KBIN_MPI_COMMAND);}
   xvasp.aopts.flag("AFLOWIN_FLAG::MPI_BIN", !kflags.KBIN_MPI_BIN.empty());
   if (!kflags.KBIN_MPI_BIN.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::MPI_BIN", kflags.KBIN_MPI_BIN);}
   xvasp.aopts.flag("AFLOWIN_FLAG::MPI_NUM_CPUS", !kflags.KBIN_MPI_NCPUS_STRING.empty());
   if (!kflags.KBIN_MPI_NCPUS_STRING.empty()) {xvasp.aopts.push_attached("AFLOWIN_FLAG::MPI_NUM_CPUS", kflags.KBIN_MPI_NCPUS_STRING);}
-  xvasp.AVASP_flag_MPI=((kflags.KBIN_MPI_NCPUS > 1) || kflags.KBIN_MPI);  // ME20190201
+  xvasp.AVASP_flag_MPI=((kflags.KBIN_MPI_NCPUS > 1) || kflags.KBIN_MPI);  //ME20190201
 
   // System
   xvasp.aopts.flag("AFLOWIN_FLAG::SYSTEM", vflags.AFLOW_SYSTEM.isentry); //CO20181226
@@ -832,7 +832,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
     xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC", vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.isentry);
     xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF", vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry);
   }
-  xvasp.AVASP_LDAU_PARAMETERS_STRING = vflags.KBIN_VASP_LDAU_PARAMETERS;  // ME20191010
+  xvasp.AVASP_LDAU_PARAMETERS_STRING = vflags.KBIN_VASP_LDAU_PARAMETERS;  //ME20191010
 
   // INCAR
   xvasp.aopts.flag("FLAG::INCAR_MODE_IMPLICIT", vflags.KBIN_VASP_INCAR_MODE.flag("IMPLICIT"));
@@ -887,7 +887,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   // Output files
   xvasp.aopts.flag("FLAG::AVASP_BADER", vflags.KBIN_VASP_FORCE_OPTION_BADER.option);
   xvasp.aopts.flag("FLAG::AVASP_CHGCAR", vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option);
-  if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) xvasp.aopts.push_attached("AFLOWIN_FLAG::CHGCAR_FILE", vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string);  // ME20191028
+  if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) xvasp.aopts.push_attached("AFLOWIN_FLAG::CHGCAR_FILE", vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string);  //ME20191028
   xvasp.aopts.flag("FLAG::AVASP_ELF", vflags.KBIN_VASP_FORCE_OPTION_ELF.option);
   xvasp.aopts.flag("FLAG::AVASP_WAVECAR", vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option);
 
@@ -941,7 +941,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::CIF\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CIF") << endl;} //DX20190123 - add CIF
-  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::CHGCAR_FILE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CHGCAR_FILE") << endl;}  // ME20191028
+  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::CHGCAR_FILE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CHGCAR_FILE") << endl;}  //ME20191028
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::CONVERT_UNIT_CELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::ENMAX_MULTIPLY\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY") << endl;}
@@ -1028,7 +1028,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   return true;
 }
 
-// ME20181030 - Set parameters for ARUNs
+//ME20181030 - Set parameters for ARUNs
 void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,_xvasp& xvasp) {
   // Prevent compiler warnings
   if(aflags.QUIET){}
@@ -1045,8 +1045,8 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
 
   if (xvasp.AVASP_arun_mode == "APL" || xvasp.AVASP_arun_mode == "AAPL") {
     // Unset writing APL and AAPL parameters since the child aflow.in files don't need them
-    xvasp.aopts.flag("FLAG::AVASP_AGL=OFF", true);  // ME20190112
-    xvasp.aopts.flag("FLAG::AVASP_AEL=OFF", true);  // ME20190112
+    xvasp.aopts.flag("FLAG::AVASP_AGL=OFF", true);  //ME20190112
+    xvasp.aopts.flag("FLAG::AVASP_AEL=OFF", true);  //ME20190112
     xvasp.aopts.flag("FLAG::AVASP_APL=OFF", true);
     xvasp.aopts.flag("FLAG::AVASP_AAPL=OFF", true);
     xvasp.aopts.flag("FLAG::AVASP_QHA=OFF", true);
@@ -1062,11 +1062,11 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       xvasp.aopts.pop_attached("AFLOWIN_FLAG::KSCHEME_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC", scheme);
     }
     scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPPRA");
-    //ME20190408 - START
+    //ME20190408 START
     if ((xvasp.AVASP_arun_mode == "AAPL") && xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL")) {
       scheme = xvasp.aaplopts.getattachedscheme("AFLOWIN_FLAG::AAPL_KPPRA_AAPL");
     }
-    //ME20190408 - END
+    //ME20190408 END
     if (!scheme.empty()) {
       xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", scheme);
     }
@@ -1098,9 +1098,9 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       } else {
         if (DEFAULT_APL_USE_LEPSILON) {
           xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("IBRION=8",_incarpad_) << "# Linear Response method" << std::endl;
-          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LEPSILON=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  // ME20190109
+          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LEPSILON=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  //ME20190109
         } else {
-          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LCALCEPS=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  // ME20190109
+          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LCALCEPS=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  //ME20190109
         }
       }
       xvasp.AVASP_EXTRA_INCAR << "# Added by [AFLOW_APL] end" << std::endl;
@@ -1114,11 +1114,11 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
         // Born charges need a denser k-point grid. Increase by 25%. ME20190207 - set to 10,000
         //int kpts = aurostd::string2utype<int>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));
         //kpts = (5 * kpts)/4;
-        xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", "10000");  // ME20190207 - modified
+        xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", "10000");  //ME20190207 - modified
       }
     }
 
-    // ME20191029 - ZEROSTATE CHGCAR
+    //ME20191029 - ZEROSTATE CHGCAR
     if (xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR")) {
       xvasp.aopts.pop_attached("AFLOWIN_FLAG::CHGCAR_FILE");
       if (xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE")) xvasp.aopts.flag("FLAG::AVASP_CHGCAR", true);
@@ -1133,7 +1133,7 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
   }
 }
 
-// ME20181102 - Set static run
+//ME20181102 - Set static run
 void setStatic(_xvasp& xvasp) {
   xvasp.AVASP_flag_RUN_RELAX = false;
   xvasp.AVASP_flag_RUN_RELAX_STATIC = false;
@@ -1146,7 +1146,7 @@ void setStatic(_xvasp& xvasp) {
   }
 }
 
-// ME20181102 - Do not convert unit cell
+//ME20181102 - Do not convert unit cell
 void setPreserveUnitCell(_xvasp& xvasp) {
   xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL", false);
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_PRESERVE", true);
@@ -1162,7 +1162,7 @@ void setPreserveUnitCell(_xvasp& xvasp) {
   xvasp.aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_WIGNERSEITZ", false);
 }
 
-// ME/CO20181103 - Fix masses and volume if they are missing
+//ME+CO20181103 - Fix masses and volume if they are missing
 void AVASP_fix_volumes_masses_XVASP(_xvasp& xvasp,bool skip_volume) { //CO20181226
   if (xvasp.str.species.size() > 0) {
     bool zero_vol = false, zero_mass = false;
@@ -1194,10 +1194,10 @@ void AVASP_fix_volumes_masses_XVASP(_xvasp& xvasp,bool skip_volume) { //CO201812
 }
 
 bool AVASP_MakeSingleAFLOWIN(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
-  return AVASP_MakeSingleAFLOWIN_181226(xvasp_in,_aflowin,flag_WRITE,pthread,flag_PRINT);
+  return AVASP_MakeSingleAFLOWIN_20181226(xvasp_in,_aflowin,flag_WRITE,pthread,flag_PRINT);
 }
 
-bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
+bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
   //  if(flag_WRITE==FALSE) DEBUG=TRUE;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="AVASP_MakeSingleAFLOWIN():";
@@ -1229,10 +1229,10 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_FORCE_NOLDAU\")=" << xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::PSTRESS\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::PSTRESS\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::PSTRESS") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MODULE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MODULE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  //CO20180214
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::POTIM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::POTIM") << endl;
@@ -1245,8 +1245,8 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::METAGGA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::METAGGA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::IVDW") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::IVDW") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE") << endl;  //CO20180214
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_MODE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_MODE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_COUNT\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_COUNT") << endl;
@@ -1261,7 +1261,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::VOLUME_PLUS_EQUAL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"FLAG::VOLUME_PRESERVED\")=" << xvasp.aopts.flag("FLAG::VOLUME_PRESERVED") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"FLAG::VOLUME_PRESERVED\")=" << xvasp.aopts.flag("FLAG::VOLUME_PRESERVED") << endl;  //CO20180214
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA") << endl;
@@ -1357,10 +1357,10 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     xvasp.str.species_mass.clear(); 
     for(uint i=0;i<xvasp.str.species.size();i++) xvasp.str.species_mass.push_back(0);
   }
-  //CO20181226 - Marco, don't fix volume of ICSD's, these volumes are provided by experiment (of the cell)
+  //CO20181226 - ME, don't fix volume of ICSD's, these volumes are provided by experiment (of the cell)
   //and hence we cannot say what the volume of the atoms are individually
   bool skip_volume=(xvasp_in.AVASP_prototype_mode==LIBRARY_MODE_ICSD || xvasp_in.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD); //CO20181226
-  AVASP_fix_volumes_masses_XVASP(xvasp,skip_volume);  // ME20181103  //CO20181226
+  AVASP_fix_volumes_masses_XVASP(xvasp,skip_volume);  //ME20181103  //CO20181226
   deque<double> vmass(xvasp.str.species_mass); // BACKUP
   //  for(uint i=0;i<xvasp.str.species.size();i++) cerr << "xvasp.str.species_mass=" << xvasp.str.species_mass.at(i) << endl;
 
@@ -1553,9 +1553,9 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
             cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
             cerr << "DEBUG - " << soliloquy << " xvasp.str.species_pp[i=" << i << "]=" << xvasp.str.species_pp[i] << endl;
           }
-          string FilePotcar,DataPotcar;
+          string FilePotcar,DataPotcar,AUIDPotcar;
           if (!XHOST.GENERATE_AFLOWIN_ONLY) { //CO20190116
-            if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar)) {
+            if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
               cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
               return FALSE; // dont die
               //exit(0);
@@ -1582,8 +1582,8 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
                 if(tokens.at(2)=="PAW") {pottype="PAW_LDA";date=tokens.at(4);}
                 if(tokens.at(2)=="PAW_GGA") {pottype="PAW_GGA";date=tokens.at(4);}
                 if(tokens.at(2)=="PAW_RPBE") {pottype="PAW_RPBE";date=tokens.at(4);}  // potpaw_GGA/DEFAULT_VASP_POTCAR_DATE/Ge_h
-                if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);} //CO20181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized" //CO20191110
-                if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA";date=tokens.at(4);} //CO20181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
+                if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);} //CO20181226 - SC, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX CO+SC LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized" //CO20191110
+                if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA";date=tokens.at(4);} //CO20181226 - SC, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX CO+SC LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
                 if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO20191020
                 if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO20191020
                 // SEE https://cms.mpi.univie.ac.at/wiki/index.php/METAGGA
@@ -1615,7 +1615,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.3]" << endl;
       directory+=pp_add_on+"/"+xvasp.AVASP_label;
       //  cerr << "DEBUG - " << soliloquy << " xvasp.AVASP_prototype_from_library_ directory(1)=" << directory << endl;    
-      system=""+aurostd::vectorstring2string(xvasp.str.species_pp)+((specify_pottype_once && !pottypedatestr.empty())?":"+pottypedatestr:"")+"."+xvasp.AVASP_label;  // ME200228 - removed colon for empty pottypedatestr
+      system=""+aurostd::vectorstring2string(xvasp.str.species_pp)+((specify_pottype_once && !pottypedatestr.empty())?":"+pottypedatestr:"")+"."+xvasp.AVASP_label;  //ME20200228 - removed colon for empty pottypedatestr
       // label_text0 - MIX
       label_MIX=xvasp.AVASP_libbase+"/"+aurostd::vectorstring2string(xvasp.str.species_pp)+"/"+xvasp.AVASP_label+"/"+_AFLOWIN_;
       if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.4]" << endl;
@@ -1699,14 +1699,14 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
 
       if(xvasp.str.species.size()==1) { // because specie 1 is part of the binary stuff //CO20181226 - cannot be pocc with species.size()==1
         if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [6a] xvasp.str.species.size()=" << xvasp.str.species.size() << endl;	
-        // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0));species_pp.push_back(xvasp.str.species_pp.at(0));
-        // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0));species_pp_backup.push_back(xvasp.str.species_pp.at(0));  // to prevent mess up of species
-        // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0));species_volume.push_back(xvasp.str.species_volume.at(0));
-        // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0));species_mass.push_back(xvasp.str.species_mass.at(0));
-        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); // DX20180118 - instead of adding 2 (see above)
-        //[CO20181226 OBSOLETE]deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); // DX20180118 - instead of adding 2 (see above)
+        //DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0));species_pp.push_back(xvasp.str.species_pp.at(0));
+        //DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0));species_pp_backup.push_back(xvasp.str.species_pp.at(0));  // to prevent mess up of species
+        //DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0));species_volume.push_back(xvasp.str.species_volume.at(0));
+        //DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0));species_mass.push_back(xvasp.str.species_mass.at(0));
+        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); //DX20180118 - instead of adding 2 (see above)
+        //[CO20181226 OBSOLETE]deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); //DX20180118 - instead of adding 2 (see above)
         //	xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in); // FOR HTQC
         xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in,xvasp_in.AVASP_prototype_mode); 
         xstr_orig = xvasp.str; //DX20190326 - mirror saving unpocc'd structure
@@ -1811,20 +1811,20 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       system+="/"+xvasp.Directory;
     }
     aurostd::StringSubst(system,"/./","/");aurostd::StringSubst(system,"//","/");
-    // ME20181121
+    //ME20181121
     if (xvasp.AVASP_prototype_mode==LIBRARY_MODE_ARUN && xvasp.aopts.flag("AFLOWIN_FLAG::SYSTEM")) {
       system = xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::SYSTEM");
     }
   }
 
-  if(system.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No system name information found",_INPUT_ILLEGAL_);}  //CO200102
+  if(system.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No system name information found",_INPUT_ILLEGAL_);}  //CO20200102
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[11]" << endl;
 
   bool AFLOWIN_OLD=FALSE;
   bool AFLOWIN_NEW=TRUE;
 
-  // DX20190326 - moved up and added if-statement cases - START
+  //DX20190326 - moved up and added if-statement cases - START
   // check for ANRL
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS")==TRUE) {
     //DX [OBSOLETE] string anrl_add_on=""; //":ANRL="+xvasp.AVASP_parameters; //CO20181226 - we ignore this
@@ -1851,20 +1851,20 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     }
     //DX20190314 - check if parameter string matches with parameter values from ANRL library - END
     system+=anrl_add_on;directory+=anrl_add_on;xvasp.AVASP_label+=anrl_add_on;
-    //CO20181216 - some fudging to adjust for database runs - DAVID REMOVE WHEN YOU FIX ANRL
-    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A3B5_oC32_38_abce_abcdf-001")) {aurostd::StringSubst(system,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");aurostd::StringSubst(directory,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");aurostd::StringSubst(xvasp.AVASP_label,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");} //A3B5_oC32_38_abce_abcdf ohad bccSQS
-    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB3_mC32_8_4a_12a-001")) {aurostd::StringSubst(system,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");aurostd::StringSubst(directory,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");aurostd::StringSubst(xvasp.AVASP_label,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");} //AB3_mC32_8_4a_12a ohad bccSQS
-    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A5B11_mP16_6_2abc_2a3b3c-001")) {aurostd::StringSubst(system,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");aurostd::StringSubst(directory,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");aurostd::StringSubst(xvasp.AVASP_label,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");} //A5B11_mP16_6_2abc_2a3b3c ohad bccSQS
-    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A3B13_oC32_38_ac_a2bcdef-001")) {aurostd::StringSubst(system,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");aurostd::StringSubst(directory,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");aurostd::StringSubst(xvasp.AVASP_label,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");} //A3B13_oC32_38_ac_a2bcdef ohad bccSQS
-    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB3_mC32_8_4a_4a4b-001")) {aurostd::StringSubst(system,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");aurostd::StringSubst(directory,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");aurostd::StringSubst(xvasp.AVASP_label,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");} //AB3_mC32_8_4a_4a4b ohad bccSQS
-    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB_aP16_2_4i_4i-001")) {aurostd::StringSubst(system,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");aurostd::StringSubst(directory,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");aurostd::StringSubst(xvasp.AVASP_label,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");} //AB_aP16_2_4i_4i ohad bccSQS
-    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB7_hR16_166_c_c2h-001")) {aurostd::StringSubst(system,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");aurostd::StringSubst(directory,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");aurostd::StringSubst(xvasp.AVASP_label,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");} //AB7_hR16_166_c_c2h ohad bccSQS
+    //CO20181216 - some fudging to adjust for database runs - DX REMOVE WHEN YOU FIX ANRL
+    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A3B5_oC32_38_abce_abcdf-001")) {aurostd::StringSubst(system,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");aurostd::StringSubst(directory,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");aurostd::StringSubst(xvasp.AVASP_label,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");} //A3B5_oC32_38_abce_abcdf OL bccSQS
+    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB3_mC32_8_4a_12a-001")) {aurostd::StringSubst(system,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");aurostd::StringSubst(directory,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");aurostd::StringSubst(xvasp.AVASP_label,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");} //AB3_mC32_8_4a_12a OL bccSQS
+    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A5B11_mP16_6_2abc_2a3b3c-001")) {aurostd::StringSubst(system,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");aurostd::StringSubst(directory,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");aurostd::StringSubst(xvasp.AVASP_label,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");} //A5B11_mP16_6_2abc_2a3b3c OL bccSQS
+    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A3B13_oC32_38_ac_a2bcdef-001")) {aurostd::StringSubst(system,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");aurostd::StringSubst(directory,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");aurostd::StringSubst(xvasp.AVASP_label,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");} //A3B13_oC32_38_ac_a2bcdef OL bccSQS
+    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB3_mC32_8_4a_4a4b-001")) {aurostd::StringSubst(system,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");aurostd::StringSubst(directory,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");aurostd::StringSubst(xvasp.AVASP_label,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");} //AB3_mC32_8_4a_4a4b OL bccSQS
+    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB_aP16_2_4i_4i-001")) {aurostd::StringSubst(system,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");aurostd::StringSubst(directory,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");aurostd::StringSubst(xvasp.AVASP_label,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");} //AB_aP16_2_4i_4i OL bccSQS
+    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB7_hR16_166_c_c2h-001")) {aurostd::StringSubst(system,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");aurostd::StringSubst(directory,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");aurostd::StringSubst(xvasp.AVASP_label,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");} //AB7_hR16_166_c_c2h OL bccSQS
     //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A2BCD4_tI16_82_ac_b_d_g-001")) {aurostd::StringSubst(system,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001");aurostd::StringSubst(directory,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001");aurostd::StringSubst(xvasp.AVASP_label,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001");} //A2BCD4_tI16_82_ac_b_d_g natalio kesterite
     //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A_tI4_141_a-001")) {aurostd::StringSubst(system,"A_tI4_141_a","A_tI4_141_a-001");aurostd::StringSubst(directory,"A_tI4_141_a","A_tI4_141_a-001");aurostd::StringSubst(xvasp.AVASP_label,"A_tI4_141_a","A_tI4_141_a-001");} //A_tI4_141_a mike Sn
     //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A_hP1_191_a-001")) {aurostd::StringSubst(system,"A_hP1_191_a","A_hP1_191_a-001");aurostd::StringSubst(directory,"A_hP1_191_a","A_hP1_191_a-001");aurostd::StringSubst(xvasp.AVASP_label,"A_hP1_191_a","A_hP1_191_a-001");} //A_hP1_191_a mike Sn
     //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB2_hP3_191_a_d-001")) {aurostd::StringSubst(system,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");aurostd::StringSubst(directory,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");aurostd::StringSubst(xvasp.AVASP_label,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");} //AB2_hP3_191_a_d pranab 6-metal-boride
   }
-  // DX20190326 - moved up and added if-statement cases - END
+  //DX20190326 - moved up and added if-statement cases - END
 
   if(pocc){ //CO20181226
     string pocc_params_add_on=":POCC_"+xvasp.AVASP_pocc_parameters;
@@ -1875,7 +1875,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     }
   }
 
-  //DX20190326 - moved up [OBSOLETE]  // DX20180123 - Add ANRL parameters to label - START
+  //DX20190326 - moved up [OBSOLETE]  //DX20180123 - Add ANRL parameters to label - START
   //DX20190326 - moved up [OBSOLETE]  // check for ANRL
   //DX20190326 - moved up [OBSOLETE]  if(xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS")==TRUE) {
   //DX20190326 - moved up [OBSOLETE]    //DX [OBSOLETE] string anrl_add_on=""; //":ANRL="+xvasp.AVASP_parameters; //CO20181226 - we ignore this
@@ -1902,20 +1902,20 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   //DX20190326 - moved up [OBSOLETE]    }
   //DX20190326 - moved up [OBSOLETE]    //DX20190314 - check if parameter string matches with parameter values from ANRL library - END
   //DX20190326 - moved up [OBSOLETE]    system+=anrl_add_on;directory+=anrl_add_on;xvasp.AVASP_label+=anrl_add_on;
-  //DX20190326 - moved up [OBSOLETE]    //CO20181216 - some fudging to adjust for database runs - DAVID REMOVE WHEN YOU FIX ANRL
-  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A3B5_oC32_38_abce_abcdf-001")) {aurostd::StringSubst(system,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");aurostd::StringSubst(directory,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");aurostd::StringSubst(xvasp.AVASP_label,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");} //A3B5_oC32_38_abce_abcdf ohad bccSQS
-  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB3_mC32_8_4a_12a-001")) {aurostd::StringSubst(system,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");aurostd::StringSubst(directory,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");aurostd::StringSubst(xvasp.AVASP_label,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");} //AB3_mC32_8_4a_12a ohad bccSQS
-  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A5B11_mP16_6_2abc_2a3b3c-001")) {aurostd::StringSubst(system,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");aurostd::StringSubst(directory,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");aurostd::StringSubst(xvasp.AVASP_label,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");} //A5B11_mP16_6_2abc_2a3b3c ohad bccSQS
-  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A3B13_oC32_38_ac_a2bcdef-001")) {aurostd::StringSubst(system,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");aurostd::StringSubst(directory,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");aurostd::StringSubst(xvasp.AVASP_label,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");} //A3B13_oC32_38_ac_a2bcdef ohad bccSQS
-  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB3_mC32_8_4a_4a4b-001")) {aurostd::StringSubst(system,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");aurostd::StringSubst(directory,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");aurostd::StringSubst(xvasp.AVASP_label,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");} //AB3_mC32_8_4a_4a4b ohad bccSQS
-  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB_aP16_2_4i_4i-001")) {aurostd::StringSubst(system,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");aurostd::StringSubst(directory,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");aurostd::StringSubst(xvasp.AVASP_label,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");} //AB_aP16_2_4i_4i ohad bccSQS
-  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB7_hR16_166_c_c2h-001")) {aurostd::StringSubst(system,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");aurostd::StringSubst(directory,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");aurostd::StringSubst(xvasp.AVASP_label,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");} //AB7_hR16_166_c_c2h ohad bccSQS
+  //DX20190326 - moved up [OBSOLETE]    //CO20181216 - some fudging to adjust for database runs - DX REMOVE WHEN YOU FIX ANRL
+  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A3B5_oC32_38_abce_abcdf-001")) {aurostd::StringSubst(system,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");aurostd::StringSubst(directory,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");aurostd::StringSubst(xvasp.AVASP_label,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001");} //A3B5_oC32_38_abce_abcdf OL bccSQS
+  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB3_mC32_8_4a_12a-001")) {aurostd::StringSubst(system,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");aurostd::StringSubst(directory,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");aurostd::StringSubst(xvasp.AVASP_label,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001");} //AB3_mC32_8_4a_12a OL bccSQS
+  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A5B11_mP16_6_2abc_2a3b3c-001")) {aurostd::StringSubst(system,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");aurostd::StringSubst(directory,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");aurostd::StringSubst(xvasp.AVASP_label,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001");} //A5B11_mP16_6_2abc_2a3b3c OL bccSQS
+  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A3B13_oC32_38_ac_a2bcdef-001")) {aurostd::StringSubst(system,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");aurostd::StringSubst(directory,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");aurostd::StringSubst(xvasp.AVASP_label,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001");} //A3B13_oC32_38_ac_a2bcdef OL bccSQS
+  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB3_mC32_8_4a_4a4b-001")) {aurostd::StringSubst(system,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");aurostd::StringSubst(directory,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");aurostd::StringSubst(xvasp.AVASP_label,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001");} //AB3_mC32_8_4a_4a4b OL bccSQS
+  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB_aP16_2_4i_4i-001")) {aurostd::StringSubst(system,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");aurostd::StringSubst(directory,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");aurostd::StringSubst(xvasp.AVASP_label,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001");} //AB_aP16_2_4i_4i OL bccSQS
+  //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB7_hR16_166_c_c2h-001")) {aurostd::StringSubst(system,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");aurostd::StringSubst(directory,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");aurostd::StringSubst(xvasp.AVASP_label,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001");} //AB7_hR16_166_c_c2h OL bccSQS
   //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A2BCD4_tI16_82_ac_b_d_g-001")) {aurostd::StringSubst(system,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001");aurostd::StringSubst(directory,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001");aurostd::StringSubst(xvasp.AVASP_label,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001");} //A2BCD4_tI16_82_ac_b_d_g natalio kesterite
   //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A_tI4_141_a-001")) {aurostd::StringSubst(system,"A_tI4_141_a","A_tI4_141_a-001");aurostd::StringSubst(directory,"A_tI4_141_a","A_tI4_141_a-001");aurostd::StringSubst(xvasp.AVASP_label,"A_tI4_141_a","A_tI4_141_a-001");} //A_tI4_141_a mike Sn
   //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"A_hP1_191_a-001")) {aurostd::StringSubst(system,"A_hP1_191_a","A_hP1_191_a-001");aurostd::StringSubst(directory,"A_hP1_191_a","A_hP1_191_a-001");aurostd::StringSubst(xvasp.AVASP_label,"A_hP1_191_a","A_hP1_191_a-001");} //A_hP1_191_a mike Sn
   //DX20190326 - moved up [OBSOLETE]    //DX20190227 [OBSOLETE] if(!aurostd::substring2bool(system,"AB2_hP3_191_a_d-001")) {aurostd::StringSubst(system,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");aurostd::StringSubst(directory,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");aurostd::StringSubst(xvasp.AVASP_label,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001");} //AB2_hP3_191_a_d pranab 6-metal-boride
   //DX20190326 - moved up [OBSOLETE]  }
-  //DX20190326 - moved up [OBSOLETE]  // DX20180123 - Add ANRL parameters to label - END
+  //DX20190326 - moved up [OBSOLETE]  //DX20180123 - Add ANRL parameters to label - END
 
   // check for PSTRESS/PRESSURE   //  if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS",TRUE)) xvasp.aopts.push_attached("AFLOWIN_FLAG::PSTRESS","7.65");
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS")==TRUE) {
@@ -1928,7 +1928,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     }
   }
 
-  // ME20191031 - no need to add LDAU to ARUNs as it should already be in the parent system name
+  //ME20191031 - no need to add LDAU to ARUNs as it should already be in the parent system name
   if (!xvasp.AVASP_arun) {
     // check for LDAU1
     if(0 && xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !aurostd::substring2bool(system,"_ICSD")) {
@@ -1943,7 +1943,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       system+=ldau2_add_on;directory+=ldau2_add_on;xvasp.AVASP_label+=ldau2_add_on;
     }
 
-    // ME20181121
+    //ME20181121
     if (xvasp.AVASP_prototype_mode == LIBRARY_MODE_ARUN) {
       string arun_add_on=":" + ARUN_DIRECTORY_PREFIX + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname; //CO20181226
       system+=arun_add_on;
@@ -2000,7 +2000,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << "#[AFLOW_MODE_MPI]" << endl;
   }
   string NCPUS_VAL="MAX";  // Modified - ME20181113
-  if(xvasp.aopts.flag("AFLOWIN_FLAG::MPI_NUM_CPUS")) NCPUS_VAL=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MPI_NUM_CPUS");  // ME20181113
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::MPI_NUM_CPUS")) NCPUS_VAL=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MPI_NUM_CPUS");  //ME20181113
   if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) NCPUS_VAL=XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS");
   if (!NCPUS_VAL.empty()) aflowin << "[AFLOW_MODE_MPI_MODE]NCPUS=" << NCPUS_VAL << " " << endl;  // Modified - ME20181113
 #ifdef MPI_LAM
@@ -2017,9 +2017,9 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // SYMMETRY WRITE
   if(!xvasp.aopts.flag("FLAG::AVASP_SYMMETRY=OFF")) {
-    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
     //aflowin << "[AFLOW_SYMMETRY]CALC " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_WRITE " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
@@ -2027,9 +2027,9 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
   // NEIGHBOURS WRITE
   if(!xvasp.aopts.flag("FLAG::AVASP_NEIGHBOURS=OFF")) {
-    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
     //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
     //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
     //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
@@ -2040,7 +2040,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // This would set CONVERT_UNIT_CELL=PRES for aflow_proto.
   // Setting to PRES should only be done for ARUNs and thus set in
   // AVASP_populateXVASP_ARUN
-  // ME20190107
+  //ME20190107
   //if (MODULE == "APL" || MODULE == "AAPL") {
   //  // (A)APL should not convert the unit cell as this would lead to discrepancies between the
   //  // structure in the aflow.in file and the supercell.
@@ -2048,19 +2048,19 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // }
 
   // APL WRITING - ME20181027
-  if(!xvasp.aopts.flag("FLAG::AVASP_APL=OFF")) { // CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
-    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; // CO20180214
+  if(!xvasp.aopts.flag("FLAG::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
+    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; //CO20180214
     //[ME20181216] - OLD SCHEME
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]// DX and CO - START
+    //[ME20181216]//DX+CO START
     //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string(""):string("#"))+"[AFLOW_APL]SUPERCELL="+
-    //[ME20181216]    (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  // CO20180214
+    //[ME20181216]    (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  //CO20180214
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]// DX AND CO - END
+    //[ME20181216]//DX+CO END
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DOS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TP=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TPT=0:2000:10",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
@@ -2068,7 +2068,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_APL]";
     //vector<string> vkeys = xvasp.aplopts.getattachedschemekeys();
-    std::sort(xvasp.aplopts.vxscheme.begin(), xvasp.aplopts.vxscheme.end());  // ME20190114
+    std::sort(xvasp.aplopts.vxscheme.begin(), xvasp.aplopts.vxscheme.end());  //ME20190114
     const vector<string>& vkeys=xvasp.aplopts.vxscheme;
     for (uint i = 0; i < vkeys.size(); i++) {
       xvaspflag = vkeys[i];
@@ -2086,11 +2086,11 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
@@ -2123,7 +2123,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_AAPL]";
     //vector<string> vkeys = xvasp.aaplopts.getattachedschemekeys();
-    std::sort(xvasp.aaplopts.vxscheme.begin(), xvasp.aaplopts.vxscheme.end());  // ME20190114
+    std::sort(xvasp.aaplopts.vxscheme.begin(), xvasp.aaplopts.vxscheme.end());  //ME20190114
     const vector<string>& vkeys=xvasp.aaplopts.vxscheme;
     for (uint i = 0; i < vkeys.size(); i++) {
       xvaspflag = vkeys[i];
@@ -2239,19 +2239,19 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(xvasp.aopts.flag("FLAG::AVASP_WAVECAR")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
   } else {
-    // ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
+    //ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
   }
 
   // CHGCAR WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_CHGCAR")) {
-    // ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
+    //ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
   } else {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
   }
 
-  // ME20191028 - CHGCAR_FILE
+  //ME20191028 - CHGCAR_FILE
   if (!xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE").empty()) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR_FILE="+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE"),_aflowinpad_) << std::endl;
   }
@@ -2300,7 +2300,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // NBANDS WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS",_aflowinpad_) << "// Estimate Bands (better than VASP)" << endl;
-  } else if (xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS_EQUAL")) {  // ME20181128
+  } else if (xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS_EQUAL")) {  //ME20181128
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS=" + xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::NBANDS_EQUAL"),_aflowinpad_) << "// Number of bands" << endl;
   } else {
     // aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]NBANDS",_aflowinpad_) << "// Estimate Bands (better than VASP)" << endl;
@@ -2390,18 +2390,18 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
 
   // RELAX_TYPE + RELAX WRITING
-  // CO20181226 - I modified because RELAX_ALL is different than RELAX_MODE
+  //CO20181226 - I modified because RELAX_ALL is different than RELAX_MODE
   // one sets isif
   // the other sets other associated flags, like ediffg (see ivasp)
   if(!(xvasp.AVASP_flag_RUN_STATIC==TRUE || xvasp.AVASP_flag_RUN_STATIC_BANDS==TRUE)){
-    if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  // CO20180214
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  //CO20180214
       aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_aflowinpad_);
       aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
     } else {
       if(xvasp.aopts.flag("FLAG::VOLUME_PRESERVED")==FALSE){
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_ALL",_aflowinpad_);
         aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
-      } // CO20181226 - melding from below - I am interpreting this as: if not volume_preserved, then you probably want RELAX_ALL
+      } //CO20181226 - melding from below - I am interpreting this as: if not volume_preserved, then you probably want RELAX_ALL
     }
     // RELAX_MODE
     if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE")) {
@@ -2434,7 +2434,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=HIGH",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='A' || PRECISION.at(0)=='a')
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=ACCURATE",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
-      // ME20181022
+      //ME20181022
       if(PRECISION.at(0)=='P' || PRECISION.at(0)=='p')
         aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=PHONONS",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       aflowin << "#[VASP_FORCE_OPTION]PREC_preserved " << endl;
@@ -2452,7 +2452,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
         vstr.push_back("HIGH");
       if(PRECISION.at(0)=='A' || PRECISION.at(0)=='a')
         vstr.push_back("ACCURATE");
-      // ME20181022
+      //ME20181022
       if(PRECISION.at(0)=='P' || PRECISION.at(0)=='p')
         vstr.push_back("PHONONS");
       if(xvasp.aopts.flag("FLAG::PRECISION_PRESERVED")) vstr.push_back("PRESERVED");
@@ -2594,7 +2594,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   //[CO20181226 - melding with above]// RELAX WRITING
   //[CO20181226 - melding with above]if(xvasp.aopts.flag("FLAG::VOLUME_PRESERVED")==TRUE || xvasp.AVASP_flag_RUN_STATIC==TRUE || xvasp.AVASP_flag_RUN_STATIC_BANDS==TRUE) {
   //[CO20181226 - melding with above]} else {
-  //[CO20181226 - melding with above]  if(!xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")) aflowin << "[VASP_FORCE_OPTION]RELAX_ALL " << endl; // CO20180214
+  //[CO20181226 - melding with above]  if(!xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")) aflowin << "[VASP_FORCE_OPTION]RELAX_ALL " << endl; //CO20180214
   //[CO20181226 - melding with above]}
 
   // NOTUNE WRITING - Modified ME20181128
@@ -2766,7 +2766,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // INCAR
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
-  // ME20181128 - Added remaining INCAR modes
+  //ME20181128 - Added remaining INCAR modes
   if (xvasp.aopts.flag("FLAG::INCAR_MODE_MODE_IMPLICIT")) {aflowin << "[VASP_INCAR_MODE_IMPLICIT]" << endl;}
   else if (xvasp.aopts.flag("FLAG::INCAR_MODE_EXPLICIT") && xvasp.aopts.flag("FLAG::INCAR_KEYWORD")) {aflowin << "[VASP_INCAR_MODE_EXPLICIT]" << endl;}
   else if (xvasp.aopts.flag("FLAG::INCAR_MODE_EXTERNAL")) {aflowin << "[VASP_INCAR_MODE_EXTERNAL]" << endl;}
@@ -2784,9 +2784,9 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     if(xvasp.aopts.flag("FLAG::EXTRA_INCAR")==TRUE) {
       aflowin << xvasp.AVASP_EXTRA_INCAR.str(); // << endl;
     }
-    if (xvasp.aopts.flag("FLAG::INCAR_EXPLICIT_START_STOP")) {  // ME20181128
+    if (xvasp.aopts.flag("FLAG::INCAR_EXPLICIT_START_STOP")) {  //ME20181128
       //[CO20181226 OBSOLETE - need to remove system]aflowin << xvasp.AVASP_INCAR_EXPLICIT_START_STOP.str();
-      //CO20181226 - START
+      //CO20181226 START
       vector<string> vlines;
       aurostd::stream2vectorstring(xvasp.AVASP_INCAR_EXPLICIT_START_STOP, vlines);
       for(uint i=0;i<vlines.size();i++){
@@ -2795,7 +2795,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
           aflowin << vlines[i] << endl;
         }
       }
-      //CO20181226 - STOP
+      //CO20181226 STOP
     }
     aflowin << aurostd::PaddedPOST("#PSTRESS=000       # Pressure in kBar (1kB=0.1GPa) ",_aflowinpad_) << "# for hand modification" << endl;
     aflowin << aurostd::PaddedPOST("#EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"     # For relaxed forces ",_aflowinpad_) << "# for hand modification" << endl;
@@ -2809,9 +2809,9 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.11]" << endl;
 
   // KPOINTS
-  // ME20181128 - Added remaining KPOINTS modes
+  //ME20181128 - Added remaining KPOINTS modes
   bool skip_implicit = (!xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT") &&
-      (xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") || xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") || xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL")));  //CO20190401 - start/stop
+      (xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") || xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") || xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL")));  //CO20190401 START/STOP
   if (!skip_implicit) {
     aflowin << "[VASP_KPOINTS_MODE_IMPLICIT] " << endl;
     //[ME20181216]aflowin << "[VASP_KPOINTS_FILE]KSCHEME=" << xvasp.AVASP_KSCHEME << " " << endl;
@@ -2847,7 +2847,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     //    }
     //  }
 
-    bool write_all = false;  // ME20181023
+    bool write_all = false;  //ME20181023
     // HTQC do AUTO
     if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD || xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) {
       write_all = true;
@@ -2866,13 +2866,13 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     // PROTOTYPE check the stuff out
     if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_PROTOTYPE) {
       write_all = true;
-      if (LDEBUG) cerr << "DEBUG - AVASP calculating parameters for bands" << endl;  // ME20190107 - added LDEBUG
+      if (LDEBUG) cerr << "DEBUG - AVASP calculating parameters for bands" << endl;  //ME20190107 - added LDEBUG
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC;                           
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;
       // kpoints for the brillouin zone
       xvasp.str.GetLatticeType(); // takes care of everything
       xvasp.AVASP_path_BANDS=xvasp.str.bravais_lattice_variation_type;  // ICSD BASTARDS
-      if(LDEBUG) cerr << "DEBUG - AVASP xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;  // ME20190107 - added LDEBUG
+      if(LDEBUG) cerr << "DEBUG - AVASP xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;  //ME20190107 - added LDEBUG
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;                               
       if(xvasp.AVASP_path_BANDS=="HEX" || xvasp.AVASP_path_BANDS=="FCC") {
         xvasp.AVASP_KSCHEME="G";           // HEXAGONAL/FCC SYSTEMS GET GAMMA KPOINTS GRID
@@ -2895,7 +2895,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME="G";
     }
 
-    // ME20181023 - Write the k-points into the aflow.in file
+    //ME20181023 - Write the k-points into the aflow.in file
     if (!xvasp.AVASP_flag_RUN_STATIC || write_all) {
       aflowin << "[VASP_KPOINTS_FILE]KSCHEME=" << xvasp.AVASP_KSCHEME << endl;
       aflowin << "[VASP_KPOINTS_FILE]KPPRA=" << xvasp.AVASP_value_KPPRA << endl;
@@ -2904,9 +2904,9 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       if (xvasp.aopts.flag("AFLOWIN_FLAG::KMODE"))
         aflowin << "[VASP_KPOINTS_FILE]KMODE=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KMODE") << endl;
     }
-    //if (!xvasp.AVASP_flag_RUN_RELAX || write_all) //CO20181226 - marco, this needs to be more explicit, breaks pocc
+    //if (!xvasp.AVASP_flag_RUN_RELAX || write_all) //CO20181226 - ME, this needs to be more explicit, breaks pocc
     if (xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_STATIC_BANDS || write_all)  //CO20181226
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       aflowin << "[VASP_KPOINTS_FILE]STATIC_KSCHEME=" << xvasp.AVASP_STATIC_KSCHEME << endl;
       aflowin << "[VASP_KPOINTS_FILE]STATIC_KPPRA=" << xvasp.AVASP_value_KPPRA_STATIC << endl;
       if (xvasp.aopts.flag("AFLOWIN_FLAG::KSHIFT_STATIC"))
@@ -2922,7 +2922,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
 
   if (xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL")) {aflowin << "[VASP_KPOINTS_MODE_EXTERNAL]" << endl;}
   else if (xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") && xvasp.aopts.flag("FLAG::KPOINTS_KEYWORD")) {aflowin << "[VASP_KPOINTS_MODE_EXPLICIT]" << endl;}
-  if (xvasp.aopts.flag("FLAG::KPOINTS_KEYWORD") && skip_implicit) { //CO20181226 - Marco check!!!!!!
+  if (xvasp.aopts.flag("FLAG::KPOINTS_KEYWORD") && skip_implicit) { //CO20181226 - ME check!!!!!!
     for (uint i = 0; i < xvasp.AVASP_KPOINTS_KEYWORD.size(); i++) {  // Last vector element is empty  //CO20181226 - better way
       if(!aurostd::RemoveWhiteSpacesFromTheBack(xvasp.AVASP_KPOINTS_KEYWORD[i]).empty()){  //CO20181226 - better way
         aflowin << "[VASP_KPOINTS_FILE]" << xvasp.AVASP_KPOINTS_KEYWORD[i] << endl;
@@ -2941,7 +2941,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // STRUCTURE VASP
   if(xvasp.aopts.flag("AFLOWIN_FLAG::VASP")) {
     if(pocc){
-      aflowin << aurostd::PaddedPOST("[AFLOW_POCC]CALC ",_aflowinpad_) << "// README_AFLOW_POCC.TXT" << endl; // CO20180214
+      aflowin << aurostd::PaddedPOST("[AFLOW_POCC]CALC ",_aflowinpad_) << "// README_AFLOW_POCC.TXT" << endl; //CO20180214
       aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     }
     if(pocc){aflowin << "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE " << endl;}
@@ -3116,7 +3116,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << "[AFLOW] AFLOW automatically generated (aflow_avasp.cpp) " << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
 
-  //CO20181226 - printing the directory in ARUN mode is problematic, as directory becomes full path, so we get /home/corey...
+  //CO20181226 - printing the directory in ARUN mode is problematic, as directory becomes full path, so we get /home/...
   string directory_to_print=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(directory);
   bool print_directory=(!directory_to_print.empty());
   if(print_directory && xvasp.AVASP_prototype_mode==LIBRARY_MODE_ARUN && directory_to_print[0]=='/'){print_directory=false;} //root directory
@@ -3239,7 +3239,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
 }
 
 #ifndef COMPILE_SLIM
-bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
+bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bool flag_WRITE,int pthread,bool flag_PRINT) {
   //  if(flag_WRITE==FALSE) DEBUG=TRUE;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="AVASP_MakeSingleAFLOWIN():";
@@ -3266,10 +3266,10 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_FORCE_NOLDAU\")=" << xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::PSTRESS\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::PSTRESS\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::PSTRESS") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MODULE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::MODULE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::MODULE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL") << endl;  //CO20180214
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::EDIFFG") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::POTIM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::POTIM") << endl;
@@ -3282,8 +3282,8 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::METAGGA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::METAGGA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::IVDW") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::IVDW") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE") << endl;  // CO20180214
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE") << endl;  //CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_TYPE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE") << endl;  //CO20180214
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::RELAX_MODE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::RELAX_MODE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::TYPE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::TYPE") << endl;
@@ -3294,7 +3294,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::VOLUME_PLUS_EQUAL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT") << endl;  // CO20180214
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT") << endl;  //CO20180214
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA") << endl;
@@ -3573,8 +3573,8 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
         directory+=xvasp.str.species_pp.at(i);
         if(xvasp.POTCAR_TYPE_DATE_PRINT_flag) { // add potential type and date
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
-          string FilePotcar,DataPotcar;
-          if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar)) {
+          string FilePotcar,DataPotcar,AUIDPotcar;
+          if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
             cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
             return FALSE; // dont die
             //exit(0);
@@ -3597,8 +3597,8 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
               if(tokens.at(2)=="PAW_GGA") {pottype="PAW_GGA";date=tokens.at(4);}
               if(tokens.at(2)=="PAW_RPBE") {pottype="PAW_RPBE";date=tokens.at(4);}  // potpaw_GGA/DEFAULT_VASP_POTCAR_DATE/Ge_h
               if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);}
-              if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);} // FIX COREY/STEFANIO PBE_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
-              if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);} // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
+              if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);} // FIX CO+SC PBE_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
+              if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);} // FIX CO+SC LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
               // SEE https://cms.mpi.univie.ac.at/wiki/index.php/METAGGA
             }
             if(pottype.empty()) {
@@ -3704,14 +3704,14 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
 
       if(xvasp.str.species.size()==1) { // because specie 1 is part of the binary stuff
         if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [6a] xvasp.str.species.size()=" << xvasp.str.species.size() << endl;	
-        // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0));species_pp.push_back(xvasp.str.species_pp.at(0));
-        // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0));species_pp_backup.push_back(xvasp.str.species_pp.at(0));  // to prevent mess up of species
-        // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0));species_volume.push_back(xvasp.str.species_volume.at(0));
-        // DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0));species_mass.push_back(xvasp.str.species_mass.at(0));
-        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); // DX20180118 - instead of adding 2 (see above)
-        deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); // DX20180118 - instead of adding 2 (see above)
+        //DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0));species_pp.push_back(xvasp.str.species_pp.at(0));
+        //DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0));species_pp_backup.push_back(xvasp.str.species_pp.at(0));  // to prevent mess up of species
+        //DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0));species_volume.push_back(xvasp.str.species_volume.at(0));
+        //DX [OBSOLETE] - Not sure why we add 2 of each; breaks ANRL unaries: deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0));species_mass.push_back(xvasp.str.species_mass.at(0));
+        deque<string> species_pp;      species_pp.push_back(xvasp.str.species_pp.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<string> species_pp_backup; species_pp_backup.push_back(xvasp.str.species_pp.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<double> species_volume;  species_volume.push_back(xvasp.str.species_volume.at(0)); //DX20180118 - instead of adding 2 (see above)
+        deque<double> species_mass;    species_mass.push_back(xvasp.str.species_mass.at(0)); //DX20180118 - instead of adding 2 (see above)
         //	xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in); // FOR HTQC
         xvasp.str=aflowlib::PrototypeLibraries(oaus,xvasp.AVASP_label,xvasp.AVASP_parameters,species_pp,species_volume,xvasp.AVASP_volume_in,xvasp_in.AVASP_prototype_mode); 
         for(uint i=0;i<xvasp.str.species_pp.size()&&i<species_pp_backup.size();i++) xvasp.str.species_pp.at(i)=species_pp_backup.at(i); // to restore mess up of species
@@ -3805,13 +3805,13 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   bool AFLOWIN_OLD=FALSE;
   bool AFLOWIN_NEW=TRUE;
 
-  // DX20180123 - Add ANRL parameters to label - START
+  //DX20180123 - Add ANRL parameters to label - START
   // check for ANRL
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS")==TRUE) {
     string anrl_add_on=":ANRL="+xvasp.AVASP_parameters;
     system+=anrl_add_on;directory+=anrl_add_on;xvasp.AVASP_label+=anrl_add_on;
   }
-  // DX20180123 - Add ANRL parameters to label - END
+  //DX20180123 - Add ANRL parameters to label - END
 
   // check for PSTRESS/PRESSURE   //  if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS",TRUE)) xvasp.aopts.push_attached("AFLOWIN_FLAG::PSTRESS","7.65");
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS")==TRUE) {
@@ -3895,9 +3895,9 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // SYMMETRY WRITE
   if(!xvasp.aopts.flag("FLAGS::AVASP_SYMMETRY=OFF")) {
-    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; // CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
     //aflowin << "[AFLOW_SYMMETRY]CALC " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_WRITE " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
@@ -3905,9 +3905,9 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
   // NEIGHBOURS WRITE
   if(!xvasp.aopts.flag("FLAGS::AVASP_NEIGHBOURS=OFF")) {
-    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; // CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
     //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
     //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
     //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
@@ -3915,18 +3915,18 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
   string MODULE = aurostd::toupper(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE"));
   // APL WRITING
-  if(!xvasp.aopts.flag("FLAGS::AVASP_APL=OFF")) { // CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
-    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; // CO20180214
+  if(!xvasp.aopts.flag("FLAGS::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
+    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; //CO20180214
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    // DX and CO - START
+    //DX+CO START
     aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string(""):string("#"))+"[AFLOW_APL]SUPERCELL="+
-        (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  // CO20180214
+        (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  //CO20180214
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    // DX AND CO - END
+    //DX+CO END
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]DOS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]TP=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_APL]TPT=0:2000:10",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
@@ -3936,11 +3936,11 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
@@ -4132,7 +4132,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
 
   // RELAX_TYPE
-  if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  // CO20180214
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  //CO20180214
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_aflowinpad_);
     aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME " << endl;
   } else {
@@ -4317,7 +4317,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   // RELAX WRITING
   if(xvasp.aopts.flag("FLAG::VOLUME_PRESERVED")==TRUE || xvasp.AVASP_flag_RUN_STATIC==TRUE || xvasp.AVASP_flag_RUN_STATIC_BANDS==TRUE) {
   } else {
-    if(!xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")) aflowin << "[VASP_FORCE_OPTION]RELAX_ALL " << endl; // CO20180214
+    if(!xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")) aflowin << "[VASP_FORCE_OPTION]RELAX_ALL " << endl; //CO20180214
   }
 
   // NOTUNE WRITING
@@ -4984,10 +4984,10 @@ bool AVASP_MakePrototype_AFLOWIN_LOOP(deque<_xvasp>& dxvasp,bool flag_WRITE) {
 // };
 
 bool AVASP_MakePrototype_AFLOWIN(_AVASP_PROTO *PARAMS) {
-  return AVASP_MakePrototype_AFLOWIN_181226(PARAMS);
+  return AVASP_MakePrototype_AFLOWIN_20181226(PARAMS);
 }
 
-bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
+bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="AVASP_MakePrototype_AFLOWIN():";
   stringstream message;
@@ -4995,7 +4995,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
 
   _xvasp xvasp;
   AVASP_DefaultValuesBinary_AFLOWIN(xvasp);
-  KBIN::setModules(xvasp);  // ME20181105
+  KBIN::setModules(xvasp);  //ME20181105
   xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_COUNT")){ //CO20190219
     xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_COUNT",TRUE);
@@ -5050,8 +5050,8 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   }
 
   bool reverse=PARAMS->vparams.flag("AFLOWIN_FLAG::REVERSE"); //CO20181226
-  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); // DX20180118 - added parameters to AVASP
-  //DX20190227 - START
+  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); //DX20180118 - added parameters to AVASP
+  //DX20190227 START
   // default without parameters is to use the atomic volume scaling method (i.e., a=-1)
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
   if(xvasp.AVASP_parameters.size()!=0 && PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
@@ -5061,7 +5061,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   else if(xvasp.AVASP_parameters.size()==0 && PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     xvasp.AVASP_parameters="use_anrl_lattice_param";
   }
-  //DX20190227 - END
+  //DX20190227 END
   //xvasp.AVASP_pocc_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POCC_PARAMS"); //CO20181226
   //bool pocc=!xvasp.AVASP_pocc_parameters.empty();
   string pocc_parameters_raw=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POCC_PARAMS");
@@ -5084,23 +5084,23 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC_ICSD;
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BADER")) xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BADER")) xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC"));}
@@ -5108,7 +5108,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); // DX20180123 - added ANRL parameters to PARAMS
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); //DX20180123 - added ANRL parameters to PARAMS
 
   string string_POTENTIAL=PARAMS->vparams.getattachedscheme("AFLOWIN_STRING::POTENTIAL");
   if(LDEBUG)  cerr << "DEBUG - " << soliloquy << " string_POTENTIAL=" << string_POTENTIAL << endl;
@@ -5144,7 +5144,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::MISSING")) xvasp.AVASP_aflowin_only_if_missing=TRUE;
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::NEGLECT_NOMIX")==TRUE) xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE);
 
-  //CO20181226 - START
+  //CO20181226 START
 
   if(PARAMS->ucell.size()==0){
     message << "No --aflow_proto input" << endl;
@@ -5159,7 +5159,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //get label_raw, may contain ","
   string label_raw=(reverse?PARAMS->ucell.back():PARAMS->ucell.front());
 
-  // DX20190708 - START 
+  //DX20190708 START 
   // add default permutation to label if not included in input //DX20190708
   vector<string> orig_labels, new_labels, anrl_tokens, perm_tokens;
   aurostd::string2tokens(label_raw,orig_labels,",");
@@ -5175,7 +5175,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
     else{ new_labels.push_back(orig_labels[i]); }
   }
   label_raw = aurostd::joinWDelimiter(new_labels,",");
-  // DX20190708 - END
+  //DX20190708 END
 
   //get nspecies //CO20191110 - NOTE: nspeciesHTQC is what is expected from label (proto), nspecies is REAL input number of species separated by colons, not commas (different for pocc)
   uint nspeciesHTQC=aflowlib::PrototypeLibrariesSpeciesNumber(label_raw),nspecies=nspeciesHTQC; //PARAMS->ucell.at(0)); //CO20181226
@@ -5195,9 +5195,9 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
     if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) {nspecies=nspeciesHTQC=PARAMS->ucell.size()-1;}  //CO20181226 - I patched nspecies to work for ICSD robustly
     if(PARAMS->ucell.size()==1) { //this must be OLD as _ICSD_ passes through the AVASP_MakePrototypeICSD_AFLOWIN() not here, probably obsolete, but we keep for history
       vector<string> austokens,austokens2;
-      aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
-      aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
-      aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
+      PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
+      PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
+      PARAMS->ucell.at(0)=aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
       KBIN::VASP_SplitAlloySpecies(austokens.at(0),austokens2);
       nspecies=austokens2.size()+1;  // backward, //CO20181226 it would be nice to have an example to see why this works... it probably should be austokens2.size() (not +1)
       if(nspeciesHTQC==3) nspecies=3;       // new
@@ -5260,7 +5260,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   vector<string> specieX_raw;
   for(uint i=0;i<vvstr.size();i++){specieX_raw.push_back(aurostd::joinWDelimiter(vvstr[i],","));}
 
-  //CO20181226 - STOP
+  //CO20181226 STOP
 
   //[CO20181226 - OBSOLETE]// some wrap up and definitions
   //[CO20181226 - OBSOLETE]if(PARAMS->ucell.size()!=1+nspecies && PARAMS->ucell.size()!=1+nspecies+1 && PARAMS->ucell.size()!=1+nspecies*2) {
@@ -5622,7 +5622,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
                   if((nspeciesHTQC==2) || (nspeciesHTQC==3)){xaus.POTCAR_TYPE_PRINT_flag=false;}  //CO20191020 - exceptions, do not print for binaries/ternaries
                 }
               }
-              //[CO20181226 - obsolete, spoke to stefano. As long as we have AVASP_Get_PseudoPotential_XX, we are fine]if(!aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_AUTO_)){xaus.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE);}
+              //[CO20181226 - obsolete, spoke to SC. As long as we have AVASP_Get_PseudoPotential_XX, we are fine]if(!aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_AUTO_)){xaus.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE);}
               if(xaus.aopts.flag("FLAG::AVASP_FORCE_LDAU")){AVASP_ADD_LDAU(xaus);}
               if(xaus.aopts.flag("FLAG::AVASP_FORCE_NOLDAU")){AVASP_REMOVE_LDAU(xaus);}
               xaus.aopts.push_attached("AFLOWIN_FLAG::PSTRESS",aurostd::utype2string(PARAMS->vpressure.at(ip)));
@@ -5738,7 +5738,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //[CO20181226 OBSOLETE]        // 	if((flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])!=specieX.at(1).at(ii[1])) ||
   //[CO20181226 OBSOLETE]        // 	   (flag_LIB2U==TRUE  && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1]))  ||
   //[CO20181226 OBSOLETE]        // 	   (flag_LIB2U==FALSE && flag_LIB2==TRUE  && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1]))  ||
-  //[CO20181226 OBSOLETE]        // 	   (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])) ) { // check if identical is done later //[CO200106 - close bracket for indenting]}
+  //[CO20181226 OBSOLETE]        // 	   (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])) ) { // check if identical is done later //[CO20200106 - close bracket for indenting]}
   //[CO20181226 OBSOLETE]        for(uint k=0;k<label.size();k++) {
   //[CO20181226 OBSOLETE]          for(uint ip=0;ip<PARAMS->vpressure.size();ip++) {
   //[CO20181226 OBSOLETE]            _xvasp xaus(xvasp);
@@ -5811,7 +5811,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //[CO20181226 OBSOLETE]          // 	  if((flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])!=specieX.at(1).at(ii[1]) && specieX.at(1).at(ii[1])!=specieX.at(2).at(ii[2])) ||
   //[CO20181226 OBSOLETE]          // 	     (flag_LIB2U==TRUE  && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2]))  ||
   //[CO20181226 OBSOLETE]          // 	     (flag_LIB2U==FALSE && flag_LIB2==TRUE  && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2]))  ||
-  //[CO20181226 OBSOLETE]          // 	     (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2]))) {  //[CO200106 - close bracket for indenting]}
+  //[CO20181226 OBSOLETE]          // 	     (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2]))) {  //[CO20200106 - close bracket for indenting]}
   //[CO20181226 OBSOLETE]          for(uint k=0;k<label.size();k++) {
   //[CO20181226 OBSOLETE]            if(LDEBUG) cerr <<"DEBUG - " << soliloquy << " [5.1] 3species label.at(" << k << ")=" << label.at(k) << endl;
   //[CO20181226 OBSOLETE]            for(uint ip=0;ip<PARAMS->vpressure.size();ip++) {
@@ -5825,7 +5825,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //[CO20181226 OBSOLETE]              for(uint i=0;i<nspecies;i++) xaus.str.species_pp_version.push_back("");
   //[CO20181226 OBSOLETE]              for(uint i=0;i<nspecies;i++) xaus.str.species_pp_ZVAL.push_back(0.0);
   //[CO20181226 OBSOLETE]              for(uint i=0;i<nspecies;i++) xaus.str.species_pp_vLDAU.push_back(deque<double>());
-  //[CO20181226 OBSOLETE]              //	if(flag_LIB3==FALSE) {  //[CO200106 - close bracket for indenting]}
+  //[CO20181226 OBSOLETE]              //	if(flag_LIB3==FALSE) {  //[CO20200106 - close bracket for indenting]}
   //[CO20181226 OBSOLETE]              if(!aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_AUTO_)) xaus.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE);
   //[CO20181226 OBSOLETE]              if(xaus.aopts.flag("FLAG::AVASP_FORCE_LDAU")) AVASP_ADD_LDAU(xaus);
   //[CO20181226 OBSOLETE]              if(xaus.aopts.flag("FLAG::AVASP_FORCE_NOLDAU")) AVASP_REMOVE_LDAU(xaus);
@@ -5879,7 +5879,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //[CO20181226 OBSOLETE]          // 	    if((flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])!=specieX.at(1).at(ii[1]) && specieX.at(1).at(ii[1])!=specieX.at(2).at(ii[2]) && specieX.at(2).at(ii[2])!=specieX.at(3).at(ii[3])) ||
   //[CO20181226 OBSOLETE]          // 	       (flag_LIB2U==TRUE  && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3]))  ||
   //[CO20181226 OBSOLETE]          // 	       (flag_LIB2U==FALSE && flag_LIB2==TRUE  && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3]))  ||
-  //[CO20181226 OBSOLETE]          // 	       (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3]))) {  //[CO200106 - close bracket for indenting]}
+  //[CO20181226 OBSOLETE]          // 	       (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3]))) {  //[CO20200106 - close bracket for indenting]}
   //[CO20181226 OBSOLETE]          if(specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3])) { // check if identical is done later
   //[CO20181226 OBSOLETE]            for(uint k=0;k<label.size();k++) {
   //[CO20181226 OBSOLETE]              for(uint ip=0;ip<PARAMS->vpressure.size();ip++) {
@@ -5906,7 +5906,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //[CO20181226 OBSOLETE]                  if(1) AVASP_ADD_LDAU(xaus);
   //[CO20181226 OBSOLETE]                  if(xaus.aopts.flag("FLAG::AVASP_FORCE_NOLDAU")) AVASP_REMOVE_LDAU(xaus);
   //[CO20181226 OBSOLETE]                }
-  //[CO20181226 OBSOLETE]                //  if(flag_LIB3==FALSE) { //[CO200106 - close bracket for indenting]}
+  //[CO20181226 OBSOLETE]                //  if(flag_LIB3==FALSE) { //[CO20200106 - close bracket for indenting]}
   //[CO20181226 OBSOLETE]                xaus.aopts.push_attached("AFLOWIN_FLAG::PSTRESS",aurostd::utype2string(PARAMS->vpressure.at(ip)));
   //[CO20181226 OBSOLETE]                if(PARAMS->vpressure.size()==1 && abs(aurostd::string2utype<double>(xaus.aopts.getattachedscheme("AFLOWIN_FLAG::PSTRESS")))<0.00001) {
   //[CO20181226 OBSOLETE]                  xaus.aopts.flag("AFLOWIN_FLAG::PSTRESS",FALSE);xaus.aopts.push_attached("AFLOWIN_FLAG::PSTRESS","0.0");};
@@ -5950,7 +5950,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
 }
 
 #ifndef COMPILE_SLIM
-bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
+bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="AVASP_MakePrototype_AFLOWIN():";
   stringstream message;
@@ -5959,8 +5959,8 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
   _xvasp xvasp;
   AVASP_DefaultValuesBinary_AFLOWIN(xvasp);
   xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); // DX20180118 - added parameters to AVASP
-  //DX20190227 - START
+  xvasp.AVASP_parameters=PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PARAMS"); //DX20180118 - added parameters to AVASP
+  //DX20190227 START
   // default without parameters is to use the atomic volume scaling method (i.e., a=-1)
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
   if(xvasp.AVASP_parameters.size()!=0 && vpflow.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
@@ -5970,7 +5970,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
   else if(xvasp.AVASP_parameters.size()==0 && vpflow.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     xvasp.AVASP_parameters="use_anrl_lattice_param";
   }
-  //DX20190227 - END
+  //DX20190227 END
 
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
@@ -5981,27 +5981,27 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC_ICSD;
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT")) xvasp.aopts.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT",TRUE); // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT")) xvasp.aopts.flag("AFLOWIN_FLAG::NO_VOLUME_ADJUSTMENT",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); // DX20180123 - added ANRL parameters to PARAMS
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")) xvasp.aopts.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM",TRUE); // DX20190227 - add anrl lattice parameter flag 
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); //DX20180123 - added ANRL parameters to PARAMS
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")) xvasp.aopts.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM",TRUE); //DX20190227 - add anrl lattice parameter flag 
 
   string string_POTENTIAL=PARAMS->vparams.getattachedscheme("AFLOWIN_STRING::POTENTIAL");
   if(LDEBUG)  cerr << "DEBUG - " << soliloquy << " string_POTENTIAL=" << string_POTENTIAL << endl;
@@ -6088,8 +6088,8 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
 
   if(PARAMS->ucell.size()==1) {
     vector<string> austokens;
-    aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
-    aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
+    PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWIN_);
+    PARAMS->ucell.at(0)=aurostd::RemoveSubString(PARAMS->ucell.at(0),"/"+_AFLOWLOCK_);
     aurostd::string2tokens(PARAMS->ucell.at(0),austokens,"/");
     KBIN::VASP_SplitAlloySpecies(austokens.at(0),specieX_raw);
     nspecies=specieX_raw.size()+1;  // backward
@@ -6382,7 +6382,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
           // 	if((flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])!=specieX.at(1).at(ii[1])) ||
           // 	   (flag_LIB2U==TRUE  && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1]))  ||
           // 	   (flag_LIB2U==FALSE && flag_LIB2==TRUE  && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1]))  ||
-          // 	   (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])) ) { // check if identical is done later //[CO200106 - close bracket for indenting]}
+          // 	   (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])) ) { // check if identical is done later //[CO20200106 - close bracket for indenting]}
           for(uint k=0;k<label.size();k++) {
             for(uint ip=0;ip<PARAMS->vpressure.size();ip++) {
               _xvasp xaus(xvasp);
@@ -6455,7 +6455,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
             // 	  if((flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])!=specieX.at(1).at(ii[1]) && specieX.at(1).at(ii[1])!=specieX.at(2).at(ii[2])) ||
             // 	     (flag_LIB2U==TRUE  && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2]))  ||
             // 	     (flag_LIB2U==FALSE && flag_LIB2==TRUE  && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2]))  ||
-            // 	     (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2]))) {  //[CO200106 - close bracket for indenting]}
+            // 	     (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2]))) {  //[CO20200106 - close bracket for indenting]}
             for(uint k=0;k<label.size();k++) {
               if(LDEBUG) cerr <<"DEBUG - " << soliloquy << " [5.1] 3species label.at(" << k << ")=" << label.at(k) << endl;
               for(uint ip=0;ip<PARAMS->vpressure.size();ip++) {
@@ -6469,7 +6469,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
                 for(uint i=0;i<nspecies;i++) xaus.str.species_pp_version.push_back("");
                 for(uint i=0;i<nspecies;i++) xaus.str.species_pp_ZVAL.push_back(0.0);
                 for(uint i=0;i<nspecies;i++) xaus.str.species_pp_vLDAU.push_back(deque<double>());
-                //	if(flag_LIB3==FALSE) {  //[CO200106 - close bracket for indenting]}
+                //	if(flag_LIB3==FALSE) {  //[CO20200106 - close bracket for indenting]}
                 if(!aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_AUTO_)) xaus.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE);
                 if(xaus.aopts.flag("FLAG::AVASP_FORCE_LDAU")) AVASP_ADD_LDAU(xaus);
                 if(xaus.aopts.flag("FLAG::AVASP_FORCE_NOLDAU")) AVASP_REMOVE_LDAU(xaus);
@@ -6523,7 +6523,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
             // 	    if((flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])!=specieX.at(1).at(ii[1]) && specieX.at(1).at(ii[1])!=specieX.at(2).at(ii[2]) && specieX.at(2).at(ii[2])!=specieX.at(3).at(ii[3])) ||
             // 	       (flag_LIB2U==TRUE  && flag_LIB2==FALSE && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3]))  ||
             // 	       (flag_LIB2U==FALSE && flag_LIB2==TRUE  && flag_LIB3==FALSE && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3]))  ||
-            // 	       (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3]))) {  //[CO200106 - close bracket for indenting]}
+            // 	       (flag_LIB2U==FALSE && flag_LIB2==FALSE && flag_LIB3==TRUE  && specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3]))) {  //[CO20200106 - close bracket for indenting]}
             if(specieX.at(0).at(ii[0])<specieX.at(1).at(ii[1])  && specieX.at(1).at(ii[1])<specieX.at(2).at(ii[2])  && specieX.at(2).at(ii[2])<specieX.at(3).at(ii[3])) { // check if identical is done later
               for(uint k=0;k<label.size();k++) {
                 for(uint ip=0;ip<PARAMS->vpressure.size();ip++) {
@@ -6550,7 +6550,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
                     if(1) AVASP_ADD_LDAU(xaus);
                     if(xaus.aopts.flag("FLAG::AVASP_FORCE_NOLDAU")) AVASP_REMOVE_LDAU(xaus);
                   }
-                  //  if(flag_LIB3==FALSE) {  //[CO200106 - close bracket for indenting]}
+                  //  if(flag_LIB3==FALSE) {  //[CO20200106 - close bracket for indenting]}
                   xaus.aopts.push_attached("AFLOWIN_FLAG::PSTRESS",aurostd::utype2string(PARAMS->vpressure.at(ip)));
                   if(PARAMS->vpressure.size()==1 && abs(aurostd::string2utype<double>(xaus.aopts.getattachedscheme("AFLOWIN_FLAG::PSTRESS")))<0.00001) {
                     xaus.aopts.flag("AFLOWIN_FLAG::PSTRESS",FALSE);xaus.aopts.push_attached("AFLOWIN_FLAG::PSTRESS","0.0");};
@@ -6690,7 +6690,7 @@ bool AVASP_REMOVE_LDAU(_xvasp &xvasp) {
 
 //bool AVASP_MakePrototypeICSD_AFLOWIN(vector<string> params_UCELL_SPECIES,bool flag_AFLOW_IN_ONLY_IF_MISSING)
 bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONLY_IF_MISSING)
-{ //CO200106 - patching for auto-indenting
+{ //CO20200106 - patching for auto-indenting
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="AVASP_MakePrototypeICSD_AFLOWIN():";
@@ -6708,20 +6708,20 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  // CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); // CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
@@ -6747,18 +6747,24 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   if(LDEBUG) cerr << soliloquy << " 0d" << endl;
 
   if(xvasp.AVASP_aflowin_only_if_missing) { // this test is redundant, but since the Prototype generation is slow, it is nice to avoid unless you really need it
-    //  cerr << "[" << xvasp.AVASP_label << "]" << endl;
-    //  if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) cerr << "SKIPPISSIMO" << endl;
-    //     vector<string> austokens,vLibrary;
-    //     aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),austokens,"\n");
-    //     for(uint i=0;i<austokens.size();i++)
-    //       if(aurostd::substring2bool(austokens.at(i),"/"))
-    // 	vLibrary.push_back(austokens.at(i));
+    // [OBSOLETE] cerr << "[" << xvasp.AVASP_label << "]" << endl;
+    // [OBSOLETE]   if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) cerr << "SKIPPISSIMO" << endl;
+    // [OBSOLETE]      vector<string> austokens,vLibrary;
+    // [OBSOLETE]      aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),austokens,"\n");
+    // [OBSOLETE]      for(uint i=0;i<austokens.size();i++)
+    // [OBSOLETE]        if(aurostd::substring2bool(austokens.at(i),"/"))
+    // [OBSOLETE]  	vLibrary.push_back(austokens.at(i));
 
     // TEST IF CALCULATED
-    if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) {if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl; return TRUE;}
+    init::InitGlobalObject("vLIBS");
+    // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),xvasp.AVASP_label+" ")) {
+    if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,xvasp.AVASP_label+" ")) {
+      if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl;
+      return TRUE;
+    }
     for(uint ilattice=1;ilattice<=14;ilattice++) {
-      if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+      // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+      if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
         if(DEBUG_SKIP) cerr << "SKIP (calculated): " << lattices[ilattice] << "/" << xvasp.AVASP_label << endl;
         return TRUE;
       }
@@ -6868,14 +6874,14 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   // extra INCAR
   xvasp.aopts.flag("FLAG::EXTRA_INCAR",TRUE);                               
   xvasp.AVASP_EXTRA_INCAR.clear();                                          
-  xvasp.AVASP_EXTRA_INCAR << "NELM = 120" << endl;                           // WAHYU DEFAULT
-  xvasp.AVASP_EXTRA_INCAR << "NELMIN=2"  << endl;                            // WAHYU DEFAULT
-  xvasp.AVASP_EXTRA_INCAR << "LPLANE=.TRUE." << endl;                        // WAHYU DEFAULT
-  if(xvasp.str.atoms.size()<=10)                     // cutoff for LREAL     // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "LREAL=.FALSE." << endl;                      // WAHYU DEFAULT
+  xvasp.AVASP_EXTRA_INCAR << "NELM = 120" << endl;                           //WSETYAWAN DEFAULT
+  xvasp.AVASP_EXTRA_INCAR << "NELMIN=2"  << endl;                            //WSETYAWAN DEFAULT
+  xvasp.AVASP_EXTRA_INCAR << "LPLANE=.TRUE." << endl;                        //WSETYAWAN DEFAULT
+  if(xvasp.str.atoms.size()<=10)                     // cutoff for LREAL     //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "LREAL=.FALSE." << endl;                      //WSETYAWAN DEFAULT
   else
-    xvasp.AVASP_EXTRA_INCAR << "LREAL=Auto" << endl;                         // WAHYU DEFAULT
-  xvasp.AVASP_EXTRA_INCAR << "LSCALU=.FALSE." << endl;                       // WAHYU DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "LREAL=Auto" << endl;                         //WSETYAWAN DEFAULT
+  xvasp.AVASP_EXTRA_INCAR << "LSCALU=.FALSE." << endl;                       //WSETYAWAN DEFAULT
 
   // make the _AFLOWIN_
 
@@ -6978,7 +6984,7 @@ string AVASP_Shortcuts_for_Binaries(string &label) {
   if(aurostd::substring2bool(label,"bccnAt3")) {ss.clear();ss.str(std::string());for(uint i=bcc_start3;i<=bcc_start4-1;i++) if(i<bcc_start4-1) ss<<bcc_str<<i<<","; else ss<<bcc_str<<i;aurostd::StringSubst(label,"bccnAt3",ss.str());}
   if(aurostd::substring2bool(label,"bccnAt2")) {ss.clear();ss.str(std::string());for(uint i=bcc_start2;i<=bcc_start3-1;i++) if(i<bcc_start3-1) ss<<bcc_str<<i<<","; else ss<<bcc_str<<i;aurostd::StringSubst(label,"bccnAt2",ss.str());}
   if(aurostd::substring2bool(label,"bccnAt1")) {ss.clear();ss.str(std::string());for(uint i=bcc_start1;i<=bcc_start2-1;i++) if(i<bcc_start2-1) ss<<bcc_str<<i<<","; else ss<<bcc_str<<i;aurostd::StringSubst(label,"bccnAt1",ss.str());}
-  // SC
+  //SC
   if(aurostd::substring2bool(label,"scnAt1-16")) aurostd::StringSubst(label,"scnAt1-16","scnAt1,scnAt2,scnAt3,scnAt4,scnAt5,scnAt6,scnAt7,scnAt8,scnAt9,scnAt10,scnAt11,scnAt12,scnAt13,scnAt14,scnAt15,scnAt16");
   if(aurostd::substring2bool(label,"scnAt1-15")) aurostd::StringSubst(label,"scnAt1-15","scnAt1,scnAt2,scnAt3,scnAt4,scnAt5,scnAt6,scnAt7,scnAt8,scnAt9,scnAt10,scnAt11,scnAt12,scnAt13,scnAt14,scnAt15");
   if(aurostd::substring2bool(label,"scnAt1-14")) aurostd::StringSubst(label,"scnAt1-14","scnAt1,scnAt2,scnAt3,scnAt4,scnAt5,scnAt6,scnAt7,scnAt8,scnAt9,scnAt10,scnAt11,scnAt12,scnAt13,scnAt14");
@@ -7110,7 +7116,7 @@ string AVASP_Shortcuts_for_Ternaries(string &label) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2015           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow PINKU NATH - Duke University 2014-2016             *
 // *                                                                         *
 // ***************************************************************************
@@ -61,11 +61,11 @@ namespace apl
     _freq_kp.clear(); _freq_km.clear(); _freq.clear();
 
 
-    // ME20190428 - START
+    //ME20190428 START
     //_kpoints=_umesh.get_kpoints();  OBSOLETE
     //_weights=_umesh.get_weights();  OBSOLETE - not used
     _kpoints = _umesh.getQPointsCPOS();
-    // ME20190428 - END
+    //ME20190428 END
     xvector<double> dv(3,1);
     _kpoints_kp.resize(_kpoints.size(), dv);
     _kpoints_km.resize(_kpoints.size(), dv);
@@ -86,10 +86,10 @@ namespace apl
 
     if (_kpoints.size()==0)
     {
-      // ME20190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error<<"group velocity calculation _kpoints.size()==0 "<<apl::endl; 
       //exit(0);
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("group velocity calculation _kpoints.size()==0");
       string function = "GroupVelocity::populate_variables()";
       string message = "group velocity calculation _kpoints.size()==0";
@@ -192,7 +192,7 @@ namespace apl
     string filename = "aflow.apl.gamma_point.out";
     aurostd::stringstream2file(dm, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("Cannot open output aflow.apl.gamma_point.out.");
       string function = "GroupVelocity::sound_speed()";
       string message = "Cannot open output " + filename;
@@ -234,7 +234,7 @@ namespace apl
     string filename = "aflow.apl.group_velocities.out";
     aurostd::stringstream2file(dm, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("Cannot open output aflow.apl.group_velocities.out file.");
       string function = "GroupVelocity::write()";
       string message = "Cannot open output file " + filename;
@@ -290,16 +290,15 @@ namespace apl
       threads.push_back( new std::thread(&GroupVelocity::solve_eigenvalues_at_k,this,startIndex,endIndex, icpu, ktype) );
     }
 
-    /* OBSOLETE ME20180801
-       for(int icpu = 0; icpu < ncpus; icpu++) {
-       startIndex = icpu * qpointsPerCPU;
-       endIndex = startIndex + qpointsPerCPU;
-       if( ( (uint)endIndex > _kpoints.size() ) ||
-       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
-       endIndex = _kpoints.size();
-       threads.push_back( new std::thread(&GroupVelocity::solve_eigenvalues_at_k,this,startIndex,endIndex, icpu, ktype) );
-       }
-       */
+    // OBSOLETE ME20180801
+    //for(int icpu = 0; icpu < ncpus; icpu++) {
+    //startIndex = icpu * qpointsPerCPU;
+    //endIndex = startIndex + qpointsPerCPU;
+    //if( ( (uint)endIndex > _kpoints.size() ) ||
+    //( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
+    //endIndex = _kpoints.size();
+    //threads.push_back( new std::thread(&GroupVelocity::solve_eigenvalues_at_k,this,startIndex,endIndex, icpu, ktype) );
+    //}
 
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {

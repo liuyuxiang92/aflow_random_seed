@@ -19,7 +19,7 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   PhononDispersionCalculator::PhononDispersionCalculator(IPhononCalculator& pc, Logger& l) : _pc(pc), _logger(l) {
-    _system = _pc.getSystemName();  // ME20190614
+    _system = _pc.getSystemName();  //ME20190614
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ namespace apl {
   void PhononDispersionCalculator::clear() {
     _qpoints.clear();
     _freqs.clear();
-    _temperature = 0.0;  // ME20190614
+    _temperature = 0.0;  //ME20190614
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ namespace apl {
       int USER_DC_NPOINTS, 
       bool CARTESIAN_COORDS) {
     if(USER_DC_INITCOORDS.empty() || USER_DC_INITLABELS.empty()) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PhononDispersionCalculator::initPathCoords; Inputs are empty.");
       string function = "apl::PhononDispersionCalculator::initPathCoords";
       string message = "Inputs are empty.";
@@ -59,14 +59,14 @@ namespace apl {
     string lattice = USER_DC_INITLATTICE;
     if (lattice.empty()) {
       xstructure a(_pc.getInputCellStructure());
-      //CO - START
+      //CO START
       if (a.bravais_lattice_variation_type == "") {
         if (a.spacegroup == "") {
-          if(a.space_group_ITC<1 || a.space_group_ITC>230){a.space_group_ITC = a.SpaceGroup_ITC();} //if (a.space_group_ITC == 0) { //CO20180214 - if not set then it could be 32767 //[CO200106 - close bracket for indenting]}
+          if(a.space_group_ITC<1 || a.space_group_ITC>230){a.space_group_ITC = a.SpaceGroup_ITC();} //if (a.space_group_ITC == 0) { //CO20180214 - if not set then it could be 32767 //[CO20200106 - close bracket for indenting]}
         a.spacegroup = GetSpaceGroupName(a.space_group_ITC) + " #" + aurostd::utype2string(a.space_group_ITC);  //will break here if spacegroup is bad
         }
         // Use PLATON to get space group number if user did not get it...
-        //a.platon2sg(_PLATON_P_EQUAL_DEFAULT,    //corey
+        //a.platon2sg(_PLATON_P_EQUAL_DEFAULT,    //CO
         //	      _PLATON_P_EXACT_DEFAULT,
         //	      _PLATON_P_ANG_DEFAULT,
         //	      _PLATON_P_D1_DEFAULT,
@@ -86,7 +86,7 @@ namespace apl {
       } else {lattice = a.bravais_lattice_variation_type;}
       _logger << "The phonon dispersion curves will be generated for lattice variation " << lattice << "." << apl::endl;
     }
-    //CO - END
+    //CO END
 
     // cerr << "LATTICE=" << lattice << std::endl;
     // Suck point definition from the electronic structure part of AFLOW...
@@ -104,7 +104,7 @@ namespace apl {
     // Get user's path...
     if (!USER_DC_OWNPATH.empty()) {
       if (USER_DC_OWNPATH.find('|') != string::npos) {
-        // ME20190614 - START
+        //ME20190614 START
         // This breaks "mixed" paths such as G-X-W-L|K-U (interprets as G-X|W-L|K-U
         // _qpoints = _pb.getPath(apl::PathBuilder::COUPLE_POINT_MODE, USER_DC_OWNPATH);
         vector<string> tokens, tokens_pt;
@@ -125,7 +125,7 @@ namespace apl {
           }
         }
         _qpoints = _pb.getPath(apl::PathBuilder::COUPLE_POINT_MODE, path);
-        // ME20190614 - END
+        //ME20190614 END
       } else {
         _qpoints = _pb.getPath(apl::PathBuilder::SINGLE_POINT_MODE, USER_DC_OWNPATH);
       }
@@ -238,18 +238,18 @@ namespace apl {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE); //ME20181226
     _logger << "Writing dispersion curves into file " << filename << "." << apl::endl; //ME20181226
 
-    //CO - START
+    //CO START
     //ofstream outfile("PDIS",ios_base::out);
     stringstream outfile;
     //if( !outfile.is_open() ) {
     //  throw apl::APLRuntimeError("Cannot open output PDIS file.");
     //}
-    //CO - END
+    //CO END
 
     // Write header
     outfile << "# Phonon dispersion curves calculated by Aflow" << std::endl;
     outfile << "#" << std::endl;
-    outfile << "# <system>    \"" << _system << "\"" << std::endl;  // ME20190614 - use system name, not structure title
+    outfile << "# <system>    \"" << _system << "\"" << std::endl;  //ME20190614 - use system name, not structure title
     outfile << "#" << std::endl;
     outfile << "# <units>     " << _frequencyFormat << std::endl;
     outfile << "# <nbranches> " << _pc.getNumberOfBranches() << std::endl;
@@ -274,10 +274,10 @@ namespace apl {
     labelMap.insert(std::pair<double, string>(1.0, _pb.getPointLabel(_pb.getPointSize())));
     outfile << "#" << std::endl;
 
-    //writing high-symmetry qpoints [PINKU] //PN180705
-    stringstream ouths;  //PN180705
-    ouths << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);  //PN180705
-    ouths << setprecision(8);  //PN180705
+    //writing high-symmetry qpoints [PN] //PN20180705
+    stringstream ouths;  //PN20180705
+    ouths << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);  //PN20180705
+    ouths << setprecision(8);  //PN20180705
 
     // Write table of exact _qpoints + use label map to identify its labels
     x = 0.0;
@@ -305,10 +305,10 @@ namespace apl {
           outfile << "# <exact>     " << x << " "
             << setw(5) << name
             << std::endl;
-          ouths << "# <exact>     " << x << " "  //PN180705
-            << setw(5) << name  //PN180705
-            << setw(15) << _qpoints[i][1]<< setw(15) << _qpoints[i][2]<< setw(15) << _qpoints[i][3]  //PN180705
-            << '\n';  //PN180705
+          ouths << "# <exact>     " << x << " "  //PN20180705
+            << setw(5) << name  //PN20180705
+            << setw(15) << _qpoints[i][1]<< setw(15) << _qpoints[i][2]<< setw(15) << _qpoints[i][3]  //PN20180705
+            << '\n';  //PN20180705
         }
       }
 
@@ -329,8 +329,8 @@ namespace apl {
     exactPointPositions.clear();
 
     // Write frequencies
-    //[OBSOLETE PN180705]path_segment.clear();  //[PINKU]
-    //[OBSOLETE PN180705]path.clear();          //[PINKU]
+    //[OBSOLETE PN20180705]path_segment.clear();  //[PN]
+    //[OBSOLETE PN20180705]path.clear();          //[PN]
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
     outfile << setprecision(8);
     x = 0.0;
@@ -338,13 +338,13 @@ namespace apl {
     xstep = 0.0;
     p = 0;
     for (uint i = 0; i < _freqs.size(); i++) {
-      ouths<<setw(15)<<_qpoints[i][1]<<setw(15) //PN180705
-        <<_qpoints[i][2]<<setw(15)<<_qpoints[i][3]<<setw(15)<<p<<setw(15)<<x<<"\n"; //PN180705
+      ouths<<setw(15)<<_qpoints[i][1]<<setw(15) //PN20180705
+        <<_qpoints[i][2]<<setw(15)<<_qpoints[i][3]<<setw(15)<<p<<setw(15)<<x<<"\n"; //PN20180705
 
       outfile << setw(4) << p << " ";
-      //[OBSOLETE PN180705]path_segment.push_back(p);  //[PINKU]
+      //[OBSOLETE PN20180705]path_segment.push_back(p);  //[PN]
       outfile << setw(15) << x << " ";
-      //[OBSOLETE PN180705]path.push_back(x);  //[PINKU]
+      //[OBSOLETE PN20180705]path.push_back(x);  //[PN]
       for (uint j = 1; j <= _pc.getNumberOfBranches(); j++)
         outfile << setw(15) << _freqs[i](j) << " ";
       outfile << std::endl;
@@ -362,7 +362,7 @@ namespace apl {
       p++;
     }
 
-    //CO - START
+    //CO START
     aurostd::stringstream2file(outfile, filename); //ME20181226
     if (!aurostd::FileExist(filename)) { //ME20181226
       string function = "PhononDispersionCalculator::writePDIS()";
@@ -373,9 +373,9 @@ namespace apl {
     //
     //outfile.clear();
     //outfile.close();
-    //CO - END
+    //CO END
 
-    //PINKU //PN180705
+    //PN //PN20180705
     string hskptsfile = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HSKPTS_FILE); //ME20181226
     aurostd::stringstream2file(ouths, hskptsfile); //ME20181226
     if (!aurostd::FileExist(hskptsfile)) { //ME20181226
@@ -384,7 +384,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("Cannot open output aflow.apl_hskpoints.out file.");
     }
-    //PINKU
+    //PN
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -417,7 +417,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20190614 - START
+  //ME20190614 START
   // Write the eigenvalues into a VASP EIGENVAL-formatted file
   void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHEIGENVAL_FILE);
@@ -510,6 +510,6 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  // ME20190614 - END
+  //ME20190614 END
 
 }  // namespace apl
