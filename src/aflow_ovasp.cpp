@@ -8136,9 +8136,7 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   for(int i3=1;i3<=grid(3);i3++) {  // CO - x is fastest, z is slowest
     for(int i2=1;i2<=grid(2);i2++) {
       for(int i1=1;i1<=grid(1);i1++) {  // CO - x is fastest, z is slowest
-        iii++;
-        tvalues_aus[i1][i2][i3]=vvalues(iii); //ME20180705
-        //[OBSOLETE ME20180705]tvalues_aus(i1,i2,i3)=vvalues(iii);
+        tvalues_aus[i1][i2][i3]=vvalues(++iii); //ME20180705  //CO20200404 - using ++iii
       }
     }
   }

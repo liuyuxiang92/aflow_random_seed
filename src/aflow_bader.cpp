@@ -842,7 +842,7 @@ namespace bader_functions {
             oss << soliloquy << "Please check." << endl;
             oss << endl;
           }
-          bader_file = "Bvol" + aurostd::PaddedNumString(atomCOUNT++, 4) + ".dat";
+          bader_file = "Bvol" + aurostd::PaddedNumString(++atomCOUNT, 4) + ".dat";  //CO20200404 - add BEFORE
         }
         //B_wexxxx.dat
         //these have different file names than Bvolxxx.dat even though they are the same files (artifact of bader code?)
