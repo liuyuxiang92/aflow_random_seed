@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -181,7 +181,7 @@ Finally, note that you need to add -llapack package in the linux OS.
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

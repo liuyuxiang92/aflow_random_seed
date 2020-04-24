@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -208,7 +208,7 @@ namespace aurostd {
     isinteger(const xvector<utype>&,const utype& tol=(utype)0.01) __xprototype; //CO20180409
 
   template<class utype> bool
-    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  // ME20180702 //CO20191201 - 1e-7 seems arbitrary
+    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  //ME20180702 //CO20191201 - 1e-7 seems arbitrary
   // CONSTRUCTIONS OF VECTORS FROM SCALARS
 
   template<class utype> xvector<utype>
@@ -589,7 +589,7 @@ namespace aurostd { //CO20190620
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

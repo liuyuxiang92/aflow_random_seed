@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -145,7 +145,7 @@ LATEST VERSION OF THE FILE:                      materials.duke.edu/AFLOW/README
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

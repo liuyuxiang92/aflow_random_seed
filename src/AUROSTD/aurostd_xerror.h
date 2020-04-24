@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************
 #ifndef _AUROSTD_XERROR_H_
@@ -65,7 +65,7 @@ namespace aurostd {
 #endif
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************

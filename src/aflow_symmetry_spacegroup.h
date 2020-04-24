@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2016           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Richard H. Taylor
@@ -242,9 +242,9 @@ namespace SYM {
     bool commensurate;
     string crystalsystem;
     string latticesystem;
-    vector<int> lattice_pgroups;                // DX NEW
-    vector<xmatrix<double> > lattice_sym_mats;  // DX NEW
-    vector<xmatrix<double> > crystal_sym_mats;  // DX NEW
+    vector<int> lattice_pgroups;                //DX NEW
+    vector<xmatrix<double> > lattice_sym_mats;  //DX NEW
+    vector<xmatrix<double> > crystal_sym_mats;  //DX NEW
     vector<int> insym;
     vector<xvector<double> > translations;
     vector<vector<int> > all_atom_maps;
@@ -391,7 +391,7 @@ namespace SYM {
       }
       //if(count >= 1)
       if (count == 1)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         contains = true;
       }
       return contains;
@@ -410,7 +410,7 @@ namespace SYM {
   string OrthoDefect(istream& cin);
   xstructure SpaceGroup(istream& cin);
   void rgcd(vector<string> num);
-  // DX void AtomicEnvironment(istream & cin, vector<string> av);
+  //DX void AtomicEnvironment(istream & cin, vector<string> av);
   string ReverseSpaceGroup(vector<string> num);
   //END MAIN FUNCTIONS
 
@@ -448,7 +448,7 @@ namespace SYM {
   vector<int> get_multiplicities(string sg);
   vector<string> get_symmetry_symbols(string sg);
 
-  vector<string> get_wyckoff_equation(string spaceg, int mult);  // DX20170830
+  vector<string> get_wyckoff_equation(string spaceg, int mult);  //DX20170830
   vector<vector<vector<string> > > get_wyckoff_pos(string spaceg, int mult);
   vector<vector<vector<string> > > get_wyckoff_pos(string spaceg, int mult, bool getcentering);
   vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter); //DX20190129
@@ -669,7 +669,7 @@ void print(const vector<_atom>& atoms);
 void print(const deque<_atom>& atoms);
 
 //Function to eliminate duplicate projections:
-// DX TEST void eliminate_duplicates(Proj& P);
+//DX TEST void eliminate_duplicates(Proj& P);
 
 namespace SYM {
   //Operations on class-atoms
