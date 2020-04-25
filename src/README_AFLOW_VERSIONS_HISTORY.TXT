@@ -19,6 +19,7 @@
         -- added ELK detector, reader, and writer (DX)
         -- added ELK file format to READMEs (DX)
         -- moved frac2dbl from SYM to AUROSTD, and reformatted in more consistent style to AFLOW (DX)
+        -- fixed Wyckoff position function; now displays more than just the representative position (DX)
         -- added overloads for running database comparison functions internally: compare2database(), isMatchingStructureInDatabase(), matchingStructuresInDatabase(), printCompare2Database()  (DX)
         -- added FileMESSAGE and logstream to more comparison functions (DX)
         -- changed namespace of all comparison functions to "compare"; i.e., "pflow" -> "compare" (DX)
