@@ -2068,8 +2068,8 @@ namespace SYM {
             if(position.size()!=0){
               all_positions.push_back(position);
             }
-            break;
           }
+          break; //DX20200423 - moved break outside of loop
         }
       }
     }
@@ -2264,8 +2264,8 @@ namespace SYM {
             if(position.size()!=0){
               positions.push_back(position);
             }
-            break;
           }
+          break; //DX20200423 - moved break outside of loop
         }
       }
     }
