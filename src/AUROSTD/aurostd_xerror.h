@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************
 #ifndef _AUROSTD_XERROR_H_
@@ -48,8 +48,8 @@ namespace aurostd {
       ~xerror() throw() {};
       int error_code;
       std::string what();
-      std::string whereFunction();  //CO191201
-      std::string whereFileName();  //CO191201
+      std::string whereFunction();  //CO20191201
+      std::string whereFileName();  //CO20191201
       std::string error_message;
     private:
       int error_type, error_number;
@@ -65,7 +65,7 @@ namespace aurostd {
 #endif
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************

@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *              AFlow CORMAC TOHER - Duke University 2013-2019             *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *              AFlow CORMAC TOHER - Duke University 2013-2020             *
 // *                                                                         *
 // ***************************************************************************
 // aflow_ael_elasticity.h
@@ -202,8 +202,8 @@ namespace AEL_functions {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *              AFlow CORMAC TOHER - Duke University 2013-2018             *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *              AFlow CORMAC TOHER - Duke University 2013-2020             *
 // *                                                                         *
 // ***************************************************************************
 

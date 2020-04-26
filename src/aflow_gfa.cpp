@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *           Aflow ERIC PERIM MARTINS - Duke University 2014-2016          *
 // *           Aflow DENISE FORD - Duke University 2016-2019                 *
 // *                                                                         *  
@@ -843,7 +843,7 @@ namespace pflow {
             dt=sqrt(dt);
             //[CO20190501 - OBSOLETE]if(dt>300*sigma_r)
             if(dt>sigma_weight*sigma_r) //CO20190501
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               stop=true;
               break;
             }

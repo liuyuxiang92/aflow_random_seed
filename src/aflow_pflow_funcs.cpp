@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo
@@ -43,11 +43,11 @@ string getGenericTitleXStructure(const xstructure& xstr,bool latex){ //CO2019052
   uint iat=0;
   //if any names missing from atoms, lets use generic names
   bool atom_names=true;
-  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].name.empty()){atom_names=false;}} // CO20180316 - use pp names
+  for(uint i=0;i<xstr.atoms.size()&&atom_names;i++){if(xstr.atoms[i].name.empty()){atom_names=false;}} //CO20180316 - use pp names
   for(uint itype=0;itype<xstr.num_each_type.size();itype++){
     for(uint j=0;j<(uint)xstr.num_each_type.at(itype);j++) {
       if(j==0){
-        if(atom_names){title+=xstr.atoms.at(iat).name;} // CO20180316 - use pp names
+        if(atom_names){title+=xstr.atoms.at(iat).name;} //CO20180316 - use pp names
         else {title+=char('A'+itype);}
         if(latex){title+="$_{"+aurostd::utype2string(xstr.num_each_type.at(itype))+"}$";}
         else {title+=aurostd::utype2string(xstr.num_each_type.at(itype));}
@@ -1012,7 +1012,7 @@ namespace pflow {
         //[CO20190423 - too much work, rely on atom.ijk instead!]}
         //for(uint i=0;i<v_apd.size();i++)
         //  //if(!std::signbit(v_apd[i].distance)) //not great about atoms right on plane
-        //  { //CO200106 - patching for auto-indenting
+        //  { //CO20200106 - patching for auto-indenting
         //  if(signed_point_plane_distance>=-_ZERO_TOL_){ //above plane, opposite of what is defined above for count_below/count_above
         //    xstr_shear.atoms[v_apd[i].index].cpos += shear_fraction * d_layers_s;
         //    xstr_shear.atoms[v_apd[i].index].fpos = C2F(xstr_shear.lattice,xstr_shear.atoms[v_apd[i].index].cpos);
@@ -1686,7 +1686,7 @@ void ParseChemFormulaIndividual(uint nchar, string& ChemFormula, string& AtomSym
 // ***************************************************************************
 // GetXRAY HELPER FUNCTIONS
 // ***************************************************************************
-// Corey Oses 190620
+// Corey Oses 20190620
 namespace pflow {
   void GetXray2ThetaIntensity(const xstructure& str,
       vector<double>& v_twotheta,
@@ -1756,7 +1756,7 @@ namespace pflow {
       cerr << soliloquy << " avg_window=" << avg_window << endl;
     }
 
-    //COREY COME BACK, plug in 20-120 range
+    //CO COME BACK, plug in 20-120 range
     vector<int> _peak_indices=aurostd::getPeaks(xv_intensity,xv_intensity_smooth,smoothing_iterations,avg_window,width_maximum,significance_multiplier);  //indices wrt xvector (starts at 1), need to convert
     v_intensity_smooth=aurostd::xvector2vector<double>(xv_intensity_smooth);
     vector<uint> peak_indices;for(uint i=0;i<_peak_indices.size();i++){peak_indices.push_back(_peak_indices[i]-xv_intensity.lrows);} //shift indices for xvector -> vector conversion
@@ -2109,7 +2109,7 @@ namespace pflow {
 // ***************************************************************************
 // This function gets XRAY following the convasp framework.
 // Dane Morgan
-// updated by Corey Oses 190520
+// updated by Corey Oses 20190520
 namespace pflow {
   void GetXray(const xstructure& str, vector<double>& dist,vector<double>& sf,
       vector<double>& scatt_fact, //CO20190520
@@ -2273,8 +2273,8 @@ namespace pflow {
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,
       const int& smooth_width,const matrix<double>& rdf,
       matrix<double>& rdfsh,matrix<double>& rdfsh_loc) {
-    // double TOL=1e-5; // DANE not used
-    // int natom=(int)str.atoms.size(); // DANE not used
+    // double TOL=1e-5; //DM not used
+    // int natom=(int)str.atoms.size(); //DM not used
     if(smooth_width) {;} // phony just to keep smooth_width busy
     if(str.atoms.size()) {;} // phony just to keep str busy
 
@@ -5385,8 +5385,8 @@ namespace pflow {
 namespace pflow {
   void SmoothPDOS(const projdata& prd, pdosdata& pdd) {
     double de=(pdd.emax-pdd.emin)/pdd.nbins;
-    //   double e; // DANE not used
-    //  int ibin; // DANE not used
+    //   double e; //DM not used
+    //  int ibin; //DM not used
     int sp_size=1;
     if(prd.sp) sp_size=3;
 
@@ -5515,7 +5515,7 @@ namespace pflow {
       int id=0;
       string tok=token_vec[i];
       string sval;
-      // double dval; // DANE not used
+      // double dval; //DM not used
       int ival;
       int found_token=0;
       if(tok=="ATOMS") {
@@ -5712,7 +5712,7 @@ namespace pflow {
           // Loop over each bin
           for(int ib=0;ib<pdd.nbins;ib++) {
             // Do spin sum
-            //  double val; // DANE not used
+            //  double val; //DM not used
             // Note: allpdos[atoms][spin][lm][bin]
             switch (pdd.spin) {
               case 1:{ // non spin polarized
@@ -6113,7 +6113,7 @@ namespace pflow {
     for(int ic=0;ic<3;ic++) {
       imax[ic]=(int)(RMAX/(scale*pflow::norm(lat[ic]))+1)*ngrid[ic];
     }
-    //    double sumchg=0;  // DANE not used
+    //    double sumchg=0;  //DM not used
     // Atom loop
     matrix<double> at_fpos=pflow::GetFpos(str);
     for(int iat=0;iat<natoms;iat++) {
@@ -6251,7 +6251,7 @@ namespace pflow {
       stringstream& chgcar_ss,
       ostream& oss) {
     // This funtion reads in the CHGCAR or AECCAR file from a file.
-    // Operates under assumption that it was formatted by v46s (updated by Corey)
+    // Operates under assumption that it was formatted by v46s (updated by CO)
     // v46s is standard for AFLOWLIB
     // Format:
     //      Starts with POSCAR
@@ -6360,7 +6360,7 @@ namespace pflow {
     if(LDEBUG) oss << soliloquy << "READING POSCAR" << endl;
     //DX20190618 [OBSOLETE] for(uint i=0;i<7;i++)
     for(uint i=0;i<poscar_header_count;i++) //DX20190618
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       poscar << vcontent.at(i) << endl;
       chgcar_header << vcontent.at(i) << endl;
       linecount=i;
@@ -6550,7 +6550,7 @@ namespace pflow {
     for(int ic=0;ic<3;ic++) {
       imax[ic]=(int)(RMAX/(scale*norm(lat[ic]))+1)*ngrid[ic];
     }
-    //   double sumchg=0;   // DANE not used
+    //   double sumchg=0;   //DM not used
     // Atom loop
     matrix<double> at_fpos=pflow::GetFpos(str);
     for(int iat=0;iat<natoms;iat++) {
@@ -6825,7 +6825,7 @@ double CONV_FACT=(1.0E+10*E_ELECTRON/(4.0*PI*EPS_VACUUM));
 // ***************************************************************************
 // Ewald
 // ***************************************************************************
-// Calculates Ewald Sum.  Based on routine from Eric Wu.
+// Calculates Ewald Sum.  Based on routine from EG Wu.
 
 // ******************************************************************
 // **                   Subroutine ewald                           **
@@ -6986,7 +6986,7 @@ namespace pflow {
       chg_cell_corr=chg_cell_corr+atchg[ia];
     }
     ept=ept*rteta/RTPI;
-    chg_cell_corr=chg_cell_corr*chg_cell_corr*PI/(2.0*vol*rteta*rteta); //chg_cell_corr*PI/(2.0*vol*rteta*rteta); //Wei Xie 180316
+    chg_cell_corr=chg_cell_corr*chg_cell_corr*PI/(2.0*vol*rteta*rteta); //chg_cell_corr*PI/(2.0*vol*rteta*rteta); //Wei Xie 20180316
     ept=ept+chg_cell_corr;
     ept=CONV_FACT*ept;
     return ept;
@@ -7159,7 +7159,7 @@ namespace pflow {
     str=PutInCell(str);
     matrix<double> lat = pflow::GetScaledLat(str);
     int natoms=pflow::GetNumAtoms(str);
-    // double vol=pflow::GetVol(lat);  // DANE not used
+    // double vol=pflow::GetVol(lat);  //DM not used
     matrix<double> atfpos=pflow::GetFpos(str);
     vector<int> attyp=pflow::GetTypes(str);
     vector<string> names=pflow::GetNames(str);
@@ -7327,7 +7327,7 @@ namespace pflow {
 }
 
 
-// ME20190628 - BEGIN
+//ME20190628 BEGIN
 // prettyPrintCompound
 namespace pflow {
 
@@ -7344,7 +7344,7 @@ namespace pflow {
     return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO20190629
   }
 
-  string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO2019062
+  string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO20190629
     // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
     string soliloquy="pflow::prettyPrintCompound():";
     uint precision=COEF_PRECISION;
@@ -7380,7 +7380,7 @@ namespace pflow {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 #endif
