@@ -4286,47 +4286,6 @@ namespace KBIN {
 // --------------------------------------------------------------------------------------------------------------------------------------------------------
 // aconvasp_aflow.cpp
 
-namespace pflow {
-  // Dane Morgan style,adjusted by Stefano Curtarolo
-  // Bringing definitions inside the template helps
-  // constructing the right templates.
-  template<class utype>
-    class matrix {
-      public:
-        // constructors
-        matrix(void) {};
-        matrix(const int m);
-        matrix(const int m,const int n);
-        matrix(const int m,const int n,const utype& inutype);
-        matrix(const int m,const vector<utype>& inutypevec);
-        ~matrix(void) {};                         // destructor
-        // accessors
-        void print(void);
-        uint size(void) const {return (uint) mat.size();}
-        matrix<utype> transpose(void) const;
-        //  matrix<utype>::iterator begin();
-        //  matrix<utype>::iterator end();
-        // operator
-        vector<utype>& operator[] (const int i) {assert(i>=0 && i<=(int) mat.size()); return mat[i];}
-        const vector<utype>& operator[] (const int i) const {assert(i>=0 && i<=(int) mat.size()); return mat[i];};
-        const matrix<utype>& operator=(const matrix<utype>& b);
-        // mutators
-        void push_back(const vector<utype>& inutypevec) {mat.push_back(inutypevec);}
-        void pop_back(void) {mat.pop_back();}
-        void vecvec2mat(const vector<vector<utype> >& inVV);
-        void vec2mat(const vector<utype>& inV);
-        void clear(void) {mat.clear();}
-        void insert(const int& id,const vector<utype>& inV) {mat.insert(mat.begin()+id,inV);}
-        void erase(const int id);
-        void erase_col(const int id);
-      private:
-        vector<vector<utype> > mat;
-    };
-  template <class utype> matrix<utype>  xmatrix2matrix(const xmatrix<utype>& );
-  template <class utype> xmatrix<utype> matrix2xmatrix(const matrix<utype>& );
-}
-
-
 xstructure PutInCell(const xstructure& a);     // Bring all atoms in the cell (will be moved to external function)
 xstructure PutInCompact(const xstructure& a);  // Bring all atoms in a compact shape (will be moved to external function)
 xstructure GetPrim(const xstructure& a);
@@ -4351,15 +4310,15 @@ namespace pflow {
   // [OBSOLETE] void GetNeighData(const deque<_atom>& in_atom_vec,const xstructure& in_str,const double& rmin,const double& rmax,deque<deque<_atom> >& neigh_mat);
   // [OBSOLETE] void GetStrNeighData(const xstructure& str,const double cutoff,deque<deque<_atom> >& neigh_mat);
   double GetVol(const xmatrix<double>& lat);
-  double GetVol(const pflow::matrix<double>& lat);
+  double GetVol(const aurostd::matrix<double>& lat); //CO20200404 aurostd->pflow
   double GetSignedVol(const xmatrix<double>& lat);
-  double GetSignedVol(const pflow::matrix<double>& lat);
+  double GetSignedVol(const aurostd::matrix<double>& lat); //CO20200404 aurostd->pflow
   xmatrix<double> RecipLat(const xmatrix<double>& lat);
-  pflow::matrix<double> RecipLat(const pflow::matrix<double>& lat);
+  aurostd::matrix<double> RecipLat(const aurostd::matrix<double>& lat);  //CO20200404 aurostd->pflow
   _atom SetCpos(const _atom& a,const vector<double>& in_cpos);
   _atom SetFpos(const _atom& a,const vector<double>& in_fpos);
-  vector<double> vecF2C(const pflow::matrix<double>& lat,const vector<double>& vf);
-  vector<double> vecC2F(const pflow::matrix<double>& lat,const vector<double>& vc);
+  vector<double> vecF2C(const aurostd::matrix<double>& lat,const vector<double>& vf);  //CO20200404 aurostd->pflow
+  vector<double> vecC2F(const aurostd::matrix<double>& lat,const vector<double>& vc);  //CO20200404 aurostd->pflow
   _atom SetName(const _atom& a,const string& in_name);
   _atom SetType(const _atom& a,const int in_type);
   _atom SetNum(const _atom& a,const int in_num);
@@ -4367,16 +4326,16 @@ namespace pflow {
   vector<string> GetNames(const xstructure& a);
   vector<string> GetCleanNames(const xstructure& a);
   vector<double> GetSpins(const xstructure& a);
-  pflow::matrix<double> GetFpos(const xstructure& str);
-  pflow::matrix<double> GetCpos(const xstructure& str);
+  aurostd::matrix<double> GetFpos(const xstructure& str);  //CO20200404 aurostd->pflow
+  aurostd::matrix<double> GetCpos(const xstructure& str);  //CO20200404 aurostd->pflow
   xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
   deque<int> GetNumEachType(const xstructure& a);
-  xstructure SetLat(const xstructure& a,const pflow::matrix<double>& in_lat);
-  pflow::matrix<double> GetLat(const xstructure& a);
+  xstructure SetLat(const xstructure& a,const aurostd::matrix<double>& in_lat);  //CO20200404 aurostd->pflow
+  aurostd::matrix<double> GetLat(const xstructure& a); //CO20200404 aurostd->pflow
   double GetScale(const xstructure& a);
-  pflow::matrix<double> GetScaledLat(const xstructure& a);
-  xstructure AddAllAtomPos(const xstructure& a,const pflow::matrix<double>& in_pos,const int in_coord_flag);
-  xstructure SetAllAtomPos(const xstructure& a,const pflow::matrix<double>& in_pos,const int in_coord_flag);
+  aurostd::matrix<double> GetScaledLat(const xstructure& a); //CO20200404 aurostd->pflow
+  xstructure AddAllAtomPos(const xstructure& a,const aurostd::matrix<double>& in_pos,const int in_coord_flag); //CO20200404 aurostd->pflow
+  xstructure SetAllAtomPos(const xstructure& a,const aurostd::matrix<double>& in_pos,const int in_coord_flag); //CO20200404 aurostd->pflow
   xstructure SetAllAtomNames(const xstructure& a,const vector<string>& in_names);
   xstructure SetNamesWereGiven(const xstructure& a,const vector<int>& in_names_were_given);
   xstructure SetOrigin(const xstructure& a,const vector<double>& in_origin);
@@ -4386,16 +4345,16 @@ namespace pflow {
   bool VVequal(const deque<double>& a,const deque<double>& b);
   bool VVequal(const deque<int>& a,const deque<int>& b);
   vector<double> SmoothFunc(const vector<double>& func,const double& sigma);
-  void VVset(matrix<double>& mat,const double& value);
+  void VVset(aurostd::matrix<double>& mat,const double& value);  //CO20200404 aurostd->pflow
   void VVset(vector<vector< int> >& mat,const int& value);
   double norm(const vector<double>& v);
   double getcos(const vector<double>& a,const vector<double>& b);
-  //  vector<double> Getabc_angles(const pflow::matrix<double>& lat);   // confuses namespace
+  //  vector<double> Getabc_angles(const aurostd::matrix<double>& lat);   // confuses namespace  //CO20200404 aurostd->pflow
   vector<double> Sort_abc_angles(const vector<double>& abc_angles);
   void Vout(const vector<double>& a,ostream& out);
   void Vout(const vector<int>& a,ostream& out);
   void Vout(const vector<string>& a,ostream& out);
-  void Mout(const pflow::matrix<double>& m,ostream& out);
+  void Mout(const aurostd::matrix<double>& m,ostream& out);  //CO20200404 aurostd->pflow
   void Mout(const vector<vector<double> >& m,ostream& out);
   vector<double> SVprod(const double& s,const vector<double>& b);
   vector<int> SVprod(const int& s,const vector<int>& b);
@@ -4404,10 +4363,10 @@ namespace pflow {
   vector<double> VVdiff(const vector<double>& a,const vector<double>& b);
   double VVprod(const vector<double>& a,const vector<double>& b);
   double VVprod(const vector<double>& a,const vector<int>& b);
-  pflow::matrix<double> MMmult(const pflow::matrix<double>& a,const pflow::matrix<double>& b);
-  vector<double> MVmult(const pflow::matrix<double>& A,const vector<double>& v);
-  vector<double> VMmult(const vector<double>& v,const pflow::matrix<double>& A);
-  vector<double> VMmult(const vector<int>& v,const pflow::matrix<double>& A);
+  aurostd::matrix<double> MMmult(const aurostd::matrix<double>& a,const aurostd::matrix<double>& b); //CO20200404 aurostd->pflow
+  vector<double> MVmult(const aurostd::matrix<double>& A,const vector<double>& v); //CO20200404 aurostd->pflow
+  vector<double> VMmult(const vector<double>& v,const aurostd::matrix<double>& A); //CO20200404 aurostd->pflow
+  vector<double> VMmult(const vector<int>& v,const aurostd::matrix<double>& A);  //CO20200404 aurostd->pflow
   vector<double> VVcross(const vector<double>& a,const vector<double>& b);
   double VVdot(const vector<double>& a,const vector<double>& b);
   int GetNumAtoms(const xstructure& a);

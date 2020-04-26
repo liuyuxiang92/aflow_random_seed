@@ -18,213 +18,6 @@ int Nint(const double& x) {return (int) aurostd::nint(x);}
 int Sign(const double& x) {return (int) aurostd::sign(x);}
 
 // ***************************************************************************
-// Matrix classes in Dane Morgan Style
-// ***************************************************************************
-namespace pflow {
-  // constructor
-
-  //   template<class utype>
-  //   matrix<utype>::matrix(void) { // default
-  //   }
-
-  template<class utype>
-    matrix<utype>::matrix(const int m) { // specifying rows
-      vector<utype> v;
-      mat=vector<vector<utype> > (m,v);
-    }
-
-  template<class utype>
-    matrix<utype>::matrix(const int m, const int n) { // specifying rows and columns
-      vector<utype> v(n);
-      mat=vector<vector<utype> > (m,v);
-    }
-
-  template<class utype>
-    matrix<utype>::matrix(const int m, const vector<utype>& inutypevec) { // specifying rows as vectors.
-      mat=vector<vector<utype> > (m,inutypevec);
-    }
-
-  template<class utype>
-    matrix<utype>::matrix(const int m, const int n, const utype& inutype) { // specifying rows and columns and initial values
-      vector<utype> v(n);
-      mat=vector<vector<utype> > (m,v);
-      for(uint i=0;i<mat.size();i++) {
-        for(uint j=0;j<mat[i].size();j++) {
-          mat[i][j]=inutype;
-        }
-      }
-    }
-
-  // accessors
-  template<class utype>
-    void matrix<utype>::print(void) {
-      cout.setf(std::ios::fixed,std::ios::floatfield);
-      cout.precision(4);
-      for(uint i=0;i<mat.size();i++) {
-        cout << "  ";
-        for(uint j=0;j<mat[i].size();j++) {
-          cout << " " << mat[i][j];
-        }
-        cout << endl;
-      }
-    }
-
-  //   template<class utype>
-  //   inline int matrix<utype>::size(void) const{
-  //     return (int) mat.size();
-  //   }
-
-
-  template<class utype>
-    matrix<utype> matrix<utype>::transpose() const{
-      matrix<utype> tmat;
-      uint m=mat.size();
-      if(m==0) return tmat;
-      uint n=mat[0].size();
-      tmat = matrix<utype> (n,m);
-      for(uint i=0;i<m;i++) {
-        for(uint j=0;j<n;j++) {
-          tmat[j][i]=mat[i][j];
-        }
-      }
-      return tmat;
-    }
-
-  // template<class utype>
-  // vector<vector<utype> >::iterator matrix<utype>::begin() {
-  // return mat.begin();
-  // }
-  //
-  // template<class utype>
-  // vector<vector<utype> >::iterator matrix<utype>::end() {
-  // return mat.end();
-  // }
-
-  // operator
-  //   template<class utype>
-  //   vector<utype>& matrix<utype>::operator[] (const int index) {
-  //     assert(index>=0 && index<=mat.size());
-  //     return mat[index];
-  //   }
-  //   template<class utype>
-  //   const vector<utype>& matrix<utype>::operator[] (const int index) const {
-  //     assert(index>=0 && index<=mat.size());
-  //     return mat[index];
-
-  //   }
-
-  template<class utype>
-    const matrix<utype>& matrix<utype>::operator=(const matrix<utype> &b) {
-      if(this != &b) {
-        uint m=b.mat.size();
-        uint n=0;
-        mat=vector<vector<utype> > (m);
-        for(uint i=0;i<m;i++) {
-          n=b.mat[i].size();
-          mat[i]=vector<utype> (n);
-          for(uint j=0;j<n;j++) {
-            mat[i][j]=b.mat[i][j];
-          }
-        }
-      }
-      return *this;
-    }
-
-  // mutators
-  //  template<class utype>
-  // void matrix<utype>::push_back(const vector<utype>& inutypevec) {
-  //   mat.push_back(inutypevec);
-  //  }
-
-  //  template<class utype>
-  // void matrix<utype>::pop_back() {
-  //   mat.pop_back();
-  //  }
-
-  template<class utype>
-    void matrix<utype>::vecvec2mat(const vector<vector<utype> >& inVV) {
-      mat=vector<vector<utype> > (inVV.size());
-      for(uint i=0;i<mat.size();i++) {
-        mat[i]=vector<utype> (inVV[i].size());
-        for(uint j=0;j<mat[i].size();j++) {
-          mat[i][j]=inVV[i][j];
-        }
-      }
-    }
-
-  // template<class utype>
-  // void matrix<utype>::clear() {
-  //   mat.clear();
-  // }
-
-  template<class utype>
-    void matrix<utype>::vec2mat(const vector<utype>& inV) {
-      mat=vector<vector<utype> > (1);
-      mat[0]=vector<utype> (inV.size());
-      for(uint j=0;j<mat[0].size();j++) {
-        mat[0][j]=inV[j];
-      }
-    }
-
-  // template<class utype>
-  // void matrix<utype>::insert(const int& id, const vector<utype>& inV) {
-  //  mat.insert(mat.begin()+id,inV);
-  // }
-
-  // template<class utype>
-  // void matrix<utype>::erase(const int id) {
-  // vector<utype>::iterator p=mat.begin()+id;
-  // mat.erase(p);
-  // }
-
-  // template<class utype>
-  // void matrix<utype>::erase_col(const int id) {
-  //   for(int i=0;i<mat.size();i++) {
-  //           vector<utype>::iterator p=mat[i].begin()+id;
-  //     if(id<mat[i].size()) mat[i].erase(p);
-  //   }
-  // }
-
-  // template<class utype>
-  // void matrix<utype>::erase(const int id) {
-  //   vector<vector<utype> >::iterator p=mat.begin()+id;
-  //   mat.erase(p);
-  // }
-
-  template <class utype> matrix<utype>
-    xmatrix2matrix(const xmatrix<utype>& _xmatrix) {
-      int isize=_xmatrix.rows,jsize=_xmatrix.cols;
-      matrix<utype> _matrix(isize,jsize);
-      for(register int i=0;i<isize;i++)
-        for(register int j=0;j<jsize;j++)
-          _matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
-      return _matrix;
-    }
-
-  //   matrix<double> xmatrix2matrix(const xmatrix<double>& _xmatrix) {
-  //     int isize=_xmatrix.rows,jsize=_xmatrix.cols;
-  //     matrix<double> _matrix(isize,jsize);
-  //     for(register int i=0;i<isize;i++)
-  //       for(register int j=0;j<jsize;j++)
-  // 	_matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
-  //     return _matrix;
-  //   }
-
-  template <class utype> xmatrix<utype>
-    matrix2xmatrix(const matrix<utype>& _matrix) {
-      int isize=_matrix.size(),jsize=_matrix[0].size();
-      xmatrix<utype> _xmatrix(isize,jsize);
-      for(register int i=1;i<=isize;i++)
-        for(register int j=1;j<=jsize;j++)
-          _xmatrix(i,j)=_matrix[i-1][j-1];
-      return _xmatrix;
-    }
-
-
-
-}
-
-// ***************************************************************************
 // Function PutInCompact
 // ***************************************************************************
 // Make a structure where all the atoms are all the
@@ -639,7 +432,7 @@ namespace pflow {
   double GetVol(const xmatrix<double>& lat) {
     return (double) aurostd::abs(pflow::GetSignedVol(lat));
   }
-  double GetVol(const matrix<double>& lat) {
+  double GetVol(const aurostd::matrix<double>& lat) {  //CO20200404 aurostd->pflow
     return (double) aurostd::abs(pflow::GetSignedVol(lat));
   }
 }
@@ -656,8 +449,8 @@ namespace pflow {
     vol=aurostd::scalar_product(lat(1),u);
     return vol;
   }
-  double GetSignedVol(const matrix<double>& lat) {
-    return (double) pflow::GetSignedVol(pflow::matrix2xmatrix(lat));
+  double GetSignedVol(const aurostd::matrix<double>& lat) {  //CO20200404 aurostd->pflow
+    return (double) pflow::GetSignedVol(aurostd::matrix2xmatrix(lat)); //CO20200404 aurostd->pflow
   }
 }
 
@@ -680,11 +473,11 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// Function RecipLat matrix<double>
+// Function RecipLat aurostd::matrix<double>
 // ***************************************************************************
 namespace pflow {
-  matrix<double> RecipLat(const matrix<double>& lat) {
-    matrix<double> rlat (3,3);
+  aurostd::matrix<double> RecipLat(const aurostd::matrix<double>& lat) { //CO20200404 aurostd->pflow
+    aurostd::matrix<double> rlat (3,3);  //CO20200404 aurostd->pflow
     double vol = pflow::GetSignedVol(lat);
     rlat[0]=pflow::SVprod(2.0*PI/vol,pflow::VVcross(lat[1],lat[2]));
     rlat[1]=pflow::SVprod(2.0*PI/vol,pflow::VVcross(lat[2],lat[0]));
@@ -726,7 +519,7 @@ namespace pflow {
 // ***************************************************************************
 // This function converts a vector in direct to cartesian
 namespace pflow {
-  vector<double> vecF2C(const matrix<double>& lat, const vector<double>& vf) {
+  vector<double> vecF2C(const aurostd::matrix<double>& lat, const vector<double>& vf) {  //CO20200404 aurostd->pflow
     vector<double> vc(3,0.0);
     for(int ic=0;ic<3;ic++) {
       for(int jc=0;jc<3;jc++)
@@ -741,7 +534,7 @@ namespace pflow {
 // ***************************************************************************
 // This function converts a vector in direct to cartesian
 namespace pflow {
-  vector<double> vecC2F(const matrix<double>& lat, const vector<double>& vc) {
+  vector<double> vecC2F(const aurostd::matrix<double>& lat, const vector<double>& vc) {  //CO20200404 aurostd->pflow
     vector<double> vf(3,0.0);
     vf=aurostd::xvector2vector(C2F(matrix2xmatrix(lat),aurostd::vector2xvector(vc)));
     return vf;
@@ -833,9 +626,9 @@ namespace pflow {
 // Function GetFpos
 // ***************************************************************************
 namespace pflow {
-  matrix<double> GetFpos(const xstructure& str) {
+  aurostd::matrix<double> GetFpos(const xstructure& str) { //CO20200404 aurostd->pflow
     int num_atoms=str.atoms.size();
-    matrix<double> fpos(num_atoms,3);pflow::VVset(fpos,0.0);
+    aurostd::matrix<double> fpos(num_atoms,3);pflow::VVset(fpos,0.0);  //CO20200404 aurostd->pflow
     for(int i=0;i<num_atoms;i++)
       for(int j=0;j<3;j++)
         fpos[i][j]=str.atoms.at(i).fpos(j+1);
@@ -847,9 +640,9 @@ namespace pflow {
 // Function GetCpos
 // ***************************************************************************
 namespace pflow {
-  matrix<double> GetCpos(const xstructure& str) {
+  aurostd::matrix<double> GetCpos(const xstructure& str) { //CO20200404 aurostd->pflow
     int num_atoms=str.atoms.size();
-    matrix<double> cpos(num_atoms,3);pflow::VVset(cpos,0.0);
+    aurostd::matrix<double> cpos(num_atoms,3);pflow::VVset(cpos,0.0);  //CO20200404 aurostd->pflow
     for(int i=0;i<num_atoms;i++)
       for(int j=0;j<3;j++)
         cpos[i][j]=str.atoms.at(i).cpos(j+1);
@@ -866,9 +659,9 @@ xstructure SetLat(const xstructure& a, const xmatrix<double>& in_lat) {
   return b;
 }
 namespace pflow {
-  xstructure SetLat(const xstructure& a, const matrix<double>& in_lat) {
+  xstructure SetLat(const xstructure& a, const aurostd::matrix<double>& in_lat) {  //CO20200404 aurostd->pflow
     xstructure b(a);
-    b.lattice=pflow::matrix2xmatrix(in_lat);
+    b.lattice=aurostd::matrix2xmatrix(in_lat); //CO20200404 aurostd->pflow
     return b;
   }
 }
@@ -880,8 +673,8 @@ xmatrix<double> GetLat(const xstructure& a) {
   return a.lattice;
 }
 namespace pflow {
-  matrix<double> GetLat(const xstructure& a) {
-    return pflow::xmatrix2matrix(a.lattice);
+  aurostd::matrix<double> GetLat(const xstructure& a) {  //CO20200404 aurostd->pflow
+    return aurostd::xmatrix2matrix(a.lattice); //CO20200404 aurostd->pflow
   }
 }
 
@@ -898,8 +691,8 @@ namespace pflow {
 // Function GetScaledLat
 // ***************************************************************************
 namespace pflow {
-  matrix<double> GetScaledLat(const xstructure& a) {
-    return pflow::xmatrix2matrix(a.scale*a.lattice);
+  aurostd::matrix<double> GetScaledLat(const xstructure& a) {  //CO20200404 aurostd->pflow
+    return aurostd::xmatrix2matrix(a.scale*a.lattice); //CO20200404 aurostd->pflow
   }
 }
 
@@ -933,7 +726,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure AddAllAtomPos(const xstructure& a,
-      const matrix<double>& in_pos,
+      const aurostd::matrix<double>& in_pos, //CO20200404 aurostd->pflow
       const int in_coord_flag)  {
     assert(in_coord_flag==0 || in_coord_flag==1);
     xstructure b(a);
@@ -964,7 +757,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure SetAllAtomPos(const xstructure& a,
-      const matrix<double>& in_pos,
+      const aurostd::matrix<double>& in_pos, //CO20200404 aurostd->pflow
       const int in_coord_flag)  {
     assert(in_coord_flag==0 || in_coord_flag==1);
     xstructure b(a);
@@ -1116,7 +909,7 @@ namespace pflow {
     int range=(int) (5.0*sigma);
     // Get Gaussian weights
     vector<double> norm(nx,0.0);
-    matrix<double> wt(nx,2*range+1);pflow::VVset(wt,0.0);
+    aurostd::matrix<double> wt(nx,2*range+1);pflow::VVset(wt,0.0); //CO20200404 aurostd->pflow
 
     for(int ix=0;ix<nx;ix++) {
       for(int i=-range;i<=range;i++) {
@@ -1171,7 +964,7 @@ double Normal(const double& x, const double& mu, const double& sigma) {
 // ***************************************************************************
 // This function sets a vector of vector with the proper values
 namespace pflow {
-  void VVset(matrix<double> &mat,const double& value) {
+  void VVset(aurostd::matrix<double> &mat,const double& value) { //CO20200404 aurostd->pflow
     for(uint i=0;i<mat.size();i++)
       for(uint j=0;j<mat[i].size();j++)
         mat[i][j]=(double) value;
@@ -1229,7 +1022,7 @@ namespace pflow {
 // Dane Morgan style
 namespace pflow {
   // template<class utype>
-  vector<double> Getabc_angles(const matrix<double>& lat) {
+  vector<double> Getabc_angles(const aurostd::matrix<double>& lat) { //CO20200404 aurostd->pflow
     //    cerr << lat[0][0] << " " << lat[0][1] << " " << lat[0][2] << endl;
     //    cerr << lat[1][0] << " " << lat[1][1] << " " << lat[1][2] << endl;
     //   cerr << lat[2][0] << " " << lat[2][1] << " " << lat[2][2] << endl;
@@ -1248,15 +1041,15 @@ namespace pflow {
 //   void dont_run_this(void) {
 //     {
 //       vector<float> d;pflow::norm(d);pflow::getcos(d,d);
-//       matrix<float> D;pflow::Getabc_angles(D);
+//       aurostd::matrix<float> D;pflow::Getabc_angles(D); //CO20200404 aurostd->pflow
 //     }
 //     {
 //       vector<double> d;pflow::norm(d);pflow::getcos(d,d);
-//       matrix<double> D;pflow::Getabc_angles(D);
+//       aurostd::matrix<double> D;pflow::Getabc_angles(D);  //CO20200404 aurostd->pflow
 //     }
 //     {
 //       vector<long double> d;pflow::norm(d);pflow::getcos(d,d);
-//       matrix<long double> D;pflow::Getabc_angles(D);
+//       aurostd::matrix<long double> D;pflow::Getabc_angles(D); //CO20200404 aurostd->pflow
 //     }
 //   }
 // }
@@ -1325,7 +1118,7 @@ namespace pflow {
 // This function outputs a matrix.
 // Dane Morgan style
 namespace pflow {
-  void Mout(const matrix<double>& m, ostream& out) {
+  void Mout(const aurostd::matrix<double>& m, ostream& out) {  //CO20200404 aurostd->pflow
     for(uint i=0;i<m.size();i++) {
       for(uint j=0;j<m[i].size();j++) {
         out << m[i][j] << " ";
@@ -1436,11 +1229,11 @@ namespace pflow {
 // a=MxN, b=NxM.
 // Dane Morgan style
 namespace pflow {
-  matrix<double> MMmult(const matrix<double>& a, const matrix<double>& b) {
+  aurostd::matrix<double> MMmult(const aurostd::matrix<double>& a, const aurostd::matrix<double>& b) { //CO20200404 aurostd->pflow
     uint M=std::min((uint) a.size(),(uint) b[0].size());
     uint N=std::min((uint) a[0].size(),(uint) b.size());
     vector<double> v(M,0.0);
-    matrix<double> c(M,v);
+    aurostd::matrix<double> c(M,v);  //CO20200404 aurostd->pflow
     for(uint i=0;i<M;i++) {
       for(uint j=0;j<M;j++) {
         double sum=0.0;
@@ -1461,7 +1254,7 @@ namespace pflow {
 //  A=MxN, v=Nx1.
 // Dane Morgan style
 namespace pflow {
-  vector<double> MVmult(const matrix<double>& A, const vector<double>& v) {
+  vector<double> MVmult(const aurostd::matrix<double>& A, const vector<double>& v) { //CO20200404 aurostd->pflow
     uint M=A.size();
     uint N=std::min((uint) A[0].size(),(uint) v.size());
     vector<double> u(M,0.0);
@@ -1483,7 +1276,7 @@ namespace pflow {
 // A=MxN, v=1xM. Return vector of length N.
 // Dane Morgan style
 namespace pflow {
-  vector<double> VMmult(const vector<double>& v, const matrix<double>& A) {
+  vector<double> VMmult(const vector<double>& v, const aurostd::matrix<double>& A) { //CO20200404 aurostd->pflow
     uint M=A.size();
     uint N=std::min((uint) A[0].size(),(uint) v.size());
     vector<double> u(M,0.0);
@@ -1495,7 +1288,7 @@ namespace pflow {
     }
     return u;
   }
-  vector<double> VMmult(const vector<int>& v, const matrix<double>& A) {
+  vector<double> VMmult(const vector<int>& v, const aurostd::matrix<double>& A) {  //CO20200404 aurostd->pflow
     uint M=A.size();
     uint N=std::min((uint) A[0].size(),(uint) v.size());
     vector<double> u(M,0.0);
@@ -1666,20 +1459,20 @@ namespace pflow {
 // ***************************************************************************
 
 bool never_call_this_function(void) {
-  { pflow::matrix<double> m0(1,1,(double)0),m1(1,1),m2(1),m3;
+  { aurostd::matrix<double> m0(1,1,(double)0),m1(1,1),m2(1),m3;  //CO20200404 aurostd->pflow
     std::vector<double> v(1);
     m1.push_back(v);m1[0];m1[0][0];m2=m1; }
-  { pflow::matrix<int> m0(1,1,(int)0),m1(1,1),m2(1),m3;
+  { aurostd::matrix<int> m0(1,1,(int)0),m1(1,1),m2(1),m3;  //CO20200404 aurostd->pflow
     std::vector<int> v(1);
     m1.push_back(v);m1[0];m1[0][0];m2=m1; }
-  { pflow::matrix<std::complex<double> > m0(1,1,(std::complex<double>)0.0),m1(1,1),m2(1),m3;
+  { aurostd::matrix<std::complex<double> > m0(1,1,(std::complex<double>)0.0),m1(1,1),m2(1),m3; //CO20200404 aurostd->pflow
     std::vector<std::complex<double> > v(1);
     m1.push_back(v);m1[0];m1[0][0];m2=m1;}
-  { pflow::matrix<double> m0(1,1,(double) 0),m1(1,1),m2(1),m3;
-    pflow::matrix<pflow::matrix<double> > mm1(1,1,m0),mm2(1,1,m0);
+  { aurostd::matrix<double> m0(1,1,(double) 0),m1(1,1),m2(1),m3; //CO20200404 aurostd->pflow
+    aurostd::matrix<aurostd::matrix<double> > mm1(1,1,m0),mm2(1,1,m0); //CO20200404 aurostd->pflow
     mm2=mm1;}
-  { pflow::matrix<std::complex<double> > m0(1,1,(std::complex<double>) 0),m1(1,1),m2(1),m3;
-    pflow::matrix<pflow::matrix<std::complex<double> > > mm1(1,1,m0),mm2(1,1,m0);
+  { aurostd::matrix<std::complex<double> > m0(1,1,(std::complex<double>) 0),m1(1,1),m2(1),m3;  //CO20200404 aurostd->pflow
+    aurostd::matrix<aurostd::matrix<std::complex<double> > > mm1(1,1,m0),mm2(1,1,m0);  //CO20200404 aurostd->pflow
     mm2=mm1;}
   return TRUE;
 }
