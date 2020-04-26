@@ -316,9 +316,9 @@ namespace compare{
       const bool& ignore_symmetry, const bool& ignore_Wyckoff);
   bool structuresCompatible(const StructurePrototype& structure1,
       const StructurePrototype& structure2, bool same_species, 
-      bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment); //DX20190730
+      bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool ignore_environment_angles); //DX20190730 //DX20200320 - added environment angles
   vector<StructurePrototype> groupStructurePrototypes(vector<StructurePrototype>& structures, 
-      bool same_species, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool duplicates_removed); //DX20190731 - remove const and & //DX20190830 - added duplicates_removed
+      bool same_species, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool ignore_environment_angles, bool duplicates_removed); //DX20190731 - remove const and & //DX20190830 - added duplicates_removed //DX20200320 - added environment angles
 
   vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
       ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
@@ -457,12 +457,12 @@ namespace compare{
   void computeLFAEnvironments(vector<StructurePrototype>& structures, uint start_index=0, uint end_index=AUROSTD_MAX_UINT);  //DX20191122
   vector<AtomEnvironment> computeLFAEnvironment(const xstructure& xstr, bool unique_only=true); //DX20190711
   bool compatibleEnvironmentSets(const vector<AtomEnvironment>& env_set1, 
-      const vector<AtomEnvironment>& env_set2, bool same_species, bool exact_match); //DX20190711
+      const vector<AtomEnvironment>& env_set2, bool same_species, bool ignore_environment_angles, bool exact_match); //DX20190711 //DX20200320 - added environment angles
   bool compatibleEnvironments(const AtomEnvironment& env_1, 
-      const AtomEnvironment& env_2, bool same_species, bool compare_frequency, bool exact_match); //DX20190711
+      const AtomEnvironment& env_2, bool same_species, bool ignore_environment_angles, bool exact_match); //DX20190711 //DX20200320 - added environment angles
   bool compatibleEnvironments(const AtomEnvironment& env_1, 
       const AtomEnvironment& env_2, vector<vector<string> > & matched_species, 
-      bool same_species, bool compare_frequency, bool exact_match); //DX20190711
+      bool same_species, bool ignore_environment_angles, bool exact_match); //DX 20190711 //DX20200320 - added environment angles
   vector<vector<double> > getAnglesBetweenMixedSpeciesEnvironments(const vector<vector<xvector<double> > >& neighbor_coordinates); //DX20190715
   bool compatibleNearestNeighborTypesEnvironments(const vector<vector<double> >& nn_lfa_with_types_1,
       const vector<vector<double> >& nn_lfa_with_types_2,
@@ -498,7 +498,7 @@ namespace compare{
   //void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
   //    double& minMis, int type_match, bool optimize_match, ostream& oss); //DX20190530
   void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
-      structure_misfit& min_misfit_info, int type_match, bool optimize_match, ostream& oss); //DX20190530 //DX20191210 - added lattice_dev, coordinate_dis, and failure
+      structure_misfit& min_misfit_info, int type_match, bool optimize_match, bool scale_volume, ostream& oss); //DX20190530 //DX20191210 - added lattice_dev, coordinate_dis, and failure //DX20200422 - added scale volume
   void quadrupletSearch(const xmatrix<double>& q1, const xstructure& xstr_LFA_supercell,
       const xstructure& xstr2,
       vector<xvector<double> >& lattice_vecs, vector<vector<uint> >& ij_index);
@@ -509,7 +509,7 @@ namespace compare{
   //                        const int& type_match, double& possible_minMis, ostream& oss,
   //                        vector<xvector<double> >& lattice_vecs,
   //                        vector<vector<uint> >& ij_index); // 1 bracket
-  bool buildSimilarLattices(vector<xvector<double> >& translation_vectors, xmatrix<double>& q1, double& xstr1_vol, double& abs_det_q1, xvector<double>& abc_angles_q1, vector<xmatrix<double> >& lattices, vector<xmatrix<double> >& clattices, vector<double>& latt_devs, const bool& optimize_match);
+  bool buildSimilarLattices(vector<xvector<double> >& translation_vectors, xmatrix<double>& q1, double& xstr1_vol, double& abs_det_q1, xvector<double>& abc_angles_q1, vector<xmatrix<double> >& lattices, vector<xmatrix<double> >& clattices, vector<double>& latt_devs, bool optimize_match, bool scale_volume); //DX20200422 - scale volume
   //  bool structureSearch(const string& lfa,
   //                        const vector<double>& all_nn1,
   //			                  const xstructure& xstr_supercell, //DX20190530 - added "_supercell"; more descriptive 
