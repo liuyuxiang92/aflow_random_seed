@@ -5395,7 +5395,14 @@ namespace aurostd {
     // --------------------------------------------------------------------------
     // expects two fields
     if(field_count == 1){ // not slash
-      return aurostd::string2utype<double>(str);
+      if(aurostd::isfloat(str)){ //DX20200424
+        return aurostd::string2utype<double>(str);
+      }
+      else{ //DX20200424
+        string function_name = "aurostd::frac2dbl():";
+        stringstream message; message << "The input is not a numeric: str = " << str;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+      }
     }
     else if(field_count != 2){
       string function_name = "aurostd::frac2dbl():";
@@ -5403,9 +5410,17 @@ namespace aurostd {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
     }
 
+    // --------------------------------------------------------------------------
+    // protect against non-numeric values //DX20200424
+    if(!aurostd::isfloat(tokens[0]) || !aurostd::isfloat(tokens[1])){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "The input is not a numeric: str = " << str;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
     double numerator = aurostd::string2utype<double>(tokens[0]);
     double denominator = aurostd::string2utype<double>(tokens[1]);
-
+    
     // --------------------------------------------------------------------------
     // protect against division by zero
     if(aurostd::isequal(denominator,_ZERO_TOL_)){

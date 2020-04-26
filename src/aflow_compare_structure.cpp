@@ -1090,6 +1090,7 @@ namespace compare {
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"), 
+        comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
         false); //DX20200103 - condensed booleans to xoptions 
     message << "Number of comparison groups: " << comparison_schemes.size() << ".";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -1578,6 +1579,8 @@ namespace compare {
     // store input structure 
     StructurePrototype input_structure;
     input_structure.structure_representative = xstr;
+    input_structure.number_of_atoms = xstr.atoms.size(); //DX20200421
+    input_structure.number_of_types = xstr.num_each_type.size(); //DX20200421
     input_structure.structure_representative.ReScale(1.0); //DX20191105
     input_structure.structure_representative_name = "input geometry";
     input_structure.stoichiometry = compare::getStoichiometry(xstr,same_species);
@@ -1659,6 +1662,8 @@ namespace compare {
           deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
           entry.vstr[structure_index].SetSpecies(deque_species);
           str_proto_tmp.structure_representative = entry.vstr[structure_index];
+          str_proto_tmp.number_of_atoms = entry.vstr[structure_index].atoms.size(); //DX20200421
+          str_proto_tmp.number_of_types = entry.vstr[structure_index].num_each_type.size(); //DX20200421
           str_proto_tmp.structure_representative.ReScale(1.0); //DX20191105
           str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX20190321 - changed to false, i.e., do not load from common
           str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directoryr
@@ -1736,6 +1741,7 @@ namespace compare {
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"), 
+        comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
         false); //DX20200103 - condensed booleans to xoptions 
     //cerr << "number of schemes: " << comparison_schemes.size() << endl;
     //cerr << "comparison_schemes: " << comparison_schemes.size() << endl;
@@ -2084,7 +2090,7 @@ namespace compare {
     // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
     string catalog = "";
     string catalog_summons = "";
-    bool ICSD_comparison = false;
+    //DX20200331 [OBSOLETE] bool ICSD_comparison = false;
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::CATALOG")) {
       catalog = aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::CATALOG")); //DX20190718
       catalog_summons = "catalog(\'" + catalog + "\')";
@@ -2093,7 +2099,8 @@ namespace compare {
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     if(catalog=="" || catalog=="icsd" || catalog=="all"){ //DX20191108 - needs to be outside of loop
-      ICSD_comparison=true;
+      comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",TRUE);
+      //DX20200331 [OBSOLETE] ICSD_comparison=true;
     }
 
     // ---------------------------------------------------------------------------
@@ -2678,6 +2685,7 @@ namespace compare {
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"), 
+        comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
         false); //DX20200103 - condensed booleans to xoptions
 
     message << "Number of comparison groups: " << comparison_schemes.size() << ".";
@@ -3098,7 +3106,7 @@ namespace compare {
       if(LDEBUG) {cerr << "compare:: " << "WAIT... Computing quadruplets..."<<endl;} 
       // creates the threads for checking quadruplets (lattices)
       //DX20190530 - OLD threadGeneration(num_proc,q_base,xstr_test,vprotos,xstr_base,type_match,optimize_match,minMis,comparison_log);
-      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,comparison_log); //DX20190530
+      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
 
       if(LDEBUG) {cerr << "compare:: " << "Total # of possible matching representations: " << vprotos.size() << endl;}	
       final_misfit=min_misfit_info.misfit;
