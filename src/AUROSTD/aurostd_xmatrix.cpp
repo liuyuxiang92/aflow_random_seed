@@ -5468,27 +5468,27 @@ namespace aurostd {
 
   template<class utype>
     matrix<utype>::matrix(const int m) { // specifying rows
-      free();  //CO20200404 aurostd->pflow
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
       std::vector<utype> v;
       mat=std::vector<std::vector<utype> > (m,v);
     }
 
   template<class utype>
     matrix<utype>::matrix(const int m, const int n) { // specifying rows and columns
-      free();  //CO20200404 aurostd->pflow
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
       std::vector<utype> v(n);
       mat=std::vector<std::vector<utype> > (m,v);
     }
 
   template<class utype>
     matrix<utype>::matrix(const int m, const std::vector<utype>& inutypevec) { // specifying rows as vectors.
-      free();  //CO20200404 aurostd->pflow
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
       mat=std::vector<std::vector<utype> > (m,inutypevec);
     }
 
   template<class utype>
     matrix<utype>::matrix(const int m, const int n, const utype& inutype) { // specifying rows and columns and initial values
-      free();  //CO20200404 aurostd->pflow
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
       std::vector<utype> v(n);
       mat=std::vector<std::vector<utype> > (m,v);
       for(uint i=0;i<mat.size();i++) {

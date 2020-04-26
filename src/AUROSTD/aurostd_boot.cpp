@@ -32,9 +32,9 @@ using aurostd::mod;
 using aurostd::min;
 using aurostd::max;
 using aurostd::xcomplex;
-using aurostd::matrix;  //CO20200404 aurostd->pflow
-using aurostd::matrix2xmatrix;  //CO20200404 aurostd->pflow
-using aurostd::xmatrix2matrix;  //CO20200404 aurostd->pflow
+using aurostd::matrix;  //CO20200404 pflow::matrix()->aurostd::matrix()
+using aurostd::matrix2xmatrix;  //CO20200404 pflow::matrix()->aurostd::matrix()
+using aurostd::xmatrix2matrix;  //CO20200404 pflow::matrix()->aurostd::matrix()
 using aurostd::xmatrix;
 using aurostd::modulus;
 using aurostd::angle;

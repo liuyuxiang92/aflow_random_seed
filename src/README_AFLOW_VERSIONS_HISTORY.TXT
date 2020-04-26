@@ -1,5 +1,5 @@
 3.2.3 - 2020/05/01
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- added check for broken REST-API to aflow_chull_python.py (MB)
         -- Added check for required binaries to plotter. (ME)
@@ -55,6 +55,7 @@
         -- patched --kapth to take default values from .aflow.rc (CO)
         -- changed default value for kgrid to AUTO (MP vs. Gamma) (CO)
         -- added secondary wget location for AFLOW3_FREE files for make (CO)
+        -- pflow::matrix()->aurostd::matrix() to fix linking issues on nietzsche (CO)
 3.2.2j - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- standardized vext,vcat,vzip from XHOST 2j (SC)

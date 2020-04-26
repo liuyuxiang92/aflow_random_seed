@@ -4803,8 +4803,8 @@ namespace pflow {
     if(LDEBUG) oss << soliloquy << "SUCCESSFULLY READ " << chgcar2_file << endl;
 
     // check formats
-    aurostd::matrix<double> lat1=pflow::GetLat(structure1);  //CO20200404 aurostd->pflow
-    aurostd::matrix<double> lat2=pflow::GetLat(structure2);  //CO20200404 aurostd->pflow
+    aurostd::matrix<double> lat1=pflow::GetLat(structure1);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> lat2=pflow::GetLat(structure2);  //CO20200404 pflow::matrix()->aurostd::matrix()
     if(LDEBUG) oss << soliloquy << "CHECK IF FORMATS OF CHGCARS MATCH" << endl;
     if(format_dim1!=format_dim2) {
       oss << endl;
@@ -4863,8 +4863,8 @@ namespace pflow {
     vector<double> chg_diff;
     pflow::ReadChg(str,ngrid,chg_tot,chg_diff,chgfile);
     // Integrate charge
-    vector<aurostd::matrix<double> > rad_chg_int;  //CO20200404 aurostd->pflow
-    aurostd::matrix<double> vor_chg_int; //CO20200404 aurostd->pflow
+    vector<aurostd::matrix<double> > rad_chg_int;  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> vor_chg_int; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetChgInt(rad_chg_int,vor_chg_int,str,ngrid,chg_tot,chg_diff);
     // Print results
     pflow::PrintChgInt(rad_chg_int,vor_chg_int,cout);
@@ -5046,7 +5046,7 @@ namespace pflow {
     vector<int> ngrid1(3),ngrid2(3),format_dim1,format_dim2;
     vector<double> chg_tot1,chg_tot2;
     vector<double> chg_diff1,chg_diff2;
-    aurostd::matrix<double> lat1,lat2; //CO20200404 aurostd->pflow
+    aurostd::matrix<double> lat1,lat2; //CO20200404 pflow::matrix()->aurostd::matrix()
 
     if(LDEBUG) oss << soliloquy << "CHECK " << chgcar_files.at(0) << endl;
     aurostd::efile2stringstream(chgcar_files.at(0),chgcar_ss);
@@ -13675,7 +13675,7 @@ namespace pflow {
     infileB >> strB;
     string path_flag(argv.at(4).c_str());
     double totdist;
-    aurostd::matrix<double> cm(2,3,999999);  //CO20200404 aurostd->pflow
+    aurostd::matrix<double> cm(2,3,999999);  //CO20200404 pflow::matrix()->aurostd::matrix()
     xstructure diffstr;
     pflow::RBPoscarDisp(strA,strB,diffstr,totdist,cm,path_flag);
     PrintRBPoscarDisp(diffstr,totdist,cm,path_flag,cout);
@@ -13706,15 +13706,15 @@ namespace pflow {
     if(tokens.size()>=2) nbins=aurostd::string2utype<int>(tokens.at(1));
     if(tokens.size()>=3) smooth_width=aurostd::string2utype<int>(tokens.at(2));
 
-    aurostd::matrix<double> rdf_all; //CO20200404 aurostd->pflow
+    aurostd::matrix<double> rdf_all; //CO20200404 pflow::matrix()->aurostd::matrix()
     cerr << "[1]" << endl;
     pflow::GetRDF(a,rmax,nbins,rdf_all);
     cerr << "[1]" << endl;
     // for(int i=0;i<rdf_all.size();i++) {for(int j=0;j<rdf_all[i].size();j++) cerr << rdf_all[i][j] << " "; cerr << endl;};exit(0);
-    aurostd::matrix<double> rdf_all_sm;  //CO20200404 aurostd->pflow
+    aurostd::matrix<double> rdf_all_sm;  //CO20200404 pflow::matrix()->aurostd::matrix()
     rdf_all_sm=pflow::GetSmoothRDF(rdf_all,smooth_width);
-    aurostd::matrix<double> rdfsh_all; //CO20200404 aurostd->pflow
-    aurostd::matrix<double> rdfsh_loc; // Radial location of rdf shells. //CO20200404 aurostd->pflow
+    aurostd::matrix<double> rdfsh_all; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetRDFShells(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc);
     PrintRDF(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc,cout);
     if(LDEBUG) cerr << "pflow::RDF: END" << endl;
@@ -13750,21 +13750,21 @@ namespace pflow {
     xstructure strA(tokens.at(4),IOAFLOW_AUTO);
     xstructure strB(tokens.at(5),IOAFLOW_AUTO);
     // Get rdfs
-    aurostd::matrix<double> rdf_all_A; //CO20200404 aurostd->pflow
-    aurostd::matrix<double> rdf_all_B; //CO20200404 aurostd->pflow
+    aurostd::matrix<double> rdf_all_A; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdf_all_B; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetRDF(strA,rmax,nbins,rdf_all_A);
     pflow::GetRDF(strB,rmax,nbins,rdf_all_B);
-    aurostd::matrix<double> rdf_all_A_sm=pflow::GetSmoothRDF(rdf_all_A,smooth_width);  //CO20200404 aurostd->pflow
-    aurostd::matrix<double> rdf_all_B_sm=pflow::GetSmoothRDF(rdf_all_B,smooth_width);  //CO20200404 aurostd->pflow
+    aurostd::matrix<double> rdf_all_A_sm=pflow::GetSmoothRDF(rdf_all_A,smooth_width);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdf_all_B_sm=pflow::GetSmoothRDF(rdf_all_B,smooth_width);  //CO20200404 pflow::matrix()->aurostd::matrix()
     // Get shells
-    aurostd::matrix<double> rdfsh_all_A; //CO20200404 aurostd->pflow
-    aurostd::matrix<double> rdfsh_loc_A; // Radial location of rdf shells. //CO20200404 aurostd->pflow
-    aurostd::matrix<double> rdfsh_all_B; //CO20200404 aurostd->pflow
-    aurostd::matrix<double> rdfsh_loc_B; // Radial location of rdf shells. //CO20200404 aurostd->pflow
+    aurostd::matrix<double> rdfsh_all_A; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc_A; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_all_B; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc_B; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetRDFShells(strA,rmax,nbins,smooth_width,rdf_all_A_sm,rdfsh_all_A,rdfsh_loc_A);
     pflow::GetRDFShells(strB,rmax,nbins,smooth_width,rdf_all_B_sm,rdfsh_all_B,rdfsh_loc_B);
     vector<int> best_match;
-    aurostd::matrix<double> rms_mat; //CO20200404 aurostd->pflow
+    aurostd::matrix<double> rms_mat; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::CmpRDFShells(strA,strB,rdfsh_all_A,rdfsh_all_B,nsh,best_match,rms_mat);
     PrintRDFCmp(strA,strB,rmax,nbins,smooth_width,nsh,rdfsh_all_A,rdfsh_all_B,best_match,rms_mat,cout);
     if(LDEBUG) cerr << "pflow::RDFCMP: END" << endl;
@@ -14376,7 +14376,7 @@ namespace pflow {
     ifstream PDOS_infile(argv.at(3).c_str());
     aurostd::InFileExistCheck("convasp.cc",argv.at(3),PDOS_infile,cerr);
     pflow::pdosdata pdd;
-    aurostd::matrix<aurostd::matrix<double> > allpdos; //CO20200404 aurostd->pflow
+    aurostd::matrix<aurostd::matrix<double> > allpdos; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::ReadSumDOSParams(SumPDOSParams_infile,pdd);
     //      projdata prd;
     //      pdd.PrintParams(cout,prd.LMnames);
@@ -14501,9 +14501,9 @@ namespace pflow {
     }
     //    ifstream infile(infile_name.c_str());
     // aurostd::InFileExistCheck("aflow",infile_name,infile,cerr);
-    aurostd::matrix<double> mmsc(3,3); //CO20200404 aurostd->pflow
+    aurostd::matrix<double> mmsc(3,3); //CO20200404 pflow::matrix()->aurostd::matrix()
     // if(LDEBUG) cerr << "pflow::SUPERCELLSTRLIST: msc=" << msc << endl;
-    mmsc=aurostd::xmatrix2matrix(msc); //CO20200404 aurostd->pflow
+    mmsc=aurostd::xmatrix2matrix(msc); //CO20200404 pflow::matrix()->aurostd::matrix()
     //  pflow::Mout(mmsc,cout);
     ifstream list_inf(infile_name.c_str());
     aurostd::InFileExistCheck("pflow::SUPERCELLSTRLIST",infile_name,list_inf,cerr);
