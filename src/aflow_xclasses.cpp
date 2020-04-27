@@ -2036,6 +2036,7 @@ ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
 
+// ME20200427 - Initializer functions
 void xStream::initialize(ostream& oss) {
   free();
   p_FileMESSAGE = new ofstream();

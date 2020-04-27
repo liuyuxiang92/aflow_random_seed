@@ -18,30 +18,31 @@ string time_delay(long double seconds) { return aurostd::utype2string<long doubl
 //---------------------------------------------------------------------------------
 // class xOUTCAR
 //---------------------------------------------------------------------------------
+// ME20200427 - included xStream::initialize
 xOUTCAR::xOUTCAR(ostream& oss) : xStream() {
   free();
   xStream::initialize(oss); //CO20200404 - xStream integration for logging
 }
 
-xOUTCAR::xOUTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {
+xOUTCAR::xOUTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream() {
   free();
   xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
 }
 
-xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {
+xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
   free();
   xStream::initialize(oss);  //CO20200404 - xStream integration for logging
-  initialize(fileIN, QUIET);
+  m_initialized = initialize(fileIN, QUIET);
 }
 
-xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {
+xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
   free();
   xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
   m_initialized = initialize(fileIN, QUIET);
 }
 
 bool xOUTCAR::initialize(const string& fileIN, bool QUIET) {
-  filename=fileIN;
+  filename = fileIN;
   return GetPropertiesFile(fileIN,QUIET);
 }
 
@@ -51,7 +52,7 @@ xOUTCAR::~xOUTCAR() {xStream::free();free();}  //CO20200404 - xStream integratio
 
 void xOUTCAR::free() {
   //------------------------------------------------------------------------------
-  m_initialized=false; //CO20200404 - xStream integration for logging
+  m_initialized=false; //CO20200404
   // GetProperties
   content="";                   // for aflowlib_libraries.cpp
   vcontent.clear();             // for aflowlib_libraries.cpp
@@ -222,7 +223,7 @@ void xOUTCAR::free() {
 void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
   xStream::copy(b);  //CO20200404 - xStream integration for logging
   free();
-  m_initialized=b.m_initialized; //CO20200404 - xStream integration for logging
+  m_initialized=b.m_initialized; //CO20200404
   content=b.content;
   vcontent.clear(); for(uint i=0;i<b.vcontent.size();i++) vcontent.push_back(b.vcontent.at(i));  // for aflowlib_libraries.cpp
   filename=b.filename;
@@ -4027,41 +4028,32 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 
 // ***************************************************************************
 // class xDOSCAR
-xDOSCAR::xDOSCAR(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
-xDOSCAR::xDOSCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
-xDOSCAR::xDOSCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
-xDOSCAR::xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
+// ME20200427 - included xStream::initialize
+xDOSCAR::xDOSCAR(ostream& oss) : xStream() {
+  free();
+  xStream::initialize(oss); //CO20200404 - xStream integration for logging
+}
 
-bool xDOSCAR::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(*_p_FileMESSAGE,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xDOSCAR::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(ofstream& FileMESSAGE,ostream& oss) : xStream() {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  m_initialized=false;  //no point
-  return m_initialized;
+  xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
 }
-bool xDOSCAR::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xDOSCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+
+xDOSCAR::xDOSCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-  m_initialized=true;  //no point
-  return m_initialized;
+  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+xDOSCAR::xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
+  free();
+  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+bool xDOSCAR::initialize(const string& fileIN, bool QUIET) {
+  filename = fileIN;
+  return GetPropertiesFile(fileIN, QUIET);
 }
 
 xDOSCAR::xDOSCAR(const xDOSCAR& b) {free();copy(b);} // copy PUBLIC
@@ -4069,7 +4061,7 @@ xDOSCAR::xDOSCAR(const xDOSCAR& b) {free();copy(b);} // copy PUBLIC
 xDOSCAR::~xDOSCAR() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
 void xDOSCAR::free() {  //CO20191110
-  m_initialized=false; //CO20200404 - xStream integration for logging
+  m_initialized=false; //CO20200404
   content="";
   vcontent.clear();
   filename="";
@@ -4968,41 +4960,32 @@ ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
 
 // ***************************************************************************
 // class xEIGENVAL
-xEIGENVAL::xEIGENVAL(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
-xEIGENVAL::xEIGENVAL(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
-xEIGENVAL::xEIGENVAL(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
-xEIGENVAL::xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
+// ME20200427 - included xStream::initialize
+xEIGENVAL::xEIGENVAL(ostream& oss) : xStream() {
+  free();
+  xStream::initialize(oss); //CO20200404 - xStream integration for logging
+}
 
-bool xEIGENVAL::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(*_p_FileMESSAGE,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xEIGENVAL::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(ofstream& FileMESSAGE,ostream& oss) : xStream() {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  m_initialized=false;  //no point
-  return m_initialized;
+  xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
 }
-bool xEIGENVAL::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xEIGENVAL::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+
+xEIGENVAL::xEIGENVAL(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-  m_initialized=true;  //no point
-  return m_initialized;
+  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+xEIGENVAL::xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
+  free();
+  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+bool xEIGENVAL::initialize(const string& fileIN, bool QUIET) {
+  filename = fileIN;
+  return GetPropertiesFile(fileIN,QUIET);
 }
 
 xEIGENVAL::xEIGENVAL(const xEIGENVAL& b) {free();copy(b);} // copy PUBLIC
@@ -5010,7 +4993,7 @@ xEIGENVAL::xEIGENVAL(const xEIGENVAL& b) {free();copy(b);} // copy PUBLIC
 xEIGENVAL::~xEIGENVAL() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
 void xEIGENVAL::free() {
-  m_initialized=false; //CO20200404 - xStream integration for logging
+  m_initialized=false; //CO20200404
   content="";
   vcontent.clear(); 
   filename="";
@@ -7447,41 +7430,32 @@ void CompareEdges (vector<vector<xvector<int> > >& branches,
 //-------------------------------------------------------------------------------------------------
 // ***************************************************************************
 // class xPOTCAR
-xPOTCAR::xPOTCAR(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
-xPOTCAR::xPOTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
-xPOTCAR::xPOTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
-xPOTCAR::xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
+// ME20200427 - included xStream::initialize
+xPOTCAR::xPOTCAR(ostream& oss) : xStream() {
+  free();
+  xStream::initialize(oss); //CO20200404 - xStream integration for logging
+}
 
-bool xPOTCAR::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(*_p_FileMESSAGE,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xPOTCAR::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream() {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  m_initialized=false;  //no point
-  return m_initialized;
+  xStream::initialize(FileMESSAGE,oss); //CO20200404 - xStream integration for logging
 }
-bool xPOTCAR::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xPOTCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+
+xPOTCAR::xPOTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-  m_initialized=true;  //no point
-  return m_initialized;
+  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+xPOTCAR::xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
+  free();
+  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+bool xPOTCAR::initialize(const string& fileIN, bool QUIET) {
+  filename = fileIN;
+  return GetPropertiesFile(fileIN, QUIET);
 }
 
 xPOTCAR::xPOTCAR(const xPOTCAR& b) {free();copy(b);} // copy PUBLIC
@@ -7489,7 +7463,7 @@ xPOTCAR::xPOTCAR(const xPOTCAR& b) {free();copy(b);} // copy PUBLIC
 xPOTCAR::~xPOTCAR() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
 void xPOTCAR::free() {
-  m_initialized=false; //CO20200404 - xStream integration for logging
+  m_initialized=false; //CO20200404
   content="";                   // for aflowlib_libraries.cpp
   vcontent.clear();             // for aflowlib_libraries.cpp
   filename="";                  // for aflowlib_libraries.cpp
@@ -8914,41 +8888,32 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //---------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 // constructor
-xQMVASP::xQMVASP(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
-xQMVASP::xQMVASP(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
-xQMVASP::xQMVASP(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
-xQMVASP::xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
+// ME20200427 - included xStream::initialize
+xQMVASP::xQMVASP(ostream& oss) : xStream() {
+  free();
+  xStream::initialize(oss); //CO20200404 - xStream integration for logging
+}
 
-bool xQMVASP::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(*_p_FileMESSAGE,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xQMVASP::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(ofstream& FileMESSAGE,ostream& oss) : xStream() {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  m_initialized=false;  //no point
-  return m_initialized;
+  xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
 }
-bool xQMVASP::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xQMVASP::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+
+xQMVASP::xQMVASP(const string& fileIN,bool QUIET,ostream& oss) : xStream() {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-  m_initialized=true;  //no point
-  return m_initialized;
+  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+xQMVASP::xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream() {
+  free();
+  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+bool xQMVASP::initialize(const string& fileIN, bool QUIET) {
+  filename = fileIN;
+  return GetPropertiesFile(fileIN, QUIET);
 }
 
 xQMVASP::xQMVASP(const xQMVASP& b) {free();copy(b);} // copy PUBLIC
@@ -8956,7 +8921,7 @@ xQMVASP::xQMVASP(const xQMVASP& b) {free();copy(b);} // copy PUBLIC
 xQMVASP::~xQMVASP() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
 void xQMVASP::free() { //CO20191110
-  m_initialized=false; //CO20200404 - xStream integration for logging
+  m_initialized=false; //CO20200404
   //------------------------------------------------------------------------------
   content="";                   // for aflowlib_libraries.cpp
   vcontent.clear();             // for aflowlib_libraries.cpp

@@ -1837,8 +1837,8 @@ class xStream {
     void free();
     //void freeAll(); //CO20190318 - not necessary
     void copy(const xStream& b);
-    void initialize(ostream&);
-    void initialize(ofstream&, ostream&);
+    void initialize(ostream&);  // ME20200427
+    void initialize(ofstream&, ostream&);  // ME20200427
     //NECESSARY END CLASS METHODS - END
     //logger variables
     ostream* p_oss;
@@ -2960,7 +2960,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     xOUTCAR(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,bool=TRUE);
+    bool initialize(const string& fileIN, bool=TRUE);  //ME20200427
     
     xOUTCAR(const xOUTCAR& b);                                    // constructor copy
     ~xOUTCAR();                                                   // kill everything
@@ -3118,10 +3118,7 @@ class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
     xDOSCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xDOSCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
-    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
 
     xDOSCAR(const xDOSCAR& b);                                    // constructor copy
     ~xDOSCAR();                                                   // kill everything
@@ -3193,10 +3190,7 @@ class xEIGENVAL : public xStream { //CO20200404 - xStream integration for loggin
     xEIGENVAL(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xEIGENVAL(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
-    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
     
     xEIGENVAL(const xEIGENVAL& b);                                // constructor copy
     ~xEIGENVAL();                                                 // kill everything
@@ -3237,10 +3231,7 @@ class xPOTCAR : public xStream { //CO20200404 - xStream integration for logging
     xPOTCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xPOTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
-    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
     
     ~xPOTCAR();                                                   // kill everything
     xPOTCAR(const xPOTCAR& b);                                    // constructor copy
@@ -3418,10 +3409,7 @@ class xQMVASP : public xStream {  //CO20191110 //CO20200404 - xStream integratio
     xQMVASP(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xQMVASP(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
     xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
-    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
     
     ~xQMVASP();                                                    // kill everything
     xQMVASP(const xQMVASP& b);                                     // constructor copy
