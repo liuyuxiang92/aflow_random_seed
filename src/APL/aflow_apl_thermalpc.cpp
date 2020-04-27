@@ -37,28 +37,26 @@ static const string _APL_TPC_MODULE_ = "APL";
 namespace apl {
 
   // Default Constructor
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator() {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ostream& oss): xStream() {
     free();
+    xStream::initialize(oss);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf, ostream& os) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf, ostream& oss) : xStream() {
     free();
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(oss);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, ostream& os, string directory) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, ostream& oss, string directory) : xStream() {
     free();
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(dosc.getBins(), dosc.getDOS(), dosc._system);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, ostream& os, string directory) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, ostream& oss, string directory) : xStream() {
     free();
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(mf, oss);
     _directory = directory;
     vector<double> freq = aurostd::deque2vector(xdos.venergy);
     // Convert to THz
@@ -82,15 +80,15 @@ namespace apl {
 
   // Destructor
   ThermalPropertiesCalculator::~ThermalPropertiesCalculator() {
+    xStream::free();
     free();
   }
 
   void ThermalPropertiesCalculator::copy(const ThermalPropertiesCalculator& that) {
+    xStream::copy(that);
     _freqs_0K = that._freqs_0K;
     _dos_0K = that._dos_0K;
     _directory = that._directory;
-    messageFile = that.messageFile;
-    oss = that.oss;
     system = that.system;
     temperatures = that.temperatures;
     Cv = that.Cv;
@@ -114,10 +112,8 @@ namespace apl {
     U0 = 0.0;
   }
 
-  void ThermalPropertiesCalculator::clear(ofstream& mf, ostream& os) {
+  void ThermalPropertiesCalculator::clear() {
     free();
-    messageFile = &mf;
-    oss = &os;
   }
 
   void ThermalPropertiesCalculator::setDirectory(const string& directory) {
@@ -156,7 +152,7 @@ namespace apl {
       double Tend,
       double Tstep) {
     string message = "Calculating thermal properties.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (Tstart > Tend) {
       string function = _APL_THERMO_ERR_PREFIX_ + "calculateThermalProperties()";
       message = "Tstart cannot be higher than Tend.";
@@ -383,7 +379,7 @@ namespace apl {
   void ThermalPropertiesCalculator::writePropertiesToFile(string filename) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing thermal properties into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     stringstream outfile;
 

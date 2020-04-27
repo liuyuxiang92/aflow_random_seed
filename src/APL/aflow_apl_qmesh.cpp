@@ -27,30 +27,28 @@ static const string _APL_QMESH_MODULE_ = "QMESH";  // for the logger
 namespace apl {
 
   // Default Constructor
-  QMesh::QMesh() {
+  QMesh::QMesh(ostream& oss) : xStream() {
     free();
+    xStream::initialize(oss);
   }
 
-  QMesh::QMesh(ofstream& mf, ostream& os) {
+  QMesh::QMesh(ofstream& mf, ostream& oss) : xStream() {
     free();
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(mf, oss);
   }
 
-  QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf, ostream& os,
-      bool include_inversions, bool gamma_centered, string directory) {
+  QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf, ostream& oss,
+      bool include_inversions, bool gamma_centered, string directory) : xStream() {
     free();
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(grid, xs, include_inversions, gamma_centered);
   }
 
-  QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf, ostream& os,
-      bool include_inversions, bool gamma_centered, string directory) {
+  QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf, ostream& oss,
+      bool include_inversions, bool gamma_centered, string directory) : xStream() {
     free();
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(mf, oss);
     _directory = directory;
     initialize(aurostd::vector2xvector(vgrid), xs, include_inversions, gamma_centered);
   }
@@ -70,12 +68,11 @@ namespace apl {
   }
 
   void QMesh::copy(const QMesh& that) {
+    xStream::copy(that);
     _ibzqpts = that._ibzqpts;
     _isGammaCentered = that._isGammaCentered;
     _littleGroups = that._littleGroups;
     _littleGroupsCalculated = that._littleGroupsCalculated;
-    messageFile = that.messageFile;
-    oss = that.oss;
     _directory = that._directory;
     _nIQPs = that._nIQPs;
     _nQPs = that._nQPs;
@@ -91,6 +88,7 @@ namespace apl {
 
   // Destructor
   QMesh::~QMesh() {
+    xStream::free();
     free();
   }
 
@@ -120,10 +118,8 @@ namespace apl {
     _weights.clear();
   }
 
-  void QMesh::clear(ofstream& mf, ostream& os) {
+  void QMesh::clear() {
     free();
-    messageFile = &mf;
-    oss = &os;
   }
 
 }  // namespace apl
@@ -143,10 +139,6 @@ namespace apl {
 
   const string& QMesh::getDirectory() const {
     return _directory;
-  }
-
-  ofstream& QMesh::getOutputStream() {
-    return *messageFile;
   }
 
 }
@@ -234,7 +226,7 @@ namespace apl {
   void QMesh::generateGridPoints(bool force_gamma) {
     stringstream message;
     message << "Generating a " << _qptGrid[1] << "x" << _qptGrid[2] << "x" << _qptGrid[3] << " q-point mesh.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     _qpoints.resize(_nQPs);
     _ibzqpts.resize(_nQPs);  // Before making the mesh irreducible, treat all q-points as irreducible q-points
     _weights.assign(_nQPs, 1);
@@ -351,7 +343,7 @@ namespace apl {
     }
     _reduced = true;
     message << "Found " << _nIQPs << " irreducible qpoints.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
   }
 
   // ME20200109

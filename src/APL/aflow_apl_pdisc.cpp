@@ -119,7 +119,7 @@ namespace apl {
         lattice = a.bravais_lattice_variation_type;
       }
       string message = "The phonon dispersion curves will be generated for lattice variation " + lattice + ".";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(),_pc->getOutputStringStream());
+      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(),*_pc->getOSS());
     }
     //CO - END
 
@@ -202,7 +202,7 @@ namespace apl {
 
     // Compute frequencies for each q-point
     string message = "Calculating frequencies for the phonon dispersion.";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
 
@@ -259,7 +259,7 @@ namespace apl {
   void PhononDispersionCalculator::writePDIS(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE); //ME20181226
     string message = "Writing dispersion curves into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
     //CO - START
     //ofstream outfile("PDIS",ios_base::out);
@@ -445,7 +445,7 @@ namespace apl {
   void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHEIGENVAL_FILE);
     string message = "Writing phonon eigenvalues into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
+    pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     stringstream eigenval;
     eigenval << createEIGENVAL();
     aurostd::stringstream2file(eigenval, filename);

@@ -1835,6 +1835,8 @@ class xStream {
     void free();
     //void freeAll(); //CO20190318 - not necessary
     void copy(const xStream& b);
+    void initialize(ostream&);  // ME20200427
+    void initialize(ofstream&, ostream&);  // ME20200427
     //NECESSARY END CLASS METHODS - END
     //logger variables
     ostream* p_oss;

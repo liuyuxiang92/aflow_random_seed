@@ -1,5 +1,6 @@
 3.2.1   - 2020/02/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        -- Enhanced logger support for APL using xStream. (ME)
         -- Added state writer and reader for the force constant calculators. (ME)
         -- Added more KPOINTS_GRID and RELAX_COMMENSURATE options to APL. (ME)
         -- NBANDS now scales with supercell size if set in the parent aflow.in (ME)

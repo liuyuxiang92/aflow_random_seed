@@ -16,20 +16,20 @@ static const string _APL_LRPC_MODULE_ = "APL";  // for the logger
 
 namespace apl {
 
-  LinearResponsePC::LinearResponsePC() : ForceConstantCalculator() {
+  LinearResponsePC::LinearResponsePC(ostream& oss) : ForceConstantCalculator(oss) {
     free();
   }
 
   LinearResponsePC::LinearResponsePC(Supercell& sc,
       _xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os)
-    : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, os) {
+      _xflags& xflags, string& AflowIn, ofstream& mf, ostream& oss)
+    : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, oss) {
       free();
     }
 
   LinearResponsePC::LinearResponsePC(const LinearResponsePC& that)
     : ForceConstantCalculator(*that._supercell, *that._xInput, *that._aflowFlags, *that._kbinFlags,
-      *that._xFlags, *that._AflowIn, *that.messageFile, *that.oss) {
+      *that._xFlags, *that._AflowIn, *that.getOFStream(), *that.getOSS()) {
     free();
     copy(that);
   }
@@ -43,11 +43,12 @@ namespace apl {
   }
 
   LinearResponsePC::~LinearResponsePC() {
+    xStream::free();
     free();
   }
 
   void LinearResponsePC::clear(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os) {
+      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn) {
     free();
     _supercell = &sc;
     _xInput = &xinput;
@@ -55,17 +56,14 @@ namespace apl {
     _kbinFlags = &kflags;
     _xFlags = &xflags;
     _AflowIn = &AflowIn;
-    messageFile = &mf;
-    oss = &os;
   }
 
   void LinearResponsePC::copy(const LinearResponsePC& that) {
+    xStream::copy(that);
     _aflowFlags = that._aflowFlags;
     _AflowIn = that._AflowIn;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
-    messageFile = that.messageFile;
-    oss = that.oss;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
     _kbinFlags = that._kbinFlags;
@@ -96,7 +94,7 @@ namespace apl {
   bool LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
     if (zerostate_chgcar) {
       string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, *oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     }
     bool stagebreak = false;
 
@@ -143,8 +141,8 @@ namespace apl {
       xInput.setDirectory(_xInput->getDirectory() + "/" + runname);
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
-        createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *messageFile);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+        createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *p_FileMESSAGE);
         stagebreak = true;
       }
     }
@@ -186,7 +184,7 @@ namespace apl {
   bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
 
     // Read vasprun.xml
@@ -195,7 +193,7 @@ namespace apl {
       filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
       if (aurostd::EFileExist(filename)) {
         message << "Could not find vasprun.xml file for linear response calculations.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
         return false;
       }
     }
@@ -275,7 +273,7 @@ namespace apl {
   void LinearResponsePC::saveState(const string& filename) {
     string function = "apl::LinearResponsePC::saveState()";
     string message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, std::cout);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
     out << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -298,7 +296,7 @@ namespace apl {
   void LinearResponsePC::readFromStateFile(const string& filename) {
     string function = "apl::LinearResponsePC::readFromState()";
     string message = "Reading state of the phonon calculator from " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, std::cout);
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);

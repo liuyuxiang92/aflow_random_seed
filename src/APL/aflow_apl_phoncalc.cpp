@@ -22,14 +22,14 @@ static const string _APL_PHCALC_ERR_PREFIX_ = "apl::PhononCalculator::";
 
 namespace apl {
 
-  PhononCalculator::PhononCalculator() {
+  PhononCalculator::PhononCalculator(ostream& oss) : xStream() {
     free();
+    xStream::initialize(oss);
   }
 
-  PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf, ostream& os) {
+  PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf, ostream& oss) : xStream() {
     free();
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(mf, oss);
     _supercell = &sc;
     _directory = "./";
     _ncpus = 1;
@@ -51,6 +51,7 @@ namespace apl {
   }
 
   void PhononCalculator::copy(const PhononCalculator& that) {
+    xStream::copy(that);
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
     _directory = that._directory;
@@ -62,11 +63,10 @@ namespace apl {
     _recsqrtDielectricTensorDeterminant = that._recsqrtDielectricTensorDeterminant;
     _supercell = that._supercell;
     _system = that._system;
-    messageFile = that.messageFile;
-    oss = that.oss;
   }
 
   PhononCalculator::~PhononCalculator() {
+    xStream::free();
     free();
   }
 
@@ -85,11 +85,9 @@ namespace apl {
   }
 
 
-  void PhononCalculator::clear(Supercell& sc, ofstream& mf, ostream& os) {
+  void PhononCalculator::clear(Supercell& sc) {
     free();
     _supercell = &sc;
-    messageFile = &mf;
-    oss = &os;
   }
 
 }  // namespace apl
@@ -129,14 +127,6 @@ namespace apl {
 
   int PhononCalculator::getNCPUs() const {
     return _ncpus;
-  }
-
-  ofstream& PhononCalculator::getOutputFileStream() {
-    return *messageFile;
-  }
-
-  ostream& PhononCalculator::getOutputStringStream() {
-    return *oss;
   }
 
   // ME20200206
