@@ -8411,7 +8411,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
@@ -8444,7 +8444,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8490,15 +8490,10 @@ namespace pflow {
         message << "Loading entries from COMMON";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       } else {
-        if(server == "materials.duke.edu") {
-          message << "Using materials.duke.edu as server";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-        } else if(server == "aflowlib.duke.edu") {
-          message << "Using aflowlib.duke.edu as server";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        if((server==AFLOW_MATERIALS_SERVER_DEFAULT)||(server==AFLOWLIB_SERVER_DEFAULT)){
+          message << "Using " << server << " as server";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         } else {
-          message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          message << "Server must be either " << AFLOW_MATERIALS_SERVER_DEFAULT << " or " << AFLOWLIB_SERVER_DEFAULT;pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;  //entries;
         }
       }
@@ -8649,7 +8644,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
@@ -8684,7 +8679,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8725,7 +8720,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
@@ -8758,7 +8753,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8903,7 +8898,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(LIB, elements, server, entries, FileMESSAGE, oss);
   }
@@ -8938,7 +8933,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
@@ -8980,7 +8975,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9017,7 +9012,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9061,7 +9056,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(LIB, elements, server, entries, FileMESSAGE, oss);
   }
@@ -9096,7 +9091,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
@@ -9138,7 +9133,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9175,7 +9170,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9262,19 +9257,13 @@ namespace pflow {
       }
     }
     if(!load_from_common) {
-      if(server == "materials.duke.edu") {
+      if((server == AFLOW_MATERIALS_SERVER_DEFAULT)||(server==AFLOWLIB_SERVER_DEFAULT)) {
         if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
-          message << "Using materials.duke.edu as server";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-        }
-      } else if(server == "aflowlib.duke.edu") {
-        if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
-          message << "Using aflowlib.duke.edu as server";
+          message << "Using " << server << " as server";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         }
       } else {
-        message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        message << "Server must be either " << AFLOW_MATERIALS_SERVER_DEFAULT << " or " << AFLOWLIB_SERVER_DEFAULT;pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         return false;  //entries;
       }
       if(isICSD) {

@@ -56,6 +56,99 @@
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
 
+bool EgapTest(ostream& oss){ofstream FileMESSAGE;return EgapTest(FileMESSAGE,oss);}  //CO20190520
+bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
+  string soliloquy="EgapTest():";
+  bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+
+  message << "Performing Egap test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  string system="",path="",query="",file="",efile="",ext="",tfile="",Egap_type="";
+  vector<string> files;
+  xOUTCAR xout(FileMESSAGE,oss);
+  double EFERMI=AUROSTD_MAX_DOUBLE,Egap=0.0;
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  //FCC/Si1_ICSD_150530
+  system="ICSD_WEB/FCC/Si1_ICSD_150530";
+  
+  path=AFLOWLIB_SERVER_DEFAULT+"/AFLOWDATA/"+system;
+  query=path+"/?files";
+  message << "Fetching: " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  aurostd::url2tokens(query,files,",");
+  if(files.size()==0){
+    message << "Could not fetch query: " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  //OUTCAR.static
+  file="OUTCAR.static";
+  if(!aurostd::EWithinList(files,file,efile)){
+    message << "No " << file << " found within " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  ext=aurostd::GetCompressionExtension(efile);
+  tfile=aurostd::TmpFileCreate("Egap_file1")+ext;
+  query=path+"/"+efile;
+  message << "Fetching: " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  if(!(aurostd::url2file(query,tfile,LDEBUG) && aurostd::FileExist(tfile))){
+    message << "Could not fetch query: " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  message << "Loaded file to: " << tfile;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  if(!xout.GetPropertiesFile(tfile,!LDEBUG)){
+    message << "xOUTCAR::GetProperties() failed";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+#ifndef _AFLOW_TEMP_PRESERVE_
+  aurostd::RemoveFile(tfile);
+#endif
+  EFERMI=xout.Efermi;
+  //OUTCAR.bands
+  file="OUTCAR.bands";
+  if(!aurostd::EWithinList(files,file,efile)){
+    query=path+"/?files"; //reload query for error message
+    message << "No " << file << " found within " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  ext=aurostd::GetCompressionExtension(efile);
+  tfile=aurostd::TmpFileCreate("Egap_file1")+ext;
+  query=path+"/"+efile;
+  message << "Fetching: " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  if(!(aurostd::url2file(query,tfile,LDEBUG) && aurostd::FileExist(tfile))){
+    message << "Could not fetch query: " << query;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  message << "Loaded file to: " << tfile;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  if(!xout.GetPropertiesFile(tfile,!LDEBUG)){
+    message << "xOUTCAR::GetProperties() failed";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+#ifndef _AFLOW_TEMP_PRESERVE_
+  aurostd::RemoveFile(tfile);
+#endif
+  //GetBandGap
+  message << "Running bandgap code";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  if(!xout.GetBandGap(EFERMI)){
+    message << "xOUTCAR::GetBandGap() failed";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  Egap=+6.1000e-01;
+  if(!aurostd::isequal(Egap,xout.Egap[0])){
+    message << "xOUTCAR::GetBandGap() did not find Egap==" << Egap << ", found instead xOUTCAR.Egap[0]==" << xout.Egap[0];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  Egap_type="insulator-indirect";
+  if(xout.Egap_type[0]!="insulator-indirect"){
+    message << "xOUTCAR::GetBandGap() did not find type==" << Egap_type << ", found instead xOUTCAR.Egap_type[0]==" << xout.Egap_type[0];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+    return false;
+  }
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+
+  return true;
+}
+
 bool gcdTest(ostream& oss){ofstream FileMESSAGE;return gcdTest(FileMESSAGE,oss);}  //CO20190520
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   string soliloquy="gcdTest():";
@@ -309,6 +402,7 @@ int main(int _argc,char **_argv) {
       //exit(0);
       return 0; //CO20180419
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {

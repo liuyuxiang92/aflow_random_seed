@@ -141,6 +141,7 @@ extern string _AFLOWLOCK_;
 // aflow2 default definitions
 #define AFLOW_MATERIALS_SERVER_DEFAULT        string("materials.duke.edu")
 #define AFLOW_WEB_SERVER_DEFAULT              string("nietzsche.mems.duke.edu")
+#define AFLOWLIB_SERVER_DEFAULT               string("aflowlib.duke.edu")
 #define AFLOWLIB_MATERIALS_SERVER             string("aflow.org")
 #define AFLOWLIB_CONSORTIUM_STRING            string("AFLOW - www.aflow.org consortium")
 #define _XENTRY_ string("index.php")
@@ -2428,6 +2429,8 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
+bool EgapTest(ostream& oss=cout);
+bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool gcdTest(ostream& oss=cout);
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool smithTest(ostream& oss=cout);

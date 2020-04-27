@@ -1026,18 +1026,19 @@ patch_makefile2: Makefile
 	cat Makefile | sed "s/\-O1//g" | sed "s/\-O2//g" | sed "s/\-O3//g" > M	
 	mv M Makefile
 check:
-	$(MAKE) proto_check
+	$(MAKE) check_proto
 check_full:
-	$(MAKE) gcd_check
-	$(MAKE) smith_check
-	$(MAKE) proto_check
-	$(MAKE) slab_check
-	$(MAKE) chull_check
-	$(MAKE) pocc_check
-	$(MAKE) aflowSG_check
-	$(MAKE) aflowSYM_check
-	$(MAKE) aflow_xtal_match_check
-proto_check:
+	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
+	$(MAKE) check_gcd
+	$(MAKE) check_smith
+	$(MAKE) check_proto
+	$(MAKE) check_slab
+	$(MAKE) check_chull
+	$(MAKE) check_pocc
+	$(MAKE) check_aflowSG
+	$(MAKE) check_AFLOWSYM
+	$(MAKE) check_aflow_xtal_match
+check_proto:
 	@echo "Performing 'aflow --proto' test"
 	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \
 		PROTO4SUM=$$(./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum | cut -d ' ' -f1) && \
@@ -1050,17 +1051,19 @@ proto_check:
 #	./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum
 #	#ffb9c5681045fb80f391e9a931f21d1
 #	./aflow --checki | grep FAIL
-slab_check:
-	./aflow --slab_test
-gcd_check:
+check_Egap:
+	./aflow --Egap_test
+check_gcd:
 	./aflow --gcd_test
-smith_check:
+check_smith:
 	./aflow --smith_test
-chull_check:
+check_slab:
+	./aflow --slab_test
+check_chull:
 	@echo "Running CHULL test 1 - stability criterion of Mn2PdPt" && ANSWER=32 && SC=$$(./aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t | cut -d' ' -f2) && \
 		if [ -n "$${SC##$$ANSWER*}" ]; then echo "CHULL did not return a stability criterion of ~$$ANSWER meV/atom for Mn2PdPt './aflow --chull --alloy=MnPdPt --sc=aflow:fb9eaa58604ce774 --screen_only --o=t', found $$SC instead" && exit 1; fi
 	@echo "CHULL tests passed"
-pocc_check:
+check_pocc:
 	@echo "Running POCC test 1 - unique structures count of C5HfMoNbTaTi" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:Ti --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
 		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
 	@echo "Running POCC test 2 - unique structures count of C5HfMoNbTaV" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Hf:Mo:Nb:Ta:V --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
@@ -1186,15 +1189,15 @@ pocc_check:
 	@echo "Running POCC test 62 - unique structures count of C5CrMoTiWZr" && ANSWER=49 && COUNT=$$(./aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique | grep 'Structure bin' | tail -1 | awk -F 'bin ' '{print $$2}' | cut -d ':' -f1) && \
 		if [ "$$COUNT" -ne "$$ANSWER" ]; then echo "POCC did not return $$ANSWER unique structures for './aflow --proto=AB_cF8_225_a_b.AB:C:Cr:Mo:Ti:W:Zr --pocc_params=S0-1xA_S1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF | ./aflow --pocc_count_unique', found $$COUNT instead" && exit 1; fi
 	@echo "POCC tests passed"
-aflowSG_check:
+check_aflowSG:
 	@echo "Running aflowSG test 1" && ANSWER="Pm-3m #221" && RESULT=$$(./aflow --proto=AB_cP2_221_b_a:Cl:Cs | ./aflow --aflowSG) && \
 		if [ "$$RESULT" != "$$ANSWER" ]; then "aflowSG did not return $$ANSWER for './aflow --proto=AB_cP2_221_b_a:Cl:Cs | ./aflow --aflowSG', found $$RESULT instead" && exit 1; fi
 	@echo "aflowSG test 1 passed!"
-aflowSYM_check:
+check_AFLOWSYM:
 	@echo "Running aflowSYM test 1" && ANSWER_PGROUPS=8 && ANSWER_PGROUPKS=8 && ANSWER_FGROUPS=4 && ANSWER_PGROUP_XTALS=4 && ANSWER_PGROUPK_XTALS=4 && ANSWER_AGROUPS=24 && ANSWER_SGROUPS=108 && RESULT=$$(./aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only) && COUNT_PGROUPS=$$(echo $$RESULT | awk -F'pgroup ' '{print NF-1}') && COUNT_PGROUPKS=$$(echo $$RESULT | awk -F'pgroupk ' '{print NF-1}') && COUNT_FGROUPS=$$(echo $$RESULT | awk -F'fgroup ' '{print NF-1}') && COUNT_PGROUP_XTALS=$$(echo $$RESULT | awk -F'pgroup_xtal ' '{print NF-1}') && COUNT_PGROUPK_XTALS=$$(echo $$RESULT | awk -F'pgroupk_xtal ' '{print NF-1}') && COUNT_AGROUPS=$$(echo $$RESULT | awk -F'agroup ' '{print NF-1}') && COUNT_SGROUPS=$$(echo $$RESULT | awk -F'sgroup ' '{print NF-1}') && \
 		if [ "$$ANSWER_PGROUPS" -ne "$$COUNT_PGROUPS" ] || [ "$$ANSWER_PGROUPKS" -ne "$$COUNT_PGROUPKS" ] || [ "$$ANSWER_FGROUPS" -ne "$$COUNT_FGROUPS" ] || [ "$$ANSWER_PGROUP_XTALS" -ne "$$COUNT_PGROUP_XTALS" ] || [ "$$ANSWER_PGROUPK_XTALS" -ne "$$COUNT_PGROUPK_XTALS" ] || [ "$$ANSWER_AGROUPS" -ne "$$COUNT_AGROUPS" ] || [ "$$ANSWER_SGROUPS" -ne "$$COUNT_SGROUPS" ]; then "aflowSYM did not return one of the correct group cardinalities for './aflow --proto=ABC2_mP8_10_ac_eh_mn-001:Au:Ag:Te | ./aflow --aflowSYM --screen_only'; (ANSWER==FOUND) $$ANSWER_PGROUPS==$$COUNT_PGROUPS, $$ANSWER_PGROUPKS==$$COUNT_PGROUPKS, $$ANSWER_FGROUPS==$$COUNT_FGROUPS, $$ANSWER_PGROUP_XTALS==$$COUNT_PGROUP_XTALS, $$ANSWER_PGROUPK_XTALS==$$COUNT_PGROUPK_XTALS, $$ANSWER_AGROUPS==$$COUNT_AGROUPS, $$ANSWER_SGROUPS==$$COUNT_SGROUPS"  && exit 1; fi
 	@echo "aflowSYM test 1 passed!"
-aflow_xtal_match_check:
+check_aflow_xtal_match:
 	@echo "Running aflow_xtal_match test 1" && ANSWER=1 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
 		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_match did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
 	@echo "aflow_xtal_match test 1 passed!"

@@ -1407,7 +1407,7 @@ namespace aflowlib {
       // [OBSOLETE]  } // iext
 
       // FILES to remove
-      deque<string> vfile2remove; aurostd::string2tokens("KPOINTS.bands.old,EIGENVAL.bands.old,OUTCAR.relax1,OUTCAR.bands",vfile2remove,",");
+      deque<string> vfile2remove; aurostd::string2tokens("KPOINTS.bands.old,EIGENVAL.bands.old,OUTCAR.relax1",vfile2remove,","); //CO20200404 - removed OUTCAR.bands from this list, we need for Egap. EIGENVAL.bands does not have occupancies
       vfile2remove.push_back("aflow.pgroupk_xtal.out"); // comes from nowere DX
       for(uint iremove=0;iremove<vfile2remove.size();iremove++) {
         if(aurostd::FileExist(directory_RAW+"/"+vfile2remove.at(iremove))) { // need to be present

@@ -70,6 +70,8 @@
         -- patched --bandgap function with new xOUTCAR.GetProperties() routine (CO)
         -- removed xOUTCAR.ERROR, xDOSCAR.ERROR, xAIMSOUT.ERROR (CO)
         -- unfriended effective mass functions (CO)
+        -- including OUTCAR.bands in WEB, needed for Egap; EIGENVAL.bands does not have occupancies (CO)
+        -- added unit test for Egap, will add to check_full once ICSD LIB2RAW is redone (CO)
 3.2.2j - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- standardized vext,vcat,vzip from XHOST 2j (SC)
