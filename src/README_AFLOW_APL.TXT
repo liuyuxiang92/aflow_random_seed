@@ -34,6 +34,7 @@ Table of Contents:
 2.1.2.    Supercell Parameters
 2.1.3.    k-Point Parameters
 2.1.4.    Polar Corrections
+2.1.5.    Number of Bands
 2.2.    Direct Method Parameters
 2.3.    Linear Response Method Parameters
 
@@ -84,10 +85,15 @@ forces. This can be achieved in one of two ways:
     already exists. The input and output files are saved in XXXCAR.relax_aplN with N = 1,2.
     For more information on the PREC option, see Section 2.1.1.
 
-    APL automatically chooses the k-point grid for the relaxation to be commensurate with the
+    APL can automatically choose the k-point grid for the relaxation to be commensurate with the
     k-point grid for the supercell. For example, if a 3x2x1 supercell uses a 2x2x3 k-point gird,
     the unit cell will be relaxed using a 6x4x3 k-point grid. This minimizes the risk of ghost
-    forces in the supercell calculations.
+    forces in the supercell calculations. This feature can be turned on by using:
+
+      [AFLOW_APL]RELAX_COMMENSURATE=ON
+
+    The default is ON. If this option is OFF, APL will use the k-point settings for RELAX runs.
+    See README_AFLOW.TXT for more information.
 
     NOTE: Relaxations will be skipped when a PHPOSCAR file is present (see below).
 
@@ -201,6 +207,12 @@ general AFLOW k-point parameters:
       entry. The "[AFLOW_APL]KPPRA" flag overrides this for APL calculations. See README_AFLOW.TXT
       for more information on KPPRA.
 
+    * The k-point grid can also be set directly using:
+
+        [AFLOW_APL]KPOINTS_GRID=k1xk2xk3
+
+      This takes precedence over KPPRA. KPPRA is used as default.
+
     * The k-point scheme can be set using:
 
         [AFLOW_APL]KSCHEME=scheme
@@ -241,6 +253,12 @@ unlimited, the following line needs to be written either in the .bashrc file or 
 The dielectric constant tensor and the Born effective charge tensor is by default calculated using
 the tag LEPSILON in the VASP INCAR file, but can be calculated using LCALCEPS as well. To switch to
 LCALCEPS, the value DEFAULT_APL_USE_LEPSILON in the aflow.rc file needs to be set to false (0).
+
+2.1.5. Number of Bands
+
+If NBANDS is set in the parent aflow.in file, APL will scale the number of bands automatically in
+the supercell file. For example, if NBANDS = 20 and a 2x2x2 supercell is used, NBANDS will be set
+to 80 in the supercell calculations.
 
 2.2. Direct Method Parameters
 
