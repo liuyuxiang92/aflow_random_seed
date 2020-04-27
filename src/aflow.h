@@ -1837,6 +1837,8 @@ class xStream {
     void free();
     //void freeAll(); //CO20190318 - not necessary
     void copy(const xStream& b);
+    void initialize(ostream&);
+    void initialize(ofstream&, ostream&);
     //NECESSARY END CLASS METHODS - END
     //logger variables
     ostream* p_oss;
@@ -2958,10 +2960,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     xOUTCAR(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
     xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
-    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
-    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,bool=TRUE);
     
     xOUTCAR(const xOUTCAR& b);                                    // constructor copy
     ~xOUTCAR();                                                   // kill everything

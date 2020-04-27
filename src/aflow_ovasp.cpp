@@ -18,41 +18,31 @@ string time_delay(long double seconds) { return aurostd::utype2string<long doubl
 //---------------------------------------------------------------------------------
 // class xOUTCAR
 //---------------------------------------------------------------------------------
-xOUTCAR::xOUTCAR(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
-xOUTCAR::xOUTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
-xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
-xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(ostream& oss) : xStream() {
+  free();
+  xStream::initialize(oss); //CO20200404 - xStream integration for logging
+}
 
-bool xOUTCAR::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(*_p_FileMESSAGE,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xOUTCAR::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
-  m_initialized=false;  //no point
-  return m_initialized;
+  xStream::initialize(FileMESSAGE, oss); //CO20200404 - xStream integration for logging
 }
-bool xOUTCAR::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  xStream::free();
-  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
-  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
-  f_new_ofstream=true;  //override
-  return m_initialized;
-}
-bool xOUTCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
-  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+
+xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {
   free();
-  setOFStream(FileMESSAGE); f_new_ofstream=false;
-  setOSS(oss);
+  xStream::initialize(oss);  //CO20200404 - xStream integration for logging
+  initialize(fileIN, QUIET);
+}
+
+xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {
+  free();
+  xStream::initialize(FileMESSAGE, oss);  //CO20200404 - xStream integration for logging
+  m_initialized = initialize(fileIN, QUIET);
+}
+
+bool xOUTCAR::initialize(const string& fileIN, bool QUIET) {
   filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-  m_initialized=true;  //no point
-  return m_initialized;
+  return GetPropertiesFile(fileIN,QUIET);
 }
 
 xOUTCAR::xOUTCAR(const xOUTCAR& b) {free();copy(b);} // copy PUBLIC

@@ -2036,6 +2036,20 @@ ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
 
+void xStream::initialize(ostream& oss) {
+  free();
+  p_FileMESSAGE = new ofstream();
+  f_new_ofstream = true;
+  initialize(*p_FileMESSAGE, oss);
+  f_new_ofstream = true;  // override
+}
+
+void xStream::initialize(ofstream& ofs, ostream& oss) {
+  setOFStream(ofs);
+  f_new_ofstream = false;
+  setOSS(oss);
+}
+
 #endif  // _AFLOW_CLASSES_CPP
 
 
