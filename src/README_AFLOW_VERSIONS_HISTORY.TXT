@@ -69,6 +69,7 @@
         -- removed error in xOUTCAR looking for irreducible kpoints, this fails for all OUTCAR.bands (CO)
         -- patched --bandgap function with new xOUTCAR.GetProperties() routine (CO)
         -- removed xOUTCAR.ERROR, xDOSCAR.ERROR, xAIMSOUT.ERROR (CO)
+        -- unfriended effective mass functions (CO)
 3.2.2j - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- standardized vext,vcat,vzip from XHOST 2j (SC)
