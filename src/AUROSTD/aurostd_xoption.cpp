@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 2013-2014
@@ -17,7 +17,7 @@ namespace aurostd {
 
   // constructure
   xoption::xoption() {
-    keyword=""; //DX 20180824 - missing from constructor
+    keyword=""; //DX20180824 - missing from constructor
     isentry=FALSE; 
     content_string="";
     content_double=0.0;
@@ -43,7 +43,7 @@ namespace aurostd {
 
   // copy fuction
   void xoption::copy(const xoption& b) {
-    keyword=b.keyword; //DX 20180824 - missing from copy constructor
+    keyword=b.keyword; //DX20180824 - missing from copy constructor
     isentry=b.isentry;
     content_string=b.content_string;
     content_double=b.content_double;
@@ -97,7 +97,7 @@ namespace aurostd {
     if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: option_DEFAULT=" << (option_DEFAULT?"TRUE":"FALSE") << endl;
     if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
     // start the scan
-    //string keyword; //CO 180404 - now a member of the object
+    //string keyword; //CO20180404 - now a member of the object
     vector<string> vkeyword;
     // tokenize the option
     aurostd::string2tokens(input_keyword,vkeyword,"|"); 
@@ -144,8 +144,8 @@ namespace aurostd {
         if(isentry && !xscheme_DEFAULT.empty()) {
           if(LDEBUG) cerr << "DEBUG - aurostd::xoption::options2entry: SCHEME MODE" << endl;
           content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,FALSE));
-          // ME 181030 - Special case: if the scheme is a Boolean keyword, unset option
-          // ME 190107 - Cannot use N or F because it's ambiguous (nitrogen, fluorine)
+          //ME20181030 - Special case: if the scheme is a Boolean keyword, unset option
+          //ME20190107 - Cannot use N or F because it's ambiguous (nitrogen, fluorine)
           string content = aurostd::toupper(content_string);
           if ((content == "OFF") || (content == "FALSE") || (content == "NO")) {
             option = false;
@@ -283,10 +283,10 @@ namespace aurostd {
     }
   }
 
-  bool xoption::isscheme(string check) const {                     //CO 180101
-    // ISSCHEME and FLAG checks only vxscheme... does not manage the ghost, so for example    // SC20200114
-    // CONVERT_UNIT_CELL (as flag) will not be confused with CONVERT_UNIT_CELL=STANDARD as method.   // SC20200114
-    // Thanks to Marco Esters for getting this bug.   // SC20200114
+  bool xoption::isscheme(string check) const {                     //CO20180101
+    // ISSCHEME and FLAG checks only vxscheme... does not manage the ghost, so for example    //SC20200114
+    // CONVERT_UNIT_CELL (as flag) will not be confused with CONVERT_UNIT_CELL=STANDARD as method.   //SC20200114
+    // Thanks to Marco Esters for getting this bug.   //SC20200114
     string a,b;
     // check schemes list going through vxscheme 1 by 1
     for(uint i=0;i<vxscheme.size();i++) {
@@ -302,6 +302,18 @@ namespace aurostd {
         return TRUE;
       }
     }
+    //SC20200310 // THIS IS INCORRECT 
+    //SC20200310 // check attached schemes list going through vxsghost 2 by 2  //SC20191227
+    //SC20200310 for(uint i=0;i<vxsghost.size();i+=2) {
+    //SC20200310   //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;  
+    //SC20200310   a=aurostd::toupper(vxsghost.at(i));                         // shortcuts
+    //SC20200310   b=aurostd::toupper(check);                                  // shortcuts
+    //SC20200310   if(a==b) {
+    //SC20200310     //	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;  
+    //SC20200310    return TRUE;
+    //SC20200310   }
+    //SC20200310 }
+    //SC20200310 // nor in scheme nor in attached scheme... exit
     return FALSE;
   }
 
@@ -326,11 +338,11 @@ namespace aurostd {
     if(operation==TRUE) {
       if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
       if(LDEBUG) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: ADD_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
-      //CO181226 START - check that it doesn't already exist, multiples don't affect isscheme, but affects how we iterate through aplopts
+      //CO20181226 START - check that it doesn't already exist, multiples don't affect isscheme, but affects how we iterate through aplopts
       for(uint i=0;i<vxscheme.size();i++){
         if(aurostd::toupper(vxscheme.at(i))==aurostd::toupper(_xscheme)){opscheme(_xscheme,FALSE);} //recursion is GNU's pleasure
       }
-      //CO181226 STOP
+      //CO20181226 STOP
       vxscheme.push_back(aurostd::toupper(_xscheme));
       if(LDEBUG) for(uint i=0;i<vxscheme.size();i++) cerr << "DEBUG - aurostd::xoption::opscheme: ADD_BEFORE vxscheme.at(" << i << ")=" << vxscheme.at(i) << endl;
     } else {
@@ -359,28 +371,28 @@ namespace aurostd {
 
   bool xoption::flag(void) const {  // same as ischeme
     if(vxscheme.size()>0) return TRUE;
-    // NO NEED ANYMORE SC20200114    if(vxsghost.size()>0) return TRUE;  // SC 20191227
+    // NO NEED ANYMORE SC20200114    if(vxsghost.size()>0) return TRUE;  //SC20191227
     return FALSE;
   }
 
   // now for the attached ones.
 
-  bool xoption::isdefined(string check) const {                        // SC20200114
-    // checks only scheme (vxscheme) it does not go through the attached schemes (vxghost).   // SC20200114
-    string a,b;   // SC20200114
-    // check schemes list going through vxscheme 1 by 1   // SC20200114
-    // check attached schemes list going through vxsghost 2 by 2  // SC 20191227    // SC20200114
-    for(uint i=0;i<vxsghost.size();i+=2) {   // SC20200114
-      //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;     // SC20200114
-      a=aurostd::toupper(vxsghost.at(i));                         // shortcuts   // SC20200114
-      b=aurostd::toupper(check);                                  // shortcuts   // SC20200114
-      if(a==b) {   // SC20200114
-        //	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;     // SC20200114
-        return TRUE;   // SC20200114
-      }   // SC20200114
-    }   // SC20200114
-    return FALSE;   // SC20200114
-  }   // SC20200114
+  bool xoption::isdefined(string check) const {                        //SC20200114
+    // checks only scheme (vxscheme) it does not go through the attached schemes (vxghost).   //SC20200114
+    string a,b;   //SC20200114
+    // check schemes list going through vxscheme 1 by 1   //SC20200114
+    // check attached schemes list going through vxsghost 2 by 2  //SC20191227    //SC20200114
+    for(uint i=0;i<vxsghost.size();i+=2) {   //SC20200114
+      //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;     //SC20200114
+      a=aurostd::toupper(vxsghost.at(i));                         // shortcuts   //SC20200114
+      b=aurostd::toupper(check);                                  // shortcuts   //SC20200114
+      if(a==b) {   //SC20200114
+        //	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;     //SC20200114
+        return TRUE;   //SC20200114
+      }   //SC20200114
+    }   //SC20200114
+    return FALSE;   //SC20200114
+  }   //SC20200114
 
   string xoption::getattachedscheme(string xscheme) const {
     if(vxsghost.size()==0) return "";
@@ -399,11 +411,11 @@ namespace aurostd {
     if(operation==TRUE) {
       if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opattachedscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
       if(LDEBUG) cerr << "DEBUG - aurostd::xoption::opattachedscheme: GHOST=" << attached << endl;
-      //CO181226 START - check that it doesn't already exist, multiples affect getattachedscheme
+      //CO20181226 START - check that it doesn't already exist, multiples affect getattachedscheme
       for(uint i=0;i<vxsghost.size();i+=2) {
         if(aurostd::toupper(vxsghost.at(i))==aurostd::toupper(_xscheme)) {opattachedscheme(_xscheme,attached,FALSE);} //recursion is GNU's pleasure
       }
-      //CO181226 STOP
+      //CO20181226 STOP
       vxsghost.push_back(aurostd::toupper(_xscheme));
       vxsghost.push_back(attached);
     }  else {
@@ -488,6 +500,6 @@ namespace aurostd {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

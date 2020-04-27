@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -1095,7 +1095,7 @@ namespace apennsy_std {
 	lines[j++] << "(fractional)   ";
 	read_VASPIN(lines,231,"230,231","        "," "," ","CuAl$_2$ ",VERB);// 230,231  tI12                  CuAl2   #140      
 	read_VASPIN(lines,232,"232,233","C11$_b$ "," "," ","MoSi$_2$ ",VERB);// 232,233  tI6    I4/mmm  C11_b  MoSi2   #139  
-	read_VASPIN(lines,234,"234,235","C16     "," "," ","Al$_2$Cu ",VERB);// 234,235  tl12   I4/mcm  C16    Al2Cu   #140 130617.cif
+	read_VASPIN(lines,234,"234,235","C16     "," "," ","Al$_2$Cu ",VERB);// 234,235  tl12   I4/mcm  C16    Al2Cu   #140 20130617.cif
 	read_VASPIN(lines,246,"246,247","        "," "," ","CaIn$_2$         ",VERB);// 246,247  hP6    P63/mmc          CaIn2   #194 AL5296.cif  
 	for(i=1;i<j;i++) lines[i] << "\t \\\\ ";
 	// cout << "{\\begin{center}" << endl;
@@ -1369,6 +1369,6 @@ namespace apennsy_std {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

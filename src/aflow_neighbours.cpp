@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 //
@@ -31,7 +31,7 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
   bool Krun=TRUE;
   bool LVERBOSE=TRUE;
   // DO THE NEIGHBOURS CALCULATION
-  // ME20190107 - Support for American spelling
+  //ME20190107 - Support for American spelling
   aurostd::StringSubst(AflowIn, "[AFLOW_NEIGHBORS]", "[AFLOW_NEIGHBOURS]");
   if(aurostd::substring2bool(AflowIn,"[AFLOW_NEIGHBOURS]CALC",TRUE)) {
     kflags.KBIN_NEIGHBOURS_CALCULATION=TRUE;
@@ -272,6 +272,6 @@ bool StepNeighboursPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_a
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 // ***************************************************************************
 // 
@@ -191,40 +191,64 @@ namespace plotter {
   void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
     string soliloquy="plotter::savePlotGNUPLOT():";
-    string directory = plotoptions.getattachedscheme("DIRECTORY");
-    if(directory.empty()){directory=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
-    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
-    string filename = plotoptions.getattachedscheme("FILE_NAME");
-    if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
-    string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
-    // PDF is default since we use pdflatex to compile
-    string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
-    if (format.empty()) format = "pdf";
-    string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
-    // Create temp directory
-    string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
-    chdir(tmp.c_str());
-    // Execute gnuplot and pdflatex
-    aurostd::stringstream2file(gpfile, filename + ".plt");
-    aurostd::execute(XHOST.command("gnuplot") + " " + filename + ".plt");
-    aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex 2>&1 > /dev/null");
-    // Convert to the desired format if not pdf
-    if (format != "pdf") {
-      aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
+    //ME20200327 - Check that all required binaries are available
+    // Check that gnuplot is version 5+
+    if (XHOST.is_command("gnuplot")) {
+      string versionstring = aurostd::execute2string(XHOST.command("gnuplot") + " --version");
+      vector<string> tokens;
+      aurostd::string2tokens(versionstring, tokens, " ");
+      double version = aurostd::string2utype<double>(tokens[1]);
+      if (version < 5.0) {
+        string message = "Gnuplot needs to be version 5 or newer (found " + tokens[1] + ").";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+      }
     }
-    chdir(current_dir.c_str());
-    aurostd::CopyFile(tmp + filename_latex + "." + format, directory + "/" + filename + "." + format);
-    if(LDEBUG){cerr << soliloquy << " moving file to: " << directory + "/" + filename + "." + format << endl;}
-    // Keep gnuplot file if aflow was called with --keep=gpl
-    if (XHOST.vflag_control.flag("KEEP::GPL")) {
-      aurostd::CopyFile(tmp + filename + ".plt", directory);
+    string binaries = "gnuplot,pdflatex,repstopdf,convert";
+    vector<string> missing_binaries, required_binaries;
+    aurostd::string2tokens(binaries, required_binaries, ",");
+    for (uint i = 0; i < required_binaries.size(); i++) {
+      if (!XHOST.is_command(required_binaries[i])) missing_binaries.push_back(required_binaries[i]);
     }
-    // Clean up
-    aurostd::RemoveDirectory(tmp);
-    if (!aurostd::FileExist(directory + "/" + filename + "." + format)) {
-      string function = "plotter::savePlotGNUPLOT():";
-      string message = "Error while generating plot.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+
+    if (missing_binaries.size() == 0) {
+      string directory = plotoptions.getattachedscheme("DIRECTORY");
+      if(directory.empty()){directory=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
+      if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
+      string filename = plotoptions.getattachedscheme("FILE_NAME");
+      if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
+      string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
+      // PDF is default since we use pdflatex to compile
+      string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
+      if (format.empty()) format = "pdf";
+      string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
+      // Create temp directory
+      string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
+      chdir(tmp.c_str());
+      // Execute gnuplot and pdflatex
+      aurostd::stringstream2file(gpfile, filename + ".plt");
+      aurostd::execute(XHOST.command("gnuplot") + " " + filename + ".plt");
+      aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex 2>&1 > /dev/null");
+      // Convert to the desired format if not pdf
+      if (format != "pdf") {
+        aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
+      }
+      chdir(current_dir.c_str());
+      aurostd::CopyFile(tmp + filename_latex + "." + format, directory + "/" + filename + "." + format);
+      if(LDEBUG){cerr << soliloquy << " moving file to: " << directory + "/" + filename + "." + format << endl;}
+      // Keep gnuplot file if aflow was called with --keep=gpl
+      if (XHOST.vflag_control.flag("KEEP::GPL")) {
+        aurostd::CopyFile(tmp + filename + ".plt", directory);
+      }
+      // Clean up
+      aurostd::RemoveDirectory(tmp);
+      if (!aurostd::FileExist(directory + "/" + filename + "." + format)) {
+        string function = "plotter::savePlotGNUPLOT():";
+        string message = "Error while generating plot.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      }
+    } else {
+      string message = "The following binaries are missing: " + aurostd::joinWDelimiter(missing_binaries, " ") + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -239,6 +263,12 @@ namespace plotter {
     if (filename.empty()) {
       string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
       if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
+      //ME20200228 - Remove ANRL parameters
+      string::size_type t = default_title.find(":ANRL=");
+      if (t != string::npos) {
+        default_title = default_title.substr(0, t);
+        if(LDEBUG){std::cerr << soliloquy << " default_title (post ANRL)=" << default_title << std::endl;}
+      }
       filename = default_title;
       // Get filename
       string ext = plotoptions.getattachedscheme("EXTENSION");
@@ -298,6 +328,14 @@ namespace plotter {
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, ".");
+      //ME20200228 - title may contain ANRL parameters
+      if ((tokens.size() > 2) && aurostd::substring2bool(tokens[2], "ANRL")) {
+        string::size_type t = tokens[2].find_first_of(":");
+        if (t != string::npos) {
+          tokens[2] = tokens[2].substr(0, t);
+          tokens.erase(tokens.begin() + 3, tokens.end());
+        }
+      }
       if ((tokens.size() == 2) || (tokens.size() == 3)) {
         string proto = tokens[1];
         vector<string> protos;
@@ -392,8 +430,8 @@ namespace plotter {
   //formatDefaultTitlePOCC//////////////////////////////////////////////////////
   // Converts a POCC-formatted title into a plot title. It currently only works
   // if the POCC string consists only of P-designations.
-  string formatDefaultTitlePOCC(const xoption& plotoptions) {return formatDefaultTitlePOCC_191004(plotoptions);} //CO20191110
-  string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version //CO20191110
+  string formatDefaultTitlePOCC(const xoption& plotoptions) {return formatDefaultTitlePOCC_20191004(plotoptions);} //CO20191110
+  string formatDefaultTitlePOCC_20191004(const xoption& plotoptions) {  //CO version //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="plotter::formatDefaultTitlePOCC():";
     stringstream message;
@@ -509,7 +547,7 @@ namespace plotter {
 
     return new_title; //aurostd::fixStringLatex(new_title, false, false);  //substs $ for \\$
   }
-  string formatDefaultTitlePOCC_190101(const xoption& plotoptions) {  //ME version
+  string formatDefaultTitlePOCC_20190101(const xoption& plotoptions) {  //ME version
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="plotter::formatDefaultTitlePOCC():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
@@ -779,7 +817,7 @@ namespace plotter {
     }
 
     plotoptions.push_attached("DEFAULT_TITLE", xdos.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  //CO20191110 - MARCO, check out and let me know if we should apply everywhere
+    patchDefaultTitleAFLOWIN(plotoptions);  //CO20191110 - ME, check out and let me know if we should apply everywhere
     setFileName(plotoptions);
     setTitle(plotoptions);
 
@@ -921,6 +959,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    patchDefaultTitleAFLOWIN(plotoptions);  //ME20200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
@@ -974,6 +1013,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    patchDefaultTitleAFLOWIN(plotoptions);  //ME20200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
@@ -1005,7 +1045,7 @@ namespace plotter {
     std::stringstream poscar;
     //if (plotoptions.getattachedscheme("EXTENSION") == "phdos")
     if (carstring == "PHON")
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);
     } else if(carstring == "POCC") { //CO20191110
       //[do NOT load in PARTCAR, we need an example ARUN POSCAR, they all have the same num_each_type]aurostd::efile2stringstream(directory+"/PARTCAR", poscar);
@@ -2162,7 +2202,7 @@ namespace plotter {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 // ***************************************************************************

@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
 // *                                                                         *
 // ***************************************************************************
 // AFLOW-XtalMatch (compare crystal structures)
@@ -402,15 +402,15 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
       sscontent_json << "\"properties_structures_duplicate\":[";
       tmp_vstring.clear();
       //DX20190326 - should be duplicate for(uint i=0;i<StructurePrototype.properties_structure_representative.size();i++)
-      for(uint i=0;i<StructurePrototype.properties_structures_duplicate.size();i++) // DX20190326 - correctly changed to duplicate_sturctures_properties
-      { //CO200106 - patching for auto-indenting
+      for(uint i=0;i<StructurePrototype.properties_structures_duplicate.size();i++) //DX20190326 - correctly changed to duplicate_sturctures_properties
+      { //CO20200106 - patching for auto-indenting
         tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_duplicate[i],"\""),","));
       }
       sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
       sscontent_json << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-      //DX20190425 - START
+      //DX20190425 START
       // family_structure_properties
       sscontent_json << "\"properties_structures_family\":[";
       tmp_vstring.clear();
@@ -420,7 +420,7 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
       sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
       sscontent_json << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      //DX20190425 - END
+      //DX20190425 END
     } //DX20190425
 
     // Put into json StructurePrototype object
@@ -702,7 +702,7 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
   // remove structure information
   structures_duplicate_names.erase(structures_duplicate_names.begin()+index);
   structures_duplicate_compounds.erase(structures_duplicate_compounds.begin()+index); //DX20190111 - added compound, e.g., Ag1Br2
-  // DX may need to be careful here.  If we have a mix of generated and non-generated, we may have difficulties
+  //DX - may need to be careful here.  If we have a mix of generated and non-generated, we may have difficulties
   if(structures_duplicate_generated[index]){
     structures_duplicate.erase(structures_duplicate.begin()+index);
   }
@@ -714,12 +714,12 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
   // remove misfit
   structure_misfits_duplicate.erase(structure_misfits_duplicate.begin()+index); //DX20191217
 
-  //DX20190504 - START
+  //DX20190504 START
   // remove comparison log
   if(duplicate_comparison_logs.size()!=0){
     duplicate_comparison_logs.erase(duplicate_comparison_logs.begin()+index);
   }
-  //DX20190504 - END
+  //DX20190504 END
 
   // remove properties
   if(property_names.size()!=0){
@@ -1145,7 +1145,7 @@ namespace compare {
   }
 }
 
-//DX20190424 - START
+//DX20190424 START
 // ***************************************************************************
 // loadStructuresFromStructureList() 
 // ***************************************************************************
@@ -1222,7 +1222,7 @@ namespace compare {
     return all_structures;
   }
 }
-//DX20190424 - END
+//DX20190424 END
 
 //DX20191105 - load multiple structures (useful for multithreaded structure loading) - START
 // ***************************************************************************
@@ -1278,7 +1278,7 @@ namespace compare {
     else if(structure_from=="aurl"){
       aflowlib::_aflowlib_entry entry; entry.aurl = structure_name; 
       //DX20190326 - need to put url path, i.e., structure name, [OBSOLETE] if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;}
-      //DX B4 20191105 - if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX20190326
+      //DX ORIG B4 20191105 - if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX20190326
       if(!pflow::loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (aurl=" << entry.aurl << ") ... skipping..." << endl; return false;} //DX20191105
       if(entry.vstr.size()==1){
         structure = entry.vstr[0];
@@ -3235,11 +3235,11 @@ namespace compare{
     uint number_of_matched_sets = 0;
     for(uint m=0;m<grouped_Wyckoff_letters.size();m++)
       //for(uint i=0;i<grouped_possible_Wyckoff_letters.size();i++)
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       bool matched_set = false;
       for(uint i=0;i<grouped_possible_Wyckoff_letters.size();i++)
         //for(uint m=0;m<grouped_Wyckoff_letters.size();m++)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         if(grouped_possible_Wyckoff_letters[i].size()==grouped_Wyckoff_letters[m].size()){
           uint matched_Wyckoffs = 0;
           vector<uint> index_matched;
@@ -3339,7 +3339,7 @@ namespace compare{
     for(uint i=0;i<prototype_labels.size();i++){ 
       if(species_count == species_counts[i])
         //if(space_group == space_groups[i]) // only 230, filter before stoich which can have virtually infinite
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         if(matchableSpaceGroups(space_group,space_groups[i])){ // only 230, filter before stoich which can have virtually infinite
           vector<uint> anrl_stoichiometry = anrl::extractStoichiometry(prototype_labels[i]);
           string anrl_stoich_string = aurostd::joinWDelimiter(anrl_stoichiometry,":"); 
@@ -3497,11 +3497,11 @@ namespace compare{
                //vsgroups[i] == comparison_schemes[j].space_group &&
                matchableSpaceGroups(vsgroups[i],comparison_schemes[j].space_group) &&
                matchableWyckoffPositions(vgrouped_Wyckoff_positions[i], comparison_schemes[j].grouped_Wyckoff_positions,same_species)))){
-                 //DX if(same_material_stoich==true && 
-                 //DX   vstoichs[i] == comparison_schemes[j].stoichiometry && 
-                 //DX   vpearsons[i] == comparison_schemes[j].Pearson && 
-                 //DX   vsgroups[i] == comparison_schemes[j].space_group &&
-                 //DX   matchableWyckoffPositions(vgrouped_Wyckoff_positions[i], comparison_schemes[j].grouped_Wyckoff_positions,same_species)){ //[CO200106 - close bracket for indenting]}
+                 //DX ORIG if(same_material_stoich==true && 
+                 //DX ORIG   vstoichs[i] == comparison_schemes[j].stoichiometry && 
+                 //DX ORIG   vpearsons[i] == comparison_schemes[j].Pearson && 
+                 //DX ORIG   vsgroups[i] == comparison_schemes[j].space_group &&
+                 //DX ORIG   matchableWyckoffPositions(vgrouped_Wyckoff_positions[i], comparison_schemes[j].grouped_Wyckoff_positions,same_species)){ //[CO20200106 - close bracket for indenting]}
                  if(same_species==false){
                    for(uint e=0;e<vvelements[i].size();e++){
                      bool already_in=false;
@@ -3602,7 +3602,7 @@ namespace compare{
     // check if species/stoichiometries are compatible
     //DX20190430 - this may take longer, use compound if(same_species==true && matchableSpecies(structures[i].structure_representative,comparison_schemes[j].structure_representative,same_species)==true)
     if(same_species==true && structure1.structure_representative_compound!=structure2.structure_representative_compound) //DX20190430 - quicker //DX20190702 - changed to "!=" and "false" for speed increase
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       return false;
     }
     else if(same_species==false && structure1.stoichiometry!=structure2.stoichiometry){ //DX20190702 - changed to "!=" and "false" for speed increase
@@ -3791,7 +3791,7 @@ namespace compare{
 //DX [OBSOLETE]    // ========== Check final_prototypes ========== //
 //DX [OBSOLETE]    // It is possible that two prototypes are the same regardless 
 //DX [OBSOLETE]    // of having different space groups.
-//DX [OBSOLETE]    //DX BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
+//DX [OBSOLETE]    //DX - BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
 //DX [OBSOLETE] 
 //DX [OBSOLETE]    message << "Number of unique prototypes: " << final_prototypes.size() << " (out of " << vxstrs.size() << " structures).";
 //DX [OBSOLETE]    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
@@ -4529,7 +4529,7 @@ namespace compare{
 
     // append new prototype groupings
     compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX20200103
-    //DX20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
+    //DX ORIG 20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
     return final_prototypes;
   }
 }
@@ -5322,10 +5322,10 @@ namespace compare{
     //DX20190702 [OBSOLETE - not robust and slow] for(uint i=0;i<xstr1.num_each_type.size();i++){
     //DX20190702 [OBSOLETE - not robust and slow]   bool matched = false;
     //DX20190702 [OBSOLETE - not robust and slow]   for(uint j=0;j<xstr2.num_each_type.size();j++){
-    //DX20190702 [OBSOLETE - not robust and slow]     // DX IS SPECIES CHECK TOO STRICT? if(xstr1.num_each_type[i] == xstr2.num_each_type[j] &&
-    //DX20190702 [OBSOLETE - not robust and slow]     // DX IS SPECIES CHECK TOO STRICT?   xstr1.species[i] == xstr2.species[j])
+    //DX20190702 [OBSOLETE - not robust and slow]     //DX IS SPECIES CHECK TOO STRICT? if(xstr1.num_each_type[i] == xstr2.num_each_type[j] &&
+    //DX20190702 [OBSOLETE - not robust and slow]     //DX IS SPECIES CHECK TOO STRICT?   xstr1.species[i] == xstr2.species[j])
     //DX20190702 [OBSOLETE - not robust and slow]     if(xstr1.num_each_type[i] == xstr2.num_each_type[j])
-    //DX20190702 [OBSOLETE - not robust and slow]     {  //CO200106 - patching for auto-indenting
+    //DX20190702 [OBSOLETE - not robust and slow]     {  //CO20200106 - patching for auto-indenting
     //DX20190702 [OBSOLETE - not robust and slow]       matched = true;
     //DX20190702 [OBSOLETE - not robust and slow]       break;
     //DX20190702 [OBSOLETE - not robust and slow]     }
@@ -5676,235 +5676,235 @@ namespace compare{
   }
 }
 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] // Reset dims for RadiusSphereLattice() 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   void resetLatticeDimensions(const xmatrix<double>& lattice, double radius, xvector<int>& dims,
-// DX20191122 [MOVED TO XATOM]       vector<xvector<double> >& l1, vector<xvector<double> >& l2, 
-// DX20191122 [MOVED TO XATOM]       vector<xvector<double> >& l3, vector<int>& a_index, 
-// DX20191122 [MOVED TO XATOM]       vector<int>& b_index, vector<int>& c_index){
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // resets the lattice dimensions (dims) based on radius
-// DX20191122 [MOVED TO XATOM]     // generates lattice vectors (l1,l2,l3) right away = speed increase
-// DX20191122 [MOVED TO XATOM]     // stores dimension indices (a_index,b_index,c_index)
-// DX20191122 [MOVED TO XATOM]     // new dims explore order : zeroth cell to max dims = speed increase 
-// DX20191122 [MOVED TO XATOM]     // (can break early if match is found)
-// DX20191122 [MOVED TO XATOM]     // DX create function date: 20190705
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // get new dimensions based on radius
-// DX20191122 [MOVED TO XATOM]     if(radius<=_ZERO_TOL_){ dims[1]=1; dims[2]=1; dims[3]=1; }
-// DX20191122 [MOVED TO XATOM]     else{ dims=LatticeDimensionSphere(lattice,radius); }
-// DX20191122 [MOVED TO XATOM]     //cerr << "using dims: " << dims << endl; 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // clear old 
-// DX20191122 [MOVED TO XATOM]     l1.clear(); l2.clear(); l3.clear();
-// DX20191122 [MOVED TO XATOM]     a_index.clear(); b_index.clear(); c_index.clear();
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // [NEW] - go from zeroth cell out
-// DX20191122 [MOVED TO XATOM]     // more likely to find match close to origin, why start so far away
-// DX20191122 [MOVED TO XATOM]     
-// DX20191122 [MOVED TO XATOM]     // push back zeroth cell : dims[1]=dims[2]=dims[3]=0
-// DX20191122 [MOVED TO XATOM]     l1.push_back(0*lattice(1));a_index.push_back(0);
-// DX20191122 [MOVED TO XATOM]     l2.push_back(0*lattice(2));b_index.push_back(0);
-// DX20191122 [MOVED TO XATOM]     l3.push_back(0*lattice(3));c_index.push_back(0);
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // push back 1,-1,2,-2,...dims,-dims
-// DX20191122 [MOVED TO XATOM]     for(int a=1;a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a); l1.push_back(-a*lattice(1));a_index.push_back(-a);}
-// DX20191122 [MOVED TO XATOM]     for(int b=1;b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b); l2.push_back(-b*lattice(2));b_index.push_back(-b);}
-// DX20191122 [MOVED TO XATOM]     for(int c=1;c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c); l3.push_back(-c*lattice(3));c_index.push_back(-c);}
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
-// DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates){
-// DX20191122 [MOVED TO XATOM]     
-// DX20191122 [MOVED TO XATOM]     // determine the minimum coordination shell of the lattice
-// DX20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
-// DX20191122 [MOVED TO XATOM]     // (overload: uses lattice radius) 
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // determine necessary search radius
-// DX20191122 [MOVED TO XATOM]     double radius=RadiusSphereLattice(lattice);
-// DX20191122 [MOVED TO XATOM]   
-// DX20191122 [MOVED TO XATOM]     minimumCoordinationShellLatticeOnly(lattice, min_dist, frequency, coordinates, radius);
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
-// DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, double radius){
-// DX20191122 [MOVED TO XATOM]     
-// DX20191122 [MOVED TO XATOM]     // determine the minimum coordination shell of the lattice
-// DX20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
-// DX20191122 [MOVED TO XATOM]     // (overload: instantiates lattice dimension information) 
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // instantiate lattice vectors 
-// DX20191122 [MOVED TO XATOM]     vector<xvector<double> > l1, l2, l3; 
-// DX20191122 [MOVED TO XATOM]     vector<int> a_index, b_index, c_index;
-// DX20191122 [MOVED TO XATOM]     xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
-// DX20191122 [MOVED TO XATOM]     resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
-// DX20191122 [MOVED TO XATOM]   
-// DX20191122 [MOVED TO XATOM]     minimumCoordinationShellLatticeOnly(lattice, dims, l1, l2, l3, 
-// DX20191122 [MOVED TO XATOM]         a_index, b_index, c_index, 
-// DX20191122 [MOVED TO XATOM]         min_dist, frequency, coordinates, radius);
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, xvector<int>& dims,
-// DX20191122 [MOVED TO XATOM]       vector<xvector<double> >& l1, vector<xvector<double> >& l2, vector<xvector<double> >& l3, 
-// DX20191122 [MOVED TO XATOM]       vector<int>& a_index, vector<int>& b_index, vector<int>& c_index, 
-// DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates,
-// DX20191122 [MOVED TO XATOM]       double radius){
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // determine the minimum coordination shell environment of the lattice
-// DX20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
-// DX20191122 [MOVED TO XATOM]     // stores l1, l2, l3, a_index, b_index, and c_index for external use
-// DX20191122 [MOVED TO XATOM]     // optional "radius" as enables more control over search space 
-// DX20191122 [MOVED TO XATOM]     // (and potential speed up, may not need to search as far as the lattice radius)
-// DX20191122 [MOVED TO XATOM]     
-// DX20191122 [MOVED TO XATOM]     xvector<double> tmp;
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // reset lattice dimensions 
-// DX20191122 [MOVED TO XATOM]     resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // loop through lattice vectors (stored before-hand in l1,l2,l3)
-// DX20191122 [MOVED TO XATOM]     for(uint m=0;m<l1.size();m++){
-// DX20191122 [MOVED TO XATOM]       xvector<double> a_component = l1[m];                  // DX : coord1-coord2+a*lattice(1)
-// DX20191122 [MOVED TO XATOM]       for(uint n=0;n<l2.size();n++){
-// DX20191122 [MOVED TO XATOM]         xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
-// DX20191122 [MOVED TO XATOM]         for(uint p=0;p<l3.size();p++){
-// DX20191122 [MOVED TO XATOM]           if(!(m==0 && n==0 && p==0)){
-// DX20191122 [MOVED TO XATOM]             tmp = ab_component + l3[p];                     // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
-// DX20191122 [MOVED TO XATOM]             double tmp_mod = aurostd::modulus(tmp);
-// DX20191122 [MOVED TO XATOM]             // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]             // if found a new minimum distance and update coordination/frequency and coordinate 
-// DX20191122 [MOVED TO XATOM]             if(tmp_mod<min_dist){
-// DX20191122 [MOVED TO XATOM]               // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]               // if new distance is close to the original it is the same coordination shell (add to coordination)
-// DX20191122 [MOVED TO XATOM]               // otherwise, reset coordination shell
-// DX20191122 [MOVED TO XATOM]               // DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
-// DX20191122 [MOVED TO XATOM]               if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
-// DX20191122 [MOVED TO XATOM]               else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
-// DX20191122 [MOVED TO XATOM]               min_dist=tmp_mod;
-// DX20191122 [MOVED TO XATOM]               // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]               // diminishing dims: if minimum distance changed, then we may not need to search as far
-// DX20191122 [MOVED TO XATOM]               // reset loop and search again based on new minimum distance
-// DX20191122 [MOVED TO XATOM]               if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
-// DX20191122 [MOVED TO XATOM]                 resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
-// DX20191122 [MOVED TO XATOM]                 m=n=p=0;
-// DX20191122 [MOVED TO XATOM]                 frequency=0; //reset
-// DX20191122 [MOVED TO XATOM]               }
-// DX20191122 [MOVED TO XATOM]             }
-// DX20191122 [MOVED TO XATOM]             // DX FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
-// DX20191122 [MOVED TO XATOM]             else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
-// DX20191122 [MOVED TO XATOM]           }
-// DX20191122 [MOVED TO XATOM]         }
-// DX20191122 [MOVED TO XATOM]       }
-// DX20191122 [MOVED TO XATOM]     }
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] // minimumCoordinationShell() 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
-// DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates){
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     string type = "";
-// DX20191122 [MOVED TO XATOM]   
-// DX20191122 [MOVED TO XATOM]     minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates, type);
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] // minimumCoordinationShell() 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
-// DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type){
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // determine the minimum coordination shell environment
-// DX20191122 [MOVED TO XATOM]     // "type" enables the search of environments by certain elements/types only
-// DX20191122 [MOVED TO XATOM]     // (e.g., find the neighborhood of oxygen atoms surrounding a magnesium center)
-// DX20191122 [MOVED TO XATOM]     
-// DX20191122 [MOVED TO XATOM]     xvector<double> tmp;
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // instantiate lattice vectors 
-// DX20191122 [MOVED TO XATOM]     vector<xvector<double> > l1, l2, l3; 
-// DX20191122 [MOVED TO XATOM]     vector<int> a_index, b_index, c_index;
-// DX20191122 [MOVED TO XATOM]     xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
-// DX20191122 [MOVED TO XATOM]     //resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     for(uint ii=0; ii<xstr.atoms.size(); ii++){
-// DX20191122 [MOVED TO XATOM]       // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]       // if atom ii is not environment center, find minimum distance between center atom ii's images 
-// DX20191122 [MOVED TO XATOM]       if(ii!=center_index && (xstr.atoms[ii].name == type || type == "")){ //DX20191105 - added type=="" 
-// DX20191122 [MOVED TO XATOM]         xvector<double> incell_dist = xstr.atoms[center_index].cpos-xstr.atoms[ii].cpos;
-// DX20191122 [MOVED TO XATOM]         double incell_mod = aurostd::modulus(incell_dist);
-// DX20191122 [MOVED TO XATOM]         if(!(dims[1]==1 && dims[2]==1 && dims[3]==1) && incell_mod!=1e9){
-// DX20191122 [MOVED TO XATOM]           resetLatticeDimensions(xstr.lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
-// DX20191122 [MOVED TO XATOM]         }
-// DX20191122 [MOVED TO XATOM]         //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
-// DX20191122 [MOVED TO XATOM]         for(uint m=0;m<l1.size();m++){
-// DX20191122 [MOVED TO XATOM]           xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
-// DX20191122 [MOVED TO XATOM]           for(uint n=0;n<l2.size();n++){
-// DX20191122 [MOVED TO XATOM]             xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
-// DX20191122 [MOVED TO XATOM]             for(uint p=0;p<l3.size();p++){
-// DX20191122 [MOVED TO XATOM]               tmp = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
-// DX20191122 [MOVED TO XATOM]               double tmp_mod = aurostd::modulus(tmp);
-// DX20191122 [MOVED TO XATOM]               if(tmp_mod<min_dist){
-// DX20191122 [MOVED TO XATOM]                 //DX FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
-// DX20191122 [MOVED TO XATOM]                 if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
-// DX20191122 [MOVED TO XATOM]                 else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
-// DX20191122 [MOVED TO XATOM]                 min_dist=tmp_mod;
-// DX20191122 [MOVED TO XATOM]               }
-// DX20191122 [MOVED TO XATOM]               //DX FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
-// DX20191122 [MOVED TO XATOM]               else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
-// DX20191122 [MOVED TO XATOM]             }
-// DX20191122 [MOVED TO XATOM]           }
-// DX20191122 [MOVED TO XATOM]         }
-// DX20191122 [MOVED TO XATOM]       }
-// DX20191122 [MOVED TO XATOM]       // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]       // if atom is environment center check its images, but only need to search as 
-// DX20191122 [MOVED TO XATOM]       // far as min_dist or lattice_radius (whichever is smaller)
-// DX20191122 [MOVED TO XATOM]       else if(ii==center_index && (xstr.atoms[ii].name == type || type == "")){ //DX20191105 - added type==""
-// DX20191122 [MOVED TO XATOM]         double lattice_radius=RadiusSphereLattice(xstr.lattice);
-// DX20191122 [MOVED TO XATOM]         double search_radius=min(lattice_radius,min_dist);
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]         // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]         // use variant that stores the lattice dimension information so it can be 
-// DX20191122 [MOVED TO XATOM]         // updated for the "minimumCoordinationShell" function
-// DX20191122 [MOVED TO XATOM]         minimumCoordinationShellLatticeOnly(xstr.lattice, dims, l1, l2, l3, 
-// DX20191122 [MOVED TO XATOM]             a_index, b_index, c_index, 
-// DX20191122 [MOVED TO XATOM]             min_dist, frequency, coordinates, search_radius);
-// DX20191122 [MOVED TO XATOM]       }
-// DX20191122 [MOVED TO XATOM]     }
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] // Reset dims for RadiusSphereLattice() 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   void resetLatticeDimensions(const xmatrix<double>& lattice, double radius, xvector<int>& dims,
+//DX20191122 [MOVED TO XATOM]       vector<xvector<double> >& l1, vector<xvector<double> >& l2, 
+//DX20191122 [MOVED TO XATOM]       vector<xvector<double> >& l3, vector<int>& a_index, 
+//DX20191122 [MOVED TO XATOM]       vector<int>& b_index, vector<int>& c_index){
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // resets the lattice dimensions (dims) based on radius
+//DX20191122 [MOVED TO XATOM]     // generates lattice vectors (l1,l2,l3) right away = speed increase
+//DX20191122 [MOVED TO XATOM]     // stores dimension indices (a_index,b_index,c_index)
+//DX20191122 [MOVED TO XATOM]     // new dims explore order : zeroth cell to max dims = speed increase 
+//DX20191122 [MOVED TO XATOM]     // (can break early if match is found)
+//DX20191122 [MOVED TO XATOM]     //DX create function date: 20190705
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // get new dimensions based on radius
+//DX20191122 [MOVED TO XATOM]     if(radius<=_ZERO_TOL_){ dims[1]=1; dims[2]=1; dims[3]=1; }
+//DX20191122 [MOVED TO XATOM]     else{ dims=LatticeDimensionSphere(lattice,radius); }
+//DX20191122 [MOVED TO XATOM]     //cerr << "using dims: " << dims << endl; 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // clear old 
+//DX20191122 [MOVED TO XATOM]     l1.clear(); l2.clear(); l3.clear();
+//DX20191122 [MOVED TO XATOM]     a_index.clear(); b_index.clear(); c_index.clear();
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // [NEW] - go from zeroth cell out
+//DX20191122 [MOVED TO XATOM]     // more likely to find match close to origin, why start so far away
+//DX20191122 [MOVED TO XATOM]     
+//DX20191122 [MOVED TO XATOM]     // push back zeroth cell : dims[1]=dims[2]=dims[3]=0
+//DX20191122 [MOVED TO XATOM]     l1.push_back(0*lattice(1));a_index.push_back(0);
+//DX20191122 [MOVED TO XATOM]     l2.push_back(0*lattice(2));b_index.push_back(0);
+//DX20191122 [MOVED TO XATOM]     l3.push_back(0*lattice(3));c_index.push_back(0);
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // push back 1,-1,2,-2,...dims,-dims
+//DX20191122 [MOVED TO XATOM]     for(int a=1;a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a); l1.push_back(-a*lattice(1));a_index.push_back(-a);}
+//DX20191122 [MOVED TO XATOM]     for(int b=1;b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b); l2.push_back(-b*lattice(2));b_index.push_back(-b);}
+//DX20191122 [MOVED TO XATOM]     for(int c=1;c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c); l3.push_back(-c*lattice(3));c_index.push_back(-c);}
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+//DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates){
+//DX20191122 [MOVED TO XATOM]     
+//DX20191122 [MOVED TO XATOM]     // determine the minimum coordination shell of the lattice
+//DX20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
+//DX20191122 [MOVED TO XATOM]     // (overload: uses lattice radius) 
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // determine necessary search radius
+//DX20191122 [MOVED TO XATOM]     double radius=RadiusSphereLattice(lattice);
+//DX20191122 [MOVED TO XATOM]   
+//DX20191122 [MOVED TO XATOM]     minimumCoordinationShellLatticeOnly(lattice, min_dist, frequency, coordinates, radius);
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+//DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, double radius){
+//DX20191122 [MOVED TO XATOM]     
+//DX20191122 [MOVED TO XATOM]     // determine the minimum coordination shell of the lattice
+//DX20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
+//DX20191122 [MOVED TO XATOM]     // (overload: instantiates lattice dimension information) 
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // instantiate lattice vectors 
+//DX20191122 [MOVED TO XATOM]     vector<xvector<double> > l1, l2, l3; 
+//DX20191122 [MOVED TO XATOM]     vector<int> a_index, b_index, c_index;
+//DX20191122 [MOVED TO XATOM]     xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
+//DX20191122 [MOVED TO XATOM]     resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+//DX20191122 [MOVED TO XATOM]   
+//DX20191122 [MOVED TO XATOM]     minimumCoordinationShellLatticeOnly(lattice, dims, l1, l2, l3, 
+//DX20191122 [MOVED TO XATOM]         a_index, b_index, c_index, 
+//DX20191122 [MOVED TO XATOM]         min_dist, frequency, coordinates, radius);
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, xvector<int>& dims,
+//DX20191122 [MOVED TO XATOM]       vector<xvector<double> >& l1, vector<xvector<double> >& l2, vector<xvector<double> >& l3, 
+//DX20191122 [MOVED TO XATOM]       vector<int>& a_index, vector<int>& b_index, vector<int>& c_index, 
+//DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates,
+//DX20191122 [MOVED TO XATOM]       double radius){
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // determine the minimum coordination shell environment of the lattice
+//DX20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
+//DX20191122 [MOVED TO XATOM]     // stores l1, l2, l3, a_index, b_index, and c_index for external use
+//DX20191122 [MOVED TO XATOM]     // optional "radius" as enables more control over search space 
+//DX20191122 [MOVED TO XATOM]     // (and potential speed up, may not need to search as far as the lattice radius)
+//DX20191122 [MOVED TO XATOM]     
+//DX20191122 [MOVED TO XATOM]     xvector<double> tmp;
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // reset lattice dimensions 
+//DX20191122 [MOVED TO XATOM]     resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // loop through lattice vectors (stored before-hand in l1,l2,l3)
+//DX20191122 [MOVED TO XATOM]     for(uint m=0;m<l1.size();m++){
+//DX20191122 [MOVED TO XATOM]       xvector<double> a_component = l1[m];                  //DX : coord1-coord2+a*lattice(1)
+//DX20191122 [MOVED TO XATOM]       for(uint n=0;n<l2.size();n++){
+//DX20191122 [MOVED TO XATOM]         xvector<double> ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+//DX20191122 [MOVED TO XATOM]         for(uint p=0;p<l3.size();p++){
+//DX20191122 [MOVED TO XATOM]           if(!(m==0 && n==0 && p==0)){
+//DX20191122 [MOVED TO XATOM]             tmp = ab_component + l3[p];                     //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+//DX20191122 [MOVED TO XATOM]             double tmp_mod = aurostd::modulus(tmp);
+//DX20191122 [MOVED TO XATOM]             // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]             // if found a new minimum distance and update coordination/frequency and coordinate 
+//DX20191122 [MOVED TO XATOM]             if(tmp_mod<min_dist){
+//DX20191122 [MOVED TO XATOM]               // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]               // if new distance is close to the original it is the same coordination shell (add to coordination)
+//DX20191122 [MOVED TO XATOM]               // otherwise, reset coordination shell
+//DX20191122 [MOVED TO XATOM]               //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+//DX20191122 [MOVED TO XATOM]               if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+//DX20191122 [MOVED TO XATOM]               else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
+//DX20191122 [MOVED TO XATOM]               min_dist=tmp_mod;
+//DX20191122 [MOVED TO XATOM]               // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]               // diminishing dims: if minimum distance changed, then we may not need to search as far
+//DX20191122 [MOVED TO XATOM]               // reset loop and search again based on new minimum distance
+//DX20191122 [MOVED TO XATOM]               if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+//DX20191122 [MOVED TO XATOM]                 resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
+//DX20191122 [MOVED TO XATOM]                 m=n=p=0;
+//DX20191122 [MOVED TO XATOM]                 frequency=0; //reset
+//DX20191122 [MOVED TO XATOM]               }
+//DX20191122 [MOVED TO XATOM]             }
+//DX20191122 [MOVED TO XATOM]             //DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+//DX20191122 [MOVED TO XATOM]             else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
+//DX20191122 [MOVED TO XATOM]           }
+//DX20191122 [MOVED TO XATOM]         }
+//DX20191122 [MOVED TO XATOM]       }
+//DX20191122 [MOVED TO XATOM]     }
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] // minimumCoordinationShell() 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+//DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates){
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     string type = "";
+//DX20191122 [MOVED TO XATOM]   
+//DX20191122 [MOVED TO XATOM]     minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates, type);
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] // minimumCoordinationShell() 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+//DX20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type){
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // determine the minimum coordination shell environment
+//DX20191122 [MOVED TO XATOM]     // "type" enables the search of environments by certain elements/types only
+//DX20191122 [MOVED TO XATOM]     // (e.g., find the neighborhood of oxygen atoms surrounding a magnesium center)
+//DX20191122 [MOVED TO XATOM]     
+//DX20191122 [MOVED TO XATOM]     xvector<double> tmp;
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // instantiate lattice vectors 
+//DX20191122 [MOVED TO XATOM]     vector<xvector<double> > l1, l2, l3; 
+//DX20191122 [MOVED TO XATOM]     vector<int> a_index, b_index, c_index;
+//DX20191122 [MOVED TO XATOM]     xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
+//DX20191122 [MOVED TO XATOM]     //resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     for(uint ii=0; ii<xstr.atoms.size(); ii++){
+//DX20191122 [MOVED TO XATOM]       // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]       // if atom ii is not environment center, find minimum distance between center atom ii's images 
+//DX20191122 [MOVED TO XATOM]       if(ii!=center_index && (xstr.atoms[ii].name == type || type == "")){ //DX20191105 - added type=="" 
+//DX20191122 [MOVED TO XATOM]         xvector<double> incell_dist = xstr.atoms[center_index].cpos-xstr.atoms[ii].cpos;
+//DX20191122 [MOVED TO XATOM]         double incell_mod = aurostd::modulus(incell_dist);
+//DX20191122 [MOVED TO XATOM]         if(!(dims[1]==1 && dims[2]==1 && dims[3]==1) && incell_mod!=1e9){
+//DX20191122 [MOVED TO XATOM]           resetLatticeDimensions(xstr.lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+//DX20191122 [MOVED TO XATOM]         }
+//DX20191122 [MOVED TO XATOM]         //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
+//DX20191122 [MOVED TO XATOM]         for(uint m=0;m<l1.size();m++){
+//DX20191122 [MOVED TO XATOM]           xvector<double> a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
+//DX20191122 [MOVED TO XATOM]           for(uint n=0;n<l2.size();n++){
+//DX20191122 [MOVED TO XATOM]             xvector<double> ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+//DX20191122 [MOVED TO XATOM]             for(uint p=0;p<l3.size();p++){
+//DX20191122 [MOVED TO XATOM]               tmp = ab_component + l3[p];                       //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+//DX20191122 [MOVED TO XATOM]               double tmp_mod = aurostd::modulus(tmp);
+//DX20191122 [MOVED TO XATOM]               if(tmp_mod<min_dist){
+//DX20191122 [MOVED TO XATOM]                 //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+//DX20191122 [MOVED TO XATOM]                 if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+//DX20191122 [MOVED TO XATOM]                 else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
+//DX20191122 [MOVED TO XATOM]                 min_dist=tmp_mod;
+//DX20191122 [MOVED TO XATOM]               }
+//DX20191122 [MOVED TO XATOM]               //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+//DX20191122 [MOVED TO XATOM]               else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+//DX20191122 [MOVED TO XATOM]             }
+//DX20191122 [MOVED TO XATOM]           }
+//DX20191122 [MOVED TO XATOM]         }
+//DX20191122 [MOVED TO XATOM]       }
+//DX20191122 [MOVED TO XATOM]       // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]       // if atom is environment center check its images, but only need to search as 
+//DX20191122 [MOVED TO XATOM]       // far as min_dist or lattice_radius (whichever is smaller)
+//DX20191122 [MOVED TO XATOM]       else if(ii==center_index && (xstr.atoms[ii].name == type || type == "")){ //DX20191105 - added type==""
+//DX20191122 [MOVED TO XATOM]         double lattice_radius=RadiusSphereLattice(xstr.lattice);
+//DX20191122 [MOVED TO XATOM]         double search_radius=min(lattice_radius,min_dist);
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]         // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]         // use variant that stores the lattice dimension information so it can be 
+//DX20191122 [MOVED TO XATOM]         // updated for the "minimumCoordinationShell" function
+//DX20191122 [MOVED TO XATOM]         minimumCoordinationShellLatticeOnly(xstr.lattice, dims, l1, l2, l3, 
+//DX20191122 [MOVED TO XATOM]             a_index, b_index, c_index, 
+//DX20191122 [MOVED TO XATOM]             min_dist, frequency, coordinates, search_radius);
+//DX20191122 [MOVED TO XATOM]       }
+//DX20191122 [MOVED TO XATOM]     }
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
 
 // ***************************************************************************
 // Find centroid for system with periodic boundary conditions
@@ -6070,14 +6070,14 @@ namespace compare{
           }
         }
         // Need to find the min distance; thus check distance between neighboring cells to find true minimum.
-        //DX running vector in each loop saves computations; fewer duplicate operations
+        //DX - running vector in each loop saves computations; fewer duplicate operations
         if(incell_mod>0.25){
           for(uint m=0;m<l1.size();m++){
-            xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
+            xvector<double> a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
             for(uint n=0;n<l2.size();n++){
-              xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+              xvector<double> ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
               for(uint p=0;p<l3.size();p++){
-                tmp_xvec = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+                tmp_xvec = ab_component + l3[p];                       //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
                 tmp=aurostd::modulus(tmp_xvec);
                 if(tmp < dist){
                   i1 = j;
@@ -6131,7 +6131,7 @@ namespace compare{
           return false;
         }
       }
-      //DX20191213 - START
+      //DX20191213 START
       if(!_CALCULATE_MAGNETIC_MISFIT_){
         // Check non_collinear spin
         if(is_non_collinear){
@@ -6154,7 +6154,7 @@ namespace compare{
           }
         }
       }
-      //DX20191213 - END
+      //DX20191213 END
       // Check for one-to-one mappings 
       for(uint i=0;i<im1_name.size();i++){
         // Check if i1 index has multiple mappings
@@ -6547,7 +6547,7 @@ namespace compare{
         // ---------------------------------------------------------------------------
         // check frequency of distance
         // this is sensitive to tolerance of cutoff; use with caution
-        // DX THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.neighbor_frequencies[j]){ continue; }
+        //DX - THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.neighbor_frequencies[j]){ continue; }
 
         // ---------------------------------------------------------------------------
         // exact match 
@@ -6560,7 +6560,7 @@ namespace compare{
         else if(!exact_match && 
             //aurostd::abs(env_1.distances_neighbor[i]-env_2.distances_neighbor[j])/(env_1.distances_neighbor[i]+env_2.distances_neighbor[j])<_TOL_RELATIVE_MATCH_) //DX20190730 - too strict
           aurostd::abs(env_1.distances_neighbor[i]-env_2.distances_neighbor[j])<_TOL_LOOSE_MATCH_) //DX20190730
-          { //CO200106 - patching for auto-indenting
+          { //CO20200106 - patching for auto-indenting
             match_found = true; species.push_back(env_2.elements_neighbor[j]);
           }
 
@@ -6589,7 +6589,7 @@ namespace compare{
             for(uint k=0;k<angles_sets_2[i].size();k++){
               //if(aurostd::isequal(angles_sets_1[i][j],angles_sets_2[i][k],10.0)) //equal within 10 degrees
               if(aurostd::isequal(angles_sets_1[i][j],angles_sets_2[i][k],20.0)) //equal within 10 degrees
-              { //CO200106 - patching for auto-indenting
+              { //CO20200106 - patching for auto-indenting
                 matched=true;
                 break;
               }
@@ -6704,76 +6704,76 @@ namespace compare{
   }
 }
 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] // get nearest neighbors 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   vector<AtomEnvironment> getUniqueTypesAtomEnvironmentForLFA(const xstructure& xstr, const string lfa, 
-// DX20191122 [MOVED TO XATOM]       const vector<string>& LFAs){
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // Calculates the nearest neighbor distance to a particular atom
-// DX20191122 [MOVED TO XATOM]     // hinges on alphabetic, perhaps make more robust
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     vector<AtomEnvironment> environments_LFA;
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     for(uint i=0;i<xstr.atoms.size();i++){
-// DX20191122 [MOVED TO XATOM]       if(xstr.atoms[i].name == lfa){
-// DX20191122 [MOVED TO XATOM]         AtomEnvironment LFA_env; 
-// DX20191122 [MOVED TO XATOM]         LFA_env.element_center = xstr.atoms[i].name;
-// DX20191122 [MOVED TO XATOM]         LFA_env.type_center = xstr.atoms[i].type;
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]         for(uint j=0;j<LFAs.size();j++)
-// DX20191122 [MOVED TO XATOM]         //DX for(uint j=0;j<xstr.species.size();j++)
-// DX20191122 [MOVED TO XATOM]         { //CO200106 - patching for auto-indenting
-// DX20191122 [MOVED TO XATOM]           //if(xstr.species[j]!=lfa){
-// DX20191122 [MOVED TO XATOM]             uint frequency = 0;
-// DX20191122 [MOVED TO XATOM]             vector<xvector<double> > coordinates;
-// DX20191122 [MOVED TO XATOM]             //DX LFA_env.elements_neighbor.push_back(xstr.species[j]);
-// DX20191122 [MOVED TO XATOM]             LFA_env.elements_neighbor.push_back(LFAs[j]); //TEST 
-// DX20191122 [MOVED TO XATOM]             LFA_env.types_neighbor.push_back(j);
-// DX20191122 [MOVED TO XATOM]             //DX LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,xstr.species[j]));
-// DX20191122 [MOVED TO XATOM]             LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,LFAs[j])); //TEST
-// DX20191122 [MOVED TO XATOM]             LFA_env.coordinations_neighbor.push_back(frequency);
-// DX20191122 [MOVED TO XATOM]             LFA_env.coordinates_neighbor.push_back(coordinates);
-// DX20191122 [MOVED TO XATOM]           //}
-// DX20191122 [MOVED TO XATOM]         }
-// DX20191122 [MOVED TO XATOM]         environments_LFA.push_back(LFA_env);
-// DX20191122 [MOVED TO XATOM]       }
-// DX20191122 [MOVED TO XATOM]     }
-// DX20191122 [MOVED TO XATOM]     return environments_LFA;
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] // Shortest Distance from one atom
-// DX20191122 [MOVED TO XATOM] // ***************************************************************************
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   double shortestDistanceRestrictType(const xstructure& xstr, const uint& k, string type) {
-// DX20191122 [MOVED TO XATOM]     // Find the minimum interatomic distance from a central atom to 
-// DX20191122 [MOVED TO XATOM]     // a particular element/type 
-// DX20191122 [MOVED TO XATOM]     // (overload)
-// DX20191122 [MOVED TO XATOM]     
-// DX20191122 [MOVED TO XATOM]     uint frequency = 0;
-// DX20191122 [MOVED TO XATOM]     vector<xvector<double> > coordinates;
-// DX20191122 [MOVED TO XATOM]     return shortestDistanceRestrictType(xstr,k,frequency,coordinates,type);
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM] namespace compare{
-// DX20191122 [MOVED TO XATOM]   double shortestDistanceRestrictType(const xstructure& xstr, const uint& k, 
-// DX20191122 [MOVED TO XATOM]       uint& frequency, vector<xvector<double> >& coordinates, string type) {
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // Find the minimum interatomic distance from a central atom to 
-// DX20191122 [MOVED TO XATOM]     // a particular element/type and store frequency/coordination and coordinates
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
-// DX20191122 [MOVED TO XATOM]     // instantiate variables
-// DX20191122 [MOVED TO XATOM]     double min_dist=1e9;
-// DX20191122 [MOVED TO XATOM]     minimumCoordinationShell(xstr, k, min_dist, frequency, coordinates, type);
-// DX20191122 [MOVED TO XATOM] 
-// DX20191122 [MOVED TO XATOM]     return min_dist;
-// DX20191122 [MOVED TO XATOM]   }
-// DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] // get nearest neighbors 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   vector<AtomEnvironment> getUniqueTypesAtomEnvironmentForLFA(const xstructure& xstr, const string lfa, 
+//DX20191122 [MOVED TO XATOM]       const vector<string>& LFAs){
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // Calculates the nearest neighbor distance to a particular atom
+//DX20191122 [MOVED TO XATOM]     // hinges on alphabetic, perhaps make more robust
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     vector<AtomEnvironment> environments_LFA;
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     for(uint i=0;i<xstr.atoms.size();i++){
+//DX20191122 [MOVED TO XATOM]       if(xstr.atoms[i].name == lfa){
+//DX20191122 [MOVED TO XATOM]         AtomEnvironment LFA_env; 
+//DX20191122 [MOVED TO XATOM]         LFA_env.element_center = xstr.atoms[i].name;
+//DX20191122 [MOVED TO XATOM]         LFA_env.type_center = xstr.atoms[i].type;
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]         for(uint j=0;j<LFAs.size();j++)
+//DX20191122 [MOVED TO XATOM]         //DX ORIG for(uint j=0;j<xstr.species.size();j++)
+//DX20191122 [MOVED TO XATOM]         { //CO20200106 - patching for auto-indenting
+//DX20191122 [MOVED TO XATOM]           //if(xstr.species[j]!=lfa){
+//DX20191122 [MOVED TO XATOM]             uint frequency = 0;
+//DX20191122 [MOVED TO XATOM]             vector<xvector<double> > coordinates;
+//DX20191122 [MOVED TO XATOM]             //DX ORIG LFA_env.elements_neighbor.push_back(xstr.species[j]);
+//DX20191122 [MOVED TO XATOM]             LFA_env.elements_neighbor.push_back(LFAs[j]); //TEST 
+//DX20191122 [MOVED TO XATOM]             LFA_env.types_neighbor.push_back(j);
+//DX20191122 [MOVED TO XATOM]             //DX ORIG LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,xstr.species[j]));
+//DX20191122 [MOVED TO XATOM]             LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,LFAs[j])); //TEST
+//DX20191122 [MOVED TO XATOM]             LFA_env.coordinations_neighbor.push_back(frequency);
+//DX20191122 [MOVED TO XATOM]             LFA_env.coordinates_neighbor.push_back(coordinates);
+//DX20191122 [MOVED TO XATOM]           //}
+//DX20191122 [MOVED TO XATOM]         }
+//DX20191122 [MOVED TO XATOM]         environments_LFA.push_back(LFA_env);
+//DX20191122 [MOVED TO XATOM]       }
+//DX20191122 [MOVED TO XATOM]     }
+//DX20191122 [MOVED TO XATOM]     return environments_LFA;
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] // Shortest Distance from one atom
+//DX20191122 [MOVED TO XATOM] // ***************************************************************************
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   double shortestDistanceRestrictType(const xstructure& xstr, const uint& k, string type) {
+//DX20191122 [MOVED TO XATOM]     // Find the minimum interatomic distance from a central atom to 
+//DX20191122 [MOVED TO XATOM]     // a particular element/type 
+//DX20191122 [MOVED TO XATOM]     // (overload)
+//DX20191122 [MOVED TO XATOM]     
+//DX20191122 [MOVED TO XATOM]     uint frequency = 0;
+//DX20191122 [MOVED TO XATOM]     vector<xvector<double> > coordinates;
+//DX20191122 [MOVED TO XATOM]     return shortestDistanceRestrictType(xstr,k,frequency,coordinates,type);
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM] namespace compare{
+//DX20191122 [MOVED TO XATOM]   double shortestDistanceRestrictType(const xstructure& xstr, const uint& k, 
+//DX20191122 [MOVED TO XATOM]       uint& frequency, vector<xvector<double> >& coordinates, string type) {
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // Find the minimum interatomic distance from a central atom to 
+//DX20191122 [MOVED TO XATOM]     // a particular element/type and store frequency/coordination and coordinates
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+//DX20191122 [MOVED TO XATOM]     // instantiate variables
+//DX20191122 [MOVED TO XATOM]     double min_dist=1e9;
+//DX20191122 [MOVED TO XATOM]     minimumCoordinationShell(xstr, k, min_dist, frequency, coordinates, type);
+//DX20191122 [MOVED TO XATOM] 
+//DX20191122 [MOVED TO XATOM]     return min_dist;
+//DX20191122 [MOVED TO XATOM]   }
+//DX20191122 [MOVED TO XATOM] }
 
 // ***************************************************************************
 // Compute nearest neighbors 
@@ -6834,11 +6834,11 @@ namespace compare{
         }
         //DX20180423 - running vector in each loop saves computations; fewer duplicate operations
         for(uint m=0;m<l1.size();m++){
-          xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
+          xvector<double> a_component = incell_dist + l1[m];    //DX : coord1-coord2+a*lattice(1)
           for(uint n=0;n<l2.size();n++){
-            xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+            xvector<double> ab_component = a_component + l2[n]; //DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
             for(uint p=0;p<l3.size();p++){
-              tmp_coord = ab_component + l3[p];                 // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+              tmp_coord = ab_component + l3[p];                 //DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
               min_dist=aurostd::min(min_dist,aurostd::modulus(tmp_coord));
             }
           }
@@ -7319,7 +7319,7 @@ namespace compare{
     string function_name = "compare::latticeAndOriginSearch()";
 
     bool test_one_lfa_only = false; //DX20190318
-    //DX SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
+    //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX20190318
 
     bool magnetic_analysis = (xstr1.atoms[0].spin_is_given || xstr1.atoms[0].noncoll_spin_is_given);
     min_misfit_info.is_magnetic_misfit=(magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_); //DX20191218
@@ -7545,7 +7545,7 @@ namespace compare{
           // ---------------------------------------------------------------------------
           // collect misfits and matching structure representations
           for(uint p=0;p<possible_min_misfit_info.size();p++){
-            if(p==0 && y==0 && x==0){ // DX20170208 - need to add x==0 ortherwise matches can be overwritten
+            if(p==0 && y==0 && x==0){ //DX20170208 - need to add x==0 ortherwise matches can be overwritten
               min_misfit_info=possible_min_misfit_info[p]; //DX20191218
               matching_indices_1=possible_matching_indices_1[p];
               matching_indices_2=possible_matching_indices_2[p];
@@ -7618,7 +7618,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]     string lfa, lfa_str1;
 // [OBSOLETE - DX20190717] 
 // [OBSOLETE - DX20190717]     //cerr << "SUPERCELL" << endl;
-// [OBSOLETE - DX20190717]     //DX20190319 - START
+// [OBSOLETE - DX20190717]     //DX20190319 START
 // [OBSOLETE - DX20190717]     vector<int> sc2pcMap, pc2scMap;
 // [OBSOLETE - DX20190717]     bool get_symmetry=false;
 // [OBSOLETE - DX20190717]     bool get_full_basis=false;
@@ -7628,11 +7628,11 @@ namespace compare{
 // [OBSOLETE - DX20190717]     uint y=0;
 // [OBSOLETE - DX20190717]     uint x=0;
 // [OBSOLETE - DX20190717] 
-// [OBSOLETE - DX20190717]     // DX TEST
+// [OBSOLETE - DX20190717]     //DX TEST
 // [OBSOLETE - DX20190717]     // Consider all LFAs
 // [OBSOLETE - DX20190717]     for(y=0;y<LFA_str2.size();y++){
 // [OBSOLETE - DX20190717]       for(x=0;x<LFA_str1.size();x++){
-// [OBSOLETE - DX20190717]         // DX TEST
+// [OBSOLETE - DX20190717]         //DX TEST
 // [OBSOLETE - DX20190717]         lfa_str1=LFA_str1[x];
 // [OBSOLETE - DX20190717]         lfa=LFA_str2[y];
 // [OBSOLETE - DX20190717]         if(type_match == 2 && lfa_str1 != lfa){
@@ -7645,14 +7645,14 @@ namespace compare{
 // [OBSOLETE - DX20190717]           cerr << "===> LFA: "<<lfa<<endl;
 // [OBSOLETE - DX20190717]         }
 // [OBSOLETE - DX20190717] 
-// [OBSOLETE - DX20190717]         // DX NEW so we don't need to do this in an inner loop
+// [OBSOLETE - DX20190717]         //DX NEW so we don't need to do this in an inner loop
 // [OBSOLETE - DX20190717]         for(uint a=0;a<xstr.atoms.size();a++){
 // [OBSOLETE - DX20190717]           if(xstr.atoms[a].name == lfa){
 // [OBSOLETE - DX20190717]             xstr.ShifOriginToAtom(a);
 // [OBSOLETE - DX20190717]             break;
 // [OBSOLETE - DX20190717]           }
 // [OBSOLETE - DX20190717]         }
-// [OBSOLETE - DX20190717]         // DX NEW
+// [OBSOLETE - DX20190717]         //DX NEW
 // [OBSOLETE - DX20190717] 
 // [OBSOLETE - DX20190717]         //cerr << "xstr1 centroid: " << endl;
 // [OBSOLETE - DX20190717] 
@@ -7724,7 +7724,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]           xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos);
 // [OBSOLETE - DX20190717]         }
 // [OBSOLETE - DX20190717]         vector<double> all_nn1 = computeNearestNeighbors(xstr1_tmp);
-// [OBSOLETE - DX20190717]         // DX NEW
+// [OBSOLETE - DX20190717]         //DX NEW
 // [OBSOLETE - DX20190717]         //for(uint n=0; n<num_proc; n++){
 // [OBSOLETE - DX20190717]         //  vector<xstructure> vprotos_tmp;
 // [OBSOLETE - DX20190717]         //  vvprotos.push_back(vprotos_tmp);
@@ -7831,7 +7831,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]         }
 // [OBSOLETE - DX20190717]         //cerr << "========== possible_minMis.size(): " << possible_minMis.size() << endl;
 // [OBSOLETE - DX20190717]         for(uint p=0;p<possible_minMis.size();p++){
-// [OBSOLETE - DX20190717]           if(p==0 && y==0 && x==0){ // DX20170208 - need to add x==0 ortherwise matches can be overwritten
+// [OBSOLETE - DX20190717]           if(p==0 && y==0 && x==0){ //DX20170208 - need to add x==0 ortherwise matches can be overwritten
 // [OBSOLETE - DX20190717]             minMis=possible_minMis[p];
 // [OBSOLETE - DX20190717]             xstr1=xstr1_for_thread[p];
 // [OBSOLETE - DX20190717]             vprotos=vvprotos[p];
@@ -7852,11 +7852,11 @@ namespace compare{
 // [OBSOLETE - DX20190717]           return;
 // [OBSOLETE - DX20190717]         }
 // [OBSOLETE - DX20190717]         // //DX20190226 - fast return, no need to check other LFAs if a match is found - END
-// [OBSOLETE - DX20190717]         // DX20190318 - START
+// [OBSOLETE - DX20190717]         //DX20190318 START
 // [OBSOLETE - DX20190717]         if(test_one_lfa_only){
 // [OBSOLETE - DX20190717]           return;
 // [OBSOLETE - DX20190717]         }
-// [OBSOLETE - DX20190717]         // DX20190318 - START
+// [OBSOLETE - DX20190717]         //DX20190318 START
 // [OBSOLETE - DX20190717]       } 
 // [OBSOLETE - DX20190717]     } 
 // [OBSOLETE - DX20190717]   }  
@@ -7941,7 +7941,7 @@ namespace compare{
       proto_new.title=proto.title;
       proto_new.lattice=clattices[p];
 
-      // DX NEW - START =======================
+      //DX NEW - START =======================
       xmatrix<double> f2c = trasp(proto_new.lattice); //DX20190717
       xmatrix<double> c2f = aurostd::inverse(trasp(proto_new.lattice)); //DX20190717
       //DX20190717 [OBSOLETE] xmatrix<double> f2c = trasp(proto.lattice);
@@ -8410,7 +8410,7 @@ namespace compare{
 // [OBSOLETE - DX20190717]       proto_new.title=proto.title;
 // [OBSOLETE - DX20190717]       proto_new.lattice=clattices[p];
 // [OBSOLETE - DX20190717] 
-// [OBSOLETE - DX20190717]       // DX NEW - START =======================
+// [OBSOLETE - DX20190717]       //DX NEW - START =======================
 // [OBSOLETE - DX20190717]       xmatrix<double> f2c = trasp(proto.lattice);
 // [OBSOLETE - DX20190717]       xmatrix<double> c2f = aurostd::inverse(trasp(proto.lattice));
 // [OBSOLETE - DX20190717]       bool skew = false;
@@ -8536,7 +8536,7 @@ namespace compare{
 // Contributors: Carlo De Santo
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
 // *                                                                         *
 // ***************************************************************************
