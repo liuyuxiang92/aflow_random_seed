@@ -9028,7 +9028,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LDBEUG) cout << "xQMVASP::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDBEUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -9041,10 +9041,10 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   H_atom_static=AUROSTD_NAN;
   bool inside_relax=false,inside_static=false;
   // ----------------------------------------------------------------------
-  if(LDBEUG) cerr << "xQMVASP::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LDBEUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
   // ----------------------------------------------------------------------
   for(uint iline=0;iline<vcontent.size();iline++){
-    if(LDBEUG) cerr << "xQMVASP::GetProperties: vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
+    if(LDBEUG) cerr << soliloquy << " vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
     if(aurostd::substring2bool(vcontent[iline],"STOP_relax")){inside_relax=false;}
     else if(aurostd::substring2bool(vcontent[iline],"START_relax")){inside_relax=true;}
     else if(aurostd::substring2bool(vcontent[iline],"STOP_static")){inside_static=false;}
@@ -9091,7 +9091,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   // ----------------------------------------------------------------------   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LDBEUG) cerr << "xQMVASP::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LDBEUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xQMVASP::GetProperties: ERROR_flag set in xQMVASP" << endl;
