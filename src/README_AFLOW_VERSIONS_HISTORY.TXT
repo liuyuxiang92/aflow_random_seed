@@ -33,6 +33,8 @@
         -- fixed typo in "a" Wyckoff position for space group #55 (DX)
         -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- added Patterson symmetry analysis; denoted "pgroupk_Patterson" (applies to reciprocal space only) (DX)
+        -- fixed compilation bugs with old GCC/G++ version (V4.3.4 specifically; nullptr vs NULL, assigning struct attributes, and no back() method for strings) (DX)
+        -- added aflow_gcc_compatibility_check to Makefile (DX)
         -- compare Patterson point symmetry to Laue point group as consistency check (DX)
         -- added Patterson symmetry to full symmetry command (DX)
         -- added stand-alone Patterson symmetry command (DX)
