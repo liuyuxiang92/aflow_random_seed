@@ -18,8 +18,50 @@ string time_delay(long double seconds) { return aurostd::utype2string<long doubl
 //---------------------------------------------------------------------------------
 // class xOUTCAR
 //---------------------------------------------------------------------------------
-xOUTCAR::xOUTCAR() {
+xOUTCAR::xOUTCAR(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
+xOUTCAR::xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
+
+bool xOUTCAR::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(*_p_FileMESSAGE,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xOUTCAR::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  m_initialized=false;  //no point
+  return m_initialized;
+}
+bool xOUTCAR::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xOUTCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  filename=fileIN;
+  GetPropertiesFile(fileIN,QUIET);
+  m_initialized=true;  //no point
+  return m_initialized;
+}
+
+xOUTCAR::xOUTCAR(const xOUTCAR& b) {free();copy(b);} // copy PUBLIC
+
+xOUTCAR::~xOUTCAR() {xStream::free();free();}  //CO20200404 - xStream integration for logging
+
+void xOUTCAR::free() {
   //------------------------------------------------------------------------------
+  m_initialized=false; //CO20200404 - xStream integration for logging
   // GetProperties
   content="";                   // for aflowlib_libraries.cpp
   vcontent.clear();             // for aflowlib_libraries.cpp
@@ -128,72 +170,69 @@ xOUTCAR::xOUTCAR() {
   //Egap_net = 0.0;               // for aflowlib_libraries.cpp     //CO
   Egap_fit_net = AUROSTD_NAN;   // for aflowlib_libraries.cpp 
   Egap_net = AUROSTD_NAN;       // for aflowlib_libraries.cpp 
-  ERROR = "";                   // for aflowlib_libraries.cpp
-}        
-
-xOUTCAR::~xOUTCAR() {
-  free();
-}
-
-void xOUTCAR::free() {
-  //------------------------------------------------------------------------------
-  // GetProperties
-  vcontent.clear();                    // for aflowlib_libraries.cpp
-  vmag.clear();                        // for aflowlib_libraries.cpp
-  vmag_noncoll.clear();                //DX20171205 - non-collinear magnetization 
-  vforces.clear();                     // for aflowlib_libraries.cpp
-  vpositions_cartesian.clear();        // for aflowlib_libraries.cpp
-  // begin shared xPOTCAR
-  vENMAX.clear();                      // for aflowlib_libraries.cpp
-  vENMIN.clear();                      // for aflowlib_libraries.cpp
-  vPOMASS.clear();                     // for aflowlib_libraries.cpp
-  vZVAL.clear();                       // for aflowlib_libraries.cpp
-  vEATOM.clear();                      // for aflowlib_libraries.cpp
-  vRCORE.clear();                      // for aflowlib_libraries.cpp
-  vRWIGS.clear();                      // for aflowlib_libraries.cpp
-  vEAUG.clear();                       // for aflowlib_libraries.cpp
-  vRAUG.clear();                       // for aflowlib_libraries.cpp
-  vRMAX.clear();                       // for aflowlib_libraries.cpp
-  vTITEL.clear();                      // unicity
-  vLEXCH.clear();                      // unicity
-  // end shared xPOTCAR
-  species.clear();                     // for aflowlib_libraries.cpp
-  species_Z.clear();                   // for aflowlib_libraries.cpp
-  species_pp.clear();                  // for aflowlib_libraries.cpp
-  species_pp_type.clear();             // for aflowlib_libraries.cpp
-  species_pp_version.clear();          // for aflowlib_libraries.cpp
-  species_pp_AUID.clear();             // for aflowlib_libraries.cpp
-  species_pp_AUID_collisions.clear();  // for aflowlib_libraries.cpp
-  species_pp_groundstate_energy.clear();      // for aflowlib_libraries.cpp
-  species_pp_groundstate_structure.clear();   // for aflowlib_libraries.cpp
-  species_pp_vLDAU.clear();            // for aflowlib_libraries.cpp
-  vkpoint_reciprocal.clear();          // for aflowlib_libraries.cpp
-  vkpoint_cartesian.clear();           // for aflowlib_libraries.cpp
-  vweights.clear();                    // for aflowlib_libraries.cpp
-  //------------------------------------------------------------------------------
-  // GetEffectiveMass
-  band_index.clear();                  // for aflowlib_libraries.cpp
-  carrier_type.clear();                // for aflowlib_libraries.cpp
-  carrier_spin.clear();                // for aflowlib_libraries.cpp
-  extrema_cart_coord.clear();          // for aflowlib_libraries.cpp
-  effective_mass_axes.clear();         // for aflowlib_libraries.cpp
-  equivalent_valley.clear();           // for aflowlib_libraries.cpp
-  effective_mass_DOS.clear();          // for aflowlib_libraries.cpp
-  effective_mass_COND.clear();         // for aflowlib_libraries.cpp
-  mass_elec_dos.clear();               // for aflowlib_libraries.cpp
-  mass_hole_dos.clear();               // for aflowlib_libraries.cpp
-  mass_elec_conduction.clear();        // for aflowlib_libraries.cpp
-  mass_hole_conduction.clear();        // for aflowlib_libraries.cpp
-  //------------------------------------------------------------------------------
-  // GetBandGap
-  xstr.clear(); //DX20191220 - uppercase to lowercase clear
-  conduction_band_min.clear();         // for aflowlib_libraries.cpp
-  valence_band_max.clear();            // for aflowlib_libraries.cpp
-  Egap_type.clear();                   // for aflowlib_libraries.cpp
-  Egap.clear();                        // for aflowlib_libraries.cpp
+  
+  //[CO20200404 - OBSOLETE]ERROR = "";                   // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]//------------------------------------------------------------------------------
+  //[CO20200404 - OBSOLETE]// GetProperties
+  //[CO20200404 - OBSOLETE]vcontent.clear();                    // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vmag.clear();                        // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vmag_noncoll.clear();                //DX20171205 - non-collinear magnetization 
+  //[CO20200404 - OBSOLETE]vforces.clear();                     // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vpositions_cartesian.clear();        // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]// begin shared xPOTCAR
+  //[CO20200404 - OBSOLETE]vENMAX.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vENMIN.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vPOMASS.clear();                     // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vZVAL.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vEATOM.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vRCORE.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vRWIGS.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vEAUG.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vRAUG.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vRMAX.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vTITEL.clear();                      // unicity
+  //[CO20200404 - OBSOLETE]vLEXCH.clear();                      // unicity
+  //[CO20200404 - OBSOLETE]// end shared xPOTCAR
+  //[CO20200404 - OBSOLETE]species.clear();                     // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_Z.clear();                   // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp.clear();                  // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_type.clear();             // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_version.clear();          // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_AUID.clear();             // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_AUID_collisions.clear();  // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_groundstate_energy.clear();      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_groundstate_structure.clear();   // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_vLDAU.clear();            // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vkpoint_reciprocal.clear();          // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vkpoint_cartesian.clear();           // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vweights.clear();                    // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]//------------------------------------------------------------------------------
+  //[CO20200404 - OBSOLETE]// GetEffectiveMass
+  //[CO20200404 - OBSOLETE]band_index.clear();                  // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]carrier_type.clear();                // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]carrier_spin.clear();                // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]extrema_cart_coord.clear();          // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]effective_mass_axes.clear();         // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]equivalent_valley.clear();           // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]effective_mass_DOS.clear();          // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]effective_mass_COND.clear();         // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]mass_elec_dos.clear();               // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]mass_hole_dos.clear();               // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]mass_elec_conduction.clear();        // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]mass_hole_conduction.clear();        // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]//------------------------------------------------------------------------------
+  //[CO20200404 - OBSOLETE]// GetBandGap
+  //[CO20200404 - OBSOLETE]xstr.clear(); //DX20191220 - uppercase to lowercase clear
+  //[CO20200404 - OBSOLETE]conduction_band_min.clear();         // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]valence_band_max.clear();            // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]Egap_type.clear();                   // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]Egap.clear();                        // for aflowlib_libraries.cpp
 }
 
 void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
+  xStream::copy(b);  //CO20200404 - xStream integration for logging
+  free();
+  m_initialized=b.m_initialized; //CO20200404 - xStream integration for logging
   content=b.content;
   vcontent.clear(); for(uint i=0;i<b.vcontent.size();i++) vcontent.push_back(b.vcontent.at(i));  // for aflowlib_libraries.cpp
   filename=b.filename;
@@ -313,23 +352,12 @@ void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
   Egap_type_net = b.Egap_type_net;
   Egap_fit_net = b.Egap_net;
   Egap_net = b.Egap_net;
-  ERROR = b.ERROR ; // camilo
+  //[CO20200404 - OBSOLETE]ERROR = b.ERROR ; // camilo
 }
 
 const xOUTCAR& xOUTCAR::operator=(const xOUTCAR& b) {  // operator= PUBLIC
   if(this!=&b) {free();copy(b);}
   return *this;
-}
-
-xOUTCAR::xOUTCAR(const string& fileIN,bool QUIET) {
-  clear(); // so it does not mess up vector/deque
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-}
-
-xOUTCAR::xOUTCAR(const xOUTCAR& b) { // copy PUBLIC
-  //  free(); *this=b;
-  copy(b);
 }
 
 void xOUTCAR::clear() {  // clear PRIVATE
@@ -471,7 +499,7 @@ ostream& operator<<(ostream& oss, const xOUTCAR& xOUT) {  //SC20200330
   oss << " Egap_fit_net=" << xOUT.Egap_fit_net << endl;
   oss << " Egap_type.size()=" << xOUT.Egap_type.size() << ": "; for(uint i=0;i<xOUT.Egap_type.size();i++) { oss << xOUT.Egap_type.at(i) << " "; } oss << endl;
   oss << " Egap_type_net=" << xOUT.Egap_type_net << endl;
-  oss << " ERROR=" << xOUT.ERROR << endl;
+  //[CO20200404 - OBSOLETE]oss << " ERROR=" << xOUT.ERROR << endl;
   // ----------------------------------------------------------------------
   if(LVERBOSE) cerr << "xOUTCAR::operator<<: END (" << time_delay(seconds) << ")" << endl;
   return oss;   
@@ -493,15 +521,20 @@ bool xOUTCAR::GetPropertiesFile(const string& fileIN,bool QUIET) {
 bool xOUTCAR::GetPropertiesFile(const string& fileIN,uint natoms_check,bool QUIET) {
   bool flag=GetPropertiesFile(fileIN,QUIET);
   if(aurostd::abs(natoms_check-(double) natoms)>0.1) { 
-    cerr << "ERROR xOUTCAR::GetPropertiesFile: natoms_check(" << natoms_check << ")!= (int) natoms(" << natoms << ") ..." << endl;
-    exit(0);}
+    //[CO20200404 - OBSOLETE]cerr << "ERROR xOUTCAR::GetPropertiesFile: natoms_check(" << natoms_check << ")!= (int) natoms(" << natoms << ") ..." << endl;
+    //[CO20200404 - OBSOLETE]exit(0);
+    string soliloquy="xOUTCAR::GetPropertiesFile():";
+    stringstream message;
+    message << "natoms_check(" << natoms_check << ")!= (int) natoms(" << natoms << ")";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _VALUE_ERROR_);
+  }
   return flag;
 }
 
 bool xOUTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {
   string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
-  bool out=GetPropertiesFile(tmpfile);
+  bool out=GetPropertiesFile(tmpfile,VERBOSE); //CO20200404 - added VERBOSE
   aurostd::RemoveFile(tmpfile);
   return out;
 }
@@ -602,19 +635,23 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
 
 
 bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
-  bool LVERBOSE=(FALSE || XHOST.DEBUG || !QUIET);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
+  string soliloquy="xOUTCAR::GetProperties():";
+  stringstream message;
+  bool force_exit=true; //SC wants to exit here so we can fix the problem
+
   bool ERROR_flag=FALSE;
   clear(); // so it does not mess up vector/deque
 
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   stringstream sss; sss.str(stringstreamIN.str());
   content=stringstreamIN.str();
   vcontent.clear();
   vector<string> vline,tokens,vcontentRED;
   aurostd::string2vectorstring(content,vcontent);
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vcontent.size()=" << vcontent.size() << " (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << " (" << time_delay(seconds) << ")" << endl;
   for(uint iline=0;iline<vcontent.size();iline++) { // NEW - FROM THE BACK
     string saus=vcontent.at(iline);
     if(aurostd::substring2bool(saus,"="))  vcontentRED.push_back(saus);
@@ -622,18 +659,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(saus,"number")) vcontentRED.push_back(saus); // number
     if(aurostd::substring2bool(saus,"bands")) vcontentRED.push_back(saus); // bands
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vcontentRED.size()=" << vcontentRED.size() << " (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " vcontentRED.size()=" << vcontentRED.size() << " (" << time_delay(seconds) << ")" << endl;
   
   string line;
   if(filename=="") filename="stringstream";
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: filename=[" << filename << "]" << endl;
-  if(LVERBOSE) cerr.precision(12);
+  if(LDEBUG) cerr << soliloquy << " filename=[" << filename << "]" << endl;
+  if(LDEBUG) cerr.precision(12);
 
   // ----------------------------------------------------------------------
   //SC
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
  
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD SYSTEM (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD SYSTEM (" << time_delay(seconds) << ")" << endl;
   SYSTEM="";
   line="";
   for(uint iline=0;iline<vcontent.size();iline++) { // NEW - FROM THE BACK 
@@ -643,17 +680,17 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 	break;
       }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LDEBUG) cerr << soliloquy << " line=" << line << endl;
   if(line!="") {
     aurostd::string2tokens(line,tokens,"="); // cerr << tokens.size() << endl;
     SYSTEM=aurostd::RemoveWhiteSpaces(tokens.at(1));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SYSTEM=" << SYSTEM << endl; 
+  if(LDEBUG) cerr << soliloquy << " SYSTEM=" << SYSTEM << endl; 
   // ----------------------------------------------------------------------
   //KY STUFF DONT TOUCH - GET Number of IONS and Fermi
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD KESONG STUFF (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD KESONG STUFF (" << time_delay(seconds) << ")" << endl;
   string anchor_word_NIONS="NIONS";
   string anchor_word_LSORBIT="LSORBIT =";
   string anchor_word_Efermi="E-fermi";
@@ -673,9 +710,9 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       Efermi=aurostd::string2utype<double>(tokens.at(2));
     }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: NIONS=" << NIONS << endl; //exit(0);
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: isLSCOUPLING=" << isLSCOUPLING << endl; //exit(0);
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: Efermi=" << Efermi << endl; //exit(0);
+  if(LDEBUG) cerr << soliloquy << " NIONS=" << NIONS << endl; //exit(0);
+  if(LDEBUG) cerr << soliloquy << " isLSCOUPLING=" << isLSCOUPLING << endl; //exit(0);
+  if(LDEBUG) cerr << soliloquy << " Efermi=" << Efermi << endl; //exit(0);
   // return TRUE;
   // ----------------------------------------------------------------------
   // DO SC STUFF
@@ -683,8 +720,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   natoms=(double) NIONS;
   // ----------------------------------------------------------------------
   // LOAD EENTROPY DATA
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD EENTROPY DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD EENTROPY DATA (" << time_delay(seconds) << ")" << endl;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"entropy"))
       if(aurostd::substring2bool(vcontent.at(iline),"EENTRO"))
@@ -692,18 +729,20 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           line=vcontent.at(iline);
           break;
         }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl; 
+  if(LDEBUG) cerr << soliloquy << " line=" << line << endl; 
   aurostd::string2tokens(line,tokens,"=");
   if(tokens.size()==0) {
-    if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (entropy) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of entries (entropy) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of entries (entropy) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
   }//exit(0); //CO20200106 - patching for auto-indenting
   eentropy_cell=0;
   if(tokens.size()>1) eentropy_cell=aurostd::string2utype<double>(tokens.at(1));
   eentropy_atom=eentropy_cell/natoms;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: eentropy_cell=" << eentropy_cell << endl; //exit(0);
+  if(LDEBUG) cerr << soliloquy << " eentropy_cell=" << eentropy_cell << endl; //exit(0);
   // LOAD ENERGY DATA  // without energy of electrons
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD ENERGY DATA" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD ENERGY DATA" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"energy")) // VASP
@@ -712,19 +751,29 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           line=vcontent.at(iline);
           break;
         }  // VASP
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LDEBUG) cerr << soliloquy << " line=" << line << endl;
   aurostd::string2tokens(line,tokens,"=");
-  if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (energy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting
+  if(tokens.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of entries (energy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of entries (energy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  }//exit(0); //CO20200106 - patching for auto-indenting
   if(tokens.size()>1) line=tokens.at(1);
   aurostd::string2tokens(line,tokens,"e");
-  if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (energy_2) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting
+  if(tokens.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of entries (energy_2) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of entries (energy_2) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  }//exit(0); //CO20200106 - patching for auto-indenting
   if(tokens.size()>0) energy_cell=aurostd::string2utype<double>(tokens.at(0));
   energy_atom=energy_cell/natoms;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
+  if(LDEBUG) cerr << soliloquy << " energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
   // ----------------------------------------------------------------------
   // LOAD PV DATA (IF PRESENT)
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD PV DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD PV DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"TOTEN"))  // VASP
@@ -735,16 +784,21 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
               line=vcontent.at(iline);
               break;
             } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LDEBUG) cerr << soliloquy << " line=" << line << endl;
   if(line.length()<10) {
     PV_cell=0.0;
     PV_atom=PV_cell/natoms;
   } else {
     aurostd::string2tokens(line,tokens,"=");
-    if(tokens.size()!=3) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (PV) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting
+    if(tokens.size()!=3) {
+      //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of entries (PV) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
+      message << "Wrong number of entries (PV) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      ERROR_flag=TRUE;
+    }//exit(0); //CO20200106 - patching for auto-indenting
     if(tokens.size()>2) PV_cell=aurostd::string2utype<double>(tokens.at(2));
     PV_atom=PV_cell/natoms;
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
+    if(LDEBUG) cerr << soliloquy << " PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
   }
 
   // correct if PV
@@ -753,7 +807,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     enthalpy_cell=energy_cell;  // default without PV
     enthalpy_atom=energy_atom;   // default without PV
   } else {
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: pressure=" << pressure << endl; 
+    if(LDEBUG) cerr << soliloquy << " pressure=" << pressure << endl; 
     // LOAD ENTHALPY DATA IF P!=0
     line="";
     for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW
@@ -762,9 +816,9 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           line=vcontent.at(iline);
           break;
         } 
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+    if(LDEBUG) cerr << soliloquy << " line=" << line << endl;
     aurostd::string2tokens(line,tokens," ");
-    //    if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (enthalpy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting 
+    //    if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of entries (enthalpy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting 
 
     if(tokens.size()!=0) {
       for(int i=tokens.size()-2;i>=0;i--)
@@ -774,20 +828,20 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           if(aurostd::substring2bool(tokens.at(i-1),"TOTEN")) {
             enthalpy_cell=aurostd::string2utype<double>(tokens.at(i+1));
             enthalpy_atom=enthalpy_cell/natoms;
-            if(LVERBOSE) cerr << "xOUTCAR::GetProperties: enthalpy_cell=" << enthalpy_cell << " enthalpy_atom=" << enthalpy_atom << endl; 
+            if(LDEBUG) cerr << soliloquy << " enthalpy_cell=" << enthalpy_cell << " enthalpy_atom=" << enthalpy_atom << endl; 
           }
         }
       }
     }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: enthalpy_cell=" << enthalpy_cell << " enthalpy_atom=" << enthalpy_atom << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
+  if(LDEBUG) cerr << soliloquy << " enthalpy_cell=" << enthalpy_cell << " enthalpy_atom=" << enthalpy_atom << endl; 
+  if(LDEBUG) cerr << soliloquy << " energy_cell=" << energy_cell << " energy_atom=" << energy_atom << endl; 
+  if(LDEBUG) cerr << soliloquy << " PV_cell=" << PV_cell << " PV_atom=" << PV_atom << endl; 
 
   // ----------------------------------------------------------------------
   // LOAD PVstress DATA (IF PRESENT)
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD STRESS DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD STRESS DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"external"))  // VASP
@@ -797,7 +851,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             line=vcontent.at(iline-1);
             break;
           }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LDEBUG) cerr << soliloquy << " line=" << line << endl;
   stress.clear();
   aurostd::string2tokens(line,tokens," ");
   if(tokens.size()>=8) {
@@ -811,13 +865,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     stress(1,3)=aurostd::string2utype<double>(tokens.at(7));
     stress(3,1)=aurostd::string2utype<double>(tokens.at(7));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: stress=" << endl << stress << endl; 
+  if(LDEBUG) cerr << soliloquy << " stress=" << endl << stress << endl; 
   //   Direction    XX        YY        ZX        XY       YZ       ZX
   //   in kB       -5.93     -5.93    -19.31      0.00      0.00     -0.00
   // ----------------------------------------------------------------------
   // LOAD VOLUME DATA (IF PRESENT)
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD volume DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD volume DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"volume"))
@@ -826,7 +880,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           line=vcontent.at(iline);
           break;
         } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl; 
+  if(LDEBUG) cerr << soliloquy << " line=" << line << endl; 
   volume_cell=0.0;
   aurostd::string2tokens(line,tokens," ");
   if(tokens.size()>=5) {
@@ -835,11 +889,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
   }
   volume_atom=volume_cell/natoms;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: volume_cell=" << volume_cell << " volume_atom=" << volume_atom << endl;   
+  if(LDEBUG) cerr << soliloquy << " volume_cell=" << volume_cell << " volume_atom=" << volume_atom << endl;   
   // ----------------------------------------------------------------------
   // LOAD PRESSURE_RESIDUAL/PULAY DATA
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD PRESSURE_RESIDUAL/PULAY DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD PRESSURE_RESIDUAL/PULAY DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
     if(aurostd::substring2bool(vcontent.at(iline),"Pullay") || aurostd::substring2bool(vcontent.at(iline),"pullay") ||
@@ -848,9 +902,14 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         line=vcontent.at(iline);
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl;
+  if(LDEBUG) cerr << soliloquy << " line=" << line << endl;
   aurostd::string2tokens(line,tokens,"=");
-  if(tokens.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of entries (Pulay stress) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting
+  if(tokens.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of entries (Pulay stress) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of entries (Pulay stress) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  }//exit(0); //CO20200106 - patching for auto-indenting
 
   pressure_residual=0;
   Pulay_stress=0;
@@ -868,13 +927,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(tokens.size()>0) Pulay_stress=aurostd::string2utype<double>(tokens.at(0));
   }
 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: pressure_residual=" << pressure_residual << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: Pulay_stress=" << Pulay_stress << endl;
+  if(LDEBUG) cerr << soliloquy << " pressure_residual=" << pressure_residual << endl;
+  if(LDEBUG) cerr << soliloquy << " Pulay_stress=" << Pulay_stress << endl;
 
   // ----------------------------------------------------------------------
   // LOAD SPIN
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD SPIN DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD SPIN DATA (" << time_delay(seconds) << ")" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
     if(aurostd::substring2bool(vcontent.at(iline),"magnetization"))
@@ -882,7 +941,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         line=vcontent.at(iline);
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: line=" << line << endl; 
+  if(LDEBUG) cerr << soliloquy << " line=" << line << endl; 
   mag_cell=0.0;
   aurostd::string2tokens(line,tokens," ");
   if(tokens.size()>=6) {
@@ -890,11 +949,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       mag_cell=aurostd::string2utype<double>(tokens.at(5)); //JX seems to work
   }
   mag_atom=mag_cell/natoms;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: mag_cell=" << mag_cell << " mag_atom=" << mag_atom << endl;   
+  if(LDEBUG) cerr << soliloquy << " mag_cell=" << mag_cell << " mag_atom=" << mag_atom << endl;   
   // ----------------------------------------------------------------------
   // LOAD SPIN DECOMPOSITION
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD SPIN DECOMPOSITION DATA" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD SPIN DECOMPOSITION DATA" << endl;
   line="";
   uint mline=0;
   //DX20171205 - Check for magnetization z (non-collinear) - START
@@ -907,8 +966,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         found_magz_line=true;
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (z) line=" << line << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (z) mline=" << mline << endl; 
+  if(LDEBUG) cerr << soliloquy << " magnetization (z) line=" << line << endl; 
+  if(LDEBUG) cerr << soliloquy << " magnetization (z) mline=" << mline << endl; 
   if(found_magz_line) {
     for(uint iline=mline;iline<mline+natoms;iline++) {
       aurostd::string2tokens(vcontent.at(iline),tokens," ");
@@ -927,8 +986,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         found_magy_line=true;
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (y) line=" << line << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (y) mline=" << mline << endl; 
+  if(LDEBUG) cerr << soliloquy << " magnetization (y) line=" << line << endl; 
+  if(LDEBUG) cerr << soliloquy << " magnetization (y) mline=" << mline << endl; 
   if(found_magy_line) {
     for(uint iline=mline;iline<mline+natoms;iline++) {
       aurostd::string2tokens(vcontent.at(iline),tokens," ");
@@ -946,8 +1005,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         found_magx_line=true;
         break;
       } 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (x) line=" << line << endl; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: magnetization (x) mline=" << mline << endl; 
+  if(LDEBUG) cerr << soliloquy << " magnetization (x) line=" << line << endl; 
+  if(LDEBUG) cerr << soliloquy << " magnetization (x) mline=" << mline << endl; 
   if(found_magx_line) {
     for(uint iline=mline;iline<mline+natoms;iline++) {
       aurostd::string2tokens(vcontent.at(iline),tokens," ");
@@ -957,9 +1016,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   }
   //DX20171205 - Non-collinear vs collinear - START
   if(found_magx_line && found_magy_line && found_magz_line){ //non-collinear calculation
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: non-collinear magnetization found." << endl; 
+    if(LDEBUG) cerr << soliloquy << " non-collinear magnetization found." << endl; 
     if(vmag_x.size()!=vmag_y.size() || vmag_x.size()!=vmag_z.size()){
-      if(!QUIET){cerr << "WARNING - xOUTCAR::GetProperties:" << " number of magnetization components (x, y, z) are not the same in OUTCAR; filename=[" << filename << "]" << endl;}
+      //[CO20200404 - OBSOLETE]if(!QUIET){cerr << "WARNING - "<< soliloquy << " number of magnetization components (x, y, z) are not the same in OUTCAR; filename=[" << filename << "]" << endl;}
+      message << "Number of magnetization components (x, y, z) are not the same in OUTCAR; filename=[" << filename << "]";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       ERROR_flag=TRUE;
     }
     for(uint m=0;m<vmag_x.size();m++){
@@ -968,16 +1029,16 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
   }
   else if(found_magx_line && !found_magy_line && !found_magz_line){ //collinear calculation (x only)
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: collinear magnetization found." << endl; 
+    if(LDEBUG) cerr << soliloquy << " collinear magnetization found." << endl; 
     for(uint m=0;m<vmag_x.size();m++){
       vmag.push_back(vmag_x[m]);
     }
   }
-  //  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: mag_cell=" << mag_cell << " mag_atom=" << mag_atom << endl;   
+  //  if(LDEBUG) cerr << soliloquy << " mag_cell=" << mag_cell << " mag_atom=" << mag_atom << endl;   
   // ----------------------------------------------------------------------
   // LOAD FORCES/POSITIONS
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD FORCES/POSITIONS DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD FORCES/POSITIONS DATA (" << time_delay(seconds) << ")" << endl;
   vforces.clear();                    // QM FORCES calculation
   vpositions_cartesian.clear();                 // QM POSITIONS calculation
   for(uint i=0;i<(uint) natoms;i++) {
@@ -991,7 +1052,12 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       for(uint iat=0;iat<(uint)natoms && iat<vcontent.size();iat++) {
         aurostd::string2tokens(vcontent.at(iline+iat+2),tokens," ");
         //cerr << natoms << " " << tokens.size() << "    " << vcontent.at(iline+iat+2) << endl;
-        if(tokens.size()<6) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties:" << " wrong number of force/positions entries in OUTCAR; line=[ " << vcontent.at(iline+iat+2) << "]" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting
+        if(tokens.size()<6) {
+          //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of force/positions entries in OUTCAR; line=[ " << vcontent.at(iline+iat+2) << "]" << "   filename=[" << filename << "]" << endl;
+          message << "Wrong number of force/positions entries in OUTCAR; line=[ " << vcontent.at(iline+iat+2) << "]" << "   filename=[" << filename << "]";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+          ERROR_flag=TRUE;
+        }//exit(0); //CO20200106 - patching for auto-indenting
         vpositions_cartesian.at(iat)[1]=aurostd::string2utype<double>(tokens.at(0));
         vpositions_cartesian.at(iat)[2]=aurostd::string2utype<double>(tokens.at(1));
         vpositions_cartesian.at(iat)[3]=aurostd::string2utype<double>(tokens.at(2));
@@ -1005,8 +1071,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   // ----------------------------------------------------------------------
   // ENCUT EDIFF EDIFFG POTIM TEIN TEBEG TEEND SMASS NPACO APACO PSTRESS  
   // NBANDS NKPTS NSW NBLOCK KBLOCK IBRION NFREE ISIF IWAVPR ISYM TEIN TEBEG ISPIN
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD \"Electronic convergence/Ionic relaxation\" DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD \"Electronic convergence/Ionic relaxation\" DATA (" << time_delay(seconds) << ")" << endl;
   vline.clear();
   ENCUT=0.0;EDIFF=0.0;EDIFFG=0.0;POTIM=0.0;TEIN=0.0;TEBEG=0.0;TEEND=0.0;SMASS=0.0;NPACO=0.0;APACO=0.0;PSTRESS=0.0;pressure=0.0;     // 
   NBANDS=0;NKPTS=0;NSW=0;NBLOCK=0;KBLOCK=0;IBRION=0;NFREE=0;ISIF=0;IWAVPR=0;ISYM=0;TEIN=0;TEBEG=0;ISPIN=0; //
@@ -1038,14 +1104,19 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"NBANDS") && aurostd::substring2bool(vcontentRED.at(iline),"number of bands")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"total energy-change") && aurostd::substring2bool(vcontentRED.at(iline),"(2. order)")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"Ionic relaxation\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO20200106 - patching for auto-indenting
+  if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
+  if(vline.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of \"Ionic relaxation\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of \"Ionic relaxation\" in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  }//exit(0);  //CO20200106 - patching for auto-indenting
   for(uint j=0;j<vline.size();j++) {   // to the back
-    //   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    //   if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
     aurostd::StringSubst(vline.at(j),":"," ");
-    //   if(LVERBOSE) cerr << vline.at(j) << endl;
+    //   if(LDEBUG) cerr << vline.at(j) << endl;
     aurostd::string2tokens(vline.at(j),tokens," ");
     for(uint k=0;k<tokens.size();k++) {
       if(tokens.at(k)=="ENCUT" && k+1<tokens.size()) ENCUT=aurostd::string2utype<double>(tokens.at(k+1));
@@ -1081,43 +1152,43 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       aurostd::StringSubst(vline.at(j),"="," ");
       aurostd::StringSubst(vline.at(j),";"," ");
       aurostd::StringSubst(vline.at(j),":"," ");
-      //   if(LVERBOSE) cerr << vline.at(j) << endl;
+      //   if(LDEBUG) cerr << vline.at(j) << endl;
       aurostd::string2tokens(vline.at(j),tokens," ");
       for(uint k=0;k<tokens.size();k++) {
         //    if(tokens.at(k)=="order)" && k+1<tokens.size()) total_energy_change=aurostd::string2utype<double>(tokens.at(k+1));
       }
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENCUT=" << ENCUT << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EDIFF=" << EDIFF << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EDIFFG=" << EDIFFG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NSW=" << NSW << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NBLOCK=" << NBLOCK << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: KBLOCK=" << KBLOCK << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: IBRION=" << IBRION << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NFREE=" << NFREE << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ISIF=" << ISIF << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: IWAVPR=" << IWAVPR << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ISYM=" << ISYM << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: POTIM=" << POTIM << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: TEIN=" << TEIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: TEBEG=" << TEBEG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: TEEND=" << TEEND << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: SMASS=" << SMASS << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NPACO=" << NPACO << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: APACO=" << APACO << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: PSTRESS=" << PSTRESS << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: pressure(PSTRESS)=" << pressure << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NBANDS=" << NBANDS << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: NKPTS=" << NKPTS << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ISPIN=" << ISPIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: total_energy_change=" << total_energy_change << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ENCUT=" << ENCUT << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EDIFF=" << EDIFF << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EDIFFG=" << EDIFFG << endl;}
+  if(LDEBUG) {cerr << soliloquy << " NSW=" << NSW << endl;}
+  if(LDEBUG) {cerr << soliloquy << " NBLOCK=" << NBLOCK << endl;}
+  if(LDEBUG) {cerr << soliloquy << " KBLOCK=" << KBLOCK << endl;}
+  if(LDEBUG) {cerr << soliloquy << " IBRION=" << IBRION << endl;}
+  if(LDEBUG) {cerr << soliloquy << " NFREE=" << NFREE << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ISIF=" << ISIF << endl;}
+  if(LDEBUG) {cerr << soliloquy << " IWAVPR=" << IWAVPR << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ISYM=" << ISYM << endl;}
+  if(LDEBUG) {cerr << soliloquy << " POTIM=" << POTIM << endl;}
+  if(LDEBUG) {cerr << soliloquy << " TEIN=" << TEIN << endl;}
+  if(LDEBUG) {cerr << soliloquy << " TEBEG=" << TEBEG << endl;}
+  if(LDEBUG) {cerr << soliloquy << " TEEND=" << TEEND << endl;}
+  if(LDEBUG) {cerr << soliloquy << " SMASS=" << SMASS << endl;}
+  if(LDEBUG) {cerr << soliloquy << " NPACO=" << NPACO << endl;}
+  if(LDEBUG) {cerr << soliloquy << " APACO=" << APACO << endl;}
+  if(LDEBUG) {cerr << soliloquy << " PSTRESS=" << PSTRESS << endl;}
+  if(LDEBUG) {cerr << soliloquy << " pressure(PSTRESS)=" << pressure << endl;}
+  if(LDEBUG) {cerr << soliloquy << " NBANDS=" << NBANDS << endl;}
+  if(LDEBUG) {cerr << soliloquy << " NKPTS=" << NKPTS << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ISPIN=" << ISPIN << endl;}
+  if(LDEBUG) {cerr << soliloquy << " total_energy_change=" << total_energy_change << endl;}
 
   // if pressure correct enthalpy
   // ----------------------------------------------------------------------
   // ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RMAX (there are many)
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RMAX\" DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RMAX\" DATA (" << time_delay(seconds) << ")" << endl;
   vline.clear();
   vENMAX.clear();vENMIN.clear();vPOMASS.clear();vZVAL.clear();vEATOM.clear();vRCORE.clear();vRWIGS.clear();vEAUG.clear();vRAUG.clear();vRMAX.clear();
   for(uint iline=0;iline<vcontentRED.size();iline++) {
@@ -1131,13 +1202,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"RAUG") && aurostd::substring2bool(vcontentRED.at(iline),"sphere")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"RMAX") && aurostd::substring2bool(vcontentRED.at(iline),"radius")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RAUG RMAX\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO20200106 - patching for auto-indenting
+  if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << " (" << time_delay(seconds) << ")" << endl;
+  if(vline.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RAUG RMAX\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RAUG RMAX\" in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  }//exit(0);  //CO20200106 - patching for auto-indenting
   for(uint j=0;j<vline.size();j++) {
-    // if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    // if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
-    //    if(LVERBOSE) cerr << vline.at(j) << endl;
+    //    if(LDEBUG) cerr << vline.at(j) << endl;
     aurostd::string2tokens(vline.at(j),tokens," ");
     for(uint k=0;k<tokens.size();k++) {
       if(tokens.at(k)=="ENMAX" && k+1<tokens.size()) vENMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
@@ -1162,37 +1238,37 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
   ENMAX=aurostd::max(vENMAX);
   ENMIN=aurostd::min(vENMIN);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
 
   POMASS_sum=aurostd::sum(vPOMASS);POMASS_min=aurostd::min(vPOMASS);POMASS_max=aurostd::max(vPOMASS);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
 
   ZVAL_sum=aurostd::sum(vZVAL);ZVAL_min=aurostd::min(vZVAL);ZVAL_max=aurostd::max(vZVAL);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
 
   EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
 
   RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
 
   RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
 
   EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
 
   RAUG_min=aurostd::min(vRAUG);RAUG_max=aurostd::max(vRAUG);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
 
   RMAX_min=aurostd::min(vRMAX);RMAX_max=aurostd::max(vRMAX);
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr  << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr  << " " << endl;}
   
   // ----------------------------------------------------------------------
   // KINETIC AND METAGGA DATA
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD KINETIC AND METAGGA DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD KINETIC AND METAGGA DATA (" << time_delay(seconds) << ")" << endl;
   isKIN=FALSE;
   isMETAGGA=FALSE;
   METAGGA="";
@@ -1201,7 +1277,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontent.at(iline),"partial kinetic energy density read in")) { isKIN=TRUE; }
     if(aurostd::substring2bool(vcontent.at(iline),"METAGGA")) { vline.push_back(vcontent.at(iline)); }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << endl;
 
   if(vline.size()>0) {
     aurostd::string2tokens(vline.at(0),tokens,"=");
@@ -1215,15 +1291,15 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       }
     }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: isKIN=" << isKIN << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: isMETAGGA=" << isMETAGGA << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: METAGGA=" << METAGGA << endl;
+  if(LDEBUG) cerr << soliloquy << " isKIN=" << isKIN << endl;
+  if(LDEBUG) cerr << soliloquy << " isMETAGGA=" << isMETAGGA << endl;
+  if(LDEBUG) cerr << soliloquy << " METAGGA=" << METAGGA << endl;
 
   // ----------------------------------------------------------------------
   // PSEUDOPOTENTIAL DATA
-  // LVERBOSE=1;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA (" << time_delay(seconds) << ")" << endl;
+  // LDEBUG=1;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD PSEUDOPOTENTIAL DATA (" << time_delay(seconds) << ")" << endl;
  
   vline.clear();
   vTITEL.clear();
@@ -1233,33 +1309,74 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(aurostd::substring2bool(vcontentRED.at(iline),"TITEL")) {
  	aurostd::string2tokens(vcontentRED.at(iline),tokens,"=");
 	if(tokens.size()>1) vTITEL.push_back(tokens.at(1));
-	//	if(LVERBOSE) cerr << "xOUTCAR::GetProperties: TITEL=" << tokens.at(1) << endl;
+	//	if(LDEBUG) cerr << soliloquy << " TITEL=" << tokens.at(1) << endl;
       }
       if(aurostd::substring2bool(vcontentRED.at(iline),"LEXCH")) {
 	if(!aurostd::substring2bool(vcontentRED.at(iline),"exchange")) {
 	  aurostd::string2tokens(vcontentRED.at(iline),tokens,"=");
 	  if(tokens.size()>1) vLEXCH.push_back(tokens.at(1));
-	  //	if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LEXCH=" << tokens.at(1) << endl;
+	  //	if(LDEBUG) cerr << soliloquy << " LEXCH=" << tokens.at(1) << endl;
 	}
       }
     }
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vEATOM.size()=" << vEATOM.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
-  if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vEATOM.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vRMAX.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
-  if(vTITEL.size()!=vLEXCH.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vLEXCH.size()!=vEATOM.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
-  if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
+  if(LDEBUG) cerr << soliloquy << " vTITEL.size()=" << vTITEL.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vLEXCH.size()=" << vLEXCH.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vEATOM.size()=" << vEATOM.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vRMAX.size()=" << vRMAX.size() << endl;
+  if(vTITEL.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;  
+    //[CO20200404 - OBSOLETE]exit(0);
+  } //CO20200106 - patching for auto-indenting
+  if(vLEXCH.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;  
+    //[CO20200404 - OBSOLETE]exit(0);
+  } //CO20200106 - patching for auto-indenting
+  if(vEATOM.size()==0) {
+    message << "Wrong number of pseudopotentials (EATOM) in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+    //[CO20200404 - OBSOLETE]exit(0);
+  } //CO20200106 - patching for auto-indenting
+  if(vRMAX.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+    //[CO20200404 - OBSOLETE]exit(0);
+  }   //CO20200106 - patching for auto-indenting
+  if(vTITEL.size()!=vLEXCH.size()) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+    //[CO20200404 - OBSOLETE]exit(0);
+  } //CO20200106 - patching for auto-indenting
+  if(vLEXCH.size()!=vEATOM.size()) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+    //[CO20200404 - OBSOLETE]exit(0);
+  } //CO20200106 - patching for auto-indenting
+  if(vEATOM.size()!=vRMAX.size()) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+    //[CO20200404 - OBSOLETE]exit(0);
+  }   //CO20200106 - patching for auto-indenting
  
   for(uint j=0;j<vTITEL.size();j++) {
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SPECIES(" << j << ") " << endl;
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vTITEL.at(j)=" << vTITEL.at(j) << endl;
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
+    if(LDEBUG) cerr << soliloquy << " SPECIES(" << j << ") " << endl;
+    if(LDEBUG) cerr << soliloquy << " vTITEL.at(j)=" << vTITEL.at(j) << endl;
+    if(LDEBUG) cerr << soliloquy << " vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
     aurostd::string2tokens(vTITEL.at(j),tokens," ");
     pp_type=tokens.at(0);
     if(pp_type=="US" or pp_type=="NC") {
@@ -1272,10 +1389,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 	}
       }
     }
-    if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << "xOUTCAR::GetProperties: PAW_LDA" << endl;
+    if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << soliloquy << " PAW_LDA" << endl;
     if(isKIN) pp_type+="_KIN";
     if(isMETAGGA) pp_type+=":"+METAGGA;
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: pp_type=" << pp_type << endl;
+    if(LDEBUG) cerr << soliloquy << " pp_type=" << pp_type << endl;
     species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1)));
     species_Z.push_back(xelement::symbol2Z(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1))));
     species_pp.push_back(tokens.at(1));
@@ -1287,11 +1404,11 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     
     vTITEL.at(j)=aurostd::RemoveWhiteSpaces(vTITEL.at(j));
     vLEXCH.at(j)=aurostd::RemoveWhiteSpaces(vLEXCH.at(j));   
-    xPOTCAR xPOT(xPOTCAR_Finder(species_pp_AUID,species_pp_AUID_collisions,vTITEL.at(j),vLEXCH.at(j),vEATOM.at(j),vRMAX.at(j),LVERBOSE)); // FIXES species_pp_AUID,species_pp_AUID_collisions
+    xPOTCAR xPOT(xPOTCAR_Finder(species_pp_AUID,species_pp_AUID_collisions,vTITEL.at(j),vLEXCH.at(j),vEATOM.at(j),vRMAX.at(j),LDEBUG)); // FIXES species_pp_AUID,species_pp_AUID_collisions
     species_pp_groundstate_energy.push_back(xPOT.species_pp_groundstate_energy.at(0));
     species_pp_groundstate_structure.push_back(xPOT.species_pp_groundstate_structure.at(0));
     
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version, AUID] = "
+    if(LDEBUG) cerr << soliloquy << " SPECIES(" << j << ") [pp, type, version, AUID] = "
                       << species.at(species.size()-1) << " ["
                       << species_Z.at(species_Z.size()-1) << ", "
                       << species_pp.at(species_pp.size()-1) << ", "
@@ -1302,25 +1419,27 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
                       << species_pp_groundstate_structure.at(species_pp_groundstate_structure.size()-1) << "]" << endl;
   }
  
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species.size()=" << species.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_Z.size()=" << species_Z.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp.size()=" << species_pp.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_AUID.size()=" << species_pp_AUID.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " PSEUDOPOTENTIAL type = " << pp_type << endl;
+  if(LDEBUG) cerr << soliloquy << " species.size()=" << species.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_Z.size()=" << species_Z.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp.size()=" << species_pp.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp_type.size()=" << species_pp_type.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp_version.size()=" << species_pp_version.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp_AUID.size()=" << species_pp_AUID.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << endl;
   if(species_pp_AUID_collisions.size()) {
-    cerr << "xOUTCAR::GetProperties: COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+    //[CO20200404 - OBSOLETE]cerr << soliloquy << " COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+    message << "COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size();
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     ERROR_flag=TRUE;
   }
   
   // ----------------------------------------------------------------------
   // LDAU DATA
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD LDAU DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD LDAU DATA (" << time_delay(seconds) << ")" << endl;
   for(uint j=0;j<species.size();j++) 
     species_pp_vLDAU.push_back(deque<double>());  // make space for LDAU
 
@@ -1333,7 +1452,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             vline.push_back(vcontent.at(iline));
 
   if(vline.size()!=0) {
-    if(LVERBOSE) cout << "xOUTCAR::GetProperties: LDAU calculation in OUTCAR" << endl;
+    if(LDEBUG) cout << soliloquy << " LDAU calculation in OUTCAR" << endl;
     int LDAUT=0;
     vector<int> vLDAUL;vector<double> vLDAUU,vLDAUJ;
     for(uint j=0;j<vline.size();j++) {
@@ -1348,22 +1467,29 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(j==3) for(uint i=0;i<tokens.size();i++) vLDAUJ.push_back(((int) 100*aurostd::string2utype<double>(tokens.at(i)))/100.0);
     }
     if(species_pp_vLDAU.size()!=species.size()) {
-      if(!QUIET) cerr << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != species.size()[" << species.size() << "]" << "   filename=[" << filename << "]" << endl;
+      //[CO20200404 - OBSOLETE]if(!QUIET) cerr << soliloquy << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != species.size()[" << species.size() << "]" << "   filename=[" << filename << "]" << endl;
+      message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != species.size()[" << species.size() << "]" << "   filename=[" << filename << "]";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       ERROR_flag=TRUE;
       //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUL.size()) {
-      if(!QUIET) cerr << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]" << endl;
+      //[CO20200404 - OBSOLETE]if(!QUIET) cerr << soliloquy << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]" << endl;
+      message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       ERROR_flag=TRUE;
       //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUU.size()) {
-      if(!QUIET) cerr << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUU.size()[" << vLDAUU.size() << "]" << "   filename=[" << filename << "]" << endl;
+      //[CO20200404 - OBSOLETE]if(!QUIET) cerr << soliloquy << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUU.size()[" << vLDAUU.size() << "]" << "   filename=[" << filename << "]" << endl;
+      message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUU.size()[" << vLDAUU.size() << "]" << "   filename=[" << filename << "]";
       ERROR_flag=TRUE;
       //exit(0);
     }
     if(species_pp_vLDAU.size()!=vLDAUJ.size()) {
-      if(!QUIET) cerr << "xOUTCAR::GetProperties: ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]" << endl;
+      //[CO20200404 - OBSOLETE]if(!QUIET) cerr << soliloquy << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]" << endl;
+      message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       ERROR_flag=TRUE;
       //exit(0);
     }
@@ -1374,19 +1500,19 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       species_pp_vLDAU.at(j).push_back(vLDAUJ.at(j));
     }
 
-    if(LVERBOSE) { 
-      cout << "xOUTCAR::GetProperties: LDA_type=" << LDAUT << endl;
-      cout << "xOUTCAR::GetProperties: LDAU_L=";
+    if(LDEBUG) { 
+      cout << soliloquy << " LDA_type=" << LDAUT << endl;
+      cout << soliloquy << " LDAU_L=";
       for(uint i=0;i<vLDAUL.size();i++) cout << vLDAUL.at(i) << ((i<vLDAUL.size()-1)?",":""); 
       cout << endl;
     }
-    if(LVERBOSE) {
-      cout << "xOUTCAR::GetProperties: LDAU_U=";
+    if(LDEBUG) {
+      cout << soliloquy << " LDAU_U=";
       for(uint i=0;i<vLDAUU.size();i++) cout << vLDAUU.at(i) << ((i<vLDAUU.size()-1)?",":""); 
       cout << endl;
     }
-    if(LVERBOSE) {
-      cout << "xOUTCAR::GetProperties: LDAU_J=";
+    if(LDEBUG) {
+      cout << soliloquy << " LDAU_J=";
       for(uint i=0;i<vLDAUJ.size();i++) cout << vLDAUJ.at(i) << ((i<vLDAUJ.size()-1)?",":"");
       cout << endl;
     }
@@ -1399,18 +1525,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     for(uint i=0;i<vLDAUJ.size();i++) sdata_ldau << vLDAUJ.at(i) << ((i<vLDAUJ.size()-1)?",":"");
     //sdata_ldau << ";";
     string_LDAU=sdata_ldau.str();
-    if(LVERBOSE) cout << "xOUTCAR::GetProperties: string_LDAU=" << string_LDAU << endl;
+    if(LDEBUG) cout << soliloquy << " string_LDAU=" << string_LDAU << endl;
   }
 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: species_pp_vLDAU.size()=" << species_pp_vLDAU.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " species_pp_vLDAU.size()=" << species_pp_vLDAU.size() << endl;
 
   // ----------------------------------------------------------------------
   // DOS related values:
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD DOS related values DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD DOS related values DATA (" << time_delay(seconds) << ")" << endl;
   EMIN=0.0;EMAX=0.0;SIGMA=0.0;ISMEAR=0;  // for aflowlib_libraries.cpp 
   vline.clear();
-  for(uint iline=vcontentRED.size()-1;iline>0;iline--)  //CO20200404
+  for(uint iline=vcontentRED.size()-1;iline<vcontentRED.size();iline--)  //CO20200404
     //  for(uint iline=0;iline<vcontentRED.size();iline++)
     { //CO20200106 - patching for auto-indenting
     if(aurostd::substring2bool(vcontentRED.at(iline),"EMIN") && aurostd::substring2bool(vcontentRED.at(iline),"energy-range for DOS")) vline.push_back(vcontentRED.at(iline));
@@ -1418,13 +1544,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"ISMEAR") && aurostd::substring2bool(vcontentRED.at(iline),"broadening in eV")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"SIGMA") && aurostd::substring2bool(vcontentRED.at(iline),"broadening in eV")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"DOS related values\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO20200106 - patching for auto-indenting
+  if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << endl;
+  if(vline.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of \"DOS related values\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of \"DOS related values\" in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  }//exit(0);  //CO20200106 - patching for auto-indenting
   for(uint j=0;j<vline.size();j++) {
-    //   if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    //   if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
-    //    if(LVERBOSE) cerr << vline.at(j) << endl;
+    //    if(LDEBUG) cerr << vline.at(j) << endl;
     aurostd::string2tokens(vline.at(j),tokens," ");
     for(uint k=0;k<tokens.size();k++) {
       if(tokens.at(k)=="EMIN" && k+1<tokens.size()) EMIN=aurostd::string2utype<double>(tokens.at(k+1));
@@ -1433,21 +1564,21 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="SIGMA" && k+1<tokens.size()) SIGMA=aurostd::string2utype<double>(tokens.at(k+1));
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EMIN=" << EMIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EMAX=" << EMAX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: ISMEAR=" << ISMEAR << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: SIGMA=" << SIGMA << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EMIN=" << EMIN << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EMAX=" << EMAX << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ISMEAR=" << ISMEAR << endl;}
+  if(LDEBUG) {cerr << soliloquy << " SIGMA=" << SIGMA << endl;}
 
   // ----------------------------------------------------------------------
   // Electronic relaxation
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD Electronic relaxation DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD Electronic relaxation DATA (" << time_delay(seconds) << ")" << endl;
   IALGO=0;                      // for aflowlib_libraries.cpp
   LDIAG="";                     // for aflowlib_libraries.cpp
   IMIX=0;INIMIX=0;MIXPRE=0;     // for aflowlib_libraries.cpp
   AMIX=0.0;BMIX=0.0;AMIX_MAG=0.0;BMIX_MAG=0.0;AMIN=0.0;WC=0.0;  // for aflowlib_libraries.cpp
   vline.clear();
-  for(uint iline=vcontentRED.size()-1;iline>0;iline--)  //CO20200404  // DOWN
+  for(uint iline=vcontentRED.size()-1;iline<vcontentRED.size();iline--)  //CO20200404  // DOWN
     // for(uint iline=0;iline<vcontentRED.size();iline++)  // UP
     { //CO20200106 - patching for auto-indenting
     if(aurostd::substring2bool(vcontentRED.at(iline),"IALGO") && aurostd::substring2bool(vcontentRED.at(iline),"algorithm")) vline.push_back(vcontentRED.at(iline));
@@ -1458,13 +1589,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"AMIN")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"WC") && aurostd::substring2bool(vcontentRED.at(iline),"INIMIX") && aurostd::substring2bool(vcontentRED.at(iline),"MIXPRE")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"Electronic relaxation\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting
+  if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << endl;
+  if(vline.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of \"Electronic relaxation\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of \"Electronic relaxation\" in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  }//exit(0); //CO20200106 - patching for auto-indenting
   for(uint j=0;j<vline.size();j++) {
-    //  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    //  if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
-    //    if(LVERBOSE) cerr << vline.at(j) << endl;
+    //    if(LDEBUG) cerr << vline.at(j) << endl;
     aurostd::string2tokens(vline.at(j),tokens," ");
     for(uint k=0;k<tokens.size();k++) {
       if(tokens.at(k)=="IALGO" && k+1<tokens.size()) IALGO=aurostd::string2utype<int>(tokens.at(k+1));
@@ -1480,25 +1616,25 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="MIXPRE" && k+1<tokens.size()) MIXPRE=aurostd::string2utype<int>(tokens.at(k+1));
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: IALGO=" << IALGO << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: LDIAG=" << LDIAG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: IMIX=" << IMIX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: AMIX=" << AMIX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: BMIX=" << BMIX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: AMIX_MAG=" << AMIX_MAG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: BMIX_MAG=" << BMIX_MAG << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: AMIN=" << AMIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: WC=" << WC << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: INIMIX=" << INIMIX << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: MIXPRE=" << MIXPRE << endl;}
+  if(LDEBUG) {cerr << soliloquy << " IALGO=" << IALGO << endl;}
+  if(LDEBUG) {cerr << soliloquy << " LDIAG=" << LDIAG << endl;}
+  if(LDEBUG) {cerr << soliloquy << " IMIX=" << IMIX << endl;}
+  if(LDEBUG) {cerr << soliloquy << " AMIX=" << AMIX << endl;}
+  if(LDEBUG) {cerr << soliloquy << " BMIX=" << BMIX << endl;}
+  if(LDEBUG) {cerr << soliloquy << " AMIX_MAG=" << AMIX_MAG << endl;}
+  if(LDEBUG) {cerr << soliloquy << " BMIX_MAG=" << BMIX_MAG << endl;}
+  if(LDEBUG) {cerr << soliloquy << " AMIN=" << AMIN << endl;}
+  if(LDEBUG) {cerr << soliloquy << " WC=" << WC << endl;}
+  if(LDEBUG) {cerr << soliloquy << " INIMIX=" << INIMIX << endl;}
+  if(LDEBUG) {cerr << soliloquy << " MIXPRE=" << MIXPRE << endl;}
 
   // ----------------------------------------------------------------------
   // Intra band minimization
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD Intra band minimization DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD Intra band minimization DATA (" << time_delay(seconds) << ")" << endl;
   WEIMIN=0.0;EBREAK=0.0;DEPER=0.0;TIME=0.0;  // for aflowlib_libraries.cpp
   vline.clear();
-  for(uint iline=vcontentRED.size()-1;iline>0;iline--)  //CO20200404
+  for(uint iline=vcontentRED.size()-1;iline<vcontentRED.size();iline--)  //CO20200404
     //  for(uint iline=0;iline<vcontentRED.size();iline++)
   { //CO20200106 - patching for auto-indenting
     if(aurostd::substring2bool(vcontentRED.at(iline),"WEIMIN") && aurostd::substring2bool(vcontentRED.at(iline),"energy-eigenvalue tresh-hold")) vline.push_back(vcontentRED.at(iline));
@@ -1506,13 +1642,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontentRED.at(iline),"DEPER") && aurostd::substring2bool(vcontentRED.at(iline),"relativ break condition")) vline.push_back(vcontentRED.at(iline));
     if(aurostd::substring2bool(vcontentRED.at(iline),"TIME") && aurostd::substring2bool(vcontentRED.at(iline),"timestep for ELM")) vline.push_back(vcontentRED.at(iline));
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \"Intra band minimization\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0); //CO20200106 - patching for auto-indenting
+  if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << endl;
+  if(vline.size()==0) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of \"Intra band minimization\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
+    message << "Wrong number of \"Intra band minimization\" in OUTCAR" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  }//exit(0); //CO20200106 - patching for auto-indenting
   for(uint j=0;j<vline.size();j++) {
-    //  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    //  if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
-    //    if(LVERBOSE) cerr << vline.at(j) << endl;
+    //    if(LDEBUG) cerr << vline.at(j) << endl;
     aurostd::string2tokens(vline.at(j),tokens," ");
     for(uint k=0;k<tokens.size();k++) {
       if(tokens.at(k)=="WEIMIN" && k+1<tokens.size()) WEIMIN=aurostd::string2utype<double>(tokens.at(k+1));
@@ -1521,15 +1662,15 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(k)=="TIME" && k+1<tokens.size()) TIME=aurostd::string2utype<double>(tokens.at(k+1));
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: WEIMIN=" << WEIMIN << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: EBREAK=" << EBREAK << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: DEPER=" << DEPER << endl;}
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: TIME=" << TIME; cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " WEIMIN=" << WEIMIN << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EBREAK=" << EBREAK << endl;}
+  if(LDEBUG) {cerr << soliloquy << " DEPER=" << DEPER << endl;}
+  if(LDEBUG) {cerr << soliloquy << " TIME=" << TIME; cerr << endl;}
 
   // ----------------------------------------------------------------------
   // LOAD NWEIGHTS VKPOINT
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD NWEIGHTS KPOINTLIST DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD NWEIGHTS KPOINTLIST DATA (" << time_delay(seconds) << ")" << endl;
   uint nkpoints_line=0;
   nweights=0;
   nkpoints_irreducible=0;
@@ -1543,19 +1684,24 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   { //CO20200106 - patching for auto-indenting
     if(aurostd::substring2bool(vcontent.at(iline),"Found") && aurostd::substring2bool(vcontent.at(iline),"irreducible k-points")) {vline.push_back(vcontent.at(iline));nkpoints_line=iline+4;}
   }
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.size()=" << vline.size() << endl;
-  if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: wrong number of \" LOAD NWEIGHTS VKPOINT\" in OUTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  //CO20200106 - patching for auto-indenting
+  if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << endl;
+  //[CO20200404 - breaks for all OUTCAR.bands]if(vline.size()==0) {
+  //[CO20200404 - breaks for all OUTCAR.bands]  //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " wrong number of \" LOAD NWEIGHTS VKPOINT\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
+  //[CO20200404 - breaks for all OUTCAR.bands]  message << "Wrong number of \" LOAD NWEIGHTS VKPOINT\" in OUTCAR" << "   filename=[" << filename << "]";
+  //[CO20200404 - breaks for all OUTCAR.bands]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+  //[CO20200404 - breaks for all OUTCAR.bands]  ERROR_flag=TRUE;
+  //[CO20200404 - breaks for all OUTCAR.bands]}//exit(0);  //CO20200106 - patching for auto-indenting
   for(uint j=0;j<vline.size();j++) {
-    if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vline.at(" << j << ")=" << vline.at(j) << endl;
+    if(LDEBUG) cerr << soliloquy << " vline.at(" << j << ")=" << vline.at(j) << endl;
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
-    //    if(LVERBOSE) cerr << vline.at(j) << endl;
+    //    if(LDEBUG) cerr << vline.at(j) << endl;
     aurostd::string2tokens(vline.at(j),tokens," ");
     for(uint k=0;k<tokens.size();k++) {
       if(tokens.at(k)=="Found" && k+1<tokens.size()) nkpoints_irreducible=aurostd::string2utype<uint>(tokens.at(k+1));
     }
   }
-  if(LVERBOSE) {cerr << "xOUTCAR::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;}
+  if(LDEBUG) {cerr << soliloquy << " nkpoints_irreducible=" << nkpoints_irreducible << endl;}
 
   if(nkpoints_irreducible) {
     for(uint iline=nkpoints_line;(iline<nkpoints_line+nkpoints_irreducible && iline<vcontent.size());iline++) {
@@ -1571,7 +1717,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         minweight=aurostd::min(minweight,aurostd::string2utype<uint>(tokens.at(3)));
         nweights+=aurostd::string2utype<uint>(tokens.at(3));
       } else {
-        //	if(!QUIET) cerr << "xOUTCAR::GetProperties: error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
+        //	if(!QUIET) cerr << soliloquy << " error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
         //	ERROR_flag=TRUE;//exit(0);
       }
     }
@@ -1586,22 +1732,22 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         kpoint[3]=aurostd::string2utype<double>(tokens.at(2));
         vkpoint_cartesian.push_back(kpoint); // cerr.precision(20);
       } else {
-        //	if(!QUIET) cerr << "xOUTCAR::GetProperties: error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
+        //	if(!QUIET) cerr << soliloquy << " error in NWEIGHTS/VKPOINT calculation tokens.size()=" << tokens.size() << endl;
         //	ERROR_flag=TRUE;//exit(0);
       }
     }
   }
   //  nweights=nweights/minweight; 
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vkpoint_reciprocal.size()=" << vkpoint_reciprocal.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vkpoint_cartesian.size()=" << vkpoint_cartesian.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: vweights.size()=" << vweights.size() << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: nweights=" << nweights << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: nkpoints_irreducible=" << nkpoints_irreducible << endl;
+  if(LDEBUG) cerr << soliloquy << " vkpoint_reciprocal.size()=" << vkpoint_reciprocal.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vkpoint_cartesian.size()=" << vkpoint_cartesian.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vweights.size()=" << vweights.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " nweights=" << nweights << endl;
+  if(LDEBUG) cerr << soliloquy << " nkpoints_irreducible=" << nkpoints_irreducible << endl;
 
   // ----------------------------------------------------------------------
   // LOAD CALCULATION STUFF
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: LOAD CALCULATION STUFF DATA (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD CALCULATION STUFF DATA (" << time_delay(seconds) << ")" << endl;
   // CALCULATION_CORES
   calculation_cores=1;
   for(uint iline=0;iline<vcontent.size();iline++) 
@@ -1615,7 +1761,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(tokens.size()>2) calculation_cores=aurostd::string2utype<uint>(tokens.at(2));
   }
   if(calculation_cores<1) calculation_cores=1; 
-  if(LVERBOSE) cout << "xOUTCAR::GetProperties: calculation_cores=" << calculation_cores << endl;
+  if(LDEBUG) cout << soliloquy << " calculation_cores=" << calculation_cores << endl;
   // CALCULATION_TIME
   calculation_time=0.0;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
@@ -1624,10 +1770,15 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         line=vcontent.at(iline);
         break;
       } 
-  if(line.empty()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: in OUTCAR (no calculation_time)" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;} // exit(0);  //CO20200106 - patching for auto-indenting
+  if(line.empty()) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " in OUTCAR (no calculation_time)" << "   filename=[" << filename << "]" << endl;
+    message << "In OUTCAR (no calculation_time)" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  } // exit(0);  //CO20200106 - patching for auto-indenting
   aurostd::string2tokens(line,tokens);
   if(tokens.size()>1) calculation_time=aurostd::string2utype<double>(tokens.at(tokens.size()-1));
-  if(LVERBOSE) cout << "xOUTCAR::GetProperties: calculation_time=" << calculation_time << endl;
+  if(LDEBUG) cout << soliloquy << " calculation_time=" << calculation_time << endl;
   // CALCULATION_MEMORY 
   calculation_memory=0.0;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
@@ -1636,18 +1787,28 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         line=vcontent.at(iline);
         break;
       } 
-  if(line.empty()) {if(!QUIET) cerr << "WARNING - xOUTCAR::GetProperties: in OUTCAR (no calculation_memory)" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;} // exit(0);  //CO20200106 - patching for auto-indenting
+  if(line.empty()) {
+    //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< soliloquy << " in OUTCAR (no calculation_memory)" << "   filename=[" << filename << "]" << endl;
+    message << "In OUTCAR (no calculation_memory)" << "   filename=[" << filename << "]";
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    ERROR_flag=TRUE;
+  } // exit(0);  //CO20200106 - patching for auto-indenting
   aurostd::string2tokens(line,tokens); //   cerr << tokens.at(3) << endl;
   if(tokens.size()>3) calculation_memory=aurostd::string2utype<double>(tokens.at(3));
-  if(LVERBOSE) cout << "xOUTCAR::GetProperties: calculation_memory=" << calculation_memory << endl;
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: ---------------------------------" << endl;
+  if(LDEBUG) cout << soliloquy << " calculation_memory=" << calculation_memory << endl;
+  if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
 
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xOUTCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
 
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xOUTCAR::GetProperties: ERROR_flag set in xOUTCAR" << endl;
-  if(ERROR_flag) return FALSE;
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - "<< soliloquy << " ERROR_flag set in xOUTCAR" << endl;
+  if(ERROR_flag){
+    message << "ERROR_flag set in xOUTCAR";
+    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return FALSE;
+  }
   return TRUE;
 }
 //-------------------------------------------------------------------------------------------------
@@ -2373,20 +2534,30 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //repetita iuvant!!!!!!!!
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="xOUTCAR::GetBandGap():";
+  stringstream message;
+  bool force_exit=false;
+
   if((content == "") || (vcontent.size() == 0)) {
-    ERROR = soliloquy + " xOUTCAR needs to be loaded before. \n"
-      "        GetProperties(const stringstream&); \n"
-      "        GetProperties(const string&); \n"
-      "        GetPropertiesFile(const string&); \n";
-    return FALSE;
+    //[CO20200404 - OBSOLETE]ERROR = soliloquy + " xOUTCAR needs to be loaded before. \n"
+    //[CO20200404 - OBSOLETE]  "        GetProperties(const stringstream&); \n"
+    //[CO20200404 - OBSOLETE]  "        GetProperties(const string&); \n"
+    //[CO20200404 - OBSOLETE]  "        GetPropertiesFile(const string&); \n";
+    //[CO20200404 - OBSOLETE]return FALSE;
+    message << "xOUTCAR needs to be loaded before." << endl;
+    message << "GetProperties(const stringstream&);" << endl;
+    message << "GetProperties(const string&);" << endl;
+    message << "GetPropertiesFile(const string&);" << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INPUT_MISSING_);
   }
   if(LDEBUG) {cerr << soliloquy << " OUTCAR content found" << endl;}
 
   //quick check if GetProperties() failed
   if(!(ISPIN==1 || ISPIN==2) || NKPTS==0 || NBANDS==0){
     if(!GetProperties(content) || !(ISPIN==1 || ISPIN==2) || NKPTS==0 || NBANDS==0){
-      ERROR = soliloquy + " GetProperties failed. \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " GetProperties failed. \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "GetProperties() failed";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     }
   }
   if(LDEBUG) {cerr << soliloquy << " OUTCAR properties retrieved" << endl;}
@@ -2408,8 +2579,10 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   // silly to load in POSCAR when all the information is in OUTCAR
   if(!xstr.atoms.size()){ //assume it's already loaded
     if(!GetXStructure()){
-      ERROR = soliloquy + " GetXStructure failed. \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " GetXStructure failed. \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "GetXStructure() failed";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     }
   }
   if(LDEBUG) {cerr << soliloquy << " xstructure built from OUTCAR" << endl;}
@@ -2422,8 +2595,10 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 
   vector<uint> starting_lines;
   if(!GetStartingKPointLines(starting_lines)){
-    ERROR = soliloquy + " Unable to grab starting k-point lines. \n";
-    return false;
+    //[CO20200404 - OBSOLETE]ERROR = soliloquy + " Unable to grab starting k-point lines. \n";
+    //[CO20200404 - OBSOLETE]return false;
+    message << "Unable to grab starting k-point lines";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _FILE_CORRUPT_);
   }
   if(LDEBUG) {
     cerr << soliloquy << " reading k-points starting at line";
@@ -2461,9 +2636,11 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       kpt_found=isKPointLine(iline,kpoint);
       if((int)ikpt!=kpt_found){
         if(kpt_found==-1 && ikpt<1000){  //ONLY exception, above 999, VASP starting writing ***, so ignore this check starting at 1000
-          ERROR = soliloquy + " missing k-point "+aurostd::utype2string(ikpt)+
-            " (spin="+aurostd::utype2string(ispin+1)+") \n";
-          return false;
+          //[CO20200404 - OBSOLETE]ERROR = soliloquy + " missing k-point "+aurostd::utype2string(ikpt)+
+          //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(ispin+1)+") \n";
+          //[CO20200404 - OBSOLETE]return false;
+          message << "Missing k-point " << ikpt << " (spin=" << ispin+1 << ")";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _FILE_CORRUPT_);
         }
       }
       if(LDEBUG) {cerr << soliloquy << " looking at k-point[" << ikpt << "]=" << kpoint << " (spin=" << ispin+1 << ")" << endl;}
@@ -2473,9 +2650,11 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       vkpoints[ispin].push_back(kpoint);  //push back kpoints even if empty channel
 
       if(!ProcessKPoint(iline,EFERMI,b_energies,b_occs)){
-        ERROR = soliloquy + " unable to process k-point "+aurostd::utype2string(ikpt)+
-          " (spin="+aurostd::utype2string(ispin+1)+") \n";
-        return false;
+        //[CO20200404 - OBSOLETE]ERROR = soliloquy + " unable to process k-point "+aurostd::utype2string(ikpt)+
+        //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(ispin+1)+") \n";
+        //[CO20200404 - OBSOLETE]return false;
+        message << "Unable to process k-point " << ikpt << " (spin=" << ispin+1 << +")";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _FILE_CORRUPT_);
       }
 
       band_edge_found=GetBandEdge(b_energies,b_occs,EFERMI,iedge,efermi_tol,energy_tol,occ_tol);
@@ -2517,9 +2696,11 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 
       //can we find the next kpoint?
       if(ikpt<(uint)NKPTS && !GetNextKPointLine(iline)){
-        ERROR = soliloquy + " missing k-point "+aurostd::utype2string(ikpt+1)+
-          " (spin="+aurostd::utype2string(ispin+1)+") \n";
-        return false;
+        //[CO20200404 - OBSOLETE]ERROR = soliloquy + " missing k-point "+aurostd::utype2string(ikpt+1)+
+        //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(ispin+1)+") \n";
+        //[CO20200404 - OBSOLETE]return false;
+        message << "Missing k-point " << ikpt+1 << " (spin=" << ispin+1 << +")";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _FILE_CORRUPT_);
       }
     }
   }
@@ -2528,10 +2709,12 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //but after talking with SC, I decided to simply return false!
   //these runs should be rerun - they are garbage!
   if(empty_channel[0]==1 || (ISPIN==2 && empty_channel[1]==1)){
-    ERROR = soliloquy + " unable to detect band edge for k-point "+aurostd::utype2string(first_kpt_empty)+
-      " (spin="+aurostd::utype2string(first_spin_empty+1)+"),"+
-      " this system should be rerun with a wider energy range \n";
-    return false;
+    //[CO20200404 - OBSOLETE]ERROR = soliloquy + " unable to detect band edge for k-point "+aurostd::utype2string(first_kpt_empty)+
+    //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(first_spin_empty+1)+"),"+
+    //[CO20200404 - OBSOLETE]  " this system should be rerun with a wider energy range \n";
+    message << "Unable to detect band edge for k-point " << first_kpt_empty << " (spin=" << first_spin_empty+1 << ")," << " this system should be rerun with a wider energy range";
+    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
   }
 
   //first, we differentiate between metals / insulators
@@ -2590,9 +2773,11 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       continue;
     }
     else if(broad_type[ispin]!=insulator){  //test of stupidity
-      ERROR = soliloquy + " unknown material type (!empty && !metal && !insulator) (spin="+
-        aurostd::utype2string(ispin+1)+") \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " unknown material type (!empty && !metal && !insulator) (spin="+
+      //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "Unknown material type (!empty && !metal && !insulator) (spin=" << ispin+1 << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     }
     if(LDEBUG) {cerr << soliloquy << " insulator found in spin=" << ispin+1 << endl;}
     max_VBT = (-1.0) * AUROSTD_MAX_DOUBLE;
@@ -2630,9 +2815,11 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     if(LDEBUG) {cerr << soliloquy << " removing duplicate k-points from CBB search (spin=" << ispin+1 << ")" << endl;}
     cbb_duplicate_remove=removeDuplicateKPoints(vkpoints[ispin],vimin_CBBs);
     if(!vbt_duplicate_remove || !cbb_duplicate_remove){
-      ERROR = soliloquy + " cannot find equivalent band extrema (spin="+
-        aurostd::utype2string(ispin+1)+") \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " cannot find equivalent band extrema (spin="+
+      //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
+      message << "Cannot find equivalent band extrema (spin=" << ispin+1 << ")";
+      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
     //if we found more than one possible extrema, minimize kpoint distance between max/min
     //this simulates the electron trying to reduce momentum needed to conduct
@@ -2653,15 +2840,20 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       }
     }
     if(dist_min==AUROSTD_MAX_DOUBLE){
-      ERROR = soliloquy + " cannot calculate k-point distance between band extrema (spin="+
-        aurostd::utype2string(ispin+1)+") \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " cannot calculate k-point distance between band extrema (spin="+
+      //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "Cannot calculate k-point distance between band extrema (spin=" << ispin+1 << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     }
     gap[ispin]=vCBB[ispin][imin_CBB]-vVBT[ispin][imax_VBT];
     if(gap[ispin]<0){ //test of stupidity, this should NEVER happen
-      ERROR = soliloquy + " negative band gap found, something broke (spin="+
-        aurostd::utype2string(ispin+1)+") \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " negative band gap found, something broke (spin="+
+      //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "Negative band gap found, something broke (spin=" << ispin+1 << ")";
+      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
     gap_type[ispin]=(gap[ispin] < energy_tol ? zero_gap : non_zero_gap);
     insulator_type[ispin]=(abs(dist_min)<kpt_tol ? insulator_direct : insulator_indirect);
@@ -2694,9 +2886,11 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       Egap[ispin]=_METALGAP_;
       Egap_type[ispin]="metal";
     } else if(broad_type[ispin]!=insulator){ //test of stupidity
-      ERROR = soliloquy + " unknown material type (!empty && !metal && !insulator) (spin="+
-        aurostd::utype2string(ispin+1)+") \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " unknown material type (!empty && !metal && !insulator) (spin="+
+      //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "Unknown material type (!empty && !metal && !insulator) (spin=" << ispin+1 << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     } else {
       valence_band_max[ispin]=vVBT[ispin][imax_VBT];
       conduction_band_min[ispin]=vCBB[ispin][imin_CBB];
@@ -2752,8 +2946,10 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     Egap_net=_METALGAP_;
     Egap_type_net="half-metal";
   } else if(!(broad_type[0]==insulator && broad_type[1]==insulator)){  //test of stupidity
-    ERROR = soliloquy + " unknown material type (!insulator_spin-polarized) (spin-averaged) \n";
-    return false;
+    //[CO20200404 - OBSOLETE]ERROR = soliloquy + " unknown material type (!insulator_spin-polarized) (spin-averaged) \n";
+    //[CO20200404 - OBSOLETE]return false;
+    message << "Unknown material type (!insulator_spin-polarized) (spin-averaged)";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
   } else {  //do more work for 2 spin channels that are both insulating
     //get spin-averaged properties
     if(LDEBUG) {cerr << soliloquy << " we have a spin-polarized insulator, need to find spin-averaged gap" << endl;}
@@ -2802,8 +2998,11 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     if(LDEBUG) {cerr << soliloquy << " removing duplicate k-points from CBB search (spin-averaged)" << endl;}
     cbb_duplicate_remove=removeDuplicateKPoints(vkpoints,vimin_CBBs_net,vispin_CBBs_net);
     if(!vbt_duplicate_remove || !cbb_duplicate_remove){
-      ERROR = soliloquy + " cannot find equivalent band extrema (spin-averaged) \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " cannot find equivalent band extrema (spin-averaged) \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "Cannot find equivalent band extrema (spin-averaged)";
+      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
     //if we found more than one possible extrema, minimize kpoint distance between max/min
     //this simulates the electron trying to reduce momentum needed to conduct
@@ -2824,16 +3023,21 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       }
     }
     if(dist_min==AUROSTD_MAX_DOUBLE){
-      ERROR = soliloquy + " cannot calculate k-point distance between band extrema (spin-averaged) \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " cannot calculate k-point distance between band extrema (spin-averaged) \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "Cannot calculate k-point distance between band extrema (spin-averaged)";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
     }
     valence_band_max_net=vVBT[ispin_VBT_net][imax_VBT];
     conduction_band_min_net=vCBB[ispin_CBB_net][imin_CBB];
     bool direct_insulator_net=abs(dist_min)<kpt_tol;
     double gap_net=(conduction_band_min_net-valence_band_max_net);
     if(gap_net<0){ //test of stupidity, this should NEVER happen
-      ERROR = soliloquy + " negative band gap found, something broke (spin-averaged) \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " negative band gap found, something broke (spin-averaged) \n";
+      //[CO20200404 - OBSOLETE]return false;
+      message << "Negative band gap found, something broke (spin-averaged)";
+      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
     bool zero_gap_net=gap_net < energy_tol;
     bool spin_polarized_net=ispin_VBT_net!=ispin_CBB_net;
@@ -2856,971 +3060,976 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   return true;
 }
 
-bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
-  string line0, line1, line2, line3, line4, line5;
-  vector<string> tokens1, tokens2, tokens3, tokens4, tokens5;
-  vector<double> CBB, VBT;
-  xmatrix<double> KlatticeTmp(3,3), direct_lattice(3,3), metric_tensor(3,3);  //CO20171002
-  uint NBANDS, ISPIN, NKPT, NSW;
-  //bool c_nkpt=TRUE, c_nbands=TRUE, c_system=TRUE, c_ispin=TRUE, c_efermi=TRUE;
-  bool c_nkpt=TRUE, c_nbands=TRUE, c_ispin=TRUE, c_efermi=TRUE;
-  bool c_nsw=TRUE, c_cellvol=TRUE, c_dlattice=TRUE;
-  bool SPIN_UP = FALSE, SPIN_DN = FALSE;
-  //double  CELLVOL=0; CELLVOLCUTOFF=0,   //CO20171002 - GARBAGE A != A^-1
-  double EMIN = -100.0, EMAX = 100.0;
-  //[CO20191004]double _METALGAP = -1.0E+09, _METALEDGE = -1.0; 
-  double _ENER_EPS = 1.0E-08, _ELEC_EPS = 1.0E-02, _ZERO = 0.0;
-
-  // change this into an error message
-  if((content == "") or (vcontent.size() == 0)) {
-    ERROR = "xOUTCAR::GetBandGap(void): xOUTCAR needs to be loaded before. \n"
-      "        GetProperties(const stringstream&); \n"
-      "        GetProperties(const string&); \n"
-      "        GetPropertiesFile(const string&);";
-    return FALSE;
-  }
-
-  uint tagcount = 0;
-  // get only what is necessary for the Egap information
-  for(uint ii=0;  ii<vcontent.size(); ii++) {
-    if(c_nkpt) {
-      if(aurostd::substring2bool(vcontent.at(ii),"NKPTS")) {
-        line0=vcontent.at(ii);
-        aurostd::string2tokens(line0,tokens1);
-        NKPT = aurostd::string2utype<uint>(tokens1.at(3));
-        c_nkpt = FALSE;
-        tagcount++;
-      }
-    }
-    if(c_nbands) {
-      if(aurostd::substring2bool(vcontent.at(ii),"NBANDS=")) {
-        line0=vcontent.at(ii);
-        aurostd::string2tokens(line0,tokens1);
-        NBANDS = aurostd::string2utype<uint>(tokens1.at(8));
-        c_nbands = FALSE;
-        tagcount++;
-      }
-    }
-    // [OBSOLETE ] if(c_system) {
-    // [OBSOLETE ]   if(aurostd::substring2bool(vcontent.at(ii),"SYSTEM")) {
-    // [OBSOLETE ] 	line0=vcontent.at(ii);
-    // [OBSOLETE ] 	aurostd::string2tokens(line0,tokens1);
-    // [OBSOLETE ] 	if(tokens1.at(1) == "=") {
-    // [OBSOLETE ] 	  SYSTEM = aurostd::string2utype<string>(tokens1.at(2));
-    // [OBSOLETE ] 	  c_system = FALSE;
-    // [OBSOLETE ] 	  tagcount++;
-    // [OBSOLETE ] 	}
-    // [OBSOLETE ]   }
-    // [OBSOLETE ] }
-    if(c_ispin) {
-      if(aurostd::substring2bool(vcontent.at(ii),"ISPIN")) {
-        line0=vcontent.at(ii);
-        aurostd::string2tokens(line0,tokens1);
-        ISPIN = aurostd::string2utype<uint>(tokens1.at(2));
-        c_ispin = FALSE;
-        tagcount++;
-      }
-    }
-    if(c_nsw) {
-      if(aurostd::substring2bool(vcontent.at(ii),"NSW")) {
-        line0=vcontent.at(ii);
-        aurostd::string2tokens(line0,tokens1);
-        NSW = aurostd::string2utype<uint>(tokens1.at(2));
-        if(NSW > 0) {
-          ERROR = "Number of ionic steps (NSW) > 0, exiting bandgap determination";
-          return FALSE;
-        }
-        c_nsw = FALSE;
-        tagcount++;
-      }
-    }
-    if(c_efermi) {
-      if(aurostd::substring2bool(vcontent.at(ii),"E-fermi")) {
-        line0=vcontent.at(ii);
-        aurostd::string2tokens(line0,tokens1);
-        Efermi = aurostd::string2utype<double>(tokens1.at(2));
-        c_efermi = FALSE;
-        tagcount++;
-      }
-    }
-    if(c_cellvol) {
-      if(aurostd::substring2bool(vcontent.at(ii),"volume")) {
-        line0=vcontent.at(ii);
-        aurostd::string2tokens(line0,tokens1);
-        if((tokens1.at(1) == "of") and (tokens1.at(2) == "cell")) {
-          //CELLVOL = aurostd::string2utype<double>(tokens1.at(4));
-          //CELLVOLCUTOFF = 0.05*pow(CELLVOL,1.0/3.0);  //CO20171002 - GARBAGE A != A^-1
-          c_cellvol = FALSE;
-          tagcount++;
-        }
-      }
-    }
-    //if(c_dlattice) //CO get most up to date (closer to bottom of file) lattice vectors
-    //if(aurostd::substring2bool(vcontent.at(ii),"Lattice")) //CO
-    if(aurostd::substring2bool(vcontent.at(ii),"direct"))
-    { //CO20200106 - patching for auto-indenting
-      line0=vcontent.at(ii);
-      aurostd::string2tokens(line0,tokens1);
-      //if((tokens1.at(0) == "Lattice") and (tokens1.at(1) == "vectors:")) //CO this is SYM-tag dependent
-      if((tokens1.at(0) == "direct") and (tokens1.at(1) == "lattice") and (tokens1.at(2) == "vectors") and
-          (tokens1.at(3) == "reciprocal") and (tokens1.at(4) == "lattice") and (tokens1.at(5) == "vectors")) //direct lattice vectors reciprocal lattice vectors
-      { //CO20200106 - patching for auto-indenting
-        //line1=vcontent.at(ii+2);    //CO
-        line1=vcontent.at(ii+1);
-        //aurostd::string2tokens(line1,tokens1);  //CO20170725
-        tokens1=GetCorrectPositions(line1,6); //CO20170725
-        if(!tokens1.size()){
-          ERROR = "line with lattice vector is ill-written, see: "+line1;
-          return false;
-        }
-        //direct_lattice(1,1) = aurostd::string2utype<double>(tokens1.at(3).substr(0,tokens1.at(3).size()-1));    //CO
-        //direct_lattice(1,2) = aurostd::string2utype<double>(tokens1.at(4).substr(0,tokens1.at(4).size()-1));    //CO
-        //direct_lattice(1,3) = aurostd::string2utype<double>(tokens1.at(5).substr(0,tokens1.at(5).size()-1));    //CO
-        direct_lattice(1,1) = aurostd::string2utype<double>(tokens1.at(0));
-        direct_lattice(1,2) = aurostd::string2utype<double>(tokens1.at(1));
-        direct_lattice(1,3) = aurostd::string2utype<double>(tokens1.at(2));
-        //CO just grab reciprocal lattice vectors as calculated by vasp, faster than calculating yourself
-        KlatticeTmp(1,1) = aurostd::string2utype<double>(tokens1.at(3));
-        KlatticeTmp(1,2) = aurostd::string2utype<double>(tokens1.at(4));
-        KlatticeTmp(1,3) = aurostd::string2utype<double>(tokens1.at(5));
-        //line1=vcontent.at(ii+3);    //CO
-        line1=vcontent.at(ii+2);
-        //aurostd::string2tokens(line1,tokens1);  //CO20170725
-        tokens1=GetCorrectPositions(line1,6); //CO20170725
-        if(!tokens1.size()){
-          ERROR = "line with lattice vector is ill-written, see: "+line1;
-          return false;
-        }
-        //direct_lattice(2,1) = aurostd::string2utype<double>(tokens1.at(3).substr(0,tokens1.at(3).size()-1));    //CO
-        //direct_lattice(2,2) = aurostd::string2utype<double>(tokens1.at(4).substr(0,tokens1.at(4).size()-1));    //CO
-        //direct_lattice(2,3) = aurostd::string2utype<double>(tokens1.at(5).substr(0,tokens1.at(5).size()-1));    //CO
-        direct_lattice(2,1) = aurostd::string2utype<double>(tokens1.at(0));
-        direct_lattice(2,2) = aurostd::string2utype<double>(tokens1.at(1));
-        direct_lattice(2,3) = aurostd::string2utype<double>(tokens1.at(2));
-        //CO just grab reciprocal lattice vectors as calculated by vasp, faster than calculating yourself
-        KlatticeTmp(2,1) = aurostd::string2utype<double>(tokens1.at(3));
-        KlatticeTmp(2,2) = aurostd::string2utype<double>(tokens1.at(4));
-        KlatticeTmp(2,3) = aurostd::string2utype<double>(tokens1.at(5));
-        //line1=vcontent.at(ii+4);    //CO
-        line1=vcontent.at(ii+3);
-        //aurostd::string2tokens(line1,tokens1);  //CO20170725
-        tokens1=GetCorrectPositions(line1,6); //CO20170725
-        if(!tokens1.size()){
-          ERROR = "line with lattice vector is ill-written, see: "+line1;
-          return false;
-        }
-        //direct_lattice(3,1) = aurostd::string2utype<double>(tokens1.at(3).substr(0,tokens1.at(3).size()-1));    //CO
-        //direct_lattice(3,2) = aurostd::string2utype<double>(tokens1.at(4).substr(0,tokens1.at(4).size()-1));    //CO
-        //direct_lattice(3,3) = aurostd::string2utype<double>(tokens1.at(5).substr(0,tokens1.at(5).size()-1));    //CO
-        direct_lattice(3,1) = aurostd::string2utype<double>(tokens1.at(0));
-        direct_lattice(3,2) = aurostd::string2utype<double>(tokens1.at(1));
-        direct_lattice(3,3) = aurostd::string2utype<double>(tokens1.at(2));
-        //CO just grab reciprocal lattice vectors as calculated by vasp, faster than calculating yourself
-        KlatticeTmp(3,1) = aurostd::string2utype<double>(tokens1.at(3));
-        KlatticeTmp(3,2) = aurostd::string2utype<double>(tokens1.at(4));
-        KlatticeTmp(3,3) = aurostd::string2utype<double>(tokens1.at(5));
-        //KlatticeTmp = ReciprocalLattice(direct_lattice); // scale is 1  //CO already fetched
-
-        //CO20171002
-        metric_tensor=MetricTensor(direct_lattice,1.0);
-
-        if(c_dlattice) { //CO increment tagcount once
-          c_dlattice = FALSE;
-          tagcount++;
-        }
-      }
-    }
-    if(tagcount > 7) break;
-  }
-  if(tagcount < 7) {
-    ERROR = "OUTCAR file lacks information needed for Egap determination";
-    return FALSE;
-  }
-  //-------------------------------------------------------------------------------------------------
-  //   BEGIN Egap DETERMINATIONS
-  //-------------------------------------------------------------------------------------------------
-  xmatrix<double> cbb_kpoints(ISPIN,3);
-  xmatrix<double> vbt_kpoints(ISPIN,3);
-  conduction_band_min.resize(ISPIN);
-  valence_band_max.resize(ISPIN);
-  Egap_type.resize(ISPIN);
-  Egap_fit.resize(ISPIN);
-  Egap.resize(ISPIN);
-  VBT.resize(ISPIN);
-  CBB.resize(ISPIN);
-  for(int ii=0; ii<(int)ISPIN; ii++) {
-    VBT.at(ii) = EMIN;
-    CBB.at(ii) = EMAX;
-  }
-  //-------------------------------------------------------------------------------------------------
-  // SPIN UNPOLARIZED
-  if(ISPIN == 1) {
-    xvector<double> kptdist(ISPIN); //CO20171002 - changing this to be in ANGSTROMS!
-    vector<uint> strtkpt, band_ndx;
-    for(uint ii=0; ii<vcontent.size(); ii++) {
-      if(aurostd::substring2bool(vcontent.at(ii),"k-point   1")) {
-        strtkpt.push_back(ii);
-      }
-    }
-    if(strtkpt.size() == 0) {
-      ERROR = "Corrupt OUTCAR: 'k-point   1' not found.";
-      return FALSE;
-    }
-    for(int ii=1; ii<=(int)ISPIN; ii++) kptdist(ii) = 1.0E09;
-    for(uint ii=strtkpt.at(strtkpt.size()-1)+3; ii<vcontent.size(); ii++) {
-      line0 = vcontent.at(ii);
-      for(uint jj=0; jj<NKPT; jj++) {
-        line3 = vcontent.at(ii-3);
-        for(uint kk=1; kk<NBANDS; kk++) {
-          line1 = vcontent.at(ii-1);
-          line2 = vcontent.at(ii);
-          aurostd::string2tokens(line1,tokens1);
-          aurostd::string2tokens(line2,tokens2);
-          double ene_1 = aurostd::string2utype<double>(tokens1.at(1));
-          double ene_2 = aurostd::string2utype<double>(tokens2.at(1));
-          double occ_1 = aurostd::string2utype<double>(tokens1.at(2));
-          double occ_2 = aurostd::string2utype<double>(tokens2.at(2));
-          // SHARP EDGE
-          if((abs(occ_1-2.00)<_ELEC_EPS) and (abs(occ_2)<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
-            band_ndx.push_back(kk);
-            SPIN_UP = TRUE;
-            if(ene_1 > VBT.at(0)) {
-              VBT.at(0) = ene_1;
-              aurostd::string2tokens(line3,tokens3);
-              vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-              vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-              vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-            }
-            if(ene_2 < CBB.at(0)) {
-              CBB.at(0) = ene_2;
-              aurostd::string2tokens(line3,tokens3);
-              cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-              cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-              cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-            }
-          }
-          // SOFT  EDGE
-          else if((occ_1>_ELEC_EPS) and (occ_2<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
-            band_ndx.push_back(kk);
-            SPIN_UP = TRUE;
-            if(ene_1 > VBT.at(0)) {
-              VBT.at(0) = ene_1;
-              aurostd::string2tokens(line3,tokens3);
-              vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-              vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-              vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-            }
-            if(ene_2 < CBB.at(0)) {
-              CBB.at(0) = ene_2;
-              aurostd::string2tokens(line3,tokens3);
-              cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-              cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-              cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-            }
-          }
-          ii++;
-        }
-        if(!SPIN_UP) break;
-        ii+=3;
-      }
-      break;
-    }
-    // Metallic state via band index check
-    for(uint ii=1; ii<band_ndx.size(); ii++) {
-      if(band_ndx.at(ii-1) != band_ndx.at(ii)) {
-        SPIN_UP = FALSE;
-        break;
-      }
-    }
-    // reciprocal space distance between 2 kpoints - units are (A^-1)
-    xvector<double> vdist_kcart,vdist_kcart_min;
-    double dist,dist_min=AUROSTD_MAX_DOUBLE;
-    for(int ii=-2; ii<=2; ii++) {
-      for(int jj=-2; jj<=2; jj++) {
-        for(int kk=-2; kk<=2; kk++) {
-          vdist_kcart=(vbt_kpoints(1)-cbb_kpoints(1) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
-          dist=aurostd::modulus(vdist_kcart);
-          if(dist<dist_min){
-            vdist_kcart_min=vdist_kcart;
-            dist_min=dist;
-          }
-          //CO20171002
-          // kptdist is basically an energy 
-          //kptdist(1) = min(kptdist(1),modulus(vbt_kpoints(1)-cbb_kpoints(1) + 
-          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
-        }
-      }
-    }
-    //CO20171002
-    xvector<double> vdist_dcart;
-    vdist_dcart(1)=sum(metric_tensor(1)*vdist_kcart_min(1));  //remember metric_tensor is symmetric!
-    vdist_dcart(2)=sum(metric_tensor(2)*vdist_kcart_min(2));  //remember metric_tensor is symmetric!
-    vdist_dcart(3)=sum(metric_tensor(3)*vdist_kcart_min(3));  //remember metric_tensor is symmetric!
-    kptdist(1)=aurostd::modulus(vdist_dcart);
-    // OUTPUT
-    if(SPIN_UP) {
-      conduction_band_min.at(0) = CBB.at(0) - Efermi;
-      valence_band_max.at(0) = VBT.at(0) - Efermi;
-      conduction_band_min_net = conduction_band_min.at(0);
-      valence_band_max_net = valence_band_max.at(0);
-      if(CBB.at(0)-VBT.at(0) > _ENER_EPS) { // u1
-        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
-        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
-        else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        Egap_type_net = Egap_type.at(0);
-        Egap.at(0)    = CBB.at(0) - VBT.at(0);
-        Egap_net      = Egap.at(0);
-      }
-      else if((abs(CBB.at(0)-VBT.at(0)) <= _ENER_EPS) and (abs(CBB.at(0)-VBT.at(0)) >= 0)) { // u2
-        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
-        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
-        else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        Egap_type_net = Egap_type.at(0);
-        Egap.at(0)    = _ZERO;
-        Egap_net      = Egap.at(0);
-      }
-      //WSETYAWAN
-      Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
-      Egap_fit_net   = Egap_fit.at(0);
-    }
-    else if(!SPIN_UP) { // u3
-      conduction_band_min.at(0) = _METALEDGE_;
-      valence_band_max.at(0)    = _METALEDGE_;
-      conduction_band_min_net = conduction_band_min.at(0);
-      valence_band_max_net    = valence_band_max.at(0);
-      Egap_type.at(0) = "metal";
-      Egap_type_net   = Egap_type.at(0);
-      Egap.at(0)      = _METALGAP_;
-      Egap_net        = Egap.at(0);
-      //WSETYAWAN
-      Egap_fit.at(0) = Egap.at(0);
-      Egap_fit_net   = Egap_fit.at(0);
-    }
-  }
-  //-------------------------------------------------------------------------------------------------
-  // SPIN POLARIZED
-  else if(ISPIN == 2) {
-    bool SPIN_UP_ALRT = FALSE;
-    bool SPIN_DN_ALRT = FALSE;
-    vector<uint> band_ndx_up, band_ndx_dn;
-    xvector<double> kptdist(2*ISPIN); //CO20171002 - changing this to be in ANGSTROMS!
-    for(int ii=1; ii<=2*(int)ISPIN; ii++) { kptdist(ii) = 1.0E09; }
-    // SPIN UP
-    for(uint ii=0; ii<vcontent.size(); ii++) {
-      if(aurostd::substring2bool(vcontent.at(ii),"spin component 1")) {
-        if(aurostd::substring2bool(vcontent.at(ii+1),"k-point   1 :")) {
-          ii+=4;
-          for(uint jj=1; jj<=NKPT; jj++) {
-            line3 = vcontent.at(ii-3);
-            for(uint kk=1; kk<NBANDS; kk++) {
-              line1 = vcontent.at(ii-1); // band #1
-              line2 = vcontent.at(ii);   // band #2
-              aurostd::string2tokens(line1,tokens1);
-              aurostd::string2tokens(line2,tokens2);
-              double ene_1 = aurostd::string2utype<double>(tokens1.at(1));
-              double ene_2 = aurostd::string2utype<double>(tokens2.at(1));
-              double occ_1 = aurostd::string2utype<double>(tokens1.at(2));
-              double occ_2 = aurostd::string2utype<double>(tokens2.at(2));
-              // SHARP EDGE
-              if((abs(occ_1-1.00)<_ELEC_EPS) and (abs(occ_2)<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
-                band_ndx_up.push_back(kk);
-                SPIN_UP = TRUE;
-                if(ene_1 > VBT.at(0)) {
-                  VBT.at(0) = ene_1;
-                  aurostd::string2tokens(line3,tokens3);
-                  vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-                  vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-                  vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-                }
-                if(ene_2 < CBB.at(0)) {
-                  CBB.at(0) = ene_2;
-                  aurostd::string2tokens(line3,tokens3);
-                  cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-                  cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-                  cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-                }
-              }
-              // SOFT  EDGE
-              else if((occ_1>_ELEC_EPS) and (occ_2<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
-                band_ndx_up.push_back(kk);
-                SPIN_UP = TRUE;
-                if(ene_1 > VBT.at(0)) {
-                  VBT.at(0) = ene_1;
-                  aurostd::string2tokens(line3,tokens3);
-                  vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-                  vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-                  vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-                }
-                if(ene_2 < CBB.at(0)) {
-                  CBB.at(0) = ene_2;
-                  aurostd::string2tokens(line3,tokens3);
-                  cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-                  cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-                  cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-                }
-              }
-              // special case: empty spin channel
-              else if((kk == 1) and (ene_1-Efermi > _ENER_EPS)) {
-                SPIN_UP_ALRT = TRUE;
-                SPIN_UP      = FALSE;
-                break;
-              }
-              ii++;
-            }
-            if(!SPIN_UP) break;
-            ii+=3;
-          }
-          break;
-        }
-      }
-    }
-    // SPIN DN
-    for(uint ii=0; ii<vcontent.size(); ii++) {
-      if(aurostd::substring2bool(vcontent.at(ii),"spin component 2")) {
-        if(aurostd::substring2bool(vcontent.at(ii+1),"k-point   1 :")) {
-          ii+=4; // starts at band #2
-          for(uint jj=1; jj<=NKPT; jj++) {
-            line3 = vcontent.at(ii-3);
-            for(uint kk=1; kk<NBANDS; kk++) {
-              line1 = vcontent.at(ii-1); // band #1
-              line2 = vcontent.at(ii);   // band #2
-              aurostd::string2tokens(line1,tokens1);
-              aurostd::string2tokens(line2,tokens2);
-              double ene_1 = aurostd::string2utype<double>(tokens1.at(1));
-              double ene_2 = aurostd::string2utype<double>(tokens2.at(1));
-              double occ_1 = aurostd::string2utype<double>(tokens1.at(2));
-              double occ_2 = aurostd::string2utype<double>(tokens2.at(2));
-              // SHARP EDGE
-              if((abs(occ_1-1.00)<_ELEC_EPS) and (abs(occ_2)<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
-                band_ndx_dn.push_back(kk);
-                SPIN_DN = TRUE;
-                if(ene_1 > VBT.at(1)) {
-                  VBT.at(1) = ene_1;
-                  aurostd::string2tokens(line3,tokens3);
-                  vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-                  vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-                  vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-                }
-                if(ene_2 < CBB.at(1)) {
-                  CBB.at(1) = ene_2;
-                  aurostd::string2tokens(line3,tokens3);
-                  cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-                  cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-                  cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-                }
-              }
-              // SOFT  EDGE
-              else if((occ_1>_ELEC_EPS) and (occ_2<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
-                band_ndx_dn.push_back(kk);
-                SPIN_DN = TRUE;
-                if(ene_1 > VBT.at(1)) {
-                  VBT.at(1) = ene_1;
-                  aurostd::string2tokens(line3,tokens3);
-                  vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-                  vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-                  vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-                }
-                if(ene_2 < CBB.at(1)) {
-                  CBB.at(1) = ene_2;
-                  aurostd::string2tokens(line3,tokens3);
-                  cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
-                  cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
-                  cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
-                }
-              }
-              // special case: empty spin channel
-              else if((kk == 1) and (ene_1-Efermi > _ENER_EPS)) {
-                SPIN_DN_ALRT = TRUE;
-                SPIN_DN = FALSE;
-                break;
-              }
-              ii++;
-            }
-            if(!SPIN_DN) break;
-            ii+=3;
-          }
-          break;
-        }
-      }
-    }
-    // Metallic state via band index check
-    for(uint ii=1; ii<band_ndx_up.size(); ii++) {
-      if(band_ndx_up.at(ii-1) != band_ndx_up.at(ii)) {
-        SPIN_UP = FALSE;
-        break;
-      }
-    }
-    for(uint ii=1; ii<band_ndx_dn.size(); ii++) {
-      if(band_ndx_dn.at(ii-1) != band_ndx_dn.at(ii)) {
-        SPIN_DN = FALSE;
-        break;
-      }
-    }
-    //CO20171002
-    xvector<double> vdist1_kcart,vdist1_kcart_min,vdist2_kcart,vdist2_kcart_min,vdist3_kcart,vdist3_kcart_min,vdist4_kcart,vdist4_kcart_min;
-    double dist1,dist2,dist3,dist4,dist1_min,dist2_min,dist3_min,dist4_min;
-    dist1_min=dist2_min=dist3_min=dist4_min=AUROSTD_MAX_DOUBLE;
-    // reciprocal space distance between 2 kpoints - units are (A^-1)
-    for(int ii=-2; ii<=2; ii++) {
-      for(int jj=-2; jj<=2; jj++) {
-        for(int kk=-2; kk<=2; kk++) {
-          // within spin channels
-          vdist1_kcart=(vbt_kpoints(1)-cbb_kpoints(1) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
-          dist1=aurostd::modulus(vdist1_kcart);
-          if(dist1<dist1_min){
-            vdist1_kcart_min=vdist1_kcart;
-            dist1_min=dist1;
-          }
-          vdist2_kcart=(vbt_kpoints(1)-cbb_kpoints(1) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
-          dist2=aurostd::modulus(vdist2_kcart);
-          if(dist2<dist2_min){
-            vdist2_kcart_min=vdist2_kcart;
-            dist2_min=dist2;
-          }
-          // across spin channels
-          vdist3_kcart=(vbt_kpoints(1)-cbb_kpoints(2) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
-          dist3=aurostd::modulus(vdist3_kcart);
-          if(dist3<dist3_min){
-            vdist3_kcart_min=vdist3_kcart;
-            dist3_min=dist3;
-          }
-          vdist4_kcart=(vbt_kpoints(2)-cbb_kpoints(1) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
-          dist4=aurostd::modulus(vdist4_kcart);
-          if(dist4<dist4_min){
-            vdist4_kcart_min=vdist4_kcart;
-            dist4_min=dist4;
-          }
-          //CO20171002
-          //// within spin channels
-          //kptdist(1) = min(kptdist(1),modulus(vbt_kpoints(1)-cbb_kpoints(1) + 
-          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
-          //kptdist(2) = min(kptdist(2),modulus(vbt_kpoints(2)-cbb_kpoints(2) + 
-          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
-          //// across spin channels
-          //kptdist(3) = min(kptdist(3),modulus(vbt_kpoints(1)-cbb_kpoints(2) + 
-          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
-          //kptdist(4) = min(kptdist(4),modulus(vbt_kpoints(2)-cbb_kpoints(1) + 
-          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
-        }
-      }
-    }
-    //CO20171002
-    xvector<double> vdist1_dcart,vdist2_dcart,vdist3_dcart,vdist4_dcart;
-    vdist1_dcart(1)=sum(metric_tensor(1)*vdist1_kcart_min(1));  //remember metric_tensor is symmetric!
-    vdist1_dcart(2)=sum(metric_tensor(2)*vdist1_kcart_min(2));  //remember metric_tensor is symmetric!
-    vdist1_dcart(3)=sum(metric_tensor(3)*vdist1_kcart_min(3));  //remember metric_tensor is symmetric!
-    kptdist(1)=modulus(vdist1_dcart);
-
-    vdist2_dcart(1)=sum(metric_tensor(1)*vdist2_kcart_min(1));  //remember metric_tensor is symmetric!
-    vdist2_dcart(2)=sum(metric_tensor(2)*vdist2_kcart_min(2));  //remember metric_tensor is symmetric!
-    vdist2_dcart(3)=sum(metric_tensor(3)*vdist2_kcart_min(3));  //remember metric_tensor is symmetric!
-    kptdist(2)=modulus(vdist2_dcart);
-
-    vdist3_dcart(1)=sum(metric_tensor(1)*vdist3_kcart_min(1));  //remember metric_tensor is symmetric!
-    vdist3_dcart(2)=sum(metric_tensor(2)*vdist3_kcart_min(2));  //remember metric_tensor is symmetric!
-    vdist3_dcart(3)=sum(metric_tensor(3)*vdist3_kcart_min(3));  //remember metric_tensor is symmetric!
-    kptdist(3)=modulus(vdist3_dcart);
-
-    vdist4_dcart(1)=sum(metric_tensor(1)*vdist4_kcart_min(1));  //remember metric_tensor is symmetric!
-    vdist4_dcart(2)=sum(metric_tensor(2)*vdist4_kcart_min(2));  //remember metric_tensor is symmetric!
-    vdist4_dcart(3)=sum(metric_tensor(3)*vdist4_kcart_min(3));  //remember metric_tensor is symmetric!
-    kptdist(4)=modulus(vdist4_dcart);
-    // ---------------------------------------------------------------------------------------------------
-    // These are systems that are actually not polarized or only have 1 usable spin channel
-    if(SPIN_UP_ALRT or SPIN_DN_ALRT) {
-      conduction_band_min.resize(1);
-      valence_band_max.resize(1);
-      Egap_type.resize(1);
-      Egap.resize(1);
-      if(SPIN_DN_ALRT) {
-        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
-        else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
-        if(CBB.at(0)-VBT.at(0) > _ENER_EPS) {
-          conduction_band_min.at(0) = CBB.at(0) - Efermi;
-          valence_band_max.at(0)    = VBT.at(0) - Efermi;
-          conduction_band_min_net   = conduction_band_min.at(0);
-          valence_band_max_net      = valence_band_max.at(0);
-          Egap_type_net = Egap_type.at(0);
-          Egap.at(0)    = CBB.at(0)-VBT.at(0);
-          Egap_net      = Egap.at(0);
-          //WSETYAWAN fit
-          Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
-          Egap_fit_net   = Egap_fit.at(0);
-        }
-        else if((abs(CBB.at(0)-VBT.at(0)) <= _ENER_EPS) and (abs(CBB.at(0)-VBT.at(0)) >= 0)) {
-          conduction_band_min.at(0) = CBB.at(0) - Efermi;
-          valence_band_max.at(0)    = VBT.at(0) - Efermi;
-          conduction_band_min_net   = conduction_band_min.at(0);
-          valence_band_max_net      = valence_band_max.at(0);
-          Egap_type_net = Egap_type.at(0);
-          Egap.at(0)    = _ZERO;
-          Egap_net      = Egap.at(0);
-          //WSETYAWAN fit
-          Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
-          Egap_fit_net   = Egap_fit.at(0);
-        }
-        else {
-          conduction_band_min.at(0) = _METALEDGE_;
-          valence_band_max.at(0)    = _METALEDGE_;
-          conduction_band_min_net   = conduction_band_min.at(0);
-          valence_band_max_net      = valence_band_max.at(0);
-          Egap_type.at(0) = "metal";
-          Egap_type_net = Egap_type.at(0);
-          Egap.at(0)    = _METALGAP_;
-          Egap_net      = Egap.at(0);
-          //WSETYAWAN fit
-          Egap_fit.at(0) = _METALGAP_;
-          Egap_fit_net   = Egap_fit.at(0);
-        }
-      }
-      else if(SPIN_UP_ALRT) {
-        if      (kptdist(2) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
-        else if(kptdist(2) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
-        if(CBB.at(1)-VBT.at(1) > _ENER_EPS) {
-          conduction_band_min.at(0) = CBB.at(1) - Efermi;
-          valence_band_max.at(0)    = VBT.at(1) - Efermi;
-          conduction_band_min_net   = conduction_band_min.at(0);
-          valence_band_max_net      = valence_band_max.at(0);
-          Egap_type_net = Egap_type.at(0);
-          Egap.at(0)    = CBB.at(1)-VBT.at(1);
-          Egap_net      = Egap.at(0);
-          //WSETYAWAN fit
-          Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
-          Egap_fit_net   = Egap_fit.at(0);
-        }
-        else if((abs(CBB.at(1)-VBT.at(1)) <= _ENER_EPS) and (abs(CBB.at(1)-VBT.at(1)) >= 0)) {
-          conduction_band_min.at(0) = CBB.at(1) - Efermi;
-          valence_band_max.at(0)    = VBT.at(1) - Efermi;
-          conduction_band_min_net   = conduction_band_min.at(0);
-          valence_band_max_net      = valence_band_max.at(0);
-          Egap_type_net = Egap_type.at(0);
-          Egap.at(0)    = _ZERO;
-          Egap_net      = Egap.at(0);
-          //WSETYAWAN fit
-          Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
-          Egap_fit_net   = Egap_fit.at(0);
-        }
-        else {
-          conduction_band_min.at(0) = _METALEDGE_;
-          valence_band_max.at(0)    = _METALEDGE_;
-          conduction_band_min_net   = conduction_band_min.at(0);
-          valence_band_max_net      = valence_band_max.at(0);
-          Egap_type.at(0) = "metal";
-          Egap_type_net = Egap_type.at(0);
-          Egap.at(0)    = _METALGAP_;
-          Egap_net      = Egap.at(0);
-          //WSETYAWAN fit
-          Egap_fit.at(0) = _METALGAP_;
-          Egap_fit_net   = Egap_fit.at(0);
-        }
-      }
-    }
-    // ---------------------------------------------------------------------------------------------------
-    else if(!SPIN_UP_ALRT and !SPIN_DN_ALRT) {
-      conduction_band_min.at(0) = CBB.at(0) - Efermi;
-      conduction_band_min.at(1) = CBB.at(1) - Efermi;
-      valence_band_max.at(0)    = VBT.at(0) - Efermi;
-      valence_band_max.at(1)    = VBT.at(1) - Efermi;
-      conduction_band_min_net   = min(conduction_band_min);
-      valence_band_max_net      = max(valence_band_max);
-      if(SPIN_UP and SPIN_DN) {
-        // Egap value
-        for(uint ii=0; ii<2; ii++) {
-          Egap.at(ii)     = CBB.at(ii) - VBT.at(ii);
-          Egap_fit.at(ii) = 1.348 * Egap.at(ii) + 0.913;
-          if(Egap.at(ii)     < _ENER_EPS) Egap.at(ii)     = _ZERO;
-          if(Egap_fit.at(ii) < _ENER_EPS) Egap_fit.at(ii) = _ZERO;
-        }
-        // Gap types
-        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
-        else if(kptdist(1) > kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        if      (kptdist(2) <= kpt_tol) Egap_type.at(1) = "insulator_direct";
-        else if(kptdist(2) >  kpt_tol) Egap_type.at(1) = "insulator_indirect";
-        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
-        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(1) = "insulator_direct";
-        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(1) = "insulator_indirect";
-        ///////////////////////////////////////////////////
-        // SET 1: VBT1<CBB1 && VBT2=CBB2
-        if((CBB.at(0)-VBT.at(0)>_ENER_EPS) and (abs(CBB.at(1)-VBT.at(1))<_ENER_EPS)) {
-          if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (VBT.at(0)-CBB.at(1)>_ENER_EPS)) { // 1a
-            Egap_type_net = "metal";
-            Egap_net      = _METALGAP_ ;
-            Egap_fit_net  = _METALGAP_ ;
-          }
-          else if((abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (abs(VBT.at(0)-CBB.at(1))<_ENER_EPS)) { // 1b
-            if  (abs(kptdist(1)-kptdist(3)) < kpt_tol) Egap_type_net = Egap_type.at(1);
-            else if(kptdist(1)-kptdist(3)  < kpt_tol) Egap_type_net = Egap_type.at(1);
-            else if(kptdist(1)-kptdist(3)  > kpt_tol) {
-              //[CO20171002 - GARBAGE A != A^-1]if  (abs(kptdist(1)-kptdist(3)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
-              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(3)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
-              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(3)  > CELLVOLCUTOFF) {  //[CO20200106 - close bracket for indenting]}
-              if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
-              else if(Egap_type.at(0) == "insulator_direct")   Egap_type_net = "insulator_indirect";
-            }
-            Egap_net     = _ZERO;
-            Egap_fit_net = _ZERO;
-          }
-          else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 1c
-            Egap_type_net = Egap_type.at(1);
-            Egap_net     = _ZERO;
-            Egap_fit_net = _ZERO;
-          }
-          else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (abs(VBT.at(1)-CBB.at(0))<_ENER_EPS)) { // 1d
-            if  (abs(kptdist(2)-kptdist(4)) < kpt_tol) Egap_type_net = Egap_type.at(1);
-            else if(kptdist(2)-kptdist(4)  < kpt_tol) Egap_type_net = Egap_type.at(1);
-            else if(kptdist(2)-kptdist(4)  > kpt_tol) {
-              //[CO20171002 - GARBAGE A != A^-1]if  (abs(kptdist(2)-kptdist(4)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
-              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2)-kptdist(4)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
-              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2)-kptdist(4)  > CELLVOLCUTOFF) {  //[CO20200106 - close bracket for indenting]}
-              if      (Egap_type.at(1) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
-              else if(Egap_type.at(1) == "insulator_direct")   Egap_type_net = "insulator_indirect";
-            }
-            Egap_net     = _ZERO;
-            Egap_fit_net = _ZERO;
-          }
-          if((VBT.at(1)-CBB.at(0)>_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 1e
-            Egap_type_net = "metal";
-            Egap_net      = _METALGAP_ ;
-            Egap_fit_net  = _METALGAP_ ;
-          }
-        }
-        ///////////////////////////////////////////////////
-        // SET 2: VBT1=CBB1 && VBT2<CBB2
-        else if((abs(CBB.at(0)-VBT.at(0))<_ENER_EPS) and (CBB.at(1)-VBT.at(1)>_ENER_EPS)) {
-          if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (VBT.at(1)-CBB.at(0)>_ENER_EPS)) { // 2a
-            Egap_type_net = "metal";
-            Egap_net      = _METALGAP_ ;
-            Egap_fit_net  = _METALGAP_ ;
-          }
-          else if((abs(VBT.at(1)-VBT.at(0))<_ENER_EPS) and (abs(VBT.at(1)-CBB.at(0))<_ENER_EPS)) { // 2b
-            if  (abs(kptdist(1)-kptdist(4)) < kpt_tol) Egap_type_net = Egap_type.at(0);
-            else if(kptdist(1)-kptdist(4)  < kpt_tol) Egap_type_net = Egap_type.at(0);
-            else if(kptdist(1)-kptdist(4)  > kpt_tol) {
-              //[CO20171002 - GARBAGE A != A^-1]if  (abs(kptdist(1)-kptdist(4)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
-              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(4)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
-              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(4)  > CELLVOLCUTOFF) {  //[CO20200106 - close bracket for indenting]}
-              if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
-              else if(Egap_type.at(0) == "insulator_direct")   Egap_type_net = "insulator_indirect";
-            }
-            Egap_net     = _ZERO;
-            Egap_fit_net = _ZERO;
-          }
-          else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 2c
-            Egap_type_net = Egap_type.at(0);
-            Egap_net     = _ZERO;
-            Egap_fit_net = _ZERO;
-          }
-          else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (abs(VBT.at(0)-CBB.at(1))<_ENER_EPS)) { // 2d
-            if  (abs(kptdist(1)-kptdist(3)) < kpt_tol) Egap_type_net = Egap_type.at(0);
-            else if(kptdist(1)-kptdist(3)  < kpt_tol) Egap_type_net = Egap_type.at(0);
-            else if(kptdist(1)-kptdist(3)  > kpt_tol) {
-              //[CO20171002 - GARBAGE A != A^-1]if  (abs(kptdist(1)-kptdist(3)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
-              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(3)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
-              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(3)  > CELLVOLCUTOFF) {  //[CO20200106 - close bracket for indenting]}
-              if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
-              else if(Egap_type.at(0) == "insulator_direct"  ) Egap_type_net = "insulator_indirect";
-            }
-            Egap_net     = _ZERO;
-            Egap_fit_net = _ZERO;
-          }
-          if((VBT.at(0)-CBB.at(1)>_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 2e
-            Egap_type_net = "metal";
-            Egap_net      = _METALGAP_ ;
-            Egap_fit_net  = _METALGAP_ ;
-          }
-        }
-        ///////////////////////////////////////////////////
-        // SET 3: VBT1=CBB1 && VBT2=CBB2
-        else if( (abs(CBB.at(0)-VBT.at(0))<_ENER_EPS) and (abs(CBB.at(1)-VBT.at(1))<_ENER_EPS) ) { // CAMILOFIX
-          if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and ((CBB.at(0)-CBB.at(1))>_ENER_EPS)) { // 3a
-            Egap_type_net = "metal";
-            Egap_net      = _METALGAP_ ;
-            Egap_fit_net  = _METALGAP_ ;
-          }
-          else if( (abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS) ) { // 3b // CAMILOFIX
-            if((kptdist(1)<=kpt_tol) or (kptdist(2)<=kpt_tol) or
-                (kptdist(3)<=kpt_tol) or (kptdist(4)<=kpt_tol)) {
-              //[CO20171002 - GARBAGE A != A^-1]if((kptdist(1)<=CELLVOLCUTOFF) or (kptdist(2)<=CELLVOLCUTOFF) or
-              //[CO20171002 - GARBAGE A != A^-1]   (kptdist(3)<=CELLVOLCUTOFF) or (kptdist(4)<=CELLVOLCUTOFF)) { //[CO20200106 - close bracket for indenting]}
-              Egap_type_net = "insulator_direct";
-            }
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = _ZERO;
-            Egap_fit_net = _ZERO;
-          }
-          if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and ((CBB.at(1)-CBB.at(0))>_ENER_EPS)) { // 3c
-            Egap_type_net = "metal";
-            Egap_net      = _METALGAP_ ;
-            Egap_fit_net  = _METALGAP_ ;
-          }
-        }
-        ///////////////////////////////////////////////////
-        // SET 4: VBT1<CBB1 && VBT2<CBB2
-        else if((CBB.at(0)-VBT.at(0)>_ENER_EPS) and (CBB.at(1)-VBT.at(1)>_ENER_EPS)) {
-          if(VBT.at(0)-CBB.at(1)>_ENER_EPS) { // 4a
-            Egap_type_net = "metal";
-            Egap_net      = _METALGAP_ ;
-            Egap_fit_net  = _METALGAP_ ;
-          }
-          else if(VBT.at(1)-CBB.at(0)>_ENER_EPS) { // 4b
-            Egap_type_net = "metal";
-            Egap_net      = _METALGAP_ ;
-            Egap_fit_net  = _METALGAP_ ;
-          }
-          else if(abs(VBT.at(0)-CBB.at(1))<_ENER_EPS) { // 4c
-            if(kptdist(3)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(3)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = _ZERO;
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if(abs(VBT.at(1)-CBB.at(0))<_ENER_EPS) { // 4d
-            if(kptdist(4)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(4)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = _ZERO;
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if((CBB.at(0)-CBB.at(1)>_ENER_EPS) and (VBT.at(0)-VBT.at(1)>_ENER_EPS)) { // 4e
-            if(kptdist(3)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(3)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net   = "insulator_indirect";
-            Egap_net     = CBB.at(1) - VBT.at(0);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if((CBB.at(1)-CBB.at(0)>_ENER_EPS) and (VBT.at(1)-VBT.at(0)>_ENER_EPS)) { // 4f
-            if(kptdist(4)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(4)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = CBB.at(0) - VBT.at(1);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS)) { // 4g
-            if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = CBB.at(0) - VBT.at(0);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS)) { // 4h
-            if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = CBB.at(1) - VBT.at(1);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 4i
-            if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = CBB.at(0) - VBT.at(0);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 4j
-            if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = CBB.at(1) - VBT.at(1);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if( (abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS) ) { // 4k // CAMILOFIX
-            if((kptdist(1)<=kpt_tol) or (kptdist(2)<=kpt_tol) or
-                (kptdist(3)<=kpt_tol) or (kptdist(4)<=kpt_tol)) {
-              //[CO20171002 - GARBAGE A != A^-1]if((kptdist(1)<=CELLVOLCUTOFF) or (kptdist(2)<=CELLVOLCUTOFF) or
-              //[CO20171002 - GARBAGE A != A^-1]   (kptdist(3)<=CELLVOLCUTOFF) or (kptdist(4)<=CELLVOLCUTOFF)) { //[CO20200106 - close bracket for indenting]}
-              Egap_type_net = "insulator_direct";
-            }
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = CBB.at(0) - VBT.at(0);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if((abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 4l
-            if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = CBB.at(0) - VBT.at(0);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-          else if((abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 4m
-            if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
-            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
-            else Egap_type_net = "insulator_indirect";
-            Egap_net     = CBB.at(1) - VBT.at(1);
-            Egap_fit_net = 1.348 * Egap_net + 0.913;
-          }
-        }
-      }
-      else if( SPIN_UP and !SPIN_DN) { // m1
-        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
-        else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
-        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
-        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
-        conduction_band_min.at(1) = _METALEDGE_;
-        valence_band_max.at(1)    = _METALEDGE_;
-        conduction_band_min_net = conduction_band_min.at(1);
-        valence_band_max_net    = valence_band_max.at(1);
-        Egap_type.at(1) = "metal";
-        Egap_type_net   = Egap_type.at(1);
-        Egap.at(0)      = CBB.at(0) - VBT.at(0);
-        Egap.at(1)      = _METALGAP_;
-        Egap_net        = Egap.at(1);
-        //WSETYAWAN fit
-        Egap_fit.at(0)  = 1.348 * Egap.at(0) + 0.913;
-        Egap_fit.at(1)  = _METALGAP_;
-        Egap_fit_net    = Egap_fit.at(1);
-      }
-      else if(!SPIN_UP and  SPIN_DN) { // m2
-        if      (kptdist(2) <= kpt_tol) Egap_type.at(1) = "insulator_direct";
-        else if(kptdist(2) >  kpt_tol) Egap_type.at(1) = "insulator_indirect";
-        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(1) = "insulator_direct";
-        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(1) = "insulator_indirect";
-        conduction_band_min.at(0) = _METALEDGE_;
-        valence_band_max.at(0)    = _METALEDGE_;
-        conduction_band_min_net = conduction_band_min.at(0);
-        valence_band_max_net    = valence_band_max.at(0);
-        Egap_type.at(0) = "metal";
-        Egap_type_net   = Egap_type.at(0);
-        Egap.at(0)      = _METALGAP_;
-        Egap.at(1)      = CBB.at(1) - VBT.at(1);
-        Egap_net        = Egap.at(0);
-        //WSETYAWAN fit
-        Egap_fit.at(0)  = _METALGAP_;
-        Egap_fit.at(1)  = 1.348 * Egap.at(1) + 0.913;
-        Egap_fit_net    = Egap_fit.at(0);
-      }
-      // Full metal
-      else if(!SPIN_UP and !SPIN_DN) { // m3
-        for(int ii=0; ii<(int)ISPIN; ii++) {
-          conduction_band_min.at(ii) = _METALEDGE_;
-          valence_band_max.at(ii) = _METALEDGE_;
-        }
-        conduction_band_min_net = _METALEDGE_;
-        valence_band_max_net    = _METALEDGE_;
-        Egap.at(0) = _METALGAP_;
-        Egap.at(1) = _METALGAP_;
-        Egap_type.at(0) = "metal";
-        Egap_type.at(1) = "metal";
-        Egap_type_net   = "metal";
-        Egap_net = _METALGAP_;
-        //WSETYAWAN fit
-        Egap_fit.at(0) = _METALGAP_;
-        Egap_fit.at(1) = _METALGAP_;
-        Egap_fit_net   = _METALGAP_;
-      }
-    }
-  }
-  // ----------------------------------------------------------------------
-  // DONE NOW RETURN
-  //  if(ERROR_flag && !QUIET) return FALSE;
-  return TRUE;
-}
+//[CO20200404 - OBSOLETE]bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
+//[CO20200404 - OBSOLETE]  string line0, line1, line2, line3, line4, line5;
+//[CO20200404 - OBSOLETE]  vector<string> tokens1, tokens2, tokens3, tokens4, tokens5;
+//[CO20200404 - OBSOLETE]  vector<double> CBB, VBT;
+//[CO20200404 - OBSOLETE]  xmatrix<double> KlatticeTmp(3,3), direct_lattice(3,3), metric_tensor(3,3);  //CO20171002
+//[CO20200404 - OBSOLETE]  uint NBANDS, ISPIN, NKPT, NSW;
+//[CO20200404 - OBSOLETE]  //bool c_nkpt=TRUE, c_nbands=TRUE, c_system=TRUE, c_ispin=TRUE, c_efermi=TRUE;
+//[CO20200404 - OBSOLETE]  bool c_nkpt=TRUE, c_nbands=TRUE, c_ispin=TRUE, c_efermi=TRUE;
+//[CO20200404 - OBSOLETE]  bool c_nsw=TRUE, c_cellvol=TRUE, c_dlattice=TRUE;
+//[CO20200404 - OBSOLETE]  bool SPIN_UP = FALSE, SPIN_DN = FALSE;
+//[CO20200404 - OBSOLETE]  //double  CELLVOL=0; CELLVOLCUTOFF=0,   //CO20171002 - GARBAGE A != A^-1
+//[CO20200404 - OBSOLETE]  double EMIN = -100.0, EMAX = 100.0;
+//[CO20200404 - OBSOLETE]  //[CO20191004]double _METALGAP = -1.0E+09, _METALEDGE = -1.0; 
+//[CO20200404 - OBSOLETE]  double _ENER_EPS = 1.0E-08, _ELEC_EPS = 1.0E-02, _ZERO = 0.0;
+//[CO20200404 - OBSOLETE]
+//[CO20200404 - OBSOLETE]  // change this into an error message
+//[CO20200404 - OBSOLETE]  if((content == "") or (vcontent.size() == 0)) {
+//[CO20200404 - OBSOLETE]    ERROR = "xOUTCAR::GetBandGap(void): xOUTCAR needs to be loaded before. \n"
+//[CO20200404 - OBSOLETE]      "        GetProperties(const stringstream&); \n"
+//[CO20200404 - OBSOLETE]      "        GetProperties(const string&); \n"
+//[CO20200404 - OBSOLETE]      "        GetPropertiesFile(const string&);";
+//[CO20200404 - OBSOLETE]    return FALSE;
+//[CO20200404 - OBSOLETE]    message << "xOUTCAR needs to be loaded before." << endl;
+//[CO20200404 - OBSOLETE]    message << "GetProperties(const stringstream&);" << endl;
+//[CO20200404 - OBSOLETE]    message << "GetProperties(const string&);" << endl;
+//[CO20200404 - OBSOLETE]    message << "GetPropertiesFile(const string&);" << endl;
+//[CO20200404 - OBSOLETE]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INPUT_MISSING_);
+//[CO20200404 - OBSOLETE]  }
+//[CO20200404 - OBSOLETE]
+//[CO20200404 - OBSOLETE]  uint tagcount = 0;
+//[CO20200404 - OBSOLETE]  // get only what is necessary for the Egap information
+//[CO20200404 - OBSOLETE]  for(uint ii=0;  ii<vcontent.size(); ii++) {
+//[CO20200404 - OBSOLETE]    if(c_nkpt) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"NKPTS")) {
+//[CO20200404 - OBSOLETE]        line0=vcontent.at(ii);
+//[CO20200404 - OBSOLETE]        aurostd::string2tokens(line0,tokens1);
+//[CO20200404 - OBSOLETE]        NKPT = aurostd::string2utype<uint>(tokens1.at(3));
+//[CO20200404 - OBSOLETE]        c_nkpt = FALSE;
+//[CO20200404 - OBSOLETE]        tagcount++;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    if(c_nbands) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"NBANDS=")) {
+//[CO20200404 - OBSOLETE]        line0=vcontent.at(ii);
+//[CO20200404 - OBSOLETE]        aurostd::string2tokens(line0,tokens1);
+//[CO20200404 - OBSOLETE]        NBANDS = aurostd::string2utype<uint>(tokens1.at(8));
+//[CO20200404 - OBSOLETE]        c_nbands = FALSE;
+//[CO20200404 - OBSOLETE]        tagcount++;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] if(c_system) {
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ]   if(aurostd::substring2bool(vcontent.at(ii),"SYSTEM")) {
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] 	line0=vcontent.at(ii);
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] 	aurostd::string2tokens(line0,tokens1);
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] 	if(tokens1.at(1) == "=") {
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] 	  SYSTEM = aurostd::string2utype<string>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] 	  c_system = FALSE;
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] 	  tagcount++;
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] 	}
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ]   }
+//[CO20200404 - OBSOLETE]    // [OBSOLETE ] }
+//[CO20200404 - OBSOLETE]    if(c_ispin) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"ISPIN")) {
+//[CO20200404 - OBSOLETE]        line0=vcontent.at(ii);
+//[CO20200404 - OBSOLETE]        aurostd::string2tokens(line0,tokens1);
+//[CO20200404 - OBSOLETE]        ISPIN = aurostd::string2utype<uint>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]        c_ispin = FALSE;
+//[CO20200404 - OBSOLETE]        tagcount++;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    if(c_nsw) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"NSW")) {
+//[CO20200404 - OBSOLETE]        line0=vcontent.at(ii);
+//[CO20200404 - OBSOLETE]        aurostd::string2tokens(line0,tokens1);
+//[CO20200404 - OBSOLETE]        NSW = aurostd::string2utype<uint>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]        if(NSW > 0) {
+//[CO20200404 - OBSOLETE]          ERROR = "Number of ionic steps (NSW) > 0, exiting bandgap determination";
+//[CO20200404 - OBSOLETE]          return FALSE;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        c_nsw = FALSE;
+//[CO20200404 - OBSOLETE]        tagcount++;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    if(c_efermi) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"E-fermi")) {
+//[CO20200404 - OBSOLETE]        line0=vcontent.at(ii);
+//[CO20200404 - OBSOLETE]        aurostd::string2tokens(line0,tokens1);
+//[CO20200404 - OBSOLETE]        Efermi = aurostd::string2utype<double>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]        c_efermi = FALSE;
+//[CO20200404 - OBSOLETE]        tagcount++;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    if(c_cellvol) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"volume")) {
+//[CO20200404 - OBSOLETE]        line0=vcontent.at(ii);
+//[CO20200404 - OBSOLETE]        aurostd::string2tokens(line0,tokens1);
+//[CO20200404 - OBSOLETE]        if((tokens1.at(1) == "of") and (tokens1.at(2) == "cell")) {
+//[CO20200404 - OBSOLETE]          //CELLVOL = aurostd::string2utype<double>(tokens1.at(4));
+//[CO20200404 - OBSOLETE]          //CELLVOLCUTOFF = 0.05*pow(CELLVOL,1.0/3.0);  //CO20171002 - GARBAGE A != A^-1
+//[CO20200404 - OBSOLETE]          c_cellvol = FALSE;
+//[CO20200404 - OBSOLETE]          tagcount++;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    //if(c_dlattice) //CO get most up to date (closer to bottom of file) lattice vectors
+//[CO20200404 - OBSOLETE]    //if(aurostd::substring2bool(vcontent.at(ii),"Lattice")) //CO
+//[CO20200404 - OBSOLETE]    if(aurostd::substring2bool(vcontent.at(ii),"direct"))
+//[CO20200404 - OBSOLETE]    { //CO20200106 - patching for auto-indenting
+//[CO20200404 - OBSOLETE]      line0=vcontent.at(ii);
+//[CO20200404 - OBSOLETE]      aurostd::string2tokens(line0,tokens1);
+//[CO20200404 - OBSOLETE]      //if((tokens1.at(0) == "Lattice") and (tokens1.at(1) == "vectors:")) //CO this is SYM-tag dependent
+//[CO20200404 - OBSOLETE]      if((tokens1.at(0) == "direct") and (tokens1.at(1) == "lattice") and (tokens1.at(2) == "vectors") and
+//[CO20200404 - OBSOLETE]          (tokens1.at(3) == "reciprocal") and (tokens1.at(4) == "lattice") and (tokens1.at(5) == "vectors")) //direct lattice vectors reciprocal lattice vectors
+//[CO20200404 - OBSOLETE]      { //CO20200106 - patching for auto-indenting
+//[CO20200404 - OBSOLETE]        //line1=vcontent.at(ii+2);    //CO
+//[CO20200404 - OBSOLETE]        line1=vcontent.at(ii+1);
+//[CO20200404 - OBSOLETE]        //aurostd::string2tokens(line1,tokens1);  //CO20170725
+//[CO20200404 - OBSOLETE]        tokens1=GetCorrectPositions(line1,6); //CO20170725
+//[CO20200404 - OBSOLETE]        if(!tokens1.size()){
+//[CO20200404 - OBSOLETE]          ERROR = "line with lattice vector is ill-written, see: "+line1;
+//[CO20200404 - OBSOLETE]          return false;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        //direct_lattice(1,1) = aurostd::string2utype<double>(tokens1.at(3).substr(0,tokens1.at(3).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        //direct_lattice(1,2) = aurostd::string2utype<double>(tokens1.at(4).substr(0,tokens1.at(4).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        //direct_lattice(1,3) = aurostd::string2utype<double>(tokens1.at(5).substr(0,tokens1.at(5).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        direct_lattice(1,1) = aurostd::string2utype<double>(tokens1.at(0));
+//[CO20200404 - OBSOLETE]        direct_lattice(1,2) = aurostd::string2utype<double>(tokens1.at(1));
+//[CO20200404 - OBSOLETE]        direct_lattice(1,3) = aurostd::string2utype<double>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]        //CO just grab reciprocal lattice vectors as calculated by vasp, faster than calculating yourself
+//[CO20200404 - OBSOLETE]        KlatticeTmp(1,1) = aurostd::string2utype<double>(tokens1.at(3));
+//[CO20200404 - OBSOLETE]        KlatticeTmp(1,2) = aurostd::string2utype<double>(tokens1.at(4));
+//[CO20200404 - OBSOLETE]        KlatticeTmp(1,3) = aurostd::string2utype<double>(tokens1.at(5));
+//[CO20200404 - OBSOLETE]        //line1=vcontent.at(ii+3);    //CO
+//[CO20200404 - OBSOLETE]        line1=vcontent.at(ii+2);
+//[CO20200404 - OBSOLETE]        //aurostd::string2tokens(line1,tokens1);  //CO20170725
+//[CO20200404 - OBSOLETE]        tokens1=GetCorrectPositions(line1,6); //CO20170725
+//[CO20200404 - OBSOLETE]        if(!tokens1.size()){
+//[CO20200404 - OBSOLETE]          ERROR = "line with lattice vector is ill-written, see: "+line1;
+//[CO20200404 - OBSOLETE]          return false;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        //direct_lattice(2,1) = aurostd::string2utype<double>(tokens1.at(3).substr(0,tokens1.at(3).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        //direct_lattice(2,2) = aurostd::string2utype<double>(tokens1.at(4).substr(0,tokens1.at(4).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        //direct_lattice(2,3) = aurostd::string2utype<double>(tokens1.at(5).substr(0,tokens1.at(5).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        direct_lattice(2,1) = aurostd::string2utype<double>(tokens1.at(0));
+//[CO20200404 - OBSOLETE]        direct_lattice(2,2) = aurostd::string2utype<double>(tokens1.at(1));
+//[CO20200404 - OBSOLETE]        direct_lattice(2,3) = aurostd::string2utype<double>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]        //CO just grab reciprocal lattice vectors as calculated by vasp, faster than calculating yourself
+//[CO20200404 - OBSOLETE]        KlatticeTmp(2,1) = aurostd::string2utype<double>(tokens1.at(3));
+//[CO20200404 - OBSOLETE]        KlatticeTmp(2,2) = aurostd::string2utype<double>(tokens1.at(4));
+//[CO20200404 - OBSOLETE]        KlatticeTmp(2,3) = aurostd::string2utype<double>(tokens1.at(5));
+//[CO20200404 - OBSOLETE]        //line1=vcontent.at(ii+4);    //CO
+//[CO20200404 - OBSOLETE]        line1=vcontent.at(ii+3);
+//[CO20200404 - OBSOLETE]        //aurostd::string2tokens(line1,tokens1);  //CO20170725
+//[CO20200404 - OBSOLETE]        tokens1=GetCorrectPositions(line1,6); //CO20170725
+//[CO20200404 - OBSOLETE]        if(!tokens1.size()){
+//[CO20200404 - OBSOLETE]          ERROR = "line with lattice vector is ill-written, see: "+line1;
+//[CO20200404 - OBSOLETE]          return false;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        //direct_lattice(3,1) = aurostd::string2utype<double>(tokens1.at(3).substr(0,tokens1.at(3).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        //direct_lattice(3,2) = aurostd::string2utype<double>(tokens1.at(4).substr(0,tokens1.at(4).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        //direct_lattice(3,3) = aurostd::string2utype<double>(tokens1.at(5).substr(0,tokens1.at(5).size()-1));    //CO
+//[CO20200404 - OBSOLETE]        direct_lattice(3,1) = aurostd::string2utype<double>(tokens1.at(0));
+//[CO20200404 - OBSOLETE]        direct_lattice(3,2) = aurostd::string2utype<double>(tokens1.at(1));
+//[CO20200404 - OBSOLETE]        direct_lattice(3,3) = aurostd::string2utype<double>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]        //CO just grab reciprocal lattice vectors as calculated by vasp, faster than calculating yourself
+//[CO20200404 - OBSOLETE]        KlatticeTmp(3,1) = aurostd::string2utype<double>(tokens1.at(3));
+//[CO20200404 - OBSOLETE]        KlatticeTmp(3,2) = aurostd::string2utype<double>(tokens1.at(4));
+//[CO20200404 - OBSOLETE]        KlatticeTmp(3,3) = aurostd::string2utype<double>(tokens1.at(5));
+//[CO20200404 - OBSOLETE]        //KlatticeTmp = ReciprocalLattice(direct_lattice); // scale is 1  //CO already fetched
+//[CO20200404 - OBSOLETE]
+//[CO20200404 - OBSOLETE]        //CO20171002
+//[CO20200404 - OBSOLETE]        metric_tensor=MetricTensor(direct_lattice,1.0);
+//[CO20200404 - OBSOLETE]
+//[CO20200404 - OBSOLETE]        if(c_dlattice) { //CO increment tagcount once
+//[CO20200404 - OBSOLETE]          c_dlattice = FALSE;
+//[CO20200404 - OBSOLETE]          tagcount++;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    if(tagcount > 7) break;
+//[CO20200404 - OBSOLETE]  }
+//[CO20200404 - OBSOLETE]  if(tagcount < 7) {
+//[CO20200404 - OBSOLETE]    ERROR = "OUTCAR file lacks information needed for Egap determination";
+//[CO20200404 - OBSOLETE]    return FALSE;
+//[CO20200404 - OBSOLETE]  }
+//[CO20200404 - OBSOLETE]  //-------------------------------------------------------------------------------------------------
+//[CO20200404 - OBSOLETE]  //   BEGIN Egap DETERMINATIONS
+//[CO20200404 - OBSOLETE]  //-------------------------------------------------------------------------------------------------
+//[CO20200404 - OBSOLETE]  xmatrix<double> cbb_kpoints(ISPIN,3);
+//[CO20200404 - OBSOLETE]  xmatrix<double> vbt_kpoints(ISPIN,3);
+//[CO20200404 - OBSOLETE]  conduction_band_min.resize(ISPIN);
+//[CO20200404 - OBSOLETE]  valence_band_max.resize(ISPIN);
+//[CO20200404 - OBSOLETE]  Egap_type.resize(ISPIN);
+//[CO20200404 - OBSOLETE]  Egap_fit.resize(ISPIN);
+//[CO20200404 - OBSOLETE]  Egap.resize(ISPIN);
+//[CO20200404 - OBSOLETE]  VBT.resize(ISPIN);
+//[CO20200404 - OBSOLETE]  CBB.resize(ISPIN);
+//[CO20200404 - OBSOLETE]  for(int ii=0; ii<(int)ISPIN; ii++) {
+//[CO20200404 - OBSOLETE]    VBT.at(ii) = EMIN;
+//[CO20200404 - OBSOLETE]    CBB.at(ii) = EMAX;
+//[CO20200404 - OBSOLETE]  }
+//[CO20200404 - OBSOLETE]  //-------------------------------------------------------------------------------------------------
+//[CO20200404 - OBSOLETE]  // SPIN UNPOLARIZED
+//[CO20200404 - OBSOLETE]  if(ISPIN == 1) {
+//[CO20200404 - OBSOLETE]    xvector<double> kptdist(ISPIN); //CO20171002 - changing this to be in ANGSTROMS!
+//[CO20200404 - OBSOLETE]    vector<uint> strtkpt, band_ndx;
+//[CO20200404 - OBSOLETE]    for(uint ii=0; ii<vcontent.size(); ii++) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"k-point   1")) {
+//[CO20200404 - OBSOLETE]        strtkpt.push_back(ii);
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    if(strtkpt.size() == 0) {
+//[CO20200404 - OBSOLETE]      ERROR = "Corrupt OUTCAR: 'k-point   1' not found.";
+//[CO20200404 - OBSOLETE]      return FALSE;
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    for(int ii=1; ii<=(int)ISPIN; ii++) kptdist(ii) = 1.0E09;
+//[CO20200404 - OBSOLETE]    for(uint ii=strtkpt.at(strtkpt.size()-1)+3; ii<vcontent.size(); ii++) {
+//[CO20200404 - OBSOLETE]      line0 = vcontent.at(ii);
+//[CO20200404 - OBSOLETE]      for(uint jj=0; jj<NKPT; jj++) {
+//[CO20200404 - OBSOLETE]        line3 = vcontent.at(ii-3);
+//[CO20200404 - OBSOLETE]        for(uint kk=1; kk<NBANDS; kk++) {
+//[CO20200404 - OBSOLETE]          line1 = vcontent.at(ii-1);
+//[CO20200404 - OBSOLETE]          line2 = vcontent.at(ii);
+//[CO20200404 - OBSOLETE]          aurostd::string2tokens(line1,tokens1);
+//[CO20200404 - OBSOLETE]          aurostd::string2tokens(line2,tokens2);
+//[CO20200404 - OBSOLETE]          double ene_1 = aurostd::string2utype<double>(tokens1.at(1));
+//[CO20200404 - OBSOLETE]          double ene_2 = aurostd::string2utype<double>(tokens2.at(1));
+//[CO20200404 - OBSOLETE]          double occ_1 = aurostd::string2utype<double>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]          double occ_2 = aurostd::string2utype<double>(tokens2.at(2));
+//[CO20200404 - OBSOLETE]          // SHARP EDGE
+//[CO20200404 - OBSOLETE]          if((abs(occ_1-2.00)<_ELEC_EPS) and (abs(occ_2)<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
+//[CO20200404 - OBSOLETE]            band_ndx.push_back(kk);
+//[CO20200404 - OBSOLETE]            SPIN_UP = TRUE;
+//[CO20200404 - OBSOLETE]            if(ene_1 > VBT.at(0)) {
+//[CO20200404 - OBSOLETE]              VBT.at(0) = ene_1;
+//[CO20200404 - OBSOLETE]              aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]              vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]              vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]              vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            if(ene_2 < CBB.at(0)) {
+//[CO20200404 - OBSOLETE]              CBB.at(0) = ene_2;
+//[CO20200404 - OBSOLETE]              aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]              cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]              cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]              cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          // SOFT  EDGE
+//[CO20200404 - OBSOLETE]          else if((occ_1>_ELEC_EPS) and (occ_2<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
+//[CO20200404 - OBSOLETE]            band_ndx.push_back(kk);
+//[CO20200404 - OBSOLETE]            SPIN_UP = TRUE;
+//[CO20200404 - OBSOLETE]            if(ene_1 > VBT.at(0)) {
+//[CO20200404 - OBSOLETE]              VBT.at(0) = ene_1;
+//[CO20200404 - OBSOLETE]              aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]              vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]              vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]              vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            if(ene_2 < CBB.at(0)) {
+//[CO20200404 - OBSOLETE]              CBB.at(0) = ene_2;
+//[CO20200404 - OBSOLETE]              aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]              cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]              cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]              cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          ii++;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        if(!SPIN_UP) break;
+//[CO20200404 - OBSOLETE]        ii+=3;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]      break;
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    // Metallic state via band index check
+//[CO20200404 - OBSOLETE]    for(uint ii=1; ii<band_ndx.size(); ii++) {
+//[CO20200404 - OBSOLETE]      if(band_ndx.at(ii-1) != band_ndx.at(ii)) {
+//[CO20200404 - OBSOLETE]        SPIN_UP = FALSE;
+//[CO20200404 - OBSOLETE]        break;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    // reciprocal space distance between 2 kpoints - units are (A^-1)
+//[CO20200404 - OBSOLETE]    xvector<double> vdist_kcart,vdist_kcart_min;
+//[CO20200404 - OBSOLETE]    double dist,dist_min=AUROSTD_MAX_DOUBLE;
+//[CO20200404 - OBSOLETE]    for(int ii=-2; ii<=2; ii++) {
+//[CO20200404 - OBSOLETE]      for(int jj=-2; jj<=2; jj++) {
+//[CO20200404 - OBSOLETE]        for(int kk=-2; kk<=2; kk++) {
+//[CO20200404 - OBSOLETE]          vdist_kcart=(vbt_kpoints(1)-cbb_kpoints(1) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
+//[CO20200404 - OBSOLETE]          dist=aurostd::modulus(vdist_kcart);
+//[CO20200404 - OBSOLETE]          if(dist<dist_min){
+//[CO20200404 - OBSOLETE]            vdist_kcart_min=vdist_kcart;
+//[CO20200404 - OBSOLETE]            dist_min=dist;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          //CO20171002
+//[CO20200404 - OBSOLETE]          // kptdist is basically an energy 
+//[CO20200404 - OBSOLETE]          //kptdist(1) = min(kptdist(1),modulus(vbt_kpoints(1)-cbb_kpoints(1) + 
+//[CO20200404 - OBSOLETE]          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    //CO20171002
+//[CO20200404 - OBSOLETE]    xvector<double> vdist_dcart;
+//[CO20200404 - OBSOLETE]    vdist_dcart(1)=sum(metric_tensor(1)*vdist_kcart_min(1));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist_dcart(2)=sum(metric_tensor(2)*vdist_kcart_min(2));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist_dcart(3)=sum(metric_tensor(3)*vdist_kcart_min(3));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    kptdist(1)=aurostd::modulus(vdist_dcart);
+//[CO20200404 - OBSOLETE]    // OUTPUT
+//[CO20200404 - OBSOLETE]    if(SPIN_UP) {
+//[CO20200404 - OBSOLETE]      conduction_band_min.at(0) = CBB.at(0) - Efermi;
+//[CO20200404 - OBSOLETE]      valence_band_max.at(0) = VBT.at(0) - Efermi;
+//[CO20200404 - OBSOLETE]      conduction_band_min_net = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]      valence_band_max_net = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]      if(CBB.at(0)-VBT.at(0) > _ENER_EPS) { // u1
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]        Egap.at(0)    = CBB.at(0) - VBT.at(0);
+//[CO20200404 - OBSOLETE]        Egap_net      = Egap.at(0);
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]      else if((abs(CBB.at(0)-VBT.at(0)) <= _ENER_EPS) and (abs(CBB.at(0)-VBT.at(0)) >= 0)) { // u2
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]        Egap.at(0)    = _ZERO;
+//[CO20200404 - OBSOLETE]        Egap_net      = Egap.at(0);
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]      //WSETYAWAN
+//[CO20200404 - OBSOLETE]      Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
+//[CO20200404 - OBSOLETE]      Egap_fit_net   = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    else if(!SPIN_UP) { // u3
+//[CO20200404 - OBSOLETE]      conduction_band_min.at(0) = _METALEDGE_;
+//[CO20200404 - OBSOLETE]      valence_band_max.at(0)    = _METALEDGE_;
+//[CO20200404 - OBSOLETE]      conduction_band_min_net = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]      valence_band_max_net    = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]      Egap_type.at(0) = "metal";
+//[CO20200404 - OBSOLETE]      Egap_type_net   = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]      Egap.at(0)      = _METALGAP_;
+//[CO20200404 - OBSOLETE]      Egap_net        = Egap.at(0);
+//[CO20200404 - OBSOLETE]      //WSETYAWAN
+//[CO20200404 - OBSOLETE]      Egap_fit.at(0) = Egap.at(0);
+//[CO20200404 - OBSOLETE]      Egap_fit_net   = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]  }
+//[CO20200404 - OBSOLETE]  //-------------------------------------------------------------------------------------------------
+//[CO20200404 - OBSOLETE]  // SPIN POLARIZED
+//[CO20200404 - OBSOLETE]  else if(ISPIN == 2) {
+//[CO20200404 - OBSOLETE]    bool SPIN_UP_ALRT = FALSE;
+//[CO20200404 - OBSOLETE]    bool SPIN_DN_ALRT = FALSE;
+//[CO20200404 - OBSOLETE]    vector<uint> band_ndx_up, band_ndx_dn;
+//[CO20200404 - OBSOLETE]    xvector<double> kptdist(2*ISPIN); //CO20171002 - changing this to be in ANGSTROMS!
+//[CO20200404 - OBSOLETE]    for(int ii=1; ii<=2*(int)ISPIN; ii++) { kptdist(ii) = 1.0E09; }
+//[CO20200404 - OBSOLETE]    // SPIN UP
+//[CO20200404 - OBSOLETE]    for(uint ii=0; ii<vcontent.size(); ii++) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"spin component 1")) {
+//[CO20200404 - OBSOLETE]        if(aurostd::substring2bool(vcontent.at(ii+1),"k-point   1 :")) {
+//[CO20200404 - OBSOLETE]          ii+=4;
+//[CO20200404 - OBSOLETE]          for(uint jj=1; jj<=NKPT; jj++) {
+//[CO20200404 - OBSOLETE]            line3 = vcontent.at(ii-3);
+//[CO20200404 - OBSOLETE]            for(uint kk=1; kk<NBANDS; kk++) {
+//[CO20200404 - OBSOLETE]              line1 = vcontent.at(ii-1); // band #1
+//[CO20200404 - OBSOLETE]              line2 = vcontent.at(ii);   // band #2
+//[CO20200404 - OBSOLETE]              aurostd::string2tokens(line1,tokens1);
+//[CO20200404 - OBSOLETE]              aurostd::string2tokens(line2,tokens2);
+//[CO20200404 - OBSOLETE]              double ene_1 = aurostd::string2utype<double>(tokens1.at(1));
+//[CO20200404 - OBSOLETE]              double ene_2 = aurostd::string2utype<double>(tokens2.at(1));
+//[CO20200404 - OBSOLETE]              double occ_1 = aurostd::string2utype<double>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]              double occ_2 = aurostd::string2utype<double>(tokens2.at(2));
+//[CO20200404 - OBSOLETE]              // SHARP EDGE
+//[CO20200404 - OBSOLETE]              if((abs(occ_1-1.00)<_ELEC_EPS) and (abs(occ_2)<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
+//[CO20200404 - OBSOLETE]                band_ndx_up.push_back(kk);
+//[CO20200404 - OBSOLETE]                SPIN_UP = TRUE;
+//[CO20200404 - OBSOLETE]                if(ene_1 > VBT.at(0)) {
+//[CO20200404 - OBSOLETE]                  VBT.at(0) = ene_1;
+//[CO20200404 - OBSOLETE]                  aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]                }
+//[CO20200404 - OBSOLETE]                if(ene_2 < CBB.at(0)) {
+//[CO20200404 - OBSOLETE]                  CBB.at(0) = ene_2;
+//[CO20200404 - OBSOLETE]                  aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]                }
+//[CO20200404 - OBSOLETE]              }
+//[CO20200404 - OBSOLETE]              // SOFT  EDGE
+//[CO20200404 - OBSOLETE]              else if((occ_1>_ELEC_EPS) and (occ_2<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
+//[CO20200404 - OBSOLETE]                band_ndx_up.push_back(kk);
+//[CO20200404 - OBSOLETE]                SPIN_UP = TRUE;
+//[CO20200404 - OBSOLETE]                if(ene_1 > VBT.at(0)) {
+//[CO20200404 - OBSOLETE]                  VBT.at(0) = ene_1;
+//[CO20200404 - OBSOLETE]                  aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]                }
+//[CO20200404 - OBSOLETE]                if(ene_2 < CBB.at(0)) {
+//[CO20200404 - OBSOLETE]                  CBB.at(0) = ene_2;
+//[CO20200404 - OBSOLETE]                  aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]                }
+//[CO20200404 - OBSOLETE]              }
+//[CO20200404 - OBSOLETE]              // special case: empty spin channel
+//[CO20200404 - OBSOLETE]              else if((kk == 1) and (ene_1-Efermi > _ENER_EPS)) {
+//[CO20200404 - OBSOLETE]                SPIN_UP_ALRT = TRUE;
+//[CO20200404 - OBSOLETE]                SPIN_UP      = FALSE;
+//[CO20200404 - OBSOLETE]                break;
+//[CO20200404 - OBSOLETE]              }
+//[CO20200404 - OBSOLETE]              ii++;
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            if(!SPIN_UP) break;
+//[CO20200404 - OBSOLETE]            ii+=3;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          break;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    // SPIN DN
+//[CO20200404 - OBSOLETE]    for(uint ii=0; ii<vcontent.size(); ii++) {
+//[CO20200404 - OBSOLETE]      if(aurostd::substring2bool(vcontent.at(ii),"spin component 2")) {
+//[CO20200404 - OBSOLETE]        if(aurostd::substring2bool(vcontent.at(ii+1),"k-point   1 :")) {
+//[CO20200404 - OBSOLETE]          ii+=4; // starts at band #2
+//[CO20200404 - OBSOLETE]          for(uint jj=1; jj<=NKPT; jj++) {
+//[CO20200404 - OBSOLETE]            line3 = vcontent.at(ii-3);
+//[CO20200404 - OBSOLETE]            for(uint kk=1; kk<NBANDS; kk++) {
+//[CO20200404 - OBSOLETE]              line1 = vcontent.at(ii-1); // band #1
+//[CO20200404 - OBSOLETE]              line2 = vcontent.at(ii);   // band #2
+//[CO20200404 - OBSOLETE]              aurostd::string2tokens(line1,tokens1);
+//[CO20200404 - OBSOLETE]              aurostd::string2tokens(line2,tokens2);
+//[CO20200404 - OBSOLETE]              double ene_1 = aurostd::string2utype<double>(tokens1.at(1));
+//[CO20200404 - OBSOLETE]              double ene_2 = aurostd::string2utype<double>(tokens2.at(1));
+//[CO20200404 - OBSOLETE]              double occ_1 = aurostd::string2utype<double>(tokens1.at(2));
+//[CO20200404 - OBSOLETE]              double occ_2 = aurostd::string2utype<double>(tokens2.at(2));
+//[CO20200404 - OBSOLETE]              // SHARP EDGE
+//[CO20200404 - OBSOLETE]              if((abs(occ_1-1.00)<_ELEC_EPS) and (abs(occ_2)<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
+//[CO20200404 - OBSOLETE]                band_ndx_dn.push_back(kk);
+//[CO20200404 - OBSOLETE]                SPIN_DN = TRUE;
+//[CO20200404 - OBSOLETE]                if(ene_1 > VBT.at(1)) {
+//[CO20200404 - OBSOLETE]                  VBT.at(1) = ene_1;
+//[CO20200404 - OBSOLETE]                  aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]                }
+//[CO20200404 - OBSOLETE]                if(ene_2 < CBB.at(1)) {
+//[CO20200404 - OBSOLETE]                  CBB.at(1) = ene_2;
+//[CO20200404 - OBSOLETE]                  aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]                }
+//[CO20200404 - OBSOLETE]              }
+//[CO20200404 - OBSOLETE]              // SOFT  EDGE
+//[CO20200404 - OBSOLETE]              else if((occ_1>_ELEC_EPS) and (occ_2<_ELEC_EPS) and (Efermi>ene_1) and (Efermi<ene_2)) {
+//[CO20200404 - OBSOLETE]                band_ndx_dn.push_back(kk);
+//[CO20200404 - OBSOLETE]                SPIN_DN = TRUE;
+//[CO20200404 - OBSOLETE]                if(ene_1 > VBT.at(1)) {
+//[CO20200404 - OBSOLETE]                  VBT.at(1) = ene_1;
+//[CO20200404 - OBSOLETE]                  aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]                  vbt_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]                }
+//[CO20200404 - OBSOLETE]                if(ene_2 < CBB.at(1)) {
+//[CO20200404 - OBSOLETE]                  CBB.at(1) = ene_2;
+//[CO20200404 - OBSOLETE]                  aurostd::string2tokens(line3,tokens3);
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,1) = aurostd::string2utype<double>(tokens3.at(3));
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,2) = aurostd::string2utype<double>(tokens3.at(4));
+//[CO20200404 - OBSOLETE]                  cbb_kpoints(1,3) = aurostd::string2utype<double>(tokens3.at(5));
+//[CO20200404 - OBSOLETE]                }
+//[CO20200404 - OBSOLETE]              }
+//[CO20200404 - OBSOLETE]              // special case: empty spin channel
+//[CO20200404 - OBSOLETE]              else if((kk == 1) and (ene_1-Efermi > _ENER_EPS)) {
+//[CO20200404 - OBSOLETE]                SPIN_DN_ALRT = TRUE;
+//[CO20200404 - OBSOLETE]                SPIN_DN = FALSE;
+//[CO20200404 - OBSOLETE]                break;
+//[CO20200404 - OBSOLETE]              }
+//[CO20200404 - OBSOLETE]              ii++;
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            if(!SPIN_DN) break;
+//[CO20200404 - OBSOLETE]            ii+=3;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          break;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    // Metallic state via band index check
+//[CO20200404 - OBSOLETE]    for(uint ii=1; ii<band_ndx_up.size(); ii++) {
+//[CO20200404 - OBSOLETE]      if(band_ndx_up.at(ii-1) != band_ndx_up.at(ii)) {
+//[CO20200404 - OBSOLETE]        SPIN_UP = FALSE;
+//[CO20200404 - OBSOLETE]        break;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    for(uint ii=1; ii<band_ndx_dn.size(); ii++) {
+//[CO20200404 - OBSOLETE]      if(band_ndx_dn.at(ii-1) != band_ndx_dn.at(ii)) {
+//[CO20200404 - OBSOLETE]        SPIN_DN = FALSE;
+//[CO20200404 - OBSOLETE]        break;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    //CO20171002
+//[CO20200404 - OBSOLETE]    xvector<double> vdist1_kcart,vdist1_kcart_min,vdist2_kcart,vdist2_kcart_min,vdist3_kcart,vdist3_kcart_min,vdist4_kcart,vdist4_kcart_min;
+//[CO20200404 - OBSOLETE]    double dist1,dist2,dist3,dist4,dist1_min,dist2_min,dist3_min,dist4_min;
+//[CO20200404 - OBSOLETE]    dist1_min=dist2_min=dist3_min=dist4_min=AUROSTD_MAX_DOUBLE;
+//[CO20200404 - OBSOLETE]    // reciprocal space distance between 2 kpoints - units are (A^-1)
+//[CO20200404 - OBSOLETE]    for(int ii=-2; ii<=2; ii++) {
+//[CO20200404 - OBSOLETE]      for(int jj=-2; jj<=2; jj++) {
+//[CO20200404 - OBSOLETE]        for(int kk=-2; kk<=2; kk++) {
+//[CO20200404 - OBSOLETE]          // within spin channels
+//[CO20200404 - OBSOLETE]          vdist1_kcart=(vbt_kpoints(1)-cbb_kpoints(1) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
+//[CO20200404 - OBSOLETE]          dist1=aurostd::modulus(vdist1_kcart);
+//[CO20200404 - OBSOLETE]          if(dist1<dist1_min){
+//[CO20200404 - OBSOLETE]            vdist1_kcart_min=vdist1_kcart;
+//[CO20200404 - OBSOLETE]            dist1_min=dist1;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          vdist2_kcart=(vbt_kpoints(1)-cbb_kpoints(1) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
+//[CO20200404 - OBSOLETE]          dist2=aurostd::modulus(vdist2_kcart);
+//[CO20200404 - OBSOLETE]          if(dist2<dist2_min){
+//[CO20200404 - OBSOLETE]            vdist2_kcart_min=vdist2_kcart;
+//[CO20200404 - OBSOLETE]            dist2_min=dist2;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          // across spin channels
+//[CO20200404 - OBSOLETE]          vdist3_kcart=(vbt_kpoints(1)-cbb_kpoints(2) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
+//[CO20200404 - OBSOLETE]          dist3=aurostd::modulus(vdist3_kcart);
+//[CO20200404 - OBSOLETE]          if(dist3<dist3_min){
+//[CO20200404 - OBSOLETE]            vdist3_kcart_min=vdist3_kcart;
+//[CO20200404 - OBSOLETE]            dist3_min=dist3;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          vdist4_kcart=(vbt_kpoints(2)-cbb_kpoints(1) + (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3));
+//[CO20200404 - OBSOLETE]          dist4=aurostd::modulus(vdist4_kcart);
+//[CO20200404 - OBSOLETE]          if(dist4<dist4_min){
+//[CO20200404 - OBSOLETE]            vdist4_kcart_min=vdist4_kcart;
+//[CO20200404 - OBSOLETE]            dist4_min=dist4;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          //CO20171002
+//[CO20200404 - OBSOLETE]          //// within spin channels
+//[CO20200404 - OBSOLETE]          //kptdist(1) = min(kptdist(1),modulus(vbt_kpoints(1)-cbb_kpoints(1) + 
+//[CO20200404 - OBSOLETE]          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
+//[CO20200404 - OBSOLETE]          //kptdist(2) = min(kptdist(2),modulus(vbt_kpoints(2)-cbb_kpoints(2) + 
+//[CO20200404 - OBSOLETE]          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
+//[CO20200404 - OBSOLETE]          //// across spin channels
+//[CO20200404 - OBSOLETE]          //kptdist(3) = min(kptdist(3),modulus(vbt_kpoints(1)-cbb_kpoints(2) + 
+//[CO20200404 - OBSOLETE]          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
+//[CO20200404 - OBSOLETE]          //kptdist(4) = min(kptdist(4),modulus(vbt_kpoints(2)-cbb_kpoints(1) + 
+//[CO20200404 - OBSOLETE]          //			      (double)ii*KlatticeTmp(1)+(double)jj*KlatticeTmp(2)+(double)kk*KlatticeTmp(3)));
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    //CO20171002
+//[CO20200404 - OBSOLETE]    xvector<double> vdist1_dcart,vdist2_dcart,vdist3_dcart,vdist4_dcart;
+//[CO20200404 - OBSOLETE]    vdist1_dcart(1)=sum(metric_tensor(1)*vdist1_kcart_min(1));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist1_dcart(2)=sum(metric_tensor(2)*vdist1_kcart_min(2));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist1_dcart(3)=sum(metric_tensor(3)*vdist1_kcart_min(3));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    kptdist(1)=modulus(vdist1_dcart);
+//[CO20200404 - OBSOLETE]
+//[CO20200404 - OBSOLETE]    vdist2_dcart(1)=sum(metric_tensor(1)*vdist2_kcart_min(1));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist2_dcart(2)=sum(metric_tensor(2)*vdist2_kcart_min(2));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist2_dcart(3)=sum(metric_tensor(3)*vdist2_kcart_min(3));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    kptdist(2)=modulus(vdist2_dcart);
+//[CO20200404 - OBSOLETE]
+//[CO20200404 - OBSOLETE]    vdist3_dcart(1)=sum(metric_tensor(1)*vdist3_kcart_min(1));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist3_dcart(2)=sum(metric_tensor(2)*vdist3_kcart_min(2));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist3_dcart(3)=sum(metric_tensor(3)*vdist3_kcart_min(3));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    kptdist(3)=modulus(vdist3_dcart);
+//[CO20200404 - OBSOLETE]
+//[CO20200404 - OBSOLETE]    vdist4_dcart(1)=sum(metric_tensor(1)*vdist4_kcart_min(1));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist4_dcart(2)=sum(metric_tensor(2)*vdist4_kcart_min(2));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    vdist4_dcart(3)=sum(metric_tensor(3)*vdist4_kcart_min(3));  //remember metric_tensor is symmetric!
+//[CO20200404 - OBSOLETE]    kptdist(4)=modulus(vdist4_dcart);
+//[CO20200404 - OBSOLETE]    // ---------------------------------------------------------------------------------------------------
+//[CO20200404 - OBSOLETE]    // These are systems that are actually not polarized or only have 1 usable spin channel
+//[CO20200404 - OBSOLETE]    if(SPIN_UP_ALRT or SPIN_DN_ALRT) {
+//[CO20200404 - OBSOLETE]      conduction_band_min.resize(1);
+//[CO20200404 - OBSOLETE]      valence_band_max.resize(1);
+//[CO20200404 - OBSOLETE]      Egap_type.resize(1);
+//[CO20200404 - OBSOLETE]      Egap.resize(1);
+//[CO20200404 - OBSOLETE]      if(SPIN_DN_ALRT) {
+//[CO20200404 - OBSOLETE]        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        if(CBB.at(0)-VBT.at(0) > _ENER_EPS) {
+//[CO20200404 - OBSOLETE]          conduction_band_min.at(0) = CBB.at(0) - Efermi;
+//[CO20200404 - OBSOLETE]          valence_band_max.at(0)    = VBT.at(0) - Efermi;
+//[CO20200404 - OBSOLETE]          conduction_band_min_net   = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]          valence_band_max_net      = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]          Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]          Egap.at(0)    = CBB.at(0)-VBT.at(0);
+//[CO20200404 - OBSOLETE]          Egap_net      = Egap.at(0);
+//[CO20200404 - OBSOLETE]          //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]          Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
+//[CO20200404 - OBSOLETE]          Egap_fit_net   = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        else if((abs(CBB.at(0)-VBT.at(0)) <= _ENER_EPS) and (abs(CBB.at(0)-VBT.at(0)) >= 0)) {
+//[CO20200404 - OBSOLETE]          conduction_band_min.at(0) = CBB.at(0) - Efermi;
+//[CO20200404 - OBSOLETE]          valence_band_max.at(0)    = VBT.at(0) - Efermi;
+//[CO20200404 - OBSOLETE]          conduction_band_min_net   = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]          valence_band_max_net      = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]          Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]          Egap.at(0)    = _ZERO;
+//[CO20200404 - OBSOLETE]          Egap_net      = Egap.at(0);
+//[CO20200404 - OBSOLETE]          //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]          Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
+//[CO20200404 - OBSOLETE]          Egap_fit_net   = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        else {
+//[CO20200404 - OBSOLETE]          conduction_band_min.at(0) = _METALEDGE_;
+//[CO20200404 - OBSOLETE]          valence_band_max.at(0)    = _METALEDGE_;
+//[CO20200404 - OBSOLETE]          conduction_band_min_net   = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]          valence_band_max_net      = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]          Egap_type.at(0) = "metal";
+//[CO20200404 - OBSOLETE]          Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]          Egap.at(0)    = _METALGAP_;
+//[CO20200404 - OBSOLETE]          Egap_net      = Egap.at(0);
+//[CO20200404 - OBSOLETE]          //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]          Egap_fit.at(0) = _METALGAP_;
+//[CO20200404 - OBSOLETE]          Egap_fit_net   = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]      else if(SPIN_UP_ALRT) {
+//[CO20200404 - OBSOLETE]        if      (kptdist(2) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        else if(kptdist(2) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        if(CBB.at(1)-VBT.at(1) > _ENER_EPS) {
+//[CO20200404 - OBSOLETE]          conduction_band_min.at(0) = CBB.at(1) - Efermi;
+//[CO20200404 - OBSOLETE]          valence_band_max.at(0)    = VBT.at(1) - Efermi;
+//[CO20200404 - OBSOLETE]          conduction_band_min_net   = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]          valence_band_max_net      = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]          Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]          Egap.at(0)    = CBB.at(1)-VBT.at(1);
+//[CO20200404 - OBSOLETE]          Egap_net      = Egap.at(0);
+//[CO20200404 - OBSOLETE]          //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]          Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
+//[CO20200404 - OBSOLETE]          Egap_fit_net   = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        else if((abs(CBB.at(1)-VBT.at(1)) <= _ENER_EPS) and (abs(CBB.at(1)-VBT.at(1)) >= 0)) {
+//[CO20200404 - OBSOLETE]          conduction_band_min.at(0) = CBB.at(1) - Efermi;
+//[CO20200404 - OBSOLETE]          valence_band_max.at(0)    = VBT.at(1) - Efermi;
+//[CO20200404 - OBSOLETE]          conduction_band_min_net   = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]          valence_band_max_net      = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]          Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]          Egap.at(0)    = _ZERO;
+//[CO20200404 - OBSOLETE]          Egap_net      = Egap.at(0);
+//[CO20200404 - OBSOLETE]          //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]          Egap_fit.at(0) = 1.348 * Egap.at(0) + 0.913;
+//[CO20200404 - OBSOLETE]          Egap_fit_net   = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        else {
+//[CO20200404 - OBSOLETE]          conduction_band_min.at(0) = _METALEDGE_;
+//[CO20200404 - OBSOLETE]          valence_band_max.at(0)    = _METALEDGE_;
+//[CO20200404 - OBSOLETE]          conduction_band_min_net   = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]          valence_band_max_net      = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]          Egap_type.at(0) = "metal";
+//[CO20200404 - OBSOLETE]          Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]          Egap.at(0)    = _METALGAP_;
+//[CO20200404 - OBSOLETE]          Egap_net      = Egap.at(0);
+//[CO20200404 - OBSOLETE]          //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]          Egap_fit.at(0) = _METALGAP_;
+//[CO20200404 - OBSOLETE]          Egap_fit_net   = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]    // ---------------------------------------------------------------------------------------------------
+//[CO20200404 - OBSOLETE]    else if(!SPIN_UP_ALRT and !SPIN_DN_ALRT) {
+//[CO20200404 - OBSOLETE]      conduction_band_min.at(0) = CBB.at(0) - Efermi;
+//[CO20200404 - OBSOLETE]      conduction_band_min.at(1) = CBB.at(1) - Efermi;
+//[CO20200404 - OBSOLETE]      valence_band_max.at(0)    = VBT.at(0) - Efermi;
+//[CO20200404 - OBSOLETE]      valence_band_max.at(1)    = VBT.at(1) - Efermi;
+//[CO20200404 - OBSOLETE]      conduction_band_min_net   = min(conduction_band_min);
+//[CO20200404 - OBSOLETE]      valence_band_max_net      = max(valence_band_max);
+//[CO20200404 - OBSOLETE]      if(SPIN_UP and SPIN_DN) {
+//[CO20200404 - OBSOLETE]        // Egap value
+//[CO20200404 - OBSOLETE]        for(uint ii=0; ii<2; ii++) {
+//[CO20200404 - OBSOLETE]          Egap.at(ii)     = CBB.at(ii) - VBT.at(ii);
+//[CO20200404 - OBSOLETE]          Egap_fit.at(ii) = 1.348 * Egap.at(ii) + 0.913;
+//[CO20200404 - OBSOLETE]          if(Egap.at(ii)     < _ENER_EPS) Egap.at(ii)     = _ZERO;
+//[CO20200404 - OBSOLETE]          if(Egap_fit.at(ii) < _ENER_EPS) Egap_fit.at(ii) = _ZERO;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        // Gap types
+//[CO20200404 - OBSOLETE]        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        else if(kptdist(1) > kpt_tol) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        if      (kptdist(2) <= kpt_tol) Egap_type.at(1) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        else if(kptdist(2) >  kpt_tol) Egap_type.at(1) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(1) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(1) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        ///////////////////////////////////////////////////
+//[CO20200404 - OBSOLETE]        // SET 1: VBT1<CBB1 && VBT2=CBB2
+//[CO20200404 - OBSOLETE]        if((CBB.at(0)-VBT.at(0)>_ENER_EPS) and (abs(CBB.at(1)-VBT.at(1))<_ENER_EPS)) {
+//[CO20200404 - OBSOLETE]          if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (VBT.at(0)-CBB.at(1)>_ENER_EPS)) { // 1a
+//[CO20200404 - OBSOLETE]            Egap_type_net = "metal";
+//[CO20200404 - OBSOLETE]            Egap_net      = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]            Egap_fit_net  = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (abs(VBT.at(0)-CBB.at(1))<_ENER_EPS)) { // 1b
+//[CO20200404 - OBSOLETE]            if  (abs(kptdist(1)-kptdist(3)) < kpt_tol) Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]            else if(kptdist(1)-kptdist(3)  < kpt_tol) Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]            else if(kptdist(1)-kptdist(3)  > kpt_tol) {
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]if  (abs(kptdist(1)-kptdist(3)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(3)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(3)  > CELLVOLCUTOFF) {  //[CO20200106 - close bracket for indenting]}
+//[CO20200404 - OBSOLETE]              if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
+//[CO20200404 - OBSOLETE]              else if(Egap_type.at(0) == "insulator_direct")   Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = _ZERO;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 1c
+//[CO20200404 - OBSOLETE]            Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = _ZERO;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (abs(VBT.at(1)-CBB.at(0))<_ENER_EPS)) { // 1d
+//[CO20200404 - OBSOLETE]            if  (abs(kptdist(2)-kptdist(4)) < kpt_tol) Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]            else if(kptdist(2)-kptdist(4)  < kpt_tol) Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]            else if(kptdist(2)-kptdist(4)  > kpt_tol) {
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]if  (abs(kptdist(2)-kptdist(4)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2)-kptdist(4)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2)-kptdist(4)  > CELLVOLCUTOFF) {  //[CO20200106 - close bracket for indenting]}
+//[CO20200404 - OBSOLETE]              if      (Egap_type.at(1) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
+//[CO20200404 - OBSOLETE]              else if(Egap_type.at(1) == "insulator_direct")   Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = _ZERO;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          if((VBT.at(1)-CBB.at(0)>_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 1e
+//[CO20200404 - OBSOLETE]            Egap_type_net = "metal";
+//[CO20200404 - OBSOLETE]            Egap_net      = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]            Egap_fit_net  = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        ///////////////////////////////////////////////////
+//[CO20200404 - OBSOLETE]        // SET 2: VBT1=CBB1 && VBT2<CBB2
+//[CO20200404 - OBSOLETE]        else if((abs(CBB.at(0)-VBT.at(0))<_ENER_EPS) and (CBB.at(1)-VBT.at(1)>_ENER_EPS)) {
+//[CO20200404 - OBSOLETE]          if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (VBT.at(1)-CBB.at(0)>_ENER_EPS)) { // 2a
+//[CO20200404 - OBSOLETE]            Egap_type_net = "metal";
+//[CO20200404 - OBSOLETE]            Egap_net      = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]            Egap_fit_net  = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((abs(VBT.at(1)-VBT.at(0))<_ENER_EPS) and (abs(VBT.at(1)-CBB.at(0))<_ENER_EPS)) { // 2b
+//[CO20200404 - OBSOLETE]            if  (abs(kptdist(1)-kptdist(4)) < kpt_tol) Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]            else if(kptdist(1)-kptdist(4)  < kpt_tol) Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]            else if(kptdist(1)-kptdist(4)  > kpt_tol) {
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]if  (abs(kptdist(1)-kptdist(4)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(4)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(4)  > CELLVOLCUTOFF) {  //[CO20200106 - close bracket for indenting]}
+//[CO20200404 - OBSOLETE]              if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
+//[CO20200404 - OBSOLETE]              else if(Egap_type.at(0) == "insulator_direct")   Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = _ZERO;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 2c
+//[CO20200404 - OBSOLETE]            Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = _ZERO;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (abs(VBT.at(0)-CBB.at(1))<_ENER_EPS)) { // 2d
+//[CO20200404 - OBSOLETE]            if  (abs(kptdist(1)-kptdist(3)) < kpt_tol) Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]            else if(kptdist(1)-kptdist(3)  < kpt_tol) Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]            else if(kptdist(1)-kptdist(3)  > kpt_tol) {
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]if  (abs(kptdist(1)-kptdist(3)) < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(3)  < CELLVOLCUTOFF) Egap_type_net = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1)-kptdist(3)  > CELLVOLCUTOFF) {  //[CO20200106 - close bracket for indenting]}
+//[CO20200404 - OBSOLETE]              if      (Egap_type.at(0) == "insulator_indirect") Egap_type_net = "insulator_direct"  ;
+//[CO20200404 - OBSOLETE]              else if(Egap_type.at(0) == "insulator_direct"  ) Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = _ZERO;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          if((VBT.at(0)-CBB.at(1)>_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 2e
+//[CO20200404 - OBSOLETE]            Egap_type_net = "metal";
+//[CO20200404 - OBSOLETE]            Egap_net      = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]            Egap_fit_net  = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        ///////////////////////////////////////////////////
+//[CO20200404 - OBSOLETE]        // SET 3: VBT1=CBB1 && VBT2=CBB2
+//[CO20200404 - OBSOLETE]        else if( (abs(CBB.at(0)-VBT.at(0))<_ENER_EPS) and (abs(CBB.at(1)-VBT.at(1))<_ENER_EPS) ) { // CAMILOFIX
+//[CO20200404 - OBSOLETE]          if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and ((CBB.at(0)-CBB.at(1))>_ENER_EPS)) { // 3a
+//[CO20200404 - OBSOLETE]            Egap_type_net = "metal";
+//[CO20200404 - OBSOLETE]            Egap_net      = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]            Egap_fit_net  = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if( (abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS) ) { // 3b // CAMILOFIX
+//[CO20200404 - OBSOLETE]            if((kptdist(1)<=kpt_tol) or (kptdist(2)<=kpt_tol) or
+//[CO20200404 - OBSOLETE]                (kptdist(3)<=kpt_tol) or (kptdist(4)<=kpt_tol)) {
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]if((kptdist(1)<=CELLVOLCUTOFF) or (kptdist(2)<=CELLVOLCUTOFF) or
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]   (kptdist(3)<=CELLVOLCUTOFF) or (kptdist(4)<=CELLVOLCUTOFF)) { //[CO20200106 - close bracket for indenting]}
+//[CO20200404 - OBSOLETE]              Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = _ZERO;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and ((CBB.at(1)-CBB.at(0))>_ENER_EPS)) { // 3c
+//[CO20200404 - OBSOLETE]            Egap_type_net = "metal";
+//[CO20200404 - OBSOLETE]            Egap_net      = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]            Egap_fit_net  = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        ///////////////////////////////////////////////////
+//[CO20200404 - OBSOLETE]        // SET 4: VBT1<CBB1 && VBT2<CBB2
+//[CO20200404 - OBSOLETE]        else if((CBB.at(0)-VBT.at(0)>_ENER_EPS) and (CBB.at(1)-VBT.at(1)>_ENER_EPS)) {
+//[CO20200404 - OBSOLETE]          if(VBT.at(0)-CBB.at(1)>_ENER_EPS) { // 4a
+//[CO20200404 - OBSOLETE]            Egap_type_net = "metal";
+//[CO20200404 - OBSOLETE]            Egap_net      = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]            Egap_fit_net  = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if(VBT.at(1)-CBB.at(0)>_ENER_EPS) { // 4b
+//[CO20200404 - OBSOLETE]            Egap_type_net = "metal";
+//[CO20200404 - OBSOLETE]            Egap_net      = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]            Egap_fit_net  = _METALGAP_ ;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if(abs(VBT.at(0)-CBB.at(1))<_ENER_EPS) { // 4c
+//[CO20200404 - OBSOLETE]            if(kptdist(3)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(3)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if(abs(VBT.at(1)-CBB.at(0))<_ENER_EPS) { // 4d
+//[CO20200404 - OBSOLETE]            if(kptdist(4)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(4)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = _ZERO;
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((CBB.at(0)-CBB.at(1)>_ENER_EPS) and (VBT.at(0)-VBT.at(1)>_ENER_EPS)) { // 4e
+//[CO20200404 - OBSOLETE]            if(kptdist(3)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(3)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net   = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(1) - VBT.at(0);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((CBB.at(1)-CBB.at(0)>_ENER_EPS) and (VBT.at(1)-VBT.at(0)>_ENER_EPS)) { // 4f
+//[CO20200404 - OBSOLETE]            if(kptdist(4)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(4)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(0) - VBT.at(1);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS)) { // 4g
+//[CO20200404 - OBSOLETE]            if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(0) - VBT.at(0);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS)) { // 4h
+//[CO20200404 - OBSOLETE]            if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(1) - VBT.at(1);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((VBT.at(0)-VBT.at(1)>_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 4i
+//[CO20200404 - OBSOLETE]            if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(0) - VBT.at(0);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((VBT.at(1)-VBT.at(0)>_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 4j
+//[CO20200404 - OBSOLETE]            if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(1) - VBT.at(1);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if( (abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (abs(CBB.at(0)-CBB.at(1))<_ENER_EPS) ) { // 4k // CAMILOFIX
+//[CO20200404 - OBSOLETE]            if((kptdist(1)<=kpt_tol) or (kptdist(2)<=kpt_tol) or
+//[CO20200404 - OBSOLETE]                (kptdist(3)<=kpt_tol) or (kptdist(4)<=kpt_tol)) {
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]if((kptdist(1)<=CELLVOLCUTOFF) or (kptdist(2)<=CELLVOLCUTOFF) or
+//[CO20200404 - OBSOLETE]              //[CO20171002 - GARBAGE A != A^-1]   (kptdist(3)<=CELLVOLCUTOFF) or (kptdist(4)<=CELLVOLCUTOFF)) { //[CO20200106 - close bracket for indenting]}
+//[CO20200404 - OBSOLETE]              Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            }
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(0) - VBT.at(0);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (CBB.at(1)-CBB.at(0)>_ENER_EPS)) { // 4l
+//[CO20200404 - OBSOLETE]            if(kptdist(1)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(1)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(0) - VBT.at(0);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]          else if((abs(VBT.at(0)-VBT.at(1))<_ENER_EPS) and (CBB.at(0)-CBB.at(1)>_ENER_EPS)) { // 4m
+//[CO20200404 - OBSOLETE]            if(kptdist(2)<=kpt_tol) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            //[CO20171002 - GARBAGE A != A^-1]if(kptdist(2)<=CELLVOLCUTOFF) Egap_type_net = "insulator_direct";
+//[CO20200404 - OBSOLETE]            else Egap_type_net = "insulator_indirect";
+//[CO20200404 - OBSOLETE]            Egap_net     = CBB.at(1) - VBT.at(1);
+//[CO20200404 - OBSOLETE]            Egap_fit_net = 1.348 * Egap_net + 0.913;
+//[CO20200404 - OBSOLETE]          }
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]      else if( SPIN_UP and !SPIN_DN) { // m1
+//[CO20200404 - OBSOLETE]        if      (kptdist(1) <= kpt_tol) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        else if(kptdist(1) >  kpt_tol) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(1) <= CELLVOLCUTOFF) Egap_type.at(0) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(1) >  CELLVOLCUTOFF) Egap_type.at(0) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        conduction_band_min.at(1) = _METALEDGE_;
+//[CO20200404 - OBSOLETE]        valence_band_max.at(1)    = _METALEDGE_;
+//[CO20200404 - OBSOLETE]        conduction_band_min_net = conduction_band_min.at(1);
+//[CO20200404 - OBSOLETE]        valence_band_max_net    = valence_band_max.at(1);
+//[CO20200404 - OBSOLETE]        Egap_type.at(1) = "metal";
+//[CO20200404 - OBSOLETE]        Egap_type_net   = Egap_type.at(1);
+//[CO20200404 - OBSOLETE]        Egap.at(0)      = CBB.at(0) - VBT.at(0);
+//[CO20200404 - OBSOLETE]        Egap.at(1)      = _METALGAP_;
+//[CO20200404 - OBSOLETE]        Egap_net        = Egap.at(1);
+//[CO20200404 - OBSOLETE]        //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]        Egap_fit.at(0)  = 1.348 * Egap.at(0) + 0.913;
+//[CO20200404 - OBSOLETE]        Egap_fit.at(1)  = _METALGAP_;
+//[CO20200404 - OBSOLETE]        Egap_fit_net    = Egap_fit.at(1);
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]      else if(!SPIN_UP and  SPIN_DN) { // m2
+//[CO20200404 - OBSOLETE]        if      (kptdist(2) <= kpt_tol) Egap_type.at(1) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        else if(kptdist(2) >  kpt_tol) Egap_type.at(1) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]if      (kptdist(2) <= CELLVOLCUTOFF) Egap_type.at(1) = "insulator_direct";
+//[CO20200404 - OBSOLETE]        //[CO20171002 - GARBAGE A != A^-1]else if(kptdist(2) >  CELLVOLCUTOFF) Egap_type.at(1) = "insulator_indirect";
+//[CO20200404 - OBSOLETE]        conduction_band_min.at(0) = _METALEDGE_;
+//[CO20200404 - OBSOLETE]        valence_band_max.at(0)    = _METALEDGE_;
+//[CO20200404 - OBSOLETE]        conduction_band_min_net = conduction_band_min.at(0);
+//[CO20200404 - OBSOLETE]        valence_band_max_net    = valence_band_max.at(0);
+//[CO20200404 - OBSOLETE]        Egap_type.at(0) = "metal";
+//[CO20200404 - OBSOLETE]        Egap_type_net   = Egap_type.at(0);
+//[CO20200404 - OBSOLETE]        Egap.at(0)      = _METALGAP_;
+//[CO20200404 - OBSOLETE]        Egap.at(1)      = CBB.at(1) - VBT.at(1);
+//[CO20200404 - OBSOLETE]        Egap_net        = Egap.at(0);
+//[CO20200404 - OBSOLETE]        //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]        Egap_fit.at(0)  = _METALGAP_;
+//[CO20200404 - OBSOLETE]        Egap_fit.at(1)  = 1.348 * Egap.at(1) + 0.913;
+//[CO20200404 - OBSOLETE]        Egap_fit_net    = Egap_fit.at(0);
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]      // Full metal
+//[CO20200404 - OBSOLETE]      else if(!SPIN_UP and !SPIN_DN) { // m3
+//[CO20200404 - OBSOLETE]        for(int ii=0; ii<(int)ISPIN; ii++) {
+//[CO20200404 - OBSOLETE]          conduction_band_min.at(ii) = _METALEDGE_;
+//[CO20200404 - OBSOLETE]          valence_band_max.at(ii) = _METALEDGE_;
+//[CO20200404 - OBSOLETE]        }
+//[CO20200404 - OBSOLETE]        conduction_band_min_net = _METALEDGE_;
+//[CO20200404 - OBSOLETE]        valence_band_max_net    = _METALEDGE_;
+//[CO20200404 - OBSOLETE]        Egap.at(0) = _METALGAP_;
+//[CO20200404 - OBSOLETE]        Egap.at(1) = _METALGAP_;
+//[CO20200404 - OBSOLETE]        Egap_type.at(0) = "metal";
+//[CO20200404 - OBSOLETE]        Egap_type.at(1) = "metal";
+//[CO20200404 - OBSOLETE]        Egap_type_net   = "metal";
+//[CO20200404 - OBSOLETE]        Egap_net = _METALGAP_;
+//[CO20200404 - OBSOLETE]        //WSETYAWAN fit
+//[CO20200404 - OBSOLETE]        Egap_fit.at(0) = _METALGAP_;
+//[CO20200404 - OBSOLETE]        Egap_fit.at(1) = _METALGAP_;
+//[CO20200404 - OBSOLETE]        Egap_fit_net   = _METALGAP_;
+//[CO20200404 - OBSOLETE]      }
+//[CO20200404 - OBSOLETE]    }
+//[CO20200404 - OBSOLETE]  }
+//[CO20200404 - OBSOLETE]  // ----------------------------------------------------------------------
+//[CO20200404 - OBSOLETE]  // DONE NOW RETURN
+//[CO20200404 - OBSOLETE]  //  if(ERROR_flag && !QUIET) return FALSE;
+//[CO20200404 - OBSOLETE]  return TRUE;
+//[CO20200404 - OBSOLETE]}
 
 // ***************************************************************************
 // ***************************************************************************
@@ -3828,11 +4037,49 @@ bool xOUTCAR::GetBandGap_Camilo(double kpt_tol) {
 
 // ***************************************************************************
 // class xDOSCAR
-xDOSCAR::xDOSCAR() {free();}  //CO20191110
+xDOSCAR::xDOSCAR(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
+xDOSCAR::xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
 
-xDOSCAR::~xDOSCAR() {free();} //CO20191110
+bool xDOSCAR::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(*_p_FileMESSAGE,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xDOSCAR::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  m_initialized=false;  //no point
+  return m_initialized;
+}
+bool xDOSCAR::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xDOSCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  filename=fileIN;
+  GetPropertiesFile(fileIN,QUIET);
+  m_initialized=true;  //no point
+  return m_initialized;
+}
+
+xDOSCAR::xDOSCAR(const xDOSCAR& b) {free();copy(b);} // copy PUBLIC
+
+xDOSCAR::~xDOSCAR() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
 void xDOSCAR::free() {  //CO20191110
+  m_initialized=false; //CO20200404 - xStream integration for logging
   content="";
   vcontent.clear();
   filename="";
@@ -3858,7 +4105,7 @@ void xDOSCAR::free() {  //CO20191110
   isLSCOUPLING = false;  //ME20190620
   lmResolved = false;  //ME20190620
   carstring=""; //CO20191010
-  ERROR="";
+  //[CO20200404 - OBSOLETE]ERROR="";
   conduction_band_min.clear();
   conduction_band_min_net=AUROSTD_NAN;
   valence_band_max.clear();
@@ -3872,7 +4119,9 @@ void xDOSCAR::free() {  //CO20191110
 }
 
 void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
+  xStream::copy(b);  //CO20200404 - xStream integration for logging
   free();
+  m_initialized=b.m_initialized; //CO20200404 - xStream integration for logging
   content=b.content;
   vcontent.clear(); for(uint i=0;i<b.vcontent.size();i++) vcontent.push_back(b.vcontent.at(i));  // for aflowlib_libraries.cpp
   filename=b.filename;
@@ -3917,7 +4166,7 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
   isLSCOUPLING = b.isLSCOUPLING;  //ME20190620
   lmResolved = b.lmResolved;  //ME20190620
   carstring=b.carstring;  //CO20191010
-  ERROR=b.ERROR;
+  //[CO20200404 - OBSOLETE]ERROR=b.ERROR;
   conduction_band_min.clear(); for(uint ispin=0;ispin<b.conduction_band_min.size();ispin++){conduction_band_min.push_back(b.conduction_band_min[ispin]);}
   conduction_band_min_net=b.conduction_band_min_net;
   valence_band_max.clear(); for(uint ispin=0;ispin<b.valence_band_max.size();ispin++){valence_band_max.push_back(b.valence_band_max[ispin]);}
@@ -3933,17 +4182,6 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
 const xDOSCAR& xDOSCAR::operator=(const xDOSCAR& b) {  // operator= PUBLIC
   if(this!=&b) {free();copy(b);}
   return *this;
-}
-
-xDOSCAR::xDOSCAR(const string& fileIN,bool QUIET) {
-  clear(); // so it does not mess up vector/deque
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-}
-
-xDOSCAR::xDOSCAR(const xDOSCAR& b) { // copy PUBLIC
-  //  free(); *this=b;
-  copy(b);
 }
 
 void xDOSCAR::clear() {  // clear PRIVATE
@@ -3975,10 +4213,14 @@ bool xDOSCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VER
 }
 
 bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
-  bool LVERBOSE=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
+  string soliloquy="xDOSCAR::GetProperties():";
+  bool force_exit=false;
+  stringstream message;
+  
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -3989,9 +4231,9 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(filename=="") filename="stringstream";
   //ME20190812 - Add checks for broken DOSCARs
   if (vcontent.size() < 7) {
-    string function = "xDOSCAR::GetProperties()";
-    string message = "Broken DOSCAR: no content.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    //[CO20200404 - OBSOLETE]string function = "xDOSCAR::GetProperties()";
+    message << "Broken DOSCAR: no content";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _FILE_ERROR_);
   }
   for(uint iline = 0; iline < 7;iline++) { //ME20190614 - Read header
     aurostd::string2tokens(vcontent.at(iline),tokens);
@@ -4133,9 +4375,9 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       d++;
       //ME20190810 - Safeguard against DOSCARs with additional lines
       if (d == (int) ndos) {
-        string message = "DOSCAR contains more lines than the header suggests."
-          " xDOSCAR object may not be properly populated.";
-        pflow::logger(_AFLOW_FILE_NAME_, "xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
+        message << "DOSCAR contains more lines than the header suggests." << endl;
+        message << "xDOSCAR object may not be properly populated.";
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_oss, _LOGGER_WARNING_);
         break;
       }
       e = 0;
@@ -4209,9 +4451,9 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   }
   //ME20190812 - Safeguard against broken DOSCARs
   if ((d + 1 < (int) ndos) || (e < (int) number_energies)) {  //ME20191010: needs to be d + 1
-    string function = "xDOSCAR::GetProperties()";
-    string message = "Broken DOSCAR: not enough lines.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    //[CO20200404 - OBSOLETE]string function = "xDOSCAR::GetProperties()";
+    message << "Broken DOSCAR: not enough lines";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _FILE_ERROR_);
   }
   // fix denergy
   denergy=venergy.at(1)-venergy.at(0);
@@ -4256,36 +4498,41 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(0) cout << " spinF = " << ((spinF!=AUROSTD_NAN)?aurostd::utype2string(spinF,5):"unavailable") << endl;
 
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: title=" << title << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: spin=" << spin << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: Vol=" << Vol << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: lattice=" << lattice << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: POTIM=" << POTIM << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: temperature=" << temperature << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: RWIGS=" << RWIGS << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: Efermi=" << Efermi << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: spinF=" << spinF << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: number_energies=" << number_energies << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: energy_max=" << energy_max << " energy_min=" << energy_min << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: denergy=" << denergy << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  //ME20190614 - new vDOS format
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  //ME20190614 - new viDOS format
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME20190614
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME20190614
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME20190614
-  // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME20190614
-  // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
-  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME20190614
-  // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
+  if(LDEBUG) cout << soliloquy << " title=" << title << endl;
+  if(LDEBUG) cout << soliloquy << " spin=" << spin << endl;
+  if(LDEBUG) cout << soliloquy << " Vol=" << Vol << endl;
+  if(LDEBUG) cout << soliloquy << " lattice=" << lattice << endl;
+  if(LDEBUG) cout << soliloquy << " POTIM=" << POTIM << endl;
+  if(LDEBUG) cout << soliloquy << " temperature=" << temperature << endl;
+  if(LDEBUG) cout << soliloquy << " RWIGS=" << RWIGS << endl;
+  if(LDEBUG) cout << soliloquy << " Efermi=" << Efermi << endl;
+  if(LDEBUG) cout << soliloquy << " spinF=" << spinF << endl;
+  if(LDEBUG) cout << soliloquy << " number_energies=" << number_energies << endl;
+  if(LDEBUG) cout << soliloquy << " energy_max=" << energy_max << " energy_min=" << energy_min << endl;
+  if(LDEBUG) cout << soliloquy << " denergy=" << denergy << endl;
+  if(LDEBUG) cout << soliloquy << " venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
+  if(LDEBUG) cout << soliloquy << " vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  //ME20190614 - new vDOS format
+  if(LDEBUG) cout << soliloquy << " viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  //ME20190614 - new viDOS format
+  //if(LDEBUG) cout << soliloquy << " vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME20190614
+  //if(LDEBUG) cout << soliloquy << " viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME20190614
+  //if(LDEBUG) cout << soliloquy << " vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME20190614
+  // if(LDEBUG) cout << soliloquy << " vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
+  //if(LDEBUG) cout << soliloquy << " vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME20190614
+  // if(LDEBUG) cout << soliloquy << " vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
+  //if(LDEBUG) cout << soliloquy << " vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME20190614
+  // if(LDEBUG) cout << soliloquy << " vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;  
+  if(LDEBUG) cout << soliloquy << " END (" << time_delay(seconds) << ")" << endl;  
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xDOSCAR::GetProperties: ERROR_flag set in xDOSCAR" << endl;
-  if(ERROR_flag) return FALSE;
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xDOSCAR::GetProperties: ERROR_flag set in xDOSCAR" << endl;
+  if(ERROR_flag){
+    message << "ERROR_flag set in xDOSCAR";
+    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return FALSE;
+  }
   return TRUE;
 }
 
@@ -4375,17 +4622,25 @@ bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO20191110
 bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,double occ_tol) { //CO20191004
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="xDOSCAR::GetBandGap():";
+  stringstream message;
+  bool force_exit=false;
 
   if((content == "") || (vcontent.size() == 0)) {
-    ERROR = soliloquy + " xDOSCAR needs to be loaded before. \n"
-      "        GetProperties(const stringstream&); \n"
-      "        GetProperties(const string&); \n"
-      "        GetPropertiesFile(const string&); \n";
-    return FALSE;
+    //[CO20200404 - OBSOLETE]ERROR = soliloquy + " xDOSCAR needs to be loaded before. \n"
+    //[CO20200404 - OBSOLETE]  "        GetProperties(const stringstream&); \n"
+    //[CO20200404 - OBSOLETE]  "        GetProperties(const string&); \n"
+    //[CO20200404 - OBSOLETE]  "        GetPropertiesFile(const string&); \n";
+    //[CO20200404 - OBSOLETE]return FALSE;
+    message << "xOUTCAR needs to be loaded before." << endl;
+    message << "GetProperties(const stringstream&);" << endl;
+    message << "GetProperties(const string&);" << endl;
+    message << "GetPropertiesFile(const string&);" << endl;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INPUT_MISSING_);
   }
   if(LDEBUG) {cerr << soliloquy << " DOSCAR content found" << endl;}
 
-  if(!checkDOS(ERROR)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR,_INPUT_ERROR_);};  //quick check if GetProperties() failed
+  string error_string="";
+  if(!checkDOS(error_string)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,error_string,_INPUT_ERROR_);};  //quick check if GetProperties() failed
 
   //this should all work now that we checkDOS()
   uint IENERGY=venergy.size();
@@ -4457,14 +4712,18 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       }
     }
     if(valence_band_max[ispin]!=AUROSTD_MAX_DOUBLE && conduction_band_min[ispin]==AUROSTD_MAX_DOUBLE){
-      ERROR = soliloquy + " conduction band maximum not found [ispin="+aurostd::utype2string(ispin)+"] \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " conduction band maximum not found [ispin="+aurostd::utype2string(ispin)+"] \n";
+      message << "Conduction band maximum not found [ispin=" << ispin << "]";
+      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
   }
 
   if(!found_EFERMI){
-    ERROR = soliloquy + " E-fermi not found \n";
-    return false;
+    //[CO20200404 - OBSOLETE]ERROR = soliloquy + " E-fermi not found \n";
+    //[CO20200404 - OBSOLETE]return false;
+    message << " E-fermi not found";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
   }
 
   if(LDEBUG){
@@ -4482,8 +4741,10 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   for(uint ispin=0;ispin<ISPIN;ispin++){
     if(valence_band_max[ispin]!=AUROSTD_MAX_DOUBLE && conduction_band_min[ispin]!=AUROSTD_MAX_DOUBLE){
       if(valence_band_max[ispin]>conduction_band_min[ispin]){
-        ERROR = soliloquy + " Negative band gap found in ispin="+aurostd::utype2string(ispin)+", not expected \n";
-        return false;
+        //[CO20200404 - OBSOLETE]ERROR = soliloquy + " Negative band gap found in ispin="+aurostd::utype2string(ispin)+", not expected \n";
+        message << "Negative band gap found in ispin=" << ispin << ", not expected";
+        if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+        else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
       }
       Egap[ispin]=conduction_band_min[ispin]-valence_band_max[ispin];
       Egap_fit[ispin]=1.348 * Egap[ispin] + 0.913;
@@ -4496,8 +4757,10 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       Egap_fit[ispin]=_METALGAP_;
       Egap_type[ispin]="metal";
     }else{
-      ERROR = soliloquy + " valence_band_max/conduction_band_min not found [ispin="+aurostd::utype2string(ispin)+"] \n";
-      return false;
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " valence_band_max/conduction_band_min not found [ispin="+aurostd::utype2string(ispin)+"] \n";
+      message << "Valence_band_max/conduction_band_min not found [ispin=" << ispin << "]";
+      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
   }
   if(ISPIN==1){
@@ -4514,8 +4777,10 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       double cbm=aurostd::min(conduction_band_min[0],conduction_band_min[1]);
       double vbm=aurostd::max(valence_band_max[0],valence_band_max[1]);
       if(vbm>cbm){
-        ERROR = soliloquy + " Negative band gap found in net, not expected \n";
-        return false;
+        //[CO20200404 - OBSOLETE]ERROR = soliloquy + " Negative band gap found in net, not expected \n";
+        message << "Negative band gap found in net, not expected";
+        if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+        else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
       }
       Egap_net=cbm-vbm;
       Egap_fit_net=1.348 * Egap_net + 0.913;
@@ -4555,8 +4820,8 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
   }
   if(LDEBUG) {cerr << soliloquy << " DOSCAR content found" << endl;}
 
-  string ERROR_out; //keep this function const for plotter
-  if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR_out,_INPUT_ERROR_);};  //quick check if GetProperties() failed
+  string error_string=""; //keep this function const for plotter
+  if(!checkDOS(error_string)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,error_string,_INPUT_ERROR_);};  //quick check if GetProperties() failed
 
   //this should all work now that we checkDOS()
   uint IENERGY=venergy.size();
@@ -4713,7 +4978,49 @@ ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
 
 // ***************************************************************************
 // class xEIGENVAL
-xEIGENVAL::xEIGENVAL() {
+xEIGENVAL::xEIGENVAL(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
+xEIGENVAL::xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
+
+bool xEIGENVAL::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(*_p_FileMESSAGE,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xEIGENVAL::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  m_initialized=false;  //no point
+  return m_initialized;
+}
+bool xEIGENVAL::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xEIGENVAL::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  filename=fileIN;
+  GetPropertiesFile(fileIN,QUIET);
+  m_initialized=true;  //no point
+  return m_initialized;
+}
+
+xEIGENVAL::xEIGENVAL(const xEIGENVAL& b) {free();copy(b);} // copy PUBLIC
+
+xEIGENVAL::~xEIGENVAL() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
+
+void xEIGENVAL::free() {
+  m_initialized=false; //CO20200404 - xStream integration for logging
   content="";
   vcontent.clear(); 
   filename="";
@@ -4733,28 +5040,24 @@ xEIGENVAL::xEIGENVAL() {
   carstring = "";  //ME20190620
   number_atoms = 0;  //ME20190623
   number_loops = 0;  //ME20190623
-}  
 
-xEIGENVAL::~xEIGENVAL() {
-  free();
-}
-
-void xEIGENVAL::free() {
-  vcontent.clear(); 
-  lattice.clear();
-  vweight.clear();
-  for(uint i=0;i<vkpoint.size();i++) vkpoint.at(i).clear(); 
-  vkpoint.clear();
-  for(uint i=0;i<venergy.size();i++) 
-    for(uint j=0;j<venergy.at(i).size();j++) 
-      venergy.at(i).at(j).clear(); 
-  for(uint i=0;i<venergy.size();i++) 
-    venergy.at(i).clear(); 
-  venergy.clear();
+  //[CO20200404 - OBSOLETE]vcontent.clear(); 
+  //[CO20200404 - OBSOLETE]lattice.clear();
+  //[CO20200404 - OBSOLETE]vweight.clear();
+  //[CO20200404 - OBSOLETE]for(uint i=0;i<vkpoint.size();i++) vkpoint.at(i).clear(); 
+  //[CO20200404 - OBSOLETE]vkpoint.clear();
+  //[CO20200404 - OBSOLETE]for(uint i=0;i<venergy.size();i++) 
+  //[CO20200404 - OBSOLETE]  for(uint j=0;j<venergy.at(i).size();j++) 
+  //[CO20200404 - OBSOLETE]    venergy.at(i).at(j).clear(); 
+  //[CO20200404 - OBSOLETE]for(uint i=0;i<venergy.size();i++) 
+  //[CO20200404 - OBSOLETE]  venergy.at(i).clear(); 
+  //[CO20200404 - OBSOLETE]venergy.clear();
 }
 
 void xEIGENVAL::copy(const xEIGENVAL& b) { // copy PRIVATE
+  xStream::copy(b);  //CO20200404 - xStream integration for logging
   free();
+  m_initialized=b.m_initialized; //CO20200404 - xStream integration for logging
   content=b.content;
   vcontent.clear(); 
   for(uint i=0;i<b.vcontent.size();i++) vcontent.push_back(b.vcontent.at(i));  // for aflowlib_libraries.cpp
@@ -4791,17 +5094,6 @@ const xEIGENVAL& xEIGENVAL::operator=(const xEIGENVAL& b) {  // operator= PUBLIC
   return *this;
 }
 
-xEIGENVAL::xEIGENVAL(const string& fileIN,bool QUIET) {
-  clear(); // so it does not mess up vector/deque
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-}
-
-xEIGENVAL::xEIGENVAL(const xEIGENVAL& b) { // copy PUBLIC
-  //  free(); *this=b;
-  copy(b);
-}
-
 void xEIGENVAL::clear() {  // clear PRIVATE
   xEIGENVAL _temp;
   string filename_aus=filename;
@@ -4831,10 +5123,14 @@ bool xEIGENVAL::GetPropertiesUrlFile(const string& url,const string& file,bool V
 }
 
 bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
-  bool LVERBOSE=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
+  string soliloquy="xEIGENVAL::GetProperties():";
+  stringstream message;
+  bool force_exit=false;
+
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -4906,35 +5202,40 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
   }
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: title=" << title << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: spin=" << spin << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: Vol=" << Vol << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: lattice=" << lattice << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: POTIM=" << POTIM << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: temperature=" << temperature << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: number_electrons=" << number_electrons << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: number_kpoints=" << number_kpoints << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: number_bands=" << number_bands << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: vweight.size()=" << vweight.size() << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.size()=" << venergy.size() << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.at(max).size()=" << venergy.at(venergy.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.at(max).at(max).size()=" 
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: title=" << title << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: spin=" << spin << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: Vol=" << Vol << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: lattice=" << lattice << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: POTIM=" << POTIM << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: temperature=" << temperature << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: number_electrons=" << number_electrons << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: number_kpoints=" << number_kpoints << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: number_bands=" << number_bands << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: vweight.size()=" << vweight.size() << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.size()=" << venergy.size() << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.at(max).size()=" << venergy.at(venergy.size()-1).size() << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.at(max).at(max).size()=" 
 		    << venergy.at(venergy.size()-1).at(venergy.at(venergy.size()-1).size()-1).size() << endl;
 
   // for(uint i=0;i<venergy.size();i++)
-  //   if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").size()=" << venergy.at(i).size() << endl;
+  //   if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").size()=" << venergy.at(i).size() << endl;
   // for(uint i=0;i<venergy.size();i++)
   //   for(uint j=0;j<venergy.at(i).size();j++)
-  //     if(LVERBOSE) cout << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").at.(" << j << ").size()=" << venergy.at(i).at(j).size() << endl;
+  //     if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").at.(" << j << ").size()=" << venergy.at(i).at(j).size() << endl;
 
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cout << "xEIGENVAL::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cout << "xEIGENVAL::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xEIGENVAL::GetProperties: ERROR_flag set in xEIGENVAL" << endl;
-  if(ERROR_flag) return FALSE;
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xEIGENVAL::GetProperties: ERROR_flag set in xEIGENVAL" << endl;
+  if(ERROR_flag){
+    message << "ERROR_flag set in xEIGENVAL";
+    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return FALSE;
+  }
   return TRUE;
 }
 
@@ -7155,7 +7456,49 @@ void CompareEdges (vector<vector<xvector<int> > >& branches,
 //-------------------------------------------------------------------------------------------------
 // ***************************************************************************
 // class xPOTCAR
-xPOTCAR::xPOTCAR() {
+xPOTCAR::xPOTCAR(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
+xPOTCAR::xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
+
+bool xPOTCAR::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(*_p_FileMESSAGE,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xPOTCAR::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  m_initialized=false;  //no point
+  return m_initialized;
+}
+bool xPOTCAR::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xPOTCAR::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  filename=fileIN;
+  GetPropertiesFile(fileIN,QUIET);
+  m_initialized=true;  //no point
+  return m_initialized;
+}
+
+xPOTCAR::xPOTCAR(const xPOTCAR& b) {free();copy(b);} // copy PUBLIC
+
+xPOTCAR::~xPOTCAR() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
+
+void xPOTCAR::free() {
+  m_initialized=false; //CO20200404 - xStream integration for logging
   content="";                   // for aflowlib_libraries.cpp
   vcontent.clear();             // for aflowlib_libraries.cpp
   filename="";                  // for aflowlib_libraries.cpp
@@ -7194,44 +7537,40 @@ xPOTCAR::xPOTCAR() {
   // [OBSOLETE] vname.clear();                                // for pseudopotential references
   // [OBSOLETE] vdate.clear();                                // for pseudopotential references
   AUID="";                                      // for pseudopotential references
-}  
 
-xPOTCAR::~xPOTCAR() {
-  free();
-}
-
-void xPOTCAR::free() {
-  vcontent.clear(); 
-  species.clear();                    // for aflowlib_libraries.cpp
-  species_Z.clear();                  // for aflowlib_libraries.cpp
-  species_pp.clear();                 // for aflowlib_libraries.cpp
-  species_pp_type.clear();            // for aflowlib_libraries.cpp
-  species_pp_version.clear();         // for aflowlib_libraries.cpp
-  species_pp_AUID.clear();   // for aflowlib_libraries.cpp
-  species_pp_AUID_collisions.clear();   // for aflowlib_libraries.cpp
-  species_pp_groundstate_energy.clear();   // for aflowlib_libraries.cpp
-  species_pp_groundstate_structure.clear();      // for aflowlib_libraries.cpp
-  // begin shared xPOTCAR
-  vENMAX.clear();                      // for aflowlib_libraries.cpp
-  vENMIN.clear();                      // for aflowlib_libraries.cpp
-  vPOMASS.clear();                     // for aflowlib_libraries.cpp
-  vZVAL.clear();                       // for aflowlib_libraries.cpp
-  vEATOM.clear();                      // for aflowlib_libraries.cpp
-  vRCORE.clear();                      // for aflowlib_libraries.cpp
-  vRWIGS.clear();                      // for aflowlib_libraries.cpp
-  vEAUG.clear();                       // for aflowlib_libraries.cpp
-  vRAUG.clear();                       // for aflowlib_libraries.cpp
-  vRMAX.clear();                       // for aflowlib_libraries.cpp
-  vTITEL.clear();                      // unicity
-  vLEXCH.clear();                      // unicity
-  // [OBSOLETE] vsymbol.clear();                     // for pseudopotential references
-  // [OBSOLETE] vname.clear();                       // for pseudopotential references
-  // [OBSOLETE] vdate.clear();                       // for pseudopotential references
-  // end shared xPOTCAR
+  //[CO20200404 - OBSOLETE]vcontent.clear(); 
+  //[CO20200404 - OBSOLETE]species.clear();                    // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_Z.clear();                  // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp.clear();                 // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_type.clear();            // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_version.clear();         // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_AUID.clear();   // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_AUID_collisions.clear();   // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_groundstate_energy.clear();   // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]species_pp_groundstate_structure.clear();      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]// begin shared xPOTCAR
+  //[CO20200404 - OBSOLETE]vENMAX.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vENMIN.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vPOMASS.clear();                     // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vZVAL.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vEATOM.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vRCORE.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vRWIGS.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vEAUG.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vRAUG.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vRMAX.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - OBSOLETE]vTITEL.clear();                      // unicity
+  //[CO20200404 - OBSOLETE]vLEXCH.clear();                      // unicity
+  //[CO20200404 - OBSOLETE]// [OBSOLETE] vsymbol.clear();                     // for pseudopotential references
+  //[CO20200404 - OBSOLETE]// [OBSOLETE] vname.clear();                       // for pseudopotential references
+  //[CO20200404 - OBSOLETE]// [OBSOLETE] vdate.clear();                       // for pseudopotential references
+  //[CO20200404 - OBSOLETE]// end shared xPOTCAR
 }
 
 void xPOTCAR::copy(const xPOTCAR& b) { // copy PRIVATE
+  xStream::copy(b);  //CO20200404 - xStream integration for logging
   free();
+  m_initialized=b.m_initialized; //CO20200404 - xStream integration for logging
   content=b.content;
   vcontent.clear(); for(uint i=0;i<b.vcontent.size();i++) vcontent.push_back(b.vcontent.at(i));  // for aflowlib_libraries.cpp
   filename=b.filename;
@@ -7287,17 +7626,6 @@ const xPOTCAR& xPOTCAR::operator=(const xPOTCAR& b) {  // operator= PUBLIC
   return *this;
 }
 
-xPOTCAR::xPOTCAR(const string& fileIN,bool QUIET) {
-  clear(); // so it does not mess up vector/deque
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-}
-
-xPOTCAR::xPOTCAR(const xPOTCAR& b) { // copy PUBLIC
-  //  free(); *this=b;
-  copy(b);
-}
-
 void xPOTCAR::clear() {  // clear PRIVATE
   xPOTCAR _temp;
   string filename_aus=filename;
@@ -7329,11 +7657,15 @@ bool xPOTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool VER
 #define PSEUDOPOTENTIAL_GENERATOR_pad 70
  
 bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
-  bool LVERBOSE=(FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
+  string soliloquy="xPOTCAR::GetProperties():";
+  stringstream message;
+  bool force_exit=true; //SC wants to exit here so we can fix the problem
+
   bool ERROR_flag=FALSE;
   // XHOST.PSEUDOPOTENTIAL_GENERATOR=TRUE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -7358,7 +7690,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   
   // ----------------------------------------------------------------------
   // EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" DATA" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" DATA" << endl;
   vline.clear();
   vENMAX.clear();vENMIN.clear();vPOMASS.clear();vZVAL.clear();vEATOM.clear();vRCORE.clear();vRWIGS.clear();vEAUG.clear();vRAUG.clear();vRMAX.clear();
   for(uint iline=0;iline<vcontent.size();iline++) {
@@ -7372,12 +7704,12 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(aurostd::substring2bool(vcontent.at(iline),"RAUG") && aurostd::substring2bool(vcontent.at(iline),"sphere")) vline.push_back(vcontent.at(iline));
     if(aurostd::substring2bool(vcontent.at(iline),"RMAX") && aurostd::substring2bool(vcontent.at(iline),"radius")) vline.push_back(vcontent.at(iline));
   }
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vline.size()=" << vline.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vline.size()=" << vline.size() << endl;
   if(vline.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;}//exit(0);  
   for(uint j=0;j<vline.size();j++) {
     aurostd::StringSubst(vline.at(j),"="," ");
     aurostd::StringSubst(vline.at(j),";"," ");
-    //    if(LVERBOSE) cerr << vline.at(j) << endl;
+    //    if(LDEBUG) cerr << vline.at(j) << endl;
     aurostd::string2tokens(vline.at(j),tokens," ");
     for(uint k=0;k<tokens.size();k++) {
       if(tokens.at(k)=="ENMAX" && k+1<tokens.size()) vENMAX.push_back(aurostd::string2utype<double>(tokens.at(k+1)));
@@ -7402,37 +7734,37 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   
   ENMAX=aurostd::max(vENMAX);
   ENMIN=aurostd::min(vENMIN);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ENMAX=" << ENMAX << " vENMAX.size()=" << vENMAX.size() << ": "; for(uint i=0;i<vENMAX.size();i++) { cerr << vENMAX.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ENMIN=" << ENMIN << " vENMIN.size()=" << vENMIN.size() << ": "; for(uint i=0;i<vENMIN.size();i++) { cerr << vENMIN.at(i) << " "; } cerr << " " << endl;}
   
   POMASS_sum=aurostd::sum(vPOMASS);POMASS_min=aurostd::min(vPOMASS);POMASS_max=aurostd::max(vPOMASS);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " POMASS_sum=" << POMASS_sum << " POMASS_min=" << POMASS_min << " POMASS_max=" << POMASS_max << " vPOMASS.size()=" << vPOMASS.size() << ": "; for(uint i=0;i<vPOMASS.size();i++) { cerr << vPOMASS.at(i) << " "; } cerr << " " << endl;}
   
   ZVAL_sum=aurostd::sum(vZVAL);ZVAL_min=aurostd::min(vZVAL);ZVAL_max=aurostd::max(vZVAL);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " ZVAL_sum=" << ZVAL_sum << " ZVAL_min=" << ZVAL_min << " ZVAL_max=" << ZVAL_max << " vZVAL.size()=" << vZVAL.size() << ": "; for(uint i=0;i<vZVAL.size();i++) { cerr << vZVAL.at(i) << " "; } cerr << " " << endl;}
   
   EATOM_min=aurostd::min(vEATOM);EATOM_max=aurostd::max(vEATOM);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EATOM_min=" << EATOM_min << " EATOM_max=" << EATOM_max << " vEATOM.size()=" << vEATOM.size() << ": "; for(uint i=0;i<vEATOM.size();i++) { cerr << vEATOM.at(i) << " "; } cerr << " " << endl;}
   
   RCORE_min=aurostd::min(vRCORE);RCORE_max=aurostd::max(vRCORE);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " RCORE_min=" << RCORE_min << " RCORE_max=" << RCORE_max << " vRCORE.size()=" << vRCORE.size() << ": "; for(uint i=0;i<vRCORE.size();i++) { cerr << vRCORE.at(i) << " "; } cerr << " " << endl;}
   
   RWIGS_min=aurostd::min(vRWIGS);RWIGS_max=aurostd::max(vRWIGS);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " RWIGS_min=" << RWIGS_min << " RWIGS_max=" << RWIGS_max << " vRWIGS.size()=" << vRWIGS.size() << ": "; for(uint i=0;i<vRWIGS.size();i++) { cerr << vRWIGS.at(i) << " "; } cerr << " " << endl;}
   
   EAUG_min=aurostd::min(vEAUG);EAUG_max=aurostd::max(vEAUG);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " EAUG_min=" << EAUG_min << " EAUG_max=" << EAUG_max << " vEAUG.size()=" << vEAUG.size() << ": "; for(uint i=0;i<vEAUG.size();i++) { cerr << vEAUG.at(i) << " "; } cerr << " " << endl;}
 
   RAUG_min=aurostd::min(vRAUG);RAUG_max=aurostd::max(vRAUG);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " RAUG_min=" << RAUG_min << " RAUG_max=" << RAUG_max << " vRAUG.size()=" << vRAUG.size() << ": "; for(uint i=0;i<vRAUG.size();i++) { cerr << vRAUG.at(i) << " "; } cerr << " " << endl;}
 
   RMAX_min=aurostd::min(vRMAX);RMAX_max=aurostd::max(vRMAX);
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr << " " << endl;}
+  if(LDEBUG) {cerr << soliloquy << " RMAX_min=" << RMAX_min << " RMAX_max=" << RMAX_max << " vRMAX.size()=" << vRMAX.size() << ": "; for(uint i=0;i<vRMAX.size();i++) { cerr << vRMAX.at(i) << " "; } cerr << " " << endl;}
 
    
   // ----------------------------------------------------------------------
   // PSEUDOPOTENTIAL DATA
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD PSEUDOPOTENTIAL DATA" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD PSEUDOPOTENTIAL DATA" << endl;
   
   vline.clear();
   vTITEL.clear();
@@ -7442,20 +7774,20 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(aurostd::substring2bool(vcontent.at(iline),"TITEL")) {
  	aurostd::string2tokens(vcontent.at(iline),tokens,"=");
 	if(tokens.size()>1) vTITEL.push_back(tokens.at(1));
-	//	if(LVERBOSE) cerr << "xPOTCAR::GetProperties: TITEL=" << tokens.at(1) << endl;
+	//	if(LDEBUG) cerr << soliloquy << " TITEL=" << tokens.at(1) << endl;
       }
       if(aurostd::substring2bool(vcontent.at(iline),"LEXCH")) {
 	if(!aurostd::substring2bool(vcontent.at(iline),"exchange")) {
 	  aurostd::string2tokens(vcontent.at(iline),tokens,"=");
 	  if(tokens.size()>1) vLEXCH.push_back(tokens.at(1));
-	  //	if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LEXCH=" << tokens.at(1) << endl;
+	  //	if(LDEBUG) cerr << soliloquy << " LEXCH=" << tokens.at(1) << endl;
 	}
       }
     }
   }
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vRMAX.size()=" << vRMAX.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vTITEL.size()=" << vTITEL.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vLEXCH.size()=" << vLEXCH.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vRMAX.size()=" << vRMAX.size() << endl;
 
   if(vTITEL.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()==0) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);} //CO20200106 - patching for auto-indenting
@@ -7466,9 +7798,9 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vEATOM.size()!=vRMAX.size()) {if(!QUIET) cerr << "WARNING - xPOTCAR::GetProperties: wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;exit(0);}   //CO20200106 - patching for auto-indenting
   
   for(uint j=0;j<vTITEL.size();j++) {
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: SPECIES(" << j << ") " << endl;
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vTITEL.at(j)=" << vTITEL.at(j) << endl;
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
+    if(LDEBUG) cerr << soliloquy << " SPECIES(" << j << ") " << endl;
+    if(LDEBUG) cerr << soliloquy << " vTITEL.at(j)=" << vTITEL.at(j) << endl;
+    if(LDEBUG) cerr << soliloquy << " vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
     aurostd::string2tokens(vTITEL.at(j),tokens," ");
     pp_type=tokens.at(0);
     if(pp_type=="US" or pp_type=="NC") {
@@ -7479,8 +7811,8 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             pp_type="LDA";
     }
     if(tokens.size()>1) {
-      if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << "xPOTCAR::GetProperties: PAW_LDA" << endl;
-      if(LVERBOSE) cerr << "xPOTCAR::GetProperties: pp_type=" << pp_type << " " << "tokens.size()=" << tokens.size() << endl;
+      if(pp_type=="PAW") pp_type="PAW_LDA"; // cerr << soliloquy << " PAW_LDA" << endl;
+      if(LDEBUG) cerr << soliloquy << " pp_type=" << pp_type << " " << "tokens.size()=" << tokens.size() << endl;
       species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1)));
       species_Z.push_back(xelement::symbol2Z(KBIN::VASP_PseudoPotential_CleanName(tokens.at(1))));
       species_pp.push_back(tokens.at(1));
@@ -7499,11 +7831,11 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
     vTITEL.at(j)=aurostd::RemoveWhiteSpaces(vTITEL.at(j));
     vLEXCH.at(j)=aurostd::RemoveWhiteSpaces(vLEXCH.at(j));   
-    xPOTCAR xPOT(xPOTCAR_Finder(species_pp_AUID,species_pp_AUID_collisions,vTITEL.at(j),vLEXCH.at(j),vEATOM.at(j),vRMAX.at(j),LVERBOSE)); // FIXES species_pp_AUID,species_pp_AUID_collisions
+    xPOTCAR xPOT(xPOTCAR_Finder(species_pp_AUID,species_pp_AUID_collisions,vTITEL.at(j),vLEXCH.at(j),vEATOM.at(j),vRMAX.at(j),LDEBUG)); // FIXES species_pp_AUID,species_pp_AUID_collisions
     species_pp_groundstate_energy.push_back(xPOT.species_pp_groundstate_energy.at(0));
     species_pp_groundstate_structure.push_back(xPOT.species_pp_groundstate_structure.at(0));
 
-    if(LVERBOSE) cerr << "xPOTCAR::GetProperties: SPECIES(" << j << ") [pp, type, version, AUID] = "
+    if(LDEBUG) cerr << soliloquy << " SPECIES(" << j << ") [pp, type, version, AUID] = "
 		      << species.at(species.size()-1) << " ["
 		      << species_Z.at(species_Z.size()-1) << ", "
 		      << species_pp.at(species_pp.size()-1) << ", "
@@ -7514,29 +7846,29 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 		      << species_pp_groundstate_structure.at(species_pp_groundstate_structure.size()-1) << "]" << endl;
   }
   
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: PSEUDOPOTENTIAL type = " << pp_type << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species.size()=" << species.size() << ": "; for(uint i=0;i<species.size();i++) { cerr << species.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_Z.size()=" << species_Z.size() << ": "; for(uint i=0;i<species_Z.size();i++) { cerr << species_Z.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp.size()=" << species_pp.size() << ": "; for(uint i=0;i<species_pp.size();i++) { cerr << species_pp.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_type.size()=" << species_pp_type.size() << ": "; for(uint i=0;i<species_pp_type.size();i++) { cerr << species_pp_type.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_version.size()=" << species_pp_version.size() << ": "; for(uint i=0;i<species_pp_version.size();i++) { cerr << species_pp_version.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_AUID.size()=" << species_pp_AUID.size() << ": "; for(uint i=0;i<species_pp_AUID.size();i++) { cerr << species_pp_AUID.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << ": "; for(uint i=0;i<species_pp_AUID_collisions.size();i++) { cerr << species_pp_AUID_collisions.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << ": "; for(uint i=0;i<species_pp_groundstate_energy.size();i++) { cerr << species_pp_groundstate_energy.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << ": "; for(uint i=0;i<species_pp_groundstate_structure.size();i++) { cerr << species_pp_groundstate_structure.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: vTITEL.size()=" << vTITEL.size() << ": "; for(uint i=0;i<vTITEL.size();i++) { cerr << vTITEL.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: vLEXCH.size()=" << vLEXCH.size() << ": "; for(uint i=0;i<vLEXCH.size();i++) { cerr << vLEXCH.at(i) << " "; } cerr << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: filename=" << filename << endl;}
-  if(LVERBOSE) {cerr << "xPOTCAR::GetProperties: AUID=" << AUID << endl;}
+  if(LDEBUG) {cerr << soliloquy << " PSEUDOPOTENTIAL type = " << pp_type << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species.size()=" << species.size() << ": "; for(uint i=0;i<species.size();i++) { cerr << species.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species_Z.size()=" << species_Z.size() << ": "; for(uint i=0;i<species_Z.size();i++) { cerr << species_Z.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species_pp.size()=" << species_pp.size() << ": "; for(uint i=0;i<species_pp.size();i++) { cerr << species_pp.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species_pp_type.size()=" << species_pp_type.size() << ": "; for(uint i=0;i<species_pp_type.size();i++) { cerr << species_pp_type.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species_pp_version.size()=" << species_pp_version.size() << ": "; for(uint i=0;i<species_pp_version.size();i++) { cerr << species_pp_version.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species_pp_AUID.size()=" << species_pp_AUID.size() << ": "; for(uint i=0;i<species_pp_AUID.size();i++) { cerr << species_pp_AUID.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << ": "; for(uint i=0;i<species_pp_AUID_collisions.size();i++) { cerr << species_pp_AUID_collisions.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species_pp_groundstate_energy.size()=" << species_pp_groundstate_energy.size() << ": "; for(uint i=0;i<species_pp_groundstate_energy.size();i++) { cerr << species_pp_groundstate_energy.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " species_pp_groundstate_structure.size()=" << species_pp_groundstate_structure.size() << ": "; for(uint i=0;i<species_pp_groundstate_structure.size();i++) { cerr << species_pp_groundstate_structure.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " vTITEL.size()=" << vTITEL.size() << ": "; for(uint i=0;i<vTITEL.size();i++) { cerr << vTITEL.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " vLEXCH.size()=" << vLEXCH.size() << ": "; for(uint i=0;i<vLEXCH.size();i++) { cerr << vLEXCH.at(i) << " "; } cerr << endl;}
+  if(LDEBUG) {cerr << soliloquy << " filename=" << filename << endl;}
+  if(LDEBUG) {cerr << soliloquy << " AUID=" << AUID << endl;}
   if(species_pp_AUID_collisions.size()) {
-    cerr << "xPOTCAR::GetProperties: COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
+    cerr << soliloquy << " COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
     ERROR_flag=TRUE;
   }
-  if(LVERBOSE) cerr.flush();
+  if(LDEBUG) cerr.flush();
 
   // ----------------------------------------------------------------------
   // POTCAR_PAW POTCAR_TYPE POTCAR_KINETIC
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: LOAD POTCAR_PAW POTCAR_TYPE" << endl;
+  if(LDEBUG) cerr << soliloquy << " LOAD POTCAR_PAW POTCAR_TYPE" << endl;
   POTCAR_PAW=FALSE;
   POTCAR_KINETIC=FALSE;
   POTCAR_GW=FALSE;
@@ -7566,28 +7898,33 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if(tokens.at(0)=="PAW" && POTCAR_KINETIC) POTCAR_TYPE="PAW_LDA_KIN";
     }
   }    
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_PAW = " << POTCAR_PAW << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_TYPE = " << POTCAR_TYPE << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_KINETIC = " << POTCAR_KINETIC << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_GW = " << POTCAR_GW << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: POTCAR_AE = " << POTCAR_AE << endl;
+  if(LDEBUG) cerr << soliloquy << " POTCAR_PAW = " << POTCAR_PAW << endl;
+  if(LDEBUG) cerr << soliloquy << " POTCAR_TYPE = " << POTCAR_TYPE << endl;
+  if(LDEBUG) cerr << soliloquy << " POTCAR_KINETIC = " << POTCAR_KINETIC << endl;
+  if(LDEBUG) cerr << soliloquy << " POTCAR_GW = " << POTCAR_GW << endl;
+  if(LDEBUG) cerr << soliloquy << " POTCAR_AE = " << POTCAR_AE << endl;
 
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: WRITE vxpseudopotentials" << endl;
+  if(LDEBUG) cerr << soliloquy << " WRITE vxpseudopotentials" << endl;
 
   if(XHOST.PSEUDOPOTENTIAL_GENERATOR && species.size()==1) xPOTCAR_PURE_Printer((*this),cout);
   
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: (BULLSHIT DONT USE) title=" << title << endl;
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " (BULLSHIT DONT USE) title=" << title << endl;
+  if(LDEBUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cerr << "xPOTCAR::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xPOTCAR::GetProperties: ERROR_flag set in xPOTCAR" << endl;
-  if(ERROR_flag) return FALSE;
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xPOTCAR::GetProperties: ERROR_flag set in xPOTCAR" << endl;
+  if(ERROR_flag){
+    message << "ERROR_flag set in xPOTCAR";
+    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return FALSE;
+  }
   return TRUE;
 }
 
@@ -8586,11 +8923,49 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //---------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 // constructor
-xQMVASP::xQMVASP() {free();} //CO20191110
+xQMVASP::xQMVASP(ostream& oss) : xStream(),m_initialized(false) {initialize(oss);} //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(ofstream& FileMESSAGE,ostream& oss) : xStream(),m_initialized(false) {initialize(FileMESSAGE,oss);} //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(const string& fileIN,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,QUIET,oss);}  //CO20200404 - xStream integration for logging
+xQMVASP::xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(),m_initialized(false) {initialize(fileIN,FileMESSAGE,QUIET,oss);}  //CO20200404 - xStream integration for logging
 
-xQMVASP::~xQMVASP() {free();}  //CO20191110
+bool xQMVASP::initialize(ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(*_p_FileMESSAGE,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xQMVASP::initialize(ofstream& FileMESSAGE,ostream& oss){  //CO20200404 - xStream integration for logging
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  m_initialized=false;  //no point
+  return m_initialized;
+}
+bool xQMVASP::initialize(const string& fileIN,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  xStream::free();
+  ofstream* _p_FileMESSAGE=new ofstream();f_new_ofstream=true;
+  initialize(fileIN,*_p_FileMESSAGE,QUIET,oss); 
+  f_new_ofstream=true;  //override
+  return m_initialized;
+}
+bool xQMVASP::initialize(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss){  //CO20200404 - xStream integration for logging
+  //[CO20200404 - OBSOLETE]clear(); // so it does not mess up vector/deque
+  free();
+  setOFStream(FileMESSAGE); f_new_ofstream=false;
+  setOSS(oss);
+  filename=fileIN;
+  GetPropertiesFile(fileIN,QUIET);
+  m_initialized=true;  //no point
+  return m_initialized;
+}
+
+xQMVASP::xQMVASP(const xQMVASP& b) {free();copy(b);} // copy PUBLIC
+
+xQMVASP::~xQMVASP() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
 
 void xQMVASP::free() { //CO20191110
+  m_initialized=false; //CO20200404 - xStream integration for logging
   //------------------------------------------------------------------------------
   content="";                   // for aflowlib_libraries.cpp
   vcontent.clear();             // for aflowlib_libraries.cpp
@@ -8601,6 +8976,9 @@ void xQMVASP::free() { //CO20191110
 }
 
 void xQMVASP::copy(const xQMVASP& b) { // copy PRIVATE //CO20191110
+  xStream::copy(b);  //CO20200404 - xStream integration for logging
+  free();
+  m_initialized=b.m_initialized; //CO20200404 - xStream integration for logging
   content=b.content;
   vcontent.clear();for(uint i=0;i<b.vcontent.size();i++){vcontent.push_back(b.vcontent[i]);}  // for aflowlib_libraries.cpp
   filename=b.filename;
@@ -8613,14 +8991,6 @@ const xQMVASP& xQMVASP::operator=(const xQMVASP& b) {  // operator= PUBLIC //CO2
   if(this!=&b) {free();copy(b);}
   return *this;
 }
-
-xQMVASP::xQMVASP(const string& fileIN,bool QUIET) {  //CO20191110
-  clear(); // so it does not mess up vector/deque
-  filename=fileIN;
-  GetPropertiesFile(fileIN,QUIET);
-}
-
-xQMVASP::xQMVASP(const xQMVASP& b) {copy(b);} // copy PUBLIC  //CO20191110
 
 void xQMVASP::clear() {  // clear PRIVATE  //CO20191110
   xQMVASP _temp;
@@ -8651,11 +9021,14 @@ bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool VER
 }
 
 bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //CO20191110
+  bool LDBEUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy="xQMVASP::GetProperties():";
-  bool LVERBOSE=(FALSE || XHOST.DEBUG || !QUIET);
+  stringstream message;
+  bool force_exit=false;
+
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LVERBOSE) cout << "xQMVASP::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDBEUG) cout << "xQMVASP::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -8668,10 +9041,10 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   H_atom_static=AUROSTD_NAN;
   bool inside_relax=false,inside_static=false;
   // ----------------------------------------------------------------------
-  if(LVERBOSE) cerr << "xQMVASP::GetProperties: vcontent.size()=" << vcontent.size() << endl;
+  if(LDBEUG) cerr << "xQMVASP::GetProperties: vcontent.size()=" << vcontent.size() << endl;
   // ----------------------------------------------------------------------
   for(uint iline=0;iline<vcontent.size();iline++){
-    if(LVERBOSE) cerr << "xQMVASP::GetProperties: vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
+    if(LDBEUG) cerr << "xQMVASP::GetProperties: vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
     if(aurostd::substring2bool(vcontent[iline],"STOP_relax")){inside_relax=false;}
     else if(aurostd::substring2bool(vcontent[iline],"START_relax")){inside_relax=true;}
     else if(aurostd::substring2bool(vcontent[iline],"STOP_static")){inside_static=false;}
@@ -8718,11 +9091,16 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   // ----------------------------------------------------------------------   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LVERBOSE) cerr << "xQMVASP::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LDBEUG) cerr << "xQMVASP::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(ERROR_flag && !QUIET) cerr << "WARNING - xQMVASP::GetProperties: ERROR_flag set in xQMVASP" << endl;
-  if(ERROR_flag) return FALSE;
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xQMVASP::GetProperties: ERROR_flag set in xQMVASP" << endl;
+  if(ERROR_flag){
+    message << "ERROR_flag set in xQMVASP";
+    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+    return FALSE;
+  }
   return TRUE;
 }
 

@@ -65,6 +65,8 @@
         -- changed default value for kgrid to AUTO (MP vs. Gamma) (CO)
         -- added secondary wget location for AFLOW3_FREE files for make (CO)
         -- pflow::matrix()->aurostd::matrix() to fix linking issues on nietzsche (CO)
+        -- restructured xOUTCAR, xDOSCAR, xEIGENVAL, xPOTCAR, xQMVASP for xStream (CO)
+        -- removed error in xOUTCAR looking for irreducible kpoints, this fails for all OUTCAR.bands (CO)
 3.2.2j - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- standardized vext,vcat,vzip from XHOST 2j (SC)

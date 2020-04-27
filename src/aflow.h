@@ -2952,14 +2952,24 @@ class xQMVASP;  //CO20190803
 namespace aflowlib { class _aflowlib_entry;}
 
 // -------------------------------------------------------------------------------------------------
-class xOUTCAR {
+class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xOUTCAR();                                                    // default, just allocate
-    ~xOUTCAR();                                                   // kill everything
-    xOUTCAR(const string& fileIN,bool=TRUE);                      // constructor from filename, QUIET
+    xOUTCAR(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xOUTCAR(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xOUTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    
     xOUTCAR(const xOUTCAR& b);                                    // constructor copy
+    ~xOUTCAR();                                                   // kill everything
     const xOUTCAR& operator=(const xOUTCAR &b);                   // copy
     void clear(void);                                             // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string SYSTEM;
@@ -3034,7 +3044,7 @@ class xOUTCAR {
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
-    bool GetPropertiesFile(const string& fileIN,uint natoms_check,bool);       // get everything QUIET
+    bool GetPropertiesFile(const string& fileIN,uint natoms_check,bool=TRUE);       // get everything QUIET  //CO20200404 - added default for bool
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
     // EFFECTIVE MASSES
     friend bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr);
@@ -3103,14 +3113,24 @@ class xOUTCAR {
 };
 
 //-------------------------------------------------------------------------------------------------
-class xDOSCAR {
+class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xDOSCAR();                                                    // default, just allocate
-    ~xDOSCAR();                                                   // kill everything
-    xDOSCAR(const string& fileIN,bool=TRUE);                      // constructor from filename QUIET
+    xDOSCAR(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xDOSCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xDOSCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+
     xDOSCAR(const xDOSCAR& b);                                    // constructor copy
+    ~xDOSCAR();                                                   // kill everything
     const xDOSCAR& operator=(const xDOSCAR &b);                   // copy
     void clear(void);                                             // clear
+    
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string title;
@@ -3168,14 +3188,24 @@ class xDOSCAR {
     void copy(const xDOSCAR& b);                                  //
 };
 //-------------------------------------------------------------------------------------------------
-class xEIGENVAL {
+class xEIGENVAL : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xEIGENVAL();                                                  // default, just allocate
-    ~xEIGENVAL();                                                 // kill everything
-    xEIGENVAL(const string& fileIN,bool=TRUE);                    // constructor from filename QUIET
+    xEIGENVAL(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xEIGENVAL(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xEIGENVAL(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    
     xEIGENVAL(const xEIGENVAL& b);                                // constructor copy
+    ~xEIGENVAL();                                                 // kill everything
     const xEIGENVAL& operator=(const xEIGENVAL &b);               // copy
     void clear(void);                                             // clear
+    
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string title;
@@ -3202,14 +3232,24 @@ class xEIGENVAL {
     void copy(const xEIGENVAL& b);                                //
 };
 //-------------------------------------------------------------------------------------------------
-class xPOTCAR {
+class xPOTCAR : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xPOTCAR();                                                    // default, just allocate
+    xPOTCAR(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xPOTCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xPOTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    
     ~xPOTCAR();                                                   // kill everything
-    xPOTCAR(const string& fileIN,bool=TRUE);                      // constructor from filename QUIET
     xPOTCAR(const xPOTCAR& b);                                    // constructor copy
     const xPOTCAR& operator=(const xPOTCAR &b);                   // copy
     void clear(void);                                             // clear
+    
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+    
     // CONTENT
     string content;vector<string> vcontent;                       // the content and the lines
     string filename;                                              // the filename - THIS IS A GLOBAL PROPERTY OF THE WHOLE POTCAR
@@ -3373,14 +3413,24 @@ class xCHGCAR {
     void copy(const xCHGCAR& b); //
 };
 
-class xQMVASP {  //CO20191110
+class xQMVASP : public xStream {  //CO20191110 //CO20200404 - xStream integration for logging
   public:
-    xQMVASP();                                                     // default, just allocate
+    xQMVASP(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xQMVASP(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xQMVASP(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout); //CO20200404 - xStream integration for logging
+    
     ~xQMVASP();                                                    // kill everything
-    xQMVASP(const string& fileIN,bool=TRUE);                       // constructor from filename QUIET
     xQMVASP(const xQMVASP& b);                                     // constructor copy
     const xQMVASP& operator=(const xQMVASP &b);                    // copy
     void clear(void);                                              // clear
+    
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;        // the content, and lines of it
     double H_atom_relax;
