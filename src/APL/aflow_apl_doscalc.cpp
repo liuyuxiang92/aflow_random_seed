@@ -636,6 +636,10 @@ namespace apl {
     return _idos;
   }
 
+  const vector<xvector<double> >& DOSCalculator::getFreqs() const {
+    return _freqs;
+  }
+
   bool DOSCalculator::hasNegativeFrequencies() const {
     return (_minFreq < MIN_FREQ_TRESHOLD ? true : false);
   }

@@ -1550,6 +1550,7 @@ namespace apl {
       const std::vector<double>& getBins() const;  // ME20200108 - added const
       const std::vector<double>& getDOS() const;   // ME20200108 - added const
       const std::vector<double>& getIDOS() const;  // ME20200210
+      const std::vector<xvector<double> >& getFreqs() const;  // AS20200312
       bool hasNegativeFrequencies() const;  // ME20200108 - added const
       string _system;  // ME20190614
     private:
@@ -1898,6 +1899,155 @@ namespace apl {
   };
 }
 // ***************************************************************************
+#define QHA_ARUN_MODE "QHA" // used in filename
+#define N_GP_FIT_PARAMETERS  3 ///< number of parameters to fit w=w(V) relation
+#define N_EOS_FIT_PARAMETERS 5 ///< number of parameters for polynomial EOS fit
+#define DEFAULT_QHA_GP_PATH_FILE string("aflow.qha.gp.disp.out")
+#define DEFAULT_QHA_THERMO_FILE  string("aflow.qha.thermo.out")
+#define DEFAULT_QHA_FILE_PREFIX string("aflow.qha.")
+#define DEFAULT_QHA_GP_MESH_FILE string("gp.mesh.out")
+
+namespace apl
+{
+  class EOSfit{
+    public:
+      EOSfit();
+      int method;
+      xvector<double> E;
+      xvector<double> V;
+      xvector<double> guess;
+      xvector<double> p;
+      double Eeq;
+      double Veq;
+      double B;
+      double Bp;
+      void fit();
+      double eval(double Vin);
+  };
+}
+
+namespace apl
+{
+  /** Calculates QHA-related properties
+   *
+   * This class will substitute old QHA class.
+   * The old QHA class will be kept until the new one is finished.
+   */
+  class QHAN{
+    public:
+      QHAN();
+      QHAN(const QHAN& qha);
+      QHAN(_xinput &xinput, _aflags &aflags, _kflags &kflags, _xflags &xflags,
+                  const string &tpt, xoption &supercellopts, 
+                  ofstream &messageFile, ostream &oss=std::cout);
+      void initialize(_xinput &xinput, _aflags &aflags, _kflags &kflags,
+          _xflags &xflags, const string &tpt, xoption &supercellopts,
+          ofstream &messageFile, ostream &oss);
+      ~QHAN();
+      const QHAN& operator=(const QHAN &qha);
+      void run();
+      void clear();
+      double calcGamma(double V, xvector<double> &xomega, double &w);
+      double calcGammaFD(xvector<double> &xomega);
+      void   calcCV_GP(double T, double &CV, double &GP);
+      void   calcCV_GP_fit(double T, double V, double &CV, double &GP);
+      double FreeEnergy(double T, int id);
+      double FreeEnergyFit(double T, double V, int method);
+      double electronicFreeEnergy(double T, int id);
+      xvector<double> FreeEnergySommerfeld(double T);
+      xvector<double> DOSatEf();
+      double InternalEnergyFit(double T, double V);
+      double Entropy(double T, double V, int method);
+      double getEqVolumeT(double T, int method);
+      double ThermalExpansion(double T, int method);
+      double IsochoricSpecificHeat(double T, double V, int method);
+      // QHA3P and SCQHA
+      double extrapolateFrequency(double V, xvector<double> &xomega);
+      double extrapolateGamma(double V, xvector<double> &xomega);
+      // QHA3P
+      double FreeEnergyTE(double T, int Vid);
+      double InternalEnergyTE(double T, double V);
+      // SCQHA
+      double VPgamma(double T, double V);
+      void   run_scqha(int method, bool all_iterations_self_consistent=true);
+      // output
+      void   writeThermalProperties(int eos_method, int qha_method);
+      void   writeFVT();
+      void   writeGPpath(double V);
+      void   writeGPpath(double V, const string &directory);
+      void   writeAverageGP_FD();
+      void   writeGPmeshFD();
+      void   writeFrequencies();
+      // members
+      xoption apl_options;
+      EOSfit eos;
+    private:
+      ofstream* messageFile;
+      ostream *oss;
+      xoption supercellopts;
+      bool isEOS;
+      bool isGP_FD;
+      bool ignore_imaginary;
+      bool runQHA, runQHA3P, runSCQHA;
+      bool includeElectronicContribution;
+      int Ntemperatures;
+      int N_GPvolumes;   ///< number of volumes/calculations for finite difference calc
+      int N_EOSvolumes;  ///< number of volumes/calculations for EOS calc
+      int Nbranches;       ///< number of phonon dispersion branches
+      int NatomsOrigCell;  ///< number of atoms in original cell
+      //int NatomsSupercell; ///< number of atoms in supercell
+      xstructure origStructure;
+      vector<double> Temperatures;
+      vector<double> GPvolumes;
+      vector<double> EOSvolumes;
+      vector<double> coefGPVolumes;
+      vector<double> coefEOSVolumes;
+      xvector<double> DOS_Ef;
+      // data necessary to calculate thermodynamic properties
+      vector<double> Efermi_V; ///< Fermi energy vs V
+      vector<double> E0_V;     ///< total energy vs V
+      vector<xEIGENVAL> static_eigvals;
+      vector<xIBZKPT> static_ibzkpts;
+      vector<vector<double> > energies_V; ///< electronic energy bins vs V
+      vector<vector<double> > edos_V; ///< electronic DOS
+      vector<vector<double> > frequencies_V; ///< phonon frequency bins vs V
+      vector<vector<double> > pdos_V; ///< phonon DOS
+      vector<int> qpWeights;
+      vector<xvector<double> > qPoints;
+      // data needed for Grueneisen parameter calculation
+      xmatrix<double> gp_fit_matrix;
+      vector<vector<vector<double> > > omegaV_mesh;
+      vector<vector<vector<double> > > omegaV_mesh_EOS;
+      vector<xEIGENVAL> gp_ph_dispersions;
+      vector<ThermalPropertiesCalculator> eos_vib_thermal_properties;
+      //
+      vector<string> subdirectories_apl_eos;
+      vector<string> subdirectories_apl_gp;
+      vector<string> subdirectories_static;
+      vector<string> arun_runnames_apl_eos;
+      vector<string> arun_runnames_apl_gp;
+      vector<string> arun_runnames_static;
+      _xinput xinput;
+      _xflags xflags;
+      _aflags aflags;
+      _kflags kflags;
+      string currentDirectory;
+      // methods
+      int  check();
+      int  check_apl();
+      int  check_static();
+      void read();
+      double run_apl(vector<string> &subdirectories,
+                     vector<string> &arun_subdirectories,
+                     vector<double> &coefVolumes, bool gp=true);
+      void read_static();
+      void calculate();
+      void createSubCalculations();
+      void createSubdirectoriesStaticRun();
+      void free();
+      void copy(const QHAN &qha);
+  };
+}
 // ***************************************************************************
 namespace apl
 {

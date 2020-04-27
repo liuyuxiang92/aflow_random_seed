@@ -78,6 +78,9 @@
 #define PLANCKSCONSTANTAMU_hbar_THz   PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2nmTHz)  // amu A^2 THz
 #define BEfactor_hbar_THz             PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
 
+//AS20200427 - QHA-related conversion factors
+#define eV2GPa 160.2176621    // [eV/A^3] --> [GPa]
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
 

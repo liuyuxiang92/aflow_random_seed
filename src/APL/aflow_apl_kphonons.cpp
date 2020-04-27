@@ -18,6 +18,9 @@
 //CO20181226
 #define COMPILE_SLIM
 
+//AS20200427
+#define NEW_QHA true
+
 bool _WITHIN_DUKE_ = false;
 
 //CO fixing cpp version issues with auto_ptr (depreciated)
@@ -1531,6 +1534,42 @@ namespace KBIN {
     //[OBSOLETE] }
     //[OBSOLETE] //    else {  OBSOLETE ME20181026 //[CO200106 - close bracket for indenting]}
     //[OBSOLETE] //      throw apl::APLRuntimeError("The settings for supercell construction are confusing.");
+
+    /////////////////////////////////////////////////////////////////////////////
+    //                                                                         //
+    //                           QHA                                           //
+    //                                                                         //
+    /////////////////////////////////////////////////////////////////////////////
+
+    bool run_any_qha =
+          kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_QHA_A || kflags.KBIN_PHONONS_CALCULATION_QHA_B || kflags.KBIN_PHONONS_CALCULATION_QHA_C ||
+          kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
+          kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
+    if (NEW_QHA && run_any_qha){
+      cout << "QHA run\n";
+
+      apl::QHAN qha(xinput, aflags, kflags, xflags, USER_TPT, supercell_opts,
+          messageFile, oss);
+      qha.apl_options.flag("AUTO_DIST", USER_AUTO_DISTORTIONS);
+      qha.apl_options.flag("DPM", USER_DPM);
+      qha.apl_options.flag("XYZONLY", USER_DISTORTIONS_XYZ_ONLY);
+      qha.apl_options.flag("SYMMETRIZE", USER_DISTORTIONS_SYMMETRIZE);
+      qha.apl_options.flag("INEQUIVONLY", USER_DISTORTIONS_INEQUIVONLY);
+      qha.apl_options.flag("ZEROSTATE", USER_ZEROSTATE);
+      qha.apl_options.flag("POLAR", USER_POLAR);
+      qha.apl_options.push_attached("DIST_MAGNITUDE",
+          aurostd::utype2string<double>(USER_DISTORTION_MAGNITUDE));
+
+      qha.apl_options.push_attached("DOS_METHOD", USER_DOS_METHOD);
+      qha.apl_options.push_attached("DOS_MESH", DOS_MESH_SCHEME);
+      qha.apl_options.push_attached("DOS_NPOINTS",
+          aurostd::utype2string<int>(USER_DOS_NPOINTS));
+      qha.apl_options.push_attached("DOS_SMEAR",
+          aurostd::utype2string<double>(USER_DOS_SMEAR));
+
+      qha.run();
+      return;
+    }
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //

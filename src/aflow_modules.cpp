@@ -531,6 +531,8 @@ namespace KBIN {
     opt.keyword="GP_DISTORTION"; opt.xscheme = utype2string<double>(DEFAULT_QHA_GP_DISTORTION); qhaflags.push_back(opt); opt.clear();
     opt.keyword="INCLUDE_ELE"; opt.option = DEFAULT_QHA_INCLUDE_ELE; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="SCQHA_PDIS_T"; opt.xscheme = DEFAULT_QHA_SCQHA_PDIS_T; qhaflags.push_back(opt); opt.clear();
+    opt.keyword="GP_FINITE_DIFF"; opt.option = DEFAULT_QHA_GP_FINITE_DIFF; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="IGNORE_IMAGINARY"; opt.option = DEFAULT_QHA_IGNORE_IMAGINARY; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
 
     if (LDEBUG) {
       for (uint i = 0; i < qhaflags.size(); i++) {
@@ -550,6 +552,8 @@ namespace KBIN {
     if(key=="GP_DISTORTION"){return true;}
     if(key=="INCLUDE_ELE"){return true;}
     if(key=="SCQHA_PDIS_T"){return false;}
+    if(key=="GP_FINITE_DIFF"){return true;}
+    if(key=="IGNORE_IMAGINARY"){return false;}
 
     return true;
   }
