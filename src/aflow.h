@@ -3046,9 +3046,6 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,uint natoms_check,bool=TRUE);       // get everything QUIET  //CO20200404 - added default for bool
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-    // EFFECTIVE MASSES
-    friend bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr,ostream& oss=cout); //CO20200404
-    friend bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr,ofstream& FileMeSSAGE,ostream& oss=cout); //CO20200404
     vector<int> band_index;
     vector<int> carrier_spin;
     vector<string> carrier_type;
@@ -3112,6 +3109,10 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     void free();                 // free space
     void copy(const xOUTCAR& b); //
 };
+
+// EFFECTIVE MASSES //CO20200404 - moved from "friend" of xOUTCAR
+bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr,ostream& oss=cout); //CO20200404
+bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr,ofstream& FileMeSSAGE,ostream& oss=cout); //CO20200404
 
 //-------------------------------------------------------------------------------------------------
 class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
