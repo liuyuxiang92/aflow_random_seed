@@ -1057,29 +1057,50 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
     }
 
     // Set k-points
-    string scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KSCHEME");
-    if (!scheme.empty()) {
-      xvasp.aopts.pop_attached("AFLOWIN_FLAG::KSCHEME_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC", scheme);
+    // ME20200427 - implemented grid option
+    string scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS_GRID");
+    if (scheme.empty()) {
+      scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KSCHEME");
+
+      if (!scheme.empty()) {
+        xvasp.aopts.pop_attached("AFLOWIN_FLAG::KSCHEME_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC", scheme);
+      }
+      scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPPRA");
+      //ME20190408 - START
+      if ((xvasp.AVASP_arun_mode == "AAPL") && xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL")) {
+        scheme = xvasp.aaplopts.getattachedscheme("AFLOWIN_FLAG::AAPL_KPPRA_AAPL");
+      }
+      //ME20190408 - END
+      if (!scheme.empty()) {
+        xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", scheme);
+      }
+      scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS");
+      if (!scheme.empty()) {
+        xvasp.aopts.flag("AFLOWIN_FLAG::KPOINTS", TRUE); //CO20181226
+        xvasp.aopts.push_attached("AFLOWIN_FLAG::KPOINTS", scheme);
+      }
+      // Set to implicit
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT", true);
+    } else {
+      vector<int> kpts;
+      aurostd::string2tokens(scheme, kpts, " xX");
+      string k_scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KSCHEME");
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str("");
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "k-points set by APL" << std::endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << std::endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << aurostd::joinWDelimiter(kpts, " ") << std::endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << scheme << std::endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << std::endl;
+
+      // Set to explicit
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", true);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT", false);
     }
-    scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPPRA");
-    //ME20190408 - START
-    if ((xvasp.AVASP_arun_mode == "AAPL") && xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL")) {
-      scheme = xvasp.aaplopts.getattachedscheme("AFLOWIN_FLAG::AAPL_KPPRA_AAPL");
-    }
-    //ME20190408 - END
-    if (!scheme.empty()) {
-      xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", scheme);
-    }
-    scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS");
-    if (!scheme.empty()) {
-      xvasp.aopts.flag("AFLOWIN_FLAG::KPOINTS", TRUE); //CO20181226
-      xvasp.aopts.push_attached("AFLOWIN_FLAG::KPOINTS", scheme);
-    }
-    // ME20200205 - set to implicit
-    xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT", false);
-    xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", false);
-    xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
-    xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT", true);
 
     // Setup run
     setStatic(xvasp);

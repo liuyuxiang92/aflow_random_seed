@@ -264,6 +264,89 @@ namespace apl {
 
 }  // namespace apl
 
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                               FILE OUTPUT                                //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  void LinearResponsePC::saveState(const string& filename) {
+    string function = "apl::LinearResponsePC::saveState()";
+    string message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    stringstream out;
+    string tag = "[APL_FC_CALCULATOR]";
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    out << tag << "ENGINE=LR" << std::endl;
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    out << tag << "SUPERCELL=" << _supercell->scell << std::endl;
+    out << tag << "INPUT_STRUCTURE=START" << std::endl;
+    out << _supercell->getInputStructure();  // No endl necessary
+    out << tag << "INPUT_STRUCTURE=STOP" << std::endl;
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    out << tag << "POLAR=" << _isPolarMaterial << std::endl;
+    out << AFLOWIN_SEPARATION_LINE << std::endl;
+    aurostd::stringstream2file(out, filename);
+    if (!aurostd::FileExist(filename)) {
+      message = "Could not save state into file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+    }
+  }
+
+  void LinearResponsePC::readFromStateFile(const string& filename) {
+    string function = "apl::LinearResponsePC::readFromState()";
+    string message = "Reading state of the phonon calculator from " + filename + ".";
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *messageFile, std::cout);
+    if (!aurostd::EFileExist(filename)) {
+      message = "Could not find file " + filename + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+    }
+
+    // Defaults
+    _xInput->xvasp.AVASP_arun_mode = "APL";
+    _isPolarMaterial = DEFAULT_APL_POLAR;
+
+    // Set xInput for the linear response calculation
+    xInputs.push_back(*_xInput);
+    xInputs[0].setXStr(_supercell->getSupercellStructureLight());
+    xInputs[0].xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;
+
+    // Read
+    xInputs.clear();
+    vector<string> vlines, tokens;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+    uint iline = 0;
+    while (++iline < nlines) {
+      if (aurostd::substring2bool(vlines[iline], "POLAR=")) {
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        if (tokens.size() != 2) {
+          string message = "Tag for POLAR is broken.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        _isPolarMaterial = aurostd::string2utype<bool>(tokens[1]);
+        if (_isPolarMaterial) {
+          xInputs.push_back(*_xInput);
+          xInputs[1].setXStr(_supercell->getInputStructureLight());
+          xInputs[1].xvasp.AVASP_arun_runname = "2_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_;
+        }
+      }
+    }
+
+    // Set directories
+    string base_directory = _xInput->getDirectory();
+    string dir = "";
+    for (uint i = 0; i < xInputs.size(); i++) {
+      const _xvasp& xvasp = xInputs[i].xvasp;
+      dir = base_directory + "/ARUN." + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname + "/";
+      xInputs[i].setDirectory(aurostd::CleanFileName(dir));
+    }
+  }
+
+}  // namespace apl
+
 //****************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *

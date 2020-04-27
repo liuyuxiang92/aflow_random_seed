@@ -608,7 +608,7 @@ namespace apl {
       vector<vector<vector<xvector<double> > > > phase_vectors;  // ME20200116
 
     private:
-      void calculateWholeSymmetry(xstructure&);
+      void calculateWholeSymmetry(xstructure&, bool=true);
       xstructure calculatePrimitiveStructure() const;
       bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME20200117
       void free();
@@ -616,14 +616,17 @@ namespace apl {
 
     public:
       Supercell();
+      Supercell(ofstream&, ostream& os=std::cout);
       Supercell(const xstructure&, ofstream&, ostream& oss=std::cout, string="./"); //CO20181226
+      Supercell(const string&, ofstream&, ostream& os=std::cout, string="./");  // ME20200112
       Supercell(const Supercell&);
       Supercell& operator=(const Supercell&);
       ~Supercell();
       void clear(ofstream&, ostream&);
       void setDirectory(const string&);
       string getDirectory() const;
-      void initialize(const xstructure&);  // ME20191225
+      void readFromStateFile(const string&);  // ME20200212
+      void initialize(const xstructure&, bool=true);  // ME20191225
       void clearSupercell();
       //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME20200220
       bool isConstructed();
@@ -817,6 +820,8 @@ namespace apl {
       void symmetrizeBornEffectiveChargeTensors(void);
       void readDielectricTensorFromAIMSOUT(void);
       void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
+      virtual void saveState(const string&) {}  // ME20200112
+      virtual void readFromStateFile(const string&) {};  // ME20200112
   };
 }
 
@@ -876,6 +881,8 @@ namespace apl {
       void writeFORCES();
       void writeDYNMAT();
       void writeXCrysDenForces();
+      void saveState(const string&);  // ME20200212
+      void readFromStateFile(const string&);  // ME20200212
 
     private:
       void copy(const DirectMethodPC&);
@@ -1028,6 +1035,9 @@ namespace apl {
 
       bool runVASPCalculations(bool);  // ME20191029
       bool calculateForceConstants();  // ME20200211
+
+      void saveState(const string&);  // ME20200212
+      void readFromStateFile(const string&); // ME20200212
   };
 }  // namespace apl
 
