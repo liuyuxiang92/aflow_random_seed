@@ -146,6 +146,7 @@ bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   }
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
+  message << "Egap test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return true;
 }
 
