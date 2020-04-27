@@ -4478,7 +4478,7 @@ namespace aflowlib {
             data.vspinD.push_back(0.0);
           }
         }
-      } else { cout << MESSAGE << " ERROR OUTCAR.static properties cannot be extracted: " << outcar_static.ERROR << endl; }
+      } else { cout << MESSAGE << " ERROR OUTCAR.static properties cannot be extracted" << endl; }  //CO20200404 - removed xOUTCAR.ERROR
     } else { cout << MESSAGE << " MISSING OUTCAR.static" << endl; }
     if(EFERMI==AUROSTD_NAN) { cout << MESSAGE << " unable to load OUTCAR.static, using Efermi from bands" << endl; }
 
@@ -4519,8 +4519,8 @@ namespace aflowlib {
               cout << MESSAGE << " MISSING DOSCAR.static and DOSCAR.relax[2]" << endl;
             }
           }
-        } else { cout << MESSAGE << " ERROR OUTCAR.bands BandGap() cannot be extracted: " << outcar_static.ERROR << endl; }  //CO20181129
-      } else { cout << MESSAGE << " ERROR OUTCAR.bands properties cannot be extracted: " << outcar_static.ERROR << endl; }  //CO20181129
+        } else { cout << MESSAGE << " ERROR OUTCAR.bands BandGap() cannot be extracted" << endl; }  //CO20181129  //CO20200404 - removed xOUTCAR.ERROR
+      } else { cout << MESSAGE << " ERROR OUTCAR.bands properties cannot be extracted" << endl; }  //CO20181129 //CO20200404 - removed xOUTCAR.ERROR
     } else { cout << MESSAGE << " MISSING OUTCAR.bands" << endl; }  //CO20181129
 
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " spin/cell = "         <<   data.spin_cell << endl;

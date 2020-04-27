@@ -3558,9 +3558,10 @@ namespace pocc {
 
         xOUTCAR outcar_aus;
         if(!outcar_aus.GetPropertiesFile(voutcar_files.at(i))){
-          aus << "ERROR" << ": OUTCAR.static reading error " << outcar_aus.ERROR << endl;
-          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-          exit(1);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, "xOUTCAR::GetPropertiesFile() failed", _RUNTIME_ERROR_); //CO20200404
+          //[CO20200404 - OBSOLETE]aus << "ERROR" << ": OUTCAR.static reading error " << outcar_aus.ERROR << endl;
+          //[CO20200404 - OBSOLETE]aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+          //[CO20200404 - OBSOLETE]exit(1);
         }
         double EFERMI=outcar_aus.Efermi;
         outcar_aus.GetBandGap();

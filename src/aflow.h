@@ -3045,8 +3045,6 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,uint natoms_check,bool=TRUE);       // get everything QUIET  //CO20200404 - added default for bool
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-    // EFFECTIVE MASSES
-    friend bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr);
     vector<int> band_index;
     vector<int> carrier_spin;
     vector<string> carrier_type;
@@ -3101,7 +3099,7 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     double         Egap_fit_net;
     vector<string> Egap_type;
     string         Egap_type_net;
-    string ERROR;
+    //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
     //int spin;  //CO20171006 - camilo garbage
@@ -3110,6 +3108,10 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     void free();                 // free space
     void copy(const xOUTCAR& b); //
 };
+
+// EFFECTIVE MASSES //CO20200404 - moved from "friend" of xOUTCAR
+bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr,ostream& oss=cout); //CO20200404
+bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr,ofstream& FileMeSSAGE,ostream& oss=cout); //CO20200404
 
 //-------------------------------------------------------------------------------------------------
 class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
@@ -3158,7 +3160,7 @@ class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
     bool lmResolved;  // Is it lm-resolved?
     string carstring;  // The fourth line of the DOSCAR
     //ME20190620 END
-    string ERROR; //CO20191004
+    //[CO20200404 - OBSOLETE]string ERROR; //CO20191004
     vector<double> conduction_band_min;     //CO20191004
     double         conduction_band_min_net; //CO20191004
     vector<double> valence_band_max;        //CO20191004
@@ -3472,7 +3474,7 @@ class xAIMSOUT {
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     vector<aurostd::xvector<double> > vforces;                    // for aflowlib_libraries.cpp
     double natoms;
-    string ERROR;
+    //[CO20200404 - OBSOLETE]string ERROR;
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
