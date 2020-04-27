@@ -5798,7 +5798,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   if(LDEBUG){cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;}
 
   // OUTCAR_bands
-  if(!ss_outcar_bands.str().length() && aurostd::FileExist(directory+"/OUTCAR.bands",path_outcar_bands)) aurostd::file2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
+  //[CO20200404 - OBSOLETE]if(!ss_outcar_bands.str().length() && aurostd::FileExist(directory+"/OUTCAR.bands",path_outcar_bands)) aurostd::file2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
   if(!ss_outcar_bands.str().length() && aurostd::EFileExist(directory+"/OUTCAR.bands",path_outcar_bands)) aurostd::efile2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
   if(!ss_outcar_bands.str().length()) {
     message << "OUTCAR.bands not found"; //CO20200404
@@ -5807,7 +5807,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
     //[CO20200404]oss << endl;
     //[CO20200404]return FALSE;
   }  //CO20200404
-  if(!ss_outcar_bands.str().length() && aurostd::FileExist(directory+"/OUTCAR",path_outcar_bands)) aurostd::file2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
+  //[CO20200404 - OBSOLETE]if(!ss_outcar_bands.str().length() && aurostd::FileExist(directory+"/OUTCAR",path_outcar_bands)) aurostd::file2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
   if(!ss_outcar_bands.str().length() && aurostd::EFileExist(directory+"/OUTCAR",path_outcar_bands)) aurostd::efile2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
   if(!ss_outcar_bands.str().length()) {  //CO20200404
     message << "OUTCAR not found"; //CO20200404
@@ -5843,7 +5843,8 @@ bool PrintBandGap(string& directory, ostream &oss) {
   double EFERMI=xoutcar_bands.Efermi;  //hopefully we can grab this from static, otherwise settle on the one in bands
 
   // OUTCAR_static - try to grab right Efermi
-  if(!aurostd::FileExist(directory+"/OUTCAR.static",path_outcar_static) && !aurostd::EFileExist(directory+"/OUTCAR.static",path_outcar_static)){
+  //[CO20200404 - OBSOLETE]if(!aurostd::FileExist(directory+"/OUTCAR.static",path_outcar_static) && !aurostd::EFileExist(directory+"/OUTCAR.static",path_outcar_static))
+  if(!aurostd::EFileExist(directory+"/OUTCAR.static",path_outcar_static)){
     message << "OUTCAR.static not found, defaulting E-Fermi to that found in OUTCAR.bands";  //CO20200404
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_); //CO20200404
     //[CO20200404]oss << "WARNING " << soliloquy << " OUTCAR.static not found here: " << directory << endl;
@@ -5851,8 +5852,8 @@ bool PrintBandGap(string& directory, ostream &oss) {
     //[CO20200404]oss << endl;
     //return FALSE;
   } else {
-    if(!xoutcar_static.GetProperties(ss_outcar_static) && aurostd::FileExist(directory+"/OUTCAR.static",path_outcar_static)) aurostd::file2stringstream(path_outcar_static, ss_outcar_static); //CO20200404
-    if(!xoutcar_static.GetProperties(ss_outcar_static) && aurostd::EFileExist(directory+"/OUTCAR.static",path_outcar_static)) aurostd::efile2stringstream(path_outcar_static, ss_outcar_static); //CO20200404
+    //[CO20200404 - OBSOLETE]if(!xoutcar_static.GetProperties(ss_outcar_static) && aurostd::FileExist(directory+"/OUTCAR.static",path_outcar_static)) aurostd::file2stringstream(path_outcar_static, ss_outcar_static); //CO20200404
+    aurostd::efile2stringstream(path_outcar_static, ss_outcar_static); //CO20200404
     if(!xoutcar_static.GetProperties(ss_outcar_static)){
       message << xoutcar_bands.ERROR << endl;  //CO20200404
       message << "Defaulting E-Fermi to that found in OUTCAR.bands"; //CO20200404
