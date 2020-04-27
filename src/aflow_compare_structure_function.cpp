@@ -874,16 +874,17 @@ bool GroupedWyckoffPosition::operator<(const GroupedWyckoffPosition& b) const{  
 // ***************************************************************************
 namespace compare{
   structure_misfit initialize_misfit_struct(bool magnetic){
-    structure_misfit misfit_info = { 
-      .is_magnetic_misfit=magnetic,
-      .misfit=AUROSTD_MAX_DOUBLE, 
-      .lattice_deviation=AUROSTD_MAX_DOUBLE, 
-      .coordinate_displacement=AUROSTD_MAX_DOUBLE, 
-      .failure=AUROSTD_MAX_DOUBLE, 
-      .magnetic_misfit=AUROSTD_MAX_DOUBLE,
-      .magnetic_displacement=AUROSTD_MAX_DOUBLE,
-      .magnetic_failure=AUROSTD_MAX_DOUBLE
-    };
+    structure_misfit misfit_info;
+    //DX20200317 - set attributes explicitly
+    // { .attribute=<>, .attribute=<>, ...} doesn't work for old GCC versions
+    misfit_info.is_magnetic_misfit=magnetic;
+    misfit_info.misfit=AUROSTD_MAX_DOUBLE;
+    misfit_info.lattice_deviation=AUROSTD_MAX_DOUBLE;
+    misfit_info.coordinate_displacement=AUROSTD_MAX_DOUBLE;
+    misfit_info.failure=AUROSTD_MAX_DOUBLE;
+    misfit_info.magnetic_misfit=AUROSTD_MAX_DOUBLE;
+    misfit_info.magnetic_displacement=AUROSTD_MAX_DOUBLE;
+    misfit_info.magnetic_failure=AUROSTD_MAX_DOUBLE;
     return misfit_info;
   }
 }

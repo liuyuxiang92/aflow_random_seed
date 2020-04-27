@@ -5308,14 +5308,14 @@ namespace aurostd {
     string soliloquy = "aurostd::dbl2frac()";
     stringstream message;
 
-    string out;
+    string out = ""; //DX20200427 - missing initialization
     bool neg = false;
     double tol = _ZERO_TOL_;
     if(a < 0) {
       neg = true;
       a = aurostd::abs(a);
     }
-    else if(aurostd::abs(a) < tol) {
+    if(aurostd::abs(a) < tol) { //DX20200427 - if not else if
       out = "0";
     }
     else if(aurostd::abs(a - .25) < tol) {
@@ -5364,8 +5364,9 @@ namespace aurostd {
       out = "11/12"; //DX20180726 - added
     } //DX20180726 - added
     else {
-      message << "Could not find hard-coded fraction for the double " << a << ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+      //DX20200427 [should not throw if not found, just return decimal] message << "Could not find hard-coded fraction for the double " << a << ".";
+      //DX20200427 [should not throw if not found, just return decimal] throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+      out = aurostd::utype2string<double>(a);
     }
     if(sign_prefix){
       if(neg == true) {

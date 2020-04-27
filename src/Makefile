@@ -1037,6 +1037,7 @@ check_full:
 	$(MAKE) aflowSG_check
 	$(MAKE) aflowSYM_check
 	$(MAKE) aflow_xtal_match_check
+	$(MAKE) aflow_gcc_compatibility_check
 proto_check:
 	@echo "Performing 'aflow --proto' test"
 	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \
@@ -1198,6 +1199,10 @@ aflow_xtal_match_check:
 	@echo "Running aflow_xtal_match test 1" && ANSWER=1 && RESULT=$$(./aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet) && NUM_MATCHING_PROTOS=$$(echo $$RESULT | awk -F'duplicate_compounds=' '{print $$2}' | awk '{print $$1}') && \
 		if [ "$$NUM_MATCHING_PROTOS" -ne "$$ANSWER" ]; then "aflow_xtal_match did not return $$ANSWER for './aflow --proto=A2B3_hR10_167_c_e:Al:O --params=-1,2.72957758313,0.36,0.5561 | ./aflow --compare2protos --print=txt --catalog=anrl --quiet', found $$NUM_MATCHING_PROTOS instead" && exit 1; fi
 	@echo "aflow_xtal_match test 1 passed!"
+aflow_gcc_compatibility_check:
+	@echo "Running aflow_gcc_compatibility_check test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' *.cpp | wc -l) && \
+		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit; fi
+	@echo "aflow_gcc_compatibility_check test 1 passed!"
 www:	web
 clean:
 	rm -rf *~ *.o *.o-* *.rpo AUROSTD/*~ AUROSTD/*.o AUROSTD/*.rpo ./APL/*~ ./APL/*o ./APL/*a ./ANRL/*~ ./ANRL/*o ./ANRL/*a ./ANRL*/*~ ./ANRL*/*o ./ANRL*/*a ./SQLITE/*o aflow aflow_data aflowd aflow2 aflowd2 aflow1 aflowd1 aflow.exe aconvasp apennsy aflow_convasp* *.eps *.pdf *ps *aux *dvi *log *m *tex nohup* core* VASP_TEST* GRND_TEST* xa xb xc xd xe xf aflow.out* core* *~ \#* *.o aflow_pennsy *.eps *.pdf *ps *aux *dvi *log *m *tex *exe aurostd_xtensor_extra.cpp aflow_data_*cpp xaflowauto boo* xlist* _xdat `find . -name *~`
