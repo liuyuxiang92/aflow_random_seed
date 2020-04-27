@@ -68,7 +68,7 @@ namespace cce {
   void get_dft_form_energies_functionals(const string& dft_energies_input_str, const string& functionals_input_str, CCE_Variables& cce_vars);
   int get_offset(const string& functional);
   vector<double> get_oxidation_states(const string& oxidation_numbers_input_str, const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
-  string get_functional_from_aflow_in(const xstructure& structure, string& aflowin_file);
+  string get_functional_from_aflow_in(const xstructure& structure, string& aflowin_file, string& outcar_file);
   // initialise flags and variables
   aurostd::xoption init_flags(); // ME20200213
   CCE_Variables init_variables(const xstructure&); // ME20200213
