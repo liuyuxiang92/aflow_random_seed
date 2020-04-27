@@ -13338,7 +13338,7 @@ namespace pflow {
       oss << " FROM OUTCAR" << endl;
       oss << " vTITEL.size()=" << xOUT.vTITEL.size() << ": "; for(uint i=0;i<xOUT.vTITEL.size();i++) { oss << xOUT.vTITEL.at(i) << " "; } oss << endl;
       oss << " SYSTEM=" << xOUT.SYSTEM << endl;
-      oss << " ERROR=" << xOUT.ERROR << endl;
+      //[CO20200404 - OBSOLETE]oss << " ERROR=" << xOUT.ERROR << endl;
       oss << " pp_type=" << xOUT.pp_type << endl;
       oss << " species.size()=" << xOUT.species.size() << ": "; for(uint i=0;i<xOUT.species.size();i++) { oss << xOUT.species.at(i) << " "; } oss << endl;
       oss << " species_pp.size()=" << xOUT.species_pp.size() << ": "; for(uint i=0;i<xOUT.species_pp.size();i++) { oss << xOUT.species_pp.at(i) << " "; } oss << endl;

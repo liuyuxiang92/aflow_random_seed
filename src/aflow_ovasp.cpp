@@ -5276,7 +5276,8 @@ ostream& operator<<(ostream& oss, const xEIGENVAL& xeigen) {
 
 //---------------------------------------------------------------------------------
 // GetEffectiveMass: Calculate the eff. mass. via the Harmonic approximation 
-bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, xstructure xstr) {
+bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, xstructure xstr,ostream& oss) {ofstream FileMESSAGE;return GetEffectiveMass(xoutcar,xdoscar,xeigenval,xstr,FileMESSAGE,oss);} //CO20200404
+bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, xstructure xstr,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
   // The band gap, number of spins, and some other data are read out of the DOSCAR
   // The extrema (valleys) of the valence and conduction bands are gathered and
   // the curvature of the valley is solved for by fitting the E( kx, ky, kz) data to an ellipse.
@@ -5293,6 +5294,9 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
   // xOUTCAR.mass_elec_dos, xOUTCAR.mass_hole_dos, xOUTCAR.mass_elec_conduction, and xOUTCAR.mass_hole_conduction
   // algorithm depends on the energy in doscar.venergy being sorted in ascending order  
   ///////////////////////////////////////////////////////////////////////
+  string soliloquy="GetEffectiveMass():";
+  stringstream message;
+
   xmatrix<double> reciprocal_lattice(1,1,3,3);
   vector<vector<vector<kEn_st> > > fit_data_all;
   vector<vector<int> > number_of_valley_list;
@@ -5334,18 +5338,24 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
     }
   }
   else {
-    xoutcar.ERROR = "EIGENVAL spin value is neither 0 nor 1."; // probably unnecessary
+    //[CO20200404 - OBSOLETE]xoutcar.ERROR = "EIGENVAL spin value is neither 0 nor 1."; // probably unnecessary
+    message << "EIGENVAL spin value is neither 0 nor 1"; //CO20200404
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
     return FALSE;
   }
   if(ispin == 1) {
     if(!SPIN_UP) {
-      xoutcar.ERROR = "Metallic system encountered";
+      //[CO20200404 - OBSOLETE]xoutcar.ERROR = "Metallic system encountered";
+      message << "Metallic system encountered"; //CO20200404
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
       return FALSE;
     }
   }
   else if(ispin == 2) {
     if(!SPIN_UP and !SPIN_DN) {
-      xoutcar.ERROR = "Metallic system encountered";
+      //[CO20200404 - OBSOLETE]xoutcar.ERROR = "Metallic system encountered";
+      message << "Metallic system encountered"; //CO20200404
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
       return FALSE;
     }
   }
@@ -5570,7 +5580,9 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
           }
           //  cout << endl;
           if(SINGULAR) {
-            xoutcar.ERROR = "Singular system: ill-defined matrix problem encountered.";
+            //[CO20200404 - OBSOLETE]xoutcar.ERROR = "Singular system: ill-defined matrix problem encountered.";
+            message << "Singular system: ill-defined matrix problem encountered."; //CO20200404
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
             return FALSE;
           }
         }
@@ -5803,9 +5815,9 @@ bool PrintBandGap(string& directory, ostream &oss) {
   if(!ss_outcar_bands.str().length()) {
     message << "OUTCAR.bands not found"; //CO20200404
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_); //CO20200404
-    //[CO20200404]oss << "WARNING " << soliloquy << " OUTCAR.bands not found here: " << directory << endl;
-    //[CO20200404]oss << endl;
-    //[CO20200404]return FALSE;
+    //[CO20200404 - OBSOLETE]oss << "WARNING " << soliloquy << " OUTCAR.bands not found here: " << directory << endl;
+    //[CO20200404 - OBSOLETE]oss << endl;
+    //[CO20200404 - OBSOLETE]return FALSE;
   }  //CO20200404
   //[CO20200404 - OBSOLETE]if(!ss_outcar_bands.str().length() && aurostd::FileExist(directory+"/OUTCAR",path_outcar_bands)) aurostd::file2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
   if(!ss_outcar_bands.str().length() && aurostd::EFileExist(directory+"/OUTCAR",path_outcar_bands)) aurostd::efile2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
@@ -5823,17 +5835,17 @@ bool PrintBandGap(string& directory, ostream &oss) {
   //CO20171002 - using tolerance from symmetry calc - STOP
 
   if(!xoutcar_bands.GetProperties(ss_outcar_bands)){
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
-    //[CO20200404]oss << "WARNING " << soliloquy << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
-    //[CO20200404]oss << endl;
+    //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+    //[CO20200404 - OBSOLETE]oss << "WARNING " << soliloquy << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
+    //[CO20200404 - OBSOLETE]oss << endl;
     return FALSE;
   }
   //try to grab xstr from OUTCAR
   if(!xoutcar_bands.GetXStructure()){
     if(!aurostd::FileExist(directory+"/POSCAR.bands",path_POSCAR) && !aurostd::EFileExist(directory+"/POSCAR.bands",path_POSCAR)) {
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
-      //[CO20200404]oss << "WARNING " << soliloquy << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
-      //[CO20200404]oss << endl;
+      //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+      //[CO20200404 - OBSOLETE]oss << "WARNING " << soliloquy << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
+      //[CO20200404 - OBSOLETE]oss << endl;
       return FALSE;
     }
     xstructure xstr(path_POSCAR,IOVASP_POSCAR);
@@ -5847,20 +5859,20 @@ bool PrintBandGap(string& directory, ostream &oss) {
   if(!aurostd::EFileExist(directory+"/OUTCAR.static",path_outcar_static)){
     message << "OUTCAR.static not found, defaulting E-Fermi to that found in OUTCAR.bands";  //CO20200404
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_); //CO20200404
-    //[CO20200404]oss << "WARNING " << soliloquy << " OUTCAR.static not found here: " << directory << endl;
-    //[CO20200404]oss << "WARNING " << soliloquy << " Defaulting E-Fermi to that found in OUTCAR.bands" << endl;
-    //[CO20200404]oss << endl;
+    //[CO20200404 - OBSOLETE]oss << "WARNING " << soliloquy << " OUTCAR.static not found here: " << directory << endl;
+    //[CO20200404 - OBSOLETE]oss << "WARNING " << soliloquy << " Defaulting E-Fermi to that found in OUTCAR.bands" << endl;
+    //[CO20200404 - OBSOLETE]oss << endl;
     //return FALSE;
   } else {
     //[CO20200404 - OBSOLETE]if(!xoutcar_static.GetProperties(ss_outcar_static) && aurostd::FileExist(directory+"/OUTCAR.static",path_outcar_static)) aurostd::file2stringstream(path_outcar_static, ss_outcar_static); //CO20200404
     aurostd::efile2stringstream(path_outcar_static, ss_outcar_static); //CO20200404
     if(!xoutcar_static.GetProperties(ss_outcar_static)){
-      message << xoutcar_bands.ERROR << endl;  //CO20200404
+      //[CO20200404 - OBSOLETE]message << xoutcar_bands.ERROR << endl;  //CO20200404
       message << "Defaulting E-Fermi to that found in OUTCAR.bands"; //CO20200404
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_); //CO20200404
-      //[CO20200404]oss << "WARNING " << soliloquy << " " << xoutcar_static.ERROR << endl << "   filename=[" << path_outcar_static << "]" << endl;
-      //[CO20200404]oss << "WARNING " << soliloquy << " Defaulting E-Fermi to that found in OUTCAR.bands" << endl;
-      //[CO20200404]oss << endl;
+      //[CO20200404 - OBSOLETE]oss << "WARNING " << soliloquy << " " << xoutcar_static.ERROR << endl << "   filename=[" << path_outcar_static << "]" << endl;
+      //[CO20200404 - OBSOLETE]oss << "WARNING " << soliloquy << " Defaulting E-Fermi to that found in OUTCAR.bands" << endl;
+      //[CO20200404 - OBSOLETE]oss << endl;
       //return FALSE;
     } else {
       EFERMI=xoutcar_static.Efermi;
@@ -5869,9 +5881,9 @@ bool PrintBandGap(string& directory, ostream &oss) {
   }
 
   if(!xoutcar_bands.GetBandGap(EFERMI)){
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
-    //[CO20200404]oss << "WARNING " << soliloquy << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
-    //[CO20200404]oss << endl;
+    //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+    //[CO20200404 - OBSOLETE]oss << "WARNING " << soliloquy << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
+    //[CO20200404 - OBSOLETE]oss << endl;
     return FALSE;
   }
 
@@ -5958,9 +5970,9 @@ bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
   if(!ss_doscar_static.str().length()) {
     message << "DOSCAR.static not found";  //CO20200404
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_); //CO20200404
-    //[CO20200404]oss << "ERROR " << soliloquy << " DOSCAR.static not found here: " << directory << endl;
-    //[CO20200404]oss << endl;
-    //[CO20200404]return FALSE;
+    //[CO20200404 - OBSOLETE]oss << "ERROR " << soliloquy << " DOSCAR.static not found here: " << directory << endl;
+    //[CO20200404 - OBSOLETE]oss << endl;
+    //[CO20200404 - OBSOLETE]return FALSE;
   }  //CO20200404
   if(!ss_outcar_bands.str().length() && aurostd::FileExist(directory+"/DOSCAR",path_doscar_static)) aurostd::file2stringstream(path_doscar_static, ss_doscar_static);  //CO20200404
   if(!ss_outcar_bands.str().length() && aurostd::EFileExist(directory+"/DOSCAR",path_doscar_static)) aurostd::efile2stringstream(path_doscar_static, ss_doscar_static);  //CO20200404
@@ -5972,15 +5984,15 @@ bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
 
   xDOSCAR xdoscar;
   if(!xdoscar.GetProperties(ss_doscar_static)){
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xdoscar.ERROR, oss, _LOGGER_ERROR_); //CO20200404
-    //[CO20200404]oss << "ERROR " << soliloquy << " " << xdoscar.ERROR << endl << "   filename=[" << path_doscar_static << "]" << endl;
-    //[CO20200404]oss << endl;
+    //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xdoscar.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+    //[CO20200404 - OBSOLETE]oss << "ERROR " << soliloquy << " " << xdoscar.ERROR << endl << "   filename=[" << path_doscar_static << "]" << endl;
+    //[CO20200404 - OBSOLETE]oss << endl;
     return FALSE;
   }
   if(!xdoscar.GetBandGap()){ //use EFERMI of doscar.static (most accurate)
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xdoscar.ERROR, oss, _LOGGER_ERROR_); //CO20200404
-    //[CO20200404]oss << "ERROR " << soliloquy << " " << xdoscar.ERROR << endl << "   filename=[" << path_doscar_static << "]" << endl;
-    //[CO20200404]oss << endl;
+    //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, soliloquy, xdoscar.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+    //[CO20200404 - OBSOLETE]oss << "ERROR " << soliloquy << " " << xdoscar.ERROR << endl << "   filename=[" << path_doscar_static << "]" << endl;
+    //[CO20200404 - OBSOLETE]oss << endl;
     return FALSE;
   }
 
@@ -6137,7 +6149,8 @@ bool PrintEffectiveMass(string& directory, ostream &oss) {
   EM_TAG = GetEffectiveMass(xoutcar,xdoscar,xeigenval, xstr);
   if(!EM_TAG) {
     oss << "System              : " << xoutcar.SYSTEM << endl; 
-    oss << xoutcar.ERROR << "   filename[=" << xoutcar.filename << "]" << endl;
+    //[CO20200404 - OBSOLETE]oss << xoutcar.ERROR << "   filename[=" << xoutcar.filename << "]" << endl;
+    oss << string("FAILED") << "   filename[=" << xoutcar.filename << "]" << endl;
     oss << endl;
     return FALSE;
   }
@@ -6196,6 +6209,8 @@ bool PrintEffectiveMass(string& directory, ostream &oss) {
 // This is then used to approximate the location of the e.m. ellipsoids in the IBZ
 // 2015: Camilo E. Calderon
 bool PrintEigCurv(string& directory, ostream &oss) {
+  string soliloquy="PrintEigCurv():";
+  stringstream message;
 
   vector<vector<vector<vector<vector<double> > > > > branches_bnds ;
   vector<vector<vector<xvector<double> > > > branches_kpts ;
@@ -6299,7 +6314,9 @@ bool PrintEigCurv(string& directory, ostream &oss) {
     IBZextrema        (xeigenval,vkpoint_eig,branches) ;
   } else {
     oss << endl ;
-    xoutcar.ERROR = "Material is metallic." ;
+    //[CO20200404 - OBSOLETE]xoutcar.ERROR = "Material is metallic." ;
+    message << "Material is metallic";  //CO20200404
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_); //CO20200404
     return FALSE ;
   }
   return TRUE ;
