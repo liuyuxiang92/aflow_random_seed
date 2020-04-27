@@ -1034,11 +1034,11 @@ check_full:
 	$(MAKE) check_proto
 	$(MAKE) check_slab
 	$(MAKE) check_chull
-	$(MAKE) check_pocc
 	$(MAKE) check_aflowSG
 	$(MAKE) check_AFLOWSYM
 	$(MAKE) check_aflow_xtal_match
 	$(MAKE) check_aflow_gcc_compatibility
+	$(MAKE) check_pocc
 check_proto:
 	@echo "Performing 'aflow --proto' test"
 	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \
