@@ -1109,6 +1109,14 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
     // Set precision
     xvasp.aopts.pop_attached("AFLOWIN_FLAG::PRECISION");xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION", xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_PREC"));
 
+    // ME20200427 - Scale number of bands appropriately when NBANDS has been
+    // set in the parent aflow.in
+    if (vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.isentry && !xvasp.aopts.flag("APL_FLAG::AVASP_BORN")) {
+      int nbands = vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.content_int;
+      nbands *= aurostd::string2utype<int>(xvasp.aopts.getattachedscheme("AFLOW_APL::NCELLS"));
+      xvasp.aopts.pop_attached("AFLOWIN_FLAG::NBANDS_EQUAL");
+      xvasp.aopts.push_attached("AFLOWIN_FLAG::NBANDS_EQUAL", vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.content_string);
+    }
     // Set Born charge and linear response parameters
     if (xvasp.aopts.flag("APL_FLAG::AVASP_BORN") || xvasp.aopts.flag("APL_FLAG::AVASP_LR")) {
       // Add INCAR flags

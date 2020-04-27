@@ -1464,6 +1464,13 @@ namespace KBIN {
     supercell.build(scell_dims);
     if (USER_MAXSHELL > 0) supercell.setupShellRestrictions(USER_MAXSHELL);
 
+    // ME20200427 - If NBANDS has been specified, store the number of supercells
+    // to scale.
+    if (xflags.vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.isentry) {
+      int ncells = scell_dims[1] * scell_dims[2] * scell_dims[3];
+      xinput.xvasp.aopts.push_attached("AFLOW_APL::NCELLS", aurostd::utype2string<int>(ncells));
+    }
+
     // Write supercell input structure into PHPOSCAR to save state
     // unless it has been read before.
     if (!aurostd::EFileExist(phposcar_file)) {
