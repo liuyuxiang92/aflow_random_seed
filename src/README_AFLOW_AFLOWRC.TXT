@@ -1285,7 +1285,7 @@ DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
   default: 0
 
 DEFAULT_QHA_SCQHA_PDIS_T
-  description: For SCQHA method defines a set of temperatures for with temperature-dependent phonon band structure will be calculated.
+  description: Defines the set of temperatures to calculate the temperature-dependent phonon band structure with the SCQHA method.
   type: string
   default: "50,100,600"
 
