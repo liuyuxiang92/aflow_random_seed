@@ -1173,6 +1173,9 @@ namespace apl {
     return getDynamicalMatrix(kpoint, kpoint_nac, placeholder, false);
   }
 
+  // kpoint_nac is a direction at the Gamma point and a k-point
+  // otherwise. This is done to properly display the discontinuity
+  // for non-cubic structures in the phonon dispersions near Gamma.
   xmatrix<xcomplex<double> > PhononCalculator::getDynamicalMatrix(const xvector<double>& kpoint,
       const xvector<double>& kpoint_nac,
       vector<xmatrix<xcomplex<double> > >& dDynMat,
