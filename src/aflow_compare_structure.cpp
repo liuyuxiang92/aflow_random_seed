@@ -1631,7 +1631,10 @@ namespace compare {
       if(compare::sameStoichiometry(stoichiometry,tmp_reduced_stoich)){
         aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i]; 
         vector<string> structure_files;
-        if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;}
+        if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, "Could not load structure (auid="+entry.auid+") ... skipping...", FileMESSAGE, logstream, _LOGGER_WARNING_);
+          continue;
+        }
         bool found_structure = false;
         uint structure_index = 0;
         if(load_most_relaxed_structure_only && entry.vstr.size()==1){
@@ -2371,7 +2374,10 @@ namespace compare {
       //if(compare::sameStoichiometry(stoichiometry,tmp_reduced_stoich)){
       aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i]; 
       vector<string> structure_files;
-      if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;} //DX20200225 - added load_most_relaxed_structure_only
+      if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, "Could not load structure (auid="+entry.auid+") ... skipping...", FileMESSAGE, logstream, _LOGGER_WARNING_);
+        continue;
+      }
       //DX20200225 - added compare to particular geometry files - START
       bool found_structure = false;
       uint structure_index = 0;
