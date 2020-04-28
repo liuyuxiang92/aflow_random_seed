@@ -3832,7 +3832,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     else {if(LDEBUG) {cerr << soliloquy << " AIMS GEOM DETECTOR = FALSE" << endl;}}
   }
-  
   // DESPERATE FINDING => VASP
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " VASP DETECTOR" << endl;
