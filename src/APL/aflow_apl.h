@@ -229,16 +229,16 @@ namespace apl {
   };
 
   class Supercell;  // Forward declaration
-  class ClusterSet {
+  class ClusterSet : public xStream {
     // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
     public:
-      ClusterSet();
+      ClusterSet(ostream& oss=std::cout);
       ClusterSet(const Supercell&, int, double, ofstream&, _aflags&, ostream& oss=std::cout);  // Constructor
       ClusterSet(const string&, const Supercell&, int, double, int, ofstream&, _aflags&, ostream& oss=std::cout);  // From file
       ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
       ~ClusterSet();  // Destructor
       const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
-      void clear(ofstream&, _aflags&, ostream& oss=std::cout);
+      void clear(_aflags&);
       void initialize(const Supercell&, int, double);
 
       vector<_cluster> clusters;
@@ -265,8 +265,6 @@ namespace apl {
       void writeClusterSetToFile(const string&);
 
     private:
-      ofstream* messageFile;
-      ostream* oss;
       _aflags* aflags;
 
       void free();
@@ -330,15 +328,15 @@ namespace apl {
       void readHigherOrderDistortions(uint&, const vector<string>&);
   };
 
-  class AnharmonicIFCs {
+  class AnharmonicIFCs : public xStream {
     // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
     public:
-      AnharmonicIFCs();
+      AnharmonicIFCs(ostream& oss=std::cout);
       AnharmonicIFCs(_xinput&, _aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&, ostream& oss=std::cout);
       AnharmonicIFCs(const AnharmonicIFCs&);
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
       ~AnharmonicIFCs();
-      void clear(_xinput&,_aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&, ostream& oss=std::cout);
+      void clear(_xinput&,_aflags&, _kflags&, _xflags&, ClusterSet&);
 
       void setOptions(double, int, double, double, bool);
       int getOrder() const;
@@ -355,8 +353,6 @@ namespace apl {
       _kflags* _kbinFlags;
       _xflags* _xFlags;
       ClusterSet* clst;
-      ofstream* messageFile;
-      ostream* oss;
 
       vector<_xinput> xInputs;
       bool _useZeroStateForces;
@@ -582,11 +578,9 @@ namespace apl {
 // ***************************************************************************
 // "supercell.h"
 namespace apl {
-  class Supercell {
+  class Supercell : public xStream {
     private:
       string _directory;  // for the logger
-      ofstream* messageFile;
-      ostream* oss;
       xstructure _inStructure;
       xstructure _inStructure_original;  //CO
       xstructure _inStructure_light;     //CO, does not include HEAVY symmetry stuff
@@ -615,14 +609,14 @@ namespace apl {
       void copy(const Supercell&);
 
     public:
-      Supercell();
+      Supercell(ostream& oss=std::cout);
       Supercell(ofstream&, ostream& os=std::cout);
       Supercell(const xstructure&, ofstream&, ostream& oss=std::cout, string="./"); //CO20181226
       Supercell(const string&, ofstream&, ostream& os=std::cout, string="./");  // ME20200112
       Supercell(const Supercell&);
       Supercell& operator=(const Supercell&);
       ~Supercell();
-      void clear(ofstream&, ostream&);
+      void clear();
       void setDirectory(const string&);
       string getDirectory() const;
       void readFromStateFile(const string&);  // ME20200212
@@ -742,7 +736,7 @@ namespace apl {
   void createAflowInPhononsAIMS(_aflags&, _kflags&, _xflags&, string&, _xinput&, ofstream&);
   bool filesExistPhonons(_xinput&);
   bool outfileFoundAnywherePhonons(vector<_xinput>&);
-  bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, bool=false);  // ME20191029
+  bool outfileFoundEverywherePhonons(vector<_xinput>&, const string&, ofstream&, ostream&, bool=false);  // ME20191029
   bool readForcesFromDirectory(_xinput&);  // ME20200219
   void subtractZeroStateForces(vector<_xinput>&, bool);
   void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME20190114
@@ -750,7 +744,7 @@ namespace apl {
 }
 
 namespace apl {
-  class ForceConstantCalculator {
+  class ForceConstantCalculator : public xStream {
     protected:
       // Aflow's stuff required for running some routines
       Supercell* _supercell;
@@ -759,8 +753,6 @@ namespace apl {
       _kflags* _kbinFlags;
       _xflags* _xFlags; //_vflags& _vaspFlags;
       string* _AflowIn;
-      ofstream* messageFile;
-      ostream* oss;
 
       vector<_xinput> xInputs;
 
@@ -794,12 +786,12 @@ namespace apl {
       void printFCShellInfo(ostream&);
 
     public:
-      ForceConstantCalculator();
+      ForceConstantCalculator(ostream& oss=std::cout);
       ForceConstantCalculator(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
       ForceConstantCalculator(const ForceConstantCalculator&);
       ForceConstantCalculator& operator=(const ForceConstantCalculator&);
       virtual ~ForceConstantCalculator() {};
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&);
 
       virtual bool runVASPCalculations(bool) {return false;};  // ME20191029
       bool runVASPCalculationsBE(_xinput&, uint);
@@ -857,12 +849,12 @@ namespace apl {
       bool runVASPCalculations(bool);  // ME20190412
 
     public:
-      DirectMethodPC();
+      DirectMethodPC(ostream& oss=std::cout);
       DirectMethodPC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
       DirectMethodPC(const DirectMethodPC&);
       DirectMethodPC& operator=(const DirectMethodPC&);
       ~DirectMethodPC();
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&);
 
       bool calculateForceFields();  // ME20190412  // ME20191029
       // Easy access to global parameters
@@ -1026,12 +1018,12 @@ namespace apl {
       bool readForceConstantsFromVasprun(_xinput&);  // ME20200211
 
     public:
-      LinearResponsePC();
+      LinearResponsePC(ostream& oss=std::cout);
       LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
       LinearResponsePC(const LinearResponsePC&);
       LinearResponsePC& operator=(const LinearResponsePC&);
       ~LinearResponsePC();
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
+      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&);
 
       bool runVASPCalculations(bool);  // ME20191029
       bool calculateForceConstants();  // ME20200211
@@ -1057,7 +1049,7 @@ namespace apl {
 }  // namespace apl
 
 namespace apl {
-  class PhononCalculator {
+  class PhononCalculator : public xStream {
     protected:
       // USER PARAMETERS
       string _system;  // ME20190614 - for VASP-style output files
@@ -1084,8 +1076,6 @@ namespace apl {
       // Anharmonic IFCs
       vector<vector<vector<double> > > anharmonicIFCs;
       vector<vector<vector<int> > > clusters;
-      ofstream* messageFile;
-      ostream* oss;
 
     private:
       void copy(const PhononCalculator&);  // ME20191228
@@ -1101,12 +1091,12 @@ namespace apl {
       xmatrix<xcomplex<double> > getEwaldSumDipoleDipoleContribution(const xvector<double>, bool = true);
 
     public:
-      PhononCalculator();
+      PhononCalculator(ostream& oss=std::cout);
       PhononCalculator(Supercell&, ofstream&, ostream& oss=std::cout);
       PhononCalculator(const PhononCalculator&);
       PhononCalculator& operator=(const PhononCalculator&);
       ~PhononCalculator();
-      void clear(Supercell&, ofstream&, ostream& oss=std::cout);
+      void clear(Supercell&);
 
       // Getter functions
       const Supercell& getSupercell() const;
@@ -1116,8 +1106,6 @@ namespace apl {
       string getSystemName() const;  // ME20190614
       string getDirectory() const;
       int getNCPUs() const;
-      ofstream& getOutputFileStream();
-      ostream& getOutputStringStream();
       bool isPolarMaterial() const;  // ME20200206
       const vector<vector<xmatrix<double> > >& getHarmonicForceConstants() const;
       const vector<vector<double> >& getAnharmonicForceConstants(int) const;
@@ -1366,16 +1354,16 @@ namespace apl {
     vector<_sym_op> pgroup;  // The point group operations of the reciprocal cell
   };
 
-  class QMesh {
+  class QMesh : public xStream {
     public:
-      QMesh();
+      QMesh(ostream& oss=std::cout);
       QMesh(ofstream&, ostream& os=std::cout);
       QMesh(const xvector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
       QMesh(const vector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
-      void clear(ofstream&, ostream& os=std::cout);
+      void clear();
       void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
 
@@ -1383,7 +1371,6 @@ namespace apl {
       void setModule(const string&);
       const string& getDirectory() const;
       const string& getModule() const;
-      ofstream& getOutputStream();
 
       void makeIrreducible();
       void calculateLittleGroups();  // ME20200109
@@ -1424,8 +1411,6 @@ namespace apl {
       void free();
       void copy(const QMesh&);
 
-      ofstream* messageFile;
-      ostream* oss;
       string _directory;
 
       vector<int> _ibzqpts;  // The indices of the irreducible q-points
@@ -1611,10 +1596,8 @@ namespace apl {
     ueVK,
     kB };
 
-  class ThermalPropertiesCalculator {
+  class ThermalPropertiesCalculator : public xStream {
     private:
-      ofstream* messageFile;
-      ostream* oss;
       string _directory;
       std::vector<double> _freqs_0K;
       std::vector<double> _dos_0K;
@@ -1627,14 +1610,14 @@ namespace apl {
       double getScalingFactor(const ThermalPropertiesUnits&);
 
     public:
-      ThermalPropertiesCalculator();
+      ThermalPropertiesCalculator(ostream& oss=std::cout);
       ThermalPropertiesCalculator(ofstream&, ostream& os=std::cout);
       ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, ostream& os=std::cout, string="./");
       ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, ostream& os=std::cout, string="./");
       ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
       ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
       ~ThermalPropertiesCalculator();
-      void clear(ofstream&, ostream& os=std::cout);
+      void clear();
 
       void setDirectory(const string&);
       string getDirectory() const;

@@ -870,6 +870,9 @@ namespace KBIN {
 
     vflags.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.options2entry(AflowIn,"[AFLOW_APL]KPOINTS=|[AFLOW_QHA]KPOINTS=|[AFLOW_AAPL]KPOINTS=",
         FALSE,vflags.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.xscheme);
+    // ME202020427 - APL k-point handling needs to be moved to modules eventually
+    // This is a non-standard feature and should not be defaulted
+    vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.options2entry(AflowIn,"[AFLOW_APL]KPOINTS_GRID=|[AFLOW_QHA]KPOINTS_GRID=|[AFLOW_AAPL]KPOINTS_GRID=", FALSE,"");
     //[ME20181216]    vflags.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.clear();
     //[ME20181216]    if(aurostd::substring2bool(AflowIn,"[AFLOW_APL]KPOINTS=EVEN",TRUE) || 
     //[ME20181216]        aurostd::substring2bool(AflowIn,"[AFLOW_QHA]KPOINTS=EVEN",TRUE) ||
@@ -4050,49 +4053,46 @@ namespace KBIN {
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
   string getVASPVersionString(const string& binfile) {
-    if (XHOST.is_command(binfile)) {
-      // Get the full path to the binary
-      string fullPathBinaryName = XHOST.command(binfile);
-      if (fullPathBinaryName.empty()) return "";
+    if (!XHOST.is_command(binfile)) return "";
+    // Get the full path to the binary
+    string fullPathBinaryName = XHOST.command(binfile);
+    if (fullPathBinaryName.empty()) return "";
 
-      // Open the binary
-      ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
-      if (!infile.is_open()) return "";
+    // Open the binary
+    ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
+    if (!infile.is_open()) return "";
 
-      // Read bytes...
-      int bufferSize = 1024;
-      char buffer[bufferSize];
-      string versionString;
-      while (true) {
-        if (!infile.read(buffer, bufferSize))
-          bufferSize = infile.gcount();
+    // Read bytes...
+    int bufferSize = 1024;
+    char buffer[bufferSize];
+    string versionString;
+    while (true) {
+      if (!infile.read(buffer, bufferSize))
+        bufferSize = infile.gcount();
 
-        for (int i = 0; i < bufferSize; i++) {
-          if ((buffer[i] == 'v') &&
-              (buffer[i + 1] == 'a') &&
-              (buffer[i + 2] == 's') &&
-              (buffer[i + 3] == 'p') &&
-              (buffer[i + 4] == '.')) {
-            int j = i + 5;
-            while (buffer[j] != ' ')
-              versionString.push_back(buffer[j++]);
-            break;
-          }
+      for (int i = 0; i < bufferSize; i++) {
+        if ((buffer[i] == 'v') &&
+            (buffer[i + 1] == 'a') &&
+            (buffer[i + 2] == 's') &&
+            (buffer[i + 3] == 'p') &&
+            (buffer[i + 4] == '.')) {
+          int j = i + 5;
+          while (buffer[j] != ' ')
+            versionString.push_back(buffer[j++]);
+          break;
         }
-        if (!versionString.empty()) break;
-        if (infile.eof()) break;
-
-        // Shift cursor to avoid the case where "vasp." is on the boundary of two buffers...
-        infile.seekg(-20, std::ios::cur);
       }
+      if (!versionString.empty()) break;
+      if (infile.eof()) break;
 
-      infile.close();
-      infile.clear();
-
-      return versionString;
-    } else {
-      return "";
+      // Shift cursor to avoid the case where "vasp." is on the boundary of two buffers...
+      infile.seekg(-20, std::ios::cur);
     }
+
+    infile.close();
+    infile.clear();
+
+    return versionString;
   }
 }  // namespace KBIN
 

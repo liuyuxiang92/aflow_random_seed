@@ -19,7 +19,7 @@ namespace apl {
       _xflags& xflags, //_vflags& vflags,
       string& AflowIn,
       ofstream& mf,
-      ostream& os) : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, os) //xvasp, aflags, kflags, vflags, l)
+      ostream& oss) : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, oss) //xvasp, aflags, kflags, vflags, l)
   {  //CO200106 - patching for auto-indenting
     clear();
     _log.open(_logfile.c_str());
@@ -33,7 +33,7 @@ namespace apl {
     _log << std::setprecision(8) << std::fixed;
   }
   // ***************************************************************************************
-  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear(); }
+  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear(); xStream::free();}
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::clear()
   {
@@ -87,7 +87,7 @@ namespace apl {
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::run_qha()
   {
-    pflow::logger(_AFLOW_FILE_NAME_, "QHA", "Arranging all qha-options ", *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, "QHA", "Arranging all qha-options ", *_aflowFlags, *p_FileMESSAGE, *p_oss);
 
     //options are mutually exclusive
     if((_is_gp_on) && (_is_eos)){
@@ -209,16 +209,16 @@ namespace apl {
     string message = "";
     if(phonon_option==0){
       message = "Creating distorted configurations to calculate QHA properties ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==1){
       message = "Creating distorted configurations to calculate SCQHA/QHA3P properties ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==2){
       message = "Creating distorted configurations to calculate QHA EOS ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==3){
       message = "Creating distorted configurations to calculate QHA static energies ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     }
 
     if(phonon_option==0){
@@ -334,7 +334,7 @@ namespace apl {
             ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
       message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       if(phonon_option<3){ 
         write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==3){ 
@@ -354,46 +354,46 @@ namespace apl {
     if(phonon_option==4){
       if(_is_gp_A_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_gp_B_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_gp_C_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==5){
       if(_is_sc_gp_A_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_sc_gp_B_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_sc_gp_C_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==6){
       if(_is_eos_A){ 
         message = "Creating distorted configurations to calculate EOS-phonon-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_B){ 
         message = "Creating distorted configurations to calculate EOS-phonon-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_C){ 
         message = "Creating distorted configurations to calculate EOS-phonon-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==7){
       if(_is_eos_A){ 
         message = "Creating distorted configurations to calculate EOS-static-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_B){ 
         message ="Creating distorted configurations to calculate EOS-static-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_C){ 
         message = "Creating distorted configurations to calculate EOS-static-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       }
     }
 
@@ -509,7 +509,7 @@ namespace apl {
             ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
       message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       if(phonon_option<7){
         write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==7){
@@ -844,7 +844,7 @@ namespace apl {
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
       string message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       write_static_OUTPUT(vaspRuns[idxRun]);
     }
     vaspRuns.clear();
@@ -881,7 +881,7 @@ namespace apl {
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
 
       string message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       write_static_OUTPUT(vaspRuns[idxRun]);
     }
     vaspRuns.clear();

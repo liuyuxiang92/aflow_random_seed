@@ -154,7 +154,7 @@ namespace apl {
   }
 
   void TCONDCalculator::initialize() {
-    _logger.initialize(_pc->getOutputFileStream(), *aflags);
+    _logger.initialize(*_pc->getOFStream(), *aflags);
     _logger.setModuleName(_AAPL_TCOND_MODULE_);
     nBranches = _pc->getNumberOfBranches();
     nQPs = _qm->getnQPs();
@@ -999,7 +999,7 @@ namespace apl {
       int num_iter = 1;
       double norm = 0.0;
       _logger << "Begin SCF for the Boltzmann transport equation." << apl::endl;
-      ostream& oss = _pc->getOutputStringStream();
+      ostream& oss = *_pc->getOSS();
       oss << std::setiosflags(std::ios::fixed | std::ios::right);
       oss << std::setw(15) << "Iteration";
       oss << std::setiosflags(std::ios::fixed | std::ios::right);

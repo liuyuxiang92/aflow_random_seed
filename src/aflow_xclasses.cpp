@@ -848,6 +848,7 @@ _vflags::_vflags() {
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME.push(DEFAULT_PHONONS_KSCHEME);  //"Gamma");           // KSCHEME
 
   KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.clear();         // PARITY
+  KBIN_VASP_KPOINTS_PHONONS_GRID.clear();
   // BANDS
   // KBIN_VASP_KPOINTS_BANDS_LATTICE
   KBIN_VASP_KPOINTS_BANDS_LATTICE.clear();                       // LATTICE
@@ -1019,6 +1020,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_KPOINTS_PHONONS_KPPRA                                = b.KBIN_VASP_KPOINTS_PHONONS_KPPRA;
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME                              = b.KBIN_VASP_KPOINTS_PHONONS_KSCHEME;
   KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY                  = b.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY;
+  KBIN_VASP_KPOINTS_PHONONS_GRID                                 = b.KBIN_VASP_KPOINTS_PHONONS_GRID;  // ME20200427
   // BANDS
   KBIN_VASP_KPOINTS_BANDS_LATTICE                                = b.KBIN_VASP_KPOINTS_BANDS_LATTICE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG                           = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
@@ -2019,6 +2021,21 @@ ostream* xStream::getOSS() const {return p_oss;} //CO20191110
 ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
+
+// ME20200427 - Initializer functions
+void xStream::initialize(ostream& oss) {
+  free();
+  p_FileMESSAGE = new ofstream();
+  f_new_ofstream = true;
+  initialize(*p_FileMESSAGE, oss);
+  f_new_ofstream = true;  // override
+}
+
+void xStream::initialize(ofstream& ofs, ostream& oss) {
+  setOFStream(ofs);
+  f_new_ofstream = false;
+  setOSS(oss);
+}
 
 #endif  // _AFLOW_CLASSES_CPP
 
