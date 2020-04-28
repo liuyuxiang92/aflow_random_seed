@@ -1751,21 +1751,21 @@ namespace KBIN {
       message << "Could not find VASP binary file " << kflags.KBIN_BIN << "."
               << " POSCAR may have the wrong format.";
       pflow::logger(_AFLOW_FILE_NAME_, function, message, std::cout, _LOGGER_WARNING_);
-    } else {
-      int vaspv = vaspVersion[0] - '0';
-      if ((vaspv == 4) && !xvasp.str.is_vasp4_poscar_format) {
-        xvasp.str.is_vasp4_poscar_format = true;
-        xvasp.str.is_vasp5_poscar_format = false;
-        xvasp.POSCAR.str(std::string());
-        xvasp.POSCAR.clear();
-        xvasp.POSCAR << xvasp.str;
-      } else if ((vaspv == 5) && !xvasp.str.is_vasp5_poscar_format) {
-        xvasp.str.is_vasp4_poscar_format = false;
-        xvasp.str.is_vasp5_poscar_format = true;
-        xvasp.POSCAR.str(std::string());
-        xvasp.POSCAR.clear();
-        xvasp.POSCAR << xvasp.str;
-      }
+      return;
+    }
+    int vaspv = vaspVersion[0] - '0';
+    if ((vaspv == 4) && !xvasp.str.is_vasp4_poscar_format) {
+      xvasp.str.is_vasp4_poscar_format = true;
+      xvasp.str.is_vasp5_poscar_format = false;
+      xvasp.POSCAR.str(std::string());
+      xvasp.POSCAR.clear();
+      xvasp.POSCAR << xvasp.str;
+    } else if ((vaspv == 5) && !xvasp.str.is_vasp5_poscar_format) {
+      xvasp.str.is_vasp4_poscar_format = false;
+      xvasp.str.is_vasp5_poscar_format = true;
+      xvasp.POSCAR.str(std::string());
+      xvasp.POSCAR.clear();
+      xvasp.POSCAR << xvasp.str;
     }
   }
 
