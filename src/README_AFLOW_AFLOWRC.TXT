@@ -1265,7 +1265,7 @@ DEFAULT_QHA_MODE
   default: "QHA"
 
 DEFAULT_QHA_EOS
-  description: Run EOS calculation (includes several APL runs) to obtain thermodynamic properties of material.
+  description: Runs equation of state (EOS) calculation (includes several APL runs) to obtain thermodynamic properties of material.
   type: bool
   default: 1
 
