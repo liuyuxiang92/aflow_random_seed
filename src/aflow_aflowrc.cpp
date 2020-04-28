@@ -556,7 +556,7 @@
 #define         DEFAULT_AAPL_CUT_RAD                          XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_RAD")
 #define AFLOWRC_DEFAULT_AAPL_CUT_SHELL                        string("6")  //ME20190301  //ME20190408  //ME20191029
 #define         DEFAULT_AAPL_CUT_SHELL                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_SHELL")
-#define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("21x21x21")  // ME20200110 - 21x21x21 more than enough for tetrahedron method
+#define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("21x21x21")  // ME20200110 - 21x21x21 more than enough for tetrahedron method; odd is preferred (Gamma-centered by construction)
 #define         DEFAULT_AAPL_THERMALGRID                      XHOST.adefault.getattachedscheme("DEFAULT_AAPL_THERMALGRID")
 #define AFLOWRC_DEFAULT_AAPL_TCT                              string("50:550:50")
 #define         DEFAULT_AAPL_TCT                              XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCT")
