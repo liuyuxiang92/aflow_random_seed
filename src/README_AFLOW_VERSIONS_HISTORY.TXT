@@ -21,6 +21,7 @@
         -- Changed the determination of the irreducible Brillouin zone in APL. (ME)
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
         -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
+        -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- Added check for required binaries to plotter. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
