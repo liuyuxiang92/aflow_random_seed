@@ -175,7 +175,7 @@ namespace apl {
     if ((include_inversions && !xs.pgroupk_Patterson_calculated) ||
         (!include_inversions && !xs.pgroupk_xtal_calculated)) {
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell()";
-      string message = "Calculation of the point group of the reciprocal cell unsuccessful.";
+      string message = "Calculation of the crystallographic point group of the reciprocal cell unsuccessful.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
 
