@@ -308,7 +308,7 @@ namespace apl {
   // ME20200109
   //calculateLittleGroups/////////////////////////////////////////////////////
   // Calculates little/small groups for each irreducible q-point. The little
-  // group is the group that leaves a q-point invariant.
+  // group is the group that leaves a q-point invariant, i.e. U q = q + G.
   void QMesh::calculateLittleGroups() {
     _littleGroups.resize(_nIQPs, vector<int>(1, 0));  // Identity is always invariant
     uint nsymops = _recCell.pgroup.size();

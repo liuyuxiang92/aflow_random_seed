@@ -574,23 +574,21 @@ namespace KBIN {
             message += "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
             //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
-          } else {
-            string projscheme = "";
-            if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty()) projscheme = USER_DOS_PROJECTIONS_CART_SCHEME;
-            else projscheme = USER_DOS_PROJECTIONS_FRAC_SCHEME;
-            aurostd::string2tokens(projscheme, tokens, "; ");
-            for (uint i = 0; i < tokens.size(); i++) {
-              vector<double> proj;
-              aurostd::string2tokens(tokens[i], proj, ", ");
-              if (proj.size() == 3) {
-                USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
-              } else {
-                message = "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
-                message += string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
-                message += "See README_AFLOW_APL.TXT for the correct format.";
-                //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
-                throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
-              }
+          }
+          string projscheme = "";
+          if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty()) projscheme = USER_DOS_PROJECTIONS_CART_SCHEME;
+          else projscheme = USER_DOS_PROJECTIONS_FRAC_SCHEME;
+          aurostd::string2tokens(projscheme, tokens, "; ");
+          for (uint i = 0; i < tokens.size(); i++) {
+            vector<double> proj;
+            aurostd::string2tokens(tokens[i], proj, ", ");
+            if (proj.size() == 3) {
+              USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
+            } else {
+              message = "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
+              message += string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
+              message += "See README_AFLOW_APL.TXT for the correct format.";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
             }
           }
         } else {
