@@ -1116,7 +1116,7 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       int nbands = vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.content_int;
       nbands *= aurostd::string2utype<int>(xvasp.aopts.getattachedscheme("AFLOW_APL::NCELLS"));
       xvasp.aopts.pop_attached("AFLOWIN_FLAG::NBANDS_EQUAL");
-      xvasp.aopts.push_attached("AFLOWIN_FLAG::NBANDS_EQUAL", vflags.KBIN_VASP_FORCE_OPTION_NBANDS_EQUAL.content_string);
+      xvasp.aopts.push_attached("AFLOWIN_FLAG::NBANDS_EQUAL", aurostd::utype2string<int>(nbands));
     }
     // Set Born charge and linear response parameters
     if (xvasp.aopts.flag("APL_FLAG::AVASP_BORN") || xvasp.aopts.flag("APL_FLAG::AVASP_LR")) {

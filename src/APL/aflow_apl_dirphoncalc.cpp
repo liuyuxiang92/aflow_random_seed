@@ -1171,7 +1171,7 @@ namespace apl {
   void DirectMethodPC::saveState(const string& filename) {
     string function = "apl::LinearResponsePC::saveState()";
     string message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
     out << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -1211,7 +1211,7 @@ namespace apl {
   void DirectMethodPC::readFromStateFile(const string& filename) {
     string function = "apl::LinearResponsePC::readFromState()";
     string message = "Reading state of the phonon calculator from " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, std::cout);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);

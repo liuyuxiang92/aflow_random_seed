@@ -32,12 +32,6 @@ namespace apl {
     xStream::initialize(mf, oss);
   }
 
-  Supercell::Supercell(ofstream& mf, ostream& os) {
-    free();
-    messageFile = &mf;
-    oss = &os;
-  }
-
   //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
   // ME20200102 - Refactored
   Supercell::Supercell(const xstructure& _xstr, ofstream& mf, ostream& oss, string directory) : xStream() {  //CO20181226

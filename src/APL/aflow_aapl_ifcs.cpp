@@ -967,10 +967,11 @@ namespace apl {
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
-    parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME20190219
-    parameters.unsetf(std::ios::hex);  // ME20190125 - Remove hexadecimal formatting
-    parameters  << "</i>" << std::endl;
+    // ME20200428 - We do not compare checksums anymore
+    //parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
+    //parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME20190219
+    //parameters.unsetf(std::ios::hex);  // ME20190125 - Remove hexadecimal formatting
+    //parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
 
     // Distortion magnitude
