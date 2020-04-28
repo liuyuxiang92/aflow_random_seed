@@ -44,7 +44,7 @@ namespace apl {
 
   ThermalPropertiesCalculator::ThermalPropertiesCalculator(ofstream& mf, ostream& oss) : xStream() {
     free();
-    xStream::initialize(oss);
+    xStream::initialize(mf, oss);
   }
 
   ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, ostream& oss, string directory) : xStream() {
