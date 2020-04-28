@@ -552,8 +552,8 @@
 #define         DEFAULT_QHA_EOS_DISTORTION_RANGE              XHOST.adefault.getattachedscheme("DEFAULT_QHA_EOS_DISTORTION_RANGE")
 #define AFLOWRC_DEFAULT_QHA_GP_DISTORTION                     1.0
 #define         DEFAULT_QHA_GP_DISTORTION                     XHOST.adefault.getattachedutype<double>("DEFAULT_QHA_GP_DISTORTION")
-#define AFLOWRC_DEFAULT_QHA_INCLUDE_ELE                       FALSE
-#define         DEFAULT_QHA_INCLUDE_ELE                       XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_INCLUDE_ELE")
+#define AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              FALSE
+#define         DEFAULT_QHA_INCLUDE_ELEC_CONTRIB              XHOST.adefault.getattachedutype<bool>("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB")
 #define AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T                      string("50,100,600")
 #define         DEFAULT_QHA_SCQHA_PDIS_T                      XHOST.adefault.getattachedscheme("DEFAULT_QHA_SCQHA_PDIS_T")
 
@@ -1291,7 +1291,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_EOS", AFLOWRC_DEFAULT_QHA_EOS);
     aflowrc::load_default("DEFAULT_QHA_EOS_DISTORTION_RANGE", AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE);
     aflowrc::load_default("DEFAULT_QHA_GP_DISTORTION", AFLOWRC_DEFAULT_QHA_GP_DISTORTION);
-    aflowrc::load_default("DEFAULT_QHA_INCLUDE_ELE", AFLOWRC_DEFAULT_QHA_INCLUDE_ELE);
+    aflowrc::load_default("DEFAULT_QHA_INCLUDE_ELEC_CONTRIB", AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB);
     aflowrc::load_default("DEFAULT_QHA_SCQHA_PDIS_T", AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T);
 
     // DEFAULT AAPL
@@ -1807,7 +1807,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_EOS=" << AFLOWRC_DEFAULT_QHA_EOS  << endl;
     aflowrc << "DEFAULT_QHA_EOS_DISTORTION_RANGE=\"" << AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
     aflowrc << "DEFAULT_QHA_GP_DISTORTION=" << AFLOWRC_DEFAULT_QHA_GP_DISTORTION  << endl;
-    aflowrc << "DEFAULT_QHA_INCLUDE_ELE=" << AFLOWRC_DEFAULT_QHA_INCLUDE_ELE  << endl;
+    aflowrc << "DEFAULT_QHA_INCLUDE_ELEC_CONTRIB=" << AFLOWRC_DEFAULT_QHA_INCLUDE_ELEC_CONTRIB  << endl;
     aflowrc << "DEFAULT_QHA_SCQHA_PDIS_T=\"" << AFLOWRC_DEFAULT_QHA_SCQHA_PDIS_T << "\"" << endl;
 
     aflowrc << " " << endl;
@@ -2290,7 +2290,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS\")=" << DEFAULT_QHA_EOS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_EOS_DISTORTION_RANGE\")=\"" << DEFAULT_QHA_EOS_DISTORTION_RANGE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_GP_DISTORTION\")=" << DEFAULT_QHA_GP_DISTORTION << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_INCLUDE_ELE\")=" << DEFAULT_QHA_INCLUDE_ELE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_INCLUDE_ELEC_CONTRIB\")=" << DEFAULT_QHA_INCLUDE_ELEC_CONTRIB << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_SCQHA_PDIS_T\")=\"" << DEFAULT_QHA_SCQHA_PDIS_T << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;

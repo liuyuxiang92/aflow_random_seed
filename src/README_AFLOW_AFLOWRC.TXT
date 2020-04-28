@@ -1257,6 +1257,39 @@ DEFAULT_APL_PHEIGENVAL_FILE
   default: "PHEIGENVAL"
 
 ####################################################################################################
+DEFAULTS QHA
+
+DEFAULT_QHA_MODE
+  descriptions: Defines QHA mode to be run. The choices are QHA, QHA3P and SCQHA.
+  type: string
+  default: "QHA"
+
+DEFAULT_QHA_EOS
+  description: Run EOS calculation (includes several APL runs) to obtain thermodynamic properties of material.
+  type: bool
+  default: 1
+
+DEFAULT_QHA_EOS_DISTORTION_RANGE
+  description: Sets the range of volumes and the volume increment for the set of EOS calculations.
+  type: string
+  default: "-12:16:3"
+
+DEFAULT_QHA_GP_DISTORTION
+  description: For calculation of Grueneisen parameter using finite difference method sets the value of volume change (dV).
+  type: double
+  default: 1.0
+
+DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
+  description: Defines if electronic contribution to free energy is included.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_SCQHA_PDIS_T
+  description: For SCQHA method defines a set of temperatures for with temperature-dependent phonon band structure will be calculated.
+  type: string
+  default: "50,100,600"
+
+####################################################################################################
 DEFAULTS AAPL
 
 DEFAULT_AAPL_BTE
