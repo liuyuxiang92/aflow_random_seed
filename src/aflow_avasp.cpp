@@ -1091,8 +1091,8 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str("");
       xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "k-points set by APL" << std::endl;
       xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << std::endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << k_scheme << std::endl;
       xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << aurostd::joinWDelimiter(kpts, " ") << std::endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << scheme << std::endl;
       xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << std::endl;
 
       // Set to explicit
@@ -1100,6 +1100,7 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP", true);
       xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL", false);
       xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT", false);
+      xvasp.aopts.flag("FLAG::KPOINTS_KEYWORD", false);
     }
 
     // Setup run
