@@ -867,8 +867,8 @@ namespace chull {
     if(vpflow.flag("CHULL::SEE_NEGLECT")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SEE_NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
-    if(vpflow.flag("CHULL::N1EG")) { //SK20200327
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::N1EG set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
+    if(vpflow.flag("CHULL::NPLUS1_ENTHALPY_GAIN")) { //SK20200327
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::NPLUS1_ENTHALPY_GAIN set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
     }
     if(vpflow.flag("CHULL::REMOVE_EXTREMA")) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::REMOVE_EXTREMA set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
@@ -3927,7 +3927,7 @@ namespace chull {
 
     bool remove_requested=m_cflags.flag("CHULL::NEGLECT");
     bool see_neglect=m_cflags.flag("CHULL::SEE_NEGLECT");
-    bool n1eg_requested=m_cflags.flag("CHULL::N1EG"); //SK20200327
+    bool n1eg_requested=m_cflags.flag("CHULL::NPLUS1_ENTHALPY_GAIN"); //SK20200327
     bool remove_invalid=true;
     bool remove_duplicate_entries=true;        //we remove duplicate entries from the database, but in general, keep input of user constant
     bool remove_extreme=m_cflags.flag("CHULL::REMOVE_EXTREMA");
@@ -11088,7 +11088,7 @@ namespace chull {
     //[SK20200325 - OBSOLETE]main_JSON_file="aflow_"+input+"_hull_web.json"; //WSCHMITT20190620
     //SK20200331 start
     bool sc_requested=m_cflags.flag("CHULL::NEGLECT");  //only neglect feature via web
-    bool n1eg_requested=m_cflags.flag("CHULL::N1EG");
+    bool n1eg_requested=m_cflags.flag("CHULL::NPLUS1_ENTHALPY_GAIN");
     vector<string> sc_point;
     string delimiter="";
     // naming stability criterion files
