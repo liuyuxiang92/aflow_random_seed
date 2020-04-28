@@ -1,6 +1,7 @@
 3.2.3 - 2020/05/01
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
         -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME & RF)
+        -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- Added check for required binaries to plotter. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
