@@ -5613,7 +5613,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
               for(uint i=0;i<xaus.str.species.size();i++){xaus.str.species_pp_vLDAU.push_back(deque<double>());}
               if(xaus.POTCAR_TYPE_PRINT_flag==false){   //[CO20191020]if it haven't been set previously - see _AVASP_PSEUDOPOTENTIAL_POTENTIAL_TYPE_
                 xaus.POTCAR_TYPE_PRINT_flag=true; //print :PAW_PBE afterwards
-                if(1||pocc==false){  //CO20191110 - always print date for pocc structures //CO20200223 - nvm, LIB2/LIB3 get no-type ALWAYS, we will do global fix at the end
+                if(1||pocc==false){  //CO20191110 - always print date for pocc structures //CO20200223 - nevermind, LIB2/LIB3 get no-type ALWAYS, we will do global fix at the end
                   if((nspeciesHTQC==2) || (nspeciesHTQC==3)){xaus.POTCAR_TYPE_PRINT_flag=false;}  //CO20191020 - exceptions, do not print for binaries/ternaries
                 }
               }
