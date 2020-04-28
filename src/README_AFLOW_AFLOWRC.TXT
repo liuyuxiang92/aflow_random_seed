@@ -1281,7 +1281,7 @@ DEFAULT_QHA_GP_DISTORTION
   default: 1.0
 
 DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
-  description: Defines if electronic contribution to free energy is included.
+  description: Defines if electronic contribution to the free energy is included.
   type: bool
   default: 0
 
