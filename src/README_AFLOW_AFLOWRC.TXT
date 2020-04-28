@@ -1260,8 +1260,9 @@ DEFAULT_APL_PHEIGENVAL_FILE
 DEFAULTS QHA
 
 DEFAULT_QHA_MODE
-  descriptions: Defines QHA mode to run. The choices are QHA, QHA3P and SCQHA.
+  descriptions: Defines QHA mode to run (it is possible to run several modes simultaneously).
   type: string
+  choices: "QHA", "QHA3P", "SCHQA" or their comma-separated combination
   default: "QHA"
 
 DEFAULT_QHA_EOS
