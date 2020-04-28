@@ -6348,7 +6348,7 @@ namespace chull {
       //set sign convention, negative for outside hull
       //scriterion=abs(scriterion);
       message << "Ground-state ";
-      message << (!m_points[i_point].m_entry.compound.empty()?m_points[i_point].m_entry.compound:"")+" ";
+      message << (!m_points[i_point].m_entry.compound.empty()?m_points[i_point].m_entry.compound+" ":"");
       message << "(i_point=" << i_point;
       message << (m_points[i_point].m_entry.auid.empty()?"":",auid="+m_points[i_point].m_entry.auid);
       message << ") shows stability criterion = ";
