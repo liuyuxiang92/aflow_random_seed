@@ -4756,7 +4756,7 @@ namespace aurostd {
   }
   bool EWithinList(const vector<string>& list, const string& input, string& output) { //CO20200223
     output="";
-    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+    for (uint i = 0, nlist = list.size(); i < nlist; i++) {
       if(list[i]==input){output=input;return true;}
       if(list[i]==input+".xz"){output=input+".xz";return true;}
       if(list[i]==input+".gz"){output=input+".gz";return true;}
