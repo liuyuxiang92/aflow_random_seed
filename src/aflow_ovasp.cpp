@@ -4844,7 +4844,8 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   // different k-points, while vasp 4.x.x uses " \n" (space+newline).
   // When a regular string2vectorsting is used, a sequence of "\n\n" is
   // treated as a single '\n'. As a result separating line disappears
-  // in vcontent and all the data is corrupted.
+  // in vcontent and the line indices are inconsistent.
+  // As a result, vweight, vkpoint and venergy vectors are not correctly populated.
   // Setting consecutive = true in string2vectorstring fixes the issue.
   //
   // aurostd::string2vectorstring(content,vcontent);
