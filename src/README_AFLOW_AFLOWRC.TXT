@@ -1275,7 +1275,7 @@ DEFAULT_QHA_EOS_DISTORTION_RANGE
   default: "-12:16:3"
 
 DEFAULT_QHA_GP_DISTORTION
-  description: For calculation of Grueneisen parameter using finite difference method sets the value of volume change (dV).
+  description: Sets the value of volume change (dV) for calculation of Grueneisen parameter using the finite difference method.
   type: double
   default: 1.0
 
