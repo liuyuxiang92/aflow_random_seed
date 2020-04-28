@@ -169,6 +169,8 @@ namespace KBIN {
     // grid for the supercell calculations with the relaxed structure. If they
     // do not agree, then the structure has changed too much and the relaxation
     // did not use an appropriate k-point grid.
+    // the k-points scheme MUST be resolved pre-phonon-relaxation and made consistent
+    // with the desired supercell dimensions, otherwise ghost-forces may appear.
     scell.clear();
     scell.initialize(xvasp.str);
     supercell_opts.flag("SCELL::VERBOSE", false);
