@@ -849,7 +849,7 @@ namespace apl {
     if (!mapped) {
       // When calculating the primitive cell, the positions of the atoms
       // may alternate between x and 1 - x. Test if this is the case here.
-      if (LDEBUG) std::cout << function << " Not mapped succesfully. Try shifting atoms." << std::endl;
+      if (LDEBUG) std::cerr << function << " Not mapped succesfully. Try shifting atoms." << std::endl;
       xvector<double> ones(3); ones.set(1.0);
       for (uint at = 0; at < pcell.atoms.size(); at++) {
         pcell.atoms[at].fpos = ones - pcell.atoms[at].fpos;
