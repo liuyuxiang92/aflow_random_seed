@@ -2629,7 +2629,7 @@ namespace cce {
             //checking for which oxidation states corrections are available and throw out errors accordingly
             uint ox_nums_count=0;
             vector<uint> ox_nums_avail_vec;
-            for(uint k=0,ksize=12;k<ksize;k++){ // larger than ox. num. +12 should not occur
+            for(uint k=0;k<12;k++){ // larger than ox. num. +12 should not occur
               if ( get_corrections_line(structure.atoms[i].cleanname + "_+" + aurostd::utype2string<uint>(k) + "_" + considered_anion_species) != "") {
                 ox_nums_count+=1;
                 ox_nums_avail_vec.push_back(k);
