@@ -3552,11 +3552,11 @@ namespace aflowlib {
 } // namespace aflowlib
 
 namespace aflowlib {
-  string _aflowlib_entry::getPathAURL(ostream& oss, bool load_from_common){
+  string _aflowlib_entry::getPathAURL(ostream& oss, bool load_from_common){ //CO20200404
     ofstream FileMESSAGE;
     return getPathAURL(FileMESSAGE, oss, load_from_common);
   }
-  string _aflowlib_entry::getPathAURL(ofstream& FileMESSAGE,ostream& oss, bool load_from_common){
+  string _aflowlib_entry::getPathAURL(ofstream& FileMESSAGE,ostream& oss, bool load_from_common){ //CO20200404
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = "_aflowlib_entry::getPathAURL():";
     stringstream message;
