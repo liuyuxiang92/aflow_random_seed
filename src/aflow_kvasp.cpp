@@ -410,10 +410,10 @@ namespace KBIN {
           vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
         }
       } else {
-        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1")) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=TRUE;
-        else vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE;
-        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=TRUE;
-        else vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
+        vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE;
+        vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
+        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1")){vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=TRUE;}
+        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")){vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=TRUE;}
       }
     }
     if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE; // nothing to remove
