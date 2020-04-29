@@ -1803,7 +1803,7 @@ namespace cce {
         oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         oss << "Co3O4 with ratio of Co/O= " << Co_O_ratio << endl;
       }
-      uint num_formula_units_in_cell;
+      uint num_formula_units_in_cell = 0;
       num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Co3O4
       if(cce_flags.flag("COMMAND_LINE")){
         oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
