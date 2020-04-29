@@ -382,7 +382,7 @@ namespace cce {
     // if species of atoms are not known like in VASP4 format, throw error
     for(uint k=0,ksize=structure.atoms.size();k<ksize;k++){
       if (structure.atoms[k].cleanname == ""){
-        message << "BAD NEWS: It seems you are providing a POSCAR without complete species information as input. This implementation requires a POSCAR in VASP5 format with the species information included. Please adjust the structure file and rerun.";
+        message << "BAD NEWS: It seems you are providing a POSCAR without complete species information as input. This implementation requires a structure in VASP POSCAR format with the species information included. Please adjust the structure file and rerun.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
     }
@@ -3027,7 +3027,7 @@ namespace cce {
     oss << endl;
     oss << "(ii) AVAILABLE OPTIONS:" << endl;
     oss << "--cce/--cce=POSCAR --usage  Prints these user instructions." << endl;
-    oss << "--cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP5 POSCAR format." << endl; 
+    oss << "--cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP POSCAR format." << endl;
     oss << "--dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies," << endl; 
     oss << "                            they are assumed to be: (i) negative for compounds lower in energy" << endl; 
     oss << "                            than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
@@ -3043,7 +3043,7 @@ namespace cce {
     oss << "                            (ii) they are in the same sequence as the corresponding atoms in the" << endl;
     oss << "                            provided POSCAR file." << endl;
     oss << "--poscar2cce < POSCAR       Determines the CCE corrections for the structure in file POSCAR (must" << endl;
-    oss << "                            be in VASP5 POSCAR format)." << endl;
+    oss << "                            be in VASP POSCAR format)." << endl;
     oss << endl;
     oss << "(iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:" << endl;
     oss << "Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)" << endl;

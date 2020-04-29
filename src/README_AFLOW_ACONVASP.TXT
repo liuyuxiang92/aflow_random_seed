@@ -737,7 +737,7 @@ LATTICES = (the ones with "")
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out]
 
-        Determines the CCE corrections for the structure in file POSCAR (must be in VASP5 POSCAR format).
+        Determines the CCE corrections for the structure in file POSCAR (must be in VASP POSCAR format).
         Precalculated DFT formation energies can be provided as a comma separated list using the option
         --dft_formation_energies=
         Functionals for which corrections should be returned can be provided as a comma separated list 
@@ -2634,7 +2634,7 @@ LATTICES = (the ones with "")
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
             [ --print=json|out]
 
-        Determines the CCE corrections for the structure in file POSCAR (must be in VASP5 POSCAR format).
+        Determines the CCE corrections for the structure in file POSCAR (must be in VASP POSCAR format).
         Precalculated DFT formation energies can be provided as a comma separated list using the option
         --dft_formation_energies=
         Functionals for which corrections should be returned can be provided as a comma separated list 
