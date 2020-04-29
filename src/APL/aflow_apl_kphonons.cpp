@@ -403,6 +403,16 @@ namespace KBIN {
       }
     }
 
+    // Make sure that the formatting for the k-point shift is correct
+    if (xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_SHIFT.isentry) {
+      vector<int> kpts;
+      aurostd::string2tokens(xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_SHIFT.content_string, kpts, " ,;");
+      if (kpts.size() != 3) {
+        string message = "Incorrect format for KPOINTS_SHIFT";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      }
+    }
+
     // APL ----------------------------------------------------------------------
 
     //ME20181026 START

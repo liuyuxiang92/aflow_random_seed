@@ -224,6 +224,12 @@ general AFLOW k-point parameters:
       "[AFLOW_APL]KSCHEME" overrides this setting. See README_AFLOW.TXT for more information on
       KSCHEME.
 
+    * The k-point shift vector can be set using the following format:
+
+        [AFLOW_APL]KPOINTS_SHIFT=X,Y,Z
+
+      Where X, Y, and Z are the comma-separated components of the shift vector.
+
     * The k-point parity can be set using:
 
         [AFLOW_APL]KPOINTS=EVEN | ODD

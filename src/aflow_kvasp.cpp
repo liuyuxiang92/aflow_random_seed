@@ -873,6 +873,7 @@ namespace KBIN {
     // ME202020427 - APL k-point handling needs to be moved to modules eventually
     // This is a non-standard feature and should not be defaulted
     vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.options2entry(AflowIn,"[AFLOW_APL]KPOINTS_GRID=|[AFLOW_QHA]KPOINTS_GRID=|[AFLOW_AAPL]KPOINTS_GRID=", FALSE,"");
+    vflags.KBIN_VASP_KPOINTS_PHONONS_SHIFT.options2entry(AflowIn,"[AFLOW_APL]KPOINTS_SHIFT=|[AFLOW_QHA]KPOINTS_SHIFT=|[AFLOW_AAPL]KPOINTS_SHIFT=", FALSE,"");
     //[ME20181216]    vflags.KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.clear();
     //[ME20181216]    if(aurostd::substring2bool(AflowIn,"[AFLOW_APL]KPOINTS=EVEN",TRUE) || 
     //[ME20181216]        aurostd::substring2bool(AflowIn,"[AFLOW_QHA]KPOINTS=EVEN",TRUE) ||
