@@ -1891,7 +1891,7 @@ namespace cce {
       cerr << soliloquy << "number of O ions= " << amount_O << endl;
       cerr << soliloquy << "number of alkali (" << alkali_metal << ") ions= " << amount_alkali << endl;
     }
-    double O_alkali_ratio;
+    double O_alkali_ratio = 0.0;
     if ( amount_alkali != 0 ){
       O_alkali_ratio=amount_O/amount_alkali;
     } else {
