@@ -1870,7 +1870,7 @@ namespace cce {
       cerr << soliloquy << "This is a binary alkali metal oxide, checking whether it is an alkali metal sesquioxide..." << endl;
     }
     uint num_alkali_before_O = 0; // num cations before O not O before cations since setting oxidation states of anions below, not for cations as in other cases
-    string alkali_metal;
+    string alkali_metal = "";
     if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1])) ) {
       num_alkali_before_O=0;
       alkali_metal=KBIN::VASP_PseudoPotential_CleanName(structure.species[1]);
