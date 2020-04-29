@@ -5589,7 +5589,10 @@ namespace KBIN {
     string soliloquy="KBIN::GetMostRelaxedStructure():";  //CO20200404
     string POSCARfile;
 
-    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - " << soliloquy << " XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) {
+      //[CO20200404 - OBSOLETE]cerr << "ERROR - " << soliloquy << " XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); 
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "XHOST.vext.size()!=XHOST.vcat.size(), aborting", _RUNTIME_ERROR_);
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //READ POSCAR.orig
@@ -5646,8 +5649,9 @@ namespace KBIN {
       }
     }
     if(!found_POSCAR)  {
-      cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No POSCAR[.bands|.static|.relax2|.relax1][.EXT] found in the directory, aborting." << endl;
-      exit(0);
+      //[CO20200404 - OBSOLETE]cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No POSCAR[.bands|.static|.relax2|.relax1][.EXT] found in the directory, aborting." << endl;
+      //[CO20200404 - OBSOLETE]exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "No POSCAR[.bands|.static|.relax2|.relax1][.EXT] found in the directory, aborting", _INPUT_MISSING_);
     }
 
     xstructure xstr_name(POSCARfile, IOVASP_POSCAR); //import xstructure from filename
@@ -5660,12 +5664,17 @@ namespace KBIN {
 // KBIN::ExtractAtomicSpecies
 // ***************************************************************************//
 namespace KBIN {
-  vector<string> ExtractAtomicSpecies(string directory) {
+  vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss) {ofstream FileMESSAGE;return ExtractAtomicSpecies(directory,FileMESSAGE,oss);} //CO20200404 - added ofstream
+  vector<string> ExtractAtomicSpecies(const string& directory,ofstream& FileMESSAGE,ostream& oss) { //CO20200404 - added ofstream
     string soliloquy="KBIN::ExtractAtomicSpecies():"; //CO20200404
+    stringstream message;
     string OUTCARfile; //, POSCARfile;
     string file_outcar_tmp=aurostd::TmpFileCreate("OUTCAR.tmp");
 
-    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - " << soliloquy << " XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) {
+      //[CO20200404 - OBSOLETE]cerr << "ERROR - " << soliloquy << " XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "XHOST.vext.size()!=XHOST.vcat.size(), aborting", _RUNTIME_ERROR_);
+    }
 
     xstructure xstr_name=GetMostRelaxedStructure(directory); //CO20180626
 
@@ -5673,8 +5682,9 @@ namespace KBIN {
     if(aurostd::FileExist(directory+"/POSCAR.orig")) {
       xstructure xstr_poscar_orig(directory+"/POSCAR.orig", IOVASP_POSCAR);
       if(xstr_poscar_orig.atoms.size()!=xstr_name.atoms.size()) {
-        cerr << "!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!" << endl;
-        cerr << "I tell you--'POSCAR.orig' has different atoms number from 'POSCAR.bands', though I can still produce PEDOS plots for you!" << endl;
+        //[CO20200404 - OBSOLETE]cerr << "!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!" << endl;
+        //[CO20200404 - OBSOLETE]cerr << "I tell you--'POSCAR.orig' has different atoms number from 'POSCAR.bands', though I can still produce PEDOS plots for you!" << endl;
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "POSCAR.orig has different atoms number from POSCAR.bands", directory, FileMESSAGE, oss, _LOGGER_ERROR_);
       }
     }
 
@@ -5708,8 +5718,9 @@ namespace KBIN {
           }
         }
         if(!found_OUTCAR) {
-          cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No OUTCAR[.static][.EXT] found in the directory, aborting." << endl;
-          exit(0);
+          //[CO20200404 - OBSOLETE]cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No OUTCAR[.static][.EXT] found in the directory, aborting." << endl;
+          //[CO20200404 - OBSOLETE]exit(0);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "No OUTCAR[.static][.EXT] found in the directory, aborting", _INPUT_MISSING_);
         }
 
         vector<string> vposcars, vpp;
@@ -5751,11 +5762,15 @@ namespace KBIN {
 // ***************************************************************************//
 namespace KBIN {
   double ExtractEfermiOUTCAR(string directory) {
+    string soliloquy="KBIN::ExtractEfermiOUTCAR():";  //CO20200404
     double Efermi=0;
     string OUTCARfile, stmp, line;
     stringstream  strline;
 
-    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractEfermiOUTCAR: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) {
+      //[CO20200404 - OBSOLETE]cerr << "ERROR - KBIN::ExtractEfermiOUTCAR: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "XHOST.vext.size()!=XHOST.vcat.size(), aborting", _RUNTIME_ERROR_);
+    }
 
     bool found_OUTCAR=FALSE;
 
@@ -5778,8 +5793,9 @@ namespace KBIN {
       }
     }
     if(!found_OUTCAR) {
-      cerr <<"ERROR - KBIN::ExtractEfermiOUTCAR: No OUTCAR[.static][.EXT] found in the directory, aborting." << endl;
-      exit(0);
+      //[CO20200404 - OBSOLETE]cerr <<"ERROR - KBIN::ExtractEfermiOUTCAR: No OUTCAR[.static][.EXT] found in the directory, aborting." << endl;
+      //[CO20200404 - OBSOLETE]exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "No OUTCAR[.static][.EXT] found in the directory, aborting", _INPUT_MISSING_);
     }
 
     ////GET Number of IONS and Fermi

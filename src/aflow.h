@@ -2894,7 +2894,8 @@ namespace KBIN {
   string ExtractSystemNameFromVASP(string directory);  //ME20200217
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
-  vector<string> ExtractAtomicSpecies(string directory);
+  vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);
+  vector<string> ExtractAtomicSpecies(const string& directory,ofstream& FileMESSAGE,ostream& oss=cout);
 
 }
 
