@@ -1220,7 +1220,7 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::load_ox_states_templates_each_species():";
     _atom atom;
-    uint z;
+    uint z = 0;
     for(uint i=0,isize=structure.species.size();i<isize;i++){ 
       z = GetAtomNumber(KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]));
       xelement element(z);
