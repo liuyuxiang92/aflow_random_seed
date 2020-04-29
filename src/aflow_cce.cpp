@@ -1696,7 +1696,7 @@ namespace cce {
       cerr << soliloquy << "number of Mn ions= " << amount_Mn << endl;
       cerr << soliloquy << "number of O ions= " << amount_O << endl;
     }
-    double Mn_O_ratio;
+    double Mn_O_ratio = 0.0;
     if ( amount_O != 0 ){
       Mn_O_ratio=amount_Mn/amount_O;
     } else {
