@@ -745,7 +745,7 @@ namespace cce {
       cerr << soliloquy << "ANION SPECIES FROM ALLEN ELECTRONEGATIVITIES:" << endl;
     }
     _atom atom;
-    uint z;
+    uint z = 0;
 
     double anion_electronegativity = 0;
     for(uint k=0,ksize=structure.species.size();k<ksize;k++){
