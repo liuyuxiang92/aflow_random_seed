@@ -1511,7 +1511,7 @@ namespace cce {
     }
     uint num_formula_units_in_cell = 0;
     // check for Magneli composition Ti_(n)O_(2n-1)
-    double n;
+    double n = 0.0;
     bool magneli = false;
     for(n=3;n<101;n++){
       //oss << "n/(2*n-1)= " << n/(2*n-1) << endl;
