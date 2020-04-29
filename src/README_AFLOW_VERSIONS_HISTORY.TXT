@@ -53,6 +53,7 @@
         -- normalize environment distances when comparing environments in XtalMatch (DX)
         -- widened tolerances to check more lattices in XtalMatch for volume scaling comparisons only (DX)
         -- fixed typo in "a" Wyckoff position for space group #55 (DX)
+        -- variable name changes in structure comparison (number_of_atoms -> natoms, number_of_types -> ntypes, structure_from -> structure_source) (DX+CO)
         -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- added Patterson symmetry analysis; denoted "pgroupk_Patterson" (applies to reciprocal space only) (DX)
         -- fixed compilation bugs with old GCC/G++ version (V4.3.4 specifically; nullptr vs NULL, assigning struct attributes, and no back() method for strings) (DX)

@@ -246,7 +246,8 @@ namespace compare{
       structure.structure_representative.SpeciesPutAlphabetic();
     }
     structure.structure_representative_generated = true; 
-    structure.structure_representative_from = "input"; 
+    structure.structure_representative_source = "input";
+    structure.structure_representative_relaxation_step = 0; //DX20200429 input is assumed to be unrelaxed
 
     // ---------------------------------------------------------------------------
     // get the unique permutations for the structure
@@ -353,23 +354,23 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // distinguish structures coming from directory or file
-    string structures_from = ""; // "structure_list", "directory" or "file"
+    string structures_source = ""; // "structure_list", "directory" or "file"
 
     // from list appended to command
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST").empty()){
-      structures_from = "structure_list";
+      structures_source = "structure_list";
     }
     // from directory
     //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY") || vpflow.flag("COMPARE_STRUCTURE_DIRECTORY"))
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty())
     { //CO20200106 - patching for auto-indenting
-      structures_from = "directory";
+      structures_source = "directory";
     }
     // from file
     //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_FILE") || vpflow.flag("COMPARE_STRUCTURE_FILE"))
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty())
     { //CO20200106 - patching for auto-indenting
-      structures_from = "file";
+      structures_source = "file";
     }
 
     // ---------------------------------------------------------------------------
@@ -378,13 +379,13 @@ namespace compare {
     string directory=".";
     string filename="";
     //DX20190424 START
-    if(structures_from=="structure_list") {
+    if(structures_source=="structure_list") {
       aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),file_list,",");
       message << "List of files to compare: " << aurostd::joinWDelimiter(file_list,",");
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     //DX20190424 END
-    else if(structures_from=="directory") {
+    else if(structures_source=="directory") {
       directory=vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY");
       if(!aurostd::FileExist(directory)) {
         message << "Unable to locate directory: " << directory << ". Exiting." << endl;
@@ -396,7 +397,7 @@ namespace compare {
     }
     // ---------------------------------------------------------------------------
     // FLAG: file of structures to compare
-    else if(structures_from=="file") {
+    else if(structures_source=="file") {
       filename=vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE");
       if(!aurostd::FileExist(filename)) {
         message << "Unable to locate file: " << filename << ". Exiting." << endl;
@@ -580,13 +581,13 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // load structures 
     vector<StructurePrototype> final_prototypes;
-    if(structures_from=="structure_list") {
+    if(structures_source=="structure_list") {
       final_prototypes = compare::compareStructuresFromStructureList(file_list, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
-    else if(structures_from=="directory") {
+    else if(structures_source=="directory") {
       final_prototypes = compare::compareStructuresFromDirectory(directory, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
-    if(structures_from=="file") {
+    if(structures_source=="file") {
       final_prototypes = compare::compareStructuresFromFile(filename, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
 
@@ -991,7 +992,8 @@ namespace compare {
     input_structure.structure_representative_compound = compare::getCompoundName(xstr);
     input_structure.structure_representative_generated = true;
     stringstream ss_input; ss_input << xstr;
-    input_structure.structure_representative_from = ss_input.str(); 
+    input_structure.structure_representative_source = ss_input.str();
+    input_structure.structure_representative_relaxation_step = 0; //DX20200429 input is assumed to be unrelaxed
     all_structures.push_back(input_structure);
 
     // ---------------------------------------------------------------------------
@@ -1121,7 +1123,7 @@ namespace compare {
       for(uint i=0;i<final_prototypes.size();i++){
         // check if xstructure is generated; if not, make it
         if(!final_prototypes[i].structure_representative_generated){
-          if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_from,final_prototypes[i].structure_representative,oss)){
+          if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_source,final_prototypes[i].structure_representative_relaxation_step,final_prototypes[i].structure_representative,oss)){ //DX20200429
             message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
           }
@@ -1579,8 +1581,8 @@ namespace compare {
     // store input structure 
     StructurePrototype input_structure;
     input_structure.structure_representative = xstr;
-    input_structure.number_of_atoms = xstr.atoms.size(); //DX20200421
-    input_structure.number_of_types = xstr.num_each_type.size(); //DX20200421
+    input_structure.natoms = xstr.atoms.size(); //DX20200421
+    input_structure.ntypes = xstr.num_each_type.size(); //DX20200421
     input_structure.structure_representative.ReScale(1.0); //DX20191105
     input_structure.structure_representative_name = "input geometry";
     input_structure.stoichiometry = compare::getStoichiometry(xstr,same_species);
@@ -1589,7 +1591,8 @@ namespace compare {
     //DX20191105 [MOVED LATER - SAME AS SYMMETRY] input_structure.LFA_environments= compare::computeLFAEnvironment(input_structure.structure_representative); //DX20190711
     input_structure.structure_representative_generated = true; 
     stringstream ss_input; ss_input << xstr;
-    input_structure.structure_representative_from = ss_input.str(); 
+    input_structure.structure_representative_source = ss_input.str();
+    input_structure.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
     input_structure.property_names = property_list;
     input_structure.property_units = property_units;
     all_structures.push_back(input_structure);
@@ -1665,19 +1668,20 @@ namespace compare {
           deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
           entry.vstr[structure_index].SetSpecies(deque_species);
           str_proto_tmp.structure_representative = entry.vstr[structure_index];
-          str_proto_tmp.number_of_atoms = entry.vstr[structure_index].atoms.size(); //DX20200421
-          str_proto_tmp.number_of_types = entry.vstr[structure_index].num_each_type.size(); //DX20200421
+          str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20200421
+          str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20200421
           str_proto_tmp.structure_representative.ReScale(1.0); //DX20191105
           str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX20190321 - changed to false, i.e., do not load from common
           str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directoryr
           str_proto_tmp.structure_representative_generated=true;
-          str_proto_tmp.structure_representative_from="aurl";
+          str_proto_tmp.structure_representative_source="aurl";
+          str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
           str_proto_tmp.stoichiometry=tmp_reduced_stoich;
           str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]); //DX20190430 - added
           //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
           str_proto_tmp.elements=species;
-          str_proto_tmp.number_of_atoms = entry.vstr[structure_index].atoms.size(); //DX20191031
-          str_proto_tmp.number_of_types = entry.vstr[structure_index].num_each_type.size(); //DX20191031
+          str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
+          str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20191031
           // store any properties 
           for(uint l=0;l<properties_response[i].size();l++){
             bool property_requested = false;
@@ -2273,7 +2277,8 @@ namespace compare {
       str_proto_tmp.stoichiometry=tmp_reduced_stoich;
       str_proto_tmp.elements=species;
       str_proto_tmp.structure_representative_name=aurls[i];
-      str_proto_tmp.structure_representative_from="aurl,"+aurostd::utype2string<uint>(relaxation_step); //DX20200225 - hack, perhaps make more robust
+      str_proto_tmp.structure_representative_source="aurl";
+      str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
       all_structures.push_back(str_proto_tmp);
     }
     message << "Finished initializing StructurePrototype object, now spawn threads.";     
@@ -2414,11 +2419,12 @@ namespace compare {
         str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX20190321 - changed to false, i.e., do not load from common
         str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directory
         str_proto_tmp.structure_representative_generated=true;
-        str_proto_tmp.structure_representative_from="aurl";
+        str_proto_tmp.structure_representative_source="aurl";
+        str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
         str_proto_tmp.stoichiometry=tmp_reduced_stoich;
         str_proto_tmp.elements=species;
-        str_proto_tmp.number_of_atoms = entry.vstr[structure_index].atoms.size(); //DX20191031
-        str_proto_tmp.number_of_types = entry.vstr[structure_index].num_each_type.size(); //DX20191031
+        str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
+        str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20191031
         str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]);
         //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX20190711
         str_proto_tmp.property_names = property_list; //DX20190326
@@ -2734,7 +2740,7 @@ namespace compare {
             arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions)){
           // check if xstructure is generated; if not, make it
           if(!final_prototypes[i].structure_representative_generated){
-            if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_from,final_prototypes[i].structure_representative,oss)){
+            if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_source,final_prototypes[i].structure_representative_relaxation_step,final_prototypes[i].structure_representative,oss)){ //DX20200429
               message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
               throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
             }

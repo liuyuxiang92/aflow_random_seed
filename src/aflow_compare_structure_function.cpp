@@ -42,12 +42,13 @@ void StructurePrototype::free(){
   structure_representative_compound="";
   structure_representative.clear(); //DX20191220 - uppercase to lowercase clear
   structure_representative_generated=false;
-  structure_representative_from="";
+  structure_representative_source="";
+  structure_representative_relaxation_step=0; //DX20200429
   number_compounds_matching_representative=0;
-  number_of_types=0;
+  ntypes=0;
   elements.clear();
   stoichiometry.clear();
-  number_of_atoms=0;
+  natoms=0;
   atom_decorations_equivalent.clear();
   Pearson="";
   space_group=0;
@@ -64,14 +65,16 @@ void StructurePrototype::free(){
   structures_duplicate_compounds.clear();
   structures_duplicate.clear();
   structures_duplicate_generated.clear();
-  structures_duplicate_from.clear();
+  structures_duplicate_source.clear();
+  structures_duplicate_relaxation_step.clear(); //DX20200429
   structures_duplicate_grouped_Wyckoff_positions.clear(); //DX20190813
   number_compounds_matching_duplicate.clear();
   duplicate_comparison_logs.clear(); //DX20190506
   structures_family_names.clear();
   structures_family.clear();
   structures_family_generated.clear();
-  structures_family_from.clear();
+  structures_family_source.clear();
+  structures_family_relaxation_step.clear(); //DX20200429
   structures_family_grouped_Wyckoff_positions.clear(); //DX20190813
   number_compounds_matching_family.clear();
   family_comparison_logs.clear(); //DX20190506
@@ -101,12 +104,13 @@ void StructurePrototype::copy(const StructurePrototype& b) {
   structure_representative_compound=b.structure_representative_compound; 
   structure_representative=b.structure_representative; 
   structure_representative_generated=b.structure_representative_generated; 
-  structure_representative_from=b.structure_representative_from; 
+  structure_representative_source=b.structure_representative_source;
+  structure_representative_relaxation_step=b.structure_representative_relaxation_step; //DX20200429
   number_compounds_matching_representative=b.number_compounds_matching_representative;
-  number_of_types=b.number_of_types;
+  ntypes=b.ntypes;
   elements=b.elements;
   stoichiometry=b.stoichiometry;
-  number_of_atoms=b.number_of_atoms;
+  natoms=b.natoms;
   atom_decorations_equivalent=b.atom_decorations_equivalent;
   Pearson=b.Pearson;
   space_group=b.space_group;
@@ -123,14 +127,16 @@ void StructurePrototype::copy(const StructurePrototype& b) {
   structures_duplicate_compounds=b.structures_duplicate_compounds;
   structures_duplicate=b.structures_duplicate;
   structures_duplicate_generated=b.structures_duplicate_generated;
-  structures_duplicate_from=b.structures_duplicate_from;
+  structures_duplicate_source=b.structures_duplicate_source;
+  structures_duplicate_relaxation_step=b.structures_duplicate_relaxation_step; //DX20200429
   structures_duplicate_grouped_Wyckoff_positions=b.structures_duplicate_grouped_Wyckoff_positions; //DX20190813
   number_compounds_matching_duplicate=b.number_compounds_matching_duplicate;
   duplicate_comparison_logs=b.duplicate_comparison_logs; //DX20190506
   structures_family_names=b.structures_family_names;
   structures_family=b.structures_family;
   structures_family_generated=b.structures_family_generated;
-  structures_family_from=b.structures_family_from;
+  structures_family_source=b.structures_family_source;
+  structures_family_relaxation_step=b.structures_family_relaxation_step; //DX20200429
   structures_family_grouped_Wyckoff_positions=b.structures_family_grouped_Wyckoff_positions; //DX20190813
   number_compounds_matching_family=b.number_compounds_matching_family;
   family_comparison_logs=b.family_comparison_logs; //DX20190506
@@ -180,8 +186,8 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     sscontent_json << "\"number_compounds_matching_representative\":" << StructurePrototype.number_compounds_matching_representative << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // number_of_types 
-    sscontent_json << "\"number_of_types\":" << StructurePrototype.number_of_types << eendl;
+    // ntypes
+    sscontent_json << "\"ntypes\":" << StructurePrototype.ntypes << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     // elements 
@@ -192,8 +198,8 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     sscontent_json << "\"stoichiometry\":[" << aurostd::joinWDelimiter(StructurePrototype.stoichiometry,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-    // number_of_atoms 
-    sscontent_json << "\"number_of_atoms\":" << StructurePrototype.number_of_atoms << eendl;
+    // natoms
+    sscontent_json << "\"natoms\":" << StructurePrototype.natoms << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     // atom_decorations_equivalent
@@ -523,7 +529,8 @@ bool StructurePrototype::addStructurePrototypeAsDuplicate(StructurePrototype& b)
   else {
     structures_duplicate_compounds.push_back(""); //DX20190111 - added compound, e.g., Ag1Br2
   }
-  structures_duplicate_from.push_back(b.structure_representative_from);
+  structures_duplicate_source.push_back(b.structure_representative_source);
+  structures_duplicate_relaxation_step.push_back(b.structure_representative_relaxation_step); //DX20200429
   // add Wyckoff positions
   structures_duplicate_grouped_Wyckoff_positions.push_back(b.grouped_Wyckoff_positions); //DX20190814 - added Wyckoff information for duplicates
   number_compounds_matching_duplicate.push_back(b.number_compounds_matching_representative); //DX20190228 - added duplicate compound count
@@ -560,7 +567,8 @@ void StructurePrototype::putDuplicateAsFamily(uint index, bool keep_generated){
   }
 
   // generated structure info
-  structures_family_from.push_back(structures_duplicate_from[index]);
+  structures_family_source.push_back(structures_duplicate_source[index]);
+  structures_family_relaxation_step.push_back(structures_duplicate_relaxation_step[index]); //DX20200429
   if(keep_generated && structures_duplicate_generated[index]){
     structures_family.push_back(structures_duplicate[index]);
     structures_family_generated.push_back(structures_duplicate_generated[index]);
@@ -588,7 +596,7 @@ bool StructurePrototype::copyPrototypeInformation(StructurePrototype& b){
 
   //elements=comparison_schemes[i].elements;
   stoichiometry=b.stoichiometry;
-  number_of_types=b.stoichiometry.size();
+  ntypes=b.stoichiometry.size();
   Pearson=b.Pearson;
   space_group=b.space_group;
   grouped_Wyckoff_positions=b.grouped_Wyckoff_positions;
@@ -610,15 +618,16 @@ bool StructurePrototype::putDuplicateAsRepresentative(StructurePrototype& b, uin
 
   // load structure info
   structure_representative_name=b.structures_duplicate_names[index];
-  // number_of_types=b.structures_duplicate[index].num_each_type.size();
+  // ntypes=b.structures_duplicate[index].num_each_type.size();
   structure_representative_compound=b.structures_duplicate_compounds[index]; //DX20190111 - added compound, e.g., Ag1Br2
   elements = pflow::getElements(structure_representative_compound); //DX20191003 - add elements of this compound only!
   structure_representative_generated=b.structures_duplicate_generated[index];
-  structure_representative_from=b.structures_duplicate_from[index];
+  structure_representative_source=b.structures_duplicate_source[index];
+  structure_representative_relaxation_step=b.structures_duplicate_relaxation_step[index]; //DX20200429
   grouped_Wyckoff_positions=b.structures_duplicate_grouped_Wyckoff_positions[index]; //DX20190814
   number_compounds_matching_representative=b.number_compounds_matching_duplicate[index]; //DX20190228 - added duplicate compound count
   if(b.structures_duplicate_generated[index]){
-    number_of_atoms=b.structures_duplicate[index].atoms.size();
+    natoms=b.structures_duplicate[index].atoms.size();
     structure_representative=b.structures_duplicate[index];
   }
 
@@ -642,7 +651,8 @@ bool StructurePrototype::putDuplicateAsRepresentative(StructurePrototype& b, uin
 //DX [OBSOLETE]  structures_duplicate_names.push_back(b.structure_representative_name);
 //DX [OBSOLETE]  structures_duplicate_compounds.push_back(b.structure_representative_compound); //DX20190111 - added compound, e.g., Ag1Br2
 //DX [OBSOLETE]  structures_duplicate_generated.push_back(b.structure_representative_generated);
-//DX [OBSOLETE]  structures_duplicate_from.push_back(b.structure_representative_from);
+//DX [OBSOLETE]  structures_duplicate_source.push_back(b.structure_representative_source);
+//DX [OBSOLETE]  structures_duplicate_relaxation_step.push_back(b.structure_representative_relaxation_step); //DX20200429
 //DX [OBSOLETE]  number_compounds_matching_duplicate.push_back(b.number_compounds_matching_representative); //DX20190228 - added duplicate compound count
 //DX [OBSOLETE]  if(b.structure_representative_generated){
 //DX [OBSOLETE]    structures_duplicate.push_back(b.structure_representative);
@@ -666,7 +676,8 @@ bool StructurePrototype::copyDuplicate(StructurePrototype& b, uint& index, bool 
   structures_duplicate_names.push_back(b.structures_duplicate_names[index]);
   structures_duplicate_compounds.push_back(b.structures_duplicate_compounds[index]);
   structures_duplicate_generated.push_back(b.structures_duplicate_generated[index]);
-  structures_duplicate_from.push_back(b.structures_duplicate_from[index]);
+  structures_duplicate_source.push_back(b.structures_duplicate_source[index]);
+  structures_duplicate_relaxation_step.push_back(b.structures_duplicate_relaxation_step[index]); //DX20200429
   structures_duplicate_grouped_Wyckoff_positions.push_back(b.structures_duplicate_grouped_Wyckoff_positions[index]);
   number_compounds_matching_duplicate.push_back(b.number_compounds_matching_duplicate[index]); //DX20190228 - added duplicate compound count
   if(b.structures_duplicate_generated[index]){
@@ -707,7 +718,8 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
     structures_duplicate.erase(structures_duplicate.begin()+index);
   }
   structures_duplicate_generated.erase(structures_duplicate_generated.begin()+index);
-  structures_duplicate_from.erase(structures_duplicate_from.begin()+index);
+  structures_duplicate_source.erase(structures_duplicate_source.begin()+index);
+  structures_duplicate_relaxation_step.erase(structures_duplicate_relaxation_step.begin()+index); //DX20200429
   number_compounds_matching_duplicate.erase(number_compounds_matching_duplicate.begin()+index);
   structures_duplicate_grouped_Wyckoff_positions.erase(structures_duplicate_grouped_Wyckoff_positions.begin()+index); //DX20190814
 
@@ -740,7 +752,8 @@ bool StructurePrototype::removeDuplicates(bool remove_duplicate_count){
   structures_duplicate_compounds.clear(); //DX20190111 - added compound, e.g., Ag1Br2
   structures_duplicate.clear();
   structures_duplicate_generated.clear();
-  structures_duplicate_from.clear();
+  structures_duplicate_source.clear();
+  structures_duplicate_relaxation_step.clear(); //DX20200429
 
   // may want to keep this information
   if(remove_duplicate_count){number_compounds_matching_duplicate.clear();}
@@ -1003,8 +1016,8 @@ namespace compare {
         structure_tmp.structure_representative_name = directory+"/"+vfiles[i];
         structure_tmp.stoichiometry = compare::getStoichiometry(xstr1,same_species);
         structure_tmp.elements = compare::getElements(xstr1);
-        structure_tmp.number_of_atoms = xstr1.atoms.size(); //DX20190425
-        structure_tmp.number_of_types = xstr1.num_each_type.size(); //DX20190425
+        structure_tmp.natoms = xstr1.atoms.size(); //DX20190425
+        structure_tmp.ntypes = xstr1.num_each_type.size(); //DX20190425
         structure_tmp.structure_representative_compound = compare::getCompoundName(xstr1); //remove ones is true  //DX20190311 //DX20190313 - use xstr1
         // update xstructure species
         if(structure_tmp.structure_representative.species.size()==0){
@@ -1024,8 +1037,9 @@ namespace compare {
           continue;
         }
         //DX20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA= compare::computeLFAEnvironment(xstr1); //DX20190711
-        structure_tmp.structure_representative_generated = true; 
-        structure_tmp.structure_representative_from = "file"; 
+        structure_tmp.structure_representative_generated = true;
+        structure_tmp.structure_representative_source = "file";
+        structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
         if(LDEBUG) {
           cerr << "compare::loadStructureFromDirectory() Found structure: " << directory+"/"+vfiles[i] << endl;
         }
@@ -1113,8 +1127,8 @@ namespace compare {
         structure_tmp.structure_representative_name = designation.str();
         structure_tmp.stoichiometry = compare::getStoichiometry(structure_tmp.structure_representative,same_species);
         structure_tmp.elements = compare::getElements(structure_tmp.structure_representative);
-        structure_tmp.number_of_atoms = structure_tmp.structure_representative.atoms.size(); //DX20190425
-        structure_tmp.number_of_types = structure_tmp.structure_representative.num_each_type.size(); //DX20190425
+        structure_tmp.natoms = structure_tmp.structure_representative.atoms.size(); //DX20190425
+        structure_tmp.ntypes = structure_tmp.structure_representative.num_each_type.size(); //DX20190425
         structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.structure_representative); //remove ones is true  //DX20190311 //DX20190313 - use xstr
         // update xstructure species
         if(structure_tmp.structure_representative.species.size()==0){
@@ -1134,8 +1148,9 @@ namespace compare {
           continue;
         }
         //DX20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA=compare::computeLFAEnvironment(structure_tmp.structure_representative); //DX20190711
-        structure_tmp.structure_representative_generated = true; 
-        structure_tmp.structure_representative_from = input_file.str(); 
+        structure_tmp.structure_representative_generated = true;
+        structure_tmp.structure_representative_source = input_file.str();
+        structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
         if(LDEBUG) {
           cerr << "compare::loadStructureFromFile(): loaded structure " << i << endl;
         }
@@ -1192,8 +1207,8 @@ namespace compare {
       structure_tmp.structure_representative_name = filenames[i];
       structure_tmp.stoichiometry = compare::getStoichiometry(xstr,same_species);
       structure_tmp.elements = compare::getElements(xstr);
-      structure_tmp.number_of_atoms = xstr.atoms.size(); //DX20190425
-      structure_tmp.number_of_types = xstr.num_each_type.size(); //DX20190425
+      structure_tmp.natoms = xstr.atoms.size(); //DX20190425
+      structure_tmp.ntypes = xstr.num_each_type.size(); //DX20190425
       structure_tmp.structure_representative_compound = compare::getCompoundName(xstr); //remove ones is true  //DX20190311 //DX20190313 - use xstr
       // update xstructure species
       if(structure_tmp.structure_representative.species.size()==0){
@@ -1213,8 +1228,9 @@ namespace compare {
         continue;
       }
       //DX20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA=compare::computeLFAEnvironment(structure_tmp.structure_representative); //DX20190711
-      structure_tmp.structure_representative_generated = true; 
-      structure_tmp.structure_representative_from = "file"; 
+      structure_tmp.structure_representative_generated = true;
+      structure_tmp.structure_representative_source = "file";
+        structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
       if(LDEBUG) {
         cerr << function_name << ": loaded structure " << i << endl;
       }
@@ -1237,8 +1253,11 @@ namespace compare {
 
     for(uint i=start_index;i<end_index;i++){
       if(!structures[i].structure_representative_generated){
-        structures[i].structure_representative_generated = generateStructure(structures[i].structure_representative_name, structures[i].structure_representative_from,
-            structures[i].structure_representative, oss);
+        structures[i].structure_representative_generated = generateStructure(structures[i].structure_representative_name,
+            structures[i].structure_representative_source,
+            structures[i].structure_representative_relaxation_step, //DX20200429
+            structures[i].structure_representative,
+            oss);
       }
     }
   }
@@ -1249,7 +1268,7 @@ namespace compare {
 // generateStructure 
 // ***************************************************************************
 namespace compare {
-  bool generateStructure(string& structure_name, string& structure_from, xstructure& structure, ostream& oss){
+  bool generateStructure(string& structure_name, string& structure_source, uint relaxation_step, xstructure& structure, ostream& oss){ //DX20200429 - added relaxation_step
 
     // generate the xstructure object, having this separate function allows us to load structures in 
     // a threaded environment
@@ -1265,31 +1284,30 @@ namespace compare {
     vector<string> tokens;
 
     if(LDEBUG){
-      cerr << function_name << ": generating structure: " << structure_name << " from " << structure_from << endl;
+      cerr << function_name << ": generating structure: " << structure_name << " from " << structure_source << endl;
     }
 
     // ---------------------------------------------------------------------------
     // load from AFLOW prototypes
-    if(structure_from=="aflow_prototypes"){
+    if(structure_source=="aflow_prototypes"){
       // htqc or anrl
       structure = aflowlib::PrototypeLibraries(oss,structure_name,"",2); //DX20200103 - cout to oss
     }
     // ---------------------------------------------------------------------------
     // load from AURL
-    else if(aurostd::substring2bool(structure_from, "aurl")){
+    else if(aurostd::substring2bool(structure_source, "aurl")){
       //DX20200225 - check if relaxation_step is appended 
       uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_; //default
       bool load_most_relaxed_structure_only = true;
-      vector<string> tmp_tokens; 
-      if(aurostd::string2tokens(structure_from,tokens,",") == 2){
-        relaxation_step = aurostd::string2utype<uint>(tokens[1]);
-        if(relaxation_step != _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ load_most_relaxed_structure_only = false; }
-      }
-      aflowlib::_aflowlib_entry entry; entry.aurl = structure_name; 
+      if(relaxation_step != _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ load_most_relaxed_structure_only = false; }
+      aflowlib::_aflowlib_entry entry; entry.aurl = structure_name;
       vector<string> structure_files;
       //DX20190326 - need to put url path, i.e., structure name, [OBSOLETE] if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;}
       //DX ORIG B4 20191105 - if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX20190326
-      if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){ cerr << "WARNING::Could not load structure (aurl=" << entry.aurl << ") ... skipping..." << endl; return false;} //DX20191105
+      if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, "Could not load structure (aurl="+entry.aurl+") ... skipping...", FileMESSAGE, oss, _LOGGER_WARNING_);
+        return false;
+      }
       //DX20200225 - added compare to particular geometry files - START
       bool found_structure = false;
       uint structure_index = 0;
@@ -1326,7 +1344,7 @@ namespace compare {
     }
     // ---------------------------------------------------------------------------
     // load from file
-    else if(structure_from=="file"){
+    else if(structure_source=="file"){
       stringstream sss;
       aurostd::efile2stringstream(structure_name,sss);
       xstructure xstr(sss);
@@ -1345,7 +1363,7 @@ namespace compare {
       // ---------------------------------------------------------------------------
       // tokenize stringstream by newline
       vector<string> lines;
-      aurostd::string2tokens(structure_from,lines,"\n");
+      aurostd::string2tokens(structure_source,lines,"\n");
 
       // ---------------------------------------------------------------------------
       // structure delimiters 
@@ -1375,17 +1393,17 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // load from input (istream, e.g., from 'cat' or redirect '<') 
     else if(structure_name=="input geometry"){
-      stringstream sss; sss << structure_from;
+      stringstream sss; sss << structure_source;
       xstructure xstr(sss);
       structure = xstr;
     }
     // ---------------------------------------------------------------------------
     // load permutation 
-    else if(aurostd::substring2bool(structure_from, "permutation of: ")){
-      //cerr << "permutation generator: " << structure_from << endl;
+    else if(aurostd::substring2bool(structure_source, "permutation of: ")){
+      //cerr << "permutation generator: " << structure_source << endl;
       //cerr << "permutation of: " << structure_name << endl;
-      string tmp_from = structure_from;
-      stringstream sss; sss << aurostd::StringSubst(tmp_from, "permutation of: ", "");
+      string tmp_source = structure_source;
+      stringstream sss; sss << aurostd::StringSubst(tmp_source, "permutation of: ", "");
       xstructure xstr(sss);
       deque<string> species; 
       for(uint j=0;j<structure_name.size();j++){stringstream ss_site; ss_site << structure_name[j]; species.push_back(ss_site.str());}
@@ -1399,7 +1417,7 @@ namespace compare {
     // load-type not accounted for 
     else {
       stringstream message;
-      message << "Structure location (from=" << structure_from << ") is not specified correctly for " << structure_name << " (i.e., input, aflow_prototype, aurl, etc.).";
+      message << "Structure location (from=" << structure_source << ") is not specified correctly for " << structure_name << " (i.e., input, aflow_prototype, aurl, etc.).";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); //DX20200103 - cerr to logger
       return false;
     }
@@ -1818,9 +1836,10 @@ namespace compare{
       str_proto_tmp.structure_representative.ReScale(1.0); //DX20190715
       str_proto_tmp.structure_representative_name = aurostd::joinWDelimiter(species,"");
       str_proto_tmp.structure_representative_generated = true;
-      //DX20190730 - ORIG - str_proto_tmp.structure_representative_from = "permutation";
+      //DX20190730 - ORIG - str_proto_tmp.structure_representative_source = "permutation";
       stringstream ss_str; ss_str << "permutation of: " << structure.structure_representative; //DX20190730
-      str_proto_tmp.structure_representative_from = ss_str.str(); //DX20190730
+      str_proto_tmp.structure_representative_source = ss_str.str(); //DX20190730
+      str_proto_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input is assumed to be unrelaxed
       str_proto_tmp.copyPrototypeInformation(structure);
       str_proto_tmp.stoichiometry = compare::getStoichiometry(str_proto_tmp.structure_representative, true); //DX20190529 - need updated stoich
       // compound name is always alphabetic; order swapping is dictated by stoichiometry
@@ -2078,7 +2097,8 @@ namespace compare{
       str_proto_tmp.structure_representative_name = aurostd::joinWDelimiter(species,"");
       str_proto_tmp.environments_LFA=compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
       str_proto_tmp.structure_representative_generated = true;
-      str_proto_tmp.structure_representative_from = "permutation";
+      str_proto_tmp.structure_representative_source = "permutation";
+      str_proto_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input is assumed to be unrelaxed
       str_proto_tmp.copyPrototypeInformation(structure);
       permutation_structures.push_back(str_proto_tmp);
     }
@@ -2214,7 +2234,8 @@ namespace compare{
           structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
           structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
           structure_tmp.structure_representative_generated = false; 
-          structure_tmp.structure_representative_from = "aflow_prototypes"; 
+          structure_tmp.structure_representative_source = "aflow_prototypes";
+          structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - prototypes are unrelaxed
           all_structures.push_back(structure_tmp);
         }
       }
@@ -2231,7 +2252,8 @@ namespace compare{
         structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
         structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
         structure_tmp.structure_representative_generated = false; 
-        structure_tmp.structure_representative_from = "aflow_prototypes"; 
+        structure_tmp.structure_representative_source = "aflow_prototypes";
+        structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - prototypes are unrelaxed
         all_structures.push_back(structure_tmp);
       }
     }
@@ -3428,7 +3450,8 @@ namespace compare{
       vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions,
       const string& directory, const vector<string>& vfiles, 
       vector<bool>& vstructures_generated,
-      vector<string>& vstructures_from,
+      vector<string>& vstructures_source,
+      vector<uint>& vstructures_relaxation_step,
       const bool& ignore_symmetry, const bool& ignore_Wyckoff){
     vector<string> property_names, property_units;
     vector<vector<string> > property_values;
@@ -3445,7 +3468,7 @@ namespace compare{
         vvelements, vstoichs, vpearsons, vsgroups, 
         vgrouped_Wyckoff_positions, property_names, property_units, property_values, 
         directory, vfiles,
-        vstructures_generated, vstructures_from,
+        vstructures_generated, vstructures_source, vstructures_relaxation_step,
         ignore_symmetry, ignore_Wyckoff);
 
   }
@@ -3466,7 +3489,8 @@ namespace compare{
       vector<vector<string> >& property_values,
       const string& directory, const vector<string>& vfiles,
       vector<bool>& vstructures_generated,
-      vector<string>& vstructures_from,
+      vector<string>& vstructures_source,
+      vector<uint>& vstructures_relaxation_step, //DX20200429
       const bool& ignore_symmetry, const bool& ignore_Wyckoff){
 
     // Populates the structure information into the StructurePrototype object.
@@ -3478,7 +3502,7 @@ namespace compare{
 
     //cerr << "vstoichs: " << vstoichs.size() << endl;
     //cerr << "vstructures_generated: " << vstructures_generated.size() << endl;
-    //cerr << "vstructures_from: " << vstructures_from.size() << endl;
+    //cerr << "vstructures_source: " << vstructures_source.size() << endl;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     // First, separate by stoichiometry
@@ -3493,11 +3517,12 @@ namespace compare{
           str_proto_tmp.structure_representative_name = directory+"/"+vfiles[i];  aurostd::StringSubst(str_proto_tmp.structure_representative_name,"//","/"); //DX20181003
         }
         str_proto_tmp.structure_representative_generated=vstructures_generated[i];
-        str_proto_tmp.structure_representative_from=vstructures_from[i];
-        //str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
+        str_proto_tmp.structure_representative_source=vstructures_source[i];
+        str_proto_tmp.structure_representative_relaxation_step=vstructures_relaxation_step[i]; //DX20200429
+        //str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
         str_proto_tmp.elements=vvelements[i];
         str_proto_tmp.stoichiometry=vstoichs[i];
-        //str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+        //str_proto_tmp.natoms=vxstrs[i].atoms.size();
         str_proto_tmp.Pearson=vpearsons[i];
         str_proto_tmp.space_group=vsgroups[i];
         str_proto_tmp.grouped_Wyckoff_positions=vgrouped_Wyckoff_positions[i];
@@ -3508,8 +3533,8 @@ namespace compare{
         }
         if(vstructures_generated[i]){
           str_proto_tmp.structure_representative=vxstrs[i];
-          str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
-          str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+          str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
+          str_proto_tmp.natoms=vxstrs[i].atoms.size();
           str_proto_tmp.structure_representative_compound=getCompoundName(vxstrs[i]); //DX20190111 - added compound, e.g., Ag1Br2
         }
         comparison_schemes.push_back(str_proto_tmp);
@@ -3563,10 +3588,11 @@ namespace compare{
                  }
                  comparison_schemes[j].structures_duplicate_names.push_back(duplicate_name);
                  comparison_schemes[j].structures_duplicate_generated.push_back(vstructures_generated[i]);
-                 comparison_schemes[j].structures_duplicate_from.push_back(vstructures_from[i]);
+                 comparison_schemes[j].structures_duplicate_source.push_back(vstructures_source[i]);
+                 comparison_schemes[j].structures_duplicate_relaxation_step.push_back(vstructures_relaxation_step[i]); //DX20200429
                  //cerr << "adding to " << j << " (name): " << comparison_schemes[j].structures_duplicate_names.size() << endl;
                  //cerr << "adding to " << j << " (gen): " << comparison_schemes[j].structures_duplicate_generated.size() << endl;
-                 //cerr << "adding to " << j << " (from): " << comparison_schemes[j].structures_duplicate_from.size() << endl;
+                 //cerr << "adding to " << j << " (from): " << comparison_schemes[j].structures_duplicate_source.size() << endl;
                  if(vstructures_generated[i]){
                    comparison_schemes[j].structures_duplicate.push_back(vxstrs[i]);
                    comparison_schemes[j].structures_duplicate_compounds.push_back(getCompoundName(vxstrs[i])); //DX20190111 - added compound, e.g., Ag1Br2
@@ -3590,11 +3616,12 @@ namespace compare{
             str_proto_tmp.structure_representative_name = directory+"/"+vfiles[i];  aurostd::StringSubst(str_proto_tmp.structure_representative_name,"//","/"); //DX20181003
           }
           str_proto_tmp.structure_representative_generated=vstructures_generated[i];
-          str_proto_tmp.structure_representative_from=vstructures_from[i];
-          //str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
+          str_proto_tmp.structure_representative_source=vstructures_source[i];
+          str_proto_tmp.structure_representative_relaxation_step=vstructures_relaxation_step[i]; //DX20200429
+          //str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
           str_proto_tmp.elements=vvelements[i];
           str_proto_tmp.stoichiometry=vstoichs[i];
-          //str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+          //str_proto_tmp.natoms=vxstrs[i].atoms.size();
           str_proto_tmp.Pearson=vpearsons[i];
           str_proto_tmp.space_group=vsgroups[i];
           str_proto_tmp.grouped_Wyckoff_positions=vgrouped_Wyckoff_positions[i];
@@ -3605,8 +3632,8 @@ namespace compare{
           }
           if(vstructures_generated[i]){
             str_proto_tmp.structure_representative=vxstrs[i];
-            str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
-            str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+            str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
+            str_proto_tmp.natoms=vxstrs[i].atoms.size();
             str_proto_tmp.structure_representative_compound=getCompoundName(vxstrs[i]); //DX20190111 - added compound, e.g., Ag1Br2
           }
           comparison_schemes.push_back(str_proto_tmp);
@@ -3622,7 +3649,7 @@ namespace compare{
     //for(uint i=0;i<comparison_schemes.size();i++){
     //      cerr << i << "structures_duplicate.size(): " << comparison_schemes[i].structures_duplicate.size() << endl;
     //      cerr << i << "structures_duplicate_generated.size(): " << comparison_schemes[i].structures_duplicate_generated.size() << endl;
-    //      cerr << i << "structures_duplicate_from.size(): " << comparison_schemes[i].structures_duplicate_from.size() << endl;
+    //      cerr << i << "structures_duplicate_source.size(): " << comparison_schemes[i].structures_duplicate_source.size() << endl;
     //}
   }
 }
@@ -3652,8 +3679,8 @@ namespace compare{
       return false;
     }
     // check if number of atoms are integer multiples of one another (elements only; compounds verified with stoich) //DX20200421
-    if(structure1.number_of_types == 1 && structure1.structure_representative_generated && structure2.structure_representative_generated){
-      if(structure1.number_of_atoms%structure2.number_of_atoms!=0 && structure2.number_of_atoms%structure1.number_of_atoms!=0){
+    if(structure1.ntypes == 1 && structure1.structure_representative_generated && structure2.structure_representative_generated){
+      if(structure1.natoms%structure2.natoms!=0 && structure2.natoms%structure1.natoms!=0){
         return false;
       }
     }
@@ -3757,7 +3784,7 @@ namespace compare{
     // DEBUG  cerr << i << "structures_duplicate.size(): " << comparison_schemes[i].structures_duplicate.size() << endl;
     // DEBUG  cerr << i << "structures_duplicate_names.size(): " << comparison_schemes[i].structures_duplicate_names.size() << endl;
     // DEBUG  cerr << i << "structures_duplicate_generated.size(): " << comparison_schemes[i].structures_duplicate_generated.size() << endl;
-    // DEBUG  cerr << i << "structures_duplicate_from.size(): " << comparison_schemes[i].structures_duplicate_from.size() << endl;
+    // DEBUG  cerr << i << "structures_duplicate_source.size(): " << comparison_schemes[i].structures_duplicate_source.size() << endl;
     // DEBUG }
     return comparison_schemes;
   }
@@ -3775,7 +3802,7 @@ namespace compare{
 //DX [OBSOLETE]         vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions,
 //DX [OBSOLETE]         const string& directory, const vector<string>& vfiles, 
 //DX [OBSOLETE]         vector<bool>& vstructures_generated,
-//DX [OBSOLETE]         vector<string>& vstructures_from,
+//DX [OBSOLETE]         vector<string>& vstructures_source,
 //DX [OBSOLETE]         const bool& ignore_symmetry, const bool& ignore_Wyckoff,
 //DX [OBSOLETE]         const bool& structures_generated){
 //DX [OBSOLETE]    vector<string> property_names, property_units;
@@ -3784,7 +3811,7 @@ namespace compare{
 //DX [OBSOLETE]                                     vvelements, vstoichs, vpearsons, vsgroups, 
 //DX [OBSOLETE]                                     vgrouped_Wyckoff_positions, property_names, property_units, property_values, 
 //DX [OBSOLETE]                                     directory, vfiles,
-//DX [OBSOLETE]                                     vstructures_generated, vstructures_from,
+//DX [OBSOLETE]                                     vstructures_generated, vstructures_source,
 //DX [OBSOLETE]                                     ignore_symmetry, ignore_Wyckoff, structures_generated);
 //DX [OBSOLETE]  }
 //DX [OBSOLETE]}
@@ -3804,7 +3831,7 @@ namespace compare{
 //DX [OBSOLETE]         vector<vector<string> >& property_values,
 //DX [OBSOLETE]         const string& directory, const vector<string>& vfiles,
 //DX [OBSOLETE]         vector<bool>& vstructures_generated,
-//DX [OBSOLETE]         vector<string>& vstructures_from,
+//DX [OBSOLETE]         vector<string>& vstructures_source,
 //DX [OBSOLETE]         const bool& ignore_symmetry, const bool& ignore_Wyckoff,
 //DX [OBSOLETE]         const bool& structures_generated){
 //DX [OBSOLETE]
@@ -3818,11 +3845,11 @@ namespace compare{
 //DX [OBSOLETE]    // === Organize into objects based on stoichiometry and symmetry (Pearson and space group)
 //DX [OBSOLETE]
 //DX [OBSOLETE]    cerr << "vstructures_generated: " << vstructures_generated.size() << endl;
-//DX [OBSOLETE]    cerr << "vstructures_from: " << vstructures_from.size() << endl;
+//DX [OBSOLETE]    cerr << "vstructures_source: " << vstructures_source.size() << endl;
 //DX [OBSOLETE]    compare::createStructurePrototypes(comparison_schemes, vxstrs, same_species, 
 //DX [OBSOLETE]                                       vvelements, vstoichs, vpearsons, vsgroups, 
 //DX [OBSOLETE]                                       vgrouped_Wyckoff_positions, directory, vfiles,
-//DX [OBSOLETE]                                       vstructures_generated, vstructures_from,
+//DX [OBSOLETE]                                       vstructures_generated, vstructures_source,
 //DX [OBSOLETE]                                       ignore_symmetry, ignore_Wyckoff, structures_generated);
 //DX [OBSOLETE]   
 //DX [OBSOLETE]    // === If an ICSD comparison, make minimum ICSD number as the representative prototype === // 
@@ -4081,11 +4108,12 @@ namespace compare{
         }
         str_proto_tmp.structure_representative.clear(); //clear xstructure; //DX20191220 - uppercase to lowercase clear
         str_proto_tmp.structure_representative_generated=false;
-        str_proto_tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
+        str_proto_tmp.structure_representative_source=prototype_scheme.structures_duplicate_source[i];
+        str_proto_tmp.structure_representative_relaxation_step=prototype_scheme.structures_duplicate_relaxation_step[i]; //DX20200429
         str_proto_tmp.structures_duplicate_names.clear(); str_proto_tmp.structures_duplicate_compounds.clear(); str_proto_tmp.structures_duplicate.clear(); str_proto_tmp.structure_misfits_duplicate.clear(); str_proto_tmp.properties_structures_duplicate.clear();
-        str_proto_tmp.structures_duplicate_generated.clear(); str_proto_tmp.structures_duplicate_from.clear(); str_proto_tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX20190814 - added Wyckoff positions
+        str_proto_tmp.structures_duplicate_generated.clear(); str_proto_tmp.structures_duplicate_source.clear(); str_proto_tmp.structures_duplicate_relaxation_step.clear(); str_proto_tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX20190814 - added Wyckoff positions
         str_proto_tmp.structures_family_names.clear(); str_proto_tmp.structures_family.clear(); str_proto_tmp.structure_misfits_family.clear(); str_proto_tmp.properties_structures_family.clear(); //DX20190425 - added properties
-        str_proto_tmp.structures_family_generated.clear(); str_proto_tmp.structures_family_from.clear();
+        str_proto_tmp.structures_family_generated.clear(); str_proto_tmp.structures_family_source.clear(); str_proto_tmp.structures_family_relaxation_step.clear();
         str_proto_tmp.elements.clear();
         duplicate_check_schemes.push_back(str_proto_tmp);
       }
@@ -4098,7 +4126,8 @@ namespace compare{
             xstructure tmp_xstr;
             duplicate_check_schemes[j].structures_duplicate.push_back(tmp_xstr);
             duplicate_check_schemes[j].structures_duplicate_generated.push_back(false);
-            duplicate_check_schemes[j].structures_duplicate_from.push_back(prototype_scheme.structures_duplicate_from[i]);
+            duplicate_check_schemes[j].structures_duplicate_source.push_back(prototype_scheme.structures_duplicate_source[i]);
+            duplicate_check_schemes[j].structures_duplicate_relaxation_step.push_back(prototype_scheme.structures_duplicate_relaxation_step[i]); //DX20200429
             duplicate_check_schemes[j].structures_duplicate_grouped_Wyckoff_positions.push_back(prototype_scheme.structures_duplicate_grouped_Wyckoff_positions[i]);
             if(prototype_scheme.properties_structures_duplicate.size()>0){
               duplicate_check_schemes[j].properties_structures_duplicate.push_back(prototype_scheme.properties_structures_duplicate[i]);
@@ -4123,11 +4152,12 @@ namespace compare{
           }
           str_proto_tmp.structure_representative.clear(); //clear xstructure; //DX20191220 - uppercase to lowercase clear
           str_proto_tmp.structure_representative_generated=false;
-          str_proto_tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
+          str_proto_tmp.structure_representative_source=prototype_scheme.structures_duplicate_source[i];
+          str_proto_tmp.structure_representative_relaxation_step=prototype_scheme.structures_duplicate_relaxation_step[i]; //DX20200429
           str_proto_tmp.structures_duplicate_names.clear(); str_proto_tmp.structures_duplicate_compounds.clear(); str_proto_tmp.structures_duplicate.clear(); str_proto_tmp.structure_misfits_duplicate.clear(); str_proto_tmp.properties_structures_duplicate.clear();
-          str_proto_tmp.structures_duplicate_generated.clear(); str_proto_tmp.structures_duplicate_from.clear(); str_proto_tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX20190814 - added Wyckoff positions
+          str_proto_tmp.structures_duplicate_generated.clear(); str_proto_tmp.structures_duplicate_source.clear(); str_proto_tmp.structures_duplicate_relaxation_step.clear(); str_proto_tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX20190814 - added Wyckoff positions
           str_proto_tmp.structures_family_names.clear(); str_proto_tmp.structures_family.clear(); str_proto_tmp.structure_misfits_family.clear(); str_proto_tmp.properties_structures_family.clear(); //DX20190425 - added properties
-          str_proto_tmp.structures_family_generated.clear(); str_proto_tmp.structures_family_from.clear();
+          str_proto_tmp.structures_family_generated.clear(); str_proto_tmp.structures_family_source.clear(); str_proto_tmp.structures_family_relaxation_step.clear();
           duplicate_check_schemes.push_back(str_proto_tmp);
         }
       }
@@ -4157,7 +4187,8 @@ namespace compare{
           final_prototypes[i].structures_duplicate_names.erase(final_prototypes[i].structures_duplicate_names.begin()+j);
           final_prototypes[i].structures_duplicate_compounds.erase(final_prototypes[i].structures_duplicate_compounds.begin()+j);
           final_prototypes[i].structures_duplicate_generated.erase(final_prototypes[i].structures_duplicate_generated.begin()+j);
-          final_prototypes[i].structures_duplicate_from.erase(final_prototypes[i].structures_duplicate_from.begin()+j);
+          final_prototypes[i].structures_duplicate_source.erase(final_prototypes[i].structures_duplicate_source.begin()+j);
+          final_prototypes[i].structures_duplicate_relaxation_step.erase(final_prototypes[i].structures_duplicate_relaxation_step.begin()+j); //DX20200429
           if(final_prototypes[i].property_names.size()!=0){
             final_prototypes[i].properties_structures_duplicate.erase(final_prototypes[i].properties_structures_duplicate.begin()+j);
           }
@@ -4191,14 +4222,16 @@ namespace compare{
               string old_representative_ID = comparison_schemes[i].structure_representative_name;
               string old_representative_compound = comparison_schemes[i].structure_representative_compound;
               bool old_representative_generated = comparison_schemes[i].structure_representative_generated;
-              string old_representative_from = comparison_schemes[i].structure_representative_from;
+              string old_representative_source = comparison_schemes[i].structure_representative_source;
+              uint old_representative_relaxation_step = comparison_schemes[i].structure_representative_relaxation_step; //DX20200429
               vector<GroupedWyckoffPosition> old_Wyckoff_positions = comparison_schemes[i].grouped_Wyckoff_positions; //DX20190813 - need to update; otherwise, the compound name and Wyckoff positions may not match; especially for structure-type comparisons
               uint old_representative_duplicate_count = comparison_schemes[i].number_compounds_matching_representative;
               vector<string> old_representative_properties = comparison_schemes[i].properties_structure_representative;
               comparison_schemes[i].structure_representative_name = comparison_schemes[i].structures_duplicate_names[j];  
               comparison_schemes[i].structure_representative_compound = comparison_schemes[i].structures_duplicate_compounds[j];  
               comparison_schemes[i].structure_representative_generated = comparison_schemes[i].structures_duplicate_generated[j];  
-              comparison_schemes[i].structure_representative_from = comparison_schemes[i].structures_duplicate_from[j]; 
+              comparison_schemes[i].structure_representative_source = comparison_schemes[i].structures_duplicate_source[j];
+              comparison_schemes[i].structure_representative_relaxation_step = comparison_schemes[i].structures_duplicate_relaxation_step[j]; //DX20200429
               comparison_schemes[i].grouped_Wyckoff_positions = comparison_schemes[i].structures_duplicate_grouped_Wyckoff_positions[j]; //DX20190813 - need to update; otherwise, the compound name and Wyckoff positions may not match; especially for structure-type comparisons
               comparison_schemes[i].number_compounds_matching_representative = comparison_schemes[i].number_compounds_matching_duplicate[j]; 
               if(old_representative_generated){
@@ -4227,7 +4260,8 @@ namespace compare{
               //DX20190304 - moved into if statment up above - comparison_schemes[i].structures_duplicate[j] = old_representative_xstr;
               comparison_schemes[i].structures_duplicate_compounds[j] = old_representative_compound;
               //DX20190304 - moved into if statment up above - comparison_schemes[i].structures_duplicate_generated[j] = old_representative_generated;
-              comparison_schemes[i].structures_duplicate_from[j] = old_representative_from;
+              comparison_schemes[i].structures_duplicate_source[j] = old_representative_source;
+              comparison_schemes[i].structures_duplicate_relaxation_step[j] = old_representative_relaxation_step; //DX20200429
               comparison_schemes[i].structures_duplicate_grouped_Wyckoff_positions[j] = old_Wyckoff_positions; //DX20190813
               comparison_schemes[i].number_compounds_matching_duplicate[j] = old_representative_duplicate_count;
               if(comparison_schemes[i].properties_structures_duplicate.size()>0){
@@ -4291,7 +4325,7 @@ namespace compare{
 
         // get representative structure 
         if(!comparison_schemes[i].structure_representative_generated){
-          if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_from,structure_representative,oss)){
+          if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_source,comparison_schemes[i].structure_representative_relaxation_step,structure_representative,oss)){ //DX20200429
             message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative_name << ").";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX20190717 - exit to xerror
           }
@@ -4304,7 +4338,7 @@ namespace compare{
         // get prototype structure 
         xstructure duplicate_structure;
         if(!comparison_schemes[i].structures_duplicate_generated[j]){
-          if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_from[j],duplicate_structure,oss)){
+          if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_source[j],comparison_schemes[i].structures_duplicate_relaxation_step[j],duplicate_structure,oss)){ //DX20200429
             message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate_names[j] << ").";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX20190717 - exit to xerror
           }
@@ -4420,7 +4454,7 @@ namespace compare{
       for(uint j=0; j<comparison_schemes[i].structures_duplicate_names.size(); j++){
         if(j==0){
           if(!comparison_schemes[i].structure_representative_generated){
-            if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_from,structure_representative,oss)){
+            if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_source,comparison_schemes[i].structure_representative_relaxation_step,structure_representative,oss)){ //DX20200429
               message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative_name << ").";
               throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX20190717 - exit to xerror
             }
@@ -4435,7 +4469,7 @@ namespace compare{
         structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
         xstructure duplicate_structure;
         if(!comparison_schemes[i].structures_duplicate_generated[j]){
-          if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_from[j],duplicate_structure,oss)){
+          if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_source[j],comparison_schemes[i].structures_duplicate_relaxation_step[j],duplicate_structure,oss)){ //DX20200429
             message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate_names[j] << ").";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX20190717 - exit to xerror
           }
@@ -4671,9 +4705,10 @@ namespace compare{
         str_proto_tmp.structure_representative_name=name;
         str_proto_tmp.structure_representative=vxstrs[i];
         str_proto_tmp.structure_representative_generated=true;
-        str_proto_tmp.structure_representative_from="input";
-        str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
-        str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+        str_proto_tmp.structure_representative_source="input";
+        str_proto_tmp.structure_representative_relaxation_step=0; //DX20200429 - input is assumed to be unrelaxed
+        str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
+        str_proto_tmp.natoms=vxstrs[i].atoms.size();
         str_proto_tmp.grouped_Wyckoff_positions=permutation_grouped_Wyckoff_positions[i];
         //cerr << "tmp: " << tmp << endl;
         comparison_schemes.push_back(str_proto_tmp);
@@ -4693,7 +4728,8 @@ namespace compare{
             comparison_schemes[j].structures_duplicate_names.push_back(name);
             comparison_schemes[j].structures_duplicate.push_back(vxstrs[i]);
             comparison_schemes[j].structures_duplicate_generated.push_back(true);
-            comparison_schemes[j].structures_duplicate_from.push_back("input");
+            comparison_schemes[j].structures_duplicate_source.push_back("input");
+            comparison_schemes[j].structures_duplicate_relaxation_step.push_back(0); //DX20200429 - input is assumed to be unrelaxed
             structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX20191218
             comparison_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX20191218
             scheme_created=true;
@@ -4704,10 +4740,11 @@ namespace compare{
           StructurePrototype str_proto_tmp;
           str_proto_tmp.structure_representative_name=name;
           str_proto_tmp.structure_representative_generated=true;
-          str_proto_tmp.structure_representative_from="input";
+          str_proto_tmp.structure_representative_source="input";
+          str_proto_tmp.structure_representative_relaxation_step=0; //DX20200429 - input is assumed to be unrelaxed
           str_proto_tmp.structure_representative=vxstrs[i];
-          str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
-          str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+          str_proto_tmp.ntypes=vxstrs[i].num_each_type.size();
+          str_proto_tmp.natoms=vxstrs[i].atoms.size();
           str_proto_tmp.grouped_Wyckoff_positions=permutation_grouped_Wyckoff_positions[i];
           comparison_schemes.push_back(str_proto_tmp);
         }
@@ -4772,15 +4809,18 @@ namespace compare{
         comparison_schemes[i].structures_duplicate_names.push_back(comparison_schemes[i].structure_representative_name);  
         comparison_schemes[i].structures_duplicate.push_back(comparison_schemes[i].structure_representative);  
         comparison_schemes[i].structures_duplicate_generated.push_back(comparison_schemes[i].structure_representative_generated);  
-        comparison_schemes[i].structures_duplicate_from.push_back(comparison_schemes[i].structure_representative_from);  
-        comparison_schemes[i].structure_representative_name = comparison_schemes[i].structures_duplicate_names[min_duplicate_index];  
-        comparison_schemes[i].structure_representative = comparison_schemes[i].structures_duplicate[min_duplicate_index];  
-        comparison_schemes[i].structure_representative_generated = comparison_schemes[i].structures_duplicate_generated[min_duplicate_index];  
-        comparison_schemes[i].structure_representative_from = comparison_schemes[i].structures_duplicate_from[min_duplicate_index];  
+        comparison_schemes[i].structures_duplicate_source.push_back(comparison_schemes[i].structure_representative_source);
+        comparison_schemes[i].structures_duplicate_relaxation_step.push_back(comparison_schemes[i].structure_representative_relaxation_step); //DX20200429
+        comparison_schemes[i].structure_representative_name = comparison_schemes[i].structures_duplicate_names[min_duplicate_index];
+        comparison_schemes[i].structure_representative = comparison_schemes[i].structures_duplicate[min_duplicate_index];
+        comparison_schemes[i].structure_representative_generated = comparison_schemes[i].structures_duplicate_generated[min_duplicate_index];
+        comparison_schemes[i].structure_representative_source = comparison_schemes[i].structures_duplicate_source[min_duplicate_index];
+        comparison_schemes[i].structure_representative_relaxation_step = comparison_schemes[i].structures_duplicate_relaxation_step[min_duplicate_index]; //DX20200429
         comparison_schemes[i].structures_duplicate_names.erase(comparison_schemes[i].structures_duplicate_names.begin()+min_duplicate_index);
         comparison_schemes[i].structures_duplicate.erase(comparison_schemes[i].structures_duplicate.begin()+min_duplicate_index);
         comparison_schemes[i].structures_duplicate_generated.erase(comparison_schemes[i].structures_duplicate_generated.begin()+min_duplicate_index);
-        comparison_schemes[i].structures_duplicate_from.erase(comparison_schemes[i].structures_duplicate_from.begin()+min_duplicate_index);
+        comparison_schemes[i].structures_duplicate_source.erase(comparison_schemes[i].structures_duplicate_source.begin()+min_duplicate_index);
+        comparison_schemes[i].structures_duplicate_relaxation_step.erase(comparison_schemes[i].structures_duplicate_relaxation_step.begin()+min_duplicate_index); //DX20200429
       }
     }
     return true;
@@ -4995,10 +5035,14 @@ namespace compare{
         final_prototypes[sg_ind].structures_duplicate_generated.insert(final_prototypes[sg_ind].structures_duplicate_generated.end(),
             final_prototypes[other_ind].structures_duplicate_generated.begin(),
             final_prototypes[other_ind].structures_duplicate_generated.end());
-        final_prototypes[sg_ind].structures_duplicate_from.push_back(final_prototypes[other_ind].structure_representative_from);
-        final_prototypes[sg_ind].structures_duplicate_from.insert(final_prototypes[sg_ind].structures_duplicate_from.end(),
-            final_prototypes[other_ind].structures_duplicate_from.begin(),
-            final_prototypes[other_ind].structures_duplicate_from.end());
+        final_prototypes[sg_ind].structures_duplicate_source.push_back(final_prototypes[other_ind].structure_representative_source);
+        final_prototypes[sg_ind].structures_duplicate_source.insert(final_prototypes[sg_ind].structures_duplicate_source.end(),
+            final_prototypes[other_ind].structures_duplicate_source.begin(),
+            final_prototypes[other_ind].structures_duplicate_source.end());
+        final_prototypes[sg_ind].structures_duplicate_relaxation_step.push_back(final_prototypes[other_ind].structure_representative_relaxation_step); //DX20200429
+        final_prototypes[sg_ind].structures_duplicate_relaxation_step.insert(final_prototypes[sg_ind].structures_duplicate_relaxation_step.end(), //DX20200429
+            final_prototypes[other_ind].structures_duplicate_relaxation_step.begin(), //DX20200429
+            final_prototypes[other_ind].structures_duplicate_relaxation_step.end()); //DX20200429
         // Delete the prototype with the lower space group
         final_prototypes.erase(final_prototypes.begin()+other_ind);
         // If the index deleted was less than the initial loop (i), then need to reduce iterator
@@ -6521,15 +6565,15 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // check if atom environment set has only one atom 
     // (signal more comprehensive environment comparison)
-    //DX 20200320 [OBSOLETE] bool only_single_LFA_atoms = true;
-    //DX 20200320 [OBSOLETE] string first_lfa_element = env_set1[0].element_center; //safe to acess element since I checked earlier
-    //DX 20200320 [OBSOLETE] for(uint i=1;i<env_set1.size();i++){ // start after first 1
-    //DX 20200320 [OBSOLETE]   if(first_lfa_element ==env_set1[i].element_center){
-    //DX 20200320 [OBSOLETE]     only_single_LFA_atoms = false;
-    //DX 20200320 [OBSOLETE]     break;
-    //DX 20200320 [OBSOLETE]   }
-    //DX 20200320 [OBSOLETE] }
-    //bool compare_frequency = only_single_LFA_atoms;
+    //DX20200320 [OBSOLETE] bool only_single_LFA_atoms = true;
+    //DX20200320 [OBSOLETE] string first_lfa_element = env_set1[0].element_center; //safe to acess element since I checked earlier
+    //DX20200320 [OBSOLETE] for(uint i=1;i<env_set1.size();i++){ // start after first 1
+    //DX20200320 [OBSOLETE]   if(first_lfa_element ==env_set1[i].element_center){
+    //DX20200320 [OBSOLETE]     only_single_LFA_atoms = false;
+    //DX20200320 [OBSOLETE]     break;
+    //DX20200320 [OBSOLETE]   }
+    //DX20200320 [OBSOLETE] }
+    //DX20200320 [OBSOLETE] bool compare_frequency = only_single_LFA_atoms;
     // ---------------------------------------------------------------------------
     // if same species
     if(same_species){
@@ -8021,8 +8065,9 @@ namespace compare{
       // ---------------------------------------------------------------------------
       // supercell method : orig, slow
       if(supercell_method){
+        xmatrix<double> c2f=inverse(proto.scale*trasp(proto.lattice)); //DX+CO20200429 - calculate outside loop [speed]
         for(uint iat=0;iat<proto.atoms.size();iat++){
-          proto.atoms[iat].fpos=C2F(proto.lattice,proto.atoms[iat].cpos);
+          proto.atoms[iat].fpos=c2f*proto.atoms[iat].cpos; //DX+CO20200429 - C2F (matrix inverse + matrix multiplication) -> c2f (matrix multiplication)
           if(atomInCell(proto.atoms[iat],0.05)){ //DX20191125 - soft cutoff, using robust MapAtom later on resulting subset
             new_basis_2.push_back(proto.atoms[iat]);
           }
@@ -8031,8 +8076,9 @@ namespace compare{
       // ---------------------------------------------------------------------------
       // tranformation method : new, fast //DX20200330
       else{
+        xmatrix<double> c2f=inverse(proto.scale*trasp(proto.lattice)); //DX+CO20200429 - calculate outside loop [speed]
         for(uint iat=0;iat<proto.atoms.size();iat++){
-          proto.atoms[iat].fpos=C2F(proto.lattice,proto.atoms[iat].cpos);
+          proto.atoms[iat].fpos=c2f*proto.atoms[iat].cpos; //DX+CO20200429 - C2F (matrix inverse + matrix multiplication) -> c2f (matrix multiplication)
           new_basis_2.push_back(proto.atoms[iat]);
         }
       }
