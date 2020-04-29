@@ -798,7 +798,7 @@ namespace cce {
     double cutoffs_max=aurostd::max(cce_vars.cutoffs);
     deque<deque<_atom> > neigh_mat;
     structure.GetStrNeighData(cutoffs_max,neigh_mat);
-    uint z;
+    uint z = 0;
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       uint neighbors_count=0;
       uint multi_anion_count=0;
