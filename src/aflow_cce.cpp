@@ -1298,7 +1298,7 @@ namespace cce {
     string soliloquy="cce::treat_SbO2_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Sb") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Sb" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
-    uint num_O_before_Sb;
+    uint num_O_before_Sb = 0;
     if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Sb" ) {
       num_O_before_Sb=4;
     } else {
