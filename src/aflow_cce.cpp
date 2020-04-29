@@ -1406,7 +1406,7 @@ namespace cce {
       cerr << soliloquy << "number of Pb ions= " << amount_Pb << endl;
       cerr << soliloquy << "number of O ions= " << amount_O << endl;
     }
-    double Pb_O_ratio;
+    double Pb_O_ratio = 0.0;
     if ( amount_O != 0 ){
       Pb_O_ratio=amount_Pb/amount_O;
     } else {
