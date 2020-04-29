@@ -363,6 +363,7 @@ namespace cce {
     return read_structure(structure);
   }
 
+  //read_structure////////////////////////////////////////////////////////
   xstructure read_structure(xstructure& structure){
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::read_structure():";
