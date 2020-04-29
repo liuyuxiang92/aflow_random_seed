@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -177,16 +177,16 @@ namespace AGL_functions {
       AGL_dos_pressure.energy.clear();
       AGL_dos_pressure.dosval.clear();
       AGL_dos_pressure.idosval.clear();
-      for (uint i = 0; i < doscar.vDOS.at(0).at(0).size(); i++) { // CT190626 - check vector size is correct for all spin states
-	if (doscar.vDOS.at(0).at(0).at(i).size() < doscar.venergy.size()) {  // ME20190614 - new vDOS format
+      for (uint i = 0; i < doscar.vDOS.at(0).at(0).size(); i++) { //CT20190626 - check vector size is correct for all spin states
+	if (doscar.vDOS.at(0).at(0).at(i).size() < doscar.venergy.size()) {  //ME20190614 - new vDOS format
 	  aurostd::StringstreamClean(aus);
 	  aus << _AGLSTR_WARNING_ + "Mismatch between number of DOS values and number of energy values" << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  continue;
 	}
       }
-      for (uint i = 0; i < doscar.viDOS.size(); i++) { // CT190626 - check vector size is correct for all spin states
-	if (doscar.viDOS.at(i).size() < doscar.venergy.size()) {  // ME20190614 - new vDOS format
+      for (uint i = 0; i < doscar.viDOS.size(); i++) { //CT20190626 - check vector size is correct for all spin states
+	if (doscar.viDOS.at(i).size() < doscar.venergy.size()) {  //ME20190614 - new vDOS format
 	  aurostd::StringstreamClean(aus);
 	  aus << _AGLSTR_WARNING_ + "Mismatch between number of DOS values and number of energy values" << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -197,9 +197,9 @@ namespace AGL_functions {
 	AGL_dos_pressure.energy.push_back(doscar.venergy.at(i));
 	sumdos = 0.0;
 	sumidos = 0.0;
-	for (uint j = 0; j < doscar.spin + 1; j++) {  // ME20190614 - new vDOS format
-	  sumdos = sumdos + doscar.vDOS.at(0).at(0).at(j).at(i);  // ME20190614 - new vDOS format
-	  sumidos = sumidos + doscar.viDOS.at(j).at(i);  // ME20190614 - new viDOS format
+	for (uint j = 0; j < doscar.spin + 1; j++) {  //ME20190614 - new vDOS format
+	  sumdos = sumdos + doscar.vDOS.at(0).at(0).at(j).at(i);  //ME20190614 - new vDOS format
+	  sumidos = sumidos + doscar.viDOS.at(j).at(i);  //ME20190614 - new viDOS format
 	}
 	AGL_dos_pressure.dosval.push_back(sumdos);
 	AGL_dos_pressure.idosval.push_back(sumidos);
@@ -2168,3 +2168,9 @@ namespace AGL_functions {
 } // namespace AGL_functions
 
 #endif  // _AFLOW_AGL_ELECTRONIC_CPP
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *                                                                         *
+// ***************************************************************************

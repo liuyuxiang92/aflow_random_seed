@@ -843,7 +843,7 @@ namespace pflow {
             dt=sqrt(dt);
             //[CO20190501 - OBSOLETE]if(dt>300*sigma_r)
             if(dt>sigma_weight*sigma_r) //CO20190501
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               stop=true;
               break;
             }

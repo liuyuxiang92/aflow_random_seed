@@ -600,7 +600,7 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A4B_cI10_229_c_a(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 300
   uint PrototypeANRL_A7B3_cI40_229_df_e(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 301
   uint PrototypeANRL_A2B3C12D3_cI160_230_a_c_h_d(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 302
-  //DX20181130 - add Ohad's SQS structures - START
+  //DX20181130 - add OL's SQS structures - START
   // -------------------------------------------------------------------------
   // SQS (from O. Levy)
   // -------------------------------------------------------------------------
@@ -611,10 +611,10 @@ namespace anrl { // put them in order
   uint PrototypeANRL_A3B13_oC32_38_ac_a2bcdef(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 5
   uint PrototypeANRL_A3B5_oC32_38_abce_abcdf(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 6
   uint PrototypeANRL_AB7_hR16_166_c_c2h(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 7
-  //DX20181130 - add Ohad's SQS structures - END
-  //DX20181211 - add Corey's kesterite structure - START
+  //DX20181130 - add OL's SQS structures - END
+  //DX20181211 - add CO's kesterite structure - START
   uint PrototypeANRL_A2BCD4_tI16_82_ac_b_d_g(stringstream &web,xstructure& str,string parameters,string proto_line,uint print_mode,bool LDEBUG); // 1
-  //DX20181211 - add Corey's kesterite structure - END
+  //DX20181211 - add CO's kesterite structure - END
   // -------------------------------------------------------------------------
   // misc prototypes (from Y. Lederer)
   // -------------------------------------------------------------------------
@@ -732,7 +732,7 @@ namespace anrl {
     if(tokens.size()==1) { label_anrl=tokens.at(0); }
     if(tokens.size()==2) { label_anrl=tokens.at(0); label_permutations=tokens.at(1); }
 
-    // DX20181207 - add predefined protos - START
+    //DX20181207 - add predefined protos - START
     if(aurostd::substring2bool(label,"-")){
       vector<string> tokens;
       aurostd::string2tokens(label,tokens,"-");
@@ -859,7 +859,7 @@ namespace anrl {
       parameters=all_possible_vparameters[0];
     }
     aurostd::string2tokens(parameters,vparameters,",");
-    if(vparameters.size()==0){  //CO20181226 david fix
+    if(vparameters.size()==0){  //CO20181226 DX fix
       stringstream message;
       message << "no parameters provided; add parameter values with --params=... or use tabulated enumeration suffix (see aflow --protos)" << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX20200207 - exit -> throw
@@ -3520,7 +3520,7 @@ namespace anrl {
     // 302 // ./aflow --proto=A2B3C12D3_cI160_230_a_c_h_d --params=11.4597,0.3471,0.4664,0.0512
     if(vlabel.at(ifound)=="A2B3C12D3_cI160_230_a_c_h_d")
       PrototypeANRL_A2B3C12D3_cI160_230_a_c_h_d(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    //DX20181130 - add Ohad's SQS structures - START
+    //DX20181130 - add OL's SQS structures - START
     // -------------------------------------------------------------------------
     // SQS (from O. Levy)
     // -------------------------------------------------------------------------
@@ -3552,9 +3552,9 @@ namespace anrl {
     // 7 // ./aflow --proto=AB7_hR16_166_c_c2h --params=9.2519726786,1.22474487138,0.875,0.625,1.625,0.1250000001,1.125,1.6249999999
     if(found && vlabel.at(ifound)=="AB7_hR16_166_c_c2h")
       PrototypeANRL_AB7_hR16_166_c_c2h(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    //DX20181130 - add Ohad's SQS structures - END
+    //DX20181130 - add OL's SQS structures - END
 
-    //DX20181211 - add Corey's kesterite structure - START
+    //DX20181211 - add CO's kesterite structure - START
     // -------------------------------------------------------------------------
     // Kesterite (from C. Oses)
     // -------------------------------------------------------------------------
@@ -3562,7 +3562,7 @@ namespace anrl {
     // 1 // ./aflow --proto=A2BCD4_tI16_82_ac_b_d_g --params=5.427,2.00313248572,0.7434,0.256,0.6278
     if(found && vlabel.at(ifound)=="A2BCD4_tI16_82_ac_b_d_g")
       PrototypeANRL_A2BCD4_tI16_82_ac_b_d_g(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
-    //DX20181211 - add Corey's kesterite structure - END
+    //DX20181211 - add CO's kesterite structure - END
 
     // -------------------------------------------------------------------------
     // misc prototypes (from Y. Lederer)
@@ -3811,7 +3811,7 @@ namespace anrl {
     // ---------------------------------------------------------------------------
 
 
-    // DAVID PUT THEM HERE WITH THE ORDER OF THE PAPER
+    //DX PUT THEM HERE WITH THE ORDER OF THE PAPER
 
     //if(vlabel.at(ifound)=="YYY") {
     //  PrototypeANRL_YYY(web,str,parameters,vproto.at(ifound),print_mode,LDEBUG);
@@ -3819,7 +3819,7 @@ namespace anrl {
 
     // after you generate them you should try them with aflowSG  and if they are small with the pearson
 
-    // DX NOT NEEDED: Parameters are always in RHL if(XHOST.vflag_pflow.flag("PROTO::RHL")) cout << "DAVID WE GOT RHL"<< endl;
+    //DX NOT NEEDED: Parameters are always in RHL if(XHOST.vflag_pflow.flag("PROTO::RHL")) cout << "DX WE GOT RHL"<< endl;
     if(XHOST.vflag_pflow.flag("PROTO::HEX") && vproto_Pearson_symbol[ifound][1] == 'R') {
       vector<double> vparameters;
       aurostd::string2tokens(parameters,vparameters,",");
@@ -3898,16 +3898,16 @@ namespace anrl {
     //DX20200207 [OBSOLETE]   exit(0);
     //DX20200207 [OBSOLETE] }
 
-    //CO20181216 - fudging until real fix goes in - DAVID REMOVE
+    //CO20181216 - fudging until real fix goes in - DX REMOVE
     //DX20190227 [OBSOLETE]    aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too
     //DX20190227 [OBSOLETE]    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");}
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B5_oC32_38_abce_abcdf-001")) aurostd::StringSubst(str.title,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001"); //A3B5_oC32_38_abce_abcdf ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_12a-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001"); //AB3_mC32_8_4a_12a ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A5B11_mP16_6_2abc_2a3b3c-001")) aurostd::StringSubst(str.title,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001"); //A5B11_mP16_6_2abc_2a3b3c ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B13_oC32_38_ac_a2bcdef-001")) aurostd::StringSubst(str.title,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001"); //A3B13_oC32_38_ac_a2bcdef ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_4a4b-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001"); //AB3_mC32_8_4a_4a4b ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB_aP16_2_4i_4i-001")) aurostd::StringSubst(str.title,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001"); //AB_aP16_2_4i_4i ohad bccSQS
-    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB7_hR16_166_c_c2h-001")) aurostd::StringSubst(str.title,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001"); //AB7_hR16_166_c_c2h ohad bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B5_oC32_38_abce_abcdf-001")) aurostd::StringSubst(str.title,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001"); //A3B5_oC32_38_abce_abcdf OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_12a-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001"); //AB3_mC32_8_4a_12a OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A5B11_mP16_6_2abc_2a3b3c-001")) aurostd::StringSubst(str.title,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001"); //A5B11_mP16_6_2abc_2a3b3c OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B13_oC32_38_ac_a2bcdef-001")) aurostd::StringSubst(str.title,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001"); //A3B13_oC32_38_ac_a2bcdef OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_4a4b-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001"); //AB3_mC32_8_4a_4a4b OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB_aP16_2_4i_4i-001")) aurostd::StringSubst(str.title,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001"); //AB_aP16_2_4i_4i OL bccSQS
+    //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB7_hR16_166_c_c2h-001")) aurostd::StringSubst(str.title,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001"); //AB7_hR16_166_c_c2h OL bccSQS
     //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A2BCD4_tI16_82_ac_b_d_g-001")) aurostd::StringSubst(str.title,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001"); //A2BCD4_tI16_82_ac_b_d_g natalio kesterite
     //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_tI4_141_a-001")) aurostd::StringSubst(str.title,"A_tI4_141_a","A_tI4_141_a-001"); //A_tI4_141_a mike Sn
     //DX20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_hP1_191_a-001")) aurostd::StringSubst(str.title,"A_hP1_191_a","A_hP1_191_a-001"); //A_hP1_191_a mike Sn
@@ -4275,7 +4275,7 @@ namespace anrl {
     // load structure
     xstructure xstr(input,IOAFLOW_AUTO);
 
-    //DX20191217 - START
+    //DX20191217 START
     // ---------------------------------------------------------------------------
     // print format 
     string format = "text";

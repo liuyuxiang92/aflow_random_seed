@@ -89,8 +89,8 @@ void CalculateNewStateAFLOW(string & SL_name) {
     args_list[0] = cmd_name;
 
     // redirect stdout and stderr in child process
-    int fout = open("out.dat", O_WRONLY | O_CREAT, 0600); //FK 180515
-    int ferr = open("err.dat", O_WRONLY | O_CREAT, 0600); //FK 180515
+    int fout = open("out.dat", O_WRONLY | O_CREAT, 0600); //FK20180515
+    int ferr = open("err.dat", O_WRONLY | O_CREAT, 0600); //FK20180515
 
     dup2(fout, STDOUT_FILENO);
     dup2(ferr, STDOUT_FILENO);

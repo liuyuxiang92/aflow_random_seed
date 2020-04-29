@@ -387,7 +387,7 @@ namespace FROZSL {
     ostringstream oss;
     oss.clear();
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    uint _precision_=10; //was 16 stefano 10 dane
+    uint _precision_=10; //was 16 SC 10 DM
     oss.precision(_precision_);
   
     vector<string> vinput,tokens,Mrefs;

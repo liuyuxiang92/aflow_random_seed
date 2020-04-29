@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -489,7 +489,7 @@ mesh, the number of energy points, and the smearing width.
       This is especially important for the RS method. The default is 0.05 for the RS method and
       0.0 for the LT method (i.e. no smearing).
 
-Projected DOS can be calculted using the keyword DOS_PROJECT:
+Projected DOS can be calculated using the keyword DOS_PROJECT:
 
          [AFLOW_APL]DOS_PROJECT=ON
 
@@ -1035,7 +1035,7 @@ Direct(2) [A1B1]
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

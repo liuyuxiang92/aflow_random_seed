@@ -162,8 +162,6 @@ namespace apl {
   bool LinearResponsePC::calculateForceConstants() {
     // Check if supercell is already built
     if (!_supercell->isConstructed()) {
-      // ME20191031 - use xerror
-      //throw APLRuntimeError("apl::LinearResponsePC::calculateForceFields(); The supercell structure has not been initialized yet.");
       string function = "apl::LinearResponsePC::calculateForceFields()";
       string message = "The supercell structure has not been initialized yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
@@ -180,7 +178,7 @@ namespace apl {
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // ME20200211
+  //ME20200211
   bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";

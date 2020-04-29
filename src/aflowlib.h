@@ -13,7 +13,7 @@
 
 #include "aflow.h"
 #include "SQLITE/aflow_sqlite.h"
-//[OBSOLETE] [KESONG] #include "aflow_contrib_kesong.h" //CO20180515
+//[OBSOLETE] [KY] #include "aflow_contrib_kesong.h" //CO20180515
 
 using std::vector;
 using std::string;
@@ -51,7 +51,7 @@ namespace aflowlib {
       string auid;                                              // AFLOW UNIQUE IDENTIFIER
       deque<string> vauid;                                      // AFLOW UNIQUE IDENTIFIER SPLIT
       string aurl;deque<string> vaurl;                          // AFLOW RESEARCH LOCATOR and TOKENS
-      string title;                                             // ME20190125 - title of the calculation
+      string title;                                             //ME20190125 - title of the calculation
       string keywords;deque<string> vkeywords;                  // keywords inside
       string aflowlib_date,aflowlib_version;                    // version/creation
       string aflowlib_entries;vector<string> vaflowlib_entries; // this contains the subdirectories that can be associated
@@ -100,7 +100,7 @@ namespace aflowlib {
       string geometry_orig;vector<double> vgeometry_orig; // a,b,c and unit_cell_angles (b,c) (a,c) (a,b) //DX20190124 - add original crystal info
       string lattice_system_orig,lattice_variation_orig,lattice_system_relax,lattice_variation_relax;
       string ldau_TLUJ;
-      vector<vector<double> > vLDAU;  // ME20190124
+      vector<vector<double> > vLDAU;  //ME20190124
       uint natoms;
       uint natoms_orig; //DX20190124 - add original crystal info
       string nbondxx;vector<double> vnbondxx;
@@ -115,12 +115,14 @@ namespace aflowlib {
       string prototype;
       double PV_cell,PV_atom;
       double scintillation_attenuation_length;
-      string sg,sg2;vector<string> vsg,vsg2; // CO20180101
+      string sg,sg2;vector<string> vsg,vsg2; //CO20180101
       string spacegroup_orig,spacegroup_relax;
       string species;vector<string> vspecies;
       string species_pp;vector<string> vspecies_pp;
       string species_pp_version;vector<string> vspecies_pp_version;
       string species_pp_ZVAL;vector<double> vspecies_pp_ZVAL;
+      string species_pp_AUID;vector<string> vspecies_pp_AUID;
+      string METAGGA; // empty if none, potential type is in xPOTCAR/xOUTCAR
       double spin_cell,spin_atom;
       string spinD;vector<double> vspinD;
       string spinD_magmom_orig;vector<double> vspinD_magmom_orig;
@@ -201,10 +203,10 @@ namespace aflowlib {
       double agl_bulk_modulus_static_300K;//  (GPa)
       double agl_bulk_modulus_isothermal_300K;//  (GPa)
       string agl_poisson_ratio_source;//
-      double agl_vibrational_free_energy_300K_cell;// (meV/cell) //CT181212
-      double agl_vibrational_free_energy_300K_atom;// (meV/atom) //CT181212
-      double agl_vibrational_entropy_300K_cell;// (meV/cell*K) //CT181212
-      double agl_vibrational_entropy_300K_atom;// (meV/atom*K) //CT181212
+      double agl_vibrational_free_energy_300K_cell;// (meV/cell) //CT20181212
+      double agl_vibrational_free_energy_300K_atom;// (meV/atom) //CT20181212
+      double agl_vibrational_entropy_300K_cell;// (meV/cell*K) //CT20181212
+      double agl_vibrational_entropy_300K_atom;// (meV/atom*K) //CT20181212
       double ael_poisson_ratio ;//
       double ael_bulk_modulus_voigt;//  (GPa)
       double ael_bulk_modulus_reuss;//  (GPa)
@@ -213,17 +215,16 @@ namespace aflowlib {
       double ael_bulk_modulus_vrh;//  (GPa)
       double ael_shear_modulus_vrh;//  (GPa)
       double ael_elastic_anisotropy;// //CO20181128
-      double ael_youngs_modulus_vrh;//  (GPa) //CT181212
-      double ael_speed_sound_transverse;// (m/s) //CT181212
-      double ael_speed_sound_longitudinal;// (m/s) //CT181212
-      double ael_speed_sound_average;// (m/s) //CT181212
-      double ael_pughs_modulus_ratio;// //CT181212
-      double ael_debye_temperature;// (K) //CT181212
-      double ael_applied_pressure;// (GPa) //CT181212
-      double ael_average_external_pressure; // (GPa) //CT181212
-      xmatrix<double> ael_stiffness_tensor;  // ME20191105
-      xmatrix<double> ael_compliance_tensor;  // ME20191105
-
+      double ael_youngs_modulus_vrh;//  (GPa) //CT20181212
+      double ael_speed_sound_transverse;// (m/s) //CT20181212
+      double ael_speed_sound_longitudinal;// (m/s) //CT20181212
+      double ael_speed_sound_average;// (m/s) //CT20181212
+      double ael_pughs_modulus_ratio;// //CT20181212
+      double ael_debye_temperature;// (K) //CT20181212
+      double ael_applied_pressure;// (GPa) //CT20181212
+      double ael_average_external_pressure; // (GPa) //CT20181212
+      xmatrix<double> ael_stiffness_tensor;  //ME20191105
+      xmatrix<double> ael_compliance_tensor;  //ME20191105
       // BADER
       string bader_net_charges;vector<double> vbader_net_charges;//electrons
       string bader_atomic_volumes;vector<double> vbader_atomic_volumes;//Angst^3
@@ -254,10 +255,10 @@ namespace aflowlib {
       string aflowlib2string(string="out");                      //
       string aflowlib2file(string file,string="out");            //
       bool directory2auid(string directory);                                                // from directory and AURL gives AUID and VAUID
-      void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         // CO20171202 - apennsy fixes
-      void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   // CO20171202 - apennsy fixes
-      bool ignoreBadDatabase() const;                                                       // CO20171202 - apennsy fixes
-      bool ignoreBadDatabase(string& reason) const;                                         // CO20171202 - apennsy fixes
+      void correctBadDatabase(bool verbose=true,ostream& oss=cout);                         //CO20171202 - apennsy fixes
+      void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
+      bool ignoreBadDatabase() const;                                                       //CO20171202 - apennsy fixes
+      bool ignoreBadDatabase(string& reason) const;                                         //CO20171202 - apennsy fixes
       string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
       string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
     private:                                                     //
@@ -278,13 +279,13 @@ namespace aflowlib {
     private:
       struct sockaddr_in client;
       int sock;
-      int PORT;// = 80; // CO20180401
+      int PORT;// = 80; //CO20180401
       string Summons;
       string API_Path;
       string Domain;
       bool establish();
     public:
-      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; // CO20181226
+      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
       void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
       friend ostream& operator<<( ostream& output, APIget& a );
   };
@@ -292,16 +293,17 @@ namespace aflowlib {
 
 // ***************************************************************************
 namespace aflowlib {
-  uint auid2present(string="");
+  bool json2aflowlib(const string& json,string key,string& value); //ME I do not understand why you have out this function as a private member... it would have been simpler to be able to use everywhere
+  uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);
   string AFLUXCall(aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
   string AFLUXCall(vector<string>& matchbook); //DX20190206 - add AFLUX functionality
   string AFLUXCall(string& summons); //DX20190206 - add AFLUX functionality 
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX20190206 - get properties from AFLUX response
-  uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss);
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
-  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  // TEST SC 20190813
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813
 }
 
 // ***************************************************************************
@@ -373,7 +375,7 @@ namespace aflowlib {
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
   bool LIB2RAW(string options,bool overwrite,bool LOCAL=false);
   bool XPLUG(vector<string> argv);
-  bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); // CO20171025
+  bool AddFileNameBeforeExtension(string _file,string addendum,string& out_file); //CO20171025
   bool LIB2RAW_Loop_Thermodynamics(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE,bool LOCAL=false);
   // [OBSOLETE]  bool LIB2RAW_Loop_DATA(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
   bool LIB2RAW_Loop_Bands(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
@@ -382,7 +384,8 @@ namespace aflowlib {
   bool LIB2RAW_Loop_AGL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
   bool LIB2RAW_Loop_AEL(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,string MESSAGE);
   bool LIB2RAW_Loop_LOCK(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
-  bool LIB2LIB(string options,bool overwrite,bool LOCAL=false); //CT181212
+  bool LIB2RAW_Loop_PATCH(string& directory_LIB,string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,string MESSAGE);
+  bool LIB2LIB(string options,bool overwrite,bool LOCAL=false); //CT20181212
 }
 
 namespace aflowlib {
@@ -425,6 +428,7 @@ class _outreach {
     string place,date;
     string type;   // ARTICLE PRESENTATION_TALK PRESENTATION_SEMINAR PRESENTATION_COLLOQUIUM PRESENTATION_KEYNOTE PRESENTATION_PLENARY PRESENTATION_TUTORIAL PRESENTATION_CONTRIBUTED PRESENTATION_POSTER
     bool _isinvited;       // YES
+    bool _isonline;       // YES
     string host;           // who invited
     string abstract;       // if available and in LaTeX
     string pdf;
@@ -490,7 +494,7 @@ bool AlloyAlphabeticLIBRARY(const string& system);
 // ***************************************************************************
 
 // ***************************************************************************
-// ME20191001
+//ME20191001
 // AflowDB class
 
 namespace aflowlib {
@@ -509,84 +513,96 @@ namespace aflowlib {
   };
 
   class AflowDB {
-    public:
-      AflowDB(const string&);
-      AflowDB(const string&, const string&, const string&);
-      AflowDB(const AflowDB&);
-      AflowDB& operator=(const AflowDB&);
-      ~AflowDB();
-      void clear();
+  public:
+    AflowDB(const string&);
+    AflowDB(const string&, const string&, const string&);
+    AflowDB(const AflowDB&);
+    AflowDB& operator=(const AflowDB&);
+    ~AflowDB();
+    void clear();
 
-      string data_path;
-      string database_file;
-      string lock_file;
+    string data_path;
+    string database_file;
+    string lock_file;
 
-      bool isTMP();
+    bool isTMP();
 
-      bool rebuildDatabase(bool=false);
-      void analyzeDatabase(const string&);
+    bool rebuildDatabase(bool=false);
+    void analyzeDatabase(const string&);
 
-      vector<string> getTables(string="");
-      vector<string> getTables(sqlite3*, string="");
+    vector<string> getTables(string="");
+    vector<string> getTables(sqlite3*, string="");
 
-      vector<string> getColumnNames(const string&);
-      vector<string> getColumnNames(sqlite3*, const string&);
-      vector<string> getColumnTypes(const string&);
-      vector<string> getColumnTypes(sqlite3*, const string&);
+    vector<string> getColumnNames(const string&);
+    vector<string> getColumnNames(sqlite3*, const string&);
+    vector<string> getColumnTypes(const string&);
+    vector<string> getColumnTypes(sqlite3*, const string&);
 
-      string getValue(const string&, const string&, string="");
-      string getValue(sqlite3*, const string&, const string&, string="");
-      string getProperty(const string&, const string&, const string&, string="");
-      string getProperty(sqlite3*, const string&, const string&, const string&, string="");
-      vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, string="");
-      vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, string="");
-      vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
-      vector<string> getSet(sqlite3*, const string&, const string&, bool=false, string="", int=0, string="");
-      vector<string> getSetMultiTables(const vector<string>&, const string&, bool=false, string="", int=0);
-      vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool=false, string="", int=0);
+    string getValue(const string&, const string&, string="");
+    string getValue(sqlite3*, const string&, const string&, string="");
+    string getProperty(const string&, const string&, const string&, string="");
+    string getProperty(sqlite3*, const string&, const string&, const string&, string="");
+    vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, string="");
+    vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, string="");
+    vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
+    vector<string> getSet(sqlite3*, const string&, const string&, bool=false, string="", int=0, string="");
+    vector<string> getSetMultiTables(const vector<string>&, const string&, bool=false, string="", int=0);
+    vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool=false, string="", int=0);
 
-      void transaction(bool);
+    void transaction(bool);
 
-    private:
-      void free();
-      void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
-      void close();
-      void copy(const AflowDB&);
+  private:
+    void free();
+    void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
+    void close();
+    void copy(const AflowDB&);
 
-      sqlite3* db;
-      bool is_tmp;
+    sqlite3* db;
+    bool is_tmp;
 
-      void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
-      bool closeTmpFile(bool=false, bool=false);
+    void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
+    bool closeTmpFile(bool=false, bool=false);
 
-      void rebuildDB();
-      void buildTables(int, int, const vector<string>&, const vector<string>&);
-      void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
+    void rebuildDB();
+    void buildTables(int, int, const vector<string>&, const vector<string>&);
+    void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
 
-      vector<string> getSchemaKeys();
-      vector<string> getDataTypes(const vector<string>&, bool);
-      vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
-      string extractJsonValueAflow(const string&, string);
+    vector<string> getSchemaKeys();
+    vector<string> getDataTypes(const vector<string>&, bool);
+    vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
+    string extractJsonValueAflow(const string&, string);
 
-      DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
-      void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
-          const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
-          vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
-      vector<string> getUniqueFromJsonArrays(const vector<string>&);
-      void writeStatsToJson(std::stringstream&, const DBStats&);
+    DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
+    void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
+		     const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
+		     vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
+    vector<string> getUniqueFromJsonArrays(const vector<string>&);
+    void writeStatsToJson(std::stringstream&, const DBStats&);
 
-      void createIndex(const string&, const string&, const string&);
-      void dropIndex(const string&);
-      void dropTable(const string&);
-      void createTable(const string&, const vector<string>&, const string&);
-      void createTable(const string&, const vector<string>&, const vector<string>&);
-      void insertValues(const string&, const vector<string>&);
-      void insertValues(const string&, const vector<string>&, const vector<string>&);
-      string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
-      string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
+    void createIndex(const string&, const string&, const string&);
+    void dropIndex(const string&);
+    void dropTable(const string&);
+    void createTable(const string&, const vector<string>&, const string&);
+    void createTable(const string&, const vector<string>&, const vector<string>&);
+    void insertValues(const string&, const vector<string>&);
+    void insertValues(const string&, const vector<string>&, const vector<string>&);
+    string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
+    string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
   };
-
 }  // namespace aflowlib
+
+// ----------------------------------------------------------------------------
+// aflowlib_libraries_scrubber.cpp
+
+// will be moved near LI2RAW
+namespace aflowlib {
+  uint MOSFET(int mode,bool VERBOSE);
+  uint MAIL2SCAN(string library,bool VERBOSE);
+  uint LIB2SCRUB(string library,bool VERBOSE);
+  bool LIB2AUID(string entry,bool TEST,bool _VERBOSE);
+}  // namespace aflowlib
+
+
 
 #endif //  _AFLOWLIB_H_
 

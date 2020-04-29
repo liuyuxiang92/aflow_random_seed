@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2018
@@ -15,7 +15,7 @@
 //#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ double(1.0e-6)
 
 //#ifndef _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_
-//#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ 1.0e-6 // DX20171025
+//#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ 1.0e-6 //DX20171025
 //#endif
 
 #ifndef XXEND
@@ -283,7 +283,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ME20180904 returns a matrix column as an xvector
+//ME20180904 returns a matrix column as an xvector
 namespace aurostd {  // namespace aurostd
   template<class utype>
     xvector<utype> xmatrix<utype>::getcol(int i) const {
@@ -710,7 +710,7 @@ namespace aurostd {  // namespace aurostd
       printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif    
       if(a.cols!=b.rows) {
-        // ME20190814 - eliminate exit
+        //ME20190814 - eliminate exit
         //{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*: (a.cols!=b.rows)=FALSE" << endl;exit(0);}    
         string function = "aurostd::xmatrix<utype>::operator*";
         string message = "a.cols != b.rows";
@@ -725,7 +725,7 @@ namespace aurostd {  // namespace aurostd
         ai=a[ii];
         //for(k=a.lcols,kk=b.lcols;k<=a.ucols;k++,kk++)
         for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)
-        { //CO200106 - patching for auto-indenting
+        { //CO20200106 - patching for auto-indenting
           bk=b[kk];
           aik=ai[k];
           for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)
@@ -743,7 +743,7 @@ namespace aurostd {  // namespace aurostd
       return  c;
     }
 
-  // ME20190814 - multiplication of a real matrix with a complex matrix
+  //ME20190814 - multiplication of a real matrix with a complex matrix
   template<class utype>
     xmatrix<xcomplex<utype> > operator*(const xmatrix<utype>& a, const xmatrix<xcomplex<utype> >& b) {
 #ifdef _XMATH_DEBUG_OPERATORS
@@ -885,7 +885,7 @@ namespace aurostd {
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
     operator/(const xmatrix<utype>& a,const utype s) {
-      return (utype) ((utype)1/s)*a;                     // DX20170115 - add utype to 1/s to account for xcomplex
+      return (utype) ((utype)1/s)*a;                     //DX20170115 - add utype to 1/s to account for xcomplex
     }
   template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
     operator/(const xmatrix<utype>& a,const xmatrix<utype>& b) {  //CO20191201
@@ -930,12 +930,12 @@ namespace aurostd {  // namespace aurostd
 
   template<class utype> bool                             // is xmatrix == xmatrix ?
     identical(const xmatrix<utype>& a,const xmatrix<utype>& b,const utype& _tol_,const char& _mode_) {
-      // ME20190814 - BEGIN
+      //ME20190814 BEGIN
       // [OBSOLETE - return false instead] if(a.rows!=b.rows) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[1]" << endl;exit(0);}
       // [OBSOLETE - return false instead] if(a.cols!=b.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[2]" << endl;exit(0);}
       if ((a.rows != b.rows) || (a.cols != b.cols)) return false;
-      //if(a.isfloat || a.iscomplex) { ME20190814 - this doesn't work for xcomplex because abs() and _tol_ have different types //[CO200106 - close bracket for indenting]}
-      // ME20190814 - END
+      //if(a.isfloat || a.iscomplex) { ME20190814 - this doesn't work for xcomplex because abs() and _tol_ have different types //[CO20200106 - close bracket for indenting]}
+      //ME20190814 END
       if(a.isfloat) {
         if(_mode_==1) { // relative tolerance
           for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++)
@@ -1015,7 +1015,7 @@ namespace aurostd {  // namespace aurostd
       return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
     }
 
-  // ME20190814 - xcomplex version
+  //ME20190814 - xcomplex version
   // namespace aurostd
   template<class utype> bool
     identical(const xmatrix<xcomplex<utype> >& a, const xmatrix<xcomplex<utype> >& b, const utype& _tol_, const char& _mode_) {
@@ -1113,7 +1113,7 @@ namespace aurostd {  // namespace aurostd
     }    
 
   // namespace aurostd
-  //CO - START
+  //CO START
   template<class utype> bool
     isidentity(const xmatrix<utype>& a) {
       if(a.rows!=a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in issymmetric (must be square)" << endl;exit(0);}
@@ -1126,11 +1126,11 @@ namespace aurostd {  // namespace aurostd
           }
       return TRUE;
     }
-  //CO - START
+  //CO START
 
   // namespace aurostd
   template<class utype> bool
-    isdiagonal(const xmatrix<utype>& a,const utype& _eps_) { // DX20171025
+    isdiagonal(const xmatrix<utype>& a,const utype& _eps_) { //DX20171025
       for(int i=a.lrows;i<=a.urows;i++)
         for(int j=a.lcols;j<=a.ucols;j++)
           if(i-a.lrows+1!=j-a.lcols+1)  // i != j
@@ -1411,13 +1411,13 @@ namespace aurostd {
 // -------------------------------------------------------------- xmatrix example types
 
 namespace aurostd {  // namespace aurostd
-  //171008 - CO
+  //20171008 - CO
   //doesn't have to be square like identity
   template<class utype> xmatrix<utype>
     eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO20190520
       if(nch==AUROSTD_MAX_INT){nch=nrh;}  //eye(3)==eye(3,3)
       xmatrix<utype> a(nrh,nch,nrl,ncl);
-      //[CO200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME20200106
+      //[CO20200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME20200106
       int i=0,j=0;
       for (i=a.lrows;i<=a.urows;i++){
         for (j=a.lcols;j<=a.ucols;j++){
@@ -1429,7 +1429,7 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
-  //171008 - CO
+  //20171008 - CO
   template<class utype> xmatrix<utype>
     ones_xm(int nrh,int nch,int nrl,int ncl) __xprototype { //CO20190520
       xmatrix<utype> a(nrh,nch,nrl,ncl);
@@ -1728,7 +1728,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 // Cayley-Menger Determinant
 // http://mathworld.wolfram.com/Cayley-MengerDeterminant.html
-// CO20180515
+//CO20180515
 namespace aurostd { // namespace aurostd
   template<class utype> utype
     CMdet(const xmatrix<utype>& B){ //Cayley-Menger Determinant for simplex content
@@ -1753,8 +1753,8 @@ namespace aurostd { // namespace aurostd
 
 // ----------------------------------------------------------------------------
 // getRotationMatrix3D() rotating a onto b
-// https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
-// CO20190324
+// https://math.stackexchange.com/questions/20180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
+//CO20190324
 namespace aurostd { // namespace aurostd
   template<class utype> xmatrix<utype>
     getRotationMatrix3D(const xvector<utype>& a,const xvector<utype>& b){
@@ -2255,7 +2255,7 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-  template<class utype> utype  // DX20170115 - double to utype (needed for xcomplex)                                          // trace
+  template<class utype> utype  //DX20170115 - double to utype (needed for xcomplex)                                          // trace
     trace(const xmatrix<utype>& a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function trace: ");
@@ -2264,7 +2264,7 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(!a.issquare)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in trace defined for square xmatrixes" << endl;exit(0);}
-      utype out=0.0; // DX20170115 - double to utype (needed for xcomplex)
+      utype out=0.0; //DX20170115 - double to utype (needed for xcomplex)
       for(int i=a.lrows;i<=a.urows;i++)
         out+=a[i][i];
       return out;
@@ -2274,7 +2274,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {
   template<class utype>
-    xmatrix<utype> KroneckerProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { // ME20180614 - Kronecker product
+    xmatrix<utype> KroneckerProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //ME20180614 - Kronecker product
       int rows, cols, r, c;
       utype aelement, belement;
       rows = A.rows * B.rows;
@@ -2441,7 +2441,7 @@ namespace aurostd {
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-  // ME20180904
+  //ME20180904
   template<class utype> xmatrix<utype>                             // conj xmatrix
     conj(const xmatrix<utype>& a){
       if (a.iscomplex) {
@@ -2504,7 +2504,7 @@ namespace aurostd {  // namespace aurostd
       }
     }
   template<class utype> void                             // trasp xmatrix
-    traspInPlace(xmatrix<utype>& a,bool conjugate){  // ME20190813 - conjugate complex now an option //CO20191201 - in place
+    traspInPlace(xmatrix<utype>& a,bool conjugate){  //ME20190813 - conjugate complex now an option //CO20191201 - in place
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function traspose xmatrix: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
@@ -2538,7 +2538,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                             // trasp xvector
-    trasp(const xvector<utype>& a, bool conjugate){  // ME20190813 - conjugate complex now an option
+    trasp(const xvector<utype>& a, bool conjugate){  //ME20190813 - conjugate complex now an option
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function traspose xvector: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
@@ -3156,7 +3156,7 @@ namespace aurostd {  // namespace aurostd
     xmatrix<int> mx(ma.urows,ma.ucols,ma.lrows,ma.lcols),my(ma.urows,ma.ucols,ma.lrows,ma.lcols);
     return GCD(ma,mb,mgcd,mx,my);
   }
-  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my){ //CO20191291
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my){ //CO20191219
     if(ma.rows==0 || ma.cols==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.rows==0 || ma.cols==0",_INPUT_NUMBER_);}
     //ma vs. mb
     if(ma.lrows!=mb.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.lrows!=mb.lrows",_INDEX_MISMATCH_);}
@@ -3638,14 +3638,14 @@ namespace aurostd {
           z[ip]=0.0;
         }
       }
-      // ME20200106 - replace with xerror
+      //ME20200106 - replace with xerror
       //cerr << _AUROSTD_XLIBS_ERROR_ << "JACOBI: Too many iterations in routine jacobi" << endl;
       //exit(0);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, "xmatrix::jacobi()", "Too many iterations.", _RUNTIME_ERROR_);
     }
 #undef ROTATE  
 
-  // ME20190815
+  //ME20190815
   // Jacobi algorithm for Hermitian matrices (used to be in APL/apl_aplmath.cpp)
   // Based on http://arxiv.org/abs/physics/0607103
   template<class utype>
@@ -3848,7 +3848,7 @@ namespace aurostd {
 }
 
 // ****************************************************
-// CO20171129
+//CO20171129
 namespace aurostd {
   template<class utype>
     void QRDecomposition_HouseHolder(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO20191110
@@ -3977,7 +3977,7 @@ namespace aurostd {
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }
   template<class utype>
-    void getEHermite(utype a,utype b,xmatrix<utype>& ehermite){ //CO+YL191201
+    void getEHermite(utype a,utype b,xmatrix<utype>& ehermite){ //CO+YL20191201
       //implementation is inspired by that found here: http://pydoc.net/GBpy/0.1.1/GBpy.tools/
       //original license: GNU-GPL Style.
       //Elementary Hermite transformation.
@@ -4011,7 +4011,7 @@ namespace aurostd {
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }
   template<class utype>
-    void getSmithNormalForm(const xmatrix<utype>& A_in,xmatrix<utype>& U_out,xmatrix<utype>& V_out,xmatrix<utype>& S_out,double tol){  //CO+YL191201
+    void getSmithNormalForm(const xmatrix<utype>& A_in,xmatrix<utype>& U_out,xmatrix<utype>& V_out,xmatrix<utype>& S_out,double tol){  //CO+YL20191201
       //implementation is inspired by that found here: http://pydoc.net/GBpy/0.1.1/GBpy.tools/
       //original license: GNU-GPL Style.
       //Smith normal form of an integer matrix.
@@ -5165,7 +5165,7 @@ namespace aurostd { // namespace aurostd
       // Loop over singular values and over alowed iterations
       for(int its=1;its<=_MAX_ITS;its++) {
         flag=true;
-        //for(l=k;l>=1;l-- ) { // test forsplitting //[CO200106 - close bracket for indenting]}
+        //for(l=k;l>=1;l-- ) { // test forsplitting //[CO20200106 - close bracket for indenting]}
         // to avoid out of range as nm cannot be 0
         // should check!!!!!
         nm=1;
@@ -5517,6 +5517,6 @@ namespace aurostd { // namespace aurostd
 #endif
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

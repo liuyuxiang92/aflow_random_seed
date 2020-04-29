@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -227,7 +227,7 @@ namespace AEL_functions {
     outfile << "[AFLOW_MODE_ZIP=" << _kbinFlags.KZIP_BIN << "]" << std::endl;
     if(SPACES) { outfile << std::endl; }
     
-    // CO20180130 - START
+    //CO20180130 START
     //adding aflow.rc stuff
     outfile << "[AFLOW_MODE_BINARY=";
     if(!_kbinFlags.KBIN_BIN.empty()){outfile << _kbinFlags.KBIN_BIN;}
@@ -248,9 +248,9 @@ namespace AEL_functions {
     else {outfile << DEFAULT_VASP_MPI_BIN;}
     outfile << "\"" << std::endl;
     outfile << AFLOWIN_SEPARATION_LINE << std::endl;
-    // CO20180130 - STOP
+    //CO20180130 STOP
 
-    // CO20180130 - making obsolete with lines above
+    //CO20180130 - making obsolete with lines above
     //[OBSOLETE]if( _kbinFlags.KBIN_MPI ) {
     //[OBSOLETE]  outfile << AFLOWIN_SEPARATION_LINE << std::endl;
     //[OBSOLETE]  outfile << "[AFLOW_MODE_BINARY=" << _kbinFlags.KBIN_BIN << "]" << std::endl;
@@ -1011,3 +1011,9 @@ namespace AEL_functions {
 // **************************************************************************
 
 #endif  // _AFLOW_AEL_GET_STRESS_CPP
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *                                                                         *
+// ***************************************************************************

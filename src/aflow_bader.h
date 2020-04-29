@@ -22,9 +22,9 @@ namespace bader_functions {
 string BaderCalc(aurostd::xoption vpflow);
 bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, string& directory, ostream& oss);
 bool BaderCalc(aurostd::xoption& vpflow, const string& bader_options, const string& prototype,
-               const deque<string>& vspecies, const deque<int>& num_each_species, const vector<double>& vZVAL,
+               const vector<string>& vspecies, const deque<int>& num_each_species, const vector<double>& vZVAL,
                const vector<double>& cutoffs, const vector<int>& downsample_ratios, string& directory, ostream& oss);
-bool BaderCalc(const string& bader_options, const string& prototype, const deque<string>& vspecies,
+bool BaderCalc(const string& bader_options, const string& prototype, const vector<string>& vspecies,
                const deque<int>& num_each_species, const vector<double>& vZVAL, const vector<double>& cutoffs,
                const vector<int>& downsample_ratios, string& directory, ostream& oss);
 void FixDirectory(string& directory);

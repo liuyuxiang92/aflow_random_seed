@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *              AFlow STEFANO CURTAROLO  Duke University 2003-2020         *
-// *              AFlow COREY OSES  Duke University 2013-2019                *
+// *              AFlow COREY OSES  Duke University 2013-2020                *
 // *                                                                         *
 // ***************************************************************************
 // aflow_pocc.cpp
@@ -35,7 +35,7 @@ const string POCC_AFLOWIN_tag="[AFLOW_POCC]";
 const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000-3000K, looks weird if decimal is larger than non-decimal part of number //4;  //this is std::fixed
 
 //make defaults in AFLOW_RC
-const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with kesong
+const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare with KY
 
 //some constants
 const int BAR_WIDTH = 70;
@@ -52,7 +52,7 @@ bool COMPARE_WITH_KESONG=false;
 bool ENUMERATE_ALL_HNF=false;
 
 namespace pocc {
-  //temporary function to replace kesong's code, but should never be called
+  //temporary function to replace KY's code, but should never be called
   //does NOT handle aflow.in generation well at all
   bool poccInput() {
     string soliloquy="pocc::poccInput():";
@@ -65,7 +65,7 @@ namespace pocc {
     //aflags
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
 
     //aflow.in
     string AflowIn_file,AflowIn;
@@ -1018,7 +1018,7 @@ namespace pocc {
     cmdline_opts.push_attached("PLOTTER::PRINT", "png");
     plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
     plot_opts.push_attached("DIRECTORY",m_aflags.Directory);
-    if(1){  //turn off for marco - POCC+APL
+    if(1){  //turn off for ME - POCC+APL
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_orbitals_T"+getTemperatureString(temperature)+"K");
@@ -1043,7 +1043,7 @@ namespace pocc {
           plotter::PLOT_PDOS(plot_opts,m_xdoscar);
         }
       }
-    }else{  //marco!
+    }else{  //ME!
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.push_attached("PROJECTION","ATOMS");
       //plot_opts.push_attached("EXTENSION","dos_atoms_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
@@ -2233,7 +2233,7 @@ namespace pocc {
   //    xstr_pocc.comp_each_type[xstr_pocc.atoms[i].type] += xstr_pocc.atoms[i].partial_occupation_value;
   //  }
   //
-  //  //corey add check for if all sites are fully occupied
+  //  //CO add check for if all sites are fully occupied
   //  return true;
   //}
 
@@ -2283,26 +2283,26 @@ namespace pocc {
     // that way, we explore all possibilities efficiently without having to save the hnf's (only corresponding superlattices)
     // this iterative scheme helps save some memory, which we need elsewhere in the code
     // starting_config ensures we don't ALSO lose calculation iterations in recalculating hnf possibilities we already explored
-    // REMEMBER when comparing with kesong's hnf's, his are TRANSPOSED!
+    // REMEMBER when comparing with KY's hnf's, his are TRANSPOSED!
     bool starting_config;
     for(int a=a_start;a<=n_hnf;a++){
       starting_config=(a==a_start);
       for(int c=( starting_config ? c_start : C_START );c<=n_hnf/a;c++) //for(int c=( a==a_start ? c_start : C_START );c<=n_hnf/a;c++) //for(int c=c_start;c<=n_hnf/a;c++)
-      {   //CO200106 - patching for auto-indenting
+      {   //CO20200106 - patching for auto-indenting
         starting_config=(starting_config && (c==c_start));
         for(int f=( starting_config ? f_start : F_START );f<=n_hnf/a/c;f++) //for(int f=( (a==a_start && c==c_start) ? f_start : F_START );f<=n_hnf/a/c;f++) //for(int f=f_start;f<=n_hnf/a/c;f++)
-        { //CO200106 - patching for auto-indenting
+        { //CO20200106 - patching for auto-indenting
           if(a*c*f==n_hnf){
             //found new viable diagonal set, now enumerate based on off-diagonals
             starting_config=(starting_config && (f==f_start));
             for(int b=( starting_config ? b_start : B_START );b<c;b++) //for(int b=( (a==a_start && c==c_start && f==f_start) ? b_start : B_START );b<c;b++) //for(int b=b_start;b<c;b++)
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               starting_config=(starting_config && (b==b_start));
               for(int d=( starting_config ? d_start : D_START );d<f;d++) //for(int d=( (a==a_start && c==c_start && f==f_start && b==b_start) ? d_start : D_START );d<f;d++) //for(int d=d_start;d<f;d++)
-              { //CO200106 - patching for auto-indenting
+              { //CO20200106 - patching for auto-indenting
                 starting_config=(starting_config && (d==d_start));
                 for(int e=( starting_config ? e_start : E_START );e<f;e++) //for(int e=( (a==a_start && c==c_start && f==f_start && b==b_start && d==d_start) ? e_start : E_START );e<f;e++) //for(int e=e_start;e<f;e++)
-                { //CO200106 - patching for auto-indenting
+                { //CO20200106 - patching for auto-indenting
                   if(LDEBUG) {
                     cerr << " a=" << a << "(max=n_hnf=" << n_hnf << ")";
                     cerr << " c=" << c << "(max=n_hnf/a=" << n_hnf/a << ")";
@@ -2651,12 +2651,12 @@ namespace pocc {
     xmatrix<double> hnf_mat;                            //really xmatrix of int's, but we rule for int * double in xmatrix, no big deal
     //vector<xmatrix<double> > v_unique_superlattices;    //only store locally, as we need to make comparisons
 
-    //START KESONG
-    //cerr << "START KESONG " << endl;
+    //START KY
+    //cerr << "START KY " << endl;
     //CalculateHNF(p_str.xstr_pocc,p_str.n_hnf);
 
     //cerr << endl;
-    //cerr << "START COREY " << endl;
+    //cerr << "START CO " << endl;
     //resetMaxSLRadius();
     hnf_count=0;
     resetHNFMatrices();
@@ -2680,9 +2680,9 @@ namespace pocc {
     //vector<vector<int> > v_types_config;
     //vector<int> v_config_iterators; //, v_site_iterators;
 
-    //while(getNextSiteConfiguration(v_types_config,v_config_iterators,v_site_iterators)){  //[CO200106 - close bracket for indenting]}
+    //while(getNextSiteConfiguration(v_types_config,v_config_iterators,v_site_iterators)){  //[CO20200106 - close bracket for indenting]}
 
-    // COREY MAKE THIS A TRUE CALCULATOR, simply go through each site, add between configs, 
+    //CO MAKE THIS A TRUE CALCULATOR, simply go through each site, add between configs, 
     //multiple across sites
     types_config_permutations_count=0;   //per hnf matrix
     unsigned long long int str_config_permutations_count;
@@ -2990,7 +2990,7 @@ namespace pocc {
 
   //[OBSOLETE]for(uint atom1=0;atom1<supercell.atoms.size();atom1++){
   //[OBSOLETE]  for(uint atom2=atom1+1;atom2<supercell.atoms.size();atom2++){
-  //[OBSOLETE]    if(abs(distance_matrix(atom1,atom2)-v_nn_dists[atom1])<0.5){  //kesong standard for bonding, keep for now
+  //[OBSOLETE]    if(abs(distance_matrix(atom1,atom2)-v_nn_dists[atom1])<0.5){  //KY standard for bonding, keep for now
   //[OBSOLETE]      v_bonded_atom_indices.push_back(vector<uint>(0));
   //[OBSOLETE]      v_bonded_atom_indices.back().push_back(atom1);
   //[OBSOLETE]      v_bonded_atom_indices.back().push_back(atom2);
@@ -3030,13 +3030,13 @@ namespace pocc {
     //  cerr << "LOOK start " << std::distance(l_supercell_sets.begin(),i_start) << " " << (*i_start).getUFFEnergy() << endl;
     //  cerr << "LOOK end " << std::distance(l_supercell_sets.begin(),i_end) << " " << (*i_end).getUFFEnergy() << endl;
     if(i_start==i_end) //std::distance(i_start,i_end)==0)
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       //    cerr << "start==stop" << endl;
       //
       if(i_start==l_supercell_sets.end()){--i_start;}
 
       if(areEquivalentStructuresByUFF(i_start,psc)) //aurostd::isequal(psc.energy,(*i_start).getUFFEnergy(),m_energy_uff_tolerance))
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         //      cerr << "found degeneracy with " << std::distance(l_supercell_sets.begin(),i_start) << endl;
         (*i_start).m_psc_set.push_back(psc);
         //(*i_start).m_degeneracy++;
@@ -3058,7 +3058,7 @@ namespace pocc {
     //  cerr << "Looking at middle=" << std::distance(l_supercell_sets.begin(),i_middle) << " " << (*i_middle).getUFFEnergy() << endl;
     //cerr << "SEE HERE " << i_middle << endl;
     if(areEquivalentStructuresByUFF(i_middle,psc)) //aurostd::isequal(psc.energy,(*i_middle).getUFFEnergy(),m_energy_uff_tolerance))
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       //    cerr << "found degeneracy with " << std::distance(l_supercell_sets.begin(),i_middle) << endl;
       (*i_middle).m_psc_set.push_back(psc);
       //(*i_middle).m_degeneracy++;
@@ -3193,11 +3193,9 @@ namespace pocc {
       cerr << "========================================== vs. ==========================================" << endl;
       cerr << b;
     }
-    //xstructure aa("/home/corey/work/work/pranab/POCC/new_tests/new_sets_test_new_pocc/test/sc_test/POSCAR1",IOAFLOW_AUTO);
-    //xstructure bb("/home/corey/work/work/pranab/POCC/new_tests/new_sets_test_new_pocc/test/sc_test/POSCAR2",IOAFLOW_AUTO);
     //cerr << aa << endl;
     //cerr << bb << endl;
-    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! // DX20180123 - added fast_match = true // DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=compare::aflowCompareStructure(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
     //cerr << are_equivalent << endl;
     //exit(1);
     if(LDEBUG) {cerr << soliloquy << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
@@ -3385,7 +3383,7 @@ namespace pocc {
     message << "Calculating unique supercells. Please be patient";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
-    ////[CO20181226 - need to experiment]double energy_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out corey, only works if energy radius = 10
+    ////[CO20181226 - need to experiment]double energy_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out CO, only works if energy radius = 10
     //double energy_radius=DEFAULT_UFF_CLUSTER_RADIUS;
     ////if(SET_KESONG_STANDARD_DIST){energy_radius=ENERGY_RADIUS;}
     //if(COMPARE_WITH_KESONG){energy_radius=ENERGY_RADIUS;}
@@ -4650,7 +4648,7 @@ namespace pocc {
 
       //for(unsigned long long int i=0;i<getUniqueSuperCellsCount();i++)
       for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         isupercell=std::distance(l_supercell_sets.begin(),it);
         if(LDEBUG) {cerr << soliloquy << " starting structure[" << isupercell << "]" << endl;}
 
@@ -4771,7 +4769,7 @@ namespace pocc {
     //no need to assign fake names to xstr_pocc, we already do in xstr_nopocc
 
     //clean atom/species names
-    pflow::fixEmptyAtomNames(xstr_pocc, false); //true);  //aflow likes pp info //corey come back - use fakenames() too if needed
+    pflow::fixEmptyAtomNames(xstr_pocc, false); //true);  //aflow likes pp info //CO come back - use fakenames() too if needed
     //add here fakenames()
 
     //quick tests of stupidity
@@ -4830,14 +4828,14 @@ namespace pocc {
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ostream& oss) {
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss) {ofstream FileMESSAGE;return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);}
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss) {
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     return getPOccSites(xstr_pocc,aflags,FileMESSAGE,oss);
   }
   vector<POccUnit> getPOccSites(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
@@ -5078,7 +5076,7 @@ namespace pocc {
 
   //void POccStructure::getSiteCountConfigurations(int i_hnf, double& min_stoich_error)
   void POccCalculator::getSiteCountConfigurations(int i_hnf)
-  { //CO200106 - patching for auto-indenting
+  { //CO20200106 - patching for auto-indenting
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::getSiteCountConfigurations():";
     //return these values, do not necessarily store as "global" values
@@ -5143,11 +5141,11 @@ namespace pocc {
     xvector<double> stoich_each_type_new;
     double stoich_error;
     double eps=1.0; //(double)m_pocc_sites.size();   //number of sites
-    //cerr << "COREY START" << endl;
+    //cerr << "CO START" << endl;
     //std::vector<double>::iterator it_max_stoich;
     //while(getNextSiteConfiguration(vv_count_configs,v_config_order,v_config_iterators,v_types_config))
     while(pocc::getNextSiteConfiguration(vv_count_configs,v_config_iterators,v_types_config))
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       stoich_each_type_new=calculateStoichEachType(v_types_config);
       stoich_error=aurostd::max(aurostd::abs(stoich_each_type-stoich_each_type_new));
       //stoich_error=calculateStoichDiff(stoich_each_type,xstr_pocc.stoich_each_type);
@@ -5187,7 +5185,7 @@ namespace pocc {
         v_str_configs.back().max_stoich_error=stoich_error;
       }
     }
-    //cerr << "COREY Stop" << endl;
+    //cerr << "CO STOP" << endl;
 
     //vector<int> starting_config;
     //for(uint str_config=0;str_config<v_str_configs.size();str_config++){
@@ -5242,7 +5240,7 @@ namespace pocc {
     for(uint site=0;site<pocc_sites.size();site++){
       if(pocc_sites[site].partial_occupation_flag){
         //test of stupidity
-        //[COREY COME BACK, add another reasonable check that includes vacancies]if(pocc_sites[site].v_occupants.size()<2){return false;}
+        //[CO COME BACK, add another reasonable check that includes vacancies]if(pocc_sites[site].v_occupants.size()<2){return false;}
         //set the 0th index to non-pocc status
         xstr_nopocc.atoms[pocc_sites[site].v_occupants[0]].partial_occupation_value=1.0;
         xstr_nopocc.atoms[pocc_sites[site].v_occupants[0]].partial_occupation_flag=false;
@@ -5501,7 +5499,7 @@ namespace pocc {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::calculateSymNonPOccStructure():";
     stringstream message;
-    // CO - default should always be to turn everything on, modify input
+    //CO - default should always be to turn everything on, modify input
     //get ROBUST symmetry determination
     xstr_sym=xstr_nopocc; //make copy to avoid carrying extra sym_ops (heavy) if not needed
     pflow::defaultKFlags4SymCalc(m_kflags,true);
@@ -5544,7 +5542,7 @@ namespace pocc {
   void POccCalculator::propagateEquivalentAtoms2POccStructure() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::propagateEquivalentAtoms2POccStructure():";
-    // CO - default should always be to turn everything on, modify input
+    //CO - default should always be to turn everything on, modify input
     //assign iatoms info to pocc structure as well, allows sorting later
     //remember, the 0th occupant of xstr_pocc remains in xstr_sym (xstr_nopocc)
     for(uint site=0;site<m_pocc_sites.size();site++){
@@ -5583,7 +5581,7 @@ namespace pocc {
           //output - START
           ss_header << "| ";
           ss_header << aurostd::PaddedCENTER("pocc_atom = " + aurostd::utype2string(pocc_atom) + "/" + aurostd::utype2string(pocc_atoms_total) + (!atom_name.empty()?" ["+atom_name+"]":""),getHNFTableColumnPadding()+2);  //need to +2, bug in PaddedCENTER()
-          ss_header << " " ;  // CO20170629
+          ss_header << " " ;  //CO20170629
           //output - END
           pocc_atom++;
         }
@@ -5617,7 +5615,7 @@ namespace pocc {
     site_error=v_str_configs[str_config].max_site_error;
     if(LDEBUG) {
       if(v_str_configs.size()>1){
-        //cerr << "COREY CHECK IT OUT" << endl;
+        //cerr << "CO CHECK IT OUT" << endl;
         for(uint str_config=0;str_config<v_str_configs.size();str_config++){
           cerr << "config " << str_config << endl;
           for(uint site=0;site<v_str_configs[str_config].site_configs.size();site++){
@@ -6059,7 +6057,7 @@ namespace pocc {
   }
 
   void POccUFFEnergyAnalyzer::setExplorationRadius(){
-    //[CO20181226 - need to experiment]double m_exploration_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out corey, only works if energy radius = 10
+    //[CO20181226 - need to experiment]double m_exploration_radius=RadiusSphereLattice(getLattice())*1.5; //figure this out CO, only works if energy radius = 10
     m_exploration_radius=DEFAULT_UFF_CLUSTER_RADIUS;
     //if(SET_KESONG_STANDARD_DIST){m_exploration_radius=ENERGY_RADIUS;}
     if(COMPARE_WITH_KESONG){m_exploration_radius=ENERGY_RADIUS;}
@@ -6209,10 +6207,10 @@ namespace pocc {
         if(atom1!=atom2){
           //distij=AtomDist(xstr_cluster.atoms[atom1],xstr_cluster.atoms[atom2]);
           distij=AtomDist(xstr_cluster.grid_atoms[atom1],xstr_cluster.grid_atoms[atom2]);
-          if(distij<=m_exploration_radius){ //kesong (via stefano) used <= as well (GetNeighData)
+          if(distij<=m_exploration_radius){ //KY (via SC) used <= as well (GetNeighData)
             //  cerr << "OK cluster atom 1 " << atom1 << " " << xstr_cluster.grid_atoms[atom1].cpos << endl;
             //  cerr << "OK cluster atom 2 " << atom2 << " " << xstr_cluster.grid_atoms[atom2].cpos << endl;
-            if(abs(distij-v_dist_nn[(this->*NNDistancesMap)(atom1)])<=uff_bonding_distance){  //kesong only looked at <, not <= (ExtractBonds)
+            if(abs(distij-v_dist_nn[(this->*NNDistancesMap)(atom1)])<=uff_bonding_distance){  //KY only looked at <, not <= (ExtractBonds)
               v_bonded_atom_indices.push_back(vector<uint>(0));
               v_bonded_atom_indices.back().push_back(atom1);
               v_bonded_atom_indices.back().push_back(atom2);

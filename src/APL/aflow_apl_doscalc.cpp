@@ -5,7 +5,7 @@
 
 #include "aflow_apl.h"
 
-//CO - START
+//CO START
 // Some parts are written within the C++0x support in GCC, especially the std::thread,
 // which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
 // http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
@@ -15,7 +15,7 @@
 #else
 #warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
-//CO - END
+//CO END
 
 #define MIN_FREQ_TRESHOLD -0.1
 
@@ -82,10 +82,10 @@ namespace apl {
     _freqs.clear();
     _bins.clear();
     _dos.clear();
-    _idos.clear();  // ME20190614
-    _eigen.clear();  // ME20190624
-    _projectedDOS.clear(); // ME20190614
-    _projections.clear();  // ME20190624
+    _idos.clear();  //ME20190614
+    _eigen.clear();  //ME20190624
+    _projectedDOS.clear(); //ME20190614
+    _projections.clear();  //ME20190624
     _bzmethod = "";
     _temperature = 0.0;  // ME20190614
     _minFreq = AUROSTD_NAN;
@@ -102,33 +102,33 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  //CO - START
+  //CO START
   void DOSCalculator::calculateInOneThread(int startIndex, int endIndex) {
     //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
     for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  // ME20190624
+      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  //ME20190624
       //std::this_thread::yield();
     }
   }
-  //CO - END
+  //CO END
 
   //////////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calculateFrequencies() {
     // Get q-points for which to calculate the frequencies
-    // ME20190419 - BEGIN
-    //_qpoints = _rg->getPoints();
-    //_qweights = _rg->getWeights();
+    //ME20190419 BEGIN
+    //_qpoints = _rg.getPoints();
+    //_qweights = _rg.getWeights();
     _qpoints = _rg->getIrredQPointsCPOS();
-    // ME20190419 - END
+    //ME20190419 END
 
-    // 07-08-2010 We do not need it anymore, since mpmesh has all points in catesian coords now
+    // 20100708 We do not need it anymore, since mpmesh has all points in catesian coords now
     // Transform points to the form as it is expected by CPC:
     // Transform from the reciprocal lattice of the primitive cell to cartesian coordinates
     // for(uint t = 0; t < _qpoints.size(); t++)
     //    _qpoints[t] = trasp(ReciprocalLattice(_pc->getPrimitiveCellStructure().lattice)) * _qpoints[t];
 
-    //CO - START
+    //CO START
     string message = "Calculating frequencies for the phonon DOS.";
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
@@ -137,7 +137,7 @@ namespace apl {
     xvector<double> zero(_pc->getNumberOfBranches());
     for (uint i = 0; i < _qpoints.size(); i++)
       _freqs.push_back(zero);
-    _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc->getNumberOfBranches(), _pc->getNumberOfBranches()));  // ME20190624
+    _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc->getNumberOfBranches(), _pc->getNumberOfBranches()));  // M20190624
 
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
 
@@ -174,8 +174,8 @@ namespace apl {
 #else
 
     // Calculate frequencies
-    // ME20190624 - added eigenvectors for projected DOS
-    // ME20200206 - use calculateInOneThread so changes only need to be made in one place
+    //ME20190624 - added eigenvectors for projected DOS
+    //ME20200206 - use calculateInOneThread so changes only need to be made in one place
     //[[OBSOLETE]xmatrix<xcomplex<double> > xmtrx(_pc->getNumberOfBranches(), _pc->getNumberOfBranches());
     //[[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
     //[[OBSOLETE]  _freqs.push_back(_pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
@@ -184,15 +184,15 @@ namespace apl {
     calculateInOneThread(0, (int) _qpoints.size());
 
 #endif
-    //CO - END
+    //CO END
 
-    //if freq > MIN_FREQ_TRESHOLD considerd as +ve freq [PINKU]
+    //if freq > MIN_FREQ_TRESHOLD considerd as +ve freq [PN]
     for (uint i = 0; i < _freqs.size(); i++) {
       for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
         if ((_freqs[i][j] < 0.00) && (_freqs[i][j] > MIN_FREQ_TRESHOLD)) _freqs[i][j] = 0.00;
       }
     }
-    //PINKU END
+    //PN END
 
     // Get min and max values
     _maxFreq = -1.0;
@@ -205,11 +205,12 @@ namespace apl {
     }
     _maxFreq += 1.0;
     if (_minFreq < MIN_FREQ_TRESHOLD) _minFreq -= 1.0;
+    else _minFreq = 0.0;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20190614 - added integrated DOS
+  //ME20190614 - added integrated DOS
   void DOSCalculator::smearWithGaussian(vector<double>& dos, vector<double>& idos, double h, double sigma) {
     // Construct table for gaussian function
     int ng = (int)(6.0 * sigma / h + 1.0);
@@ -292,23 +293,23 @@ namespace apl {
 
     // Clear old stuff
     _dos.clear();
-    _idos.clear();  // ME20190614
+    _idos.clear();  //ME20190614
     _bins.clear();
 
     // Prepare storagearrays
     for (int k = 0; k < USER_DOS_NPOINTS; k++) {
       _dos.push_back(0);
-      _idos.push_back(0);  // ME20190614
+      _idos.push_back(0);  //ME20190614
       _bins.push_back(fmin + k * _stepDOS + _halfStepDOS);
     }
-    // ME20190624
+    //ME20190624
     if (_projections.size() > 0)
       _projectedDOS.resize(_pc->getInputCellStructure().atoms.size(),
           vector<vector<double> >(_projections.size(), vector<double>(USER_DOS_NPOINTS)));
 
     // Perform the raw specific calculation by method
-    // ME20190423 - START
-    // ME20200321 - Added logger output
+    //ME20190423 START
+    //ME20200321 - Added logger output
     //rawCalc(USER_DOS_NPOINTS);  OBSOLETE
     if (_bzmethod == "LT") {
       string message = "Calculating phonon DOS using the linear tetrahedron method.";
@@ -319,11 +320,11 @@ namespace apl {
       pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       calcDosRS();
     }
-    // ME20190423 - END
+    //ME20190423 END
 
     // Smooth DOS by gaussians
     if (USER_DOS_SMEAR > 1E-6)
-      smearWithGaussian(_dos, _idos, _stepDOS, USER_DOS_SMEAR);  // ME20190614
+      smearWithGaussian(_dos, _idos, _stepDOS, USER_DOS_SMEAR);  //ME20190614
 
     // Normalize to number of branches
     double sum = 0.0;
@@ -333,11 +334,11 @@ namespace apl {
 
     for (int k = 0; k < USER_DOS_NPOINTS; k++) {
       _dos[k] /= (sum * _stepDOS);
-      //_idos[k] /= (sum * _stepDOS);  // ME20190614  // OBSOLETE - ME20200228 - not necessary for iDOS
+      //_idos[k] /= (sum * _stepDOS);  //ME20190614  // OBSOLETE - ME20200228 - not necessary for iDOS
     }
   }
 
-  // ME20190423 - START
+  //ME20190423 START
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -352,7 +353,7 @@ namespace apl {
         }
       }
     }
-    // ME20190614 - calculate integrated DOS
+    //ME20190614 - calculate integrated DOS
     _idos[0] = _dos[0];
     for (uint k = 1; k < _dos.size(); k++) {
       _idos[k] = _idos[k-1] + _dos[k];
@@ -361,9 +362,9 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20190614 - added integrated DOS
-  // ME20190625 - rearranged and added projected DOS
-  // ME20200213 - added atom-projected DOS
+  //ME20190614 - added integrated DOS
+  //ME20190625 - rearranged and added projected DOS
+  //ME20200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
     // Procompute projections for each q-point and branch to save time
     uint nproj = _projections.size();
@@ -487,18 +488,18 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20190423 - END
+  //ME20190423 END
 
   void DOSCalculator::writePDOS(const string& directory) {
     // Write PHDOS file
-    //CO - START
+    //CO START
     //ofstream outfile("PDOS",ios_base::out);
     stringstream outfile;
     //if( !outfile.is_open() )
     //{
     //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
     //}
-    //CO - END
+    //CO END
 
     string filename = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE;
     double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
@@ -518,7 +519,7 @@ namespace apl {
         << setw(15) << _dos[k] << std::endl;
     }
 
-    //CO - START
+    //CO START
     aurostd::stringstream2file(outfile, filename); //ME20181226
     if (!aurostd::FileExist(filename)) { //ME20181226
       string function = "DOSCalculator::writePDOS()";
@@ -528,10 +529,10 @@ namespace apl {
     }
     //outfile.clear();
     //outfile.close();
-    //CO - END
+    //CO END
   }
 
-  // ME20190614 - writes phonon DOS in DOSCAR format
+  //ME20190614 - writes phonon DOS in DOSCAR format
   void DOSCalculator::writePHDOSCAR(const string& directory) {
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
     string message = "Writing phonon density of states into file " + filename + ".";
@@ -558,6 +559,7 @@ namespace apl {
     //     string message = "Cannot open output file " + filename + ".";
     //     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     //   }
+    // }
   }
 
   xDOSCAR DOSCalculator::createDOSCAR() {
@@ -593,7 +595,7 @@ namespace apl {
     xdos.viDOS.resize(1);
     xdos.viDOS[0] = aurostd::vector2deque(_idos);
     deque<deque<deque<deque<double> > > > vDOS;
-    // ME20190625
+    //ME20190625
     if (_projections.size() > 0) {
       vDOS.resize(xdos.number_atoms + 1, deque<deque<deque<double> > >(_projections.size() + 1, deque<deque<double> >(1, deque<double>(xdos.number_energies, 0.0))));
     } else {
@@ -602,7 +604,7 @@ namespace apl {
 
     vDOS[0][0][0] = aurostd::vector2deque<double>(_dos);
 
-    // ME20190624 - projected DOS
+    //ME20190624 - projected DOS
     if (_projections.size() > 0) {
       for (uint at = 0; at < xdos.number_atoms; at++) {
         for (uint p = 0; p < _projections.size(); p++) {
@@ -641,13 +643,13 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  //PINKU - START
-  void DOSCalculator::writePDOS(string path, string ex)  //[PINKU]
+  //PN START
+  void DOSCalculator::writePDOS(string path, string ex)  //[PN]
   {
-    //CO - START
+    //CO START
     // Write PHDOS file
     stringstream outfile;
-    //CO - END
+    //CO END
 
     double factorTHz2Raw = _pc->getFrequencyConversionFactor(apl::THZ, apl::RAW);
     double factorRaw2rcm = _pc->getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
@@ -667,7 +669,7 @@ namespace apl {
         << setw(15) << _dos[k] << std::endl;
     }
 
-    //CO - START
+    //CO START
     string file = path + "/" + filename + "." + ex; //ME20181226
     aurostd::stringstream2file(outfile, file);
     if (!aurostd::FileExist(file)) {
@@ -675,9 +677,9 @@ namespace apl {
       message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
-    //CO - END
+    //CO END
   }
-  //PINKU - END
+  //PN END
   // ///////////////////////////////////////////////////////////////////////////
 
 }  // namespace apl

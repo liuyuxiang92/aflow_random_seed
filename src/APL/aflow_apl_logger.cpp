@@ -361,7 +361,7 @@ void Logger::initProgressBar(const char* s) {
   cout << std::endl;
   cout.flush();
   _progressBarLastPercent = 0;
-  _progressBarPercent = 0.0;  // ME20180831
+  _progressBarPercent = 0.0;  //ME20180831
 }
 
 void Logger::updateProgressBar(int i, int n) {
@@ -373,7 +373,7 @@ void Logger::updateProgressBar(int i, int n) {
   }
 }
 
-// ME20180831 - Update the progress bar to be updated by a set increment
+//ME20180831 - Update the progress bar to be updated by a set increment
 void Logger::updateProgressBar(double p) {
   _progressBarPercent += 100 * p;
   double snapshot = _progressBarPercent - 100 * p;
@@ -386,7 +386,7 @@ void Logger::updateProgressBar(double p) {
 }
 
 void Logger::finishProgressBar() {
-  // ME20180831 -- Due to numerical errors, _progressBarPercent may end up
+  //ME20180831 -- Due to numerical errors, _progressBarPercent may end up
   // being less than 100%.
   if (_progressBarLastPercent == 99) {
     cout << "|";

@@ -1,8 +1,8 @@
 //****************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *               Pinku Nath - Duke University 2014 - 2016                  *
-// *                  Marco Esters - Duke University 2020                    *
+// *                Aflow PINKU NATH - Duke University 2014-2016             *
+// *                 Aflow MARCO ESTERS - Duke University 2020               *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters based on work by Pinku Nath
@@ -174,7 +174,7 @@ namespace apl {
 
   void AtomicDisplacements::calculateMeanSquareDisplacementMatrices() {
     string message = "Calculating mean square displacement matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     _displacement_matrices.clear();
     _displacement_modes.clear();
     calculateEigenvectors();
@@ -324,7 +324,7 @@ namespace apl {
   void AtomicDisplacements::writeMeanSquareDisplacementsToFile(string filename) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing mean square displacements into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     vector<vector<xvector<double> > > disp_vec = getDisplacementVectors();
     stringstream output;
     string tag = "[APL_DISPLACEMENTS]";
@@ -360,7 +360,7 @@ namespace apl {
   void AtomicDisplacements::writeSceneFileXcrysden(string filename, const xstructure& scell, const vector<vector<vector<double> > >& disp, int nperiods) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing atomic displacements in XCRYSDEN format into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(),*_pc->getOSS());
 
     uint nsteps = disp.size();
     uint natoms = scell.atoms.size();
@@ -402,7 +402,7 @@ namespace apl {
       const vector<vector<vector<xvector<xcomplex<double> > > > >& displacements) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing atomic displacements in V_SIM format into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), _pc->getOutputFileStream(), _pc->getOutputStringStream());
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
     stringstream output;
     // Lattice

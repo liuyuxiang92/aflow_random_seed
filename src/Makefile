@@ -1,6 +1,6 @@
 # ***************************************************************************
 # *                                                                         *
-# *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+# *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 # *                                                                         *
 # ***************************************************************************
 #
@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
 
-VERSNUMBER=3.2.1
+VERSNUMBER=3.2.3
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -107,7 +107,7 @@ SQLITE_OPTS=-DSQLITE_THREADSAFE=1
 AUROSTD_CPP = ./AUROSTD/aurostd.cpp ./AUROSTD/aurostd_main.cpp ./AUROSTD/aurostd_argv.cpp ./AUROSTD/aurostd_xoption.cpp ./AUROSTD/aurostd_boot.cpp ./AUROSTD/aurostd_crc64.cpp ./AUROSTD/aurostd_xscalar.cpp ./AUROSTD/aurostd_xcomplex.cpp ./AUROSTD/aurostd_xvector.cpp ./AUROSTD/aurostd_xmatrix.cpp ./AUROSTD/aurostd_xtensor.cpp ./AUROSTD/aurostd_xcombos.cpp ./AUROSTD/aurostd_xerror.cpp
 AUROSTD_HPP = ./AUROSTD/aurostd.h ./AUROSTD/aurostd_argv.h ./AUROSTD/aurostd_xcomplex.h ./AUROSTD/aurostd_xmatrix.h ./AUROSTD/aurostd_xoption.h ./AUROSTD/aurostd_xrandom.h ./AUROSTD/aurostd_xscalar.h ./AUROSTD/aurostd_xtensor.h ./AUROSTD/aurostd_xvector.h ./AUROSTD/aurostd_xcombos.h AUROSTD/aurostd_xerror.h
 
-#CO 170614
+#CO20170614
 #ME191125 -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip)
 SQLITE_C = ./SQLITE/sqlite3.c
 
@@ -121,14 +121,14 @@ AFLOWLIB_HPP = aflowlib.h
 
 
 AFLOW_CLASS_SRC = aflow_xclasses.cpp 
-AFLOW_FUNCS_SRC = aflow_aflowrc.cpp aflow_init.cpp aflow_xatom.cpp aflow_xelement.cpp aflow_kbin.cpp aflow_ialien.cpp aflow_kalien.cpp aflow_kvasp.cpp aflow_ivasp.cpp aflow_avasp.cpp aflow_ovasp.cpp aflow_kaims.cpp aflow_iaims.cpp aflow_oaims.cpp aflow_lattice.cpp aflow_spacegroup.cpp aflow_mix.cpp aflow_nomix.cpp aflow_qsub.cpp aflow_pthreads.cpp aflow_symmetry.cpp aflow_neighbours.cpp aflow_surface.cpp aflow_defects.cpp aflow_wyckoff.cpp aflow_xproto.cpp aflow_xproto_gus.cpp aflow_matlab.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_ifrozsl.cpp aflow_modules.cpp
+AFLOW_FUNCS_SRC = aflow_aflowrc.cpp aflow_init.cpp aflow_xatom.cpp aflow_kbin.cpp aflow_ialien.cpp aflow_kalien.cpp aflow_kvasp.cpp aflow_ivasp.cpp aflow_avasp.cpp aflow_ovasp.cpp aflow_kaims.cpp aflow_iaims.cpp aflow_oaims.cpp aflow_lattice.cpp aflow_spacegroup.cpp aflow_mix.cpp aflow_nomix.cpp aflow_qsub.cpp aflow_pthreads.cpp aflow_symmetry.cpp aflow_neighbours.cpp aflow_surface.cpp aflow_defects.cpp aflow_wyckoff.cpp aflow_xproto.cpp aflow_xproto_gus.cpp aflow_matlab.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_ifrozsl.cpp aflow_modules.cpp aflow_xelement.cpp aflow_xpseudopotentials.cpp
 # aflow_ifrozsl.cpp
 PFLOW_FUNCS_SRC = aflow_aconvasp_main.cpp aflow_pflow_funcs.cpp aflow_pflow_print.cpp aflow_aconvasp.cpp 
 ESTRUCTURE_FUNCS_SRC = aflow_estructure.cpp aflow_plotter.cpp
 #[OBSOLETE] [KESONG] POCCUPATION_FUNCS_SRC = aflow_poccupation_params.cpp aflow_poccupation_edos.cpp aflow_poccupation_forcefield.cpp 
 POCCUPATION_FUNCS_SRC = aflow_pocc_old.cpp
 APENNSY_FUNCS_SRC = aflow_apennsy_gndstate.cpp aflow_apennsy_structures.cpp aflow_apennsy.cpp aflow_apennsy_phases.cpp aflow_apennsy_main.cpp aflow_apennsy_vaspin.cpp
-LIBRARIES_FUNCS_SRC = aflowlib_libraries.cpp 
+LIBRARIES_FUNCS_SRC = aflowlib_libraries.cpp aflowlib_libraries_scrubber.cpp 
 CALCULATED_SRC = aflow_data_calculated.cpp
 AFLOWLIB_SRC = aflowlib_web_interface.cpp aflowlib_web_outreach.cpp aflowlib_database.cpp SQLITE/aflow_sqlite.cpp
 #DX and CO - START
@@ -167,7 +167,7 @@ DATA_OBJ                = $(DATA_FUNCS_SRC:.cpp=.o)
 
 GFA_FUNCS_SRC = aflow_gfa.cpp
 
-#CO 180409
+#CO20180409
 POCC_FUNCS_SRC = aflow_pocc.cpp aflow_pocc.h
 
 #AUROSTD_OBJ    = $(AUROSTD_CPP:.cpp=.o)
@@ -190,9 +190,9 @@ ANRL_OBJ               = $(ANRL_SRC:.cpp=.o)
 COMPARE_FUNCS_DH_OBJ   = $(COMPARE_FUNCS_DH_SRC:.cpp=.o)
 CHULL_OBJ              = $(CHULL_FUNCS_SRC:.cpp=.o)
 GFA_OBJ                = $(GFA_FUNCS_SRC:.cpp=.o)
-POCC_OBJ               = $(POCC_FUNCS_SRC:.cpp=.o) #CO 180409
+POCC_OBJ               = $(POCC_FUNCS_SRC:.cpp=.o) #CO20180409
 CCE_OBJ                = $(CCE_SRC:.cpp=.o) #RF 190603
-SQLITE_OBJ             = $(SQLITE_C:.c=.o)	#CO 170614
+SQLITE_OBJ             = $(SQLITE_C:.c=.o)	#CO20170614
 
 #MB 190301 - added jupyter notebook files for chull
 CHULL_JUPYTER_OBJS_ALL=aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp
@@ -223,7 +223,7 @@ static_no_pdf: aflow aflow_data
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) -o aflow_data aflow_data.o aflow_data_*.o $(LIBS_STATIC)
 #static: static_no_pdf
 #	tar Jcfvp /www/AFLOW/CURRENT/aflow_$(VERSNUMBER)_amd64_debian_static.tar.xz aflow aflow_data	
-$(SQLITE_OBJ): $(SQLITE_C)	#CO 1706147
+$(SQLITE_OBJ): $(SQLITE_C)	#CO201706147
 	#$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $^ $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 	#$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $^ $(LIBS)
 	#$(CC) -DSQLITE_ENABLE_JSON1 -c $^ $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
@@ -293,22 +293,22 @@ aflow_apennsy_phases.o: aflow_apennsy_phases.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Mak
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS)  aflow_apennsy_phases.cpp -c
 #aflow_mix_nomix_table.o: aflow_mix_nomix_table.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 #	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_mix_nomix_table.cpp -c
-#CO 170622 - START
+#CO20170622 - START
 aflowlib_webapp_entry.cpp: aflowlib_webapp_entry.js
 	rm -rf $@
 	echo "// $@ automatic generated" >> $@
 	echo "std::string AFLOW_WEBAPP_ENTRY_JS=\"\\" >> $@
 	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\\u/\\\\u/g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
-#CO 170622 - END
-#CO 180305 - START
+#CO20170622 - END
+#CO20180305 - START
 aflowlib_webapp_bands.cpp: aflowlib_webapp_bands.js
 	rm -rf $@
 	echo "// $@ automatic generated" >> $@
 	echo "std::string AFLOW_WEBAPP_BANDS_JS=\"\\" >> $@
 	cat $^ | perl -p -e 's/\r//g' | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> $@
 	echo "\";" >> $@
-#CO 180305 - END
+#CO20180305 - END
 #MB 190301 - START
 aflow_chull_jupyter.cpp: aflow_chull_jupyter.json
 	rm -rf $@
@@ -475,27 +475,10 @@ $(ICSD_LIB)/README_LIBRARY_ICSD9.TXT:
 ############################################################################################################
 aflow_data_calculated.cpp: Makefile
 	rm -rf aflow_data_calculated.cpp
-	# [OBSOLETE] # vAUID	
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then echo "// aflow_data_calculated.cpp automatic generated from CALCULATED/vAUID.dat" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then echo "#include <string>" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then echo "std::string vAUID=\"\\" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAUID.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] # vAURL
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then echo "// aflow_data_calculated.cpp automatic generated from CALCULATED/vAURL.dat" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then echo "#include <string>" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then echo "std::string vAURL=\"\\" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vAURL.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] # vLOOP	
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "// aflow_data_calculated.cpp automatic generated from CALCULATED/vLOOP.dat" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "#include <string>" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "std::string vLOOP=\"\\" >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
-	# [OBSOLETE] if [ -f $(EXTRA_FREE)/CALCULATED/vLOOP.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
 	# vLIBS	
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "// aflow_data_calculated.cpp automatic generated from CALCULATED/vLIBS.dat" >> aflow_data_calculated.cpp ; fi
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "#include <string>" >> aflow_data_calculated.cpp ; fi
+	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "std::string vAUID,vAURL,vLOOP;" >> aflow_data_calculated.cpp ; fi
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "std::string vLIBS=\"\\" >> aflow_data_calculated.cpp ; fi
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then xzcat $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz | grep -v "//" | perl -p -e 's/\n/\\n\\\n/g' >> aflow_data_calculated.cpp ; fi
 	if [ -f $(EXTRA_FREE)/CALCULATED/vLIBS.dat.xz ]; then echo "\";" >> aflow_data_calculated.cpp ; fi
@@ -1223,6 +1206,9 @@ realclean: clean
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then rm -fv ../AFLOW3_NONFREE/EXTRA/FROZSL/*conflic*; fi
 	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR realclean; fi
+dataclean:
+	rm -f aflow_data aflow_data_*
+data: aflow_data
 clean_autogen:
 	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
 # ****************************************************************************

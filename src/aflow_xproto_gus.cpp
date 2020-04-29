@@ -180,7 +180,7 @@ namespace aflowlib {
       p(1,2)=0.0000000;p(2,2)= 1.0000000;p(3,2)= 0.0000000;   //   # a2 parent lattice vector
       p(1,3)=0.0000000;p(2,3)= 0.0000000;p(3,3)= 1.0000000;   //   # a3 parent lattice vector
       nD=1;
-      dvec(1,1)=0.0000000;dvec(2,1)=0.0000000;dvec(3,1)=0.0000000;           // SC
+      dvec(1,1)=0.0000000;dvec(2,1)=0.0000000;dvec(3,1)=0.0000000;           //SC
       //    nlabels=2;
       labelmax=188729;
       title_database="sc";

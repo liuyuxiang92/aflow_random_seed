@@ -447,24 +447,22 @@ void PERFORM_TEST3(ostream& oss) {
   exit(0);
 }
 
-vector<string> vAUID_new,vAURL_new;
-
-void PERFORM_TEST1(ostream& oss) {
-  aflowlib::auid2present(); // empty=- load
-  oss << XHOST_vAUID.size() << " " << XHOST_vAURL.size() << endl; 
-  for(uint i=0;i<XHOST_vAUID.size();i++) { 
-    uint j;
-    if((j=aflowlib::auid2present(XHOST_vAUID.at(i)))) {
-      oss << "found duplicate i=" << i << " j=" << j << " " << XHOST_vAUID.at(i) << " " << XHOST_vAURL.at(i) << " " << vAURL_new.at(j) << endl;
-    } else { 
-      vAUID_new.push_back(XHOST_vAUID.at(i)); // survives all
-      vAURL_new.push_back(XHOST_vAURL.at(i)); // survives all
-      //      if(!aurostd::mod((int) vAUID_new.size(),20000))	oss << vAUID_new.size() << " " << vAURL_new.size() << endl; 
-    }
-  }
-  oss << vAUID_new.size() << " " << vAURL_new.size() << endl; 
-  
-}
+// vector<string> vAUID_new,vAURL_new;
+// void PERFORM_TEST1(ostream& oss) {
+//   aflowlib::auid2present(); // empty=- load
+//   oss << XHOST_vAUID.size() << " " << XHOST_vAURL.size() << endl; 
+//   for(uint i=0;i<XHOST_vAUID.size();i++) { 
+//     uint j;
+//     if((j=aflowlib::auid2present(XHOST_vAUID.at(i)))) {
+//       oss << "found duplicate i=" << i << " j=" << j << " " << XHOST_vAUID.at(i) << " " << XHOST_vAURL.at(i) << " " << vAURL_new.at(j) << endl;
+//     } else { 
+//       vAUID_new.push_back(XHOST_vAUID.at(i)); // survives all
+//       vAURL_new.push_back(XHOST_vAURL.at(i)); // survives all
+//       //      if(!aurostd::mod((int) vAUID_new.size(),20000))	oss << vAUID_new.size() << " " << vAURL_new.size() << endl; 
+//     }
+//   }
+//   oss << vAUID_new.size() << " " << vAURL_new.size() << endl; 
+// }
 
 #define NTERM 5
 #define SPREAD 0.1

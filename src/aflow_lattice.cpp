@@ -38,7 +38,7 @@ namespace LATTICE {
   }
 }
 
-//DX20191031 - START
+//DX20191031 START
 namespace LATTICE {
   string Lattice2TypeAndCentering(const string& lattice_type) {
 
@@ -63,7 +63,7 @@ namespace LATTICE {
     return "";
   }
 }
-//DX20191031 - END
+//DX20191031 END
 
 // ***************************************************************************
 namespace LATTICE {
@@ -133,7 +133,7 @@ namespace LATTICE {
   }
 }
 
-//DX20191031 - START
+//DX20191031 START
 namespace LATTICE {
   string SpaceGroup2LatticeTypeAndCentering(uint sg) {
     string lattice_type,lattice_system, type_and_centering;
@@ -141,7 +141,7 @@ namespace LATTICE {
     return LATTICE::Lattice2TypeAndCentering(lattice_type);
   }
 }
-//DX20191031 - END
+//DX20191031 END
 
 namespace LATTICE {
   string Lattice_System_SpaceGroup(uint sg) {
@@ -674,7 +674,7 @@ namespace LATTICE {
 }
 
 // ***************************************************************************
-// DX - START
+//DX START
 namespace LATTICE {
   bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
     return LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym);
@@ -687,13 +687,13 @@ namespace LATTICE {
 //bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
 //return LATTICE::Standard_Lattice_StructureNormal(str_in,str_sp,str_sc);}
 //}
-// DX - END
+//DX END
 
-//**************************JUNKAI EDITED START****************************
+//**************************JX EDITED START****************************
 namespace LATTICE {
   bool Standard_Lattice_StructureDefault(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {
-    // DX OBSOLETEreturn LATTICE::Standard_Lattice_StructureMedium(str_in,str_sp,str_sc);}
-    return LATTICE::Standard_Lattice_Structure_20170718(str_in,str_sp,str_sc,full_sym);} // DX
+    //DX OBSOLETEreturn LATTICE::Standard_Lattice_StructureMedium(str_in,str_sp,str_sc);}
+    return LATTICE::Standard_Lattice_Structure_20170718(str_in,str_sp,str_sc,full_sym);} //DX
     //bool Standard_Lattice_StructureCoarse(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
     //int time=0;
     //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,_EPS_);}
@@ -711,7 +711,7 @@ namespace LATTICE {
     //int time=0;
     //return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.0004,0.004,time,_EPS_);} // epsabc //epsang
     }
-//**************************JUNKAI EDITED END****************************
+//**************************JX EDITED END****************************
 
 namespace LATTICE {
   //bool Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram) ;
@@ -725,15 +725,15 @@ namespace LATTICE {
 
 namespace LATTICE {
   // transformation to standardization
-  bool Standard_Lattice_Structure_20170718(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {//**************************JUNKAI EDITED*****************
+  bool Standard_Lattice_Structure_20170718(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,bool full_sym) {//**************************JX EDITED*****************
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    bool is_deg = true; // DX
+    bool is_deg = true; //DX
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
     // cerr << "eps=" << eps << " " << "epsang=" << epsang << endl;
     //  LDEBUG=TRUE;
     // starting from a str_in (whatever lattices) this routine returns a standard primitive (str_sp)
-    // and a standard conventional (str_sc) following the ideas of stefano and wahyu
+    // and a standard conventional (str_sc) following the ideas of SC+WSETYAWAN
     if(str_in.Standard_Lattice_avoid==TRUE) return FALSE; // if you do not want to calculate
     // preparation
     str_sp=str_in; // copy it
@@ -803,8 +803,8 @@ namespace LATTICE {
 
     string crystal_system="none";
     bool SYS_VERBOSE=FALSE;
-    // DX - START
-    // DX20170814 - if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {  //[CO200106 - close bracket for indenting]}
+    //DX START
+    //DX20170814 - if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {  //[CO20200106 - close bracket for indenting]}
     if(str_sp.crystal_system=="") {
       ofstream FileDevNull("/dev/null");
       _aflags aflags;
@@ -812,8 +812,8 @@ namespace LATTICE {
       kflags.KBIN_SYMMETRY_PGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_FGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=FALSE;
-      kflags.KBIN_SYMMETRY_PGROUPK_WRITE=FALSE; // DX20171207 - was mising before
-      kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE; // DX20171207 - added pgroupk_xtal
+      kflags.KBIN_SYMMETRY_PGROUPK_WRITE=FALSE; //DX20171207 - was mising before
+      kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=FALSE; //DX20171207 - added pgroupk_xtal
       kflags.KBIN_SYMMETRY_SGROUP_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_IATOMS_WRITE=FALSE;
       kflags.KBIN_SYMMETRY_AGROUP_WRITE=FALSE;
@@ -822,17 +822,17 @@ namespace LATTICE {
       if(LDEBUG) { cerr << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;}
       //pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
       string format="out";
-      if(str_sp.pgroup_xtal_calculated==TRUE) { // DX20170814 - Speed increase, if already calculated just look use look-up table
-        SYM::PointGroupLookUpTable(FileDevNull,str_sp,aflags,kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE,SYS_VERBOSE,cout,format); // DX20170814
+      if(str_sp.pgroup_xtal_calculated==TRUE) { //DX20170814 - Speed increase, if already calculated just look use look-up table
+        SYM::PointGroupLookUpTable(FileDevNull,str_sp,aflags,kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE,SYS_VERBOSE,cout,format); //DX20170814
       }
       else if(str_sp.pgroup_xtal_calculated==FALSE) {
-        // DX Calculate up to pgroup_xtal only
+        //DX Calculate up to pgroup_xtal only
         if(full_sym){
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;
-          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE; // DX20171207 - added pgroupk_xtal
+          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=TRUE; //DX20171207 - added pgroupk_xtal
           kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=TRUE;
@@ -842,7 +842,7 @@ namespace LATTICE {
           kflags.KBIN_SYMMETRY_CALCULATE_FGROUP=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL=TRUE;
           kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=FALSE;
-          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; // DX20171207 - added pgroupk_xtal // DX20171218 - missing the "K" in "PGROUPK_XTAL"
+          kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL=FALSE; //DX20171207 - added pgroupk_xtal //DX20171218 - missing the "K" in "PGROUPK_XTAL"
           kflags.KBIN_SYMMETRY_CALCULATE_IATOMS=FALSE;
           kflags.KBIN_SYMMETRY_CALCULATE_AGROUP=FALSE;
           kflags.KBIN_SYMMETRY_CALCULATE_SGROUP=FALSE;
@@ -866,9 +866,9 @@ namespace LATTICE {
     bool found=FALSE;
     vector<xmatrix<double> > vrlattice1,vrlattice1_aaa;
     vector<xvector<double> > vvectors;
-    double amin=min(aurostd::modulus(str_sp.lattice(1)),aurostd::modulus(str_sp.lattice(2)),aurostd::modulus(str_sp.lattice(3))); // DX
+    double amin=min(aurostd::modulus(str_sp.lattice(1)),aurostd::modulus(str_sp.lattice(2)),aurostd::modulus(str_sp.lattice(3))); //DX
     volume=det(str_sp.lattice);
-    double eps_volume = eps*amin*amin*amin; // DX
+    double eps_volume = eps*amin*amin*amin; //DX
     vrlattice1.push_back(str_sp.lattice);
 
     //CO20180627 nndist=1.0e6;
@@ -908,7 +908,7 @@ namespace LATTICE {
     //  if(crystal_system=="tetragonal") {cutoff=(2.0/sqrt(3.0))*max(rdata[1],rdata[2],rdata[3]);}
     if(crystal_system=="tetragonal") {cutoff=1.05*(2.0/sqrt(3.0))*RadiusSphereLattice(str_sc.lattice);}
     if(crystal_system=="trigonal") {cutoff=max(rdata[1],rdata[2],rdata[3]);} // the primitives always get the max of the lenghts
-    //  if(crystal_system=="orthorhombic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //stefano recipe
+    //  if(crystal_system=="orthorhombic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //SC recipe
     if(crystal_system=="orthorhombic") {cutoff=1.05*(2.0/sqrt(3.0))*RadiusSphereLattice(str_sc.lattice);}
     if(crystal_system=="monoclinic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);} //sqrt(2) catches the centered face
     if(crystal_system=="triclinic") {cutoff=max(rdata[1],rdata[2],rdata[3]);} // the primitives always get the max of the lenghts
@@ -932,12 +932,12 @@ namespace LATTICE {
           vaus=rlattice[1][1]*rlattice[2][2]*rlattice[3][3]+rlattice[1][2]*rlattice[2][3]*rlattice[3][1]+        // FAST
             rlattice[1][3]*rlattice[2][1]*rlattice[3][2]-rlattice[1][3]*rlattice[2][2]*rlattice[3][1]-        // FAST
             rlattice[1][2]*rlattice[2][1]*rlattice[3][3]-rlattice[1][1]*rlattice[2][3]*rlattice[3][2];        // FAST
-          if(abs(vaus)>eps_volume){ // DX20170904 - Otherwise, Getabc_angles may fail if vaus=0.0
-            if(abs(vaus-1.0*volume)<eps_volume || abs(vaus-2.0*volume)<eps_volume || abs(vaus-4.0*volume)<eps_volume) { // DX
-              //DX ORIG 5/22/18 only do rdata when you have to rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-              // DX if(abs(vaus-volume)<eps)
-              if(abs(vaus-volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+          if(abs(vaus)>eps_volume){ //DX20170904 - Otherwise, Getabc_angles may fail if vaus=0.0
+            if(abs(vaus-1.0*volume)<eps_volume || abs(vaus-2.0*volume)<eps_volume || abs(vaus-4.0*volume)<eps_volume) { //DX
+              //DX ORIG 20180522 only do rdata when you have to rdata=Getabc_angles(rlattice,DEGREES);a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
+              //DX if(abs(vaus-volume)<eps)
+              if(abs(vaus-volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 vrlattice1.push_back(rlattice);
                 //DX20180522 - only calculate vrlattice1_aaa if cubic or trigonal (rhl); no other lattice types require it - save time
                 if(crystal_system=="cubic" || crystal_system=="trigonal"){
@@ -946,7 +946,7 @@ namespace LATTICE {
                     vrlattice1_aaa.push_back(rlattice);
                   }
                 } //DX20180522
-              } // DX20170904
+              } //DX20170904
             }
           }
         }
@@ -992,11 +992,11 @@ namespace LATTICE {
           if((choice==0 && (aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps)))) // just to help not necessary
             // CUB: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 a]: a a a 90 90 90  primitive
             // CUB: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 a]: a a a 90 90 90  conventional
-            // DX if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) &&
-            // DX   aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          { //CO200106 - patching for auto-indenting
-            if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) && // DX
-                SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) { // DX 
+            //DX if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) &&
+            //DX   aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          { //CO20200106 - patching for auto-indenting
+            if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) && //DX
+                SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) { //DX 
               found=TRUE;
               //check for coordinate system transformation 
               xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1034,9 +1034,9 @@ namespace LATTICE {
             // BCC:  a1=[-a/2 a/2 a/2] a2=[a/2 -a/2 a/2]/ a3=[a/2 a/2 -a/2]     a a a 109.471 109.471 109.471 primitive
             // BCC:  [a 0 0] [0 a 0] [0 0 a] with 0,0,0 and 1/2 1/2 1/2 basis
             if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) &&
-                SYM::checkAngle(b,c,alpha,109.471,is_deg,eps) && SYM::checkAngle(a,c,beta,109.471,is_deg,eps) && SYM::checkAngle(a,b,gamma,109.471,is_deg,eps)) // DX
+                SYM::checkAngle(b,c,alpha,109.471,is_deg,eps) && SYM::checkAngle(a,c,beta,109.471,is_deg,eps) && SYM::checkAngle(a,b,gamma,109.471,is_deg,eps)) //DX
               //aurostd::isequal(alpha,109.471,epsang) && aurostd::isequal(beta,109.471,epsang) && aurostd::isequal(gamma,109.471,epsang))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               found=TRUE;
               //check for coordinate system transformation 
               xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1080,9 +1080,9 @@ namespace LATTICE {
             // FCC:  a1=[0 a/2 a/2]  a2=[a/2 0 a/2]  a3=[a/2 a/2 0] a a a 60.0 60.0 60.0
             // FCC:  [a 0 0] [0 a 0] [0 0 a] with 0,0,0 and 0 1/2 1/2 + 1/2 0 1/2 + 1/2 1/2 0 basis
             if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps) && aurostd::isequal(c,a,eps) &&
-                SYM::checkAngle(b,c,alpha,60.0,is_deg,eps) && SYM::checkAngle(a,c,beta,60.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,60.0,is_deg,eps)) // DX
-              // DX aurostd::isequal(alpha,60.0,epsang) && aurostd::isequal(beta,60.0,epsang) && aurostd::isequal(gamma,60.0,epsang))
-            { //CO200106 - patching for auto-indenting
+                SYM::checkAngle(b,c,alpha,60.0,is_deg,eps) && SYM::checkAngle(a,c,beta,60.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,60.0,is_deg,eps)) //DX
+              //DX aurostd::isequal(alpha,60.0,epsang) && aurostd::isequal(beta,60.0,epsang) && aurostd::isequal(gamma,60.0,epsang))
+            { //CO20200106 - patching for auto-indenting
               found=TRUE;
               //check for coordinate system transformation 
               xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1128,14 +1128,14 @@ namespace LATTICE {
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
           //   cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << endl;
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             // cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << endl;
             if((choice==0 && ((aurostd::isequal(a,b,eps)&&aurostd::isdifferent(b,c,eps))||(aurostd::isequal(b,c,eps)&&aurostd::isdifferent(c,a,eps))||(aurostd::isequal(c,a,eps)&&aurostd::isdifferent(a,b,eps)))) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps)&&aurostd::isequal(b,c,eps)))))
               // if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
 
               // TET: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 c]: a a c 90 90 90  primitive
               // TET: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 c]: a a c 90 90 90  conventional
@@ -1197,13 +1197,13 @@ namespace LATTICE {
           // STD_PRIM: a1=[-a/2 a/2 c/2] a2=[a/2 -a/2 c/2] a3=[a/2 a/2 -c/2]
           //if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
           if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps))
-          { //CO200106 - patching for auto-indenting
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && ((aurostd::isequal(a,b,eps)&&aurostd::isdifferent(b,c,eps)))) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps)&&aurostd::isequal(b,c,eps))))) {
               ac=a;cc=c;
-              // DX if(abs(ac*ac*cc-2.0*volume)<eps)
-              if(abs(ac*ac*cc-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(ac*ac*cc-2.0*volume)<eps)
+              if(abs(ac*ac*cc-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 found=TRUE;
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1222,8 +1222,8 @@ namespace LATTICE {
                 plattice[3][1]= ac/2.0;plattice[3][2]= ac/2.0;plattice[3][3]=-cc/2.0; // make the standard primitive bct
                 LATTICE::fix_sts_sp(str_sp,rlattice,plattice);  // project out of rlattice and in plattice
                 if(cc<ac) {str_sp.bravais_lattice_variation_type="BCT1";}
-                // DX - 9/7/17 - Need to include a=c if(ac<cc) {str_sp.bravais_lattice_variation_type="BCT2";}
-                if(ac<=cc) {str_sp.bravais_lattice_variation_type="BCT2";} // DX20170907 - Add a=c case; pick BCT2 since less high sym points 
+                //DX20170907 - Need to include a=c if(ac<cc) {str_sp.bravais_lattice_variation_type="BCT2";}
+                if(ac<=cc) {str_sp.bravais_lattice_variation_type="BCT2";} //DX20170907 - Add a=c case; pick BCT2 since less high sym points 
                 // do the STANDARD CONVENTIONAL
                 // C=supercell*P => supercell = C*inv(P)
                 str_sc=GetSuperCell(str_sp,bct);
@@ -1243,7 +1243,7 @@ namespace LATTICE {
       // TRIGONAL CRYSTAL SYSTEM                          
       if(found==FALSE && (crystal_system=="all" || crystal_system=="trigonal")) {  // trigonal can be rhl or hex
         if(VERBOSE_PROGRESS) cerr << "RHL SYSTEMS looking for lattices a a a alpha alpha alpha" << endl;
-        // DX double rhl_ratio=1.0; // you might need to reduce this to reproduce tiny distortions... insted of increasing eps, you reduce it
+        //DX double rhl_ratio=1.0; // you might need to reduce this to reproduce tiny distortions... insted of increasing eps, you reduce it
         xmatrix<double> rhl(3,3);
         rhl[1][1]=1.0;rhl[1][2]=-1.0;rhl[1][3]= 0.0;
         rhl[2][1]=0.0;rhl[2][2]= 1.0;rhl[2][3]=-1.0;
@@ -1257,16 +1257,16 @@ namespace LATTICE {
           if(choice==0) { // only pristine
             if(aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps)) {  // aaa
               //  cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
-              // DX if(aurostd::isequal(alpha,beta,epsang) && aurostd::isequal(beta,gamma,epsang))  // alpha alpha alpha
-              if(SYM::checkAngle(b,c,alpha,beta,is_deg,eps) && SYM::checkAngle(a,c,beta,gamma,is_deg,eps)) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(aurostd::isequal(alpha,beta,epsang) && aurostd::isequal(beta,gamma,epsang))  // alpha alpha alpha
+              if(SYM::checkAngle(b,c,alpha,beta,is_deg,eps) && SYM::checkAngle(a,c,beta,gamma,is_deg,eps)) //DX
+              { //CO20200106 - patching for auto-indenting
                 //  cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
-                // DX if(aurostd::isdifferent(alpha,90.0,epsang/rhl_ratio) && // no cubic
-                // DX    aurostd::isdifferent(alpha,60.0,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-60.0,epsang/rhl_ratio) && // no fcc (60 and 120)
-                // DX   aurostd::isdifferent(alpha,109.471,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-109.471,epsang/rhl_ratio)) {  // no bcc stuff  //[CO200106 - close bracket for indenting]}
-                // DX20170906 [OBSOLETE] if(!SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && // no cubic
-                // DX20170906 [OBSOLETE]    !SYM::checkAngle(b,c,alpha,60.0,is_deg,eps) && !SYM::checkAngle(b,c,alpha,120.0,is_deg,eps) && // no fcc (60 and 120)
-                // DX20170906 [OBSOLETE]    !SYM::checkAngle(b,c,alpha,109.471,is_deg,eps) && !SYM::checkAngle(b,c,alpha,180.0-109.471,is_deg,eps)) {  // no bcc stuff
+                //DX if(aurostd::isdifferent(alpha,90.0,epsang/rhl_ratio) && // no cubic
+                //DX    aurostd::isdifferent(alpha,60.0,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-60.0,epsang/rhl_ratio) && // no fcc (60 and 120)
+                //DX   aurostd::isdifferent(alpha,109.471,epsang/rhl_ratio) && aurostd::isdifferent(alpha,180.0-109.471,epsang/rhl_ratio)) {  // no bcc stuff  //[CO20200106 - close bracket for indenting]}
+                //DX20170906 [OBSOLETE] if(!SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && // no cubic
+                //DX20170906 [OBSOLETE]    !SYM::checkAngle(b,c,alpha,60.0,is_deg,eps) && !SYM::checkAngle(b,c,alpha,120.0,is_deg,eps) && // no fcc (60 and 120)
+                //DX20170906 [OBSOLETE]    !SYM::checkAngle(b,c,alpha,109.471,is_deg,eps) && !SYM::checkAngle(b,c,alpha,180.0-109.471,is_deg,eps)) {  // no bcc stuff
                 //   cerr << a << " " << b << " " << c << " " << alpha << " " << beta << " " << gamma << " " << eps << " " << epsang << endl;
                 // make standard primitive
                 // RHL: a1=[a*cos(alpha/2) -a*sin(alpha/2) 0]
@@ -1286,7 +1286,7 @@ namespace LATTICE {
                 plattice[2][1]=a*cos(alpha/2.0);plattice[2][2]= a*sin(alpha/2.0);plattice[2][3]=0.0; // make the standard primitive rhl
                 plattice[3][1]=a*cos(alpha)/cos(alpha/2.0);plattice[3][2]=0.0;
                 plattice[3][3]=a*sqrt(1.0-cos(alpha)*cos(alpha)/cos(alpha/2.0)/cos(alpha/2.0));      // make the standard primitive rhl
-                // DX20170929 - check if sqrt results in nan - START 
+                //DX20170929 - check if sqrt results in nan - START 
                 if(std::isnan(plattice[3][3])){
                   found=FALSE;
                   continue;
@@ -1300,7 +1300,7 @@ namespace LATTICE {
                 else {
                   str_sp.rotate_lattice_original2new=str_sp.rotate_lattice_original2new*aurostd::inverse(str_sp.lattice)*rlattice;
                 }
-                // DX20170929 - check if sqrt results in nan - END
+                //DX20170929 - check if sqrt results in nan - END
                 LATTICE::fix_sts_sp(str_sp,rlattice,plattice);
                 // make the STANDARD CONVENTIONAL
 #ifndef _RHL_HEX_SC_
@@ -1315,7 +1315,7 @@ namespace LATTICE {
                 str_sc.pearson_symbol="hP"+aurostd::utype2string(str_sc.atoms.size());
 #endif
                 if(VERBOSE_PROGRESS) cerr << str_sp.bravais_lattice_type << " found" << endl;
-                // DX20170906 [OBSOLETE]}
+                //DX20170906 [OBSOLETE]}
               }
             }
           }
@@ -1335,12 +1335,12 @@ namespace LATTICE {
           // HEX a1=[a/2 -a/2*sqrt(3) 0]  a2=[a/2 a/2*sqrt(3) 0]  a3=[0 0 c]   a a c 90 90 120 primitive
           // HEX a1=[a/2 -a/2*sqrt(3) 0]  a2=[a/2 a/2*sqrt(3) 0]  a3=[0 0 c]   a a c 90 90 120 conventional
           if(choice==0) { // only pristine
-            // DX if((aurostd::isequal(a,b,eps) && aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang)) &&
-            // DX    (aurostd::isequal(gamma,120.0,epsang) || aurostd::isequal(gamma,60.0,epsang)))
-            // DX   if(aurostd::isequal(gamma,60.0,epsang))
+            //DX if((aurostd::isequal(a,b,eps) && aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang)) &&
+            //DX    (aurostd::isequal(gamma,120.0,epsang) || aurostd::isequal(gamma,60.0,epsang)))
+            //DX   if(aurostd::isequal(gamma,60.0,epsang))
             if((aurostd::isequal(a,b,eps) && SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps)) &&
                 (SYM::checkAngle(a,b,gamma,120.0,is_deg,eps) || SYM::checkAngle(a,b,gamma,60.0,is_deg,eps)))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               xmatrix<double> orig_rlattice = rlattice;
               xmatrix<double> orig_rlattice_metric_tensor = MetricTensor(orig_rlattice);
               if(!aurostd::identical(minkowski_metric_tensor,orig_rlattice_metric_tensor)){
@@ -1392,9 +1392,9 @@ namespace LATTICE {
           rlattice=vrlattice1.at(i);
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && ((aurostd::isdifferent(a,b,eps) && aurostd::isdifferent(b,c,eps) && aurostd::isdifferent(c,a,eps)))) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps) || aurostd::isequal(b,c,eps) || aurostd::isequal(c,a,eps))))) {
               // ORC: a1=[a 0 0]  a2=[0 b 0]  a3=[0 0 c]: a<b<c 90 90 90  primitive
@@ -1473,16 +1473,16 @@ namespace LATTICE {
           // a1=[0 bc/2 cc/2]
           // a2=[ac/2 0 cc/2]
           // a3=[ac/2 bc/2 0]
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && (a<b && b<c)) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps) && b<c) || (a<b && aurostd::isequal(b,c,eps)))) ||
                 (choice==2 && ((aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps))))) {
               ac=a;bc=b;cc=c;
-              // DX if(abs(ac*bc*cc-4.0*volume)<eps)
-              if(abs(ac*bc*cc-4.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(ac*bc*cc-4.0*volume)<eps)
+              if(abs(ac*bc*cc-4.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 found=TRUE;
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1536,16 +1536,16 @@ namespace LATTICE {
           // a1=[-a/2 b/2 c/2]
           // a2=[a/2 -b/2 c/2]
           // a3=[a/2 b/2 -c/2]
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && (a<b && b<c)) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps) && b<c) || (a<b && aurostd::isequal(b,c,eps)))) ||
                 (choice==2 && ((aurostd::isequal(a,b,eps) && aurostd::isequal(b,c,eps))))) {
               ac=a;bc=b;cc=c;
-              // DX if(abs(ac*bc*cc-2.0*volume)<eps)
-              if(abs(ac*bc*cc-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(ac*bc*cc-2.0*volume)<eps)
+              if(abs(ac*bc*cc-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 found=TRUE;
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1595,14 +1595,14 @@ namespace LATTICE {
           // a2=[a/2 b/2 0]
           // a3=[0 0 c]
           // pick only the case when a<b
-          // DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,90.0,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && (a<b)) || (choice==1 && (aurostd::isequal(a,b,eps)))) {
               ac=a;bc=b;cc=c;
-              // DX if(abs(ac*bc*cc-2.0*volume)<eps)
-              if(abs(ac*bc*cc-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(ac*bc*cc-2.0*volume)<eps)
+              if(abs(ac*bc*cc-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 found=TRUE;
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
@@ -1648,9 +1648,9 @@ namespace LATTICE {
           rlattice=vrlattice1.at(i);
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-          // DX if(alpha<90.0 && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(alpha<90.0 && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(alpha<90.0 && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(alpha<90.0 && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && b<c)|| (choice==1 && aurostd::isequal(b,c,eps))) {  // && not necessary aurostd::isdifferent(a,b,eps) && aurostd::isdifferent(b,c,eps) && aurostd::isdifferent(c,a,eps)
               if(alpha>MCL_alpha_max) MCL_alpha_max=alpha;
             }
@@ -1661,9 +1661,9 @@ namespace LATTICE {
           rlattice=vrlattice1.at(i);
           rdata=Getabc_angles(rlattice,DEGREES);
           a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-          // DX if(aurostd::isequal(alpha,MCL_alpha_max,epsang)  && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-          if(SYM::checkAngle(b,c,alpha,MCL_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-          { //CO200106 - patching for auto-indenting
+          //DX if(aurostd::isequal(alpha,MCL_alpha_max,epsang)  && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+          if(SYM::checkAngle(b,c,alpha,MCL_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+          { //CO20200106 - patching for auto-indenting
             if((choice==0 && b<c)|| (choice==1 && aurostd::isequal(b,c,eps))) {  // && not necessary aurostd::isdifferent(a,b,eps) && aurostd::isdifferent(b,c,eps) && aurostd::isdifferent(c,a,eps)
               // MCL: a1=[a 0 0]  a2=[0 b 0]  a3=[0 c*cos(alpha) c*sin(alpha)]: a b<c alpha<90 90 90  primitive
               // MCL: a1=[a 0 0]  a2=[0 b 0]  a3=[0 c*cos(alpha) c*sin(alpha)]: a b<c alpha<90 90 90  conventional
@@ -1707,13 +1707,13 @@ namespace LATTICE {
             rlattice=vrlattice1.at(i);
             rdata=Getabc_angles(mclc*rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
-            // DX if(alpha<90.0 && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-            if(alpha<90.0 && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-            { //CO200106 - patching for auto-indenting
+            //DX if(alpha<90.0 && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+            if(alpha<90.0 && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+            { //CO20200106 - patching for auto-indenting
               ac=a;bc=b;cc=c;
-              // DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
-              if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
+              if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 if(alpha>MCLC_alpha_max) MCLC_alpha_max=alpha;
               }
             }
@@ -1728,13 +1728,13 @@ namespace LATTICE {
             // [ac 0 0] [0 bc 0] [0 cc*cos(alpha) cc*sin(alpha) ]    Conventional direct lattice:
             // Direct Lattice (VASP and Bilbao):
             // a1=[ a/2 b/2 0] a2=[-a/2 b/2 0] a3=[0 c*cos(alpha) c*sin(alpha)]
-            // DX if(aurostd::isequal(alpha,MCLC_alpha_max,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-            if(SYM::checkAngle(b,c,alpha,MCLC_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) // DX
-            { //CO200106 - patching for auto-indenting
+            //DX if(aurostd::isequal(alpha,MCLC_alpha_max,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
+            if(SYM::checkAngle(b,c,alpha,MCLC_alpha_max,is_deg,eps) && SYM::checkAngle(a,c,beta,90.0,is_deg,eps) && SYM::checkAngle(a,b,gamma,90.0,is_deg,eps)) //DX
+            { //CO20200106 - patching for auto-indenting
               ac=a;bc=b;cc=c;
-              // DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
-              if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) // DX
-              { //CO200106 - patching for auto-indenting
+              //DX if(abs(det(mclc*rlattice)-2.0*volume)<eps)
+              if(abs(det(mclc*rlattice)-2.0*volume)<eps_volume) //DX
+              { //CO20200106 - patching for auto-indenting
                 //check for coordinate system transformation 
                 xmatrix<double> rlattice_metric_tensor = MetricTensor(rlattice);
                 if(!aurostd::identical(minkowski_metric_tensor,rlattice_metric_tensor)){
@@ -1756,9 +1756,9 @@ namespace LATTICE {
                 str_sp.FixLattices();
                 klattice=str_sp.klattice;
                 kdata=Getabc_angles(klattice,DEGREES);kalpha=kdata[4];kbeta=kdata[5];kgamma=kdata[6];
-                // DX if(aurostd::isequal(kgamma,90.0,epsang))
-                if(SYM::checkAngle(kdata[1],kdata[2],kgamma,90.0,is_deg,eps)) // DX
-                { //CO200106 - patching for auto-indenting
+                //DX if(aurostd::isequal(kgamma,90.0,epsang))
+                if(SYM::checkAngle(kdata[1],kdata[2],kgamma,90.0,is_deg,eps)) //DX
+                { //CO20200106 - patching for auto-indenting
                   found=TRUE; str_sp.bravais_lattice_variation_type="MCLC2";
                 } else {
                   if(kgamma>90.0) {
@@ -1767,7 +1767,7 @@ namespace LATTICE {
                     // kgamma<90
                     alpharad=alpha*PI/180.0;
                     testphi=0.75-0.25*b*b/a/a-0.25*b/tan(alpharad)*(1/c/sin(alpharad)-1/b/tan(alpharad));
-                    if(aurostd::isequal(testphi,0.5,1e-2)) { // DX: This is a normalized quantity, so we do not need to use checkAngle, should be approximately 0.5
+                    if(aurostd::isequal(testphi,0.5,1e-2)) { //DX: This is a normalized quantity, so we do not need to use checkAngle, should be approximately 0.5
                       found=TRUE; str_sp.bravais_lattice_variation_type="MCLC4";
                     } else {
                       if(testphi>0.5) {
@@ -1809,17 +1809,17 @@ namespace LATTICE {
             if(kalpha>90.0 && kbeta>90.0 && kgamma>90.0) {
               if((kalpha-90.0)+(kbeta-90.0)+(kgamma-90.0)<weight_TRI1a) {
                 weight_TRI1a=abs(kalpha-90.0)+abs(kbeta-90.0)+abs(kgamma-90.0);rrlattice_TRI1a=rlattice; } }
-            // DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
-            if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) // DX
-            { //CO200106 - patching for auto-indenting
+            //DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
+            if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) //DX
+            { //CO20200106 - patching for auto-indenting
               if((kalpha-90.0)+(kbeta-90.0)<weight_TRI2a) {
                 weight_TRI2a=abs(kalpha-90.0)+abs(kbeta-90.0)+abs(kgamma-90.0);rrlattice_TRI2a=rlattice; } }
             if(kalpha<90.0 && kbeta<90.0 && kgamma<90.0) {
               if((90.0-kalpha)+(90.0-kbeta)+(90.0-kgamma)<weight_TRI1b) {
                 weight_TRI1b=abs(kalpha-90.0)+abs(kbeta-90.0)+abs(kgamma-90.0);rrlattice_TRI1b=rlattice; } }
-            // DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
+            //DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
             if(kalpha<90.0 && kbeta<90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
               if((90.0-kalpha)+(90.0-kbeta)<weight_TRI2b) {
                 weight_TRI2b=abs(kalpha-90.0)+abs(kbeta-90.0)+abs(kgamma-90.0);rrlattice_TRI2b=rlattice; } }
           }
@@ -1835,7 +1835,7 @@ namespace LATTICE {
             rdata=Getabc_angles(rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //2-17-16 COses, Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
+            //20160217 COses, Karol Jarolimek discovered B1Cd1Li1O3_ICSD_20200615 was calculated to be TRI1B, not TRI1A like shown in
             //Comp. Mat. Sci. 49, 299 (2010) Fig 47.  Turns out we forgot to set ka...kgamma, so the following lines were added.
             //Interestingly, this system has weight_TRIa==weight_TRIb, so the check above (TRI1a before TRI1b) is very important.
             klattice=ReciprocalLattice(rlattice);
@@ -1846,17 +1846,17 @@ namespace LATTICE {
             if(kalpha>90.0 && kbeta>90.0 && kgamma>90.0) {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI1a";
             }
-            // DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
-            if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) // DX
+            //DX if(kalpha>90.0 && kbeta>90.0 && aurostd::isequal(kgamma,90.0,epsang))
+            if(kalpha>90.0 && kbeta>90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) //DX
             {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI2a";
             }
             if(kalpha<90.0 && kbeta<90.0 && kgamma<90.0) {
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI1b";
             }
-            // DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
-            if(kalpha<90.0 && kbeta<90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) // DX
-            { //CO200106 - patching for auto-indenting
+            //DX if(kalpha<90.0 && kbeta<90.0 && aurostd::isequal(kgamma,90.0,epsang))
+            if(kalpha<90.0 && kbeta<90.0 && SYM::checkAngle(ka,kb,kgamma,90.0,is_deg,eps)) //DX
+            { //CO20200106 - patching for auto-indenting
               found=TRUE;str_sp.bravais_lattice_type="TRI";str_sp.bravais_lattice_variation_type="TRI2b";
             }
             // found=false;
@@ -1959,14 +1959,14 @@ namespace LATTICE {
       str_reciprocal_in.lattice=str_sp.klattice;str_reciprocal_in.FixLattices();
       str_reciprocal_in.title="NO_RECURSION";
       _atom atom;str_reciprocal_in.AddAtom(atom);
-      // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //STEFANO OLD VERSION
-      int ss=0; //JUNKAI
-      LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JUNKAI
+      // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
+      int ss=0; //JX
+      LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JX
       str_sp.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-      str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//wahyu mod
+      str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//WSETYAWAN mod
       //str_sp.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
       str_sc.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-      str_sc.reciprocal_lattice_variation_type=str_reciprocal_sc.bravais_lattice_variation_type;//wahyu mod
+      str_sc.reciprocal_lattice_variation_type=str_reciprocal_sc.bravais_lattice_variation_type;//WSETYAWAN mod
       //str_sc.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
       // SUPERLATTICE
       xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
@@ -1974,9 +1974,9 @@ namespace LATTICE {
       str_superlattice_in.title="NO_RECURSION";
       str_superlattice_in.IdenticalAtoms();
       str_superlattice_in.Minkowski_calculated=FALSE;
-      //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //STEFANO OLD VERSION
-      ss=0; //JUNKAI
-      LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JUNKAI
+      //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //SC OLD VERSION
+      ss=0; //JX
+      LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JX
       str_sp.bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
       str_sp.bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
       str_sp.bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
@@ -2070,15 +2070,15 @@ namespace LATTICE {
 
 namespace LATTICE {
   // transformation to standardization
-  bool Standard_Lattice_Structure_20170101(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram)  //**************************JUNKAI EDITED*****************
-    //bool LATTICE::Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang)   //STEFANO OLD VERSION
-  { //CO200106 - patching for auto-indenting
+  bool Standard_Lattice_Structure_20170101(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang,int& time,double symeps,bool histogram)  //**************************JX EDITED*****************
+    //bool LATTICE::Standard_Lattice_Structure(const xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang)   //SC OLD VERSION
+  { //CO20200106 - patching for auto-indenting
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: BEGIN" << endl;
     // cerr << "eps=" << eps << " " << "epsang=" << epsang << endl;
     //  LDEBUG=TRUE;
     // starting from a str_in (whatever lattices) this routine returns a standard primitive (str_sp)
-    // and a standard conventional (str_sc) following the ideas of stefano and wahyu
+    // and a standard conventional (str_sc) following the ideas of SC+WSETYAWAN
     if(str_in.Standard_Lattice_avoid==TRUE) return FALSE; // if you do not want to calculate
     // preparation
     str_sp=str_in; // copy it
@@ -2146,7 +2146,7 @@ namespace LATTICE {
        if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(SYS_VERBOSE);
        */
 
-    // DX - START
+    //DX START
     if(str_sp.pgroup_calculated==FALSE || str_sp.fgroup_calculated==FALSE || str_sp.pgroup_xtal_calculated==FALSE) {
       ofstream FileDevNull("/dev/null");
       _aflags aflags;
@@ -2163,9 +2163,9 @@ namespace LATTICE {
       pflow::PerformFullSymmetry(str_sp,FileDevNull,aflags,kflags,SYS_VERBOSE,cout);
     }
 
-    //**************************JUNKAI EDITED START****************************
+    //**************************JX EDITED START****************************
     /* OLD (DX)
-    // JUNKAI CHECK THE POSCAR OF KESONG it has 1.21% strain and finds it cubic but is it tet ?
+    //JX CHECK THE POSCAR OF KY it has 1.21% strain and finds it cubic but is it tet ?
     //  cerr << "[1]" << endl;
     if(str_sp.pgroup_calculated==FALSE) {
     //   cerr << "str_sp.pgroup_calculated" << endl;
@@ -2174,8 +2174,8 @@ namespace LATTICE {
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4a1]" << endl;
-    // DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     }
 
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b]" << endl;
@@ -2187,11 +2187,11 @@ namespace LATTICE {
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b1]" << endl;
-    // DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4b2]" << endl;
-    // DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     }
 
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c]" << endl;
@@ -2204,22 +2204,22 @@ namespace LATTICE {
     aflags.Directory="./";aflags.QUIET=TRUE;
     str_sp.LatticeReduction_avoid=TRUE;
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c1]" << endl;
-    // DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    if(str_sp.pgroup_calculated==FALSE) SYM::CalculatePointGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c2]" << endl;
-    // DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    if(str_sp.fgroup_calculated==FALSE) SYM::CalculateFactorGroup(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c3]" << endl;
-    // DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
-    SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); // DX
+    //DX SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps/2.0);
+    SYM::CalculatePointGroupCrystal(FileDevNull,str_sp,aflags,FALSE,SYS_VERBOSE,cout,symeps); //DX
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4c4]" << endl;
     }
 
     if(LDEBUG) cerr << "LATTICE::Standard_Lattice_Structure: [4d]" << endl;
     //  cerr << "[4]" << endl;
     */ //OLD (DX)
-    // DX - END
-    //**************************JUNKAI EDITED END****************************
+    //DX END
+    //**************************JX EDITED END****************************
 
     // http://en.wikipedia.org/wiki/Crystal_system  table from bottom to top
     //  if(str_sp.pgroup.size()==24 && str_sp.crystal_system=="") str_sp.crystal_system="hexagonal";
@@ -2272,7 +2272,7 @@ namespace LATTICE {
     //  if(crystal_system=="tetragonal") {cutoff=(2.0/sqrt(3.0))*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;}
     if(crystal_system=="tetragonal") {cutoff=1.05*(2.0/sqrt(3.0))*RadiusSphereLattice(str_sc.lattice);lattice_found=TRUE;}
     if(crystal_system=="trigonal") {cutoff=max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} // the primitives always get the max of the lenghts
-    //  if(crystal_system=="orthorhombic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //stefano recipe
+    //  if(crystal_system=="orthorhombic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //SC recipe
     if(crystal_system=="orthorhombic") {cutoff=1.05*(2.0/sqrt(3.0))*RadiusSphereLattice(str_sc.lattice);lattice_found=TRUE;}
     if(crystal_system=="monoclinic") {cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} //sqrt(2) catches the centered face
     if(crystal_system=="triclinic") {cutoff=max(rdata[1],rdata[2],rdata[3]);lattice_found=TRUE;} // the primitives always get the max of the lenghts
@@ -2291,7 +2291,7 @@ namespace LATTICE {
        }
        */
 
-    //**************************JUNKAI EDITED START****************************
+    //**************************JX EDITED START****************************
     if((lattice_found==FALSE || crystal_system=="none" || cutoff<=0.01)&&!histogram) {
       vector<double> tolerance;
       int ij;
@@ -2305,7 +2305,7 @@ namespace LATTICE {
       //   return LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,0.05,0.5,time,aeps);
     }
 
-    //**************************JUNKAI EDITED END****************************  
+    //**************************JX EDITED END****************************  
 
     // crystal_system="all";cutoff=sqrt(2)*max(rdata[1],rdata[2],rdata[3]);
 
@@ -2486,7 +2486,7 @@ namespace LATTICE {
             if((choice==0 && ((aurostd::isequal(a,b,eps)&&aurostd::isdifferent(b,c,eps))||(aurostd::isequal(b,c,eps)&&aurostd::isdifferent(c,a,eps))||(aurostd::isequal(c,a,eps)&&aurostd::isdifferent(a,b,eps)))) ||
                 (choice==1 && ((aurostd::isequal(a,b,eps)&&aurostd::isequal(b,c,eps)))))
               // if(aurostd::isequal(alpha,90.0,epsang) && aurostd::isequal(beta,90.0,epsang) && aurostd::isequal(gamma,90.0,epsang))
-            { //CO200106 - patching for auto-indenting
+            { //CO20200106 - patching for auto-indenting
 
               // TET: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 c]: a a c 90 90 90  primitive
               // TET: a1=[a 0 0]  a2=[0 a 0]  a3=[0 0 c]: a a c 90 90 90  conventional
@@ -3029,7 +3029,7 @@ namespace LATTICE {
             rdata=Getabc_angles(rlattice,DEGREES);
             a=rdata[1];b=rdata[2];c=rdata[3];alpha=rdata[4];beta=rdata[5];gamma=rdata[6];
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //2-17-16 COses, Karol Jarolimek discovered B1Cd1Li1O3_ICSD_200615 was calculated to be TRI1B, not TRI1A like shown in
+            //20160217 COses, Karol Jarolimek discovered B1Cd1Li1O3_ICSD_20200615 was calculated to be TRI1B, not TRI1A like shown in
             //Comp. Mat. Sci. 49, 299 (2010) Fig 47.  Turns out we forgot to set ka...kgamma, so the following lines were added.
             //Interestingly, this system has weight_TRIa==weight_TRIb, so the check above (TRI1a before TRI1b) is very important.
             klattice=ReciprocalLattice(rlattice);
@@ -3136,14 +3136,14 @@ namespace LATTICE {
         str_reciprocal_in.lattice=str_sp.klattice;str_reciprocal_in.FixLattices();
         str_reciprocal_in.title="NO_RECURSION";
         _atom atom;str_reciprocal_in.AddAtom(atom);
-        // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //STEFANO OLD VERSION
-        int ss=0; //JUNKAI
-        LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JUNKAI
+        // LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang); //SC OLD VERSION
+        int ss=0; //JX
+        LATTICE::Standard_Lattice_Structure(str_reciprocal_in,str_reciprocal_sp,str_reciprocal_sc,eps,epsang,ss,_EPS_);//JX
         str_sp.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-        str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//wahyu mod
+        str_sp.reciprocal_lattice_variation_type=str_reciprocal_sp.bravais_lattice_variation_type;//WSETYAWAN mod
         //str_sp.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
         str_sc.reciprocal_lattice_type=str_reciprocal_sp.bravais_lattice_type;
-        str_sc.reciprocal_lattice_variation_type=str_reciprocal_sc.bravais_lattice_variation_type;//wahyu mod
+        str_sc.reciprocal_lattice_variation_type=str_reciprocal_sc.bravais_lattice_variation_type;//WSETYAWAN mod
         //str_sc.reciprocal_conventional_lattice_type=str_reciprocal_sp.bravais_lattice_system;
         // SUPERLATTICE
         xstructure str_superlattice_in,str_superlattice_sp,str_superlattice_sc;
@@ -3151,9 +3151,9 @@ namespace LATTICE {
         str_superlattice_in.title="NO_RECURSION";
         str_superlattice_in.IdenticalAtoms();
         str_superlattice_in.Minkowski_calculated=FALSE;
-        //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //STEFANO OLD VERSION
-        ss=0; //JUNKAI
-        LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JUNKAI
+        //LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang); //SC OLD VERSION
+        ss=0; //JX
+        LATTICE::Standard_Lattice_Structure(str_superlattice_in,str_superlattice_sp,str_superlattice_sc,eps,epsang,ss,_EPS_);//JX
         str_sp.bravais_superlattice_type=str_superlattice_sp.bravais_lattice_type;
         str_sp.bravais_superlattice_variation_type=str_superlattice_sp.bravais_lattice_variation_type;
         str_sp.bravais_superlattice_system=str_superlattice_sp.bravais_lattice_system;
@@ -3173,7 +3173,7 @@ namespace LATTICE {
     if(VERBOSE_PROGRESS) cerr << "LATTICE::Standard_Lattice_Structure: X3 found=" << found << endl;
 
     // last checks
-    // STEFANO OLD VERSION
+    //SC OLD VERSION
     //   if(abs(NearestNeighbour(str_in)-NearestNeighbour(str_sp))>0.01) {
     //   cerr << "ERROR:  LATTICE::Standard_Lattice_Structure" << endl;
     //   cerr << "ERROR:  str_in.title=" << str_in.title << endl;
@@ -3254,18 +3254,18 @@ namespace LATTICE {
 // ***************************************************************************
 namespace LATTICE {
   bool Bravais_Lattice_Structure(xstructure& str_in,xstructure& str_sp,xstructure& str_sc,double eps,double epsang) {
-    //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang);// STEFANO OLD VERSION
-    int ss=0; //JUNKAI                                                                                                                                                                                                                                                
-    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JUNKAI
+    //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang);//SC OLD VERSION
+    int ss=0; //JX                                                                                                                                                                                                                                                
+    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JX
     str_in.bravais_lattice_type=str_sp.bravais_lattice_type;
     str_in.bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
     str_in.bravais_lattice_system=str_sp.bravais_lattice_system;
     xstructure _str_in,_str_sp,_str_sc;
     _str_in.lattice=str_in.lattice; _str_in.scale=1.0;
     _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
-    //  LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang); //STEFANO OLD VERSION
-    ss=0; //JUNKAI                                        
-    LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JUNKAI
+    //  LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang); //SC OLD VERSION
+    ss=0; //JX                                        
+    LATTICE::Standard_Lattice_Structure(_str_in,str_sp,str_sc,eps,epsang,ss,_EPS_);//JX
     str_in.bravais_lattice_lattice_type=_str_sp.bravais_lattice_type;
     str_in.bravais_lattice_lattice_variation_type=_str_sp.bravais_lattice_variation_type;
     str_in.bravais_lattice_lattice_system=_str_sp.bravais_lattice_system;
@@ -3273,7 +3273,7 @@ namespace LATTICE {
   }
 }
 
-// DX - START 
+//DX START 
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault(xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
     return Bravais_Lattice_StructureDefault_20170401(str_in,str_sp,str_sc,full_sym);
@@ -3281,8 +3281,8 @@ namespace LATTICE {
 }
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault_20170401(xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG); // DX20180426 - added LDEBUG
-    string directory=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX20180426 - added current working directory 
+    bool LDEBUG=(FALSE || XHOST.DEBUG); //DX20180426 - added LDEBUG
+    string directory=aurostd::getPWD(); //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd"); //DX20180426 - added current working directory 
     bool same_eps = false;
     bool no_scan = false;
     bool ignore_checks = false;
@@ -3292,13 +3292,13 @@ namespace LATTICE {
         same_eps = true; //force single while loop, no check
       }
       if(!LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym)){
-        if(LDEBUG) {cerr << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} // DX20180426 - added directory info and put in LDEBUG
+        if(LDEBUG) {cerr << "LATTICE::WARNING: Could not find crystal lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
           cerr << "LATTICE::WARNING: [1] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
           ignore_checks = true;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
-        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
+        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
         continue;
       }
       str_in.bravais_lattice_type=str_sp.bravais_lattice_type;
@@ -3309,27 +3309,27 @@ namespace LATTICE {
       str_sp.bravais_lattice_system=str_sp.bravais_lattice_system;
       xstructure _str_in,_str_sp,_str_sc;
       _str_in.lattice=str_in.lattice; _str_in.scale=1.0;
-      _str_in.sym_eps=_str_sp.sym_eps=_str_sc.sym_eps=str_sp.sym_eps; // DX
-      _str_in.sym_eps_calculated=_str_sp.sym_eps_calculated=_str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; // DX
-      _str_in.sym_eps_change_count=_str_sp.sym_eps_change_count=_str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
+      _str_in.sym_eps=_str_sp.sym_eps=_str_sc.sym_eps=str_sp.sym_eps; //DX
+      _str_in.sym_eps_calculated=_str_sp.sym_eps_calculated=_str_sc.sym_eps_calculated=str_sp.sym_eps_calculated; //DX
+      _str_in.sym_eps_change_count=_str_sp.sym_eps_change_count=_str_sc.sym_eps_change_count=str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
       _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; _str_in.AddAtom(atom);
-      // DX20170814 - START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
-      // DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
-      // DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
-      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup = _str_sp.pgroup = _str_sc.pgroup = str_sp.pgroup;
-      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal = _str_sp.pgroup_xtal = _str_sc.pgroup_xtal = str_sp.pgroup;
-      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_calculated = _str_sp.pgroup_calculated = _str_sc.pgroup_calculated = str_sp.pgroup_calculated;
-      // DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
-      // DX20170814 - END
-      // DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
-      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) // DX20180226 - do not need to do full sym on lattice
-      { //CO200106 - patching for auto-indenting
-        if(LDEBUG) {cerr << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} // DX20180426 - added directory info and put in LDEBUG
+      //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgrouk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
+      //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
+      //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal) 
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup = _str_sp.pgroup = _str_sc.pgroup = str_sp.pgroup;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal = _str_sp.pgroup_xtal = _str_sc.pgroup_xtal = str_sp.pgroup;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_calculated = _str_sp.pgroup_calculated = _str_sc.pgroup_calculated = str_sp.pgroup_calculated;
+      //DX20180426 [OBSOLETE] - this is not a reciprocal lattice structure - _str_in.pgroup_xtal_calculated = _str_sp.pgroup_xtal_calculated = _str_sc.pgroup_xtal_calculated = str_sp.pgroup_xtal_calculated;
+      //DX20170814 END
+      //DX20180226 [OBSOLETE] if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,full_sym))
+      if(!LATTICE::Standard_Lattice_StructureDefault(_str_in,_str_sp,_str_sc,false)) //DX20180226 - do not need to do full sym on lattice
+      { //CO20200106 - patching for auto-indenting
+        if(LDEBUG) {cerr << "LATTICE::WARNING: Could not find lattice lattice type." << " [dir=" << directory << "]" << endl;} //DX20180426 - added directory info and put in LDEBUG
         if(!SYM::change_tolerance(str_sp,str_sp.sym_eps,str_sp.dist_nn_min,no_scan)){
           cerr << "LATTICE::WARNING: [2] Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << " [dir=" << directory << "]" << endl;
         }
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = str_sp.sym_eps;
-        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
+        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
         continue;
       }
       str_in.bravais_lattice_lattice_type=_str_sp.bravais_lattice_type;
@@ -3343,7 +3343,7 @@ namespace LATTICE {
       }
       else { 
         str_in.sym_eps = str_sp.sym_eps = str_sc.sym_eps = _str_sp.sym_eps;
-        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = _str_sp.sym_eps_change_count; // DX20180222 - added sym_eps change count
+        str_in.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = _str_sp.sym_eps_change_count; //DX20180222 - added sym_eps change count
       }
     }
     if(count==100){
@@ -3353,9 +3353,9 @@ namespace LATTICE {
     return TRUE;
   }
 }
-// DX - END
+//DX END
 
-// DX - START
+//DX START
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault_20160101(xstructure& str_in,xstructure& str_sp,xstructure& str_sc) {
     LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
@@ -3378,16 +3378,16 @@ namespace LATTICE {
     return TRUE;
   }
 }
-// DX - END
+//DX END
 
 namespace LATTICE {
   bool Lattice(const xmatrix<double>& lattice,xmatrix<double>& lattice_sp,xmatrix<double>& lattice_sc,string& bravais_lattice_type,string& bravais_lattice_variation_type,string& bravais_lattice_system,double eps,double epsang) {
     xstructure str_in,str_sp,str_sc;
     str_in.lattice=lattice; str_in.scale=1.0;
     _atom atom; atom.cpos.clear();atom.fpos.clear();atom.type=0; str_in.AddAtom(atom);
-    //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang); // STEFANO OLD VERSION
-    int ss=0; //JUNKAI                                                                                                                                                                                                                                                
-    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_); //JUNKAI
+    //  LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang); //SC OLD VERSION
+    int ss=0; //JX                                                                                                                                                                                                                                                
+    LATTICE::Standard_Lattice_Structure(str_in,str_sp,str_sc,eps,epsang,ss,_EPS_); //JX
     lattice_sp=str_sp.lattice;lattice_sc=str_sc.lattice;
     bravais_lattice_type=str_sp.bravais_lattice_type;
     bravais_lattice_variation_type=str_sp.bravais_lattice_variation_type;
@@ -5834,10 +5834,10 @@ namespace LATTICE {
       conback(1,i)=23; conback(2,i)=24;  Nconback=i;
     }
     //----------- TRI1a or TRI2a --------------------------
-    if(LattVar=="TRI1A" || LattVar=="TRI1a" || LattVar=="tri1a" || LattVar=="TRI2A" || LattVar=="TRI2a" || LattVar=="tri2a") {	//corey and david
+    if(LattVar=="TRI1A" || LattVar=="TRI1a" || LattVar=="tri1a" || LattVar=="TRI2A" || LattVar=="TRI2a" || LattVar=="tri2a") {	//CO+DX
       found=true;
-      if(LattVar=="TRI1A" || LattVar=="TRI1a" || LattVar=="tri1a")    glatt="TRI_1_a";	//corey and david
-      if(LattVar=="TRI2A" || LattVar=="TRI2a" || LattVar=="tri2a")    glatt="TRI_2_a";	//corey and david
+      if(LattVar=="TRI1A" || LattVar=="TRI1a" || LattVar=="tri1a")    glatt="TRI_1_a";	//CO+DX
+      if(LattVar=="TRI2A" || LattVar=="TRI2a" || LattVar=="tri2a")    glatt="TRI_2_a";	//CO+DX
       xrotview=75; zrotview=140;
       azview=120; elview=10;
       b1arrow=0.25; b2arrow=0.25; b3arrow=0.25;
@@ -5956,10 +5956,10 @@ namespace LATTICE {
       conback(1,i)=28; conback(2,i)=27;  Nconback=i;
     }
     //----------- TRI1b or TRI2b --------------------------
-    if( LattVar=="TRI1B" || LattVar=="TRI1b" || LattVar=="tri1b" || LattVar=="TRI2B" || LattVar=="TRI2b" || LattVar=="tri2b") {	//corey and david
+    if( LattVar=="TRI1B" || LattVar=="TRI1b" || LattVar=="tri1b" || LattVar=="TRI2B" || LattVar=="TRI2b" || LattVar=="tri2b") {	//CO+DX
       found=true;
-      if(LattVar=="TRI1B" || LattVar=="TRI1b" || LattVar=="tri1b")    glatt="TRI_1_b";	//corey and david
-      if(LattVar=="TRI2B" || LattVar=="TRI2b" || LattVar=="tri2b")    glatt="TRI_2_b";	//corey and david
+      if(LattVar=="TRI1B" || LattVar=="TRI1b" || LattVar=="tri1b")    glatt="TRI_1_b";	//CO+DX
+      if(LattVar=="TRI2B" || LattVar=="TRI2b" || LattVar=="tri2b")    glatt="TRI_2_b";	//CO+DX
       xrotview=75; zrotview=55;
       azview=120; elview=10;
       b1arrow=0.25; b2arrow=0.25; b3arrow=0.25;
@@ -6461,9 +6461,9 @@ namespace LATTICE {
 namespace LATTICE {
   string KPOINTS_Directions(xstructure str_in,double grid,bool &foundBZ) {
     xstructure str_sp,str_sc;
-    bool full_sym = false; // DX20170829 - Speed increase
-    // DX20170829 [OBSOLETE] LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
-    LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym); // DX20170829 - Speed increase
+    bool full_sym = false; //DX20170829 - Speed increase
+    //DX20170829 [OBSOLETE] LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
+    LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc,full_sym); //DX20170829 - Speed increase
     string lattice_type=str_sp.bravais_lattice_variation_type;
     //return LATTICE::KPOINTS_Directions(lattice_type,str_sp.lattice,grid,str_sp.iomode,foundBZ); 
     return LATTICE::KPOINTS_Directions(lattice_type,str_sp.lattice,str_sp.transform_coordinates_original2new, grid,str_sp.iomode,foundBZ);  //DX20181101
@@ -8142,7 +8142,7 @@ namespace LATTICE {
     //************** TRICLINIC ********************************************
     if( lattice_type=="TRI1A" || lattice_type=="TRI1a" || lattice_type=="TRI1B" || 
         lattice_type=="TRI1b" || lattice_type=="TRI2A" || lattice_type=="TRI2a" || 
-        lattice_type=="TRI2B" || lattice_type=="TRI2b") {		//corey and david
+        lattice_type=="TRI2B" || lattice_type=="TRI2b") {		//CO+DX
       //DX20181105 [OBSOLETE] stringstream G,Y,A,D,H1,F2,B2,Z1,E,F,B,L,X,D1,H,O,K,M1,Y1,A1,F1,B1,Z,A2,D2,E1,M,R,N;
       _kpoint G,L,M,M1,N,R,X,Y,Y1,Z,Z1,A,A1,A2,B,B1,B2,D,D1,D2,E,E1,F,F1,F2,H,H1,K,O;
       double zeta,phi,psi,rho,tau,nu,theta,lambda,omega,eta,mu,delta;
@@ -8150,7 +8150,7 @@ namespace LATTICE {
 
       //DX20181105 [OBSOLETE] G << "   0.000   0.000   0.000   ! \\Gamma";
       G.fpos(1)=0.000; G.fpos(2)=0.000; G.fpos(3)=0.000; G.label="\\Gamma";
-      if(lattice_type=="TRI1A" || lattice_type=="TRI1a" || lattice_type=="TRI2A" || lattice_type=="TRI2a") {		//corey and david
+      if(lattice_type=="TRI1A" || lattice_type=="TRI1a" || lattice_type=="TRI2A" || lattice_type=="TRI2a") {		//CO+DX
         foundBZ=TRUE;
         zeta=1.0+(b1(3)+b2(3))*(b1(3)+b2(3)+b3(3))/b1(1)/b1(1);
         zeta=zeta+ (b1(2)+b2(2))/b1(1)/b1(1)*(b1(2)-b2(3)*(b2(3)+b3(3))/b2(2));
@@ -8281,7 +8281,7 @@ namespace LATTICE {
         //DX20181105 - reformat kpoints to transform - END
 
       }
-      if(lattice_type=="TRI1B" || lattice_type=="TRI1b" || lattice_type=="TRI2B" || lattice_type=="TRI2b") {		//corey and david
+      if(lattice_type=="TRI1B" || lattice_type=="TRI1b" || lattice_type=="TRI2B" || lattice_type=="TRI2b") {		//CO+DX
         foundBZ=TRUE;
         rho= 1.0 + b1(2)*(b1(2)+b2(2))/b1(1)/b1(1) - b1(3)*(b3(3)-b1(3))/b1(1)/b1(1);
         rho=rho - b2(3)*(b3(3)-b2(3))*b1(2)/b1(1)/b1(1)/b2(2);

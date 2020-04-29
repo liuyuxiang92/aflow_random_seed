@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2020           *
 // *                                                                         *
 // ***************************************************************************
 // aflow_agl_debye.h
@@ -328,7 +328,7 @@ namespace AGL_functions {
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
-// *              AFlow CORMAC TOHER - Duke University 2013-2018             *
+// *              AFlow CORMAC TOHER - Duke University 2013-2020             *
 // *                                                                         *
 // ***************************************************************************
 

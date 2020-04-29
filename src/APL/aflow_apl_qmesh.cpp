@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 
@@ -113,7 +113,7 @@ namespace apl {
     _recCell.f2c = zeroMatrix;
     _recCell.skewed = false;
     _recCell.pgroup.clear();
-    _shifted = false;  // ME20190701
+    _shifted = false;  //ME20190701
     _shift = zerodbl;
     _weights.clear();
   }
@@ -175,7 +175,18 @@ namespace apl {
   }
 
   //setupReciprocalCell///////////////////////////////////////////////////////
-  // Sets up the reciprocal cell that belongs to the q-mesh.
+  // Sets up the reciprocal cell that belongs to the q-mesh and calculates
+  // the point group. Literature and phonon codes are not consistent about
+  // whether to use pgroupk or pgroupk_xtal. To get all symmetry-related
+  // properties (see DOI: 10.1103/RevModPhys.40.1), pgroupk_xtal must be used
+  // or else the transformation properties of the dynamical matrix cannot be
+  // captured since they require symmetry operations that map atoms in real
+  // space. Thus, pgroupk_xtal needs to be used to get the irreducible wedge;
+  // using pgroupk is not correct. However, observables such as the phonon
+  // frequencies, eigenvectors, or phonon-phonon scattering matrices also have
+  // inversion symmetry, which is not always present in pgroupk_xtal. So,
+  // unless the dynamical matrix itself is needed, the Patterson symmetry
+  // (pgroupk_Patterson) can be used to create the irreducible wedge.
   void QMesh::setupReciprocalCell(xstructure xs, bool include_inversions) {
     _recCell.rlattice = xs.lattice;
     _recCell.lattice = ReciprocalLattice(_recCell.rlattice);
@@ -191,18 +202,7 @@ namespace apl {
     double tol = _AFLOW_APL_EPS_;
     _recCell.skewed = SYM::isLatticeSkewed(_recCell.lattice, min_dist, tol);
 
-    // Calculate the point group of the reciprocal cell. Literature and phonon
-    // codes are not consistent about whether to use pgroupk or pgroupk_xtal.
-    // To get all symmetry properties (see DOI: 10.1103/RevModPhys.40.1),
-    // pgroupk_xtal must be used or else the transformation properties of the
-    // dynamical matrix cannot be captured since they require symmetry
-    // operations that map atoms in real space. Thus, pgroupk_xtal needs to be
-    // used to get the irreducible wedge - using pgroupk is not correct.
-    // However, observables such as the phonon frequencies, eigenvectors, or
-    // phonon-phonon scattering matrices also have inversion symmetry, which
-    // is not always present in pgroupk_xtal. So, unless the dynamical matrix
-    // itself is needed, the Patterson symmetry (pgroupk_Patterson) can be
-    // used to create the irreducible wedge.
+    // Calculate the crystallographic point group of the reciprocal cell.
     if (include_inversions && !xs.pgroupk_Patterson_calculated) {
       xs.CalculateSymmetryPointGroupKPatterson(false);
     } else if (!xs.pgroupk_xtal_calculated) {
@@ -212,7 +212,7 @@ namespace apl {
     if ((include_inversions && !xs.pgroupk_Patterson_calculated) ||
         (!include_inversions && !xs.pgroupk_xtal_calculated)) {
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell()";
-      string message = "Calculation of the point group of the reciprocal cell unsuccessful.";
+      string message = "Calculation of the crystallographic point group of the reciprocal cell unsuccessful.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
 
@@ -272,7 +272,7 @@ namespace apl {
       gamma = true;
     }
     _isGammaCentered = gamma;
-    _shifted = !aurostd::iszero(shift);  // ME20190813
+    _shifted = !aurostd::iszero(shift);  //ME20190813
 
     // Obtain Cartesian coordinates
     if (!_shifted) {
@@ -295,16 +295,16 @@ namespace apl {
 
   //moveToBZ//////////////////////////////////////////////////////////////////
   // Moves a q-point into the first Brillouin zone.
-  // ME20190702 - made more robust
+  //ME20190702 - made more robust
   void QMesh::moveToBZ(xvector<double>& qpt) const {
     BringInCellInPlace(qpt, _ZERO_TOL_, 0.5, -0.5); //DX20190905 - removed SYM namespace
   }
 
   //makeIrreducible///////////////////////////////////////////////////////////
   // Makes the q-point mesh irreducible
-  // ME20190813 - Changed algorithm to be much faster
+  //ME20190813 - Changed algorithm to be much faster
   void QMesh::makeIrreducible() {
-    if (_reduced) return;  // ME20190701 - don't reduce if it's already reduced
+    if (_reduced) return;  //ME20190701 - don't reduce if it's already reduced
     stringstream message;
 
     _ibzqpts.clear();
@@ -348,7 +348,8 @@ namespace apl {
 
   // ME20200109
   //calculateLittleGroups/////////////////////////////////////////////////////
-  // Calculates little/small groups for each irreducible q-point.
+  // Calculates little/small groups for each irreducible q-point. The little
+  // group is the group that leaves a q-point invariant, i.e. U q = q + G.
   void QMesh::calculateLittleGroups() {
     if (_littleGroupsCalculated) return;
     _littleGroups.resize(_nIQPs, vector<int>(1, 0));  // Identity is always invariant
@@ -433,7 +434,7 @@ namespace apl {
     return _qpoints[getQPointIndex(fpos)];
   }
 
-  // ME20190813
+  //ME20190813
   // Returns the index of the qpoint based on the fractional
   // position. It assumes that the point is already on the grid.
   int QMesh::getQPointIndex(xvector<double> fpos) const {
@@ -487,7 +488,7 @@ namespace apl {
     return _recCell;
   }
 
-  // ME20190813
+  //ME20190813
   bool QMesh::isShifted() const {
     return _shifted;
   }
@@ -615,7 +616,7 @@ namespace apl {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

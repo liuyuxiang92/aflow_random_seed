@@ -53,7 +53,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
   for(uint nalloy=0;nalloy<alloys.size();nalloy++)
     //  cerr << "DEBUG [0]  " << "Nalloy=" << nalloy << endl;
     // for(nalloy=1;nalloy<=1;nalloy++)
-  { //CO200106 - patching for auto-indenting
+  { //CO20200106 - patching for auto-indenting
 #ifdef TMELTING
     fgets(string_line_TMELTING,1024,in_file_pointer_TMELTING);
     if(!strstr(string_line_TMELTING,alloys.at(nalloy))) {
@@ -100,7 +100,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
     // 		      vector<string> &vList_Pmin,                       // OUT  [0,nspecies[ returns the prototype for reference
     // 		      vector<uint> &vList_Imin,                         // OUT  [0,nspecies[ returns the line index of vList.at(ispecies), in which we have the min enthalpy for reference
     // 		      vector<vector<vector<double> > > &vList_concs,    // OUT  [0,naries[*[0,vList.size()[*[0.nspecies[ the concentrations AxAyCz... where x+y+z=1 and it contains also ZEROS so that 0 0.25 0.75 is allowed
-    // 		      vector<vector<double> > &vList_Ef) {              // OUT  [0,naries[*[0,vList.size()[ returns the formation energy of the list  //[CO200106 - close bracket for indenting]}
+    // 		      vector<vector<double> > &vList_Ef) {              // OUT  [0,naries[*[0,vList.size()[ returns the formation energy of the list  //[CO20200106 - close bracket for indenting]}
     //vector<string> vspecies;                         // IN   [0,nspecies[ the species Ag,Cd,...   nspecies=number of these items    nspecies=naries
     //vector<string> vspecies_pp;                      // IN   [0,nspecies[ the pseudopotentials Ag_pv, Cd_sv
     //vector<vector<string> > vList;                   // OUT  [0,naries[*[0,vList.size()[ returns the lines of the library containing A,B,C,AB,AC,BC,ABC....
@@ -1071,8 +1071,8 @@ bool APENNSY_Parameters::LibLoadAlloysALLOY(string alloy_name,_aflags &aflags) {
       //  cerr << "[" << names << "] [" << KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i))) << "]" << endl;
       // if(aurostd::substring2bool(KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i))),names))
       if(names==KBIN::VASP_PseudoPotential_CleanName(KBIN::VASP_PseudoPotential_CleanName(paramsX_tmp.alloys.at(i)))) // only one
-      { //CO200106 - patching for auto-indenting
-        // if(names==paramsX_tmp.alloys.at(i)) { // only one  //[CO200106 - close bracket for indenting]}
+      { //CO20200106 - patching for auto-indenting
+        // if(names==paramsX_tmp.alloys.at(i)) { // only one  //[CO20200106 - close bracket for indenting]}
         cerr << paramsX_tmp.alloys.at(i) << endl;
         alloys.push_back(paramsX_tmp.alloys.at(i));
         alloysRAW.push_back(paramsX_tmp.alloysRAW.at(i));

@@ -285,11 +285,11 @@ namespace apl {
                   int shellID = getShell(aurostd::modulus(atom.cpos));
                   addAtomToShell(shellID, atom, false);
                 }
-                // ME20191031 - use xerror
+                //ME20191031 - use xerror
                 //catch (APLLogicError& e)
                 catch (aurostd::xerror& e)
-                { //CO200106 - patching for auto-indenting
-                  cout << "Atom cpos: " << atom.cpos;  // ME20190218
+                { //CO20200106 - patching for auto-indenting
+                  cout << "Atom cpos: " << atom.cpos;  //ME20190218
                   // [OBSOLETE ME20190218] printXVector(atom.cpos, false);
                   cout << ";r = " << aurostd::modulus(atom.cpos) << std::endl;
                   //throw APLLogicError("apl::ShellHandle::splitBySymmetry(); No shell for this atom.");
@@ -319,11 +319,11 @@ namespace apl {
     // to this atom
     //_initStructure.ShiftOriginToAtom(_centralAtomID); //CO
     //_initStructure.BringInCell(); //CO
-    //COREY - START
+    //CO START
     //we now do the same thing as with supercell, shiftorigin to central atom, then shift back original (not 0)
     //more robust
-    center(_centralAtomID);  //corey
-    //COREY - END
+    center(_centralAtomID);  //CO
+    //CO END
 
     // Calculate average shell radius
     for (uint ishell = 0; ishell < _shells.size(); ishell++) {
@@ -460,11 +460,11 @@ namespace apl {
     // Take the center of init structure into atom 0 (by default)
     //_initStructure.ShiftOriginToAtom(0); //CO
     //_initStructure.BringInCell(); //CO
-    //COREY - START
+    //CO START
     //we now do the same thing as with supercell, shiftorigin to central atom, then shift back original (not 0)
     //more robust
-    center_original();  //corey
-    //COREY - END
+    center_original();  //CO
+    //CO END
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -500,7 +500,7 @@ namespace apl {
 
   double ShellHandle::getShellRadius(int nn) {
     if (nn >= (int)_shells.size()) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("ShellHandle::getShellRadius(); Index out of range.");
       string function = "ShellHandle::getShellRadius()";
       string message = "Index " + aurostd::utype2string<int>(nn) + " out of range.";
@@ -538,7 +538,7 @@ namespace apl {
     }
 
     if (j == _shells.size()) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLLogicError("apl::ShellHandle::getShell(); Problem to find shell for this radius.");
       string function = "apl::ShellHandle::getShell()";
       string message = "Problem to find shell for this radius.";
@@ -609,7 +609,7 @@ namespace apl {
 
   void ShellHandle::addAtomToShell(int nn, const _atom& atom, bool useSplittedShells) {
     if (nn >= (int)_shells.size()) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::ShellHandle::addAtomToShell(); Index out of range.");
       string function = "ShellHandle::getShellRadius()";
       string message = "Index " + aurostd::utype2string<int>(nn) + " out of range.";
@@ -629,7 +629,7 @@ namespace apl {
       }
       if (i != _shells[nn].ratoms.size()) {
         if (_shells[nn].ratoms.size() != _shells[nn].atoms.size()) {
-          // ME20191031 - use xerror
+          //ME20191031 - use xerror
           //throw APLLogicError("apl::ShellHandle::addAtomToShell(); Problem to add atom into symmetry splitted shell list. Arrays differ.");
           string function = "apl::ShellHandle::addAtomToShell()";
           string message = "Problem to add atom into symmetry split shell list. Arrays differ.";
@@ -639,15 +639,15 @@ namespace apl {
         }
       } else {
         cout << "SHELL: " << nn << std::endl;
-        cout << "add: " << atom.cpos;  // ME20190218
+        cout << "add: " << atom.cpos;  //ME20190218
         // [OBSOLETE ME20190218] printXVector(atom.cpos);
         for (i = 0; i < _shells[nn].ratoms.size(); i++) {
           for (uint j = 0; j < _shells[nn].ratoms[i].size(); j++) {
-            cout << " ->  " << _shells[nn].ratoms[i][j].cpos;  // ME20190218
+            cout << " ->  " << _shells[nn].ratoms[i][j].cpos;  //ME20190218
             // pOBSOLETE ME20190218] printXVector(_shells[nn].ratoms[i][j].cpos);
           }
         }
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLLogicError("apl::ShellHandle::addAtomToShell(); None reference atom found.");
         string function = "apl::ShellHandle::addAtomToShell()";
         string message = "No reference atom found.";
@@ -704,11 +704,11 @@ namespace apl {
         atom.cpos = cpos;
         addAtomToShell(shellID, atom, useSplittedShells);
       }
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //catch (APLLogicError& e)
       catch (aurostd::xerror& e)
-      { //CO200106 - patching for auto-indenting
-        cout << "Atom cpos: " << cpos;  // ME20190218
+      { //CO20200106 - patching for auto-indenting
+        cout << "Atom cpos: " << cpos;  //ME20190218
         // [OBSOLETE ME20190218] printXVector(cpos, false);
         cout << "; r = " << aurostd::modulus(cpos) << std::endl;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::ShellHandle::mapStructure()", "There is an atom which does not correspond to any shell.", _RUNTIME_ERROR_);
@@ -727,7 +727,7 @@ namespace apl {
 
   int ShellHandle::getNumberOfSubshells(int ishell) {
     if (ishell > (int)_shells.size() - 1) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::ShellHandle::getNumberOfSubshells; The shell index is out of range.");
       string function = "apl::ShellHandle::getNumberOfSubshells";
       string message = "The shell index " + aurostd::utype2string<int>(ishell) + "is out of range.";
@@ -740,14 +740,14 @@ namespace apl {
 
   std::deque<_atom> ShellHandle::getAtomsAtSameShell(int ishell, int isubshell) {
     if (ishell > (int)_shells.size() - 1) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The shell index is out of range.");
       string function = "apl::ShellHandle::getAtomsAtSameShell()";
       string message = "The shell index " + aurostd::utype2string<int>(ishell) + "is out of range.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
     if (isubshell > (int)_shells[ishell].atoms.size() - 1) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The subshell index is out of range.");
       string function = "apl::ShellHandle::getAtomsAtSameShell()";
       string message = "The subshell index " + aurostd::utype2string<int>(isubshell) + "is out of range.";
@@ -761,14 +761,14 @@ namespace apl {
 
   const std::deque<_atom>& ShellHandle::getReferenceAtomsAtSameShell(int ishell, int isubshell) {
     if (ishell > (int)_shells.size() - 1) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The shell index is out of range.");
       string function = "apl::ShellHandle::getReferenceAtomsAtSameShell()";
       string message = "The shell index " + aurostd::utype2string<int>(ishell) + "is out of range.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
     if (isubshell > (int)_shells[ishell].ratoms.size() - 1) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The subshell index is out of range.");
       string function = "apl::ShellHandle::getReferenceAtomsAtSameShell()";
       string message = "The subshell index " + aurostd::utype2string<int>(isubshell) + "is out of range.";
@@ -845,7 +845,7 @@ namespace apl {
       << setfill(' ');
   }
 
-  //COREY - START
+  //CO START
   void ShellHandle::center(int i) {
     //_initStructure.ShiftOriginToAtom(i);
     //_initStructure.BringInCell();
@@ -871,7 +871,7 @@ namespace apl {
       _initStructure.atoms[i].cpos = _initStructure_original.atoms[i].cpos;
     }
   }
-  //COREY - END
+  //CO END
 
   // ///////////////////////////////////////////////////////////////////////////
 

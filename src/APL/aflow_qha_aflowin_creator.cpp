@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2015           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow PINKU NATH - Duke University 2014-2018             *
 // *                                                                         *
 // ***************************************************************************
@@ -24,7 +24,7 @@ namespace apl {
     clear();
     _log.open(_logfile.c_str());
     if (!_log.is_open()) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon() Cannot create [aflow_qha_aflowcreate_information.out] file.");
       string function = "apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon()";
       string message = "Cannot create [" + _logfile + "] file.";
@@ -139,25 +139,25 @@ namespace apl {
     if(_scqha_vol_distortion==0) 
     {
       if(_is_sc_gp_on){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp is on.");
         string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
         string message = "scqha_distortion==0 but _is_sc_gp is on.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       } else if(_is_sc_gp_A_on){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_A is on.");
         string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
         string message = "scqha_distortion==0 but _is_sc_gp_A is on.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       } else if(_is_sc_gp_B_on){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_B is on.");
         string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
         string message = "scqha_distortion==0 but _is_sc_gp_B is on.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       } else if(_is_sc_gp_C_on){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_C is on.");
         string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
         string message = "scqha_distortion==0 but _is_sc_gp_C is on.";
@@ -525,7 +525,7 @@ namespace apl {
     }
     //if(xinput.AFLOW_MODE_AIMS){return create_aflowin_phonon_phonon(xinput.xaims);}
     else {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::write_phonon_OUTPUT(); Input -> aflow.in conversion unknown.");
       string function = "apl::QHA_AFLOWIN_CREATOR::write_phonon_OUTPUT()";
       string message = "Input -> aflow.in conversion unknown.";
@@ -537,7 +537,7 @@ namespace apl {
     if(xinput.AFLOW_MODE_VASP){return write_static_AFLOWIN(xinput.xvasp);}
     //if(xinput.AFLOW_MODE_AIMS){return create_aflowin_phonon_phonon(xinput.xaims);}
     else {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::write_static_OUTPUT(); Input -> aflow.in conversion unknown.");
       string function = "apl::QHA_AFLOWIN_CREATOR::write_static_OUTPUT()";
       string message = "Input -> aflow.in conversion unknown.";
@@ -678,7 +678,7 @@ namespace apl {
         }
       }
     } else {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("apl::ForceConstantCalculator::createGPAFLOWIN(); Cannot open [aflow.in] file.");
       string function = "apl::ForceConstantCalculator::createGPAFLOWIN()";
       string message = "Cannot open [" + _AFLOWIN_ + "] file.";
@@ -720,7 +720,7 @@ namespace apl {
     string filename = xvasp.Directory + string("/") + string(_AFLOWIN_);
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon; Cannot create [aflow.in] file.");
       string function = "apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon";
       string message = "Cannot create [" + filename + "] file.";
@@ -1017,20 +1017,20 @@ namespace apl {
 
     aflowin << AFLOWIN_SEPARATION_LINE << std::endl;  // [AFLOW] **************************************************
     aflowin << "[VASP_INCAR_MODE_EXPLICIT]START" << std::endl;
-    xvasp.AVASP_EXTRA_INCAR.clear();                          // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "NELM = 120" << std::endl;     // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "NELMIN=2" << std::endl;       // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "LPLANE=.TRUE." << std::endl;  // WAHYU DEFAULT
+    xvasp.AVASP_EXTRA_INCAR.clear();                          //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "NELM = 120" << std::endl;     //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "NELMIN=2" << std::endl;       //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "LPLANE=.TRUE." << std::endl;  //WSETYAWAN DEFAULT
 
-    if (xvasp.str.atoms.size() <= 10)                           // cutoff for LREAL     // WAHYU DEFAULT
-      xvasp.AVASP_EXTRA_INCAR << "LREAL=.FALSE." << std::endl;  // WAHYU DEFAULT
+    if (xvasp.str.atoms.size() <= 10)                           // cutoff for LREAL     //WSETYAWAN DEFAULT
+      xvasp.AVASP_EXTRA_INCAR << "LREAL=.FALSE." << std::endl;  //WSETYAWAN DEFAULT
     else
-      xvasp.AVASP_EXTRA_INCAR << "LREAL=Auto" << std::endl;    // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "LSCALU=.FALSE." << std::endl;  // WAHYU DEFAULT
+      xvasp.AVASP_EXTRA_INCAR << "LREAL=Auto" << std::endl;    //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "LSCALU=.FALSE." << std::endl;  //WSETYAWAN DEFAULT
     // extra INCAR
     aflowin << xvasp.AVASP_EXTRA_INCAR.str();  // << endl;
     aflowin << "NEDOS=" << _NEDOS << std::endl;
-    aflowin << _PSTRESS << std::endl;  // WAHYU DEFAULT
+    aflowin << _PSTRESS << std::endl;  //WSETYAWAN DEFAULT
     aflowin << "[VASP_INCAR_MODE_EXPLICIT]STOP" << std::endl;
     aflowin << AFLOWIN_SEPARATION_LINE << std::endl;  // [AFLOW] **************************************************
     if (SPACES) aflowin << std::endl;
@@ -1066,11 +1066,11 @@ namespace apl {
     aflowin << "[VASP_POSCAR_MODE_EXPLICIT]STOP " << std::endl;
     aflowin << AFLOWIN_SEPARATION_LINE << std::endl;
 
-    //CO - START
+    //CO START
     string filename = xvasp.Directory + string("/") + string(_AFLOWIN_);
     aurostd::stringstream2file(aflowin, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("apl::ForceConstantCalculator::createEOSAFLOWIN(); Cannot create [aflow.in] file.");
       string function = "apl::ForceConstantCalculator::createEOSAFLOWIN()";
       string message = "Cannot create [" + filename + "] file.";
@@ -1088,7 +1088,7 @@ namespace apl {
     aurostd::string2vectorstring(_AFLOWIN_,vlines);
     if (!vlines.size())  //CO
     {
-      // ME20191031 - usexerror
+      //ME20191031 - usexerror
       //throw apl::APLRuntimeError("apl::ForceConstantCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
       string function = "apl::ForceConstantCalculator::get_special_inputs()";
       string message = "Cannot read ["+_AFLOWIN_+"] file.";
