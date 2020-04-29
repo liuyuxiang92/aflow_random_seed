@@ -1477,7 +1477,7 @@ namespace cce {
     string soliloquy="cce::treat_Ti_O_Magneli_phase_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Ti") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Ti" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
-    uint num_O_before_Ti;
+    uint num_O_before_Ti = 0;
     if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Ti" ) {
       num_O_before_Ti=5;
     } else {
