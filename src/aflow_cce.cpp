@@ -1769,7 +1769,7 @@ namespace cce {
     string soliloquy="cce::treat_Co3O4_special_case():";
     stringstream message;
     if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Co") || (KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "Co" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;}
-    uint num_O_before_Co;
+    uint num_O_before_Co = 0;
     if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "Co" ) {
       num_O_before_Co=4;
     } else {
