@@ -162,62 +162,62 @@ void xOUTCAR::free() {
   Egap_fit_net = AUROSTD_NAN;   // for aflowlib_libraries.cpp 
   Egap_net = AUROSTD_NAN;       // for aflowlib_libraries.cpp 
   
-  //[CO20200404 - OBSOLETE]ERROR = "";                   // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]//------------------------------------------------------------------------------
-  //[CO20200404 - OBSOLETE]// GetProperties
-  //[CO20200404 - OBSOLETE]vcontent.clear();                    // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vmag.clear();                        // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vmag_noncoll.clear();                //DX20171205 - non-collinear magnetization 
-  //[CO20200404 - OBSOLETE]vforces.clear();                     // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vpositions_cartesian.clear();        // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]// begin shared xPOTCAR
-  //[CO20200404 - OBSOLETE]vENMAX.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vENMIN.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vPOMASS.clear();                     // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vZVAL.clear();                       // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vEATOM.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vRCORE.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vRWIGS.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vEAUG.clear();                       // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vRAUG.clear();                       // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vRMAX.clear();                       // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vTITEL.clear();                      // unicity
-  //[CO20200404 - OBSOLETE]vLEXCH.clear();                      // unicity
-  //[CO20200404 - OBSOLETE]// end shared xPOTCAR
-  //[CO20200404 - OBSOLETE]species.clear();                     // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_Z.clear();                   // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp.clear();                  // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_type.clear();             // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_version.clear();          // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_AUID.clear();             // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_AUID_collisions.clear();  // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_groundstate_energy.clear();      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_groundstate_structure.clear();   // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_vLDAU.clear();            // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vkpoint_reciprocal.clear();          // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vkpoint_cartesian.clear();           // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vweights.clear();                    // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]//------------------------------------------------------------------------------
-  //[CO20200404 - OBSOLETE]// GetEffectiveMass
-  //[CO20200404 - OBSOLETE]band_index.clear();                  // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]carrier_type.clear();                // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]carrier_spin.clear();                // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]extrema_cart_coord.clear();          // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]effective_mass_axes.clear();         // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]equivalent_valley.clear();           // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]effective_mass_DOS.clear();          // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]effective_mass_COND.clear();         // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]mass_elec_dos.clear();               // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]mass_hole_dos.clear();               // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]mass_elec_conduction.clear();        // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]mass_hole_conduction.clear();        // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]//------------------------------------------------------------------------------
-  //[CO20200404 - OBSOLETE]// GetBandGap
-  //[CO20200404 - OBSOLETE]xstr.clear(); //DX20191220 - uppercase to lowercase clear
-  //[CO20200404 - OBSOLETE]conduction_band_min.clear();         // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]valence_band_max.clear();            // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]Egap_type.clear();                   // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]Egap.clear();                        // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]ERROR = "";                   // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]//------------------------------------------------------------------------------
+  //[CO20200404 - DUPLICATE]// GetProperties
+  //[CO20200404 - DUPLICATE]vcontent.clear();                    // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vmag.clear();                        // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vmag_noncoll.clear();                //DX20171205 - non-collinear magnetization 
+  //[CO20200404 - DUPLICATE]vforces.clear();                     // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vpositions_cartesian.clear();        // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]// begin shared xPOTCAR
+  //[CO20200404 - DUPLICATE]vENMAX.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vENMIN.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vPOMASS.clear();                     // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vZVAL.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vEATOM.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vRCORE.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vRWIGS.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vEAUG.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vRAUG.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vRMAX.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vTITEL.clear();                      // unicity
+  //[CO20200404 - DUPLICATE]vLEXCH.clear();                      // unicity
+  //[CO20200404 - DUPLICATE]// end shared xPOTCAR
+  //[CO20200404 - DUPLICATE]species.clear();                     // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_Z.clear();                   // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp.clear();                  // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_type.clear();             // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_version.clear();          // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_AUID.clear();             // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_AUID_collisions.clear();  // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_groundstate_energy.clear();      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_groundstate_structure.clear();   // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_vLDAU.clear();            // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vkpoint_reciprocal.clear();          // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vkpoint_cartesian.clear();           // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vweights.clear();                    // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]//------------------------------------------------------------------------------
+  //[CO20200404 - DUPLICATE]// GetEffectiveMass
+  //[CO20200404 - DUPLICATE]band_index.clear();                  // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]carrier_type.clear();                // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]carrier_spin.clear();                // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]extrema_cart_coord.clear();          // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]effective_mass_axes.clear();         // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]equivalent_valley.clear();           // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]effective_mass_DOS.clear();          // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]effective_mass_COND.clear();         // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]mass_elec_dos.clear();               // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]mass_hole_dos.clear();               // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]mass_elec_conduction.clear();        // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]mass_hole_conduction.clear();        // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]//------------------------------------------------------------------------------
+  //[CO20200404 - DUPLICATE]// GetBandGap
+  //[CO20200404 - DUPLICATE]xstr.clear(); //DX20191220 - uppercase to lowercase clear
+  //[CO20200404 - DUPLICATE]conduction_band_min.clear();         // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]valence_band_max.clear();            // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]Egap_type.clear();                   // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]Egap.clear();                        // for aflowlib_libraries.cpp
 }
 
 void xOUTCAR::copy(const xOUTCAR& b) { // copy PRIVATE
@@ -5014,17 +5014,17 @@ void xEIGENVAL::free() {
   number_atoms = 0;  //ME20190623
   number_loops = 0;  //ME20190623
 
-  //[CO20200404 - OBSOLETE]vcontent.clear(); 
-  //[CO20200404 - OBSOLETE]lattice.clear();
-  //[CO20200404 - OBSOLETE]vweight.clear();
-  //[CO20200404 - OBSOLETE]for(uint i=0;i<vkpoint.size();i++) vkpoint.at(i).clear(); 
-  //[CO20200404 - OBSOLETE]vkpoint.clear();
-  //[CO20200404 - OBSOLETE]for(uint i=0;i<venergy.size();i++) 
-  //[CO20200404 - OBSOLETE]  for(uint j=0;j<venergy.at(i).size();j++) 
-  //[CO20200404 - OBSOLETE]    venergy.at(i).at(j).clear(); 
-  //[CO20200404 - OBSOLETE]for(uint i=0;i<venergy.size();i++) 
-  //[CO20200404 - OBSOLETE]  venergy.at(i).clear(); 
-  //[CO20200404 - OBSOLETE]venergy.clear();
+  //[CO20200404 - DUPLICATE]vcontent.clear(); 
+  //[CO20200404 - DUPLICATE]lattice.clear();
+  //[CO20200404 - DUPLICATE]vweight.clear();
+  //[CO20200404 - DUPLICATE]for(uint i=0;i<vkpoint.size();i++) vkpoint.at(i).clear(); 
+  //[CO20200404 - DUPLICATE]vkpoint.clear();
+  //[CO20200404 - DUPLICATE]for(uint i=0;i<venergy.size();i++) 
+  //[CO20200404 - DUPLICATE]  for(uint j=0;j<venergy.at(i).size();j++) 
+  //[CO20200404 - DUPLICATE]    venergy.at(i).at(j).clear(); 
+  //[CO20200404 - DUPLICATE]for(uint i=0;i<venergy.size();i++) 
+  //[CO20200404 - DUPLICATE]  venergy.at(i).clear(); 
+  //[CO20200404 - DUPLICATE]venergy.clear();
 }
 
 void xEIGENVAL::copy(const xEIGENVAL& b) { // copy PRIVATE
@@ -7520,33 +7520,33 @@ void xPOTCAR::free() {
   // [OBSOLETE] vdate.clear();                                // for pseudopotential references
   AUID="";                                      // for pseudopotential references
 
-  //[CO20200404 - OBSOLETE]vcontent.clear(); 
-  //[CO20200404 - OBSOLETE]species.clear();                    // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_Z.clear();                  // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp.clear();                 // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_type.clear();            // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_version.clear();         // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_AUID.clear();   // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_AUID_collisions.clear();   // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_groundstate_energy.clear();   // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]species_pp_groundstate_structure.clear();      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]// begin shared xPOTCAR
-  //[CO20200404 - OBSOLETE]vENMAX.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vENMIN.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vPOMASS.clear();                     // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vZVAL.clear();                       // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vEATOM.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vRCORE.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vRWIGS.clear();                      // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vEAUG.clear();                       // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vRAUG.clear();                       // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vRMAX.clear();                       // for aflowlib_libraries.cpp
-  //[CO20200404 - OBSOLETE]vTITEL.clear();                      // unicity
-  //[CO20200404 - OBSOLETE]vLEXCH.clear();                      // unicity
-  //[CO20200404 - OBSOLETE]// [OBSOLETE] vsymbol.clear();                     // for pseudopotential references
-  //[CO20200404 - OBSOLETE]// [OBSOLETE] vname.clear();                       // for pseudopotential references
-  //[CO20200404 - OBSOLETE]// [OBSOLETE] vdate.clear();                       // for pseudopotential references
-  //[CO20200404 - OBSOLETE]// end shared xPOTCAR
+  //[CO20200404 - DUPLICATE]vcontent.clear(); 
+  //[CO20200404 - DUPLICATE]species.clear();                    // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_Z.clear();                  // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp.clear();                 // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_type.clear();            // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_version.clear();         // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_AUID.clear();   // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_AUID_collisions.clear();   // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_groundstate_energy.clear();   // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]species_pp_groundstate_structure.clear();      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]// begin shared xPOTCAR
+  //[CO20200404 - DUPLICATE]vENMAX.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vENMIN.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vPOMASS.clear();                     // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vZVAL.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vEATOM.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vRCORE.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vRWIGS.clear();                      // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vEAUG.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vRAUG.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vRMAX.clear();                       // for aflowlib_libraries.cpp
+  //[CO20200404 - DUPLICATE]vTITEL.clear();                      // unicity
+  //[CO20200404 - DUPLICATE]vLEXCH.clear();                      // unicity
+  //[CO20200404 - DUPLICATE]// [OBSOLETE] vsymbol.clear();                     // for pseudopotential references
+  //[CO20200404 - DUPLICATE]// [OBSOLETE] vname.clear();                       // for pseudopotential references
+  //[CO20200404 - DUPLICATE]// [OBSOLETE] vdate.clear();                       // for pseudopotential references
+  //[CO20200404 - DUPLICATE]// end shared xPOTCAR
 }
 
 void xPOTCAR::copy(const xPOTCAR& b) { // copy PRIVATE
