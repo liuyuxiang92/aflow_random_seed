@@ -1604,7 +1604,7 @@ namespace cce {
       cerr << soliloquy << "number of Fe ions= " << amount_Fe << endl;
       cerr << soliloquy << "number of O ions= " << amount_O << endl;
     }
-    double Fe_O_ratio;
+    double Fe_O_ratio = 0.0;
     if ( amount_O != 0 ){
       Fe_O_ratio=amount_Fe/amount_O;
     } else {
