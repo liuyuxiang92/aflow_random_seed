@@ -1499,7 +1499,7 @@ namespace cce {
       cerr << soliloquy << "number of O ions= " << amount_O << endl;
       cerr << soliloquy << "number of Ti ions= " << amount_Ti << endl;
     }
-    double Ti_O_ratio;
+    double Ti_O_ratio = 0.0;
     if ( amount_O != 0 ){
       Ti_O_ratio=amount_Ti/amount_O;
     } else {
