@@ -8150,7 +8150,7 @@ namespace compare{
                   cerr << "compare::structureSearch: " << im1[m] << " == " << im2[m] << " : dist=" << min_dists[m] << endl;
                 }
               }
-              double cd=1e9, f=1e9; //DX20200421 - missing initialization
+              double cd=AUROSTD_NAN, f=AUROSTD_NAN; //DX20200421 - missing initialization
               // Only calculate the NN for the proto if we found suitable matches.  
               // Only calculate once, nothing changes between shifts to origin (affine)
               if(!all_nn_calculated){
