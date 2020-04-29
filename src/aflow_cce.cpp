@@ -2621,7 +2621,7 @@ namespace cce {
     }
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
-        string corrections_line;
+        string corrections_line = "";
         if (num_neighbors[i] > 0){ // are there actually bonds between the cation and the anion species under consideration (to load only needed corrections in multi-anion systems)
           if ( get_corrections_line(structure.atoms[i].cleanname + "_+" + aurostd::utype2string<double>(cce_vars.oxidation_states[i]) + "_" + considered_anion_species) == "") { // the considered anion species can be the main anion species or a multi anion species
             cce_flags.flag("CORRECTABLE",FALSE);
