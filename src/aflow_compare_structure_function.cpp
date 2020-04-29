@@ -973,7 +973,7 @@ namespace compare {
 
     // load all structures from a directory into a vector of StructurePrototype 
     // objects
-    string function_name = "compare:loadStructuresFromDirectory()";
+    string function_name = "compare:loadStructuresFromDirectory():";
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
@@ -1041,7 +1041,7 @@ namespace compare {
         structure_tmp.structure_representative_source = "file";
         structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
         if(LDEBUG) {
-          cerr << "compare::loadStructureFromDirectory() Found structure: " << directory+"/"+vfiles[i] << endl;
+          cerr << function_name << " Found structure: " << directory+"/"+vfiles[i] << endl;
         }
         all_structures.push_back(structure_tmp);
       }
@@ -1067,7 +1067,7 @@ namespace compare {
     // load all structures from a file into a vector of StructurePrototype object
     // useful for reading in aflow.in relaxation steps or pocc structures
 
-    string function_name = "compare:loadStructuresFromFile()";
+    string function_name = "compare:loadStructuresFromFile():";
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     //DX20191122 [OBSOLETE] ostream& logstream = cout;
@@ -1152,7 +1152,7 @@ namespace compare {
         structure_tmp.structure_representative_source = input_file.str();
         structure_tmp.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
         if(LDEBUG) {
-          cerr << "compare::loadStructureFromFile(): loaded structure " << i << endl;
+          cerr << function_name << " loaded structure " << i << endl;
         }
         all_structures.push_back(structure_tmp);
       }
@@ -1179,7 +1179,7 @@ namespace compare {
     // load all structures from a vector of filenames into a vector of StructurePrototype object
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare:loadStructuresFromStructureList()";
+    string function_name = "compare:loadStructuresFromStructureList():";
     stringstream message;
     //DX20191122 [OBSOLETE] ostream& logstream = cout;
     //DX [OBSOLETE] ofstream FileMESSAGE;
@@ -1279,12 +1279,12 @@ namespace compare {
     // 3) input (cin)
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::generateStructure()";
+    string function_name = "compare::generateStructure():";
     ofstream FileMESSAGE;
     vector<string> tokens;
 
     if(LDEBUG){
-      cerr << function_name << ": generating structure: " << structure_name << " from " << structure_source << endl;
+      cerr << function_name << " generating structure: " << structure_name << " from " << structure_source << endl;
     }
 
     // ---------------------------------------------------------------------------
@@ -1576,7 +1576,7 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
-    string function_name = "compare::comparePermutations()";
+    string function_name = "compare::comparePermutations():";
     stringstream message;
     //DX20191125 [OBSOLETE] ostream& logstream = cout;
 
@@ -2207,10 +2207,10 @@ namespace compare{
     // strutures for comparison
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "addAFLOWPrototypes2StructurePrototypeVector()";
+    string function_name = "addAFLOWPrototypes2StructurePrototypeVector():";
 
     for(uint i=0;i<vlabel.size();i++){
-      if(LDEBUG) { cerr << function_name << ": Storing AFLOW prototype information for " << vlabel[i] << endl; }
+      if(LDEBUG) { cerr << function_name << " Storing AFLOW prototype information for " << vlabel[i] << endl; }
 
       // anrl prototypes
       vector<string> tokens;
@@ -2532,7 +2532,7 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // split comparisons into threads via indices
-    string function_name = "compare::splitComparisonIntoThreads()";
+    string function_name = "compare::splitComparisonIntoThreads():";
     stringstream message;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
@@ -2544,7 +2544,7 @@ namespace compare{
 
     if(number_of_comparisons==0){
       if(LDEBUG) {
-        cerr << function_name << ": Number of comparisons is zero, no need to split into threads." << endl;
+        cerr << function_name << " Number of comparisons is zero, no need to split into threads." << endl;
       } 
       return true;
     }   
@@ -2555,7 +2555,7 @@ namespace compare{
     if(residual!=0){num_per_thread+=1;}
 
     if(LDEBUG) {
-      cerr << function_name << ": Number of comparisons per thread: " << num_per_thread << endl;
+      cerr << function_name << " Number of comparisons per thread: " << num_per_thread << endl;
     }
 
     uint tmp =0;
@@ -2669,8 +2669,8 @@ namespace compare{
     // Same as the StructurePrototype version, just not as concise
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name="compare::calculateSymmetries()";
-    if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
+    string function_name="compare::calculateSymmetries():";
+    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
     // THREADED VERSION - START
@@ -2727,7 +2727,7 @@ namespace compare{
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] 
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     // ---------------------------------------------------------------------------
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     // split comparisons into threads via indices
-//DX20191108 [OBSOLETE - switching to getThreadDistribution]     string function_name = "compare::splitTaskIntoThread()";
+//DX20191108 [OBSOLETE - switching to getThreadDistribution]     string function_name = "compare::splitTaskIntoThread():";
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     stringstream message;
 //DX20191108 [OBSOLETE - switching to getThreadDistribution]     bool safety_check=false; // safety check if split incorrectly
 //DX20191108 [OBSOLETE - switching to getThreadDistribution] 
@@ -2823,8 +2823,8 @@ namespace compare{
     // Same as the vector<xstructure> version, just more concise
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name="compare::calculateSymmetries()";
-    if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
+    string function_name="compare::calculateSymmetries():";
+    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
     // THREADED VERISON - START
@@ -2889,8 +2889,8 @@ namespace compare{
     // stores it in the StructurePrototype object
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name="compare::calculateLFAEnvironments()";
-    if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
+    string function_name="compare::calculateLFAEnvironments():";
+    if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
 
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
     // THREADED VERISON - START
@@ -3722,12 +3722,12 @@ namespace compare{
     // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::groupStructurePrototypes()";
+    string function_name = "compare::groupStructurePrototypes():";
 
     // variable to store structure sets to compare 
     vector<StructurePrototype> comparison_schemes;
 
-    if(LDEBUG) {cerr << function_name << ": Number of structures to group: " << structures.size() << endl;}
+    if(LDEBUG) {cerr << function_name << " Number of structures to group: " << structures.size() << endl;}
 
     // Loop over structures. 
     // Group structures that have comparable by stoichiometry and symmetry 
@@ -3770,7 +3770,7 @@ namespace compare{
       }
     }
     if(LDEBUG) {
-      cerr << function_name << ": Prepared comparison sets: " << endl;
+      cerr << function_name << " Prepared comparison sets: " << endl;
       stringstream ss_test;
       compare::printResults(ss_test, same_species, comparison_schemes);
       cerr << ss_test.str() << endl;
@@ -3835,7 +3835,7 @@ namespace compare{
 //DX [OBSOLETE]         const bool& ignore_symmetry, const bool& ignore_Wyckoff,
 //DX [OBSOLETE]         const bool& structures_generated){
 //DX [OBSOLETE]
-//DX [OBSOLETE]    string function_name = "compare::compareMultipleStructures()";
+//DX [OBSOLETE]    string function_name = "compare::compareMultipleStructures():";
 //DX [OBSOLETE]    ostream& logstream = cout;
 //DX [OBSOLETE]    stringstream message;
 //DX [OBSOLETE]    ofstream FileMESSAGE;
@@ -3914,7 +3914,7 @@ namespace compare{
     // this function checks if compounds/structures match better with another group 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::checkForBetterMatches()";
+    string function_name = "compare::checkForBetterMatches():";
     stringstream message;
     //DX20191125 [OBSOLETE] ostream& logstream = cout;
 
@@ -4046,7 +4046,7 @@ namespace compare{
 namespace compare{
   vector<StructurePrototype> compareDuplicateCompounds(vector<StructurePrototype>& prototype_schemes, uint& num_proc, 
       bool& ICSD_comparison, ostringstream& oss){
-    string function_name = "compare::compareDuplicateCompounds()";
+    string function_name = "compare::compareDuplicateCompounds():";
     ostream& logstream = cout;
     bool quiet = false;
     stringstream message;
@@ -4297,7 +4297,7 @@ namespace compare{
     // the single comparison only (prevents overwriting in the comparisons) 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::runComparisonThreads()";
+    string function_name = "compare::runComparisonThreads():";
     stringstream message;
     //bool store_comparison_logs = false; //DX20190624
 
@@ -4333,7 +4333,7 @@ namespace compare{
         else {
           structure_representative = comparison_schemes[i].structure_representative;
         }
-        //if(LDEBUG) { cerr << function_name << ": Loaded representative structure = " << comparison_schemes[i].structure_representative_name << endl; }
+        //if(LDEBUG) { cerr << function_name << " Loaded representative structure = " << comparison_schemes[i].structure_representative_name << endl; }
 
         // get prototype structure 
         xstructure duplicate_structure;
@@ -4346,19 +4346,19 @@ namespace compare{
         else {
           duplicate_structure = comparison_schemes[i].structures_duplicate[j];
         }
-        if(LDEBUG) { cerr << function_name << ": Loaded duplicate structure = " << comparison_schemes[i].structures_duplicate_names[j] << endl; }
+        if(LDEBUG) { cerr << function_name << " Loaded duplicate structure = " << comparison_schemes[i].structures_duplicate_names[j] << endl; }
 
         // call the main comparison function
         ostringstream tmp_oss; tmp_oss.clear();
         double final_misfit=AUROSTD_MAX_DOUBLE;
         structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX20191218
-        if(LDEBUG) { cerr << function_name << ": Comparing " << comparison_schemes[i].structure_representative_name << " and " << comparison_schemes[i].structures_duplicate_names[j] <<  endl; }
+        if(LDEBUG) { cerr << function_name << " Comparing " << comparison_schemes[i].structure_representative_name << " and " << comparison_schemes[i].structures_duplicate_names[j] <<  endl; }
         compare::aflowCompareStructure(1, structure_representative, //num_proc -> 1 for threads (not sure how it behaves otherwise)
             duplicate_structure,
             same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX20191218 - added misfit_info
 
         // store the figure of misfit
-        if(LDEBUG) { cerr << function_name << ": Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl; }
+        if(LDEBUG) { cerr << function_name << " Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl; }
         comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX20191218
         if(store_comparison_logs){comparison_schemes[i].duplicate_comparison_logs.push_back(tmp_oss.str());} //DX20190506
       }
@@ -4393,7 +4393,7 @@ namespace compare{
       ostream& logstream){ //DX20200103 - condensed booleans to xoptions
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::runComparisonScheme()";
+    string function_name = "compare::runComparisonScheme():";
 
     stringstream message;
     //DX20191125 [OBSOLETE] ostream& logstream = cout;
@@ -4401,7 +4401,7 @@ namespace compare{
 
     // print initial grouped sets of comparisons
     if(LDEBUG) {
-      cerr << function_name << ": Number of comparion sets: " << comparison_schemes.size() << endl;
+      cerr << function_name << " Number of comparion sets: " << comparison_schemes.size() << endl;
       stringstream ss_test;
       compare::printResults(ss_test, same_species, comparison_schemes);
       cerr << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
@@ -4414,7 +4414,7 @@ namespace compare{
     uint num_comparison_threads = 1;
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
     // THREADED VERSION - START
-    if(LDEBUG) { cerr << function_name << ": Threaded version." << endl; } 
+    if(LDEBUG) { cerr << function_name << " Threaded version." << endl; }
 
     // split into threads
     number_of_comparisons = 0;
@@ -4447,7 +4447,7 @@ namespace compare{
 
 #else
     // NON-THREADED VERISON - START
-    if(LDEBUG) { cerr << function_name << ": Non-threaded version." << endl; } 
+    if(LDEBUG) { cerr << function_name << " Non-threaded version." << endl; }
 
     for(uint i=0; i<comparison_schemes.size(); i++){
       xstructure structure_representative;
@@ -4691,7 +4691,7 @@ namespace compare{
     // space group. A "representative" structure is chosen and will be compared to the 
     // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
 
-    string function_name = "compare::createStructurePermutations()";
+    string function_name = "compare::createStructurePermutations():";
     stringstream message;
 
     // ---------------------------------------------------------------------------
@@ -4880,7 +4880,7 @@ namespace compare{
     //DX20191125 [OBSOLETE] ostream& logstream = cout;
     stringstream message;
     //DX20191125 [OBSOLETE] ofstream FileMESSAGE;
-    string function_name = "compare::appendStructurePrototypes()";
+    string function_name = "compare::appendStructurePrototypes():";
 
     vector<StructurePrototype> tmp_list;
     for(uint i=0; i<comparison_schemes.size(); i++){
@@ -5388,7 +5388,7 @@ namespace compare{
     // Determine if the structures have the same types and counts of species
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::sameSpecies()";
+    string function_name = "compare::sameSpecies():";
 
     bool VERBOSE = (display && LDEBUG); //DX20191125
 
@@ -5414,10 +5414,10 @@ namespace compare{
     std::sort(xstr2_num_each_type.begin(), xstr2_num_each_type.end());
 
     if(xstr1_num_each_type!=xstr2_num_each_type){
-      if(VERBOSE) { cerr << function_name << ": Number of each type of element are incompatible." << endl; }
+      if(VERBOSE) { cerr << function_name << " Number of each type of element are incompatible." << endl; }
       return false;
     }
-    if(VERBOSE) { cerr << function_name << ": Number of each type of element are compatible; proceeding." << endl; }
+    if(VERBOSE) { cerr << function_name << " Number of each type of element are compatible; proceeding." << endl; }
 
     //DX20190702 [OBSOLETE - not robust and slow] for(uint i=0;i<xstr1.num_each_type.size();i++){
     //DX20190702 [OBSOLETE - not robust and slow]   bool matched = false;
@@ -6100,7 +6100,7 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
-    string function_name = "compare::findMatch()";
+    string function_name = "compare::findMatch():";
 
     uint j=0,k=0;
     int i1=0,i2=0;                                  //Indices corresponding atoms
@@ -6221,7 +6221,7 @@ namespace compare{
       }
 
       if(VERBOSE){
-        cerr << function_name << ": set of distances for original structure's " << j << "th atom: " << endl; 
+        cerr << function_name << " set of distances for original structure's " << j << "th atom: " << endl;
         for(uint d=0;d<vdiffs.size();d++){
           cerr << d << ": " << vdiffs[d] << endl;
         }
@@ -6230,7 +6230,7 @@ namespace compare{
       if(type_match == 2){ // same species
         if(i1_name != i2_name){
           if(VERBOSE){
-            cerr << function_name << ":WARNING: Matching species are not the same type, throwing out match (same species comparison)" << endl;
+            cerr << function_name << " WARNING: Matching species are not the same type, throwing out match (same species comparison)" << endl;
           }
           return false;
         }
@@ -6243,7 +6243,7 @@ namespace compare{
               aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(2)-PROTO_atoms[i2_real].noncoll_spin(2))>_SPIN_TOL_ ||
               aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(3)-PROTO_atoms[i2_real].noncoll_spin(3))>_SPIN_TOL_){
             if(VERBOSE){
-              cerr << function_name << ":WARNING: Matching atoms do not have the same non-collinear spin, throwing out match" << endl;
+              cerr << function_name << " WARNING: Matching atoms do not have the same non-collinear spin, throwing out match" << endl;
             }
             return false;
           }
@@ -6252,7 +6252,7 @@ namespace compare{
         if(is_collinear){
           if(aurostd::abs(xstr1_atoms[i1_real].spin-PROTO_atoms[i2_real].spin)>_SPIN_TOL_){
             if(VERBOSE){
-              cerr << function_name << ":WARNING: Matching atoms do not have the same collinear spin, throwing out match" << endl;
+              cerr << function_name << " WARNING: Matching atoms do not have the same collinear spin, throwing out match" << endl;
             }
             return false;
           }
@@ -6628,7 +6628,7 @@ namespace compare{
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
-    string function_name = "compare::compatibleEnvironments()";
+    string function_name = "compare::compatibleEnvironments():";
 
     double _TOL_EXACT_MATCH_ = 0.01; // hundredth of an Angstrom, perhaps put in header?
     double _TOL_RELATIVE_MATCH_ = 0.10; // ten percent, perhaps put in header? //DX20190724 - changed from 0.25 to 0.1
@@ -7050,7 +7050,7 @@ namespace compare{
     double _NON_COLLINEAR_ANGLE_DEGREE_TOL_ = 10.0;
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::magneticDeviation()";
+    string function_name = "compare::magneticDeviation():";
     double magmom_num = 0.0;
     double magmom_den = 0.0;
     uint mag_fail_1 = 0, mag_fail_2 = 0;
@@ -7370,7 +7370,7 @@ namespace compare{
     // to speed up translation vector search
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::GetLFASupercell()";
+    string function_name = "compare::GetLFASupercell():";
 
     // ---------------------------------------------------------------------------
     // remove all atoms that are not of the LFA type 
@@ -7413,7 +7413,7 @@ namespace compare{
     xstr_LFA_supercell.grid_atoms.clear();
     //xstr_LFA_supercell = pflow::SetNumEachType(xstr_LFA_supercell, sizes);
 
-    if(LDEBUG){cerr << function_name << ": Number of LFAs in supercell: " << xstr_LFA_supercell.atoms.size() << endl;}
+    if(LDEBUG){cerr << function_name << " Number of LFAs in supercell: " << xstr_LFA_supercell.atoms.size() << endl;}
 
     return xstr_LFA_supercell;
   }
@@ -7437,7 +7437,7 @@ namespace compare{
     // Performs lattice and origin search
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::latticeAndOriginSearch()";
+    string function_name = "compare::latticeAndOriginSearch():";
 
     bool supercell_method = false; //DX20200330 - original method, but slow
     bool test_one_lfa_only = false; //DX20190318
@@ -7464,8 +7464,8 @@ namespace compare{
     double search_radius = aurostd::max(abc_angles_q1(1),abc_angles_q1(2),abc_angles_q1(3));
     xvector<int> dims = LatticeDimensionSphere(xstr2.lattice,search_radius);
 
-    if(LDEBUG){cerr << function_name << ": lattice search radius: " << search_radius << endl;}
-    if(LDEBUG){cerr << function_name << ": lattice dims : " << dims << endl;}
+    if(LDEBUG){cerr << function_name << " lattice search radius: " << search_radius << endl;}
+    if(LDEBUG){cerr << function_name << " lattice dims : " << dims << endl;}
 
     // ---------------------------------------------------------------------------
     // peform supercell expansion on LFA atoms in structure2 
@@ -7483,7 +7483,7 @@ namespace compare{
     vector<xmatrix<double> > clattices;
     vector<double> latt_devs;
     buildSimilarLattices(translation_vectors, q1, abs_det_q1, abs_det_q1, abc_angles_q1, lattices, clattices, latt_devs, optimize_match, scale_volume); //DX20200422
-    if(LDEBUG){cerr << function_name << ": Number of lattices to compare: " << lattices.size() << endl;}
+    if(LDEBUG){cerr << function_name << " Number of lattices to compare: " << lattices.size() << endl;}
 
     if(lattices.size()>0){
 
@@ -7580,8 +7580,8 @@ namespace compare{
           oss << "===> LFA (structure 2): " << lfa_str2 << endl;
 
           if(LDEBUG){
-            cerr << function_name << ": LFA (structure 1): " << lfa_str1 << endl;
-            cerr << function_name << ": LFA (structure 2): " << lfa_str2 << endl;
+            cerr << function_name << " LFA (structure 1): " << lfa_str1 << endl;
+            cerr << function_name << " LFA (structure 2): " << lfa_str2 << endl;
           }
 
           // ---------------------------------------------------------------------------
@@ -7629,7 +7629,7 @@ namespace compare{
           // ---------------------------------------------------------------------------
           // threaded (DX20191107 thread pointer) 
           vector<std::thread*> threads;
-          if(LDEBUG){cerr << function_name << ": Searching for possible matching structures [THREADED VERSION]" << endl;}
+          if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
           for(uint n=0; n<number_of_threads; n++){
             threads.push_back(new std::thread(structureSearch,
                   std::ref(xstr1_for_thread[n]),
@@ -7655,7 +7655,7 @@ namespace compare{
           uint n=0;
           uint start_index=0;
           uint end_index=lattices.size();  //DX20191107 switching end point convention
-          if(LDEBUG){cerr << function_name << ": Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
+          if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
           //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
           //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
           structureSearch(
@@ -7698,7 +7698,7 @@ namespace compare{
           // ---------------------------------------------------------------------------
           // quick return if found a match
           if(min_misfit_info.misfit<0.1 && !optimize_match){
-            if(LDEBUG){cerr << function_name << ": Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
+            if(LDEBUG){cerr << function_name << " Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
             printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
                 matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
             return;
@@ -7709,7 +7709,7 @@ namespace compare{
           //DX20190702 - can i do this: if(!optimize_match && minMis==1){ test_one_lfa_only=true;}
           if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && type_match==2){ test_one_lfa_only=true;} //DX20190809 - need type match here; otherwise we may miss structure-type matches
           if(test_one_lfa_only){
-            if(LDEBUG){cerr << function_name << ": No match found. Searched only one LFA set. Terminating search early." << endl;}
+            if(LDEBUG){cerr << function_name << " No match found. Searched only one LFA set. Terminating search early." << endl;}
             return;
           }
         } 
@@ -8227,7 +8227,7 @@ namespace compare{
     // This function is parallelized since it is the time-limiting function.
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = "compare::quadrupletSearch()";
+    string function_name = "compare::quadrupletSearch():";
     bool relative_tolerance=true;
 
     double min_q1_a = 0.0; double max_q1_a = 0.0;
@@ -8252,10 +8252,10 @@ namespace compare{
     }
 
     if(LDEBUG) {
-      cerr << function_name << ": Lattice parameters: " << aurostd::modulus(q1(1)) << ", " << aurostd::modulus(q1(2)) << ", " << aurostd::modulus(q1(3)) << endl;
-      cerr << function_name << ": Modulus search range for lattice vector a: " << min_q1_a << " - " << max_q1_a << endl;
-      cerr << function_name << ": Modulus search range for lattice vector b: " << min_q1_b << " - " << max_q1_b << endl;
-      cerr << function_name << ": Modulus search range for lattice vector c: " << min_q1_c << " - " << max_q1_c << endl;
+      cerr << function_name << " Lattice parameters: " << aurostd::modulus(q1(1)) << ", " << aurostd::modulus(q1(2)) << ", " << aurostd::modulus(q1(3)) << endl;
+      cerr << function_name << " Modulus search range for lattice vector a: " << min_q1_a << " - " << max_q1_a << endl;
+      cerr << function_name << " Modulus search range for lattice vector b: " << min_q1_b << " - " << max_q1_b << endl;
+      cerr << function_name << " Modulus search range for lattice vector c: " << min_q1_c << " - " << max_q1_c << endl;
     }
 
     xvector<double> tmp_vec;
@@ -8300,7 +8300,7 @@ namespace compare{
     }
 
     if(LDEBUG) {
-      cerr << function_name << ": Number of potential lattice vectors: " << lattice_vecs.size() << endl;
+      cerr << function_name << " Number of potential lattice vectors: " << lattice_vecs.size() << endl;
     } 
 
     // ---------------------------------------------------------------------------
@@ -8336,9 +8336,9 @@ namespace compare{
       lattice_vecs = lattice_vecs_periodic; //DX20190320
     }
     if(LDEBUG) {
-      cerr << function_name << ": Number of lattice vectors (preserves periodicity): " << lattice_vecs.size() << endl;
+      cerr << function_name << " Number of lattice vectors (preserves periodicity): " << lattice_vecs.size() << endl;
       for(uint i=0;i<lattice_vecs.size();i++){
-        cerr << function_name << ": lattice vector " << i << ": " << lattice_vecs[i] << " (" << aurostd::modulus(lattice_vecs[i]) << ")" << endl; 
+        cerr << function_name << " lattice vector " << i << ": " << lattice_vecs[i] << " (" << aurostd::modulus(lattice_vecs[i]) << ")" << endl;
       }
     } 
   }

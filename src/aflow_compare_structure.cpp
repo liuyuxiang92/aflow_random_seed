@@ -322,7 +322,7 @@ namespace compare {
 
     // This function compares multiple structures (i.e., more than two).
 
-    string function_name = "compare::compareMultipleStructures()";
+    string function_name = "compare::compareMultipleStructures():";
     bool LDEBUG=(false || XHOST.DEBUG);
     ostringstream oss;
     //DX20200103 ostream& logstream = cout;
@@ -692,7 +692,7 @@ namespace compare {
 namespace compare {
   string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow){ 
     
-    string function_name = "compare::IsopointalPrototypes()";
+    string function_name = "compare::IsopointalPrototypes():";
     string usage="aflow --isopointal_prototypes|--get_isopointal_prototypes < POSCAR";
     string options="";
     
@@ -729,7 +729,7 @@ namespace compare {
 namespace compare {
   vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog){ 
     
-    string function_name = "compare::getIsopointalPrototypes()";
+    string function_name = "compare::getIsopointalPrototypes():";
     
     // ---------------------------------------------------------------------------
     // stoichiometry
@@ -893,7 +893,7 @@ namespace compare {
   vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){ 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    string function_name = "compare::compare2prototypes()";
+    string function_name = "compare::compare2prototypes():";
     ostringstream oss;
     //DX20200103 ostream& logstream = cout;
     bool quiet = false;
@@ -1016,7 +1016,7 @@ namespace compare {
     }
 
     if(LDEBUG) {
-      cerr << function_name << ": Wyckoff positions of input structure:" << endl;
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
         cerr << all_structures[0].grouped_Wyckoff_positions[i] << endl;
       }
@@ -1030,7 +1030,7 @@ namespace compare {
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
 
     if(LDEBUG) {
-      cerr << function_name << ": Wyckoff positions of input structure:" << endl;
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
         cerr << all_structures[0].grouped_Wyckoff_positions[i] << endl;
       }
@@ -1062,7 +1062,7 @@ namespace compare {
     message << "Potential compatible prototypes: " << vlabel.size() << " (" << aurostd::joinWDelimiter(vlabel,",") << ").";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     if(LDEBUG) {
-      cerr << function_name << ": Wyckoff positions of input structure:" << endl;
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
         cerr << all_structures[0].grouped_Wyckoff_positions[i] << endl;
       }
@@ -1077,7 +1077,7 @@ namespace compare {
 
     compare::addAFLOWPrototypes2StructurePrototypeVector(all_structures, vlabel); 
     if(LDEBUG) {
-      cerr << function_name << ": Wyckoff positions of input structure:" << endl;
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
         cerr << all_structures[0].grouped_Wyckoff_positions[i] << endl;
       }
@@ -1497,7 +1497,7 @@ namespace compare {
     message << "Number of entries returned: " << aurostd::string2tokens(response,tokens,"\n");
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
-    if(LDEBUG) {cerr << function_name << "::AFLUX response:" << endl << response << endl;}
+    if(LDEBUG) {cerr << function_name << " AFLUX response:" << endl << response << endl;}
 
     // ---------------------------------------------------------------------------
     // extract properties from AFLUX response
@@ -1891,7 +1891,7 @@ namespace compare {
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){ //DX20191125 - added ofstream and ostream
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    string function_name = "compare::compareDatabaseEntries()";
+    string function_name = "compare::compareDatabaseEntries():";
     string directory = ".";
     stringstream message;
     stringstream oss;
@@ -2573,7 +2573,7 @@ namespace compare {
 namespace compare {
   vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options, ostream& logstream){ //DX20200103 - condensed booleans to xoptions //DX20200226 - added logstream
 
-    string function_name = "compare::compareMultipleStructures()";
+    string function_name = "compare::compareMultipleStructures():";
     bool LDEBUG=(false || XHOST.DEBUG);
     //DX20200226 ostream& logstream = cout;
     stringstream message;
