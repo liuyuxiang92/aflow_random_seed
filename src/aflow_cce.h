@@ -16,6 +16,9 @@ static const double _CCE_NN_DIST_TOL_ = 0.5; // 0.5 Ang tolerance between shorte
 static const double _CCE_NN_DIST_TOL_MULTI_ANION_ = 0.4; // 0.4 Ang tolerance between shortest and longest bonds for each bond when testing for multi-anion compound; it was found that the standard 0.5 Ang tol. is too large such that different anions appear to be bonded, which would prevent anions to be detected as such
 static const double _CCE_OX_TOL_ = 0.001; // choose small finite value since sum of oxidation states might not be exactly zero due to numerics
 static const double _CCE_SELF_DIST_TOL_ = 0.001; // distance tolerance in Ang for neighbor screening to savely exclude the cation itself having distance zero to itself
+static const double _CCE_perox_cutoff_=1.6; // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang
+static const double _CCE_superox_cutoff_=1.4; // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang
+static const double _CCE_O2_molecule_cutoff_=1.2; // O-O bonds in the O2 molecule is about 1.21 Ang.
 
 namespace cce {
   struct CCE_Variables {

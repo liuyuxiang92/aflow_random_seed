@@ -918,7 +918,7 @@ namespace cce {
     for(uint i=0,isize=neigh_mat.size();i<isize;i++){ //same size as structure.atoms.size(); number of atoms in the structure (not determined by cutoff (or cutoffs_max))
       uint neighbors_count=0;
       bool warning = false;
-      uint empty_line_count=0;
+      bool insert_empty_line=true;
       for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by cutoffs_max
         const _atom& atom=neigh_mat[i][j];
         if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= cce_vars.cutoffs[structure.atoms[i].type] ){ // distance must be larger than _CCE_SELF_DIST_TOL_ since GetStrNeighData includes also structure.atoms[i] itself as neighbor having distance zero to itself
@@ -928,12 +928,7 @@ namespace cce {
               neighbors_count+=1;
             } else if (atom.cleanname != anion_species && structure.atoms[i].cleanname != anion_species){ // second condition set since it is expected that the anion has predominantly other neighbors than its own type 
               if (!cce_flags.flag("MULTI_ANION_SYSTEM")){
-                if (empty_line_count == 0){ // construction just to make sure that only one empty line is added at the beginning of the warning block
-                  if(cce_flags.flag("COMMAND_LINE")){
-                    oss << endl;
-                  }
-                  empty_line_count+=1;
-                }
+                if (insert_empty_line && cce_flags.flag("COMMAND_LINE")) { oss << endl; insert_empty_line = false; } // construction just to make sure that only one empty line is added at the beginning of the warning block
                 warning = true;
                 if(cce_flags.flag("COMMAND_LINE")){
                   oss << "WARNING: Not all nearest neighbors of " << structure.atoms[i].cleanname << " (ATOM[" << i << "]) within the distance tolerance of " << tolerance << " Ang. are " << anion_species << ", there is also " << atom.cleanname << endl;
@@ -992,9 +987,6 @@ namespace cce {
     if(LDEBUG){
       cerr << soliloquy << "CHECKING FOR (SU-)PEROXIDES:" << endl;
     }
-    double perox_cutoff=1.6; // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang
-    double superox_cutoff=1.4; // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang
-    double O2_molecule_cutoff=1.2; // O-O bonds n the O2 molecule is about 1.21 Ang.
     uint perox_count=0;
     uint superox_count=0;
     for ( uint i = 0; i < structure.atoms.size(); i++ ) { // initialize elements of vectors to 0 
@@ -1010,16 +1002,16 @@ namespace cce {
         for(uint j=0,jsize=neigh_mat[i].size();j<jsize;j++){  //number of nearest neighbors within cutoff of atom i; number of neighbors of each atom i determined by the cutoffs_max
           const _atom& atom=neigh_mat[i][j];
           if (atom.cleanname == "O"){
-            if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= O2_molecule_cutoff ){ // distance must be larger than _CCE_SELF_DIST_TOL_ to savely exclude the anion itself having distance zero to itself; if O-O bond is shorter than in O2 molecule (approx. 1.21 Ang) the result of the structural relaxation is most likely wrong 
+            if (_CCE_SELF_DIST_TOL_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= _CCE_O2_molecule_cutoff_ ){ // distance must be larger than _CCE_SELF_DIST_TOL_ to savely exclude the anion itself having distance zero to itself; if O-O bond is shorter than in O2 molecule (approx. 1.21 Ang) the result of the structural relaxation is most likely wrong
               message << "THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS SHORTER THAN IN THE O2 MOLECULE; CHECK YOUR STRUCTURE! THE O-O BOND LENGTH IS: " << AtomDist(structure.atoms[i],atom) << " Ang.";
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
-            } else if (O2_molecule_cutoff < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= superox_cutoff ){
+            } else if (_CCE_O2_molecule_cutoff_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= _CCE_superox_cutoff_ ){
               if(LDEBUG){
                 cerr << soliloquy << "WARNING: This should be a superoxide; the O-O bond length is: " << AtomDist(structure.atoms[i],atom) << " Ang." << endl;
               }
               superox_count+=1;
               cce_vars.superox_indices[i]=1;
-            } else if (superox_cutoff < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= perox_cutoff ){
+            } else if (_CCE_superox_cutoff_ < AtomDist(structure.atoms[i],atom) && AtomDist(structure.atoms[i],atom) <= _CCE_perox_cutoff_ ){
               if(LDEBUG){
                 cerr << soliloquy << "WARNING: This should be a peroxide; the O-O bond length is: " << AtomDist(structure.atoms[i],atom) << " Ang." << endl;
               }
