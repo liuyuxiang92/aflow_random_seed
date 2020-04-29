@@ -588,25 +588,33 @@ namespace apl {
       int _maxShellID;
       vector<double> _maxShellRadius;
       bool _isConstructed;
+      vector<vector<vector<xvector<double> > > > phase_vectors;  // ME20200116
 
     private:
       void calculateWholeSymmetry(xstructure&);
       xstructure calculatePrimitiveStructure() const;
+      bool getMaps(const xstructure&, const xstructure&, const xstructure&, vector<int>&, vector<int>&);  // ME20200117
 
     public:
       Supercell(const xstructure&, const _aflags& aflags, Logger&); //CO20181226
       Supercell(const Supercell&);
       ~Supercell();
+      void initialize(const xstructure&);  // ME191225
       void LightCopy(const xstructure& a, xstructure& b);
       void clear();
       Supercell& operator=(const Supercell&);
       bool isConstructed();
       void reset();
+      xvector<int> determineSupercellDimensions(const aurostd::xoption&);  // ME191225
+      void build(aurostd::xoption&, bool = true);  // ME191225
+      void build(const xvector<int>&, bool = true);  // ME191225
       void build(int, int, int, bool = TRUE);
       void trimStructure(int, const xvector<double>&,
           const xvector<double>&, const xvector<double>&,
           bool = true);
-      int buildSuitableForShell(int, bool, bool VERBOSE);
+      void projectToPrimitive();  // ME20200117
+      void projectToOriginal();  // ME20200117
+      xvector<int> buildSuitableForShell(int, bool, bool VERBOSE);  // ME20200102
       void setupShellRestrictions(int);
       //ME20190715 BEGIN - added const to getter functions so they can be used with const Supercell &
       bool isShellRestricted() const;
@@ -627,6 +635,7 @@ namespace apl {
       const xstructure& getPrimitiveStructure() const;
       const xstructure& getInputStructure() const;
       const xstructure& getInputStructureLight() const;
+      const xstructure& getOriginalStructure() const;  // ME20200117
       int atomGoesTo(const _sym_op&, int, int, bool = TRUE); //CO20190218
       int atomComesFrom(const _sym_op&, int, int, bool = TRUE); //CO20190218
       const _sym_op& getSymOpWhichMatchAtoms(int, int, int);
@@ -637,6 +646,7 @@ namespace apl {
       xvector<double> getCPositionItsNearestImage(int, int);
       bool compareFPositions(xvector<double>&, xvector<double>&);          //CO
       bool compareFPositions(xvector<double>&, xvector<double>&, double);  //CO
+      void calculatePhaseVectors();  // ME20200117
       bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
       bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
           int&, xvector<xcomplex<double> >&, bool);  //ME20180828
@@ -645,7 +655,9 @@ namespace apl {
       void center(int);
       //CO START
       void center_original(void);
-      //CO
+      //corey
+      void getFullBasisAGROUP();  //ME20191218
+      bool fullBasisCalculatedAGROUP();  //ME20191218
       const vector<vector<_sym_op> >& getAGROUP(void) const;
       const vector<_sym_op>& getFGROUP(void) const;
       const vector<_sym_op>& getAGROUP(int) const;
@@ -690,9 +702,13 @@ namespace apl {
     public:
       virtual ~IPhononCalculator() {}
       virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&) = 0;
-      virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &) = 0;  //ME20190624
-      virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &,
+      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&) = 0;  //ME20200206
+      virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> > &) = 0;  //ME20190624
+      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&) = 0;  //ME20200206
+      virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> > &,
           vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  //ME20180827
+      virtual xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  //ME20200206
       virtual double getEPS() = 0;  //CO
       virtual double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags) = 0;
       virtual const Supercell& getSupercell() = 0;
@@ -700,9 +716,11 @@ namespace apl {
       virtual const xstructure& getSuperCellStructure() = 0;
       virtual uint getNumberOfBranches() = 0;
       virtual string getSystemName() = 0;  //ME20190614
+      virtual bool isPolarMaterial() = 0;  //ME20200206
       // **** BEGIN PN ******
       virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&) = 0;
-      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&,
+      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&) = 0;  // ME20200206
+      virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
           vector<xmatrix<xcomplex<double> > >&,
           bool=true) = 0;  //ME20180827
       virtual vector<double> get_ATOMIC_MASSES_AMU() = 0;
@@ -785,7 +803,8 @@ namespace apl {
       void printForceConstantMatrices(ostream&);
       void printFCShellInfo(ostream&);
       xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&);
-      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&,
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&);  //ME20200206
+      xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&, const xvector<double>&,
           vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20180827
       xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&);
       xmatrix<xcomplex<double> > getNonanalyticalTermWang(const xvector<double>&,
@@ -804,11 +823,11 @@ namespace apl {
       PhononCalculator& operator=(const PhononCalculator&);
       virtual ~PhononCalculator();
       void clear();
-      void run();  //ME20191029
-      xvector<double> getEigenvalues(const xvector<double>&);
-      xvector<double> getEigenvalues(const xvector<double>&, xmatrix<xcomplex<double> >&,
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20180827
-      void isPolarMaterial(bool b) { _isPolarMaterial = b; }
+      void run();  // ME20191029
+      //xvector<double> getEigenvalues(const xvector<double>&);  // OBSOLETE ME20200206
+      xvector<double> getEigenvalues(const xvector<double>&, const xvector<double>&,
+          xmatrix<xcomplex<double> >&, vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20180827
+      void setPolarMaterial(bool b) { _isPolarMaterial = b; }  //ME20200218
       void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
       void setDistortionINEQUIVONLY(bool b) { DISTORTION_INEQUIVONLY = b; } //CO20190108
       void setCalculateZeroStateForces(bool b) { _calculateZeroStateForces = b; }
@@ -834,9 +853,13 @@ namespace apl {
       bool _stagebreak;  //ME20191029
       // Interface
       xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  //ME20180827
-      xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&);  //ME20190624
-      xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&, 
-          vector<xmatrix<xcomplex<double> > >&, bool=true);  //ME20180827
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&);  //ME20200206
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  //ME20190624
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&);  //ME20200206
+      xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20180827
+      xvector<double> getFrequency(const xvector<double>&, const xvector<double>&, const IPCFreqFlags&, xmatrix<xcomplex<double> >&,
+          vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME20200206
       double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
       const Supercell& getSupercell();
       const xstructure& getInputCellStructure();
@@ -844,6 +867,7 @@ namespace apl {
       double getEPS();  //CO
       uint getNumberOfBranches();
       string getSystemName();  //ME20190614
+      bool isPolarMaterial();  //ME20200206
       /* friend void runVASPCalculationsBE(apl::PhononCalculator*); */
       /* friend void readBornEffectiveChargesFromOUTCAR(apl::PhononCalculator *pcalculator); */
       /* friend void symmetrizeBornEffectiveChargeTensors(apl::PhononCalculator *pcalculator); */
@@ -1279,14 +1303,17 @@ namespace apl {
 
   class QMesh {
     public:
-      QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true);
-      QMesh(const vector<int>&, const xstructure&, Logger&, bool=true);
+      QMesh(Logger&);
+      QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true, bool=true);
+      QMesh(const vector<int>&, const xstructure&, Logger&, bool=true, bool=true);
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
-      void clear();
+      void clear(Logger&);
+      void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
 
       void makeIrreducible();
+      void calculateLittleGroups();  // ME20200109
       void writeQpoints(string, bool=true);
       void writeIrredQpoints(string, bool=true);
 
@@ -1317,14 +1344,19 @@ namespace apl {
       const vector<int>& getWeights() const;
       bool isReduced() const;
       bool isGammaCentered() const;
+      bool littleGroupsCalculated() const;  // ME20200109
+      const vector<int>& getLittleGroup(int) const;  // ME20200109
 
     private:
       void free();
+      void copy(const QMesh&);
 
       Logger& _logger;  // The APL logger
 
       vector<int> _ibzqpts;  // The indices of the irreducible q-points
       bool _isGammaCentered;  // Indicates whether the includes the Gamma point
+      vector<vector<int> > _littleGroups;  // The little groups of the irreducible q-points
+      bool _littleGroupsCalculated;  // Indicates whether the little groups have been calculated
       int _nIQPs;  // The number of irreducible q-points
       int _nQPs;  // The number of q-points
       xvector<int> _qptGrid;  // The dimensions of the q-point mesh
@@ -1337,7 +1369,7 @@ namespace apl {
       vector<int> _weights;  // The weights of each irreducible q-point
 
       void setGrid(const xvector<int>&);
-      void setupReciprocalCell(xstructure);
+      void setupReciprocalCell(xstructure, bool);
       void generateGridPoints(bool);
       void shiftMesh(const xvector<double>&);
       void moveToBZ(xvector<double>&) const;
@@ -1460,15 +1492,17 @@ namespace apl {
       //ME20190423 END
       void calc(int);
       void calc(int, double);
+      void calc(int, double, double, double);  // ME20200203
       void clear();
       void writePDOS(const string&);
       void writePDOS(string, string);  //[PN]
       xDOSCAR createDOSCAR();  //ME20190614
       void writePHDOSCAR(const string&);  //ME20190614
       // Interface IDOSCalculator
-      std::vector<double> getBins();
-      std::vector<double> getDOS();
-      bool hasNegativeFrequencies();
+      const std::vector<double>& getBins() const;  //ME20200108 - added const
+      const std::vector<double>& getDOS() const;   //ME20200108 - added const
+      const std::vector<double>& getIDOS() const;  //ME20200210
+      bool hasNegativeFrequencies() const;  //ME20200108 - added const
       string _system;  //ME20190614
   };
 }  // namespace apl
@@ -1519,31 +1553,51 @@ namespace apl {
 
   class ThermalPropertiesCalculator {
     private:
-      //IDOSCalculator& _dosc;  //CO  OBSOLETE ME20190423
-      DOSCalculator& _dosc;  //ME20190423
       Logger& _logger;
-      std::vector<double> _bins;
-      std::vector<double> _dos;
-      double _stepDOS;
-      double _zeroPointVibrationEnergy_meV;
-      bool _isCalcZeroPointVibrationEnergy_meV;
+      std::vector<double> _freqs_0K;
+      std::vector<double> _dos_0K;
+      string system;
 
-    private:
-      double getScalingFactor(ThermalPropertiesUnits units);
+      void free();
+      void copy(const ThermalPropertiesCalculator&);
+ 
+      double getStepDOS(const vector<double>&);
+      double getScalingFactor(const ThermalPropertiesUnits&);
 
     public:
-      //ThermalPropertiesCalculator(IDOSCalculator&, Logger&);  OBSOLETE ME20190423
-      ThermalPropertiesCalculator(DOSCalculator&, Logger&);  //ME20190423
+      ThermalPropertiesCalculator(Logger&);
+      ThermalPropertiesCalculator(const DOSCalculator&, Logger&);
+      ThermalPropertiesCalculator(const xDOSCAR&, Logger&);
+      ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
+      ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
       ~ThermalPropertiesCalculator();
-      void clear();
-      void writeTHERMO(double, double, double, const string&);
-      double getZeroPointVibrationEnergy(ThermalPropertiesUnits);
-      double getInternalEnergy(double, ThermalPropertiesUnits);
-      double getVibrationalFreeEnergy(double, ThermalPropertiesUnits);
-      double getVibrationalEntropy(double, ThermalPropertiesUnits);
-      double getIsochoricSpecificHeat(double, ThermalPropertiesUnits);
-  };
+      void clear(Logger&);
 
+      vector<double> temperatures;
+      vector<double> Cv;
+      vector<double> Fvib;
+      vector<double> Svib;
+      vector<double> U;
+      double U0;
+
+      void initialize(const vector<double>&, const vector<double>&, string="");
+      void calculateThermalProperties(double, double, double);
+      void addPoint(double, const xDOSCAR&);
+      void addPoint(double, const vector<double>&, const vector<double>&);
+
+      double getZeroPointEnergy();
+      double getInternalEnergy(double, ThermalPropertiesUnits=apl::meV);
+      double getInternalEnergy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::meV);
+      double getVibrationalFreeEnergy(double, ThermalPropertiesUnits=apl::meV);
+      double getVibrationalFreeEnergy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::meV);
+      double getVibrationalEntropy(double, ThermalPropertiesUnits=apl::meV);
+      double getVibrationalEntropy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
+      double getVibrationalEntropy(double, double, double, ThermalPropertiesUnits=apl::kB);
+      double getIsochoricSpecificHeat(double, ThermalPropertiesUnits=apl::kB);
+      double getIsochoricSpecificHeat(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
+   
+      void writePropertiesToFile(string);
+  };
 }  // namespace apl
 
 // ***************************************************************************
@@ -1551,7 +1605,6 @@ namespace apl {
 // ***************************************************************************
 
 namespace apl {
-
   //[ME20190520 - MOVED UP]struct _qpoint {
   //[ME20190520 - MOVED UP]  xvector<double> cpos;  // Cartesian position of the q-point
   //[ME20190520 - MOVED UP]  xvector<double> fpos;  // Fractional coordinates of the q-point
@@ -1605,7 +1658,6 @@ namespace apl {
       vector<vector<double> > calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases);
       double calculateAverageGrueneisen(double T, const vector<vector<double> >&);
 
-      vector<vector<int> > calculateSmallGroups();
       void calculateFrequenciesGroupVelocities();
       void calculateFreqGvel(int, int);
       void getWeightsLT(const LTMethod&, double, const vector<double>&, vector<double>&);
@@ -1617,7 +1669,7 @@ namespace apl {
       void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
       vector<vector<double> > calculateTransitionProbabilitiesBoundary();
       void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
-      xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&,
+      xmatrix<double> calculateThermalConductivityTensor(double,
           vector<vector<vector<double> > >&,
           vector<vector<vector<double> > >&);
       vector<vector<double> > getOccupationNumbers(double);
@@ -1628,9 +1680,9 @@ namespace apl {
       vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
       xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
           const vector<vector<xvector<double> > >&);
-      void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<int> >&,
+      void getMeanFreeDispFull(const vector<vector<double> >&,
           const vector<vector<double> >&, vector<vector<xvector<double> > >&);
-      void calculateDelta(int, int, const vector<vector<int> >&, const vector<vector<double> >&,
+      void calculateDelta(int, int, const vector<vector<double> >&,
           const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
       void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
 

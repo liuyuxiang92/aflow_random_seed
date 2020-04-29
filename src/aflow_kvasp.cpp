@@ -4060,27 +4060,25 @@ namespace KBIN {
   //ME20190219 - getVASPVersionString
   // Retrives the VASP version of a binary file.
   // Taken from old APL/apl_hroutines
+  // ME20200114 - Return empty string instead of throwing xerror when the binary
+  // is not found or not a valid VASP binary. Throwing errors would kill aflow
+  // when aflow.in files are moved between machines and the VASP binary files
+  // have different names. This is not desirable when VASP does not need to be
+  // run (e.g. for post-processing).
   string getVASPVersionString(const string& binfile) {
+    if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
     string fullPathBinaryName = XHOST.command(binfile);
-    if (fullPathBinaryName.empty()) {
-      string function = "KBIN::getVASPVersionString";
-      string message = "Binary file name empty";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
-    }
+    if (fullPathBinaryName.empty()) return "";
 
     // Open the binary
     ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
-    if (!infile.is_open()) {
-      string function = "KBIN::getVASPVersionString";
-      string message = "Cannot open binary file";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-    }
+    if (!infile.is_open()) return "";
 
     // Read bytes...
     int bufferSize = 1024;
     char buffer[bufferSize];
-    string versionString;
+    string versionString = "";
     while (true) {
       if (!infile.read(buffer, bufferSize))
         bufferSize = infile.gcount();
