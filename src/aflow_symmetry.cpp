@@ -2883,7 +2883,7 @@ namespace SYM {
     if(a.pgroup_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP CRYSTAL
     if(a.pgroupk_xtal_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroupKCrystal(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP KCRYSTAL
       
-    xmatrix<double> inversion_symmetry_matrix = -aurostd::identity((double)0,3,3);
+    xmatrix<double> inversion_symmetry_matrix = -aurostd::identity((double)0,3);
       
     // ---------------------------------------------------------------------------
     // check if pgroup_xtal contains inversion symmetry already
@@ -4399,7 +4399,7 @@ namespace SYM {
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);     // translation
     a1=lattice(1);a2=lattice(2);a3=lattice(3);               // a1,a2,a3 are the rows of the lattice matrix
     Act=lattice;
-    Adt=aurostd::identity((double) 0,3,3);
+    Adt=aurostd::identity((double) 0,3);  // ME20200123 - new identity format
     xvector<double> clatticedata(6),temp_clatticedata(6);    // triplet position
     clatticedata=_Getabc_angles(lattice,DEGREES);
     vector<xvector<double>*> grid_clattice; xvector<double> *grid_clattice_ptr;  // grid for rrr points
@@ -4670,7 +4670,7 @@ namespace SYM {
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);  // translation
     a1=lattice(1);a2=lattice(2);a3=lattice(3);            // a1,a2,a3 are the rows of the lattice matrix
     Act=lattice;
-    Adt=aurostd::identity((double) 0,3,3);
+    Adt=aurostd::identity((double) 0,3);  // ME20200123 - new identity format
     xvector<double> clatticedata(6),temp_clatticedata(6); // triplet position
     clatticedata=_Getabc_angles(lattice,DEGREES);
     vector<xvector<double>*> grid_clattice; xvector<double> *grid_clattice_ptr;  // grid for rrr points
@@ -4875,7 +4875,7 @@ int PointGroup_HITS(xstructure &a,double _eps_) {
   xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);
   a1=lattice(1);a2=lattice(2);a3=lattice(3);
   Act=lattice;
-  Adt=aurostd::identity((double) 0,3,3);
+  Adt=aurostd::identity((double) 0,3);  // ME20200123 - new identity format
   xvector<double> clatticedata(6),temp_clatticedata(6);
   clatticedata=_Getabc_angles(lattice,DEGREES);
   vector<xvector<double>*> grid_clattice; xvector<double> *grid_clattice_ptr;
@@ -4986,13 +4986,14 @@ vector<double> PointGroupHistogramCheck(xstructure& a) {
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------------------------- POINT GROUP OPERATIONS
-// SYM::CalculatePointGroupKlattice
+// SYM::CalculatePointGroupKLattice
 //
 // This function calculate the whole point group and saves in the aflow.pgroup file
 // Written by SC, dec 09
 //
+// ME20200114 - made function name capitalization more consistent with other functions
 namespace SYM {
-  bool CalculatePointGroupKlattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {  // AFLOW_FUNCTION_IMPLEMENTATION
+  bool CalculatePointGroupKLattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {  // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool Krun=TRUE;
     //DX+CO START
@@ -5022,7 +5023,7 @@ namespace SYM {
       SYM::AddSymmetryToStructure(a,symop.Uc,symop.Uf,symop.ctau,symop.ftau,symop.ctrasl,symop.ftrasl,symop.basis_atoms_map,symop.basis_types_map,false,_PGROUPK_);
     }
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUPK_,osswrite,oss,format);
-    if(LDEBUG) cerr << "DEBUG: SYM::CalculatePointGroupKlattice: a.pgroupk.size()=" << a.pgroupk.size() << endl;
+    if(LDEBUG) cerr << "DEBUG: SYM::CalculatePointGroupKLattice: a.pgroupk.size()=" << a.pgroupk.size() << endl;
     return Krun;
   }
 } // namespace SYM
@@ -6786,6 +6787,13 @@ namespace SYM {
 //DX+CO START
 // return the number of inequivalent atoms
 namespace SYM {
+  // ME20200207
+  bool CalculateInequivalentAtoms(xstructure& a) {
+    ofstream FileMessage;
+    _aflags aflags;
+    return CalculateInequivalentAtoms(FileMessage, a, aflags, false, false, std::cout, "");
+  }
+
   bool CalculateInequivalentAtoms(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool rely_on_basis=TRUE; //HUGE SPEED UP
     return CalculateInequivalentAtoms(FileMESSAGE,a,rely_on_basis,aflags,_write_,osswrite,oss,format);
@@ -6880,6 +6888,8 @@ namespace SYM {
         for(uint iat2=0;iat2<a.iatoms.size();iat2++)
           if(a.atoms.at(iat1).equivalent==a.iatoms.at(iat2).at(0)) {
             a.iatoms.at(iat2).push_back(iat1);
+            // ME20200207 - all atoms should be mapped with index_iatoms
+            a.atoms[iat1].index_iatoms = iat2;
           }
       }
     }
@@ -7591,7 +7601,7 @@ namespace SYM {
     xvector<double> clatticedata(6),temp_clatticedata(6);
     a1=lattice(1);a2=lattice(2);a3=lattice(3);            // a1,a2,a3 are the rows of the lattice matrix
     Act=lattice;
-    Adt=aurostd::identity((double) 0,3,3);
+    Adt=aurostd::identity((double) 0,3);  // ME20200123 - new identity format
     clatticedata=_Getabc_angles(lattice,DEGREES);
     vector<xvector<double>*> grid_clattice; xvector<double> *grid_clattice_ptr;  // grid for rrr points
     vector<xvector<double>*> grid_flattice; xvector<double> *grid_flattice_ptr;  // grid for ijk points

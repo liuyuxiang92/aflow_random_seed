@@ -5335,7 +5335,7 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
 
   if(SPIN_UP or SPIN_DN) { // this disappears
     xstr.FixLattices();
-    xstr.CalculateSymmetryPointGroupKlattice();
+    xstr.CalculateSymmetryPointGroupKLattice();
     reciprocal_lattice = xstr.klattice;
     vector<vector<kEn_st> > allkE_points;
     // allkE_points.at(eigenvalue).at(kpoint).{kEn_st details}
@@ -5774,7 +5774,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   string soliloquy="PrintBandGap():";
   stringstream message;  //CO20200404
   stringstream ss_outcar_static(""),ss_outcar_bands("");
-  string path_outcar_static="",path_outcar_bands="";
+  string path_outcar_static="",path_outcar_bands="",path_POSCAR="";
   xOUTCAR xoutcar_static,xoutcar_bands;
   char LastChar = *directory.rbegin();
   if(LastChar == '/') directory.erase(directory.size()-1);

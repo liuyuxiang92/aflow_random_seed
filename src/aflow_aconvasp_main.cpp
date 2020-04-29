@@ -6078,7 +6078,7 @@ namespace pflow {
         }
       } //DX20170814
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK){ //DX20170814
-        if(!SYM::CalculatePointGroupKlattice(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_WRITE,osswrite,oss,format)){
+        if(!SYM::CalculatePointGroupKLattice(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_WRITE,osswrite,oss,format)){
           //cerr << "CO TESTING POINTGROUP KLATTICE FAILED!!! exiting for now" << endl;
           //exit(1);
           if(!no_scan){
@@ -6748,7 +6748,7 @@ namespace pflow {
     bool PGROUPWRITE=TRUE,PGROUPKWRITE=TRUE,FGROUPWRITE=TRUE,SGROUPWRITE=FALSE,IATOMSWRITE=TRUE,AGROUPWRITE=TRUE;
     bool OSSWRITE=TRUE; // to FileMESSAGE, does not matter as it is /dev/null
     SYM::CalculatePointGroup(FileMESSAGE,xvasp.str,aflags,PGROUPWRITE,OSSWRITE,cout);
-    SYM::CalculatePointGroupKlattice(FileMESSAGE,xvasp.str,aflags,PGROUPKWRITE,OSSWRITE,cout);
+    SYM::CalculatePointGroupKLattice(FileMESSAGE,xvasp.str,aflags,PGROUPKWRITE,OSSWRITE,cout);
     SYM::CalculateFactorGroup(FileMESSAGE,xvasp.str,aflags,FGROUPWRITE,OSSWRITE,cout);
     SYM::CalculateSpaceGroup(FileMESSAGE,xvasp.str,aflags,SGROUPWRITE,OSSWRITE,cout);
     SYM::CalculateInequivalentAtoms(FileMESSAGE,xvasp.str,aflags,IATOMSWRITE,OSSWRITE,cout);
@@ -11540,7 +11540,7 @@ namespace pflow {
     xstructure a(input,IOAFLOW_AUTO);
     bool WRITE=TRUE;
     ofstream File("/dev/null");
-    //DX20170815 SYM::CalculatePointGroupKlattice(File,a,aflags,WRITE,TRUE,cout);
+    //DX20170815 SYM::CalculatePointGroupKLattice(File,a,aflags,WRITE,TRUE,cout);
     _kflags kflags;                                   //DX20170815 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       //DX20170815 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;      //DX20170815 - Add in consistency checks
@@ -14232,7 +14232,7 @@ namespace pflow {
     bool WRITE=TRUE;
     ofstream File("/dev/null");
     SYM::CalculatePointGroup(File,a,aflags,WRITE,TRUE,cout);
-    SYM::CalculatePointGroupKlattice(File,a,aflags,WRITE,TRUE,cout);
+    SYM::CalculatePointGroupKLattice(File,a,aflags,WRITE,TRUE,cout);
     SYM::CalculateFactorGroup(File,a,aflags,WRITE,TRUE,cout);
     SYM::CalculatePointGroupCrystal(File,a,aflags,WRITE,TRUE,cout);
     a.sgroup_radius=radius;

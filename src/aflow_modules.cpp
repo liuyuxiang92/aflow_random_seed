@@ -112,6 +112,7 @@ namespace KBIN {
     opt.keyword="DOSMESH"; opt.xscheme = DEFAULT_APL_DOSMESH; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSSMEAR"; opt.xscheme = utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION); aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPOINTS"; opt.xscheme = utype2string<int>(DEFAULT_APL_DOSPOINTS); aplflags.push_back(opt); opt.clear();
+    opt.keyword="DOS_PROJECT"; opt.option = DEFAULT_APL_DOS_PROJECT; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // ME20200213
     opt.keyword="DOSPROJECTIONS_CART"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPROJECTIONS_FRAC"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();

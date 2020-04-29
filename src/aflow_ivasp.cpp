@@ -1740,8 +1740,19 @@ namespace KBIN {
 namespace KBIN {
   //ME20190220
   // Convert POSCAR into the format that is consistent with the binary version   
+  // ME20200114 - Throw a warning when the version could not be determined and
+  // leave as is. Aborting is not desirable for instances where VASP does not
+  // need to be run (e.g. post-processing).
   void convertPOSCARFormat(_xvasp& xvasp, const _kflags& kflags) {
     string vaspVersion = getVASPVersionString(kflags.KBIN_BIN);
+    if (vaspVersion.empty()) {
+      string function = "KBIN::convertPOSCARFormat()";
+      stringstream message;
+      message << "Could not find VASP binary file " << kflags.KBIN_BIN << "."
+              << " POSCAR may have the wrong format.";
+      pflow::logger(_AFLOW_FILE_NAME_, function, message, std::cout, _LOGGER_WARNING_);
+      return;
+    }
     int vaspv = vaspVersion[0] - '0';
     if ((vaspv == 4) && !xvasp.str.is_vasp4_poscar_format) {
       xvasp.str.is_vasp4_poscar_format = true;
@@ -1756,7 +1767,6 @@ namespace KBIN {
       xvasp.POSCAR.clear();
       xvasp.POSCAR << xvasp.str;
     }
-
   }
 
   // CONVERT_UNIT_CELL STUFF
