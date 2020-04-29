@@ -2402,7 +2402,7 @@ namespace cce {
     functional=get_functional_from_aflow_in(structure, _AFLOWIN_,outcar);
     string aflowIn = aurostd::RemoveComments(aurostd::file2string(_AFLOWIN_));
     vector<string> vlines = aurostd::string2vectorstring(aflowIn);
-    string line_a;
+    string line_a = "";
     for (uint i = 0; i < vlines.size(); i++) { 
       line_a = aurostd::RemoveSpaces(vlines[i]);
       if (line_a.find("[AFLOW]SYSTEM=") != string::npos){ // string::npos is returned if string is not found
