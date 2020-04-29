@@ -2325,7 +2325,7 @@ namespace cce {
     // since the calculation (for getting the Bader charges) could have only been done with one functional and not more than one
     // oxidation numbers should not be functional dependent since results are for a specific calculation, i.e. PBE or LDA or SCAN or PBE+U_ICSD and not more than one
     // for a given structure there should be only one correct assignment of oxidation numbers
-    string system_name;
+    string system_name = "";
     string functional;
     // check whether aflow.in exists
     if (aurostd::FileExist(_AFLOWIN_)) {
