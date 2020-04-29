@@ -2271,17 +2271,28 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-namespace aurostd {  // namespace aurostd
-  template<class utype>                                 // identity xmatrix
-    xmatrix<utype> identity(const utype& _type,const int& n,const int& m) {
-      xmatrix<utype> a(n,m);
-      if(!a.issquare)
-      {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in identity defined for square xmatrixes [2]" << endl;exit(0);}
-      for(int i=a.lrows;i<=a.urows;i++)
-        for(int j=a.lcols;j<=a.ucols;j++)
-          if(i==j) a[i][j]=(utype) 1.0; else a[i][j]=(utype) 0.0;
-      return a;
-      if(_type) {;}  // something phony to keep _type busy !
+// ME20200123 - if the identity matrix must be square, why would we allow two
+// input parameters?
+//[OBSOLETE]namespace aurostd {  // namespace aurostd
+//[OBSOLETE]  template<class utype>                                 // identity xmatrix
+//[OBSOLETE]    xmatrix<utype> identity(const utype& _type,const int& n,const int& m) {
+//[OBSOLETE]      xmatrix<utype> a(n,m);
+//[OBSOLETE]      if(!a.issquare)
+//[OBSOLETE]      {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in identity defined for square xmatrixes [2]" << endl;exit(0);}
+//[OBSOLETE]      for(int i=a.lrows;i<=a.urows;i++)
+//[OBSOLETE]        for(int j=a.lcols;j<=a.ucols;j++)
+//[OBSOLETE]          if(i==j) a[i][j]=(utype) 1.0; else a[i][j]=(utype) 0.0;
+//[OBSOLETE]      return a;
+//[OBSOLETE]      if(_type) {;}  // something phony to keep _type busy !
+//[OBSOLETE]    }
+//[OBSOLETE]}
+
+// ME20200123
+namespace aurostd {
+  template<class utype>
+    xmatrix<utype> identity(const utype& _type, int ubounds, int lbounds) {
+      return eye<utype>(ubounds, ubounds, lbounds, lbounds);
+      if (_type) {;}  // To suppress compiler warnings
     }
 }
 
