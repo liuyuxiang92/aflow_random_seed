@@ -2458,7 +2458,7 @@ namespace cce {
     stringstream message;
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if (structure.atoms[i].cleanname != cce_vars.anion_species){
-        string Bader_templ_line;
+        string Bader_templ_line = "";
         if (get_Bader_templates(structure.atoms[i].cleanname) == "") {
           cce_flags.flag("CORRECTABLE",FALSE);
           cerr << "VERY BAD NEWS: There is no correction for " << structure.atoms[i].cleanname << " (ATOM[" << i << "])" << " since this species was not included in the set for deducing corrections!"  << endl;
