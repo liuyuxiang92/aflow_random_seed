@@ -1509,7 +1509,7 @@ namespace cce {
     if(LDEBUG){
       cerr << soliloquy << "ratio of Ti/O= " << Ti_O_ratio << endl;
     }
-    uint num_formula_units_in_cell;
+    uint num_formula_units_in_cell = 0;
     // check for Magneli composition Ti_(n)O_(2n-1)
     double n;
     bool magneli = false;
