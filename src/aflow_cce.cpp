@@ -1788,7 +1788,7 @@ namespace cce {
       cerr << soliloquy << "number of Co ions= " << amount_Co << endl;
       cerr << soliloquy << "number of O ions= " << amount_O << endl;
     }
-    double Co_O_ratio;
+    double Co_O_ratio = 0.0;
     if ( amount_O != 0 ){
       Co_O_ratio=amount_Co/amount_O;
     } else {
