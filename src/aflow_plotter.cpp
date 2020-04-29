@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 // ***************************************************************************
 // 
@@ -39,9 +39,9 @@ static const string POCC_ARUN_TAG=ARUN_TAG+"POCC_";
 
 namespace plotter {
 
-  // Plot options --------------------------------------------------------------
+  // Plot options ------------------------------------------------------------
 
-  //getPlotOptions//////////////////////////////////////////////////////////////
+  //getPlotOptions////////////////////////////////////////////////////////////
   // Sets plot options for all plots based on command line arguments.
   xoption getPlotOptions(const aurostd::xoption& xopt, const string& key, bool datasets) {
     xoption plotoptions;
@@ -98,9 +98,9 @@ namespace plotter {
     return plotoptions;
   }
 
-  // Electronic structure plots ------------------------------------------------
+  // Electronic structure plots ----------------------------------------------
 
-  //getPlotOptionsEStructure////////////////////////////////////////////////////
+  //getPlotOptionsEStructure//////////////////////////////////////////////////
   // Sets the plot options that are specific to electronic structure plots.
   xoption getPlotOptionsEStructure(const aurostd::xoption& xopt, const string& key, bool datasets) {
     xoption plotoptions = getPlotOptions(xopt, key, datasets);
@@ -134,7 +134,7 @@ namespace plotter {
     return plotoptions;
   }
 
-  //getPlotOptionsPhonons///////////////////////////////////////////////////////
+  //getPlotOptionsPhonons/////////////////////////////////////////////////////
   // Sets the plot options that are specific to phonon dispersions and DOS.
   xoption getPlotOptionsPhonons(const aurostd::xoption& xopt, const string& key) {
     xoption plotoptions = getPlotOptionsEStructure(xopt, key);
@@ -156,9 +156,9 @@ namespace plotter {
     return plotoptions;
   }
 
-  // Plot functions ------------------------------------------------------------
+  // Plot functions ----------------------------------------------------------
 
-  //generateHeader//////////////////////////////////////////////////////////////
+  //generateHeader////////////////////////////////////////////////////////////
   // Creates the header in the desired output format.
   void generateHeader(stringstream& out, const aurostd::xoption& plotoptions, bool multiplot) {
     string plottitle = plotoptions.getattachedscheme("PLOT_TITLE");
@@ -186,52 +186,76 @@ namespace plotter {
     }
   }
 
-  //savePlotGNUPLOT/////////////////////////////////////////////////////////////
+  //savePlotGNUPLOT///////////////////////////////////////////////////////////
   // Executes the gnuplot script and converts into the desired image format.
   void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
     string soliloquy="plotter::savePlotGNUPLOT():";
-    string directory = plotoptions.getattachedscheme("DIRECTORY");
-    if(directory.empty()){directory=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
-    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
-    string filename = plotoptions.getattachedscheme("FILE_NAME");
-    if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
-    string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
-    // PDF is default since we use pdflatex to compile
-    string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
-    if (format.empty()) format = "pdf";
-    string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
-    // Create temp directory
-    string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
-    chdir(tmp.c_str());
-    // Execute gnuplot and pdflatex
-    aurostd::stringstream2file(gpfile, filename + ".plt");
-    aurostd::execute(XHOST.command("gnuplot") + " " + filename + ".plt");
-    aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex 2>&1 > /dev/null");
-    // Convert to the desired format if not pdf
-    if (format != "pdf") {
-      aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
+    //ME20200327 - Check that all required binaries are available
+    // Check that gnuplot is version 5+
+    if (XHOST.is_command("gnuplot")) {
+      string versionstring = aurostd::execute2string(XHOST.command("gnuplot") + " --version");
+      vector<string> tokens;
+      aurostd::string2tokens(versionstring, tokens, " ");
+      double version = aurostd::string2utype<double>(tokens[1]);
+      if (version < 5.0) {
+        string message = "Gnuplot needs to be version 5 or newer (found " + tokens[1] + ").";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+      }
     }
-    chdir(current_dir.c_str());
-    aurostd::CopyFile(tmp + filename_latex + "." + format, directory + "/" + filename + "." + format);
-    if(LDEBUG){cerr << soliloquy << " moving file to: " << directory + "/" + filename + "." + format << endl;}
-    // Keep gnuplot file if aflow was called with --keep=gpl
-    if (XHOST.vflag_control.flag("KEEP::GPL")) {
-      aurostd::CopyFile(tmp + filename + ".plt", directory);
+    string binaries = "gnuplot,pdflatex,repstopdf,convert";
+    vector<string> missing_binaries, required_binaries;
+    aurostd::string2tokens(binaries, required_binaries, ",");
+    for (uint i = 0; i < required_binaries.size(); i++) {
+      if (!XHOST.is_command(required_binaries[i])) missing_binaries.push_back(required_binaries[i]);
     }
-    // Clean up
-    aurostd::RemoveDirectory(tmp);
-    if (!aurostd::FileExist(directory + "/" + filename + "." + format)) {
-      string function = "plotter::savePlotGNUPLOT():";
-      string message = "Error while generating plot.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+
+    if (missing_binaries.size() == 0) {
+      string directory = plotoptions.getattachedscheme("DIRECTORY");
+      if(directory.empty()){directory=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
+      if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
+      string filename = plotoptions.getattachedscheme("FILE_NAME");
+      if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
+      string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
+      // PDF is default since we use pdflatex to compile
+      string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
+      if (format.empty()) format = "pdf";
+      string current_dir = aurostd::getPWD();  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
+      // Create temp directory
+      string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
+      chdir(tmp.c_str());
+      // Execute gnuplot and pdflatex
+      aurostd::stringstream2file(gpfile, filename + ".plt");
+      aurostd::execute(XHOST.command("gnuplot") + " " + filename + ".plt");
+      aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex 2>&1 > /dev/null");
+      // Convert to the desired format if not pdf
+      if (format != "pdf") {
+        aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
+      }
+      chdir(current_dir.c_str());
+      aurostd::CopyFile(tmp + filename_latex + "." + format, directory + "/" + filename + "." + format);
+      if(LDEBUG){cerr << soliloquy << " moving file to: " << directory + "/" + filename + "." + format << endl;}
+      // Keep gnuplot file if aflow was called with --keep=gpl
+      if (XHOST.vflag_control.flag("KEEP::GPL")) {
+        aurostd::CopyFile(tmp + filename + ".plt", directory);
+      }
+      // Clean up
+      aurostd::RemoveDirectory(tmp);
+      if (!aurostd::FileExist(directory + "/" + filename + "." + format)) {
+        string function = "plotter::savePlotGNUPLOT():";
+        string message = "Error while generating plot.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      }
+    } else {
+      string message = "The following binaries are missing: " + aurostd::joinWDelimiter(missing_binaries, " ") + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
   }
 
-  //setFileName/////////////////////////////////////////////////////////////////
+  //setFileName///////////////////////////////////////////////////////////////
   // Sets the file name of the final plot. FILE_NAME_LATEX is the name of the
-  // tex file that is generated by gnuplot, which has different limitations than
-  // the output image.
+  // tex file that is generated by gnuplot, which has different limitations
+  // than the output image.
   void setFileName(xoption& plotoptions, string filename) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="plotter::setFileName():";
@@ -239,6 +263,12 @@ namespace plotter {
     if (filename.empty()) {
       string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
       if(LDEBUG){cerr << soliloquy << " default_title=" << default_title << endl;}
+      //ME20200228 - Remove ANRL parameters
+      string::size_type t = default_title.find(":ANRL=");
+      if (t != string::npos) {
+        default_title = default_title.substr(0, t);
+        if(LDEBUG){std::cerr << soliloquy << " default_title (post ANRL)=" << default_title << std::endl;}
+      }
       filename = default_title;
       // Get filename
       string ext = plotoptions.getattachedscheme("EXTENSION");
@@ -262,7 +292,7 @@ namespace plotter {
     }
   }
 
-  //setTitle////////////////////////////////////////////////////////////////////
+  //setTitle//////////////////////////////////////////////////////////////////
   // Sets the plot title.
   void setTitle(xoption& plotoptions) {
     string title = plotoptions.getattachedscheme("TITLE");
@@ -271,7 +301,7 @@ namespace plotter {
     plotoptions.push_attached("PLOT_TITLE", title);
   }
 
-  //formatDefaultPlotTitle//////////////////////////////////////////////////////
+  //formatDefaultPlotTitle////////////////////////////////////////////////////
   // Checks if the default title is in a known AFLOW format and formats it
   // appropriately.
   string formatDefaultPlotTitle(const xoption& plotoptions) {
@@ -298,6 +328,14 @@ namespace plotter {
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
       vector<string> tokens;
       aurostd::string2tokens(default_title, tokens, ".");
+      //ME20200228 - title may contain ANRL parameters
+      if ((tokens.size() > 2) && aurostd::substring2bool(tokens[2], "ANRL")) {
+        string::size_type t = tokens[2].find_first_of(":");
+        if (t != string::npos) {
+          tokens[2] = tokens[2].substr(0, t);
+          tokens.erase(tokens.begin() + 3, tokens.end());
+        }
+      }
       if ((tokens.size() == 2) || (tokens.size() == 3)) {
         string proto = tokens[1];
         vector<string> protos;
@@ -343,9 +381,9 @@ namespace plotter {
     return title;
   }
 
-  //getCompositionFromHTQCPrototype/////////////////////////////////////////////
-  // Gets the composition from an HTQC prototype string. The composition string
-  // must be retrieved beforehand.
+  //getCompositionFromHTQCPrototype///////////////////////////////////////////
+  // Gets the composition from an HTQC prototype string. The composition
+  // string must be retrieved beforehand.
   vector<double> getCompositionFromHTQCPrototype(const string& htqc_prototype,
       const string& composition) {
     string anrl_prototype = composition + "_";
@@ -356,7 +394,7 @@ namespace plotter {
     return getCompositionFromANRLPrototype(anrl_prototype);
   }
 
-  //getCompositionFromANRLPrototype/////////////////////////////////////////////
+  //getCompositionFromANRLPrototype///////////////////////////////////////////
   // Gets the composition from an ANRL prototype string.
   vector<double> getCompositionFromANRLPrototype(const string& prototype) {
     // Determine element sequence
@@ -392,8 +430,8 @@ namespace plotter {
   //formatDefaultTitlePOCC//////////////////////////////////////////////////////
   // Converts a POCC-formatted title into a plot title. It currently only works
   // if the POCC string consists only of P-designations.
-  string formatDefaultTitlePOCC(const xoption& plotoptions) {return formatDefaultTitlePOCC_191004(plotoptions);} //CO20191110
-  string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version //CO20191110
+  string formatDefaultTitlePOCC(const xoption& plotoptions) {return formatDefaultTitlePOCC_20191004(plotoptions);} //CO20191110
+  string formatDefaultTitlePOCC_20191004(const xoption& plotoptions) {  //CO version //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="plotter::formatDefaultTitlePOCC():";
     stringstream message;
@@ -509,7 +547,7 @@ namespace plotter {
 
     return new_title; //aurostd::fixStringLatex(new_title, false, false);  //substs $ for \\$
   }
-  string formatDefaultTitlePOCC_190101(const xoption& plotoptions) {  //ME version
+  string formatDefaultTitlePOCC_20190101(const xoption& plotoptions) {  //ME version
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="plotter::formatDefaultTitlePOCC():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
@@ -611,7 +649,7 @@ namespace plotter {
     return title;
   }
 
-  //getCompositionFromPoccString////////////////////////////////////////////////
+  //getCompositionFromPoccString//////////////////////////////////////////////
   // Returns a composition from a POCC string. It also tests whether the POCC
   // string is complete, which is not always the case due to VASP's character
   // limit for titles.
@@ -712,9 +750,9 @@ static const string LM_ORBITALS[16] = {"s", "p_y", "p_z", "p_x",
 
 namespace plotter {
 
-  // Plot functions -------------------------------------------------------------
+  // Plot functions -----------------------------------------------------------
 
-  //PLOT_DOS////////////////////////////////////////////////////////////////////
+  //PLOT_DOS//////////////////////////////////////////////////////////////////
   // PLots electronic densities of states.
   void PLOT_DOS(xoption& plotoptions) {
     // Set output format to gnuplot
@@ -779,7 +817,7 @@ namespace plotter {
     }
 
     plotoptions.push_attached("DEFAULT_TITLE", xdos.title);
-    patchDefaultTitleAFLOWIN(plotoptions);  //CO20191110 - MARCO, check out and let me know if we should apply everywhere
+    patchDefaultTitleAFLOWIN(plotoptions);  //CO20191110 - ME, check out and let me know if we should apply everywhere
     setFileName(plotoptions);
     setTitle(plotoptions);
 
@@ -801,9 +839,9 @@ namespace plotter {
     generateDosPlot(out, xdos, plotoptions);
   }
 
-  //PLOT_PDOS///////////////////////////////////////////////////////////////////
-  // Plots projected density of states. If PDOS == -1, the projected DOS of all
-  // atoms will be plotted into separate files.
+  //PLOT_PDOS/////////////////////////////////////////////////////////////////
+  // Plots projected density of states. If PDOS == -1, the projected DOS of
+  // all atoms will be plotted into separate files.
   void PLOT_PDOS(xoption& plotoptions) {
     // Set output format to gnuplot
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
@@ -892,7 +930,7 @@ namespace plotter {
     }
   }
 
-  //PLOT_BAND///////////////////////////////////////////////////////////////////
+  //PLOT_BAND/////////////////////////////////////////////////////////////////
   // Plots band structures.
   void PLOT_BAND(xoption& plotoptions) {
     // Set k-points format to LaTeX
@@ -921,6 +959,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    patchDefaultTitleAFLOWIN(plotoptions);  //ME20200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
@@ -942,7 +981,7 @@ namespace plotter {
     generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
   }
 
-  //PLOT_BANDDOS////////////////////////////////////////////////////////////////
+  //PLOT_BANDDOS//////////////////////////////////////////////////////////////
   // Plots combined band structure + DOS plots.
   void PLOT_BANDDOS(xoption& plotoptions) {
     // Set k-points format to LaTeX
@@ -974,6 +1013,7 @@ namespace plotter {
     xstructure xstr(poscar);
 
     plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    patchDefaultTitleAFLOWIN(plotoptions);  //ME20200217
     plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
     setFileName(plotoptions);
     setTitle(plotoptions);
@@ -996,16 +1036,16 @@ namespace plotter {
     generateDosPlot(out, xdos, plotoptions);
   }
 
-  // Helper functions ----------------------------------------------------------
+  // Helper functions --------------------------------------------------------
 
-  //getStructureWithNames///////////////////////////////////////////////////////
+  //getStructureWithNames/////////////////////////////////////////////////////
   // Extracts the structure from VASP input files, including species names.
   xstructure getStructureWithNames(const xoption& plotoptions,const string& carstring) {
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     std::stringstream poscar;
     //if (plotoptions.getattachedscheme("EXTENSION") == "phdos")
     if (carstring == "PHON")
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);
     } else if(carstring == "POCC") { //CO20191110
       //[do NOT load in PARTCAR, we need an example ARUN POSCAR, they all have the same num_each_type]aurostd::efile2stringstream(directory+"/PARTCAR", poscar);
@@ -1025,7 +1065,7 @@ namespace plotter {
     return xstr;
   }
 
-  //getLatticeFromKpointsTitle//////////////////////////////////////////////////
+  //getLatticeFromKpointsTitle////////////////////////////////////////////////
   // If the KPOINTS file is formatted according to the AFLOW standard, return
   // the lattice of the system. Otherwise, return nothing.
   string getLatticeFromKpointsTitle(const string& title) {
@@ -1069,7 +1109,7 @@ namespace plotter {
   }
 
 
-  //shiftEfermiToZero///////////////////////////////////////////////////////////
+  //shiftEfermiToZero/////////////////////////////////////////////////////////
   // Shift the energies in an xEIGENVAL object so that the Fermi energy is at
   // zero. This is not necessary for xDOSCAR because it has a separate vector
   // for that purpose.
@@ -1083,8 +1123,9 @@ namespace plotter {
     }
   }
 
-  //setEMinMax//////////////////////////////////////////////////////////////////
-  // Sets the minimum and maximum energy values for electronic structure plots.
+  //setEMinMax////////////////////////////////////////////////////////////////
+  // Sets the minimum and maximum energy values for electronic structure
+  // plots.
   void setEMinMax(xoption& plotoptions, double Emin, double Emax) {
     if (plotoptions.getattachedscheme("XMIN").empty()) {
       if (plotoptions.flag("NOSHIFT")) {
@@ -1102,9 +1143,9 @@ namespace plotter {
     }
   }
 
-  // DOS -----------------------------------------------------------------------
+  // DOS ---------------------------------------------------------------------
 
-  //generateDosPlot/////////////////////////////////////////////////////////////
+  //generateDosPlot///////////////////////////////////////////////////////////
   // Generates the data for a DOS plot. 
   void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
@@ -1229,9 +1270,9 @@ namespace plotter {
     }
   }
 
-  // Bands ---------------------------------------------------------------------
+  // Bands -------------------------------------------------------------------
 
-  //generateBandPlot////////////////////////////////////////////////////////////
+  //generateBandPlot//////////////////////////////////////////////////////////
   // Generates the data for a band structure plot.
   void generateBandPlot(stringstream& out, const xEIGENVAL& xeigen, const xKPOINTS& xkpts,
       const xstructure& xstr, const xoption& plotoptions) {
@@ -1287,7 +1328,7 @@ namespace plotter {
     }
   }
 
-  //convertKPointLabel//////////////////////////////////////////////////////////
+  //convertKPointLabel////////////////////////////////////////////////////////
   // Converts a raw k-point string a k-point label into the desired format.
   string convertKPointLabel(const string& kpoint, const string& format) {
     vector<string> parts;
@@ -1306,7 +1347,7 @@ namespace plotter {
     return formatted_label;
   }
 
-  //convertKPointLetter/////////////////////////////////////////////////////////
+  //convertKPointLetter///////////////////////////////////////////////////////
   // Converts a raw k-point letter string into the desired format.
   string convertKPointLetter(string letter, const string& format) {
     if (format == "LATEX") {
@@ -1324,9 +1365,9 @@ namespace plotter {
     return letter;
   }
 
-  // Gnuplot -------------------------------------------------------------------
+  // Gnuplot -----------------------------------------------------------------
 
-  //generateDosPlotGNUPLOT//////////////////////////////////////////////////////
+  //generateDosPlotGNUPLOT////////////////////////////////////////////////////
   // Generates the gnuplot script for DOS plots.
   void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<double>& energies,
       const deque<deque<deque<double> > >& dos, const vector<string>& labels,
@@ -1450,11 +1491,12 @@ namespace plotter {
     }
   }
 
-  //getDosLimits////////////////////////////////////////////////////////////////
-  // Determines the maximum DOS in the plot and sets the limit so that the tics
-  // give "nice" numbers. Each plot has four tics, i.e. spin-polarized DOS have
-  // two tics per side. This prevents negative numbers from overlapping. This
-  // function is fairly primitive but should work for most plots.
+  //getDosLimits//////////////////////////////////////////////////////////////
+  // Determines the maximum DOS in the plot and sets the limit so that the
+  // tics give "nice" numbers. Each plot has four tics, i.e. spin-polarized
+  // DOS have two tics per side. This prevents negative numbers from
+  // overlapping. This function is fairly primitive but should work for most
+  // plots.
   double getDosLimits(const xoption& plotoptions, const xDOSCAR& xdos,
       const deque<deque<deque<double> > >& dos, const deque<double>& energies) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); 
@@ -1531,7 +1573,7 @@ namespace plotter {
     return dosmax;
   }
 
-  //generateBandPlotGNUPLOT/////////////////////////////////////////////////////
+  //generateBandPlotGNUPLOT///////////////////////////////////////////////////
   // Generates the gnuplot script for band structure plots.
   void generateBandPlotGNUPLOT(stringstream& out, const xEIGENVAL& xeigen,
       const vector<double>& xvals, const vector<double>& ticvals,
@@ -1639,9 +1681,9 @@ namespace plotter {
     }
   }
 
-  //getFormattedUnit////////////////////////////////////////////////////////////
-  // Formats the energy/frequency unit for band structures. This is especially
-  // useful for phonons.
+  //getFormattedUnit//////////////////////////////////////////////////////////
+  // Formats the energy/frequency unit for band structures. This is
+  // especially useful for phonons.
   string getFormattedUnit(const string& unit) {
     if (unit == "EV") return "eV";
     if (unit == "MEV") return "meV";
@@ -1661,7 +1703,7 @@ namespace plotter {
 
 namespace plotter {
 
-  //PLOT_PHDOS//////////////////////////////////////////////////////////////////
+  //PLOT_PHDOS////////////////////////////////////////////////////////////////
   // Plots phonon DOS.
   void PLOT_PHDOS(xoption& plotoptions) {
     // Set k-points format to LaTeX
@@ -1701,7 +1743,7 @@ namespace plotter {
     generateDosPlot(out, xdos, plotoptions);
   }
 
-  //PLOT_PHDISP/////////////////////////////////////////////////////////////////
+  //PLOT_PHDISP///////////////////////////////////////////////////////////////
   // Plots phonon dispersion curves.
   void PLOT_PHDISP(xoption& plotoptions) {
     // Set k-points format to LaTeX
@@ -1747,7 +1789,7 @@ namespace plotter {
     generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
   }
 
-  //PLOT_PHDISPDOS//////////////////////////////////////////////////////////////
+  //PLOT_PHDISPDOS////////////////////////////////////////////////////////////
   // Plots combined phonon band structure + DOS plots.
   void PLOT_PHDISPDOS(xoption& plotoptions) {
     // Set k-points format to LaTeX
@@ -1798,9 +1840,9 @@ namespace plotter {
     generateDosPlot(out, xdos, plotoptions);
   }
 
-  //convertEnergies/////////////////////////////////////////////////////////////
-  // Converts the energies in an electronic structure object (xDOSCAR/xEIGENVAL)
-  // into the desired energy/frequency unit.
+  //convertEnergies///////////////////////////////////////////////////////////
+  // Converts the energies in an electronic structure
+  // object (xDOSCAR/xEIGENVAL) into the desired energy/frequency unit.
   void convertEnergies(xEIGENVAL& xeigen, const string& unit) {
     double conversion_factor = getEnergyConversionFactor(unit);
     for (uint k = 0; k < xeigen.number_kpoints; k++) {
@@ -1824,14 +1866,15 @@ namespace plotter {
     xdos.energy_max *= conversion_factor;
   }
 
-  //getEnergyConversionFactor///////////////////////////////////////////////////
+  //getEnergyConversionFactor/////////////////////////////////////////////////
   // Returns the factor to convert eV into the desired energy/frequency unit.
   // Supported units are meV, THz, Hz, and reciprocal cm (CM-1/RCM).
+  // ME20200121 - Replaced with constants from xscalar.
   double getEnergyConversionFactor(const string& unit) {
     if (unit == "MEV") return 1000.0;
-    if (unit == "THZ") return 241.7990504024;
-    if (unit == "HZ") return 2.417990504024E14;
-    if ((unit == "CM-1") || (unit == "RCM")) return 8065.548153549;
+    if (unit == "THZ") return (eV2Hz * Hz2THz);
+    if (unit == "HZ") return eV2Hz;
+    if ((unit == "CM-1") || (unit == "RCM")) return eV2rcm;
     return 1.0;
   }
 
@@ -1845,7 +1888,7 @@ namespace plotter {
 
 namespace plotter {
 
-  //PLOT_THERMO/////////////////////////////////////////////////////////////////
+  //PLOT_THERMO///////////////////////////////////////////////////////////////
   // Plots APL thermal properties.
   void PLOT_THERMO(xoption& plotoptions) {
     stringstream out;
@@ -1887,7 +1930,7 @@ namespace plotter {
     }
   }
 
-  //PLOT_TCOND//////////////////////////////////////////////////////////////////
+  //PLOT_TCOND////////////////////////////////////////////////////////////////
   // Plots AAPL thermal conductivity tensors
   void PLOT_TCOND(xoption& plotoptions) {
     stringstream out;
@@ -1924,29 +1967,29 @@ namespace plotter {
 
 namespace plotter {
 
-  // Color palettes ------------------------------------------------------------
+  // Color palettes ----------------------------------------------------------
 
-  // The color palette was designed to be accessible for people with color vision
-  // deficiencies. When changing the colors, please make sure that they are still
-  // distinguishable for everyone!
+  // The color palette was designed to be accessible for people with color
+  // vision deficiencies. When changing the colors, please make sure that they
+  // are still distinguishable for everyone!
   static const string MATRIX_COLORS = "#000000,#004949,#009292,#490092,#B66DFF,#6DB6FF,#924900,#D55E00,#EDB120";
 
-  // Point styles --------------------------------------------------------------
+  // Point styles ------------------------------------------------------------
 
   static const string MATRIX_POINT_STYLES = "17,35,51,44,18,9,60,11,20";
 
-  // Line types ----------------------------------------------------------------
+  // Line types --------------------------------------------------------------
 
   static const string MATRIX_LINE_TYPES = "-1";
 
-  // Pre-set labels -----------------------------------------------------------
+  // Pre-set labels ---------------------------------------------------------
 
   static const string MATRIX_LABELS[9] = {"xx", "yx", "zx",
     "xy", "yy", "zy",
     "xz", "yz", "zz"};
 
 
-  //plotSingleFromSet///////////////////////////////////////////////////////////
+  //plotSingleFromSet/////////////////////////////////////////////////////////
   // Plots a single column from a dataset.
   void plotSingleFromSet(xoption& plotoptions, stringstream& out,
       const vector<vector<double> >& data_set, int col) {
@@ -1963,7 +2006,7 @@ namespace plotter {
     generatePlotGNUPLOT(out, plotoptions, data);
   }
 
-  //plotMatrix//////////////////////////////////////////////////////////////////
+  //plotMatrix////////////////////////////////////////////////////////////////
   // Plots a 3 x 3 matrix.
   void plotMatrix(xoption& plotoptions, stringstream& out) {
     vector<vector<double> > data = readAflowDataFile(plotoptions);
@@ -1989,7 +2032,7 @@ namespace plotter {
     generatePlotGNUPLOT(out, plotoptions, data);
   }
 
-  //setPlotLabels///////////////////////////////////////////////////////////////
+  //setPlotLabels/////////////////////////////////////////////////////////////
   // Stores the labels and units for the plots.
   void setPlotLabels(xoption& plotoptions,
       const string& xlabel, const string& xunit,
@@ -2004,9 +2047,9 @@ namespace plotter {
     plotoptions.push_attached("YUNIT", yunit);
   }
 
-  //readDataFile////////////////////////////////////////////////////////////////
-  // Reads data from an AFLOW data file. Requires a START and STOP string to be
-  // present so that it can skip headers and other data sets.
+  //readDataFile//////////////////////////////////////////////////////////////
+  // Reads data from an AFLOW data file. Requires a START and STOP string to
+  // be present so that it can skip headers and other data sets.
   vector<vector<double> > readAflowDataFile(xoption& plotoptions) {
     vector<vector<double> > data;
     vector<double> row;
@@ -2053,7 +2096,7 @@ namespace plotter {
     return data;
   }
 
-  //generatePlotGNUPLOT/////////////////////////////////////////////////////////
+  //generatePlotGNUPLOT///////////////////////////////////////////////////////
   // Generate the gnuplot scripts for general plots.
   void generatePlotGNUPLOT(stringstream& out, const xoption& plotoptions,
       const vector<vector<double> >& data) {
@@ -2162,7 +2205,7 @@ namespace plotter {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 // ***************************************************************************

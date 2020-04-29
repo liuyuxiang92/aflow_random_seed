@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -42,7 +42,7 @@
 #define angstrom2bohr (1/0.529177249)
 #define bohr2angstrom (0.529177249)
 
-//ME181020 - check out https://physics.nist.gov/cuu/Constants/index.html
+//ME20181020 - check out https://physics.nist.gov/cuu/Constants/index.html
 //#define PI                    3.14159265359
 #define PI                      3.14159265358979323846
 #define TWOPI                   6.28318530717958647692
@@ -61,16 +61,22 @@
 #define KBOLTZEV                (KBOLTZ/E_ELECTRON)             // eV/K //8.617343E-5
 #define eV2K                    (11604.505)                     // 1eV=11604.505 K
 #define meV2K                   (11.604505)                     // 1meV=11.604505 K
-#define atom2mol                6.0221408E23                    //CO 180329
-#define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO 180329
+#define atom2mol                6.0221408E23                    //CO20180329
+#define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO20180329
+#define hartree2eV              27.2113862459                   //ME20200206
 
-//ME200107 - (A)APL conversion factors
-#define THz2Hz                      1E12
-#define Hz2THz                      1/THz2Hz
-#define au2THz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
-#define PLANCKSCONSTANT_hbar_THz    PLANCKSCONSTANT_hbar*THz2Hz // J/THz
-#define PLANCKSCONSTANTAMU_hbar_THz PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2THz)  // amu A^2 THz
-#define BEfactor_hbar_THz           PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
+//ME20200107 - (A)APL conversion factors
+#define THz2Hz                        1E12
+#define Hz2THz                        1/THz2Hz
+#define au2Hz                         aurostd::sqrt(E_ELECTRON*1E20/AMU2KILOGRAM)  // eV/(A^2 amu) -> Hz
+#define au2rcm                        au2Hz/(100*C_VACUUM)                         // eV/(A^2 amu) -> cm^-1
+#define au2eV                         au2Hz*PLANCKSCONSTANTEV_h                    // eV/(A^2 amu) -> eV
+#define eV2Hz                         1/PLANCKSCONSTANTEV_h
+#define eV2rcm                        1/(PLANCKSCONSTANTEV_h*100*C_VACUUM)
+#define au2nmTHz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
+#define PLANCKSCONSTANT_hbar_THz      PLANCKSCONSTANT_hbar*THz2Hz // J/THz
+#define PLANCKSCONSTANTAMU_hbar_THz   PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2nmTHz)  // amu A^2 THz
+#define BEfactor_hbar_THz             PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
 
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
@@ -113,7 +119,7 @@
 
 namespace aurostd {
   // namespace aurostd
-  //[CO 180729 OBSOLETE]template<class utype> bool _isfloat(utype) __xprototype;
+  //[CO20180729 OBSOLETE]template<class utype> bool _isfloat(utype) __xprototype;
   template<class utype> bool _isodd(utype) __xprototype;
   template<class utype> bool _iseven(utype) __xprototype;
   template<class utype> bool _isreal(utype) __xprototype;
@@ -124,53 +130,53 @@ namespace aurostd {
   template<class utype> utype sign(utype) __xprototype;
   template<class utype> utype mod(utype,utype) __xprototype;
   template<class utype> utype nint(utype) __xprototype;
-  template<class utype> void _GCD(int a,int b, int& gcd, int& x, int& y); //CO180409  //CO191112 - extended GCD, get Bezout coefficients
-  template<class utype> void _GCD(int a,int b, int& gcd); //CO180409
-  void GCD(int a,int b,int& gcd,int& x,int& y); //CO191201
-  void GCD(int a,int b,int& gcd); //CO191201
-  void GCD(uint a,uint b,uint& gcd,uint& x,uint& y);  //CO191201
-  void GCD(uint a,uint b,uint& gcd);  //CO191201
-  void GCD(long int a,long int b,long int& gcd,long int& x,long int& y);  //CO191201
-  void GCD(long int a,long int b,long int& gcd);  //CO191201
-  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd,unsigned long int& x,unsigned long int& y); //CO191201
-  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd); //CO191201
-  void GCD(long long int a,long long int b,long long int& gcd,long long int& x,long long int& y); //CO191201
-  void GCD(long long int a,long long int b,long long int& gcd); //CO191201
-  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd,unsigned long long int& x,unsigned long long int& y);  //CO191201
-  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd);  //CO191201
-  void GCD(float a,float b,float& gcd,float& x,float& y,float tolerance=0.01);  //CO191201
-  void GCD(float a,float b,float& gcd,float tolerance=0.01);  //CO191201
-  void GCD(double a,double b,double& gcd,double& x,double& y,double tolerance=0.01);  //CO191201
-  void GCD(double a,double b,double& gcd,double tolerance=0.01);  //CO191201
-  void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance=0.01);  //CO191201
-  void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO191201
-  int LCM(int a,int b); //CO190520
+  template<class utype> void _GCD(int a,int b, int& gcd, int& x, int& y); //CO20180409  //CO20191112 - extended GCD, get Bezout coefficients
+  template<class utype> void _GCD(int a,int b, int& gcd); //CO20180409
+  void GCD(int a,int b,int& gcd,int& x,int& y); //CO20191201
+  void GCD(int a,int b,int& gcd); //CO20191201
+  void GCD(uint a,uint b,uint& gcd,uint& x,uint& y);  //CO20191201
+  void GCD(uint a,uint b,uint& gcd);  //CO20191201
+  void GCD(long int a,long int b,long int& gcd,long int& x,long int& y);  //CO20191201
+  void GCD(long int a,long int b,long int& gcd);  //CO20191201
+  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd,unsigned long int& x,unsigned long int& y); //CO20191201
+  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd); //CO20191201
+  void GCD(long long int a,long long int b,long long int& gcd,long long int& x,long long int& y); //CO20191201
+  void GCD(long long int a,long long int b,long long int& gcd); //CO20191201
+  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd,unsigned long long int& x,unsigned long long int& y);  //CO20191201
+  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd);  //CO20191201
+  void GCD(float a,float b,float& gcd,float& x,float& y,float tolerance=0.01);  //CO20191201
+  void GCD(float a,float b,float& gcd,float tolerance=0.01);  //CO20191201
+  void GCD(double a,double b,double& gcd,double& x,double& y,double tolerance=0.01);  //CO20191201
+  void GCD(double a,double b,double& gcd,double tolerance=0.01);  //CO20191201
+  void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance=0.01);  //CO20191201
+  void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO20191201
+  int LCM(int a,int b); //CO20190520
 
-  template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;  //CO191201
-  //bool isinteger(bool x,bool tolerance=(bool)0.01); //CO191201
-  //bool isinteger(char x,char tolerance=(char)0.01); //CO191201
-  bool isinteger(uint x,uint tolerance=(uint)0.01); //CO191201  //CO191201 - obvious but define for boot
-  bool isinteger(int x,int tolerance=(int)0.01);  //CO191201  //CO191201 - obvious but define for boot
-  bool isinteger(long int x,long int tolerance=(long)0.01); //CO191201  //CO191201 - obvious but define for boot
-  bool isinteger(unsigned long int x,unsigned long int tolerance=(unsigned long)0.01); //CO191201  //CO191201 - obvious but define for boot
-  bool isinteger(long long int x,long long int tolerance=(long long int)0.01);  //CO191201  //CO191201 - obvious but define for boot
-  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)0.01); //CO191201  //CO191201 - obvious but define for boot
-  bool isinteger(float x,float tolerance=(float)0.01);  //CO191201
-  bool isinteger(double x,double tolerance=(double)0.01); //CO191201
-  bool isinteger(long double x,long double tolerance=(long double)0.01);  //CO191201
+  template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;  //CO20191201
+  //bool isinteger(bool x,bool tolerance=(bool)0.01); //CO20191201
+  //bool isinteger(char x,char tolerance=(char)0.01); //CO20191201
+  bool isinteger(uint x,uint tolerance=(uint)0.01); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(int x,int tolerance=(int)0.01);  //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(long int x,long int tolerance=(long)0.01); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(unsigned long int x,unsigned long int tolerance=(unsigned long)0.01); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(long long int x,long long int tolerance=(long long int)0.01);  //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)0.01); //CO20191201  //CO20191201 - obvious but define for boot
+  bool isinteger(float x,float tolerance=(float)0.01);  //CO20191201
+  bool isinteger(double x,double tolerance=(double)0.01); //CO20191201
+  bool isinteger(long double x,long double tolerance=(long double)0.01);  //CO20191201
 
-  template<class utype> bool _iszero(utype a,utype tol=(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);  //CO191201
-  //bool iszero(bool x,bool tolerance); //CO191201
-  //bool iszero(char x,char tolerance); //CO191201
-  bool iszero(uint x,uint tolerance=(uint)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
-  bool iszero(int x,int tolerance=(int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
-  bool iszero(long int x,long int tolerance=(long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
-  bool iszero(unsigned long int x,unsigned long int tolerance=(unsigned long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
-  bool iszero(long long int x,long long int tolerance=(long long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
-  bool iszero(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
-  bool iszero(float x,float tolerance=(float)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
-  bool iszero(double x,double tolerance=(double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
-  bool iszero(long double x,long double tolerance=(long double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  template<class utype> bool _iszero(utype a,utype tol=(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);  //CO20191201
+  //bool iszero(bool x,bool tolerance); //CO20191201
+  //bool iszero(char x,char tolerance); //CO20191201
+  bool iszero(uint x,uint tolerance=(uint)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+  bool iszero(int x,int tolerance=(int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+  bool iszero(long int x,long int tolerance=(long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+  bool iszero(unsigned long int x,unsigned long int tolerance=(unsigned long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+  bool iszero(long long int x,long long int tolerance=(long long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+  bool iszero(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+  bool iszero(float x,float tolerance=(float)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+  bool iszero(double x,double tolerance=(double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+  bool iszero(long double x,long double tolerance=(long double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
 
   template<class utype> utype fact(utype) __xprototype;
   template<class utype> utype factorial(utype) __xprototype;
@@ -220,7 +226,7 @@ namespace aurostd {
   bool _isfloat(xcomplex<double>) __xprototype;
   bool _isfloat(xcomplex<long double>) __xprototype;
 #endif
-  bool isfloat(const string& in); //CO 180729
+  bool isfloat(const string& in); //CO20180729
 }
 
 // ----------------------------------------------------------------------------
@@ -232,7 +238,7 @@ namespace aurostd {
   bool _iscomplex(uint) __xprototype;
   bool _iscomplex(int) __xprototype;
   bool _iscomplex(long int) __xprototype;
-  bool _iscomplex(unsigned long int) __xprototype;  //CO191201
+  bool _iscomplex(unsigned long int) __xprototype;  //CO20191201
   bool _iscomplex(long long int) __xprototype;
   bool _iscomplex(unsigned long long int) __xprototype;
   bool _iscomplex(float) __xprototype;
@@ -254,7 +260,7 @@ namespace aurostd {
   bool _isreal(uint) __xprototype;
   bool _isreal(int) __xprototype;
   bool _isreal(long int) __xprototype;
-  bool _isreal(unsigned long int) __xprototype; //CO191201
+  bool _isreal(unsigned long int) __xprototype; //CO20191201
   bool _isreal(long long int) __xprototype;
   bool _isreal(unsigned long long int) __xprototype;
   bool _isreal(float) __xprototype;
@@ -276,7 +282,7 @@ namespace aurostd {
   bool _isreal(uint) __xprototype;
   bool _isreal(int) __xprototype;
   bool _isreal(long int) __xprototype;
-  bool _isreal(unsigned long int) __xprototype; //CO191201
+  bool _isreal(unsigned long int) __xprototype; //CO20191201
   bool _isreal(long long int) __xprototype;
   bool _isreal(unsigned long long int) __xprototype;
   bool _isreal(float) __xprototype;
@@ -340,7 +346,7 @@ namespace aurostd {
   uint _real(uint) __xprototype;
   int _real(int) __xprototype;
   long int _real(long int) __xprototype;
-  unsigned long int _real(unsigned long int) __xprototype;  //CO191201
+  unsigned long int _real(unsigned long int) __xprototype;  //CO20191201
   long long int _real(long long int) __xprototype;
   unsigned long long int _real(unsigned long long int) __xprototype;
   float _real(float) __xprototype;
@@ -519,16 +525,16 @@ namespace aurostd {
 }
 
 namespace aurostd {
-  int boundary_conditions_periodic(int lrows,int urows,int i);  //CO190419 - taken from xvector BOUNDARY_CONDITIONS_PERIODIC
+  int boundary_conditions_periodic(int lrows,int urows,int i);  //CO20190419 - taken from xvector BOUNDARY_CONDITIONS_PERIODIC
 }
 
 namespace aurostd {
-  uint powint(uint x,uint exp); //CO191201
-  int powint(int x,uint exp); //CO191201
-  long int powint(long int x,uint exp); //CO191201
-  unsigned long int powint(unsigned long int x,uint exp); //CO191201
-  long long int powint(long long int x,uint exp); //CO191201
-  unsigned long long int powint(unsigned long long int x,uint exp); //CO191201
+  uint powint(uint x,uint exp); //CO20191201
+  int powint(int x,uint exp); //CO20191201
+  long int powint(long int x,uint exp); //CO20191201
+  unsigned long int powint(unsigned long int x,uint exp); //CO20191201
+  long long int powint(long long int x,uint exp); //CO20191201
+  unsigned long long int powint(unsigned long long int x,uint exp); //CO20191201
 }
 
 // ----------------------------------------------------------------------------
@@ -538,7 +544,7 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

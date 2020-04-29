@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
 // *                                                                         *
 // ***************************************************************************
 // AFLOW-XtalMatch (compare crystal structures)
@@ -128,7 +128,7 @@ namespace pflow {
     bool print_misfit=false; //defalut=false
     if(vpflow.flag("COMPARE_PERMUTATION::PRINT")) { print_misfit=true; }
 
-    //DX20190504 - START
+    //DX20190504 START
     // ---------------------------------------------------------------------------
     // FLAG: print format
     string format = "both";
@@ -138,7 +138,7 @@ namespace pflow {
     else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
       format = "json";
     }
-    //DX20190504 - END
+    //DX20190504 END
 
     // ---------------------------------------------------------------------------
     // FLAG: optimize match (default: false)
@@ -194,7 +194,7 @@ namespace compare{
     vector<string> unique_permutations;
     stringstream ss_output; //DX20190506
 
-    //DX20190506 - START
+    //DX20190506 START
     // ---------------------------------------------------------------------------
     // print format 
     string format = "text";
@@ -204,7 +204,7 @@ namespace compare{
     if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
       format = "json";
     }
-    //DX20190506 - END
+    //DX20190506 END
 
     // ---------------------------------------------------------------------------
     // permutation comparisons must compare the same species 
@@ -265,7 +265,7 @@ namespace compare{
         ss_output << endl;
       }
     }
-    //DX20190506 - START
+    //DX20190506 START
     else if(format=="json"){
       stringstream sscontent_json;
       vector<string> vcontent_json;
@@ -282,7 +282,7 @@ namespace compare{
       sscontent_json << "]";
       ss_output << "{" << sscontent_json.str() << "}" << endl;
     }
-    //DX20190506 - END
+    //DX20190506 END
 
     // ---------------------------------------------------------------------------
     // print misfit results
@@ -362,13 +362,13 @@ namespace pflow {
     // from directory
     //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY") || vpflow.flag("COMPARE_STRUCTURE_DIRECTORY"))
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty())
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       structures_from = "directory";
     }
     // from file
     //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_FILE") || vpflow.flag("COMPARE_STRUCTURE_FILE"))
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty())
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       structures_from = "file";
     }
 
@@ -377,13 +377,13 @@ namespace pflow {
     vector<string> file_list; //DX20190424
     string directory=".";
     string filename="";
-    //DX20190424 - START
+    //DX20190424 START
     if(structures_from=="structure_list") {
       aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),file_list,",");
       message << "List of files to compare: " << aurostd::joinWDelimiter(file_list,",");
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
-    //DX20190424 - END
+    //DX20190424 END
     else if(structures_from=="directory") {
       directory=vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY");
       if(!aurostd::FileExist(directory)) {
@@ -1057,7 +1057,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // load compatible aflow prototypes
 
-    // DX20190830 - to avoid multiple threads being spun-up (here and in aflow_xproto.cpp), turn of aflow_pthreads
+    //DX20190830 - to avoid multiple threads being spun-up (here and in aflow_xproto.cpp), turn of aflow_pthreads
     uint uint_backup=AFLOW_PTHREADS::MAX_PTHREADS;
     AFLOW_PTHREADS::MAX_PTHREADS=1;
 
@@ -1091,11 +1091,11 @@ namespace pflow {
     message << "Comparisons complete ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
 
-    AFLOW_PTHREADS::MAX_PTHREADS = uint_backup; // DX20190830 - set back to original setting
+    AFLOW_PTHREADS::MAX_PTHREADS = uint_backup; //DX20190830 - set back to original setting
 
     // ---------------------------------------------------------------------------
     // return if there are no similar structures
-    if(final_prototypes.size()==0){ return final_prototypes; } // DX20190314 originally : return oss.str()
+    if(final_prototypes.size()==0){ return final_prototypes; } //DX20190314 originally : return oss.str()
 
     comparison_schemes.clear();
 
@@ -1244,7 +1244,7 @@ namespace pflow {
 
     // ---------------------------------------------------------------------------
     // FLAG: specify the geometry file to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
-    // DX TODO 
+    //DX TODO 
     string geometry_file = "";
     if(vpflow.flag("COMPARE2DATABASE::GEOMETRY_FILE")) {
       geometry_file = vpflow.getattachedscheme("COMPARE2DATABASE::GEOMETRY_FILE");
@@ -1301,7 +1301,7 @@ namespace pflow {
     xstructure xstr(input,IOAFLOW_AUTO);
 
     // ---------------------------------------------------------------------------
-    // fix species (remove pseudopotntials, etc.) 
+    // fix species (remove pseudopotentials, etc.) 
     string species_str = aurostd::joinWDelimiter(xstr.species, ""); //DX20200212 
     vector<string> vspecies = pflow::stringElements2VectorElements(species_str); //DX20200212
     xstr.species = aurostd::vector2deque(vspecies); //DX20200212 - needed to perform material comparisons with database entries
@@ -1491,7 +1491,7 @@ namespace pflow {
       vector<uint> tmp_stoich;
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
       for(uint j=0;j<vcomposition.size();j++) //DX20191106
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         if(aurostd::isinteger(vcomposition[j])){
           tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j]));
         }
@@ -1684,12 +1684,12 @@ namespace pflow {
   }
 }
 
-//DX COMPARE DATABASE ENTRIES - START
+//DX - COMPARE DATABASE ENTRIES - START
 // ***************************************************************************
 // pflow::compareDatabaseEntries - compares database entries
 // ***************************************************************************
 namespace pflow {
-  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream){ // DX20191125 - added ofstream overload and added ostream as input
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream){ //DX20191125 - added ofstream overload and added ostream as input
     ofstream FileMESSAGE;
     return compareDatabaseEntries(vpflow, FileMESSAGE, logstream);
   }
@@ -1871,7 +1871,7 @@ namespace pflow {
 
     // ---------------------------------------------------------------------------
     // FLAG: specify the geometry file to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
-    // DX TODO 
+    //DX TODO 
     string geometry_file = "";
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE")) {
       geometry_file = vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE");
@@ -2039,7 +2039,7 @@ namespace pflow {
       vector<uint> tmp_stoich;
       //DX20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++)
       for(uint j=0;j<vcomposition.size();j++) //DX20191106
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         if(aurostd::isinteger(vcomposition[j])){
           tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j]));
         }
@@ -2240,9 +2240,9 @@ namespace pflow {
   }
 }
 
-//DX COMPARE DATABASE ENTRIES - END
+//DX - COMPARE DATABASE ENTRIES - END
 
-//DX20190424 - START
+//DX20190424 START
 // ***************************************************************************
 // compare::compareStructuresFromStructureList()
 // ***************************************************************************
@@ -2263,7 +2263,7 @@ namespace compare {
 
   }
 }
-//DX20190424 - END
+//DX20190424 END
 
 // ***************************************************************************
 // compare::compareStructuresFromDirectory()
@@ -3148,7 +3148,7 @@ namespace compare {
 // Contributors: Carlo De Santo
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
 // *                                                                         *
 // ***************************************************************************

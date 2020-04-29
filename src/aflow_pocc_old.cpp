@@ -99,8 +99,8 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
     unsigned long long int Num_calculated;
     unsigned long long int Num_xstr;
 
-    if(1){  //OLD KESONG
-      vecgroupxstr_sorted = Partial2Supercell(xstr_pocc);  //170721 CO - KESONG OLD code
+    if(1){  //OLD KY
+      vecgroupxstr_sorted = Partial2Supercell(xstr_pocc);  //CO20170721 - KY OLD code
       Num_xstr=vecgroupxstr_sorted.size();
 
       if(Num_xstr<MaxNumberPOSCAR) {
@@ -119,7 +119,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
         ssxstr_sorted << "[VASP_POSCAR_MODE_EXPLICIT]STOP." <<ss.str() << endl;
         ssxstr_sorted << AFLOWIN_SEPARATION_LINE<< endl;
       }
-    } else {  //START COREY
+    } else {  //START CO
       aurostd::xoption pflags;
       _kflags kflags;
       pocc::POccCalculator pcalc(xstr_pocc,aflags,kflags,FileMESSAGE,cout);
@@ -1429,7 +1429,7 @@ void CombineAll(const vector<vector<vector<int> > > &allVecs, size_t vecIndex, v
 // ***************************************************************************
 vector<string> CalculateSecondAtomicNameSupercell(xstructure xstr_orig, int n) {
   vector<string> AtomicNameSupercell;
-  //    if(CheckDoubleOccupied(xstr_orig)) {  //[CO200106 - close bracket for indenting]}
+  //    if(CheckDoubleOccupied(xstr_orig)) {  //[CO20200106 - close bracket for indenting]}
   xstructure xstr_norm = NormalizeXstructure(xstr_orig); //Format POSCAR
   vector<vector<int> > num_norm_xstr = NormalisedNumberXstructure(xstr_orig); //Format normalized POSCAR's number using 2D vector
   vector<vector<int> > vec_num_supercell=CalculateXstrNumberSupercell(xstr_norm,n); //Produce supercell's number using 2D vector
@@ -1478,7 +1478,7 @@ vector<vector<int> > GenerateSupercellAtomNumber(xstructure xstr_orig, int n) {
   //    vector<vector<int> > atom_num_supercell = CalculateXstrNumberSupercell(xstr_orig, n); //format like 0 1 2 3; 4 5 6 7
   //    We just need to store the atoms' number using normalized xstructure
 
-  //if(CheckDoubleOccupied(xstr_orig)) {  //[CO200106 - close bracket for indenting]}
+  //if(CheckDoubleOccupied(xstr_orig)) {  //[CO20200106 - close bracket for indenting]}
   for (uint i=0; i<xstr_norm.atoms.size();i++) {
     if(xstr_norm.atoms.at(i).partial_occupation_flag) {
       int num_vacancy= hnf_double2int((1-xstr_norm.atoms.at(i).partial_occupation_value)*n);
@@ -2405,7 +2405,7 @@ vector<xstructure> RemoveEquivalentXstr(vector<xstructure> vec_xstr, ofstream &F
     }
   }
 
-  //cerr << "KESONG TEST" << endl;
+  //cerr << "KY TEST" << endl;
   vector<int> vecDG; vecDG.clear(); //Degenracy
   for (uint i=0;i<vec_xstr_energy_final.size();i++) {
     int DGi =0;
@@ -3580,11 +3580,11 @@ namespace pocc {
         vEgap.push_back(outcar_aus.Egap);
 
         if(LDEBUG||1) {
-          cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; DE=" << vDE[i] << "; NIONS=" << vions.at(i) << "; enthalpy_atom=" << vtoten_per_atom.at(i) << "; mag_cell=" << vmag.at(i) << "; Egap_net=" << vEgap_net.at(i) << endl;    // corey - should read out enthalpy/atom from STATIC, not BANDS
+          cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; DE=" << vDE[i] << "; NIONS=" << vions.at(i) << "; enthalpy_atom=" << vtoten_per_atom.at(i) << "; mag_cell=" << vmag.at(i) << "; Egap_net=" << vEgap_net.at(i) << endl;    //CO - should read out enthalpy/atom from STATIC, not BANDS
         }
 
         //	if(LDEBUG||1) {
-        //	cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; NIONS=" << outcar_aus.NIONS << "; enthalpy_atom=" << outcar_aus.enthalpy_atom << "; mag_cell=" << outcar_aus.mag_cell << "; Egap_net=" << outcar_aus.Egap_net << endl;   //corey
+        //	cerr << "pocc::POCC_GENERATE_DOSDATA: vrun.at(" << i << ")=" << vrun.at(i) << "; NIONS=" << outcar_aus.NIONS << "; enthalpy_atom=" << outcar_aus.enthalpy_atom << "; mag_cell=" << outcar_aus.mag_cell << "; Egap_net=" << outcar_aus.Egap_net << endl;   //CO
         //	}
       }
 
@@ -3632,8 +3632,8 @@ namespace pocc {
         Egap.push_back(0);
         for (uint i=0;i<vEgap.size();i++) {
           //Calculate average Egap
-          Egap.at(j)+=vEgap.at(0).at(j)*vprob.at(i);    //corey - otherwise, it crashes if you have Egap up AND Egap down (magnetized system)
-          //Egap.at(j)+=vEgap.at(i).at(j)*vprob.at(i);  //corey
+          Egap.at(j)+=vEgap.at(0).at(j)*vprob.at(i);    //CO - otherwise, it crashes if you have Egap up AND Egap down (magnetized system)
+          //Egap.at(j)+=vEgap.at(i).at(j)*vprob.at(i);  //CO
         }
       }
 
@@ -3643,7 +3643,7 @@ namespace pocc {
         string doscar_file = vdoscar_files.at(i); stringstream ss_doscar; aurostd::efile2stringstream(doscar_file, ss_doscar); 
         string outcar_file = voutcar_files.at(i); stringstream ss_outcar; aurostd::efile2stringstream(outcar_file, ss_outcar);
         double Efermi; vector<vector<double> > TDOS, TOTALPDOS;
-        //CO20180218 - let's not mess around with kesong's functions too much
+        //CO20180218 - let's not mess around with KY's functions too much
         //for now, assume POCC runs have standard DOSCAR.static (PDOS in it)
         //if no PDOS, exit
         //I will fix later
@@ -4138,7 +4138,7 @@ namespace pocc {
   void ExtractBonds(const xstructure& xstr, deque<deque<_atom> >& neigh_mat_bonded, deque<deque<_atom> >& neigh_mat_nonbonded) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20180409
     //Extract bonded and nonbonded atoms
-    const double radius = 10.00; //12;//8.05323*1.5;//10.00; //COREY TEST, this number is very important, and not well explained...
+    const double radius = 10.00; //12;//8.05323*1.5;//10.00; //CO TEST, this number is very important, and not well explained...
     deque<deque<_atom> > neigh_mat;
     xstructure xstr_tmp = xstr;
     xstr_tmp.GetStrNeighData(radius, neigh_mat); // radius 12 angstrom

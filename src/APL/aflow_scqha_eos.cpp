@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2015           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow PINKU NATH - Duke University 2014-2018             *
 // *                                                                         *
 // ***************************************************************************
@@ -507,10 +507,10 @@ namespace apl
               _d2fdv2[j][k]*(V_T[i]-_scqha_volumes[1]));
 
           if(omega_T[i][j][k]<0.01){
-            // ME20190726 - exit clean-up
+            //ME20190726 - exit clean-up
             //_logger<<apl::error<<"Frequency too small at "<<temperature<<" K "<<apl::endl;
             //exit(0);
-            // ME20191031 - use xerror
+            //ME20191031 - use xerror
             //throw APLRuntimeError("Frequency too small at " + aurostd::utype2string<double>(temperature) + " K");
             string function = "SCQHAEOS::sccycle()";
             string message = "Frequency too small at " + aurostd::utype2string<double>(temperature) + " K";
@@ -629,7 +629,7 @@ namespace apl
     string filename = "aflow.scqha.iter.out";
     aurostd::stringstream2file(scf_err, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("Cannot open output aflow.scqha.iter.out file.");
       string function = "SCQHAEOS::sccycle()";
       string message = "Cannot open output " + filename;
@@ -640,7 +640,7 @@ namespace apl
     filename = "aflow.scqha.thermo.out";
     aurostd::stringstream2file(scf_thermo, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("Cannot open output aflow.scqha.thermo.out file.");
       string function = "SCQHAEOS::sccycle()";
       string message = "Cannot open output " + filename;
@@ -650,7 +650,7 @@ namespace apl
     filename = "aflow.scqha.pressure.out";
     aurostd::stringstream2file(scf_thermo_p, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031
+      //ME20191031
       //throw apl::APLRuntimeError("Cannot open output aflow.scqha.pressure.out file.");
       string function = "SCQHAEOS::sccycle()";
       string message = "Cannot open output " + filename;
@@ -697,7 +697,7 @@ namespace apl
     outfile<<"[AFLOW] "<<STAR50<<"\n";
     string file="aflow.scqha.enthalpy.out";
     if(!aurostd::stringstream2file(outfile, file, "WRITE")) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Cannot write aflow.scqha.enthalpy.out");
       string function = "SCQHAEOS::total_enthalpy()";
       string message = "Cannot write" + file;
@@ -712,10 +712,10 @@ namespace apl
   { 
 
     if(omeg< 0.001){
-      // ME20190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error <<"Frequency too small (<0.001 THz) for U_vib(T)"<<apl::endl;
       //exit(0);
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for U_vib(T)");
       string function = "SCQHAEOS::internal_energy()";
       string message = "Frequency too small (<0.001 THz) for U_vib(T)";
@@ -745,10 +745,10 @@ namespace apl
   {
     if(omeg<0.001)
     {
-      // ME20190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error<<"Frequency too small (<0.001 THz) for F_vib(T)"<<apl::endl;
       //exit(0);
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for F_vib(T)");
       string function = "SCQHAEOS::free_energy()";
       string message = "Frequency too small (<0.001 THz) for F_vib(T)";
@@ -764,10 +764,10 @@ namespace apl
   double SCQHAEOS::entropy(const double omeg, const double temp)
   {
     if(omeg<0.001){
-      // ME20190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error<< "Frequency too small (<0.001 THz) for S_vib(T)" <<apl::endl;
       //exit(0);
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for S_vib(T)");
       string function = "SCQHAEOS::entropy()";
       string message = "Frequency too small (<0.001 THz) for S_vib(T)";
@@ -783,10 +783,10 @@ namespace apl
   {
     if(omeg<0.001)
     {
-      // ME20190726 - exit clean-up
+      //ME20190726 - exit clean-up
       //_logger<<apl::error<<"Frequency too small (<0.001 THz) for Cv(T)" <<apl::endl;
       //exit(0);
-      // ME20191031 - use xerro
+      //ME20191031 - use xerro
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for Cv(T)");
       string function = "SCQHAEOS::heat_capacity()";
       string message = "Frequency too small (<0.001 THz) for Cv(T)";
@@ -841,7 +841,7 @@ namespace apl
     string filename = "aflow.mesh.taylor_cofficients.out";
     aurostd::stringstream2file(out, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("Cannot open aflow.mesh.taylor_cofficients.out file.");
       string function = "SCQHAEOS::print_freq_taylor_coefficients()";
       string message = "Cannot open " + filename + " file.";

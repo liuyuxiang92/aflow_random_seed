@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -16,14 +16,14 @@
 #define _AUROSTD_XVECTOR_TOLERANCE_IDENTITY_ AUROSTD_IDENTITY_TOL //1.0e-6
 #define _AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_ AUROSTD_ROUNDOFF_TOL //1.0e-6
 
-#define CONV_SHAPE_FULL 0 //CO190520
-#define CONV_SHAPE_SAME 1 //CO190520
-#define CONV_SHAPE_VALID 2 //CO190520
+#define CONV_SHAPE_FULL 0 //CO20190520
+#define CONV_SHAPE_SAME 1 //CO20190520
+#define CONV_SHAPE_VALID 2 //CO20190520
 
 // -------------------------------------------------------------- class xvector
 
 namespace aurostd {
-  template<class utype> class xmatrix;  //forward declaration  //CO191110
+  template<class utype> class xmatrix;  //forward declaration  //CO20191110
   // namespace aurostd
   template<class utype>
     class xvector {
@@ -32,7 +32,7 @@ namespace aurostd {
         // xvector(int);                                       // default constructor
         xvector(int=3,int=1);                                  // default constructor
         xvector(const xvector<utype>&);                        // copy constructor
-        xvector(const xmatrix<utype>&);                        // copy constructor //CO191110
+        xvector(const xmatrix<utype>&);                        // copy constructor //CO20191110
         // xvector (const xmatrix<utype>&);                    // make a vector of a xmatrix
         xvector<utype>& operator=(const xvector<utype>&);	   // assignment
         //     operator xvector<utype>() { return *this;};      // IBM_CPP
@@ -41,11 +41,11 @@ namespace aurostd {
         utype& operator()(int) const;		                    // indicize
         utype& operator()(int,bool) const;        // indicize boundary conditions
         xvector<utype>& operator +=(const xvector<utype>&);
-        xvector<utype>& operator +=(utype); //CO 180409
+        xvector<utype>& operator +=(utype); //CO20180409
         xvector<utype>& operator -=(const xvector<utype>&);
-        xvector<utype>& operator -=(utype); //CO 180409
-        xvector<utype>& operator *=(utype r); //(const utype& r) //CO 171130 - v*=v[1] doesn't work //CO 180409
-        xvector<utype>& operator /=(utype r); //(const utype& r) //CO 171130 - v/=v[1] doesn't work //CO 180409
+        xvector<utype>& operator -=(utype); //CO20180409
+        xvector<utype>& operator *=(utype r); //(const utype& r) //CO20171130 - v*=v[1] doesn't work //CO20180409
+        xvector<utype>& operator /=(utype r); //(const utype& r) //CO20171130 - v/=v[1] doesn't work //CO20180409
         // xvector<utype>& operator *=(const xvector<utype>&);
         // xvector<utype>& operator /=(const xvector<utype>&);
         //    friend std::ostream& operator<<<utype>(std::ostream&,const xvector<utype>&);
@@ -63,10 +63,10 @@ namespace aurostd {
         long int vsize;
 
         //NECESSARY PRIVATE CLASS METHODS - START
-        void free();  //CO190808
-        void copy(const xvector<utype>& b);  //CO190808
-        void copy(const xmatrix<utype>& b);  //CO190808
-        void refresh(); //CO190808 - refresh internal properties dependent on lrows, urows, utype
+        void free();  //CO20190808
+        void copy(const xvector<utype>& b);  //CO20190808
+        void copy(const xmatrix<utype>& b);  //CO20190808
+        void refresh(); //CO20190808 - refresh internal properties dependent on lrows, urows, utype
         //NECESSARY END CLASS METHODS - END
     };
 }
@@ -205,10 +205,10 @@ namespace aurostd {
     operator!=(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
   template<class utype> bool
-    isinteger(const xvector<utype>&,const utype& tol=(utype)0.01) __xprototype; //CO 180409
+    isinteger(const xvector<utype>&,const utype& tol=(utype)0.01) __xprototype; //CO20180409
 
   template<class utype> bool
-    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  // ME180702 //CO191201 - 1e-7 seems arbitrary
+    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  //ME20180702 //CO20191201 - 1e-7 seems arbitrary
   // CONSTRUCTIONS OF VECTORS FROM SCALARS
 
   template<class utype> xvector<utype>
@@ -232,7 +232,7 @@ namespace aurostd {
 
 // ----------------------------------------------------------- xvector example types
 namespace aurostd {
-  //CO180419
+  //CO20180419
   template<class utype> xvector<utype> ones_xv(int=3,int=1) __xprototype;
   template<class utype> xvector<utype> box_filter_xv(int window,int lrows=1) __xprototype;
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype;  //if you need lrows!=1, use shiftlrows()
@@ -277,10 +277,10 @@ namespace aurostd {
     xvector2vector(const xvector<utype>&) __xprototype;
 
   template<class utype> xvector<utype>
-    vector2xvector(const vector<utype>&,int lrows=1) __xprototype; //CO 180409
+    vector2xvector(const vector<utype>&,int lrows=1) __xprototype; //CO20180409
 
-  xvector<double> xvectorint2double(const xvector<int>&); //CO 180515
-  xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO 180515
+  xvector<double> xvectorint2double(const xvector<int>&); //CO20180515
+  xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO20180515
 
   // OPERATIONS ON XVECTORS
 
@@ -336,47 +336,47 @@ namespace aurostd {
     maxi(const xvector<utype>&) __xprototype;
 
   template<class utype> xvector<utype>                  // clear values too small
-    roundoff(const xvector<utype>&,utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_) __xprototype; // claar values too small //CO 180409
+    roundoff(const xvector<utype>&,utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_) __xprototype; // claar values too small //CO20180409
 
-  void GCD(const xvector<int>&,int&);                         // get GCD of xvector //CO 180409 //CO191201
-  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd); //CO191201
-  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd,xvector<int>& vx,xvector<int>& vy); //CO191201
-  int LCM(const xvector<int>&);                         // get LCM of xvector //CO 180520
+  void GCD(const xvector<int>&,int&);                         // get GCD of xvector //CO20180409 //CO20191201
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd); //CO20191201
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd,xvector<int>& vx,xvector<int>& vy); //CO20191201
+  int LCM(const xvector<int>&);                         // get LCM of xvector //CO20180520
 
-  //DX 20191125 [OBSOLETE] template<class utype> xvector<utype>                                       // simply divide by GCD (useful for compounds) //CO 180409
-  //DX 20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,                                  // simply divide by GCD (useful for compounds) //CO 180409
-  //DX 20191125 [OBSOLETE]       const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO 180409
-
-  template<class utype> 
-    void reduceByGCD(const xvector<utype>& in_V,                    // simply divide by GCD (useful for compounds) //CO 180409
-        xvector<utype>& out_V,                                        // simply divide by GCD (useful for compounds) //CO 180409
-        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO 180409 //CO191201
-
-  void GCD(const vector<int>&,int&);                          // get GCD of vector //DX 20191125 (modeled after CO's xvector version) //CO191201
-  int LCM(const vector<int>&);                          // get LCM of vector //DX 20191125 (modeled after CO's xvector version)
+  //DX20191125 [OBSOLETE] template<class utype> xvector<utype>                                       // simply divide by GCD (useful for compounds) //CO20180409
+  //DX20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,                                  // simply divide by GCD (useful for compounds) //CO20180409
+  //DX20191125 [OBSOLETE]       const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO20180409
 
   template<class utype> 
-    void reduceByGCD(const vector<utype>& in_V,                     // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
-        vector<utype>& out_V,                                         // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
-        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)  //CO191201
+    void reduceByGCD(const xvector<utype>& in_V,                    // simply divide by GCD (useful for compounds) //CO20180409
+        xvector<utype>& out_V,                                        // simply divide by GCD (useful for compounds) //CO20180409
+        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO20180409 //CO20191201
 
-  void GCD(const deque<int>&,int& gcd);                           // get GCD of deque //DX 20191125 (modeled after CO's xvector version)  //CO191201
-  int LCM(const deque<int>&);                           // get LCM of deque //DX 20191125 (modeled after CO's xvector version)
+  void GCD(const vector<int>&,int&);                          // get GCD of vector //DX20191125 (modeled after CO's xvector version) //CO20191201
+  int LCM(const vector<int>&);                          // get LCM of vector //DX20191125 (modeled after CO's xvector version)
 
   template<class utype> 
-    void reduceByGCD(const deque<utype>& in_V,                      // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
-        deque<utype>& out_V,                                          // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
-        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)  //CO191201
+    void reduceByGCD(const vector<utype>& in_V,                     // simply divide by GCD (useful for compounds) //DX20191125 (modeled after CO's xvector version)
+        vector<utype>& out_V,                                         // simply divide by GCD (useful for compounds) //DX20191125 (modeled after CO's xvector version)
+        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //DX20191125 (modeled after CO's xvector version)  //CO20191201
+
+  void GCD(const deque<int>&,int& gcd);                           // get GCD of deque //DX20191125 (modeled after CO's xvector version)  //CO20191201
+  int LCM(const deque<int>&);                           // get LCM of deque //DX20191125 (modeled after CO's xvector version)
+
+  template<class utype> 
+    void reduceByGCD(const deque<utype>& in_V,                      // simply divide by GCD (useful for compounds) //DX20191125 (modeled after CO's xvector version)
+        deque<utype>& out_V,                                          // simply divide by GCD (useful for compounds) //DX20191125 (modeled after CO's xvector version)
+        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //DX20191125 (modeled after CO's xvector version)  //CO20191201
 
   template<class utype> xvector<utype> 
     normalizeSumToOne(const xvector<utype>& in_V,
-        const utype& tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_) __xprototype; //CO 180801
+        const utype& tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_) __xprototype; //CO20180801
 
   template<class utype> void                                   // swap
     swap(xvector<utype>&,const int&,const int&) __xprototype;  // swap
 
-  template<class utype> void                              //shift lrows so first index is i //CO 180409
-    shiftlrows(xvector<utype>&,const int&) __xprototype;  //shift lrows so first index is i //CO 180409
+  template<class utype> void                              //shift lrows so first index is i //CO20180409
+    shiftlrows(xvector<utype>&,const int&) __xprototype;  //shift lrows so first index is i //CO20180409
 
   // Complex operations
   template<class utype> xvector<utype>
@@ -478,27 +478,27 @@ namespace aurostd {
   template<class utype> double   // angle between three  vectors in radiants
     getangle(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
 
-  template<class utype> bool //determine if two vectors are collinear //CO 180409
+  template<class utype> bool //determine if two vectors are collinear //CO20180409
     isCollinear(const xvector<utype>& v0,const xvector<utype>& v1,const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;
 
-  template<class utype> xvector<utype> //get centroid of data points //CO 180409
+  template<class utype> xvector<utype> //get centroid of data points //CO20180409
     getCentroid(const vector<xvector<utype> >& points) __xprototype;
 
-  // TRIGONOMETRIC OPERATIONS BETWEEN TWO GENERAL VECTORS //CO 180409
+  // TRIGONOMETRIC OPERATIONS BETWEEN TWO GENERAL VECTORS //CO20180409
   template<class utype> xvector<double> 
-    getGeneralAngles(const xvector<utype>& vec,const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_); //CO 180409
+    getGeneralAngles(const xvector<utype>& vec,const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_); //CO20180409
 
   template<class utype> double
-    getGeneralAngle(const xvector<utype>& _vec,int _i,const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_); //CO 180409
+    getGeneralAngle(const xvector<utype>& _vec,int _i,const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_); //CO20180409
 
   template<class utype> xvector<utype>
-    getGeneralNormal(const vector<xvector<utype> >& _directive_vectors); //CO 180409
+    getGeneralNormal(const vector<xvector<utype> >& _directive_vectors); //CO20180409
 
   template<class utype> xvector<utype>
-    pointLineIntersection(const xvector<utype>& a,const xvector<utype>& n,const xvector<utype>& p); //CO 180520
+    pointLineIntersection(const xvector<utype>& a,const xvector<utype>& n,const xvector<utype>& p); //CO20180520
 
   template<class utype> bool
-    linePlaneIntersect(const xvector<utype>& p0,const xvector<utype>& n,const xvector<utype>& l0, const xvector<utype>& l,double& d,xvector<utype>& intersection); //CO 180520
+    linePlaneIntersect(const xvector<utype>& p0,const xvector<utype>& n,const xvector<utype>& l0, const xvector<utype>& l,double& d,xvector<utype>& intersection); //CO20180520
 
   // SIMPLE SORT ROUTINES
   template<class utype> xvector<utype>  // WRAP TO SHELL SHORT
@@ -549,7 +549,7 @@ namespace aurostd {
       quicksort4(n,a,b,c,d);}
 }
 
-namespace aurostd { //CO190419
+namespace aurostd { //CO20190419
   template<class utype>
     class compareVecElement {
       public:
@@ -565,21 +565,21 @@ namespace aurostd { //CO190419
   template<class utype> bool compareXVecElements(const aurostd::xvector<utype>& a,const aurostd::xvector<utype>& b);
 }
 
-namespace aurostd { //CO190419
+namespace aurostd { //CO20190419
   //SOME STATS STUFF
-  template<class utype> utype mean(const xvector<utype>& a); //CO190520
-  template<class utype> utype stddev(const xvector<utype>& a); //CO190520
-  template<class utype> void getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3);  //CO 171202
-  template<class utype> utype getMAD(const xvector<utype>& _a,utype median=(utype)AUROSTD_NAN);   //CO 171202, absolute deviation around the median (MAD)
-  template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,int SHAPE=CONV_SHAPE_FULL); //CO190419
-  template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,vector<uint>& sum_counts,int SHAPE=CONV_SHAPE_FULL); //CO190419
-  template<class utype> xvector<utype> moving_average(const xvector<utype>& signal_input,int window); //CO190419
+  template<class utype> utype mean(const xvector<utype>& a); //CO20190520
+  template<class utype> utype stddev(const xvector<utype>& a); //CO20190520
+  template<class utype> void getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3);  //CO20171202
+  template<class utype> utype getMAD(const xvector<utype>& _a,utype median=(utype)AUROSTD_NAN);   //CO20171202, absolute deviation around the median (MAD)
+  template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,int SHAPE=CONV_SHAPE_FULL); //CO20190419
+  template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,vector<uint>& sum_counts,int SHAPE=CONV_SHAPE_FULL); //CO20190419
+  template<class utype> xvector<utype> moving_average(const xvector<utype>& signal_input,int window); //CO20190419
 }
 
-namespace aurostd { //CO190620
+namespace aurostd { //CO20190620
   //signal processing
-  template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO190620
-  template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,xvector<utype>& signal_smooth,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO190620
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO20190620
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,xvector<utype>& signal_smooth,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO20190620
 }
 
 // ----------------------------------------------------------------------------
@@ -589,7 +589,7 @@ namespace aurostd { //CO190620
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
