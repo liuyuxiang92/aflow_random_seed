@@ -528,7 +528,7 @@ namespace cce {
     string functional = "";
     string aflowIn = aurostd::RemoveComments(aurostd::file2string(aflowin_file));
     vector<string> vlines = aurostd::string2vectorstring(aflowIn);
-    string line_a;
+    string line_a = "";
     bool pbe = false;
     bool ldau = false;
     bool pbe_u_icsd = false;
