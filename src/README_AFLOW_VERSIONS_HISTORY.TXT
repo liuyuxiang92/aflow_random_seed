@@ -1,6 +1,6 @@
 3.2.3 - 2020/05/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
-        -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME & RF)
+        -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME+RF)
         -- Sped up determination of irreducible tetrahedra for the tetrahedron method. (ME)
         -- Sped up APL force constant matrix calculation. (ME)
         -- Sped up the calculation of the dynamical matrix. (ME)
