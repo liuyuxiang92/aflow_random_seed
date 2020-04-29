@@ -5062,7 +5062,7 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
 
   if(SPIN_UP or SPIN_DN) { // this disappears
     xstr.FixLattices();
-    xstr.CalculateSymmetryPointGroupKlattice();
+    xstr.CalculateSymmetryPointGroupKLattice();
     reciprocal_lattice = xstr.klattice;
     vector<vector<kEn_st> > allkE_points;
     // allkE_points.at(eigenvalue).at(kpoint).{kEn_st details}

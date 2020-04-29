@@ -552,7 +552,13 @@ namespace apl {
       addPoint(vlabels[i],3,coordinate[0],coordinate[1],coordinate[2]);
     }
 
-    if(!CARTESIAN_COORDS){transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) );} //must be reciprocal
+    if(!CARTESIAN_COORDS){
+      // ME20200203 - these are custom points, i.e. they are user generated based
+      // on a user-defined input structure. AFLOW should not switch the basis
+      // behind the scenes. Assume that the user knows what they are doing.
+      //transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) ); //must be reciprocal
+      transform( trasp(ReciprocalLattice(sc.getInputStructure().lattice)) );
+    }
 
     //set lattices
     cartesianLattice = sc.getSupercellStructure().lattice;
@@ -634,10 +640,15 @@ namespace apl {
       points = _points;
       labels = _labels;
     }
-    // Convert to reciprocal coordinates
+    // ME20200117 - Convert to reciprocal coordinates of the
+    // original structure or the distances will be wrong
     if (_store == CARTESIAN_LATTICE) {
-      xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(sc.getInputStructure().lattice)));
+      xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(sc.getOriginalStructure().lattice)));
       for (uint i = 0; i < points.size(); i++) points[i] = c2f * points[i];
+    } else {
+      xmatrix<double> f2c = trasp(ReciprocalLattice(sc.getInputStructure().lattice));
+      xmatrix<double> c2f_orig = inverse(trasp(ReciprocalLattice(sc.getOriginalStructure().lattice)));
+      for (uint i = 0; i < points.size(); i++) points[i] = c2f_orig * f2c * points[i];
     }
 
     xKPOINTS xkpts;

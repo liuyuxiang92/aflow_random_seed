@@ -63,14 +63,20 @@
 #define meV2K                   (11.604505)                     // 1meV=11.604505 K
 #define atom2mol                6.0221408E23                    //CO20180329
 #define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO20180329
+#define hartree2eV              27.2113862459                   //ME20200206
 
 //ME20200107 - (A)APL conversion factors
-#define THz2Hz                      1E12
-#define Hz2THz                      1/THz2Hz
-#define au2THz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
-#define PLANCKSCONSTANT_hbar_THz    PLANCKSCONSTANT_hbar*THz2Hz // J/THz
-#define PLANCKSCONSTANTAMU_hbar_THz PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2THz)  // amu A^2 THz
-#define BEfactor_hbar_THz           PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
+#define THz2Hz                        1E12
+#define Hz2THz                        1/THz2Hz
+#define au2Hz                         aurostd::sqrt(E_ELECTRON*1E20/AMU2KILOGRAM)  // eV/(A^2 amu) -> Hz
+#define au2rcm                        au2Hz/(100*C_VACUUM)                         // eV/(A^2 amu) -> cm^-1
+#define au2eV                         au2Hz*PLANCKSCONSTANTEV_h                    // eV/(A^2 amu) -> eV
+#define eV2Hz                         1/PLANCKSCONSTANTEV_h
+#define eV2rcm                        1/(PLANCKSCONSTANTEV_h*100*C_VACUUM)
+#define au2nmTHz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
+#define PLANCKSCONSTANT_hbar_THz      PLANCKSCONSTANT_hbar*THz2Hz // J/THz
+#define PLANCKSCONSTANTAMU_hbar_THz   PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2nmTHz)  // amu A^2 THz
+#define BEfactor_hbar_THz             PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
 
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
