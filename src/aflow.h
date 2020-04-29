@@ -1521,8 +1521,12 @@ class xstructure {
     void CalculateSymmetryFactorGroup(void);                      // Calculate the symmetry
     void CalculateSymmetryPointGroupCrystal(bool);                // Calculate the symmetry
     void CalculateSymmetryPointGroupCrystal(void);                // Calculate the symmetry
-    void CalculateSymmetryPointGroupKlattice(bool);               // Calculate the symmetry
-    void CalculateSymmetryPointGroupKlattice(void);               // Calculate the symmetry
+    void CalculateSymmetryPointGroupKLattice(bool);               // Calculate the symmetry
+    void CalculateSymmetryPointGroupKLattice(void);               // Calculate the symmetry
+    void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  // ME20200114
+    void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  // ME20200114
+    void CalculateSymmetryPointGroupKPatterson(bool);             // Calculate the symmetry  // ME20200129
+    void CalculateSymmetryPointGroupKPatterson(void);             // Calculate the symmetry  // ME20200129
     int  GenerateGridAtoms(int,int,int,int,int,int);              // generate grid of atoms
     int  GenerateGridAtoms(int,int,int);                          // generate grid of atoms
     int  GenerateGridAtoms(int);                                  // generate grid of atoms
@@ -2361,10 +2365,18 @@ void CalculateSymmetryFactorGroup(xstructure& str,bool ossverbose,ostream& oss,b
 void CalculateSymmetryFactorGroup(xstructure& str,bool ossverbose,ostream& oss);
 void CalculateSymmetryFactorGroup(xstructure& str,bool ossverbose);
 void CalculateSymmetryFactorGroup(xstructure& str);
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose,ostream& oss);
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose);
-void CalculateSymmetryPointGroupKlattice(xstructure& str);
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss);
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose);
+void CalculateSymmetryPointGroupKLattice(xstructure& str);
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  // ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  // ME20200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str);  // ME20200114
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose,ostream& oss);  // ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str,bool ossverbose);  // ME20200129
+void CalculateSymmetryPointGroupKPatterson(xstructure& str);  // ME20200129
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);
@@ -3810,7 +3822,7 @@ namespace SYM {
   bool CalculatePointGroup_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_); //DX
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); //DX
   //DX+CO END
-  bool CalculatePointGroupKlattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KLATTICE     _PGROUPK_
+  bool CalculatePointGroupKLattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KLATTICE     _PGROUPK_
   bool CalculatePointGroupKCrystal(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KCRYSTAL     _PGROUPK_XTAL_ //DX20171205 - New group: reciprocal space counterpart of pgroup_xtal
   bool TransformSymmetryFromRealToReciprocal(ofstream &FileMESSAGE, xstructure& real_space_crystal, xstructure& reciprocal_space,
       _aflags& aflags, const bool& osswrite, ostream& oss, string& pgroup_type); //DX20170808 - New klattice routine //DX20171205 - Added pgroup_type option to account for pgroupk_xtal
@@ -3923,6 +3935,7 @@ namespace SYM {
   //DX END
   bool CalculateSpaceGroup(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");      // SPACE GROUP      _SGROUP_
 
+  bool CalculateInequivalentAtoms(xstructure&);
   bool CalculateInequivalentAtoms(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt"); // EQUIVALENT ATOMS _IATOMS_
   //DX+CO START
   bool CalculateInequivalentAtoms(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); // EQUIVALENT ATOMS _IATOMS_ //DX
@@ -4232,7 +4245,7 @@ namespace KBIN {
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20181107
+  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME 20181107
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general
   void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general //CO20181216

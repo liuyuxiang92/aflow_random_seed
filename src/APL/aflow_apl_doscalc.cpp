@@ -120,14 +120,14 @@ namespace apl {
     }
 
     // OBSOLETE ME20180801
-    //for (int icpu = 0; icpu < ncpus; icpu++) {
-    //startIndex = icpu * qpointsPerCPU;
-    //endIndex = startIndex + qpointsPerCPU;
-    //if (((uint)endIndex > _qpoints.size()) ||
-    //((icpu == ncpus - 1) && ((uint)endIndex < _qpoints.size())))
-    //endIndex = _qpoints.size();
-    //threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
-    //}
+    //   for (int icpu = 0; icpu < ncpus; icpu++) {
+    //   startIndex = icpu * qpointsPerCPU;
+    //   endIndex = startIndex + qpointsPerCPU;
+    //   if (((uint)endIndex > _qpoints.size()) ||
+    //   ((icpu == ncpus - 1) && ((uint)endIndex < _qpoints.size())))
+    //   endIndex = _qpoints.size();
+    //   threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
+    //   }
 
     // Wait to finish all threads here!
     for (uint i = 0; i < threads.size(); i++) {
@@ -174,6 +174,7 @@ namespace apl {
     }
     _maxFreq += 1.0;
     if (_minFreq < MIN_FREQ_TRESHOLD) _minFreq -= 1.0;
+    else _minFreq = 0.0;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -229,17 +230,34 @@ namespace apl {
     gauss.clear();
   }
 
+  // ME20200203 - DOS can now be calculated within any frequency range
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calc(int USER_DOS_NPOINTS) {
-    calc(USER_DOS_NPOINTS, 0.0);
+    calc(USER_DOS_NPOINTS, 0.0, _minFreq, _maxFreq);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
+    calc(USER_DOS_NPOINTS, USER_DOS_SMEAR, _minFreq, _maxFreq);
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+  void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR,
+      double fmin, double fmax) {
+    // Check parameters
+    if (aurostd::isequal(fmax, fmin, _AFLOW_APL_EPS_)) {
+      string function = "apl::DOSCalculator::calc()";
+      string message = "Frequency range of phonon DOS is nearly zero.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    } else if (fmin > fmax) {
+      double tmp = fmax;
+      fmax = fmin;
+      fmin = tmp;
+    }
     // Calculate steps
-    _stepDOS = (_maxFreq - _minFreq) / (double)USER_DOS_NPOINTS;
+    _stepDOS = (fmax - fmin) / (double)USER_DOS_NPOINTS;
     _halfStepDOS = 0.5 * _stepDOS;
 
     // Clear old stuff
@@ -251,7 +269,7 @@ namespace apl {
     for (int k = 0; k < USER_DOS_NPOINTS; k++) {
       _dos.push_back(0);
       _idos.push_back(0);  //ME20190614
-      _bins.push_back(_minFreq + k * _stepDOS + _halfStepDOS);
+      _bins.push_back(fmin + k * _stepDOS + _halfStepDOS);
     }
     //ME20190624
     if (_projections.size() > 0)
@@ -304,10 +322,11 @@ namespace apl {
     }
   }
 
-  // ///////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////
 
   //ME20190614 - added integrated DOS
   //ME20190625 - rearranged and added projected DOS
+  //ME20200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
     _logger << "Calculating phonon DOS using the linear tetrahedron method." << apl::endl;
     // Procompute projections for each q-point and branch to save time
@@ -320,6 +339,7 @@ namespace apl {
     uint natoms = xstr.atoms.size();
     vector<vector<vector<vector<double> > > > parts;
     if (nproj > 0) {
+      // Precompute eigenvector projections
       xcomplex<double> eig;
       parts.assign(_rg.getnQPs(), vector<vector<vector<double> > >(_pc.getNumberOfBranches(), vector<vector<double> >(nproj, vector<double>(natoms, 0))));
       for (int q = 0; q < _rg.getnQPs(); q++) {
@@ -327,10 +347,16 @@ namespace apl {
           int ibranch = br + _freqs[0].lrows;
           for (uint p = 0; p < nproj; p++) {
             for (uint at = 0; at < natoms; at++) {
-              eig.re = 0.0;
-              eig.im = 0.0;
-              for (int i = 1; i < 4; i++) eig += proj_norm[p][i] * _eigen[q][3*at + i][ibranch];
-              parts[q][br][p][at] = aurostd::magsqr(eig);
+              if (aurostd::iszero(proj_norm[p])) {  // zero-vector = atom-projected DOS
+                for (int i = 1; i < 4; i++) {
+                  parts[q][br][p][at] += aurostd::magsqr(_eigen[q][3*at + i][ibranch]);
+                }
+              } else {
+                eig.re = 0.0;
+                eig.im = 0.0;
+                for (int i = 1; i < 4; i++) eig += proj_norm[p][i] * _eigen[q][3*at + i][ibranch];
+                parts[q][br][p][at] = aurostd::magsqr(eig);
+              }
             }
           }
         }
@@ -384,7 +410,8 @@ namespace apl {
         double fbin, dos, part;
         int br = ibranch - _freqs[0].lrows;
         for (int k = kstart; k <= kstop; k++) {
-          fbin = _minFreq + k * _stepDOS + _halfStepDOS;
+          // ME20200203 - Use bins to accommodate different frequency range
+          fbin = _bins[k]; // _minFreq + k * _stepDOS + _halfStepDOS;
           dos = 0.0;
           if ((f[0] <= fbin) && (fbin <= f[1])) {
             double df = fbin - f[0];
@@ -474,19 +501,20 @@ namespace apl {
       string message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
-    if (xdos.partial) {  // Write PHPOSCAR if there are projected DOS
-      filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
-      xstructure xstr = _pc.getInputCellStructure();
-      xstr.is_vasp5_poscar_format = true;
-      stringstream poscar;
-      poscar << xstr;
-      aurostd::stringstream2file(poscar, filename);
-      if (!aurostd::FileExist(filename)) {
-        string function = "PhononDispersionCalculator::writePHPOSCAR()";
-        string message = "Cannot open output file " + filename + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-      }
-    }
+    // OBSOLETE ME191219 - PHPOSCAR is already written in KBIN::RunPhonons_APL
+    // if (xdos.partial) {  // Write PHPOSCAR if there are projected DOS
+    //   filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
+    //   xstructure xstr = _pc.getInputCellStructure();
+    //   xstr.is_vasp5_poscar_format = true;
+    //   stringstream poscar;
+    //   poscar << xstr;
+    //   aurostd::stringstream2file(poscar, filename);
+    //   if (!aurostd::FileExist(filename)) {
+    //     string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    //     string message = "Cannot open output file " + filename + ".";
+    //     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    //   }
+    // }
   }
 
   xDOSCAR DOSCalculator::createDOSCAR() {
@@ -510,8 +538,10 @@ namespace apl {
     double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
     double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
     double conv = factorTHz2Raw * factorRaw2meV/1000;
-    xdos.energy_max = _maxFreq * conv;
-    xdos.energy_min = _minFreq * conv;
+    // ME20200203 - use _bins instead of _minFreq in case the DOS was calculated
+    // using different frequency ranges
+    xdos.energy_max = _bins.back() * conv;
+    xdos.energy_min = _bins[0] * conv;
     xdos.number_energies = _dos.size();
     xdos.Efermi = 0.0;  // phonon DOS have no Fermi energy
     xdos.venergy = aurostd::vector2deque(_bins);
@@ -543,15 +573,21 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  vector<double> DOSCalculator::getBins() {
+  // ME20200108 - added const
+  const vector<double>& DOSCalculator::getBins() const {
     return _bins;
   }
 
-  vector<double> DOSCalculator::getDOS() {
+  const vector<double>& DOSCalculator::getDOS() const {
     return _dos;
   }
 
-  bool DOSCalculator::hasNegativeFrequencies() {
+  // ME20200210
+  const vector<double>& DOSCalculator::getIDOS() const {
+    return _idos;
+  }
+
+  bool DOSCalculator::hasNegativeFrequencies() const {
     return (_minFreq < MIN_FREQ_TRESHOLD ? true : false);
   }
 

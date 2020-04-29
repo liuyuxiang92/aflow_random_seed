@@ -138,7 +138,16 @@ namespace apl {
     //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
     for (int iqp = startIndex; iqp < endIndex; iqp++) {
       _logger.updateProgressBar(iqp, _qpoints.size());
-      _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], _frequencyFormat);
+      // ME20200206 - get direction for q-points near Gamma for non-analytical correction
+      // or the discontinuity due to LO-TO splitting is not accurately captured.
+      if (_pc.isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
+        int npts = _pb.getDensity() + 1;
+        int i = iqp/npts;
+        xvector<double> qpoint_nac = _qpoints[i * npts] - _qpoints[(i + 1) * npts - 1];
+        _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], qpoint_nac, _frequencyFormat);
+      } else {
+        _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], _frequencyFormat);
+      }
       //std::this_thread::yield();
     }
   }
@@ -190,14 +199,14 @@ namespace apl {
     }
 
     // OBSOLETE ME20180801
-    //   for (int icpu = 0; icpu < ncpus; icpu++) {
-    //   startIndex = icpu * qpointsPerCPU;
-    //   endIndex = startIndex + qpointsPerCPU;
-    //   if (((uint)endIndex > _qpoints.size()) ||
-    //   ((icpu == ncpus - 1) && ((uint)endIndex < _qpoints.size())))
-    //   endIndex = _qpoints.size();
-    //   threads.push_back(new std::thread(&PhononDispersionCalculator::calculateInOneThread, this, startIndex, endIndex));
-    //   }
+    //  for (int icpu = 0; icpu < ncpus; icpu++) {
+    //    startIndex = icpu * qpointsPerCPU;
+    //    endIndex = startIndex + qpointsPerCPU;
+    //    if (((uint)endIndex > _qpoints.size()) ||
+    //        ((icpu == ncpus - 1) && ((uint)endIndex < _qpoints.size())))
+    //      endIndex = _qpoints.size();
+    //    threads.push_back(new std::thread(&PhononDispersionCalculator::calculateInOneThread, this, startIndex, endIndex));
+    //  }
 
     // Wait to finish all threads here!
     for (uint i = 0; i < threads.size(); i++) {
@@ -212,10 +221,12 @@ namespace apl {
 #else
 
     _logger.initProgressBar("Calculating frequencies for PDIS");
-    for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
-      _logger.updateProgressBar(iqp, _qpoints.size());
-      _freqs.push_back(_pc.getFrequency(_qpoints[iqp], _frequencyFormat));
-    }
+    // ME20200206 - use calculateInOneThread so changes only need to be made in one place
+    //[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
+    //[OBSOLETE]  _logger.updateProgressBar(iqp, _qpoints.size());
+    //[OBSOLETE]  _freqs.push_back(_pc.getFrequency(_qpoints[iqp], _frequencyFormat));
+    //[OBSOLETE]}
+    calculateInOneThread(0, (int) _qpoints.size());
     _logger.finishProgressBar();
 
 #endif
@@ -422,17 +433,18 @@ namespace apl {
 
     // Also write PHKPOINTS and PHPOSCAR file
     writePHKPOINTS(directory);
-    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
-    xstructure xstr = _pc.getInputCellStructure();
-    xstr.is_vasp5_poscar_format = true;
-    stringstream poscar;
-    poscar << xstr;
-    aurostd::stringstream2file(poscar, filename);
-    if (!aurostd::FileExist(filename)) {
-      string function = "PhononDispersionCalculator::writePHPOSCAR()";
-      string message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-    }
+    // OBSOLETE ME191219 - PHPOSCAR is already written in KBIN::RunPhonons_APL
+    // filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
+    // xstructure xstr = _pc.getInputCellStructure();
+    // xstr.is_vasp5_poscar_format = true;
+    // stringstream poscar;
+    // poscar << xstr;
+    // aurostd::stringstream2file(poscar, filename);
+    // if (!aurostd::FileExist(filename)) {
+    //   string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    //   string message = "Cannot open output file " + filename + ".";
+    //   throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    // }
   }
 
   xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
