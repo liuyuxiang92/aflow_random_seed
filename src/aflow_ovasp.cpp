@@ -5774,7 +5774,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   string soliloquy="PrintBandGap():";
   stringstream message;  //CO20200404
   stringstream ss_outcar_static(""),ss_outcar_bands("");
-  string path_outcar_static,path_outcar_bands, path_POSCAR;
+  string path_outcar_static="",path_outcar_bands="";
   xOUTCAR xoutcar_static,xoutcar_bands;
   char LastChar = *directory.rbegin();
   if(LastChar == '/') directory.erase(directory.size()-1);
@@ -5927,9 +5927,6 @@ bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="PrintBandGap_DOS():";
   stringstream message;  //CO20200404
-  stringstream ss_outcar_static(""),ss_outcar_bands("");
-  string path_outcar_static,path_outcar_bands, path_POSCAR;
-  xOUTCAR xoutcar_static,xoutcar_bands;
   char LastChar = *directory.rbegin();
   if(LastChar == '/') directory.erase(directory.size()-1);
 
@@ -5938,8 +5935,8 @@ bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
 
   string path_doscar_static="";
   stringstream ss_doscar_static;
-  if(!ss_outcar_bands.str().length() && aurostd::FileExist(directory+"/DOSCAR.static",path_doscar_static)) aurostd::file2stringstream(path_doscar_static, ss_doscar_static); //CO20200404
-  if(!ss_outcar_bands.str().length() && aurostd::EFileExist(directory+"/DOSCAR.static",path_doscar_static)) aurostd::efile2stringstream(path_doscar_static, ss_doscar_static); //CO20200404
+  if(!ss_doscar_static.str().length() && aurostd::FileExist(directory+"/DOSCAR.static",path_doscar_static)) aurostd::file2stringstream(path_doscar_static, ss_doscar_static); //CO20200404
+  if(!ss_doscar_static.str().length() && aurostd::EFileExist(directory+"/DOSCAR.static",path_doscar_static)) aurostd::efile2stringstream(path_doscar_static, ss_doscar_static); //CO20200404
   if(!ss_doscar_static.str().length()) {
     message << "DOSCAR.static not found";  //CO20200404
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_); //CO20200404
@@ -5947,8 +5944,8 @@ bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
     //[CO20200404 - OBSOLETE]oss << endl;
     //[CO20200404 - OBSOLETE]return FALSE;
   }  //CO20200404
-  if(!ss_outcar_bands.str().length() && aurostd::FileExist(directory+"/DOSCAR",path_doscar_static)) aurostd::file2stringstream(path_doscar_static, ss_doscar_static);  //CO20200404
-  if(!ss_outcar_bands.str().length() && aurostd::EFileExist(directory+"/DOSCAR",path_doscar_static)) aurostd::efile2stringstream(path_doscar_static, ss_doscar_static);  //CO20200404
+  if(!ss_doscar_static.str().length() && aurostd::FileExist(directory+"/DOSCAR",path_doscar_static)) aurostd::file2stringstream(path_doscar_static, ss_doscar_static);  //CO20200404
+  if(!ss_doscar_static.str().length() && aurostd::EFileExist(directory+"/DOSCAR",path_doscar_static)) aurostd::efile2stringstream(path_doscar_static, ss_doscar_static);  //CO20200404
   if(!ss_doscar_static.str().length()) { //CO20200404
     message << "DOSCAR not found"; //CO20200404
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_ERROR_); //CO20200404
