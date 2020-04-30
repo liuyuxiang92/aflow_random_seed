@@ -9,11 +9,15 @@
 // This file provides a framework to calculate thermo-mechanical properties for
 // disordered materials modeled using the POCC algorithm.
 
+#ifndef _AFLOW_POCC_AEL_AGL_CPP_ //CO20200404
+#define _AFLOW_POCC_AEL_AGL_CPP_ //CO20200404
+
 #include "aflow.h"
 #include "aflow_pocc.h"
 #include "aflow_ael_elasticity.h"
 #include "aflow_agl_debye.h"
 
+#define _DEBUG_POCC_AEL_AGL_ false  //CO20190116
 
 // CT20200319 - POCC+AEL functions
 // ***************************************************************************
@@ -46,7 +50,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::setAELOptions(bool& ael_run_postprocess, bool& ael_write_full_results) {
-    // bool LDEBUG=(FALSE || XHOST.DEBUG);
+    // bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
     ael_run_postprocess = false;
     ael_write_full_results = false;
 
@@ -66,14 +70,14 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::generateElasticProperties(vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="getElasticProperties():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
+    string soliloquy="POccCalculator::generateElasticProperties():";
     uint aelerror = 0;
     if(LDEBUG) {
-      cerr << soliloquy << "BEGIN" << endl;
+      cerr << soliloquy << " BEGIN" << endl;
     }
     if(LDEBUG) {
-      cerr << soliloquy << "directory=[" << m_aflags.Directory << "]" << endl;
+      cerr << soliloquy << " directory=[" << m_aflags.Directory << "]" << endl;
     }
     double ael_bulk_modulus_voigt, ael_bulk_modulus_reuss, ael_bulk_modulus_vrh;
     double ael_shear_modulus_voigt, ael_shear_modulus_reuss, ael_shear_modulus_vrh;
@@ -91,7 +95,7 @@ namespace pocc {
       pocc_directory_abs=m_aflags.Directory+"/"+m_ARUN_directories[isupercell];
       aelerror = AEL_functions::Get_ElasticProperties_AEL_postprocess(pocc_directory_abs, ael_bulk_modulus_voigt, ael_bulk_modulus_reuss, ael_bulk_modulus_vrh, ael_shear_modulus_voigt, ael_shear_modulus_reuss, ael_shear_modulus_vrh, ael_poisson_ratio, elastic_tensor, compliance_tensor);
       if (aelerror > 0) {
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AEL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AEL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
       Bvoigt.push_back(ael_bulk_modulus_voigt);
       Breuss.push_back(ael_bulk_modulus_reuss);
@@ -107,21 +111,22 @@ namespace pocc {
     }
   }
 } // namespace pocc
-    
+
 // ***************************************************************************
 //  void POccCalculator::getElasticProperties(vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list)
 //  Retrieves elastic properties from aflow.ael.out files 
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::getElasticProperties(vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="getElasticProperties():";
+    bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
+    string soliloquy="POccCalculator::getElasticProperties():";
+    stringstream message;
     //uint aelerror = 0;
     if(LDEBUG) {
-      cerr << soliloquy << "BEGIN" << endl;
+      cerr << soliloquy << " BEGIN" << endl;
     }
     if(LDEBUG) {
-      cerr << soliloquy << "directory=[" << m_aflags.Directory << "]" << endl;
+      cerr << soliloquy << " directory=[" << m_aflags.Directory << "]" << endl;
     }
     double ael_bulk_modulus_voigt, ael_bulk_modulus_reuss, ael_bulk_modulus_vrh;
     double ael_shear_modulus_voigt, ael_shear_modulus_reuss, ael_shear_modulus_vrh;
@@ -149,79 +154,80 @@ namespace pocc {
       if(LDEBUG){cerr << soliloquy << " look at pocc_directory_abs=" << pocc_directory_abs << endl;}
       //energy_dft
       ael_filename=pocc_directory_abs+"/aflow.ael.out";
-      if(LDEBUG) {cerr << soliloquy << ael_filename << endl;}
+      if(LDEBUG) {cerr << soliloquy << " ael_filename=[" << ael_filename << "]" << endl;}
       // if(!aurostd::EFileExist(ael_filename,ael_filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No aflow.ael.out file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);}
       if(aurostd::EFileExist(ael_filename,ael_filename)){
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");
-	aelfilezipped = true;
-      } else if (aurostd::FileExist(ael_filename)) {
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(ael_filename),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");
-	aelfilezipped = false;
+        message << "Reading " << m_ARUN_directories[isupercell]+"/aflow.ael.out";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
+        aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");
+        aelfilezipped = true;
+      //[CO20200404 - OBSOLETE]} else if (aurostd::FileExist(ael_filename)) {
+      //[CO20200404 - OBSOLETE]  aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(ael_filename),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");
+      //[CO20200404 - OBSOLETE]  aelfilezipped = false;
       } else {
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No aflow.ael.out file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No aflow.ael.out file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
       if(LDEBUG) {
-	//aurostd::StringstreamClean(aus);
-	cerr << soliloquy << aflow_ael_out.str() << endl;
-	//aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        //aurostd::StringstreamClean(aus);
+        cerr << soliloquy << " aflow_ael_out:" << endl << aflow_ael_out.str() << endl;
+        //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       aurostd::stream2vectorstring(aflow_ael_out,vline);
       for (uint i=0;i<vline.size();i++) {
-	aurostd::StringSubst(vline.at(i),"="," ");
-	aurostd::string2tokens(vline.at(i),tokens," ");
-	if(tokens.size()>=2) {
-	  if(tokens.at(0)=="ael_poisson_ratio") ael_poisson_ratio=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="ael_bulk_modulus_voigt") ael_bulk_modulus_voigt=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="ael_bulk_modulus_reuss") ael_bulk_modulus_reuss=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="ael_shear_modulus_voigt") ael_shear_modulus_voigt=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="ael_shear_modulus_reuss") ael_shear_modulus_reuss=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="ael_bulk_modulus_vrh") ael_bulk_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="ael_shear_modulus_vrh") ael_shear_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
-	}
+        aurostd::StringSubst(vline.at(i),"="," ");
+        aurostd::string2tokens(vline.at(i),tokens," ");
+        if(tokens.size()>=2) {
+          if(tokens.at(0)=="ael_poisson_ratio") ael_poisson_ratio=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="ael_bulk_modulus_voigt") ael_bulk_modulus_voigt=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="ael_bulk_modulus_reuss") ael_bulk_modulus_reuss=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="ael_shear_modulus_voigt") ael_shear_modulus_voigt=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="ael_shear_modulus_reuss") ael_shear_modulus_reuss=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="ael_bulk_modulus_vrh") ael_bulk_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="ael_shear_modulus_vrh") ael_shear_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
+        }
       }
       if (aelfilezipped) {
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_elastic_tensor,"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP");
+        aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_elastic_tensor,"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP");
       } else {
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(ael_filename),aflow_elastic_tensor,"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP");
+        aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(ael_filename),aflow_elastic_tensor,"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP");
       }
       if(LDEBUG) {
-	//aurostd::StringstreamClean(aus);
-	cerr << soliloquy << aflow_elastic_tensor.str() << endl;
-	//aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        //aurostd::StringstreamClean(aus);
+        cerr << soliloquy << " aflow_elastic_tensor = " << endl << aflow_elastic_tensor.str() << endl;
+        //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       aurostd::stream2vectorstring(aflow_elastic_tensor,vline);
       for (uint i=0;i<vline.size();i++) {
-	aurostd::string2tokens(vline.at(i),tokens," ");
-	if(tokens.size()>=6) {
-	  elastic_const_row.clear();
-	  for(uint j=0; j<tokens.size(); j++) {
-	    elastic_const=aurostd::string2utype<double>(tokens.at(j));
-	    elastic_const_row.push_back(elastic_const);
-	  }
-	  elastic_tensor.push_back(elastic_const_row);
-	}
+        aurostd::string2tokens(vline.at(i),tokens," ");
+        if(tokens.size()>=6) {
+          elastic_const_row.clear();
+          for(uint j=0; j<tokens.size(); j++) {
+            elastic_const=aurostd::string2utype<double>(tokens.at(j));
+            elastic_const_row.push_back(elastic_const);
+          }
+          elastic_tensor.push_back(elastic_const_row);
+        }
       }
       if (aelfilezipped) {
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_compliance_tensor,"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP");
+        aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_compliance_tensor,"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP");
       } else {
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(ael_filename),aflow_compliance_tensor,"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP");
+        aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(ael_filename),aflow_compliance_tensor,"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP");
       }
       if(LDEBUG) {
-	//aurostd::StringstreamClean(aus);
-	cerr << soliloquy << aflow_compliance_tensor.str() << endl;
-	//aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        //aurostd::StringstreamClean(aus);
+        cerr << soliloquy << " aflow_compliance_tensor = " << endl << aflow_compliance_tensor.str() << endl;
+        //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       aurostd::stream2vectorstring(aflow_compliance_tensor,vline);
       for (uint i=0;i<vline.size();i++) {
-	aurostd::string2tokens(vline.at(i),tokens," ");
-	if(tokens.size()>=6) {
-	  compliance_const_row.clear();
-	  for(uint j=0; j<tokens.size(); j++) {
-	    compliance_const=aurostd::string2utype<double>(tokens.at(j));
-	    compliance_const_row.push_back(compliance_const);
-	  }
-	  compliance_tensor.push_back(compliance_const_row);
-	}
+        aurostd::string2tokens(vline.at(i),tokens," ");
+        if(tokens.size()>=6) {
+          compliance_const_row.clear();
+          for(uint j=0; j<tokens.size(); j++) {
+            compliance_const=aurostd::string2utype<double>(tokens.at(j));
+            compliance_const_row.push_back(compliance_const);
+          }
+          compliance_tensor.push_back(compliance_const_row);
+        }
       }
       Bvoigt.push_back(ael_bulk_modulus_voigt);
       Breuss.push_back(ael_bulk_modulus_reuss);
@@ -248,6 +254,9 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::getAverageElasticProperties(const vector<double>& v_temperatures, bool& ael_write_full_results, vector<double>& Bvoigt, vector<double>& Breuss, vector<double>& Bvrh, vector<double>& Gvoigt, vector<double>& Greuss, vector<double>& Gvrh,vector<double>& Poisson_ratio, vector<vector<vector<double> > >& elastic_tensor_list,  vector<vector<vector<double> > >& compliance_tensor_list) {
+    bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
+    string soliloquy="POccCalculator::getAverageElasticProperties():";
+    stringstream message;
     ostringstream aus;
     ofstream FileMESSAGE;
     double T;
@@ -277,6 +286,8 @@ namespace pocc {
 
     double kval, kvalsq;
     stringstream ossmain, ossfull;
+
+    if(LDEBUG){cerr << soliloquy << " v_temperatures=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",") << endl;}  //CO20200404
 
     // Calculate elastic modulus, hardness and ductility 
     unsigned long long int isupercell = 0;
@@ -367,7 +378,7 @@ namespace pocc {
     Cauchy_max = aurostd::max(Cauchy_pressure);
     Pugh_ratio_min = aurostd::min(Pugh_ratio);
     Pugh_ratio_max = aurostd::max(Pugh_ratio);    
-          
+
     // Boltzmann average properties
     ossmain.clear();
     ossmain.str(std::string());
@@ -376,21 +387,22 @@ namespace pocc {
     for (uint j=0; j<elastic_tensor_list.at(0).size(); j++) {
       elastic_tensor_row.clear();
       for (uint k=0; k<elastic_tensor_list.at(0).at(j).size(); k++) {
-	elastic_tensor_row.push_back(0.0);
+        elastic_tensor_row.push_back(0.0);
       }
       elastic_tensor_ave.push_back(elastic_tensor_row);
     }
-    
+
     for (uint j=0; j<compliance_tensor_list.at(0).size(); j++) {
       compliance_tensor_row.clear();
       for (uint k=0; k<compliance_tensor_list.at(0).at(j).size(); k++) {
-	compliance_tensor_row.push_back(0.0);
+        compliance_tensor_row.push_back(0.0);
       }
       compliance_tensor_ave.push_back(compliance_tensor_row);
     }
 
     for (uint jt = 0; jt < v_temperatures.size(); jt++) {
       T = v_temperatures.at(jt);
+      message << "Averaging Elastic Properties at T=" << T;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
       setPOccStructureProbabilities(T);
       Bvoigt_ave = 0.0;
       Breuss_ave = 0.0;
@@ -414,58 +426,58 @@ namespace pocc {
       Hv_Tian_reuss_ave = 0.0;
       Hv_Tian_vrh_ave = 0.0;
       for (uint j=0; j<elastic_tensor_ave.size(); j++) {
-	for (uint k=0; k<elastic_tensor_ave.at(j).size(); k++) {
-	  elastic_tensor_ave.at(j).at(k) = 0.0;
-	}
+        for (uint k=0; k<elastic_tensor_ave.at(j).size(); k++) {
+          elastic_tensor_ave.at(j).at(k) = 0.0;
+        }
       }
-    
+
       for (uint j=0; j<compliance_tensor_ave.size(); j++) {
-	for (uint k=0; k<compliance_tensor_ave.at(j).size(); k++) {
-	  compliance_tensor_ave.at(j).at(k) = 0.0;
-	}
+        for (uint k=0; k<compliance_tensor_ave.at(j).size(); k++) {
+          compliance_tensor_ave.at(j).at(k) = 0.0;
+        }
       }
-    
+
       isupercell = 0;
       for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); it != l_supercell_sets.end(); ++it) {
-	isupercell = std::distance(l_supercell_sets.begin(), it);
-	// Boltzmann weighted average for bulk modulus
-	Bvoigt_ave = Bvoigt_ave + (*it).m_probability * Bvoigt.at(isupercell);
-	Breuss_ave = Breuss_ave + (*it).m_probability * Breuss.at(isupercell);
-	Bvrh_ave = Bvrh_ave + (*it).m_probability * Bvrh.at(isupercell);
-	// Boltzmann weighted average for shear modulus      
-	Gvoigt_ave = Gvoigt_ave + (*it).m_probability * Gvoigt.at(isupercell);
-	Greuss_ave = Greuss_ave + (*it).m_probability * Greuss.at(isupercell);
-	Gvrh_ave = Gvrh_ave + (*it).m_probability * Gvrh.at(isupercell);
-	// Boltzmann weighted average for Young's modulus      
-	Yvoigt_ave = Yvoigt_ave + (*it).m_probability * Yvoigt.at(isupercell);
-	Yreuss_ave = Yreuss_ave + (*it).m_probability * Yreuss.at(isupercell);
-	Yvrh_ave = Yvrh_ave + (*it).m_probability * Yvrh.at(isupercell);
-	// Boltzmann weighted average for Poisson ratio
-	Poisson_ratio_ave = Poisson_ratio_ave + (*it).m_probability * Poisson_ratio.at(isupercell);
-	// Boltzmann weighted average for Pugh's modulus ratio
-	Pugh_ratio_ave = Pugh_ratio_ave + (*it).m_probability * Pugh_ratio.at(isupercell);
-	// Boltzmann weighted average for Cauchy pressure
-	Cauchy_ave = Cauchy_ave + (*it).m_probability * Cauchy_pressure.at(isupercell);
-	// Boltzmann weighted average for hardness    
-	Hv_Teter_voigt_ave = Hv_Teter_voigt_ave + (*it).m_probability * Hv_Teter_voigt_val;
-	Hv_Teter_reuss_ave = Hv_Teter_reuss_ave + (*it).m_probability * Hv_Teter_reuss_val;
-	Hv_Teter_vrh_ave = Hv_Teter_vrh_ave + (*it).m_probability * Hv_Teter_vrh_val;
-	Hv_Chen_voigt_ave = Hv_Chen_voigt_ave + (*it).m_probability * Hv_Chen_voigt_val;
-	Hv_Chen_reuss_ave = Hv_Chen_reuss_ave + (*it).m_probability * Hv_Chen_reuss_val;
-	Hv_Chen_vrh_ave = Hv_Chen_vrh_ave + (*it).m_probability * Hv_Chen_vrh_val;
-	Hv_Tian_voigt_ave = Hv_Tian_voigt_ave + (*it).m_probability * Hv_Tian_voigt_val;
-	Hv_Tian_reuss_ave = Hv_Tian_reuss_ave + (*it).m_probability * Hv_Tian_reuss_val;
-	Hv_Tian_vrh_ave = Hv_Tian_vrh_ave + (*it).m_probability * Hv_Tian_vrh_val;
-	for (uint j=0; j<elastic_tensor_list.at(0).size(); j++) {
-	  for (uint k=0; k<elastic_tensor_list.at(0).at(j).size(); k++) {
-	    elastic_tensor_ave.at(j).at(k) = elastic_tensor_ave.at(j).at(k) + ((*it).m_probability * elastic_tensor_list.at(isupercell).at(j).at(k));
-	  }
-	}
-	for (uint j=0; j<compliance_tensor_list.at(0).size(); j++) {
-	  for (uint k=0; k<compliance_tensor_list.at(0).at(j).size(); k++) {
-	    compliance_tensor_ave.at(j).at(k) = compliance_tensor_ave.at(j).at(k) + ((*it).m_probability * compliance_tensor_list.at(isupercell).at(j).at(k));
-	  }
-	}
+        isupercell = std::distance(l_supercell_sets.begin(), it);
+        // Boltzmann weighted average for bulk modulus
+        Bvoigt_ave = Bvoigt_ave + (*it).m_probability * Bvoigt.at(isupercell);
+        Breuss_ave = Breuss_ave + (*it).m_probability * Breuss.at(isupercell);
+        Bvrh_ave = Bvrh_ave + (*it).m_probability * Bvrh.at(isupercell);
+        // Boltzmann weighted average for shear modulus      
+        Gvoigt_ave = Gvoigt_ave + (*it).m_probability * Gvoigt.at(isupercell);
+        Greuss_ave = Greuss_ave + (*it).m_probability * Greuss.at(isupercell);
+        Gvrh_ave = Gvrh_ave + (*it).m_probability * Gvrh.at(isupercell);
+        // Boltzmann weighted average for Young's modulus      
+        Yvoigt_ave = Yvoigt_ave + (*it).m_probability * Yvoigt.at(isupercell);
+        Yreuss_ave = Yreuss_ave + (*it).m_probability * Yreuss.at(isupercell);
+        Yvrh_ave = Yvrh_ave + (*it).m_probability * Yvrh.at(isupercell);
+        // Boltzmann weighted average for Poisson ratio
+        Poisson_ratio_ave = Poisson_ratio_ave + (*it).m_probability * Poisson_ratio.at(isupercell);
+        // Boltzmann weighted average for Pugh's modulus ratio
+        Pugh_ratio_ave = Pugh_ratio_ave + (*it).m_probability * Pugh_ratio.at(isupercell);
+        // Boltzmann weighted average for Cauchy pressure
+        Cauchy_ave = Cauchy_ave + (*it).m_probability * Cauchy_pressure.at(isupercell);
+        // Boltzmann weighted average for hardness    
+        Hv_Teter_voigt_ave = Hv_Teter_voigt_ave + (*it).m_probability * Hv_Teter_voigt_val;
+        Hv_Teter_reuss_ave = Hv_Teter_reuss_ave + (*it).m_probability * Hv_Teter_reuss_val;
+        Hv_Teter_vrh_ave = Hv_Teter_vrh_ave + (*it).m_probability * Hv_Teter_vrh_val;
+        Hv_Chen_voigt_ave = Hv_Chen_voigt_ave + (*it).m_probability * Hv_Chen_voigt_val;
+        Hv_Chen_reuss_ave = Hv_Chen_reuss_ave + (*it).m_probability * Hv_Chen_reuss_val;
+        Hv_Chen_vrh_ave = Hv_Chen_vrh_ave + (*it).m_probability * Hv_Chen_vrh_val;
+        Hv_Tian_voigt_ave = Hv_Tian_voigt_ave + (*it).m_probability * Hv_Tian_voigt_val;
+        Hv_Tian_reuss_ave = Hv_Tian_reuss_ave + (*it).m_probability * Hv_Tian_reuss_val;
+        Hv_Tian_vrh_ave = Hv_Tian_vrh_ave + (*it).m_probability * Hv_Tian_vrh_val;
+        for (uint j=0; j<elastic_tensor_list.at(0).size(); j++) {
+          for (uint k=0; k<elastic_tensor_list.at(0).at(j).size(); k++) {
+            elastic_tensor_ave.at(j).at(k) = elastic_tensor_ave.at(j).at(k) + ((*it).m_probability * elastic_tensor_list.at(isupercell).at(j).at(k));
+          }
+        }
+        for (uint j=0; j<compliance_tensor_list.at(0).size(); j++) {
+          for (uint k=0; k<compliance_tensor_list.at(0).at(j).size(); k++) {
+            compliance_tensor_ave.at(j).at(k) = compliance_tensor_ave.at(j).at(k) + ((*it).m_probability * compliance_tensor_list.at(isupercell).at(j).at(k));
+          }
+        }
       }
       // Write main results to a file
       ossmain << "[AFLOW] **************************************************************************************************************************" << endl;
@@ -483,66 +495,66 @@ namespace pocc {
       ossmain << "[AFLOW] **************************************************************************************************************************" << endl;
       ossmain << "[POCC_AEL_STIFFNESS_TENSOR]START" << endl;
       for (uint j = 0; j < elastic_tensor_ave.size(); j++) {
-	for (uint k = 0; k < elastic_tensor_ave.at(j).size(); k++) {
-	  ossmain << setw(15) << setprecision(6) << (elastic_tensor_ave.at(j).at(k));
-	}
-	ossmain << endl;
+        for (uint k = 0; k < elastic_tensor_ave.at(j).size(); k++) {
+          ossmain << setw(15) << setprecision(6) << (elastic_tensor_ave.at(j).at(k));
+        }
+        ossmain << endl;
       }
       ossmain << "[POCC_AEL_STIFFNESS_TENSOR]STOP" << endl;
       ossmain << "[AFLOW] **************************************************************************************************************************" << endl;
       ossmain << "[POCC_AEL_COMPLIANCE_TENSOR]START" << endl;
       for (uint j = 0; j < compliance_tensor_ave.size(); j++) {
-	for (uint k = 0; k < compliance_tensor_ave.at(j).size(); k++) {
-	  ossmain << setw(15) << setprecision(6) << (compliance_tensor_ave.at(j).at(k));
-	}
-	ossmain << endl;
+        for (uint k = 0; k < compliance_tensor_ave.at(j).size(); k++) {
+          ossmain << setw(15) << setprecision(6) << (compliance_tensor_ave.at(j).at(k));
+        }
+        ossmain << endl;
       }
       ossmain << "[POCC_AEL_COMPLIANCE_TENSOR]STOP" << endl;
       ossmain << "[AFLOW] **************************************************************************************************************************" << endl;
       // Writes all results to a file
       if (ael_write_full_results) {
-	ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
-	ossfull << "[POCC_AEL_RESULTS]START" << endl;
-	ossfull << "pocc_ael_temperature=" << T << "  (K)" << endl;
-	ossfull << "pocc_ael_bulk_modulus_voigt=" << Bvoigt_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_bulk_modulus_reuss=" << Breuss_ave  << "  (GPa)" << endl;
-	ossfull << "pocc_ael_bulk_modulus_vrh=" << Bvrh_ave << "  (GPa)" << endl;    
-	ossfull << "pocc_ael_shear_modulus_voigt=" << Gvoigt_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_shear_modulus_reuss=" << Greuss_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_shear_modulus_vrh=" << Gvrh_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_youngs_modulus_voigt=" << Yvoigt_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_youngs_modulus_reuss=" << Yreuss_ave  << "  (GPa)" << endl;
-	ossfull << "pocc_ael_youngs_modulus_vrh=" << Yvrh_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_poisson_ratio=" << Poisson_ratio_ave << endl;    
-	ossfull << "pocc_ael_hardness_teter_voigt=" << Hv_Teter_voigt_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_hardness_teter_reuss=" << Hv_Teter_reuss_ave  << "  (GPa)" << endl;
-	ossfull << "pocc_ael_hardness_teter_vrh=" << Hv_Teter_vrh_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_hardness_chen_voigt=" << Hv_Chen_voigt_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_hardness_chen_reuss=" << Hv_Chen_reuss_ave  << "  (GPa)" << endl;
-	ossfull << "pocc_ael_hardness_chen_vrh=" << Hv_Chen_vrh_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_hardness_tian_voigt=" << Hv_Tian_voigt_ave << "  (GPa)" << endl;
-	ossfull << "pocc_ael_hardness_tian_reuss=" << Hv_Tian_reuss_ave  << "  (GPa)" << endl;
-	ossfull << "pocc_ael_hardness_tian_vrh=" << Hv_Tian_vrh_ave << "  (GPa)" << endl;
-	ossfull << "[POCC_AEL_RESULTS]STOP" << endl;
-	ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
-	ossfull << "[POCC_AEL_STIFFNESS_TENSOR]START" << endl;
-	for (uint j = 0; j < elastic_tensor_ave.size(); j++) {
-	  for (uint k = 0; k < elastic_tensor_ave.at(j).size(); k++) {
-	    ossfull << setw(15) << setprecision(6) << (elastic_tensor_ave.at(j).at(k));
-	  }
-	  ossfull << endl;
-	}
-	ossfull << "[POCC_AEL_STIFFNESS_TENSOR]STOP" << endl;
-	ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
-	ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]START" << endl;
-	for (uint j = 0; j < compliance_tensor_ave.size(); j++) {
-	for (uint k = 0; k < compliance_tensor_ave.at(j).size(); k++) {
-	  ossfull << setw(15) << setprecision(6) << (compliance_tensor_ave.at(j).at(k));
-	}
-	ossfull << endl;
-	}
-	ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]STOP" << endl;
-	ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
+        ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
+        ossfull << "[POCC_AEL_RESULTS]START" << endl;
+        ossfull << "pocc_ael_temperature=" << T << "  (K)" << endl;
+        ossfull << "pocc_ael_bulk_modulus_voigt=" << Bvoigt_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_bulk_modulus_reuss=" << Breuss_ave  << "  (GPa)" << endl;
+        ossfull << "pocc_ael_bulk_modulus_vrh=" << Bvrh_ave << "  (GPa)" << endl;    
+        ossfull << "pocc_ael_shear_modulus_voigt=" << Gvoigt_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_shear_modulus_reuss=" << Greuss_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_shear_modulus_vrh=" << Gvrh_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_youngs_modulus_voigt=" << Yvoigt_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_youngs_modulus_reuss=" << Yreuss_ave  << "  (GPa)" << endl;
+        ossfull << "pocc_ael_youngs_modulus_vrh=" << Yvrh_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_poisson_ratio=" << Poisson_ratio_ave << endl;    
+        ossfull << "pocc_ael_hardness_teter_voigt=" << Hv_Teter_voigt_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_hardness_teter_reuss=" << Hv_Teter_reuss_ave  << "  (GPa)" << endl;
+        ossfull << "pocc_ael_hardness_teter_vrh=" << Hv_Teter_vrh_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_hardness_chen_voigt=" << Hv_Chen_voigt_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_hardness_chen_reuss=" << Hv_Chen_reuss_ave  << "  (GPa)" << endl;
+        ossfull << "pocc_ael_hardness_chen_vrh=" << Hv_Chen_vrh_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_hardness_tian_voigt=" << Hv_Tian_voigt_ave << "  (GPa)" << endl;
+        ossfull << "pocc_ael_hardness_tian_reuss=" << Hv_Tian_reuss_ave  << "  (GPa)" << endl;
+        ossfull << "pocc_ael_hardness_tian_vrh=" << Hv_Tian_vrh_ave << "  (GPa)" << endl;
+        ossfull << "[POCC_AEL_RESULTS]STOP" << endl;
+        ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
+        ossfull << "[POCC_AEL_STIFFNESS_TENSOR]START" << endl;
+        for (uint j = 0; j < elastic_tensor_ave.size(); j++) {
+          for (uint k = 0; k < elastic_tensor_ave.at(j).size(); k++) {
+            ossfull << setw(15) << setprecision(6) << (elastic_tensor_ave.at(j).at(k));
+          }
+          ossfull << endl;
+        }
+        ossfull << "[POCC_AEL_STIFFNESS_TENSOR]STOP" << endl;
+        ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
+        ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]START" << endl;
+        for (uint j = 0; j < compliance_tensor_ave.size(); j++) {
+          for (uint k = 0; k < compliance_tensor_ave.at(j).size(); k++) {
+            ossfull << setw(15) << setprecision(6) << (compliance_tensor_ave.at(j).at(k));
+          }
+          ossfull << endl;
+        }
+        ossfull << "[POCC_AEL_COMPLIANCE_TENSOR]STOP" << endl;
+        ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
       }
     }
     string ofileafpoccaelname = m_aflags.Directory + "/aflow.pocc_ael.out";
@@ -599,7 +611,7 @@ namespace pocc {
       ossfull << "[POCC_AEL_CONFIG_RESULTS]START" << endl;
       ossfull << "# Config" << "  " << aurostd::PaddedPRE("Bvoigt(GPa)",2," ") << "  " << aurostd::PaddedPRE("Breuss(GPa)",2," ") << "  " << aurostd::PaddedPRE("Bvrh(GPa)",2," ") << "  " << aurostd::PaddedPRE("Gvoigt(GPa)",2," ") << "  " << aurostd::PaddedPRE("Greuss(GPa)",2," ") << "  " << aurostd::PaddedPRE("Gvrh(GPa)",2," ") << "  " << aurostd::PaddedPRE("Evoigt(GPa)",2," ") << "  " << aurostd::PaddedPRE("Ereuss(GPa)",2," ") << "  " << aurostd::PaddedPRE("Evrh(GPa)",2," ") << "  " << aurostd::PaddedPRE("Poisson_ratio",2," ") << "  " << aurostd::PaddedPRE("Hv_Teter(GPa)",2," ") << "  " << aurostd::PaddedPRE("Hv_Chen(GPa)",2," ") << "  " << aurostd::PaddedPRE("Hv_Tian(GPa)",2," ")  << "  " << aurostd::PaddedPRE("Pugh_modulus_ratio",2," ")  << "  " << aurostd::PaddedPRE("Cauchy_pressure(GPa)",2," ")<< endl;
       for (uint i = 0; i < Bvoigt.size(); i++) {
-	ossfull << setw(8) << fixed << i << "  " << setw(11) << setprecision(3) << Bvoigt.at(i) << "  " << setw(11) << setprecision(3) << Breuss.at(i) << "  " << setw(9) << setprecision(3) << Bvrh.at(i)  << "  " << setw(11) << setprecision(3) << Gvoigt.at(i) << "  " << setw(11) << setprecision(3) << Greuss.at(i) << "  " << setw(9) << setprecision(3) << Gvrh.at(i) << "  " << setw(11) << setprecision(3) << Yvoigt.at(i) << "  " << setw(11) << setprecision(3) << Yreuss.at(i) << "  " << setw(9) << setprecision(3) << Yvrh.at(i)  << "  " << setw(13) << setprecision(6) << Poisson_ratio.at(i) << "  " << setw(13) << setprecision(3) << Hv_Teter_vrh.at(i) << "  " << setw(12) << setprecision(3) << Hv_Chen_vrh.at(i) << "  " << setw(12) << setprecision(3) << Hv_Tian_vrh.at(i) << "  " << setw(18) << setprecision(6) << Pugh_ratio.at(i)  << "  " << setw(20) << setprecision(3) << Cauchy_pressure.at(i) << endl;
+        ossfull << setw(8) << fixed << i << "  " << setw(11) << setprecision(3) << Bvoigt.at(i) << "  " << setw(11) << setprecision(3) << Breuss.at(i) << "  " << setw(9) << setprecision(3) << Bvrh.at(i)  << "  " << setw(11) << setprecision(3) << Gvoigt.at(i) << "  " << setw(11) << setprecision(3) << Greuss.at(i) << "  " << setw(9) << setprecision(3) << Gvrh.at(i) << "  " << setw(11) << setprecision(3) << Yvoigt.at(i) << "  " << setw(11) << setprecision(3) << Yreuss.at(i) << "  " << setw(9) << setprecision(3) << Yvrh.at(i)  << "  " << setw(13) << setprecision(6) << Poisson_ratio.at(i) << "  " << setw(13) << setprecision(3) << Hv_Teter_vrh.at(i) << "  " << setw(12) << setprecision(3) << Hv_Chen_vrh.at(i) << "  " << setw(12) << setprecision(3) << Hv_Tian_vrh.at(i) << "  " << setw(18) << setprecision(6) << Pugh_ratio.at(i)  << "  " << setw(20) << setprecision(3) << Cauchy_pressure.at(i) << endl;
       }
       ossfull << "[POCC_AEL_CONFIG_RESULTS]STOP" << endl;
       ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
@@ -646,7 +658,7 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::setAGLOptions(bool& agl_run_postprocess, bool& agl_write_full_results, uint& ntemperature, double& stemperature, uint& npressure, double& spressure) {
-    // bool LDEBUG=(FALSE || XHOST.DEBUG);
+    // bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
     agl_run_postprocess = false;
     agl_write_full_results = false;
     ntemperature = 0;
@@ -661,7 +673,7 @@ namespace pocc {
     if(XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS")){
       agl_write_full_results=XHOST.vflag_control.flag("AGL_WRITE_FULL_RESULTS");
     }  //command line input
-    
+
     if(XHOST.vflag_control.flag("AGL_NTEMPERATURE")){
       ntemperature=aurostd::string2utype<uint>(XHOST.vflag_control.getattachedscheme("AGL_NTEMPERATURE"));
     }  //command line input
@@ -686,18 +698,18 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::generateDebyeThermalProperties(const uint& ntemperature, const uint& stemperature, const uint& npressure, const double& spressure, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
     uint aglerror = 0;
-    string soliloquy="generateDebyeThermalProperties():";
+    string soliloquy="POccCalculator::generateDebyeThermalProperties():";
     if(LDEBUG) {
-      cerr << soliloquy << "BEGIN" << endl;
+      cerr << soliloquy << " BEGIN" << endl;
     }
     if(LDEBUG) {
-      cerr << soliloquy << "directory=[" << m_aflags.Directory << "]" << endl;
+      cerr << soliloquy << " directory=[" << m_aflags.Directory << "]" << endl;
     }
     // string aflowin;
     // aflowin=string(directory +"/"+_AFLOWIN_);
-    // if(!aurostd::FileExist(aflowin)) {cerr << soliloquy << ": file not found " << aflowin << endl; exit(1);}
+    // if(!aurostd::FileExist(aflowin)) {cerr << soliloquy << " file not found " << aflowin << endl; exit(1);}
     // string str_AflowIn; aurostd::file2string(aflowin, str_AflowIn);
     double agl_debye_temperature, agl_debye_acoustic, agl_gruneisen;
     double agl_heat_capacity_Cv_300K, agl_heat_capacity_Cp_300K;
@@ -717,30 +729,30 @@ namespace pocc {
       pocc_directory_abs=m_aflags.Directory+"/"+m_ARUN_directories[isupercell];
       aglerror = AGL_functions::Get_ThermalProperties_AGL_postprocess(pocc_directory_abs, ntemperature, stemperature, npressure, spressure, agl_temperature, agl_gibbs_energy_atom, agl_vibrational_energy_atom);
       if (aglerror > 0) {
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Problem with AGL calculation: [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
       aurostd::StringstreamClean(aflow_agl_out);
       aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.agl.out"),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
       if(LDEBUG) {
-	cerr << soliloquy << "aflow.agl.out = " << aflow_agl_out.str() << endl;
+        cerr << soliloquy << " aflow.agl.out:" << endl << aflow_agl_out.str() << endl;
       }
       aurostd::stream2vectorstring(aflow_agl_out,vline);
       for (uint i=0;i<vline.size();i++) {
-	aurostd::StringSubst(vline.at(i),"="," ");
-	aurostd::string2tokens(vline.at(i),tokens," ");
-	// cout << "Tokens = " << tokens << endl;
-	if(tokens.size()>=2) {
-	  if(tokens.at(0)=="agl_debye") agl_debye_temperature=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_acoustic_debye") agl_debye_acoustic=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_gruneisen") agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_heat_capacity_Cv_300K") agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_heat_capacity_Cp_300K") agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));	      
-	  if(tokens.at(0)=="agl_vibrational_free_energy_300K_cell") agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_vibrational_free_energy_300K_atom") agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_vibrational_entropy_300K_cell") agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_vibrational_entropy_300K_atom") agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_thermal_conductivity_300K") agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
-	}
+        aurostd::StringSubst(vline.at(i),"="," ");
+        aurostd::string2tokens(vline.at(i),tokens," ");
+        // cout << "Tokens = " << tokens << endl;
+        if(tokens.size()>=2) {
+          if(tokens.at(0)=="agl_debye") agl_debye_temperature=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_acoustic_debye") agl_debye_acoustic=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_gruneisen") agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_heat_capacity_Cv_300K") agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_heat_capacity_Cp_300K") agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));	      
+          if(tokens.at(0)=="agl_vibrational_free_energy_300K_cell") agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_vibrational_free_energy_300K_atom") agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_vibrational_entropy_300K_cell") agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_vibrational_entropy_300K_atom") agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_thermal_conductivity_300K") agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
+        }
       }
       Debye_temperature.push_back(agl_debye_temperature);
       Debye_acoustic.push_back(agl_debye_acoustic);
@@ -765,14 +777,15 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::getDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_AEL_AGL_ || XHOST.DEBUG);
+    stringstream message;
     // [OBSOLETE] uint aglerror = 0;
-    string soliloquy="generateDebyeThermalProperties():";
+    string soliloquy="POccCalculator::generateDebyeThermalProperties():";
     if(LDEBUG) {
-      cerr << soliloquy << "BEGIN" << endl;
+      cerr << soliloquy << " BEGIN" << endl;
     }
     if(LDEBUG) {
-      cerr << soliloquy << "directory=[" << m_aflags.Directory << "]" << endl;
+      cerr << soliloquy << " directory=[" << m_aflags.Directory << "]" << endl;
     }
     double agl_debye_temperature, agl_debye_acoustic, agl_gruneisen;
     double agl_heat_capacity_Cv_300K, agl_heat_capacity_Cp_300K;
@@ -795,57 +808,58 @@ namespace pocc {
       aurostd::StringstreamClean(aflow_agl_out);
       agl_filename=pocc_directory_abs+"/aflow.agl.out";
       if(aurostd::EFileExist(agl_filename,agl_filename)){
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(agl_filename),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
-	aglfilezipped = true;
-      } else if (aurostd::FileExist(agl_filename)) {
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(agl_filename),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
-	aglfilezipped = false;
+        message << "Reading " << m_ARUN_directories[isupercell]+"/aflow.agl.out";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
+        aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(agl_filename),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
+        aglfilezipped = true;
+      //[CO20200404 - OBSOLETE]} else if (aurostd::FileExist(agl_filename)) {
+      //[CO20200404 - OBSOLETE]  aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(agl_filename),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
+      //[CO20200404 - OBSOLETE]  aglfilezipped = false;
       } else {
-	throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No aflow.agl.out file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No aflow.agl.out file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);
       }
       if(LDEBUG) {
-	cerr << soliloquy << "aflow.agl.out = " << aflow_agl_out.str() << endl;
+        cerr << soliloquy << " aflow.agl.out:" << endl << aflow_agl_out.str() << endl;
       }
       aurostd::stream2vectorstring(aflow_agl_out,vline);
       for (uint i=0;i<vline.size();i++) {
-	aurostd::StringSubst(vline.at(i),"="," ");
-	aurostd::string2tokens(vline.at(i),tokens," ");
-	// cout << "Tokens = " << tokens << endl;
-	if(tokens.size()>=2) {
-	  if(tokens.at(0)=="agl_debye") agl_debye_temperature=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_acoustic_debye") agl_debye_acoustic=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_gruneisen") agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_heat_capacity_Cv_300K") agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_heat_capacity_Cp_300K") agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));	      
-	  if(tokens.at(0)=="agl_vibrational_free_energy_300K_cell") agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_vibrational_free_energy_300K_atom") agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_vibrational_entropy_300K_cell") agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_vibrational_entropy_300K_atom") agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
-	  if(tokens.at(0)=="agl_thermal_conductivity_300K") agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
-	}
+        aurostd::StringSubst(vline.at(i),"="," ");
+        aurostd::string2tokens(vline.at(i),tokens," ");
+        // cout << "Tokens = " << tokens << endl;
+        if(tokens.size()>=2) {
+          if(tokens.at(0)=="agl_debye") agl_debye_temperature=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_acoustic_debye") agl_debye_acoustic=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_gruneisen") agl_gruneisen=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_heat_capacity_Cv_300K") agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_heat_capacity_Cp_300K") agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(tokens.at(1));	      
+          if(tokens.at(0)=="agl_vibrational_free_energy_300K_cell") agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_vibrational_free_energy_300K_atom") agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_vibrational_entropy_300K_cell") agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_vibrational_entropy_300K_atom") agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(tokens.at(1));
+          if(tokens.at(0)=="agl_thermal_conductivity_300K") agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
+        }
       }
       aurostd::StringstreamClean(aflow_agl_energies_out);
       if (aglfilezipped) {
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
+        aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
       } else {
-	aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
+        aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
       }
       if(LDEBUG) {
-	cerr << soliloquy << "aflow_agl_energies: " << aflow_agl_energies_out.str() << endl;
+        cerr << soliloquy << " aflow_agl_energies:" << endl << aflow_agl_energies_out.str() << endl;
       }
       aurostd::stream2vectorstring(aflow_agl_energies_out,vline);
       for (uint i=0;i<vline.size();i++) {
-	aurostd::StringSubst(vline.at(i),"="," ");
-	aurostd::string2tokens(vline.at(i),tokens," ");
-	if(tokens.size()>=9) {
-	  if (tokens.at(0) == "#") {
-	    continue;
-	  } else {
-	    agl_temperature.push_back(aurostd::string2utype<double>(tokens.at(0)));
-	    agl_gibbs_energy_atom.push_back(aurostd::string2utype<double>(tokens.at(5)));
-	    agl_vibrational_energy_atom.push_back(aurostd::string2utype<double>(tokens.at(6)));
-	  }
-	}
+        aurostd::StringSubst(vline.at(i),"="," ");
+        aurostd::string2tokens(vline.at(i),tokens," ");
+        if(tokens.size()>=9) {
+          if (tokens.at(0) == "#") {
+            continue;
+          } else {
+            agl_temperature.push_back(aurostd::string2utype<double>(tokens.at(0)));
+            agl_gibbs_energy_atom.push_back(aurostd::string2utype<double>(tokens.at(5)));
+            agl_vibrational_energy_atom.push_back(aurostd::string2utype<double>(tokens.at(6)));
+          }
+        }
       }
       Debye_temperature.push_back(agl_debye_temperature);
       Debye_acoustic.push_back(agl_debye_acoustic);
@@ -871,6 +885,8 @@ namespace pocc {
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::getAverageDebyeThermalProperties(const vector<double>& v_temperatures, bool& agl_write_full_results, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom) {
+    string soliloquy="POccCalculator::getAverageDebyeThermalProperties():";
+    stringstream message;
     ostringstream aus;
     ofstream FileMESSAGE;
     double T;
@@ -897,29 +913,30 @@ namespace pocc {
     }
     for (uint isupercell=1; isupercell<agl_temperatures.size(); isupercell++) {
       if (agl_temperatures.at(isupercell).size() < jtmaxlow) {
-	jtmaxlow = agl_temperatures.at(isupercell).size();
-	imaxlow = isupercell;
-	if (jtmaxlow > 0) {
-	  tmaxlow = agl_temperatures.at(isupercell).at(jtmaxlow-1);
-	} else {
-	  tmaxlow = 0.0;
-	}
+        jtmaxlow = agl_temperatures.at(isupercell).size();
+        imaxlow = isupercell;
+        if (jtmaxlow > 0) {
+          tmaxlow = agl_temperatures.at(isupercell).at(jtmaxlow-1);
+        } else {
+          tmaxlow = 0.0;
+        }
       }
     }
     if (tmaxlow < 1.0) {
-      cerr << "WARNING: Maximum temperature = " << tmaxlow << endl;
+      message << "Maximum temperature = " << tmaxlow;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_); //CO20200404
     }
     // Next, set temperatures for averaged thermal properties equal to temperatures of smallest range
     for (uint j = 0; j < jtmaxlow; j++) {
       agl_temperatures_ave.push_back(agl_temperatures.at(imaxlow).at(j));
     }
-    
+
     ossmain.clear();
     ossmain.str(std::string());
     ossfull.clear();
     ossfull.str(std::string());    
     for (uint jt = 0; jt < v_temperatures.size(); jt++) {
       T = v_temperatures.at(jt);
+      message << "Averaging Debye Thermal Properties at T=" << T;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
       setPOccStructureProbabilities(T);
       Debye_temperature_ave = 0.0;
       Debye_acoustic_ave = 0.0;
@@ -935,60 +952,60 @@ namespace pocc {
       vibrational_energy_atom_ave = 0.0;
       unsigned long long int isupercell = 0;
       for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); it != l_supercell_sets.end(); ++it) {
-	isupercell = std::distance(l_supercell_sets.begin(), it);
-	// Boltzmann weighted averages
-	Debye_temperature_ave = Debye_temperature_ave + (*it).m_probability * Debye_temperature.at(isupercell);
-	Debye_acoustic_ave = Debye_acoustic_ave + (*it).m_probability * Debye_acoustic.at(isupercell);
-	Gruneisen_ave = Gruneisen_ave + (*it).m_probability * Gruneisen.at(isupercell);
-	Cv300K_ave = Cv300K_ave + (*it).m_probability * Cv300K.at(isupercell);
-	Cp300K_ave = Cp300K_ave + (*it).m_probability * Cp300K.at(isupercell);
-	Fvib300K_atom_ave = Fvib300K_atom_ave + (*it).m_probability * Fvib300K_atom.at(isupercell);
-	Fvib300K_cell_ave = Fvib300K_cell_ave + (*it).m_probability * Fvib300K_cell.at(isupercell);
-	Svib300K_atom_ave = Svib300K_atom_ave + (*it).m_probability * Svib300K_atom.at(isupercell);
-	Svib300K_cell_ave = Svib300K_cell_ave + (*it).m_probability * Svib300K_cell.at(isupercell);
-	kappa300K_ave = kappa300K_ave + (*it).m_probability * kappa300K.at(isupercell);
-	// Find closest vibrational temperature to POCC temperature
-	tdiffmin = fabs(agl_temperatures.at(isupercell).at(0) - T);
-	jtp = 0;
-	for (uint j = 0; j < agl_temperatures.at(isupercell).size(); j++) {
-	  tdiff = fabs(agl_temperatures.at(isupercell).at(j) - T);
-	  if (tdiff < tdiffmin) {
-	    jtp = j;
-	    tdiffmin = tdiff;
-	  }
-	}
-	gibbs_energy_atom_ave = gibbs_energy_atom_ave + (*it).m_probability * agl_gibbs_energies_atom.at(isupercell).at(jtp);
-	vibrational_energy_atom_ave = vibrational_energy_atom_ave + (*it).m_probability * agl_vibrational_energies_atom.at(isupercell).at(jtp);
+        isupercell = std::distance(l_supercell_sets.begin(), it);
+        // Boltzmann weighted averages
+        Debye_temperature_ave = Debye_temperature_ave + (*it).m_probability * Debye_temperature.at(isupercell);
+        Debye_acoustic_ave = Debye_acoustic_ave + (*it).m_probability * Debye_acoustic.at(isupercell);
+        Gruneisen_ave = Gruneisen_ave + (*it).m_probability * Gruneisen.at(isupercell);
+        Cv300K_ave = Cv300K_ave + (*it).m_probability * Cv300K.at(isupercell);
+        Cp300K_ave = Cp300K_ave + (*it).m_probability * Cp300K.at(isupercell);
+        Fvib300K_atom_ave = Fvib300K_atom_ave + (*it).m_probability * Fvib300K_atom.at(isupercell);
+        Fvib300K_cell_ave = Fvib300K_cell_ave + (*it).m_probability * Fvib300K_cell.at(isupercell);
+        Svib300K_atom_ave = Svib300K_atom_ave + (*it).m_probability * Svib300K_atom.at(isupercell);
+        Svib300K_cell_ave = Svib300K_cell_ave + (*it).m_probability * Svib300K_cell.at(isupercell);
+        kappa300K_ave = kappa300K_ave + (*it).m_probability * kappa300K.at(isupercell);
+        // Find closest vibrational temperature to POCC temperature
+        tdiffmin = fabs(agl_temperatures.at(isupercell).at(0) - T);
+        jtp = 0;
+        for (uint j = 0; j < agl_temperatures.at(isupercell).size(); j++) {
+          tdiff = fabs(agl_temperatures.at(isupercell).at(j) - T);
+          if (tdiff < tdiffmin) {
+            jtp = j;
+            tdiffmin = tdiff;
+          }
+        }
+        gibbs_energy_atom_ave = gibbs_energy_atom_ave + (*it).m_probability * agl_gibbs_energies_atom.at(isupercell).at(jtp);
+        vibrational_energy_atom_ave = vibrational_energy_atom_ave + (*it).m_probability * agl_vibrational_energies_atom.at(isupercell).at(jtp);
       }
       // Average Gibbs and vibrational free energies at each temperature
       // Use smallest AGL temperature range
       // Next, for each temperature in this range, average over energies of all configurations
       for (uint j = 0; j < jtmaxlow; j++) {
-	gibbs_energy_atom_ave_temp = 0.0;
-	vibrational_energy_atom_ave_temp = 0.0;
-	isupercell = 0;
-	for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); it != l_supercell_sets.end(); ++it) {
-	  isupercell = std::distance(l_supercell_sets.begin(), it);      
-	  gibbs_energy_atom_ave_temp = gibbs_energy_atom_ave_temp + ((*it).m_probability * agl_gibbs_energies_atom.at(isupercell).at(j));
-	  vibrational_energy_atom_ave_temp = vibrational_energy_atom_ave_temp + ((*it).m_probability * agl_vibrational_energies_atom.at(isupercell).at(j));
-	}
-	agl_gibbs_energies_atom_ave.push_back(gibbs_energy_atom_ave_temp);
-	agl_vibrational_energies_atom_ave.push_back(vibrational_energy_atom_ave_temp);
+        gibbs_energy_atom_ave_temp = 0.0;
+        vibrational_energy_atom_ave_temp = 0.0;
+        isupercell = 0;
+        for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); it != l_supercell_sets.end(); ++it) {
+          isupercell = std::distance(l_supercell_sets.begin(), it);      
+          gibbs_energy_atom_ave_temp = gibbs_energy_atom_ave_temp + ((*it).m_probability * agl_gibbs_energies_atom.at(isupercell).at(j));
+          vibrational_energy_atom_ave_temp = vibrational_energy_atom_ave_temp + ((*it).m_probability * agl_vibrational_energies_atom.at(isupercell).at(j));
+        }
+        agl_gibbs_energies_atom_ave.push_back(gibbs_energy_atom_ave_temp);
+        agl_vibrational_energies_atom_ave.push_back(vibrational_energy_atom_ave_temp);
       }
       // Find maximum and minimum values of Debye temperature
       Debyemin = Debye_temperature.at(0);
       Debyemax = Debye_temperature.at(0);
       isupercell = 0;
       for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); it != l_supercell_sets.end(); ++it) {
-	isupercell = std::distance(l_supercell_sets.begin(), it);
-	if (Debye_temperature.at(isupercell) < Debyemin) {
-	  Debyemin = Debye_temperature.at(isupercell);
-	}
-	if (Debye_temperature.at(isupercell) > Debyemax) {
-	  Debyemax = Debye_temperature.at(isupercell);
-	}      
+        isupercell = std::distance(l_supercell_sets.begin(), it);
+        if (Debye_temperature.at(isupercell) < Debyemin) {
+          Debyemin = Debye_temperature.at(isupercell);
+        }
+        if (Debye_temperature.at(isupercell) > Debyemax) {
+          Debyemax = Debye_temperature.at(isupercell);
+        }      
       }
-    
+
       // Writes all results to a file
       ossmain << "[AFLOW] **************************************************************************************************************************" << endl;
       ossmain << "[POCC_AGL_RESULTS]START" << endl;
@@ -1010,36 +1027,36 @@ namespace pocc {
       ossmain << "[POCC_AGL_ENERGIES_TEMPERATURE]START" << endl;
       ossmain << "#   T(K)" << "  " << aurostd::PaddedPRE("G(eV/atom)",2," ") << "  " << aurostd::PaddedPRE("Fvib(meV/atom)",2," ") << endl;
       for (uint j = 0; j < agl_temperatures_ave.size(); j++) {
-	ossmain << setw(8) << setprecision(2) << fixed << agl_temperatures_ave.at(j) << "  " << setw(10) << setprecision(4) << agl_gibbs_energies_atom_ave.at(j) << "  " << setw(14) << setprecision(4) << agl_vibrational_energies_atom_ave.at(j) << endl;
+        ossmain << setw(8) << setprecision(2) << fixed << agl_temperatures_ave.at(j) << "  " << setw(10) << setprecision(4) << agl_gibbs_energies_atom_ave.at(j) << "  " << setw(14) << setprecision(4) << agl_vibrational_energies_atom_ave.at(j) << endl;
       }
       ossmain << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP" << endl;
       ossmain << "[AFLOW] **************************************************************************************************************************" << endl;
       if (agl_write_full_results) {
-	ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
-	ossfull << "[POCC_AGL_RESULTS]START" << endl;
-	ossfull << "pocc_temperature=" << T << "  (K)" << endl;
-	ossfull << "pocc_agl_debye_temperature=" << Debye_temperature_ave << "  (K)" << endl;
-	ossfull << "pocc_agl_debye_acoustic=" << Debye_acoustic_ave << "  (K)" << endl;
-	ossfull << "pocc_agl_gruneisen=" << Gruneisen_ave << endl;
-	ossfull << "pocc_agl_heat_capacity_Cv_300K=" << Cv300K_ave << "  (kB/cell)" << endl;
-	ossfull << "pocc_agl_heat_capacity_Cp_300K=" << Cp300K_ave << "  (kB/cell)" << endl;
-	ossfull << "pocc_agl_vibrational_free_energy_300K_cell=" << Fvib300K_cell_ave << "  (meV/cell)" << endl;
-	ossfull << "pocc_agl_vibrational_free_energy_300K_atom=" << Fvib300K_atom_ave << "  (meV/atom)" << endl;
-	ossfull << "pocc_agl_vibrational_entropy_300K_cell=" << Svib300K_cell_ave << "  (meV/cell)" << endl;
-	ossfull << "pocc_agl_vibrational_entropy_300K_atom=" << Svib300K_atom_ave << "  (meV/atom)" << endl;
-	ossfull << "pocc_agl_thermal_conductivity_300K=" << kappa300K_ave << "  (W/m*K)" << endl;
-	ossfull << "pocc_agl_gibbs_energy_atom_ave=" << gibbs_energy_atom_ave << "  (eV/atom)" << endl;
-	ossfull << "pocc_agl_vibrational_energy_atom_ave=" << vibrational_energy_atom_ave << "  (meV/atom)" << endl;    
-	ossfull << "[POCC_AGL_RESULTS]STOP" << endl;
-	ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
-	ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]START" << endl;
-	// Writes Gibbs and vibrational free energies to a file
-	ossfull << "#   T(K)" << "  " << aurostd::PaddedPRE("G(eV/atom)",2," ") << "  " << aurostd::PaddedPRE("Fvib(meV/atom)",2," ") << endl;
-	for (uint j = 0; j < agl_temperatures_ave.size(); j++) {
-	  ossfull << setw(8) << setprecision(2) << fixed << agl_temperatures_ave.at(j) << "  " << setw(10) << setprecision(4) << agl_gibbs_energies_atom_ave.at(j) << "  " << setw(14) << setprecision(4) << agl_vibrational_energies_atom_ave.at(j) << endl;
-	}
-	ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP" << endl;
-	ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
+        ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
+        ossfull << "[POCC_AGL_RESULTS]START" << endl;
+        ossfull << "pocc_temperature=" << T << "  (K)" << endl;
+        ossfull << "pocc_agl_debye_temperature=" << Debye_temperature_ave << "  (K)" << endl;
+        ossfull << "pocc_agl_debye_acoustic=" << Debye_acoustic_ave << "  (K)" << endl;
+        ossfull << "pocc_agl_gruneisen=" << Gruneisen_ave << endl;
+        ossfull << "pocc_agl_heat_capacity_Cv_300K=" << Cv300K_ave << "  (kB/cell)" << endl;
+        ossfull << "pocc_agl_heat_capacity_Cp_300K=" << Cp300K_ave << "  (kB/cell)" << endl;
+        ossfull << "pocc_agl_vibrational_free_energy_300K_cell=" << Fvib300K_cell_ave << "  (meV/cell)" << endl;
+        ossfull << "pocc_agl_vibrational_free_energy_300K_atom=" << Fvib300K_atom_ave << "  (meV/atom)" << endl;
+        ossfull << "pocc_agl_vibrational_entropy_300K_cell=" << Svib300K_cell_ave << "  (meV/cell)" << endl;
+        ossfull << "pocc_agl_vibrational_entropy_300K_atom=" << Svib300K_atom_ave << "  (meV/atom)" << endl;
+        ossfull << "pocc_agl_thermal_conductivity_300K=" << kappa300K_ave << "  (W/m*K)" << endl;
+        ossfull << "pocc_agl_gibbs_energy_atom_ave=" << gibbs_energy_atom_ave << "  (eV/atom)" << endl;
+        ossfull << "pocc_agl_vibrational_energy_atom_ave=" << vibrational_energy_atom_ave << "  (meV/atom)" << endl;    
+        ossfull << "[POCC_AGL_RESULTS]STOP" << endl;
+        ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
+        ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]START" << endl;
+        // Writes Gibbs and vibrational free energies to a file
+        ossfull << "#   T(K)" << "  " << aurostd::PaddedPRE("G(eV/atom)",2," ") << "  " << aurostd::PaddedPRE("Fvib(meV/atom)",2," ") << endl;
+        for (uint j = 0; j < agl_temperatures_ave.size(); j++) {
+          ossfull << setw(8) << setprecision(2) << fixed << agl_temperatures_ave.at(j) << "  " << setw(10) << setprecision(4) << agl_gibbs_energies_atom_ave.at(j) << "  " << setw(14) << setprecision(4) << agl_vibrational_energies_atom_ave.at(j) << endl;
+        }
+        ossfull << "[POCC_AGL_ENERGIES_TEMPERATURE]STOP" << endl;
+        ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
       }
     }
     string ofileafpoccaglname = m_aflags.Directory + "/aflow.pocc_agl.out";
@@ -1051,7 +1068,7 @@ namespace pocc {
       ossfull << "[POCC_AGL_CONFIG_RESULTS]START" << endl;
       ossfull << "# Config" << "  " << aurostd::PaddedPRE("Debye_temperature(K)",2," ") << "  " << aurostd::PaddedPRE("Debye_acoustic(K)",2," ") << "  " << aurostd::PaddedPRE("Gruneisen_parameter",2," ") << "  " << aurostd::PaddedPRE("Cv(kB/cell)",2," ") << "  " << aurostd::PaddedPRE("Cp(kB/cell)",2," ") << "  " << aurostd::PaddedPRE("Fvib/cell(meV/cell)",2," ") << "  " << aurostd::PaddedPRE("Fvib/atom(meV/atom)",2," ") << "  " << aurostd::PaddedPRE("Svib/cell(meV/cell*K)",2," ") << "  " << aurostd::PaddedPRE("Svib/atom(meV/atom*K)",2," ") << "  " << aurostd::PaddedPRE("Thermal_conductivity(W/(m*K))",2," ") << endl;
       for (uint i = 0; i < Debye_temperature.size(); i++) {
-	ossfull << setw(8) << fixed << i << "  " << setw(20) << setprecision(3) << Debye_temperature.at(i) << "  " << setw(17) << setprecision(3) << Debye_acoustic.at(i) << "  " << setw(19) << setprecision(5) << Gruneisen.at(i)  << "  " << setw(11) << setprecision(4) << Cv300K.at(i) << "  " << setw(11) << setprecision(4) << Cp300K.at(i) << "  " << setw(19) << setprecision(4) << Fvib300K_cell.at(i) << "  " << setw(19) << setprecision(4) << Fvib300K_atom.at(i) << "  " << setw(21) << setprecision(5) << Svib300K_cell.at(i) << "  " << setw(21) << setprecision(6) << Svib300K_atom.at(i)  << "  " << setw(29) << setprecision(6) << kappa300K.at(i) << endl;
+        ossfull << setw(8) << fixed << i << "  " << setw(20) << setprecision(3) << Debye_temperature.at(i) << "  " << setw(17) << setprecision(3) << Debye_acoustic.at(i) << "  " << setw(19) << setprecision(5) << Gruneisen.at(i)  << "  " << setw(11) << setprecision(4) << Cv300K.at(i) << "  " << setw(11) << setprecision(4) << Cp300K.at(i) << "  " << setw(19) << setprecision(4) << Fvib300K_cell.at(i) << "  " << setw(19) << setprecision(4) << Fvib300K_atom.at(i) << "  " << setw(21) << setprecision(5) << Svib300K_cell.at(i) << "  " << setw(21) << setprecision(6) << Svib300K_atom.at(i)  << "  " << setw(29) << setprecision(6) << kappa300K.at(i) << endl;
       }
       ossfull << "[POCC_AGL_CONFIG_RESULTS]STOP" << endl;
       ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
@@ -1062,6 +1079,8 @@ namespace pocc {
     }
   }
 } // namespace pocc    
+
+#endif  // _AFLOW_POCC_AEL_AGL_CPP_  //CO20200404
 
 //****************************************************************************
 // *                                                                         *

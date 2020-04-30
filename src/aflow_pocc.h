@@ -586,7 +586,7 @@ namespace pocc {
       void resetHNFMatrices();
       void resetSiteConfigurations();
 
-      void postProcessing(const aurostd::xoption& opts);  // ME20200302 - added options
+      void postProcessing();
       void StructuresAllFile2SupercellSets();
       void StructuresUniqueFile2SupercellSets();
       bool QMVASPsFound() const;

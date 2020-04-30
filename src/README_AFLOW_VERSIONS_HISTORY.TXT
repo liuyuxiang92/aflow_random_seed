@@ -1,5 +1,6 @@
 3.2.3 - 2020/05/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        -- added POCC+AEL+AGL workflow (CT)
         -- Sped up determination of irreducible tetrahedra for the tetrahedron method. (ME)
         -- Sped up APL force constant matrix calculation. (ME)
         -- Sped up the calculation of the dynamical matrix. (ME)
@@ -42,6 +43,7 @@
         -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
         -- added error for non-standard prototypes that create structures with atoms too close (CO+DX)
         -- added secondary wget location for AFLOW3_FREE files for make (CO)
+        -- added some messaging/debug-logging to POCC+AEL+AGL workflow (CO)
 3.2.2j - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- standardized vext,vcat,vzip from XHOST 2j (SC)
