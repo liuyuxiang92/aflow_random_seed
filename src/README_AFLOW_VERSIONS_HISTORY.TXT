@@ -4,6 +4,7 @@
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
         -- Added QHA to modules. (AS)
         -- Fixed xEIGENVAL to work correctly with files created by vasp 5. (AS)
+        -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME+RF)
         -- Added check for required binaries to plotter. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
         -- Fixed broken system name for aflow_proto. (ME)
