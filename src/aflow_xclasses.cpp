@@ -1195,11 +1195,12 @@ _xvasp::_xvasp() {
   // AVASP
   //aopts.clear();                                  // default  //CO20180420 - clears AFLOWIN_FLAG::VASP default (TRUE)
   AVASP_aflowin_only_if_missing=FALSE;  // DEFAULT VALUES
-  AVASP_arun = false;  //ME20181019
-  AVASP_arun_mode = "";  //ME20181019
-  AVASP_arun_runname = "";  //ME20181019
-  aplopts.clear();  //ME20181025
-  aaplopts.clear();  //ME20181025
+  AVASP_arun = false;         //ME20181019
+  AVASP_arun_mode = "";       //ME20181019
+  AVASP_arun_runname = "";    //ME20181019
+  aplopts.clear();            //ME20181025
+  aaplopts.clear();           //ME20181025
+  qhaopts.clear();            //AS20200302
   AVASP_dirbase="";
   AVASP_libbase="";
   AVASP_label="";
@@ -1357,11 +1358,12 @@ void _xvasp::copy(const _xvasp& b) {
   // [OBSOLETE] AFLOWIN_FLAG_AIMS                      = b.AFLOWIN_FLAG_AIMS;
   // AVASP
   AVASP_aflowin_only_if_missing            = b.AVASP_aflowin_only_if_missing;
-  AVASP_arun                               = b.AVASP_arun;            //ME20181019
-  AVASP_arun_mode                          = b.AVASP_arun_mode;       //ME20181019
-  AVASP_arun_runname                       = b.AVASP_arun_runname;    //ME20181019
-  aplopts                                  = b.aplopts;               //ME20181025
-  aaplopts                                 = b.aaplopts;              //ME20181025
+  AVASP_arun                               = b.AVASP_arun;            // ME20181019
+  AVASP_arun_mode                          = b.AVASP_arun_mode;       // ME20181019
+  AVASP_arun_runname                       = b.AVASP_arun_runname;    // ME20181019
+  aplopts                                  = b.aplopts;               // ME20181025
+  aaplopts                                 = b.aaplopts;              // ME20181025
+  qhaopts                                  = b.qhaopts;               // AS20200302
   AVASP_dirbase                            = b.AVASP_dirbase;
   AVASP_libbase                            = b.AVASP_libbase;
   AVASP_label                              = b.AVASP_label;
