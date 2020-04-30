@@ -473,7 +473,7 @@ namespace apl {
     string allowed_formats_str = "XCRYSDEN,V_SIM";
     vector<string> allowed_formats;
     aurostd::string2tokens(allowed_formats_str, allowed_formats, ",");
-    if (!aurostd::withinList(allowed_formats, format)) {
+    if (!aurostd::WithinList(allowed_formats, format)) {
       message = "Unregonized format " + format + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
