@@ -5403,7 +5403,7 @@ namespace pocc {
           for(uint itype=0;itype<m_pocc_sites_resorted[site].v_types.size();itype++){
             type=m_pocc_sites_resorted[site].v_types[itype];
             if(LDEBUG) {cerr << soliloquy << " type=" << type << endl;}
-            if(!aurostd::withinList(types_added,type)){
+            if(!aurostd::WithinList(types_added,type)){
               //species[occupant2species_map[iocc2spec++]]=species_orig[type];
               species[type]=species_orig[occupant2species_map[iocc2spec++]];
               types_added.push_back(type);

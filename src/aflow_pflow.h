@@ -99,14 +99,19 @@ namespace pflow {
   void CLEANALL(istream& input);
   void CMPSTR(vector<string>);
   void COMPARE(string options);
-  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20191125
-  string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20191125
-  string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DX //DX20181004
-  //DX20190425 [OBSOLETE] string compareStructureDirectory(aurostd::xoption& vpflow); //DX
-  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
-  string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20181004
-  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow); //DX20181004 //DX20190314 - changed return value
-  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20190314 - overloaded 
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20191125
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20191125
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DX //DX20181004
+  //DX20190425 [OBSOLETE - moved to XtalMatch header] string compareStructureDirectory(aurostd::xoption& vpflow); //DX
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20190425
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20181004
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20200225
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX //DX20181004 //CO20200225
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string compare2database(const xstructure& xstr, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX //DX20200225
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20181004 //DX20190314 - changed return value
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX20190314 - overloaded 
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX20190314 - overloaded 
   //DX20170901 [OBSOLETE] void DATA(string smode,istream& input);
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss=cout); //DX20170901 - SGDATA + JSON
   void DATA1(string options,istream& input);
@@ -135,7 +140,7 @@ namespace pflow {
   string GEOMETRY(istream& input); //CO20191110
   bool GetCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<double>& vmag); //DX20170927 - Magnetic symmetry //DX20191107 - int to uint
   bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll); //DX20171205 - Magnetic symmetry non-collinear //DX20191107 - int to uint
-  vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX20190314 
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX20190314 
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF20190329
   void GULP(istream& input);
   void HKL(string options,_aflags &aflags,istream& input);
@@ -157,6 +162,7 @@ namespace pflow {
   void KBAND(vector<string>);
   xstructure INFLATE_LATTICE(string options,istream& input);
   xstructure INFLATE_VOLUME(string options,istream& input);
+  void KPATH(istream& input,bool WWW); 
   void KPATH(istream& input,double grid,bool WWW); 
   xstructure KPOINTS(string options,istream& input,ostream& oss=cout);
   xstructure KPOINTS_DELTA(aurostd::xoption& vpflow, istream& input, ostream& oss=cout);
@@ -166,8 +172,8 @@ namespace pflow {
   string LATTICE_TYPE(istream& input);
   string LATTICE_LATTICE_TYPE(istream& input);
   string listPrototypeLabels(aurostd::xoption& vpflow); //DX20181004
-  string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX20200131 
-  vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX20200131 
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow); //DX20200131 
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog); //DX20200131 
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
   //START - all relevent functions for loading entries here
@@ -293,6 +299,7 @@ namespace pflow {
   // loads xstructures
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
+  bool loadXstructures(aflowlib::_aflowlib_entry& entry, vector<string>& structure_files, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false); //DX20200224
   ////////////////////////////////////////////////////////////////////////////////
   vector<string> getElements(const string& _input); //CO20190712
   void elementsFromCompositionString(const string& input);  //CO20190712
@@ -381,8 +388,8 @@ namespace pflow {
   void POCC(vector<string>);
   string POSCAR2AFLOWIN(istream& input, const string& ="");  // Modified ME20181113
   void POSCAR2WYCKOFF(istream& input);
-  string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX20190314 
-  string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314 
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX20190314 
+  //DX20200225 [OBSOLETE - moved to XtalMatch header] string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX20190314 
   bool PSEUDOPOTENTIALS_CHECK(aurostd::xoption vpflow,string file,ostream& oss=cout); //SC20200330
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO20180703
   xstructure POSCAR(istream& input);
@@ -469,7 +476,7 @@ namespace pflow {
   class projdata;
   void PrintBands(const pflow::projdata& pd);
   bool PrintCHGCAR(const xstructure& str,const stringstream& chgcar_header,const vector<int>& ngrid,const vector<int>& format_dim,const vector<double>& chg_tot,const vector<double>& chg_diff,const string& output_name,ostream& oss=cout);
-  void PrintChgInt(vector<pflow::matrix<double> >& rad_chg_int,pflow::matrix<double>& vor_chg_int,ostream& oss=cout);
+  void PrintChgInt(vector<aurostd::matrix<double> >& rad_chg_int,aurostd::matrix<double>& vor_chg_int,ostream& oss=cout);  //CO20200404 pflow::matrix()->aurostd::matrix()
   void PrintCIF(ostream& oss,const xstructure&,int=1,int=1); //DX20180806 - added setting default
   void PrintClat(const xvector<double>& data,ostream& oss=cout);
   void PrintCmpStr(const xstructure& str1,const xstructure& str2,const double& rcut,ostream& oss=cout);
@@ -498,12 +505,12 @@ void PrintNdata(const xstructure&,ostream& oss=cout);
 //void PrintNeatProj(projdata& pd);
 void PrintPDB(const xstructure&,ostream& oss=cout);
 void platon2print(xstructure,bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3,ostream& sout);
-void PrintRDF(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,const pflow::matrix<double>& rdf_all,
-    pflow::matrix<double>& rdfsh_all,pflow::matrix<double>& rdfsh_loc,ostream& oss=cout);
+void PrintRDF(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,const aurostd::matrix<double>& rdf_all,
+    aurostd::matrix<double>& rdfsh_all,aurostd::matrix<double>& rdfsh_loc,ostream& oss=cout);  //CO20200404 pflow::matrix()->aurostd::matrix()
 void PrintRDFCmp(const xstructure& str_A,const xstructure& str_B,const double& rmax,const int nbins,
-    const double& smooth_width,const int nsh,const pflow::matrix<double>& rdfsh_all_A,
-    const pflow::matrix<double>& rdfsh_all_B,const vector<int>& best_match,
-    const pflow::matrix<double>& rms_mat,ostream& oss=cout);
+    const double& smooth_width,const int nsh,const aurostd::matrix<double>& rdfsh_all_A,
+    const aurostd::matrix<double>& rdfsh_all_B,const vector<int>& best_match,
+    const aurostd::matrix<double>& rms_mat,ostream& oss=cout); //CO20200404 pflow::matrix()->aurostd::matrix()
 void PrintRSM(const xstructure&,ostream& oss=cout);
 void PrintShell(const xstructure& str,const int& ns,const double& rmin,const double& rmax,const string& sname,const int lin_dens,ostream& oss=cout);
 double CorrectionFactor(const double& th);
@@ -548,19 +555,19 @@ namespace pflow {
       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO20190520
   void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,
       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
-      vector<vector<double> >& ids,pflow::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO20190409  //CO20190620 - intmax can be grabbed later
-  void GetRDF(xstructure str,const double& rmax,const int& nbins,matrix<double>& rdf_all);
+      vector<vector<double> >& ids,aurostd::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO20190409  //CO20190620 - intmax can be grabbed later  //CO20200404 pflow::matrix()->aurostd::matrix()
+  void GetRDF(xstructure str,const double& rmax,const int& nbins,aurostd::matrix<double>& rdf_all);  //CO20200404 pflow::matrix()->aurostd::matrix()
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,
-      const pflow::matrix<double>& rdf,matrix<double>& rdfsh,matrix<double>& rdfsh_loc);
+      const aurostd::matrix<double>& rdf,aurostd::matrix<double>& rdfsh,aurostd::matrix<double>& rdfsh_loc); //CO20200404 pflow::matrix()->aurostd::matrix()
   double RdfSh_RMS(const int iaA,const int iaB,const int nsh_max,const int nt,
-      const pflow::matrix<double>& rdfsh_all_A,const pflow::matrix<double>& rdfsh_all_B);
-  void CmpRDFShells(const xstructure& str_A,const xstructure& str_B,const pflow::matrix<double>& rdfsh_all_A,
-      const pflow::matrix<double>& rdfsh_all_B,const int nsh,vector<int>& best_match,
-      pflow::matrix<double>& rms_mat);
-  pflow::matrix<double> GetSmoothRDF(const pflow::matrix<double>& rdf,const double& sigma);
+      const aurostd::matrix<double>& rdfsh_all_A,const aurostd::matrix<double>& rdfsh_all_B);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  void CmpRDFShells(const xstructure& str_A,const xstructure& str_B,const aurostd::matrix<double>& rdfsh_all_A,
+      const aurostd::matrix<double>& rdfsh_all_B,const int nsh,vector<int>& best_match,
+      aurostd::matrix<double>& rms_mat); //CO20200404 pflow::matrix()->aurostd::matrix()
+  aurostd::matrix<double> GetSmoothRDF(const aurostd::matrix<double>& rdf,const double& sigma);  //CO20200404 pflow::matrix()->aurostd::matrix()
   void CmpStrDist(xstructure str1,xstructure str2,const double& cutoff,
-      pflow::matrix<double>& dist1,pflow::matrix<double>& dist2,
-      pflow::matrix<double>& dist_diff,matrix<double>& dist_diff_n);
+      aurostd::matrix<double>& dist1,aurostd::matrix<double>& dist2,
+      aurostd::matrix<double>& dist_diff,aurostd::matrix<double>& dist_diff_n);  //CO20200404 pflow::matrix()->aurostd::matrix()
 }
 
 // aflow_pflow.cpp
@@ -580,11 +587,11 @@ namespace pflow {
       void PrintPDOS(ostream& oss, const int& sp);
       // variables
       string PDOSinfile;
-      pflow::matrix<int> pdos_at;
-      pflow::matrix<int> pdos_k;
-      pflow::matrix<int> pdos_b;
-      pflow::matrix<int> pdos_lm;
-      pflow::matrix<double> pdos;
+      aurostd::matrix<int> pdos_at;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<int> pdos_k;   //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<int> pdos_b;   //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<int> pdos_lm;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> pdos;  //CO20200404 pflow::matrix()->aurostd::matrix()
       double emin;
       double emax;
       double efermi;
@@ -627,15 +634,15 @@ namespace pflow {
       vector<double> center_guide;
       int center_s;
       vector<double> background;
-      pflow::matrix<double> lightcenter;
+      aurostd::matrix<double> lightcenter; //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<double> lightrad;
-      pflow::matrix<double> lightcolor;
+      aurostd::matrix<double> lightcolor;  //CO20200404 pflow::matrix()->aurostd::matrix()
       // Sphere texture variables (ambient, diffuse, specular, opacity)
-      pflow::matrix<double> sphtex_tex;
+      aurostd::matrix<double> sphtex_tex;  //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<double> sphtex_tex_def;
-      pflow::matrix<double> sphtex_color;
+      aurostd::matrix<double> sphtex_color;  //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<double> sphtex_color_def;
-      pflow::matrix<double> sphtex_phong;
+      aurostd::matrix<double> sphtex_phong;  //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<double> sphtex_phong_def;
       vector<string> sphtex_names;
       vector<double> sph_rad;
@@ -657,7 +664,7 @@ namespace pflow {
       double sph_rad_def;
       string shading;
       string outfile;
-      pflow::matrix<double> sc;
+      aurostd::matrix<double> sc;  //CO20200404 pflow::matrix()->aurostd::matrix()
       int sc_s;
       int calc_type;
       vector<string> input_files;
@@ -670,15 +677,15 @@ namespace pflow {
 
   void SetRTParams(xstructure& str, pflow::rtparams& rtp);
   vector<xstructure> GetStrVecFromOUTCAR_XDATCAR(ifstream& outcar_inf, ifstream& xdatcar_inf);
-  void GetDatFromOutcar(vector<pflow::matrix<double> >& lat_vec, deque<int>& num_each_type, ifstream& outcar_inf);
-  void GetDatFromXdatcar(vector<pflow::matrix<double> >& fpos_vec, ifstream& xdatcar_inf);
+  void GetDatFromOutcar(vector<aurostd::matrix<double> >& lat_vec, deque<int>& num_each_type, ifstream& outcar_inf); //CO20200404 pflow::matrix()->aurostd::matrix()
+  void GetDatFromXdatcar(vector<aurostd::matrix<double> >& fpos_vec, ifstream& xdatcar_inf); //CO20200404 pflow::matrix()->aurostd::matrix()
   vector<xstructure> GetStrVecFromOUTCAR_XDATCAR(ifstream& outcar_inf, ifstream& xdatcar_inf);
   void PrintStrVec(const vector<xstructure>& str_vec, ostream& outf);
   void ReadInRTParams(ifstream& rtinfile, pflow::rtparams& rtp);
   void ReadInStrVec(vector<xstructure>& str_vec, ifstream& strlist_inf);
   void JoinStrVec(vector<xstructure> str_vec_1,vector<xstructure> str_vec_2,vector<xstructure>& str_vec_tot);
   void SetStrFromRTParams(xstructure& str, pflow::rtparams& rtp);
-  void SuperCellStrVec(vector<xstructure>& str_vec, const pflow::matrix<double>& sc);
+  void SuperCellStrVec(vector<xstructure>& str_vec, const aurostd::matrix<double>& sc);  //CO20200404 pflow::matrix()->aurostd::matrix()
   void UpDateRTParams(pflow::rtparams& rtp, const int& istr, int nstr);
   void SetRTParams(xstructure& str, pflow::rtparams& rtp);
   void GetRTDatFile(xstructure str, const pflow::rtparams& rtp, ostringstream& rtdat_file);
@@ -689,7 +696,7 @@ namespace pflow {
   string PrintRTencFile(const pflow::rtparams& rt_params, ostringstream& rtenc_file);
   string CreateRTmpgFile(const pflow::rtparams& rt_params, const string& encfile);
   void RayTraceManager(vector<string>);
-  pflow::matrix<double> GetRotationMatrix(const vector<double>& angles);
+  aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles); //CO20200404 pflow::matrix()->aurostd::matrix()
   void RotateStrVec(vector<xstructure>& str_vec, const vector<double>& rot);
 
 }
@@ -716,39 +723,39 @@ namespace pflow {
       int nions;
       int ntypes;
       vector<int> num_each_type;
-      pflow::matrix<double> wfermi_u;
-      pflow::matrix<double> wfermi_d;
+      aurostd::matrix<double> wfermi_u;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> wfermi_d;  //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<double> wkpt;
-      vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_u;
-      vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_d;
-      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_u;
-      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_d;
-      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_u;
-      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_d;
-      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_u;
-      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_d;
-      vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_u;
-      vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_d;
-      vector<pflow::matrix<double> > occ_vs_ion_kpt_l_u;
-      vector<pflow::matrix<double> > occ_vs_ion_kpt_l_d;
-      vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_u;
-      vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_d;
-      vector<pflow::matrix<double> > occ_vs_ion_bnd_l_u;
-      vector<pflow::matrix<double> > occ_vs_ion_bnd_l_d;
-      pflow::matrix<double> occ_vs_ion_lm_u;
-      pflow::matrix<double> occ_vs_ion_lm_d;
-      pflow::matrix<double> occ_vs_ion_l_u;
-      pflow::matrix<double> occ_vs_ion_l_d;
-      pflow::matrix<double> ener_k_b_u;
-      pflow::matrix<double> ener_k_b_d;
+      vector<aurostd::matrix<aurostd::matrix<std::complex<double> > > > pdat_u;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<aurostd::matrix<std::complex<double> > > > pdat_d;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<aurostd::matrix<double> > occ_vs_ion_kpt_bnd_lm_u; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<aurostd::matrix<double> > occ_vs_ion_kpt_bnd_lm_d; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<aurostd::matrix<double> > occ_vs_ion_kpt_bnd_l_u;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<aurostd::matrix<double> > occ_vs_ion_kpt_bnd_l_d;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<aurostd::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_u;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<aurostd::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_d;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<double> > occ_vs_ion_kpt_lm_u;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<double> > occ_vs_ion_kpt_lm_d;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<double> > occ_vs_ion_kpt_l_u; //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<double> > occ_vs_ion_kpt_l_d; //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<double> > occ_vs_ion_bnd_lm_u;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<double> > occ_vs_ion_bnd_lm_d;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<double> > occ_vs_ion_bnd_l_u; //CO20200404 pflow::matrix()->aurostd::matrix()
+      vector<aurostd::matrix<double> > occ_vs_ion_bnd_l_d; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> occ_vs_ion_lm_u; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> occ_vs_ion_lm_d; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> occ_vs_ion_l_u;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> occ_vs_ion_l_d;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> ener_k_b_u;  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> ener_k_b_d;  //CO20200404 pflow::matrix()->aurostd::matrix()
       int sp;
       int rspin;
-      pflow::matrix<double> kpts;
+      aurostd::matrix<double> kpts;  //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<string> LMnames;
       vector<string> Lnames;
       vector<string> LLMnames;
       string PROOUTinfile;
-      pflow::matrix<double> lat;
+      aurostd::matrix<double> lat; //CO20200404 pflow::matrix()->aurostd::matrix()
   };
 }
 
@@ -775,8 +782,8 @@ void PrintNeatProj(pflow::projdata& pd, ostream& outf);
 // in aflow_pflow_funcs.cpp
 namespace pflow {
   void ReadSumDOSParams(ifstream& infile, pflow::pdosdata& pdd);
-  void ReadInPDOSData(matrix<pflow::matrix<double> >& allpdos, pflow::pdosdata& pdd,ifstream& infile);
-  void SumPDOS(const pflow::matrix<pflow::matrix<double> >& allpdos, pflow::pdosdata& pdd);
+  void ReadInPDOSData(aurostd::matrix<aurostd::matrix<double> >& allpdos, pflow::pdosdata& pdd,ifstream& infile);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  void SumPDOS(const aurostd::matrix<aurostd::matrix<double> >& allpdos, pflow::pdosdata& pdd);  //CO20200404 pflow::matrix()->aurostd::matrix()
 }
 
 // in pflow_print
@@ -793,12 +800,12 @@ namespace pflow {
   vector<xstructure> GetRBStruct(const int& nim);
   vector<double> GetRBDistCum(const vector<xstructure>& str_vec, const string& path_flag);
   vector<double> GetRBDistFromStrI(const vector<xstructure>& str_vec,const xstructure& strI,const string& path_flag);
-  void RBPoscarDisp(const xstructure& str1in, const xstructure& str2in,xstructure& diffstr, double& totdist, pflow::matrix<double>& cm,const string& path_flag);
+  void RBPoscarDisp(const xstructure& str1in, const xstructure& str2in,xstructure& diffstr, double& totdist, aurostd::matrix<double>& cm,const string& path_flag); //CO20200404 pflow::matrix()->aurostd::matrix()
 }
 
 // in aflow_pflow_print.cpp
 void PrintRBAnal(const int& nim, const string& path_flag, ostream& outf);
-void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist, pflow::matrix<double>& cm, const string& path_flag, ostream& outf);
+void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist, aurostd::matrix<double>& cm, const string& path_flag, ostream& outf); //CO20200404 pflow::matrix()->aurostd::matrix()
 
 // ---------------------------------------------------------------------------
 // CHARGE FUNCS CHARGE FUNCS CHARGE FUNCS CHARGE FUNCS CHARGE FUNCS CHARGE FUN
@@ -808,8 +815,8 @@ namespace pflow {
     public:
       string type;
       double scale;
-      pflow::matrix<double> pts;
-      pflow::matrix<double> dpts;
+      aurostd::matrix<double> pts; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> dpts;  //CO20200404 pflow::matrix()->aurostd::matrix()
       int Nx,Ny;
       string orig_loc;
       string ortho;
@@ -820,7 +827,7 @@ namespace pflow {
       vector<double>& chg_diff, stringstream& chgcar_ss,ostream& oss=cout);
   bool ReadChg(xstructure& str,vector<int>& ngrid, vector<double>& chg_tot,
       vector<double>& chg_diff, istream& chgfile);
-  void GetChgInt(vector<pflow::matrix<double> >& rad_chg_int, pflow::matrix<double>& vor_chg_int,
+  void GetChgInt(vector<aurostd::matrix<double> >& rad_chg_int, aurostd::matrix<double>& vor_chg_int,  //CO20200404 pflow::matrix()->aurostd::matrix()
       xstructure& str,vector<int>& ngrid,vector<double>& chg_tot, vector<double>& chg_diff);
   void ReadPlaneDensParams(const xstructure& str, pd_params& pdp, istream& infile);
   void GetPlaneDens(const pd_params& pdp, vector<double>& dens2d_tot, vector<double>& dens2d_diff,
@@ -838,9 +845,9 @@ namespace pflow {
   double GetEta(const int& natoms,const double& vol);
   double GetPointEner(const double& rteta,const vector<double>& atchg,const double& vol);
   double GetRecipEner(const double& eta,const vector<double>& atchg,const double& vol,
-      const pflow::matrix<double>& rlat,const pflow::matrix<double>& fpos,const double& SUMTOL);
+      const aurostd::matrix<double>& rlat,const aurostd::matrix<double>& fpos,const double& SUMTOL); //CO20200404 pflow::matrix()->aurostd::matrix()
   double GetRealEner(const double& eta,const vector<double>& atchg,const double& vol,
-      const pflow::matrix<double>& lat,const pflow::matrix<double>& fpos,const double& SUMTOL);
+      const aurostd::matrix<double>& lat,const aurostd::matrix<double>& fpos,const double& SUMTOL);  //CO20200404 pflow::matrix()->aurostd::matrix()
   double GetScreenedESEner(void);
   double ScreenedESEner(const xstructure& in_str,const double& Ks,const double& SUMTOL);
 }

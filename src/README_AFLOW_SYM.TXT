@@ -84,6 +84,7 @@ AFLOW-SYM reads the following geometry file types:
   - QuantumESPRESSO
   - ABINIT
   - FHI-AIMS
+  - ELK
 
 More file types will be added in later versions.
 
