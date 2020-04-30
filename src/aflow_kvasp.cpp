@@ -399,8 +399,23 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1;   // DEFAULT
     vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2;   // DEFAULT
     vflags.KBIN_VASP_FORCE_OPTION_SPIN.options2entry(AflowIn,_STROPT_+"SPIN=",DEFAULT_VASP_FORCE_OPTION_SPIN);
-    if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1")) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=TRUE;
-    if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=TRUE;
+    if (vflags.KBIN_VASP_FORCE_OPTION_SPIN.isentry) { // ME+RF 20200225; fixes bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default
+      if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option){
+        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1") || aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")){
+          stringstream message;
+          ostream& oss = cout;
+          message << "SPIN is OFF. REMOVE_RELAX_1/2 will be switched off.";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE;
+          vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
+        }
+      } else {
+        vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE;
+        vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
+        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1")){vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=TRUE;}
+        if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")){vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=TRUE;}
+      }
+    }
     if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE; // nothing to remove
     if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option) vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE; // nothing to remove
 
