@@ -542,23 +542,33 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies){
+  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies){double dg_total;return getHmix(v_dg,v_energies,dg_total);}
+  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy="pocc::getEFA():";
-    double dg_total=aurostd::sum(v_dg);
+    string soliloquy="pocc::getHmix():";
+    dg_total=aurostd::sum(v_dg);
     if(LDEBUG){cerr << soliloquy << " dg_total=" << dg_total << endl;}
     double Hmix=aurostd::scalar_product(v_dg,v_energies)/dg_total;
     if(LDEBUG){cerr << soliloquy << " Hmix=" << Hmix << endl;}
+    return Hmix;
+  }
+  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy="pocc::getEFA():";
+    double dg_total=0.0;
+    double Hmix=getHmix(v_dg,v_energies,dg_total);
     double sigma=0.0;
     for(int i=v_dg.lrows;i<=v_dg.urows;i++){sigma+=v_dg[i]*pow(v_energies[i]-Hmix,2.0);}
     sigma/=(dg_total-1);
     sigma=sqrt(sigma);
     if(LDEBUG){cerr << soliloquy << " sigma=" << sigma << endl;}
-    return 1.0/sigma;
+    double efa=1.0/sigma;
+    if(LDEBUG){cerr << soliloquy << " efa=" << efa << endl;}
+    return efa;
   }
 
   void POccCalculator::StructuresAllFile2SupercellSets(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="pocc::StructuresAllFile2SupercellSets():";
 
     vector<string> vlines,vtokens,vtokens2;
@@ -644,7 +654,7 @@ namespace pocc {
   }
 
   void POccCalculator::StructuresUniqueFile2SupercellSets(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="pocc::StructuresUniqueFile2SupercellSets():";
 
     vector<string> vlines,vtokens,vtokens2;
@@ -715,7 +725,7 @@ namespace pocc {
   }
 
   void POccCalculator::setDFTEnergies() {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="setDFTEnergies():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -752,7 +762,7 @@ namespace pocc {
   }
 
   void POccCalculator::setPOccStructureProbabilities(double temperature) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="setPOccStructureProbabilities():";
     stringstream message;
 
@@ -784,7 +794,7 @@ namespace pocc {
   }
 
   void POccCalculator::setEFA(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::getEFA():";
 
     if(l_supercell_sets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
@@ -799,12 +809,12 @@ namespace pocc {
         cerr << " v_energies[" << isupercell+v_energies.lrows << "]=" << v_energies[isupercell+v_energies.lrows] << endl;
       }
     }
+    m_Hmix=pocc::getHmix(v_dg,v_energies);
     m_efa=pocc::getEFA(v_dg,v_energies);
-    if(LDEBUG){cerr << soliloquy << " m_efa=" << m_efa << endl;}
   }
 
   string POccCalculator::getTemperatureString(double temperature) const {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::getTemperatureString():";
 
     stringstream t_ss;
@@ -824,7 +834,7 @@ namespace pocc {
   }
 
   void POccCalculator::setAvgDOSCAR(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::setAvgDOSCAR():";
     stringstream message;
 
@@ -986,7 +996,7 @@ namespace pocc {
   }
 
   void POccCalculator::calculateSTATICProperties(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::calculateSTATICProperties():";
 
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
@@ -1006,7 +1016,7 @@ namespace pocc {
   }
 
   void POccCalculator::plotAvgDOSCAR(double temperature){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::plotAvgDOSCAR():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1059,7 +1069,7 @@ namespace pocc {
 #define pocc_precision 12
 #define pocc_roundoff_tol 5.0*pow(10,-((int)pocc_precision)-1)
   void POccCalculator::writeResults() const { //TEMPERATURE-INDEPENDENT
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::writeResults():";
     stringstream message;
 
@@ -1077,6 +1087,7 @@ namespace pocc {
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=ALL" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)  " << "[" << m_ARUN_directories[m_ARUN_directory_ground] << "]" << endl;
+    if(m_Hmix!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Hmix=" << aurostd::utype2string(m_Hmix,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)" << endl;
     if(m_efa!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "EFA=" << aurostd::utype2string(m_efa,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)^{-1}" << endl;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=ALL" << endl;  //"  (K)"
@@ -1088,7 +1099,7 @@ namespace pocc {
   }
 
   void POccCalculator::writeResults(double temperature) const { //TEMPERATURE-DEPENDENT
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::writeResults():";
     stringstream message;
 
@@ -1139,7 +1150,7 @@ namespace pocc {
   }
 
   bool POccCalculator::QMVASPsFound() const{
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="QMVASPsFound():";
     stringstream message;
 
@@ -1165,7 +1176,7 @@ namespace pocc {
   }
 
   vector<double> getVTemperatures(const string& temp_string){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::getVTemperatures():";
 
     if(LDEBUG){cerr << soliloquy << " temp_string=" << temp_string << endl;}
@@ -1207,7 +1218,7 @@ namespace pocc {
 
   // CT20200319 - added AEL/AGL option
   void POccCalculator::postProcessing(){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccCalculator::postProcessing():";
     stringstream message;
 
@@ -1655,6 +1666,7 @@ namespace pocc {
     //for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){(*it).clear();}
     l_supercell_sets.clear();
     m_ARUN_directories.clear();
+    m_Hmix=AUROSTD_MAX_DOUBLE;
     m_efa=AUROSTD_MAX_DOUBLE;
     m_zero_padding_temperature=0;
     m_temperatures_int=false;
@@ -1691,6 +1703,7 @@ namespace pocc {
     total_permutations_count=b.total_permutations_count;
     //for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){(*it).clear();}
     l_supercell_sets.clear();for(std::list<POccSuperCellSet>::const_iterator it=b.l_supercell_sets.begin();it!=b.l_supercell_sets.end();++it){l_supercell_sets.push_back(*it);}
+    m_Hmix=b.m_Hmix;
     m_efa=b.m_efa;
     m_zero_padding_temperature=b.m_zero_padding_temperature;
     m_temperatures_int=b.m_temperatures_int;
@@ -6628,7 +6641,7 @@ namespace pocc {
   void POccStructuresFile::setAFlags(const _aflags& aflags) {m_aflags=aflags;}
 
   void POccStructuresFile::readFile(const string& fileIn) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccStructuresFile::readFile():";
 
     m_filename="";
@@ -6646,7 +6659,7 @@ namespace pocc {
   }
 
   void POccStructuresFile::processFile() {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccStructuresFile::processFile():";
 
     //get poscar_start_tag and poscar_stop_tag
@@ -6844,7 +6857,7 @@ namespace pocc {
   }
 
   bool POccStructuresFile::getARUNDirectories(vector<string>& ARUN_directories,bool tryDirectoryLS){
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccStructuresFile::getARUNDirectories():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccStructuresFile not initialized",_RUNTIME_ERROR_);}
 
@@ -6911,7 +6924,7 @@ namespace pocc {
   }
 
   bool POccStructuresFile::loadDataIntoCalculator(POccCalculator& pcalc,bool tryDirectoryLS) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="POccStructuresFile::loadDataIntoCalculator():";
 
     //copy over l_supercell_sets

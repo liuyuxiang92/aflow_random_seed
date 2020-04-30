@@ -87,6 +87,10 @@ namespace pocc {
 
   string getARUNString(const std::list<POccSuperCellSet>& l_supercell_sets,unsigned long long int i);
   string getARUNString(unsigned long long int index_structure_group,unsigned long long int vstructure_groups_size,unsigned long long int index_structure,unsigned long long int vstructures_size,unsigned long long int index_hnf,unsigned long long int index_site_config,bool include_strgrp=false);
+
+  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies);
+  double getHmix(const xvector<double>& v_dg,const xvector<double>& v_energies,double& dg_total);
+  double getEFA(const xvector<double>& v_dg,const xvector<double>& v_energies);
 } // namespace pocc
 
 namespace pocc {
@@ -495,6 +499,7 @@ namespace pocc {
 
       //post-processing
       vector<string> m_ARUN_directories;
+      double m_Hmix;
       double m_efa;
       int m_zero_padding_temperature;
       bool m_temperatures_int;
