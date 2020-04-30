@@ -4839,7 +4839,18 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   content=stringstreamIN.str();
   vcontent.clear();
   vector<string> vline,tokens;
-  aurostd::string2vectorstring(content,vcontent);
+  // AS20200420 [BEGIN]
+  // vasp 5.x.x uses '\n' as a separator between blocks of eigenvalues of
+  // different k-points, while vasp 4.x.x uses " \n" (space+newline).
+  // When a regular string2vectorsting is used, a sequence of "\n\n" is
+  // treated as a single '\n'. As a result separating line disappears
+  // in vcontent and the line indices are inconsistent.
+  // As a result, vweight, vkpoint and venergy vectors are not correctly populated.
+  // Setting consecutive = true in string2vectorstring fixes the issue.
+  //
+  // aurostd::string2vectorstring(content,vcontent);
+  aurostd::string2vectorstring(content,vcontent,true,false);
+  // AS20200420 [END]
   string line;
   if(filename=="") filename="stringstream";
   // crunching to eat the info
