@@ -21,7 +21,7 @@
 
 #define _EPS_ 0.02
 //#define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75 //CO20171023 - see aflow.h
-#define AFLOWLIB_SERVER_DEFAULT string("aflowlib.duke.edu")
+//[CO20200404 - moved to aflow.h]#define AFLOWLIB_SERVER_DEFAULT string("aflowlib.duke.edu")
 
 using aurostd::isdifferent;
 using aurostd::isequal;

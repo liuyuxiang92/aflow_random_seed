@@ -17,7 +17,7 @@ xAIMSOUT::xAIMSOUT() {
   content="";
   filename="";
   natoms=0;
-  ERROR="";
+  //[CO20200404 - OBSOLETE]ERROR="";
   free();
 }
 

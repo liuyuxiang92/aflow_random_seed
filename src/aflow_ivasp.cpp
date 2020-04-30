@@ -401,8 +401,8 @@ namespace KBIN {
           if(!aurostd::RemoveWhiteSpacesFromTheBack(potcar_paths[j]).empty()){
             const string& potcar_path=potcar_paths[j];
             aurostd::string2tokens(potcar_path,path_parts,"/");
-            if(aurostd::withinList(path_parts,"TESTS")){continue;}  //skip VASP/TESTS
-            if(aurostd::withinList(path_parts,"BENCHS")){continue;}  //skip VASP/BENCHS
+            if(aurostd::WithinList(path_parts,"TESTS")){continue;}  //skip VASP/TESTS
+            if(aurostd::WithinList(path_parts,"BENCHS")){continue;}  //skip VASP/BENCHS
             if(path_parts.size()<2){continue;}
             element_raw=path_parts[path_parts.size()-2];
             if(aurostd::substring2bool(element_raw,"runelements")){continue;} //garbage pp
@@ -2162,7 +2162,7 @@ namespace KBIN {
           aus << "00000  MESSAGE " << STRING_KPOINTS_TO_SHOW << " Found Lattice=" << xvasp.str.bravais_lattice_variation_type << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           xvasp.str.kpoints_kscheme="Monkhorst-Pack";
 	  //          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma";  // also add RHL
-          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";
+          if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";  //DX+CO20200404 - 3-fold symmetries REQUIRE Gamma-centered
           aus << "00000  MESSAGE " << STRING_KPOINTS_TO_SHOW << "_KSCHEME=\"" << xvasp.str.kpoints_kscheme << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
@@ -2369,7 +2369,7 @@ namespace KBIN {
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSCHEME_AUTO  Found Lattice=" << xvasp.str.bravais_lattice_variation_type << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       xvasp.str.kpoints_kscheme="Monkhorst-Pack";
       //     if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC") xvasp.str.kpoints_kscheme="Gamma"; // add RHL
-      if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";
+      if(xvasp.str.bravais_lattice_variation_type=="HEX" || xvasp.str.bravais_lattice_variation_type=="FCC" || xvasp.str.bravais_lattice_variation_type=="RHL") xvasp.str.kpoints_kscheme="Gamma";  //DX+CO20200404 - 3-fold symmetries REQUIRE Gamma-centered
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]KPOINTS=KSCHEME_" << xvasp.str.kpoints_kscheme << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_KPOINTS_OPERATION(xvasp,xvasp.str.kpoints_kscheme);
@@ -5596,9 +5596,13 @@ namespace KBIN {
 // ***************************************************************************//
 namespace KBIN {
   xstructure GetMostRelaxedStructure(string directory) {
+    string soliloquy="KBIN::GetMostRelaxedStructure():";  //CO20200404
     string POSCARfile;
 
-    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractAtomicSpecies: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) {
+      //[CO20200404 - OBSOLETE]cerr << "ERROR - " << soliloquy << " XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); 
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "XHOST.vext.size()!=XHOST.vcat.size(), aborting", _RUNTIME_ERROR_);
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //READ POSCAR.orig
@@ -5655,8 +5659,9 @@ namespace KBIN {
       }
     }
     if(!found_POSCAR)  {
-      cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No POSCAR[.bands|.static|.relax2|.relax1][.EXT] found in the directory, aborting." << endl;
-      exit(0);
+      //[CO20200404 - OBSOLETE]cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No POSCAR[.bands|.static|.relax2|.relax1][.EXT] found in the directory, aborting." << endl;
+      //[CO20200404 - OBSOLETE]exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "No POSCAR[.bands|.static|.relax2|.relax1][.EXT] found in the directory, aborting", _INPUT_MISSING_);
     }
 
     xstructure xstr_name(POSCARfile, IOVASP_POSCAR); //import xstructure from filename
@@ -5669,11 +5674,17 @@ namespace KBIN {
 // KBIN::ExtractAtomicSpecies
 // ***************************************************************************//
 namespace KBIN {
-  vector<string> ExtractAtomicSpecies(string directory) {
+  vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss) {ofstream FileMESSAGE;return ExtractAtomicSpecies(directory,FileMESSAGE,oss);} //CO20200404 - added ofstream
+  vector<string> ExtractAtomicSpecies(const string& directory,ofstream& FileMESSAGE,ostream& oss) { //CO20200404 - added ofstream
+    string soliloquy="KBIN::ExtractAtomicSpecies():"; //CO20200404
+    stringstream message;
     string OUTCARfile; //, POSCARfile;
     string file_outcar_tmp=aurostd::TmpFileCreate("OUTCAR.tmp");
 
-    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractAtomicSpecies: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) {
+      //[CO20200404 - OBSOLETE]cerr << "ERROR - " << soliloquy << " XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "XHOST.vext.size()!=XHOST.vcat.size(), aborting", _RUNTIME_ERROR_);
+    }
 
     xstructure xstr_name=GetMostRelaxedStructure(directory); //CO20180626
 
@@ -5681,8 +5692,9 @@ namespace KBIN {
     if(aurostd::FileExist(directory+"/POSCAR.orig")) {
       xstructure xstr_poscar_orig(directory+"/POSCAR.orig", IOVASP_POSCAR);
       if(xstr_poscar_orig.atoms.size()!=xstr_name.atoms.size()) {
-        cerr << "!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!" << endl;
-        cerr << "I tell you--'POSCAR.orig' has different atoms number from 'POSCAR.bands', though I can still produce PEDOS plots for you!" << endl;
+        //[CO20200404 - OBSOLETE]cerr << "!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!" << endl;
+        //[CO20200404 - OBSOLETE]cerr << "I tell you--'POSCAR.orig' has different atoms number from 'POSCAR.bands', though I can still produce PEDOS plots for you!" << endl;
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "POSCAR.orig has different atoms number from POSCAR.bands", directory, FileMESSAGE, oss, _LOGGER_ERROR_);
       }
     }
 
@@ -5716,8 +5728,9 @@ namespace KBIN {
           }
         }
         if(!found_OUTCAR) {
-          cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No OUTCAR[.static][.EXT] found in the directory, aborting." << endl;
-          exit(0);
+          //[CO20200404 - OBSOLETE]cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No OUTCAR[.static][.EXT] found in the directory, aborting." << endl;
+          //[CO20200404 - OBSOLETE]exit(0);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "No OUTCAR[.static][.EXT] found in the directory, aborting", _INPUT_MISSING_);
         }
 
         vector<string> vposcars, vpp;
@@ -5759,11 +5772,15 @@ namespace KBIN {
 // ***************************************************************************//
 namespace KBIN {
   double ExtractEfermiOUTCAR(string directory) {
+    string soliloquy="KBIN::ExtractEfermiOUTCAR():";  //CO20200404
     double Efermi=0;
     string OUTCARfile, stmp, line;
     stringstream  strline;
 
-    if(XHOST.vext.size()!=XHOST.vcat.size()) { cerr << "ERROR - KBIN::ExtractEfermiOUTCAR: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0); }
+    if(XHOST.vext.size()!=XHOST.vcat.size()) {
+      //[CO20200404 - OBSOLETE]cerr << "ERROR - KBIN::ExtractEfermiOUTCAR: XHOST.vext.size()!=XHOST.vcat.size(), aborting." << endl; exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "XHOST.vext.size()!=XHOST.vcat.size(), aborting", _RUNTIME_ERROR_);
+    }
 
     bool found_OUTCAR=FALSE;
 
@@ -5786,8 +5803,9 @@ namespace KBIN {
       }
     }
     if(!found_OUTCAR) {
-      cerr <<"ERROR - KBIN::ExtractEfermiOUTCAR: No OUTCAR[.static][.EXT] found in the directory, aborting." << endl;
-      exit(0);
+      //[CO20200404 - OBSOLETE]cerr <<"ERROR - KBIN::ExtractEfermiOUTCAR: No OUTCAR[.static][.EXT] found in the directory, aborting." << endl;
+      //[CO20200404 - OBSOLETE]exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "No OUTCAR[.static][.EXT] found in the directory, aborting", _INPUT_MISSING_);
     }
 
     ////GET Number of IONS and Fermi

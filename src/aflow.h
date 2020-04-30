@@ -141,6 +141,7 @@ extern string _AFLOWLOCK_;
 // aflow2 default definitions
 #define AFLOW_MATERIALS_SERVER_DEFAULT        string("materials.duke.edu")
 #define AFLOW_WEB_SERVER_DEFAULT              string("nietzsche.mems.duke.edu")
+#define AFLOWLIB_SERVER_DEFAULT               string("aflowlib.duke.edu")
 #define AFLOWLIB_MATERIALS_SERVER             string("aflow.org")
 #define AFLOWLIB_CONSORTIUM_STRING            string("AFLOW - www.aflow.org consortium")
 #define _XENTRY_ string("index.php")
@@ -1420,6 +1421,8 @@ class AtomEnvironment{
 #define IOAIMS_AUTO    9
 #define IOAIMS_GEOM   10
 #define IOCIF         11 //DX20180723
+#define IOELK_AUTO    12 //DX20200310
+#define IOELK_GEOM    13 //DX20200310
 
 #define NOSG string("NNN #0")
 
@@ -1510,8 +1513,8 @@ class xstructure {
     string findsym2execute(double tolerance=DEFAULT_FINDSYM_TOL);
     string findsym2print(double tolerance=DEFAULT_FINDSYM_TOL);
     //  string platon2sg(void);
-    double GetVolume(void);                                       // Return volume
-    double Volume(void);                                          // Return volume
+    double GetVolume(void) const;                                 // Return volume  //CO20200201
+    double Volume(void) const;                                    // Return volume  //CO20200201
     double GetZVAL(const vector<double>& vZVAL);                  // Given the ZVAL of each species, it returns total ZVAL of cell
     double GetPOMASS(const vector<double>& vPOMASS);              // Given the POMASS of each species, it returns total POMASS of cell
     void ClearSymmetry(void);                                     // Clear all the symmetry
@@ -1541,6 +1544,7 @@ class xstructure {
     void xstructure2aims(void);                                   // some wrap up IOs to convert format to AIMS
     void xstructure2cif(void);                                    // some wrap up IOs to convert format to CIF //DX20190123
     void xstructure2abccar(void);                                 // some wrap up IOs to convert format to ABCCAR //DX20190123
+    void xstructure2elk(void);                                    // some wrap up IOs to convert format to ELK //DX20200313
     //[CO20180420 - moved outside of xstructure]bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
     //[CO20180420 - moved outside of xstructure]bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
     // OPERATORS                                                  // --------------------------------------
@@ -2421,6 +2425,7 @@ xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input);
+xstructure input2ELKxstr(istream& input); //DX20200313
 
 // ----------------------------------------------------------------------------
 // functions related to AtomEnvironment - DX20191122
@@ -2441,6 +2446,8 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
+bool EgapTest(ostream& oss=cout);
+bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool gcdTest(ostream& oss=cout);
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool smithTest(ostream& oss=cout);
@@ -2908,7 +2915,8 @@ namespace KBIN {
   string ExtractSystemNameFromVASP(string directory);  //ME20200217
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
-  vector<string> ExtractAtomicSpecies(string directory);
+  vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);
+  vector<string> ExtractAtomicSpecies(const string& directory,ofstream& FileMESSAGE,ostream& oss=cout);
 
 }
 
@@ -2971,14 +2979,21 @@ class xQMVASP;  //CO20190803
 namespace aflowlib { class _aflowlib_entry;}
 
 // -------------------------------------------------------------------------------------------------
-class xOUTCAR {
+class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xOUTCAR();                                                    // default, just allocate
-    ~xOUTCAR();                                                   // kill everything
-    xOUTCAR(const string& fileIN,bool=TRUE);                      // constructor from filename, QUIET
+    xOUTCAR(ostream& oss=cout);                         // default, just allocate  //CO20200404 - xStream integration for logging
+    xOUTCAR(ofstream& FileMESSAGE,ostream& oss=cout);   // default, just allocate  //CO20200404 - xStream integration for logging
+    xOUTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                        // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    xOUTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);  // constructor from filename, QUIET  //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE);  //ME20200427
+    
     xOUTCAR(const xOUTCAR& b);                                    // constructor copy
+    ~xOUTCAR();                                                   // kill everything
     const xOUTCAR& operator=(const xOUTCAR &b);                   // copy
     void clear(void);                                             // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string SYSTEM;
@@ -3053,10 +3068,8 @@ class xOUTCAR {
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
-    bool GetPropertiesFile(const string& fileIN,uint natoms_check,bool);       // get everything QUIET
+    bool GetPropertiesFile(const string& fileIN,uint natoms_check,bool=TRUE);       // get everything QUIET  //CO20200404 - added default for bool
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-    // EFFECTIVE MASSES
-    friend bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr);
     vector<int> band_index;
     vector<int> carrier_spin;
     vector<string> carrier_type;
@@ -3111,7 +3124,7 @@ class xOUTCAR {
     double         Egap_fit_net;
     vector<string> Egap_type;
     string         Egap_type_net;
-    string ERROR;
+    //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
     //int spin;  //CO20171006 - camilo garbage
@@ -3121,15 +3134,26 @@ class xOUTCAR {
     void copy(const xOUTCAR& b); //
 };
 
+// EFFECTIVE MASSES //CO20200404 - moved from "friend" of xOUTCAR
+bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr,ostream& oss=cout); //CO20200404
+bool GetEffectiveMass(xOUTCAR& outcar, xDOSCAR& doscar, xEIGENVAL& eigenval, xstructure xstr,ofstream& FileMeSSAGE,ostream& oss=cout); //CO20200404
+
 //-------------------------------------------------------------------------------------------------
-class xDOSCAR {
+class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xDOSCAR();                                                    // default, just allocate
-    ~xDOSCAR();                                                   // kill everything
-    xDOSCAR(const string& fileIN,bool=TRUE);                      // constructor from filename QUIET
+    xDOSCAR(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xDOSCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xDOSCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xDOSCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
+
     xDOSCAR(const xDOSCAR& b);                                    // constructor copy
+    ~xDOSCAR();                                                   // kill everything
     const xDOSCAR& operator=(const xDOSCAR &b);                   // copy
     void clear(void);                                             // clear
+    
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string title;
@@ -3161,7 +3185,7 @@ class xDOSCAR {
     bool lmResolved;  // Is it lm-resolved?
     string carstring;  // The fourth line of the DOSCAR
     //ME20190620 END
-    string ERROR; //CO20191004
+    //[CO20200404 - OBSOLETE]string ERROR; //CO20191004
     vector<double> conduction_band_min;     //CO20191004
     double         conduction_band_min_net; //CO20191004
     vector<double> valence_band_max;        //CO20191004
@@ -3187,14 +3211,21 @@ class xDOSCAR {
     void copy(const xDOSCAR& b);                                  //
 };
 //-------------------------------------------------------------------------------------------------
-class xEIGENVAL {
+class xEIGENVAL : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xEIGENVAL();                                                  // default, just allocate
-    ~xEIGENVAL();                                                 // kill everything
-    xEIGENVAL(const string& fileIN,bool=TRUE);                    // constructor from filename QUIET
+    xEIGENVAL(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xEIGENVAL(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xEIGENVAL(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xEIGENVAL(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
+    
     xEIGENVAL(const xEIGENVAL& b);                                // constructor copy
+    ~xEIGENVAL();                                                 // kill everything
     const xEIGENVAL& operator=(const xEIGENVAL &b);               // copy
     void clear(void);                                             // clear
+    
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string title;
@@ -3221,14 +3252,21 @@ class xEIGENVAL {
     void copy(const xEIGENVAL& b);                                //
 };
 //-------------------------------------------------------------------------------------------------
-class xPOTCAR {
+class xPOTCAR : public xStream { //CO20200404 - xStream integration for logging
   public:
-    xPOTCAR();                                                    // default, just allocate
+    xPOTCAR(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xPOTCAR(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xPOTCAR(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xPOTCAR(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
+    
     ~xPOTCAR();                                                   // kill everything
-    xPOTCAR(const string& fileIN,bool=TRUE);                      // constructor from filename QUIET
     xPOTCAR(const xPOTCAR& b);                                    // constructor copy
     const xPOTCAR& operator=(const xPOTCAR &b);                   // copy
     void clear(void);                                             // clear
+    
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+    
     // CONTENT
     string content;vector<string> vcontent;                       // the content and the lines
     string filename;                                              // the filename - THIS IS A GLOBAL PROPERTY OF THE WHOLE POTCAR
@@ -3392,14 +3430,21 @@ class xCHGCAR {
     void copy(const xCHGCAR& b); //
 };
 
-class xQMVASP {  //CO20191110
+class xQMVASP : public xStream {  //CO20191110 //CO20200404 - xStream integration for logging
   public:
-    xQMVASP();                                                     // default, just allocate
+    xQMVASP(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xQMVASP(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xQMVASP(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xQMVASP(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
+    
     ~xQMVASP();                                                    // kill everything
-    xQMVASP(const string& fileIN,bool=TRUE);                       // constructor from filename QUIET
     xQMVASP(const xQMVASP& b);                                     // constructor copy
     const xQMVASP& operator=(const xQMVASP &b);                    // copy
     void clear(void);                                              // clear
+    
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
     // CONTENT
     string content;vector<string> vcontent;string filename;        // the content, and lines of it
     double H_atom_relax;
@@ -3454,7 +3499,7 @@ class xAIMSOUT {
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     vector<aurostd::xvector<double> > vforces;                    // for aflowlib_libraries.cpp
     double natoms;
-    string ERROR;
+    //[CO20200404 - OBSOLETE]string ERROR;
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
@@ -3522,40 +3567,60 @@ namespace plotter {
   void generateHeader(stringstream&, const aurostd::xoption&, bool=false);
   void savePlotGNUPLOT(const aurostd::xoption&, const stringstream&);
   void setFileName(aurostd::xoption&, string="");
-  void setTitle(aurostd::xoption&);
-  string formatDefaultPlotTitle(const aurostd::xoption&);
+  void setTitle(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void setTitle(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  string formatDefaultPlotTitle(const aurostd::xoption&,ostream& oss=cout); //CO20200404
+  string formatDefaultPlotTitle(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  //ME20190813
   vector<double> getCompositionFromANRLPrototype(const string&);
-  string formatDefaultTitlePOCC(const aurostd::xoption&);
-  string formatDefaultTitlePOCC_20191004(const aurostd::xoption&); //CO20191110
-  string formatDefaultTitlePOCC_20190101(const aurostd::xoption&);
+  string formatDefaultTitlePOCC(const aurostd::xoption&,ostream& oss=cout); //CO20200404
+  string formatDefaultTitlePOCC(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  string formatDefaultTitlePOCC_20191004(const aurostd::xoption&,ostream& oss=cout); //CO20191110 //CO20200404
+  string formatDefaultTitlePOCC_20191004(const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110 //CO20200404
+  string formatDefaultTitlePOCC_20190101(const aurostd::xoption&,ostream& oss=cout);  //CO20200404
   vector<double> getCompositionFromPoccString(const string&, bool&);
 
   // Electronic structure ----------------------------------------------------
   void patchDefaultTitleAFLOWIN(xoption& plotoptions);  //CO20191110
   // Plot functions
-  void PLOT_DOS(aurostd::xoption&);
-  void PLOT_DOS(aurostd::xoption&,const xDOSCAR&); //CO20191110
-  void PLOT_DOS(aurostd::xoption&, stringstream&);
-  void PLOT_DOS(aurostd::xoption&, stringstream&,const xDOSCAR&);  //CO20191110
-  void PLOT_PDOS(aurostd::xoption&);
-  void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&); //CO20191110
-  void PLOT_PDOS(aurostd::xoption&, stringstream&);
-  void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&);  //CO20191110
-  void PLOT_BAND(aurostd::xoption&);
-  void PLOT_BAND(aurostd::xoption&, stringstream&);
+  void PLOT_DOS(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_DOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_DOS(aurostd::xoption&,const xDOSCAR&,ostream& oss=cout); //CO20191110 //CO20200404
+  void PLOT_DOS(aurostd::xoption&,const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110 //CO20200404
+  void PLOT_DOS(aurostd::xoption&,stringstream&,ostream& oss=cout); //CO20200404
+  void PLOT_DOS(aurostd::xoption&,stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_DOS(aurostd::xoption&,stringstream&,const xDOSCAR&,ostream& oss=cout);  //CO20191110  //CO20200404
+  void PLOT_DOS(aurostd::xoption&,stringstream&,const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20191110  //CO20200404
+  
+  void PLOT_PDOS(aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void PLOT_PDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&,ostream& oss=cout); //CO20191110 //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110 //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, stringstream&,ostream& oss=cout); //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&,ostream& oss=cout);  //CO20191110 //CO20200404
+  void PLOT_PDOS(aurostd::xoption&, stringstream&, const xDOSCAR&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20191110 //CO20200404
+  
+  void PLOT_BAND(aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void PLOT_BAND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_BAND(aurostd::xoption&, stringstream&,ostream& oss=cout); //CO20200404
+  void PLOT_BAND(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void BANDDOS2JSON(ostream&, string);
-  void PLOT_BANDDOS(aurostd::xoption&);
-  void PLOT_BANDDOS(aurostd::xoption&, stringstream&);
+  void PLOT_BANDDOS(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_BANDDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_BANDDOS(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
+  void PLOT_BANDDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Helper functions
-  xstructure getStructureWithNames(const aurostd::xoption&, const string& carstring="CAR");  //CO20191110
+  xstructure getStructureWithNames(const aurostd::xoption&,const string& carstring="CAR",ostream& oss=cout);  //CO20191110 //CO20200404
+  xstructure getStructureWithNames(const aurostd::xoption&,ofstream& FileMESSAGE,const string& carstring="CAR",ostream& oss=cout);  //CO20191110 //CO20200404
   string getLatticeFromKpointsTitle(const string&);
   void shiftEfermiToZero(xEIGENVAL&, double);
   void setEMinMax(aurostd::xoption&, double, double);
 
   // DOS
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&);
+  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Bands
   void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);
@@ -3571,25 +3636,38 @@ namespace plotter {
   string getFormattedUnit(const string&);
 
   // Phonons -----------------------------------------------------------------
-  void PLOT_PHDOS(aurostd::xoption&);
-  void PLOT_PHDOS(aurostd::xoption&, stringstream&);
-  void PLOT_PHDISP(aurostd::xoption&);
-  void PLOT_PHDISP(aurostd::xoption&, stringstream&);
-  void PLOT_PHDISPDOS(aurostd::xoption&);
-  void PLOT_PHDISPDOS(aurostd::xoption&, stringstream&);
+  void PLOT_PHDOS(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_PHDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_PHDOS(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
+  void PLOT_PHDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+
+  void PLOT_PHDISP(aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void PLOT_PHDISP(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_PHDISP(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_PHDISPDOS(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_PHDISPDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_PHDISPDOS(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20204004
+  void PLOT_PHDISPDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20204004
+
   void convertEnergies(xEIGENVAL&, const string&);
   void convertEnergies(xDOSCAR&, const string&);
   double getEnergyConversionFactor(const string&);
 
   // Properties plotter ------------------------------------------------------
-  void PLOT_THERMO(aurostd::xoption&);
-  void PLOT_THERMO(aurostd::xoption&, stringstream&);
-  void PLOT_TCOND(aurostd::xoption&);
-  void PLOT_TCOND(aurostd::xoption&, stringstream&);
+  void PLOT_THERMO(aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void PLOT_THERMO(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_THERMO(aurostd::xoption&, stringstream&,ostream& oss=cout); //CO20200404
+  void PLOT_THERMO(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_TCOND(aurostd::xoption&,ostream& oss=cout); //CO20200404
+  void PLOT_TCOND(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void PLOT_TCOND(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
+  void PLOT_TCOND(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // General plots -----------------------------------------------------------
-  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int);
-  void plotMatrix(xoption& plotoptions, stringstream&);
+  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ostream& oss=cout); //CO20200404
+  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
+  void plotMatrix(xoption& plotoptions, stringstream&,ostream& oss=cout); //CO20200404
+  void plotMatrix(xoption& plotoptions, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void setPlotLabels(aurostd::xoption&, const string&, const string&, const string&, const string&);
   vector<vector<double> > readAflowDataFile(aurostd::xoption&);
   void generatePlotGNUPLOT(stringstream&, const xoption&, const vector<vector<double> >&);
@@ -4273,47 +4351,6 @@ namespace KBIN {
 // --------------------------------------------------------------------------------------------------------------------------------------------------------
 // aconvasp_aflow.cpp
 
-namespace pflow {
-  // Dane Morgan style,adjusted by Stefano Curtarolo
-  // Bringing definitions inside the template helps
-  // constructing the right templates.
-  template<class utype>
-    class matrix {
-      public:
-        // constructors
-        matrix(void) {};
-        matrix(const int m);
-        matrix(const int m,const int n);
-        matrix(const int m,const int n,const utype& inutype);
-        matrix(const int m,const vector<utype>& inutypevec);
-        ~matrix(void) {};                         // destructor
-        // accessors
-        void print(void);
-        uint size(void) const {return (uint) mat.size();}
-        matrix<utype> transpose(void) const;
-        //  matrix<utype>::iterator begin();
-        //  matrix<utype>::iterator end();
-        // operator
-        vector<utype>& operator[] (const int i) {assert(i>=0 && i<=(int) mat.size()); return mat[i];}
-        const vector<utype>& operator[] (const int i) const {assert(i>=0 && i<=(int) mat.size()); return mat[i];};
-        const matrix<utype>& operator=(const matrix<utype>& b);
-        // mutators
-        void push_back(const vector<utype>& inutypevec) {mat.push_back(inutypevec);}
-        void pop_back(void) {mat.pop_back();}
-        void vecvec2mat(const vector<vector<utype> >& inVV);
-        void vec2mat(const vector<utype>& inV);
-        void clear(void) {mat.clear();}
-        void insert(const int& id,const vector<utype>& inV) {mat.insert(mat.begin()+id,inV);}
-        void erase(const int id);
-        void erase_col(const int id);
-      private:
-        vector<vector<utype> > mat;
-    };
-  template <class utype> matrix<utype>  xmatrix2matrix(const xmatrix<utype>& );
-  template <class utype> xmatrix<utype> matrix2xmatrix(const matrix<utype>& );
-}
-
-
 xstructure PutInCell(const xstructure& a);     // Bring all atoms in the cell (will be moved to external function)
 xstructure PutInCompact(const xstructure& a);  // Bring all atoms in a compact shape (will be moved to external function)
 xstructure GetPrim(const xstructure& a);
@@ -4338,15 +4375,15 @@ namespace pflow {
   // [OBSOLETE] void GetNeighData(const deque<_atom>& in_atom_vec,const xstructure& in_str,const double& rmin,const double& rmax,deque<deque<_atom> >& neigh_mat);
   // [OBSOLETE] void GetStrNeighData(const xstructure& str,const double cutoff,deque<deque<_atom> >& neigh_mat);
   double GetVol(const xmatrix<double>& lat);
-  double GetVol(const pflow::matrix<double>& lat);
+  double GetVol(const aurostd::matrix<double>& lat); //CO20200404 pflow::matrix()->aurostd::matrix()
   double GetSignedVol(const xmatrix<double>& lat);
-  double GetSignedVol(const pflow::matrix<double>& lat);
+  double GetSignedVol(const aurostd::matrix<double>& lat); //CO20200404 pflow::matrix()->aurostd::matrix()
   xmatrix<double> RecipLat(const xmatrix<double>& lat);
-  pflow::matrix<double> RecipLat(const pflow::matrix<double>& lat);
+  aurostd::matrix<double> RecipLat(const aurostd::matrix<double>& lat);  //CO20200404 pflow::matrix()->aurostd::matrix()
   _atom SetCpos(const _atom& a,const vector<double>& in_cpos);
   _atom SetFpos(const _atom& a,const vector<double>& in_fpos);
-  vector<double> vecF2C(const pflow::matrix<double>& lat,const vector<double>& vf);
-  vector<double> vecC2F(const pflow::matrix<double>& lat,const vector<double>& vc);
+  vector<double> vecF2C(const aurostd::matrix<double>& lat,const vector<double>& vf);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  vector<double> vecC2F(const aurostd::matrix<double>& lat,const vector<double>& vc);  //CO20200404 pflow::matrix()->aurostd::matrix()
   _atom SetName(const _atom& a,const string& in_name);
   _atom SetType(const _atom& a,const int in_type);
   _atom SetNum(const _atom& a,const int in_num);
@@ -4354,16 +4391,16 @@ namespace pflow {
   vector<string> GetNames(const xstructure& a);
   vector<string> GetCleanNames(const xstructure& a);
   vector<double> GetSpins(const xstructure& a);
-  pflow::matrix<double> GetFpos(const xstructure& str);
-  pflow::matrix<double> GetCpos(const xstructure& str);
+  aurostd::matrix<double> GetFpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  aurostd::matrix<double> GetCpos(const xstructure& str);  //CO20200404 pflow::matrix()->aurostd::matrix()
   xstructure SetNumEachType(const xstructure& a,const deque<int>& in_num_each_type);
   deque<int> GetNumEachType(const xstructure& a);
-  xstructure SetLat(const xstructure& a,const pflow::matrix<double>& in_lat);
-  pflow::matrix<double> GetLat(const xstructure& a);
+  xstructure SetLat(const xstructure& a,const aurostd::matrix<double>& in_lat);  //CO20200404 pflow::matrix()->aurostd::matrix()
+  aurostd::matrix<double> GetLat(const xstructure& a); //CO20200404 pflow::matrix()->aurostd::matrix()
   double GetScale(const xstructure& a);
-  pflow::matrix<double> GetScaledLat(const xstructure& a);
-  xstructure AddAllAtomPos(const xstructure& a,const pflow::matrix<double>& in_pos,const int in_coord_flag);
-  xstructure SetAllAtomPos(const xstructure& a,const pflow::matrix<double>& in_pos,const int in_coord_flag);
+  aurostd::matrix<double> GetScaledLat(const xstructure& a); //CO20200404 pflow::matrix()->aurostd::matrix()
+  xstructure AddAllAtomPos(const xstructure& a,const aurostd::matrix<double>& in_pos,const int in_coord_flag); //CO20200404 pflow::matrix()->aurostd::matrix()
+  xstructure SetAllAtomPos(const xstructure& a,const aurostd::matrix<double>& in_pos,const int in_coord_flag); //CO20200404 pflow::matrix()->aurostd::matrix()
   xstructure SetAllAtomNames(const xstructure& a,const vector<string>& in_names);
   xstructure SetNamesWereGiven(const xstructure& a,const vector<int>& in_names_were_given);
   xstructure SetOrigin(const xstructure& a,const vector<double>& in_origin);
@@ -4373,16 +4410,16 @@ namespace pflow {
   bool VVequal(const deque<double>& a,const deque<double>& b);
   bool VVequal(const deque<int>& a,const deque<int>& b);
   vector<double> SmoothFunc(const vector<double>& func,const double& sigma);
-  void VVset(matrix<double>& mat,const double& value);
+  void VVset(aurostd::matrix<double>& mat,const double& value);  //CO20200404 pflow::matrix()->aurostd::matrix()
   void VVset(vector<vector< int> >& mat,const int& value);
   double norm(const vector<double>& v);
   double getcos(const vector<double>& a,const vector<double>& b);
-  //  vector<double> Getabc_angles(const pflow::matrix<double>& lat);   // confuses namespace
+  //  vector<double> Getabc_angles(const aurostd::matrix<double>& lat);   // confuses namespace  //CO20200404 pflow::matrix()->aurostd::matrix()
   vector<double> Sort_abc_angles(const vector<double>& abc_angles);
   void Vout(const vector<double>& a,ostream& out);
   void Vout(const vector<int>& a,ostream& out);
   void Vout(const vector<string>& a,ostream& out);
-  void Mout(const pflow::matrix<double>& m,ostream& out);
+  void Mout(const aurostd::matrix<double>& m,ostream& out);  //CO20200404 pflow::matrix()->aurostd::matrix()
   void Mout(const vector<vector<double> >& m,ostream& out);
   vector<double> SVprod(const double& s,const vector<double>& b);
   vector<int> SVprod(const int& s,const vector<int>& b);
@@ -4391,10 +4428,10 @@ namespace pflow {
   vector<double> VVdiff(const vector<double>& a,const vector<double>& b);
   double VVprod(const vector<double>& a,const vector<double>& b);
   double VVprod(const vector<double>& a,const vector<int>& b);
-  pflow::matrix<double> MMmult(const pflow::matrix<double>& a,const pflow::matrix<double>& b);
-  vector<double> MVmult(const pflow::matrix<double>& A,const vector<double>& v);
-  vector<double> VMmult(const vector<double>& v,const pflow::matrix<double>& A);
-  vector<double> VMmult(const vector<int>& v,const pflow::matrix<double>& A);
+  aurostd::matrix<double> MMmult(const aurostd::matrix<double>& a,const aurostd::matrix<double>& b); //CO20200404 pflow::matrix()->aurostd::matrix()
+  vector<double> MVmult(const aurostd::matrix<double>& A,const vector<double>& v); //CO20200404 pflow::matrix()->aurostd::matrix()
+  vector<double> VMmult(const vector<double>& v,const aurostd::matrix<double>& A); //CO20200404 pflow::matrix()->aurostd::matrix()
+  vector<double> VMmult(const vector<int>& v,const aurostd::matrix<double>& A);  //CO20200404 pflow::matrix()->aurostd::matrix()
   vector<double> VVcross(const vector<double>& a,const vector<double>& b);
   double VVdot(const vector<double>& a,const vector<double>& b);
   int GetNumAtoms(const xstructure& a);
