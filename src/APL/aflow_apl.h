@@ -1048,6 +1048,110 @@ namespace apl {
   };
 }  // namespace apl
 
+// QMesh definition has to come before PhononCalculator
+namespace apl {
+
+  struct _qpoint {
+    xvector<double> cpos;  // Cartesian position of the q-point
+    xvector<double> fpos;  // Fractional coordinates of the q-point
+    int irredQpt;  // The irreducible q-point this q-point belongs to
+    int ibzqpt;  // The index of the irreducible q-point in the _ibzqpt vector
+    int symop;  // Symmetry operation to transform the irreducible q-point into this q-point
+  };
+
+  struct _kcell {
+    xmatrix<double> lattice;  // The reciprocal lattice vectors
+    xmatrix<double> rlattice;  // The real space lattice
+    xmatrix<double> c2f;  // Conversion matrix from Cartesian to fractional
+    xmatrix<double> f2c;  // Conversion matrix from fractional to Cartesian
+    bool skewed;  // Is the lattice skewed?
+    vector<_sym_op> pgroup;  // The point group operations of the reciprocal cell
+  };
+
+  class QMesh : public xStream {
+    public:
+      QMesh(ostream& oss=std::cout);
+      QMesh(ofstream&, ostream& os=std::cout);
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
+      QMesh(const vector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
+      QMesh(const QMesh&);
+      QMesh& operator=(const QMesh&);
+      ~QMesh();
+      void clear();
+      void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
+      void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
+
+      void setDirectory(const string& dir);
+      void setModule(const string&);
+      const string& getDirectory() const;
+      const string& getModule() const;
+
+      void makeIrreducible();
+      void calculateLittleGroups();  // ME20200109
+      void writeQpoints(string, bool=true);
+      void writeIrredQpoints(string, bool=true);
+
+      int getnIQPs() const;
+      int getnQPs() const;
+      int getGrid(int) const;
+      const xvector<int>& getGrid() const;
+      const _qpoint& getIrredQPoint(int) const;
+      const _qpoint& getIrredQPoint(int, int, int) const;
+      vector<xvector<double> > getIrredQPointsCPOS() const;
+      vector<xvector<double> > getIrredQPointsFPOS() const;
+      int getIrredQPointIndex(int) const;
+      int getIrredQPointIndex(int, int, int) const;
+      const _qpoint& getQPoint(int) const;
+      const _qpoint& getQPoint(int, int, int) const;
+      const _qpoint& getQPoint(const xvector<double>&) const;  //ME20190813
+      int getQPointIndex(xvector<double>) const;  //ME20190813
+      int getQPointIndex(int, int, int) const;
+      vector<xvector<double> > getQPointsCPOS() const;
+      vector<xvector<double> > getQPointsFPOS() const;
+      int getIbzqpt(int) const;
+      int getIbzqpt(int, int, int) const;
+      const vector<int>& getIbzqpts() const;
+      const vector<_qpoint>& getPoints() const;
+      const _kcell& getReciprocalCell() const;
+      bool isShifted() const;  //ME20190813
+      const xvector<double>& getShift() const;
+      const vector<int>& getWeights() const;
+      bool initialized() const;
+      bool isReduced() const;
+      bool isGammaCentered() const;
+      bool littleGroupsCalculated() const;  // ME20200109
+      const vector<int>& getLittleGroup(int) const;  // ME20200109
+
+    private:
+      void free();
+      void copy(const QMesh&);
+
+      string _directory;
+
+      vector<int> _ibzqpts;  // The indices of the irreducible q-points
+      bool _initialized;  // Indicates whether the QMesh object has been intialized
+      bool _isGammaCentered;  // Indicates whether the includes the Gamma point
+      vector<vector<int> > _littleGroups;  // The little groups of the irreducible q-points
+      bool _littleGroupsCalculated;  // Indicates whether the little groups have been calculated
+      int _nIQPs;  // The number of irreducible q-points
+      int _nQPs;  // The number of q-points
+      xvector<int> _qptGrid;  // The dimensions of the q-point mesh
+      vector<vector<vector<int> > > _qptMap;  // Maps a q-point triplet to a q-point index
+      vector<_qpoint> _qpoints;  // The q-points of the mesh
+      _kcell _recCell;  // The reciprocal cell
+      bool _reduced;  // Indicates whether the q-point mesh has been reduced
+      bool _shifted;  // Indicates whether the q-point mesh has been shifted
+      xvector<double> _shift;  // The shift vector of the mesh
+      vector<int> _weights;  // The weights of each irreducible q-point
+
+      void setGrid(const xvector<int>&);
+      void setupReciprocalCell(xstructure, bool);
+      void generateGridPoints(bool);
+      void shiftMesh(const xvector<double>&);
+      void moveToBZ(xvector<double>&) const;
+  };
+}  // namespace apl
+
 namespace apl {
   class PhononCalculator : public xStream {
     protected:
@@ -1057,6 +1161,7 @@ namespace apl {
       int _ncpus;
 
       Supercell* _supercell;
+      QMesh _qm;
 
       // harmonic IFCs
       vector<vector<xmatrix<double> > > _forceConstantMatrices;
@@ -1099,7 +1204,8 @@ namespace apl {
       void clear(Supercell&);
 
       // Getter functions
-      const Supercell& getSupercell() const;
+      Supercell& getSupercell();
+      QMesh& getQMesh();
       const xstructure& getInputCellStructure() const;
       const xstructure& getSuperCellStructure() const;
       uint getNumberOfBranches() const;
@@ -1116,6 +1222,10 @@ namespace apl {
       void setDirectory(const string&);
       void setNCPUs(const _kflags&);
       void setPolarMaterial(bool);
+
+      // Initializers
+      void initialize_qmesh(const vector<int>&, bool=true, bool=true);
+      void initialize_qmesh(const xvector<int>&, bool=true, bool=true);
 
       // IFCs
       void setHarmonicForceConstants(const ForceConstantCalculator&);
@@ -1283,158 +1393,6 @@ namespace apl { //PN20180705
       vector<int> get_path_segment();
   };
 } // namespace apl
-// ***************************************************************************
-//ME20190417 BEGIN
-// ***************************************************************************
-// OBSOLETE - all q-point grids are now described using the QMesh class
-// "irpg.h"
-//
-//namespace apl {
-//class IReciprocalPointGrid {
-// public:
-//  virtual ~IReciprocalPointGrid() {}
-//  virtual int getN(int) = 0;
-//  virtual aurostd::xmatrix<double> getReciprocalLattice() = 0;
-//  virtual std::vector<aurostd::xvector<double> > getPoints() = 0;
-//  virtual std::vector<double> getWeights() = 0;
-//  virtual aurostd::xtensor<int> getAllToIrrPointMap() = 0; //ME20180705
-//};
-//}  // end namespace apl
-//
-// ***************************************************************************
-// "mpmesh.h"
-//namespace apl {
-//class MonkhorstPackMesh : virtual public IReciprocalPointGrid {
-// private:
-//  Logger& _logger;
-//  aurostd::xvector<int> _n;
-//  std::vector<aurostd::xvector<double> > _kpoints;
-//  std::vector<double> _weights;
-//  aurostd::xvector<double> _shift;
-//  aurostd::xmatrix<double> _rlattice;
-//  aurostd::xmatrix<double> _klattice;
-//  aurostd::xtensor<int> _allToIrrPointMap; //ME20180705
-//  bool _isIrreducible;
-//
-// private:
-//  void generateAllGridPoints();
-//  void makeIrreducible(const std::vector<_sym_op>&);
-//
-// public:
-//  MonkhorstPackMesh(int, int, int, const xstructure&, Logger&);
-//  ~MonkhorstPackMesh();
-//  void clear();
-//  void setDensity(int);
-//  void setDensity(int, int, int);
-//  // Interface
-//  int getN(int);
-//  aurostd::xmatrix<double> getReciprocalLattice();
-//  std::vector<aurostd::xvector<double> > getPoints();
-//  std::vector<double> getWeights();
-//  aurostd::xtensor<int> getAllToIrrPointMap(); //ME20180705
-//};
-//}  // namespace apl
-
-namespace apl {
-
-  struct _qpoint {
-    xvector<double> cpos;  // Cartesian position of the q-point
-    xvector<double> fpos;  // Fractional coordinates of the q-point
-    int irredQpt;  // The irreducible q-point this q-point belongs to
-    int ibzqpt;  // The index of the irreducible q-point in the _ibzqpt vector
-    int symop;  // Symmetry operation to transform the irreducible q-point into this q-point
-  };
-
-  struct _kcell {
-    xmatrix<double> lattice;  // The reciprocal lattice vectors
-    xmatrix<double> rlattice;  // The real space lattice
-    xmatrix<double> c2f;  // Conversion matrix from Cartesian to fractional
-    xmatrix<double> f2c;  // Conversion matrix from fractional to Cartesian
-    bool skewed;  // Is the lattice skewed?
-    vector<_sym_op> pgroup;  // The point group operations of the reciprocal cell
-  };
-
-  class QMesh : public xStream {
-    public:
-      QMesh(ostream& oss=std::cout);
-      QMesh(ofstream&, ostream& os=std::cout);
-      QMesh(const xvector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
-      QMesh(const vector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
-      QMesh(const QMesh&);
-      QMesh& operator=(const QMesh&);
-      ~QMesh();
-      void clear();
-      void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
-      void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
-
-      void setDirectory(const string& dir);
-      void setModule(const string&);
-      const string& getDirectory() const;
-      const string& getModule() const;
-
-      void makeIrreducible();
-      void calculateLittleGroups();  // ME20200109
-      void writeQpoints(string, bool=true);
-      void writeIrredQpoints(string, bool=true);
-
-      int getnIQPs() const;
-      int getnQPs() const;
-      int getGrid(int) const;
-      const xvector<int>& getGrid() const;
-      const _qpoint& getIrredQPoint(int) const;
-      const _qpoint& getIrredQPoint(int, int, int) const;
-      vector<xvector<double> > getIrredQPointsCPOS() const;
-      vector<xvector<double> > getIrredQPointsFPOS() const;
-      int getIrredQPointIndex(int) const;
-      int getIrredQPointIndex(int, int, int) const;
-      const _qpoint& getQPoint(int) const;
-      const _qpoint& getQPoint(int, int, int) const;
-      const _qpoint& getQPoint(const xvector<double>&) const;  //ME20190813
-      int getQPointIndex(xvector<double>) const;  //ME20190813
-      int getQPointIndex(int, int, int) const;
-      vector<xvector<double> > getQPointsCPOS() const;
-      vector<xvector<double> > getQPointsFPOS() const;
-      int getIbzqpt(int) const;
-      int getIbzqpt(int, int, int) const;
-      const vector<int>& getIbzqpts() const;
-      const vector<_qpoint>& getPoints() const;
-      const _kcell& getReciprocalCell() const;
-      bool isShifted() const;  //ME20190813
-      const xvector<double>& getShift() const;
-      const vector<int>& getWeights() const;
-      bool isReduced() const;
-      bool isGammaCentered() const;
-      bool littleGroupsCalculated() const;  // ME20200109
-      const vector<int>& getLittleGroup(int) const;  // ME20200109
-
-    private:
-      void free();
-      void copy(const QMesh&);
-
-      string _directory;
-
-      vector<int> _ibzqpts;  // The indices of the irreducible q-points
-      bool _isGammaCentered;  // Indicates whether the includes the Gamma point
-      vector<vector<int> > _littleGroups;  // The little groups of the irreducible q-points
-      bool _littleGroupsCalculated;  // Indicates whether the little groups have been calculated
-      int _nIQPs;  // The number of irreducible q-points
-      int _nQPs;  // The number of q-points
-      xvector<int> _qptGrid;  // The dimensions of the q-point mesh
-      vector<vector<vector<int> > > _qptMap;  // Maps a q-point triplet to a q-point index
-      vector<_qpoint> _qpoints;  // The q-points of the mesh
-      _kcell _recCell;  // The reciprocal cell
-      bool _reduced;  // Indicates whether the q-point mesh has been reduced
-      bool _shifted;  // Indicates whether the q-point mesh has been shifted
-      xvector<double> _shift;  // The shift vector of the mesh
-      vector<int> _weights;  // The weights of each irreducible q-point
-
-      void setGrid(const xvector<int>&);
-      void setupReciprocalCell(xstructure, bool);
-      void generateGridPoints(bool);
-      void shiftMesh(const xvector<double>&);
-      void moveToBZ(xvector<double>&) const;
-  };
-}  // namespace apl
 
 namespace apl {
   class LTMethod {
@@ -1497,8 +1455,6 @@ namespace apl {
   { //CO20200106 - patching for auto-indenting
     protected:
       PhononCalculator* _pc;
-      //  IReciprocalPointGrid& _rg;  OBSOLETE ME20190417
-      QMesh* _rg;
       string _bzmethod;  //ME20190423
       std::vector<aurostd::xvector<double> > _qpoints;
       //std::vector<int> _qweights;  OBSOLETE ME20190423
@@ -1524,11 +1480,12 @@ namespace apl {
 
     public:
       DOSCalculator();
-      DOSCalculator(PhononCalculator&, QMesh&, string, const vector<xvector<double> >&);  //ME20190423 //ME20190624 - added projections
+      DOSCalculator(PhononCalculator&, const string&, const vector<xvector<double> >&);
       DOSCalculator(const DOSCalculator&);
       DOSCalculator& operator=(const DOSCalculator&);
       ~DOSCalculator();
-      void clear(PhononCalculator&, QMesh&);
+      void clear(PhononCalculator&);
+      void initialize(const vector<xvector<double> >&, const string&);
       // ME20190423 START
       //virtual void rawCalc(int) {} OBSOLETE ME20190419
       void calcDosRS();
@@ -1546,7 +1503,7 @@ namespace apl {
       const std::vector<double>& getDOS() const;   //ME20200108 - added const
       const std::vector<double>& getIDOS() const;  //ME20200210
       bool hasNegativeFrequencies() const;  //ME20200108 - added const
-      string _system;  //ME20190614
+      string _system;
     private:
       void free();
   };
@@ -1672,11 +1629,11 @@ namespace apl {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
       TCONDCalculator();
-      TCONDCalculator(PhononCalculator&, QMesh&, _aflags&);
+      TCONDCalculator(PhononCalculator&, _aflags&);
       TCONDCalculator(const TCONDCalculator&);
       TCONDCalculator& operator=(const TCONDCalculator&);
       ~TCONDCalculator();
-      void clear(PhononCalculator&, QMesh&, _aflags&);
+      void clear(PhononCalculator&, _aflags&);
       void initialize();
 
       aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
@@ -1699,7 +1656,7 @@ namespace apl {
 
     private:
       PhononCalculator* _pc;  // Reference to the phonon calculator
-      QMesh* _qm;  // Reference to the q-point mesh
+      QMesh* _qm;
       Logger _logger;  // The APL logger
       _aflags* aflags;
 
@@ -1863,7 +1820,7 @@ namespace apl {
       ~AtomicDisplacements();
       void clear(PhononCalculator&);
 
-      void calculateMeanSquareDisplacements(const QMesh&, double, double, double);
+      void calculateMeanSquareDisplacements(double, double, double);
       void calculateModeDisplacements(const vector<xvector<double> >& qpts, bool=true);
 
       const vector<double>& getTemperatures() const;

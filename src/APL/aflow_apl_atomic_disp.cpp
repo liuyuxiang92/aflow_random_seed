@@ -157,18 +157,25 @@ namespace apl {
   // temperatures. For the formula, see e.g. A. A. Mardudin "Theory of
   // Lattice Dynamics in the Harmonic Approximation", eq. 2.4.23 and 2.4.24.
   // Units are Angstrom^2.
-  void AtomicDisplacements::calculateMeanSquareDisplacements(const QMesh& qmesh, double Tstart, double Tend, double Tstep) {
+  void AtomicDisplacements::calculateMeanSquareDisplacements(double Tstart, double Tend, double Tstep) {
+    string function = "AtomicDisplacements::calculateDisplacements()";
+    string message = "";
     _qpoints.clear();
     _temperatures.clear();
 
+    QMesh& _qm = _pc->getQMesh();
+    if (!_qm.initialized()) {
+      message = "q-point mesh is not initialized.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    _qpoints = _pc->getQMesh().getPoints();
+
     if (Tstart > Tend) {
-      string function = "AtomicDisplacements::calculateDisplacements()";
-      string message = "Tstart cannot be higher than Tend.";
+      message = "Tstart cannot be higher than Tend.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     for (double T = Tstart; T <= Tend; T += Tstep) _temperatures.push_back(T);
 
-    _qpoints = qmesh.getPoints();
     calculateMeanSquareDisplacementMatrices();
   }
 

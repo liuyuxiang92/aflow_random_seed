@@ -28,15 +28,10 @@ namespace apl {
     free();
   }
 
-  DOSCalculator::DOSCalculator(PhononCalculator& pc, QMesh& rg, string method,
-      const vector<xvector<double> >& projections) {  // ME20190624
+  DOSCalculator::DOSCalculator(PhononCalculator& pc, const string& method, const vector<xvector<double> >& projections) {
     free();
     _pc = &pc;
-    _rg = &rg;
-    _bzmethod = method;
-    _system = _pc->getSystemName();  // ME20190614
-    _projections = projections;  // ME20190626
-    calculateFrequencies();
+    initialize(projections, method);
   }
 
   DOSCalculator::DOSCalculator(const DOSCalculator& that) {
@@ -54,7 +49,6 @@ namespace apl {
 
   void DOSCalculator::copy(const DOSCalculator& that) {
     _pc = that._pc;
-    _rg = that._rg;
     _bzmethod = that._bzmethod;
     _qpoints = that._qpoints;
     _freqs = that._freqs;
@@ -92,12 +86,28 @@ namespace apl {
     _maxFreq = AUROSTD_NAN;
     _stepDOS = 0.0;
     _halfStepDOS = 0.0;
+    _system = "";
   }
 
-  void DOSCalculator::clear(PhononCalculator& pc, QMesh& rg) {
+  void DOSCalculator::clear(PhononCalculator& pc) {
     free();
     _pc = &pc;
-    _rg = &rg;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+  
+  void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
+    _bzmethod = method;
+    _projections = projections;
+    _system = _pc->getSystemName();
+    QMesh& _qm = _pc->getQMesh();
+    if (!_qm.initialized()) {
+      string function = "apl::DOSCalculator::initialize()";
+      string message = "q-point mesh is not initialized.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    if (_projections.size() == 0) _qm.makeIrreducible();
+    calculateFrequencies();
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -116,17 +126,7 @@ namespace apl {
 
   void DOSCalculator::calculateFrequencies() {
     // Get q-points for which to calculate the frequencies
-    //ME20190419 BEGIN
-    //_qpoints = _rg.getPoints();
-    //_qweights = _rg.getWeights();
-    _qpoints = _rg->getIrredQPointsCPOS();
-    //ME20190419 END
-
-    // 20100708 We do not need it anymore, since mpmesh has all points in catesian coords now
-    // Transform points to the form as it is expected by CPC:
-    // Transform from the reciprocal lattice of the primitive cell to cartesian coordinates
-    // for(uint t = 0; t < _qpoints.size(); t++)
-    //    _qpoints[t] = trasp(ReciprocalLattice(_pc->getPrimitiveCellStructure().lattice)) * _qpoints[t];
+    _qpoints = _pc->getQMesh().getIrredQPointsCPOS();
 
     //CO START
     string message = "Calculating frequencies for the phonon DOS.";
@@ -348,7 +348,7 @@ namespace apl {
         for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
           if ((_freqs[i][j] > (_bins[k] - _halfStepDOS)) &&
               (_freqs[i][j] < (_bins[k] + _halfStepDOS))) {
-            _dos[k] += (double) _rg->getWeights()[i];
+            _dos[k] += (double) _pc->getQMesh().getWeights()[i];
           }
         }
       }
@@ -366,6 +366,8 @@ namespace apl {
   //ME20190625 - rearranged and added projected DOS
   //ME20200213 - added atom-projected DOS
   void DOSCalculator::calcDosLT() {
+    QMesh& _qm = _pc->getQMesh();
+
     // Procompute projections for each q-point and branch to save time
     uint nproj = _projections.size();
     vector<xvector<double> > proj_norm(nproj, xvector<double>(3));
@@ -377,9 +379,10 @@ namespace apl {
     vector<vector<vector<vector<double> > > > parts;
     if (nproj > 0) {
       // Precompute eigenvector projections
+      
       xcomplex<double> eig;
-      parts.assign(_rg->getnQPs(), vector<vector<vector<double> > >(_pc->getNumberOfBranches(), vector<vector<double> >(nproj, vector<double>(natoms, 0))));
-      for (int q = 0; q < _rg->getnQPs(); q++) {
+      parts.assign(_qm.getnQPs(), vector<vector<vector<double> > >(_pc->getNumberOfBranches(), vector<vector<double> >(nproj, vector<double>(natoms, 0))));
+      for (int q = 0; q < _qm.getnQPs(); q++) {
         for (uint br = 0; br < _pc->getNumberOfBranches(); br++) {
           int ibranch = br + _freqs[0].lrows;
           for (uint p = 0; p < nproj; p++) {
@@ -404,7 +407,7 @@ namespace apl {
     double max_freq = _bins.back() + _halfStepDOS;
     double min_freq = _bins.front() - _halfStepDOS;
     vector<vector<int> > tet_corners;
-    LTMethod _lt(*_rg);
+    LTMethod _lt(_qm);
     if (nproj == 0) {
       _lt.makeIrreducible();
       tet_corners = _lt.getIrreducibleTetrahedraIbzqpt();

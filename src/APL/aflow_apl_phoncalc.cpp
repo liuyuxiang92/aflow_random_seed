@@ -25,12 +25,16 @@ namespace apl {
   PhononCalculator::PhononCalculator(ostream& oss) : xStream() {
     free();
     xStream::initialize(oss);
+    _qm = QMesh(oss);
+    _directory = "./";
+    _ncpus = 1;
   }
 
   PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf, ostream& oss) : xStream() {
     free();
     xStream::initialize(mf, oss);
     _supercell = &sc;
+    _qm = QMesh(mf, oss);
     _directory = "./";
     _ncpus = 1;
   }
@@ -60,6 +64,7 @@ namespace apl {
     _inverseDielectricTensor = that._inverseDielectricTensor;
     _isGammaEwaldPrecomputed = that._isGammaEwaldPrecomputed;
     _ncpus = that._ncpus;
+    _qm = that._qm;
     _recsqrtDielectricTensorDeterminant = that._recsqrtDielectricTensorDeterminant;
     _supercell = that._supercell;
     _system = that._system;
@@ -81,6 +86,7 @@ namespace apl {
     _isPolarMaterial = false;
     _ncpus = 0;
     _recsqrtDielectricTensorDeterminant = 0.0;
+    _qm.clear();
     _system = "";
   }
 
@@ -100,7 +106,11 @@ namespace apl {
 
 namespace apl {
 
-  const Supercell& PhononCalculator::getSupercell() const { //CO20180409
+  QMesh& PhononCalculator::getQMesh() {
+    return _qm;
+  }
+
+  Supercell& PhononCalculator::getSupercell() {
     return *_supercell;
   }
 
@@ -158,6 +168,7 @@ namespace apl {
 
   void PhononCalculator::setDirectory(const string& dir) {
     _directory = dir;
+    _qm.setDirectory(dir);
   }
 
   void PhononCalculator::setNCPUs(const _kflags& kfl) {
@@ -166,6 +177,18 @@ namespace apl {
 
   void PhononCalculator::setPolarMaterial(bool polar) {
     _isPolarMaterial = polar;
+  }
+
+}  // namespace apl
+
+namespace apl {
+  void PhononCalculator::initialize_qmesh(const vector<int>& grid, bool include_inversions, bool gamma_centered) {
+    initialize_qmesh(aurostd::vector2xvector(grid), include_inversions, gamma_centered);
+  }
+
+  void PhononCalculator::initialize_qmesh(const xvector<int>& grid, bool include_inversions, bool gamma_centered) {
+    _qm.clear();
+    _qm.initialize(grid, _supercell->getInputStructure(), include_inversions, gamma_centered);
   }
 
 }  // namespace apl

@@ -79,9 +79,9 @@ namespace apl {
     free();
   }
 
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, _aflags& a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, _aflags& a) {
     _pc = &pc;
-    _qm = &qm;
+    _qm = &_pc->getQMesh();  // This pointer is only defined to make the code more legible
     aflags = &a;
     initialize();
   }
@@ -102,7 +102,6 @@ namespace apl {
 
   void TCONDCalculator::copy(const TCONDCalculator& that) {
     _pc = that._pc;
-    _qm = that._qm;
     aflags = that.aflags;
     calc_options = that.calc_options;
     eigenvectors = that.eigenvectors;
@@ -145,10 +144,10 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, _aflags& a) {
+  void TCONDCalculator::clear(PhononCalculator& pc, _aflags& a) {
     free();
     _pc = &pc;
-    _qm = &qm;
+    _qm = &_pc->getQMesh();
     aflags = &a;
     initialize();
   }
@@ -272,10 +271,10 @@ namespace apl {
   void TCONDCalculator::calculateFreqGvel(int startIndex, int endIndex) {
     xmatrix<xcomplex<double> > eigen(nBranches, nBranches, 1, 1);
     vector<xmatrix<xcomplex<double> > > dDynMat(3, eigen);
+    xvector<double> f;
     for (int q = startIndex; q < endIndex; q++) {
       // Frequency
-      xvector<double> f = _pc->getFrequency(_qm->getQPoint(q).cpos, apl::THZ | apl::OMEGA,
-          eigenvectors[q], dDynMat);
+      f = _pc->getFrequency(_qm->getQPoint(q).cpos, apl::THZ | apl::OMEGA, eigenvectors[q], dDynMat);
       freq[q] = aurostd::xvector2vector(f);  // Convert to vector to have same indexing as gvel
       // Group velocity
       for (int br = 0; br < nBranches; br++) {
@@ -442,7 +441,7 @@ namespace apl {
     vector<vector<int> > thread_dist;
 #endif
     string message = "";
-    LTMethod _lt(*_qm);
+    LTMethod _lt(_pc->getQMesh());
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
     vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);  // true: conjugate
@@ -525,6 +524,7 @@ namespace apl {
   // is used for the Grueneisen parameters. Calculating the phases ahead of
   // time decreases runtime considerably.
   vector<vector<vector<xcomplex<double> > > > TCONDCalculator::calculatePhases(bool conjugate) {
+    vector<xvector<double> > qpts = _pc->getQMesh().getQPointsCPOS();
     const xstructure& scell = _pc->getSuperCellStructure();
     const xstructure& pcell = _pc->getInputCellStructure();
     const vector<int>& sc2pcMap = _pc->getSupercell()._sc2pcMap;
@@ -545,8 +545,8 @@ namespace apl {
         min_vec += iat_cpos;
         min_vec -= scell.atoms[at_eq_sc].cpos;
         for (int q = 0; q < nQPs; q++) {
-          if (conjugate) phases[iat][at][q] = exp(-iONE * scalar_product(_qm->getQPoint(q).cpos, min_vec));
-          else phases[iat][at][q] = exp(iONE * scalar_product(_qm->getQPoint(q).cpos, min_vec));
+          if (conjugate) phases[iat][at][q] = exp(-iONE * scalar_product(qpts[q], min_vec));
+          else phases[iat][at][q] = exp(iONE * scalar_product(qpts[q], min_vec));
         }
       }
     }

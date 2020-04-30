@@ -70,6 +70,7 @@ namespace apl {
   void QMesh::copy(const QMesh& that) {
     xStream::copy(that);
     _ibzqpts = that._ibzqpts;
+    _initialized = that._initialized;
     _isGammaCentered = that._isGammaCentered;
     _littleGroups = that._littleGroups;
     _littleGroupsCalculated = that._littleGroupsCalculated;
@@ -98,6 +99,7 @@ namespace apl {
     xmatrix<double> zeroMatrix(3, 3);
     _directory = "";
     _ibzqpts.clear();
+    _initialized = false;
     _isGammaCentered = false;
     _littleGroups.clear();
     _littleGroupsCalculated = false;
@@ -163,6 +165,7 @@ namespace apl {
     setGrid(grid);
     setupReciprocalCell(xs, include_inversions);
     generateGridPoints(gamma_centered);
+    _initialized = true;
   }
 
   //setGrid///////////////////////////////////////////////////////////////////
@@ -501,6 +504,10 @@ namespace apl {
     return _weights;
   }
 
+  bool QMesh::initialized() const {
+    return _initialized;
+  }
+
   bool QMesh::isReduced() const {
     return _reduced;
   }
@@ -613,6 +620,12 @@ namespace apl {
   }
 
 } // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                           TETRAHEDRON METHOD                             //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
 //****************************************************************************
 // *                                                                         *
