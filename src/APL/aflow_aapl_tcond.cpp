@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters, 2019.
@@ -154,7 +154,7 @@ namespace apl {
   }
 
   void TCONDCalculator::initialize() {
-    _logger.initialize(_pc->getOutputFileStream(), *aflags);
+    _logger.initialize(*_pc->getOFStream(), *aflags);
     _logger.setModuleName(_AAPL_TCOND_MODULE_);
     nBranches = _pc->getNumberOfBranches();
     nQPs = _qm->getnQPs();
@@ -195,7 +195,7 @@ namespace apl {
 
     // Grueneisen parameters
     _logger << "Calculating Grueneisen parameters." << apl::endl;
-    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);
+    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);  // false: not conjugate
     vector<vector<double> > grueneisen_modes = calculateModeGrueneisen(phases);
     phases.clear();
     vector<double> grueneisen_avg(temperatures.size());
@@ -445,7 +445,7 @@ namespace apl {
     LTMethod _lt(*_qm);
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
-    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);
+    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);  // true: conjugate
 
     // Three-phonon transition probabilities
     message = "Transition Probabilities";
@@ -999,7 +999,7 @@ namespace apl {
       int num_iter = 1;
       double norm = 0.0;
       _logger << "Begin SCF for the Boltzmann transport equation." << apl::endl;
-      ostream& oss = _pc->getOutputStringStream();
+      ostream& oss = *_pc->getOSS();
       oss << std::setiosflags(std::ios::fixed | std::ios::right);
       oss << std::setw(15) << "Iteration";
       oss << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -1531,7 +1531,7 @@ namespace apl {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -34,6 +34,7 @@ Table of Contents:
 2.1.2.    Supercell Parameters
 2.1.3.    k-Point Parameters
 2.1.4.    Polar Corrections
+2.1.5.    Number of Bands
 2.2.    Direct Method Parameters
 2.3.    Linear Response Method Parameters
 
@@ -42,6 +43,9 @@ Table of Contents:
 3.2.    Phonon Density of States
 3.3.    Thermodynamic Properties
 3.4.    Plotting Phonon Properties
+3.5.    Atomic Displacements
+3.5.1.    Mean Square Displacements
+3.5.2.    Visualizing Phonon Displacements
 
 4.    Saving and Loading APL Results (Hibernation)
 
@@ -84,10 +88,15 @@ forces. This can be achieved in one of two ways:
     already exists. The input and output files are saved in XXXCAR.relax_aplN with N = 1,2.
     For more information on the PREC option, see Section 2.1.1.
 
-    APL automatically chooses the k-point grid for the relaxation to be commensurate with the
+    APL can automatically choose the k-point grid for the relaxation to be commensurate with the
     k-point grid for the supercell. For example, if a 3x2x1 supercell uses a 2x2x3 k-point gird,
     the unit cell will be relaxed using a 6x4x3 k-point grid. This minimizes the risk of ghost
-    forces in the supercell calculations.
+    forces in the supercell calculations. This feature can be turned on by using:
+
+      [AFLOW_APL]RELAX_COMMENSURATE=ON
+
+    The default is ON. If this option is OFF, APL will use the k-point settings for RELAX runs.
+    See README_AFLOW.TXT for more information.
 
     NOTE: Relaxations will be skipped when a PHPOSCAR file is present (see below).
 
@@ -201,6 +210,12 @@ general AFLOW k-point parameters:
       entry. The "[AFLOW_APL]KPPRA" flag overrides this for APL calculations. See README_AFLOW.TXT
       for more information on KPPRA.
 
+    * The k-point grid can also be set directly using:
+
+        [AFLOW_APL]KPOINTS_GRID=k1xk2xk3
+
+      This takes precedence over KPPRA. KPPRA is used as default.
+
     * The k-point scheme can be set using:
 
         [AFLOW_APL]KSCHEME=scheme
@@ -208,6 +223,12 @@ general AFLOW k-point parameters:
       By default, AFLOW takes the KPOINTS scheme from the "[VASP_KPOINTS_FILE]KSCHEME" entry. The
       "[AFLOW_APL]KSCHEME" overrides this setting. See README_AFLOW.TXT for more information on
       KSCHEME.
+
+    * The k-point shift vector can be set using the following format:
+
+        [AFLOW_APL]KPOINTS_SHIFT=X,Y,Z
+
+      Where X, Y, and Z are the comma-separated components of the shift vector.
 
     * The k-point parity can be set using:
 
@@ -241,6 +262,12 @@ unlimited, the following line needs to be written either in the .bashrc file or 
 The dielectric constant tensor and the Born effective charge tensor is by default calculated using
 the tag LEPSILON in the VASP INCAR file, but can be calculated using LCALCEPS as well. To switch to
 LCALCEPS, the value DEFAULT_APL_USE_LEPSILON in the aflow.rc file needs to be set to false (0).
+
+2.1.5. Number of Bands
+
+If NBANDS is set in the parent aflow.in file, APL will scale the number of bands automatically in
+the supercell file. For example, if NBANDS = 20 and a 2x2x2 supercell is used, NBANDS will be set
+to 80 in the supercell calculations.
 
 2.2. Direct Method Parameters
 
@@ -468,7 +495,7 @@ mesh, the number of energy points, and the smearing width.
       This is especially important for the RS method. The default is 0.05 for the RS method and
       0.0 for the LT method (i.e. no smearing).
 
-Projected DOS can be calculted using the keyword DOS_PROJECT:
+Projected DOS can be calculated using the keyword DOS_PROJECT:
 
          [AFLOW_APL]DOS_PROJECT=ON
 
@@ -502,6 +529,8 @@ The temperature range can be set as:
 Where TSTART and TEND are the initial and final temperature, respectively, and TSTEP is the
 temperature step size. The default setting is 0:2000:10, i.e. it calculates the properties from 0 K
 to 2000 K in 10 K steps.
+
+APL will also output mean square displacements for each atom inside that temperature range.
 
 3.4. Plotting Phonon Properties
 
@@ -558,6 +587,71 @@ Thermodynamic properties can be plotted using:
 This command outputs four separate files for the internal energy, vibrational free energy,
 vibrational entropy, and isochoral heat capacity. The file aflow.apl.thermal_properties.out must be
 present in the directory.
+
+
+3.5. Atomic Displacements
+
+3.5.1. Mean Square Displacements
+
+AFLOW can calculate the mean square displacement vectors for each atom in the unit cell by adding
+the following to the aflow.in file:
+
+    [AFLOW_APL]DISPLACEMENTS=ON
+
+This is also the default option.
+
+The temperature range is taken from the parameter TPT (see section 3.3.) and the mesh density from
+DOS_MESH (see section 3.2.).
+
+3.5.2. Visualizing Phonon Displacements
+
+APL provides an interface to the following output formats that can be used to visualize atomic
+displacements:
+
+  * XCRYSDEN
+  * V_sim
+
+The commands to create these output files are shown below:
+
+  aflow --visualize_phonons --qpoint=|--qpoints=|--q= [--format=XCRYSDEN|V_SIM] [--amplitude=] [--branches=] [--periods=] [--steps=] [--scell=] -D DIRECTORY
+        Outputs a phonon visualization file. Currently supported formats: xcrysden and v_sim.
+
+        Options for all formats:
+          --qpoint:    q-points for the phonons to be visualized as a comma-separated list.
+                       Multiple points can be specified.
+
+          --format:    The output file format.
+                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
+
+          --amplitude: The amplitude of the displacements.
+                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
+
+
+        Options for XCRYSDEN:
+          --branches:  The branches of the phonon modes as a comma-separated list.
+                       Default: all.
+
+          --periods:   The number of periods displayed in the output file.
+                       Default: DEFAULT_APL_ADISP_NPERIODS in .aflow.rc
+
+          --steps:     The number of steps per period in the output file.
+                       Default: DEFAULT_APL_ADISP_NSTEPS in .aflow.rc
+
+          --scell:     The supercell to be displayed in the output file.
+                       Default: unit cell.
+
+For XCRYSDEN, APL creates an animated structure (axsf) file for each phonon mode. These files
+contain animations that show the motions of the atoms for each of the mode. These animations can
+be used by XCRYSDEN to create mpeg movies or gif images. The parameter "steps" determines the
+number of steps for each period, and "periods" determines how many periods are output into the
+file. For gifs, one period is sufficient. The parameter "scell" can be used to show the
+displacements in a supercell instead of the unit cell, which is important for modes off the Gamma
+point.
+
+V_sim files will be output as aflow.apl.displacements.ascii, which contains all modes for the
+desired q-points. The file can be opened using V_sim or ASCII-phonons. These programs are captable
+of doing supercells and animations on their own and do not require steps, periods, or supercell
+parameters.
 
 
 4. Saving and Loading APL Results APL Calculations (Hibernation)
@@ -947,7 +1041,7 @@ Direct(2) [A1B1]
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

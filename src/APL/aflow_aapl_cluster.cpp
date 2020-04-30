@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
@@ -31,29 +31,28 @@ namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
-  ClusterSet::ClusterSet() {
+  ClusterSet::ClusterSet(ostream& oss) : xStream() {
     free();
+    xStream::initialize(oss);
   }
 
   ClusterSet::ClusterSet(const Supercell& supercell, int cut_shell,
-      double cut_rad, ofstream& mf, _aflags& a, ostream& os) {
+      double cut_rad, ofstream& mf, _aflags& a, ostream& oss) {
     free();
-    messageFile = &mf;
+    xStream::initialize(mf, oss);
     aflags = &a;
-    oss = &os;
     initialize(supercell, cut_shell, cut_rad);
   }
 
   //From file
   ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
-      int cut_shell, double cut_rad, int _order, ofstream& mf, _aflags& a, ostream& os) {
+      int cut_shell, double cut_rad, int _order, ofstream& mf, _aflags& a, ostream& oss) : xStream() {
     free();  // Clear old vectors
-    messageFile = &mf;
+    xStream::initialize(mf, oss);
     aflags = &a;
-    oss = &os;
     initialize(supercell, cut_shell, cut_rad);
     string message = "Reading ClusterSet from file " + aurostd::CleanFileName(filename) + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
 
     order = _order;
     readClusterSetFromFile(filename);
@@ -79,6 +78,7 @@ namespace apl {
   }
 
   void ClusterSet::copy(const ClusterSet& that) {
+    xStream::copy(that);
     aflags = that.aflags;
     clusters = that.clusters;
     coordination_shells = that.coordination_shells;
@@ -88,10 +88,8 @@ namespace apl {
     ineq_clusters = that.ineq_clusters;
     ineq_distortions = that.ineq_distortions;
     linear_combinations = that.linear_combinations;
-    messageFile = that.messageFile;
     nifcs = that.nifcs;
     order = that.order;
-    oss = that.oss;
     pcell = that.pcell;
     pc2scMap = that.pc2scMap;
     permutations = that.permutations;
@@ -103,6 +101,7 @@ namespace apl {
 
   //Destructor////////////////////////////////////////////////////////////////
   ClusterSet::~ClusterSet() {
+    xStream::free();
     free();
   }
 
@@ -131,11 +130,9 @@ namespace apl {
 
   //clear/////////////////////////////////////////////////////////////////////
   // Creates an empty ClusterSet object.
-  void ClusterSet::clear(ofstream& mf, _aflags& a, ostream& os) {
+  void ClusterSet::clear(_aflags& a) {
     free();
-    messageFile = &mf;
     aflags = &a;
-    oss = &os;
   }
 
   void ClusterSet::initialize(const Supercell& supercell, int cut_shell, double cut_rad) {
@@ -150,7 +147,7 @@ namespace apl {
         // globally changes CUT_RAD
         stringstream message;
         message << "Cutoff has been modified to " << max_rad << " Angstroms.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
         cut_rad = max_rad;
       }
     }
@@ -191,7 +188,7 @@ namespace apl {
       // Make sure that the factor group is calculated
       if (!pcell.fgroup_calculated) {
         pcell.CalculateSymmetryFactorGroup(false);
-        if (!pcell.pgroup_xtal_calculated) {
+        if (!pcell.fgroup_calculated) {
           string message = "Could not calculate the factor group of the primitive cell.";
           throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
         }
@@ -294,7 +291,7 @@ namespace apl {
   void ClusterSet::buildShells() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
     string message = "Building coordination shells.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
     int at1sc = 0;
     vector<int> shell;
     coordination_shells.clear();
@@ -355,7 +352,7 @@ namespace apl {
       throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
     }
     message << "Building clusters of order " << order << ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
     buildShells();
     nifcs = aurostd::powint(3, order);
     symmetry_map = getSymmetryMap();
@@ -456,7 +453,7 @@ namespace apl {
   void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
       vector<vector<int> > & ineq_clst) {
     string message = "Determining inequivalent clusters.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
     int equivalent_clst = -1;
     vector<int> unique_atoms;
     vector<vector<int> > compositions;
@@ -688,7 +685,7 @@ namespace apl {
   // Builds the inequivalent distortions for the AAPL calculations.
   void ClusterSet::buildDistortions() {
     string message = "Getting inequivalent distortions.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
     distortion_vectors = getCartesianDistortionVectors();
     linear_combinations = getLinearCombinations();
     ineq_distortions = initializeIneqDists();
@@ -1302,7 +1299,7 @@ namespace apl {
   // Writes the ClusterSet object to an XML file.
   void ClusterSet::writeClusterSetToFile(const string& filename) {
     string message = "Writing ClusterSet to file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
     std::stringstream output;
     // Header
     output << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
@@ -1336,7 +1333,7 @@ namespace apl {
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
     parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags->Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
-    parameters.unsetf(std::ios::hex);  // ME20190125 - Remove hexadecimal formatting
+    parameters.unsetf(std::ios::hex);  //ME20190125 - Remove hexadecimal formatting
     parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
 
@@ -1639,7 +1636,7 @@ namespace apl {
 
     t = line.find_first_of(">") + 1;
     tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags->Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME20190219
+    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags->Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  //ME20190219
       message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
       tokens.clear();
@@ -1830,7 +1827,7 @@ namespace apl {
       } else {
         message << "The ClusterSet needs to be determined again.";
       }
-      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *messageFile, *oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     }
     return compatible;
   }
@@ -2204,7 +2201,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow Marco Esters - Duke University 2018                *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow MARCO ESTERS - Duke University 2018-2020           *
 // *                                                                         *
 // ***************************************************************************

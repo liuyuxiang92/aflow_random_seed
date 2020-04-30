@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2015           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow PINKU NATH - Duke University 2014-2016             *
 // *                                                                         *
 // ***************************************************************************
@@ -135,16 +135,15 @@ namespace apl {
       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
     }
 
-    /* OBSOLETE ME20180801
-       for(int icpu = 0; icpu < ncpus; icpu++) {
-       startIndex = icpu * qpointsPerCPU;
-       endIndex = startIndex + qpointsPerCPU;
-       if( ( (uint)endIndex > _kpoints.size() ) ||
-       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
-       endIndex = _kpoints.size();
-       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
-       }
-       */
+    // OBSOLETE ME20180801
+    //for(int icpu = 0; icpu < ncpus; icpu++) {
+    //startIndex = icpu * qpointsPerCPU;
+    //endIndex = startIndex + qpointsPerCPU;
+    //if( ( (uint)endIndex > _kpoints.size() ) ||
+    //( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
+    //endIndex = _kpoints.size();
+    //threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
+    //}
 
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {
@@ -166,10 +165,10 @@ namespace apl {
   //create phonon-dispersion path
   void QHAsubdirectoryData::create_pdispath(std::vector< xvector<double> > &qpoints)
   {
-    // ME20190726 - exit clean-up
+    //ME20190726 - exit clean-up
     if(qpoints.size()==0){
       //_logger<<apl::error<<"qpoints.size()==0 in create_pdispath() "<<apl::endl; exit(0);
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("qpoints.size()==0 in create_pdispath()");
       string function = "QHAsubdirectoryData::create_pdispath()";
       string message = "qpoints.size()==0";
@@ -211,16 +210,15 @@ namespace apl {
       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
     }
 
-    /* OBSOLETE ME20180801
-       for(int icpu = 0; icpu < ncpus; icpu++) {
-       startIndex = icpu * qpointsPerCPU;
-       endIndex = startIndex + qpointsPerCPU;
-       if( ( (uint)endIndex > _kpoints.size() ) ||
-       ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
-       endIndex = _kpoints.size();
-       threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
-       }
-       */
+    // OBSOLETE ME20180801
+    //for(int icpu = 0; icpu < ncpus; icpu++) {
+    //startIndex = icpu * qpointsPerCPU;
+    //endIndex = startIndex + qpointsPerCPU;
+    //if( ( (uint)endIndex > _kpoints.size() ) ||
+    //( ( icpu == ncpus-1 ) && ( (uint)endIndex < _kpoints.size() ) ) )
+    //endIndex = _kpoints.size();
+    //threads.push_back( new std::thread(&QHAsubdirectoryData::get_dm,this,startIndex,endIndex) );
+    //}
 
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {
@@ -314,9 +312,9 @@ namespace apl {
       FILE *in;
       char buff[512];
       if(!(in = popen(path.c_str(), "r"))){
-        // ME20190726 - exit clean-up
+        //ME20190726 - exit clean-up
         //_logger<<apl::error<<"bash command can't not able to exacute"<<apl::endl; exit(0);
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("Cannot execute bash command.");
         string function = "QHAsubdirectoryData::directory_list()";
         string message = "Cannot execute bash command.";
@@ -394,7 +392,7 @@ namespace apl {
   {
     //weight factor
     ofstream kout1(file.c_str());
-    // ME20190726 - exit clean-up
+    //ME20190726 - exit clean-up
     if (kout1.is_open()){
       //_logger<<apl::error <<" QHAsubdirectoryData:: unable to create [kweights-file]  "<<apl::endl;exit(0);
       //throw APLRuntimeError("QHAsubdirectoryData:: unable to create [kweights-file]");

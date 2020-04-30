@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -42,7 +42,7 @@ namespace aurostd {
         //    utype re,im;
     };
 
-  // ME20200107
+  //ME20200107
   // ---------------------------------------------- identical
   template<class utype> bool identical(const xcomplex<utype>&, const xcomplex<utype>&, utype);
   template<class utype> bool isdifferent(const xcomplex<utype>&, const xcomplex<utype>&, utype);
@@ -157,7 +157,7 @@ namespace aurostd {
   // ------------------------------------------------------------ function conj
   template <class utype> // removed inline
     xcomplex<utype>  conj(const xcomplex<utype>& x) __xprototype;
-  template <class utype> // ME20180904
+  template <class utype> //ME20180904
     utype  conj(const utype& x) __xprototype;
   // ------------------------------------------------------------ function norm
   template <class utype> // removed inline
@@ -206,7 +206,7 @@ namespace aurostd {
   template <class utype> xcomplex<utype>
     sqrt(const xcomplex<utype>&) __xprototype;
 
-  // ME20180907
+  //ME20180907
   // ------------------------------------------------------------ function magnitude square
   template <class utype> utype
     magsqr(const xcomplex<utype>&) __xprototype;
@@ -428,6 +428,6 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

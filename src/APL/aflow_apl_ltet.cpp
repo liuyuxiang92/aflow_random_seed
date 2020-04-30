@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 
@@ -44,11 +44,15 @@ namespace apl {
 
   // Copy constructors
   LTMethod::LTMethod(const LTMethod& that) : _qm(that._qm) {
+    free();
     copy(that);
   }
 
   LTMethod& LTMethod::operator=(const LTMethod& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 
@@ -333,7 +337,7 @@ namespace apl {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

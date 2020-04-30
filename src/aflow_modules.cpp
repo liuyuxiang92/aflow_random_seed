@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 // ***************************************************************************
 
@@ -84,6 +84,7 @@ namespace KBIN {
     vector<aurostd::xoption> aplflags;
     aurostd::xoption opt;
     opt.keyword="RELAX"; opt.option = DEFAULT_APL_RELAX; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
+    opt.keyword="RELAX_COMMENSURATE"; opt.option = DEFAULT_APL_RELAX_COMMENSURATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // ME20200427
     opt.keyword="HIBERNATE"; opt.option = DEFAULT_APL_HIBERNATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="ENGINE"; opt.xscheme = DEFAULT_APL_ENGINE; aplflags.push_back(opt); opt.clear();
     opt.keyword="SUPERCELL"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
@@ -98,9 +99,11 @@ namespace KBIN {
     //[ME20181226 - now a default in .aflow.rc]// Special case: DPM can be true, false, or empty
     opt.keyword="DPM"; opt.xscheme = DEFAULT_APL_DPM; opt.option = (opt.xscheme=="ON"?true:false); aplflags.push_back(opt); opt.clear();  //CO20181226
     //[ME20181226 - now a default in .aflow.rc]// Special case: k-points options can be empty
-    opt.keyword="KPPRA"; opt.xscheme = utype2string<int>(DEFAULT_PHONONS_KPPRA); aplflags.push_back(opt); opt.clear(); //CO20181226 // ME20190112
-    opt.keyword="KSCHEME"; opt.xscheme = DEFAULT_PHONONS_KSCHEME; aplflags.push_back(opt); opt.clear();  // ME20190109 - KPPRA can be taken from STATIC, but KSCHEME should default to G
+    opt.keyword="KPPRA"; opt.xscheme = utype2string<int>(DEFAULT_PHONONS_KPPRA); aplflags.push_back(opt); opt.clear(); //CO20181226 //ME20190112
+    opt.keyword="KSCHEME"; opt.xscheme = DEFAULT_PHONONS_KSCHEME; aplflags.push_back(opt); opt.clear();  //ME20190109 - KPPRA can be taken from STATIC, but KSCHEME should default to G
     opt.keyword="KPOINTS"; aplflags.push_back(opt); opt.clear();
+    opt.keyword="KPOINTS_GRID"; aplflags.push_back(opt); opt.clear();  // ME20200427
+    opt.keyword="KPOINTS_SHIFT"; aplflags.push_back(opt); opt.clear();  // ME20200427
     opt.keyword="PREC"; opt.xscheme = DEFAULT_APL_PREC; aplflags.push_back(opt); opt.clear();
     opt.keyword="ZEROSTATE"; opt.option = DEFAULT_APL_ZEROSTATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="FREQFORMAT"; opt.xscheme = DEFAULT_APL_FREQFORMAT; aplflags.push_back(opt); opt.clear();
@@ -120,6 +123,7 @@ namespace KBIN {
     opt.keyword="DOSPROJECTIONS_CART"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPROJECTIONS_FRAC"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
+    opt.keyword="DISPLACEMENTS"; opt.option = DEFAULT_APL_DISPLACEMENTS; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="TPT"; opt.xscheme = DEFAULT_APL_TPT; aplflags.push_back(opt); opt.clear();
     opt.keyword="ZEROSTATE_CHGCAR"; opt.option = DEFAULT_APL_ZEROSTATE_CHGCAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     if (LDEBUG) {
@@ -132,33 +136,33 @@ namespace KBIN {
 
   //writeFlagAPL///////////////////////////////////////////////////////////////
   // Determines whether flag should be written to aflow.in
-  // CO20181226
-  bool writeFlagAPL(const string& key,const xoption& xopt){  // ME20190113
+  //CO20181226
+  bool writeFlagAPL(const string& key,const xoption& xopt){  //ME20190113
     // return true;  OBSOLETE ME20190113
-    if (xopt.isentry) {return true;}  // ME20190116 - Do not remove user entries
+    if (xopt.isentry) {return true;}  //ME20190116 - Do not remove user entries
     if(key=="RELAX"){return true;}
-    if(key=="HIBERNATE"){if((xopt.option == AFLOWRC_DEFAULT_APL_HIBERNATE) && (xopt.option == DEFAULT_APL_HIBERNATE)) {return false;}}  // ME20190113
+    if(key=="HIBERNATE"){if((xopt.option == AFLOWRC_DEFAULT_APL_HIBERNATE) && (xopt.option == DEFAULT_APL_HIBERNATE)) {return false;}}  //ME20190113
     if(key=="ENGINE"){return true;}
     if(key=="SUPERCELL"){return true;}
     if(key=="MINATOMS"){return true;}
     if(key=="MINSHELL"){return true;}
     if(key=="POLAR"){return true;}
     if(key=="DMAG"){return true;}
-    if(key=="DXYZONLY"){if((xopt.option == AFLOWRC_DEFAULT_APL_DXYZONLY) && (xopt.option == DEFAULT_APL_DXYZONLY)) {return false;}}  // ME20190113
-    if(key=="DSYMMETRIZE"){if((xopt.option == AFLOWRC_DEFAULT_APL_DSYMMETRIZE) && (xopt.option == DEFAULT_APL_DSYMMETRIZE)) {return false;}}  // ME20190113
-    if(key=="DINEQUIV_ONLY"){if((xopt.option == AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY) && (xopt.option == DEFAULT_APL_DINEQUIV_ONLY)) {return false;}}  // ME20190113
-    if(key=="DPM"){if(AFLOWRC_DEFAULT_APL_DPM==xopt.xscheme && DEFAULT_APL_DPM==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="PREC"){if(AFLOWRC_DEFAULT_APL_PREC==xopt.xscheme && DEFAULT_APL_PREC==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="DXYZONLY"){if((xopt.option == AFLOWRC_DEFAULT_APL_DXYZONLY) && (xopt.option == DEFAULT_APL_DXYZONLY)) {return false;}}  //ME20190113
+    if(key=="DSYMMETRIZE"){if((xopt.option == AFLOWRC_DEFAULT_APL_DSYMMETRIZE) && (xopt.option == DEFAULT_APL_DSYMMETRIZE)) {return false;}}  //ME20190113
+    if(key=="DINEQUIV_ONLY"){if((xopt.option == AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY) && (xopt.option == DEFAULT_APL_DINEQUIV_ONLY)) {return false;}}  //ME20190113
+    if(key=="DPM"){if(AFLOWRC_DEFAULT_APL_DPM==xopt.xscheme && DEFAULT_APL_DPM==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="PREC"){if(AFLOWRC_DEFAULT_APL_PREC==xopt.xscheme && DEFAULT_APL_PREC==xopt.xscheme){return false;}}  //ME20190113
     if(key=="ZEROSTATE"){return true;}
-    if(key=="FREQFORMAT"){if(AFLOWRC_DEFAULT_APL_FREQFORMAT==xopt.xscheme && DEFAULT_APL_FREQFORMAT==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="FREQFORMAT"){if(AFLOWRC_DEFAULT_APL_FREQFORMAT==xopt.xscheme && DEFAULT_APL_FREQFORMAT==xopt.xscheme){return false;}}  //ME20190113
     if(key=="DC"){return true;}
-    if(key=="DCPOINTS"){if(utype2string<int>(AFLOWRC_DEFAULT_APL_DCPOINTS)==xopt.xscheme && utype2string<int>(DEFAULT_APL_DCPOINTS)==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="DCPATH"){if(AFLOWRC_DEFAULT_APL_DCPATH==xopt.xscheme && DEFAULT_APL_DCPATH==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="DCPOINTS"){if(utype2string<int>(AFLOWRC_DEFAULT_APL_DCPOINTS)==xopt.xscheme && utype2string<int>(DEFAULT_APL_DCPOINTS)==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="DCPATH"){if(AFLOWRC_DEFAULT_APL_DCPATH==xopt.xscheme && DEFAULT_APL_DCPATH==xopt.xscheme){return false;}}  //ME20190113
     if(key=="DOS"){return true;}
-    if(key=="DOSMETHOD"){if(AFLOWRC_DEFAULT_APL_DOSMETHOD==xopt.xscheme && DEFAULT_APL_DOSMETHOD==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="DOSMESH"){return true;}  // ME20190113 - should always write
-    if(key=="DOSSMEAR"){if(utype2string<double>(AFLOWRC_DEFAULT_APL_DOSSMEAR, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION)==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="DOSPOINTS"){if(utype2string<int>(AFLOWRC_DEFAULT_APL_DOSPOINTS)==xopt.xscheme && utype2string<int>(DEFAULT_APL_DOSPOINTS)==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="DOSMETHOD"){if(AFLOWRC_DEFAULT_APL_DOSMETHOD==xopt.xscheme && DEFAULT_APL_DOSMETHOD==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="DOSMESH"){return true;}  //ME20190113 - should always write
+    if(key=="DOSSMEAR"){if(utype2string<double>(AFLOWRC_DEFAULT_APL_DOSSMEAR, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION)==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="DOSPOINTS"){if(utype2string<int>(AFLOWRC_DEFAULT_APL_DOSPOINTS)==xopt.xscheme && utype2string<int>(DEFAULT_APL_DOSPOINTS)==xopt.xscheme){return false;}}  //ME20190113
     if(key=="TP"){return true;}
     if(key=="TPT"){return true;}
     return true;
@@ -314,22 +318,22 @@ namespace KBIN {
 
   //writeFlagAAPL///////////////////////////////////////////////////////////////
   // Determines whether flag should be written to aflow.in
-  // CO20181226
+  //CO20181226
   bool writeFlagAAPL(const string& key,const xoption& xopt){
     // return true; OBSOLETE ME20190113
-    if (xopt.isentry) {return true;}  // ME20190116 - Do not remove user entries
+    if (xopt.isentry) {return true;}  //ME20190116 - Do not remove user entries
     if(key=="BTE"){return true;}
-    if(key=="FOURTH_ORDER"){return true;}  // ME20190113 - should always write to be explicit
+    if(key=="FOURTH_ORDER"){return true;}  //ME20190113 - should always write to be explicit
     if(key=="CUT_RAD"){return true;}
     if(key=="CUT_SHELL"){return true;}
     if(key=="THERMALGRID"){return true;}
     if(key=="TCT"){return true;}
-    if(key=="SUMRULE"){if(utype2string<double>(AFLOWRC_DEFAULT_AAPL_SUMRULE, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_AAPL_SUMRULE, FLAG_PRECISION)==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="SUMRULE_MAX_ITER"){if(utype2string<int>(AFLOWRC_DEFAULT_AAPL_SUMRULE_MAX_ITER)==xopt.xscheme && utype2string<int>(DEFAULT_AAPL_SUMRULE_MAX_ITER)==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="MIXING_COEFFICIENT"){if(utype2string<double>(AFLOWRC_DEFAULT_AAPL_MIXING_COEFFICIENT, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_AAPL_MIXING_COEFFICIENT, FLAG_PRECISION)==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="SUMRULE"){if(utype2string<double>(AFLOWRC_DEFAULT_AAPL_SUMRULE, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_AAPL_SUMRULE, FLAG_PRECISION)==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="SUMRULE_MAX_ITER"){if(utype2string<int>(AFLOWRC_DEFAULT_AAPL_SUMRULE_MAX_ITER)==xopt.xscheme && utype2string<int>(DEFAULT_AAPL_SUMRULE_MAX_ITER)==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="MIXING_COEFFICIENT"){if(utype2string<double>(AFLOWRC_DEFAULT_AAPL_MIXING_COEFFICIENT, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_AAPL_MIXING_COEFFICIENT, FLAG_PRECISION)==xopt.xscheme){return false;}}  //ME20190113
     if(key=="ISOTOPE"){return true;}
     if(key=="BOUNDARY"){return true;}
-    if(key=="CUMULATIVEK"){if((xopt.option == AFLOWRC_DEFAULT_AAPL_CUMULATIVEK) && (xopt.option == DEFAULT_AAPL_CUMULATIVEK)) {return false;}}  // ME20190113
+    if(key=="CUMULATIVEK"){if((xopt.option == AFLOWRC_DEFAULT_AAPL_CUMULATIVEK) && (xopt.option == DEFAULT_AAPL_CUMULATIVEK)) {return false;}}  //ME20190113
     if(key=="NANO_SIZE"){return true;}
     return true;
   }
@@ -363,13 +367,13 @@ namespace KBIN {
         module_opts.cut_rad_shell[1] = module_opts.aaplflags[i].isentry;
         continue;
       }
-      // ME20190408 - START
+      //ME20190408 START
       // If KPPRA_AAPL is not set, use APL KPPRA
       if (key == "KPPRA_AAPL" && module_opts.aaplflags[i].content_int < 1) {
         xinput.xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL", false);
         continue;
       }
-      // ME20190408 - END
+      //ME20190408 END
     }
     if (module_opts.cut_rad_shell[0] != module_opts.cut_rad_shell[1]) {
       if (xinput.AFLOW_MODE_VASP) {
@@ -529,7 +533,7 @@ namespace KBIN {
     opt.keyword="EOS"; opt.option = DEFAULT_QHA_EOS; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="EOS_DISTORTION_RANGE"; opt.xscheme = DEFAULT_QHA_EOS_DISTORTION_RANGE; qhaflags.push_back(opt); opt.clear();
     opt.keyword="GP_DISTORTION"; opt.xscheme = utype2string<double>(DEFAULT_QHA_GP_DISTORTION); qhaflags.push_back(opt); opt.clear();
-    opt.keyword="INCLUDE_ELE"; opt.option = DEFAULT_QHA_INCLUDE_ELE; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="INCLUDE_ELEC_CONTRIB"; opt.option = DEFAULT_QHA_INCLUDE_ELEC_CONTRIB; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="SCQHA_PDIS_T"; opt.xscheme = DEFAULT_QHA_SCQHA_PDIS_T; qhaflags.push_back(opt); opt.clear();
     opt.keyword="GP_FINITE_DIFF"; opt.option = DEFAULT_QHA_GP_FINITE_DIFF; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
     opt.keyword="IGNORE_IMAGINARY"; opt.option = DEFAULT_QHA_IGNORE_IMAGINARY; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
@@ -550,7 +554,7 @@ namespace KBIN {
     if(key=="EOS"){return true;}
     if(key=="EOS_DISTORTION_RANGE"){return true;}
     if(key=="GP_DISTORTION"){return true;}
-    if(key=="INCLUDE_ELE"){return true;}
+    if(key=="INCLUDE_ELEC_CONTRIB"){return true;}
     if(key=="SCQHA_PDIS_T"){return false;}
     if(key=="GP_FINITE_DIFF"){return true;}
     if(key=="IGNORE_IMAGINARY"){return false;}
@@ -591,7 +595,7 @@ namespace KBIN {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************

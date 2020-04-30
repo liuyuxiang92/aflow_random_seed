@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // this file contains the routines to run AIMS in KBIN
@@ -221,8 +221,8 @@ namespace KBIN{
     // ***************************************************************************
     // Some verbose
     if(kflags.KBIN_PHONONS_CALCULATION_APL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_APL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-    if(kflags.KBIN_PHONONS_CALCULATION_QHA) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_QHA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;   // CO20170601
-    if(kflags.KBIN_PHONONS_CALCULATION_AAPL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AAPL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // CO20170601
+    if(kflags.KBIN_PHONONS_CALCULATION_QHA) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_QHA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;   //CO20170601
+    if(kflags.KBIN_PHONONS_CALCULATION_AAPL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AAPL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; //CO20170601
     if(kflags.KBIN_PHONONS_CALCULATION_AGL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AGL (Debye Model)" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     if(kflags.KBIN_PHONONS_CALCULATION_AEL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_AEL (Elastic constants)" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) aus << "00000  MESSAGE KBIN::AIMS_Directory Running PHONONS_CALCULATION_FROZSL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -266,7 +266,7 @@ namespace KBIN{
         aus << "00000  MESSAGE Taking loop directory = " << xaims.Directory << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
-      // check for directory KESONG CHEC THIS (if Krun=FALSE, everything stops).
+      // check for directory KY CHECK THIS (if Krun=FALSE, everything stops).
       if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
         if(aurostd::FileExist(xaims.Directory)) {
           Krun=FALSE; // avoid rerunning
@@ -335,21 +335,21 @@ namespace KBIN{
         // ***************************************************************************
         // DO THE SYMMETRY NEIGHBOURS CALCULATION
         //if(!kflags.KBIN_PHONONS_CALCULATION_FROZSL) {
-        // DX
+        //DX
         if(!(kflags.KBIN_PHONONS_CALCULATION_FROZSL || 
               kflags.KBIN_PHONONS_CALCULATION_APL ||
-              kflags.KBIN_PHONONS_CALCULATION_QHA||     // CO20170601
-              kflags.KBIN_PHONONS_CALCULATION_AAPL) ||  // CO20170601
-            aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN ) {  // CO, do internally
-          // DX
+              kflags.KBIN_PHONONS_CALCULATION_QHA||     //CO20170601
+              kflags.KBIN_PHONONS_CALCULATION_AAPL) ||  //CO20170601
+            aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN ) {  //CO, do internally
+          //DX
           if(Krun) Krun=KBIN_StepSymmetryPerform(xaims.str,AflowIn,FileMESSAGE,aflags,kflags,TRUE,cout); // DO THE SYMMETRY CALCULATION
           if(Krun) Krun=StepNeighboursPerform(xaims.str,AflowIn,FileMESSAGE,aflags,kflags); // DO THE NEIGHBOURS CALCULATION
-          // DX
+          //DX
           //cerr << "KBIN GEN SYMMETRY OF AFLOWIN: " << aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN << endl;
           if(aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN){
             return Krun;
           }
-          // DX
+          //DX
         }
         // AIMS AIMS WRITE
         //   if(Krun) Krun=(Krun && KBIN::AIMS_Write_INPUT(xaims,aimsflags));
@@ -375,7 +375,7 @@ namespace KBIN{
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_APL " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           }
-          // CO - START 170601
+          //CO START 20170601
           if(kflags.KBIN_PHONONS_CALCULATION_QHA) {  // RUN PHONONS QHA ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_QHA " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -384,7 +384,7 @@ namespace KBIN{
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AAPL " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           }
-          // CO - END 170601
+          //CO END 20170601
           if(kflags.KBIN_PHONONS_CALCULATION_AGL) {  // RUN PHONONS AGL ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AGL (Debye Model) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -410,9 +410,9 @@ namespace KBIN{
               KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
             // ***************************************************************************
             // PHONONIC PHONONIC PHONONIC
-            if(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL) { // CO20170601
+            if(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL) { //CO20170601
               _xinput xinput(xaims);
-              readModulesFromAflowIn(AflowIn, kflags, xinput);  // ME20181027
+              readModulesFromAflowIn(AflowIn, kflags, xinput);  //ME20181027
               _xflags xflags(aimsflags);
               KBIN::RunPhonons_APL(xinput,AflowIn,aflags,kflags,xflags,FileMESSAGE);  //now it's general
               //KBIN::RunPhonons_APL(xaims,AflowIn,aflags,kflags,aimsflags,FileMESSAGE);
@@ -468,6 +468,6 @@ namespace KBIN{
 #endif
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

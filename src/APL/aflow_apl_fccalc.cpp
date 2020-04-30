@@ -20,12 +20,13 @@ static const string _APL_FCCALC_MODULE_ = "APL";  // for the logger
 
 namespace apl {
 
-  ForceConstantCalculator::ForceConstantCalculator() {
+  ForceConstantCalculator::ForceConstantCalculator(ostream& oss) {
     free();
+    xStream::initialize(oss);
   }
 
   ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os) {
+      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& oss) {
     free();
     _supercell = &sc;
     _xInput = &xinput;
@@ -33,8 +34,7 @@ namespace apl {
     _kbinFlags = &kflags;
     _xFlags = &xflags;
     _AflowIn = &AflowIn;
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(mf, oss);
   }
 
   ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) {
@@ -51,7 +51,7 @@ namespace apl {
   }
 
   void ForceConstantCalculator::clear(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& os) {
+      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn) {
     free();
     _supercell = &sc;
     _xInput = &xinput;
@@ -59,17 +59,14 @@ namespace apl {
     _kbinFlags = &kflags;
     _xFlags = &xflags;
     _AflowIn = &AflowIn;
-    messageFile = &mf;
-    oss = &os;
   }
 
   void ForceConstantCalculator::copy(const ForceConstantCalculator& that) {
+    xStream::copy(that);
     _aflowFlags = that._aflowFlags;
     _AflowIn = that._AflowIn;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
-    messageFile = that.messageFile;
-    oss = that.oss;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
     _kbinFlags = that._kbinFlags;
@@ -158,7 +155,7 @@ namespace apl {
     //CO - END
 
     string message = "Symmetrizing the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
 
     vector<xmatrix<double> > row;
     for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
@@ -279,8 +276,8 @@ namespace apl {
       xInput.setDirectory( _xInput->getDirectory() + "/" + runname );
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
-        createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *messageFile);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+        createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *p_FileMESSAGE);
         stagebreak = true;
       }
     }
@@ -300,7 +297,7 @@ namespace apl {
         infilename = directory + string("/OUTCAR");
         if (!aurostd::EFileExist(infilename, infilename)) {
           message << "The OUTCAR file in " << directory << " is missing.";
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
           return false;
         }
       }
@@ -327,7 +324,7 @@ namespace apl {
       for (int b = 1; b <= 3; b++)
         message << std::fixed << std::setw(5) << std::setprecision(3) << _dielectricTensor(a, b) << " ";
 
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     return true;
   }
 
@@ -422,17 +419,17 @@ namespace apl {
     //CO - END
     // Show charges
     message << "Input born effective charge tensors (for primitive cell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++) {
       int id = i;
       message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
         << std::setw(2) << _supercell->getInputStructure().atoms[id].cleanname
         << ") Born effective charge = ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     }
 
     // Step1
@@ -484,7 +481,7 @@ namespace apl {
 
     // Step 3
     message << "Forcing the acoustic sum rule (ASR). Resulting born effective charges (for the supercell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
 
     xmatrix<double> sum(3, 3);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++)
@@ -509,7 +506,7 @@ namespace apl {
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     }
   }
 
@@ -598,13 +595,13 @@ namespace apl {
     string base = _aflowFlags->Directory + "/" + DEFAULT_APL_FILE_PREFIX;
     string filename = aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE);
     string message = "Writing harmonic IFCs into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     writeHarmonicIFCs(filename);
     if (_isPolarMaterial) {
       filename = aurostd::CleanFileName(base + DEFAULT_APL_POLAR_FILE);
       message = "Writing harmonic IFCs into file " + filename + ".";
       writeBornChargesDielectricTensor(filename);
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     }
   }
 
@@ -619,9 +616,10 @@ namespace apl {
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
-    outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-      << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
-    outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
+    // OBSOLETE ME20200427 - we do not compare checksums anymore
+    //outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
+    //  << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
+    //outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
 
     // Force constants

@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -2715,6 +2715,10 @@ LATTICES = (the ones with "")
         Give the list of prototypes (file LIST.txt) from the DMQC-HTQC
         project (SC oct 08)
 
+  aflow --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=
+       Returns unique identification information about the
+       pseudopotentials used for the calculations.   
+ 
   aflow [--server=XXXXXXXX] --prototypes_icsd[=N] | --protos_icsd[=N]                                  
         Give the list of prototypes from the ICSD database included in the code.   
         If N is passed, then it returns ONLY the N-ary compounds.
@@ -3325,6 +3329,35 @@ LATTICES = (the ones with "")
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        
         VASP format.                                          
 
+  aflow --visualize_phonons --qpoint=|--qpoints=|--q= [--format=XCRYSDEN|V_SIM] [--amplitude=] [--branches=] [--periods=] [--steps=] [--scell=] -D DIRECTORY
+        Outputs a phonon visualization file. Currently supported formats: xcrysden and v_sim.
+        A phonon calculator state file (aflow.apl.fccalc_state.out) and a force constant
+        file (aflow.apl.harmonicIFCs.xml) must reside in the directory.
+
+        Options for all formats:
+          --qpoint:    q-points for the phonons to be visualized as a comma-separated list.
+                       Multiple points can be specified.
+
+          --format:    The output file format.
+                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
+
+          --amplitude: The amplitude of the displacements.
+                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
+
+
+        Options for XCRYSDEN:
+          --branches:  The branches of the phonon modes as a comma-separated list.
+                       Default: all.
+
+          --periods:   The number of periods displayed in the output file.
+                       Default: DEFAULT_APL_ADISP_NPERIODS in .aflow.rc
+
+          --steps:     The number of steps per period in the output file.
+                       Default: DEFAULT_APL_ADISP_NSTEPS in .aflow.rc
+
+          --scell:     The supercell to be displayed in the output file.
+                       Default: unit cell.
+
   aflow --volume v < POSCAR
         Outputs POSCAR file giving having volume equal to v.
   aflow --volume*= x < POSCAR
@@ -3544,7 +3577,7 @@ AFLOWLIB MODE
 	
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

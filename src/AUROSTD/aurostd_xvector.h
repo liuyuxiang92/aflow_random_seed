@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -147,6 +147,16 @@ namespace aurostd {
   template<class utype,class stype> xvector<utype>
     operator/(const xvector<utype>&,const stype) __xprototype;
 
+  //ME20200329 - real * complex vector
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(utype, const xvector<xcomplex<utype> >&);
+
+  template<class utype> xvector<xcomplex<utype> >
+    operator*(const xvector<xcomplex<utype> >&, utype);
+
+  template<class utype> xvector<xcomplex<utype> >
+    operator/(const xvector<xcomplex<utype> >&, utype);
+
   template<class utype> xvector<utype>
     operator<<(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
@@ -164,6 +174,10 @@ namespace aurostd {
 
   template<class utype> xvector<utype>                
     vector_product(const xvector<utype>&,const xvector<utype>&) __xprototype;
+
+  // ME20200327
+  template<class utype> xmatrix<utype>
+    outer_product(const xvector<utype>&, const xvector<utype>&) __xprototype;
 
   template<class utype> xvector<char>                    // is xvector > scalar ?
     operator>(const xvector<utype>&,const utype&) __xprototype;
@@ -208,7 +222,7 @@ namespace aurostd {
     isinteger(const xvector<utype>&,const utype& tol=(utype)0.01) __xprototype; //CO20180409
 
   template<class utype> bool
-    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  // ME20180702 //CO20191201 - 1e-7 seems arbitrary
+    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  //ME20180702 //CO20191201 - 1e-7 seems arbitrary
   // CONSTRUCTIONS OF VECTORS FROM SCALARS
 
   template<class utype> xvector<utype>
@@ -589,7 +603,7 @@ namespace aurostd { //CO20190620
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

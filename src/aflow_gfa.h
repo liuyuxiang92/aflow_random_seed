@@ -1,8 +1,8 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *           Aflow ERIC PERIM MARTINS - Duke University 2014-2016          *
-// *           Aflow DENISE FORD - Duke University 2016-2019                 *
+// *           Aflow DENISE FORD - Duke University 2016-2020                 *
 // *                                                                         * 
 // ***************************************************************************
 // Original code written by Eric Perim Martins

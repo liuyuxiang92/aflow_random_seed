@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 2013-2014
@@ -47,7 +47,7 @@ namespace aurostd {
       void options2entry(string,string,int=aurostd_xoptionONOFF,string="");
       void scheme2scheme(char,string);
       void scheme2scheme(string,string);
-      bool isscheme(string) const; // check if available //CO20180101 // SC 20191227
+      bool isscheme(string) const; // check if available //CO20180101 //SC20191227
       // [OBSOLETE] uint addscheme(string);      // add scheme then returns vscheme.size()
       // [OBSOLETE] uint purgescheme(string);    // remove scheme then returns vscheme.size()
       uint opscheme(string,bool);  // add/remove scheme then returns vscheme.size()
@@ -55,16 +55,16 @@ namespace aurostd {
       uint pop(string);            // remove scheme then returns vscheme.size()
       // for plain flags
       bool flag(string,bool);      // if bool=TRUE/FALSE => add/remove "string" 
-      bool flag(string) const;     // interrogate=TRUE/FALSE, same as ischeme // CO20180101  // SC 20191227
-      bool flag(void) const;       // return if there is any scheme inside // CO20180101 // SC 20191227
+      bool flag(string) const;     // interrogate=TRUE/FALSE, same as ischeme //CO20180101  //SC20191227
+      bool flag(void) const;       // return if there is any scheme inside //CO20180101 //SC20191227
       // attached stuff..
-      bool isdefined(string) const;                                    // SC20200114
+      bool isdefined(string) const;                                    //SC20200114
       uint opattachedscheme(string,string,bool);                       // add/remove attached_scheme if flag=TRUE, then returns vghost.size()
       uint addattachedscheme(string scheme,string attached,bool flag); // add attached_scheme if flag=TRUE, then returns vghost.size()
       // [OBSOLETE] uint purgeattachedscheme(string check);            // remove attached_scheme, then returns vghost.size() - same as pop_attached
       uint push_attached(string scheme,string attached);               // add attached_scheme, then returns vghost.size() - like addattachedscheme with flag=TRUE
       uint pop_attached(string check);                                 // remove attached_scheme, then returns vghost.size()
-      string getattachedscheme(string scheme) const; // CO20180101
+      string getattachedscheme(string scheme) const; //CO20180101
       template<class utype> utype getattachedutype(string scheme);
       bool args2addattachedscheme(vector<string> &argv,const string scheme,const string& _s_search,string string_default); 
       bool args2addattachedscheme(vector<string> &argv,vector<string> &cmds,const string scheme,const string& _s_search,string string_default);
@@ -86,7 +86,7 @@ namespace aurostd {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 

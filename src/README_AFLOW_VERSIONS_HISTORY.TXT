@@ -1,5 +1,23 @@
 3.2.3 - 2020/05/01
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.1.tar.xz
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+        -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
+        -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
+        -- Added QHA to modules. (AS)
+        -- Fixed xEIGENVAL to work correctly with files created by vasp 5. (AS)
+        -- fixed bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default (ME+RF)
+        -- Added check for required binaries to plotter. (ME)
+        -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
+        -- Fixed broken system name for aflow_proto. (ME)
+        -- Fixed plotter title and file names when ANRL parameters are present. (ME)
+        -- Fixed bug that deleted qmvasp files from previous runs instead of appending to them. (ME)
+        -- Removed VASP k-mesh symmetry fixes when SYM=OFF. (ME)
+        -- Changed database file name conventions. (ME)
+        -- Redesigned mean square displacement calculations. (ME)
+        -- Added interfaces to XCRYSDEN and V_SIM to visualize phonon displacements. (ME)
+        -- Enhanced logger support for APL using xStream. (ME)
+        -- Added state writer and reader for the force constant calculators. (ME)
+        -- Added more KPOINTS_GRID, KPOINTS_SHIFT, and RELAX_COMMENSURATE options to APL. (ME)
+        -- NBANDS now scales with supercell size if set in the parent aflow.in (ME)
         -- Separated harmonic force constants and Born effective charges/dielectric tensor into separate hibernate files. (ME)
         -- APL will not always read harmonic force constants when HIBERNATE=ON. (ME)
         -- Fixed multiplot bug in plotter. (ME)
@@ -34,16 +52,29 @@
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
         -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
         -- Fixed bug that deleted old qmvasp files. (ME)
+        -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)
+<<<<<<< HEAD
+=======
+        -- Added QHA to modules. (AS)
+        -- Changed database file name conventions. (ME)
+        -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
+        -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)
+        -- clean input structure species (pseudopotentials) in compare::compare2database() (DX)
+        -- fixed bug in --poscar2aflowin; symmetry tolerance not propogated for tolerance scan (DX)
+>>>>>>> 84d843ab5177e8940986eceb4eac5ef191c6e87f
         -- Added check for required binaries to plotter. (ME)
         -- Canonical system name is now based on aflow.in instead of VASP output files. (ME)
         -- Fixed broken system name for aflow_proto. (ME)
         -- Fixed plotter title and file names when ANRL parameters are present. (ME)
         -- Fixed bug that deleted qmvasp files from previous runs instead of appending to them. (ME)
         -- Removed VASP k-mesh symmetry fixes when SYM=OFF. (ME)
+<<<<<<< HEAD
         -- QHA class was reworked. (AS)
         -- Fixed xEIGENVAL to work correctly with files created by vasp 5. (AS)
         -- Added QHA to modules. (AS)
+=======
+>>>>>>> 84d843ab5177e8940986eceb4eac5ef191c6e87f
         -- Changed database file name conventions. (ME)
         -- added Patterson symmetry analysis; denoted "pgroupk_Patterson" (applies to reciprocal space only) (DX)
         -- compare Patterson point symmetry to Laue point group as consistency check (DX)

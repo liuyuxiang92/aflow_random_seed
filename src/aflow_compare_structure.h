@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
 // *                                                                         *
 // ***************************************************************************
 // AFLOW-XtalMatch (compare crystal structures) - Functions
@@ -63,9 +63,9 @@ struct structure_misfit {
   double lattice_deviation;             // Burzlaff's lattice deviation, captures differences between lattices
   double coordinate_displacement;       // Burzlaff's coordinate displacement; captures differences between atom positions (relatively close together)
   double failure;                       // Burzlaff's figure of failure; captures differences between atom positions (significantly far apart)
-  double magnetic_misfit;               // DX's magnetic misfit (inspired by Burzlaff's misfit; =1-(1-magnetic_displacement)(1-magnetic_failure))
-  double magnetic_displacement;         // DX's magnetic displacement; captures differences between magnetic moment magnitude (and angle for non-collinear)
-  double magnetic_failure;              // DX's magnetic failure; captures spin flip differences 
+  double magnetic_misfit;               //DX's magnetic misfit (inspired by Burzlaff's misfit; =1-(1-magnetic_displacement)(1-magnetic_failure))
+  double magnetic_displacement;         //DX's magnetic displacement; captures differences between magnetic moment magnitude (and angle for non-collinear)
+  double magnetic_failure;              //DX's magnetic failure; captures spin flip differences 
 };
 namespace compare{
   structure_misfit initialize_misfit_struct(bool magnetic=false);
@@ -513,3 +513,9 @@ namespace compare{
 // AFLOW_COMPARE_STRUCTURE
 // ***************************************************************************
 
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow DAVID HICKS - Duke University 2014-2020                 *
+// *                                                                         *
+// ***************************************************************************

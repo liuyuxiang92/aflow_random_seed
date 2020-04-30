@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2015           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow PINKU NATH - Duke University 2014-2018             *
 // *                                                                         *
 // ***************************************************************************
@@ -19,12 +19,12 @@ namespace apl {
       _xflags& xflags, //_vflags& vflags,
       string& AflowIn,
       ofstream& mf,
-      ostream& os) : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, os) //xvasp, aflags, kflags, vflags, l)
+      ostream& oss) : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, oss) //xvasp, aflags, kflags, vflags, l)
   {  //CO200106 - patching for auto-indenting
     clear();
     _log.open(_logfile.c_str());
     if (!_log.is_open()) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon() Cannot create [aflow_qha_aflowcreate_information.out] file.");
       string function = "apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon()";
       string message = "Cannot create [" + _logfile + "] file.";
@@ -33,7 +33,7 @@ namespace apl {
     _log << std::setprecision(8) << std::fixed;
   }
   // ***************************************************************************************
-  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear(); }
+  QHA_AFLOWIN_CREATOR::~QHA_AFLOWIN_CREATOR() { this->clear(); xStream::free();}
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::clear()
   {
@@ -87,7 +87,7 @@ namespace apl {
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::run_qha()
   {
-    pflow::logger(_AFLOW_FILE_NAME_, "QHA", "Arranging all qha-options ", *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, "QHA", "Arranging all qha-options ", *_aflowFlags, *p_FileMESSAGE, *p_oss);
 
     //options are mutually exclusive
     if((_is_gp_on) && (_is_eos)){
@@ -139,25 +139,25 @@ namespace apl {
     if(_scqha_vol_distortion==0) 
     {
       if(_is_sc_gp_on){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp is on.");
         string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
         string message = "scqha_distortion==0 but _is_sc_gp is on.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       } else if(_is_sc_gp_A_on){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_A is on.");
         string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
         string message = "scqha_distortion==0 but _is_sc_gp_A is on.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       } else if(_is_sc_gp_B_on){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_B is on.");
         string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
         string message = "scqha_distortion==0 but _is_sc_gp_B is on.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       } else if(_is_sc_gp_C_on){
-        // ME20191031 - use xerror
+        //ME20191031 - use xerror
         //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_C is on.");
         string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
         string message = "scqha_distortion==0 but _is_sc_gp_C is on.";
@@ -209,16 +209,16 @@ namespace apl {
     string message = "";
     if(phonon_option==0){
       message = "Creating distorted configurations to calculate QHA properties ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==1){
       message = "Creating distorted configurations to calculate SCQHA/QHA3P properties ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==2){
       message = "Creating distorted configurations to calculate QHA EOS ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     } else if(phonon_option==3){
       message = "Creating distorted configurations to calculate QHA static energies ";
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
     }
 
     if(phonon_option==0){
@@ -334,7 +334,7 @@ namespace apl {
             ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
       message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       if(phonon_option<3){ 
         write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==3){ 
@@ -354,46 +354,46 @@ namespace apl {
     if(phonon_option==4){
       if(_is_gp_A_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_gp_B_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_gp_C_on){ 
         message = "Creating distorted configurations to calculate Gruneisen-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==5){
       if(_is_sc_gp_A_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_sc_gp_B_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_sc_gp_C_on){ 
         message = "Creating distorted configurations to calculate SC-Gruneisen-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==6){
       if(_is_eos_A){ 
         message = "Creating distorted configurations to calculate EOS-phonon-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_B){ 
         message = "Creating distorted configurations to calculate EOS-phonon-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_C){ 
         message = "Creating distorted configurations to calculate EOS-phonon-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       }
     } else if(phonon_option==7){
       if(_is_eos_A){ 
         message = "Creating distorted configurations to calculate EOS-static-A Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_B){ 
         message ="Creating distorted configurations to calculate EOS-static-B Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       } else if(_is_eos_C){ 
         message = "Creating distorted configurations to calculate EOS-static-C Parameter ";
-        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+        pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       }
     }
 
@@ -509,7 +509,7 @@ namespace apl {
             ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
       message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       if(phonon_option<7){
         write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==7){
@@ -525,7 +525,7 @@ namespace apl {
     }
     //if(xinput.AFLOW_MODE_AIMS){return create_aflowin_phonon_phonon(xinput.xaims);}
     else {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::write_phonon_OUTPUT(); Input -> aflow.in conversion unknown.");
       string function = "apl::QHA_AFLOWIN_CREATOR::write_phonon_OUTPUT()";
       string message = "Input -> aflow.in conversion unknown.";
@@ -537,7 +537,7 @@ namespace apl {
     if(xinput.AFLOW_MODE_VASP){return write_static_AFLOWIN(xinput.xvasp);}
     //if(xinput.AFLOW_MODE_AIMS){return create_aflowin_phonon_phonon(xinput.xaims);}
     else {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::write_static_OUTPUT(); Input -> aflow.in conversion unknown.");
       string function = "apl::QHA_AFLOWIN_CREATOR::write_static_OUTPUT()";
       string message = "Input -> aflow.in conversion unknown.";
@@ -678,7 +678,7 @@ namespace apl {
         }
       }
     } else {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("apl::ForceConstantCalculator::createGPAFLOWIN(); Cannot open [aflow.in] file.");
       string function = "apl::ForceConstantCalculator::createGPAFLOWIN()";
       string message = "Cannot open [" + _AFLOWIN_ + "] file.";
@@ -720,7 +720,7 @@ namespace apl {
     string filename = xvasp.Directory + string("/") + string(_AFLOWIN_);
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon; Cannot create [aflow.in] file.");
       string function = "apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon";
       string message = "Cannot create [" + filename + "] file.";
@@ -844,7 +844,7 @@ namespace apl {
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
       string message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       write_static_OUTPUT(vaspRuns[idxRun]);
     }
     vaspRuns.clear();
@@ -881,7 +881,7 @@ namespace apl {
           aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
 
       string message = "Creating " + runname;
-      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *messageFile, *oss);
+      pflow::logger(_AFLOW_FILE_NAME_, "QHA", message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
       write_static_OUTPUT(vaspRuns[idxRun]);
     }
     vaspRuns.clear();
@@ -1017,20 +1017,20 @@ namespace apl {
 
     aflowin << AFLOWIN_SEPARATION_LINE << std::endl;  // [AFLOW] **************************************************
     aflowin << "[VASP_INCAR_MODE_EXPLICIT]START" << std::endl;
-    xvasp.AVASP_EXTRA_INCAR.clear();                          // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "NELM = 120" << std::endl;     // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "NELMIN=2" << std::endl;       // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "LPLANE=.TRUE." << std::endl;  // WAHYU DEFAULT
+    xvasp.AVASP_EXTRA_INCAR.clear();                          //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "NELM = 120" << std::endl;     //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "NELMIN=2" << std::endl;       //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "LPLANE=.TRUE." << std::endl;  //WSETYAWAN DEFAULT
 
-    if (xvasp.str.atoms.size() <= 10)                           // cutoff for LREAL     // WAHYU DEFAULT
-      xvasp.AVASP_EXTRA_INCAR << "LREAL=.FALSE." << std::endl;  // WAHYU DEFAULT
+    if (xvasp.str.atoms.size() <= 10)                           // cutoff for LREAL     //WSETYAWAN DEFAULT
+      xvasp.AVASP_EXTRA_INCAR << "LREAL=.FALSE." << std::endl;  //WSETYAWAN DEFAULT
     else
-      xvasp.AVASP_EXTRA_INCAR << "LREAL=Auto" << std::endl;    // WAHYU DEFAULT
-    xvasp.AVASP_EXTRA_INCAR << "LSCALU=.FALSE." << std::endl;  // WAHYU DEFAULT
+      xvasp.AVASP_EXTRA_INCAR << "LREAL=Auto" << std::endl;    //WSETYAWAN DEFAULT
+    xvasp.AVASP_EXTRA_INCAR << "LSCALU=.FALSE." << std::endl;  //WSETYAWAN DEFAULT
     // extra INCAR
     aflowin << xvasp.AVASP_EXTRA_INCAR.str();  // << endl;
     aflowin << "NEDOS=" << _NEDOS << std::endl;
-    aflowin << _PSTRESS << std::endl;  // WAHYU DEFAULT
+    aflowin << _PSTRESS << std::endl;  //WSETYAWAN DEFAULT
     aflowin << "[VASP_INCAR_MODE_EXPLICIT]STOP" << std::endl;
     aflowin << AFLOWIN_SEPARATION_LINE << std::endl;  // [AFLOW] **************************************************
     if (SPACES) aflowin << std::endl;
@@ -1066,11 +1066,11 @@ namespace apl {
     aflowin << "[VASP_POSCAR_MODE_EXPLICIT]STOP " << std::endl;
     aflowin << AFLOWIN_SEPARATION_LINE << std::endl;
 
-    //CO - START
+    //CO START
     string filename = xvasp.Directory + string("/") + string(_AFLOWIN_);
     aurostd::stringstream2file(aflowin, filename);
     if (!aurostd::FileExist(filename)) {
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw apl::APLRuntimeError("apl::ForceConstantCalculator::createEOSAFLOWIN(); Cannot create [aflow.in] file.");
       string function = "apl::ForceConstantCalculator::createEOSAFLOWIN()";
       string message = "Cannot create [" + filename + "] file.";
@@ -1088,7 +1088,7 @@ namespace apl {
     aurostd::string2vectorstring(_AFLOWIN_,vlines);
     if (!vlines.size())  //CO
     {
-      // ME20191031 - usexerror
+      //ME20191031 - usexerror
       //throw apl::APLRuntimeError("apl::ForceConstantCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
       string function = "apl::ForceConstantCalculator::get_special_inputs()";
       string message = "Cannot read ["+_AFLOWIN_+"] file.";

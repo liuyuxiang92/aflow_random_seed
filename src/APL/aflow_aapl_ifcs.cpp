@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2017-2020               *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
@@ -46,19 +46,19 @@ namespace apl {
 
   //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
-  AnharmonicIFCs::AnharmonicIFCs() {
+  AnharmonicIFCs::AnharmonicIFCs(ostream& oss) {
     free();
+    xStream::initialize(oss);
   }
 
   AnharmonicIFCs::AnharmonicIFCs(_xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, ClusterSet& _clst, ofstream& mf, ostream& os) {
+      _xflags& xflags, ClusterSet& _clst, ofstream& mf, ostream& oss) {
     free();
     _xInput = &xinput;
     _aflowFlags = &aflags;
     _kbinFlags = &kflags;
     _xFlags = &xflags;
-    messageFile = &mf;
-    oss = &os;
+    xStream::initialize(mf, oss);
     clst = &_clst;
     order = clst->order;
   }
@@ -79,6 +79,7 @@ namespace apl {
 
   //copy//////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::copy(const AnharmonicIFCs& that) {
+    xStream::copy(that);
     _aflowFlags = that._aflowFlags;
     _kbinFlags = that._kbinFlags;
     _xFlags = that._xFlags;
@@ -86,8 +87,6 @@ namespace apl {
     cart_indices = that.cart_indices;
     clst = that.clst;
     distortion_magnitude = that.distortion_magnitude;
-    messageFile = that.messageFile;
-    oss = that.oss;
     force_constants = that.force_constants;
     max_iter = that.max_iter;
     mixing_coefficient = that.mixing_coefficient;
@@ -98,6 +97,7 @@ namespace apl {
 
   //Destructor////////////////////////////////////////////////////////////////
   AnharmonicIFCs::~AnharmonicIFCs() {
+    xStream::free();
     free();
   }
 
@@ -115,16 +115,13 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void AnharmonicIFCs::clear(_xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, ClusterSet& _clst, ofstream& mf, ostream& os) {
+  void AnharmonicIFCs::clear(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags, ClusterSet& _clst) {
     free();
     _xInput = &xinput;
     _aflowFlags = &aflags;
     _kbinFlags = &kflags;
     _xFlags = &xflags;
     clst = &_clst;
-    messageFile = &mf;
-    oss = &os;
   }
 
 
@@ -159,7 +156,7 @@ namespace apl {
       _logger << "4th";
     }
     _logger << " order IFCs.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, *_aflowFlags, *p_FileMESSAGE, *p_oss);
 
     // Determine the number of runs so the run ID in the folder name can be
     // padded with the appropriate number of zeros.
@@ -189,7 +186,7 @@ namespace apl {
       }
       if (d == ndir) {
         string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, *_aflowFlags, *messageFile, *oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         zerostate_chgcar = false;
       } else {
         chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
@@ -335,7 +332,7 @@ namespace apl {
     // read the force files. The latter outputs messages, which is not desired
     // when directories have just been created.
     if (!outfileFoundAnywherePhonons(xInputs)) return false;
-    if (!outfileFoundEverywherePhonons(xInputs, _aflowFlags->Directory, *messageFile)) return false;
+    if (!outfileFoundEverywherePhonons(xInputs, _aflowFlags->Directory, *p_FileMESSAGE, *p_oss)) return false;
     if (_useZeroStateForces) {
       vector<string> directory;
       aurostd::DirectoryLS(_aflowFlags->Directory, directory);
@@ -360,11 +357,11 @@ namespace apl {
     }
     vector<vector<vector<xvector<double> > > > force_tensors = storeForces(xInputs);
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", *_aflowFlags, *p_FileMESSAGE, *p_oss);
     vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst->ineq_distortions, force_tensors);
     force_tensors.clear();
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", *_aflowFlags, *p_FileMESSAGE, *p_oss);
     force_constants = symmetrizeIFCs(ifcs_unsym);
     return true;
   }
@@ -641,11 +638,11 @@ namespace apl {
     // Do iterations
     int num_iter = 0;
     double max_err = 0.0;
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", *_aflowFlags, *messageFile, *oss);
-    *oss << std::setiosflags(std::ios::fixed | std::ios::right);
-    *oss << std::setw(15) << "Iteration";
-    *oss << std::setiosflags(std::ios::fixed | std::ios::right);
-    *oss << std::setw(20) << "Abs. max. error" << std::endl;
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
+    *p_oss << std::setw(15) << "Iteration";
+    *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
+    *p_oss << std::setw(20) << "Abs. max. error" << std::endl;
     do {
       // 1. Symmetrize using linear combinations
       applyLinCombs(ifcs);  
@@ -663,10 +660,10 @@ namespace apl {
         }
       }
 
-      *oss << std::setiosflags(std::ios::fixed | std::ios::right);
-      *oss << std::setw(15) << num_iter;
-      *oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-      *oss << std::setw(20) << max_err << std::endl;
+      *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
+      *p_oss << std::setw(15) << num_iter;
+      *p_oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+      *p_oss << std::setw(20) << max_err << std::endl;
 
       // 4. Correct IFCs
       if (max_err > sumrule_threshold) {
@@ -674,7 +671,7 @@ namespace apl {
       }
       num_iter++;
     } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", *_aflowFlags, *messageFile, *oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", *_aflowFlags, *p_FileMESSAGE, *p_oss);
     if (num_iter > max_iter) {
       string function = _AAPL_IFCS_ERR_PREFIX_ + "symmetrizeIFCs";
       stringstream message;
@@ -970,10 +967,11 @@ namespace apl {
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
-    parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME20190219
-    parameters.unsetf(std::ios::hex);  // ME20190125 - Remove hexadecimal formatting
-    parameters  << "</i>" << std::endl;
+    // ME20200428 - We do not compare checksums anymore
+    //parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
+    //parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  //ME20190219
+    //parameters.unsetf(std::ios::hex);  //ME20190125 - Remove hexadecimal formatting
+    //parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
 
     // Distortion magnitude
@@ -1086,7 +1084,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow Marco Esters - Duke University 2018                *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow MARCO ESTERS - Duke University 2018-2020           *
 // *                                                                         *
 // ***************************************************************************
