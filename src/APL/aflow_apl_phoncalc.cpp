@@ -302,28 +302,27 @@ namespace apl {
       }
       line = vlines[line_count++];  //CO
       if (line.find("born") != string::npos) break;
+    }
 
-      line = vlines[line_count++];  //CO
-      while (true) {
-        if (line_count == vlines.size()) { //CO
-          message = "Incomplete <born> tag.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
-        }
-        line = vlines[line_count++];  //CO
-        if (line.find("</varray>") != string::npos)
-          break;
-        for (int k = 1; k <= 3; k++) {
-          line = vlines[line_count++];  //CO
-          int t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          m(k, 1) = aurostd::string2utype<double>(tokens.at(0));
-          m(k, 2) = aurostd::string2utype<double>(tokens.at(1));
-          m(k, 3) = aurostd::string2utype<double>(tokens.at(2));
-          tokens.clear();
-        }
-        _bornEffectiveChargeTensor.push_back(m);
-        line = vlines[line_count++];  //CO
+    line = vlines[line_count++];  //CO
+    while (true) {
+      if (line_count == vlines.size()) { //CO
+        message = "Incomplete <born> tag.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
+      line = vlines[line_count++];  //CO
+      if (line.find("</varray>") != string::npos) break;
+      for (int k = 1; k <= 3; k++) {
+        line = vlines[line_count++];  //CO
+        int t = line.find_first_of(">") + 1;
+        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        m(k, 1) = aurostd::string2utype<double>(tokens.at(0));
+        m(k, 2) = aurostd::string2utype<double>(tokens.at(1));
+        m(k, 3) = aurostd::string2utype<double>(tokens.at(2));
+        tokens.clear();
+      }
+      _bornEffectiveChargeTensor.push_back(m);
+      line = vlines[line_count++];  //CO
     }
 
     // Get dielectric constant tensor

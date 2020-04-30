@@ -2199,7 +2199,7 @@ namespace KBIN {
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
       apl::QMesh qmtcond(messageFile, oss);
       qmtcond.setDirectory(aflags.Directory);
-      qmtcond.initialize(USER_DOS_MESH, phcalc.getInputCellStructure(), true, true);
+      qmtcond.initialize(USER_THERMALGRID, phcalc.getInputCellStructure(), true, true);
       qmtcond.makeIrreducible();
       qmtcond.writeQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE);
       qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);
