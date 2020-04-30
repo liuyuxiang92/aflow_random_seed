@@ -177,7 +177,7 @@ namespace pflow {
 namespace pflow {
   void CalcPathLength(const pflow::projdata& pd, vector<double>& pathl,
       vector<double>& dpathl) {
-    pflow::matrix<double> rlat=RecipLat(pd.lat);
+    aurostd::matrix<double> rlat=RecipLat(pd.lat); //CO20200404 pflow::matrix()->aurostd::matrix()
     pathl[0]=0;
     dpathl[0]=0;
     for(int ik=1;ik<pd.nkpts;ik++) {
@@ -386,8 +386,8 @@ namespace pflow {
 // This funtion prints out 3 lattice vectors in cartesian coordinates.
 // Dane Morgan - Stefano Curtarolo
 namespace pflow {
-  void PrintChgInt(vector<pflow::matrix<double> >& rad_chg_int,
-      pflow::matrix<double>& vor_chg_int, ostream& oss) {  
+  void PrintChgInt(vector<aurostd::matrix<double> >& rad_chg_int,
+      aurostd::matrix<double>& vor_chg_int, ostream& oss) {  //CO20200404 pflow::matrix()->aurostd::matrix()  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::PrintChgInt: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
@@ -677,9 +677,9 @@ namespace pflow {
     oss << "  Vol %Err: " << 100*2*(v2-v1)/(v2+v1) << endl;
 
     // lat par and angles
-    // vector<double> ldat1=pflow::Getabc_angles(pflow::xmatrix2matrix(sstr1.lattice));
+    // vector<double> ldat1=pflow::Getabc_angles(aurostd::xmatrix2matrix(sstr1.lattice));  //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<double> ldat1=xvector2vector(Getabc_angles(sstr1.lattice,DEGREES));
-    // vector<double> ldat2=pflow::Getabc_angles(pflow::xmatrix2matrix(sstr2.lattice));
+    // vector<double> ldat2=pflow::Getabc_angles(aurostd::xmatrix2matrix(sstr2.lattice));  //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<double> ldat2=xvector2vector(Getabc_angles(sstr2.lattice,DEGREES));
 
     ldat1=pflow::Sort_abc_angles(ldat1);  
@@ -713,10 +713,10 @@ namespace pflow {
     xstructure str2_newvol=sstr2;
     str1_newvol=SetScale(str1_newvol,rescale1);
     str2_newvol=SetScale(str2_newvol,rescale2);
-    pflow::matrix<double> dist1;
-    pflow::matrix<double> dist2;
-    pflow::matrix<double> dist_diff;
-    pflow::matrix<double> dist_diff_n;
+    aurostd::matrix<double> dist1; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> dist2; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> dist_diff; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> dist_diff_n; //CO20200404 pflow::matrix()->aurostd::matrix()
     // If cutoff < 0 use default of 4*(avg rad of an atom).  Note
     // that in a rescaled str where each atom has vavg=1, rad=.6204.
     // In the true str, where each atom has vol vavg, rad=0.6204*vavg^(1/3).
@@ -791,17 +791,17 @@ namespace pflow {
     int nbins=Nint(cutoff/bin_width);
     int smooth_width=5;
     int nsh_max=2;
-    pflow::matrix<double> rdf_all_1;
-    pflow::matrix<double> rdf_all_2;
+    aurostd::matrix<double> rdf_all_1; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdf_all_2; //CO20200404 pflow::matrix()->aurostd::matrix()
     GetRDF(sstr1,cutoff,nbins,rdf_all_1);
     GetRDF(sstr2,cutoff,nbins,rdf_all_2);
-    pflow::matrix<double> rdf_all_1_sm=GetSmoothRDF(rdf_all_1,smooth_width);
-    pflow::matrix<double> rdf_all_2_sm=GetSmoothRDF(rdf_all_2,smooth_width);
+    aurostd::matrix<double> rdf_all_1_sm=GetSmoothRDF(rdf_all_1,smooth_width); //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdf_all_2_sm=GetSmoothRDF(rdf_all_2,smooth_width); //CO20200404 pflow::matrix()->aurostd::matrix()
     // Get shells
-    pflow::matrix<double> rdfsh_all_1;
-    pflow::matrix<double> rdfsh_loc_1; // Radial location of rdf shells.
-    pflow::matrix<double> rdfsh_all_2;
-    pflow::matrix<double> rdfsh_loc_2; // Radial location of rdf shells.
+    aurostd::matrix<double> rdfsh_all_1; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc_1; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_all_2; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc_2; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
     GetRDFShells(sstr1,cutoff,nbins,smooth_width,
     rdf_all_1_sm,rdfsh_all_1,rdfsh_loc_1);
     GetRDFShells(sstr2,cutoff,nbins,smooth_width,
@@ -1563,7 +1563,7 @@ namespace pflow {
       oss << "  Vol Str1: " << v1 << endl;
 
       // lat par and angles
-      //  vector<double> ldat1=pflow::Getabc_angles(pflow::xmatrix2matrix(sstr1.lattice));
+      //  vector<double> ldat1=pflow::Getabc_angles(aurostd::xmatrix2matrix(sstr1.lattice)); //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<double> ldat1=xvector2vector(Getabc_angles(sstr1.lattice,DEGREES));
       ldat1=pflow::Sort_abc_angles(ldat1);  
       oss << "Unit cell: tot_vol a b c alpha beta gamma" << endl;
@@ -1577,10 +1577,10 @@ namespace pflow {
       xstructure str1_newvol=sstr1;
       // str1_newvol=SetScale(str1_newvol,rescale1); // Sets vol/atom=1
       str1_newvol.scale=rescale1;
-      pflow::matrix<double> dist1;
-      pflow::matrix<double> dist2;
-      pflow::matrix<double> dist_diff;
-      pflow::matrix<double> dist_diff_n;
+      aurostd::matrix<double> dist1; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> dist2; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> dist_diff; //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double> dist_diff_n; //CO20200404 pflow::matrix()->aurostd::matrix()
       // If cutoff < 0 use default of 4*(avg rad of an atom).  Note
       // that in the rescaled str, where each atom has vavg=1, rad=.6204
       // In the true str, where each atom has vol = v1, rad=0.6204*v1^(1/3).
@@ -1868,7 +1868,7 @@ namespace pflow {
     if(LDEBUG) cerr << "pflow::PrintEwald: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
     oss.setf(std::ios::fixed, std::ios::floatfield);
-    pflow::matrix<double> lat=pflow::GetScaledLat(in_str);
+    aurostd::matrix<double> lat=pflow::GetScaledLat(in_str); //CO20200404 pflow::matrix()->aurostd::matrix()
     int nat = pflow::GetNumAtoms(in_str);
     double vol=pflow::GetVol(lat);
     double d=std::pow((double) vol,(double) 1.0/3.0)*1E-10; // In meters
@@ -2359,7 +2359,7 @@ void PrintRBAnal(const int& nim, const string& path_flag, ostream& oss) {
 // This function prints out the displacement info for 2 POSCAR.
 // Dane Morgan - Stefano Curtarolo
 void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist,
-    pflow::matrix<double>& cm, const string& path_flag,
+    aurostd::matrix<double>& cm, const string& path_flag,  //CO20200404 pflow::matrix()->aurostd::matrix()
     ostream& oss) {
   oss << "*******  BEGIN:  Structure 2 - Structure 1  *******" << endl;
   oss << diffstr;
@@ -2382,9 +2382,9 @@ void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist,
 void PrintRDF(const xstructure& str, const double& rmax,
     const int& nbins,
     const int& smooth_width,
-    const pflow::matrix<double>& rdf_all,
-    pflow::matrix<double>& rdfsh_all,
-    pflow::matrix<double>& rdfsh_loc,
+    const aurostd::matrix<double>& rdf_all,  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double>& rdfsh_all,  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double>& rdfsh_loc,  //CO20200404 pflow::matrix()->aurostd::matrix()
     ostream& oss) {
   int natoms=str.atoms.size();
   //  vector<int> types=str.GetTypes();
@@ -2395,7 +2395,7 @@ void PrintRDF(const xstructure& str, const double& rmax,
   int w1=5;
   int _rdi=rdfsh_loc.size();
   int _rdj=nbins;
-  pflow::matrix<double> rdfsh_bin(_rdi,_rdj);pflow::VVset(rdfsh_bin,0.0);
+  aurostd::matrix<double> rdfsh_bin(_rdi,_rdj);pflow::VVset(rdfsh_bin,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
 
   // Put rdfsh_all into bins so you can write out in same
   // way as rdf_all
@@ -2478,10 +2478,10 @@ void PrintRDF(const xstructure& str, const double& rmax,
 void PrintRDFCmp(const xstructure& str_A, const xstructure& str_B,
     const double& rmax, const int nbins,
     const double& smooth_width,const int nsh,
-    const pflow::matrix<double>& rdfsh_all_A,
-    const pflow::matrix<double>& rdfsh_all_B,
+    const aurostd::matrix<double>& rdfsh_all_A,
+    const aurostd::matrix<double>& rdfsh_all_B,
     const vector<int>& best_match,
-    const pflow::matrix<double>& rms_mat, ostream& oss) {
+    const aurostd::matrix<double>& rms_mat, ostream& oss) {  //CO20200404 pflow::matrix()->aurostd::matrix()
   int nat=str_A.atoms.size();   if(str_B.atoms.size()) {;} // phony to keep str_B busy
   std::deque<int> num_each_type=str_A.num_each_type;
   int nt=num_each_type.size();
@@ -2981,10 +2981,10 @@ namespace pflow {
 // Given a point q and list of points, {p_i} returns the xmatrix
 // M_ij = Angle from pi-q-pj.
 // Dane Morgan - Stefano Curtarolo
-pflow::matrix<double> GetAngleMat(const xvector<double>& q, const vector<xvector<double> >& p) {
+aurostd::matrix<double> GetAngleMat(const xvector<double>& q, const vector<xvector<double> >& p) { //CO20200404 pflow::matrix()->aurostd::matrix()
   double TOL=1e-6;
   int np=p.size();
-  pflow::matrix<double> M(np,np);pflow::VVset(M,0.0);
+  aurostd::matrix<double> M(np,np);pflow::VVset(M,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
   for(int i=0;i<np;i++) {
     for(int j=0;j<np;j++) {
       xvector<double> a(3);a=p.at(i)-q;
@@ -3187,7 +3187,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
 
       // Print out angles with neighbors.
       xvector<double> q(3);q=F2C(lattice,avnfpos.at(ia));
-      pflow::matrix<double> ang_mat=GetAngleMat(q,p);
+      aurostd::matrix<double> ang_mat=GetAngleMat(q,p);  //CO20200404 pflow::matrix()->aurostd::matrix()
       int np=p.size();
       oss << "        ";
       oss << "Angles"<<endl;
@@ -3477,7 +3477,7 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
   vector<double> twoB_vec(num_atoms,0.0);
   //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
   vector<vector<double> > ids;
-  pflow::matrix<double> data;
+  aurostd::matrix<double> data;  //CO20200404 pflow::matrix()->aurostd::matrix()
   pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO20190620 - intmax can be grabbed later
 
   //get intmax

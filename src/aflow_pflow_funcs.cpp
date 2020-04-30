@@ -1700,7 +1700,7 @@ namespace pflow {
     vector<double> twoB_vec(num_atoms,0.0);
     //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
     vector<vector<double> > ids;
-    pflow::matrix<double> data;
+    aurostd::matrix<double> data;  //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO20190620 - intmax can be grabbed later
 
     v_twotheta.clear();
@@ -1873,7 +1873,7 @@ namespace pflow {
       vector<double>& scatt_fact,
       vector<double>& mass,vector<double>& twoB_vec,
       vector<vector<double> >& ids,
-      pflow::matrix<double>& data,
+      aurostd::matrix<double>& data, //CO20200404 pflow::matrix()->aurostd::matrix()
       double lambda) { //CO20190520  //CO20190620 - intmax can be grabbed later
     //int num_atoms=str.atoms.size();
     //  vector<string> names=str.GetNames();
@@ -1894,7 +1894,7 @@ namespace pflow {
     // Sort by theta (reverse sort by distance).
     // Define an id pointer to sort.
     vector<double> v(5);
-    // pflow::matrix<double> ids(tlen,v);
+    // aurostd::matrix<double> ids(tlen,v);  //CO20200404 pflow::matrix()->aurostd::matrix()
     //vector<vector<double> > ids(tlen,v);  //CO20190409
     ids.resize(tlen,v);
     for(int i0=-kmx;i0<=kmx;i0++) {
@@ -1998,7 +1998,7 @@ namespace pflow {
     double osf=sf[(int)ids[0][1]]; // Initialize osf to first distance.
     vector<vector<int> > hkl_list;
     vector<int> hkl(3);
-    //pflow::matrix<double> data;
+    //aurostd::matrix<double> data;  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int i0=-kmx;i0<=kmx;i0++) {
       for(int i1=-kmx;i1<=kmx;i1++) {
         for(int i2=-kmx;i2<=kmx;i2++) {
@@ -2123,7 +2123,7 @@ namespace pflow {
 
     xmatrix<double> rlat(3,3);rlat=sstr.klattice;
     int num_atoms=sstr.atoms.size();
-    //  matrix<double> fpos=GetFpos(sstr);
+    //  aurostd::matrix<double> fpos=GetFpos(sstr);  //CO20200404 pflow::matrix()->aurostd::matrix()
 
     // Set parameters for Debye Waller factors.
     double temp=300;
@@ -2222,11 +2222,11 @@ namespace pflow {
 // Dane Morgan, Modified by Stefano Curtarolo
 namespace pflow {
   void GetRDF(xstructure str, const double& rmax,
-      const int& nbins, matrix<double>& rdf_all) {
+      const int& nbins, aurostd::matrix<double>& rdf_all) {  //CO20200404 pflow::matrix()->aurostd::matrix()
     int natoms=str.atoms.size();
     std::deque<int> num_each_type=str.num_each_type;
     int ntyp=num_each_type.size();
-    rdf_all=matrix<double> ((ntyp+1)*natoms,nbins);
+    rdf_all=aurostd::matrix<double> ((ntyp+1)*natoms,nbins); //CO20200404 pflow::matrix()->aurostd::matrix()
     deque<deque<_atom> > nmat;
     // [OBSOLETE]    pflow::GetStrNeighData(str,rmax,nmat);
     str.GetStrNeighData(rmax,nmat);   // once GetRD goes in xstructure I can remove the copy
@@ -2271,16 +2271,16 @@ namespace pflow {
 //  >=0 again.
 namespace pflow {
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,
-      const int& smooth_width,const matrix<double>& rdf,
-      matrix<double>& rdfsh,matrix<double>& rdfsh_loc) {
+      const int& smooth_width,const aurostd::matrix<double>& rdf,  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double>& rdfsh,aurostd::matrix<double>& rdfsh_loc) { //CO20200404 pflow::matrix()->aurostd::matrix()
     // double TOL=1e-5; //DM not used
     // int natom=(int)str.atoms.size(); //DM not used
     if(smooth_width) {;} // phony just to keep smooth_width busy
     if(str.atoms.size()) {;} // phony just to keep str busy
 
     int _rdi=(int)rdf.size();
-    rdfsh = matrix<double>  (_rdi,0); pflow::VVset(rdfsh,0);
-    rdfsh_loc =  matrix<double> (_rdi,0);  pflow::VVset(rdfsh_loc,0);
+    rdfsh = aurostd::matrix<double>  (_rdi,0); pflow::VVset(rdfsh,0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    rdfsh_loc =  aurostd::matrix<double> (_rdi,0);  pflow::VVset(rdfsh_loc,0); //CO20200404 pflow::matrix()->aurostd::matrix()
     double dr=(rmax/(double)nbins);
     for(int i=0;i<_rdi;i++) {
 
@@ -2373,8 +2373,8 @@ namespace pflow {
 // atoms for each type and returns the rms.  
 namespace pflow {
   double RdfSh_RMS(const int iaA, const int iaB, const int nsh_max,const int nt,
-      const matrix<double>& rdfsh_all_A
-      ,const matrix<double>& rdfsh_all_B) {
+      const aurostd::matrix<double>& rdfsh_all_A
+      ,const aurostd::matrix<double>& rdfsh_all_B) { //CO20200404 pflow::matrix()->aurostd::matrix()
     double rms=0;
     int cnt=0;
     for(int it=0;it<nt;it++) {
@@ -2412,10 +2412,10 @@ namespace pflow {
 // str_A and str_B must have the same number of each type of atom.
 namespace pflow {
   void CmpRDFShells(const xstructure& str_A, const xstructure& str_B,
-      const matrix<double>& rdfsh_all_A,
-      const matrix<double>& rdfsh_all_B,
+      const aurostd::matrix<double>& rdfsh_all_A,
+      const aurostd::matrix<double>& rdfsh_all_B,
       const int nsh, vector<int>& best_match,
-      matrix<double>& rms_mat) {
+      aurostd::matrix<double>& rms_mat) {  //CO20200404 pflow::matrix()->aurostd::matrix()
     double TOL=1e-15;
     std::deque<int> netype_A=str_A.num_each_type;
     std::deque<int> netype_B=str_B.num_each_type;
@@ -2431,7 +2431,7 @@ namespace pflow {
     int nt=netype_A.size();
 
     // Get rms_mat
-    rms_mat = matrix<double> (nat,nat); pflow::VVset(rms_mat,-1.0);
+    rms_mat = aurostd::matrix<double> (nat,nat); pflow::VVset(rms_mat,-1.0); //CO20200404 pflow::matrix()->aurostd::matrix()
 
     for(int iaA=0;iaA<nat;iaA++) {
       for(int iaB=0;iaB<nat;iaB++) {
@@ -2476,9 +2476,9 @@ namespace pflow {
 // ***************************************************************************
 // This function gets a smoothed RDF.
 namespace pflow {
-  matrix<double> GetSmoothRDF(const matrix<double>& rdf,
+  aurostd::matrix<double> GetSmoothRDF(const aurostd::matrix<double>& rdf, //CO20200404 pflow::matrix()->aurostd::matrix()
       const double& sigma) {
-    matrix<double> rdf_sm=rdf;
+    aurostd::matrix<double> rdf_sm=rdf;  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int i=0;i<(int)rdf.size();i++) {
       rdf_sm[i]=pflow::SmoothFunc(rdf[i],sigma);
     }
@@ -2498,8 +2498,8 @@ namespace pflow {
 // Original by Dane Morgan, modified by STefano Curtarolo for type shift !
 namespace pflow {
   void CmpStrDist(xstructure str1, xstructure str2,const double& cutoff,
-      matrix<double>& dist1, matrix<double>& dist2,
-      matrix<double>& dist_diff,matrix<double>& dist_diff_n) {
+      aurostd::matrix<double>& dist1, aurostd::matrix<double>& dist2,
+      aurostd::matrix<double>& dist_diff,aurostd::matrix<double>& dist_diff_n) { //CO20200404 pflow::matrix()->aurostd::matrix()
 
     deque<deque<_atom> > neigh_mat1;
     deque<deque<_atom> > neigh_mat2;
@@ -2513,8 +2513,8 @@ namespace pflow {
     int nprs1=(ntypes1*(ntypes1+1))/2;
     int nprs2=(ntypes2*(ntypes2+1))/2;
     vector<double> tmpvec;
-    dist1=matrix<double> (nprs1,tmpvec);
-    dist2=matrix<double> (nprs2,tmpvec);
+    dist1=aurostd::matrix<double> (nprs1,tmpvec);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    dist2=aurostd::matrix<double> (nprs2,tmpvec);  //CO20200404 pflow::matrix()->aurostd::matrix()
 
     // Collect distances.
     // dist1
@@ -2558,8 +2558,8 @@ namespace pflow {
     // Assign distance difference matrix
     int ntypes_min=std::min(ntypes1,ntypes2);
     int nprs_min=ntypes_min*(ntypes_min+1)/2;
-    dist_diff = matrix<double> (nprs_min,tmpvec);
-    dist_diff_n = matrix<double> (nprs_min,tmpvec);
+    dist_diff = aurostd::matrix<double> (nprs_min,tmpvec); //CO20200404 pflow::matrix()->aurostd::matrix()
+    dist_diff_n = aurostd::matrix<double> (nprs_min,tmpvec); //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int i=0;i<ntypes_min;i++) {
       for(int j=i;j<ntypes_min;j++) {
         int id1=j-i+ntypes1*i-max(0,i*(i-1)/2);
@@ -2711,10 +2711,10 @@ namespace pflow {
     center_guide = vector<double> (6,0.0);
     center_s = 0;
     background = vector<double> (3,1.0);
-    lightcenter = matrix<double> (1,center);
+    lightcenter = aurostd::matrix<double> (1,center);  //CO20200404 pflow::matrix()->aurostd::matrix()
     lightrad = vector<double> (1,0.001);
     vector<double> color (3,0.0);
-    lightcolor = matrix<double> (1,color);
+    lightcolor = aurostd::matrix<double> (1,color);  //CO20200404 pflow::matrix()->aurostd::matrix()
     sphtex_tex_def = vector<double> (4);
     sphtex_tex_def[0] = 0.3; // ambient
     sphtex_tex_def[1] = 0.6; // diffuse
@@ -2726,7 +2726,7 @@ namespace pflow {
     sph_rad_def = 1;
     shading = "fullshade";
     outfile = "POSCAR_RT";
-    sc=matrix<double> (3,3); pflow::VVset(sc,0.0);
+    sc=aurostd::matrix<double> (3,3); pflow::VVset(sc,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     sc[0][0]=1;
     sc[1][1]=1;
     sc[2][2]=1;
@@ -2781,7 +2781,7 @@ namespace pflow {
 // OUTCAR file.
 // Dane Morgan style
 namespace pflow {
-  void GetDatFromOutcar(vector<matrix<double> >& lat_vec,
+  void GetDatFromOutcar(vector<aurostd::matrix<double> >& lat_vec, //CO20200404 pflow::matrix()->aurostd::matrix()
       deque<int>& num_each_type, ifstream& outcar_inf) {
     int first_lat=1;
     vector<string> a(3,"Z");
@@ -2790,7 +2790,7 @@ namespace pflow {
     while (outcar_inf >> a[2]) {
       string key= (a[0]+" "+a[1]+" "+a[2]);
       if(key=="reciprocal lattice vectors") {
-        matrix<double> lat(3,3);
+        aurostd::matrix<double> lat(3,3);  //CO20200404 pflow::matrix()->aurostd::matrix()
         for(int ic=0;ic<3;ic++) {
           outcar_inf >> lat[ic][0] >> lat[ic][1] >> lat[ic][2];
           outcar_inf >>sdum>>sdum>>sdum;
@@ -2822,12 +2822,12 @@ namespace pflow {
 // ***************************************************************************
 // This gets the fpos from XDATCAR.
 namespace pflow {
-  void GetDatFromXdatcar(vector<matrix<double> >& fpos_vec,
+  void GetDatFromXdatcar(vector<aurostd::matrix<double> >& fpos_vec, //CO20200404 pflow::matrix()->aurostd::matrix()
       ifstream& xdatcar_inf)
   {
     fpos_vec.clear();
     string s;
-    matrix<double> dpmat(0);
+    aurostd::matrix<double> dpmat(0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<double> dpvec(3);
     // Read in header lines
     for(int il=0;il<6;il++) {
@@ -2850,7 +2850,7 @@ namespace pflow {
         key=aurostd::GetNextVal(s,id);
       }
       fpos_vec.push_back(dpmat);
-      dpmat=matrix<double> (0);
+      dpmat=aurostd::matrix<double> (0); //CO20200404 pflow::matrix()->aurostd::matrix()
     }
   }
 }
@@ -2860,8 +2860,8 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   vector<xstructure> GetStrVecFromOUTCAR_XDATCAR(ifstream& outcar_inf, ifstream& xdatcar_inf) {
-    vector<matrix<double> > fpos_vec;
-    vector<matrix<double> > lat_vec;
+    vector<aurostd::matrix<double> > fpos_vec; //CO20200404 pflow::matrix()->aurostd::matrix()
+    vector<aurostd::matrix<double> > lat_vec;  //CO20200404 pflow::matrix()->aurostd::matrix()
     deque<int> num_each_type;
     pflow::GetDatFromOutcar(lat_vec,num_each_type,outcar_inf);
     pflow::GetDatFromXdatcar(fpos_vec,xdatcar_inf);
@@ -2876,7 +2876,7 @@ namespace pflow {
     }
     if(lat_vec.size()>fpos_vec.size()) {lat_vec.resize(fpos_vec.size());}
     if(lat_vec.size()<fpos_vec.size()) {
-      matrix<double> tlat=lat_vec[lat_vec.size()-1];
+      aurostd::matrix<double> tlat=lat_vec[lat_vec.size()-1];  //CO20200404 pflow::matrix()->aurostd::matrix()
       for(int i=(int)lat_vec.size();i<(int)fpos_vec.size();i++) {
         lat_vec.push_back(tlat);
       }
@@ -3286,9 +3286,9 @@ namespace pflow {
     for(int is=0;is<size1;is++) {
       xstructure str1=vstr1[is];
       xstructure str2=vstr2[is];
-      matrix<double> lat1=pflow::GetLat(str1);
+      aurostd::matrix<double> lat1=pflow::GetLat(str1);  //CO20200404 pflow::matrix()->aurostd::matrix()
       xmatrix<double> xlat1(3,3);xlat1=str1.lattice;
-      matrix<double> cpos2=pflow::GetCpos(str2);
+      aurostd::matrix<double> cpos2=pflow::GetCpos(str2);  //CO20200404 pflow::matrix()->aurostd::matrix()
       deque<int> num_each_type_1=pflow::GetNumEachType(str1);
       int num_types_1=num_each_type_1.size();
       deque<int> num_each_type_2=pflow::GetNumEachType(str2);
@@ -3325,7 +3325,7 @@ namespace pflow {
     // Make structral adjustments
     if(rtp.sc_s) {
       xmatrix<double> _supercell(3,3);
-      _supercell=pflow::matrix2xmatrix(rtp.sc);
+      _supercell=aurostd::matrix2xmatrix(rtp.sc);  //CO20200404 pflow::matrix()->aurostd::matrix()
       // Make a supercell if it was set by user.  Note that this moves all atoms into the unit cell.
       str=GetSuperCell(str,_supercell);
       // Reset rtparams now that you have a supercell.
@@ -3339,11 +3339,11 @@ namespace pflow {
 // ***************************************************************************
 // Gets supercells for every strucutre in the structure vector.
 namespace pflow {
-  void SuperCellStrVec(vector<xstructure>& vstr, const matrix<double>& sc) {
+  void SuperCellStrVec(vector<xstructure>& vstr, const aurostd::matrix<double>& sc) {  //CO20200404 pflow::matrix()->aurostd::matrix()
     if(vstr.size()==0) return;
     for(int is=0;is<(int)vstr.size();is++) {
       xmatrix<double> _supercell(3,3);
-      _supercell=pflow::matrix2xmatrix(sc);
+      _supercell=aurostd::matrix2xmatrix(sc);  //CO20200404 pflow::matrix()->aurostd::matrix()
       vstr[is]=GetSuperCell(vstr[is],_supercell); // Makes a supercell.
     }
   }
@@ -3388,8 +3388,8 @@ namespace pflow {
     // Now set all defaults for rtp that
     // use structural information.
     str=ReScale(str,1.0);
-    matrix<double> lat=pflow::GetLat(str);
-    matrix<double> cpos=pflow::GetCpos(str);
+    aurostd::matrix<double> lat=pflow::GetLat(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> cpos=pflow::GetCpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
     int nat=cpos.size();
 
     // For all items that must be set for each type we do that here.
@@ -3401,11 +3401,11 @@ namespace pflow {
     // called.  This is controlled by the first_set parameter.
     if(rtp.first_set) {
       int ntypes = pflow::GetNumEachType(str).size();
-      matrix<double> tmp;
+      aurostd::matrix<double> tmp; //CO20200404 pflow::matrix()->aurostd::matrix()
       int size;
       // Set sphtex_tex
       size=rtp.sphtex_tex_def.size();
-      tmp=matrix<double> (ntypes,rtp.sphtex_tex_def);
+      tmp=aurostd::matrix<double> (ntypes,rtp.sphtex_tex_def); //CO20200404 pflow::matrix()->aurostd::matrix()
       for(int i=0;i<(int)rtp.sphtex_tex.size();i++) {
         int id=(int)rtp.sphtex_tex[i][0]-1;
         for(int j=1;j<size+1;j++) {
@@ -3415,7 +3415,7 @@ namespace pflow {
       rtp.sphtex_tex=tmp;
       // Set sphtex_color
       size=rtp.sphtex_color_def.size();
-      tmp=matrix<double> (ntypes,rtp.sphtex_color_def);
+      tmp=aurostd::matrix<double> (ntypes,rtp.sphtex_color_def); //CO20200404 pflow::matrix()->aurostd::matrix()
       for(int i=0;i<(int)rtp.sphtex_color.size();i++) {
         int id=(int)rtp.sphtex_color[i][0]-1;
         for(int j=1;j<size+1;j++) {
@@ -3425,7 +3425,7 @@ namespace pflow {
       rtp.sphtex_color=tmp;
       // Set sphtex_phong
       size=rtp.sphtex_phong_def.size();
-      tmp=matrix<double> (ntypes,rtp.sphtex_phong_def);
+      tmp=aurostd::matrix<double> (ntypes,rtp.sphtex_phong_def); //CO20200404 pflow::matrix()->aurostd::matrix()
       for(int i=0;i<(int)rtp.sphtex_phong.size();i++) {
         int id=(int)rtp.sphtex_phong[i][0]-1;
         for(int j=1;j<size+1;j++) {
@@ -3565,7 +3565,7 @@ namespace pflow {
     }
     // Do atoms
     str=ReScale(str,1.0);
-    matrix<double> cpos=pflow::GetCpos(str);
+    aurostd::matrix<double> cpos=pflow::GetCpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
     deque<int> num_each_type=pflow::GetNumEachType(str);
     //int nat=(int)cpos.size();
     int ntype=(int)num_each_type.size();
@@ -3822,7 +3822,7 @@ namespace pflow {
 // to represent a rotation around x, then y, then z.
 // Angles are assumed to be in radians.
 namespace pflow {
-  matrix<double> GetRotationMatrix(const vector<double>& angles) {
+  aurostd::matrix<double> GetRotationMatrix(const vector<double>& angles) {  //CO20200404 pflow::matrix()->aurostd::matrix()
     // Sin and cos.
     vector<double> sn(3,0.0);
     vector<double> cs(3,0.0);
@@ -3831,9 +3831,9 @@ namespace pflow {
       cs[ic]=cos(angles[ic]);
     }
     // Set rotation matrix (do x, then y, then z rotation).
-    matrix<double> xm(3,3);pflow::VVset(xm,0.0);
-    matrix<double> ym(3,3);pflow::VVset(ym,0.0);
-    matrix<double> zm(3,3);pflow::VVset(zm,0.0);
+    aurostd::matrix<double> xm(3,3);pflow::VVset(xm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> ym(3,3);pflow::VVset(ym,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> zm(3,3);pflow::VVset(zm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
 
     xm[0][0]=1;
     xm[1][1]=cs[0];
@@ -3853,7 +3853,7 @@ namespace pflow {
     zm[1][1]=cs[2];
     zm[2][2]=1;
 
-    matrix<double> rm;
+    aurostd::matrix<double> rm;  //CO20200404 pflow::matrix()->aurostd::matrix()
     rm=pflow::MMmult(zm,pflow::MMmult(ym,xm));
     return rm;
   }
@@ -3878,7 +3878,7 @@ namespace pflow {
       angles[ic]=rot[2*ic];
       angles[ic]=angles[ic]*TWOPI/360.0;
     }
-    matrix<double> irm=GetRotationMatrix(angles);
+    aurostd::matrix<double> irm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
 
     // get primitive rotation matrix.
     int s=vstr.size()-1;
@@ -3887,14 +3887,14 @@ namespace pflow {
       angles[ic]=(rot[2*ic+1]-rot[2*ic])/(s);
       angles[ic]=angles[ic]*TWOPI/360.0;
     }
-    matrix<double> prm=GetRotationMatrix(angles);
-    matrix<double> rm=irm;
-    xmatrix<double> xprm(3,3); xprm=pflow::matrix2xmatrix(prm);
-    xmatrix<double> xrm(3,3);  xrm=pflow::matrix2xmatrix(rm);
+    aurostd::matrix<double> prm=GetRotationMatrix(angles); //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rm=irm;  //CO20200404 pflow::matrix()->aurostd::matrix()
+    xmatrix<double> xprm(3,3); xprm=aurostd::matrix2xmatrix(prm);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    xmatrix<double> xrm(3,3);  xrm=aurostd::matrix2xmatrix(rm);  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int is=0;is<(int)vstr.size();is++) {
-      //    xrm=pflow::matrix2xmatrix(rm);
+      //    xrm=aurostd::matrix2xmatrix(rm); //CO20200404 pflow::matrix()->aurostd::matrix()
       //   vstr[is]=Rotate(vstr[is],xrm);
-      vstr[is]=Rotate(vstr[is],pflow::matrix2xmatrix(rm));
+      vstr[is]=Rotate(vstr[is],aurostd::matrix2xmatrix(rm)); //CO20200404 pflow::matrix()->aurostd::matrix()
       rm=pflow::MMmult(prm,rm);
     }
   }
@@ -4616,7 +4616,7 @@ namespace pflow {
     if(pd.nions==1) skip=1;
 
     // Fermi weights (kpts (inner loop) and bands (outer loop)).
-    pd.wfermi_u = matrix<double> (pd.nbands,pd.nkpts,0.0);
+    pd.wfermi_u = aurostd::matrix<double> (pd.nbands,pd.nkpts,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int ib=0;ib<pd.nbands;ib++) {
       for(int ik=0;ik<pd.nkpts;ik++) {
         infile >> pd.wfermi_u[ib][ik];
@@ -4638,9 +4638,9 @@ namespace pflow {
     }
 
     // Projections
-    matrix<std::complex<double> > m(pd.nbands,pd.nlm,0.0);
-    matrix<matrix<std::complex<double> > > mm(pd.nkpts,pd.nions,m);
-    pd.pdat_u=vector<matrix<matrix<std::complex<double> > > > (pd.ntypes,mm);
+    aurostd::matrix<std::complex<double> > m(pd.nbands,pd.nlm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<aurostd::matrix<std::complex<double> > > mm(pd.nkpts,pd.nions,m);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.pdat_u=vector<aurostd::matrix<aurostd::matrix<std::complex<double> > > > (pd.ntypes,mm);  //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<double> rval(pd.nlm);
     vector<double> ival(pd.nlm);
     for(int it=0;it<pd.ntypes;it++) {
@@ -4692,8 +4692,8 @@ namespace pflow {
 
     // Kpt weights and values and energy vs. kpt,bnd
     pd.wkpt = vector<double> (pd.nkpts,0.0);
-    pd.kpts = matrix<double> (pd.nkpts,3,0.0);
-    pd.ener_k_b_u = matrix<double> (pd.nkpts,pd.nbands,0.0);
+    pd.kpts = aurostd::matrix<double> (pd.nkpts,3,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.ener_k_b_u = aurostd::matrix<double> (pd.nkpts,pd.nbands,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     getline(infile,s); // Gets line "# of k-points: ..."
     for(int ik=0;ik<pd.nkpts;ik++) {
       getline(infile,s); // Gets blank line.
@@ -4729,7 +4729,7 @@ namespace pflow {
       getline(infile,s); // get line.
 
       // Fermi weights (kpts (inner loop) and bands (outer loop)).
-      pd.wfermi_d = matrix<double> (pd.nbands,pd.nkpts,0.0);
+      pd.wfermi_d = aurostd::matrix<double> (pd.nbands,pd.nkpts,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
       for(int ib=0;ib<pd.nbands;ib++) {
         for(int ik=0;ik<pd.nkpts;ik++) {
           infile >> pd.wfermi_d[ib][ik];
@@ -4737,9 +4737,9 @@ namespace pflow {
       }
 
       // Projections
-      matrix<std::complex<double> > m(pd.nbands,pd.nlm,0.0);
-      matrix<matrix<std::complex<double> > > mm(pd.nkpts,pd.nions,m);
-      pd.pdat_d=vector<matrix<matrix<std::complex<double> > > > (pd.ntypes,mm);
+      aurostd::matrix<std::complex<double> > m(pd.nbands,pd.nlm,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<aurostd::matrix<std::complex<double> > > mm(pd.nkpts,pd.nions,m);  //CO20200404 pflow::matrix()->aurostd::matrix()
+      pd.pdat_d=vector<aurostd::matrix<aurostd::matrix<std::complex<double> > > > (pd.ntypes,mm);  //CO20200404 pflow::matrix()->aurostd::matrix()
       vector<double> rval(pd.nlm);
       vector<double> ival(pd.nlm);
       for(int it=0;it<pd.ntypes;it++) {
@@ -4789,7 +4789,7 @@ namespace pflow {
       }//if have_aug
 
       // Kpt weights and values and energy vs. kpt,bnd
-      pd.ener_k_b_d = matrix<double> (pd.nkpts,pd.nbands,0.0);
+      pd.ener_k_b_d = aurostd::matrix<double> (pd.nkpts,pd.nbands,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
       getline(infile,s); // Gets line "# of k-points: ..."
       for(int ik=0;ik<pd.nkpts;ik++) {
         getline(infile,s); // Gets blank line.
@@ -4830,18 +4830,18 @@ namespace pflow {
     // Get occ_vs_ion_kpt_lm_(u,d)
     // Get occ_vs_ion_bnd_lm_(u,d)
     // Get occ_vs_ion_lm_(u,d)
-    matrix<double> m1 (pd.nbands,pd.nlm_max,0.0);
-    matrix<double> m2 (pd.nkpts,pd.nlm_max,0.0);
-    matrix<double> m3 (pd.nbands,pd.nlm_max,0.0);
-    pd.occ_vs_ion_kpt_bnd_lm_u = matrix<matrix<double> > (pd.nions,pd.nkpts,m1);
-    pd.occ_vs_ion_kpt_lm_u = vector<matrix<double> > (pd.nions,m2);
-    pd.occ_vs_ion_bnd_lm_u = vector<matrix<double> > (pd.nions,m3);
-    pd.occ_vs_ion_lm_u = matrix<double> (pd.nions,pd.nlm_max,0.0);  
+    aurostd::matrix<double> m1 (pd.nbands,pd.nlm_max,0.0); //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> m2 (pd.nkpts,pd.nlm_max,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> m3 (pd.nbands,pd.nlm_max,0.0); //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_kpt_bnd_lm_u = aurostd::matrix<aurostd::matrix<double> > (pd.nions,pd.nkpts,m1); //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_kpt_lm_u = vector<aurostd::matrix<double> > (pd.nions,m2); //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_bnd_lm_u = vector<aurostd::matrix<double> > (pd.nions,m3); //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_lm_u = aurostd::matrix<double> (pd.nions,pd.nlm_max,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     if(pd.sp) {
-      pd.occ_vs_ion_kpt_bnd_lm_d = matrix<matrix<double> > (pd.nions,pd.nkpts,m1);
-      pd.occ_vs_ion_kpt_lm_d = vector<matrix<double> > (pd.nions,m2);
-      pd.occ_vs_ion_bnd_lm_d = vector<matrix<double> > (pd.nions,m3);
-      pd.occ_vs_ion_lm_d = matrix<double> (pd.nions,pd.nlm_max,0.0);  
+      pd.occ_vs_ion_kpt_bnd_lm_d = aurostd::matrix<aurostd::matrix<double> > (pd.nions,pd.nkpts,m1); //CO20200404 pflow::matrix()->aurostd::matrix()
+      pd.occ_vs_ion_kpt_lm_d = vector<aurostd::matrix<double> > (pd.nions,m2); //CO20200404 pflow::matrix()->aurostd::matrix()
+      pd.occ_vs_ion_bnd_lm_d = vector<aurostd::matrix<double> > (pd.nions,m3); //CO20200404 pflow::matrix()->aurostd::matrix()
+      pd.occ_vs_ion_lm_d = aurostd::matrix<double> (pd.nions,pd.nlm_max,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     }
     ioncnt=-1;
     for(int it=0;it<pd.ntypes;it++) {
@@ -4897,18 +4897,18 @@ namespace pflow {
     // Get occ_vs_ion_bnd_l_(u,d)
     // Get occ_vs_ion_kpt_bnd_l_(u,d)
     // This assumes the usual spd orbitals.
-    matrix<double> n1 (pd.nbands,pd.nl_max+1,0.0);
-    matrix<double> n2 (pd.nkpts,pd.nl_max+1,0.0);
-    matrix<double> n3 (pd.nbands,pd.nl_max+1,0.0);
-    pd.occ_vs_ion_kpt_bnd_l_u = matrix<matrix<double> > (pd.nions,pd.nkpts,n1);
-    pd.occ_vs_ion_kpt_l_u = vector<matrix<double> > (pd.nions,n2);
-    pd.occ_vs_ion_bnd_l_u = vector<matrix<double> > (pd.nions,n3);
-    pd.occ_vs_ion_l_u = matrix<double> (pd.nions,pd.nl_max+1,0.0);  
+    aurostd::matrix<double> n1 (pd.nbands,pd.nl_max+1,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> n2 (pd.nkpts,pd.nl_max+1,0.0); //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> n3 (pd.nbands,pd.nl_max+1,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_kpt_bnd_l_u = aurostd::matrix<aurostd::matrix<double> > (pd.nions,pd.nkpts,n1);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_kpt_l_u = vector<aurostd::matrix<double> > (pd.nions,n2);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_bnd_l_u = vector<aurostd::matrix<double> > (pd.nions,n3);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_l_u = aurostd::matrix<double> (pd.nions,pd.nl_max+1,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     if(pd.sp) {
-      pd.occ_vs_ion_kpt_bnd_l_d = matrix<matrix<double> > (pd.nions,pd.nkpts,n1);
-      pd.occ_vs_ion_kpt_l_d = vector<matrix<double> > (pd.nions,n2);
-      pd.occ_vs_ion_bnd_l_d = vector<matrix<double> > (pd.nions,n3);
-      pd.occ_vs_ion_l_d = matrix<double> (pd.nions,pd.nl_max+1,0.0);  
+      pd.occ_vs_ion_kpt_bnd_l_d = aurostd::matrix<aurostd::matrix<double> > (pd.nions,pd.nkpts,n1);  //CO20200404 pflow::matrix()->aurostd::matrix()
+      pd.occ_vs_ion_kpt_l_d = vector<aurostd::matrix<double> > (pd.nions,n2);  //CO20200404 pflow::matrix()->aurostd::matrix()
+      pd.occ_vs_ion_bnd_l_d = vector<aurostd::matrix<double> > (pd.nions,n3);  //CO20200404 pflow::matrix()->aurostd::matrix()
+      pd.occ_vs_ion_l_d = aurostd::matrix<double> (pd.nions,pd.nl_max+1,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     }
 
     ioncnt=-1;
@@ -5017,9 +5017,9 @@ namespace pflow {
 
     // Create single occ variable for all the l,m and sums over m together (for lmtot).
     // This way you can just loop over lm from 0 to lmtot-1.
-    m1 = matrix<double> (pd.nbands,pd.nlmtot,0.0);
-    pd.occ_vs_ion_kpt_bnd_lmtot_u = matrix<matrix<double> > (pd.nions,pd.nkpts,m1);
-    if(pd.sp) pd.occ_vs_ion_kpt_bnd_lmtot_d = matrix<matrix<double> > (pd.nions,pd.nkpts,m1);
+    m1 = aurostd::matrix<double> (pd.nbands,pd.nlmtot,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    pd.occ_vs_ion_kpt_bnd_lmtot_u = aurostd::matrix<aurostd::matrix<double> > (pd.nions,pd.nkpts,m1);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    if(pd.sp) pd.occ_vs_ion_kpt_bnd_lmtot_d = aurostd::matrix<aurostd::matrix<double> > (pd.nions,pd.nkpts,m1);  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int ii=0;ii<pd.nions;ii++) {
       for(int ik=0;ik<pd.nkpts;ik++) {
         for(int ib=0;ib<pd.nbands;ib++) {
@@ -5321,7 +5321,7 @@ namespace pflow {
     int ibin;
     int sp_size=1;
     if(prd.sp) sp_size=3;
-    pdd.pdos = matrix<double> (pdd.nbins,2*sp_size+1,0.0);
+    pdd.pdos = aurostd::matrix<double> (pdd.nbins,2*sp_size+1,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int ib=0;ib<pdd.nbins;ib++) {
       pdd.pdos[ib][0]=pdd.emin+(double)ib*de;
     }
@@ -5606,7 +5606,7 @@ namespace pflow {
 // ***************************************************************************
 // Reads in pdos data from PDOSinfile.
 namespace pflow {
-  void ReadInPDOSData(pflow::matrix<matrix<double> >& allpdos, pflow::pdosdata& pdd,
+  void ReadInPDOSData(aurostd::matrix<aurostd::matrix<double> >& allpdos, pflow::pdosdata& pdd,  //CO20200404 pflow::matrix()->aurostd::matrix()
       ifstream& infile) {
     string sdum;
     // Get natoms
@@ -5628,8 +5628,8 @@ namespace pflow {
       getline(infile,sdum);
     }
     // Initialize size of allpdos[atoms][spin][lm][bin]
-    matrix<double> tmp(pdd.nlm+1,pdd.nbins);
-    allpdos = matrix<matrix<double> > (pdd.natoms,pdd.spin,tmp);
+    aurostd::matrix<double> tmp(pdd.nlm+1,pdd.nbins);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    allpdos = aurostd::matrix<aurostd::matrix<double> > (pdd.natoms,pdd.spin,tmp); //CO20200404 pflow::matrix()->aurostd::matrix()
     // tpx
     //cout << spin << " " << pdd.nlm << " " << pdd.natoms << " " << pdd.nbins << endl;
     // Loop over each atom
@@ -5671,12 +5671,12 @@ namespace pflow {
 // ***************************************************************************
 // Sums the PDOS accoring to the parameters specified.
 namespace pflow {
-  void SumPDOS(const pflow::matrix<matrix<double> >& allpdos, pflow::pdosdata& pdd) {
+  void SumPDOS(const aurostd::matrix<aurostd::matrix<double> >& allpdos, pflow::pdosdata& pdd) { //CO20200404 pflow::matrix()->aurostd::matrix()
     if(pdd.spin==1) {
-      pdd.pdos = matrix<double> (pdd.nbins,3);
+      pdd.pdos = aurostd::matrix<double> (pdd.nbins,3);  //CO20200404 pflow::matrix()->aurostd::matrix()
     }
     else {
-      pdd.pdos = matrix<double> (pdd.nbins,7);
+      pdd.pdos = aurostd::matrix<double> (pdd.nbins,7);  //CO20200404 pflow::matrix()->aurostd::matrix()
     }
     // Set energies
     for(int ib=0;ib<pdd.nbins;ib++) {
@@ -5777,9 +5777,9 @@ namespace pflow {
   double TotalAtomDist(xstructure str, xstructure str00, const string& path_flag) {
     str=ReScale(str,1);
     str00=ReScale(str00,1);
-    matrix<double> cpos=pflow::GetCpos(str);
-    matrix<double> cpos00=pflow::GetCpos(str00);
-    matrix<double> lat=pflow::GetLat(str);
+    aurostd::matrix<double> cpos=pflow::GetCpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> cpos00=pflow::GetCpos(str00);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> lat=pflow::GetLat(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
     int nat=std::min(cpos.size(),cpos00.size());
     double dtot=0;
     for(int iat=0;iat<nat;iat++) {
@@ -5889,7 +5889,7 @@ namespace pflow {
     xstructure str=vstr[0];
     xstructure last_str=vstr[0];
     xstructure diffstr;
-    matrix<double> cm;
+    aurostd::matrix<double> cm;  //CO20200404 pflow::matrix()->aurostd::matrix()
 
     for(int im=0;im<nim+2;im++) {
       str=vstr[im];
@@ -5920,7 +5920,7 @@ namespace pflow {
     int nim = vstr.size()-2;
     vector<double> d((nim+2),0.0);
     xstructure diffstr;
-    matrix<double> cm;
+    aurostd::matrix<double> cm;  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int im=0;im<nim+2;im++) {
       RBPoscarDisp(vstr[im],strI,diffstr,d[im],cm,path_flag);
     }
@@ -5934,21 +5934,21 @@ namespace pflow {
 // This function gets the displacement between two POSCAR files (str2-str1).  
 namespace pflow {
   void RBPoscarDisp(const xstructure& str1in, const xstructure& str2in,
-      xstructure& diffstr, double& totdist, matrix<double>& cm,
+      xstructure& diffstr, double& totdist, aurostd::matrix<double>& cm, //CO20200404 pflow::matrix()->aurostd::matrix()
       const string& path_flag) {
     diffstr=str1in;
     xstructure str1=str1in;
     xstructure str2=str2in;
     str1=ReScale(str1,1);
     str2=ReScale(str2,1);
-    matrix<double> cpos1=pflow::GetCpos(str1);
-    matrix<double> cpos2=pflow::GetCpos(str2);
-    matrix<double> lat1=pflow::GetLat(str1);
-    matrix<double> lat2=pflow::GetLat(str1);
-    matrix<double> latdiff(3,3);
-    cm = matrix<double> (2);
+    aurostd::matrix<double> cpos1=pflow::GetCpos(str1);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> cpos2=pflow::GetCpos(str2);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> lat1=pflow::GetLat(str1);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> lat2=pflow::GetLat(str1);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> latdiff(3,3);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    cm = aurostd::matrix<double> (2);  //CO20200404 pflow::matrix()->aurostd::matrix()
     int nat=min(cpos1.size(),cpos2.size());
-    matrix<double> cposdiff(nat,3);
+    aurostd::matrix<double> cposdiff(nat,3); //CO20200404 pflow::matrix()->aurostd::matrix()
     totdist=0;
     for(int ic=0;ic<3;ic++) {
       latdiff[ic]=pflow::VVdiff(lat2[ic],lat1[ic]);
@@ -6041,7 +6041,7 @@ namespace pflow {
 }
 
 namespace pflow {
-  void GetChgInt(vector<matrix<double> >& rad_chg_int, matrix<double>& vor_chg_int) {
+  void GetChgInt(vector<aurostd::matrix<double> >& rad_chg_int, aurostd::matrix<double>& vor_chg_int) {  //CO20200404 pflow::matrix()->aurostd::matrix()
     // Read in CHGCAR
     // Read in intial POSCAR format at beginning of file
     xstructure str;
@@ -6100,8 +6100,8 @@ namespace pflow {
     double DR=0.05; // width of radial bins.
     double RMAX=3; // Max distance to bin to.
     int NRBIN=(int)(RMAX/DR); // First bin is 0->DR, last bin is RMAX-DR->RMAX
-    matrix<double> dum_mat(NRBIN,5,0.0);
-    rad_chg_int = vector<matrix<double> > (natoms,dum_mat);
+    aurostd::matrix<double> dum_mat(NRBIN,5,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    rad_chg_int = vector<aurostd::matrix<double> > (natoms,dum_mat); //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<int> ig(3);
     // Determine the number of images along each lattice vector which must be considered.
     // You will center the charge density on each atom so the max number of images along a
@@ -6109,13 +6109,13 @@ namespace pflow {
     // to make sure that you are more than RMAX from an atom along that lattice param direction.
     vector<int> imax(3);
     double scale=pflow::GetScale(str);
-    matrix<double> lat=pflow::GetLat(str);
+    aurostd::matrix<double> lat=pflow::GetLat(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int ic=0;ic<3;ic++) {
       imax[ic]=(int)(RMAX/(scale*pflow::norm(lat[ic]))+1)*ngrid[ic];
     }
     //    double sumchg=0;  //DM not used
     // Atom loop
-    matrix<double> at_fpos=pflow::GetFpos(str);
+    aurostd::matrix<double> at_fpos=pflow::GetFpos(str); //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int iat=0;iat<natoms;iat++) {
       // Initialize radial positions in rad_chg_int    
       for(int ib=0;ib<NRBIN;ib++) {
@@ -6166,7 +6166,7 @@ namespace pflow {
     } // iat
 
     // Voronoi charge integration
-    vor_chg_int = matrix<double> (natoms,4,0.0);
+    vor_chg_int = aurostd::matrix<double> (natoms,4,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(ig[0]=0;ig[0]<ngrid[0];ig[0]++) {
       for(ig[1]=0;ig[1]<ngrid[1];ig[1]++) {
         for(ig[2]=0;ig[2]<ngrid[2];ig[2]++) {
@@ -6519,8 +6519,8 @@ namespace pflow {
 //  each atom and a vector of matrices which gives, for each atom,
 //  the integrated charges in a sphere vs. the radius of the sphere.
 namespace pflow {
-  void GetChgInt(vector<matrix<double> >& rad_chg_int,
-      matrix<double>& vor_chg_int,
+  void GetChgInt(vector<aurostd::matrix<double> >& rad_chg_int,  //CO20200404 pflow::matrix()->aurostd::matrix()
+      aurostd::matrix<double>& vor_chg_int,  //CO20200404 pflow::matrix()->aurostd::matrix()
       xstructure& str,
       vector<int>& ngrid,
       vector<double>& chg_tot,
@@ -6535,10 +6535,10 @@ namespace pflow {
     double DR=0.05; // width of radial bins.
     double RMAX=3; // Max distance to bin to.
     int NRBIN=(int)(RMAX/DR); // First bin is 0->DR, last bin is RMAX-DR->RMAX
-    matrix<double> dum_mat(NRBIN,5,0.0);
+    aurostd::matrix<double> dum_mat(NRBIN,5,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     int natoms=pflow::GetNumAtoms(str);
     int npts=ngrid[0]*ngrid[1]*ngrid[2];
-    rad_chg_int = vector<matrix<double> > (natoms,dum_mat);
+    rad_chg_int = vector<aurostd::matrix<double> > (natoms,dum_mat); //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<int> ig(3);
     // Determine the number of images along each lattice vector which must be considered.
     // You will center the charge density on each atom so the max number of images along a
@@ -6546,13 +6546,13 @@ namespace pflow {
     // to make sure that you are more than RMAX from an atom along that lattice param direction.
     vector<int> imax(3);
     double scale=pflow::GetScale(str);
-    matrix<double> lat=pflow::GetLat(str);
+    aurostd::matrix<double> lat=pflow::GetLat(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int ic=0;ic<3;ic++) {
       imax[ic]=(int)(RMAX/(scale*norm(lat[ic]))+1)*ngrid[ic];
     }
     //   double sumchg=0;   //DM not used
     // Atom loop
-    matrix<double> at_fpos=pflow::GetFpos(str);
+    aurostd::matrix<double> at_fpos=pflow::GetFpos(str); //CO20200404 pflow::matrix()->aurostd::matrix()
     for(int iat=0;iat<natoms;iat++) {
       // Initialize radial positions in rad_chg_int    
       for(int ib=0;ib<NRBIN;ib++) {
@@ -6603,7 +6603,7 @@ namespace pflow {
     } // iat
 
     // Voronoi charge integration
-    vor_chg_int = matrix<double> (natoms,4,0.0);
+    vor_chg_int = aurostd::matrix<double> (natoms,4,0.0);  //CO20200404 pflow::matrix()->aurostd::matrix()
     for(ig[0]=0;ig[0]<ngrid[0];ig[0]++) {
       for(ig[1]=0;ig[1]<ngrid[1];ig[1]++) {
         for(ig[2]=0;ig[2]<ngrid[2];ig[2]++) {
@@ -6674,8 +6674,8 @@ namespace pflow {
     // Note that this converts everything to direct coordinates.
     string s;
     double TOL=1e-7;
-    pdp.pts = matrix<double> (3,3);
-    pdp.dpts = matrix<double> (3,3);
+    pdp.pts = aurostd::matrix<double> (3,3); //CO20200404 pflow::matrix()->aurostd::matrix()
+    pdp.dpts = aurostd::matrix<double> (3,3);  //CO20200404 pflow::matrix()->aurostd::matrix()
     infile >> pdp.type;
     getline(infile,s);
     infile >> pdp.scale;
@@ -6920,11 +6920,11 @@ namespace pflow {
       double& erecip,double& eewald,double& eta,const double& SUMTOL) {
     xstructure str=in_str;
     str=PutInCell(str);
-    matrix<double> lat = pflow::GetScaledLat(str);
-    matrix<double> rlat = pflow::RecipLat(lat);
+    aurostd::matrix<double> lat = pflow::GetScaledLat(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rlat = pflow::RecipLat(lat); //CO20200404 pflow::matrix()->aurostd::matrix()
     int natoms=pflow::GetNumAtoms(str);
     double vol=pflow::GetVol(lat);
-    matrix<double> atfpos=pflow::GetFpos(str);
+    aurostd::matrix<double> atfpos=pflow::GetFpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<int> attyp=pflow::GetTypes(str);
     vector<string> names=pflow::GetNames(str);
     // Charges should be stored in names - turn into vector of doubles.
@@ -6999,8 +6999,8 @@ namespace pflow {
 // Gets recipricol energy.
 namespace pflow {
   double GetRecipEner(const double& eta,const vector<double>& atchg,
-      const double& vol,const matrix<double>& rlat,
-      const matrix<double>& atfpos,const double& SUMTOL) {
+      const double& vol,const aurostd::matrix<double>& rlat, //CO20200404 pflow::matrix()->aurostd::matrix()
+      const aurostd::matrix<double>& atfpos,const double& SUMTOL) {  //CO20200404 pflow::matrix()->aurostd::matrix()
     double TOL=1e-16;
     double log_eps=-30; // This assumes sf<
     double arg=0;
@@ -7078,8 +7078,8 @@ namespace pflow {
 // Gets real space energy.
 namespace pflow {
   double GetRealEner(const double& eta,const vector<double>& atchg,
-      const double& vol,const matrix<double>& lat,
-      const matrix<double>& atfpos,const double& SUMTOL) {
+      const double& vol,const aurostd::matrix<double>& lat,  //CO20200404 pflow::matrix()->aurostd::matrix()
+      const aurostd::matrix<double>& atfpos,const double& SUMTOL) {  //CO20200404 pflow::matrix()->aurostd::matrix()
     if(vol) {;} // phony just to keep vol busy
 
     double ereal=0;
@@ -7157,10 +7157,10 @@ namespace pflow {
   double ScreenedESEner(const xstructure& in_str,const double& Ks,const double& SUMTOL) {
     xstructure str=in_str;
     str=PutInCell(str);
-    matrix<double> lat = pflow::GetScaledLat(str);
+    aurostd::matrix<double> lat = pflow::GetScaledLat(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
     int natoms=pflow::GetNumAtoms(str);
     // double vol=pflow::GetVol(lat);  //DM not used
-    matrix<double> atfpos=pflow::GetFpos(str);
+    aurostd::matrix<double> atfpos=pflow::GetFpos(str);  //CO20200404 pflow::matrix()->aurostd::matrix()
     vector<int> attyp=pflow::GetTypes(str);
     vector<string> names=pflow::GetNames(str);
     // Charges should be stored in names - turn into vector of doubles.

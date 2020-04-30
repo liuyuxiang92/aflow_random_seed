@@ -5511,6 +5511,243 @@ namespace aurostd { // namespace aurostd
 }
 
 // **************************************************************************
+// **************************************************************************
+//CO20200404 - moving matrix() from pflow to aurostd because it is templated
+//doesn't compile otherwise
+
+// ***************************************************************************
+// Matrix classes in Dane Morgan Style
+// ***************************************************************************
+namespace aurostd {
+  // constructor
+
+  template<class utype> matrix<utype>::matrix(void) {free();} // default
+
+  template<class utype>
+    matrix<utype>::matrix(const int m) { // specifying rows
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
+      std::vector<utype> v;
+      mat=std::vector<std::vector<utype> > (m,v);
+    }
+
+  template<class utype>
+    matrix<utype>::matrix(const int m, const int n) { // specifying rows and columns
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
+      std::vector<utype> v(n);
+      mat=std::vector<std::vector<utype> > (m,v);
+    }
+
+  template<class utype>
+    matrix<utype>::matrix(const int m, const std::vector<utype>& inutypevec) { // specifying rows as vectors.
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
+      mat=std::vector<std::vector<utype> > (m,inutypevec);
+    }
+
+  template<class utype>
+    matrix<utype>::matrix(const int m, const int n, const utype& inutype) { // specifying rows and columns and initial values
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
+      std::vector<utype> v(n);
+      mat=std::vector<std::vector<utype> > (m,v);
+      for(uint i=0;i<mat.size();i++) {
+        for(uint j=0;j<mat[i].size();j++) {
+          mat[i][j]=inutype;
+        }
+      }
+    }
+
+  //CO20200404 START - patching matrix for nietzsche
+  template<class utype> matrix<utype>::matrix(const matrix& b){copy(b);}
+  template<class utype> matrix<utype>::~matrix(void){free();}
+  template<class utype> void matrix<utype>::clear() {matrix a;copy(a);}  //clear PUBLIC
+  
+  template<class utype>
+    const matrix<utype>& matrix<utype>::operator=(const matrix& other) {
+      if(this!=&other) {copy(other);}
+      return *this;
+    }
+
+  template<class utype>
+    void matrix<utype>::free(){
+      for(uint i=0;i<mat.size();i++){mat[i].clear();} mat.clear();
+    }
+
+  template<class utype>
+    void matrix<utype>::copy(const matrix& b){
+      free();
+      for(uint i=0;i<b.mat.size();i++){mat.push_back(std::vector<utype>(0));for(uint j=0;j<b.mat[i].size();j++){mat[i].push_back(b.mat[i][j]);}}
+    }
+  //CO20200404 STOP - patching matrix for nietzsche
+
+  // accessors
+  template<class utype>
+    void matrix<utype>::print(void) {
+      cout.setf(std::ios::fixed,std::ios::floatfield);
+      cout.precision(4);
+      for(uint i=0;i<mat.size();i++) {
+        cout << "  ";
+        for(uint j=0;j<mat[i].size();j++) {
+          cout << " " << mat[i][j];
+        }
+        cout << endl;
+      }
+    }
+
+  //   template<class utype>
+  //   inline int matrix<utype>::size(void) const{
+  //     return (int) mat.size();
+  //   }
+
+
+  template<class utype>
+    matrix<utype> matrix<utype>::transpose() const{
+      matrix<utype> tmat;
+      uint m=mat.size();
+      if(m==0) return tmat;
+      uint n=mat[0].size();
+      tmat = matrix<utype> (n,m);
+      for(uint i=0;i<m;i++) {
+        for(uint j=0;j<n;j++) {
+          tmat[j][i]=mat[i][j];
+        }
+      }
+      return tmat;
+    }
+
+  // template<class utype>
+  // std::vector<std::vector<utype> >::iterator matrix<utype>::begin() {
+  // return mat.begin();
+  // }
+  //
+  // template<class utype>
+  // std::vector<std::vector<utype> >::iterator matrix<utype>::end() {
+  // return mat.end();
+  // }
+
+  // operator
+  //   template<class utype>
+  //   std::vector<utype>& matrix<utype>::operator[] (const int index) {
+  //     assert(index>=0 && index<=mat.size());
+  //     return mat[index];
+  //   }
+  //   template<class utype>
+  //   const std::vector<utype>& matrix<utype>::operator[] (const int index) const {
+  //     assert(index>=0 && index<=mat.size());
+  //     return mat[index];
+
+  //   }
+
+  //[CO20200404 - OBSOLETE]template<class utype>
+  //[CO20200404 - OBSOLETE]  const matrix<utype>& matrix<utype>::operator=(const matrix<utype> &b) {
+  //[CO20200404 - OBSOLETE]    if(this != &b) {
+  //[CO20200404 - OBSOLETE]      uint m=b.mat.size();
+  //[CO20200404 - OBSOLETE]      uint n=0;
+  //[CO20200404 - OBSOLETE]      mat=std::vector<std::vector<utype> > (m);
+  //[CO20200404 - OBSOLETE]      for(uint i=0;i<m;i++) {
+  //[CO20200404 - OBSOLETE]        n=b.mat[i].size();
+  //[CO20200404 - OBSOLETE]        mat[i]=std::vector<utype> (n);
+  //[CO20200404 - OBSOLETE]        for(uint j=0;j<n;j++) {
+  //[CO20200404 - OBSOLETE]          mat[i][j]=b.mat[i][j];
+  //[CO20200404 - OBSOLETE]        }
+  //[CO20200404 - OBSOLETE]      }
+  //[CO20200404 - OBSOLETE]    }
+  //[CO20200404 - OBSOLETE]    return *this;
+  //[CO20200404 - OBSOLETE]  }
+
+  // mutators
+  //  template<class utype>
+  // void matrix<utype>::push_back(const std::vector<utype>& inutypevec) {
+  //   mat.push_back(inutypevec);
+  //  }
+
+  //  template<class utype>
+  // void matrix<utype>::pop_back() {
+  //   mat.pop_back();
+  //  }
+
+  template<class utype>
+    void matrix<utype>::vecvec2mat(const std::vector<std::vector<utype> >& inVV) {
+      mat=std::vector<std::vector<utype> > (inVV.size());
+      for(uint i=0;i<mat.size();i++) {
+        mat[i]=std::vector<utype> (inVV[i].size());
+        for(uint j=0;j<mat[i].size();j++) {
+          mat[i][j]=inVV[i][j];
+        }
+      }
+    }
+
+  // template<class utype>
+  // void matrix<utype>::clear() {
+  //   mat.clear();
+  // }
+
+  template<class utype>
+    void matrix<utype>::vec2mat(const std::vector<utype>& inV) {
+      mat=std::vector<std::vector<utype> > (1);
+      mat[0]=std::vector<utype> (inV.size());
+      for(uint j=0;j<mat[0].size();j++) {
+        mat[0][j]=inV[j];
+      }
+    }
+
+  // template<class utype>
+  // void matrix<utype>::insert(const int& id, const std::vector<utype>& inV) {
+  //  mat.insert(mat.begin()+id,inV);
+  // }
+
+  // template<class utype>
+  // void matrix<utype>::erase(const int id) {
+  // std::vector<utype>::iterator p=mat.begin()+id;
+  // mat.erase(p);
+  // }
+
+  // template<class utype>
+  // void matrix<utype>::erase_col(const int id) {
+  //   for(int i=0;i<mat.size();i++) {
+  //           std::vector<utype>::iterator p=mat[i].begin()+id;
+  //     if(id<mat[i].size()) mat[i].erase(p);
+  //   }
+  // }
+
+  // template<class utype>
+  // void matrix<utype>::erase(const int id) {
+  //   std::vector<std::vector<utype> >::iterator p=mat.begin()+id;
+  //   mat.erase(p);
+  // }
+
+  template <class utype> matrix<utype>
+    xmatrix2matrix(const xmatrix<utype>& _xmatrix) {
+      int isize=_xmatrix.rows,jsize=_xmatrix.cols;
+      matrix<utype> _matrix(isize,jsize);
+      for(register int i=0;i<isize;i++)
+        for(register int j=0;j<jsize;j++)
+          _matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
+      return _matrix;
+    }
+
+  //   matrix<double> xmatrix2matrix(const xmatrix<double>& _xmatrix) {
+  //     int isize=_xmatrix.rows,jsize=_xmatrix.cols;
+  //     matrix<double> _matrix(isize,jsize);
+  //     for(register int i=0;i<isize;i++)
+  //       for(register int j=0;j<jsize;j++)
+  // 	_matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
+  //     return _matrix;
+  //   }
+
+  template <class utype> xmatrix<utype>
+    matrix2xmatrix(const matrix<utype>& _matrix) {
+      int isize=_matrix.size(),jsize=_matrix[0].size();
+      xmatrix<utype> _xmatrix(isize,jsize);
+      for(register int i=1;i<=isize;i++)
+        for(register int j=1;j<=jsize;j++)
+          _xmatrix(i,j)=_matrix[i-1][j-1];
+      return _xmatrix;
+    }
+
+
+
+}
+
+// **************************************************************************
 
 
 

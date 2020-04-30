@@ -209,10 +209,11 @@ namespace aurostd {
       }
     } else {
       if(LDEBUG) {
+        string soliloquy="xcombos::initialize():";  //CO20200404
         if (m_mode == 'C') {
-          std::cerr << "xcombos::initialize: combinations: " << n_choices << " choose " << m_choose << ((m_repeat)? " with " : " without ") << "repetitions.";
+          std::cerr << soliloquy << " combinations: " << n_choices << " choose " << m_choose << ((m_repeat)? " with " : " without ") << "repetitions."; //CO20200404
         } else {
-          std::cerr << "xcombos::initialize: enumerations of length " << m_choose << std::endl;
+          std::cerr << soliloquy << " enumerations of length " << m_choose << std::endl;  //CO20200404
         }
       }
       if ((m_repeat) || (m_mode == 'E')) {
