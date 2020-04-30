@@ -1947,6 +1947,7 @@ class _xvasp {
     string AVASP_arun_runname;  //ME20181019
     xoption aplopts;  //ME20181025
     xoption aaplopts;  //ME20181025
+    xoption qhaopts; //AS20200302
     string AVASP_dirbase;
     string AVASP_libbase;
     string AVASP_label;
@@ -2703,6 +2704,8 @@ namespace KBIN {
   vector<aurostd::xoption> loadDefaultsAPL();
   bool writeFlagAPL(const string& key,const xoption& xopt); //CO20181226  //ME20190113
   void readParametersAPL(const string&, _moduleOptions&, _xinput&);
+  vector<aurostd::xoption> loadDefaultsQHA();  // AS20200302
+  void readParametersQHA(const string&, _moduleOptions&, _xinput&); // AS20200302
   vector<aurostd::xoption> loadDefaultsAAPL();
   bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO20181226  //ME20190113
   void readParametersAAPL(const string&, _moduleOptions&, _xinput&);

@@ -2138,13 +2138,27 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
 
   if(!xvasp.aopts.flag("FLAG::AVASP_QHA=OFF")) {
     aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    string _ASTROPT_ = "[AFLOW_QHA]", key="", scheme="", xvaspflag="";
+
+    std::sort(xvasp.qhaopts.vxscheme.begin(), xvasp.qhaopts.vxscheme.end());
+    const vector<string>& vkeys=xvasp.qhaopts.vxscheme;
+    for (uint i = 0; i < vkeys.size(); i++) {
+      xvaspflag = vkeys[i];
+      scheme = xvasp.qhaopts.getattachedscheme(xvaspflag);
+      key = xvaspflag;
+      aurostd::StringSubst(key, "AFLOWIN_FLAG::QHA_", string(""));
+      if (!scheme.empty()) {
+        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+      }
+    }
+
+    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
     //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;

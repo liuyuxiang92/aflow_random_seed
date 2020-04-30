@@ -42,10 +42,12 @@ namespace KBIN {
     module_opts.aaplflags = loadDefaultsAAPL();
     module_opts.aelflags = loadDefaultsAEL();
     module_opts.aglflags = loadDefaultsAGL();  
+    module_opts.qhaflags = loadDefaultsQHA(); // AS20200302
     // The readParameters functions are necessary to set xvasp
     string placeholder = "";  // acts as pseudo-aflow.in
     readParametersAPL(placeholder, module_opts, xinput);
     readParametersAAPL(placeholder, module_opts, xinput);
+    readParametersQHA(placeholder, module_opts, xinput);
   }
 
   //readModulesfromAflowIn//////////////////////////////////////////////////////
@@ -65,8 +67,10 @@ namespace KBIN {
     module_opts.aaplflags = loadDefaultsAAPL();
     module_opts.aelflags = loadDefaultsAEL();
     module_opts.aglflags = loadDefaultsAGL();  
+    module_opts.qhaflags = loadDefaultsQHA();
     readParametersAPL(AflowIn, module_opts, xinput);
     readParametersAAPL(AflowIn, module_opts, xinput);
+    readParametersQHA(AflowIn, module_opts, xinput);
     kflags.KBIN_MODULE_OPTIONS = module_opts;
   }                 
 
@@ -514,6 +518,73 @@ namespace KBIN {
     if(key=="PLOT_RESULTS"){return true;}
 
     return true;
+  }
+
+  // QHA-related functions -----------------------------------------------------
+  // AS20200302
+  //loadDefaultsQHA/////////////////////////////////////////////////////////////
+  // Sets all QHA flags to their default values.
+  vector<aurostd::xoption> loadDefaultsQHA() {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy="loadDefaultsQHA():";
+    vector<aurostd::xoption> qhaflags;
+    aurostd::xoption opt;
+    opt.keyword="MODE"; opt.xscheme = DEFAULT_QHA_MODE; qhaflags.push_back(opt); opt.clear();
+    opt.keyword="EOS"; opt.option = DEFAULT_QHA_EOS; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="EOS_DISTORTION_RANGE"; opt.xscheme = DEFAULT_QHA_EOS_DISTORTION_RANGE; qhaflags.push_back(opt); opt.clear();
+    opt.keyword="GP_DISTORTION"; opt.xscheme = utype2string<double>(DEFAULT_QHA_GP_DISTORTION); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="INCLUDE_ELEC_CONTRIB"; opt.option = DEFAULT_QHA_INCLUDE_ELEC_CONTRIB; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="SCQHA_PDIS_T"; opt.xscheme = DEFAULT_QHA_SCQHA_PDIS_T; qhaflags.push_back(opt); opt.clear();
+
+    if (LDEBUG) {
+      for (uint i = 0; i < qhaflags.size(); i++) {
+        std::cerr << soliloquy << " key: " << qhaflags[i].keyword << ", xscheme: " << qhaflags[i].xscheme << ", option: " << qhaflags[i].option << std::endl;
+      }
+    }
+    return qhaflags;
+  }
+
+  //writeFlagQHA////////////////////////////////////////////////////////////////
+  // Determines whether flag should be written to aflow.in
+  bool writeFlagQHA(const string& key,const xoption& xopt){
+    if (xopt.isentry) {return true;}
+    if(key=="MODE"){return true;}
+    if(key=="EOS"){return true;}
+    if(key=="EOS_DISTORTION_RANGE"){return true;}
+    if(key=="GP_DISTORTION"){return true;}
+    if(key=="INCLUDE_ELEC_CONTRIB"){return true;}
+    if(key=="SCQHA_PDIS_T"){return false;}
+
+    return true;
+  }
+
+  //readParametersQHA///////////////////////////////////////////////////////////
+  // Reads QHA flags from an aflow.in file.
+  void readParametersQHA(const string& AflowIn,
+      _moduleOptions& module_opts, _xinput& xinput) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy="readParametersQHA():";
+    string key="", entry="", xvaspflag="";
+    for (uint i = 0; i < module_opts.qhaflags.size(); i++) {
+      key = module_opts.qhaflags[i].keyword;
+      entry = _ASTROPT_QHA_ + key + "=";
+      module_opts.qhaflags[i].options2entry(AflowIn, entry, module_opts.qhaflags[i].option, module_opts.qhaflags[i].xscheme);
+
+      module_opts.qhaflags[i].keyword = key;
+
+      // Write xvasp
+      if(xinput.AFLOW_MODE_VASP) {
+        xvaspflag = "AFLOWIN_FLAG::QHA_" + key;
+        xinput.xvasp.qhaopts.flag(xvaspflag, TRUE);
+        xinput.xvasp.qhaopts.push_attached(xvaspflag, module_opts.qhaflags[i].xscheme); //this should become pop/push or changeattachedscheme (eventually)
+      }
+    }
+
+    if (LDEBUG) {
+      for (uint i = 0; i < module_opts.qhaflags.size(); i++) {
+        std::cerr << soliloquy << "  " << module_opts.qhaflags[i].keyword << " = " << module_opts.qhaflags[i].xscheme << std::endl;
+      }
+    }
   }
 
 }  // namespace KBIN
