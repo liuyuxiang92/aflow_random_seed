@@ -3155,7 +3155,7 @@ namespace pocc {
   }
 
   void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-    if(XHOST.WEB_MODE){return;} //CO20190520 - no progress bar for web stuff
+    if(XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff //CO20200404 - new web flag
     double progress = (double)current/(double)end;
     int pos = BAR_WIDTH * progress;
 

@@ -71,7 +71,7 @@ namespace init {
     XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
     XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
     XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); //DX20171025
-    XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
+    //[CO20200404 - overload with --www]XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
     XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
 
     XHOST.tmpfs=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","/tmp");
@@ -947,7 +947,7 @@ namespace init {
     if(LDEBUG) cout << "OUTREACH OPTIONS: argv.size()=" << argv.size() << endl;
 
     // LOADING ANRL WEB
-    XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--php|-www|-web|-php"));
+    XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--web_mode|--php|--html|-www|-web|-web_mode|-php|-html"));  //CO20200404
 
     // DEFAULT options
     if(INIT_VERBOSE) oss << "--- DEFAULTSs --- " << endl;

@@ -118,7 +118,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   SKEW_TEST=FALSE; //DX20171019
   SKEW_TOL=AUROSTD_NAN; //DX20171019
   // WEB
-  WEB_MODE=FALSE; //CO20190402
+  //[CO20200404 - overload with --www]WEB_MODE=FALSE; //CO20190402
 };
 
 _XHOST::~_XHOST() { // destructor PUBLIC
@@ -210,7 +210,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   SKEW_TEST=b.SKEW_TEST; //DX20171019
   SKEW_TOL=b.SKEW_TOL; //DX20171019
   // WEB
-  WEB_MODE=b.WEB_MODE;  //CO20190402
+  //[CO20200404 - overload with --www]WEB_MODE=b.WEB_MODE;  //CO20190402
 }
 
 const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC

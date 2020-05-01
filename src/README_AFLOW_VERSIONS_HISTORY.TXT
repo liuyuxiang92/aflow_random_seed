@@ -105,6 +105,7 @@
         -- added some messaging/debug-logging to POCC+AEL+AGL workflow (CO)
         -- added Hmix to aflow.pocc.out (CO)
         -- ANOTHER patch for warnings with the aflow.rc, write to std::cerr, should fix www-data (CO)
+        -- merging --web_mode with --www (CO)
 3.2.2j - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- standardized vext,vcat,vzip from XHOST 2j (SC)

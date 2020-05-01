@@ -381,7 +381,7 @@ class _XHOST {
     bool SKEW_TEST; //DX20171019
     double SKEW_TOL; //DX20171019
     // WEB MODE
-    bool WEB_MODE;  //CO20190401
+    //[CO20200404 - overload with --www]bool WEB_MODE;  //CO20190401
   private:                                                //
     void free();                                           // free space
     void copy(const _XHOST& b);                            //

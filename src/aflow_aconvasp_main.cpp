@@ -722,7 +722,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("POCC_SKIP_WRITING_FILES",aurostd::args2flag(argv,cmds,"--pocc_skip_writing_files")); //CO20181226
   if(vpflow.flag("HNF") || vpflow.flag("POCC_COUNT_TOTAL") || vpflow.flag("POCC_COUNT_UNIQUE")){vpflow.flag("HNFCELL",TRUE);} //funnel all of these through command_line function
   if(vpflow.flag("HNFCELL")){vpflow.flag("POCC_SKIP_WRITING_FILES",TRUE);}  //CO20190401  //no point writing files if through command_line
-  if(XHOST.WEB_MODE){vpflow.flag("POCC_SKIP_WRITING_FILES",TRUE);}  //CO20190401
+  if(XHOST.vflag_control.flag("WWW")){vpflow.flag("POCC_SKIP_WRITING_FILES",TRUE);}  //CO20190401 //CO20200404 - new web flag
   vpflow.flag("MULTIENUMALL",aurostd::args2flag(argv,cmds,"--multienum|--enum"));
   vpflow.flag("MULTIENUMSORT",aurostd::args2flag(argv,cmds,"--multienumsort|--enumsort"));
   vpflow.flag("POSCAR2ENUM",(aurostd::args2flag(argv,cmds,"--poscar2multienum|--poscar2enum")));
@@ -1313,7 +1313,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::MULTIPLY_EQUAL","--volume*=","");
   vpflow.args2addattachedscheme(argv,cmds,"VOLUME::PLUS_EQUAL","--volume+=","");
 
-  vpflow.flag("WWW",aurostd::args2flag(argv,cmds,"--web|--www|--http"));
+  //[CO20200404 - refer to XHOST]vpflow.flag("WWW",aurostd::args2flag(argv,cmds,"--web|--www|--http"));
   vpflow.flag("WYCKOFF",aurostd::args2flag(argv,cmds,"--wyckoff|--wy"));
 
   // [OBSOLETE] vpflow.flag("XRAY",aurostd::args2flag(argv,cmds,"--xray"));
@@ -1563,7 +1563,7 @@ namespace pflow {
       //[CO20181226 - OBSOLETE]if(vpflow.flag("HNFTOL")) {pflow::HNFTOL(argv,cin,cout); _PROGRAMRUN=true;}
       if(vpflow.flag("ICSD_MAKELABEL")) {pflow::ICSD(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
-      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),vpflow.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically
+      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),XHOST.vflag_control.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically  //CO20200404 - new web flag
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
       //ME20191001 START
       if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
@@ -1995,7 +1995,7 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(argv,1,cin); _PROGRAMRUN=true;}
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNF")) {pflow::HNF(argv,cin,cout); _PROGRAMRUN=true;}
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNFTOL")) {pflow::HNFTOL(argv,cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),vpflow.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically
+      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),XHOST.vflag_control.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically //CO20200404 - new web flag
       // [OBSOLETE] if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(cin,aurostd::args2utype(argv,"--inflate_lattice|--ilattice",1.0)); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(cin,aurostd::args2utype(argv,"--inflate_volume|--ivolume",1.0)); _PROGRAMRUN=true;}
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
@@ -10418,7 +10418,7 @@ namespace pflow {
     if(message_parts.size()==0){return;}
 
     bool verbose=(!XHOST.QUIET && !silent);
-    bool fancy_print=(!XHOST.WEB_MODE);
+    bool fancy_print=(!XHOST.vflag_control.flag("WWW"));  //CO20200404 - new web flag
 
     string soliloquy = aurostd::RemoveWhiteSpaces(function_name);
     string ErrorBarString =   "EEEEE  ---------------------------------------------------------------------------------------------------------------------------- ";
