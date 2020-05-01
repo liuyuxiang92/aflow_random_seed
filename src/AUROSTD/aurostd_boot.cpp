@@ -32,6 +32,9 @@ using aurostd::mod;
 using aurostd::min;
 using aurostd::max;
 using aurostd::xcomplex;
+using aurostd::matrix;  //CO20200404 pflow::matrix()->aurostd::matrix()
+using aurostd::matrix2xmatrix;  //CO20200404 pflow::matrix()->aurostd::matrix()
+using aurostd::xmatrix2matrix;  //CO20200404 pflow::matrix()->aurostd::matrix()
 using aurostd::xmatrix;
 using aurostd::modulus;
 using aurostd::angle;
@@ -268,6 +271,20 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   vector<uint> vii; //CO20190622
   o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::convolution(v,v,vii,0);v=aurostd::moving_average(v,x); //CO20190520
   vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);
+  
+  //CO20200404 START - aurostd->pflow
+  utype ut=(utype)3;std::vector<utype> vec;std::complex<utype> utcomp;vector<std::complex<utype> > veccomp;
+  aurostd::matrix<utype> pmat,pmat2(1),pmat3(1,2),pmat4(1,vec),pmat5(1,2,ut);pmat=pmat2;
+  aurostd::matrix<utype> pmat6(pmat);
+  aurostd::matrix<std::complex<utype> > pmatcomp,pmatcomp2(1),pmatcomp3(1,2),pmatcomp4(1,veccomp),pmatcomp5(1,2,utcomp);pmatcomp=pmatcomp2;
+  aurostd::matrix<std::complex<utype> > pmatcomp6(pmatcomp);
+  aurostd::matrix<aurostd::matrix<utype> > pmatmat,pmatmat2(1),pmatmat3(1,2),pmatmat4(1,2,pmat);pmatmat=pmatmat2;
+  aurostd::matrix<aurostd::matrix<utype> > pmatmat5(pmatmat);
+  aurostd::matrix<aurostd::matrix<std::complex<utype> > > pmatmatcomp,pmatmatcomp2(1),pmatmatcomp3(1,2),pmatmatcomp4(1,2,pmatcomp);pmatmatcomp=pmatmatcomp2;
+  aurostd::matrix<aurostd::matrix<std::complex<utype> > > pmatmatcomp5(pmatmatcomp);
+  aurostd::xmatrix<utype> xmat=matrix2xmatrix(pmat);
+  pmat=xmatrix2matrix(xmat);
+  //CO20200404 END - aurostd->pflow
 
   // initialize matrices
   utype* mstar;mstar=NULL;

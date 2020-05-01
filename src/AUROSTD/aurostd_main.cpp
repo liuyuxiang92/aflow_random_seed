@@ -104,7 +104,7 @@ namespace aurostd {
 template<class utype>                            // operator <<  vector<>
 std::ostream& operator<< (std::ostream& buf,const std::vector<utype>& x) {
   for(uint i=0;i<x.size();i++) {
-    buf << x.at(i) << " ";
+    buf << x[i] << " ";
   }
   return buf;
 }
@@ -113,25 +113,25 @@ std::ostream& operator<< (std::ostream& buf,const std::vector<utype>& x) {
 template<class utype>                            // operator <<  deque<>
 std::ostream& operator<< (std::ostream& buf,const std::deque<utype>& x) {
   for(uint i=0;i<x.size();i++) {
-    buf << x.at(i) << " ";
+    buf << x[i] << " ";
   }
   return buf;
 }
 // ***************************************************************************
-ostream& operator<< (ostream& b,const vector<uint>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const deque<uint>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const vector<char>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const deque<char>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const vector<int>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const deque<int>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const vector<long>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const deque<long>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const vector<double>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const deque<double>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const vector<long double>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const deque<long double>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const vector<string>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
-ostream& operator<< (ostream& b,const deque<string>& x) {for(uint i=0;i<x.size();i++) b << x.at(i) << " "; return b;}
+ostream& operator<< (ostream& b,const vector<uint>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const deque<uint>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const vector<char>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const deque<char>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const vector<int>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const deque<int>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const vector<long>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const deque<long>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const vector<double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const deque<double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const vector<long double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const deque<long double>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const vector<string>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
+ostream& operator<< (ostream& b,const deque<string>& x) {for(uint i=0;i<x.size();i++) b << x[i] << " "; return b;}
 
 namespace aurostd {
   // ***************************************************************************
@@ -162,7 +162,7 @@ namespace aurostd {
   template<class utype> utype max(const vector<utype> vec) {
     if(vec.size()==0) return (utype) 0;
     utype out=vec.at(0);
-    for(uint i=0;i<vec.size();i++) if(vec.at(i)>=out) out=vec.at(i);
+    for(uint i=0;i<vec.size();i++) if(vec[i]>=out) out=vec[i];
     return out;
   }
   // overload to force compiling
@@ -179,7 +179,7 @@ namespace aurostd {
   template<class utype> utype max(const deque<utype> vec) {
     if(vec.size()==0) return (utype) 0;
     utype out=vec.at(0);
-    for(uint i=0;i<vec.size();i++) if(vec.at(i)>=out) out=vec.at(i);
+    for(uint i=0;i<vec.size();i++) if(vec[i]>=out) out=vec[i];
     return out;
   }
   // overload to force compiling
@@ -201,8 +201,8 @@ namespace aurostd {
     if(mat.at(0).size()==0) return (utype) 0;
     utype out=mat.at(0).at(0);
     for(uint i=0;i<mat.size();i++)
-      for(uint j=0;j<mat.at(i).size();j++)
-        if(mat.at(i).at(j)>=out) out=mat.at(i).at(j);
+      for(uint j=0;j<mat[i].size();j++)
+        if(mat[i][j]>=out) out=mat[i][j];
     return out;
   }
   // overload to force compiling
@@ -223,7 +223,7 @@ namespace aurostd {
   template<class utype> utype min(const vector<utype> vec) {
     if(vec.size()==0) return (utype) 0;
     utype out=vec.at(0);
-    for(uint i=0;i<vec.size();i++) if(vec.at(i)<=out) out=vec.at(i);
+    for(uint i=0;i<vec.size();i++) if(vec[i]<=out) out=vec[i];
     return out;
   }
   // overload to force compiling
@@ -241,7 +241,7 @@ namespace aurostd {
   template<class utype> utype min(const deque<utype> vec) {
     if(vec.size()==0) return (utype) 0;
     utype out=vec.at(0);
-    for(uint i=0;i<vec.size();i++) if(vec.at(i)<=out) out=vec.at(i);
+    for(uint i=0;i<vec.size();i++) if(vec[i]<=out) out=vec[i];
     return out;
   }
   // overload to force compiling
@@ -263,8 +263,8 @@ namespace aurostd {
     if(mat.at(0).size()==0) return (utype) 0;
     utype out=mat.at(0).at(0);
     for(uint i=0;i<mat.size();i++)
-      for(uint j=0;j<mat.at(i).size();j++)
-        if(mat.at(i).at(j)<=out) out=mat.at(i).at(j);
+      for(uint j=0;j<mat[i].size();j++)
+        if(mat[i][j]<=out) out=mat[i][j];
     return out;
   }
   // overload to force compiling
@@ -284,7 +284,7 @@ namespace aurostd {
   template<class utype> utype sum(const vector<utype> vec) {
     if(vec.size()==0) return (utype) 0;
     utype out=0;
-    for(uint i=0;i<vec.size();i++) out+=vec.at(i);
+    for(uint i=0;i<vec.size();i++) out+=vec[i];
     return out;
   }
   // overload to force compiling
@@ -301,7 +301,7 @@ namespace aurostd {
   template<class utype> utype sum(const deque<utype> vec) {
     if(vec.size()==0) return (utype) 0;
     utype out=0;
-    for(uint i=0;i<vec.size();i++) out+=vec.at(i);
+    for(uint i=0;i<vec.size();i++) out+=vec[i];
     return out;
   }
   // overload to force compiling
@@ -323,8 +323,8 @@ namespace aurostd {
     if(mat.at(0).size()==0) return (utype) 0;
     utype out=0;
     for(uint i=0;i<mat.size();i++)
-      for(uint j=0;j<mat.at(i).size();j++)
-        out+=mat.at(i).at(j);
+      for(uint j=0;j<mat[i].size();j++)
+        out+=mat[i][j];
     return out;
   }
   // overload to force compiling
@@ -344,7 +344,7 @@ namespace aurostd {
   template<class utype> utype mean(const vector<utype> vec) {
     if(vec.size()==0) return (utype) 0;
     utype out=0;
-    for(uint i=0;i<vec.size();i++) out+=vec.at(i);
+    for(uint i=0;i<vec.size();i++) out+=vec[i];
     return (utype) out/((utype) vec.size());
   }
   // overload to force compiling
@@ -360,7 +360,7 @@ namespace aurostd {
   template<class utype> utype mean(const deque<utype> vec) {
     if(vec.size()==0) return (utype) 0;
     utype out=0;
-    for(uint i=0;i<vec.size();i++) out+=vec.at(i);
+    for(uint i=0;i<vec.size();i++) out+=vec[i];
     return (utype) out/((utype) vec.size());
   }
   // overload to force compiling
@@ -381,8 +381,8 @@ namespace aurostd {
     if(mat.at(0).size()==0) return (utype) 0;
     utype out=0;
     for(uint i=0;i<mat.size();i++)
-      for(uint j=0;j<mat.at(i).size();j++)
-        out+=mat.at(i).at(j);
+      for(uint j=0;j<mat[i].size();j++)
+        out+=mat[i][j];
     return (utype) out/((utype) mat.size()*mat.at(0).size());
   }
   // overload to force compiling
@@ -399,7 +399,7 @@ namespace aurostd {
   // Function reset of a vector/deque
   // ***************************************************************************
   template<class utype> vector<utype> reset(vector<utype>& vec) {
-    for(uint i=0;i<vec.size();i++) vec.at(i)=(utype) 0;
+    for(uint i=0;i<vec.size();i++) vec[i]=(utype) 0;
     return vec;
   }
   // overload to force compiling
@@ -414,7 +414,7 @@ namespace aurostd {
   vector<long double>  _aurostd_initialize_reset(vector<long double>& vec) { return reset(vec);}
 
   template<class utype> deque<utype> reset(deque<utype>& vec) {
-    for(uint i=0;i<vec.size();i++) vec.at(i)=(utype) 0;
+    for(uint i=0;i<vec.size();i++) vec[i]=(utype) 0;
     return vec;
   }
   // overload to force compiling
@@ -433,8 +433,8 @@ namespace aurostd {
   // ***************************************************************************
   template<class utype> vector<vector<utype> > reset(vector<vector<utype> > mat) {
     for(uint i=0;i<mat.size();i++)
-      for(uint j=0;j<mat.at(i).size();j++)
-        mat.at(i).at(j)=(utype) 0;
+      for(uint j=0;j<mat[i].size();j++)
+        mat[i][j]=(utype) 0;
     return mat;
   }
   // overload to force compiling
@@ -452,7 +452,7 @@ namespace aurostd {
   // Function clear of a vector/deque
   // ***************************************************************************
   template<class utype> vector<utype> clear(vector<utype>& vec) {
-    for(uint i=0;i<vec.size();i++) vec.at(i)=(utype) 0;
+    for(uint i=0;i<vec.size();i++) vec[i]=(utype) 0;
     return vec;
   }
   // overload to force compiling
@@ -467,7 +467,7 @@ namespace aurostd {
   vector<long double>  _aurostd_initialize_clear(vector<long double>& vec) { return clear(vec);}
 
   template<class utype> deque<utype> clear(deque<utype>& vec) {
-    for(uint i=0;i<vec.size();i++) vec.at(i)=(utype) 0;
+    for(uint i=0;i<vec.size();i++) vec[i]=(utype) 0;
     return vec;
   }
   // overload to force compiling
@@ -486,8 +486,8 @@ namespace aurostd {
   // ***************************************************************************
   template<class utype> vector<vector<utype> > clear(vector<vector<utype> > mat) {
     for(uint i=0;i<mat.size();i++)
-      for(uint j=0;j<mat.at(i).size();j++)
-        mat.at(i).at(j)=(utype) 0;
+      for(uint j=0;j<mat[i].size();j++)
+        mat[i][j]=(utype) 0;
     return mat;
   }
   // overload to force compiling
@@ -623,14 +623,14 @@ namespace aurostd {
   string toupper(const string& in) {
     string out(in);
     for(uint i=0;i<out.length();i++)
-      out.at(i)=std::toupper(out.at(i));
+      out[i]=std::toupper(out[i]);
     return out;
   }
 
   string tolower(const string& in) {
     string out(in);
     for(uint i=0;i<out.length();i++)
-      out.at(i)=std::tolower(out.at(i));
+      out[i]=std::tolower(out[i]);
     return out;
   }
 
@@ -1319,31 +1319,31 @@ namespace aurostd {
   //[OBSOLETE]    string::size_type loc;  //CO20180409, don't do find twice (expensive)
   //[OBSOLETE]    for(uint i=0;i<vstrout.size();i++) {
   //[OBSOLETE]      //COMMENT_NEGLECT_1
-  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_1);  //CO20180409
-  //[OBSOLETE]      vstrout.at(i)=vstrout.at(i).substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
+  //[OBSOLETE]      loc=vstrout[i].find(COMMENT_NEGLECT_1);  //CO20180409
+  //[OBSOLETE]      vstrout[i]=vstrout[i].substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
   //[OBSOLETE]
   //[OBSOLETE]      //COMMENT_NEGLECT_2, but not ":"+//COMMENT_NEGLECT_1
-  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_2);  //CO20180409
+  //[OBSOLETE]      loc=vstrout[i].find(COMMENT_NEGLECT_2);  //CO20180409
   //[OBSOLETE]      while(loc!=string::npos){
-  //[OBSOLETE]        if(!(loc>0&&loc<vstrout.at(i).size()&&vstrout.at(i).at(loc-1)==':')){  //find the NOT case where we are in the range and we find ':' before comment
-  //[OBSOLETE]          vstrout.at(i)=vstrout.at(i).substr(0,loc);
+  //[OBSOLETE]        if(!(loc>0&&loc<vstrout[i].size()&&vstrout[i].at(loc-1)==':')){  //find the NOT case where we are in the range and we find ':' before comment
+  //[OBSOLETE]          vstrout[i]=vstrout[i].substr(0,loc);
   //[OBSOLETE]          break;
   //[OBSOLETE]        }
-  //[OBSOLETE]        loc=vstrout.at(i).find(COMMENT_NEGLECT_2,loc+1);
+  //[OBSOLETE]        loc=vstrout[i].find(COMMENT_NEGLECT_2,loc+1);
   //[OBSOLETE]      }
   //[OBSOLETE]
   //[OBSOLETE]      //COMMENT_NEGLECT_3
-  //[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_3);  //CO20180409
-  //[OBSOLETE]      vstrout.at(i)=vstrout.at(i).substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
+  //[OBSOLETE]      loc=vstrout[i].find(COMMENT_NEGLECT_3);  //CO20180409
+  //[OBSOLETE]      vstrout[i]=vstrout[i].substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
   //[OBSOLETE]
-  //[OBSOLETE]if(vstrout.at(i).find(COMMENT_NEGLECT_1)!=string::npos) 
-  //[OBSOLETE]  vstrout.at(i)=vstrout.at(i).substr(0,vstrout.at(i).find(COMMENT_NEGLECT_1));  
-  //[OBSOLETE]if(vstrout.at(i).find(COMMENT_NEGLECT_2)!=string::npos && vstrout.at(i).find(":"+COMMENT_NEGLECT_2)==string::npos)  // look for // but dont touch ://
-  //[OBSOLETE]  vstrout.at(i)=vstrout.at(i).substr(0,vstrout.at(i).find(COMMENT_NEGLECT_2));
-  //[OBSOLETE]if(vstrout.at(i).find(COMMENT_NEGLECT_3)!=string::npos)
-  //[OBSOLETE]  vstrout.at(i)=vstrout.at(i).substr(0,vstrout.at(i).find(COMMENT_NEGLECT_3));
-  //[OBSOLETE]  if(!vstrout.at(i).empty()) cout << vstrout.at(i) << endl;
-  //[OBSOLETE]      if(!vstrout.at(i).empty()) strout+=vstrout.at(i)+"\n";
+  //[OBSOLETE]if(vstrout[i].find(COMMENT_NEGLECT_1)!=string::npos) 
+  //[OBSOLETE]  vstrout[i]=vstrout[i].substr(0,vstrout[i].find(COMMENT_NEGLECT_1));  
+  //[OBSOLETE]if(vstrout[i].find(COMMENT_NEGLECT_2)!=string::npos && vstrout[i].find(":"+COMMENT_NEGLECT_2)==string::npos)  // look for // but dont touch ://
+  //[OBSOLETE]  vstrout[i]=vstrout[i].substr(0,vstrout[i].find(COMMENT_NEGLECT_2));
+  //[OBSOLETE]if(vstrout[i].find(COMMENT_NEGLECT_3)!=string::npos)
+  //[OBSOLETE]  vstrout[i]=vstrout[i].substr(0,vstrout[i].find(COMMENT_NEGLECT_3));
+  //[OBSOLETE]  if(!vstrout[i].empty()) cout << vstrout[i] << endl;
+  //[OBSOLETE]      if(!vstrout[i].empty()) strout+=vstrout[i]+"\n";
   //[OBSOLETE]    }  
   //[OBSOLETE]    return strout;
   //[OBSOLETE]  }
@@ -1531,7 +1531,7 @@ namespace aurostd {
     if(Directory.at(0)=='/') tokens[0]="/"+tokens[0]; // fix the root thing
     dir_tmp="";
     for(uint i=0;i<tokens.size();i++) {
-      dir_tmp+=tokens.at(i)+"/";
+      dir_tmp+=tokens[i]+"/";
       if(!aurostd::FileExist(dir_tmp)) {
         command="mkdir -p \""+dir_tmp+"\"";
         if(LDEBUG) cerr << "DirectoryMake creating directory=" <<  command << endl;
@@ -1561,7 +1561,7 @@ namespace aurostd {
     if(Directory.at(0)=='/') tokens[0]="/"+tokens[0]; // fix the root thing
     dir_tmp="";
     for(uint i=0;i<tokens.size();i++) {
-      dir_tmp+=tokens.at(i)+"/";
+      dir_tmp+=tokens[i]+"/";
       command="ssh "+user+"@"+machine+" mkdir \""+dir_tmp+"\"";
       if(LDEBUG) cerr << "SSH_DirectoryMake creating directory=" <<  command << endl;
       aurostd::execute(command);
@@ -2582,12 +2582,12 @@ namespace aurostd {
   // ***************************************************************************
   bool execute(deque<string> vcommand) {
     for(uint i=0;i<vcommand.size();i++)
-      execute(vcommand.at(i));
+      execute(vcommand[i]);
     return TRUE;
   }
   bool execute(vector<string> vcommand) {
     for(uint i=0;i<vcommand.size();i++)
-      execute(vcommand.at(i));
+      execute(vcommand[i]);
     return TRUE;
   }
 
@@ -2629,14 +2629,14 @@ namespace aurostd {
   vector<string> execute2string(vector<string> vcommand) {
     vector<string> out;
     for(uint i=0;i<vcommand.size();i++)
-      out.push_back(execute2string(vcommand.at(i)));
+      out.push_back(execute2string(vcommand[i]));
     return out;
   }
 
   deque<string> execute2string(deque<string> vcommand) {
     deque<string> out;
     for(uint i=0;i<vcommand.size();i++)
-      out.push_back(execute2string(vcommand.at(i)));
+      out.push_back(execute2string(vcommand[i]));
     return out;
   }
 
@@ -2665,14 +2665,14 @@ namespace aurostd {
   template<class utype> vector<utype> execute2utype(vector<utype> vcommand) {
     vector<utype> out;
     for(uint i=0;i<vcommand.size();i++)
-      out.push_back((utype) execute2utype<utype>(vcommand.at(i)));
+      out.push_back((utype) execute2utype<utype>(vcommand[i]));
     return out;
   }
 
   template<class utype> deque<utype> execute2utype(deque<utype> vcommand) {
     deque<utype> out;
     for(uint i=0;i<vcommand.size();i++)
-      out.push_back((utype) execute2utype<utype>(vcommand.at(i)));
+      out.push_back((utype) execute2utype<utype>(vcommand[i]));
     return out;
   }
 
@@ -2720,7 +2720,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      strline=tokens.at(i);
+      strline=tokens[i];
       if(aurostd::substring2bool(strline,subS2)) {
         FileOUTPUT << strline.substr(strline.find(subS2)+subS2.length()) << endl;
         status=TRUE;
@@ -2755,7 +2755,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      strline=tokens.at(i);
+      strline=tokens[i];
       if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
       if(status) FileOUTPUT << strline << endl;
       if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
@@ -2787,7 +2787,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      strline=tokens.at(i);
+      strline=tokens[i];
       if(aurostd::substring2bool(strline,subS2)) {
         StringOUTPUT=StringOUTPUT+strline.substr(strline.find(subS2)+subS2.length())+"\n";
         status=TRUE;
@@ -2816,7 +2816,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      strline=tokens.at(i);
+      strline=tokens[i];
       if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
       if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
       if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
@@ -2868,9 +2868,9 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      if(aurostd::substring2bool(tokens.at(i),Keyword_stop))  status=FALSE;
-      if(status) StringstreamOUTPUT << tokens.at(i) << endl;
-      if(aurostd::substring2bool(tokens.at(i),Keyword_start)) status=TRUE;
+      if(aurostd::substring2bool(tokens[i],Keyword_stop))  status=FALSE;
+      if(status) StringstreamOUTPUT << tokens[i] << endl;
+      if(aurostd::substring2bool(tokens[i],Keyword_start)) status=TRUE;
     }
     return status;  // return FALSE if something got messed up
   }
@@ -2881,8 +2881,8 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      if(aurostd::substring2bool(tokens.at(i),Keyword)) StringstreamOUTPUT << tokens.at(i).substr(tokens.at(i).find(Keyword)+Keyword.length()) << endl;
-      if(aurostd::substring2bool(tokens.at(i),Keyword)) status=TRUE;
+      if(aurostd::substring2bool(tokens[i],Keyword)) StringstreamOUTPUT << tokens[i].substr(tokens[i].find(Keyword)+Keyword.length()) << endl;
+      if(aurostd::substring2bool(tokens[i],Keyword)) status=TRUE;
     }
     return status;  // return FALSE if something got messed up
   }
@@ -2902,12 +2902,12 @@ namespace aurostd {
     aurostd::stream2vectorstring(FileIN,tokens);
     int istart=-1,istop=-1;
     for(int i=(int) tokens.size()-1;i>0;i--) {
-      if(aurostd::substring2bool(tokens.at(i),Keyword_stop)  && istop<1)  istop=i-1;
-      if(aurostd::substring2bool(tokens.at(i),Keyword_start) && istart<1) istart=i+1;
+      if(aurostd::substring2bool(tokens[i],Keyword_stop)  && istop<1)  istop=i-1;
+      if(aurostd::substring2bool(tokens[i],Keyword_start) && istart<1) istart=i+1;
     }
     if(LDEBUG) cerr << "LDEBUG: " << istart << " " << istop << endl;
     if(istart>0 && istop>0) {
-      for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens.at(i) << endl;
+      for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens[i] << endl;
       if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
@@ -2929,12 +2929,12 @@ namespace aurostd {
     aurostd::string2vectorstring(StringIN,tokens);
     int istart=-1,istop=-1;
     for(int i=(int) tokens.size()-1;i>0;i--) {
-      if(aurostd::substring2bool(tokens.at(i),Keyword_stop)  && istop<1)  istop=i-1;
-      if(aurostd::substring2bool(tokens.at(i),Keyword_start) && istart<1) istart=i+1;
+      if(aurostd::substring2bool(tokens[i],Keyword_stop)  && istop<1)  istop=i-1;
+      if(aurostd::substring2bool(tokens[i],Keyword_start) && istart<1) istart=i+1;
     }
     if(LDEBUG) cerr << "LDEBUG: " << istart << " " << istop << endl;
     if(istart>0 && istop>0) {
-      for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens.at(i) << endl;
+      for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens[i] << endl;
       if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
@@ -2996,8 +2996,8 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      if(status) StringstreamOUTPUT << tokens.at(i) << endl;
-      if(aurostd::substring2bool(tokens.at(i),Keyword_start)) status=TRUE;
+      if(status) StringstreamOUTPUT << tokens[i] << endl;
+      if(aurostd::substring2bool(tokens[i],Keyword_start)) status=TRUE;
     }
     return status;  // return FALSE if something got messed up
   }
@@ -3757,11 +3757,50 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function eurl2string
+  // ***************************************************************************
+  //CO20200223
+  bool eurl2string(const string& url,string& stringIN,bool verbose) {
+    stringIN="";
+    string ext=GetCompressionExtension(url);
+    if(!ext.empty()){
+      string temp_file=aurostd::TmpFileCreate("eurl2string")+ext;
+      url2file(url,temp_file,verbose);
+      efile2string(temp_file,stringIN);
+#ifndef _AFLOW_TEMP_PRESERVE_
+      aurostd::RemoveFile(temp_file);
+#endif
+      return stringIN.length()>0;
+    }
+    //[CO20200404 - OBSOLETE]if(aurostd::substring2bool(url,".bz2")){
+    //[CO20200404 - OBSOLETE]  string temp_file=aurostd::TmpFileCreate("eurl2string")+".bz2";
+    //[CO20200404 - OBSOLETE]  url2file(url,temp_file,verbose);
+    //[CO20200404 - OBSOLETE]  bz2file2string(temp_file,stringIN);
+    //[CO20200404 - OBSOLETE]  return stringIN.length()>0;
+    //[CO20200404 - OBSOLETE]}
+    //[CO20200404 - OBSOLETE]if(aurostd::substring2bool(url,".gz")){
+    //[CO20200404 - OBSOLETE]  string temp_file=aurostd::TmpFileCreate("eurl2string")+".gz";
+    //[CO20200404 - OBSOLETE]  url2file(url,temp_file,verbose);
+    //[CO20200404 - OBSOLETE]  gzfile2string(temp_file,stringIN);
+    //[CO20200404 - OBSOLETE]  return stringIN.length()>0;
+    //[CO20200404 - OBSOLETE]}
+    //[CO20200404 - OBSOLETE]if(aurostd::substring2bool(url,".xz")){
+    //[CO20200404 - OBSOLETE]  string temp_file=aurostd::TmpFileCreate("eurl2string")+".xz";
+    //[CO20200404 - OBSOLETE]  url2file(url,temp_file,verbose);
+    //[CO20200404 - OBSOLETE]  xzfile2string(temp_file,stringIN);
+    //[CO20200404 - OBSOLETE]  return stringIN.length()>0;
+    //[CO20200404 - OBSOLETE]}
+    url2string(url,stringIN,verbose);
+    return stringIN.length()>0;
+  }
+
+  // ***************************************************************************
   // Function url2string
   // ***************************************************************************
   // wget URL to string - Stefano Curtarolo
-  bool url2string(string url,string& stringIN,bool verbose) {
+  bool url2string(const string& url,string& stringIN,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    stringIN="";
     if(!aurostd::IsCommandAvailable("wget")) {
       cerr << "ERROR - aurostd::url2string(): command \"wget\" is necessary !" << endl;
       return FALSE;}	
@@ -3792,30 +3831,76 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function url2stringstream
+  // Function eurl2stringstream
   // ***************************************************************************
-  // wget URL to stringstream - Stefano Curtarolo
-  bool url2stringstream(string url,stringstream& stringstreamIN,bool verbose) {
+  //CO20200223
+  bool eurl2stringstream(const string& url,stringstream& stringstreamIN,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "aurostd::url2stringstream() Loading url=" << url << endl;
-    if(verbose) cout << "aurostd::url2stringstream() Loading url=" << url << endl;
-    string stringIN;
-    bool out=url2string(url,stringIN,verbose);
-    stringstreamIN.clear(); stringstreamIN << stringIN;
+    string soliloquy="aurostd::eurl2stringstream():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN="";  //CO20200404
+    bool out=eurl2string(url,stringIN,verbose);
+    stringstreamIN.str(""); stringstreamIN << stringIN;
     return out;
   }
 
   // ***************************************************************************
+  // Function url2stringstream
+  // ***************************************************************************
+  // wget URL to stringstream - Stefano Curtarolo
+  bool url2stringstream(const string& url,stringstream& stringstreamIN,bool verbose) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::url2stringstream():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN="";  //CO20200404
+    bool out=url2string(url,stringIN,verbose);
+    stringstreamIN.str(""); stringstreamIN << stringIN;
+    return out;
+  }
+
+  // ***************************************************************************
+  // Function eurl2vectorstring
+  // ***************************************************************************
+  //CO20200223
+  bool eurl2vectorstring(const string& url,vector<string>& vlines,bool verbose) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::eurl2vectorstring():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN="";  //CO20200404
+    bool out=eurl2string(url,stringIN,verbose);
+    aurostd::string2tokens(stringIN,vlines);
+    return out;
+  }
+  // ***************************************************************************
   // Function url2vectorstring
   // ***************************************************************************
   // wget URL to vectorstring - Stefano Curtarolo
-  bool url2vectorstring(string url,vector<string>& vline,bool verbose) {
+  bool url2vectorstring(const string& url,vector<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "aurostd::url2vectorstring() Loading url=" << url << endl;
-    if(verbose) cout << "aurostd::url2vectorstring() Loading url=" << url << endl;
-    string stringIN;
+    string soliloquy="aurostd::url2vectorstring():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
-    aurostd::string2tokens(stringIN,vline);
+    aurostd::string2tokens(stringIN,vlines);
+    return out;
+  }
+
+  // ***************************************************************************
+  // Function eurl2dequestring
+  // ***************************************************************************
+  //CO20200223
+  bool eurl2dequestring(const string& url,deque<string>& vlines,bool verbose) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::eurl2dequestring():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN="";  //CO20200404
+    bool out=eurl2string(url,stringIN,verbose);
+    aurostd::string2tokens(stringIN,vlines);
     return out;
   }
 
@@ -3823,40 +3908,83 @@ namespace aurostd {
   // Function url2dequestring
   // ***************************************************************************
   // wget URL to dequestring - Stefano Curtarolo
-  bool url2dequestring(string url,deque<string>& vline,bool verbose) {
+  bool url2dequestring(const string& url,deque<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "aurostd::url2dequestring() Loading url=" << url << endl;
-    if(verbose) cout << "aurostd::url2dequestring() Loading url=" << url << endl;
-    string stringIN;
+    string soliloquy="aurostd::url2dequestring():";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
-    aurostd::string2tokens(stringIN,vline);
+    aurostd::string2tokens(stringIN,vlines);
     return out;
+  }
+
+  // ***************************************************************************
+  // Function eurl2tokens
+  // ***************************************************************************
+  //CO20200223
+  template<typename utype> uint eurl2tokens(const string& url,vector<utype>& tokens,const string& delimiters) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::url2tokens<utype>(vector):";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(!aurostd::IsCommandAvailable("wget")) {
+      cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
+      return 0;}	
+    tokens.clear(); 
+    string content = "";
+    aurostd::eurl2string(url,content);
+    if(LDEBUG) { //CO20180627
+      cerr << soliloquy << " content=" << endl;
+      cerr << content << endl;
+    }
+    if(content.empty()) {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+
+    vector<string> stokens;
+    aurostd::string2tokens(content,stokens,delimiters);
+    for(uint i=0;i<stokens.size();i++)
+      if(!stokens[i].empty()) 
+        tokens.push_back(aurostd::string2utype<utype>(stokens[i]));
+    if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
+    return tokens.size();
   }
 
   // ***************************************************************************
   // Function url2tokens
   // ***************************************************************************
   // wget URL to vector of tokens - Stefano Curtarolo
-  template<typename utype> uint url2tokens(string url,vector<utype>& tokens,const string& delimiters) {
+  template<typename utype> uint url2tokens(const string& url,vector<utype>& tokens,const string& delimiters) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "aurostd::url2tokens<utype>(vector) Loading url=" << url << endl;
+    string soliloquy="aurostd::url2tokens<utype>(vector):";
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - aurostd::url2tokens<utype>(vector): command \"wget\" is necessary !" << endl;
+      cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
       return 0;}	
     tokens.clear(); 
-    string content;
+    string content = "";
     aurostd::url2string(url,content);
     if(LDEBUG) { //CO20180627
-      cerr << "aurostd::url2tokens<utype>(vector) content=" << endl;
+      cerr << soliloquy << " content=" << endl;
       cerr << content << endl;
     }
-    if(content=="") {cerr << "ERROR - aurostd::url2tokens<utype>(vector): URL empty http://" << url << endl;return 0;}
+    if(content.empty()) {cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;return 0;}
+
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
     for(uint i=0;i<stokens.size();i++)
-      if(stokens.at(i)!="") 
-        tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
-    if(LDEBUG) cerr << "aurostd::url2tokens() [5] tokens.size()=" << tokens.size() << endl;
+      if(stokens[i]!="") 
+        tokens.push_back(aurostd::string2utype<utype>(stokens[i]));
+    if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
+    return tokens.size();
+  }
+
+  // ***************************************************************************
+  // Function eurl2tokens
+  // ***************************************************************************
+  //CO20200223
+  template<typename utype> uint eurl2tokens(const string& url,deque<utype>& tokens,const string& delimiters) {
+    vector<utype> vtokens;
+    aurostd::eurl2tokens(url,vtokens,delimiters);
+    for(uint i=0;i<vtokens.size();i++) tokens.push_back(vtokens[i]);
     return tokens.size();
   }
 
@@ -3864,19 +3992,29 @@ namespace aurostd {
   // Function url2tokens
   // ***************************************************************************
   // wget URL to deque of tokens - Stefano Curtarolo
-  template<typename utype> uint url2tokens(string url,deque<utype>& tokens,const string& delimiters) {
+  template<typename utype> uint url2tokens(const string& url,deque<utype>& tokens,const string& delimiters) {
     vector<utype> vtokens;
     aurostd::url2tokens(url,vtokens,delimiters);
-    for(uint i=0;i<vtokens.size();i++) tokens.push_back(vtokens.at(i));
+    for(uint i=0;i<vtokens.size();i++) tokens.push_back(vtokens[i]);
     return tokens.size();
+  }
+
+  // ***************************************************************************
+  // Function eurl2string
+  // ***************************************************************************
+  //CO20200223
+  string eurl2string(const string& url) {
+    string stringIN="";    //CO20200404
+    eurl2string(url,stringIN);
+    return stringIN;
   }
 
   // ***************************************************************************
   // Function url2string
   // ***************************************************************************
   // wget URL to stringstream - Stefano Curtarolo
-  string url2string(string url) {
-    string stringIN;
+  string url2string(const string& url) {
+    string stringIN="";  //CO20200404
     url2string(url,stringIN);
     return stringIN;
   }
@@ -3933,7 +4071,7 @@ namespace aurostd {
   // Move files to destination, do one at a time to check if files exist
   bool file2directory(const vector<string>& files,const string& destination) {
     for(uint i=0;i<files.size();i++) {
-      if(!file2directory(files.at(i),destination)) {return FALSE;}
+      if(!file2directory(files[i],destination)) {return FALSE;}
     }
     return TRUE;
   }
@@ -4032,7 +4170,7 @@ namespace aurostd {
   //***************************************************************************//
   bool RemoveFile(const vector<string>& files) {
     for(uint i=0;i<files.size();i++) {
-      if(!RemoveFile(files.at(i))) {return FALSE;}
+      if(!RemoveFile(files[i])) {return FALSE;}
     }
     return TRUE;
   }
@@ -4080,7 +4218,7 @@ namespace aurostd {
     vector<string> vtokens;
     uint i=aurostd::string2tokens(str,vtokens,delimiters,consecutive);  //CO20170613
     tokens.clear();
-    for(i=0;i<vtokens.size();i++) tokens.push_back(vtokens.at(i));
+    for(i=0;i<vtokens.size();i++) tokens.push_back(vtokens[i]);
     return tokens.size();
   }
   template<class utype> uint string2tokens(const string& str,std::vector<utype>& tokens,const string& delimiters,bool consecutive) {  //CO20170613
@@ -4088,7 +4226,7 @@ namespace aurostd {
     uint out=aurostd::string2tokens(str,stokens, delimiters,consecutive); //CO20170613
     tokens.clear();
     for(uint i=0;i<stokens.size();i++)
-      tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
+      tokens.push_back(aurostd::string2utype<utype>(stokens[i]));
     return out;
   }
   template<class utype> uint string2tokens(const string& str,std::deque<utype>& tokens,const string& delimiters,bool consecutive) { //CO20170613
@@ -4096,7 +4234,7 @@ namespace aurostd {
     uint out=aurostd::string2tokens(str,stokens, delimiters,consecutive); //CO20170613
     tokens.clear();
     for(uint i=0;i<stokens.size();i++)
-      tokens.push_back(aurostd::string2utype<utype>(stokens.at(i)));
+      tokens.push_back(aurostd::string2utype<utype>(stokens[i]));
     return out;
   }
 
@@ -4107,25 +4245,25 @@ namespace aurostd {
   uint string2tokensAdd(const string& str,std::vector<string>& tokens,const string& delimiters) {
     vector<string> vtokens;
     uint i=aurostd::string2tokens(str,vtokens,delimiters);
-    for(i=0;i<vtokens.size();i++) tokens.push_back(vtokens.at(i));
+    for(i=0;i<vtokens.size();i++) tokens.push_back(vtokens[i]);
     return tokens.size();
   }
   uint string2tokensAdd(const string& str,std::deque<string>& tokens,const string& delimiters) {
     vector<string> vtokens;
     uint i=aurostd::string2tokens(str,vtokens,delimiters);
-    for(i=0;i<vtokens.size();i++) tokens.push_back(vtokens.at(i));
+    for(i=0;i<vtokens.size();i++) tokens.push_back(vtokens[i]);
     return tokens.size();
   }
   template<class utype> uint string2tokensAdd(const string& str,std::vector<utype>& tokens,const string& delimiters) {
     vector<string> vtokens;
     uint i=aurostd::string2tokens(str,vtokens,delimiters);
-    for(i=0;i<vtokens.size();i++) tokens.push_back(aurostd::string2utype<utype>(vtokens.at(i)));
+    for(i=0;i<vtokens.size();i++) tokens.push_back(aurostd::string2utype<utype>(vtokens[i]));
     return tokens.size();
   }
   template<class utype> uint string2tokensAdd(const string& str,std::deque<utype>& tokens,const string& delimiters) {
     deque<string> vtokens;
     uint i=aurostd::string2tokens(str,vtokens,delimiters);
-    for(i=0;i<vtokens.size();i++) tokens.push_back(aurostd::string2utype<utype>(vtokens.at(i)));
+    for(i=0;i<vtokens.size();i++) tokens.push_back(aurostd::string2utype<utype>(vtokens[i]));
     return tokens.size();
   }
 
@@ -4180,7 +4318,7 @@ namespace aurostd {
   }
 
   vector<double> vectorstring2vectordouble(vector<string> from) {
-    vector<double> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<double>(from.at(i)));return vout;
+    vector<double> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<double>(from[i]));return vout;
   }
 
   string string2string(const string& from) {
@@ -4188,15 +4326,15 @@ namespace aurostd {
   }
 
   vector<int> vectorstring2vectorint(vector<string> from) {
-    vector<int> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<int>(from.at(i)));return vout;
+    vector<int> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<int>(from[i]));return vout;
   }
 
   vector<uint> vectorstring2vectoruint(vector<string> from) {
-    vector<uint> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<uint>(from.at(i)));return vout;
+    vector<uint> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<uint>(from[i]));return vout;
   }
 
   vector<float> vectorstring2vectorfloat(vector<string> from) {
-    vector<float> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<float>(from.at(i)));return vout;
+    vector<float> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<float>(from[i]));return vout;
   }
 
   string vectorstring2string(const vector<string>& vstrings) {
@@ -4280,14 +4418,14 @@ namespace aurostd {
     string2tokens(vstring,tokens_commas,",");
     for(uint i=0;i<tokens_commas.size();i++) {
       tokens_colums.clear();
-      if(aurostd::substring2bool(tokens_commas.at(i),":")) {
-        string2tokens(tokens_commas.at(i),tokens_colums,":");
+      if(aurostd::substring2bool(tokens_commas[i],":")) {
+        string2tokens(tokens_commas[i],tokens_colums,":");
         for(int j=aurostd::string2utype<int>(tokens_colums.at(0));
             j<=aurostd::string2utype<int>(tokens_colums.at(tokens_colums.size()-1));
             j++)
           vint.push_back(j);
       } else {
-        vint.push_back(aurostd::string2utype<int>(tokens_commas.at(i)));
+        vint.push_back(aurostd::string2utype<int>(tokens_commas[i]));
       }	
     }
   }
@@ -4301,14 +4439,14 @@ namespace aurostd {
     string2tokens(vstring,tokens_commas,",");
     for(uint i=0;i<tokens_commas.size();i++) {
       tokens_colums.clear();
-      if(aurostd::substring2bool(tokens_commas.at(i),":")) {
-        string2tokens(tokens_commas.at(i),tokens_colums,":");
+      if(aurostd::substring2bool(tokens_commas[i],":")) {
+        string2tokens(tokens_commas[i],tokens_colums,":");
         for(uint j=aurostd::string2utype<uint>(tokens_colums.at(0));
             j<=(uint) aurostd::string2utype<uint>(tokens_colums.at(tokens_colums.size()-1));
             j++)
           vuint.push_back(j);
       } else {
-        vuint.push_back(aurostd::string2utype<uint>(tokens_commas.at(i)));
+        vuint.push_back(aurostd::string2utype<uint>(tokens_commas[i]));
       }	
     }
   }
@@ -4322,14 +4460,14 @@ namespace aurostd {
     string2tokens(vstring,tokens_commas,",");
     for(uint i=0;i<tokens_commas.size();i++) {
       tokens_colums.clear();
-      if(aurostd::substring2bool(tokens_commas.at(i),":")) {
-        string2tokens(tokens_commas.at(i),tokens_colums,":");
+      if(aurostd::substring2bool(tokens_commas[i],":")) {
+        string2tokens(tokens_commas[i],tokens_colums,":");
         for(float j=aurostd::string2utype<float>(tokens_colums.at(0));
             j<=aurostd::string2utype<float>(tokens_colums.at(tokens_colums.size()-1));
             j++)
           vfloat.push_back(j);
       } else {
-        vfloat.push_back(aurostd::string2utype<float>(tokens_commas.at(i)));
+        vfloat.push_back(aurostd::string2utype<float>(tokens_commas[i]));
       }	
     }
   }
@@ -4343,14 +4481,14 @@ namespace aurostd {
     string2tokens(vstring,tokens_commas,",");
     for(uint i=0;i<tokens_commas.size();i++) {
       tokens_colums.clear();
-      if(aurostd::substring2bool(tokens_commas.at(i),":")) {
-        string2tokens(tokens_commas.at(i),tokens_colums,":");
+      if(aurostd::substring2bool(tokens_commas[i],":")) {
+        string2tokens(tokens_commas[i],tokens_colums,":");
         for(double j=aurostd::string2utype<double>(tokens_colums.at(0));
             j<=aurostd::string2utype<double>(tokens_colums.at(tokens_colums.size()-1));
             j++)
           vdouble.push_back(j);
       } else {
-        vdouble.push_back(aurostd::string2utype<double>(tokens_commas.at(i)));
+        vdouble.push_back(aurostd::string2utype<double>(tokens_commas[i]));
       }	
     }
   }
@@ -4490,7 +4628,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      _strline=tokens.at(i);
+      _strline=tokens[i];
       if(_strline.find("#")!=string::npos  
           && _strline.find("#1")==string::npos && _strline.find("#2")==string::npos && _strline.find("#3")==string::npos // avoid space groups
           && _strline.find("#4")==string::npos && _strline.find("#5")==string::npos && _strline.find("#6")==string::npos // avoid space groups
@@ -4512,13 +4650,13 @@ namespace aurostd {
   bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN) {
     //  if(LDEBUG) cerr << "bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN)" << endl;
     for(uint i=0;i<vstrstream.size();i++)
-      if(aurostd::substring2bool(vstrstream.at(i),strsub1,CLEAN)) return TRUE;
+      if(aurostd::substring2bool(vstrstream[i],strsub1,CLEAN)) return TRUE;
     return FALSE;
   }
   bool substring2bool(const deque<string>& vstrstream, const string& strsub1, bool CLEAN) {
     //  if(LDEBUG) cerr << "bool substring2bool(const deque<string>& vstrstream, const string& strsub1, bool CLEAN)" << endl;
     for(uint i=0;i<vstrstream.size();i++)
-      if(aurostd::substring2bool(vstrstream.at(i),strsub1,CLEAN)) return TRUE;
+      if(aurostd::substring2bool(vstrstream[i],strsub1,CLEAN)) return TRUE;
     return FALSE;
   }
 
@@ -4535,13 +4673,13 @@ namespace aurostd {
   bool substring2bool(const vector<string>& vstrstream, const string& strsub1) {
     //  if(LDEBUG) cerr << "bool substring2bool(const vector<string>& vstrstream, const string& strsub1)" << endl;
     for(uint i=0;i<vstrstream.size();i++)
-      if(aurostd::substring2bool(vstrstream.at(i),strsub1)) return TRUE;
+      if(aurostd::substring2bool(vstrstream[i],strsub1)) return TRUE;
     return FALSE;
   }
   bool substring2bool(const deque<string>& vstrstream, const string& strsub1) {
     //  if(LDEBUG) cerr << "bool substring2bool(const deque<string>& vstrstream, const string& strsub1)" << endl;
     for(uint i=0;i<vstrstream.size();i++)
-      if(aurostd::substring2bool(vstrstream.at(i),strsub1)) return TRUE;
+      if(aurostd::substring2bool(vstrstream[i],strsub1)) return TRUE;
     return FALSE;
   }
 
@@ -4559,27 +4697,27 @@ namespace aurostd {
     return (bool) substring_present_file_FAST(FileName,strsub1,FALSE);
   }
 
-  bool withinList(const vector<string>& list,const string& input) { //CO20181010
+  bool WithinList(const vector<string>& list,const string& input) { //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
     int index;
-    return withinList(list, input, index);
+    return WithinList(list, input, index);
   }
-  bool withinList(const vector<int>& list,int input) {  //CO20181010
+  bool WithinList(const vector<int>& list,int input) {  //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
     int index;
-    return withinList(list, input, index);
+    return WithinList(list, input, index);
   }
-  bool withinList(const vector<uint>& list,uint input) {  //CO20181010
+  bool WithinList(const vector<uint>& list,uint input) {  //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
     int index;
-    return withinList(list, input, index);
+    return WithinList(list, input, index);
   }
 
   //ME20190813 - added versions that also determine the index of the item in the list
-  bool withinList(const vector<string>& list, const string& input, int& index) {
+  bool WithinList(const vector<string>& list, const string& input, int& index) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input) {
         index = i;
@@ -4590,7 +4728,7 @@ namespace aurostd {
     return false;
   }
 
-  bool withinList(const vector<int>& list, int input, int& index) {
+  bool WithinList(const vector<int>& list, int input, int& index) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input) {
         index = i;
@@ -4601,7 +4739,7 @@ namespace aurostd {
     return false;
   }
 
-  bool withinList(const vector<uint>& list, uint input, int& index) {
+  bool WithinList(const vector<uint>& list, uint input, int& index) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(list[i]==input) {
         index = i;
@@ -4609,6 +4747,21 @@ namespace aurostd {
       }
     }
     index = -1;
+    return false;
+  }
+
+  bool EWithinList(const vector<string>& list,const string& input) { //CO20200223
+    string output="";
+    return EWithinList(list, input, output);
+  }
+  bool EWithinList(const vector<string>& list, const string& input, string& output) { //CO20200223
+    output="";
+    for (uint i = 0, nlist = list.size(); i < nlist; i++) {
+      if(list[i]==input){output=input;return true;}
+      if(list[i]==input+".xz"){output=input+".xz";return true;}
+      if(list[i]==input+".gz"){output=input+".gz";return true;}
+      if(list[i]==input+".bz2"){output=input+".bz2";return true;}
+    }
     return false;
   }
 
@@ -4675,7 +4828,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      _strline=tokens.at(i);
+      _strline=tokens[i];
       if(_strline.find(COMMENT_NEGLECT_1)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_1));
       if(_strline.find(COMMENT_NEGLECT_2)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_2));
       if(_strline.find(COMMENT_NEGLECT_3)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_3));
@@ -4703,7 +4856,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      _strline=tokens.at(i);
+      _strline=tokens[i];
       if(_strline.find(COMMENT_NEGLECT_1)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_1));
       if(_strline.find(COMMENT_NEGLECT_2)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_2));
       if(_strline.find(COMMENT_NEGLECT_3)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_3));
@@ -4754,7 +4907,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      _strline=tokens.at(i);
+      _strline=tokens[i];
       if(_strline.find(COMMENT_NEGLECT_1)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_1));
       if(_strline.find(COMMENT_NEGLECT_2)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_2));
       if(_strline.find(COMMENT_NEGLECT_3)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_3));
@@ -4780,7 +4933,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      _strline=tokens.at(i);
+      _strline=tokens[i];
       if(_strline.find(COMMENT_NEGLECT_1)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_1));
       if(_strline.find(COMMENT_NEGLECT_2)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_2));
       if(_strline.find(COMMENT_NEGLECT_3)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_3));
@@ -4805,7 +4958,7 @@ namespace aurostd {
     vintout.clear();
     vector<string> vstringout;
     uint i=aurostd::substring2strings(_strstream,vstringout,_strsub1,CLEAN);
-    for(i=0;i<vstringout.size();i++) vintout.push_back(string2utype<utype>(vstringout.at(i)));
+    for(i=0;i<vstringout.size();i++) vintout.push_back(string2utype<utype>(vstringout[i]));
     return vintout.size();
   }
   template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1) {
@@ -4816,7 +4969,7 @@ namespace aurostd {
     vintout.clear();
     vector<string> vstringout;
     uint i=aurostd::substring2strings(_strstream,vstringout,_strsub1,_strsub2,CLEAN);
-    for(i=0;i<vstringout.size();i++) vintout.push_back(string2utype<utype>(vstringout.at(i)));
+    for(i=0;i<vstringout.size();i++) vintout.push_back(string2utype<utype>(vstringout[i]));
     return vintout.size();
   }
   template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2) {
@@ -5155,14 +5308,14 @@ namespace aurostd {
     string soliloquy = "aurostd::dbl2frac()";
     stringstream message;
 
-    string out;
+    string out = ""; //DX20200427 - missing initialization
     bool neg = false;
     double tol = _ZERO_TOL_;
     if(a < 0) {
       neg = true;
       a = aurostd::abs(a);
     }
-    else if(aurostd::abs(a) < tol) {
+    if(aurostd::abs(a) < tol) { //DX20200427 - if not else if
       out = "0";
     }
     else if(aurostd::abs(a - .25) < tol) {
@@ -5211,8 +5364,9 @@ namespace aurostd {
       out = "11/12"; //DX20180726 - added
     } //DX20180726 - added
     else {
-      message << "Could not find hard-coded fraction for the double " << a << ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+      //DX20200427 [should not throw if not found, just return decimal] message << "Could not find hard-coded fraction for the double " << a << ".";
+      //DX20200427 [should not throw if not found, just return decimal] throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+      out = aurostd::utype2string<double>(a);
     }
     if(sign_prefix){
       if(neg == true) {
@@ -5226,6 +5380,60 @@ namespace aurostd {
   }
 } //namespace SYM
 
+// ******************************************************************************
+// dbl2frac Double to Fraction //DX20200313
+// ******************************************************************************
+namespace aurostd {
+  double frac2dbl(const string& str) {
+
+    // converts fraction to double
+
+    // --------------------------------------------------------------------------
+    // parse tokens
+    vector<string> tokens;
+    uint field_count = aurostd::string2tokens(str,tokens,"/");
+
+    // --------------------------------------------------------------------------
+    // expects two fields
+    if(field_count == 1){ // not slash
+      if(aurostd::isfloat(str)){ //DX20200424
+        return aurostd::string2utype<double>(str);
+      }
+      else{ //DX20200424
+        string function_name = "aurostd::frac2dbl():";
+        stringstream message; message << "The input is not a numeric: str = " << str;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+      }
+    }
+    else if(field_count != 2){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "Expect two fields, i.e., numerator and denominator: str = " << str;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
+    // --------------------------------------------------------------------------
+    // protect against non-numeric values //DX20200424
+    if(!aurostd::isfloat(tokens[0]) || !aurostd::isfloat(tokens[1])){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "The input is not a numeric: str = " << str;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
+    double numerator = aurostd::string2utype<double>(tokens[0]);
+    double denominator = aurostd::string2utype<double>(tokens[1]);
+    
+    // --------------------------------------------------------------------------
+    // protect against division by zero
+    if(aurostd::isequal(denominator,_ZERO_TOL_)){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "Denominator is zero: " << denominator;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
+    return numerator/denominator;
+  }
+}
+
 // ***************************************************************************
 // SORT WORLD
 // ----------------------------------------------------------------------------
@@ -5235,7 +5443,7 @@ namespace aurostd {
   template<class utype1> // function quicksort
     void sort(vector<utype1>& arr) {
       xvector<utype1> xarr(arr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr.at(i);
+      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
       //  aurostd::sort(xarr.rows,xarr);
       aurostd::sort(xarr);
       arr.clear();
@@ -5248,8 +5456,8 @@ namespace aurostd {
     void sort(vector<utype1>& arr, vector<utype2>& brr) {
       xvector<utype1> xarr(arr.size());
       xvector<utype2> xbrr(brr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr.at(i);
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr.at(i);
+      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
+      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
       aurostd::sort2(xarr.rows,xarr,xbrr);
       // aurostd::sort2(xarr,xbrr);
       arr.clear();brr.clear();
@@ -5264,9 +5472,9 @@ namespace aurostd {
       xvector<utype1> xarr(arr.size());
       xvector<utype2> xbrr(brr.size());
       xvector<utype3> xcrr(crr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr.at(i);
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr.at(i);
-      for(uint i=0;i<crr.size();i++) xcrr[i+1]=crr.at(i);
+      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
+      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
+      for(uint i=0;i<crr.size();i++) xcrr[i+1]=crr[i];
       aurostd::sort3(xarr.rows,xarr,xbrr,xcrr);
       // aurostd::sort3(xarr,xbrr,xcrr);
       arr.clear();brr.clear();crr.clear();
@@ -5283,10 +5491,10 @@ namespace aurostd {
       xvector<utype2> xbrr(brr.size());
       xvector<utype3> xcrr(crr.size());
       xvector<utype4> xdrr(drr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr.at(i);
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr.at(i);
-      for(uint i=0;i<crr.size();i++) xcrr[i+1]=crr.at(i);
-      for(uint i=0;i<drr.size();i++) xdrr[i+1]=drr.at(i);
+      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
+      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
+      for(uint i=0;i<crr.size();i++) xcrr[i+1]=crr[i];
+      for(uint i=0;i<drr.size();i++) xdrr[i+1]=drr[i];
       //    aurostd::sort4(xarr.rows,xarr,xbrr,xcrr,xdrr);
       aurostd::sort4(xarr,xbrr,xcrr,xdrr);
       arr.clear();brr.clear();crr.clear();drr.clear();
@@ -5343,15 +5551,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<string>& varg1,vector<int>& varg2) {
     vector<aurostd::_string_int_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_string_int_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
   void sort(deque<string>& varg1,deque<int>& varg2) {
     deque<aurostd::_string_int_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_string_int_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
 }
 
@@ -5360,15 +5568,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<string>& varg1,vector<double>& varg2) {
     vector<aurostd::_string_double_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_string_double_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
   void sort(deque<string>& varg1,deque<double>& varg2) {
     deque<aurostd::_string_double_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_string_double_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
 }
 
@@ -5377,15 +5585,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<string>& varg1,vector<string>& varg2) {
     vector<aurostd::_string_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_string_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
   void sort(deque<string>& varg1,deque<string>& varg2) {
     deque<aurostd::_string_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_string_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
 }
 
@@ -5397,15 +5605,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<double>& varg1,vector<int>& varg2) {
     vector<aurostd::_double_int_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_double_int_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
   void sort(deque<double>& varg1,deque<int>& varg2) {
     deque<aurostd::_double_int_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_double_int_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
 }
 
@@ -5414,15 +5622,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<double>& varg1,vector<double>& varg2) {
     vector<aurostd::_double_double_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_double_double_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
   void sort(deque<double>& varg1,deque<double>& varg2) {
     deque<aurostd::_double_double_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_double_double_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
 }
 
@@ -5431,15 +5639,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<double>& varg1,vector<string>& varg2) {
     vector<aurostd::_double_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_double_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
   void sort(deque<double>& varg1,deque<string>& varg2) {
     deque<aurostd::_double_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];}
     sort(vv.begin(),vv.end(),_sort_double_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;}
   }
 }
 
@@ -5448,15 +5656,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<string>& varg1,vector<int>& varg2,vector<string>& varg3) {
     vector<aurostd::_string_int_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];}
     sort(vv.begin(),vv.end(),_sort_string_int_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;}
   }
   void sort(deque<string>& varg1,deque<int>& varg2,deque<string>& varg3) {
     deque<aurostd::_string_int_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];}
     sort(vv.begin(),vv.end(),_sort_string_int_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;}
   }
 }
 
@@ -5465,15 +5673,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<string>& varg1,vector<double>& varg2,vector<string>& varg3) {
     vector<aurostd::_string_double_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];}
     sort(vv.begin(),vv.end(),_sort_string_double_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;}
   }
   void sort(deque<string>& varg1,deque<double>& varg2,deque<string>& varg3) {
     deque<aurostd::_string_double_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];}
     sort(vv.begin(),vv.end(),_sort_string_double_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;}
   }
 }
 
@@ -5482,15 +5690,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<string>& varg1,vector<string>& varg2,vector<string>& varg3) {
     vector<aurostd::_string_string_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];}
     sort(vv.begin(),vv.end(),_sort_string_string_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;}
   }
   void sort(deque<string>& varg1,deque<string>& varg2,deque<string>& varg3) {
     deque<aurostd::_string_string_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];}
     sort(vv.begin(),vv.end(),_sort_string_string_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;}
   }
 }
 
@@ -5499,15 +5707,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<string>& varg1,vector<string>& varg2,vector<double>& varg3,vector<string>& varg4) {
     vector<aurostd::_string_string_double_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);vv.at(i).arg4=varg4.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];vv[i].arg4=varg4[i];}
     sort(vv.begin(),vv.end(),_sort_string_string_double_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;varg4.at(i)=vv.at(i).arg4;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;varg4[i]=vv[i].arg4;}
   }
   void sort(deque<string>& varg1,deque<string>& varg2,deque<double>& varg3,deque<string>& varg4) {
     deque<aurostd::_string_string_double_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);vv.at(i).arg4=varg4.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];vv[i].arg4=varg4[i];}
     sort(vv.begin(),vv.end(),_sort_string_string_double_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;varg4.at(i)=vv.at(i).arg4;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;varg4[i]=vv[i].arg4;}
   }
 }
 
@@ -5516,15 +5724,15 @@ namespace aurostd {
 namespace aurostd {
   void sort(vector<string>& varg1,vector<string>& varg2,vector<double>& varg3,vector<double>& varg4,vector<string>& varg5) {
     vector<aurostd::_string_string_double_double_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);vv.at(i).arg4=varg4.at(i);vv.at(i).arg5=varg5.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];vv[i].arg4=varg4[i];vv[i].arg5=varg5[i];}
     sort(vv.begin(),vv.end(),_sort_string_string_double_double_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;varg4.at(i)=vv.at(i).arg4;varg5.at(i)=vv.at(i).arg5;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;varg4[i]=vv[i].arg4;varg5[i]=vv[i].arg5;}
   }
   void sort(deque<string>& varg1,deque<string>& varg2,deque<double>& varg3,deque<double>& varg4,deque<string>& varg5) {
     deque<aurostd::_string_string_double_double_string_> vv(varg1.size());
-    for(uint i=0;i<varg1.size();i++) {vv.at(i).arg1=varg1.at(i);vv.at(i).arg2=varg2.at(i);vv.at(i).arg3=varg3.at(i);vv.at(i).arg4=varg4.at(i);vv.at(i).arg5=varg5.at(i);}
+    for(uint i=0;i<varg1.size();i++) {vv[i].arg1=varg1[i];vv[i].arg2=varg2[i];vv[i].arg3=varg3[i];vv[i].arg4=varg4[i];vv[i].arg5=varg5[i];}
     sort(vv.begin(),vv.end(),_sort_string_string_double_double_string_());
-    for(uint i=0;i<varg1.size();i++) {varg1.at(i)=vv.at(i).arg1;varg2.at(i)=vv.at(i).arg2;varg3.at(i)=vv.at(i).arg3;varg4.at(i)=vv.at(i).arg4;varg5.at(i)=vv.at(i).arg5;}
+    for(uint i=0;i<varg1.size();i++) {varg1[i]=vv[i].arg1;varg2[i]=vv[i].arg2;varg3[i]=vv[i].arg3;varg4[i]=vv[i].arg4;varg5[i]=vv[i].arg5;}
   }
 }
 
@@ -5549,7 +5757,7 @@ namespace aurostd  {
     //change value in the first column (usually menas energy in DOS)
     vector<vector<double> > vvb=vva;
     for (uint i=0; i<vvb.size(); i++) {
-      vvb.at(i).at(0)=vvb.at(i).at(0) - value;
+      vvb[i].at(0)=vvb[i].at(0) - value;
     }
     return vvb;
   }
@@ -5563,8 +5771,8 @@ namespace aurostd  {
     //shrink Fis (usually means DOS Fis in DOS); Fi means probability
     vector<vector<double> > vvb=vva;
     for (uint i=0; i<vvb.size(); i++) {
-      for (uint j=1; j<vvb.at(i).size();j++) {
-        vvb.at(i).at(j)*=Fi;
+      for (uint j=1; j<vvb[i].size();j++) {
+        vvb[i][j]*=Fi;
       }
     }
     return vvb;
@@ -5582,8 +5790,8 @@ namespace aurostd  {
     vector<vector<vector<double> > > vvvc;
     double Fi;
     for (uint i=0; i<vvva.size();i++) {
-      vv_tmp=vvva.at(i);
-      Fi=vFi.at(i);
+      vv_tmp=vvva[i];
+      Fi=vFi[i];
       vv_tmp_shrinked=aurostd::ShrinkValuesExceptFirstColumn(vv_tmp, Fi);
       vvvc.push_back(vv_tmp_shrinked);
     }
@@ -5601,7 +5809,7 @@ namespace aurostd  {
     vector<vector<double> > vvtmp, vv_sum; 
     vv_sum=vvva.at(0);
     for (uint i=1; i<vvva.size();i++) {
-      vvtmp=vvva.at(i);
+      vvtmp=vvva[i];
       vv_sum=aurostd::Sum2DVectorExceptFirstColumn(vv_sum, vvtmp);
     }
     return vv_sum;
@@ -5617,13 +5825,13 @@ namespace aurostd  {
 
     vector<vector<double> > vv_sum; vv_sum.resize(vva.size());
     for (uint i=0; i<vva.size(); i++) {
-      int N=vva.at(i).size();
-      vv_sum.at(i).resize(N);
+      int N=vva[i].size();
+      vv_sum[i].resize(N);
     }
 
     for (uint i=0; i<vva.size();i++) {
-      vv_sum[i][0]=vva.at(i).at(0);
-      for (uint j=1; j<vva.at(i).size();j++) {
+      vv_sum[i][0]=vva[i].at(0);
+      for (uint j=1; j<vva[i].size();j++) {
         vv_sum[i][j]=vva[i][j] + vvb[i][j];
       }
     }
@@ -5641,8 +5849,8 @@ namespace aurostd  {
     vector<double> vtmp;
     for (uint i=0; i<vva.size();i++) {
       vtmp.clear();
-      vtmp.push_back(vva.at(i).at(0));
-      vtmp.push_back(vva.at(i).at(n));
+      vtmp.push_back(vva[i].at(0));
+      vtmp.push_back(vva[i].at(n));
       vvb.push_back(vtmp);
     }
     return vvb;
@@ -5694,8 +5902,8 @@ namespace aurostd  {
     double area_tmp =0.0;
     double xbeg, xend, ybeg, yend;
     for (uint i=0; i<vva.size()-1;i++) {
-      xbeg=vva.at(i).at(0); xend=vva.at(i+1).at(0);
-      ybeg=vva.at(i).at(1); yend=vva.at(i+1).at(1);
+      xbeg=vva[i].at(0); xend=vva.at(i+1).at(0);
+      ybeg=vva[i].at(1); yend=vva.at(i+1).at(1);
       if(xbeg >= Emin && xend <= Emax) {
         area_tmp=0.5*(ybeg + yend)*(xend - xbeg);
         integral_result += area_tmp;
@@ -5713,8 +5921,8 @@ namespace aurostd  {
     stringstream ss_vva; ss_vva.str(std::string());
     ss_vva << std::scientific;
     for (uint i=0; i<vva.size();i++) {
-      for (uint j=0; j<vva.at(i).size();j++) {
-        ss_vva << vva.at(i).at(j) << "   ";
+      for (uint j=0; j<vva[i].size();j++) {
+        ss_vva << vva[i][j] << "   ";
       }
       ss_vva << endl;
     }
@@ -5764,10 +5972,10 @@ namespace aurostd  {
   double FindMaxIn2DvectorExcept1stColumn(const vector<vector<double> >& vva, const double& min, const double& max) {
     double max_value=0.0;
     for (uint i=0; i<vva.size();i++) {
-      double E_tmp=vva.at(i).at(0);
+      double E_tmp=vva[i].at(0);
       if(E_tmp >= min && E_tmp <= max) {
-        for (uint j=1; j<vva.at(i).size();j++) {
-          double db_tmp=vva.at(i).at(j);
+        for (uint j=1; j<vva[i].size();j++) {
+          double db_tmp=vva[i][j];
           if(abs(db_tmp) > max_value) max_value=abs(db_tmp);
         }
       }
@@ -5783,13 +5991,13 @@ namespace aurostd  {
   double FindMaxInTDOS(const vector<vector<double> >& vva, const double& min, const double& max) {
     double max_value=0.0;
     for (uint i=0; i<vva.size();i++) {
-      double E_tmp=vva.at(i).at(0);
+      double E_tmp=vva[i].at(0);
       if(E_tmp >= min && E_tmp <= max) {
         int column_max=0; // some default
         if(vva.at(0).size()==3) column_max=2; //get rid of the sum of TDOS
         if(vva.at(0).size()==5) column_max=3;
         for (int j=1; j<column_max;j++) {
-          double db_tmp=vva.at(i).at(j);
+          double db_tmp=vva[i][j];
           if(abs(db_tmp) > max_value) max_value=db_tmp;
         }
       }
@@ -5922,7 +6130,7 @@ namespace aurostd {
 
     if (ientries.size() > 2) {
       for (uint i = 0; i < ientries.size(); i++) {
-        output << ientries.at(i);
+        output << ientries[i];
         if (i == ientries.size() - 2) {
           output << lDelim;
         } else if (i != ientries.size() - 1) {
@@ -5931,7 +6139,7 @@ namespace aurostd {
       }
     } else {
       for (uint i = 0; i < ientries.size(); i++) {
-        output << ientries.at(i);
+        output << ientries[i];
         if (i == ientries.size() - 2) {
           output << mDelim;
         } else if (i != ientries.size() - 1) {
@@ -5987,7 +6195,7 @@ namespace aurostd {
     string lDelim = l_delimiter.str();
     if (uientries.size() > 2) {
       for (uint i = 0; i < uientries.size(); i++) {
-        output << uientries.at(i);
+        output << uientries[i];
         if (i == uientries.size() - 2) {
           output << lDelim;
         } else if (i != uientries.size() - 1) {
@@ -5996,7 +6204,7 @@ namespace aurostd {
       }
     } else {
       for (uint i = 0; i < uientries.size(); i++) {
-        output << uientries.at(i);
+        output << uientries[i];
         if (i == uientries.size() - 2) {
           output << mDelim;
         } else if (i != uientries.size() - 1) {
@@ -6063,13 +6271,13 @@ namespace aurostd {
     string lDelim = l_delimiter.str();
     // go through once to eliminate empty strings
     for (uint i = 0; i < _sentries.size(); i++) {
-      if (_sentries.at(i).length()) {
-        sentries.push_back(_sentries.at(i));
+      if (_sentries[i].length()) {
+        sentries.push_back(_sentries[i]);
       }
     }
     if (sentries.size() > 2) {
       for (uint i = 0; i < sentries.size(); i++) {
-        output << sentries.at(i);
+        output << sentries[i];
         if (i == sentries.size() - 2) {
           output << lDelim;
         } else if (i != sentries.size() - 1) {
@@ -6078,7 +6286,7 @@ namespace aurostd {
       }
     } else {
       for (uint i = 0; i < sentries.size(); i++) {
-        output << sentries.at(i);
+        output << sentries[i];
         if (i == sentries.size() - 2) {
           output << mDelim;
         } else if (i != sentries.size() - 1) {
@@ -6146,7 +6354,7 @@ namespace aurostd {
     string lDelim = l_delimiter.str();
     if (ientries.size() > 2) {
       for (uint i = 0; i < ientries.size(); i++) {
-        output << ientries.at(i);
+        output << ientries[i];
         if (i == ientries.size() - 2) {
           output << lDelim;
         } else if (i != ientries.size() - 1) {
@@ -6155,7 +6363,7 @@ namespace aurostd {
       }
     } else {
       for (uint i = 0; i < ientries.size(); i++) {
-        output << ientries.at(i);
+        output << ientries[i];
         if (i == ientries.size() - 2) {
           output << mDelim;
         } else if (i != ientries.size() - 1) {
@@ -6211,7 +6419,7 @@ namespace aurostd {
     string lDelim = l_delimiter.str();
     if (uientries.size() > 2) {
       for (uint i = 0; i < uientries.size(); i++) {
-        output << uientries.at(i);
+        output << uientries[i];
         if (i == uientries.size() - 2) {
           output << lDelim;
         } else if (i != uientries.size() - 1) {
@@ -6220,7 +6428,7 @@ namespace aurostd {
       }
     } else {
       for (uint i = 0; i < uientries.size(); i++) {
-        output << uientries.at(i);
+        output << uientries[i];
         if (i == uientries.size() - 2) {
           output << mDelim;
         } else if (i != uientries.size() - 1) {
@@ -6287,15 +6495,15 @@ namespace aurostd {
     string lDelim = l_delimiter.str();
     // go through once to eliminate empty strings
     for (uint i = 0; i < _sentries.size(); i++)
-      //DX - Should not be an "!"; we want it to push back if it has a length [OBSOLETE] if (!_sentries.at(i).length())
+      //DX - Should not be an "!"; we want it to push back if it has a length [OBSOLETE] if (!_sentries[i].length())
     { //CO20200106 - patching for auto-indenting
-      if (_sentries.at(i).length()) {
-        sentries.push_back(_sentries.at(i));
+      if (_sentries[i].length()) {
+        sentries.push_back(_sentries[i]);
       }
     }
     if (sentries.size() > 2) {
       for (uint i = 0; i < sentries.size(); i++) {
-        output << sentries.at(i);
+        output << sentries[i];
         if (i == sentries.size() - 2) {
           output << lDelim;
         } else if (i != sentries.size() - 1) {
@@ -6304,7 +6512,7 @@ namespace aurostd {
       }
     } else {
       for (uint i = 0; i < sentries.size(); i++) {
-        output << sentries.at(i);
+        output << sentries[i];
         if (i == sentries.size() - 2) {
           output << mDelim;
         } else if (i != sentries.size() - 1) {
@@ -6399,7 +6607,7 @@ namespace aurostd {
   // [OBSOLETE] vector<string> vecDouble2vecString(const vector<double>& vin, bool roff) {
   // [OBSOLETE]   vector<string> vout;
   // [OBSOLETE]   for(uint i=0;i<vin.size();i++){
-  // [OBSOLETE]     double tmp = vin.at(i); //DX20170822 - add roundoff
+  // [OBSOLETE]     double tmp = vin[i]; //DX20170822 - add roundoff
   // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } //DX20170822 - add roundoff
   // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); //DX20170822 - add roundoff
   // [OBSOLETE]   }
@@ -6408,7 +6616,7 @@ namespace aurostd {
   vector<string> vecDouble2vecString(const vector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
     vector<string> vout;
     for(uint i=0;i<vin.size();i++){
-      //double tmp = vin.at(i); //DX20170822 - add roundoff
+      //double tmp = vin[i]; //DX20170822 - add roundoff
       //if(roff){ tmp=roundoff(tmp,tol); } //DX20170822 - add roundoff
       vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); //DX20170822 - add roundoff
     }
@@ -6435,7 +6643,7 @@ namespace aurostd {
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff) {
   // [OBSOLETE]   deque<string> vout;
   // [OBSOLETE]   for(uint i=0;i<vin.size();i++){
-  // [OBSOLETE]     double tmp = vin.at(i); //DX20170822 - add roundoff
+  // [OBSOLETE]     double tmp = vin[i]; //DX20170822 - add roundoff
   // [OBSOLETE]     if(roff){ tmp=scalar_roundoff(tmp,1e-8); } //DX20170822 - add roundoff
   // [OBSOLETE]     vout.push_back(aurostd::utype2string(tmp)); //DX20170822 - add roundoff
   // [OBSOLETE]   }
@@ -6445,7 +6653,7 @@ namespace aurostd {
   deque<string> vecDouble2vecString(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) { //SC20200330
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
-      //double tmp = vin.at(i); //DX20170822 - add roundoff
+      //double tmp = vin[i]; //DX20170822 - add roundoff
       //if(roff){ tmp=roundoff(tmp,tol); } //DX20170822 - add roundoff
       vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); //DX20170822 - add roundoff
     }
@@ -6466,8 +6674,8 @@ namespace aurostd {
   vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end){
     vector<string> vout;
     for(uint i=0;i<vin.size();i++){
-      if(vin.at(i).length()){
-        vout.push_back(wrap_start+vin.at(i)+wrap_end);
+      if(vin[i].length()){
+        vout.push_back(wrap_start+vin[i]+wrap_end);
       }
     }
     return vout;
@@ -6478,8 +6686,8 @@ namespace aurostd {
   deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end){
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
-      if(vin.at(i).length()){
-        vout.push_back(wrap_start+vin.at(i)+wrap_end);
+      if(vin[i].length()){
+        vout.push_back(wrap_start+vin[i]+wrap_end);
       }
     }
     return vout;
@@ -6647,4 +6855,3 @@ namespace aurostd {
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
-

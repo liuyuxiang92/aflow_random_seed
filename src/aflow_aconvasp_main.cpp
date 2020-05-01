@@ -386,6 +386,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPECIES","--species=|--alloy=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::PROPERTY_LIST","--properties=|--property_list=|--property=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE","--geometry_file=|--file=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::RELAXATION_STEP","--relaxation_step=|--relaxation=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::CATALOG","--catalog=|--library=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::STOICHIOMETRY","--stoichiometry=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPACE_GROUP","--space_group=","");
@@ -506,6 +507,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::NP","--np=|--num_proc=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::PROPERTY_LIST","--properties=|--property_list=|--property=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::GEOMETRY_FILE","--geometry_file=|--file=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::RELAXATION_STEP","--relaxation_step=|--relaxation=","");
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2DATABASE::CATALOG","--catalog=|--library=","");
     vpflow.flag("COMPARE2DATABASE::PRINT",aurostd::args2flag(argv,cmds,"--print"));
     vpflow.flag("COMPARE2DATABASE::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); //DX20170803
@@ -932,12 +934,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW","--aflow_proto=|--aflow_proto_icsd=","");      // --aflow_proto=123:A:B:C  --aflow_proto_icsd=Gd1Mn2Si2_ICSD_54947 
   if(vpflow.flag("PROTO")||vpflow.flag("PROTO_AFLOW")) {  //CO20180622 - set these flags if structure is downloaded from web
-    vpflow.flag("PROTO::VASP",aurostd::args2flag(argv,cmds,"--vasp") || (!aurostd::args2flag(argv,cmds,"--qe") && !aurostd::args2flag(argv,cmds,"--abinit") && !aurostd::args2flag(argv,cmds,"--aims")  && !aurostd::args2flag(argv,cmds,"--cif"))); //DX20190131
+    vpflow.flag("PROTO::VASP",aurostd::args2flag(argv,cmds,"--vasp") || (!aurostd::args2flag(argv,cmds,"--qe") && !aurostd::args2flag(argv,cmds,"--abinit") && !aurostd::args2flag(argv,cmds,"--aims")  && !aurostd::args2flag(argv,cmds,"--cif") && !aurostd::args2flag(argv,cmds,"--elk"))); //DX20190131 //DX20200313 - added elk
     vpflow.flag("PROTO::QE",aurostd::args2flag(argv,cmds,"--qe"));
     vpflow.flag("PROTO::ABCCAR",aurostd::args2flag(argv,cmds,"--abccar")); //DX20190123 - add abccar output
     vpflow.flag("PROTO::ABINIT",aurostd::args2flag(argv,cmds,"--abinit"));
     vpflow.flag("PROTO::AIMS",aurostd::args2flag(argv,cmds,"--aims"));
     vpflow.flag("PROTO::CIF",aurostd::args2flag(argv,cmds,"--cif")); //DX20190123 - add cif output
+    vpflow.flag("PROTO::ELK",aurostd::args2flag(argv,cmds,"--elk")); //DX20200313 - add elk output
     vpflow.flag("PROTO::HEX",aurostd::args2flag(argv,cmds,"--hex"));
     vpflow.flag("PROTO::RHL",aurostd::args2flag(argv,cmds,"--rhl"));
     vpflow.flag("PROTO::ADD_EQUATIONS",aurostd::args2flag(argv,cmds,"--add_equations")); //DX20180615 - add equation info
@@ -1010,6 +1013,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::KSCHEME_STATIC")) vlist+="--kscheme_static="+vpflow.getattachedscheme("PROTO_AFLOW::KSCHEME_STATIC")+" ";   // recursion is GNU's pleasure (SC2017)  //CO20181226
 
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::KPPRA","--kppra=|--KPPRA=","");
+    if(vpflow.flag("PROTO_AFLOW::KPPRA") && vpflow.flag("KPOINTS")){vpflow.flag("KPOINTS",FALSE);}  //CO20200223 - --kppra collision
     if(vpflow.flag("PROTO_AFLOW::KPPRA")) vlist+="--kppra="+vpflow.getattachedscheme("PROTO_AFLOW::KPPRA")+" ";   // recursion is GNU's pleasure (SC2017)
     vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW::KPPRA_STATIC","--kppra_static=|--KPPRA_STATIC=","");
     if(vpflow.flag("PROTO_AFLOW::KPPRA_STATIC")) vlist+="--kppra_static="+vpflow.getattachedscheme("PROTO_AFLOW::KPPRA_STATIC")+" ";   // recursion is GNU's pleasure (SC2017)
@@ -1048,6 +1052,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::AIMS")) vlist+="--aims ";                                                   // recursion is GNU's pleasure (SC2016)
     vpflow.flag("PROTO_AFLOW::CIF",aurostd::args2flag(argv,cmds,"--cif"));  //DX20190131                                                                           //DX20190123 - added CIF
     if(vpflow.flag("PROTO_AFLOW::CIF")) vlist+="--cif ";  //DX20190131                                                    // recursion is GNU's pleasure (SC2016)  //DX20190123 - added CIF
+    vpflow.flag("PROTO_AFLOW::ELK",aurostd::args2flag(argv,cmds,"--elk"));                                                                           //DX2020031 - added ELK3
+    if(vpflow.flag("PROTO_AFLOW::ELK")) vlist+="--elk ";                                                     // recursion is GNU's pleasure (SC2016) //DX20200313 - added ELK
     vpflow.flag("PROTO_AFLOW::HEX",aurostd::args2flag(argv,cmds,"--hex"));
     if(vpflow.flag("PROTO_AFLOW::HEX")) vlist+="--hex ";                                                     // recursion is GNU's pleasure (SC2016)
     vpflow.flag("PROTO_AFLOW::RHL",aurostd::args2flag(argv,cmds,"--rhl"));
@@ -1065,6 +1071,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("ABINIT",FALSE);    // PRIORITIES
     vpflow.flag("AIMS",FALSE);      // PRIORITIES
     vpflow.flag("CIF",FALSE);       // PRIORITIES //DX20190123 - add CIF
+    vpflow.flag("ELK",FALSE);       // PRIORITIES //DX20200313 - add ELK
   }  
 
   // [OBSOLETE]  vpflow.flag("PROTOCLASSIFY",aurostd::args2flag(argv,cmds,"--protoclassify|--PROTOCLASSIFY"));
@@ -1088,6 +1095,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("ABCCAR",aurostd::args2flag(argv,cmds,"--abccar") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20190123 - moved ABCCAR to here
   vpflow.flag("ABINIT",aurostd::args2flag(argv,cmds,"--abinit") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("AIMS",aurostd::args2flag(argv,cmds,"--aims") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
+  vpflow.flag("ELK",aurostd::args2flag(argv,cmds,"--elk") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20200313
 
   //DX20190123 - CIF to work with PROTO - START 
   vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif") && (vpflow.flag("PROTO_AFLOW") || vpflow.flag("PROTO"))); //DX20190123 - to differentiate between proto and istream 
@@ -1522,26 +1530,26 @@ namespace pflow {
       //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX20190425 START
-      if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << pflow::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << compare::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){
         if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST").empty()) {
           //vector<string> vinput;
           //if(aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),vinput,",")==2){cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
           //else {cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
-          cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;
+          cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;
         } //CO20200106 - patching for auto-indenting
-        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty()) {cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
-        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty()) {cout << pflow::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
+        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
+        if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty()) {cout << compare::compareMultipleStructures(vpflow); _PROGRAMRUN=true;}
       }
       //DX20190425 END
-      if(vpflow.flag("COMPARE_PERMUTATION")) {cout << pflow::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
+      if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA
       //DX+CO START
       if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
       //DX+CO END
       if(vpflow.flag("STRUCTURE2ANRL")) {cout << anrl::structure2anrl(cin,vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("COMPARE2PROTOTYPES")) {cout << pflow::printMatchingPrototypes(cin,vpflow); _PROGRAMRUN=true;} //DX20190314
-      if(vpflow.flag("COMPARE2DATABASE")) {cout << pflow::compare2database(cin, vpflow); _PROGRAMRUN=true;} //DX20190201
+      if(vpflow.flag("COMPARE2PROTOTYPES")) {cout << compare::printMatchingPrototypes(cin,vpflow); _PROGRAMRUN=true;} //DX20190314
+      if(vpflow.flag("COMPARE2DATABASE")) {cout << compare::printCompare2Database(cin, vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY")) {pflow::GeneralizedStackingFaultEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO20190520
       if(vpflow.flag("PREPARE_CHGCAR_4_JMOL")) {cout << bader_functions::prepare_CHGCAR_4_Jmol(vpflow); _PROGRAMRUN=true;}
       //DX
@@ -1555,7 +1563,7 @@ namespace pflow {
       //[CO20181226 - OBSOLETE]if(vpflow.flag("HNFTOL")) {pflow::HNFTOL(argv,cin,cout); _PROGRAMRUN=true;}
       if(vpflow.flag("ICSD_MAKELABEL")) {pflow::ICSD(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
-      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",16.0),vpflow.flag("WWW")); _PROGRAMRUN=true;}
+      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),vpflow.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
       //ME20191001 START
       if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
@@ -1661,6 +1669,7 @@ namespace pflow {
       //  if(vpflow.flag("EFFECTIVEMASS")) {pflow::EffectiveMass(argv,aurostd::args2string(argv,"--em","./"),cout); _PROGRAMRUN=true;}
       if(vpflow.flag("EIGCURV")) {pflow::EIGCURV(vpflow.getattachedscheme("EIGCURV"),cout) ; _PROGRAMRUN=true ;} // CAMILO
       //DX20170818 [OBSOLETE] if(vpflow.flag("EQUIVALENT")) {cout << pflow::EQUIVALENT(aflags,cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("ELK")) {cout << input2ELKxstr(cin); _PROGRAMRUN=true;} //DX20200313
       if(vpflow.flag("EQUIVALENT")) {cout << pflow::EQUIVALENT(aflags,cin,vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("EWALD")) {pflow::EWALD(vpflow.getattachedscheme("EWALD"),cin); _PROGRAMRUN=true;}
       // F
@@ -1726,7 +1735,7 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(cin,aurostd::args2utype(argv,"--inflate_volume|--ivolume",1.0)); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(vpflow.getattachedscheme("INFLATE_LATTICE"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(vpflow.getattachedscheme("INFLATE_VOLUME"),cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << pflow::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX20200131
+      if(vpflow.flag("ISOPOINTAL_PROTOTYPES")) {cout << compare::isopointalPrototypes(cin, vpflow) << endl; _PROGRAMRUN=true;} //DX20200131
       // L
       if(vpflow.flag("LATTICEREDUCTION")) {cout << pflow::LATTICEREDUCTION(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("LATTICE_TYPE")) {cout << pflow::LATTICE_TYPE(cin); _PROGRAMRUN=true;}
@@ -1986,7 +1995,7 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(argv,1,cin); _PROGRAMRUN=true;}
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNF")) {pflow::HNF(argv,cin,cout); _PROGRAMRUN=true;}
       //[CO20181226 OBSOLETE]if(vpflow.flag("HNFTOL")) {pflow::HNFTOL(argv,cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",16.0),vpflow.flag("WWW")); _PROGRAMRUN=true;}
+      if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",-1),vpflow.flag("WWW")); _PROGRAMRUN=true;} //CO20200329 - default value -1 so we can decide grid automatically
       // [OBSOLETE] if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(cin,aurostd::args2utype(argv,"--inflate_lattice|--ilattice",1.0)); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(cin,aurostd::args2utype(argv,"--inflate_volume|--ivolume",1.0)); _PROGRAMRUN=true;}
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
@@ -4795,8 +4804,8 @@ namespace pflow {
     if(LDEBUG) oss << soliloquy << "SUCCESSFULLY READ " << chgcar2_file << endl;
 
     // check formats
-    pflow::matrix<double> lat1=pflow::GetLat(structure1);
-    pflow::matrix<double> lat2=pflow::GetLat(structure2);
+    aurostd::matrix<double> lat1=pflow::GetLat(structure1);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> lat2=pflow::GetLat(structure2);  //CO20200404 pflow::matrix()->aurostd::matrix()
     if(LDEBUG) oss << soliloquy << "CHECK IF FORMATS OF CHGCARS MATCH" << endl;
     if(format_dim1!=format_dim2) {
       oss << endl;
@@ -4855,8 +4864,8 @@ namespace pflow {
     vector<double> chg_diff;
     pflow::ReadChg(str,ngrid,chg_tot,chg_diff,chgfile);
     // Integrate charge
-    vector<pflow::matrix<double> > rad_chg_int;
-    pflow::matrix<double> vor_chg_int;
+    vector<aurostd::matrix<double> > rad_chg_int;  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> vor_chg_int; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetChgInt(rad_chg_int,vor_chg_int,str,ngrid,chg_tot,chg_diff);
     // Print results
     pflow::PrintChgInt(rad_chg_int,vor_chg_int,cout);
@@ -5038,7 +5047,7 @@ namespace pflow {
     vector<int> ngrid1(3),ngrid2(3),format_dim1,format_dim2;
     vector<double> chg_tot1,chg_tot2;
     vector<double> chg_diff1,chg_diff2;
-    pflow::matrix<double> lat1,lat2;
+    aurostd::matrix<double> lat1,lat2; //CO20200404 pflow::matrix()->aurostd::matrix()
 
     if(LDEBUG) oss << soliloquy << "CHECK " << chgcar_files.at(0) << endl;
     aurostd::efile2stringstream(chgcar_files.at(0),chgcar_ss);
@@ -8063,8 +8072,18 @@ namespace pflow {
 // pflow::KPATH
 // ***************************************************************************
 namespace pflow {
+  void KPATH(istream& input,bool WWW) { //CO20200329
+    xstructure str_in(input,IOAFLOW_AUTO);
+    double grid=DEFAULT_BANDS_GRID;
+    if(str_in.num_each_type.size()==1){grid=DEFAULT_UNARY_BANDS_GRID;}
+    return KPATH(input,grid,WWW);
+  }
   void KPATH(istream& input,double grid,bool WWW) {
     xstructure str_in(input,IOAFLOW_AUTO);
+    if(std::signbit(grid)){ //CO20200329
+      grid=DEFAULT_BANDS_GRID;
+      if(str_in.num_each_type.size()==1){grid=DEFAULT_UNARY_BANDS_GRID;}
+    }
     xstructure str_sp,str_sc;
     //DX20170829 [OBSOLETE] LATTICE::Standard_Lattice_StructureDefault(str_in,str_sp,str_sc);
     bool full_sym=false; //DX20170829 - Speed increase
@@ -8393,7 +8412,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
@@ -8426,7 +8445,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8472,15 +8491,10 @@ namespace pflow {
         message << "Loading entries from COMMON";
         pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       } else {
-        if(server == "materials.duke.edu") {
-          message << "Using materials.duke.edu as server";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-        } else if(server == "aflowlib.duke.edu") {
-          message << "Using aflowlib.duke.edu as server";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        if((server==AFLOW_MATERIALS_SERVER_DEFAULT)||(server==AFLOWLIB_SERVER_DEFAULT)){
+          message << "Using " << server << " as server";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         } else {
-          message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          message << "Server must be either " << AFLOW_MATERIALS_SERVER_DEFAULT << " or " << AFLOWLIB_SERVER_DEFAULT;pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;  //entries;
         }
       }
@@ -8631,7 +8645,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
@@ -8666,7 +8680,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8707,7 +8721,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
@@ -8740,7 +8754,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8885,7 +8899,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(LIB, elements, server, entries, FileMESSAGE, oss);
   }
@@ -8920,7 +8934,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
@@ -8962,7 +8976,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8999,7 +9013,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9043,7 +9057,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(LIB, elements, server, entries, FileMESSAGE, oss);
   }
@@ -9078,7 +9092,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
@@ -9120,7 +9134,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9157,7 +9171,7 @@ namespace pflow {
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
     } else {
-      server = "aflowlib.duke.edu";
+      server = AFLOWLIB_SERVER_DEFAULT;
     }
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9244,19 +9258,13 @@ namespace pflow {
       }
     }
     if(!load_from_common) {
-      if(server == "materials.duke.edu") {
+      if((server == AFLOW_MATERIALS_SERVER_DEFAULT)||(server==AFLOWLIB_SERVER_DEFAULT)) {
         if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
-          message << "Using materials.duke.edu as server";
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-        }
-      } else if(server == "aflowlib.duke.edu") {
-        if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
-          message << "Using aflowlib.duke.edu as server";
+          message << "Using " << server << " as server";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         }
       } else {
-        message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        message << "Server must be either " << AFLOW_MATERIALS_SERVER_DEFAULT << " or " << AFLOWLIB_SERVER_DEFAULT;pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         return false;  //entries;
       }
       if(isICSD) {
@@ -9737,9 +9745,14 @@ namespace pflow {
   // loads xstructures
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ostream& oss, bool relaxed_only, string path, bool is_url_path) {
     ofstream FileMESSAGE;
-    return loadXstructures(entry,FileMESSAGE,oss,relaxed_only,path,is_url_path);
+    vector<string> structure_files; //DX20200224
+    return loadXstructures(entry,structure_files,FileMESSAGE,oss,relaxed_only,path,is_url_path); //DX20200224
   }
-  bool loadXstructures(aflowlib::_aflowlib_entry& entry, ofstream& FileMESSAGE, ostream& oss, bool relaxed_only, string path, bool is_url_path) {
+  bool loadXstructures(aflowlib::_aflowlib_entry& entry, ofstream& FileMESSAGE, ostream& oss, bool relaxed_only, string path, bool is_url_path) { //DX20200224
+    vector<string> structure_files; //DX20200224
+    return loadXstructures(entry,structure_files,FileMESSAGE,oss,relaxed_only,path,is_url_path); //DX20200224
+  }
+  bool loadXstructures(aflowlib::_aflowlib_entry& entry, vector<string>& structure_files, ofstream& FileMESSAGE, ostream& oss, bool relaxed_only, string path, bool is_url_path) { //DX20200224 - added structure_files as input
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = "pflow::loadXstructures():";
     stringstream message;
@@ -9760,148 +9773,135 @@ namespace pflow {
     stringstream ss;
     vector<string> files;
     if(LDEBUG) {cerr << soliloquy << " path=" << path << endl;}
+
     if(is_url_path){aurostd::url2tokens(path + "/?files", files, ",");}
     else {aurostd::DirectoryLS(path,files);}
-    if((!aurostd::substring2bool(files, "POSCAR.relax1") &&
-          !aurostd::substring2bool(files, "POSCAR.orig") && !relaxed_only) ||
-        (!aurostd::substring2bool(files, "POSCAR.relax2") &&
-         !aurostd::substring2bool(files, "CONTCAR.relax1") && !relaxed_only) ||
-        (!aurostd::substring2bool(files, "CONTCAR.relax") &&
-         !aurostd::substring2bool(files, "CONTCAR.relax2"))) {
+
+    //CO20200404 - creating vectors for for-loops to reduce code
+    vector<string> poscar_files_orig;
+    aurostd::string2tokens("POSCAR.orig,POSCAR.relax1",poscar_files_orig,",");  //flipped order so orig is preferred if available //POSCAR.relax1,POSCAR.orig
+    vector<string> poscar_files_relax_mid;
+    aurostd::string2tokens("POSCAR.relax2,CONTCAR.relax1",poscar_files_relax_mid,",");
+    vector<string> poscar_files_relax_final;
+    aurostd::string2tokens("CONTCAR.relax,CONTCAR.relax2,POSCAR.static,POSCAR.bands,CONTCAR.static,CONTCAR.bands",poscar_files_relax_final,",");  //flipped order for speed and likelihood of existence //POSCAR.bands,CONTCAR.bands,POSCAR.static,CONTCAR.static,CONTCAR.relax2,CONTCAR.relax
+
+    //CO20200223 - substring2bool - > EWithinList()
+    string efile="";
+    if((!aurostd::EWithinList(files,"POSCAR.relax1",efile) &&
+          !aurostd::EWithinList(files,"POSCAR.orig",efile) && !relaxed_only) ||
+        (!aurostd::EWithinList(files,"POSCAR.relax2",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.relax1",efile) && !relaxed_only) ||
+        (!aurostd::EWithinList(files,"POSCAR.bands",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.bands",efile) &&
+         !aurostd::EWithinList(files,"POSCAR.static",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.static",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.relax2",efile) &&
+         !aurostd::EWithinList(files,"CONTCAR.relax",efile) &&
+         TRUE)
+        ) {
       message << "path=" << path << " missing structure files. Ignoring entry";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
-    } else {
-      if (!relaxed_only) {
-        //////////////////////////////////////////////////////////////////////////
-        // START Loading original structures
-        //////////////////////////////////////////////////////////////////////////
+    }
+    if (!relaxed_only) {
+      //////////////////////////////////////////////////////////////////////////
+      // START Loading original structures
+      //////////////////////////////////////////////////////////////////////////
 
-        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.orig")) {
+      for(uint i=0;i<poscar_files_orig.size()&&xstrAux.atoms.size()==0;i++){
+        if(aurostd::EWithinList(files,poscar_files_orig[i],efile)) {
+          if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
           ss.str("");
           if ( (is_url_path ? 
-                aurostd::url2stringstream(path + "/POSCAR.orig",ss,false) : 
-                aurostd::file2stringstream(path + "/POSCAR.orig",ss)) ) {
-            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX20191210 - added try-catch
+                aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
+                aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_orig[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
             catch(aurostd::xerror& excpt) { 
               xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
-              message << "POSCAR.orig: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              message << poscar_files_orig[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
               pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
             } //DX20191210
           }
-        }
-        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax1")) {
-          ss.str("");
-          if ( (is_url_path ? 
-                aurostd::url2stringstream(path + "/POSCAR.relax1",ss,false) :
-                aurostd::file2stringstream(path + "/POSCAR.relax1",ss)) ) {
-            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX20191210 - added try-catch
-            catch(aurostd::xerror& excpt) {
-              xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
-              message << "POSCAR.relax1: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
-            } //DX20191210
-          }
-        }
-        if (!xstrAux.atoms.size()) {
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
-          return false;
-        }
-        entry.vstr.push_back(xstrAux);
-        xstrAux.clear(); //DX20191220 - uppercase to lowercase clear
-        if(LDEBUG) {cerr << soliloquy << " loaded ORIGINAL structure" << endl;}
-
-        //////////////////////////////////////////////////////////////////////////
-        // END Loading original structures
-        //////////////////////////////////////////////////////////////////////////
-
-        //////////////////////////////////////////////////////////////////////////
-        // START Loading singularly-relaxed structures
-        //////////////////////////////////////////////////////////////////////////
-
-        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax2")) {
-          ss.str("");
-          if ( (is_url_path ? 
-                aurostd::url2stringstream(path + "/POSCAR.relax2",ss,false) :
-                aurostd::file2stringstream(path + "/POSCAR.relax2",ss)) ) {
-            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX20191210 - added try-catch
-            catch(aurostd::xerror& excpt) {
-              xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
-              message << "POSCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
-            } //DX20191210
-          }
-        }
-        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax1")) {
-          ss.str("");
-          if ( (is_url_path ? 
-                aurostd::url2stringstream(path + "/CONTCAR.relax1",ss,false) :
-                aurostd::file2stringstream(path + "/CONTCAR.relax1",ss)) ) {
-            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX20191210 - added try-catch
-            catch(aurostd::xerror& excpt) {
-              xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
-              message << "CONTCAR.relax1: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
-              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
-            } //DX20191210
-          }
-        }
-        if (!xstrAux.atoms.size()) {
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
-          return false;
-        }
-        entry.vstr.push_back(xstrAux);
-        xstrAux.clear(); //DX20191220 - uppercase to lowercase clear
-        if(LDEBUG) {cerr << soliloquy << " loaded RELAX1 structure" << endl;}
-
-        //////////////////////////////////////////////////////////////////////////
-        // END Loading singularly-relaxed structures
-        //////////////////////////////////////////////////////////////////////////
-      }
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Loading fully-relaxed structures
-      ////////////////////////////////////////////////////////////////////////////
-
-      if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax")) {
-        ss.str("");
-        if ( (is_url_path ? 
-              aurostd::url2stringstream(path + "/CONTCAR.relax",ss,false): 
-              aurostd::file2stringstream(path + "/CONTCAR.relax",ss)) ) {
-          try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX20191210 - added try-catch
-          catch(aurostd::xerror& excpt) {
-            xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
-            message << "CONTCAR.relax: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
-            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
-          } //DX20191210
-        }
-      }
-      if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax2")) {
-        ss.str("");
-        if ( (is_url_path ? 
-              aurostd::url2stringstream(path + "/CONTCAR.relax2",ss,false) :
-              aurostd::file2stringstream(path + "/CONTCAR.relax2",ss)) ) {
-          try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX20191210 - added try-catch
-          catch(aurostd::xerror& excpt) {
-            xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
-            message << "CONTCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
-            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
-          } //DX20191210
         }
       }
       if (!xstrAux.atoms.size()) {
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
       entry.vstr.push_back(xstrAux);
       xstrAux.clear(); //DX20191220 - uppercase to lowercase clear
-      if(LDEBUG) {cerr << soliloquy << " loaded FULLY-RELAXED structure" << endl;}
+      if(LDEBUG) {cerr << soliloquy << " loaded ORIGINAL structure" << endl;}
 
-      ////////////////////////////////////////////////////////////////////////////
-      // END Loading fully-relaxed structures
-      ////////////////////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////////////////
+      // END Loading original structures
+      //////////////////////////////////////////////////////////////////////////
 
-      return true;
+      //////////////////////////////////////////////////////////////////////////
+      // START Loading singularly-relaxed structures
+      //////////////////////////////////////////////////////////////////////////
+
+      for(uint i=0;i<poscar_files_relax_mid.size()&&xstrAux.atoms.size()==0;i++){
+        if(aurostd::EWithinList(files,poscar_files_relax_mid[i],efile)) {
+          if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
+          ss.str("");
+          if ( (is_url_path ? 
+                aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
+                aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_relax_mid[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
+            catch(aurostd::xerror& excpt) { 
+              xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
+              message << poscar_files_relax_mid[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX20191210
+          }
+        }
+      }
+      if (!xstrAux.atoms.size()) {
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+        return false;
+      }
+      entry.vstr.push_back(xstrAux);
+      xstrAux.clear(); //DX20191220 - uppercase to lowercase clear
+      if(LDEBUG) {cerr << soliloquy << " loaded RELAX1 structure" << endl;}
+
+      //////////////////////////////////////////////////////////////////////////
+      // END Loading singularly-relaxed structures
+      //////////////////////////////////////////////////////////////////////////
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START Loading fully-relaxed structures
+    ////////////////////////////////////////////////////////////////////////////
+
+    for(uint i=0;i<poscar_files_relax_final.size()&&xstrAux.atoms.size()==0;i++){
+      if(aurostd::EWithinList(files,poscar_files_relax_final[i],efile)) {
+        if(LDEBUG){cerr << soliloquy << " looking for " << path+"/"+efile << endl;}
+        ss.str("");
+        if ( (is_url_path ? 
+              aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
+              aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); structure_files.push_back(poscar_files_relax_final[i]); } //DX20191210 - added try-catch //DX20200224 - added structure_files tag
+          catch(aurostd::xerror& excpt) { 
+            xstrAux.clear(); //clear it if it is garbage //DX20191220 - uppercase to lowercase clear
+            message << poscar_files_relax_final[i] << ": Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX20191210
+        }
+      }
+    }
+    if (!xstrAux.atoms.size()) {
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+      return false;
+    }
+    entry.vstr.push_back(xstrAux);
+    xstrAux.clear(); //DX20191220 - uppercase to lowercase clear
+    if(LDEBUG) {cerr << soliloquy << " loaded FULLY-RELAXED structure" << endl;}
+
+    ////////////////////////////////////////////////////////////////////////////
+    // END Loading fully-relaxed structures
+    ////////////////////////////////////////////////////////////////////////////
+
+    return true;
   }
 }  // namespace pflow
 
@@ -11968,7 +11968,7 @@ namespace pflow {
         message << "No mode specified [designation=" << ps << "]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
-      if(aurostd::withinList(pocc_designations,designation)){
+      if(aurostd::WithinList(pocc_designations,designation)){
         message << "Duplicate POCC designation: " << designation;
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
@@ -12032,10 +12032,10 @@ namespace pflow {
     uint position2=p2.positions[0];
     if(p1.mode!=p2.mode){
       if(p1.mode=='S' && p2.mode=='P'){
-        if(aurostd::withinList(p1.positions,position2)){return false;} //put p2 first
+        if(aurostd::WithinList(p1.positions,position2)){return false;} //put p2 first
       }
       else if(p1.mode=='P' && p2.mode=='S'){
-        if(aurostd::withinList(p2.positions,position1)){return true;} //put p1 first
+        if(aurostd::WithinList(p2.positions,position1)){return true;} //put p1 first
       }
       else {
         message << "Unknown modes: p1.mode=" << p1.mode << ", p2.mode=" << p2.mode;
@@ -12194,7 +12194,7 @@ namespace pflow {
           cerr << soliloquy << " positions_already_added=" << aurostd::joinWDelimiter(positions_already_added,",") << endl;
         }
         if(mode=='P'){
-          if(!aurostd::withinList(positions_already_added,site)){ //do NOT over add, each position should be specified exactly once
+          if(!aurostd::WithinList(positions_already_added,site)){ //do NOT over add, each position should be specified exactly once
             atom=xstr_orig.atoms[site];
             positions_already_added_tmp.push_back(site);  //do NOT over add, each position should be specified exactly once
             atom.type=occupant;
@@ -12213,7 +12213,7 @@ namespace pflow {
           for(uint ii=0;ii<xstr_orig.num_each_type.size();ii++){
             for(uint jj=0;jj<(uint)xstr_orig.num_each_type[ii];jj++){
               if(ii==site){
-                if(!aurostd::withinList(positions_already_added,iatom)){ //do NOT over add, each position should be specified exactly once
+                if(!aurostd::WithinList(positions_already_added,iatom)){ //do NOT over add, each position should be specified exactly once
                   atom=xstr_orig.atoms[iatom];
                   positions_already_added_tmp.push_back(iatom);  //do NOT over add, each position should be specified exactly once
                   atom.type=occupant;
@@ -12644,6 +12644,9 @@ namespace pflow {
       if(vpflow.flag("PROTO::ABCCAR")) str.xstructure2abccar();
       //DX20190123 - add CIF/ABCCAR - END
 
+      // now checking ELK //DX20200313
+      if(vpflow.flag("PROTO::ELK")) str.xstructure2elk();
+
     }
 
     if(LDEBUG) cerr << soliloquy << " END" << endl;  
@@ -12978,19 +12981,21 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ENMAX_MULTIPLY\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY") << endl;
 
     // check ABINIT QE VASP AIMS
-    if(LDEBUG) cerr << soliloquy << " CHECK VASP/ABCCAR/QE/ABINIT/AIMS/CIF" << endl; //DX20190123 - add CIF
+    if(LDEBUG) cerr << soliloquy << " CHECK VASP/ABCCAR/QE/ABINIT/AIMS/CIF/ELK" << endl; //DX20190123 - add CIF //DX20200313 - add ELK
     PARAMS.vparams.flag("AFLOWIN_FLAG::VASP",TRUE); // default
     PARAMS.vparams.flag("AFLOWIN_FLAG::QE",vpflow.flag("PROTO_AFLOW::QE"));
     PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",vpflow.flag("PROTO_AFLOW::ABCCAR")); //DX20190123 - add ABCCAR
     PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",vpflow.flag("PROTO_AFLOW::ABINIT"));
     PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",vpflow.flag("PROTO_AFLOW::AIMS"));
     PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",vpflow.flag("PROTO_AFLOW::CIF")); //DX20190123 - add CIF
+    PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",vpflow.flag("PROTO_AFLOW::ELK")); //DX20200313 - add ELK
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS")) {
       PARAMS.vparams.flag("AFLOWIN_FLAG::QE",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::VASP",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX20200313 - add ELK
     }
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT")) {
       PARAMS.vparams.flag("AFLOWIN_FLAG::QE",FALSE);
@@ -12998,6 +13003,7 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX20200313 - add ELK
     }
     //DX20190123 - add ABCCAR - START
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR")) {
@@ -13006,6 +13012,7 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE); 
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX20200313 - add ELK
     }
     //DX20190123 - add ABCCAR - END
     //DX20190123 - add CIF - START
@@ -13015,6 +13022,7 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE); 
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX201200313 - add ELK
     }
     //DX20190123 - add CIF - END
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::QE"))     {
@@ -13023,6 +13031,7 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX201200313 - add ELK
     }
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::VASP"))   {
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
@@ -13030,13 +13039,25 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE);
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX20190123 - add ABCCAR
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX201200313 - add ELK
     }
+    //DX20200313 - add ELK - START
+    if(PARAMS.vparams.flag("AFLOWIN_FLAG::ELK")) {
+      PARAMS.vparams.flag("AFLOWIN_FLAG::QE",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::VASP",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS",FALSE); 
+      PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE);
+      PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE);
+    }
+    //DX20200313 - add ELK - END
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::AIMS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABINIT\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::QE\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::QE") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::VASP\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::VASP") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::CIF\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::CIF") << endl; //DX20190123 - add CIF
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABCCAR\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR") << endl; //DX20190123 - add ABCCAR
+    if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ELK\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ELK") << endl; //DX20200313 - add ELK
 
     // check stdout
     if(LDEBUG) cerr << soliloquy << " CHECK STDOUT" << endl; 
@@ -13165,6 +13186,7 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::QE\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::QE") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::CIF\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::CIF") << endl; //DX20190123 - add CIF
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABCCAR\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR") << endl; //DX20190123 - add ABCCAR
+    if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ELK\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ELK") << endl; //DX202003133 - add ELK
 
     //    if(LDEBUG) exit(0);
 
@@ -13221,7 +13243,7 @@ namespace pflow {
       oss << " FROM OUTCAR" << endl;
       oss << " vTITEL.size()=" << xOUT.vTITEL.size() << ": "; for(uint i=0;i<xOUT.vTITEL.size();i++) { oss << xOUT.vTITEL.at(i) << " "; } oss << endl;
       oss << " SYSTEM=" << xOUT.SYSTEM << endl;
-      oss << " ERROR=" << xOUT.ERROR << endl;
+      //[CO20200404 - OBSOLETE]oss << " ERROR=" << xOUT.ERROR << endl;
       oss << " pp_type=" << xOUT.pp_type << endl;
       oss << " species.size()=" << xOUT.species.size() << ": "; for(uint i=0;i<xOUT.species.size();i++) { oss << xOUT.species.at(i) << " "; } oss << endl;
       oss << " species_pp.size()=" << xOUT.species_pp.size() << ": "; for(uint i=0;i<xOUT.species_pp.size();i++) { oss << xOUT.species_pp.at(i) << " "; } oss << endl;
@@ -13558,7 +13580,7 @@ namespace pflow {
     infileB >> strB;
     string path_flag(argv.at(4).c_str());
     double totdist;
-    pflow::matrix<double> cm(2,3,999999);
+    aurostd::matrix<double> cm(2,3,999999);  //CO20200404 pflow::matrix()->aurostd::matrix()
     xstructure diffstr;
     pflow::RBPoscarDisp(strA,strB,diffstr,totdist,cm,path_flag);
     PrintRBPoscarDisp(diffstr,totdist,cm,path_flag,cout);
@@ -13589,15 +13611,15 @@ namespace pflow {
     if(tokens.size()>=2) nbins=aurostd::string2utype<int>(tokens.at(1));
     if(tokens.size()>=3) smooth_width=aurostd::string2utype<int>(tokens.at(2));
 
-    pflow::matrix<double> rdf_all;
+    aurostd::matrix<double> rdf_all; //CO20200404 pflow::matrix()->aurostd::matrix()
     cerr << "[1]" << endl;
     pflow::GetRDF(a,rmax,nbins,rdf_all);
     cerr << "[1]" << endl;
     // for(int i=0;i<rdf_all.size();i++) {for(int j=0;j<rdf_all[i].size();j++) cerr << rdf_all[i][j] << " "; cerr << endl;};exit(0);
-    pflow::matrix<double> rdf_all_sm;
+    aurostd::matrix<double> rdf_all_sm;  //CO20200404 pflow::matrix()->aurostd::matrix()
     rdf_all_sm=pflow::GetSmoothRDF(rdf_all,smooth_width);
-    pflow::matrix<double> rdfsh_all;
-    pflow::matrix<double> rdfsh_loc; // Radial location of rdf shells.
+    aurostd::matrix<double> rdfsh_all; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetRDFShells(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc);
     PrintRDF(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc,cout);
     if(LDEBUG) cerr << "pflow::RDF: END" << endl;
@@ -13633,21 +13655,21 @@ namespace pflow {
     xstructure strA(tokens.at(4),IOAFLOW_AUTO);
     xstructure strB(tokens.at(5),IOAFLOW_AUTO);
     // Get rdfs
-    pflow::matrix<double> rdf_all_A;
-    pflow::matrix<double> rdf_all_B;
+    aurostd::matrix<double> rdf_all_A; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdf_all_B; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetRDF(strA,rmax,nbins,rdf_all_A);
     pflow::GetRDF(strB,rmax,nbins,rdf_all_B);
-    pflow::matrix<double> rdf_all_A_sm=pflow::GetSmoothRDF(rdf_all_A,smooth_width);
-    pflow::matrix<double> rdf_all_B_sm=pflow::GetSmoothRDF(rdf_all_B,smooth_width);
+    aurostd::matrix<double> rdf_all_A_sm=pflow::GetSmoothRDF(rdf_all_A,smooth_width);  //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdf_all_B_sm=pflow::GetSmoothRDF(rdf_all_B,smooth_width);  //CO20200404 pflow::matrix()->aurostd::matrix()
     // Get shells
-    pflow::matrix<double> rdfsh_all_A;
-    pflow::matrix<double> rdfsh_loc_A; // Radial location of rdf shells.
-    pflow::matrix<double> rdfsh_all_B;
-    pflow::matrix<double> rdfsh_loc_B; // Radial location of rdf shells.
+    aurostd::matrix<double> rdfsh_all_A; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc_A; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_all_B; //CO20200404 pflow::matrix()->aurostd::matrix()
+    aurostd::matrix<double> rdfsh_loc_B; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::GetRDFShells(strA,rmax,nbins,smooth_width,rdf_all_A_sm,rdfsh_all_A,rdfsh_loc_A);
     pflow::GetRDFShells(strB,rmax,nbins,smooth_width,rdf_all_B_sm,rdfsh_all_B,rdfsh_loc_B);
     vector<int> best_match;
-    pflow::matrix<double> rms_mat;
+    aurostd::matrix<double> rms_mat; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::CmpRDFShells(strA,strB,rdfsh_all_A,rdfsh_all_B,nsh,best_match,rms_mat);
     PrintRDFCmp(strA,strB,rmax,nbins,smooth_width,nsh,rdfsh_all_A,rdfsh_all_B,best_match,rms_mat,cout);
     if(LDEBUG) cerr << "pflow::RDFCMP: END" << endl;
@@ -14259,7 +14281,7 @@ namespace pflow {
     ifstream PDOS_infile(argv.at(3).c_str());
     aurostd::InFileExistCheck("convasp.cc",argv.at(3),PDOS_infile,cerr);
     pflow::pdosdata pdd;
-    pflow::matrix<pflow::matrix<double> > allpdos;
+    aurostd::matrix<aurostd::matrix<double> > allpdos; //CO20200404 pflow::matrix()->aurostd::matrix()
     pflow::ReadSumDOSParams(SumPDOSParams_infile,pdd);
     //      projdata prd;
     //      pdd.PrintParams(cout,prd.LMnames);
@@ -14384,9 +14406,9 @@ namespace pflow {
     }
     //    ifstream infile(infile_name.c_str());
     // aurostd::InFileExistCheck("aflow",infile_name,infile,cerr);
-    pflow::matrix<double> mmsc(3,3);
+    aurostd::matrix<double> mmsc(3,3); //CO20200404 pflow::matrix()->aurostd::matrix()
     // if(LDEBUG) cerr << "pflow::SUPERCELLSTRLIST: msc=" << msc << endl;
-    mmsc=pflow::xmatrix2matrix(msc);
+    mmsc=aurostd::xmatrix2matrix(msc); //CO20200404 pflow::matrix()->aurostd::matrix()
     //  pflow::Mout(mmsc,cout);
     ifstream list_inf(infile_name.c_str());
     aurostd::InFileExistCheck("pflow::SUPERCELLSTRLIST",infile_name,list_inf,cerr);

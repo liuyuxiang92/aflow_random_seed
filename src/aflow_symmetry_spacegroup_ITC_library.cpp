@@ -180,7 +180,8 @@ namespace SYM {
     vector<string> vs = splitstring(tstring.str());
 
     for (uint i = 0; i < vs.size(); i++)
-      out(i + 1) = frac2dbl(vs[i]);
+      //DX20200313 [OBSOLETE] out(i + 1) = frac2dbl(vs[i]);
+      out(i + 1) = aurostd::frac2dbl(vs[i]); //DX20200313
 
     return out;
   }
@@ -201,7 +202,7 @@ namespace SYM {
 //vector<string> tmpvec = splitstring(ITCstring);
 //
 //for (uint i = 0; i < tmpvec.size(); i++) {
-//outpoint[i + 1] = frac2dbl(tmpvec[i]);
+//outpoint[i + 1] = aurostd::frac2dbl(tmpvec[i]);
 //}
 //inversion_point = outpoint;
 //}
@@ -234,7 +235,7 @@ namespace SYM {
 //}
 //vector<string> vecstring = splitstring(oss.str());
 //for (uint i = 0; i < vecstring.size(); i++) {
-//translation_vec[i + 1] = frac2dbl(vecstring[i]);
+//translation_vec[i + 1] = aurostd::frac2dbl(vecstring[i]);
 //}
 ////cerr << translation_vec << endl;
 //}
@@ -11176,8 +11177,7 @@ bool SymmetryInformationITC::initsgs(string axis_cell) {
   string sg54 = "Space Group 54\n (0,0,0) \n 8 f 1 (x,y,z) (-x+.5,-y,z) (-x,y,-z+.5) (x+.5,-y,-z+.5) (-x,-y,-z) (x+.5,y,-z) (x,-y,z+.5) (-x+.5,y,z+.5) \n 4 e ..2 (.25,.5,z) (.75,.5,-z+.5) (.75,.5,-z) (.25,.5,z+.5) \n 4 d ..2 (.25,0,z) (.75,0,-z+.5) (.75,0,-z) (.25,0,z+.5) \n 4 c .2. (0,y,.25) (.5,-y,.25) (0,-y,.75) (.5,y,.75) \n 4 b -1 (0,.5,0) (.5,.5,0) (0,.5,.5) (.5,.5,.5) \n 4 a -1 (0,0,0) (.5,0,0) (0,0,.5) (.5,0,.5) \n ";
 
   string sg55 =
-    "Space Group 55\n (0,0,0) \n 8 i 1 (x,y,z) (-x,-y,z) (-x+.5,y+.5,-z) (x+.5,-y+.5,-z) (-x,-y,-z) (x,y,-z) (x+.5,-y+.5,z) (-x+.5,y+.5,z) \n 4 h ..m (x,y,.5) (-x,-y,.5) (-x+.5,y+.5,.5) (x+.5,-y+.5,.5) \n 4 g ..m (x,y,0) (-x,-y,0) (-x+.5,y+.5,0) (x+.5,-y+.5,0) \n 4 f ..2 (0,.5,z) (.5,0,-z) (0,.5,-z) (.5,0,z) \n 4 e ..2 (0,0,z) (.5,.5,-z) (0,0,-z) (.5,.5,z) \n 2 d ..2/m (0,.5,.5) (.5,0,.5) \n 2 c ..2/m (0,.5,0) (.5,0,0) \n 2 b ..2/m (0,0,.5) (.5,.5,.5) \n \
-    2 a ..2/m (0,0,0) (.5,.5,0) \n ";
+    "Space Group 55\n (0,0,0) \n 8 i 1 (x,y,z) (-x,-y,z) (-x+.5,y+.5,-z) (x+.5,-y+.5,-z) (-x,-y,-z) (x,y,-z) (x+.5,-y+.5,z) (-x+.5,y+.5,z) \n 4 h ..m (x,y,.5) (-x,-y,.5) (-x+.5,y+.5,.5) (x+.5,-y+.5,.5) \n 4 g ..m (x,y,0) (-x,-y,0) (-x+.5,y+.5,0) (x+.5,-y+.5,0) \n 4 f ..2 (0,.5,z) (.5,0,-z) (0,.5,-z) (.5,0,z) \n 4 e ..2 (0,0,z) (.5,.5,-z) (0,0,-z) (.5,.5,z) \n 2 d ..2/m (0,.5,.5) (.5,0,.5) \n 2 c ..2/m (0,.5,0) (.5,0,0) \n 2 b ..2/m (0,0,.5) (.5,.5,.5) \n 2 a ..2/m (0,0,0) (.5,.5,0) \n "; //DX20200422 - extraneous slash removed
 
   string sg56 = "Space Group 56\n (0,0,0) \n 8 e 1 (x,y,z) (-x+.5,-y+.5,z) (-x,y+.5,-z+.5) (x+.5,-y,-z+.5) (-x,-y,-z) (x+.5,y+.5,-z) (x,-y+.5,z+.5) (-x+.5,y,z+.5) \n 4 d ..2 (.25,.75,z) (.75,.25,-z+.5) (.75,.25,-z) (.25,.75,z+.5) \n 4 c ..2 (.25,.25,z) (.75,.75,-z+.5) (.75,.75,-z) (.25,.25,z+.5) \n 4 b -1 (0,0,.5) (.5,.5,.5) (0,.5,0) (.5,0,0) \n 4 a -1 (0,0,0) (.5,.5,0) (0,.5,.5) (.5,0,.5) \n ";
 

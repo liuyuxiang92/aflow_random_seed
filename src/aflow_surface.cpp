@@ -2195,32 +2195,32 @@ namespace slab {
       intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
       intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
     }else if(count_zeros==1){ 
-      if(aurostd::withinList(zero_indices,1)){
+      if(aurostd::WithinList(zero_indices,1)){
         intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
         intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
         //intercepts.push_back( intercepts[0] + a1 ); //consistent order, but it really doesn't matter
         xvector<double> tmp=( intercepts[0] + a1 );   //consistent order, but it really doesn't matter
         intercepts.insert(intercepts.begin(),tmp);    //consistent order, but it really doesn't matter
-      }else if(aurostd::withinList(zero_indices,2)){
+      }else if(aurostd::WithinList(zero_indices,2)){
         intercepts.push_back( ((double)multiple/(double)hkl[1]) * a1 );
         intercepts.push_back( intercepts[0] + a2 );
         intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
-      }else{  //aurostd::withinList(zero_indices,3)
+      }else{  //aurostd::WithinList(zero_indices,3)
         intercepts.push_back( ((double)multiple/(double)hkl[1]) * a1 );
         intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
         intercepts.push_back( intercepts[0] + a3 );
       }
     }else{  //count_zeros==2
       xvector<double> tmp;  //0,0,0
-      if(!aurostd::withinList(zero_indices,1)){
+      if(!aurostd::WithinList(zero_indices,1)){
         intercepts.push_back( tmp );
         intercepts.push_back( a2 );
         intercepts.push_back( a3 );
-      }else if(!aurostd::withinList(zero_indices,2)){
+      }else if(!aurostd::WithinList(zero_indices,2)){
         intercepts.push_back( a1 );
         intercepts.push_back( tmp );
         intercepts.push_back( a3 );
-      }else{  //!aurostd::withinList(zero_indices,3)
+      }else{  //!aurostd::WithinList(zero_indices,3)
         intercepts.push_back( a1 );
         intercepts.push_back( a2 );
         intercepts.push_back( tmp );
@@ -2428,7 +2428,7 @@ namespace slab {
       else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find starting atom",_INPUT_ERROR_);}
     }
     if(LDEBUG){cerr << soliloquy << " fpos_starting matches atom[" << starting_atom << "]" << endl;}
-    if(starting_atom!= AUROSTD_MAX_UINT && !aurostd::withinList(atoms2skip,starting_atom)){atoms2skip.push_back(starting_atom);}  //no duplicates is better
+    if(starting_atom!= AUROSTD_MAX_UINT && !aurostd::WithinList(atoms2skip,starting_atom)){atoms2skip.push_back(starting_atom);}  //no duplicates is better
 
     //[CO20190520 - safe-guard for working in fractional space (skew)]xvector<double> fpos_current=fpos_starting;
     //[CO20190520 - safe-guard for working in fractional space (skew)]xvector<double> cpos_current=f2c*fpos_current;
@@ -2462,7 +2462,7 @@ namespace slab {
       if(!(loop_iteration==loop_iteration_starting && outside_current_cell)){ //go OUTSIDE current cell
         for(uint i=0;i<atoms.size();i++){ //loop through all atoms, find nearest in line of sight
           if(loop_iteration==loop_iteration_starting && i==starting_atom){continue;}  //only for the first
-          if(aurostd::withinList(atoms2skip,i)){continue;}
+          if(aurostd::WithinList(atoms2skip,i)){continue;}
           //[CO20190520 - safe-guard for working in fractional space (skew)]point_line_intersection_fpos=aurostd::pointLineIntersection(fpos_current,l_fpos,atoms[i].fpos);
           //[CO20190520 - safe-guard for working in fractional space (skew)]point_line_intersection_cpos=f2c*point_line_intersection_fpos;
           point_line_intersection_cpos=aurostd::pointLineIntersection(cpos_current,l_cpos,atoms[i].cpos);
@@ -4024,7 +4024,10 @@ namespace slab {
     str_ss << "   0.66666666666667   0.01846437673106   0.08333333333333  O     " << endl;
     str_ss << "   0.33333333333333   0.35179771006440   0.41666666666667  O     " << endl;
     str_ss << "   0.00000000000000   0.68513104339773   0.75000000000000  O     " << endl;
-    xstructure xstr_in(str_ss);str_ss.str("");
+    xstructure xstr_in;
+    try{str_ss >> xstr_in;}           //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    str_ss.clear();str_ss.str("");    //CO20200404 - need clear() to reuse
     min_dist=min_dist_orig=xstr_in.MinDist();
     if(LDEBUG){
       cerr << soliloquy << " xstr_in=" << endl;cerr << xstr_in << endl;
@@ -4069,7 +4072,10 @@ namespace slab {
     str_ss << "   0.01846438      0.08333333     0.00000000   O " << endl;
     str_ss << "   0.35179771      0.41666667     0.00000000   O " << endl;
     str_ss << "   0.68513104      0.75000000     0.00000000   O " << endl;
-    xstructure xstr_slab_correct(str_ss);str_ss.str("");
+    xstructure xstr_slab_correct;
+    try{str_ss >> xstr_slab_correct;} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    str_ss.clear();str_ss.str("");    //CO20200404 - need clear() to reuse
     min_dist=xstr_slab_correct.MinDist();
     if(LDEBUG){
       cerr << soliloquy << " xstr_slab_correct=" << endl;cerr << xstr_slab_correct << endl;

@@ -744,6 +744,61 @@ namespace aurostd {
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+//CO20200404 - moving matrix() from pflow to aurostd because it is templated
+//doesn't compile otherwise
+
+namespace aurostd {
+  // Dane Morgan style,adjusted by Stefano Curtarolo
+  // Bringing definitions inside the template helps
+  // constructing the right templates.
+  template<class utype>
+    class matrix {
+      public:
+        //NECESSARY PUBLIC CLASS METHODS - START
+        //constructors - START
+        matrix(void);
+        matrix(const int m);
+        matrix(const int m,const int n);
+        matrix(const int m,const int n,const utype& inutype);
+        matrix(const int m,const std::vector<utype>& inutypevec);
+        matrix(const matrix& b);
+        //constructors - STOP
+        ~matrix(void);                         // destructor
+        void clear();
+        //NECESSARY PUBLIC CLASS METHODS - STOP
+        // accessors
+        void print(void);
+        uint size(void) const {return (uint) mat.size();}
+        matrix<utype> transpose(void) const;
+        //  matrix<utype>::iterator begin();
+        //  matrix<utype>::iterator end();
+        // operator
+        std::vector<utype>& operator[] (const int i) {assert(i>=0 && i<=(int) mat.size()); return mat[i];}
+        const std::vector<utype>& operator[] (const int i) const {assert(i>=0 && i<=(int) mat.size()); return mat[i];};
+        const matrix<utype>& operator=(const matrix<utype>& b);
+        // mutators
+        void push_back(const std::vector<utype>& inutypevec) {mat.push_back(inutypevec);}
+        void pop_back(void) {mat.pop_back();}
+        void vecvec2mat(const std::vector<std::vector<utype> >& inVV);
+        void vec2mat(const std::vector<utype>& inV);
+        //[CO20200404 - OBSOLETE]void clear(void) {mat.clear();}
+        void insert(const int& id,const std::vector<utype>& inV) {mat.insert(mat.begin()+id,inV);}
+        void erase(const int id);
+        void erase_col(const int id);
+      private:
+        std::vector<std::vector<utype> > mat;
+        void free();
+        void copy(const matrix& b);
+    };
+  template <class utype> matrix<utype>  xmatrix2matrix(const xmatrix<utype>& );
+  template <class utype> xmatrix<utype> matrix2xmatrix(const matrix<utype>& );
+}
+
+
+// ----------------------------------------------------------------------------
+
 #endif
 
 // ***************************************************************************

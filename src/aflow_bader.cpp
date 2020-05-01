@@ -17,9 +17,9 @@
 
 using namespace apl;
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::BaderCalc
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   string BaderCalc(aurostd::xoption vpflow) {  //CO
     ostringstream oss;
@@ -91,9 +91,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::BaderCalc
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool BaderCalc(aurostd::xoption& vpflow,
       const string& bader_options,
@@ -276,13 +276,14 @@ namespace bader_functions {
       }
     }
     string system_name=KBIN::ExtractSystemName(directory);
-    return BaderCalc(vpflow, bader_options, /*outcar.SYSTEM,*/ system_name, outcar.species, xstr_bader.num_each_type, vZVAL, cutoffs, downsample_ratios, directory, oss);
+    //return BaderCalc(vpflow, bader_options, outcar.SYSTEM, system_name, outcar.species, xstr_bader.num_each_type, vZVAL, cutoffs, downsample_ratios, directory, oss);
+    return BaderCalc(vpflow, bader_options, system_name, outcar.species, xstr_bader.num_each_type, vZVAL, cutoffs, downsample_ratios, directory, oss);
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::BaderCalc
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool BaderCalc(aurostd::xoption& vpflow,
       const string& bader_options,
@@ -393,7 +394,9 @@ namespace bader_functions {
         oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
         return FALSE;
       }
       if(aurostd::IsCompressed(ref_file)) {
@@ -404,7 +407,9 @@ namespace bader_functions {
           oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
           aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
           return FALSE;
         }
         oss << soliloquy << "created temporary file " << ref_file << "." << endl;
@@ -426,7 +431,9 @@ namespace bader_functions {
         oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
         return FALSE;
       }
       if(LDEBUG) cerr << soliloquy << "FOUND " << required_files.at(i) << endl;
@@ -438,7 +445,9 @@ namespace bader_functions {
           oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
           aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
           return FALSE;
         }
         oss << soliloquy << "created temporary file " << tmp_file << "." << endl;
@@ -449,7 +458,9 @@ namespace bader_functions {
           oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
           aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
           return FALSE;
         }
         required_files.at(i) = tmp_file;
@@ -466,7 +477,9 @@ namespace bader_functions {
     //oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
     //oss << soliloquy << "Exiting." << endl;
     //oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
     //aurostd::RemoveFile(remove_files);   //CLEAN UP BEFORE RETURNING FALSE
+#endif
     //return FALSE;
     //}
     //else {
@@ -493,7 +506,9 @@ namespace bader_functions {
         oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
         return FALSE;
       }
       // check files exist
@@ -503,7 +518,9 @@ namespace bader_functions {
         oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
         return FALSE;
       }
       compressed_files.push_back("aflow.CHGCAR_sum");
@@ -527,7 +544,9 @@ namespace bader_functions {
       oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
       return FALSE;
     }
     string BADER_RUN_DIRECTORY = aurostd::TmpDirectoryCreate("BADER");
@@ -553,16 +572,20 @@ namespace bader_functions {
         oss << soliloquy << "BADER CODE FAILURE: should be no new maxima in edge refinement" << endl;
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
         oss << soliloquy << "changing directories back to original directory " << directory << "." << endl;
         chdir(work_dir.c_str());//directory.c_str());
         oss << soliloquy << "removing temporary directory " << BADER_RUN_DIRECTORY << "." << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
         if(!aurostd::RemoveDirectory(BADER_RUN_DIRECTORY)) {  //CLEAN UP BEFORE RETURNING FALSE
           oss << endl;
           oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << endl;
           oss << soliloquy << "Please check." << endl;
           oss << endl;
         }
+#endif
         //BZIP aflow.CHGCAR_sum (only file created), and it's created in the right directory, so no need to move
         for (uint i = 0; i < compressed_files.size(); i++) {
           //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -593,16 +616,20 @@ namespace bader_functions {
       oss << soliloquy << "BADER CODE FAILURE: should be no new maxima in edge refinement" << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
       oss << soliloquy << "changing directories back to original directory " << directory << "." << endl;
       chdir(work_dir.c_str());//directory.c_str());
       oss << soliloquy << "removing temporary directory " << BADER_RUN_DIRECTORY << "." << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
       if(!aurostd::RemoveDirectory(BADER_RUN_DIRECTORY)) {  //CLEAN UP BEFORE RETURNING FALSE
         oss << endl;
         oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << endl;
         oss << soliloquy << "Please check." << endl;
         oss << endl;
       }
+#endif
       //BZIP aflow.CHGCAR_sum (only file created), and it's created in the right directory, so no need to move
       for (uint i = 0; i < compressed_files.size(); i++) {
         //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -620,6 +647,7 @@ namespace bader_functions {
     }
     BADER_CODE_OUTPUT.str("");
 
+#ifndef _AFLOW_TEMP_PRESERVE_
     //REMOVE FILES, round 1
     if(LDEBUG) cerr << soliloquy << "removing files" << endl;
     for (uint i = 0; i < remove_files.size(); i++) {
@@ -627,14 +655,18 @@ namespace bader_functions {
       aurostd::RemoveFile(remove_files.at(i));
     }
     remove_files.clear();
+#endif
 
     //no bader files expected, dumb case but it's there
     if(vpflow.flag("BADER::NOCALCULATE") && vpflow.getattachedscheme("BADER::NOCALCULATE") == "bader") {
       oss << soliloquy << "no bader files expected." << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
       oss << soliloquy << "changing directories back to original directory " << directory << "." << endl;
       chdir(work_dir.c_str());//directory.c_str());
       oss << soliloquy << "removing temporary directory " << BADER_RUN_DIRECTORY << "." << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
       if(!aurostd::RemoveDirectory(BADER_RUN_DIRECTORY)) {
         oss << endl;
         oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << " "; //<< endl //CO20180502;
@@ -642,6 +674,7 @@ namespace bader_functions {
         oss << soliloquy << "Please check." << endl;
         oss << endl;
       }
+#endif
       //BZIP aflow.CHGCAR_sum (only file created), and it's created in the right directory, so no need to move
       for (uint i = 0; i < compressed_files.size(); i++) {
         //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -739,16 +772,20 @@ namespace bader_functions {
           oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
           aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
           oss << soliloquy << "changing directories back to original directory " << directory << "." << endl;
           chdir(work_dir.c_str());//directory.c_str());
           oss << soliloquy << "removing temporary directory " << BADER_RUN_DIRECTORY << "." << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
           if(!aurostd::RemoveDirectory(BADER_RUN_DIRECTORY)) {  //CLEAN UP BEFORE RETURNING FALSE
             oss << endl;
             oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << endl;
             oss << soliloquy << "Please check." << endl;
             oss << endl;
           }
+#endif
           //BZIP aflow.CHGCAR_sum (only file created), and it's created in the right directory, so no need to move
           for (uint i = 0; i < compressed_files.size(); i++) {
             //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -805,7 +842,7 @@ namespace bader_functions {
             oss << soliloquy << "Please check." << endl;
             oss << endl;
           }
-          bader_file = "Bvol" + aurostd::PaddedNumString(atomCOUNT++, 4) + ".dat";
+          bader_file = "Bvol" + aurostd::PaddedNumString(++atomCOUNT, 4) + ".dat";  //CO20200404 - add BEFORE
         }
         //B_wexxxx.dat
         //these have different file names than Bvolxxx.dat even though they are the same files (artifact of bader code?)
@@ -818,16 +855,20 @@ namespace bader_functions {
           oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
           aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
           oss << soliloquy << "changing directories back to original directory " << directory << "." << endl;
           chdir(work_dir.c_str());//directory.c_str());
           oss << soliloquy << "removing temporary directory " << BADER_RUN_DIRECTORY << "." << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
           if(!aurostd::RemoveDirectory(BADER_RUN_DIRECTORY)) {  //CLEAN UP BEFORE RETURNING FALSE
             oss << endl;
             oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << endl;
             oss << soliloquy << "Please check." << endl;
             oss << endl;
           }
+#endif
           //BZIP aflow.CHGCAR_sum (only file created), and it's created in the right directory, so no need to move
           for (uint i = 0; i < compressed_files.size(); i++) {
             //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -961,16 +1002,20 @@ namespace bader_functions {
         oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
         oss << soliloquy << "Exiting." << endl;
         oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
         oss << soliloquy << "changing directories back to original directory " << directory << "." << endl;
         chdir(work_dir.c_str());//directory.c_str());
         oss << soliloquy << "removing temporary directory " << BADER_RUN_DIRECTORY << "." << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
         if(!aurostd::RemoveDirectory(BADER_RUN_DIRECTORY)) {  //CLEAN UP BEFORE RETURNING FALSE
           oss << endl;
           oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << endl;
           oss << soliloquy << "Please check." << endl;
           oss << endl;
         }
+#endif
         //BZIP aflow.CHGCAR_sum (only file created), and it's created in the right directory, so no need to move
         for (uint i = 0; i < compressed_files.size(); i++) {
           //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -986,12 +1031,14 @@ namespace bader_functions {
     oss << soliloquy << "changing directories back to original directory " << directory << "." << endl;
     chdir(work_dir.c_str());//directory.c_str());
     oss << soliloquy << "removing temporary directory " << BADER_RUN_DIRECTORY << "." << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
     if(!aurostd::RemoveDirectory(BADER_RUN_DIRECTORY)) {
       oss << endl;
       oss << soliloquy << "WARNING: issues deleting directory " << BADER_RUN_DIRECTORY << "." << endl;
       oss << soliloquy << "Please check." << endl;
       oss << endl;
     }
+#endif
 
     if(LDEBUG) cerr << soliloquy << "READING ACF.DAT FILE FOR BADER VOLUME AND CHARGE" << endl;
     // containers for AFLOW net charge data
@@ -1017,7 +1064,9 @@ namespace bader_functions {
       oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveFile(remove_files);
+#endif
       //BZIP those that remain
       for (uint i = 0; i < compressed_files.size(); i++) {
         //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -1037,7 +1086,9 @@ namespace bader_functions {
       oss << soliloquy << "Perhaps the file is corrupt?" << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveFile(remove_files);
+#endif
       //BZIP those that remain
       for (uint i = 0; i < compressed_files.size(); i++) {
         //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -1164,7 +1215,9 @@ namespace bader_functions {
             oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
             oss << soliloquy << "Exiting." << endl;
             oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
             aurostd::RemoveFile(remove_files);
+#endif
             //BZIP those that remain
             for (uint i = 0; i < compressed_files.size(); i++) {
               //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -1184,7 +1237,9 @@ namespace bader_functions {
           oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
           oss << soliloquy << "Exiting." << endl;
           oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
           aurostd::RemoveFile(remove_files);
+#endif
           //BZIP those that remain
           for (uint i = 0; i < compressed_files.size(); i++) {
             //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -1223,7 +1278,9 @@ namespace bader_functions {
               oss << soliloquy << "This is necessary for sets." << endl;
               oss << soliloquy << "Exiting." << endl;
               oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
               aurostd::RemoveFile(remove_files);  //CLEAN UP BEFORE RETURNING FALSE
+#endif
               //BZIP those that remain
               for (uint i = 0; i < compressed_files.size(); i++) {
                 //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -1259,7 +1316,9 @@ namespace bader_functions {
                   oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
                   oss << soliloquy << "Exiting." << endl;
                   oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
                   aurostd::RemoveFile(remove_files);
+#endif
                   //BZIP those that remain
                   for (uint i = 0; i < compressed_files.size(); i++) {
                     //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -1278,7 +1337,9 @@ namespace bader_functions {
                   oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
                   oss << soliloquy << "Exiting." << endl;
                   oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
                   aurostd::RemoveFile(remove_files);
+#endif
                   //BZIP those that remain
                   for (uint i = 0; i < compressed_files.size(); i++) {
                     //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -1319,7 +1380,9 @@ namespace bader_functions {
                   oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
                   oss << soliloquy << "Exiting." << endl;
                   oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
                   aurostd::RemoveFile(remove_files);
+#endif
                   //BZIP those that remain
                   for (uint i = 0; i < compressed_files.size(); i++) {
                     //if(aurostd::FileExist(bader_directory+"/"+compressed_files.at(i))) {  //[CO20200106 - close bracket for indenting]}
@@ -1342,11 +1405,14 @@ namespace bader_functions {
         }
       }
     }
+#ifndef _AFLOW_TEMP_PRESERVE_
     //REMOVE FILES, round 2
     for (uint i = 0; i < remove_files.size(); i++) {
       oss << soliloquy << "removing " << remove_files.at(i) << "." << endl;
       aurostd::RemoveFile(remove_files.at(i));
     }
+    remove_files.clear();
+#endif
 
     //BZIP those that remain
     for (uint i = 0; i < compressed_files.size(); i++) {
@@ -1361,9 +1427,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::BaderCalc
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool BaderCalc(const string& bader_options,
       const string& prototype,
@@ -1380,9 +1446,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::FixDirectory
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   void FixDirectory(string& directory) {
     string soliloquy = "bader_functions::FixDirectory():  ";  // so you know who's speaking
@@ -1399,9 +1465,9 @@ namespace bader_functions {
   }
 }
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::Flags2BaderCommands
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool Flags2BaderCommands(aurostd::xoption& vpflow, string& bader_options, ostream& oss) {  //CO
     // Perform Bader analysis by means of the code from Henkelman Group at UT, Austin
@@ -1763,9 +1829,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::getPushCommand
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool getPushCommand(const string& misc_option, string& push_command, ostream& oss) {
     //this converts aflow lists/ranges to bader lists/ranges
@@ -1865,9 +1931,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::listORrange2vec
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool listORrange2vec(const string& misc_option, vector<int>& vout, ostream& oss) {
     string soliloquy = "bader_functions::BaderCalc():  ";  // so you know who's speaking
@@ -1966,9 +2032,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::BaderExtensionFound
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool BaderExtensionFound(const string& FileNameIN, string& FileNameOUT, const string& directory) {
     //input filename and directory, output full path of compressed/unccompressed file
@@ -1985,9 +2051,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::BaderExtensionFound
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool BaderExtensionFound(const string& FileNameIN, const string& directory) {
     string FileNameOUT;
@@ -1995,9 +2061,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::adjust_header
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   void adjust_header(string& new_header, stringstream& FileIN_ss) {
     string soliloquy = "bader_functions::adjust_header():  ";  // so you know who's speaking
@@ -2030,9 +2096,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::prepare_CHGCAR_4_Jmol
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   string prepare_CHGCAR_4_Jmol(aurostd::xoption vpflow) {
     ostringstream oss;
@@ -2128,9 +2194,9 @@ namespace bader_functions {
 }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::get_species_string
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool get_species_string(string& outcar_file, string& species_string, const string& dir_to_look, const string& file, ostream& oss) {
     string soliloquy = "bader_functions::get_species_string():  ";  // so you know who's speaking
@@ -2185,9 +2251,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::prepare_CHGCAR_4_Jmol
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool prepare_CHGCAR_4_Jmol(const string& _chgcar_file, string& species_header, bool zip_file, ostream& oss) {
     string soliloquy = "bader_functions::prepare_CHGCAR_4_Jmol():  ";  // so you know who's speaking
@@ -2238,9 +2304,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::prepare_CHGCAR_4_Jmol
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool prepare_CHGCAR_4_Jmol(string& _chgcar_file, string& species_header, ostream& oss) {
     bool zip_file = false;
@@ -2248,9 +2314,9 @@ namespace bader_functions {
   }
 }  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // bader_functions::prepare_CHGCAR_4_Jmol
-//***************************************************************************//
+// ***************************************************************************//
 namespace bader_functions {
   bool prepare_CHGCAR_4_Jmol(string& _chgcar_file, string& species_header) {
     ostringstream oss;
@@ -2264,9 +2330,9 @@ namespace bader_functions {
 //[CO20180220 - moved to aurostd]namespace bader_functions {
 //[CO20180220 - moved to aurostd]}  // namespace bader_functions
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   string CHGCAR2JVXL(aurostd::xoption& vpflow) {  //CO
     ostringstream oss;
@@ -2446,9 +2512,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(vector<string>& chgcar_files, const vector<double>& cutoffs, const vector<int>& downsample_ratios, const bool& cyclic, ostream& oss) {  //CO
     //NO OUTPUT_FILES SPECIFIED
@@ -2457,9 +2523,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(vector<string>& chgcar_files,
       const vector<double>& cutoffs,
@@ -2603,9 +2669,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(vector<string>& chgcar_files, const vector<double>& cutoffs, const vector<int>& downsample_ratios, ostream& oss) {  //CO
     //NO CYCLIC VARIABLE, so assume sets
@@ -2614,9 +2680,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(vector<string>& chgcar_files, const vector<double>& cutoffs, const bool& cyclic, ostream& oss) {  //CO
     //NO DOWNSAMPLE
@@ -2625,9 +2691,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(vector<string>& chgcar_files, const vector<double>& cutoffs, ostream& oss) {  //CO
     //NO DOWNSAMPLE OR CYCLIC
@@ -2636,9 +2702,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(vector<string>& chgcar_files,
       const vector<double>& cutoffs,
@@ -2651,9 +2717,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(vector<string>& chgcar_files,
       const vector<double>& cutoffs,
@@ -2665,9 +2731,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(string chgcar_file, const double cutoff, const int downsample_ratio, string output_file, ostream& oss) {
     //ACTUALLY HANDLES JMOL INTERACTION
@@ -2805,29 +2871,33 @@ namespace pflow {
     if(LDEBUG) cerr << jmol_output;
     //I WOULD LIKE TO DO THIS, BUT JMOL'S OUTPUT MAY CHANGE WITH DIFFERENT VERSIONS, SO JUST CHECK FOR JVXL FILE
     //check output and that jvxl file exists
-    /*if(!(aurostd::substring2bool(jmol_output,"isosurface1created")&&aurostd::substring2bool(jmol_output,"OKXJVXL")&&
-      aurostd::FileExist(output_file))) {
-      oss << endl;
-      oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl //CO20180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
-      oss << soliloquy << "Please correctly set your display variable and check your version of JmolData/Jmol." << endl;
-      oss << soliloquy << "Exiting." << endl;
-      oss << endl;
-      aurostd::RemoveFile(chgcar_file);
-      return FALSE;
-      }*/
+    //if(!(aurostd::substring2bool(jmol_output,"isosurface1created")&&aurostd::substring2bool(jmol_output,"OKXJVXL")&&
+    //  aurostd::FileExist(output_file))) {
+    //  oss << endl;
+    //  oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl //CO20180502;
+    //  oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
+    //  oss << soliloquy << "Please correctly set your display variable and check your version of JmolData/Jmol." << endl;
+    //  oss << soliloquy << "Exiting." << endl;
+    //  oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
+    //  aurostd::RemoveFile(chgcar_file);
+#endif
+    //  return FALSE;
+    //}
     //isosurface1 created
     //NO LONGER APPLICABLE
-    /*if(jmol_output!="-5") {    //expected command from Jmol, if it doesn't come out, then likely display variable off
-      oss << endl;
-      oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl //CO20180502;
-      oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
-      oss << soliloquy << "Please correctly set your display variable." << endl;
-      oss << soliloquy << "Exiting." << endl;
-      oss << endl;
-      aurostd::RemoveFile(chgcar_file);
-      return FALSE;
-      }*/
+    //if(jmol_output!="-5") {    //expected command from Jmol, if it doesn't come out, then likely display variable off
+    //  oss << endl;
+    //  oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl //CO20180502;
+    //  oss << soliloquy << "[dir=" << directory << "]" << endl; //CO20180220
+    //  oss << soliloquy << "Please correctly set your display variable." << endl;
+    //  oss << soliloquy << "Exiting." << endl;
+    //  oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
+    //  aurostd::RemoveFile(chgcar_file);
+#endif
+    //  return FALSE;
+    //}
     if((!aurostd::FileExist(output_file)) || aurostd::FileEmpty(output_file)) {
       oss << endl;
       oss << soliloquy << "ERROR: Jmol unable to create .jvxl file." << " "; //<< endl //CO20180502;
@@ -2835,22 +2905,26 @@ namespace pflow {
       oss << soliloquy << "Please correctly set your display variable and check your version of JmolData/Jmol." << endl;
       oss << soliloquy << "Exiting." << endl;
       oss << endl;
+#ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveFile(chgcar_file);
+#endif
       return FALSE;
     }
     oss << soliloquy << output_file << " successfully created." << endl;
     //REMOVE TEMP CHGCAR_FILE
+#ifndef _AFLOW_TEMP_PRESERVE_
     if(clean_up) {
       oss << soliloquy << "removing temporary file " << chgcar_file << "." << endl;
       aurostd::RemoveFile(chgcar_file);
     }
+#endif
     return TRUE;
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(string chgcar_file, const double& cutoff, const int& downsample_ratio, ostream& oss) {
     //MISSING OUTPUT
@@ -2859,9 +2933,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(string chgcar_file, const double& cutoff, string& output_file, ostream& oss) {
     //MISSING DOWNSAMPLE
@@ -2870,9 +2944,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool CHGCAR2JVXL(string chgcar_file, const double& cutoff, ostream& oss) {
     //MISSING DOWNSAMPLE AND OUTPUT
@@ -2881,9 +2955,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL_get_output_filename
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   string CHGCAR2JVXL_get_output_filename(string chgcar_file, const double& cutoff, const int& downsample_ratio) {
     //for handling compressed files, e.g. we don't want .EXT to be part of output name
@@ -2904,9 +2978,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::CHGCAR2JVXL_get_output_filename
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   string CHGCAR2JVXL_get_output_filename(string chgcar_file, const double& cutoff) {
     //NO DOWNSAMPLE
@@ -2915,9 +2989,9 @@ namespace pflow {
   }
 }  // namespace pflow
 
-//***************************************************************************//
+// ***************************************************************************//
 // pflow::PLOT_PHDISP
-//***************************************************************************//
+// ***************************************************************************//
 namespace pflow {
   bool PLOT_PHDISP(vector<string>& argv) {
     // Generate phonon dispersion plot using GNUPLOT.  Usage:
@@ -3093,16 +3167,14 @@ namespace pflow {
           tokens.clear();
           continue;
         }
-        /*
-        // Read positions of exact qpoints
-        if( line.find("<exact>") != string::npos ) // was "<exact>" in the line?
-        {
-        tokenize(line, tokens, string(" "));
-        exactQPointPositions.push_back( atof( tokens[2].c_str() ) );
-        tokens.clear();
-        continue;
-        }
-        */
+        //// Read positions of exact qpoints
+        //if( line.find("<exact>") != string::npos ) // was "<exact>" in the line?
+        //{
+        //tokenize(line, tokens, string(" "));
+        //exactQPointPositions.push_back( atof( tokens[2].c_str() ) );
+        //tokens.clear();
+        //continue;
+        //}
       }  // End: Read the header
     }    // End: if( fin.open() )
     fin.close();
@@ -3185,7 +3257,7 @@ namespace pflow {
     }    // End:  for loop over requested units outFlags
 
     //
-    //***********************************GENERATING GNUPLOT SCRIPTS******************************************************
+    // ***********************************GENERATING GNUPLOT SCRIPTS******************************************************
     // write PHON, the quintuplet plot of all data
     if(dis_data && dos_data && thermo_data) {
       for (unsigned int b = 0; b < unitName.size(); ++b) {
@@ -3356,9 +3428,9 @@ namespace pflow {
   }  // End: function pflow::PLOT_PHDISP()
 }
 
-//***************************************************************************//
+// ***************************************************************************//
 // gnuplotPhononHeader
-//***************************************************************************//
+// ***************************************************************************//
 string gnuplotPhononHeader(string directory, string name, string unit, string plot_type, string title) {
   // a helper function for pflow::PLOT_PHDISP() that returns a string of gnuplot instructions
   // that define an .eps plot
@@ -3378,9 +3450,9 @@ string gnuplotPhononHeader(string directory, string name, string unit, string pl
   return temp;
 }
 
-//***************************************************************************//
+// ***************************************************************************//
 // gnuplotPhononDisp
-//***************************************************************************//
+// ***************************************************************************//
 string gnuplotPhononDisp(string dis_path, string ylabel, double conversion,
     vector<string> specialLabels, vector<double> specialPositions, int nbranches,
     string rightmargin, string botmargin) {
@@ -3441,9 +3513,9 @@ string gnuplotPhononDisp(string dis_path, string ylabel, double conversion,
   return temp;
 }
 
-//***************************************************************************//
+// ***************************************************************************//
 // gnuplotPhononDos
-//***************************************************************************//
+// ***************************************************************************//
 string gnuplotPhononDos(string pdos_path, string leftmargin, string botmargin) {
   // Helper function to pflow::PLOT_PHDISP() that returns a string of the gnuplot
   // instructions for plotting the phonon density of states
@@ -3472,9 +3544,9 @@ string gnuplotPhononDos(string pdos_path, string leftmargin, string botmargin) {
   return temp;
 }
 
-//***************************************************************************//
+// ***************************************************************************//
 // gnuplotPhononThermo
-//***************************************************************************//
+// ***************************************************************************//
 string gnuplotPhononThermo(string thermo_path, string topmargin) {
   // Helper function to pflow::PLOT_PHDISP() that returns a string of the gnuplot
   // instructions for plotting F_vib, S_vib, and C_v
@@ -3551,9 +3623,9 @@ string gnuplotPhononThermo(string thermo_path, string topmargin) {
   return temp;
 }
 
-//***************************************************************************//
+// ***************************************************************************//
 // callOutputConversion
-//***************************************************************************//
+// ***************************************************************************//
 void callOutputConversion(bool PNG, bool PDF, bool JPG, bool GIF, string directory, string name, string unit, string plot) {
   // Helper function for pflow::PLOT_PHDISP() that calls `convert' to produce the requested image types from .eps
   if(PNG) {
@@ -3574,9 +3646,9 @@ void callOutputConversion(bool PNG, bool PDF, bool JPG, bool GIF, string directo
   }
 }
 
-//***************************************************************************//
+// ***************************************************************************//
 // cleanGnuplotScript
-//***************************************************************************//
+// ***************************************************************************//
 void cleanGnuplotScript(bool file1, bool file2, bool file3, string script) {
   // Helper function for pflow::PLOT_PHDISP() that removes the gnuplot scripts
   if(!XHOST.vflag_control.flag("KEEP::GPL")){ //CO20180809

@@ -98,9 +98,9 @@
 // ***************************************************************************
 
 // ***************************************************************************
-// pflow::comparePermutations()
+// compare::comparePermutations()
 // ***************************************************************************
-namespace pflow {
+namespace compare {
   string comparePermutations(istream& input, const aurostd::xoption& vpflow){
     ostringstream oss;
     ofstream FileMESSAGE; //DX20190319 - added FileMESSAGE
@@ -112,7 +112,7 @@ namespace pflow {
     // FLAG: usage
     if(vpflow.flag("COMPARE_PERMUTATION::USAGE")) {
       stringstream ss_usage;
-      init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"pflow::comparePermutations()",aurostd::liststring2string(usage,options));
+      init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_PERMUTATION"),"compare::comparePermutations()",aurostd::liststring2string(usage,options));
       return ss_usage.str();
     }
 
@@ -246,7 +246,8 @@ namespace compare{
       structure.structure_representative.SpeciesPutAlphabetic();
     }
     structure.structure_representative_generated = true; 
-    structure.structure_representative_from = "input"; 
+    structure.structure_representative_source = "input";
+    structure.structure_representative_relaxation_step = 0; //DX20200429 input is assumed to be unrelaxed
 
     // ---------------------------------------------------------------------------
     // get the unique permutations for the structure
@@ -314,14 +315,14 @@ namespace compare{
 }
 
 // ***************************************************************************
-// pflow::compareMultipleStructures()
+// compare::compareMultipleStructures()
 // ***************************************************************************
-namespace pflow {
+namespace compare {
   string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream){ //DX20190425 - changed name, more general
 
     // This function compares multiple structures (i.e., more than two).
 
-    string function_name = "pflow::compareMultipleStructures()";
+    string function_name = "compare::compareMultipleStructures():";
     bool LDEBUG=(false || XHOST.DEBUG);
     ostringstream oss;
     //DX20200103 ostream& logstream = cout;
@@ -340,36 +341,36 @@ namespace pflow {
       if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY")){
         string usage_material_comparison="aflow --compare_materials -D <dir_path>";
         string options_material_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff]";
-        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"pflow::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
+        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_material_comparison,options_material_comparison));
       }
       // structure-type comparisons
       else if(vpflow.flag("COMPARE_STRUCTURE_DIRECTORY")){
         string usage_structure_comparison="aflow --compare_structures -D <dir_path>";
         string options_structure_comparison="[--usage] [--np=|--num_proc=<number>] [--optimize_match] [--no_scale_volume] [--ignore_symmetry] [--ignore_Wyckoff] [--remove_duplicates|--remove_duplicate_compounds]";
-        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"pflow::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
+        init::ErrorOption(ss_usage,vpflow.getattachedscheme("COMPARE_STRUCTURE"),"compare::compareMultipleStructures()",aurostd::liststring2string(usage_structure_comparison,options_structure_comparison));
       }
       return ss_usage.str();
     }
 
     // ---------------------------------------------------------------------------
     // distinguish structures coming from directory or file
-    string structures_from = ""; // "structure_list", "directory" or "file"
+    string structures_source = ""; // "structure_list", "directory" or "file"
 
     // from list appended to command
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST").empty()){
-      structures_from = "structure_list";
+      structures_source = "structure_list";
     }
     // from directory
     //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY") || vpflow.flag("COMPARE_STRUCTURE_DIRECTORY"))
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY").empty())
     { //CO20200106 - patching for auto-indenting
-      structures_from = "directory";
+      structures_source = "directory";
     }
     // from file
     //DX20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_FILE") || vpflow.flag("COMPARE_STRUCTURE_FILE"))
     if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE").empty())
     { //CO20200106 - patching for auto-indenting
-      structures_from = "file";
+      structures_source = "file";
     }
 
     // ---------------------------------------------------------------------------
@@ -378,13 +379,13 @@ namespace pflow {
     string directory=".";
     string filename="";
     //DX20190424 START
-    if(structures_from=="structure_list") {
+    if(structures_source=="structure_list") {
       aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),file_list,",");
       message << "List of files to compare: " << aurostd::joinWDelimiter(file_list,",");
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     //DX20190424 END
-    else if(structures_from=="directory") {
+    else if(structures_source=="directory") {
       directory=vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY");
       if(!aurostd::FileExist(directory)) {
         message << "Unable to locate directory: " << directory << ". Exiting." << endl;
@@ -396,7 +397,7 @@ namespace pflow {
     }
     // ---------------------------------------------------------------------------
     // FLAG: file of structures to compare
-    else if(structures_from=="file") {
+    else if(structures_source=="file") {
       filename=vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE");
       if(!aurostd::FileExist(filename)) {
         message << "Unable to locate file: " << filename << ". Exiting." << endl;
@@ -580,13 +581,13 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // load structures 
     vector<StructurePrototype> final_prototypes;
-    if(structures_from=="structure_list") {
+    if(structures_source=="structure_list") {
       final_prototypes = compare::compareStructuresFromStructureList(file_list, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
-    else if(structures_from=="directory") {
+    else if(structures_source=="directory") {
       final_prototypes = compare::compareStructuresFromDirectory(directory, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
-    if(structures_from=="file") {
+    if(structures_source=="file") {
       final_prototypes = compare::compareStructuresFromFile(filename, magmoms_for_systems, oss, FileMESSAGE, num_proc, same_species, comparison_options); //DX20200103 - condensed booleans to xoptions
     }
 
@@ -686,12 +687,12 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// pflow::getIsopointalPrototypes - returns corresponding prototype label
+// compare::getIsopointalPrototypes - returns corresponding prototype label
 // ***************************************************************************
-namespace pflow {
+namespace compare {
   string isopointalPrototypes(istream& input, const aurostd::xoption& vpflow){ 
     
-    string function_name = "pflow::IsopointalPrototypes()";
+    string function_name = "compare::IsopointalPrototypes():";
     string usage="aflow --isopointal_prototypes|--get_isopointal_prototypes < POSCAR";
     string options="";
     
@@ -712,7 +713,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // get isopointal structures 
     // (calculates symmetry of input structure and grabs symmetrically similar prototypes)
-    vector<string> isopointal_prototypes = pflow::getIsopointalPrototypes(xstr, catalog);
+    vector<string> isopointal_prototypes = compare::getIsopointalPrototypes(xstr, catalog);
 
     if(isopointal_prototypes.size()==0){
       return "no isopointal prototypes in AFLOW";
@@ -723,12 +724,12 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// pflow::getIsopointalPrototypes - returns corresponding prototype label
+// compare::getIsopointalPrototypes - returns corresponding prototype label
 // ***************************************************************************
-namespace pflow {
+namespace compare {
   vector<string> getIsopointalPrototypes(xstructure& xstr, string& catalog){ 
     
-    string function_name = "pflow::getIsopointalPrototypes()";
+    string function_name = "compare::getIsopointalPrototypes():";
     
     // ---------------------------------------------------------------------------
     // stoichiometry
@@ -755,9 +756,9 @@ namespace pflow {
 
 //DX20190314 - added new function - START
 // ***************************************************************************
-// pflow::getMatchingPrototype - returns corresponding prototype label
+// compare::getMatchingPrototype - returns corresponding prototype label
 // ***************************************************************************
-namespace pflow {
+namespace compare {
   vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog){ 
 
     // Returns the matching prototype label, if any exists
@@ -794,23 +795,27 @@ namespace pflow {
 
 //DX20190314 - added overloads for compare2prototypes - START
 // ***************************************************************************
-// pflow::compare2prototypes - identifies corresponding protos 
+// compare::compare2prototypes - identifies corresponding protos 
 // ***************************************************************************
-namespace pflow {
-  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow){ 
+namespace compare {
+  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ostream& logstream){ 
+    ofstream FileMESSAGE;
+    return compare2prototypes(input, vpflow, FileMESSAGE, logstream);
+  }
+  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){ 
 
     // ---------------------------------------------------------------------------
     // load input structure
     xstructure xstr(input,IOAFLOW_AUTO);
 
-    return compare2prototypes(xstr, vpflow);
+    return compare2prototypes(xstr, vpflow, FileMESSAGE, logstream);
   }
 }
 
 // ***************************************************************************
-// pflow::printMatchingPrototypes - returns list of matching structures 
+// compare::printMatchingPrototypes - returns list of matching structures 
 // ***************************************************************************
-namespace pflow {
+namespace compare {
   string printMatchingPrototypes(istream& input, const aurostd::xoption& vpflow){ 
 
     // ---------------------------------------------------------------------------
@@ -818,13 +823,14 @@ namespace pflow {
     xstructure xstr(input,IOAFLOW_AUTO);
 
     return printMatchingPrototypes(xstr,vpflow);
+
   }
 }
 
 // ***************************************************************************
-// pflow::printMatchingPrototypes - returns list of matching structures 
+// compare::printMatchingPrototypes - returns list of matching structures 
 // ***************************************************************************
-namespace pflow {
+namespace compare {
   string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow){ 
 
     //DX20190425 - added print flag - START
@@ -877,22 +883,29 @@ namespace pflow {
 
 //DX20190314 - added overloads for compare2prototypes - END
 // ***************************************************************************
-// pflow::compare2prototypes - identifies corresponding protos 
+// compare::compare2prototypes - identifies corresponding protos 
 // ***************************************************************************
-namespace pflow {
-  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream){ 
-    bool LDEBUG=(false || XHOST.DEBUG);
+namespace compare {
+  vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream){ 
+    ofstream FileMESSAGE;
+    return compare2prototypes(xstrIN, vpflow, FileMESSAGE, logstream);
+  }
+  vector<StructurePrototype> compare2prototypes(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){ 
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    string function_name = "pflow::compare2prototypes()";
+    string function_name = "compare::compare2prototypes():";
     ostringstream oss;
     //DX20200103 ostream& logstream = cout;
+    bool quiet = false;
     stringstream message;
-    ofstream FileMESSAGE;
+    //DX20200226 [OBSOLETE] ofstream FileMESSAGE;
 
     string directory="";
 
     string usage="aflow --compare2protos|--compare2prototypes < POSCAR";
     string options="";
+
+    xstructure xstr = xstrIN; //DX20200226 - copy
 
     // ---------------------------------------------------------------------------
     // create xoptions to contain all comparison options
@@ -979,7 +992,8 @@ namespace pflow {
     input_structure.structure_representative_compound = compare::getCompoundName(xstr);
     input_structure.structure_representative_generated = true;
     stringstream ss_input; ss_input << xstr;
-    input_structure.structure_representative_from = ss_input.str(); 
+    input_structure.structure_representative_source = ss_input.str();
+    input_structure.structure_representative_relaxation_step = 0; //DX20200429 input is assumed to be unrelaxed
     all_structures.push_back(input_structure);
 
     // ---------------------------------------------------------------------------
@@ -1002,7 +1016,7 @@ namespace pflow {
     }
 
     if(LDEBUG) {
-      cerr << function_name << ": Wyckoff positions of input structure:" << endl;
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
         cerr << all_structures[0].grouped_Wyckoff_positions[i] << endl;
       }
@@ -1016,7 +1030,7 @@ namespace pflow {
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
 
     if(LDEBUG) {
-      cerr << function_name << ": Wyckoff positions of input structure:" << endl;
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
         cerr << all_structures[0].grouped_Wyckoff_positions[i] << endl;
       }
@@ -1048,7 +1062,7 @@ namespace pflow {
     message << "Potential compatible prototypes: " << vlabel.size() << " (" << aurostd::joinWDelimiter(vlabel,",") << ").";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     if(LDEBUG) {
-      cerr << function_name << ": Wyckoff positions of input structure:" << endl;
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
         cerr << all_structures[0].grouped_Wyckoff_positions[i] << endl;
       }
@@ -1063,7 +1077,7 @@ namespace pflow {
 
     compare::addAFLOWPrototypes2StructurePrototypeVector(all_structures, vlabel); 
     if(LDEBUG) {
-      cerr << function_name << ": Wyckoff positions of input structure:" << endl;
+      cerr << function_name << " Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
         cerr << all_structures[0].grouped_Wyckoff_positions[i] << endl;
       }
@@ -1078,6 +1092,7 @@ namespace pflow {
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"), 
+        comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
         false); //DX20200103 - condensed booleans to xoptions 
     message << "Number of comparison groups: " << comparison_schemes.size() << ".";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -1086,7 +1101,7 @@ namespace pflow {
     // compare structures 
     message << "Running comparisons ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(comparison_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE); //DX20200103 - condensed booleans to xoptions 
+    vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(comparison_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE, quiet, logstream); //DX20200103 - condensed booleans to xoptions 
 
     message << "Comparisons complete ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
@@ -1108,7 +1123,7 @@ namespace pflow {
       for(uint i=0;i<final_prototypes.size();i++){
         // check if xstructure is generated; if not, make it
         if(!final_prototypes[i].structure_representative_generated){
-          if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_from,final_prototypes[i].structure_representative,oss)){
+          if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_source,final_prototypes[i].structure_representative_relaxation_step,final_prototypes[i].structure_representative,oss)){ //DX20200429
             message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
           }
@@ -1140,18 +1155,93 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// pflow::compare2database - compares database 
+// compare::isMatchingStructureInDatabase - boolean if match found in database 
 // ***************************************************************************
-namespace pflow {
-  string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){
+namespace compare {
+  // load input structure
+  bool isMatchingStructureInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream){ ofstream FileMESSAGE; return isMatchingStructureInDatabase(xstrIN, vpflow, FileMESSAGE, logstream); }
+  bool isMatchingStructureInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
+    
+    // ---------------------------------------------------------------------------
+    // main compare2database() function
+    vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
+   
+    // ---------------------------------------------------------------------------
+    // safety against bad input geometry files
+    if(final_prototypes.empty()){
+      string function_name = "compare::isMatchingStructureInDatabase():";
+      stringstream message;
+      message << "The input geometry file is invalid (could not be read, corrupt, etc.); it could not be compared to the database.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_FILE_ERROR_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // database contains input structure
+    if(final_prototypes[0].structures_duplicate_names.size()){
+      return true;
+    }
+   
+    // ---------------------------------------------------------------------------
+    // database DOESN'T contain equivalent structure in input
+    return false;
+
+  }
+}
+
+// ***************************************************************************
+// compare::matchingStructuresInDatabase - returns matching structures in database 
+// ***************************************************************************
+namespace compare {
+  // load input structure
+  vector<matching_structure> matchingStructuresInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream){ ofstream FileMESSAGE; return matchingStructuresInDatabase(xstrIN, vpflow, FileMESSAGE, logstream); }
+  vector<matching_structure> matchingStructuresInDatabase(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
+    
+    // ---------------------------------------------------------------------------
+    // main compare2database() function
+    vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
+   
+
+    vector<matching_structure> matched_database_structures;
+
+    // ---------------------------------------------------------------------------
+    // database DOESN'T contain equivalent structure to input
+    if(!final_prototypes[0].structures_duplicate_names.size()){
+      return matched_database_structures;
+    }
+   
+    // ---------------------------------------------------------------------------
+    // return equivalent structures to input
+    for(uint i=0;i<final_prototypes[0].structures_duplicate_names.size();i++){
+      matching_structure database_entry;
+      database_entry.name = final_prototypes[0].structures_duplicate_names[i];
+      database_entry.misfit = final_prototypes[0].structure_misfits_duplicate[i].misfit;
+      matched_database_structures.push_back(database_entry);
+    }
+
+    return matched_database_structures;
+
+  }
+}
+
+// ***************************************************************************
+// compare::compare2database - compares database 
+// ***************************************************************************
+namespace compare {
+  // load input structure
+  vector<StructurePrototype> compare2database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ostream& logstream){ ofstream FileMESSAGE; return compare2database(xstrIN, vpflow, FileMESSAGE, logstream); }
+  vector<StructurePrototype> compare2database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    string function_name = "pflow::compare2database()";
+    vector<StructurePrototype> final_prototypes; //DX20200225
+    xstructure xstr = xstrIN; //copy //DX20200225
+
+    string function_name = "compare::compare2database():";
     string directory = "";
     ostringstream oss;
-    //DX20200103 ostream& logstream = cout;
     stringstream message;
-    ofstream FileMESSAGE;
+    bool quiet = false;
+    //DX20200103 ostream& logstream = cout;
+    //DX20200225 ofstream FileMESSAGE;
 
     string usage="aflow --compare2database < POSCAR";
     string options="";
@@ -1181,6 +1271,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // FLAG: optimize match
     if(vpflow.flag("COMPARE2DATABASE::OPTIMIZE_MATCH")) {
+      comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",TRUE); //DX20200225 - was missing
       message << "OPTIONS: Finding optimal match; exploring all possible lattices and origins to find the best match (note: this will slow down the comparisons)."; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
@@ -1253,6 +1344,37 @@ namespace pflow {
     }
 
     // ---------------------------------------------------------------------------
+    // FLAG: specify the relaxation step to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
+    //DX TODO 
+    uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
+    bool load_most_relaxed_structure_only = true; 
+    if(vpflow.flag("COMPARE2DATABASE::RELAXATION_STEP")) {
+      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "orig") || 
+          vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP") == "0"){
+        relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
+        load_most_relaxed_structure_only = false;
+      }
+      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "relax1") || 
+          aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP")), "middle_relax") || 
+          vpflow.getattachedscheme("COMPARE2DATABASE::RELAXATION_STEP") == "1"){
+        relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
+        load_most_relaxed_structure_only = false;
+      }
+      message << "OPTIONS: Relaxation step (0=original, 1=relax1, 2=most_relaxed): " << relaxation_step << endl; 
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+
+    // ---------------------------------------------------------------------------
+    // should not grab properties and compare structures other than the most relaxed structure 
+    if(property_list.size() && relaxation_step != _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
+      string relaxation_name = "";
+      if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ relaxation_name = "original"; }
+      else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_){ relaxation_name = "relax1"; }
+      message << "The " << relaxation_name << " structures will be extracted; the properties will not correspond to these structures. Proceed with caution."; 
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+    }
+
+    // ---------------------------------------------------------------------------
     // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
     string catalog = "";
     string catalog_summons = "";
@@ -1266,18 +1388,6 @@ namespace pflow {
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
-    //DX20190425 - added print flag - START
-    // ---------------------------------------------------------------------------
-    // FLAG: print format
-    string format = "both";
-    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
-      format = "txt";
-    }
-    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
-      format = "json";
-    }
-    //DX20190425 - added print flag - END
-
     //DX20190508 - added keep unmatched - START
     // ---------------------------------------------------------------------------
     // FLAG: do not remove unmatched structures from the StructurePrototype Object
@@ -1286,19 +1396,6 @@ namespace pflow {
       comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",FALSE);
     }
     //DX20190508 - added keep unmatched - END
-
-    //DX20190425 - added screen only flag - START
-    // ---------------------------------------------------------------------------
-    // FLAG: print format
-    bool screen_only = false;
-    if(vpflow.flag("COMPARE2DATABASE::SCREEN_ONLY")) {
-      screen_only=true;
-    }
-    //DX20190425 - added screen only flag - END
-
-    // ---------------------------------------------------------------------------
-    // load input structure
-    xstructure xstr(input,IOAFLOW_AUTO);
 
     // ---------------------------------------------------------------------------
     // fix species (remove pseudopotentials, etc.) 
@@ -1313,7 +1410,7 @@ namespace pflow {
     if(vspecies[0]=="A" && !structure_comparison){
       message << "Atomic species are missing for the input structure. Cannot compare to database materials without species.";     
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
-      return "";
+      return final_prototypes; //empty //DX20200225
     }
     //DX20190329 - added species check - END
 
@@ -1336,11 +1433,29 @@ namespace pflow {
       int enantiomorph_space_group_number = SYM::getEnantiomorphSpaceGroupNumber(space_group_number);
       if(space_group_number == enantiomorph_space_group_number){
         // relaxed: need to match last in string, i.e., "*,<sg_symbol> <sg_number>" (comma necessary or we may grab the orig symmetry)
-        space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27)";
+        if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
+          space_group_summons = "sg2(%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*)";
+        }
+        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
+          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*)";
+        }
+        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
+          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27)";
+        }
       }
       else { // need to get enantiomorph too
-        space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
-        space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27)";
+        if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
+          space_group_summons = "sg2(%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+          space_group_summons += ":%27" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*)";
+        }
+        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
+          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+          space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*)";
+        }
+        else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
+          space_group_summons = "sg2(*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+          space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27)";
+        }
       }
       matchbook.push_back(space_group_summons);
     }
@@ -1382,7 +1497,7 @@ namespace pflow {
     message << "Number of entries returned: " << aurostd::string2tokens(response,tokens,"\n");
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
-    if(LDEBUG) {cerr << function_name << "::AFLUX response:" << endl << response << endl;}
+    if(LDEBUG) {cerr << function_name << " AFLUX response:" << endl << response << endl;}
 
     // ---------------------------------------------------------------------------
     // extract properties from AFLUX response
@@ -1466,6 +1581,8 @@ namespace pflow {
     // store input structure 
     StructurePrototype input_structure;
     input_structure.structure_representative = xstr;
+    input_structure.natoms = xstr.atoms.size(); //DX20200421
+    input_structure.ntypes = xstr.num_each_type.size(); //DX20200421
     input_structure.structure_representative.ReScale(1.0); //DX20191105
     input_structure.structure_representative_name = "input geometry";
     input_structure.stoichiometry = compare::getStoichiometry(xstr,same_species);
@@ -1474,7 +1591,8 @@ namespace pflow {
     //DX20191105 [MOVED LATER - SAME AS SYMMETRY] input_structure.LFA_environments= compare::computeLFAEnvironment(input_structure.structure_representative); //DX20190711
     input_structure.structure_representative_generated = true; 
     stringstream ss_input; ss_input << xstr;
-    input_structure.structure_representative_from = ss_input.str(); 
+    input_structure.structure_representative_source = ss_input.str();
+    input_structure.structure_representative_relaxation_step = 0; //DX20200429 - input assumed to be unrelaxed
     input_structure.property_names = property_list;
     input_structure.property_units = property_units;
     all_structures.push_back(input_structure);
@@ -1515,24 +1633,55 @@ namespace pflow {
       // instead: filter on stoichiometry after recieving AFLUX response
       if(compare::sameStoichiometry(stoichiometry,tmp_reduced_stoich)){
         aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i]; 
-        if(!loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;}
-        if(entry.vstr.size()==1){
+        vector<string> structure_files;
+        if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, "Could not load structure (auid="+entry.auid+") ... skipping...", FileMESSAGE, logstream, _LOGGER_WARNING_);
+          continue;
+        }
+        bool found_structure = false;
+        uint structure_index = 0;
+        if(load_most_relaxed_structure_only && entry.vstr.size()==1){
+          found_structure = true;
+          structure_index = 0;
+        }
+        else if(!load_most_relaxed_structure_only){
+          if(entry.vstr.size()==3 && structure_files.size()==3){
+            if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_ && 
+                (structure_files[0] == "POSCAR.orig" || 
+                 structure_files[0] == "POSCAR.relax1")){ 
+              structure_index = 0; 
+              found_structure = true; 
+              if(LDEBUG){cerr << function_name << " loaded original structure: " << structure_files[0] << endl;}
+            }
+            else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_ && 
+                (structure_files[1] == "POSCAR.relax2" || 
+                 structure_files[1] == "CONTCAR.relax1")){ 
+              structure_index = 1; 
+              found_structure = true; 
+              if(LDEBUG){cerr << function_name << " loaded relax1 structure: " << structure_files[1] << endl;}
+            }
+          }
+        }
+        if(found_structure){
           // store entry from database
           StructurePrototype str_proto_tmp;
           deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
-          entry.vstr[0].SetSpecies(deque_species);
-          str_proto_tmp.structure_representative = entry.vstr[0];
+          entry.vstr[structure_index].SetSpecies(deque_species);
+          str_proto_tmp.structure_representative = entry.vstr[structure_index];
+          str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20200421
+          str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20200421
           str_proto_tmp.structure_representative.ReScale(1.0); //DX20191105
           str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX20190321 - changed to false, i.e., do not load from common
           str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directoryr
           str_proto_tmp.structure_representative_generated=true;
-          str_proto_tmp.structure_representative_from="aurl";
+          str_proto_tmp.structure_representative_source="aurl";
+          str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
           str_proto_tmp.stoichiometry=tmp_reduced_stoich;
-          str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]); //DX20190430 - added
+          str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]); //DX20190430 - added
           //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX20190711
           str_proto_tmp.elements=species;
-          str_proto_tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX20191031
-          str_proto_tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX20191031
+          str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
+          str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20191031
           // store any properties 
           for(uint l=0;l<properties_response[i].size();l++){
             bool property_requested = false;
@@ -1544,12 +1693,12 @@ namespace pflow {
             }
           }
           if(LDEBUG) {
-            cerr << "pflow::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
+            cerr << "compare::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
           }
           all_structures.push_back(str_proto_tmp);
         }
         else {
-          message << "More structures loaded than anticipated for auid=" << auids[i] << ".";     
+          message << "More structures loaded than anticipated for auid=" << auids[i] << " (# structures=" << entry.vstr.size() << ").";     
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
         }
       }
@@ -1599,6 +1748,7 @@ namespace pflow {
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"), 
+        comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
         false); //DX20200103 - condensed booleans to xoptions 
     //cerr << "number of schemes: " << comparison_schemes.size() << endl;
     //cerr << "comparison_schemes: " << comparison_schemes.size() << endl;
@@ -1614,16 +1764,60 @@ namespace pflow {
     // compare structures
     message << "Running comparisons...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(input_structure_comparison_scheme_only, same_species, num_proc, comparison_options, oss, FileMESSAGE); //DX20200103 - condensed booleans to xoptions 
+    final_prototypes = compare::runComparisonScheme(input_structure_comparison_scheme_only, same_species, num_proc, comparison_options, oss, FileMESSAGE, quiet, logstream); //DX20200103 - condensed booleans to xoptions //DX20200225 - declare variable at top of function
 
+    return final_prototypes;
+  }
+}
+
+// ***************************************************************************
+// compare::compare2database - compares database 
+// ***************************************************************************
+namespace compare {
+  // load input structure
+  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO); ofstream FileMESSAGE; return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //DX20200225
+  string printCompare2Database(istream& input, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){xstructure xstr(input,IOAFLOW_AUTO);return printCompare2Database(xstr,vpflow,FileMESSAGE,logstream);}  //CO20200225
+  string printCompare2Database(const xstructure& xstrIN, const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){
+    
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "compare::printCompare2Database():";
+    stringstream message;
+    ostringstream oss;
+  
+    // ---------------------------------------------------------------------------
+    // main compare2database() function
+    vector<StructurePrototype> final_prototypes = compare::compare2database(xstrIN, vpflow, FileMESSAGE, logstream);
+    
     // ---------------------------------------------------------------------------
     // return if there are no similar structures
     if(final_prototypes.size()==0){
       return oss.str();
     }
-
-    comparison_schemes.clear();
-
+    
+    // ---------------------------------------------------------------------------
+    // FLAG: print format
+    string format = "both";
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
+      format = "txt";
+    }
+    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
+      format = "json";
+    }
+    
+    // ---------------------------------------------------------------------------
+    // FLAG: print format
+    bool screen_only = false;
+    if(vpflow.flag("COMPARE2DATABASE::SCREEN_ONLY")) {
+      screen_only=true;
+    }
+    
+    // ---------------------------------------------------------------------------
+    // FLAG: type of comparison (material-type or structure-type)
+    bool same_species = true;
+    if(vpflow.flag("COMPARE2DATABASE::STRUCTURE")) {
+      same_species = false;
+    }
+    
     // ---------------------------------------------------------------------------
     // print results 
     stringstream ss_out;
@@ -1647,7 +1841,7 @@ namespace pflow {
 
     // ---------------------------------------------------------------------------
     // write results to files
-    if(!structure_comparison){  
+    if(same_species){  
       if(format=="json"){
         aurostd::stringstream2file(ss_json,"database_material_comparison_output.json");
         message << "RESULTS: See database_material_comparison_output.json for list of unique/duplicate materials in database.";
@@ -1686,9 +1880,9 @@ namespace pflow {
 
 //DX - COMPARE DATABASE ENTRIES - START
 // ***************************************************************************
-// pflow::compareDatabaseEntries - compares database entries
+// compare::compareDatabaseEntries - compares database entries
 // ***************************************************************************
-namespace pflow {
+namespace compare {
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream){ //DX20191125 - added ofstream overload and added ostream as input
     ofstream FileMESSAGE;
     return compareDatabaseEntries(vpflow, FileMESSAGE, logstream);
@@ -1697,7 +1891,7 @@ namespace pflow {
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){ //DX20191125 - added ofstream and ostream
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    string function_name = "pflow::compareDatabaseEntries()";
+    string function_name = "compare::compareDatabaseEntries():";
     string directory = ".";
     stringstream message;
     stringstream oss;
@@ -1878,12 +2072,32 @@ namespace pflow {
       message << "OPTIONS: Structure type (POSCAR.orig, POSCAR.relax1, POSCAR.relax2, CONTCAR.relax1, ...): " << geometry_file << endl; 
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
+    
+    // ---------------------------------------------------------------------------
+    // FLAG: specify the relaxation step to grab (orig, relax1, relax2, static, bands, POSCAR, CONTCAR)
+    uint relaxation_step = _COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_;
+    bool load_most_relaxed_structure_only = true; 
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")) {
+      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "orig") || 
+          vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP") == "0" ){
+        relaxation_step = _COMPARE_DATABASE_GEOMETRY_ORIGINAL_;
+        load_most_relaxed_structure_only = false;
+      }
+      if(aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "relax1") || 
+          aurostd::substring2bool(aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP")), "middle_relax") || 
+          vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::RELAXATION_STEP") == "1"){
+        relaxation_step = _COMPARE_DATABASE_GEOMETRY_RELAX1_;
+        load_most_relaxed_structure_only = false;
+      }
+      message << "OPTIONS: Relaxation step (0=original, 1=relax1, 2=most_relaxed): " << relaxation_step << endl; 
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
 
     // ---------------------------------------------------------------------------
     // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
     string catalog = "";
     string catalog_summons = "";
-    bool ICSD_comparison = false;
+    //DX20200331 [OBSOLETE] bool ICSD_comparison = false;
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::CATALOG")) {
       catalog = aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::CATALOG")); //DX20190718
       catalog_summons = "catalog(\'" + catalog + "\')";
@@ -1892,7 +2106,8 @@ namespace pflow {
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     if(catalog=="" || catalog=="icsd" || catalog=="all"){ //DX20191108 - needs to be outside of loop
-      ICSD_comparison=true;
+      comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",TRUE);
+      //DX20200331 [OBSOLETE] ICSD_comparison=true;
     }
 
     // ---------------------------------------------------------------------------
@@ -2062,7 +2277,8 @@ namespace pflow {
       str_proto_tmp.stoichiometry=tmp_reduced_stoich;
       str_proto_tmp.elements=species;
       str_proto_tmp.structure_representative_name=aurls[i];
-      str_proto_tmp.structure_representative_from="aurl";
+      str_proto_tmp.structure_representative_source="aurl";
+      str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
       all_structures.push_back(str_proto_tmp);
     }
     message << "Finished initializing StructurePrototype object, now spawn threads.";     
@@ -2073,7 +2289,7 @@ namespace pflow {
     vector<std::thread*> threads;
     for(uint n=0; n<num_threads; n++){
       //DX20191107 [OBOSLETE - switch to getThreadDistribution convention] threads.push_back(std::thread(compare::generateStructures,std::ref(all_structures),std::ref(oss),start_indices[n],end_indices[n]));
-      threads.push_back(new std::thread(&compare::generateStructures, std::ref(all_structures),std::ref(oss),thread_distribution[n][0],thread_distribution[n][1])); //DX20191107
+      threads.push_back(new std::thread(&compare::generateStructures, std::ref(all_structures),std::ref(logstream),thread_distribution[n][0],thread_distribution[n][1])); //DX20191107 //DX20200225 - oss to logstream
     }
     // ---------------------------------------------------------------------------
     // Join threads
@@ -2084,7 +2300,9 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // try to regenerate via one thread; sometimes multithreading does not load 
     // all structures (timeout issue)
-    compare::generateStructures(all_structures);
+    if(num_threads!=1){
+      compare::generateStructures(all_structures);
+    }
     message << "Threads complete. " << all_structures.size() << " structures. Adding properties.";     
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
@@ -2160,23 +2378,54 @@ namespace pflow {
       // instead: filter on stoichiometry after recieving AFLUX response
       //if(compare::sameStoichiometry(stoichiometry,tmp_reduced_stoich)){
       aflowlib::_aflowlib_entry entry; entry.auid=auids[i]; entry.aurl=aurls[i]; 
-      if(!loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;}
-      if(entry.vstr.size()==1){
+      vector<string> structure_files;
+      if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, "Could not load structure (auid="+entry.auid+") ... skipping...", FileMESSAGE, logstream, _LOGGER_WARNING_);
+        continue;
+      }
+      //DX20200225 - added compare to particular geometry files - START
+      bool found_structure = false;
+      uint structure_index = 0;
+      if(load_most_relaxed_structure_only && entry.vstr.size()==1){
+        found_structure = true;
+        structure_index = 0;
+      }
+      else if(!load_most_relaxed_structure_only){
+        if(entry.vstr.size()==3 && structure_files.size()==3){
+          if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_ORIGINAL_ && 
+              (structure_files[0] == "POSCAR.orig" || 
+               structure_files[0] == "POSCAR.relax1")){ 
+            structure_index = 0; 
+            found_structure = true; 
+            if(LDEBUG){cerr << function_name << " loaded original structure: " << structure_files[0] << endl;}
+          }
+          else if(relaxation_step == _COMPARE_DATABASE_GEOMETRY_RELAX1_ && 
+              (structure_files[1] == "POSCAR.relax2" || 
+               structure_files[1] == "CONTCAR.relax1")){ 
+            structure_index = 1; 
+            found_structure = true; 
+            if(LDEBUG){cerr << function_name << " loaded relax1 structure: " << structure_files[1] << endl;}
+          }
+        }
+      }
+      //DX20200225 - added compare to particular geometry files - END
+      if(found_structure){
         // store entry from database
         StructurePrototype str_proto_tmp;
         deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
-        entry.vstr[0].SetSpecies(deque_species);
-        str_proto_tmp.structure_representative = entry.vstr[0];
+        entry.vstr[structure_index].SetSpecies(deque_species);
+        str_proto_tmp.structure_representative = entry.vstr[structure_index];
         str_proto_tmp.structure_representative.ReScale(1.0); //DX20191105
         str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX20190321 - changed to false, i.e., do not load from common
-        str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directoryr
+        str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX20190718 - update xstructure.directory
         str_proto_tmp.structure_representative_generated=true;
-        str_proto_tmp.structure_representative_from="aurl";
+        str_proto_tmp.structure_representative_source="aurl";
+        str_proto_tmp.structure_representative_relaxation_step=relaxation_step; //DX20200429
         str_proto_tmp.stoichiometry=tmp_reduced_stoich;
         str_proto_tmp.elements=species;
-        str_proto_tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX20191031
-        str_proto_tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX20191031
-        str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]);
+        str_proto_tmp.natoms = entry.vstr[structure_index].atoms.size(); //DX20191031
+        str_proto_tmp.ntypes = entry.vstr[structure_index].num_each_type.size(); //DX20191031
+        str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[structure_index]);
         //DX20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX20190711
         str_proto_tmp.property_names = property_list; //DX20190326
         str_proto_tmp.property_units = property_units; //DX20190326
@@ -2191,7 +2440,7 @@ namespace pflow {
           }
         }
         if(LDEBUG){
-          cerr << "pflow::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
+          cerr << "compare::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
         }
         all_structures.push_back(str_proto_tmp);
       }
@@ -2307,7 +2556,7 @@ namespace compare {
 // compare::compareMultipleStructures()
 // ***************************************************************************
 namespace compare {
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory){ //DX20190319 - added FileMESSAGE
+  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, ostream& logstream){ //DX20190319 - added FileMESSAGE //DX20200226 - added logstream
 
     // ---------------------------------------------------------------------------
     // create xoptions to contain all comparison options
@@ -2322,12 +2571,13 @@ namespace compare {
 }
 
 namespace compare {
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options){ //DX20200103 - condensed booleans to xoptions
+  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options, ostream& logstream){ //DX20200103 - condensed booleans to xoptions //DX20200226 - added logstream
 
-    string function_name = "compare::compareMultipleStructures()";
+    string function_name = "compare::compareMultipleStructures():";
     bool LDEBUG=(false || XHOST.DEBUG);
-    ostream& logstream = cout;
+    //DX20200226 ostream& logstream = cout;
     stringstream message;
+    bool quiet = false;
     //DX20190319 [OBSOLETE] ofstream FileMESSAGE;
 
     message << "Total number of structures to compare: " << all_structures.size();
@@ -2447,6 +2697,7 @@ namespace compare {
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"), 
         comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"), 
+        comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES"), //DX20200320 - added environment angles
         false); //DX20200103 - condensed booleans to xoptions
 
     message << "Number of comparison groups: " << comparison_schemes.size() << ".";
@@ -2462,7 +2713,7 @@ namespace compare {
     // compare structures 
     message << "Running comparisons ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(comparison_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE); //DX20200103 - condensed booleans to xoptions 
+    vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(comparison_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE, quiet, logstream); //DX20200103 - condensed booleans to xoptions 
 
     // ---------------------------------------------------------------------------
     // return if there are no similar structures
@@ -2489,7 +2740,7 @@ namespace compare {
             arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions)){
           // check if xstructure is generated; if not, make it
           if(!final_prototypes[i].structure_representative_generated){
-            if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_from,final_prototypes[i].structure_representative,oss)){
+            if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_source,final_prototypes[i].structure_representative_relaxation_step,final_prototypes[i].structure_representative,oss)){ //DX20200429
               message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
               throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX20191031 - exit to xerror
             }
@@ -2626,7 +2877,7 @@ namespace compare {
       // ---------------------------------------------------------------------------
       // match to AFLOW prototypes 
       for(uint i=0;i<final_prototypes.size();i++){
-        vector<StructurePrototype> matching_protos = pflow::compare2prototypes(final_prototypes[i].structure_representative, vpflow_protos);
+        vector<StructurePrototype> matching_protos = compare::compare2prototypes(final_prototypes[i].structure_representative, vpflow_protos);
         final_prototypes[i].matching_aflow_prototypes = matching_protos[0].structures_duplicate_names;
       }
     }
@@ -2867,7 +3118,7 @@ namespace compare {
       if(LDEBUG) {cerr << "compare:: " << "WAIT... Computing quadruplets..."<<endl;} 
       // creates the threads for checking quadruplets (lattices)
       //DX20190530 - OLD threadGeneration(num_proc,q_base,xstr_test,vprotos,xstr_base,type_match,optimize_match,minMis,comparison_log);
-      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,comparison_log); //DX20190530
+      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,scale_volume,comparison_log); //DX20190530 //DX20200422 - scale_volume added
 
       if(LDEBUG) {cerr << "compare:: " << "Total # of possible matching representations: " << vprotos.size() << endl;}	
       final_misfit=min_misfit_info.misfit;

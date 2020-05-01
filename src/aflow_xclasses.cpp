@@ -509,6 +509,8 @@ _kflags::_kflags() {
   KBIN_SYMMETRY_CALCULATE_PGROUPK                  = TRUE; //DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_FGROUP                   = TRUE; //DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL              = TRUE; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL             = TRUE; //DX20200423 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON        = TRUE; //DX20200423 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_IATOMS                   = TRUE; //DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_AGROUP                   = TRUE; //DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_SGROUP                   = TRUE; //DX20170814 - Specify what to calculate/verify
@@ -516,6 +518,8 @@ _kflags::_kflags() {
   KBIN_SYMMETRY_PGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_PGROUP_XTAL_WRITE                  = FALSE;
   KBIN_SYMMETRY_PGROUPK_WRITE                      = FALSE;
+  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE                 = FALSE; //DX20200423
+  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE            = FALSE; //DX20200423
   KBIN_SYMMETRY_FGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_SGROUP_WRITE                       = FALSE;
   KBIN_SYMMETRY_AGROUP_WRITE                       = FALSE;
@@ -629,6 +633,8 @@ void _kflags::copy(const _kflags& b) {
   KBIN_SYMMETRY_CALCULATE_PGROUPK                  = b.KBIN_SYMMETRY_CALCULATE_PGROUPK; //DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_FGROUP                   = b.KBIN_SYMMETRY_CALCULATE_FGROUP; //DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL              = b.KBIN_SYMMETRY_CALCULATE_PGROUP_XTAL; //DX20170814 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL             = b.KBIN_SYMMETRY_CALCULATE_PGROUPK_XTAL; //DX20200423 - Specify what to calculate/verify
+  KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON        = b.KBIN_SYMMETRY_CALCULATE_PGROUPK_PATTERSON; //DX20200423 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_IATOMS                   = b.KBIN_SYMMETRY_CALCULATE_IATOMS; //DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_AGROUP                   = b.KBIN_SYMMETRY_CALCULATE_AGROUP; //DX20170814 - Specify what to calculate/verify
   KBIN_SYMMETRY_CALCULATE_SGROUP                   = b.KBIN_SYMMETRY_CALCULATE_SGROUP; //DX20170814 - Specify what to calculate/verify
@@ -636,6 +642,8 @@ void _kflags::copy(const _kflags& b) {
   KBIN_SYMMETRY_PGROUP_WRITE                       = b.KBIN_SYMMETRY_PGROUP_WRITE;
   KBIN_SYMMETRY_PGROUP_XTAL_WRITE                  = b.KBIN_SYMMETRY_PGROUP_XTAL_WRITE;
   KBIN_SYMMETRY_PGROUPK_WRITE                      = b.KBIN_SYMMETRY_PGROUPK_WRITE;
+  KBIN_SYMMETRY_PGROUPK_XTAL_WRITE                 = b.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE; //DX20200423
+  KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE            = b.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE; //DX20200423
   KBIN_SYMMETRY_FGROUP_WRITE                       = b.KBIN_SYMMETRY_FGROUP_WRITE;
   KBIN_SYMMETRY_SGROUP_WRITE                       = b.KBIN_SYMMETRY_SGROUP_WRITE;
   KBIN_SYMMETRY_AGROUP_WRITE                       = b.KBIN_SYMMETRY_AGROUP_WRITE;
@@ -2037,6 +2045,21 @@ ostream* xStream::getOSS() const {return p_oss;} //CO20191110
 ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO20191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
+
+// ME20200427 - Initializer functions
+void xStream::initialize(ostream& oss) {
+  free();
+  p_FileMESSAGE = new ofstream();
+  f_new_ofstream = true;
+  initialize(*p_FileMESSAGE, oss);
+  f_new_ofstream = true;  // override
+}
+
+void xStream::initialize(ofstream& ofs, ostream& oss) {
+  setOFStream(ofs);
+  f_new_ofstream = false;
+  setOSS(oss);
+}
 
 #endif  // _AFLOW_CLASSES_CPP
 

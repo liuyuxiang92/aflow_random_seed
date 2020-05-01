@@ -2769,7 +2769,7 @@ namespace aurostd {
       int ind2=lrows;
       sum_counts.clear();
       for(int i=conv.lrows;i<=conv.urows;i++){
-        if(!aurostd::withinList(ind_zero_padding,i)){
+        if(!aurostd::WithinList(ind_zero_padding,i)){
           conv_shape[ind2++]=conv[i];
           sum_counts.push_back(sum_counts_full[i]);
         }
