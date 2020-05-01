@@ -95,12 +95,12 @@ namespace cce {
         if (cce_vars.vfunctionals[k] != "exp") {
           if(cce_vars.dft_energies.size()!=0){ // only when precalculated DFT formation energies are provided, calculate corrected values
             // for 298.15 K
-            cce_vars.cce_form_energy_cell[2*k] = cce_vars.dft_energies[k] - cce_vars.cce_correction[2*k] ;
+            cce_vars.cce_form_energy_cell[_CCE_NUMBER_TEMPERATURES_*k] = cce_vars.dft_energies[k] - cce_vars.cce_correction[_CCE_NUMBER_TEMPERATURES_*k] ;
             // for 0 K
-            cce_vars.cce_form_energy_cell[2*k+1] = cce_vars.dft_energies[k] - cce_vars.cce_correction[2*k+1] ;
+            cce_vars.cce_form_energy_cell[_CCE_NUMBER_TEMPERATURES_*k+1] = cce_vars.dft_energies[k] - cce_vars.cce_correction[_CCE_NUMBER_TEMPERATURES_*k+1] ;
           }
         } else { // for CCE@exp the formation enthalpy (only at 298.15 K) is directly calculated from the exp. formation enthalpies per bond times the number of cation-anion bonds and is not subtracted from a given value
-          cce_vars.cce_form_energy_cell[2*k] = cce_vars.cce_correction[2*k] ;
+          cce_vars.cce_form_energy_cell[_CCE_NUMBER_TEMPERATURES_*k] = cce_vars.cce_correction[_CCE_NUMBER_TEMPERATURES_*k] ;
         }
       }
 
@@ -1306,11 +1306,11 @@ namespace cce {
     }
     double amount_Sb=0;
     double amount_O=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "Sb"){
-        amount_Sb+=1;
-      } else if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "Sb"){
+        amount_Sb=structure.num_each_type[i];
+      } else if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -1332,36 +1332,40 @@ namespace cce {
         oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         oss << "Sb2O4 with ratio of Sb/O= " << Sb_O_ratio << endl;
       }
-      uint num_formula_units_in_cell = 0;
-      num_formula_units_in_cell=structure.atoms.size()/6; // 6 for Sb2O4
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-      }
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "Sb"){
-          // taking the first Sb ions as +3 (without knowing whether they are actually +3); works only because 
-          // the number of bonds for them will be adjusted to 4 as needed for Sb2O4 disregarding the actual 
-          // number of Sb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-          if ( i < (1+num_O_before_Sb)*num_formula_units_in_cell ){  // (1 Sb3+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
-            cce_vars.oxidation_states[i]=+3;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+3 " << endl;
-            }
-            cce_vars.num_neighbors[i]=4; // for Sb2O4 the Sb3+ ions are 4-fold coordinated by oxygen
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+3: " << cce_vars.num_neighbors[i] << endl;
-            }
-          } else {
-            cce_vars.oxidation_states[i]=5;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+5 " << endl;
-            }
-            cce_vars.num_neighbors[i]=6; // for Sb2O4 the Sb5+ ions are 6-fold coordinated by oxygen
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+5: " << cce_vars.num_neighbors[i] << endl;
+      if ((structure.atoms.size() % 6) == 0) {
+        uint num_formula_units_in_cell=structure.atoms.size()/6; // 6 for Sb2O4
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Sb"){
+            // taking the first Sb ions as +3 (without knowing whether they are actually +3); works only because
+            // the number of bonds for them will be adjusted to 4 as needed for Sb2O4 disregarding the actual
+            // number of Sb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+            if ( i < (1+num_O_before_Sb)*num_formula_units_in_cell ){  // (1 Sb3+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
+              cce_vars.oxidation_states[i]=3;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+3 " << endl;
+              }
+              cce_vars.num_neighbors[i]=4; // for Sb2O4 the Sb3+ ions are 4-fold coordinated by oxygen
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+3: " << cce_vars.num_neighbors[i] << endl;
+              }
+            } else {
+              cce_vars.oxidation_states[i]=5;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Sb+5 " << endl;
+              }
+              cce_vars.num_neighbors[i]=6; // for Sb2O4 the Sb5+ ions are 6-fold coordinated by oxygen
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Sb (atom[" << i << "]) taken as Sb+5: " << cce_vars.num_neighbors[i] << endl;
+              }
             }
           }
         }
+      } else {
+        message << "The total number of atoms is not divisible by 6 as needed for Sb2O4. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
       if(cce_flags.flag("COMMAND_LINE")){
         oss << endl;
@@ -1395,11 +1399,11 @@ namespace cce {
     }
     double amount_Pb=0;
     double amount_O=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "Pb"){
-        amount_Pb+=1;
-      } else if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "Pb"){
+        amount_Pb=structure.num_each_type[i];
+      } else if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -1421,36 +1425,40 @@ namespace cce {
         oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         oss << "Pb3O4 with ratio of Pb/O= " << Pb_O_ratio << endl;
       }
-      uint num_formula_units_in_cell;
-      num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Pb3O4
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-      }
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "Pb"){
-          // taking the first Pb ions as +4 (without knowing whether they are actually +4); works only because 
-          // the number of bonds for them will be adjusted to 6 as needed for Pb3O4 disregarding the actual 
-          // number of Pb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-          if ( i < (1+num_O_before_Pb)*num_formula_units_in_cell ){  // (1 Pb4+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
-            cce_vars.oxidation_states[i]=+4;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+4 " << endl;
-            }
-            cce_vars.num_neighbors[i]=6; // for Pb3O4 the Pb4+ ions are 6-fold coordinated by oxygen
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+4: " << cce_vars.num_neighbors[i] << endl;
-            }
-          } else {
-            cce_vars.oxidation_states[i]=+2;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+2 " << endl;
-            }
-            cce_vars.num_neighbors[i]=3; // for Pb3O4 the Pb2+ ions are 3-fold coordinated by oxygen
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+2: " << cce_vars.num_neighbors[i] << endl;
+      if ((structure.atoms.size() % 7) == 0) {
+        uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Pb3O4
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Pb"){
+            // taking the first Pb ions as +4 (without knowing whether they are actually +4); works only because
+            // the number of bonds for them will be adjusted to 6 as needed for Pb3O4 disregarding the actual
+            // number of Pb-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+            if ( i < (1+num_O_before_Pb)*num_formula_units_in_cell ){  // (1 Pb4+ ions per formula unit + 4*O listed before in alphabetic order) * number of formula units
+              cce_vars.oxidation_states[i]=4;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+4 " << endl;
+              }
+              cce_vars.num_neighbors[i]=6; // for Pb3O4 the Pb4+ ions are 6-fold coordinated by oxygen
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+4: " << cce_vars.num_neighbors[i] << endl;
+              }
+            } else {
+              cce_vars.oxidation_states[i]=2;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Pb+2 " << endl;
+              }
+              cce_vars.num_neighbors[i]=3; // for Pb3O4 the Pb2+ ions are 3-fold coordinated by oxygen
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Pb (atom[" << i << "]) taken as Pb+2: " << cce_vars.num_neighbors[i] << endl;
+              }
             }
           }
         }
+      } else {
+        message << "The total number of atoms is not divisible by 7 as needed for Pb3O4. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
       if(cce_flags.flag("COMMAND_LINE")){
         oss << endl;
@@ -1488,11 +1496,11 @@ namespace cce {
     }
     double amount_O=0;
     double amount_Ti=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
-      } else if (structure.atoms[i].cleanname == "Ti"){
-        amount_Ti+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
+      } else if (structure.species[i] == "Ti"){
+        amount_Ti=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -1513,7 +1521,7 @@ namespace cce {
     // check for Magneli composition Ti_(n)O_(2n-1)
     double n = 0.0;
     bool magneli = false;
-    for(n=3;n<101;n++){
+    for(n=3;n<101;n++){ // looping up to 101 should be enough
       //oss << "n/(2*n-1)= " << n/(2*n-1) << endl;
       if ( aurostd::isequal(Ti_O_ratio,n/(2*n-1)) ){
         if(cce_flags.flag("COMMAND_LINE")){
@@ -1538,15 +1546,15 @@ namespace cce {
     if (magneli){
       for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
         if (structure.atoms[i].cleanname == "Ti"){
-          // taking the first Ti as +3 (without knowing whether they are actually +3) works only because 
+          // taking the first Ti as +3 (without knowing whether they are actually +3) works only because
           // for the Magneli phases both Ti+3 and Ti+4 have both always 6 Ti-O bonds
           if ( i < (2+num_O_before_Ti)*num_formula_units_in_cell ){
-            cce_vars.oxidation_states[i]=+3;
+            cce_vars.oxidation_states[i]=3;
             if(cce_flags.flag("COMMAND_LINE")){
               oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+3 " << endl;
             }
           } else {
-            cce_vars.oxidation_states[i]=+4;
+            cce_vars.oxidation_states[i]=4;
             if(cce_flags.flag("COMMAND_LINE")){
               oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
             }
@@ -1593,11 +1601,11 @@ namespace cce {
     }
     double amount_Fe=0;
     double amount_O=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "Fe"){
-        amount_Fe+=1;
-      } else if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "Fe"){
+        amount_Fe=structure.num_each_type[i];
+      } else if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -1619,36 +1627,40 @@ namespace cce {
         oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         oss << "Fe3O4 with ratio of Fe/O= " << Fe_O_ratio << endl;
       }
-      uint num_formula_units_in_cell = 0;
-      num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Fe3O4
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-      }
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "Fe"){
-          // taking the first Fe ions as +2 (without knowing whether they are actually +2); works only because 
-          // the number of bonds for them will be adjusted to 6 (octahedral) as needed for Fe3O4 disregarding the actual 
-          // number of Fe-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-          if ( i < (1+num_O_before_Fe)*num_formula_units_in_cell ){  // 1 Fe2+ ions per formula unit * number of formula units
-            cce_vars.oxidation_states[i]=+2;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
-            }
-            cce_vars.num_neighbors[i]=6; // for Fe3O4 the Fe2+ ions are 6-fold coordinated by oxygen according to Wikipedia
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+2: " << cce_vars.num_neighbors[i] << endl;
-            }
-          } else {
-            cce_vars.oxidation_states[i]=+3;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
-            }
-            cce_vars.num_neighbors[i]=5; // for Fe3O4 the Fe3+ ions are evenly 6- and 4-fold, so on average 5-fold (set here as a hack) coordinated by oxygen according to Wikipedia
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+3 (average between even 6- and 4-fold coordination): " << cce_vars.num_neighbors[i] << endl;
+      if ((structure.atoms.size() % 7) == 0) {
+        uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Fe3O4
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Fe"){
+            // taking the first Fe ions as +2 (without knowing whether they are actually +2); works only because
+            // the number of bonds for them will be adjusted to 6 (octahedral) as needed for Fe3O4 disregarding the actual
+            // number of Fe-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+            if ( i < (1+num_O_before_Fe)*num_formula_units_in_cell ){  // 1 Fe2+ ions per formula unit * number of formula units
+              cce_vars.oxidation_states[i]=2;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
+              }
+              cce_vars.num_neighbors[i]=6; // for Fe3O4 the Fe2+ ions are 6-fold coordinated by oxygen according to Wikipedia
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+2: " << cce_vars.num_neighbors[i] << endl;
+              }
+            } else {
+              cce_vars.oxidation_states[i]=3;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
+              }
+              cce_vars.num_neighbors[i]=5; // for Fe3O4 the Fe3+ ions are evenly 6- and 4-fold, so on average 5-fold (set here as a hack) coordinated by oxygen according to Wikipedia
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Fe (atom[" << i << "]) taken as Fe+3 (average between even 6- and 4-fold coordination): " << cce_vars.num_neighbors[i] << endl;
+              }
             }
           }
         }
+      } else {
+        message << "The total number of atoms is not divisible by 7 as needed for Fe3O4. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
       if(cce_flags.flag("COMMAND_LINE")){
         oss << endl;
@@ -1685,11 +1697,11 @@ namespace cce {
     }
     double amount_Mn=0;
     double amount_O=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "Mn"){
-        amount_Mn+=1;
-      } else if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "Mn"){
+        amount_Mn=structure.num_each_type[i];
+      } else if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -1711,36 +1723,40 @@ namespace cce {
         oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         oss << "Mn3O4 with ratio of Mn/O= " << Mn_O_ratio << endl;
       }
-      uint num_formula_units_in_cell;
-      num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Mn3O4
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-      }
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "Mn"){
-          // taking the first Mn ions as +2 (without knowing whether they are actually +2); works only because 
-          // the number of bonds for them will be adjusted to 4 (tetrahedral) as needed for Mn3O4 disregarding the actual 
-          // number of Mn-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-          if ( i < (1+num_O_before_Mn)*num_formula_units_in_cell ){  // 1 Mn2+ ions per formula unit * number of formula units
-            cce_vars.oxidation_states[i]=+2;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
-            }
-            cce_vars.num_neighbors[i]=4; // for Mn3O4 the Mn2+ ions are 4-fold coordinated by oxygen according to Wikipedia
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Mn (atom[" << i << "]) taken as Mn+2: " << cce_vars.num_neighbors[i] << endl;
-            }
-          } else {
-            cce_vars.oxidation_states[i]=+3;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+3 " << endl;
-            }
-            cce_vars.num_neighbors[i]=6; // for Mn3O4 the Mn3+ ions are 6-fold coordinated by oxygen according to Wikipedia
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Mn (atom[" << i << "]) taken as Mn+3: " << cce_vars.num_neighbors[i] << endl;
+      if ((structure.atoms.size() % 7) == 0) {
+        uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Mn3O4
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Mn"){
+            // taking the first Mn ions as +2 (without knowing whether they are actually +2); works only because
+            // the number of bonds for them will be adjusted to 4 (tetrahedral) as needed for Mn3O4 disregarding the actual
+            // number of Mn-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+            if ( i < (1+num_O_before_Mn)*num_formula_units_in_cell ){  // 1 Mn2+ ions per formula unit * number of formula units
+              cce_vars.oxidation_states[i]=2;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
+              }
+              cce_vars.num_neighbors[i]=4; // for Mn3O4 the Mn2+ ions are 4-fold coordinated by oxygen according to Wikipedia
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Mn (atom[" << i << "]) taken as Mn+2: " << cce_vars.num_neighbors[i] << endl;
+              }
+            } else {
+              cce_vars.oxidation_states[i]=3;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+3 " << endl;
+              }
+              cce_vars.num_neighbors[i]=6; // for Mn3O4 the Mn3+ ions are 6-fold coordinated by oxygen according to Wikipedia
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Mn (atom[" << i << "]) taken as Mn+3: " << cce_vars.num_neighbors[i] << endl;
+              }
             }
           }
         }
+      } else {
+        message << "The total number of atoms is not divisible by 7 as needed for Mn3O4. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
       if(cce_flags.flag("COMMAND_LINE")){
         oss << endl;
@@ -1777,11 +1793,11 @@ namespace cce {
     }
     double amount_Co=0;
     double amount_O=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "Co"){
-        amount_Co+=1;
-      } else if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "Co"){
+        amount_Co=structure.num_each_type[i];
+      } else if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -1803,36 +1819,40 @@ namespace cce {
         oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each cation oxidation state occurs should be correct." << endl;
         oss << "Co3O4 with ratio of Co/O= " << Co_O_ratio << endl;
       }
-      uint num_formula_units_in_cell = 0;
-      num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Co3O4
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-      }
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "Co"){
-          // taking the first Co ions as +2 (without knowing whether they are actually +2); works only because 
-          // the number of bonds for them will be adjusted to 4 (tetrahedral) as needed for Co3O4 disregarding the actual 
-          // number of Co-O bonds (this is a hack since I know how many bonds there should be for each ion type)
-          if ( i < (1+num_O_before_Co)*num_formula_units_in_cell ){  // 1 Co2+ ions per formula unit * number of formula units
-            cce_vars.oxidation_states[i]=+2;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Co+2 " << endl;
-            }
-            cce_vars.num_neighbors[i]=4; // for Co3O4 the Co2+ ions are 4-fold coordinated by oxygen according to Wikipedia
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Co (atom[" << i << "]) taken as Co+2: " << cce_vars.num_neighbors[i] << endl;
-            }
-          } else {
-            cce_vars.oxidation_states[i]=+3;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Co+3 " << endl;
-            }
-            cce_vars.num_neighbors[i]=6; // for Co3O4 the Co3+ ions are 6-fold coordinated by oxygen according to Wikipedia
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "Modified number of neighbors of Co (atom[" << i << "]) taken as Co+3: " << cce_vars.num_neighbors[i] << endl;
+      if ((structure.atoms.size() % 7) == 0) {
+        uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Co3O4
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "Co"){
+            // taking the first Co ions as +2 (without knowing whether they are actually +2); works only because
+            // the number of bonds for them will be adjusted to 4 (tetrahedral) as needed for Co3O4 disregarding the actual
+            // number of Co-O bonds (this is a hack since I know how many bonds there should be for each ion type)
+            if ( i < (1+num_O_before_Co)*num_formula_units_in_cell ){  // 1 Co2+ ions per formula unit * number of formula units
+              cce_vars.oxidation_states[i]=2;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Co+2 " << endl;
+              }
+              cce_vars.num_neighbors[i]=4; // for Co3O4 the Co2+ ions are 4-fold coordinated by oxygen according to Wikipedia
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Co (atom[" << i << "]) taken as Co+2: " << cce_vars.num_neighbors[i] << endl;
+              }
+            } else {
+              cce_vars.oxidation_states[i]=3;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Co+3 " << endl;
+              }
+              cce_vars.num_neighbors[i]=6; // for Co3O4 the Co3+ ions are 6-fold coordinated by oxygen according to Wikipedia
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "Modified number of neighbors of Co (atom[" << i << "]) taken as Co+3: " << cce_vars.num_neighbors[i] << endl;
+              }
             }
           }
         }
+      } else {
+        message << "The total number of atoms is not divisible by 7 as needed for Co3O4. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
       if(cce_flags.flag("COMMAND_LINE")){
         oss << endl;
@@ -1880,11 +1900,11 @@ namespace cce {
     }
     double amount_O=0;
     double amount_alkali=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
       } else {
-        amount_alkali+=1;
+        amount_alkali=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -1910,40 +1930,44 @@ namespace cce {
         oss << "The individual oxidation numbers might therefore not be assigned to the correct atoms." << endl; //, but at least how often each oxidation state occurs should be correct." << endl;
         oss << alkali_metal << "2O3 with ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
       }
-      uint num_formula_units_in_cell;
-      num_formula_units_in_cell=structure.atoms.size()/5; // 5 for alkali_metal2O3
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
-      }
-      for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-        if (structure.atoms[i].cleanname == "O"){
-          // taking the first O ions as -0.5 (superox. Os, without knowing whether they are actually -0.5); works only because 
-          // the number of superoxide bonds will be adjusted to 1 per formula unit as needed for alkali metal sesquioxides
-          // taking last O ions as -1 (perox. Os, without knowing whether they are actually -1); works only because 
-          // the number of peroxide bonds will be adjusted to 0.5 per formula unit as needed for alkali metal sesquioxides
-          // (this is a hack since I know how many bonds there should be for each ion type)
-          if ( i < (2+num_alkali_before_O)*num_formula_units_in_cell ){  // 2 superoxide O-atoms per formula unit * number of formula units
-            cce_vars.oxidation_states[i]=-0.5;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-0.5 " << endl;
+      if ((structure.atoms.size() % 5) == 0) {
+        uint num_formula_units_in_cell=structure.atoms.size()/5; // 5 for alkali_metal2O3
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "number of formula units in cell: " << num_formula_units_in_cell << endl;
+        }
+        for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
+          if (structure.atoms[i].cleanname == "O"){
+            // taking the first O ions as -0.5 (superox. Os, without knowing whether they are actually -0.5); works only because
+            // the number of superoxide bonds will be adjusted to 1 per formula unit as needed for alkali metal sesquioxides
+            // taking last O ions as -1 (perox. Os, without knowing whether they are actually -1); works only because
+            // the number of peroxide bonds will be adjusted to 0.5 per formula unit as needed for alkali metal sesquioxides
+            // (this is a hack since I know how many bonds there should be for each ion type)
+            if ( i < (2+num_alkali_before_O)*num_formula_units_in_cell ){  // 2 superoxide O-atoms per formula unit * number of formula units
+              cce_vars.oxidation_states[i]=-0.5;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-0.5 " << endl;
+              }
+              cce_vars.superox_indices[i]=1;
+            } else {
+              cce_vars.oxidation_states[i]=-1;
+              if(cce_flags.flag("COMMAND_LINE")){
+                oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-1 " << endl;
+              }
+              cce_vars.perox_indices[i]=1;
             }
-            cce_vars.superox_indices[i]=1;
-          } else {
-            cce_vars.oxidation_states[i]=-1;
-            if(cce_flags.flag("COMMAND_LINE")){
-              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to O-1 " << endl;
-            }
-            cce_vars.perox_indices[i]=1;
           }
         }
-      }
-      cce_vars.num_superox_bonds=1*num_formula_units_in_cell; // 1 superox. bonds per formula unit * num. formula units
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << "Number of superoxide bonds set to: " << cce_vars.num_superox_bonds << endl;
-      }
-      cce_vars.num_perox_bonds=0.5*num_formula_units_in_cell; // 0.5 perox. bonds per formula unit * num. formula units; this should neve yield a non-integer since there should be at least one complete peroxide ion per cell
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << "Number of peroxide bonds set to: " << cce_vars.num_perox_bonds << endl;
+        cce_vars.num_superox_bonds=1*num_formula_units_in_cell; // 1 superox. bonds per formula unit * num. formula units
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "Number of superoxide bonds set to: " << cce_vars.num_superox_bonds << endl;
+        }
+        cce_vars.num_perox_bonds=0.5*num_formula_units_in_cell; // 0.5 perox. bonds per formula unit * num. formula units; this should neve yield a non-integer since there should be at least one complete peroxide ion per cell
+        if(cce_flags.flag("COMMAND_LINE")){
+          oss << "Number of peroxide bonds set to: " << cce_vars.num_perox_bonds << endl;
+        }
+      } else {
+        message << "The total number of atoms is not divisible by 5 as needed for alkali metal sesquioxide. Please check your structure.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
       if(cce_flags.flag("COMMAND_LINE")){
         oss << endl;
@@ -1975,13 +1999,13 @@ namespace cce {
     double amount_Mn=0;
     double amount_Mo=0;
     double amount_O=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "Mn"){
-        amount_Mn+=1;
-      } else if (structure.atoms[i].cleanname == "Mo"){
-        amount_Mo+=1;
-      } else if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "Mn"){
+        amount_Mn=structure.num_each_type[i];
+      } else if (structure.species[i] == "Mo"){
+        amount_Mo=structure.num_each_type[i];
+      } else if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -1996,13 +2020,13 @@ namespace cce {
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Mn"){
-            cce_vars.oxidation_states[i]=+2;
+            cce_vars.oxidation_states[i]=2;
             if(cce_flags.flag("COMMAND_LINE")){
              oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mn+2 " << endl;
             }
           }
           if (structure.atoms[i].cleanname == "Mo"){
-            cce_vars.oxidation_states[i]=+6;
+            cce_vars.oxidation_states[i]=6;
             if(cce_flags.flag("COMMAND_LINE")){
               oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Mo+6 " << endl;
             }
@@ -2034,13 +2058,13 @@ namespace cce {
     double amount_Ca=0;
     double amount_Fe=0;
     double amount_O=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "Ca"){
-        amount_Ca+=1;
-      } else if (structure.atoms[i].cleanname == "Fe"){
-        amount_Fe+=1;
-      } else if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "Ca"){
+        amount_Ca=structure.num_each_type[i];
+      } else if (structure.species[i] == "Fe"){
+        amount_Fe=structure.num_each_type[i];
+      } else if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -2056,7 +2080,7 @@ namespace cce {
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Fe"){
-            cce_vars.oxidation_states[i]=+3;
+            cce_vars.oxidation_states[i]=3;
             if(cce_flags.flag("COMMAND_LINE")){
               oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
             }
@@ -2077,7 +2101,7 @@ namespace cce {
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Fe"){
-            cce_vars.oxidation_states[i]=+3;
+            cce_vars.oxidation_states[i]=3;
             if(cce_flags.flag("COMMAND_LINE")){
               oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
             }
@@ -2110,13 +2134,13 @@ namespace cce {
     double amount_Fe=0;
     double amount_O=0;
     double amount_Ti=0;
-    for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
-      if (structure.atoms[i].cleanname == "Fe"){
-        amount_Fe+=1;
-      } else if (structure.atoms[i].cleanname == "O"){
-        amount_O+=1;
-      } else if (structure.atoms[i].cleanname == "Ti"){
-        amount_Ti+=1;
+    for(uint i=0,isize=structure.species.size();i<isize;i++){
+      if (structure.species[i] == "Fe"){
+        amount_Fe=structure.num_each_type[i];
+      } else if (structure.species[i] == "O"){
+        amount_O=structure.num_each_type[i];
+      } else if (structure.species[i] == "Ti"){
+        amount_Ti=structure.num_each_type[i];
       }
     }
     if(LDEBUG){
@@ -2132,7 +2156,7 @@ namespace cce {
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Ti"){
-            cce_vars.oxidation_states[i]=+4;
+            cce_vars.oxidation_states[i]=4;
             if(cce_flags.flag("COMMAND_LINE")){
               oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
             }
@@ -2326,7 +2350,7 @@ namespace cce {
     // oxidation numbers should not be functional dependent since results are for a specific calculation, i.e. PBE or LDA or SCAN or PBE+U_ICSD and not more than one
     // for a given structure there should be only one correct assignment of oxidation numbers
     string system_name = "";
-    string functional;
+    string functional = "";
     // check whether aflow.in exists
     if (aurostd::FileExist(_AFLOWIN_)) {
       // get system name to identify Bader charges file and functional to distinguish corrections to be loaded from aflow.in
@@ -2499,7 +2523,7 @@ namespace cce {
               if(LDEBUG){
                 cerr << soliloquy << "Bader_deviation: " << Bader_deviation << endl;
               }
-              cce_vars.oxidation_states[i]= aurostd::string2utype<double>(Bader_tokens[1+5*n]);
+              cce_vars.oxidation_states[i]= aurostd::string2utype<double>(Bader_tokens[1+5*n]); // +5*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD)
             } else { // only if element is found but no corrections can be assigned because above conditions are not met, update Bader_deviation_min
               if ( std::abs(Bader_template-cce_vars.Bader_charges[i]) < Bader_deviation_min ) {
                 Bader_deviation_min= std::abs(Bader_template-cce_vars.Bader_charges[i]);
@@ -2511,15 +2535,15 @@ namespace cce {
             // since it can happen that the Bader charge for W in the compound (especially for W+6) is too far away 
 	    // from the Bader charge template, here W+6 is set and later the sum over the oxidation states will still be checked
             if (structure.atoms[i].cleanname == "W") {
-              cce_vars.oxidation_states[i]=+6;
+              cce_vars.oxidation_states[i]=6;
             // since it can happen that the Bader charge for Pb in the compound (especially for Pb+2) is too far away 
 	    // from the Bader charge template, here Pb+2 is set and later the sum over the oxidation states will still be checked
             } else if (structure.atoms[i].cleanname == "Pb") {
-              cce_vars.oxidation_states[i]=+2;
+              cce_vars.oxidation_states[i]=2;
             // since it can happen that the Bader charge for Ag in the compound (especially for Ag+1) is too far away 
             // from the Bader charge template, here Ag+1 is set and later the sum over the oxidation states will still be checked
             } else if (structure.atoms[i].cleanname == "Ag") {
-              cce_vars.oxidation_states[i]=+1;
+              cce_vars.oxidation_states[i]=1;
             } else {
               cce_flags.flag("CORRECTABLE",FALSE);
               cerr << "BAD NEWS: The oxidation number (and hence the correction) for " << structure.atoms[i].cleanname << " (ATOM[" << i << "])" << " cannot be identified from the Bader charges!"  << endl;
@@ -2529,9 +2553,9 @@ namespace cce {
               string separator=", ";
               for(uint n=0;n<num_ox_states;n++){ 
                 if (n<num_ox_states-1){
-                  ox_nums_avail+= Bader_tokens[1+5*n] + separator ; 
+                  ox_nums_avail+= Bader_tokens[1+5*n] + separator ; // +5*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD)
                 } else if (n==num_ox_states-1){
-                  ox_nums_avail+= Bader_tokens[1+5*n]; 
+                  ox_nums_avail+= Bader_tokens[1+5*n]; // +5*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD)
                 }
               }
               cerr << "Corrections for " << structure.atoms[i].cleanname << " coordinated by " << cce_vars.anion_species << " are available for oxidation states: " << ox_nums_avail << endl;
@@ -2574,7 +2598,7 @@ namespace cce {
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ 
       if (structure.atoms[i].cleanname == "Ti"){
         if ( cce_vars.oxidation_states[i] == 3){
-          cce_vars.oxidation_states[i]=+4;
+          cce_vars.oxidation_states[i]=4;
           if(cce_flags.flag("COMMAND_LINE")){
             oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Ti+4 " << endl;
           }
@@ -2582,12 +2606,12 @@ namespace cce {
       }
       if (structure.atoms[i].cleanname == "Fe"){
         if ( cce_vars.oxidation_states[i] == 2){
-          cce_vars.oxidation_states[i]=+3;
+          cce_vars.oxidation_states[i]=3;
           if(cce_flags.flag("COMMAND_LINE")){
             oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+3 " << endl;
           }
         } else if ( cce_vars.oxidation_states[i] == 3){
-          cce_vars.oxidation_states[i]=+2;
+          cce_vars.oxidation_states[i]=2;
           if(cce_flags.flag("COMMAND_LINE")){
             oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to Fe+2 " << endl;
           }
@@ -2595,7 +2619,7 @@ namespace cce {
       }
       if (structure.atoms[i].cleanname == "V"){
         if ( cce_vars.oxidation_states[i] == 4){
-          cce_vars.oxidation_states[i]=+5;
+          cce_vars.oxidation_states[i]=5;
           if(cce_flags.flag("COMMAND_LINE")){
             oss << "setting oxidation state of " << structure.atoms[i].cleanname << " (atom[" << i << "]) to V+5 " << endl;
           }
@@ -2641,13 +2665,7 @@ namespace cce {
               // list all oxidation states of the element for which corrections are available
               string ox_nums_avail="";
               string separator=", ";
-              for(uint n=0;n<ox_nums_count;n++){ 
-                if (n<ox_nums_count-1){
-                  ox_nums_avail+= "+" + aurostd::utype2string<uint>(ox_nums_avail_vec[n]) + separator ; 
-                } else if (n==ox_nums_count-1){
-                  ox_nums_avail+= "+" + aurostd::utype2string<uint>(ox_nums_avail_vec[n]); 
-                }
-              }
+              ox_nums_avail = aurostd::joinWDelimiter(ox_nums_avail_vec, separator);
               cerr << "Corrections for " << structure.atoms[i].cleanname << " coordinated by " << considered_anion_species << " are available for oxidation states: " << ox_nums_avail << endl;
               cerr << "If the desired oxidation state is listed but it is just not correctly determined," << endl;
               cerr << "you might want to consider supplying the oxidation numbers manually by using the option --oxidation_numbers=." << endl;
@@ -2721,7 +2739,7 @@ namespace cce {
     string soliloquy="cce::check_get_per_super_ox_corrections():";
     // check for per- and superoxides should always be kept separate since a compound could have both per- and superoxide ions (alkali-metal sesquioxides)
     if (cce_vars.num_perox_bonds > 0){
-      string corrections_line;
+      string corrections_line="";
       corrections_line=get_corrections_line("O2_-2_O");
       if(LDEBUG){
         cerr << soliloquy << "corrections line peroxides: " << corrections_line << endl;
@@ -2743,7 +2761,7 @@ namespace cce {
       }
     } 
     if (cce_vars.num_superox_bonds > 0) {
-      string corrections_line;
+      string corrections_line="";
       corrections_line=get_corrections_line("O2_-1_O");
       if(LDEBUG){
         cerr << soliloquy << "corrections line superoxides: " << corrections_line << endl;
