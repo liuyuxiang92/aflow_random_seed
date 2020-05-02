@@ -996,7 +996,7 @@ namespace aflowrc {
       if(!XHOST.vflag_control.flag("WWW")){ //CO20200404 - new web flag
         if(!(aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/MAIN") || aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/uMAIN"))){ //CO20200404 - patching for new disk
           //[CO20200404 - OBSOLETE]cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
-          message << XHOST.aflowrc_filename << " not found, loading DEFAULT values";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cout,_LOGGER_MESSAGE_);  //CO20200404 - NO std::cerr, it breaks make and travis-ci //CO20200404 - LEAVE std::cerr here, FR needs this for web
+          message << XHOST.aflowrc_filename << " not found, loading DEFAULT values";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
         }
       }
     }
@@ -2002,7 +2002,7 @@ namespace aflowrc {
     if(aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename) && aurostd::FileExist(XHOST.aflowrc_filename)){
       if(!XHOST.vflag_control.flag("WWW")){ //CO20200404 - new web flag
         //[CO20200404 - OBSOLETE]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO20190808 - issue this ONLY if it was written, should fix www-data
-        message << "WRITING default " << XHOST.aflowrc_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cout,_LOGGER_MESSAGE_);  //CO20200404 - NO std::cerr, it breaks make and travis-ci //CO20200404 - LEAVE std::cerr here, FR needs this for web
+        message << "WRITING default " << XHOST.aflowrc_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
       }
     }
     if(LDEBUG) oss << soliloquy << " END" << endl;
