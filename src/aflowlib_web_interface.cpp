@@ -4193,7 +4193,7 @@ namespace aflowlib {
 
 
 // ***************************************************************************
-/* FUNCITON IS OBSOLETE SC20200327
+//CO20200502 - NOT OBSOLETE until we get a stripped out entry page /* FUNCTION IS OBSOLETE SC20200327
 
 namespace aflowlib {
   uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss) {
@@ -5653,7 +5653,7 @@ namespace aflowlib {
 
 //#include "aflowlib_web_interface_test2.cpp"
 //#include "aflowlib_web_interface_test3.cpp"
-*/
+//CO20200502 - NOT OBSOLETE until we get a stripped out entry page */
 
 // ***************************************************************************
 namespace aflowlib {
