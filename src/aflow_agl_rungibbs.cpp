@@ -2,6 +2,7 @@
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow CORMAC TOHER - Duke University 2013-2020           *
+// *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
 // cormac.toher@duke.edu
