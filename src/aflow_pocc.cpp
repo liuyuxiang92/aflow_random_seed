@@ -1109,7 +1109,7 @@ namespace pocc {
     //double pocc_roundoff_tol=5.0*pow(10,-((int)pocc_precision)-1);
 
     //POCC.OUT
-    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (T=" << temperature << " K properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200502 - no getTemperatureString(T) needed here
+    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (T=" << temperature << "K properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200502 - no getTemperatureString(T) needed here
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
