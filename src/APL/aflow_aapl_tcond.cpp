@@ -81,7 +81,7 @@ namespace apl {
 
   TCONDCalculator::TCONDCalculator(PhononCalculator& pc, _aflags& a) {
     _pc = &pc;
-    _qm = &_pc->getQMesh();  // This pointer is only defined to make the code more legible
+    _qm = &_pc->getQMesh();  // This pointer is only defined to make the code more readable
     aflags = &a;
     initialize();
   }
