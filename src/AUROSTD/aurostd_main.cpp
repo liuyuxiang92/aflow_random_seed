@@ -71,9 +71,12 @@ namespace aurostd {
   string get_datetime(void) { return utype2string(get_date())+"_"+get_time();}
   string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO20171215
     stringstream misc_ss;
-    int y=aurostd::get_year(),b=aurostd::get_month(),d=aurostd::get_day(),h=get_hour(),m=get_min(),s=get_sec();
+    int y=aurostd::get_year(),b=aurostd::get_month(),d=aurostd::get_day();
     misc_ss << y << date_delim << (b<10?"0":"") << b << date_delim << (d<10?"0":"") << d;
-    if(include_time){misc_ss << date_time_sep << (h<10?"0":"") << h << time_delim << (m<10?"0":"") << m << ":" << (s<10?"0":"") << s;}
+    if(include_time){
+      int h=get_hour(),m=get_min(),s=get_sec();
+      misc_ss << date_time_sep << (h<10?"0":"") << h << time_delim << (m<10?"0":"") << m << time_delim << (s<10?"0":"") << s;
+    }
     return misc_ss.str();
   }
   bool beep(uint freq,uint duration) {

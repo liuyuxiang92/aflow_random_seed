@@ -106,6 +106,8 @@
         -- added Hmix to aflow.pocc.out (CO)
         -- ANOTHER patch for warnings with the aflow.rc, write to std::cerr, should fix www-data (CO)
         -- merging --web_mode with --www (CO)
+        -- added --xplug_check_only() for completed runs (CO)
+        -- patched time_delim in get_date_formatted() (CO)
 3.2.2j - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- standardized vext,vcat,vzip from XHOST 2j (SC)

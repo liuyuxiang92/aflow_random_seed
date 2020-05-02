@@ -1347,6 +1347,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("FORCE",aurostd::args2flag(argv,cmds,"--force"));
 
   vpflow.flag("XPLUG",aurostd::args2flag(argv,cmds,"--xplug"));
+  vpflow.flag("XPLUG_CHECK_ONLY",aurostd::args2flag(argv,cmds,"--xplug_check_only"));  //CO20200501
 
   //  cerr << "vpflow.flag(\"LIB2RAW\")=" << vpflow.flag("LIB2RAW") << endl; 
   //  cerr << "vpflow.getattachedscheme(\"LIB2RAW\")=" << vpflow.getattachedscheme("LIB2RAW") << endl; exit(0);
@@ -2023,6 +2024,7 @@ namespace pflow {
       // [OBSOLETE] if(vpflow.flag("CE::SQS")) {pflow::SQS(argv); _PROGRAMRUN=true;}
       // calculated stuff
       if(vpflow.flag("XPLUG")) {aflowlib::XPLUG(argv); _PROGRAMRUN=true;}
+      if(vpflow.flag("XPLUG_CHECK_ONLY")) {aflowlib::XPLUG_CHECK_ONLY(argv); _PROGRAMRUN=true;}  //CO20200501
     }
     // *********************************************************************
     if(argv.size()==4 && !_PROGRAMRUN) {

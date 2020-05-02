@@ -5133,13 +5133,14 @@ namespace aflowlib {
 namespace aflowlib {
   bool XPLUG_Directory_ok(const string &dirIN,string &dir,const uint &i,const uint &j,const int& ithread,stringstream &oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aflowlib::XPLUG_Directory_ok():"; //CO20200404
     dir=dirIN; // start from here
     bool ok=FALSE,print=TRUE;
     int answer=0;
     stringstream obb;
 
     // clean
-    if(LDEBUG) cerr << "aflowlib::XPLUG_Directory_ok [1]: analyzing = " << dir << endl;
+    if(LDEBUG) cerr << soliloquy << " [1]: analyzing = " << dir << endl;
 
     dir=aurostd::RemoveSubString(dir,"/"+_AFLOWIN_);
     dir=aurostd::RemoveSubString(dir,"/aflow.end.out");
@@ -5147,21 +5148,21 @@ namespace aflowlib {
     deque<string> vrelax; aurostd::string2tokens(".relax1,.relax2,.relax3,.static,.bands",vrelax,",");
     deque<string> vremdirname;aurostd::string2tokens("OUTCAR,OSZICAR,CONTCAR,EIGENVAL",vremdirname,",");
     deque<string> vbroken;  // no more list... this checks everything
-       
+
     for(uint iremdirname=0;iremdirname<vremdirname.size();iremdirname++) {
       for(uint irelax=0;irelax<vrelax.size();irelax++) {
-	for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+        for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
           dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax.at(irelax)+XHOST.vext.at(iext));
         }
-	dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax.at(irelax));
+        dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname)+vrelax.at(irelax));
       }
       dir=aurostd::RemoveSubString(dir,"/"+vremdirname.at(iremdirname));
     }
 
-    if(LDEBUG) cerr << "aflowlib::XPLUG_Directory_ok [2]: analyzing = " << dir << endl;
+    if(LDEBUG) cerr << soliloquy << " [2]: analyzing = " << dir << endl;
 
     if(!aurostd::FileExist(dir+"/"+_AFLOWLOCK_)) {
-      if(LDEBUG) cerr << "aflowlib::XPLUG_Directory_ok [3]: not finding " << _AFLOWLOCK_ << " = " << dir << endl;
+      if(LDEBUG) cerr << soliloquy << " [3]: not finding " << _AFLOWLOCK_ << " = " << dir << endl;
       return FALSE;
     }
     if(!aurostd::EFileExist(dir+"/OUTCAR.relax1") && 
@@ -5169,7 +5170,7 @@ namespace aflowlib {
        !aurostd::EFileExist(dir+"/OUTCAR.relax3") &&
        !aurostd::EFileExist(dir+"/OUTCAR.static") &&
        !aurostd::EFileExist(dir+"/OUTCAR.bands")) {
-      if(LDEBUG) cerr << "aflowlib::XPLUG_Directory_ok [4]: not finding any OUTCAR.* = " << dir << endl;
+      if(LDEBUG) cerr << soliloquy << " [4]: not finding any OUTCAR.* = " << dir << endl;
       return FALSE;
     }
 
@@ -5204,43 +5205,44 @@ namespace aflowlib {
         if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/OSZICAR"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=OSZICAR"+vrelax.at(irelax)+".EXT"; }}
         if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/vasp.out"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=vasp.out"+vrelax.at(irelax)+".EXT"; }}
         if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/INCAR"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=INCAR"+vrelax.at(irelax)+".EXT"; }}
-	//      if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=EIGENVAL"+vrelax.at(irelax)+".EXT"; }}
+        //      if(ok) { obb<<".";if(!aurostd::EFileExist(dir+"/EIGENVAL"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=EIGENVAL"+vrelax.at(irelax)+".EXT"; }}
         if(vrelax.at(irelax)==".static")
           if(ok) { obb<<"d"; if(!aurostd::EFileExist(dir+"/DOSCAR"+vrelax.at(irelax))) { ok=FALSE;obb<<" no=DOSCAR"+vrelax.at(irelax)+".EXT"; }}
         // "OUTCAR"+vrelax.at(irelax)+".EXT"  //CO20200106 - patching for auto-indenting (quotes)
-	obb<<".";
+        obb<<".";
         if(ok) { obb<<"o";  // check Answer 4 or 5 in OUTCAR.RELAX.EXT
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
             if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
               answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");
+              if(answer==0){answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");} //CO20200501 - soft patch, this could STILL break if xcat files to load anything
               if(answer!=4 && answer!=5) { ok=FALSE;obb<<". error(" << answer << ")=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
           }
         }
-	obb<<".";
+        obb<<".";
         if(ok) { obb<<"v"; // TEST VASP.OUT
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
             if(aurostd::FileExist(dir+"/vasp.out"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
               answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/vasp.out"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"The distance between some ions is very small\" ");
               if(answer!=0) { ok=FALSE;obb<<". ions=vasp.out"+vrelax.at(irelax)+".EXT"; }}
           }
-          }
-	obb<<".";
+        }
+        obb<<".";
       }
       if(ok) {// obb<<"b"; // TEST "+vbroken.at(ibroken)+"
-	for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-	  if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
-	    //	    cerr << string("ls "+dir+"/*"+vrelax.at(irelax)+XHOST.vext.at(iext)) << endl;
-	    aurostd::string2dequestring(aurostd::execute2string("ls "+dir+"/*"+vrelax.at(irelax)+XHOST.vext.at(iext)),vbroken);
-	    for(uint ibroken=0;ibroken<vbroken.size();ibroken++) {
-	      //      cerr << "[" << vbroken.at(ibroken) << "]" << endl;
-	      if(ok && aurostd::FileExist(vbroken.at(ibroken))) {
-		obb<<"b";
-		//		answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/"+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
-		answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
-		if(answer!=0) { ok=FALSE;obb<<". Broken_file="+vbroken.at(ibroken)+".EXT"; }}
-	    }
-	  }
-	} 
+        for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+          if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
+            //	    cerr << string("ls "+dir+"/*"+vrelax.at(irelax)+XHOST.vext.at(iext)) << endl;
+            aurostd::string2dequestring(aurostd::execute2string("ls "+dir+"/*"+vrelax.at(irelax)+XHOST.vext.at(iext)),vbroken);
+            for(uint ibroken=0;ibroken<vbroken.size();ibroken++) {
+              //      cerr << "[" << vbroken.at(ibroken) << "]" << endl;
+              if(ok && aurostd::FileExist(vbroken.at(ibroken))) {
+                obb<<"b";
+                //		answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/"+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
+                answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+vbroken.at(ibroken)+"\" 2>&1 | grep -c \"Unexpected end of input\" ");
+                if(answer!=0) { ok=FALSE;obb<<". Broken_file="+vbroken.at(ibroken)+".EXT"; }}
+            }
+          }
+        } 
       }
     }
     // DONE
@@ -5272,70 +5274,68 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
-  bool XPLUG(vector<string> argv) {
+  bool XPLUG_CHECK_ONLY(const vector<string>& argv) {  //CO20200501
+    deque<string> vdirsOUT,vzips,vcleans;
+    return XPLUG_CHECK_ONLY(argv,vdirsOUT,vzips,vcleans);
+  }
+  bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans) {  //CO20200501
     //   cerr << "aflowlib::XPLUG: is deprecated" << endl; exit(0);
     bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy="aflowlib::XPLUG_CHECK_ONLY():";  //CO20200404
     int NUM_THREADS=XHOST.CPU_Cores; //ME20181226
     //ME20181109 - Handle NCPUS=MAX
     if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")))
       NUM_THREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
     int NUM_ZIP=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_ZIP"));
     int NUM_SIZE=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_SIZE"));
-    bool FLAG_DO_CLEAN=XHOST.vflag_control.flag("XPLUG_DO_CLEAN");
-    bool FLAG_DO_ADD=XHOST.vflag_control.flag("XPLUG_DO_ADD");
-    string PREFIX=XHOST.vflag_control.getattachedscheme("XPLUG_PREFIX");
 
     if(NUM_THREADS<1) NUM_THREADS=XHOST.CPU_Cores/2;
     if(NUM_ZIP<1) NUM_ZIP=1;
     if(NUM_SIZE<1) NUM_SIZE=128;
 
-    if(LDEBUG) cerr << "aflowlib::XPLUG: NUM_THREADS=" << NUM_THREADS << endl;
-    if(LDEBUG) cerr << "aflowlib::XPLUG: NUM_ZIP=" << NUM_ZIP << endl;
-    if(LDEBUG) cerr << "aflowlib::XPLUG: NUM_SIZE=" << NUM_SIZE << endl;
-    if(LDEBUG) cerr << "aflowlib::XPLUG: FLAG_DO_CLEAN=" << FLAG_DO_CLEAN << endl;
-    if(LDEBUG) cerr << "aflowlib::XPLUG: FLAG_DO_ADD=" << FLAG_DO_ADD << endl;
-    if(LDEBUG) cerr << "aflowlib::XPLUG: PREFIX=" << PREFIX << endl;
+    if(LDEBUG) cerr << soliloquy << " NUM_THREADS=" << NUM_THREADS << endl;
     //  exit(0);
     // if(LDEBUG) cerr << "aflowlib::XPLUG = " << XHOST.hostname << endl;
-    deque<string> vdirsIN,vdirsOUT,vzips,vcleans;
+    deque<string> vdirsIN; //CO20200501,vdirsOUT,vzips,vcleans;
+    vdirsOUT.clear();vzips.clear();vcleans.clear(); //CO20200501
     deque<bool> vok;
     deque<uint> vrun;
 
     for(uint i=1;i<argv.size();i++) {
       if(aurostd::substring2bool(argv.at(i),"/")) {
-	//	cerr << "aflowlib::XPLUG: adding" << argv.at(i) << endl;
-	vdirsIN.push_back(argv.at(i));
-	vdirsOUT.push_back(argv.at(i));
+        //	cerr << soliloquy << " adding" << argv.at(i) << endl;
+        vdirsIN.push_back(argv.at(i));
+        vdirsOUT.push_back(argv.at(i));
       }
     }
     
     std::sort(vdirsIN.begin(),vdirsIN.end());
     std::sort(vdirsOUT.begin(),vdirsOUT.end());
-    if(LDEBUG) cerr << "aflowlib::XPLUG: vdirsIN.size()=" << vdirsIN.size() << endl;
-    //  if(LDEBUG) cerr << "aflowlib::XPLUG: [1]" << endl;
+    if(LDEBUG) cerr << soliloquy << " vdirsIN.size()=" << vdirsIN.size() << endl;
+    //  if(LDEBUG) cerr << soliloquy << " [1]" << endl;
     for(uint i=0;i<vdirsIN.size();i++) { vok.push_back(TRUE);vrun.push_back(i); }
-    //  if(LDEBUG) cerr << "aflowlib::XPLUG: [2]" << endl;
+    //  if(LDEBUG) cerr << soliloquy << " [2]" << endl;
 
     if((int) vdirsIN.size()<=NUM_THREADS) NUM_THREADS=(uint) vdirsIN.size();        // SAFETY
-    //  if(LDEBUG) cerr << "aflowlib::XPLUG: [3]" << endl;
+    //  if(LDEBUG) cerr << soliloquy << " [3]" << endl;
 
     if(NUM_THREADS<=1) {                                                        // run singular
-      //  if(LDEBUG) cerr << "aflowlib::XPLUG: [3b]" << endl;
+      //  if(LDEBUG) cerr << soliloquy << " [3b]" << endl;
       for(uint i=0;i<vdirsIN.size();i++) {
         stringstream oss;
-	vok.at(i)=XPLUG_Directory_ok(vdirsIN.at(i),vdirsOUT.at(i),i,vdirsIN.size(),-1,oss);
+        vok.at(i)=XPLUG_Directory_ok(vdirsIN.at(i),vdirsOUT.at(i),i,vdirsIN.size(),-1,oss);
         cerr << oss.str();cerr.flush();
       }
     }
-    //  if(LDEBUG) cerr << "aflowlib::XPLUG: [4]" << endl;
+    //  if(LDEBUG) cerr << soliloquy << " [4]" << endl;
     if(NUM_THREADS>=2) {                                                       // multithread
       AFLOW_PTHREADS::FLAG=TRUE;AFLOW_PTHREADS::MAX_PTHREADS=NUM_THREADS;      // prepare
       if(AFLOW_PTHREADS::MAX_PTHREADS>MAX_ALLOCATABLE_PTHREADS) AFLOW_PTHREADS::MAX_PTHREADS=MAX_ALLOCATABLE_PTHREADS; // check max
-      //  if(LDEBUG) cerr << "aflowlib::XPLUG: [5]" << endl;
+      //  if(LDEBUG) cerr << soliloquy << " [5]" << endl;
       AFLOW_PTHREADS::Clean_Threads();                                         // clean threads
-      //    if(LDEBUG) cerr << "aflowlib::XPLUG: [6]" << endl;
+      //    if(LDEBUG) cerr << soliloquy << " [6]" << endl;
       _threaded_XPLUG_params params[MAX_ALLOCATABLE_PTHREADS];                 // prepare
-      //    if(LDEBUG) cerr << "aflowlib::XPLUG: [7]" << endl;
+      //    if(LDEBUG) cerr << soliloquy << " [7]" << endl;
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {      // prepare loop
         params[ithread].ITHREAD=ithread;                                       // prepare params
         params[ithread].THREADS_MAX=AFLOW_PTHREADS::MAX_PTHREADS;              // prepare params
@@ -5346,11 +5346,11 @@ namespace aflowlib {
         params[ithread].itbusy=ithread;                                        // prepare params
         params[ithread].VERBOSE=FALSE;                                         // prepare params
       }
-      //    if(LDEBUG) cerr << "aflowlib::XPLUG: [8]" << endl;
+      //    if(LDEBUG) cerr << soliloquy << " [8]" << endl;
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) AFLOW_PTHREADS::viret[ithread]=pthread_create(&AFLOW_PTHREADS::vpthread[ithread],NULL,_threaded_interface_XPLUG_Directory,(void*)&params[ithread]); // run threads
-      //    if(LDEBUG) cerr << "aflowlib::XPLUG: [9]" << endl;
+      //    if(LDEBUG) cerr << soliloquy << " [9]" << endl;
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) pthread_join(AFLOW_PTHREADS::vpthread[ithread],NULL); // flush threads
-      //  if(LDEBUG) cerr << "aflowlib::XPLUG: [10]" << endl;
+      //  if(LDEBUG) cerr << soliloquy << " [10]" << endl;
     }
 
     // has OK. now do the counting
@@ -5358,10 +5358,30 @@ namespace aflowlib {
       if(vok.at(i)==TRUE) vzips.push_back(vdirsOUT.at(i));
       if(vok.at(i)==FALSE) vcleans.push_back(vdirsOUT.at(i));
     }
-    if(LDEBUG) cerr << "aflowlib::XPLUG: vdirsIN.size()=" << vdirsIN.size() << endl;
-    if(LDEBUG) cerr << "aflowlib::XPLUG: vzips.size()=" << vzips.size() << endl;
-    if(LDEBUG) cerr << "aflowlib::XPLUG: vcleans.size()=" << vcleans.size() << endl;
+    if(LDEBUG) cerr << soliloquy << " vdirsIN.size()=" << vdirsIN.size() << endl;
+    if(LDEBUG) cerr << soliloquy << " vzips.size()=" << vzips.size() << endl;
+    if(LDEBUG) cerr << soliloquy << " vcleans.size()=" << vcleans.size() << endl;
 
+    return true;
+  }
+  bool XPLUG(const vector<string>& argv) {
+    //   cerr << "aflowlib::XPLUG: is deprecated" << endl; exit(0);
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy="aflowlib::XPLUG():";  //CO20200404
+    int NUM_ZIP=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_ZIP"));
+    int NUM_SIZE=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_SIZE"));
+    bool FLAG_DO_CLEAN=XHOST.vflag_control.flag("XPLUG_DO_CLEAN");
+    bool FLAG_DO_ADD=XHOST.vflag_control.flag("XPLUG_DO_ADD");
+    string PREFIX=XHOST.vflag_control.getattachedscheme("XPLUG_PREFIX");
+
+    if(LDEBUG) cerr << soliloquy << " NUM_ZIP=" << NUM_ZIP << endl;
+    if(LDEBUG) cerr << soliloquy << " NUM_SIZE=" << NUM_SIZE << endl;
+    if(LDEBUG) cerr << soliloquy << " FLAG_DO_CLEAN=" << FLAG_DO_CLEAN << endl;
+    if(LDEBUG) cerr << soliloquy << " FLAG_DO_ADD=" << FLAG_DO_ADD << endl;
+    if(LDEBUG) cerr << soliloquy << " PREFIX=" << PREFIX << endl;
+    
+    deque<string> vdirsOUT,vzips,vcleans;
+    XPLUG_CHECK_ONLY(argv,vdirsOUT,vzips,vcleans); //CO20200501
 
     if(vzips.size()>0) {
       stringstream command;
@@ -5371,12 +5391,13 @@ namespace aflowlib {
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".pratt.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".duke.edu");
       for(uint i=0;i<vzips.size();i+=AFLOW_MAX_ARGV) {
-        command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP
-		<< " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string("")) << aurostd::get_date()
-		<< "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec() << "_" << i/AFLOW_MAX_ARGV+1 << "_" << XHOST.hostname
-		<< " --size=" << NUM_SIZE << " --DIRECTORY ";
-        for(uint j=i;j<i+AFLOW_MAX_ARGV && j<vzips.size();j++)
-          command << " " << vzips.at(j);
+        command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
+        command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
+        //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
+        command << aurostd::get_datetime_formatted("",true,"-",""); //no delim for date and time, include time, "-" between date and time
+        command << "_" << i/AFLOW_MAX_ARGV+1 << "_" << XHOST.hostname;
+        command << " --size=" << NUM_SIZE << " --DIRECTORY ";
+        for(uint j=i;j<i+AFLOW_MAX_ARGV && j<vzips.size();j++) command << " " << vzips.at(j);
         command << " " << endl << endl;
       }
       cerr << command.str() << endl;
