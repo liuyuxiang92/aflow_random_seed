@@ -20,16 +20,13 @@ namespace apl {
     free();
   }
 
-  LinearResponsePC::LinearResponsePC(Supercell& sc,
-      _xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, string& AflowIn, ofstream& mf, ostream& oss)
-    : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, oss) {
+  LinearResponsePC::LinearResponsePC(Supercell& sc, ofstream& mf, ostream& oss)
+    : ForceConstantCalculator(sc, mf, oss) {
       free();
     }
 
   LinearResponsePC::LinearResponsePC(const LinearResponsePC& that)
-    : ForceConstantCalculator(*that._supercell, *that._xInput, *that._aflowFlags, *that._kbinFlags,
-      *that._xFlags, *that._AflowIn, *that.getOFStream(), *that.getOSS()) {
+    : ForceConstantCalculator(*that._supercell, *that.getOFStream(), *that.getOSS()) {
     free();
     copy(that);
   }
@@ -47,29 +44,19 @@ namespace apl {
     free();
   }
 
-  void LinearResponsePC::clear(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn) {
+  void LinearResponsePC::clear(Supercell& sc) {
     free();
     _supercell = &sc;
-    _xInput = &xinput;
-    _aflowFlags = &aflags;
-    _kbinFlags = &kflags;
-    _xFlags = &xflags;
-    _AflowIn = &AflowIn;
   }
 
   void LinearResponsePC::copy(const LinearResponsePC& that) {
     xStream::copy(that);
-    _aflowFlags = that._aflowFlags;
-    _AflowIn = that._AflowIn;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
+    _directory = that._directory;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
-    _kbinFlags = that._kbinFlags;
     _supercell = that._supercell;
-    _xFlags = that._xFlags;
-    _xInput = that._xInput;
     xInputs = that.xInputs;
   }
 
@@ -77,6 +64,7 @@ namespace apl {
     xInputs.clear();
     _bornEffectiveChargeTensor.clear();
     _dielectricTensor.clear();
+    _directory = "";
     _forceConstantMatrices.clear();
     _isPolarMaterial = false;
   }
@@ -91,21 +79,22 @@ namespace apl {
 
 namespace apl {
 
-  bool LinearResponsePC::runVASPCalculations(bool zerostate_chgcar) {
+  bool LinearResponsePC::runVASPCalculations(_xinput& xInput, _aflags& _aflowFlags,
+      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, bool zerostate_chgcar) {
     if (zerostate_chgcar) {
       string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     }
     bool stagebreak = false;
 
     // Call VASP to calculate forces by LR
-    _xInput->xvasp.AVASP_arun_mode = "APL";
+    xInput.xvasp.AVASP_arun_mode = "APL";
     xInputs.clear();
-    xInputs.push_back(*_xInput);
-    stagebreak = runVASPCalculationsDFPT(xInputs[0]);
+    xInputs.push_back(xInput);
+    stagebreak = runVASPCalculationsDFPT(xInputs[0], _aflowFlags, _kbinFlags, _xFlags, _AflowIn);
     if (_isPolarMaterial) {
-      xInputs.push_back(*_xInput);
-      stagebreak = (runVASPCalculationsBE(xInputs[1], 2) || stagebreak);
+      xInputs.push_back(xInput);
+      stagebreak = (runVASPCalculationsBE(xInputs[1], _aflowFlags, _kbinFlags, _xFlags, _AflowIn, 2) || stagebreak);
     }
     return stagebreak;
   }
@@ -115,7 +104,8 @@ namespace apl {
   // dielectric constant matrix in the primitive cell with very high precision
   // Both values are needed by non-analytical term of dynamic matrix for
   // correct TO-LO splitting of optical phonon branches of polar systems
-  bool LinearResponsePC::runVASPCalculationsDFPT(_xinput& xInput) {
+  bool LinearResponsePC::runVASPCalculationsDFPT(_xinput& xInput, _aflags& _aflowFlags,
+      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn) {
     bool stagebreak = false;
 
     xInput.setXStr(_supercell->getSupercellStructureLight());
@@ -128,21 +118,20 @@ namespace apl {
       xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;  // ME20200213
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_BORN", false);
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_LR", true);
-      _kbinFlags->KBIN_MPI_AUTOTUNE = false;
 
       // Set POSCAR to VASP5 format
       xInput.getXStr().is_vasp4_poscar_format = false;
       xInput.getXStr().is_vasp5_poscar_format = true;
-      stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInput) || stagebreak);
+      stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInput) || stagebreak);
     }
     // For AIMS, use the old method until we have AVASP_populateXAIMS
     if(xInput.AFLOW_MODE_AIMS) {
       string runname = _AFLOW_APL_DFPT_DIRECTORY_NAME_;  // ME20200213
-      xInput.setDirectory(_xInput->getDirectory() + "/" + runname);
+      xInput.setDirectory(_directory + "/" + runname);
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
-        createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *p_FileMESSAGE);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *p_FileMESSAGE);
         stagebreak = true;
       }
     }
@@ -182,7 +171,7 @@ namespace apl {
   bool LinearResponsePC::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
 
     // Read vasprun.xml
@@ -191,7 +180,7 @@ namespace apl {
       filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
       if (aurostd::EFileExist(filename)) {
         message << "Could not find vasprun.xml file for linear response calculations.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
         return false;
       }
     }
@@ -269,13 +258,16 @@ namespace apl {
 namespace apl {
 
   void LinearResponsePC::saveState(const string& filename) {
+    if (xInputs.size() == 0) return;  // Nothing to write
     string function = "apl::LinearResponsePC::saveState()";
     string message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
     out << AFLOWIN_SEPARATION_LINE << std::endl;
     out << tag << "ENGINE=LR" << std::endl;
+    if (xInputs[0].AFLOW_MODE_VASP) out << tag << "AFLOW_MODE=VASP" << std::endl;
+    else if (xInputs[0].AFLOW_MODE_AIMS) out << tag << "AFLOW_MODE=AIMS" << std::endl;
     out << AFLOWIN_SEPARATION_LINE << std::endl;
     out << tag << "SUPERCELL=" << _supercell->scell << std::endl;
     out << tag << "INPUT_STRUCTURE=START" << std::endl;
@@ -291,30 +283,60 @@ namespace apl {
     }
   }
 
+  // ME20200501
+  // The state reader is designed to read the directory structure and supercell
+  // structures from a prior run for post-processing. It cannot create APL
+  // aflow.in files and should only be used to read forces for force constant
+  // calculations. It is still in development and has only been tested with VASP.
   void LinearResponsePC::readFromStateFile(const string& filename) {
     string function = "apl::LinearResponsePC::readFromState()";
     string message = "Reading state of the phonon calculator from " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
 
+    // Find if the calculations are VASP or AIMS calculations
+    vector<string> vlines, tokens;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+    uint iline = 0;
+    _xinput xInput;
+    while (++iline < nlines) {
+      if (aurostd::substring2bool(vlines[iline], "AFLOW_MODE") ){
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        if (tokens.size() != 2) {
+          message = "Tag for AFLOW_MODE is broken.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        if (tokens[1] == "VASP") {
+          xInput.AFLOW_MODE_VASP = true;
+        } else if (tokens[1] == "AIMS") {
+          xInput.AFLOW_MODE_AIMS = true;
+        } else {
+          message = "Unknown AFLOW_MODE " + tokens[1] + ".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        }
+      }
+    }
+    if (iline >= nlines) {
+      message = "AFLOW_MODE tag is missing.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
     // Defaults
-    _xInput->xvasp.AVASP_arun_mode = "APL";
+    xInput.xvasp.AVASP_arun_mode = "APL";
     _isPolarMaterial = DEFAULT_APL_POLAR;
 
     // Set xInput for the linear response calculation
-    xInputs.push_back(*_xInput);
+    xInputs.push_back(xInput);
     xInputs[0].setXStr(_supercell->getSupercellStructureLight());
     xInputs[0].xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_DFPT_RUNNAME_;
 
     // Read
     xInputs.clear();
-    vector<string> vlines, tokens;
-    aurostd::efile2vectorstring(filename, vlines);
-    uint nlines = vlines.size();
-    uint iline = 0;
+    iline = 0;
     while (++iline < nlines) {
       if (aurostd::substring2bool(vlines[iline], "POLAR=")) {
         aurostd::string2tokens(vlines[iline], tokens, "=");
@@ -324,7 +346,7 @@ namespace apl {
         }
         _isPolarMaterial = aurostd::string2utype<bool>(tokens[1]);
         if (_isPolarMaterial) {
-          xInputs.push_back(*_xInput);
+          xInputs.push_back(xInput);
           xInputs[1].setXStr(_supercell->getInputStructureLight());
           xInputs[1].xvasp.AVASP_arun_runname = "2_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_;
         }
@@ -332,11 +354,10 @@ namespace apl {
     }
 
     // Set directories
-    string base_directory = _xInput->getDirectory();
     string dir = "";
     for (uint i = 0; i < xInputs.size(); i++) {
       const _xvasp& xvasp = xInputs[i].xvasp;
-      dir = base_directory + "/ARUN." + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname + "/";
+      dir = _directory + "/ARUN." + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname + "/";
       xInputs[i].setDirectory(aurostd::CleanFileName(dir));
     }
   }

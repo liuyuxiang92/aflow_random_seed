@@ -28,6 +28,8 @@ using aurostd::xerror;
 static const string _AAPL_IFCS_ERR_PREFIX_ = "apl::AnharmonicIFCs::";
 static const string _AAPL_IFCS_MODULE_ = "AAPL";  // for the logger
 
+static const string _CLUSTER_SET_FILE_[2] = {"clusterSet_3rd.xml", "clusterSet_4th.xml"};
+
 // tform represents a tensor transformation containing the index and the
 // coefficients. vector<vector<int> > holds the indices, vector<double>
 // the coefficients.
@@ -49,18 +51,15 @@ namespace apl {
   AnharmonicIFCs::AnharmonicIFCs(ostream& oss) {
     free();
     xStream::initialize(oss);
+    clst = ClusterSet(oss);
+    directory = "./";
   }
 
-  AnharmonicIFCs::AnharmonicIFCs(_xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, ClusterSet& _clst, ofstream& mf, ostream& oss) {
+  AnharmonicIFCs::AnharmonicIFCs(ofstream& mf, ostream& oss) {
     free();
-    _xInput = &xinput;
-    _aflowFlags = &aflags;
-    _kbinFlags = &kflags;
-    _xFlags = &xflags;
     xStream::initialize(mf, oss);
-    clst = &_clst;
-    order = clst->order;
+    clst = ClusterSet(mf, oss);
+    directory = "./";
   }
 
   //Copy constructors
@@ -80,18 +79,17 @@ namespace apl {
   //copy//////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::copy(const AnharmonicIFCs& that) {
     xStream::copy(that);
-    _aflowFlags = that._aflowFlags;
-    _kbinFlags = that._kbinFlags;
-    _xFlags = that._xFlags;
-    _xInput = that._xInput;
     cart_indices = that.cart_indices;
     clst = that.clst;
+    directory = that.directory;
     distortion_magnitude = that.distortion_magnitude;
     force_constants = that.force_constants;
+    initialized = that.initialized;
     max_iter = that.max_iter;
     mixing_coefficient = that.mixing_coefficient;
     order = that.order;
     sumrule_threshold = that.sumrule_threshold;
+    _useZeroStateForces = that._useZeroStateForces;
     xInputs = that.xInputs;
   }
 
@@ -105,23 +103,22 @@ namespace apl {
   // Clears all vectors and resets all values.
   void AnharmonicIFCs::free() {
     cart_indices.clear();
+    clst.clear();
+    directory = "";
     distortion_magnitude = 0.0;
     force_constants.clear();
+    initialized = false;
     max_iter = 0;
     mixing_coefficient = 0.0;
     order = 0;
     sumrule_threshold = 0.0;
+    _useZeroStateForces = false;
     xInputs.clear();
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void AnharmonicIFCs::clear(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags, ClusterSet& _clst) {
+  void AnharmonicIFCs::clear() {
     free();
-    _xInput = &xinput;
-    _aflowFlags = &aflags;
-    _kbinFlags = &kflags;
-    _xFlags = &xflags;
-    clst = &_clst;
   }
 
 
@@ -132,6 +129,39 @@ namespace apl {
     mixing_coefficient = mix;
     sumrule_threshold = threshold;
     _useZeroStateForces = zero;
+  }
+
+  //directory/////////////////////////////////////////////////////////////////
+  const string& AnharmonicIFCs::getDirectory() const {
+    return directory;
+  }
+
+  void AnharmonicIFCs::setDirectory(const string& dir) {
+    directory = dir;
+    clst.setDirectory(dir);
+  }
+
+  //initialize////////////////////////////////////////////////////////////////
+  // Initializes the anharmonic IFC calculator by building the ClusterSet.
+  void AnharmonicIFCs::initialize(const Supercell& scell, int _order, int cut_shell, double cut_rad) {
+    order = _order;
+    clst.initialize(scell, _order, cut_shell, cut_rad);
+    string clust_hib_file = directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[_order-3];
+    bool awakeClusterSet = aurostd::EFileExist(clust_hib_file);
+    if (awakeClusterSet) {
+      try {
+        clst.readClusterSetFromFile(clust_hib_file);
+      } catch (aurostd::xerror& excpt) {
+        string message = excpt.error_message;
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      }
+    }
+    if (!awakeClusterSet) {
+      clst.build();
+      clst.buildDistortions();
+      clst.writeClusterSetToFile(clust_hib_file);
+    }
+    initialized = true;
   }
 
   //getOrder//////////////////////////////////////////////////////////////////
@@ -145,9 +175,15 @@ namespace apl {
 
 namespace apl {
 
-  bool AnharmonicIFCs::runVASPCalculations(bool zerostate_chgcar) {
+  bool AnharmonicIFCs::runVASPCalculations(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags, bool zerostate_chgcar) {
     bool stagebreak = false;
-    _xInput->xvasp.AVASP_arun_mode = _AAPL_IFCS_MODULE_;
+    if (!initialized) {
+      string function = _AAPL_IFCS_ERR_PREFIX_ + "runVASPCalculations()";
+      string message = "Not initialized.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+
+    xinput.xvasp.AVASP_arun_mode = _AAPL_IFCS_MODULE_;
     stringstream _logger;
     _logger << "Managing directories for ";
     if (order == 3) {
@@ -156,59 +192,59 @@ namespace apl {
       _logger << "4th";
     }
     _logger << " order IFCs.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, directory, *p_FileMESSAGE, *p_oss);
 
     // Determine the number of runs so the run ID in the folder name can be
     // padded with the appropriate number of zeros.
     int nruns = 0;
-    for (uint ineq = 0; ineq < clst->ineq_distortions.size(); ineq++) {
-      nruns += clst->ineq_distortions[ineq].distortions.size();
+    for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
+      nruns += clst.ineq_distortions[ineq].distortions.size();
     }
     if (order == 4) {
-      for (uint ineq = 0; ineq < clst->higher_order_ineq_distortions.size(); ineq++) {
-        nruns += clst->higher_order_ineq_distortions[ineq].distortions.size();
+      for (uint ineq = 0; ineq < clst.higher_order_ineq_distortions.size(); ineq++) {
+        nruns += clst.higher_order_ineq_distortions[ineq].distortions.size();
       }
     }
 
-    xInputs.assign(nruns, *_xInput);
+    xInputs.assign(nruns, xinput);
 
     string chgcar_file = "";
     if (zerostate_chgcar) {  // ME20191029 - for ZEROSTATE CHGCAR
       // Find ZEROSTATE directory
-      vector<string> directory;
-      aurostd::DirectoryLS(_aflowFlags->Directory, directory);
-      uint ndir = directory.size();
+      vector<string> dirs;
+      aurostd::DirectoryLS(directory, dirs);
+      uint ndir = dirs.size();
       uint d = 0;
       for (d = 0; d < ndir; d++) {
-        if (aurostd::IsDirectory(_aflowFlags->Directory + "/" + directory[d]) && aurostd::substring2bool(directory[d], "ZEROSTATE")) {
+        if (aurostd::IsDirectory(directory + "/" + dirs[d]) && aurostd::substring2bool(dirs[d], "ZEROSTATE")) {
           break;
         }
       }
       if (d == ndir) {
         string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         zerostate_chgcar = false;
       } else {
-        chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
-        if (_kbinFlags->KZIP_COMPRESS) chgcar_file += "." + _kbinFlags->KZIP_BIN;
+        chgcar_file = aurostd::CleanFileName("../" + dirs[d] + "/CHGCAR.static");
+        if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
       }
     }
 
     int idxRun = 0;
-    for (uint ineq = 0; ineq < clst->ineq_distortions.size(); ineq++) {
-      const vector<int>& atoms = clst->ineq_distortions[ineq].atoms;
-      const _ineq_distortions& idist = clst->ineq_distortions[ineq];
+    for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
+      const vector<int>& atoms = clst.ineq_distortions[ineq].atoms;
+      const _ineq_distortions& idist = clst.ineq_distortions[ineq];
       for (uint dist = 0; dist < idist.distortions.size(); dist++) {
         const vector<int>& distortions = idist.distortions[dist][0];
 
         // ME20190109 - add title
         xstructure& xstr = xInputs[idxRun].getXStr();
-        LightCopy(clst->scell, xstr);
+        LightCopy(clst.scell, xstr);
         xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title);
         if (xstr.title.empty()) {
           xstr.buildGenericTitle(true, false);
         }
-        xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst->sc_dim, 'x');
+        xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
 
         xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
         if (zerostate_chgcar) {
@@ -217,20 +253,20 @@ namespace apl {
 
         // Set up runname and generate distorted structure
         xInputs[idxRun].xvasp.AVASP_arun_runname = buildRunName(distortions, atoms, idxRun, nruns);
-        applyDistortions(xInputs[idxRun], clst->distortion_vectors, distortions, atoms);
+        applyDistortions(xInputs[idxRun], clst.distortion_vectors, distortions, atoms);
 
         // Create aflow.in files if they don't exist. Stagebreak is true as soon
         // as one aflow.in file was created.
-        stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInputs[idxRun]) || stagebreak);
+        stagebreak = (createAflowInPhonons(aflags, kflags, xflags, xInputs[idxRun]) || stagebreak);
         idxRun++;
       }
     }
     if (order == 4) {
-      for (uint ineq = 0; ineq < clst->higher_order_ineq_distortions.size(); ineq++) {
-        const _ineq_distortions& idist = clst->higher_order_ineq_distortions[ineq];
+      for (uint ineq = 0; ineq < clst.higher_order_ineq_distortions.size(); ineq++) {
+        const _ineq_distortions& idist = clst.higher_order_ineq_distortions[ineq];
         const vector<int>& atoms = idist.atoms;
         for (uint dist = 0; dist < idist.distortions.size(); dist++) {
-          xInputs[idxRun] = *_xInput;
+          xInputs[idxRun] = xinput;
           const vector<int>& distortions = idist.distortions[dist][0];
           xstructure& xstr = xInputs[idxRun].getXStr();
           xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title);
@@ -238,22 +274,22 @@ namespace apl {
           if (xstr.title.empty()) {
             xstr.buildGenericTitle(true, false);
           }
-          xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst->sc_dim, 'x');
+          xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
 
           // ME20190113 - make sure that POSCAR has the correct format
-          if ((!_kbinFlags->KBIN_MPI && (_kbinFlags->KBIN_BIN.find("46") != string::npos)) ||
-              (_kbinFlags->KBIN_MPI && (_kbinFlags->KBIN_MPI_BIN.find("46") != string::npos))) {
+          if ((kflags.KBIN_MPI && (kflags.KBIN_BIN.find("46") != string::npos)) ||
+              (kflags.KBIN_MPI && (kflags.KBIN_MPI_BIN.find("46") != string::npos))) {
             xstr.is_vasp5_poscar_format = false;
           }
 
           // Set up runname and generate distorted structure
           xInputs[idxRun].xvasp.AVASP_arun_runname = buildRunName(distortions, atoms, idxRun, nruns);
           xInputs[idxRun].xvasp.AVASP_arun_runname += "_3rd";
-          applyDistortions(xInputs[idxRun], clst->distortion_vectors, distortions, atoms, 2.0);
+          applyDistortions(xInputs[idxRun], clst.distortion_vectors, distortions, atoms, 2.0);
 
           // Create aflow.in files if they don't exist. Stagebreak is true as soon
           // as one aflow.in file was created.
-          stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInputs[idxRun]) || stagebreak);
+          stagebreak = (createAflowInPhonons(aflags, kflags, xflags, xInputs[idxRun]) || stagebreak);
           idxRun++;
         }
       }
@@ -332,14 +368,14 @@ namespace apl {
     // read the force files. The latter outputs messages, which is not desired
     // when directories have just been created.
     if (!outfileFoundAnywherePhonons(xInputs)) return false;
-    if (!outfileFoundEverywherePhonons(xInputs, _aflowFlags->Directory, *p_FileMESSAGE, *p_oss)) return false;
+    if (!outfileFoundEverywherePhonons(xInputs, directory, *p_FileMESSAGE, *p_oss)) return false;
     if (_useZeroStateForces) {
-      vector<string> directory;
-      aurostd::DirectoryLS(_aflowFlags->Directory, directory);
-      uint ndir = directory.size();
+      vector<string> dirs;
+      aurostd::DirectoryLS(directory, dirs);
+      uint ndir = dirs.size();
       uint d = 0;
       for (d = 0; d < ndir; d++) {
-        if (aurostd::IsDirectory(_aflowFlags->Directory + "/" + directory[d]) && aurostd::substring2bool(directory[d], "ZEROSTATE")) {
+        if (aurostd::IsDirectory(directory + "/" + dirs[d]) && aurostd::substring2bool(dirs[d], "ZEROSTATE")) {
           break;
         }
       }
@@ -348,20 +384,20 @@ namespace apl {
         string message = "Could not find ZEROSTATE directory.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
       } else {
-        _xinput zerostate(*_xInput);
+        _xinput zerostate(xInputs[0]);
         xstructure& xstr = zerostate.getXStr();
-        LightCopy(clst->scell, xstr);
-        zerostate.setDirectory(aurostd::CleanFileName(_aflowFlags->Directory + "/" + directory[d]));
+        LightCopy(clst.scell, xstr);
+        zerostate.setDirectory(aurostd::CleanFileName(directory + "/" + dirs[d]));
         subtractZeroStateForces(xInputs, zerostate);
       }
     }
     vector<vector<vector<xvector<double> > > > force_tensors = storeForces(xInputs);
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", *_aflowFlags, *p_FileMESSAGE, *p_oss);
-    vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst->ineq_distortions, force_tensors);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", directory, *p_FileMESSAGE, *p_oss);
+    vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst.ineq_distortions, force_tensors);
     force_tensors.clear();
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", directory, *p_FileMESSAGE, *p_oss);
     force_constants = symmetrizeIFCs(ifcs_unsym);
     return true;
   }
@@ -371,11 +407,11 @@ namespace apl {
   }
 
   vector<vector<int> > AnharmonicIFCs::getClusters() const {
-    uint nclusters = clst->clusters.size();
+    uint nclusters = clst.clusters.size();
     vector<vector<int> > clusters(nclusters, vector<int>(order));
     for (uint i = 0; i < nclusters; i++) {
       for (int j = 0; j < order; j++) {
-        clusters[i][j] = clst->clusters[i].atoms[j];
+        clusters[i][j] = clst.clusters[i].atoms[j];
       }
     }
     return clusters;
@@ -404,9 +440,9 @@ namespace apl {
   // Stores the forces from the VASP calculations. Each item in the vector
   // holds the force tensor for a set of distorted atoms.
   vector<vector<vector<xvector<double> > > > AnharmonicIFCs::storeForces(vector<_xinput>& xInp) {
-    vector<vector<vector<xvector<double> > > > force_tensors(clst->ineq_distortions.size());
+    vector<vector<vector<xvector<double> > > > force_tensors(clst.ineq_distortions.size());
     int idxRun = 0;
-    for (uint id = 0; id < clst->ineq_distortions.size(); id++) {
+    for (uint id = 0; id < clst.ineq_distortions.size(); id++) {
       force_tensors[id] = getForces(id, idxRun, xInp);
     }
     if (order == 4) addHigherOrderForces(force_tensors, idxRun, xInp);
@@ -418,8 +454,8 @@ namespace apl {
   // into the forces of the equivalent distortions.
   vector<vector<xvector<double> > > AnharmonicIFCs::getForces(int id, int& idxRun,
       vector<_xinput>& xInp) {
-    const _ineq_distortions& ineq_dists = clst->ineq_distortions[id];
-    int natoms = (int) clst->scell.atoms.size();
+    const _ineq_distortions& ineq_dists = clst.ineq_distortions[id];
+    int natoms = (int) clst.scell.atoms.size();
     vector<int> powers(order - 1, 1);
     int ndist = 1;
     for (int i = 0; i < order - 1; i++) {
@@ -452,7 +488,7 @@ namespace apl {
         const vector<int>& transformation_map = ineq_dists.transformation_maps[ineq][i];
         for (int at = 0; at < natoms; at++) {
           attrans = getTransformedAtom(transformation_map, at);
-          force_tensor[index][at] = clst->pcell.fgroup[fg].Uc * qmforces[attrans];
+          force_tensor[index][at] = clst.pcell.fgroup[fg].Uc * qmforces[attrans];
         }
       }
       idxRun++;
@@ -462,17 +498,17 @@ namespace apl {
 
   void AnharmonicIFCs::addHigherOrderForces(vector<vector<vector<xvector<double> > > >& force_tensor,
       int& idxRun, vector<_xinput>& xInp) {
-    const vector<_ineq_distortions>& ineq_dists = clst->higher_order_ineq_distortions;
+    const vector<_ineq_distortions>& ineq_dists = clst.higher_order_ineq_distortions;
     uint ndist = force_tensor[0].size();
-    uint natoms = clst->scell.atoms.size();
+    uint natoms = clst.scell.atoms.size();
     vector<xvector<double> > forces(natoms, xvector<double>(3));
     for (uint ineq = 0; ineq < ineq_dists.size(); ineq++) {
       uint idist;
       int at = ineq_dists[ineq].atoms[0];
-      for (idist = 0; idist < clst->ineq_distortions.size(); idist++) {
+      for (idist = 0; idist < clst.ineq_distortions.size(); idist++) {
         int a;
         for (a = 0; a < order - 1; a++) {
-          if (clst->ineq_distortions[idist].atoms[a] != at) break;
+          if (clst.ineq_distortions[idist].atoms[a] != at) break;
         }
         if (a == order - 1) break;
       }
@@ -486,7 +522,7 @@ namespace apl {
         for (uint i = 1; i < ineq_dists[ineq].distortions[dist].size(); i++) {
           d = ineq_dists[ineq].distortions[dist][i][0];
           fg = ineq_dists[ineq].rotations[dist][i];
-          force_tensor[idist][ndist + d][at] = clst->pcell.fgroup[fg].Uc * qmforces[at];
+          force_tensor[idist][ndist + d][at] = clst.pcell.fgroup[fg].Uc * qmforces[at];
         }
         xInp[idxRun].clear();
         idxRun++;
@@ -517,15 +553,15 @@ namespace apl {
   vector<vector<double> >
     AnharmonicIFCs::calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>& idist,
         const vector<vector<vector<xvector<double> > > >& forces) {
-      vector<vector<double> > ifcs(clst->clusters.size(), vector<double>(cart_indices.size()));
+      vector<vector<double> > ifcs(clst.clusters.size(), vector<double>(cart_indices.size()));
       int at = 0, cl = 0, ic = 0;
       double denom = std::pow(distortion_magnitude, order - 1);
       for (uint f = 0; f < forces.size(); f++) {
         for (uint c = 0; c < idist[f].clusters.size(); c++) {
           ic = idist[f].clusters[c];
-          cl = clst->ineq_clusters[ic][0];
-          at = clst->getCluster(cl).atoms[order - 1];
-          for (int cart = 0; cart < clst->nifcs; cart++) {
+          cl = clst.ineq_clusters[ic][0];
+          at = clst.getCluster(cl).atoms[order - 1];
+          for (int cart = 0; cart < clst.nifcs; cart++) {
             ifcs[cl][cart] = finiteDifference(forces[f], at, cart_indices[cart], idist[f].atoms)/denom;
           }
         }
@@ -567,11 +603,11 @@ namespace apl {
       vector<int> dists(5);
       int pwr = 0;
       for (int i = 0; i < order - 1; i++) pwr += powers[i];
-      dists[0] = clst->nifcs + cart_ind[0];
+      dists[0] = clst.nifcs + cart_ind[0];
       dists[1] = cart_ind[0] * pwr;
       // No need to occupy dists[2] because C3[2] is zero
       dists[3] = (cart_ind[0] + 3) * pwr;
-      dists[4] = clst->nifcs + cart_ind[0] + 3;
+      dists[4] = clst.nifcs + cart_ind[0] + 3;
       for (int i = 0; i < 5; i++) {
         if (C3[i] != 0.0) diff -= C3[i] * forces[dists[i]][at][cart_ind[order - 1] + 1];
       }
@@ -631,14 +667,14 @@ namespace apl {
     vector<vector<double> > abssum = dev_from_zero;
 
     // Tensor transformations
-    vector<vector<tform> > transformations(clst->ineq_clusters.size());
-    v4int eq_ifcs(clst->ineq_clusters.size());
+    vector<vector<tform> > transformations(clst.ineq_clusters.size());
+    v4int eq_ifcs(clst.ineq_clusters.size());
     getTensorTransformations(eq_ifcs, transformations);
 
     // Do iterations
     int num_iter = 0;
     double max_err = 0.0;
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
     *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
     *p_oss << std::setw(15) << "Iteration";
     *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -671,7 +707,7 @@ namespace apl {
       }
       num_iter++;
     } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
     if (num_iter > max_iter) {
       string function = _AAPL_IFCS_ERR_PREFIX_ + "symmetrizeIFCs";
       stringstream message;
@@ -691,8 +727,8 @@ namespace apl {
   vector<vector<int> > AnharmonicIFCs::getReducedClusters() {
     vector<vector<int> > reduced_clusters;
     vector<int> cluster(order - 1);
-    for (uint c = 0; c < clst->clusters.size(); c++) {
-      const vector<int>& atoms = clst->clusters[c].atoms;
+    for (uint c = 0; c < clst.clusters.size(); c++) {
+      const vector<int>& atoms = clst.clusters[c].atoms;
       bool append = true;
       for (uint r = 0; r < reduced_clusters.size(); r++) {
         append = false;
@@ -723,32 +759,32 @@ namespace apl {
   // Check the typedefs at the beginning of the file for tform and v4int
   void AnharmonicIFCs::getTensorTransformations(v4int& eq_ifcs,
       vector<vector<tform> >& transformations) {
-    for (uint ineq = 0; ineq < clst->ineq_clusters.size(); ineq++) {
-      vector<tform> transform(clst->ineq_clusters[ineq].size() - 1);
-      vector<vector<vector<int> > > eq(clst->nifcs, vector<vector<int> >(clst->ineq_clusters[ineq].size()));
+    for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
+      vector<tform> transform(clst.ineq_clusters[ineq].size() - 1);
+      vector<vector<vector<int> > > eq(clst.nifcs, vector<vector<int> >(clst.ineq_clusters[ineq].size()));
       int ind = 0;
-      for (int crt = 0; crt < clst->nifcs; crt++) {
+      for (int crt = 0; crt < clst.nifcs; crt++) {
         eq[ind][0].push_back(crt);
         ind++;
       }
-      for (uint c = 1; c < clst->ineq_clusters[ineq].size(); c++) {
+      for (uint c = 1; c < clst.ineq_clusters[ineq].size(); c++) {
         tform trf;
-        _cluster cluster_trans = clst->getCluster(clst->ineq_clusters[ineq][c]);
+        _cluster cluster_trans = clst.getCluster(clst.ineq_clusters[ineq][c]);
         int fg = 0, perm = 0, rw = 0, cl = 0, p = 0;
         vector<int> atoms_trans = cluster_trans.atoms;
-        atoms_trans[0] = clst->sc2pcMap[atoms_trans[0]];  // transfer to pcell
+        atoms_trans[0] = clst.sc2pcMap[atoms_trans[0]];  // transfer to pcell
         fg = cluster_trans.fgroup;
         perm = cluster_trans.permutation;
-        for (int itrans = 0; itrans < clst->nifcs; itrans++) {
+        for (int itrans = 0; itrans < clst.nifcs; itrans++) {
           std::pair<vector<int>, vector<double> > t;
           int ind_orig = 0;
-          for (int iorig = 0; iorig < clst->nifcs; iorig++) {
+          for (int iorig = 0; iorig < clst.nifcs; iorig++) {
             double coeff = 1.0;
             for (int o = 0; o < order; o++) {
               rw = cart_indices[itrans][o] + 1;
-              p = clst->permutations[perm][o];
+              p = clst.permutations[perm][o];
               cl = cart_indices[iorig][p] + 1;
-              coeff *= clst->pcell.fgroup[fg].Uc[rw][cl];
+              coeff *= clst.pcell.fgroup[fg].Uc[rw][cl];
               if (abs(coeff) < _ZERO_TOL_) {
                 coeff = 0.0;
                 o = order;
@@ -778,9 +814,9 @@ namespace apl {
   // combinations.
   void AnharmonicIFCs::applyLinCombs(vector<vector<double> >& ifcs) {
     int c = 0, cart_ind = 0, cart_ind_indep = 0;
-    for (uint ineq = 0; ineq < clst->ineq_clusters.size(); ineq++) {
-      c = clst->ineq_clusters[ineq][0];
-      _linearCombinations lcomb = clst->linear_combinations[ineq];
+    for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
+      c = clst.ineq_clusters[ineq][0];
+      _linearCombinations lcomb = clst.linear_combinations[ineq];
       for (uint d = 0; d < lcomb.dependent.size(); d++) {
         cart_ind = lcomb.dependent[d];
         ifcs[c][cart_ind] = 0.0;  // reset
@@ -802,11 +838,11 @@ namespace apl {
       vector<vector<double> >& ifcs) {
     int clst_orig = 0, clst_trans = 0, cart_indices_orig = 0;
     double coeff = 0.0;
-    for (uint ineq = 0; ineq < clst->ineq_clusters.size(); ineq++) {
-      clst_orig = clst->ineq_clusters[ineq][0];
-      for (uint c = 1; c < clst->ineq_clusters[ineq].size(); c++) {
-        clst_trans = clst->ineq_clusters[ineq][c];
-        for (int itrans = 0; itrans < clst->nifcs; itrans++) {
+    for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
+      clst_orig = clst.ineq_clusters[ineq][0];
+      for (uint c = 1; c < clst.ineq_clusters[ineq].size(); c++) {
+        clst_trans = clst.ineq_clusters[ineq][c];
+        for (int itrans = 0; itrans < clst.nifcs; itrans++) {
           ifcs[clst_trans][itrans] = 0.0;  // reset
           const std::pair<vector<int>, vector<double> >& transf = transformations[ineq][c-1][itrans];
           for (uint t = 0; t < transf.first.size(); t++) {
@@ -827,14 +863,14 @@ namespace apl {
       const vector<vector<double> >& ifcs,
       vector<vector<double> >& dev_from_zero,
       vector<vector<double> >& abssum) {
-    dev_from_zero.assign(reduced_clusters.size(), vector<double>(clst->nifcs, 0));
-    abssum.assign(reduced_clusters.size(), vector<double>(clst->nifcs, 0));
-    for (uint i = 0; i < clst->ineq_clusters.size(); i++) {
-      for (uint j = 0; j < clst->ineq_clusters[i].size(); j++) {
-        uint r = findReducedCluster(reduced_clusters, clst->getCluster(clst->ineq_clusters[i][j]).atoms);
-        for (int c = 0; c < clst->nifcs; c++) {
-          dev_from_zero[r][c] += ifcs[clst->ineq_clusters[i][j]][c];
-          abssum[r][c] += abs(ifcs[clst->ineq_clusters[i][j]][c]);
+    dev_from_zero.assign(reduced_clusters.size(), vector<double>(clst.nifcs, 0));
+    abssum.assign(reduced_clusters.size(), vector<double>(clst.nifcs, 0));
+    for (uint i = 0; i < clst.ineq_clusters.size(); i++) {
+      for (uint j = 0; j < clst.ineq_clusters[i].size(); j++) {
+        uint r = findReducedCluster(reduced_clusters, clst.getCluster(clst.ineq_clusters[i][j]).atoms);
+        for (int c = 0; c < clst.nifcs; c++) {
+          dev_from_zero[r][c] += ifcs[clst.ineq_clusters[i][j]][c];
+          abssum[r][c] += abs(ifcs[clst.ineq_clusters[i][j]][c]);
         }
       }
     }
@@ -850,25 +886,25 @@ namespace apl {
       const vector<vector<int> >& reduced_clusters,
       const v4int& eq_ifcs) {
     vector<int> eq;
-    for (uint ineq = 0; ineq < clst->ineq_clusters.size(); ineq++) {
-      uint nclusters = clst->ineq_clusters[ineq].size();
-      int ic = clst->ineq_clusters[ineq][0];
+    for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
+      uint nclusters = clst.ineq_clusters[ineq].size();
+      int ic = clst.ineq_clusters[ineq][0];
       // Calculate correction terms
       vector<vector<double> > correction_terms(nclusters);
       for (uint c = 0; c < nclusters; c++) {
-        correction_terms[c] = getCorrectionTerms(clst->ineq_clusters[ineq][c],
+        correction_terms[c] = getCorrectionTerms(clst.ineq_clusters[ineq][c],
             reduced_clusters, ifcs,
             dev_from_zero, abssum);
       }
 
       // Correct the linearly independent IFCs
-      const _linearCombinations& lcomb = clst->linear_combinations[ineq];
+      const _linearCombinations& lcomb = clst.linear_combinations[ineq];
       const vector<int>& indep = lcomb.independent;
       for (uint i = 0; i < indep.size(); i++) {
         int neq = 0, cl = 0;
         double corrected_ifc = 0.0;
         for (uint c = 0; c < nclusters; c++) {
-          cl = clst->ineq_clusters[ineq][c];
+          cl = clst.ineq_clusters[ineq][c];
           eq = eq_ifcs[ineq][indep[i]][c];
           uint eqsize = eq.size();
           for (uint e = 0; e < eqsize; e++) {
@@ -903,10 +939,10 @@ namespace apl {
         const vector<vector<double> >& dev_from_zero,
         const vector<vector<double> >& abssum) {
       vector<double> correction_terms = ifcs[c];
-      vector<double> correction(clst->nifcs);
-      for (int i = 0; i < clst->nifcs; i++) correction[i] = std::abs(correction_terms[i]);
-      uint r = findReducedCluster(reduced_clusters, clst->getCluster(c).atoms);
-      for (int crt = 0; crt < clst->nifcs; crt++) {
+      vector<double> correction(clst.nifcs);
+      for (int i = 0; i < clst.nifcs; i++) correction[i] = std::abs(correction_terms[i]);
+      uint r = findReducedCluster(reduced_clusters, clst.getCluster(c).atoms);
+      for (int crt = 0; crt < clst.nifcs; crt++) {
         if (abssum[r][crt] != 0.0) correction[crt] *= dev_from_zero[r][crt]/abssum[r][crt];
         else correction[crt] = 0.0;
         correction_terms[crt] -= correction[crt];
@@ -969,7 +1005,7 @@ namespace apl {
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     // ME20200428 - We do not compare checksums anymore
     //parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    //parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  //ME20190219
+    //parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  //ME20190219
     //parameters.unsetf(std::ios::hex);  //ME20190125 - Remove hexadecimal formatting
     //parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
@@ -1001,19 +1037,19 @@ namespace apl {
       for (int j = 1; j < 4; j++) {
         parameters << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
         parameters << std::setprecision(8);
-        parameters << std::setw(15) << clst->pcell.lattice[i][j];
+        parameters << std::setw(15) << clst.pcell.lattice[i][j];
       }
       parameters << "</v>" << std::endl;
     }
     parameters << tab << tab << "</varray>" << std::endl;
     parameters << tab << tab << "<varray name=\"positions\">" << std::endl;
-    for (uint i = 0; i < clst->pcell.atoms.size(); i++) {
-      int t = clst->pcell.atoms[i].type;
-      parameters << tab << tab << tab << "<v species=\"" << clst->pcell.species[t] << "\">";
+    for (uint i = 0; i < clst.pcell.atoms.size(); i++) {
+      int t = clst.pcell.atoms[i].type;
+      parameters << tab << tab << tab << "<v species=\"" << clst.pcell.species[t] << "\">";
       for (int j = 1; j < 4; j++) {
         parameters << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
         parameters << std::setprecision(8);
-        parameters << std::setw(15) << clst->pcell.atoms[i].fpos[j];
+        parameters << std::setw(15) << clst.pcell.atoms[i].fpos[j];
       }
       parameters << "</v>" << std::endl;
     }
@@ -1021,7 +1057,7 @@ namespace apl {
     parameters << tab << tab << "<varray name=\"supercell\">" << std::endl;
     parameters << tab << tab << tab << "<v>";
     for (int i = 1; i < 4; i++) {
-      parameters << tab << clst->sc_dim[i];
+      parameters << tab << clst.sc_dim[i];
     }
     parameters << "</v>" << std::endl;
     parameters << tab << tab << "</varray>" << std::endl;
@@ -1050,11 +1086,11 @@ namespace apl {
     }
 
     ifcs << tab << "<force_constants>" << std::endl;
-    for (uint c = 0; c < clst->clusters.size(); c++) {
+    for (uint c = 0; c < clst.clusters.size(); c++) {
       ifcs << tab << tab << "<varray atoms=\""
-        << aurostd::joinWDelimiter(clst->clusters[c].atoms, " ") << "\">" << std::endl;
+        << aurostd::joinWDelimiter(clst.clusters[c].atoms, " ") << "\">" << std::endl;
       int crt = 0;
-      for (int i = 0; i < clst->nifcs/9; i++) {
+      for (int i = 0; i < clst.nifcs/9; i++) {
         ifcs << tab << tab << tab << "<varray slice=\"" << cart_indices[crt][0];
         for (int j = 1; j < order - 2; j++) {
           ifcs << " " << cart_indices[crt][j];

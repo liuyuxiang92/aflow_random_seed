@@ -572,10 +572,11 @@ namespace apl {
 
     // Initialize phonon calculator
     string statefile = directory + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE;
-    Supercell sc_pcalc(statefile, mf);
-    PhononCalculator pc(sc_pcalc, mf);
+    PhononCalculator pc(mf, oss);
     pc.setDirectory(directory);
+    pc.initialize_supercell(statefile);
     pc.awake();
+    apl::Supercell& sc_pcalc = pc.getSupercell();
     // Must project to primitive or the vibrations will be incorrect
     if (!sc_pcalc.projectToPrimitive()) {
       message = "Could not project to primitive structure.";

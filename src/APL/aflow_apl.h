@@ -233,17 +233,20 @@ namespace apl {
     // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
     public:
       ClusterSet(ostream& oss=std::cout);
-      ClusterSet(const Supercell&, int, double, ofstream&, _aflags&, ostream& oss=std::cout);  // Constructor
-      ClusterSet(const string&, const Supercell&, int, double, int, ofstream&, _aflags&, ostream& oss=std::cout);  // From file
+      ClusterSet(ofstream&, ostream& oss=std::cout);
+      ClusterSet(const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // Constructor
+      ClusterSet(const string&, const Supercell&, int, int, double, const string&, ofstream&, ostream& oss=std::cout);  // From file
       ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
       ~ClusterSet();  // Destructor
       const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
-      void clear(_aflags&);
-      void initialize(const Supercell&, int, double);
+      void clear();
+      void initialize(const Supercell&, int, int, double);
+      void readClusterSetFromFile(const string&);
 
       vector<_cluster> clusters;
       vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
       double cutoff;  // Cutoff radius in Angstroms
+      string directory;  // Directory for logging
       vector<xvector<double> > distortion_vectors;  // List of distortion vectors
       vector<_ineq_distortions> higher_order_ineq_distortions;  //ME20190531 - for 3rd derivatives of higher order processes
       vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  //ME20190520
@@ -260,13 +263,13 @@ namespace apl {
       vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
 
       const _cluster& getCluster(const int& i) const;  //ME20190520
-      void build(int);
+      const string& getDirectory() const;
+      void setDirectory(const string&);
+      void build();
       void buildDistortions();
       void writeClusterSetToFile(const string&);
 
     private:
-      _aflags* aflags;
-
       void free();
       void copy(const ClusterSet&);
 
@@ -318,7 +321,6 @@ namespace apl {
       string writeIneqDist(const _ineq_distortions&);
       string writeHigherOrderDistortions();
 
-      void readClusterSetFromFile(const string&);
       bool checkCompatibility(uint&, const vector<string>&);
       void readInequivalentClusters(uint&, const vector<string>&);
       vector<_cluster> readClusters(uint&, const vector<string>&);
@@ -332,30 +334,31 @@ namespace apl {
     // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
     public:
       AnharmonicIFCs(ostream& oss=std::cout);
-      AnharmonicIFCs(_xinput&, _aflags&, _kflags&, _xflags&, ClusterSet&, ofstream&, ostream& oss=std::cout);
+      AnharmonicIFCs(ofstream&, ostream& oss=std::cout);
       AnharmonicIFCs(const AnharmonicIFCs&);
       const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
       ~AnharmonicIFCs();
-      void clear(_xinput&,_aflags&, _kflags&, _xflags&, ClusterSet&);
+      void clear();
+      void initialize(const Supercell&, int, int, double);
 
       void setOptions(double, int, double, double, bool);
+      const string& getDirectory() const;
+      void setDirectory(const string&);
       int getOrder() const;
 
-      bool runVASPCalculations(bool);
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, bool);
       bool calculateForceConstants();
       const vector<vector<double> >& getForceConstants() const;
       vector<vector<int> > getClusters() const;
       void writeIFCsToFile(const string&);
 
     private:
-      _xinput* _xInput;
-      _aflags* _aflowFlags;
-      _kflags* _kbinFlags;
-      _xflags* _xFlags;
-      ClusterSet* clst;
+      ClusterSet clst;
 
       vector<_xinput> xInputs;
       bool _useZeroStateForces;
+      bool initialized;
+      string directory;
       vector<vector<int> > cart_indices;  // A list of all Cartesian indices
       double distortion_magnitude;  // The magnitude of the distortions in Angstroms
       vector<vector<double> > force_constants;  // Symmetrized IFCs - ME20190520
@@ -748,11 +751,6 @@ namespace apl {
     protected:
       // Aflow's stuff required for running some routines
       Supercell* _supercell;
-      _xinput* _xInput; //_xvasp& _vaspRun;
-      _aflags* _aflowFlags;
-      _kflags* _kbinFlags;
-      _xflags* _xFlags; //_vflags& _vaspFlags;
-      string* _AflowIn;
 
       vector<_xinput> xInputs;
 
@@ -769,6 +767,7 @@ namespace apl {
       vector<xmatrix<double> > _bornEffectiveChargeTensor;
       // Dielectric tensor
       xmatrix<double> _dielectricTensor;
+      string _directory;
 
     private:
       void free();
@@ -787,14 +786,14 @@ namespace apl {
 
     public:
       ForceConstantCalculator(ostream& oss=std::cout);
-      ForceConstantCalculator(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
+      ForceConstantCalculator(Supercell&, ofstream&, ostream& os=std::cout);
       ForceConstantCalculator(const ForceConstantCalculator&);
       ForceConstantCalculator& operator=(const ForceConstantCalculator&);
       virtual ~ForceConstantCalculator() {};
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&);
+      void clear(Supercell&);
 
-      virtual bool runVASPCalculations(bool) {return false;};  // ME20191029
-      bool runVASPCalculationsBE(_xinput&, uint);
+      virtual bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool) {return false;};  // ME20191029
+      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
       void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME20200218
 
       bool run();  // ME20191029
@@ -804,6 +803,8 @@ namespace apl {
       const vector<xmatrix<double> >& getBornEffectiveChargeTensor() const;
       const xmatrix<double>& getDielectricTensor() const;
       bool isPolarMaterial() const;
+      const string& getDirectory() const;
+      void setDirectory(const string&);
 
       // Born charges + dielectric tensor
       bool calculateDielectricTensor(const _xinput&);  // ME20191029
@@ -846,15 +847,15 @@ namespace apl {
           vector<xvector<double> >&,
           bool integrate_equivalent_distortions=true);  //CO20190114
       bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO20190218
-      bool runVASPCalculations(bool);  //ME20190412
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
 
     public:
       DirectMethodPC(ostream& oss=std::cout);
-      DirectMethodPC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
+      DirectMethodPC(Supercell&, ofstream&, ostream& os=std::cout);
       DirectMethodPC(const DirectMethodPC&);
       DirectMethodPC& operator=(const DirectMethodPC&);
       ~DirectMethodPC();
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&);
+      void clear(Supercell&);
 
       bool calculateForceFields();  // ME20190412  //ME20191029
       // Easy access to global parameters
@@ -939,16 +940,12 @@ namespace apl {
       string _PSTRESS;  // ME20200220
 
     public:
-      QHA_AFLOWIN_CREATOR(Supercell& sc, _xinput& xinput,
-          _aflags& aflags, _kflags& kflags,
-          _xflags& xflags,
-          string&,
-          ofstream& mf, ostream& os=std::cout);
+      QHA_AFLOWIN_CREATOR(Supercell& sc, ofstream& mf, ostream& os=std::cout);
       ~QHA_AFLOWIN_CREATOR();
       void clear();
     public:
       //
-      void run_qha();
+      void run_qha(const _xinput&, const _kflags&, const _xflags&);
       //
       void close_log();
       //functions to set user define keys 
@@ -977,15 +974,15 @@ namespace apl {
       //create AFLOWIN for Gruneisen parameter
       //[phonon_option] 0->gp   || 1->sc-gp   || 2-> eos-phonon   || 3->eos-static 
       //[phonon_option] 4->gp_X || 5->sc-gp_X || 6-> eos-phonon_X || 7->eos-static-X
-      void create_aflowin_phonon(const double distortion, const int phonon_option);
+      void create_aflowin_phonon(const double distortion, const int phonon_option, const _xinput&, const _kflags&, const _xflags&);
       //
-      void create_aflowin_phonon_X(const double distortion, const int phonon_option);
+      void create_aflowin_phonon_X(const double distortion, const int phonon_option, const _xinput&, const _kflags&, const _xflags&);
       //
       void write_aflowin_phonon(const _xvasp& xvasp_input, const int phonon_option);
       void write_phonon_OUTPUT(const _xinput& xinput, const int phonon_option);
       //
-      void write_static_AFLOWIN(const _xvasp& xvasp_input);
-      void write_static_OUTPUT(const _xinput& xinput);
+      void write_static_AFLOWIN(const _xvasp& xvasp_input, const _kflags&, const _xflags&);
+      void write_static_OUTPUT(const _xinput& xinput, const _kflags&, const _xflags&);
 
       void get_pstress();
       //
@@ -997,8 +994,8 @@ namespace apl {
       void create_aflowin_scqha_phonon(const _xvasp& xvasp_input);
       void writeSCQHAOUTPUT(const _xinput& xinput);
       //
-      void create_aflowin_static_zero();
-      void create_aflowin_static_zero_X();
+      void create_aflowin_static_zero(const _xinput&, const _kflags&, const _xflags&);
+      void create_aflowin_static_zero_X(const _xinput&, const _kflags&, const _xflags&);
       //
       string get_phonon_runname(const double i, const double distortion);
       string get_phonon_runname(const double i);
@@ -1014,18 +1011,18 @@ namespace apl {
     private:
       void free();
       void copy(const LinearResponsePC&);
-      bool runVASPCalculationsDFPT(_xinput&);  //ME20190113  // ME20200213 - changed name
+      bool runVASPCalculationsDFPT(_xinput&, _aflags&, _kflags&, _xflags&, string&);  //ME20190113  // ME20200213 - changed name
       bool readForceConstantsFromVasprun(_xinput&);  //ME20200211
 
     public:
       LinearResponsePC(ostream& oss=std::cout);
-      LinearResponsePC(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&, ofstream&, ostream& os=std::cout);
+      LinearResponsePC(Supercell&, ofstream&, ostream& os=std::cout);
       LinearResponsePC(const LinearResponsePC&);
       LinearResponsePC& operator=(const LinearResponsePC&);
       ~LinearResponsePC();
-      void clear(Supercell&, _xinput&, _aflags&, _kflags&, _xflags&, string&);
+      void clear(Supercell&);
 
-      bool runVASPCalculations(bool);  //ME20191029
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
       bool calculateForceConstants();  //ME20200211
 
       void saveState(const string&);  //ME20200212
@@ -1040,9 +1037,7 @@ namespace apl {
 namespace apl {
   class GeneralizedSupercellApproach : public DirectMethodPC {
     public:
-      GeneralizedSupercellApproach(Supercell&, _xinput&,
-          _aflags&, _kflags&, _xflags&, //_vflags&, 
-          string&, ofstream&, ostream& os=std::cout);
+      GeneralizedSupercellApproach(Supercell&, ofstream&, ostream& os=std::cout);
       ~GeneralizedSupercellApproach();
       void clear();
   };
@@ -1077,7 +1072,10 @@ namespace apl {
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
+
       void clear();
+      void clear_tetrahedra();
+
       void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
 
@@ -1122,6 +1120,23 @@ namespace apl {
       bool littleGroupsCalculated() const;  // ME20200109
       const vector<int>& getLittleGroup(int) const;  // ME20200109
 
+      // Tetrahedron method
+      void generateTetrahedra();
+      void makeIrreducibleTetrahedra();
+
+      const vector<vector<int> >& getTetrahedra() const;
+      const vector<int>& getTetrahedron(int) const;
+      const vector<int>& getIrredTetrahedron(int) const;
+      int getTetrahedronCorner(int, int) const;
+      vector<vector<int> > getIrreducibleTetrahedra() const;
+      vector<vector<int> > getIrreducibleTetrahedraIbzqpt() const;
+      int getnTetrahedra() const;
+      int getnIrredTetrahedra() const;
+      double getVolumePerTetrahedron() const;
+      const vector<int>& getWeightsTetrahedra() const;
+      int getWeightTetrahedron(int) const;
+      bool isReducedTetrahedra() const;
+
     private:
       void free();
       void copy(const QMesh&);
@@ -1149,6 +1164,19 @@ namespace apl {
       void generateGridPoints(bool);
       void shiftMesh(const xvector<double>&);
       void moveToBZ(xvector<double>&) const;
+
+      // Tetrahedron method
+      vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra
+      vector<int> _irredTetrahedra;  // List of irreducible tetrahedra
+      bool _reducedTetrahedra; // Indicates whether the tetrahedra are reduced
+      int _nTetra;  // The number of tetrahedra
+      int _nIrredTetra;  // The number of irreducible tetrahedra - ME20190625
+      double _volumePerTetrahedron;  // The relative volume of each tetrahedron
+      vector<int> _weightsTetrahedra;  // The weights of each irreducible tetrahedron
+
+      vector<vector<xvector<int> > > initializeTetrahedra();
+      void findMostCompactTetrahedra(vector<vector<xvector<int> > >&);
+      void generateAllTetrahedra(const vector<vector<xvector<int> > >&);
   };
 }  // namespace apl
 
@@ -1160,8 +1188,8 @@ namespace apl {
       string _directory;  // for loggers
       int _ncpus;
 
-      Supercell* _supercell;
       QMesh _qm;
+      Supercell _supercell;
 
       // harmonic IFCs
       vector<vector<xmatrix<double> > > _forceConstantMatrices;
@@ -1197,12 +1225,11 @@ namespace apl {
 
     public:
       PhononCalculator(ostream& oss=std::cout);
-      PhononCalculator(Supercell&, ofstream&, ostream& oss=std::cout);
+      PhononCalculator(ofstream&, ostream& oss=std::cout);
       PhononCalculator(const PhononCalculator&);
       PhononCalculator& operator=(const PhononCalculator&);
       ~PhononCalculator();
-      void clear(Supercell&);
-
+      void clear();
       // Getter functions
       Supercell& getSupercell();
       QMesh& getQMesh();
@@ -1226,6 +1253,8 @@ namespace apl {
       // Initializers
       void initialize_qmesh(const vector<int>&, bool=true, bool=true);
       void initialize_qmesh(const xvector<int>&, bool=true, bool=true);
+      void initialize_supercell(const xstructure&);
+      void initialize_supercell(const string&);
 
       // IFCs
       void setHarmonicForceConstants(const ForceConstantCalculator&);
@@ -1393,53 +1422,6 @@ namespace apl { //PN20180705
       vector<int> get_path_segment();
   };
 } // namespace apl
-
-namespace apl {
-  class LTMethod {
-    public:
-      LTMethod();
-      LTMethod(QMesh&);
-      LTMethod(const LTMethod&);
-      LTMethod& operator=(const LTMethod&);
-      ~LTMethod();
-      void clear(QMesh&);
-
-      void makeIrreducible();  //ME20190625
-
-      const vector<vector<int> >& getTetrahedra() const;
-      const vector<int>& getTetrahedron(int) const;
-      const vector<int>& getIrredTetrahedron(int) const;
-      int getCorner(int, int) const;
-      // const int& getCornerIrred(const int&, const int&) const; OBSOLETE ME20190625
-      vector<vector<int> > getIrreducibleTetrahedra() const;  //ME20190625
-      vector<vector<int> > getIrreducibleTetrahedraIbzqpt() const;  //ME20190625
-
-      int getnTetrahedra() const;
-      int getnIrredTetrahedra() const;
-      double getVolumePerTetrahedron() const;
-      const vector<int>& getWeights() const;
-      int getWeight(int) const;
-      bool isReduced() const;
-    private:
-      void free();
-      void copy(const LTMethod&);
-
-      QMesh* _qm;
-
-      vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra - ME20190625
-      vector<int> _irredTetrahedra;  // List of irreducible tetrahedra - ME20190625
-      bool _reduced;  //ME20190625
-      int _nTetra;  // The number of tetrahedra
-      int _nIrredTetra;  // The number of irreducible tetrahedra - ME20190625
-      double _volumePerTetrahedron;  // The relative volume of each tetrahedron
-      vector<int> _weights;  // The weights of each irreducible tetrahedron
-
-      void generateTetrahedra();
-      vector<vector<xvector<int> > > initializeTetrahedra();
-      void findMostCompact(vector<vector<xvector<int> > >&);
-      void generateAllTetrahedra(const vector<vector<xvector<int> > >&);  //ME20190625
-  };
-}  // namespace apl
 
 // ***************************************************************************
 //ME20190417 END
@@ -1668,13 +1650,13 @@ namespace apl {
 
       void calculateFrequenciesGroupVelocities();
       void calculateFreqGvel(int, int);
-      void getWeightsLT(const LTMethod&, double, const vector<double>&, vector<double>&);
+      void getWeightsLT(double, const vector<double>&, vector<double>&);
       void calculateTransitionProbabilities();
       vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
-      void calculateTransitionProbabilitiesPhonon(int, int, const LTMethod&,
+      void calculateTransitionProbabilitiesPhonon(int, int,
           vector<vector<vector<vector<double> > > >&,
           const vector<vector<vector<xcomplex<double> > > >&);
-      void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
+      void calculateTransitionProbabilitiesIsotope(int, int);
       vector<vector<double> > calculateTransitionProbabilitiesBoundary();
       void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
       xmatrix<double> calculateThermalConductivityTensor(double,

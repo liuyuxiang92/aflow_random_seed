@@ -26,7 +26,6 @@ using std::auto_ptr;
 #endif
 
 static const string _ANHARMONIC_IFCS_FILE_[2] = {"anharmonicIFCs_3rd.xml", "anharmonicIFCs_4th.xml"};
-static const string _CLUSTER_SET_FILE_[2] = {"clusterSet_3rd.xml", "clusterSet_4th.xml"};
 static const int _NUM_RELAX_ = 2; //ME20181226
 static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME20181226  //ME20190125
 
@@ -280,7 +279,7 @@ namespace KBIN {
       ofstream& messageFile,
       ostream& oss) {
 
-    bool LDEBUG = (TRUE || XHOST.DEBUG);
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
@@ -1436,7 +1435,19 @@ namespace KBIN {
       xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
     }
 
-    apl::Supercell supercell(xinput.getXStr(), messageFile, oss, aflags.Directory);
+    // Set up the phonon calculator
+    apl::PhononCalculator phcalc(messageFile, oss);
+    if (xflags.vflags.AFLOW_SYSTEM.content_string.empty()) {
+      phcalc.setSystem(xinput.getXStr().title);
+    } else {
+      phcalc.setSystem(xflags.vflags.AFLOW_SYSTEM.content_string);
+    }
+    phcalc.setDirectory(aflags.Directory);
+    phcalc.setNCPUs(kflags);
+    phcalc.setPolarMaterial(USER_POLAR);
+    phcalc.initialize_supercell(xinput.getXStr());
+    apl::Supercell& supercell = phcalc.getSupercell();
+
     // Determine the supercell dimensions
     xvector<int> scell_dims = supercell.determineSupercellDimensions(supercell_opts);
 
@@ -1499,19 +1510,6 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [3a]" << std::endl;
-
-    // Set up the phonon calculator
-    apl::PhononCalculator phcalc(supercell, messageFile, oss);
-    if (xflags.vflags.AFLOW_SYSTEM.content_string.empty()) {
-      phcalc.setSystem(supercell.getInputStructure().title);
-    } else {
-      phcalc.setSystem(xflags.vflags.AFLOW_SYSTEM.content_string);
-    }
-    phcalc.setDirectory(aflags.Directory);
-    phcalc.setNCPUs(kflags);
-    phcalc.setPolarMaterial(USER_POLAR);
-
     // FORCE CONSTANTS ----------------------------------------------------------
     bool stagebreak = false;
 
@@ -1536,8 +1534,7 @@ namespace KBIN {
       // Set up calculator
       auto_ptr<apl::ForceConstantCalculator> fccalc;
       if (USER_ENGINE == string("DM")) {
-        apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, xinput, aflags,
-            kflags, xflags, AflowIn, messageFile, oss);
+        apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, messageFile, oss);
         fccalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
         fccalcdm->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY);
         fccalcdm->setDistortionSYMMETRIZE(USER_DISTORTIONS_SYMMETRIZE);
@@ -1560,12 +1557,12 @@ namespace KBIN {
       //  phcalc.reset(gsa);
       //  } //CO20200106 - patching for auto-indenting
       else {
-        fccalc.reset(new apl::LinearResponsePC(supercell, xinput, aflags,
-              kflags, xflags, AflowIn, messageFile, oss));
+        fccalc.reset(new apl::LinearResponsePC(supercell, messageFile, oss));
         fccalc->setPolarMaterial(USER_POLAR);  // ME20200218
       }
       // Run calculations
-      apl_stagebreak = fccalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
+      fccalc->setDirectory(aflags.Directory);
+      apl_stagebreak = fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, AflowIn, USER_ZEROSTATE_CHGCAR);
       fccalc->saveState(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
       if (!apl_stagebreak) {
         apl_stagebreak = !(fccalc->run());
@@ -1588,8 +1585,8 @@ namespace KBIN {
         CALCULATE_SCQHA_OPTION.option || CALCULATE_SCQHA_A_OPTION.option || CALCULATE_SCQHA_B_OPTION.option || CALCULATE_SCQHA_C_OPTION.option ||
         CALCULATE_QHA3P_OPTION.option || CALCULATE_QHA3P_A_OPTION.option || CALCULATE_QHA3P_B_OPTION.option || CALCULATE_QHA3P_C_OPTION.option)
     {
-      pheos.reset(new apl::QHA_AFLOWIN_CREATOR(supercell, xinput, aflags,
-            kflags, xflags, AflowIn, messageFile, oss));
+      pheos.reset(new apl::QHA_AFLOWIN_CREATOR(supercell, messageFile, oss));
+      pheos->setDirectory(aflags.Directory);
 
       pheos->setGP(CALCULATE_GRUNEISEN_OPTION.option, CALCULATE_GRUNEISEN_A_OPTION.option, CALCULATE_GRUNEISEN_B_OPTION.option, CALCULATE_GRUNEISEN_C_OPTION.option);
       if( CALCULATE_SCQHA_OPTION.option || CALCULATE_SCQHA_A_OPTION.option || CALCULATE_SCQHA_B_OPTION.option || CALCULATE_SCQHA_C_OPTION.option )
@@ -1613,7 +1610,7 @@ namespace KBIN {
         pheos->setEOS_NEDOS(NEDOS);
         pheos->set_edos_accurate(EDOS_ACURATE_OPTION.option);
       }
-      pheos->run_qha();
+      pheos->run_qha(xinput, kflags, xflags);
       pheos->close_log();
     }
     //QHA/SCQHA/QHA3P END
@@ -1645,34 +1642,12 @@ namespace KBIN {
 
         // Reading failed - calculate
         if (!awakeAnharmIFCs) {
-          // Clusters
-          apl::ClusterSet clst;
-          string clust_hib_file = aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[o-3];
-          bool awakeClusterSet = (USER_HIBERNATE && aurostd::EFileExist(clust_hib_file));
-          if (awakeClusterSet) {
-            try {
-              clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
-                  USER_CUTOFF_DISTANCE[o-3], o, messageFile, aflags, oss);
-            } catch (aurostd::xerror excpt) {
-              message = excpt.error_message;
-              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
-              awakeClusterSet = false;
-            }
-          }
-          // Reading clusters failed - determine
-          if (!awakeClusterSet) {
-            clst = apl::ClusterSet(supercell, USER_CUTOFF_SHELL[o-3],
-                USER_CUTOFF_DISTANCE[o-3], messageFile, aflags, oss);
-            clst.build(o);
-            clst.buildDistortions();
-            if (USER_HIBERNATE) {
-              clst.writeClusterSetToFile(clust_hib_file);
-            }
-          }
           // Setup calculations
-          apl::AnharmonicIFCs anharm(xinput, aflags, kflags, xflags, clst, messageFile, oss);
+          apl::AnharmonicIFCs anharm(messageFile, oss);
+          anharm.setDirectory(aflags.Directory);
+          anharm.initialize(phcalc.getSupercell(), o, USER_CUTOFF_SHELL[o - 3], USER_CUTOFF_DISTANCE[o - 3]);
           anharm.setOptions(USER_DISTORTION_MAGNITUDE, USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM, USER_ZEROSTATE);
-          aapl_stagebreak = (anharm.runVASPCalculations(USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
+          aapl_stagebreak = (anharm.runVASPCalculations(xinput, aflags, kflags, xflags, USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
           // Calculate IFCs
           if (!aapl_stagebreak) {
             aapl_stagebreak = !(anharm.calculateForceConstants());
@@ -1995,9 +1970,7 @@ namespace KBIN {
         if (!dosc.hasNegativeFrequencies()) {  // ME20200210
           // This is just here so that PN's code doesn't break. This should
           // become obsolete in the future.
-          apl::QMesh qmesh(messageFile, oss);
-          qmesh.setDirectory(aflags.Directory);
-          qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
+          apl::QMesh& qmesh = phcalc.getQMesh();
           if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  //ME20190625
 
           if(CALCULATE_GROUPVELOCITY_OPTION.option){

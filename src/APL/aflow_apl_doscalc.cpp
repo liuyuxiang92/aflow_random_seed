@@ -97,16 +97,24 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
   
   void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
+    string function = "apl::DOSCalculator::initialize()";
+    string message = "";
     _bzmethod = method;
     _projections = projections;
     _system = _pc->getSystemName();
+
+    if (!_pc->getSupercell().isConstructed()) {
+      message = "The supercell structure has not been initialized yet.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+
     QMesh& _qm = _pc->getQMesh();
     if (!_qm.initialized()) {
-      string function = "apl::DOSCalculator::initialize()";
-      string message = "q-point mesh is not initialized.";
+      message = "q-point mesh is not initialized.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     if (_projections.size() == 0) _qm.makeIrreducible();
+
     calculateFrequencies();
   }
 
@@ -379,7 +387,6 @@ namespace apl {
     vector<vector<vector<vector<double> > > > parts;
     if (nproj > 0) {
       // Precompute eigenvector projections
-      
       xcomplex<double> eig;
       parts.assign(_qm.getnQPs(), vector<vector<vector<double> > >(_pc->getNumberOfBranches(), vector<vector<double> >(nproj, vector<double>(natoms, 0))));
       for (int q = 0; q < _qm.getnQPs(); q++) {
@@ -407,15 +414,15 @@ namespace apl {
     double max_freq = _bins.back() + _halfStepDOS;
     double min_freq = _bins.front() - _halfStepDOS;
     vector<vector<int> > tet_corners;
-    LTMethod _lt(_qm);
+    _qm.generateTetrahedra();
     if (nproj == 0) {
-      _lt.makeIrreducible();
-      tet_corners = _lt.getIrreducibleTetrahedraIbzqpt();
+      _qm.makeIrreducibleTetrahedra();
+      tet_corners = _qm.getIrreducibleTetrahedraIbzqpt();
     } else {
-      tet_corners = _lt.getTetrahedra();
+      tet_corners = _qm.getTetrahedra();
     }
-    for (int itet = 0; itet < _lt.getnIrredTetrahedra(); itet++) {
-      double weightVolumeTetrahedron = _lt.getWeight(itet) * _lt.getVolumePerTetrahedron();
+    for (int itet = 0; itet < _qm.getnIrredTetrahedra(); itet++) {
+      double weightVolumeTetrahedron = _qm.getWeightTetrahedron(itet) * _qm.getVolumePerTetrahedron();
       const vector<int>& corners = tet_corners[itet];
       for (int ibranch = _freqs[0].lrows; ibranch <= _freqs[0].urows; ibranch++) {
         for (int icorner = 0; icorner < 4; icorner++) {

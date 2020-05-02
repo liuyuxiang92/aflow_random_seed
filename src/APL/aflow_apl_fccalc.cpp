@@ -23,18 +23,14 @@ namespace apl {
   ForceConstantCalculator::ForceConstantCalculator(ostream& oss) {
     free();
     xStream::initialize(oss);
+    _directory = "./";
   }
 
-  ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn, ofstream& mf, ostream& oss) {
+  ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, ofstream& mf, ostream& oss) {
     free();
     _supercell = &sc;
-    _xInput = &xinput;
-    _aflowFlags = &aflags;
-    _kbinFlags = &kflags;
-    _xFlags = &xflags;
-    _AflowIn = &AflowIn;
     xStream::initialize(mf, oss);
+    _directory = "./";
   }
 
   ForceConstantCalculator::ForceConstantCalculator(const ForceConstantCalculator& that) {
@@ -50,29 +46,19 @@ namespace apl {
     return *this;
   }
 
-  void ForceConstantCalculator::clear(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn) {
+  void ForceConstantCalculator::clear(Supercell& sc) {
     free();
     _supercell = &sc;
-    _xInput = &xinput;
-    _aflowFlags =  &aflags;
-    _kbinFlags = &kflags;
-    _xFlags = &xflags;
-    _AflowIn = &AflowIn;
   }
 
   void ForceConstantCalculator::copy(const ForceConstantCalculator& that) {
     xStream::copy(that);
-    _aflowFlags = that._aflowFlags;
-    _AflowIn = that._AflowIn;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
+    _directory = that._directory;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
-    _kbinFlags = that._kbinFlags;
     _supercell = that._supercell;
-    _xFlags = that._xFlags;
-    _xInput = that._xInput;
     xInputs = that.xInputs;
   }
 
@@ -80,6 +66,7 @@ namespace apl {
     xInputs.clear();
     _bornEffectiveChargeTensor.clear();
     _dielectricTensor.clear();
+    _directory = "";
     _forceConstantMatrices.clear();
     _isPolarMaterial = false;
   }
@@ -102,6 +89,14 @@ namespace apl {
 
   bool ForceConstantCalculator::isPolarMaterial() const {
     return _isPolarMaterial;
+  }
+
+  const string& ForceConstantCalculator::getDirectory() const {
+    return _directory;
+  }
+
+  void ForceConstantCalculator::setDirectory(const string& dir) {
+    _directory = dir;
   }
 
 }  // namespace apl
@@ -155,7 +150,7 @@ namespace apl {
     //CO - END
 
     string message = "Symmetrizing the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     vector<xmatrix<double> > row;
     for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
@@ -252,7 +247,8 @@ namespace apl {
 
 namespace apl {
  
-  bool ForceConstantCalculator::runVASPCalculationsBE(_xinput& xInput, uint ncalcs) {
+  bool ForceConstantCalculator::runVASPCalculationsBE(_xinput& xInput, _aflags& _aflowFlags,
+      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, uint ncalcs) {
     bool stagebreak = false;
 
     xInput.setXStr(_supercell->getInputStructure());
@@ -265,19 +261,17 @@ namespace apl {
       xInput.xvasp.AVASP_arun_runname = aurostd::utype2string<uint>(ncalcs) + "_" + _AFLOW_APL_BORN_EPSILON_RUNNAME_;
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_LR", false);
       xInput.xvasp.aopts.flag("APL_FLAG::AVASP_BORN", true);
-      // Switch off autotune
-      _kbinFlags->KBIN_MPI_AUTOTUNE = false;
       // Set POSCAR to VASP5 format
       xInput.getXStr().is_vasp4_poscar_format = false;
       xInput.getXStr().is_vasp5_poscar_format = true;
-      stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInput) || stagebreak);
+      stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInput) || stagebreak);
     } else if (xInput.AFLOW_MODE_AIMS) {
       string runname = _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_;
-      xInput.setDirectory( _xInput->getDirectory() + "/" + runname );
+      xInput.setDirectory(_directory + "/" + runname );
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
-        createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInput, *p_FileMESSAGE);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *p_FileMESSAGE);
         stagebreak = true;
       }
     }
@@ -289,7 +283,7 @@ namespace apl {
   bool ForceConstantCalculator::calculateDielectricTensor(const _xinput& xinpBE) {
     stringstream message;
     // Parse effective charges from OUTCAR
-    if (_kbinFlags->AFLOW_MODE_VASP) {
+    if (xinpBE.AFLOW_MODE_VASP) {
       string directory = xinpBE.xvasp.Directory;
       string infilename = directory + "/OUTCAR.static";
 
@@ -297,11 +291,11 @@ namespace apl {
         infilename = directory + string("/OUTCAR");
         if (!aurostd::EFileExist(infilename, infilename)) {
           message << "The OUTCAR file in " << directory << " is missing.";
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
           return false;
         }
       }
-    } else if (_kbinFlags->AFLOW_MODE_AIMS) {
+    } else if (xinpBE.AFLOW_MODE_AIMS) {
       string function = "ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT()";
       message << "This functionality has not been implemented yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
@@ -309,22 +303,22 @@ namespace apl {
       return false;
     }
 
-    if(_kbinFlags->AFLOW_MODE_VASP) readBornEffectiveChargesFromOUTCAR(xinpBE);
-    else if(_kbinFlags->AFLOW_MODE_AIMS) readBornEffectiveChargesFromAIMSOUT();
+    if (xinpBE.AFLOW_MODE_VASP) readBornEffectiveChargesFromOUTCAR(xinpBE);
+    else if (xinpBE.AFLOW_MODE_AIMS) readBornEffectiveChargesFromAIMSOUT();
 
     // Enforce ASR (Acoustic sum rules)
     symmetrizeBornEffectiveChargeTensors();
 
     // Parse epsilon from OUTCAR
-    if(_kbinFlags->AFLOW_MODE_VASP) readDielectricTensorFromOUTCAR(xinpBE);
-    if(_kbinFlags->AFLOW_MODE_AIMS) readDielectricTensorFromAIMSOUT();
+    if(xinpBE.AFLOW_MODE_VASP) readDielectricTensorFromOUTCAR(xinpBE);
+    if(xinpBE.AFLOW_MODE_AIMS) readDielectricTensorFromAIMSOUT();
 
     message << "Dielectric tensor: ";
     for (int a = 1; a <= 3; a++)
       for (int b = 1; b <= 3; b++)
         message << std::fixed << std::setw(5) << std::setprecision(3) << _dielectricTensor(a, b) << " ";
 
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     return true;
   }
 
@@ -419,17 +413,17 @@ namespace apl {
     //CO - END
     // Show charges
     message << "Input born effective charge tensors (for primitive cell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++) {
       int id = i;
       message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
         << std::setw(2) << _supercell->getInputStructure().atoms[id].cleanname
         << ") Born effective charge = ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     }
 
     // Step1
@@ -481,7 +475,7 @@ namespace apl {
 
     // Step 3
     message << "Forcing the acoustic sum rule (ASR). Resulting born effective charges (for the supercell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     xmatrix<double> sum(3, 3);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++)
@@ -506,7 +500,7 @@ namespace apl {
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     }
   }
 
@@ -592,16 +586,16 @@ namespace apl {
 namespace apl {
 
   void ForceConstantCalculator::hibernate() {
-    string base = _aflowFlags->Directory + "/" + DEFAULT_APL_FILE_PREFIX;
+    string base = _directory + "/" + DEFAULT_APL_FILE_PREFIX;
     string filename = aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE);
     string message = "Writing harmonic IFCs into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     writeHarmonicIFCs(filename);
     if (_isPolarMaterial) {
       filename = aurostd::CleanFileName(base + DEFAULT_APL_POLAR_FILE);
       message = "Writing harmonic IFCs into file " + filename + ".";
       writeBornChargesDielectricTensor(filename);
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     }
   }
 
@@ -618,7 +612,7 @@ namespace apl {
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     // OBSOLETE ME20200427 - we do not compare checksums anymore
     //outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-    //  << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
+    //  << std::hex << aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
     //outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
 
@@ -669,9 +663,10 @@ namespace apl {
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
-    outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-      << std::hex << aurostd::getFileCheckSum(_aflowFlags->Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
-    outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
+    // OBSOLETE ME20200428 - Checksums are not used anymore
+    //outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
+    //  << std::hex << aurostd::getFileCheckSum(_directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME20190219
+    //outfile.unsetf(std::ios::hex); //CO20190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
 
     // Born effective charge tensors
