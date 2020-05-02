@@ -402,7 +402,7 @@ namespace pocc {
 
     for (uint jt = 0; jt < v_temperatures.size(); jt++) {
       T = v_temperatures.at(jt);
-      message << "Averaging Elastic Properties at T=" << T;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
+      message << "Averaging elastic properties at T=" << getTemperatureString(T) << " K";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
       setPOccStructureProbabilities(T);
       Bvoigt_ave = 0.0;
       Breuss_ave = 0.0;
@@ -482,7 +482,7 @@ namespace pocc {
       // Write main results to a file
       ossmain << "[AFLOW] **************************************************************************************************************************" << endl;
       ossmain << "[POCC_AEL_RESULTS]START" << endl;
-      ossmain << "pocc_ael_temperature=" << T << "  (K)" << endl;
+      ossmain << "pocc_ael_temperature=" << T << "  (K)" << endl; //CO20200502 - no getTemperatureString(T) needed here
       ossmain << "pocc_ael_poisson_ratio=" << Poisson_ratio_ave << endl;    
       ossmain << "pocc_ael_bulk_modulus_voigt=" << Bvoigt_ave << "  (GPa)" << endl;
       ossmain << "pocc_ael_bulk_modulus_reuss=" << Breuss_ave  << "  (GPa)" << endl;
@@ -515,7 +515,7 @@ namespace pocc {
       if (ael_write_full_results) {
         ossfull << "[AFLOW] **************************************************************************************************************************" << endl;
         ossfull << "[POCC_AEL_RESULTS]START" << endl;
-        ossfull << "pocc_ael_temperature=" << T << "  (K)" << endl;
+        ossfull << "pocc_ael_temperature=" << T << "  (K)" << endl; //CO20200502 - no getTemperatureString(T) needed here
         ossfull << "pocc_ael_bulk_modulus_voigt=" << Bvoigt_ave << "  (GPa)" << endl;
         ossfull << "pocc_ael_bulk_modulus_reuss=" << Breuss_ave  << "  (GPa)" << endl;
         ossfull << "pocc_ael_bulk_modulus_vrh=" << Bvrh_ave << "  (GPa)" << endl;    
@@ -936,7 +936,7 @@ namespace pocc {
     ossfull.str(std::string());    
     for (uint jt = 0; jt < v_temperatures.size(); jt++) {
       T = v_temperatures.at(jt);
-      message << "Averaging Debye Thermal Properties at T=" << T;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
+      message << "Averaging Debye thermal properties at T=" << getTemperatureString(T) << " K";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
       setPOccStructureProbabilities(T);
       Debye_temperature_ave = 0.0;
       Debye_acoustic_ave = 0.0;

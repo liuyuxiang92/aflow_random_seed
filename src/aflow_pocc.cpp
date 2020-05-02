@@ -1085,11 +1085,11 @@ namespace pocc {
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=ALL" << endl;  //"  (K)"
-    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)  " << "[" << m_ARUN_directories[m_ARUN_directory_ground] << "]" << endl;
     if(m_Hmix!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_mix=" << aurostd::utype2string(m_Hmix,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)" << endl;
     if(m_efa!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "EFA=" << aurostd::utype2string(m_efa,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)^{-1}" << endl;
-    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=ALL" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
@@ -1109,11 +1109,11 @@ namespace pocc {
     //double pocc_roundoff_tol=5.0*pow(10,-((int)pocc_precision)-1);
 
     //POCC.OUT
-    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (temperature = " << getTemperatureString(temperature) << "  (K) properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (T=" << temperature << " K properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200502 - no getTemperatureString(T) needed here
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
-    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     //supercell probabilities
     unsigned long long int isupercell=0;
@@ -1140,7 +1140,7 @@ namespace pocc {
       pocc_out_ss << "Egap_spin_dn=" << aurostd::utype2string(Egap[1],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
     }
     if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
-    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
