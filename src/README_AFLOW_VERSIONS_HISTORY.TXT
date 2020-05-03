@@ -110,6 +110,7 @@
         -- patched time_delim in get_date_formatted() (CO)
         -- speeding up --poscar2aflowin with new AUTO settings (CO)
         -- resurrected legacy --aflowlib (CO)
+        -- adding TID (CO)
 3.2.2j - 2020/04/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.2*.tar.xz
         -- standardized vext,vcat,vzip from XHOST 2j (SC)
