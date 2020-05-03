@@ -104,7 +104,7 @@ namespace ALIEN {
     AflowIn="";char c; while (FileAFLOWIN.get(c)) if(c!='\0'){ AflowIn+=c; }               // READ AFLOW.IN and put into AflowIn //DX20190125 - remove null bytes
     FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
     if(!FileAFLOWIN) {                                                                                      // ******* Aflow.in does not exist
-      aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(aus,XHOST.QUIET);
       return FALSE;
     }
@@ -115,7 +115,7 @@ namespace ALIEN {
     // ***************************************************************************
     // Get the KBIN_BIN name
     aurostd::StringstreamClean(aus);
-    aus << "00000  MESSAGE ALIEN::Directory Running KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "00000  MESSAGE ALIEN::Directory Running KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // ***************************************************************************
     Krun=TRUE;  // guess everything is intelligent !
@@ -136,7 +136,7 @@ namespace ALIEN {
       ifstream DirectoryStream;
       DirectoryStream.open(xalien.Directory.c_str(),std::ios::in);
       if(!DirectoryStream) {
-	aus << "XXXXX  MAKING DIRECTORY = " << xalien.Directory << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	aus << "XXXXX  MAKING DIRECTORY = " << xalien.Directory << "  " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(aus,XHOST.QUIET); // return FALSE;
 	string str="mkdir "+xalien.Directory;
 	system(str.c_str());
@@ -153,7 +153,7 @@ namespace ALIEN {
 	// ***************************************************************************
 	// RUN
 	ALIEN::Write_INPUT(xalien); // ALIEN WRITE INPUT
-	aus << "AAAAA  ALIEN RUN - " <<  xalien.Directory << " - \"" << kflags.KBIN_BIN << "\" - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
+	aus << "AAAAA  ALIEN RUN - " <<  xalien.Directory << " - \"" << kflags.KBIN_BIN << "\" - " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	// single line command
 	if(alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG==TRUE) {

@@ -22,7 +22,9 @@
 
 _XHOST::_XHOST() {  // constructor PUBLIC
   PID=0;
+  TID=0;  //CO20200502 - threadID
   ostrPID.clear();ostrPID.str(string(""));
+  ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
   QUIET=FALSE;
   TEST=FALSE;
   DEBUG=FALSE;
@@ -127,7 +129,9 @@ _XHOST::~_XHOST() { // destructor PUBLIC
 
 void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   PID=b.PID;
+  TID=b.TID;  //CO20200502 - threadID
   ostrPID.clear();ostrPID.str(string(""));ostrPID << b.ostrPID.str();
+  ostrTID.clear();ostrTID.str(string(""));ostrTID << b.ostrTID.str(); //CO20200502 - threadID
   QUIET=b.QUIET;
   TEST=b.TEST;
   DEBUG=b.DEBUG;
@@ -228,6 +232,7 @@ const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
 
 void _XHOST::free() { // free PRIVATE
   ostrPID.clear();ostrPID.str(string(""));
+  ostrTID.clear();ostrTID.str(string(""));  //CO20200502 - threadID
   vTemperatureCore.clear();
   //  thread.clear();
   //  iret.clear();

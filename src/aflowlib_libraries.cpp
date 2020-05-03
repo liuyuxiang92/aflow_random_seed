@@ -1199,7 +1199,7 @@ namespace aflowlib {
     cout << "aflowlib::LIB2RAW: FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
     if((perform_THERMODYNAMICS || perform_BANDS ||  perform_MAGNETIC)) {
       _aflags aflags;
-      cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   BEGIN_DATE = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   BEGIN_DATE = " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::ZIP2ZIP(directory_LIB,"bz2","xz");
       aurostd::ZIP2ZIP(directory_LIB,"gz","xz");
 
@@ -5286,12 +5286,8 @@ namespace aflowlib {
     //ME20181109 - Handle NCPUS=MAX
     if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")))
       NUM_THREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
-    int NUM_ZIP=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_ZIP"));
-    int NUM_SIZE=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_SIZE"));
 
-    if(NUM_THREADS<1) NUM_THREADS=XHOST.CPU_Cores/2;
-    if(NUM_ZIP<1) NUM_ZIP=1;
-    if(NUM_SIZE<1) NUM_SIZE=128;
+    if(NUM_THREADS<1) NUM_THREADS=1; //[CO20200502 - --np>1 is NOT guaranteed to work, prefer to run --np=1]NUM_THREADS=XHOST.CPU_Cores/2;
 
     if(LDEBUG) cerr << soliloquy << " NUM_THREADS=" << NUM_THREADS << endl;
     //  exit(0);
@@ -5374,6 +5370,9 @@ namespace aflowlib {
     bool FLAG_DO_ADD=XHOST.vflag_control.flag("XPLUG_DO_ADD");
     string PREFIX=XHOST.vflag_control.getattachedscheme("XPLUG_PREFIX");
 
+    if(NUM_ZIP<1) NUM_ZIP=1;
+    if(NUM_SIZE<1) NUM_SIZE=128;
+    
     if(LDEBUG) cerr << soliloquy << " NUM_ZIP=" << NUM_ZIP << endl;
     if(LDEBUG) cerr << soliloquy << " NUM_SIZE=" << NUM_SIZE << endl;
     if(LDEBUG) cerr << soliloquy << " FLAG_DO_CLEAN=" << FLAG_DO_CLEAN << endl;

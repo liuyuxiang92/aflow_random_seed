@@ -93,7 +93,9 @@ namespace init {
 
     // IMMEDIATELY GET PIDS
     XHOST.PID=getpid();XHOST.ostrPID.clear();XHOST.ostrPID.str(std::string());XHOST.ostrPID<<XHOST.PID;  // initialize PID ??
+    XHOST.TID=gettid();XHOST.ostrTID.clear();XHOST.ostrTID.str(std::string());XHOST.ostrTID<<XHOST.TID;  // initialize TID ?? //CO20200502 - threadID
     // if(INIT_VERBOSE) oss << aurostd::PaddedPOST("XHOST.ostrPID = ",depth_short) << XHOST.ostrPID.str() << endl;
+    // if(INIT_VERBOSE) oss << aurostd::PaddedPOST("XHOST.ostrTID = ",depth_short) << XHOST.ostrTID.str() << endl;  //CO20200502 - threadID
     // DO THREADS IMMEDIATELY
     // std::vector<pthread_t> _thread(MAX_ALLOCATABLE_PTHREADS);AFLOW_PTHREADS::vpthread=_thread;
     // std::vector<int>    _iret(MAX_ALLOCATABLE_PTHREADS);AFLOW_PTHREADS::viret=_iret;
@@ -163,6 +165,7 @@ namespace init {
     // some verbose
     if(INIT_VERBOSE) {
       oss << aurostd::PaddedPOST("XHOST.ostrPID = ",depth_short) << XHOST.ostrPID.str() << endl;
+      oss << aurostd::PaddedPOST("XHOST.ostrTID = ",depth_short) << XHOST.ostrTID.str() << endl;  //CO20200502 - threadID
       oss << aurostd::PaddedPOST("DEFAULT_KZIP_BIN = ",depth_short) << DEFAULT_KZIP_BIN << endl;
       oss << aurostd::PaddedPOST("DEFAULT_KZIP_EXT = ",depth_short) << DEFAULT_KZIP_EXT << endl;
       oss << "--- MACHINE ------------ " << endl;
@@ -1598,10 +1601,10 @@ string aflow_get_time_string(void) {
 #ifdef ALPHA
   ostringstream aus;
   string OUT;
-  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << " " <<endl;
+  aus<<"date | sed \"s/ /_/g\" > "+XHOST.tmpfs+"/date."<< XHOST.ostrPID.str() << "." << XHOST.ostrTID.str() << " " <<endl;  //CO20200502 - threadID
   system(aus.str().c_str());
   ifstream FileAUS;
-  string FileNameAUS=XHOST.tmpfs+"/date"+XHOST.ostrPID.str();
+  string FileNameAUS=XHOST.tmpfs+"/date."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str();  //CO20200502 - threadID
   FileAUS.open(FileNameAUS.c_str(),std::ios::in);
   FileAUS >> OUT;
   FileAUS.clear();FileAUS.close();
@@ -1654,6 +1657,16 @@ string strPID(void) {
 }
 
 // ***************************************************************************
+// strTID
+// ***************************************************************************
+string strTID(void) { //CO20200502 - threadID
+  int TID=gettid();
+  ostringstream oss;
+  oss << TID;
+  return (string) oss.str();
+}
+
+// ***************************************************************************
 // Messages
 // ***************************************************************************
 double AFLOW_checkMEMORY(string progname,double memory) {
@@ -1692,6 +1705,8 @@ string Message(string list2print) {
   if(aurostd::substring2bool(list2print,"hostname") || aurostd::substring2bool(list2print,"HOSTNAME")) oss << " - [host=" << XHOST.hostname << "]";
   if(aurostd::substring2bool(list2print,"temperature")) if(init::GetTEMPs()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {oss << (i==0?"- [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
   if(aurostd::substring2bool(list2print,"machine") || aurostd::substring2bool(list2print,"MACHINE")) oss << " - [host=" << XHOST.hostname << "]";
+  if(aurostd::substring2bool(list2print,"pid") || aurostd::substring2bool(list2print,"PID")) oss << " - [PID=" << XHOST.PID << "]";  //CO20200502
+  if(aurostd::substring2bool(list2print,"tid") || aurostd::substring2bool(list2print,"TID")) oss << " - [TID=" << XHOST.TID << "]";  //CO20200502
   if(list2print.empty() || aurostd::substring2bool(list2print,"time") || aurostd::substring2bool(list2print,"TIME")) oss << " - [date=" << aflow_get_time_string() << "]";
   if(aurostd::substring2bool(list2print,"date") || aurostd::substring2bool(list2print,"DATE")) oss << " - [date=" << aflow_get_time_string() << "]";
   //  if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0)
@@ -1709,7 +1724,7 @@ string Message(string list2print) {
 string Message(string str1,string list2print) {return string(" - "+str1+Message(list2print));}
 //string Message(const _aflags& aflags) {return string(" - "+aflags.Directory + "\n");}
 string Message(const _aflags& aflags) {
-  string strout=" - [dir="+aflags.Directory+"]"+=Message("user,host,time",_AFLOW_FILE_NAME_);
+  string strout=" - [dir="+aflags.Directory+"]"+=Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);
   if(AFLOW_PTHREADS::FLAG) strout+=" - [thread="+aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER)+"/"+aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS)+"]";
   return strout;
 }

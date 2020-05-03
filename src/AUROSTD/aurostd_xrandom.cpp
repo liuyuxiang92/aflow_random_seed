@@ -40,10 +40,12 @@ namespace aurostd {
     //   cerr << tim.tv_usec << endl;
     // getpid
     int PID=getpid();
-    long int seed=tim.tv_usec+tim.tv_sec+PID;
+    int TID=gettid(); //CO20200502 - threadID
+    long int seed=tim.tv_usec+tim.tv_sec+PID+TID; //CO20200502 - threadID
     srand(seed);      // for std:: library things
     (*_idum)=seed;    // for aurostd:: library things
     //    cerr << PID << endl;
+    //    cerr << TID << endl;  //CO20200502 - threadID
     return (*_idum);
    }
   

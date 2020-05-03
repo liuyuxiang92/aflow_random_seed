@@ -15,7 +15,7 @@
 // #define  _AFLOW_TEMP_PRESERVE_  // to preseve /tmp files for debug
 
 #define NNN   -123456
-#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+//[CO20200502 - moved to aurostd.h]#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #define _ANRL_NOWEB_ //DX
 
 //COMMON TOLERANCES
@@ -76,6 +76,9 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 ",_NC2"   //CO20190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
 ",_200eV"
 "";
+
+//MESSAGE defaults - CO20200502
+#define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,tid,time"
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO20180509
@@ -297,7 +300,9 @@ class _XHOST {
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
     int PID;  // aflow.cpp
+    int TID;  // aflow.cpp  //CO20200502 - threadID
     ostringstream ostrPID; // aflow.cpp
+    ostringstream ostrTID; // aflow.cpp //CO20200502 - threadID
     // machinery
     bool QUIET,TEST,DEBUG,MPI;
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
@@ -1044,6 +1049,7 @@ bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
 string aflow_get_time_string_short(void);
 string strPID(void);
+string strTID(void);  //CO20200502 - threadID
 
 string Message(string="");
 string Message(string str1,string list2print);
@@ -2608,9 +2614,10 @@ namespace anrl {
 // uint argsprint(vector<string> argv);
 // ----------------------------------------------------------------------------
 // aflow.cpp
-string aflow_get_time_string(void);
-string aflow_get_time_string_short(void);
-string strPID(void);
+//[CO20200502 - DUPLICATE?]string aflow_get_time_string(void);
+//[CO20200502 - DUPLICATE?]string aflow_get_time_string_short(void);
+//[CO20200502 - DUPLICATE?]string strPID(void);
+//[CO20200502 - DUPLICATE?]string strTID(void);  //CO20200502 - threadID
 int AFLOW_main(vector<string> &argv);
 namespace aflow {
   string License_Preamble_aflow(void);
