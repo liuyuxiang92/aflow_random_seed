@@ -85,6 +85,26 @@ namespace aurostd {
 }
 
 // ***************************************************************************
+// get threadID
+namespace aurostd {
+  int getTID(void){ //CO20200502 - threadID
+#ifdef _MACOSX_
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
+    uint64_t tid64;
+    pthread_threadid_np(NULL, &tid64);
+    pid_t tid = (pid_t)tid64;
+#else
+#include <sys/syscall.h>  //CO20200502 - need for gettid()
+    pid_t tid = syscall(__NR_gettid);
+#endif
+    return (int)tid;
+#else
+    return gettid();
+#endif
+  }
+}
+
+// ***************************************************************************
 // FILES creation/destruction
 namespace aurostd {
   string TmpFileCreate(string identifier) {

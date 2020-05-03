@@ -58,9 +58,8 @@
 
 //CO20200502 START - including gettid()
 #ifdef __GLIBC__
-#include <gnu/libc-version.h>
 #define GLIBC_VERSION (__GLIBC__ * 100 + __GLIBC_MINOR__)
-#if GLIBC_VERSION < 230  //CO20200502 - apparently they patched at 230 - https://stackoverflow.com/questions/30680550/c-gettid-was-not-declared-in-this-scope
+#if (GLIBC_VERSION < 230) //CO20200502 - apparently they patched at 230 - https://stackoverflow.com/questions/30680550/c-gettid-was-not-declared-in-this-scope
 //[CO20200502 - too many warnings]#warning "defining getid() with syscall(SYS_gettid)"
 #include <sys/syscall.h>  //CO20200502 - need for gettid()
 #define gettid() syscall(SYS_gettid)
@@ -259,6 +258,11 @@ namespace aurostd {
   string get_datetime(void);
   string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
   bool beep(uint=2000,uint=100); // standard values
+}
+// ----------------------------------------------------------------------------
+// threadID stuff
+namespace aurostd {
+  int getTID(void); //CO20200502 - threadID
 }
 // ----------------------------------------------------------------------------
 namespace aurostd {

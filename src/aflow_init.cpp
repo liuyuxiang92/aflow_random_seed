@@ -93,7 +93,7 @@ namespace init {
 
     // IMMEDIATELY GET PIDS
     XHOST.PID=getpid();XHOST.ostrPID.clear();XHOST.ostrPID.str(std::string());XHOST.ostrPID<<XHOST.PID;  // initialize PID ??
-    XHOST.TID=gettid();XHOST.ostrTID.clear();XHOST.ostrTID.str(std::string());XHOST.ostrTID<<XHOST.TID;  // initialize TID ?? //CO20200502 - threadID
+    XHOST.TID=aurostd::getTID();XHOST.ostrTID.clear();XHOST.ostrTID.str(std::string());XHOST.ostrTID<<XHOST.TID;  // initialize TID ?? //CO20200502 - threadID
     // if(INIT_VERBOSE) oss << aurostd::PaddedPOST("XHOST.ostrPID = ",depth_short) << XHOST.ostrPID.str() << endl;
     // if(INIT_VERBOSE) oss << aurostd::PaddedPOST("XHOST.ostrTID = ",depth_short) << XHOST.ostrTID.str() << endl;  //CO20200502 - threadID
     // DO THREADS IMMEDIATELY
@@ -1660,7 +1660,7 @@ string strPID(void) {
 // strTID
 // ***************************************************************************
 string strTID(void) { //CO20200502 - threadID
-  int TID=gettid();
+  int TID=aurostd::getTID();
   ostringstream oss;
   oss << TID;
   return (string) oss.str();

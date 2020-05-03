@@ -16,11 +16,11 @@
 //  int myints[] = {16,2,77,29};
 //  vector<int> fifth (myints, myints + sizeof(myints) / sizeof(int));
 
-template<class utype>
-vector<utype> svector2vector(utype svec[]) {
-  vector<utype> vec(svec, svec + sizeof(svec) / sizeof(utype));
-  return vec;
-}
+//[CO20200502 - OBSOLETE]template<class utype>
+//[CO20200502 - OBSOLETE]vector<utype> svector2vector(utype svec[]) {
+//[CO20200502 - OBSOLETE]  vector<utype> vec(svec, svec + sizeof(svec) / sizeof(utype));
+//[CO20200502 - OBSOLETE]  return vec;
+//[CO20200502 - OBSOLETE]}
 
 // --------------------------------------------------------------------------
 // ----------------------------------------------------- NEIGHBOURS OPERATION
