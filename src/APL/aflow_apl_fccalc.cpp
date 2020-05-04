@@ -352,9 +352,9 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
-    string line;
+    string line = "";
     uint line_count = 0;  //CO
-    string KEY; //ME20181226
+    string KEY = ""; //ME20181226
     if (DEFAULT_APL_USE_LEPSILON) { //ME20181226
       KEY = string("BORN EFFECTIVE CHARGES (in e, cummulative output)");//ME20181226
     } else { //ME20181226
@@ -365,7 +365,7 @@ namespace apl {
       // Get line
       //CO - START
       if (line_count == vlines.size()) {
-        string function = "apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR()";
+        string function = "apl::ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR():";
         string message = "No information on Born effective charges in OUTCAR file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
@@ -529,14 +529,14 @@ namespace apl {
     string line;
     aurostd::efile2vectorstring(infilename, vlines);
     if (!vlines.size()) {
-      string function = "apl::LinearResponsePC::readDielectricTensorFromOUTCAR()";
+      string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
       string message = "Cannot open input file OUTCAR.";
       aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     //CO - END
 
     // Find
-    string KEY; //ME20181226
+    string KEY = ""; //ME20181226
     if (DEFAULT_APL_USE_LEPSILON) { //ME20181226
       KEY = string("MACROSCOPIC STATIC DIELECTRIC TENSOR (including local field effects in DFT)"); //ME20181226
     } else { //ME20181226
@@ -547,7 +547,7 @@ namespace apl {
       // Get line
       //CO - START
       if (line_count == vlines.size()) {
-        string function = "apl::LinearResponsePC::readDielectricTensorFromOUTCAR()";
+      string function = "apl::ForceConstantCalculator::readDielectricTensorFromOUTCAR():";
         string message = "No information on dielectric tensor in OUTCAR.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }

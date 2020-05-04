@@ -734,7 +734,7 @@ namespace apl {
                 _uniqueForces[i].push_back(testForce);
               }
 
-              // Store for next ortogonalization procedure
+              // Store for next orthogonalization procedure
               forcePool.push_back(testForce);
             }
             if (_uniqueDistortions[i].size() == 3) break;
@@ -1272,7 +1272,7 @@ namespace apl {
         DISTORTION_INEQUIVONLY = aurostd::string2utype<bool>(tokens[1]);
       } else if (aurostd::substring2bool(vlines[iline], "DISTORTIONS=START")) {
         xvector<double> distortion(3);
-        uint idist;
+        uint idist = 0;
         while ((iline++ < nlines) && !aurostd::substring2bool(vlines[iline], "DISTORTIONS=STOP")) {
           tokens.clear();
           aurostd::string2tokens(vlines[iline], tokens);
