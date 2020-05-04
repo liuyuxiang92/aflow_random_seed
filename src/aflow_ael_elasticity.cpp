@@ -261,7 +261,7 @@ namespace KBIN {
     // uint num_relax = xvasp.NRELAX;
     uint num_relax = 2;
     bool relax_complete = true;
-    bool krun;
+    bool krun = true;
 
     // First check if relaxation has already been performed
     for (uint i = 1; i <= num_relax; i++) {
