@@ -31,7 +31,7 @@ namespace apl {
   }
 
   // ME20200102 - Refactored
-  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, ostream& oss, string directory) : xStream() {  //CO20181226
+  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, string directory, ostream& oss) : xStream() {  //CO20181226
     free();
     xStream::initialize(mf, oss);
     _directory = directory;
@@ -39,7 +39,7 @@ namespace apl {
   }
 
   // ME20200212 - read from a state file
-  Supercell::Supercell(const string& filename, ofstream& mf, ostream& oss, string directory) {
+  Supercell::Supercell(const string& filename, ofstream& mf, string directory, ostream& oss) {
     free();
     xStream::initialize(mf, oss);
     _directory = directory;

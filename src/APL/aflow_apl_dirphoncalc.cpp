@@ -660,7 +660,7 @@ namespace apl {
 
   void DirectMethodPC::completeForceFields() {
     stringstream message;
-    string function = "apl::DirectMethodPC::completeForceFields()";
+    string function = "apl::DirectMethodPC::completeForceFields():";
     //CO - START
     // Test of stupidity...
     if (_supercell->getEPS() == AUROSTD_NAN) {
@@ -975,186 +975,187 @@ namespace apl {
 
 namespace apl {
 
-  void DirectMethodPC::writeDYNMAT() {
-    string filename = aurostd::CleanFileName(_directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
-    string message = "Writing forces into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+   void DirectMethodPC::writeDYNMAT() {
+     string filename = aurostd::CleanFileName(_directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
+     string message = "Writing forces into file " + filename + ".";
+     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
-    stringstream outfile;
+     stringstream outfile;
 
-    // 1st line
-    outfile << _supercell->getNumberOfUniqueAtoms() << " ";
-    outfile << _supercell->getNumberOfAtoms() << " ";
-    int dof = 0;
-    for (uint i = 0; i < _uniqueDistortions.size(); i++)
-      dof += _uniqueDistortions[i].size();
-    outfile << dof << std::endl;
+     // 1st line
+     outfile << _supercell->getNumberOfUniqueAtoms() << " ";
+     outfile << _supercell->getNumberOfAtoms() << " ";
+     int dof = 0;
+     for (uint i = 0; i < _uniqueDistortions.size(); i++)
+       dof += _uniqueDistortions[i].size();
+     outfile << dof << std::endl;
 
-    // 2nd line
-    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-    outfile << setprecision(3);
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-      if (i != 0) outfile << " ";
-      outfile << _supercell->getUniqueAtomMass(i);
-    }
-    outfile << std::endl;
+     // 2nd line
+     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+     outfile << setprecision(3);
+     for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+       if (i != 0) outfile << " ";
+       outfile << _supercell->getUniqueAtomMass(i);
+     }
+     outfile << std::endl;
 
-    // forces + 1 line info about distortion
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        // line info
-        outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
-        outfile << (j + 1) << " ";
-        xvector<double> shift(3);
-        shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-        outfile << setprecision(3);
-        outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
-        // forces
-        outfile << setprecision(6);
-        for (int k = 0; k < _supercell->getNumberOfAtoms(); k++)
-          outfile << setw(15) << _uniqueForces[i][j][k](1)
-            << setw(15) << _uniqueForces[i][j][k](2)
-            << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
-      }
-    }
+     // forces + 1 line info about distortion
+     for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+         // line info
+         outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
+         outfile << (j + 1) << " ";
+         xvector<double> shift(3);
+         shift = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
+         outfile << setprecision(3);
+         outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
+         // forces
+         outfile << setprecision(6);
+         for (int k = 0; k < _supercell->getNumberOfAtoms(); k++)
+           outfile << setw(15) << _uniqueForces[i][j][k](1)
+             << setw(15) << _uniqueForces[i][j][k](2)
+             << setw(15) << _uniqueForces[i][j][k](3) << std::endl;
+       }
+     }
 
-    aurostd::stringstream2file(outfile, filename);
-    if (!aurostd::FileExist(filename)) {
-      string function = "DirectMethodPC::writeDYNMAT()";
-      message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-    }
-  }
+     aurostd::stringstream2file(outfile, filename);
+     if (!aurostd::FileExist(filename)) {
+       string function = "DirectMethodPC::writeDYNMAT()";
+       message = "Cannot open output file " + filename + ".";
+       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+     }
+   }
 
-   //////////////////////////////////////////////////////////////////////////////
+  // [OBSOLETE]  //////////////////////////////////////////////////////////////////////////////
 
-  // This is the interface to phonopy code
+  // OBSOLETE ME20200504 - Not used
+  // [OBSOLETE] // This is the interface to phonopy code
 
-  void DirectMethodPC::writeFORCES() {
-    string function = "apl::DirectMethodPC::writeFORCES()";
-    string message = "Writing forces into file FORCES.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE] void DirectMethodPC::writeFORCES() {
+  // [OBSOLETE]   string function = "apl::DirectMethodPC::writeFORCES()";
+  // [OBSOLETE]   string message = "Writing forces into file FORCES.";
+  // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
-    xstructure ix;
-    string filename = "SPOSCAR";
-    if (!aurostd::FileEmpty(filename)) {
-      message = "Reading " + filename;
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
-      stringstream SPOSCAR;
-      aurostd::efile2stringstream(filename, SPOSCAR);
-      SPOSCAR >> ix;
-    } else {
-      ix = _supercell->getSupercellStructure();
-    }
+  // [OBSOLETE]   xstructure ix;
+  // [OBSOLETE]   string filename = "SPOSCAR";
+  // [OBSOLETE]   if (!aurostd::FileEmpty(filename)) {
+  // [OBSOLETE]     message = "Reading " + filename;
+  // [OBSOLETE]     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE]     stringstream SPOSCAR;
+  // [OBSOLETE]     aurostd::efile2stringstream(filename, SPOSCAR);
+  // [OBSOLETE]     SPOSCAR >> ix;
+  // [OBSOLETE]   } else {
+  // [OBSOLETE]     ix = _supercell->getSupercellStructure();
+  // [OBSOLETE]   }
 
-    stringstream outfile;
+  // [OBSOLETE]   stringstream outfile;
 
-    // 1st line
-    int dof = 0;
-    for (uint i = 0; i < _uniqueDistortions.size(); i++)
-      dof += _uniqueDistortions[i].size();
-    outfile << dof << std::endl;
+  // [OBSOLETE]   // 1st line
+  // [OBSOLETE]   int dof = 0;
+  // [OBSOLETE]   for (uint i = 0; i < _uniqueDistortions.size(); i++)
+  // [OBSOLETE]     dof += _uniqueDistortions[i].size();
+  // [OBSOLETE]   outfile << dof << std::endl;
 
-    // forces + 1 line info about distortion
-    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        // line info
-        outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
-        xvector<double> shift(3);
-        shift = C2F(_supercell->getSupercellStructure().lattice, DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
-        outfile << setprecision(6);
-        outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
-        // forces
-        outfile << setprecision(6);
-        for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
-          int l = 0;
-          for (; l < _supercell->getNumberOfAtoms(); l++)
-            if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell->getSupercellStructure().atoms[l].cpos(1)) < _AFLOW_APL_EPS_) &&
-                (aurostd::abs(ix.atoms[k].cpos(2) - _supercell->getSupercellStructure().atoms[l].cpos(2)) < _AFLOW_APL_EPS_) &&
-                (aurostd::abs(ix.atoms[k].cpos(3) - _supercell->getSupercellStructure().atoms[l].cpos(3)) < _AFLOW_APL_EPS_))
-              break;
-          //CO, not really mapping error, just mismatch between structure read in (ix) and current supercell structure (should be exact)
-          if (l == _supercell->getNumberOfAtoms()) {
-            cout << k << std::endl;
-            cout << ix.atoms[k].fpos << std::endl;
-            cout << ix.atoms[k].cpos << std::endl;
-            message = "Mapping error.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-          }
+  // [OBSOLETE]   // forces + 1 line info about distortion
+  // [OBSOLETE]   outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  // [OBSOLETE]   for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+  // [OBSOLETE]     for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+  // [OBSOLETE]       // line info
+  // [OBSOLETE]       outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
+  // [OBSOLETE]       xvector<double> shift(3);
+  // [OBSOLETE]       shift = C2F(_supercell->getSupercellStructure().lattice, DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
+  // [OBSOLETE]       outfile << setprecision(6);
+  // [OBSOLETE]       outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
+  // [OBSOLETE]       // forces
+  // [OBSOLETE]       outfile << setprecision(6);
+  // [OBSOLETE]       for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
+  // [OBSOLETE]         int l = 0;
+  // [OBSOLETE]         for (; l < _supercell->getNumberOfAtoms(); l++)
+  // [OBSOLETE]           if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell->getSupercellStructure().atoms[l].cpos(1)) < _AFLOW_APL_EPS_) &&
+  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(2) - _supercell->getSupercellStructure().atoms[l].cpos(2)) < _AFLOW_APL_EPS_) &&
+  // [OBSOLETE]               (aurostd::abs(ix.atoms[k].cpos(3) - _supercell->getSupercellStructure().atoms[l].cpos(3)) < _AFLOW_APL_EPS_))
+  // [OBSOLETE]             break;
+  // [OBSOLETE]         //CO, not really mapping error, just mismatch between structure read in (ix) and current supercell structure (should be exact)
+  // [OBSOLETE]         if (l == _supercell->getNumberOfAtoms()) {
+  // [OBSOLETE]           cout << k << std::endl;
+  // [OBSOLETE]           cout << ix.atoms[k].fpos << std::endl;
+  // [OBSOLETE]           cout << ix.atoms[k].cpos << std::endl;
+  // [OBSOLETE]           message = "Mapping error.";
+  // [OBSOLETE]           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+  // [OBSOLETE]         }
 
-          outfile << setw(15) << _uniqueForces[i][j][l](1) << " "
-            << setw(15) << _uniqueForces[i][j][l](2) << " "
-            << setw(15) << _uniqueForces[i][j][l](3) << std::endl;
-        }
-      }
-    }
+  // [OBSOLETE]         outfile << setw(15) << _uniqueForces[i][j][l](1) << " "
+  // [OBSOLETE]           << setw(15) << _uniqueForces[i][j][l](2) << " "
+  // [OBSOLETE]           << setw(15) << _uniqueForces[i][j][l](3) << std::endl;
+  // [OBSOLETE]       }
+  // [OBSOLETE]     }
+  // [OBSOLETE]   }
 
-    filename = "FORCES";
-    aurostd::stringstream2file(outfile, filename);
-    if (!aurostd::FileExist(filename)) {
-      message = "Cannot open output file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
-    }
+  // [OBSOLETE]   filename = "FORCES";
+  // [OBSOLETE]   aurostd::stringstream2file(outfile, filename);
+  // [OBSOLETE]   if (!aurostd::FileExist(filename)) {
+  // [OBSOLETE]     message = "Cannot open output file.";
+  // [OBSOLETE]     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+  // [OBSOLETE]   }
 
-  }
+  // [OBSOLETE] }
 
-  // ///////////////////////////////////////////////////////////////////////////
+  // [OBSOLETE] // ///////////////////////////////////////////////////////////////////////////
 
-  void DirectMethodPC::writeXCrysDenForces() {
-    string function = "apl::DirectMethodPC::writeXCrysDenForces()";
-    string message = "Writing forces into file XCrysDenForces.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
-    _supercell->center_original();  //COREY
+  // [OBSOLETE] void DirectMethodPC::writeXCrysDenForces() {
+  // [OBSOLETE]   string function = "apl::DirectMethodPC::writeXCrysDenForces()";
+  // [OBSOLETE]   string message = "Writing forces into file XCrysDenForces.";
+  // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE]   _supercell->center_original();  //COREY
 
-    stringstream outfile;  //CO
-    // forces + 1 line info about distortion
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-      for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        //string s = "FORCES_A" + stringify(_supercell->getUniqueAtomID(i)) + "D" + stringify(j) + ".xsf"; //CO
-        outfile.str("");  //CO
-        //ofstream outfile(s.c_str(), ios_base::out); //CO
+  // [OBSOLETE]   stringstream outfile;  //CO
+  // [OBSOLETE]   // forces + 1 line info about distortion
+  // [OBSOLETE]   for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+  // [OBSOLETE]     for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+  // [OBSOLETE]       //string s = "FORCES_A" + stringify(_supercell->getUniqueAtomID(i)) + "D" + stringify(j) + ".xsf"; //CO
+  // [OBSOLETE]       outfile.str("");  //CO
+  // [OBSOLETE]       //ofstream outfile(s.c_str(), ios_base::out); //CO
 
-        outfile << "CRYSTAL" << std::endl;
-        outfile << "PRIMVEC 1" << std::endl;
-        outfile << _supercell->getSupercellStructure().lattice << std::endl;
-        outfile << "CONVEC 1" << std::endl;
-        outfile << _supercell->getSupercellStructure().lattice << std::endl;
-        outfile << "PRIMCOORD 1" << std::endl;
-        outfile << _supercell->getNumberOfAtoms() << " 1" << std::endl;
+  // [OBSOLETE]       outfile << "CRYSTAL" << std::endl;
+  // [OBSOLETE]       outfile << "PRIMVEC 1" << std::endl;
+  // [OBSOLETE]       outfile << _supercell->getSupercellStructure().lattice << std::endl;
+  // [OBSOLETE]       outfile << "CONVEC 1" << std::endl;
+  // [OBSOLETE]       outfile << _supercell->getSupercellStructure().lattice << std::endl;
+  // [OBSOLETE]       outfile << "PRIMCOORD 1" << std::endl;
+  // [OBSOLETE]       outfile << _supercell->getNumberOfAtoms() << " 1" << std::endl;
 
-        xvector<double> shift(3);
-        shift = C2F(_supercell->getSupercellStructure().lattice, DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
+  // [OBSOLETE]       xvector<double> shift(3);
+  // [OBSOLETE]       shift = C2F(_supercell->getSupercellStructure().lattice, DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
 
-        outfile << setprecision(6);
-        for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
-          outfile << _supercell->getAtomNumber(k) << " ";
-          outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-          outfile << setprecision(8);
-          xvector<double> r = F2C(_supercell->getSupercellStructure().lattice,
-              _supercell->getSupercellStructure().atoms[k].fpos);
-          outfile << setw(15) << r(1) << setw(15) << r(2) << setw(15) << r(3) << " ";
-          // this is strange...
-          //outfile << setw(15) << _superCellStructure.atoms[k].cpos << " ";
+  // [OBSOLETE]       outfile << setprecision(6);
+  // [OBSOLETE]       for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
+  // [OBSOLETE]         outfile << _supercell->getAtomNumber(k) << " ";
+  // [OBSOLETE]         outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  // [OBSOLETE]         outfile << setprecision(8);
+  // [OBSOLETE]         xvector<double> r = F2C(_supercell->getSupercellStructure().lattice,
+  // [OBSOLETE]             _supercell->getSupercellStructure().atoms[k].fpos);
+  // [OBSOLETE]         outfile << setw(15) << r(1) << setw(15) << r(2) << setw(15) << r(3) << " ";
+  // [OBSOLETE]         // this is strange...
+  // [OBSOLETE]         //outfile << setw(15) << _superCellStructure.atoms[k].cpos << " ";
 
-          // Scale force, it is expected in Hartree/Angs.
-          xvector<double> f = hartree2ev * _uniqueForces[i][j][k];
+  // [OBSOLETE]         // Scale force, it is expected in Hartree/Angs.
+  // [OBSOLETE]         xvector<double> f = hartree2eV * _uniqueForces[i][j][k];
 
-          outfile << setw(15) << f(1)
-            << setw(15) << f(2)
-            << setw(15) << f(3) << std::endl;
-        }
+  // [OBSOLETE]         outfile << setw(15) << f(1)
+  // [OBSOLETE]           << setw(15) << f(2)
+  // [OBSOLETE]           << setw(15) << f(3) << std::endl;
+  // [OBSOLETE]       }
 
-        string filename = "FORCES_A" + stringify(_supercell->getUniqueAtomID(i)) + "D" + stringify(j) + ".xsf";
-        aurostd::stringstream2file(outfile, filename);
-        if (!aurostd::FileExist(filename)) {
-          string message = "Cannot create " + filename + " file.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
-        }
+  // [OBSOLETE]       string filename = "FORCES_A" + stringify(_supercell->getUniqueAtomID(i)) + "D" + stringify(j) + ".xsf";
+  // [OBSOLETE]       aurostd::stringstream2file(outfile, filename);
+  // [OBSOLETE]       if (!aurostd::FileExist(filename)) {
+  // [OBSOLETE]         string message = "Cannot create " + filename + " file.";
+  // [OBSOLETE]         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+  // [OBSOLETE]       }
 
-      }
-    }
-  }
+  // [OBSOLETE]     }
+  // [OBSOLETE]   }
+  // [OBSOLETE] }
 
   void DirectMethodPC::saveState(const string& filename) {
     if (xInputs.size() == 0) return;  // Nothing to write
@@ -1205,7 +1206,7 @@ namespace apl {
   // aflow.in files and should only be used to read forces for force constant
   // calculations. It is still in development and has only been tested with VASP.
   void DirectMethodPC::readFromStateFile(const string& filename) {
-    string function = "apl::LinearResponsePC::readFromState()";
+    string function = "apl::DirectMethodPC::readFromStateFile()";
     string message = "Reading state of the phonon calculator from " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {

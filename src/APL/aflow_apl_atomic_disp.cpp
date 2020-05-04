@@ -396,7 +396,7 @@ namespace apl {
 
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "AtomicDisplacements::writeMeanSquareDisplacementsToFile()";
+      string function = "AtomicDisplacements::writeSceneFileXcrysden()";
       message = "Could not write to file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -446,7 +446,7 @@ namespace apl {
 
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "AtomicDisplacements::writeMeanSquareDisplacementsToFile()";
+      string function = "AtomicDisplacements::writeSceneFileVsim()";
       message = "Could not write to file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -465,9 +465,13 @@ namespace apl {
   //createAtomicDisplacementSceneFile/////////////////////////////////////////
   // Interfaces with the command line to create a phonon visualization file.
   void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ostream& oss) {
+    ofstream mf("/dev/null");
+    createAtomicDisplacementSceneFile(vpflow, mf, oss);
+  }
+
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream& mf, ostream& oss) {
     string function = "apl::createAtomicDisplacementSceneFile()";
     string message = "";
-    ofstream mf("/dev/null");
 
     // Parse command line options
     string directory = vpflow.getattachedscheme("ADISP::DIRECTORY");

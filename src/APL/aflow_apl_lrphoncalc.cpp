@@ -289,7 +289,7 @@ namespace apl {
   // aflow.in files and should only be used to read forces for force constant
   // calculations. It is still in development and has only been tested with VASP.
   void LinearResponsePC::readFromStateFile(const string& filename) {
-    string function = "apl::LinearResponsePC::readFromState()";
+    string function = "apl::LinearResponsePC::readFromStateFile()";
     string message = "Reading state of the phonon calculator from " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {

@@ -137,15 +137,13 @@ namespace apl {
     string soliloquy="apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()"; //CO20190218
     // Test of stupidity...
     if (!_supercell->getSupercellStructure().agroup_calculated) {
-      string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
       string message = "The site groups have not been calculated yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
     //CO - START
     if (_supercell->getEPS() == AUROSTD_NAN) {
-      string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
       string message = "Need to define symmetry tolerance.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
     }
     //CO - END
 
@@ -156,9 +154,8 @@ namespace apl {
     for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       const vector<_sym_op>& agroup = _supercell->getAGROUP(i);  //CO //CO20190218
       if (agroup.size() == 0) {
-        string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
         string message = "Site point group operations are missing.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
       }
 
       for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
@@ -188,9 +185,8 @@ namespace apl {
               std::cerr << (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc)) << std::endl;
             }
           } catch (aurostd::xerror& e) {
-            string function = "apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()";
             string message = "Mapping problem " + aurostd::utype2string<int>(j);
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
           }
         }
         m = ( 1.0 / agroup.size() ) * m; //CO20190218
@@ -203,36 +199,43 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
+  // ME20200504 - this function needs more comments, overall explanation
   void ForceConstantCalculator::correctSumRules() {
-    xmatrix<double> sum(3, 3), sum2(3, 3);
+    // ME20200504
+    // sum appears to be the self-interaction term (diagonal terms) of the
+    // force constant matrices. See http://cmt.dur.ac.uk/sjc/thesis_prt/node83.html
+    xmatrix<double> sum(3, 3);//, sum2(3, 3); OBSOLETE ME20200504 - not used
 
     for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       // Get SUMs
       for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i != j) {
           sum = sum + _forceConstantMatrices[i][j];
-          sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);
+          //sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);
         }
       }
 
       // Correct SUM2
+      // ME20200504 - This appears to enforce the invariance of the force constants
+      // upon permutations
       for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i == j) continue;
         _forceConstantMatrices[i][j] = 0.5 * (_forceConstantMatrices[i][j] + trasp(_forceConstantMatrices[j][i]));
         _forceConstantMatrices[j][i] = trasp(_forceConstantMatrices[i][j]);
       }
 
-      // Get SUMs again
+      // Get SUMs again // ME20200504 - why?
       sum.clear();
-      sum2.clear();
+      //sum2.clear(); OBSOLETE ME20200504 - not used
       for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i != j) {
           sum = sum + _forceConstantMatrices[i][j];
-          sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);
+          //sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);  // OBSOLETE ME20200504 - not used
         }
       }
 
       // Correct SUM1 to satisfied
+      // ME20200504 - Self-interaction term
       _forceConstantMatrices[i][i] = -sum;
     }
   }
@@ -296,7 +299,7 @@ namespace apl {
         }
       }
     } else if (xinpBE.AFLOW_MODE_AIMS) {
-      string function = "ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT()";
+      string function = "ForceConstantCalculator::calculateDielectricTensor()";
       message << "This functionality has not been implemented yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     } else {
@@ -331,6 +334,7 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  // ME20190113
     string directory = xinp.xvasp.Directory;  // ME20190113
+    string function = "apl::ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR():";
 
     //CO - START
     string infilename = directory + string("/OUTCAR.static");
@@ -347,7 +351,6 @@ namespace apl {
     aurostd::efile2vectorstring(infilename, vlines);
     if (!vlines.size()) {
       //CO - END
-      string function = "apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR()";
       string message = "Cannot open input file OUTCAR.static.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -365,7 +368,6 @@ namespace apl {
       // Get line
       //CO - START
       if (line_count == vlines.size()) {
-        string function = "apl::ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR():";
         string message = "No information on Born effective charges in OUTCAR file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
@@ -717,116 +719,115 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
+  // OBSOLETE ME20200504  - not used
+  //[OBSOLETE] void ForceConstantCalculator::printForceConstantMatrices(ostream& os) {
+  //[OBSOLETE]   int units = 1;
+  //[OBSOLETE]   double conversionFactor = 1.0;
 
-  void ForceConstantCalculator::printForceConstantMatrices(ostream& os) {
-    int units = 1;
-    double conversionFactor = 1.0;
+  //[OBSOLETE]   switch (units) {
+  //[OBSOLETE]     case (1):
+  //[OBSOLETE]       os << "FORCE CONSTANT MATRICES in eV/A^2:" << std::endl;
+  //[OBSOLETE]       conversionFactor = 1.0;
+  //[OBSOLETE]       break;
+  //[OBSOLETE]     case (2):
+  //[OBSOLETE]       os << "FORCE CONSTANT MATRICES in 10 Dyn/cm:" << std::endl;
+  //[OBSOLETE]       conversionFactor = 1602.17733;
+  //[OBSOLETE]       break;
+  //[OBSOLETE]     case (3):
+  //[OBSOLETE]       os << "FORCE CONSTANT MATRICES in N/m:" << std::endl;
+  //[OBSOLETE]       conversionFactor = 16.0217733;
+  //[OBSOLETE]       break;
+  //[OBSOLETE]   }
+  //[OBSOLETE]   os << std::endl;
 
-    switch (units) {
-      case (1):
-        os << "FORCE CONSTANT MATRICES in eV/A^2:" << std::endl;
-        conversionFactor = 1.0;
-        break;
-      case (2):
-        os << "FORCE CONSTANT MATRICES in 10 Dyn/cm:" << std::endl;
-        conversionFactor = 1602.17733;
-        break;
-      case (3):
-        os << "FORCE CONSTANT MATRICES in N/m:" << std::endl;
-        conversionFactor = 16.0217733;
-        break;
-    }
-    os << std::endl;
+  //[OBSOLETE]   for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
+  //[OBSOLETE]     for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
+  //[OBSOLETE]       os << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  //[OBSOLETE]       os << setprecision(4);
+  //[OBSOLETE]       os << "- MATRIX: " << i + 1 << "/" << k + 1 << " " << k + 1 << "/" << i + 1 << std::endl;
+  //[OBSOLETE]       for (int m = 1; m <= 3; m++) {
+  //[OBSOLETE]         for (int n = 1; n <= 3; n++)
+  //[OBSOLETE]           os << setw(10) << (conversionFactor * _forceConstantMatrices[k][i](m, n)) << " ";
+  //[OBSOLETE]         os << " ";
+  //[OBSOLETE]         for (int n = 1; n <= 3; n++)
+  //[OBSOLETE]           os << setw(10) << (conversionFactor * _forceConstantMatrices[i][k](n, m)) << " ";
+  //[OBSOLETE]         os << std::endl;
+  //[OBSOLETE]       }
+  //[OBSOLETE]       os << std::endl;
+  //[OBSOLETE]     }
+  //[OBSOLETE]   }
+  //[OBSOLETE] }
 
-    for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
-      for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
-        os << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-        os << setprecision(4);
-        os << "- MATRIX: " << i + 1 << "/" << k + 1 << " " << k + 1 << "/" << i + 1 << std::endl;
-        for (int m = 1; m <= 3; m++) {
-          for (int n = 1; n <= 3; n++)
-            os << setw(10) << (conversionFactor * _forceConstantMatrices[k][i](m, n)) << " ";
-          os << " ";
-          for (int n = 1; n <= 3; n++)
-            os << setw(10) << (conversionFactor * _forceConstantMatrices[i][k](n, m)) << " ";
-          os << std::endl;
-        }
-        os << std::endl;
-      }
-    }
-  }
+  //[OBSOLETE] // ///////////////////////////////////////////////////////////////////////////
 
-  // ///////////////////////////////////////////////////////////////////////////
+  //[OBSOLETE] void ForceConstantCalculator::printFCShellInfo(ostream& os) {
+  //[OBSOLETE]   int units = 4;
+  //[OBSOLETE]   double conversionFactor = 1.0;
 
-  void ForceConstantCalculator::printFCShellInfo(ostream& os) {
-    int units = 4;
-    double conversionFactor = 1.0;
+  //[OBSOLETE]   switch (units) {
+  //[OBSOLETE]     case (1):
+  //[OBSOLETE]       os << "FORCE CONSTANT MATRICES in eV/A^2:" << std::endl;
+  //[OBSOLETE]       conversionFactor = 1.0;
+  //[OBSOLETE]       break;
+  //[OBSOLETE]     case (2):
+  //[OBSOLETE]       os << "FORCE CONSTANT MATRICES in 10 Dyn/cm:" << std::endl;
+  //[OBSOLETE]       conversionFactor = 1602.17733;
+  //[OBSOLETE]       break;
+  //[OBSOLETE]     case (3):
+  //[OBSOLETE]       os << "FORCE CONSTANT MATRICES in N/m:" << std::endl;
+  //[OBSOLETE]       conversionFactor = 16.0217733;
+  //[OBSOLETE]       break;
+  //[OBSOLETE]     case (4):
+  //[OBSOLETE]       os << "FORCE CONSTANT MATRICES in 10^3 Dyn/cm:" << std::endl;
+  //[OBSOLETE]       conversionFactor = 16.0217733;
+  //[OBSOLETE]       break;
+  //[OBSOLETE]   }
+  //[OBSOLETE]   os << std::endl;
 
-    switch (units) {
-      case (1):
-        os << "FORCE CONSTANT MATRICES in eV/A^2:" << std::endl;
-        conversionFactor = 1.0;
-        break;
-      case (2):
-        os << "FORCE CONSTANT MATRICES in 10 Dyn/cm:" << std::endl;
-        conversionFactor = 1602.17733;
-        break;
-      case (3):
-        os << "FORCE CONSTANT MATRICES in N/m:" << std::endl;
-        conversionFactor = 16.0217733;
-        break;
-      case (4):
-        os << "FORCE CONSTANT MATRICES in 10^3 Dyn/cm:" << std::endl;
-        conversionFactor = 16.0217733;
-        break;
-    }
-    os << std::endl;
+  //[OBSOLETE]   int maxshell = _supercell->getMaxShellID();
+  //[OBSOLETE]   if (maxshell == -1) maxshell = 25;
+  //[OBSOLETE]   std::vector<ShellHandle> sh;
+  //[OBSOLETE]   for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+  //[OBSOLETE]     ShellHandle s;
+  //[OBSOLETE]     sh.push_back(s);
+  //[OBSOLETE]     sh.back().init(_supercell->getInputStructure(),
+  //[OBSOLETE]         _supercell->getInputStructure().iatoms[i][0],
+  //[OBSOLETE]         maxshell);
+  //[OBSOLETE]     sh[i].splitBySymmetry();
+  //[OBSOLETE]     sh[i].mapStructure(_supercell->getSupercellStructure(), _supercell->getUniqueAtomID(i));
+  //[OBSOLETE]   }
 
-    int maxshell = _supercell->getMaxShellID();
-    if (maxshell == -1) maxshell = 25;
-    std::vector<ShellHandle> sh;
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-      ShellHandle s;
-      sh.push_back(s);
-      sh.back().init(_supercell->getInputStructure(),
-          _supercell->getInputStructure().iatoms[i][0],
-          maxshell);
-      sh[i].splitBySymmetry();
-      sh[i].mapStructure(_supercell->getSupercellStructure(), _supercell->getUniqueAtomID(i));
-    }
+  //[OBSOLETE]   for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+  //[OBSOLETE]     sh[i].printReport(cout);
+  //[OBSOLETE]     for (int ishell = 0; ishell <= sh[i].getLastOccupiedShell(); ishell++) {
+  //[OBSOLETE]       for (int isubshell = 0; isubshell < sh[i].getNumberOfSubshells(ishell); isubshell++) {
+  //[OBSOLETE]         const deque<_atom>& atomsAtSameShell = sh[i].getAtomsAtSameShell(ishell, isubshell);
+  //[OBSOLETE]         cout << "SHELL " << ishell << " " << isubshell << std::endl;
 
-    //
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
-      sh[i].printReport(cout);
-      for (int ishell = 0; ishell <= sh[i].getLastOccupiedShell(); ishell++) {
-        for (int isubshell = 0; isubshell < sh[i].getNumberOfSubshells(ishell); isubshell++) {
-          const deque<_atom>& atomsAtSameShell = sh[i].getAtomsAtSameShell(ishell, isubshell);
-          cout << "SHELL " << ishell << " " << isubshell << std::endl;
+  //[OBSOLETE]         for (uint ai = 0; ai < atomsAtSameShell.size(); ai++) {
+  //[OBSOLETE]           int nb = atomsAtSameShell[ai].number;
+  //[OBSOLETE]           cout << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  //[OBSOLETE]           cout << setprecision(4);
+  //[OBSOLETE]           cout << "- MATRIX: " << i << "/" << nb << " " << nb << "/" << i << std::endl;
+  //[OBSOLETE]           for (int m = 1; m <= 3; m++) {
+  //[OBSOLETE]             for (int n = 1; n <= 3; n++)
+  //[OBSOLETE]               cout << setw(10) << (conversionFactor * _forceConstantMatrices[nb][i](m, n)) << " ";
+  //[OBSOLETE]             cout << " ";
+  //[OBSOLETE]             for (int n = 1; n <= 3; n++)
+  //[OBSOLETE]               cout << setw(10) << (conversionFactor * _forceConstantMatrices[i][nb](n, m)) << " ";
+  //[OBSOLETE]             cout << std::endl;
+  //[OBSOLETE]           }
+  //[OBSOLETE]           cout << std::endl;
+  //[OBSOLETE]         }
+  //[OBSOLETE]       }
+  //[OBSOLETE]     }
+  //[OBSOLETE]   }
 
-          for (uint ai = 0; ai < atomsAtSameShell.size(); ai++) {
-            int nb = atomsAtSameShell[ai].number;
-            cout << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-            cout << setprecision(4);
-            cout << "- MATRIX: " << i << "/" << nb << " " << nb << "/" << i << std::endl;
-            for (int m = 1; m <= 3; m++) {
-              for (int n = 1; n <= 3; n++)
-                cout << setw(10) << (conversionFactor * _forceConstantMatrices[nb][i](m, n)) << " ";
-              cout << " ";
-              for (int n = 1; n <= 3; n++)
-                cout << setw(10) << (conversionFactor * _forceConstantMatrices[i][nb](n, m)) << " ";
-              cout << std::endl;
-            }
-            cout << std::endl;
-          }
-        }
-      }
-    }
-
-    // Clear
-    for (uint i = 0; i < sh.size(); i++)
-      sh[i].clear();
-    sh.clear();
-  }
+  //[OBSOLETE]   // Clear
+  //[OBSOLETE]   for (uint i = 0; i < sh.size(); i++)
+  //[OBSOLETE]     sh[i].clear();
+  //[OBSOLETE]   sh.clear();
+  //[OBSOLETE] }
 
 }  // namespace apl
 

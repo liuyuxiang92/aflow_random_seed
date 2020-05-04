@@ -85,7 +85,7 @@ namespace KBIN {
       // For example, if a 3x2x1 supercell uses a 2x2x3 k-point grid, the unit
       // cell will be relaxed using a 6x4x3 k-point grid. This minimizes the
       // risk of ghost forces in the supercell calculations.
-      apl::Supercell scell(xvasp.str, fileMessage, oss, aflags.Directory);
+      apl::Supercell scell(xvasp.str, fileMessage, aflags.Directory, oss);
       scell.build(scell_dims, false);
       string scheme_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KSCHEME.content_string;
       int kppra_phonons = vflags.KBIN_VASP_KPOINTS_PHONONS_KPPRA.content_int;

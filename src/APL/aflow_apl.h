@@ -614,8 +614,8 @@ namespace apl {
     public:
       Supercell(ostream& oss=std::cout);
       Supercell(ofstream&, ostream& os=std::cout);
-      Supercell(const xstructure&, ofstream&, ostream& oss=std::cout, string="./"); //CO20181226
-      Supercell(const string&, ofstream&, ostream& os=std::cout, string="./");  // ME20200112
+      Supercell(const xstructure&, ofstream&, string directory="./", ostream& oss=std::cout); //CO20181226
+      Supercell(const string&, ofstream&, string directory="./", ostream& os=std::cout);  // ME20200112
       Supercell(const Supercell&);
       Supercell& operator=(const Supercell&);
       ~Supercell();
@@ -781,8 +781,8 @@ namespace apl {
       void writeHarmonicIFCs(const string&);
       void writeBornChargesDielectricTensor(const string&);
 
-      void printForceConstantMatrices(ostream&);
-      void printFCShellInfo(ostream&);
+      //void printForceConstantMatrices(ostream&);  // OBSOLETE ME20200504 - not used
+      //void printFCShellInfo(ostream&);  // OBSOLETE ME20200504 - not used
 
     public:
       ForceConstantCalculator(ostream& oss=std::cout);
@@ -871,9 +871,9 @@ namespace apl {
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO20190108
       bool calculateForceConstants();  // ME20200211
 
-      void writeFORCES();
+      //void writeFORCES();  // OBSOLETE ME20200504 - not used
       void writeDYNMAT();
-      void writeXCrysDenForces();
+      //void writeXCrysDenForces();  // OBSOLETE ME20200504 - not used
       void saveState(const string&);  // ME20200212
       void readFromStateFile(const string&);  // ME20200212
 
@@ -1819,6 +1819,7 @@ namespace apl {
   };
 
   void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ostream& oss=std::cout);
+  void createAtomicDisplacementSceneFile(const aurostd::xoption& vpflow, ofstream&, ostream& oss=std::cout);
 }
 // ***************************************************************************
 // ***************************************************************************

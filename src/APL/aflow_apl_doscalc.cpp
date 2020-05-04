@@ -552,7 +552,7 @@ namespace apl {
     doscar << xdos;
     aurostd::stringstream2file(doscar, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "PhononDispersionCalculator::writePHDOSCAR()";
+      string function = "DOSCalculator::writePHDOSCAR()";
       message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }

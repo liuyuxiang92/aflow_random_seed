@@ -180,6 +180,8 @@ namespace apl {
   }
 
   //outfileFoundEverywherePhonons/////////////////////////////////////////////
+  // Tests whether the necessary force files are present and complete in all
+  // directories for the phonon calculatios. Also reads all forces.
   bool outfileFoundEverywherePhonons(vector<_xinput>& xinps, const string& directory, ofstream& messageFile, ostream& oss, bool contains_born) {
     string function = "apl::outfileFoundEverywherePhonons()";
     string mode = xinps[0].xvasp.AVASP_arun_mode;

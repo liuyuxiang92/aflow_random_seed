@@ -621,10 +621,10 @@ The commands to create these output files are shown below:
                        Multiple points can be specified.
 
           --format:    The output file format.
-                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
+                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
 
           --amplitude: The amplitude of the displacements.
-                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
+                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
 
 
         Options for XCRYSDEN:
