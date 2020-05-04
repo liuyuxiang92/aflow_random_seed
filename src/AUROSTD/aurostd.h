@@ -262,7 +262,7 @@ namespace aurostd {
 // ----------------------------------------------------------------------------
 // threadID stuff
 namespace aurostd {
-  int getTID(void); //CO20200502 - threadID
+  unsigned long long int getTID(void); //CO20200502 - threadID
 }
 // ----------------------------------------------------------------------------
 namespace aurostd {

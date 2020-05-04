@@ -87,7 +87,10 @@ namespace aurostd {
 // ***************************************************************************
 // get threadID
 namespace aurostd {
-  int getTID(void){ //CO20200502 - threadID
+  unsigned long long int getTID(void){ //CO20200502 - threadID
+    //for mac these numbers can be QUITE large, so better to be safe and return unsigned long long int
+    //see here: http://elliotth.blogspot.com/2012/04/gettid-on-mac-os.html
+    //also for macs: pid!=tid
 #ifdef _MACOSX_
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
     uint64_t tid64;
@@ -97,9 +100,9 @@ namespace aurostd {
 #include <sys/syscall.h>  //CO20200502 - need for gettid()
     pid_t tid = syscall(__NR_gettid);
 #endif
-    return (int)tid;
+    return (unsigned long long int)tid;
 #else
-    return gettid();
+    return (unsigned long long int)gettid();
 #endif
   }
 }
