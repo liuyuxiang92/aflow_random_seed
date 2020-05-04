@@ -28,7 +28,7 @@
 namespace AEL_functions {
   uint AEL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string AflowInName, string FileLockName, string directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE) {
     ifstream FileAFLOWIN, FileAFLOWINcheck;
-    string FileNameAFLOWIN, FileNameAFLOWINcheck, AflowInCheck;
+    string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
     string FileNameMessage = "";
     ostringstream aus;
     vector<string> vAflowInCheck;
