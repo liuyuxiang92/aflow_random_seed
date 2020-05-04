@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2016           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Richard H. Taylor
@@ -357,7 +357,7 @@ namespace SYM {
 // ******************************************************************************
 // Update atom positions after screw operation
 namespace SYM {
-  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice) { // DX20190905 - return to void 
+  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice) { //DX20190905 - return to void 
     for (uint a = 0; a < atoms.size(); a++) {
       atoms[a].cpos = S * atoms[a].cpos;
       //DX20190905 [OBSOLETE-no more mod_one_xvec] atoms[a].fpos = SYM::mod_one_xvec(C2F(lattice, atoms[a].cpos));
@@ -381,7 +381,7 @@ namespace SYM {
   }
 }
 
-//DX20190128 - START
+//DX20190128 START
 // ******************************************************************************
 // ExtractLatticeParametersFromWyccar
 // ******************************************************************************
@@ -402,7 +402,7 @@ namespace SYM {
     return lattice_parameters;
   }
 }
-//DX20190128 - END
+//DX20190128 END
 
 // ******************************************************************************
 // ExtractWyckoffAttributeString 
@@ -461,7 +461,7 @@ namespace SYM {
   }
 }
 
-//DX20190128 - START
+//DX20190128 START
 // ******************************************************************************
 // getWyckoffLettersWithSameMultiplcityAndSiteSymmetry 
 // ******************************************************************************
@@ -504,9 +504,9 @@ namespace SYM {
     return grouped_possible_Wyckoff_letters;
   }
 }
-//DX20190128 - END
+//DX20190128 END
 
-//DX20190219 - START
+//DX20190219 START
 // ******************************************************************************
 // splitSiteSymmetry 
 // ******************************************************************************
@@ -775,22 +775,22 @@ namespace SYM {
 //  //Scale the expansion to include all the points up to the radius given by user
 //  int b=0;
 //  //double scale;
-//// DX  double lp = C.return_lattice_parameter();
+////DX  double lp = C.return_lattice_parameter();
 //  double lp = C.return_scale();
 //  double min;
 //  //If volume:
-//// DX HERE  if(lp < 0){
-//// DX HERE   min = modulus(extract_row(L,1));
-//// DX HERE   if(modulus(extract_row(L,2)) < min){
-//// DX HERE     min = modulus(extract_row(L,2));
-//// DX HERE   }
-//// DX HERE   if(modulus(extract_row(L,3)) < min) {
-//// DX HERE     min = modulus(extract_row(L,3));
-//// DX HERE   }
-//// DX HERE    b = (int) (radius/min+1.0);
-//// DX HERE  }
+////DX HERE  if(lp < 0){
+////DX HERE   min = modulus(extract_row(L,1));
+////DX HERE   if(modulus(extract_row(L,2)) < min){
+////DX HERE     min = modulus(extract_row(L,2));
+////DX HERE   }
+////DX HERE   if(modulus(extract_row(L,3)) < min) {
+////DX HERE     min = modulus(extract_row(L,3));
+////DX HERE   }
+////DX HERE    b = (int) (radius/min+1.0);
+////DX HERE  }
 //  //If lattice parameter:
-//// DX HERE  if(lp > 0){
+////DX HERE  if(lp > 0){
 //    min = modulus(lp*extract_row(L,1));
 //    if(modulus(lp*extract_row(L,2)) < min){
 //      min = modulus(lp*extract_row(L,2));
@@ -799,7 +799,7 @@ namespace SYM {
 //      min = modulus(lp*extract_row(L,3));
 //    }
 //    b = (int) (radius/min+1.0);
-//// DX HERE  }
+////DX HERE  }
 //  //EXPAND BASIS:
 //  expanded_lattice = C.expand_lattice(b,b,b,L);
 //  expanded_basis = C.add_basis(expanded_lattice);
@@ -1441,7 +1441,7 @@ namespace SYM {
 // ******************************************************************************
 // mod_one (Modify double by 1; to keep in unit cell)
 // ******************************************************************************
-// DX OBSOLETE? 9/8/17
+// [OBSOLETE] DX20170908
 //namespace SYM {
 //double mod_one(double d) {
 ////double delta=1e-6;
@@ -1480,7 +1480,7 @@ namespace SYM {
         //tmp.clear();
       }
       if(line > 1)  // && add == true)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         if(sg[i] != '(') {
           tmp << sg[i];
           //cerr << sg[i] << " ";
@@ -1750,7 +1750,7 @@ namespace SYM {
 // ******************************************************************************
 // get_Wyckoff_from_letter
 // ******************************************************************************
-//DX20191029 - END
+//DX20191029 END
 namespace SYM {
   void get_Wyckoff_from_letter(uint space_group_number, string& space_group_setting, 
       string& Wyckoff_letter, uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions){
@@ -1762,10 +1762,10 @@ namespace SYM {
     get_Wyckoff_from_letter(spacegroupstring, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, positions);
   }
 }
-//DX20191029 - END
+//DX20191029 END
 
 // ---------------------------------------------------------------------------
-//DX20190128 - START
+//DX20190128 START
 namespace SYM {
   void get_Wyckoff_from_letter(string& spaceg, string& Wyckoff_letter, 
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions) { //DX20190128 - int to uint
@@ -1801,7 +1801,7 @@ namespace SYM {
     }
   }
 } //namespace SYM
-//DX20190128 - END
+//DX20190128 END
 
 // ******************************************************************************
 // Wyckoff_position_string2vector(string& string_position) 
@@ -1892,8 +1892,8 @@ namespace SYM {
         xb();  
       }
     }
-    for (uint s = 0; s < same_site_symmetry_positions.size(); s++) {  // DX20170911 - Check all shifts not just minimum (minimum may not work) 
-      for (uint t = 0; t < same_site_symmetry_positions[s].size(); t++) {  // DX20170911 - Check all shifts not just minimum (minimum may not work)
+    for (uint s = 0; s < same_site_symmetry_positions.size(); s++) {  //DX20170911 - Check all shifts not just minimum (minimum may not work) 
+      for (uint t = 0; t < same_site_symmetry_positions[s].size(); t++) {  //DX20170911 - Check all shifts not just minimum (minimum may not work)
         xvector<double> candidate_shift = SYM::Wyckoff_position_string2xvector(same_site_symmetry_positions[s][t]); 
         bool stored_shift=false; 
         for(uint p=0;p<possible_shifts.size();p++){
@@ -1905,13 +1905,13 @@ namespace SYM {
         if(!stored_shift){
           //DX20190905 [OBSOLETE-no more mod_one_xvec] possible_shifts.push_back(SYM::mod_one_xvec(candidate_shift));
           possible_shifts.push_back(BringInCell(candidate_shift)); //DX20190905
-          // DX20180228 - Consider difference of two shifts - START
+          //DX20180228 - Consider difference of two shifts - START
           bool stored_other_shift =false;
           for(uint p=0;p<possible_shifts.size();p++){
             for(uint q=0;q<possible_shifts.size();q++){
               //DX20190905 [OBSOLETE-no more mod_one_xvec] if(aurostd::abs(aurostd::modulus(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_)
               if(aurostd::abs(aurostd::modulus(BringInCell(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_) //DX20190905
-              { //CO200106 - patching for auto-indenting
+              { //CO20200106 - patching for auto-indenting
                 stored_other_shift=true;
                 break;
               }
@@ -1921,7 +1921,7 @@ namespace SYM {
               possible_shifts.push_back(BringInCell(candidate_shift-possible_shifts[p])); //DX20190905
             }
           }
-          // DX20180228 - Consider difference of two shifts - END
+          //DX20180228 - Consider difference of two shifts - END
         }
       }
     }
@@ -1962,7 +1962,7 @@ namespace SYM {
 } //namespace SYM
 
 // ******************************************************************************
-// get_wyckoff_equations (Obtain Wyckoff Equationss from ITC) // DX20170831
+// get_wyckoff_equations (Obtain Wyckoff Equationss from ITC) //DX20170831
 // ******************************************************************************
 //Function to get wyckoff data in individual lines (vector<string>). The string input is the space group data contained in the wyckoff library. Mult specifies the degeneracy of interest. For example, if you are looking for all wyckoff data with multiplicity 2 in a certain space group.
 namespace SYM {
@@ -1980,7 +1980,7 @@ namespace SYM {
     for (uint i = 0; i < mult_vec.size(); i++) {
       //if(mult_vec[i]*get_centering(spaceg).size()==mult)
       if(mult_vec[i] == mult)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         //cerr <<"match: " << i << endl;
         index.push_back(i);
       }
@@ -2006,7 +2006,7 @@ namespace SYM {
 
     //for(int l=0;l<sg_lines.size();l++)
     for (uint l = index[0]; l < index[0] + index.size(); l++)
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       for (uint i = 0; i < sg_lines[l].length(); i++) {
         //cerr << sg_lines[l][i] << " ";
         if(sg_lines[l][i] == '(') {
@@ -2029,7 +2029,7 @@ namespace SYM {
   }
 } //namespace SYM
 
-//DX20190128 - START
+//DX20190128 START
 // ******************************************************************************
 // get_wyckoff_pos (Obtain Wyckoff Positions from ITC) (Overloaded)
 // ******************************************************************************
@@ -2068,8 +2068,8 @@ namespace SYM {
             if(position.size()!=0){
               all_positions.push_back(position);
             }
-            break;
           }
+          break; //DX20200423 - moved break outside of loop
         }
       }
     }
@@ -2117,7 +2117,7 @@ namespace SYM {
     return all_Wyckoff_positions;
   }
 }
-//DX20190128 - END
+//DX20190128 END
 
 /////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS: get Wyckoff position information (DX20191030)
@@ -2264,8 +2264,8 @@ namespace SYM {
             if(position.size()!=0){
               positions.push_back(position);
             }
-            break;
           }
+          break; //DX20200423 - moved break outside of loop
         }
       }
     }
@@ -2327,7 +2327,7 @@ namespace SYM {
 
   }
 }
-//DX20190128 - END
+//DX20190128 END
 
 // ******************************************************************************
 // get_wyckoff_pos (Obtain Wyckoff Positions from ITC) (Overloaded)
@@ -2348,7 +2348,7 @@ namespace SYM {
     for (uint i = 0; i < mult_vec.size(); i++) {
       //if(mult_vec[i]*get_centering(spaceg).size()==mult)
       if(mult_vec[i] == mult)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         //cerr <<"match: " << i << endl;
         index.push_back(i);
       }
@@ -2370,15 +2370,15 @@ namespace SYM {
     }
     vector<string> singlets;
     vector<vector<string> > tuplets;
-    //vector<vector<vector<string> > > wyckoff_positions; // DX20170831
-    vector<vector<vector<string> > > wyckoff_set; // DX20170831
-    vector<vector<vector<vector<string> > > > all_wyckoff_sets; // DX20170831
+    //vector<vector<vector<string> > > wyckoff_positions; //DX20170831
+    vector<vector<vector<string> > > wyckoff_set; //DX20170831
+    vector<vector<vector<vector<string> > > > all_wyckoff_sets; //DX20170831
 
     uint start = 0; //DX20180514 - added initialization
 
     //for(int l=0;l<sg_lines.size();l++)
     for (uint l = index[0]; l < index[0] + index.size(); l++)
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       for (uint i = 0; i < sg_lines[l].length(); i++) {
         //cerr << sg_lines[l][i] << " ";
         if(sg_lines[l][i] == '(') {
@@ -2404,12 +2404,12 @@ namespace SYM {
         }
         if(sg_lines[l][i] == ')') {
           temp1.str("");
-          wyckoff_set.push_back(tuplets); // DX20170831 - wyckoff_positions to wyckoff_set
+          wyckoff_set.push_back(tuplets); //DX20170831 - wyckoff_positions to wyckoff_set
           tuplets.clear();
         }
       }
-      all_wyckoff_sets.push_back(wyckoff_set); // DX20170831
-      wyckoff_set.clear(); // DX20170831
+      all_wyckoff_sets.push_back(wyckoff_set); //DX20170831
+      wyckoff_set.clear(); //DX20170831
     }
 
     //DISPLAY CENTRING
@@ -2432,12 +2432,12 @@ namespace SYM {
     int reg = 0;   //Counter for tuplets
     int breg = 0;  //Counter for multiplicity blocks
 
-    // DX20170831 - Altered scheme to store unshifted positions first, then the shifted positions -START
+    //DX20170831 - Altered scheme to store unshifted positions first, then the shifted positions -START
     for (uint w = 0; w < all_wyckoff_sets.size(); w++){
       for (uint ii = 0; ii < get_centering(spaceg).size(); ii++) {
         for (uint k = 0; k < all_wyckoff_sets[w].size(); k++) {
           for (uint j = 0; j < all_wyckoff_sets[w][k].size(); j++)  //for(int j=0;j<3;j++)
-          { //CO200106 - patching for auto-indenting
+          { //CO20200106 - patching for auto-indenting
             for (uint i = 0; i < all_wyckoff_sets[w][k][j].size(); i++) {
               if(all_wyckoff_sets[w][k][j][i] != "\n")
                 oss << all_wyckoff_sets[w][k][j][i];
@@ -2462,7 +2462,7 @@ namespace SYM {
         }
       }
     }
-    // DX20170831 - Altered scheme to store unshifted positions first, then the shifted positions -END
+    //DX20170831 - Altered scheme to store unshifted positions first, then the shifted positions -END
     //cerr << "outvec.size(): " << outvec.size() << endl;
     //for (uint l=0;l<outvec.size(); l++){
     //	cerr << "outvec[l].size(): " << outvec[l].size() << endl;
@@ -2532,7 +2532,7 @@ namespace SYM {
 
     uint start = 0; //DX20180514 - added initialization
 
-    //for(int l=0;l<sg_lines.size();l++){ //[CO200106 - close bracket for indenting]}
+    //for(int l=0;l<sg_lines.size();l++){ //[CO20200106 - close bracket for indenting]}
     for (uint l = index[0]; l < index[0] + index.size(); l++) {
       for (uint i = 0; i < sg_lines[l].length(); i++) {
         if(sg_lines[l][i] == '(') {
@@ -2591,9 +2591,9 @@ namespace SYM {
     for (uint k = 0; k < wyckoff_positions.size(); k++) {
       //for(uint ii=0;ii<get_centering(nocent).size();ii++)
       //for(uint ii=0;ii<C;ii++)
-      //{ //CO200106 - patching for auto-indenting
+      //{ //CO20200106 - patching for auto-indenting
       for (uint j = 0; j < wyckoff_positions[k].size(); j++)  //for(int j=0;j<3;j++)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         for (uint i = 0; i < wyckoff_positions[k][j].size(); i++) {
           if(wyckoff_positions[k][j][i] != "\n")
             oss << wyckoff_positions[k][j][i];
@@ -2629,7 +2629,7 @@ namespace SYM {
 } //namespace SYM
 
 // ******************************************************************************
-// retunrGeneralWyckoffPosition // DX20170831
+// retunrGeneralWyckoffPosition //DX20170831
 // ******************************************************************************
 namespace SYM {
   void getGeneralWyckoffMultiplicityAndPosition(uint space_group_number, string& space_group_setting, int& general_wyckoff_multiplicity, vector<string>& general_wyckoff_position){
@@ -2650,7 +2650,7 @@ namespace SYM {
 }
 
 // ******************************************************************************
-// findGeneralWyckoffPosition // DX20170831
+// findGeneralWyckoffPosition //DX20170831
 // ******************************************************************************
 namespace SYM {
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity){
@@ -2679,7 +2679,7 @@ namespace SYM {
   }
 } //namespace SYM
 
-//DX20191029 - START
+//DX20191029 START
 // ******************************************************************************
 // findWyckoffEquations
 // ******************************************************************************
@@ -2693,7 +2693,7 @@ namespace SYM {
     return findWyckoffEquations(spacegroupstring, Wyckoff_letter, Wyckoff_multiplicity);
   }
 }
-//DX20191029 - END
+//DX20191029 END
 
 // ---------------------------------------------------------------------------
 namespace SYM {
@@ -2716,9 +2716,9 @@ namespace SYM {
     return positions;
   }
 } //namespace SYM
-//DX20190128 -END
+//DX20190128 END
 
-// DX20190723 - START
+//DX20190723 START
 // ******************************************************************************
 // formatWyckoffPosition
 // ******************************************************************************
@@ -2729,7 +2729,7 @@ namespace SYM {
     // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
     // convert doubles to fractions, if possible (e.g., 0.5 -> 1/2)
     // this function will be circumvented when symbolic math is integrated
-    // DX20190723
+    //DX20190723
 
     string soliloquy = "SYM::formatWyckoffPosition()";
 
@@ -2801,7 +2801,7 @@ namespace SYM {
   }
 }
 
-// DX20190708 - START
+//DX20190708 START
 // ******************************************************************************
 // reorderWyckoffPosition
 // ******************************************************************************
@@ -2813,7 +2813,7 @@ namespace SYM {
     // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
     // convert doubles to fractions, if possible (e.g., 0.5 -> 1/2)
     // this function will be circumvented when symbolic math is integrated
-    // DX20190708
+    //DX20190708
 
     string soliloquy = "SYM::reorderWyckoffPosition()";
     stringstream message;
@@ -2843,7 +2843,7 @@ namespace SYM {
     return reordered_position;
   }
 }
-// DX20190708 - END
+//DX20190708 END
 
 // ******************************************************************************
 // shiftWyckoffPositions 
@@ -3091,7 +3091,7 @@ namespace SYM {
                   //cerr << endl;
                   first_wyckoff = false;
                   // ========== Store Wyckoff Position ========== //
-                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX20171212 - need to updated coord to include non-parametrized Wyckoff positions
+                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; //DX20171212 - need to updated coord to include non-parametrized Wyckoff positions
                   tmp_Wyckoff_site.type = tmp_equivalent_atoms_shifted[ix].name;
                   //DX20191010 - update partial occupation value - START
                   if(CCell.partial_occupation_flag){
@@ -3225,7 +3225,7 @@ namespace SYM {
           atomicbasis = atoms_tmp;
           CCell.atoms = atoms_tmp;
           i = -1;
-          found_position=0; // DX20170912
+          found_position=0; //DX20170912
         } 
         else {
           break;
@@ -3495,7 +3495,7 @@ namespace SYM {
       oss << str[i];
       //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' ')
       if(!blank(oss.str()))
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         if(str[i + 1] == '\0' || str[i + 1] == ' ' || str[i + 1] == '+' || str[i + 1] == '-') {
           temp.push_back(oss.str());
           //cerr << oss.str();// << endl;
@@ -3522,7 +3522,7 @@ namespace SYM {
       oss << str[i];
       //if(str[i+1]=='-' || str[i+1]=='+' || str[i+1]=='\0' || str[i+1]==' ')
       if(str[i + 1] == '\0' || str[i + 1] == ' ')
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         temp.push_back(oss.str());
         //cerr << oss.str();// << endl;
         oss.str("");
@@ -3538,55 +3538,55 @@ namespace SYM {
 
 //DX20190724 [MOVED TO AUROSTD] - dbl2frac() Double to Fraction (Overloaded)
 
-// ******************************************************************************
-// dbl2frac Double to Fraction (Overloaded)
-// ******************************************************************************
-//NEED TO REWRITE/check FRAC2DBL
-namespace SYM {
-  double frac2dbl(string str) {  //string in the form "a/b" with minus if negative
-    //  if(str[0]==' '){
-    //str.erase(str.begin(),str.begin()+1);
-    //}
-
-    double out = 0;
-    bool neg = false;
-    stringstream ss_num, ss_den;
-    cleanupstring(str);
-    if(str[0] == '-') {
-      neg = true;
-      str.erase(str.begin(), str.begin() + 1);
-    }
-    if(str[0] == '+') {
-      str.erase(str.begin(), str.begin() + 1);
-    }
-    if(havechar(str, '/')) {
-      double numerator = 0;
-      double denominator = 0;
-      uint slash = whereischar(str, '/');
-      for (uint i = 0; i < slash; i++)
-        ss_num << str[i];
-      for (uint i = 0; i < (str.size() - slash); i++)
-        ss_den << str[i + slash + 1];
-      string num_string = ss_num.str();
-      const char* num = num_string.c_str();
-      numerator = atof(num);
-      string den_string = ss_den.str();
-      const char* den = den_string.c_str();
-      denominator = atof(den);
-      if(neg == true) {
-        out = -numerator / denominator;
-      } else {
-        out = numerator / denominator;
-      }
-    } else {
-      char dbl[256];
-      for (uint i = 0; i < str.size(); i++)
-        dbl[i] = str[i];
-      out = atof(dbl);
-    }
-    return out;
-  }
-}
+//DX20200313 [reformatted and moved to AUROSTD]// ******************************************************************************
+//DX20200313 [reformatted and moved to AUROSTD]// dbl2frac Double to Fraction (Overloaded)
+//DX20200313 [reformatted and moved to AUROSTD]// ******************************************************************************
+//DX20200313 [reformatted and moved to AUROSTD]//NEED TO REWRITE/check FRAC2DBL
+//DX20200313 [reformatted and moved to AUROSTD]namespace SYM {
+//DX20200313 [reformatted and moved to AUROSTD]  double frac2dbl(string str) {  //string in the form "a/b" with minus if negative
+//DX20200313 [reformatted and moved to AUROSTD]    //  if(str[0]==' '){
+//DX20200313 [reformatted and moved to AUROSTD]    //str.erase(str.begin(),str.begin()+1);
+//DX20200313 [reformatted and moved to AUROSTD]    //}
+//DX20200313 [reformatted and moved to AUROSTD]
+//DX20200313 [reformatted and moved to AUROSTD]    double out = 0;
+//DX20200313 [reformatted and moved to AUROSTD]    bool neg = false;
+//DX20200313 [reformatted and moved to AUROSTD]    stringstream ss_num, ss_den;
+//DX20200313 [reformatted and moved to AUROSTD]    cleanupstring(str);
+//DX20200313 [reformatted and moved to AUROSTD]    if(str[0] == '-') {
+//DX20200313 [reformatted and moved to AUROSTD]      neg = true;
+//DX20200313 [reformatted and moved to AUROSTD]      str.erase(str.begin(), str.begin() + 1);
+//DX20200313 [reformatted and moved to AUROSTD]    }
+//DX20200313 [reformatted and moved to AUROSTD]    if(str[0] == '+') {
+//DX20200313 [reformatted and moved to AUROSTD]      str.erase(str.begin(), str.begin() + 1);
+//DX20200313 [reformatted and moved to AUROSTD]    }
+//DX20200313 [reformatted and moved to AUROSTD]    if(havechar(str, '/')) {
+//DX20200313 [reformatted and moved to AUROSTD]      double numerator = 0;
+//DX20200313 [reformatted and moved to AUROSTD]      double denominator = 0;
+//DX20200313 [reformatted and moved to AUROSTD]      uint slash = whereischar(str, '/');
+//DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < slash; i++)
+//DX20200313 [reformatted and moved to AUROSTD]        ss_num << str[i];
+//DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < (str.size() - slash); i++)
+//DX20200313 [reformatted and moved to AUROSTD]        ss_den << str[i + slash + 1];
+//DX20200313 [reformatted and moved to AUROSTD]      string num_string = ss_num.str();
+//DX20200313 [reformatted and moved to AUROSTD]      const char* num = num_string.c_str();
+//DX20200313 [reformatted and moved to AUROSTD]      numerator = atof(num);
+//DX20200313 [reformatted and moved to AUROSTD]      string den_string = ss_den.str();
+//DX20200313 [reformatted and moved to AUROSTD]      const char* den = den_string.c_str();
+//DX20200313 [reformatted and moved to AUROSTD]      denominator = atof(den);
+//DX20200313 [reformatted and moved to AUROSTD]      if(neg == true) {
+//DX20200313 [reformatted and moved to AUROSTD]        out = -numerator / denominator;
+//DX20200313 [reformatted and moved to AUROSTD]      } else {
+//DX20200313 [reformatted and moved to AUROSTD]        out = numerator / denominator;
+//DX20200313 [reformatted and moved to AUROSTD]      }
+//DX20200313 [reformatted and moved to AUROSTD]    } else {
+//DX20200313 [reformatted and moved to AUROSTD]      char dbl[256];
+//DX20200313 [reformatted and moved to AUROSTD]      for (uint i = 0; i < str.size(); i++)
+//DX20200313 [reformatted and moved to AUROSTD]        dbl[i] = str[i];
+//DX20200313 [reformatted and moved to AUROSTD]      out = atof(dbl);
+//DX20200313 [reformatted and moved to AUROSTD]    }
+//DX20200313 [reformatted and moved to AUROSTD]    return out;
+//DX20200313 [reformatted and moved to AUROSTD]  }
+//DX20200313 [reformatted and moved to AUROSTD]}
 
 // ******************************************************************************
 // distance_between_points
@@ -3626,7 +3626,7 @@ namespace SYM {
 // ******************************************************************************
 namespace SYM {
   void minus_one(deque<_atom>& atomicBasis, int lvec) {
-    // DX double tol = 1e-6;
+    //DX double tol = 1e-6;
     double tol = 1e-10;
     for (uint i = 0; i < atomicBasis.size(); i++) {
       if(atomicBasis[i].fpos(lvec) > tol) {
@@ -3691,7 +3691,8 @@ namespace SYM{
       }
       if(!containschar(oss.str())) {
         if(havechar(oss.str(), '/')) {
-          num += frac2dbl(oss.str());
+          //DX20200313 [OBSOLETE] num += frac2dbl(oss.str());
+          num += aurostd::frac2dbl(oss.str()); //DX20200313
         } else {
           num += atof(oss.str().c_str());
         }
@@ -3699,7 +3700,8 @@ namespace SYM{
       } else {
         skip = true;
         if(havechar(oss.str(), '/')) {
-          out.dbl = frac2dbl(oss.str());
+          //DX20200313 [OBSOLETE] out.dbl = frac2dbl(oss.str());
+          out.dbl = aurostd::frac2dbl(oss.str()); //DX20200313
         } else {
           out.dbl = whichnum(oss.str());
         }
@@ -4448,7 +4450,7 @@ namespace SYM {
 // Fold atoms into cell
 // ******************************************************************************
 // Folds atoms into the cell
-// CO20180409 - moved to xatom
+//CO20180409 - moved to xatom
 //[CO20180409 - moved to xatom]namespace SYM {
 //[CO20180409 - moved to xatom]  deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew) {
 //[CO20180409 - moved to xatom]    double tol = _SYM_TOL_;
@@ -4567,10 +4569,10 @@ namespace SYM {
         tmp.cpos = f2c * tmp.fpos;
         //DX20191011 [OBSOLETE] tmp.name = atoms[k].name;
         //DX20191011 [OBSOLETE] tmp.type = atoms[k].type;
-        //DX20191011 [OBSOLETE] tmp.spin = atoms[k].spin; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = atoms[k].spin_is_given; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin = atoms[k].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.spin = atoms[k].spin; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = atoms[k].spin_is_given; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin = atoms[k].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
         bool contained = false;
         for (uint j = 0; j < equivalent_atoms.size(); j++) {
           if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, lattice, f2c, skew, tol)) { //DX20190215 //DX20190619 - lattice and f2c as input
@@ -4625,10 +4627,10 @@ namespace SYM {
         tmp.cpos = f2c * tmp.fpos;
         //DX20191011 [OBSOLETE] tmp.name = equivalent_atoms[i][j].name;
         //DX20191011 [OBSOLETE] tmp.type = equivalent_atoms[i][j].type;
-        //DX20191011 [OBSOLETE] tmp.spin = equivalent_atoms[i][j].spin; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; // DX20170921 - magnetic sym
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin = equivalent_atoms[i][j].noncoll_spin; // DX20171205 - magnetic sym (non-collinear)
-        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = equivalent_atoms[i][j].noncoll_spin_is_given; // DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.spin = equivalent_atoms[i][j].spin; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; //DX20170921 - magnetic sym
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin = equivalent_atoms[i][j].noncoll_spin; //DX20171205 - magnetic sym (non-collinear)
+        //DX20191011 [OBSOLETE] tmp.noncoll_spin_is_given = equivalent_atoms[i][j].noncoll_spin_is_given; //DX20171205 - magnetic sym (non-collinear)
         if(one_shifted_group.size() == 0) {
           one_shifted_group.push_back(tmp);
         } else {
@@ -4799,7 +4801,7 @@ namespace SYM {
       for (int i = 0; i < 8; i++) {
         //if(!is_lattice_point(Linv,candidate_mirror*expanded_cell[i]))
         if(!is_lattice_point(L, candidate_mirror * expanded_cell[i], lattice_vector, radius, skew, tol)) //DX20190215 - added tol
-        { //CO200106 - patching for auto-indenting
+        { //CO20200106 - patching for auto-indenting
           cont_dbl = false;
         }
       }
@@ -5092,11 +5094,11 @@ namespace SYM {
 //[OBSOLETE] //We do things with reference to "the" origin.
 //[OBSOLETE] //Norm is the direction vector of a line (or parametric representation of a line passing through origin) IN CARTESIAN COORDINATES. Linv is the lattice inverse
 //[OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG);
-//[OBSOLETE]   xmatrix<double> f2c = trasp(L); // DX
-//[OBSOLETE]   xmatrix<double> c2f = inverse(trasp(L)); // DX
-//[OBSOLETE]   // DX long long int prec = 1e7;
+//[OBSOLETE]   xmatrix<double> f2c = trasp(L); //DX
+//[OBSOLETE]   xmatrix<double> c2f = inverse(trasp(L)); //DX
+//[OBSOLETE]   //DX long long int prec = 1e7;
 //[OBSOLETE]   long long int prec = 1e10;
-//[OBSOLETE]   // DX double tol = _TOLERANCE_CLOSEST_POINT_;
+//[OBSOLETE]   //DX double tol = _TOLERANCE_CLOSEST_POINT_;
 //[OBSOLETE]   xvector<double> close_point;
 //[OBSOLETE]   vector<int> nonzeros;//vector of index where nonzeros are located
 //[OBSOLETE]   vector<double> sgns;

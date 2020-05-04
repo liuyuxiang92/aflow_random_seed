@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 // ***************************************************************************
 
@@ -42,10 +42,12 @@ namespace KBIN {
     module_opts.aaplflags = loadDefaultsAAPL();
     module_opts.aelflags = loadDefaultsAEL();
     module_opts.aglflags = loadDefaultsAGL();  
+    module_opts.qhaflags = loadDefaultsQHA(); // AS20200302
     // The readParameters functions are necessary to set xvasp
     string placeholder = "";  // acts as pseudo-aflow.in
     readParametersAPL(placeholder, module_opts, xinput);
     readParametersAAPL(placeholder, module_opts, xinput);
+    readParametersQHA(placeholder, module_opts, xinput);
   }
 
   //readModulesfromAflowIn//////////////////////////////////////////////////////
@@ -65,8 +67,10 @@ namespace KBIN {
     module_opts.aaplflags = loadDefaultsAAPL();
     module_opts.aelflags = loadDefaultsAEL();
     module_opts.aglflags = loadDefaultsAGL();  
+    module_opts.qhaflags = loadDefaultsQHA();
     readParametersAPL(AflowIn, module_opts, xinput);
     readParametersAAPL(AflowIn, module_opts, xinput);
+    readParametersQHA(AflowIn, module_opts, xinput);
     kflags.KBIN_MODULE_OPTIONS = module_opts;
   }                 
 
@@ -94,8 +98,8 @@ namespace KBIN {
     //[ME20181226 - now a default in .aflow.rc]// Special case: DPM can be true, false, or empty
     opt.keyword="DPM"; opt.xscheme = DEFAULT_APL_DPM; opt.option = (opt.xscheme=="ON"?true:false); aplflags.push_back(opt); opt.clear();  //CO20181226
     //[ME20181226 - now a default in .aflow.rc]// Special case: k-points options can be empty
-    opt.keyword="KPPRA"; opt.xscheme = utype2string<int>(DEFAULT_PHONONS_KPPRA); aplflags.push_back(opt); opt.clear(); //CO20181226 // ME20190112
-    opt.keyword="KSCHEME"; opt.xscheme = DEFAULT_PHONONS_KSCHEME; aplflags.push_back(opt); opt.clear();  // ME20190109 - KPPRA can be taken from STATIC, but KSCHEME should default to G
+    opt.keyword="KPPRA"; opt.xscheme = utype2string<int>(DEFAULT_PHONONS_KPPRA); aplflags.push_back(opt); opt.clear(); //CO20181226 //ME20190112
+    opt.keyword="KSCHEME"; opt.xscheme = DEFAULT_PHONONS_KSCHEME; aplflags.push_back(opt); opt.clear();  //ME20190109 - KPPRA can be taken from STATIC, but KSCHEME should default to G
     opt.keyword="KPOINTS"; aplflags.push_back(opt); opt.clear();
     opt.keyword="PREC"; opt.xscheme = DEFAULT_APL_PREC; aplflags.push_back(opt); opt.clear();
     opt.keyword="ZEROSTATE"; opt.option = DEFAULT_APL_ZEROSTATE; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
@@ -112,6 +116,7 @@ namespace KBIN {
     opt.keyword="DOSMESH"; opt.xscheme = DEFAULT_APL_DOSMESH; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSSMEAR"; opt.xscheme = utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION); aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPOINTS"; opt.xscheme = utype2string<int>(DEFAULT_APL_DOSPOINTS); aplflags.push_back(opt); opt.clear();
+    opt.keyword="DOS_PROJECT"; opt.option = DEFAULT_APL_DOS_PROJECT; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // ME20200213
     opt.keyword="DOSPROJECTIONS_CART"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="DOSPROJECTIONS_FRAC"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
     opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
@@ -127,33 +132,33 @@ namespace KBIN {
 
   //writeFlagAPL///////////////////////////////////////////////////////////////
   // Determines whether flag should be written to aflow.in
-  // CO20181226
-  bool writeFlagAPL(const string& key,const xoption& xopt){  // ME20190113
+  //CO20181226
+  bool writeFlagAPL(const string& key,const xoption& xopt){  //ME20190113
     // return true;  OBSOLETE ME20190113
-    if (xopt.isentry) {return true;}  // ME20190116 - Do not remove user entries
+    if (xopt.isentry) {return true;}  //ME20190116 - Do not remove user entries
     if(key=="RELAX"){return true;}
-    if(key=="HIBERNATE"){if((xopt.option == AFLOWRC_DEFAULT_APL_HIBERNATE) && (xopt.option == DEFAULT_APL_HIBERNATE)) {return false;}}  // ME20190113
+    if(key=="HIBERNATE"){if((xopt.option == AFLOWRC_DEFAULT_APL_HIBERNATE) && (xopt.option == DEFAULT_APL_HIBERNATE)) {return false;}}  //ME20190113
     if(key=="ENGINE"){return true;}
     if(key=="SUPERCELL"){return true;}
     if(key=="MINATOMS"){return true;}
     if(key=="MINSHELL"){return true;}
     if(key=="POLAR"){return true;}
     if(key=="DMAG"){return true;}
-    if(key=="DXYZONLY"){if((xopt.option == AFLOWRC_DEFAULT_APL_DXYZONLY) && (xopt.option == DEFAULT_APL_DXYZONLY)) {return false;}}  // ME20190113
-    if(key=="DSYMMETRIZE"){if((xopt.option == AFLOWRC_DEFAULT_APL_DSYMMETRIZE) && (xopt.option == DEFAULT_APL_DSYMMETRIZE)) {return false;}}  // ME20190113
-    if(key=="DINEQUIV_ONLY"){if((xopt.option == AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY) && (xopt.option == DEFAULT_APL_DINEQUIV_ONLY)) {return false;}}  // ME20190113
-    if(key=="DPM"){if(AFLOWRC_DEFAULT_APL_DPM==xopt.xscheme && DEFAULT_APL_DPM==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="PREC"){if(AFLOWRC_DEFAULT_APL_PREC==xopt.xscheme && DEFAULT_APL_PREC==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="DXYZONLY"){if((xopt.option == AFLOWRC_DEFAULT_APL_DXYZONLY) && (xopt.option == DEFAULT_APL_DXYZONLY)) {return false;}}  //ME20190113
+    if(key=="DSYMMETRIZE"){if((xopt.option == AFLOWRC_DEFAULT_APL_DSYMMETRIZE) && (xopt.option == DEFAULT_APL_DSYMMETRIZE)) {return false;}}  //ME20190113
+    if(key=="DINEQUIV_ONLY"){if((xopt.option == AFLOWRC_DEFAULT_APL_DINEQUIV_ONLY) && (xopt.option == DEFAULT_APL_DINEQUIV_ONLY)) {return false;}}  //ME20190113
+    if(key=="DPM"){if(AFLOWRC_DEFAULT_APL_DPM==xopt.xscheme && DEFAULT_APL_DPM==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="PREC"){if(AFLOWRC_DEFAULT_APL_PREC==xopt.xscheme && DEFAULT_APL_PREC==xopt.xscheme){return false;}}  //ME20190113
     if(key=="ZEROSTATE"){return true;}
-    if(key=="FREQFORMAT"){if(AFLOWRC_DEFAULT_APL_FREQFORMAT==xopt.xscheme && DEFAULT_APL_FREQFORMAT==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="FREQFORMAT"){if(AFLOWRC_DEFAULT_APL_FREQFORMAT==xopt.xscheme && DEFAULT_APL_FREQFORMAT==xopt.xscheme){return false;}}  //ME20190113
     if(key=="DC"){return true;}
-    if(key=="DCPOINTS"){if(utype2string<int>(AFLOWRC_DEFAULT_APL_DCPOINTS)==xopt.xscheme && utype2string<int>(DEFAULT_APL_DCPOINTS)==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="DCPATH"){if(AFLOWRC_DEFAULT_APL_DCPATH==xopt.xscheme && DEFAULT_APL_DCPATH==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="DCPOINTS"){if(utype2string<int>(AFLOWRC_DEFAULT_APL_DCPOINTS)==xopt.xscheme && utype2string<int>(DEFAULT_APL_DCPOINTS)==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="DCPATH"){if(AFLOWRC_DEFAULT_APL_DCPATH==xopt.xscheme && DEFAULT_APL_DCPATH==xopt.xscheme){return false;}}  //ME20190113
     if(key=="DOS"){return true;}
-    if(key=="DOSMETHOD"){if(AFLOWRC_DEFAULT_APL_DOSMETHOD==xopt.xscheme && DEFAULT_APL_DOSMETHOD==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="DOSMESH"){return true;}  // ME20190113 - should always write
-    if(key=="DOSSMEAR"){if(utype2string<double>(AFLOWRC_DEFAULT_APL_DOSSMEAR, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION)==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="DOSPOINTS"){if(utype2string<int>(AFLOWRC_DEFAULT_APL_DOSPOINTS)==xopt.xscheme && utype2string<int>(DEFAULT_APL_DOSPOINTS)==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="DOSMETHOD"){if(AFLOWRC_DEFAULT_APL_DOSMETHOD==xopt.xscheme && DEFAULT_APL_DOSMETHOD==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="DOSMESH"){return true;}  //ME20190113 - should always write
+    if(key=="DOSSMEAR"){if(utype2string<double>(AFLOWRC_DEFAULT_APL_DOSSMEAR, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION)==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="DOSPOINTS"){if(utype2string<int>(AFLOWRC_DEFAULT_APL_DOSPOINTS)==xopt.xscheme && utype2string<int>(DEFAULT_APL_DOSPOINTS)==xopt.xscheme){return false;}}  //ME20190113
     if(key=="TP"){return true;}
     if(key=="TPT"){return true;}
     return true;
@@ -309,22 +314,22 @@ namespace KBIN {
 
   //writeFlagAAPL///////////////////////////////////////////////////////////////
   // Determines whether flag should be written to aflow.in
-  // CO20181226
+  //CO20181226
   bool writeFlagAAPL(const string& key,const xoption& xopt){
     // return true; OBSOLETE ME20190113
-    if (xopt.isentry) {return true;}  // ME20190116 - Do not remove user entries
+    if (xopt.isentry) {return true;}  //ME20190116 - Do not remove user entries
     if(key=="BTE"){return true;}
-    if(key=="FOURTH_ORDER"){return true;}  // ME20190113 - should always write to be explicit
+    if(key=="FOURTH_ORDER"){return true;}  //ME20190113 - should always write to be explicit
     if(key=="CUT_RAD"){return true;}
     if(key=="CUT_SHELL"){return true;}
     if(key=="THERMALGRID"){return true;}
     if(key=="TCT"){return true;}
-    if(key=="SUMRULE"){if(utype2string<double>(AFLOWRC_DEFAULT_AAPL_SUMRULE, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_AAPL_SUMRULE, FLAG_PRECISION)==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="SUMRULE_MAX_ITER"){if(utype2string<int>(AFLOWRC_DEFAULT_AAPL_SUMRULE_MAX_ITER)==xopt.xscheme && utype2string<int>(DEFAULT_AAPL_SUMRULE_MAX_ITER)==xopt.xscheme){return false;}}  // ME20190113
-    if(key=="MIXING_COEFFICIENT"){if(utype2string<double>(AFLOWRC_DEFAULT_AAPL_MIXING_COEFFICIENT, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_AAPL_MIXING_COEFFICIENT, FLAG_PRECISION)==xopt.xscheme){return false;}}  // ME20190113
+    if(key=="SUMRULE"){if(utype2string<double>(AFLOWRC_DEFAULT_AAPL_SUMRULE, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_AAPL_SUMRULE, FLAG_PRECISION)==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="SUMRULE_MAX_ITER"){if(utype2string<int>(AFLOWRC_DEFAULT_AAPL_SUMRULE_MAX_ITER)==xopt.xscheme && utype2string<int>(DEFAULT_AAPL_SUMRULE_MAX_ITER)==xopt.xscheme){return false;}}  //ME20190113
+    if(key=="MIXING_COEFFICIENT"){if(utype2string<double>(AFLOWRC_DEFAULT_AAPL_MIXING_COEFFICIENT, FLAG_PRECISION)==xopt.xscheme && utype2string<double>(DEFAULT_AAPL_MIXING_COEFFICIENT, FLAG_PRECISION)==xopt.xscheme){return false;}}  //ME20190113
     if(key=="ISOTOPE"){return true;}
     if(key=="BOUNDARY"){return true;}
-    if(key=="CUMULATIVEK"){if((xopt.option == AFLOWRC_DEFAULT_AAPL_CUMULATIVEK) && (xopt.option == DEFAULT_AAPL_CUMULATIVEK)) {return false;}}  // ME20190113
+    if(key=="CUMULATIVEK"){if((xopt.option == AFLOWRC_DEFAULT_AAPL_CUMULATIVEK) && (xopt.option == DEFAULT_AAPL_CUMULATIVEK)) {return false;}}  //ME20190113
     if(key=="NANO_SIZE"){return true;}
     return true;
   }
@@ -358,13 +363,13 @@ namespace KBIN {
         module_opts.cut_rad_shell[1] = module_opts.aaplflags[i].isentry;
         continue;
       }
-      // ME20190408 - START
+      //ME20190408 START
       // If KPPRA_AAPL is not set, use APL KPPRA
       if (key == "KPPRA_AAPL" && module_opts.aaplflags[i].content_int < 1) {
         xinput.xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL", false);
         continue;
       }
-      // ME20190408 - END
+      //ME20190408 END
     }
     if (module_opts.cut_rad_shell[0] != module_opts.cut_rad_shell[1]) {
       if (xinput.AFLOW_MODE_VASP) {
@@ -511,11 +516,78 @@ namespace KBIN {
     return true;
   }
 
+  // QHA-related functions -----------------------------------------------------
+  // AS20200302
+  //loadDefaultsQHA/////////////////////////////////////////////////////////////
+  // Sets all QHA flags to their default values.
+  vector<aurostd::xoption> loadDefaultsQHA() {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy="loadDefaultsQHA():";
+    vector<aurostd::xoption> qhaflags;
+    aurostd::xoption opt;
+    opt.keyword="MODE"; opt.xscheme = DEFAULT_QHA_MODE; qhaflags.push_back(opt); opt.clear();
+    opt.keyword="EOS"; opt.option = DEFAULT_QHA_EOS; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="EOS_DISTORTION_RANGE"; opt.xscheme = DEFAULT_QHA_EOS_DISTORTION_RANGE; qhaflags.push_back(opt); opt.clear();
+    opt.keyword="GP_DISTORTION"; opt.xscheme = utype2string<double>(DEFAULT_QHA_GP_DISTORTION); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="INCLUDE_ELEC_CONTRIB"; opt.option = DEFAULT_QHA_INCLUDE_ELEC_CONTRIB; opt.xscheme = (opt.option?"ON":"OFF"); qhaflags.push_back(opt); opt.clear();
+    opt.keyword="SCQHA_PDIS_T"; opt.xscheme = DEFAULT_QHA_SCQHA_PDIS_T; qhaflags.push_back(opt); opt.clear();
+
+    if (LDEBUG) {
+      for (uint i = 0; i < qhaflags.size(); i++) {
+        std::cerr << soliloquy << " key: " << qhaflags[i].keyword << ", xscheme: " << qhaflags[i].xscheme << ", option: " << qhaflags[i].option << std::endl;
+      }
+    }
+    return qhaflags;
+  }
+
+  //writeFlagQHA////////////////////////////////////////////////////////////////
+  // Determines whether flag should be written to aflow.in
+  bool writeFlagQHA(const string& key,const xoption& xopt){
+    if (xopt.isentry) {return true;}
+    if(key=="MODE"){return true;}
+    if(key=="EOS"){return true;}
+    if(key=="EOS_DISTORTION_RANGE"){return true;}
+    if(key=="GP_DISTORTION"){return true;}
+    if(key=="INCLUDE_ELEC_CONTRIB"){return true;}
+    if(key=="SCQHA_PDIS_T"){return false;}
+
+    return true;
+  }
+
+  //readParametersQHA///////////////////////////////////////////////////////////
+  // Reads QHA flags from an aflow.in file.
+  void readParametersQHA(const string& AflowIn,
+      _moduleOptions& module_opts, _xinput& xinput) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+    string soliloquy="readParametersQHA():";
+    string key="", entry="", xvaspflag="";
+    for (uint i = 0; i < module_opts.qhaflags.size(); i++) {
+      key = module_opts.qhaflags[i].keyword;
+      entry = _ASTROPT_QHA_ + key + "=";
+      module_opts.qhaflags[i].options2entry(AflowIn, entry, module_opts.qhaflags[i].option, module_opts.qhaflags[i].xscheme);
+
+      module_opts.qhaflags[i].keyword = key;
+
+      // Write xvasp
+      if(xinput.AFLOW_MODE_VASP) {
+        xvaspflag = "AFLOWIN_FLAG::QHA_" + key;
+        xinput.xvasp.qhaopts.flag(xvaspflag, TRUE);
+        xinput.xvasp.qhaopts.push_attached(xvaspflag, module_opts.qhaflags[i].xscheme); //this should become pop/push or changeattachedscheme (eventually)
+      }
+    }
+
+    if (LDEBUG) {
+      for (uint i = 0; i < module_opts.qhaflags.size(); i++) {
+        std::cerr << soliloquy << "  " << module_opts.qhaflags[i].keyword << " = " << module_opts.qhaflags[i].xscheme << std::endl;
+      }
+    }
+  }
+
 }  // namespace KBIN
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2018                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
 //****************************************************************************

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2007-2019
@@ -19,57 +19,60 @@
 // XELEMENT
 // look into aflow.h for the definitions
 
+namespace xelement {
 class xelement { // simple class.. nothing fancy
 public:
 // constructor destructor                              // constructor/destructor
 xelement();                                            // default, just allocate
 xelement(uint);                                            // default, just allocate
+xelement(string);                                      // look at it by symbol or name
 ~xelement();                                           // kill everything
 const xelement& operator=(const xelement &b);          // copy
 void clear();
 // content                                             // content
 bool verbose;
 // [AFLOW]START=DECLARATION
-string symbol;                          // http://periodictable.com      // DU 2019/05/17
-string name;                            // http://periodictable.com      // DU 2019/05/17
-double Period;                          // http://periodictable.com      // DU 2019/05/17
-double Group;                           // http://periodictable.com      // DU 2019/05/17
-string Series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      // DU 2019/05/17 
-string Block;                           // http://periodictable.com      // DU 2019/05/17
+int Z; 
+string symbol;                          // http://periodictable.com      //DU20190517
+string name;                            // http://periodictable.com      //DU20190517
+double Period;                          // http://periodictable.com      //DU20190517
+double Group;                           // http://periodictable.com      //DU20190517
+string Series;                          // http://periodictable.com For Nh,Fl,Mc,Lv,Ts Value is a guess based on periodic table trend.      //DU20190517 
+string Block;                           // http://periodictable.com      //DU20190517
 //                                          
 double mass;                            // (kg)
-double MolarVolume;                     // (m^3/mol) http://periodictable.com      // DU 2019/05/17
+double MolarVolume;                     // (m^3/mol) http://periodictable.com      //DU20190517
 double volume;                          // atomic volume in A^3 from the FCC vasp table and/or successive calculations
 double Miedema_Vm;                      // (V_m^{2/3} in (cm^2)) Miedema Rule Table 1a Physica 100B (1980) 1-28
 // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
 double valence_std;                     // http://en.wikipedia.org/wiki/Valence_(chemistry) standard: number electrons minus closed shell at leff (noble gas)
 double valence_iupac;                   // http://en.wikipedia.org/wiki/Valence_(chemistry) IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
-double valence_PT;                      //           http://periodictable.com      // DU 2019/05/17
-double Density_PT;                      // (g/cm^3)  http://periodictable.com      // DU 2019/05/17
+double valence_PT;                      //           http://periodictable.com      //DU20190517
+double Density_PT;                      // (g/cm^3)  http://periodictable.com      //DU20190517
 string crystal;                     // Ashcroft-Mermin                                                                                                                   
-string CrystalStr_PT;                   // http://periodictable.com      // DU 2019/05/17
-string space_group;                     // http://periodictable.com      // DU 2019/05/17
-uint space_group_number;                // http://periodictable.com      // DU 2019/05/17
+string CrystalStr_PT;                   // http://periodictable.com      //DU20190517
+string space_group;                     // http://periodictable.com      //DU20190517
+uint space_group_number;                // http://periodictable.com      //DU20190517
 
 
-double Pearson_coefficient;             // Pearson mass deviation coefficient // ME20181020
-xvector<double> lattice_constant;       // (pm) http://periodictable.com      // DU 2019/05/17
-xvector<double> lattice_angle;          // (rad) http://periodictable.com      // DU 2019/05/17
-string phase;                           //      http://periodictable.com      // DU 2019/05/17
+double Pearson_coefficient;             // Pearson mass deviation coefficient //ME20181020
+xvector<double> lattice_constant;       // (pm) http://periodictable.com      //DU20190517
+xvector<double> lattice_angle;          // (rad) http://periodictable.com      //DU20190517
+string phase;                           //      http://periodictable.com      //DU20190517
 double radius;                      // Saxena (nm)
-double radius_PT;                       // (pm)       http://periodictable.com      // DU 2019/05/17
-double radius_covalent_PT;              // (pm)       http://periodictable.com      // DU 2019/05/17
-double radius_covalent;             // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) // DX and CO - 9/4/17
-double radius_VanDerWaals_PT;           // (pm)       http://periodictable.com      // DU 2019/05/17
-double radii_Ghosh08;                    // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      // DU 2019/05/17
-double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      // DU 2019/05/17
-double radii_Pyykko;                     // (pm) single bond covalent radii  Chem. Eur. J. 15, 186-197 (2009)      // DU 2019/05/17
+double radius_PT;                       // (pm)       http://periodictable.com      //DU20190517
+double radius_covalent_PT;              // (pm)       http://periodictable.com      //DU20190517
+double radius_covalent;             // (Angstrom) Dalton Trans. 2836, 2832-2838 (2008) //DX+CO20170904
+double radius_VanDerWaals_PT;           // (pm)       http://periodictable.com      //DU20190517
+double radii_Ghosh08;                    // (Angstrom) Journal of Molecular Structure: THEOCHEM 865, 60–67 (2008)      //DU20190517
+double radii_Slatter;                    // (Angstrom) J. of Chem. Phys. 41, 3199 (1964)      //DU20190517
+double radii_Pyykko;                     // (pm) single bond covalent radii  Chem. Eur. J. 15, 186-197 (2009)      //DU20190517
 //                                          
-double electrical_conductivity;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      // DU 2019/05/17
+double electrical_conductivity;          // (S/m)  http://periodictable.com  Value given for graphite. Diamond electrical conductivity is approximately 0.001.      //DU20190517
 double electronegativity_vec;           // Saxena
-double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       // DU 2019/05/17
-double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      // DU 2019/05/17
-double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      // DU 2019/05/17
+double hardness_Ghosh;                   // (eV) Int. J. Quantum Chem 110, 1206-1213 (2010) Table III       //DU20190517
+double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
+double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
 
 // RF/SK20200410 START
 // Allen electronegativities were chosen for CCE since the IUPAC definition of oxidation states seems to use Allen electronegativities and since they also gave the best results
@@ -83,44 +86,44 @@ vector<double> oxidation_states_preferred;
 vector<double> oxidation_states;
 // RF/SK20200410 END
 
-double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       // DU 2019/05/17
+double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
 double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
 double Miedema_nws;                     // (d.u.)^1/3 n_{ws}^{1/3} Miedema Rule Table 1a Physica 100B 1-28 (1980)
 double Miedema_gamma_s;                 // (mJ/m^2)   \gamma_s^0   Miedema Rule Table 1a Physica 100B 1-28 (1980)
 double Pettifor_scale;                  // Chemical Scale Pettifor Solid State Communications 51 31-34 (1984)
 //                                          
-double boiling_point;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      // DU 2019/05/17
-double melting_point;                   // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           // DU 2019/05/17
-double vaporization_heat_PT;             // (kJ/mol)   http://periodictable.com      // DU 2019/05/17
-double specific_heat_PT;                 // (J/(kg.K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      // DU 2019/05/17 
-double critical_Pressure;                // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      // DU 2019/05/17
-double critical_Temperature_PT;          // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      // DU 2019/05/17
-double thermal_expansion;               // (K^{-1})   http://periodictable.com C:graphite      // DU 2019/05/17
-double thermal_conductivity;            // (W/(mK))   http://periodictable.com      // DU 2019/05/17
+double boiling_point;                   // (Celsius), http://periodictable.com C:diamond, P:"YELLOW" Phosphorus, As:sublimates at this T.      //DU20190517
+double melting_point;                   // (Celsius), http://periodictable.com He does not solidify at standard pressure,C: Value given for diamond form, P : Value given for "YELLOW" phosphorus form, S : Value given for monoclinic, beta form, Se: Value given for hexagonal, gray form, Bk: Value given for alpha form.           //DU20190517
+double vaporization_heat_PT;             // (kJ/mol)   http://periodictable.com      //DU20190517
+double specific_heat_PT;                 // (J/(kg.K)) http://periodictable.com Gas_Phase:H(H2),He,N(N2),O(O2),F(F2),Ne,Cl(Cl2),Ar,Kr,Tc,Xe,Rn,Ra,Pa -- Liquid_Phase:Br,Hg -- Solid Phase: B(rhombic),C(graphite),S(rhombic),P(phase of P.4),As(alpha),Se(hexagonal),Cd(gamma),Sn(gray),Li,In,Be,Na,Mg,Al,Si,K,Ca,Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Ga,Ge,Rb,Sr,Y,Zr,Nb,Mo,Ru,Rh,Pd,Ag,Sb,Te,I,Cs,Ba,La,Ce,Pr,Nd,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Hf,Ta,W,Re,Os,Ir,Pt,Au,Tl,Pb,Bi,Ac,Th,U.      //DU20190517 
+double critical_Pressure;                // (Atm)      http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
+double critical_Temperature_PT;          // (K)        http://periodictable.com Li,Na,K,Rb: Value estimated based on extrapolation.      //DU20190517
+double thermal_expansion;               // (K^{-1})   http://periodictable.com C:graphite      //DU20190517
+double thermal_conductivity;            // (W/(mK))   http://periodictable.com      //DU20190517
 //                                         
-double Brinelll_hardness;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      // DU 2019/05/17
-double Mohs_hardness;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      // DU 2019/05/17
-double Vickers_hardness;                // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      // DU 2019/05/17
-double Hardness_Pearson;                // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      // DU 2019/05/17
-double Hardness_Putz;                   // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V.      // DU 2019/05/17
-double Hardness_RB;                     // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).      // DU 2019/05/17
-double shear_modulus;                    // (GPa)  http://periodictable.com      // DU 2019/05/17
-double Young_modulus;                    // (GPa)  http://periodictable.com      // DU 2019/05/17
-double bulk_modulus;                     // (GPa)  http://periodictable.com      // DU 2019/05/17
-double Poisson_ratio_PT;                 // (--)   http://periodictable.com      // DU 2019/05/17
+double Brinelll_hardness;               // (MPa)  http://periodictable.com For Ge value is converted from Mohs scale      //DU20190517
+double Mohs_hardness;                   //        http://periodictable.com For C, value given for graphite. Diamond value is 10.0; For Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Lu converted from Vickers scale.      //DU20190517
+double Vickers_hardness;                // (MPa)  http://periodictable.com For Si,Ge,As,Ru,Os converted from Brinell scale.      //DU20190517
+double Hardness_Pearson;                // (eV)   Inorg. Chem. 27(4) 734-740 (1988).      //DU20190517
+double Hardness_Putz;                   // (eV/atom) International Journal of Quantum Chemistry, Vol 106, 361–389 (2006), TABLE-V.      //DU20190517
+double Hardness_RB;                     // (eV)   Robles and Bartolotti, J. Am. Chem. Soc. 106, 3723-3727 (1984).      //DU20190517
+double shear_modulus;                    // (GPa)  http://periodictable.com      //DU20190517
+double Young_modulus;                    // (GPa)  http://periodictable.com      //DU20190517
+double bulk_modulus;                     // (GPa)  http://periodictable.com      //DU20190517
+double Poisson_ratio_PT;                 // (--)   http://periodictable.com      //DU20190517
 double Miedema_BVm;                     // (kJ/mole) BV_m Miedema Rule Table 1a Physica 100B 1-28 (1980) 
 //
-string Magnetic_Type_PT;                 //           http://periodictable.com       // DU 2019/05/17
-double Mass_Magnetic_Susceptibility;      // (m^3/K)   http://periodictable.com       // DU 2019/05/17
-double Volume_Magnetic_Susceptibility;    //           http://periodictable.com       // DU 2019/05/17
-double Molar_Magnetic_Susceptibility;     // (m^3/mol) http://periodictable.com       // DU 2019/05/17
-double Curie_point;                     // (K)       http://periodictable.com       // DU 2019/05/17
+string Magnetic_Type_PT;                 //           http://periodictable.com       //DU20190517
+double Mass_Magnetic_Susceptibility;      // (m^3/K)   http://periodictable.com       //DU20190517
+double Volume_Magnetic_Susceptibility;    //           http://periodictable.com       //DU20190517
+double Molar_Magnetic_Susceptibility;     // (m^3/mol) http://periodictable.com       //DU20190517
+double Curie_point;                     // (K)       http://periodictable.com       //DU20190517
 //
-double refractive_index;                 // http://periodictable.com C:diamond      // DU 2019/05/17
-string color_PT;                        // http://periodictable.com      // DU 2019/05/17
+double refractive_index;                 // http://periodictable.com C:diamond      //DU20190517
+string color_PT;                        // http://periodictable.com      //DU20190517
 //
-double HHIP;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIP: for elemental production, Uncertinities in HHI_P: C,O,F,Cl,Sc,Ga,Rb,Ru,Rh,Cs,Hf,Os,Ir,Tl.      // DU 2019/05/17
-double HHIR;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIR: for elemental reserves,   Uncertinities in HHI_R: Be,C,N,O,F,Na,Mg,Al,Si,S,Cl,Ca,Sc,Ga,Ge,As,Rb,Sr,Ru,Rh,Pd,In,Cs,Hf,Os,Ir,Pt,Tl.      // DU 2019/05/17
+double HHIP;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIP: for elemental production, Uncertinities in HHI_P: C,O,F,Cl,Sc,Ga,Rb,Ru,Rh,Cs,Hf,Os,Ir,Tl.      //DU20190517
+double HHIR;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIR: for elemental reserves,   Uncertinities in HHI_R: Be,C,N,O,F,Na,Mg,Al,Si,S,Cl,Ca,Sc,Ga,Ge,As,Rb,Sr,Ru,Rh,Pd,In,Cs,Hf,Os,Ir,Pt,Tl.      //DU20190517
 double xray_scatt;                  // shift+1 // All data collected from the NIST online tables: http://physics.nist.gov/PhysRefData/FFast/html/form.html//
 
 // Xray_scatt_vector All data collected from the NIST online tables
@@ -135,15 +138,16 @@ double xray_scatt;                  // shift+1 // All data collected from the NI
 // [AFLOW]STOP=DECLARATION
 // operators/functions                                    // operator/functions
 friend ostream& operator<<(ostream &,const xelement&);    // print
-xelement element_initialize(uint Z);                      // function to clean up the name
+xelement Iinitialize(uint Z);                      // function to clean up the name
 
 private:                                                    //
 void free();                                              // free space
 };
+}
 */
 
 
-std::vector<xelement> velement(NUM_ELEMENTS);        // store starting from ONE
+std::vector<xelement::xelement> velement(NUM_ELEMENTS);        // store starting from ONE
 
 namespace pflow {
   void XelementPrint(string options,ostream& oss) {
@@ -170,112 +174,115 @@ namespace pflow {
     // try with symbol
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(species)==aurostd::toupper(xelement(i).symbol)) Z=i;
+        if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).symbol)) Z=i;
     }
     // try with name
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(species)==aurostd::toupper(xelement(i).name)) Z=i;
+        if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).name)) Z=i;
     }
-    
+
     if(LDEBUG) cerr << "Z=" << Z << endl;
     oss << "AFLOW element property finder" << endl;
     if(Z>0) {
-      oss << "Element Z=" << Z << " - " << xelement(Z).symbol << " - " << xelement(Z).name << endl;
+      oss << "Element Z=" << xelement::xelement(Z).Z << " - " << xelement::xelement(Z).symbol << " - " << xelement::xelement(Z).name << endl;
       string space="        ";
-    
+
       // found
-    
-      
+
+      //      cerr <<  xelement::xelement(3).name << endl;
+      //      cerr <<  xelement::xelement("Li").name << endl;
+      //      cerr <<  xelement::xelement("LiThIuM").name << endl;
+
       // now look at properties
       if(tokens.size()>=2) {
-	for(uint i=1;i<tokens.size();i++) {
-	  string c=aurostd::toupper(tokens.at(i));
-	  vector<string> vs; uint len=52;
-	  vs.clear();
-	  int prec=10;
-	  if(c=="ALL" || c==aurostd::toupper("symbol")) vs.push_back(aurostd::PaddedPOST("symbol="+xelement(Z).symbol,len));
-	  if(c=="ALL" || c==aurostd::toupper("name")) vs.push_back(aurostd::PaddedPOST("name="+xelement(Z).name,len));
-	  if(c=="ALL" || c==aurostd::toupper("Period")) vs.push_back(aurostd::PaddedPOST("Period="+aurostd::utype2string(xelement(Z).Period),len));
-	  if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement(Z).Group),len));
-	  if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement(Z).Series,len));
-	  if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement(Z).Block,len));
-	  if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement(Z).mass,prec),len)+"// (kg)");
-	  if(c=="ALL" || c==aurostd::toupper("MolarVolume")) vs.push_back(aurostd::PaddedPOST("MolarVolume="+aurostd::utype2string(xelement(Z).MolarVolume,prec),len)+"// (m^3/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement(Z).volume,prec),len)+"// A^3");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_Vm")) vs.push_back(aurostd::PaddedPOST("Miedema_Vm="+aurostd::utype2string(xelement(Z).Miedema_Vm,prec),len)+"// (V_m^{2/3} in (cm^2))");
-	  if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement(Z).valence_std),len));
-	  if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement(Z).valence_iupac),len));
-	  if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement(Z).valence_PT),len));
-	  if(c=="ALL" || c==aurostd::toupper("Density_PT")) vs.push_back(aurostd::PaddedPOST("Density_PT="+aurostd::utype2string(xelement(Z).Density_PT,prec),len)+"// (g/cm^3)");
-	  if(c=="ALL" || c==aurostd::toupper("crystal")) vs.push_back(aurostd::PaddedPOST("crystal="+xelement(Z).crystal,len));
-	  if(c=="ALL" || c==aurostd::toupper("CrystalStr_PT")) vs.push_back(aurostd::PaddedPOST("CrystalStr_PT="+xelement(Z).CrystalStr_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement(Z).space_group,len));
-	  if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement(Z).space_group_number),len));
+        for(uint i=1;i<tokens.size();i++) {
+          string c=aurostd::toupper(tokens.at(i));
+          vector<string> vs; uint len=52;
+          vs.clear();
+          int prec=10;
+          if(c=="ALL" || c==aurostd::toupper("name")) vs.push_back(aurostd::PaddedPOST("name="+xelement::xelement(Z).name,len));
+          if(c=="ALL" || c==aurostd::toupper("symbol")) vs.push_back(aurostd::PaddedPOST("symbol="+xelement::xelement(Z).symbol,len));
+          if(c=="ALL" || c==aurostd::toupper("Z")) vs.push_back(aurostd::PaddedPOST("Z="+aurostd::utype2string(xelement::xelement(Z).Z),len));
+          if(c=="ALL" || c==aurostd::toupper("Period")) vs.push_back(aurostd::PaddedPOST("Period="+aurostd::utype2string(xelement::xelement(Z).Period),len));
+          if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement::xelement(Z).Group),len));
+          if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement::xelement(Z).Series,len));
+          if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement::xelement(Z).Block,len));
+          if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,prec),len)+"// (kg)");
+          if(c=="ALL" || c==aurostd::toupper("MolarVolume")) vs.push_back(aurostd::PaddedPOST("MolarVolume="+aurostd::utype2string(xelement::xelement(Z).MolarVolume,prec),len)+"// (m^3/mol)");
+          if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,prec),len)+"// A^3");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_Vm")) vs.push_back(aurostd::PaddedPOST("Miedema_Vm="+aurostd::utype2string(xelement::xelement(Z).Miedema_Vm,prec),len)+"// (V_m^{2/3} in (cm^2))");
+          if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement::xelement(Z).valence_std),len));
+          if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement::xelement(Z).valence_iupac),len));
+          if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement::xelement(Z).valence_PT),len));
+          if(c=="ALL" || c==aurostd::toupper("Density_PT")) vs.push_back(aurostd::PaddedPOST("Density_PT="+aurostd::utype2string(xelement::xelement(Z).Density_PT,prec),len)+"// (g/cm^3)");
+          if(c=="ALL" || c==aurostd::toupper("crystal")) vs.push_back(aurostd::PaddedPOST("crystal="+xelement::xelement(Z).crystal,len));
+          if(c=="ALL" || c==aurostd::toupper("CrystalStr_PT")) vs.push_back(aurostd::PaddedPOST("CrystalStr_PT="+xelement::xelement(Z).CrystalStr_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement::xelement(Z).space_group,len));
+          if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement::xelement(Z).space_group_number),len));
 
+          if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement::xelement(Z).Pearson_coefficient,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement::xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement::xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
+          if(c=="ALL" || c==aurostd::toupper("phase")) vs.push_back(aurostd::PaddedPOST("phase="+xelement::xelement(Z).phase,len));
+          if(c=="ALL" || c==aurostd::toupper("radius")) vs.push_back(aurostd::PaddedPOST("radius="+aurostd::utype2string(xelement::xelement(Z).radius,prec),len)+"// (nm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_PT")) vs.push_back(aurostd::PaddedPOST("radius_PT="+aurostd::utype2string(xelement::xelement(Z).radius_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_covalent_PT")) vs.push_back(aurostd::PaddedPOST("radius_covalent_PT="+aurostd::utype2string(xelement::xelement(Z).radius_covalent_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_covalent")) vs.push_back(aurostd::PaddedPOST("radius_covalent="+aurostd::utype2string(xelement::xelement(Z).radius_covalent,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement::xelement(Z).radius_VanDerWaals_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,prec),len)+"// (pm)");
 
-	  if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement(Z).Pearson_coefficient,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
-	  if(c=="ALL" || c==aurostd::toupper("phase")) vs.push_back(aurostd::PaddedPOST("phase="+xelement(Z).phase,len));
-	  if(c=="ALL" || c==aurostd::toupper("radius")) vs.push_back(aurostd::PaddedPOST("radius="+aurostd::utype2string(xelement(Z).radius,prec),len)+"// (nm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_PT")) vs.push_back(aurostd::PaddedPOST("radius_PT="+aurostd::utype2string(xelement(Z).radius_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_covalent_PT")) vs.push_back(aurostd::PaddedPOST("radius_covalent_PT="+aurostd::utype2string(xelement(Z).radius_covalent_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_covalent")) vs.push_back(aurostd::PaddedPOST("radius_covalent="+aurostd::utype2string(xelement(Z).radius_covalent,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement(Z).radius_VanDerWaals_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement(Z).radii_Ghosh08,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement(Z).radii_Slatter,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement(Z).radii_Pyykko,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement::xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement::xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement::xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement::xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
+          if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement::xelement(Z).Pettifor_scale,prec),len)); 
+          if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement::xelement(Z).boiling_point,prec),len)+"// (Celsius)");
+          if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement::xelement(Z).melting_point,prec),len)+"// (Celsius)");
+          if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
+          if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,prec),len)+"// (J/(kg.K))");
+          if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement::xelement(Z).critical_Pressure,prec),len)+"// (Atm) "); 
+          if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
+          if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
+          if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement::xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
+          if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement::xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
+          if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement::xelement(Z).Mohs_hardness,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement::xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("Hardness_Pearson="+aurostd::utype2string(xelement::xelement(Z).Hardness_Pearson,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_Putz")) vs.push_back(aurostd::PaddedPOST("Hardness_Putz="+aurostd::utype2string(xelement::xelement(Z).Hardness_Putz,prec),len)+"// (eV/atom)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_RB")) vs.push_back(aurostd::PaddedPOST("Hardness_RB="+aurostd::utype2string(xelement::xelement(Z).Hardness_RB,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("shear_modulus")) vs.push_back(aurostd::PaddedPOST("shear_modulus="+aurostd::utype2string(xelement::xelement(Z).shear_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("Young_modulus")) vs.push_back(aurostd::PaddedPOST("Young_modulus="+aurostd::utype2string(xelement::xelement(Z).Young_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement::xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement::xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
 
-	  if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement(Z).electronegativity_vec,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
-	  if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement(Z).Pettifor_scale,prec),len)); 
-	  if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement(Z).boiling_point,prec),len)+"// (Celsius)");
-	  if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement(Z).melting_point,prec),len)+"// (Celsius)");
-	  if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement(Z).specific_heat_PT,prec),len)+"// (J/(kg.K))");
-	  if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement(Z).critical_Pressure,prec),len)+"// (Atm) "); 
-	  if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
-	  if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
-	  if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
-	  if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement(Z).Mohs_hardness,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("Hardness_Pearson="+aurostd::utype2string(xelement(Z).Hardness_Pearson,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_Putz")) vs.push_back(aurostd::PaddedPOST("Hardness_Putz="+aurostd::utype2string(xelement(Z).Hardness_Putz,prec),len)+"// (eV/atom)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_RB")) vs.push_back(aurostd::PaddedPOST("Hardness_RB="+aurostd::utype2string(xelement(Z).Hardness_RB,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("shear_modulus")) vs.push_back(aurostd::PaddedPOST("shear_modulus="+aurostd::utype2string(xelement(Z).shear_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Young_modulus")) vs.push_back(aurostd::PaddedPOST("Young_modulus="+aurostd::utype2string(xelement(Z).Young_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement(Z).Poisson_ratio_PT,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
+          if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement::xelement(Z).Magnetic_Type_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
+          if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
+          if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement::xelement(Z).Curie_point,prec),len)+"// (K)");
 
-	  if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement(Z).Magnetic_Type_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
-	  if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement(Z).Curie_point,prec),len)+"// (K)");
-	
-	  if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement(Z).refractive_index,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement(Z).color_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement(Z).HHIP,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement(Z).HHIR,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement(Z).xray_scatt,prec),len)+"// shift+1");
+          if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement::xelement(Z).color_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,prec),len)+"// shift+1");
 
-	 if(vs.size())
-	  for(uint j=0;j<vs.size();j++)
-	      oss << vs.at(j) << endl;
-	}
+          if(vs.size())
+            for(uint j=0;j<vs.size();j++)
+              oss << vs.at(j) << endl;
+        }
       }
     }
-    
+
     if(LDEBUG) cerr << "pflow::XelementPrint [END]" << endl;
   }
 }
@@ -304,7 +311,7 @@ std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starti
 std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
 std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
 std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);        // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   // ME20181020 Pearson mass deviation coefficient
+std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);   //ME20181020 Pearson mass deviation coefficient
 
   */
   
@@ -5436,14 +5443,14 @@ xelement::xelement(uint Z) {
     CrystalStr_PT="NNN";
     space_group="NNN";
     space_group_number=NNN;
-    Pearson_coefficient=0.0;
+    Pearson_coefficient=NNN;
     lattice_constant[1]=NNN;lattice_constant[2]=NNN;lattice_constant[3]=NNN;
-    lattice_angle[1]=NNN;lattice_angle[2]=NNN;lattice_angle[3]=NNN;
-    phase="Solid";
-    radius=NNN;
-    radius_PT=205;
-    radius_covalent=1.99;
-    radius_covalent_PT=199;
+    lattice_angle[1]=NNN;lattice_angle[2]=NNN;lattice_angle[3]=NNN; 
+    phase="nnn";         
+    radius=NNN;         
+    radius_PT=NNN;          
+    radius_covalent_PT=NNN;   
+    radius_covalent=NNN;  
     radius_VanDerWaals_PT=NNN;
     radii_Ghosh08=1.5303;
     radii_Slatter=1.85;
@@ -7416,27 +7423,30 @@ xelement::xelement(uint Z) {
     thermal_expansion=NNN;
     thermal_conductivity=2;
     Brinelll_hardness=NNN;
-    Mohs_hardness=NNN;
-    Vickers_hardness=NNN;
-    Hardness_Pearson=NNN;
-    Hardness_Putz=NNN;
-    Hardness_RB=3.57;
-    shear_modulus=NNN;
-    Young_modulus=NNN;
-    bulk_modulus=NNN;
-    Poisson_ratio_PT=NNN;
-    Miedema_BVm=NNN;
-    Magnetic_Type_PT="NNN";
+    Mohs_hardness=NNN;    
+    Vickers_hardness=NNN; 
+    Hardness_Pearson=NNN;   
+    Hardness_Putz=NNN;      
+    Hardness_RB=NNN;        
+    shear_modulus=NNN;    
+    Young_modulus=NNN;    
+    bulk_modulus=NNN;     
+    Poisson_ratio_PT=NNN;    
+    Miedema_BVm=NNN;        
+    //
+    Magnetic_Type_PT="UNDEFINED";     
     Mass_Magnetic_Susceptibility=NNN;
     Volume_Magnetic_Susceptibility=NNN;
-    Molar_Magnetic_Susceptibility=NNN;
-    Curie_point=NNN;
-    color_PT="SILVER";
-    refractive_index=NNN;
-    HHIP=NNN;
-    HHIR=NNN;
-    /*xray_scatt=NNN;*/
-   //At
+    Molar_Magnetic_Susceptibility=NNN; 
+    Curie_point=NNN;                  
+    //
+    refractive_index=NNN;             
+    color_PT="UNDEFINED";               
+    //
+    HHIP=NNN;                           
+    HHIR=NNN;                           
+    xray_scatt=NNN;   
+    // [AFLOW]STOP=CONSTRUCTOR
   }
  // [AFLOW]STOP=Astatine
  // ********************************************************************************************************************************************************
@@ -8902,12 +8912,12 @@ xelement::xelement(uint Z) {
   }
  // [AFLOW]STOP=Lawrencium
  // ********************************************************************************************************************************************************
-}
+} // namespace xelement
 
-#endif // _AFLOW_X(*THIS)_CPP
+#endif // _AFLOW_XELEMENT_CPP
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

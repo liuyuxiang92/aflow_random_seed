@@ -1,9 +1,9 @@
 // ***************************************************************************
 // *                                                                         *
 // *         aflow - Automatic FLOW for materials discovery project          *
-// *             Stefano Curtarolo - Duke University - 2003-2019             *
+// *             Stefano Curtarolo - Duke University - 2003-2020             *
 // *                 Kesong Yang - Duke University 2010-2011                 *
-// *                  Corey Oses - Duke University 2013-2019                 *
+// *                  Corey Oses - Duke University 2013-2020                 *
 // *                                                                         *
 // ***************************************************************************
 // aflow_pocc.h and aflow_pocc*.cpp*
@@ -729,8 +729,8 @@ namespace pocc {
 // ***************************************************************************
 // *                                                                         *
 // *         aflow - Automatic FLOW for materials discovery project          *
-// *             Stefano Curtarolo - Duke University - 2003-2019             *
+// *             Stefano Curtarolo - Duke University - 2003-2020             *
 // *                 Kesong Yang - Duke University 2010-2011                 *
-// *                  Corey Oses - Duke University 2013-2019                 *
+// *                  Corey Oses - Duke University 2013-2020                 *
 // *                                                                         *
 // ***************************************************************************

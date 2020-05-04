@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - 2007-2019
@@ -120,27 +120,37 @@ public:
   double HHIR;                            // Chem. Mater. 25(15), 2911–2920 (2013) Herfindahl–Hirschman Index (HHI), HHIR: for elemental reserves,   Uncertinities in HHI_R: Be,C,N,O,F,Na,Mg,Al,Si,S,Cl,Ca,Sc,Ga,Ge,As,Rb,Sr,Ru,Rh,Pd,In,Cs,Hf,Os,Ir,Pt,Tl.      // DU 2019/05/17
   double xray_scatt;                      // shift+1 // All data collected from the NIST online tables: http://physics.nist.gov/PhysRefData/FFast/html/form.html//
 
-  // Xray_scatt_vector All data collected from the NIST online tables
-  // http://physics.nist.gov/PhysRefData/FFast/html/form.html
-  // All data are ideally for f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV).
-  // These are for E=7.9026keV (Cu-alpha is wavelength=1.5418A, E=8.0416keV).
+    // Xray_scatt_vector All data collected from the NIST online tables
+    // http://physics.nist.gov/PhysRefData/FFast/html/form.html
+    // All data are ideally for f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV).
+    // These are for E=7.9026keV (Cu-alpha is wavelength=1.5418A, E=8.0416keV).
 
-  // All data collected from the online tables:
-  // http://www-cxro.lbl.gov/optical_constants/pert_form.html
-  // All data are f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV].
+    // All data collected from the online tables:
+    // http://www-cxro.lbl.gov/optical_constants/pert_form.html
+    // All data are f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV].
 
-  // [AFLOW]STOP=DECLARATION
-  // operators/functions                                    // operator/functions
-  friend ostream& operator<<(ostream &,const xelement&);    // print
-  xelement element_initialize(uint Z);                      // function to clean up the name
+    // [AFLOW]STOP=DECLARATION
+    // operators/functions                                    // operator/functions
+    friend ostream& operator<<(ostream &,const xelement&);    // print
+    xelement Initialize(uint Z);                              // function to clean up the name
 
-private:                                                    //
-  void free();                                              // free space
-};
+  private:                                                    //
+    void free();                                              // free space
+  };
+}
 
-void elements_initialize(void);
+namespace xelement {
+  void Initialize(void);
+  string symbol2name(const string& symbol);
+  string name2symbol(const string& name);
+  int symbol2Z(const string& symbol);
+  string Z2symbol(const int& Z);
+  string Z2name(const int& Z);
+  int name2Z(const string& name);
 
-extern std::vector<xelement> velement;        // store starting from ONE
+} // namespace xelement
+
+extern std::vector<xelement::xelement> velement;        // store starting from ONE
 
 #endif
 

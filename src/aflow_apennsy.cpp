@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 
@@ -186,11 +186,11 @@ bool APENNSY_Parameters::LoadDynamicMemory(bool _verbose) {
 // ***************************************************************************
 // isequal with tolerance
 // ***************************************************************************
-template <class utype> bool _isequal(const utype& c1,const utype& c2) {
-#define isequal_threshold 0.0001
-  if(abs(c1-c2)<isequal_threshold) return TRUE;
-  else return FALSE;
-}
+//[CO20200404 - OBSOLETE]template <class utype> bool _isequal(const utype& c1,const utype& c2) {
+//[CO20200404 - OBSOLETE]#define isequal_threshold 0.0001
+//[CO20200404 - OBSOLETE]  if(abs(c1-c2)<isequal_threshold) return TRUE;
+//[CO20200404 - OBSOLETE]  else return FALSE;
+//[CO20200404 - OBSOLETE]}
 
 // ***************************************************************************
 // simple search string
@@ -354,6 +354,6 @@ bool _is_alphabetic(string alloy_dir) {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Stefano Curtarolo - Corey Oses
@@ -17,7 +17,7 @@ xAIMSOUT::xAIMSOUT() {
   content="";
   filename="";
   natoms=0;
-  ERROR="";
+  //[CO20200404 - OBSOLETE]ERROR="";
   free();
 }
 
@@ -171,6 +171,6 @@ bool xAIMSOUT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 #endif //  _AFLOW_OAIMS_CPP_
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

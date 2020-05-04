@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 
@@ -18,13 +18,13 @@ using std::string;
 
 static const string _APL_LTET_ERR_PREFIX_ = "apl::LTMethod::";
 
-namespace apl {
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                         CONSTRUCTORS/DESTRUCTORS                         //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////////
-  //                                                                          //
-  //                         CONSTRUCTORS/DESTRUCTORS                         //
-  //                                                                          //
-  //////////////////////////////////////////////////////////////////////////////
+namespace apl {
 
   LTMethod::LTMethod(QMesh& qm, Logger& l) : _qm(qm), _logger(l) {
     if (_qm.getnQPs() < 4) {
@@ -37,25 +37,33 @@ namespace apl {
     generateTetrahedra();
   }
 
+  // Copy constructors
   LTMethod::LTMethod(const LTMethod& that) : _qm(that._qm), _logger(that._logger) {
-    *this = that;
+    free();
+    copy(that);
   }
 
   LTMethod& LTMethod::operator=(const LTMethod& that) {
     if (this != &that) {
-      _tetrahedra = that._tetrahedra;
-      _irredTetrahedra = that._irredTetrahedra;
-      _logger = that._logger;
-      _nIrredTetra = that._nIrredTetra;
-      _nTetra = that._nTetra;
-      _qm = that._qm;
-      _reduced = that._reduced;
-      _volumePerTetrahedron = that._volumePerTetrahedron;
-      _weights = that._weights;
+      free();
+      copy(that);
     }
     return *this;
   }
 
+  void LTMethod::copy(const LTMethod& that) {
+    _tetrahedra = that._tetrahedra;
+    _irredTetrahedra = that._irredTetrahedra;
+    _logger = that._logger;
+    _nIrredTetra = that._nIrredTetra;
+    _nTetra = that._nTetra;
+    _qm = that._qm;
+    _reduced = that._reduced;
+    _volumePerTetrahedron = that._volumePerTetrahedron;
+    _weights = that._weights;
+  }
+
+  // Destructor
   LTMethod::~LTMethod() {
     free();
   }
@@ -70,13 +78,22 @@ namespace apl {
     _weights.clear();
   }
 
-  //////////////////////////////////////////////////////////////////////////////
-  //                                                                          //
-  //                                 GENERATE                                 //
-  //                                                                          //
-  //////////////////////////////////////////////////////////////////////////////
+  void LTMethod::clear(QMesh& qm, Logger& l) {
+    LTMethod that(qm, l);
+    copy(that);
+  }
 
-  //generateTetrahedra//////////////////////////////////////////////////////////
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                                 GENERATE                                 //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  //generateTetrahedra////////////////////////////////////////////////////////
   // Generates the tetrahedra of the q-point mesh.
   void LTMethod::generateTetrahedra() {
     vector<vector<xvector<int> > > tetra_init = initializeTetrahedra();
@@ -84,9 +101,9 @@ namespace apl {
     generateAllTetrahedra(tetra_init);
   }
 
-  //initializeTetrahedra////////////////////////////////////////////////////////
-  // Initializes the six tetrahedra of the microcell. For the numbered corners,
-  // see Fig. 5 in DOI 10.1103/PhysRevB.49.16223.
+  //initializeTetrahedra//////////////////////////////////////////////////////
+  // Initializes the six tetrahedra of the microcell. For the numbered
+  // corners, see Fig. 5 in DOI 10.1103/PhysRevB.49.16223.
   vector<vector<xvector<int> > > LTMethod::initializeTetrahedra() {
     vector<vector<xvector<int> > > tetra_init(6, vector<xvector<int> >(4, xvector<int>(3)));
     //Tetrahedron 3126
@@ -123,7 +140,7 @@ namespace apl {
     return tetra_init;
   }
 
-  //findMostCompact/////////////////////////////////////////////////////////////
+  //findMostCompact///////////////////////////////////////////////////////////
   // Determine the configuration that yields the most compact tetrahedra.
   void LTMethod::findMostCompact(vector<vector<xvector<int> > >& tetrahedra) {
     int lxx = 0;
@@ -166,12 +183,12 @@ namespace apl {
     }
   }
 
-  //generateAllTetrahedra///////////////////////////////////////////////////////
+  //generateAllTetrahedra/////////////////////////////////////////////////////
   // Creates a set of all tetrahedra in the reciprocal cell.
   void LTMethod::generateAllTetrahedra(const vector<vector<xvector<int> > >& tetrahedra) {
     vector<vector<vector<int> > > cornerMap(2, vector<vector<int> >(2, vector<int>(2)));
     vector<int> tet(4);
-    int j1, j2, j3, t = 0;
+    int j1 = 0, j2 = 0, j3 = 0, t = 0;
     for (int q3 = 0; q3 < _qm.getGrid(3); q3++) {
       for (int q2 = 0; q2 < _qm.getGrid(2); q2++) {
         for (int q1 = 0; q1 < _qm.getGrid(1); q1++) {
@@ -193,7 +210,7 @@ namespace apl {
             }
             std::sort(tet.begin(), tet.end());
             _tetrahedra.push_back(tet);
-            _irredTetrahedra[t];
+            _irredTetrahedra.push_back(t);
             t++;
           }
         }
@@ -204,8 +221,10 @@ namespace apl {
     _weights.assign(_nTetra, 1);
   }
 
-  //makeIrreducible/////////////////////////////////////////////////////////////
+  //makeIrreducible///////////////////////////////////////////////////////////
   // Determines the irreducible tetrahedra.
+  // ME191213 - Improved speed by storing the sorted irreducible tetrahedra
+  // instead of sorting in place.
   void LTMethod::makeIrreducible() {
     // Only makes sense with a reduced q-mesh
     if (_qm.getnQPs() != _qm.getnIQPs()) {
@@ -213,7 +232,8 @@ namespace apl {
       _irredTetrahedra.clear();
       _nIrredTetra = 0;
       int it, m;
-      vector<int> compare, irred;
+      vector<int> compare; //, irred;  OBSOLETE - ME191213
+      vector<vector<int> > irred;
       _logger << "Determining irreducible tetrahedra." << apl::endl;
       _logger.initProgressBar("Irreducible Tetrahedra");
       for (int t = 0; t < _nTetra; t++) {
@@ -221,15 +241,17 @@ namespace apl {
         for (int i = 0; i < 4; i++) compare[i] = _qm.getIrredQPointIndex(compare[i]);
         std::sort(compare.begin(), compare.end());
         for (it = 0; it < _nIrredTetra; it++) {
-          irred = getIrredTetrahedron(it);
-          for (int i = 0; i < 4; i++) irred[i] = _qm.getIrredQPointIndex(irred[i]);
-          std::sort(irred.begin(), irred.end());
+          // OBSOLETE - ME191213
+          //irred = getIrredTetrahedron(it);
+          //for (int i = 0; i < 4; i++) irred[i] = _qm.getIrredQPointIndex(irred[i]);
+          //std::sort(irred.begin(), irred.end());
           for (m = 0; m < 4; m++) {
-            if (compare[m] != irred[m]) break;
+            if (compare[m] != irred[it][m]) break;
           }
           if (m == 4) break;
         }
         if (it == _nIrredTetra) {
+          irred.push_back(compare);  // ME191213
           _irredTetrahedra.push_back(t);
           _weights.push_back(1);
           _nIrredTetra++;
@@ -244,11 +266,15 @@ namespace apl {
     }
   }
 
-  //////////////////////////////////////////////////////////////////////////////
-  //                                                                          //
-  //                            GETTER FUNCTIONS                              //
-  //                                                                          //
-  //////////////////////////////////////////////////////////////////////////////
+}  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                            GETTER FUNCTIONS                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
 
   const vector<vector<int> >& LTMethod::getTetrahedra() const {
     return _tetrahedra;
@@ -312,7 +338,7 @@ namespace apl {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

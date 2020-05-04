@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters, 2019.
@@ -42,7 +42,7 @@ using std::vector;
 
 namespace apl {
 
-  //setupMPI////////////////////////////////////////////////////////////////////
+  //setupMPI//////////////////////////////////////////////////////////////////
   // Sets up an MPI calculation.
   vector<vector<int> > setupMPI(string message, Logger& log,
       int nproc, int& ncpus) {
@@ -56,7 +56,7 @@ namespace apl {
     return getThreadDistribution(nproc, ncpus);
   }
 
-  //finishMPI///////////////////////////////////////////////////////////////////
+  //finishMPI/////////////////////////////////////////////////////////////////
   // Finishes the MPI progress bar and deletes the threads.
   void finishMPI(vector<std::thread*>& threads, Logger& log) {
     for (uint t = 0; t < threads.size(); t++) {
@@ -73,7 +73,7 @@ namespace apl {
 
 namespace apl {
 
-  //Constructor/////////////////////////////////////////////////////////////////
+  //Constructor///////////////////////////////////////////////////////////////
   TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, 
       Logger& l, _aflags& a) : _pc(pc), _qm(qm), _logger(l), aflags(a) {
     free();
@@ -82,7 +82,7 @@ namespace apl {
     nIQPs = _qm.getnIQPs();
   }
 
-  //Copy Constructor////////////////////////////////////////////////////////////
+  //Copy Constructor//////////////////////////////////////////////////////////
   TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _qm(that._qm), _logger(that._logger), aflags(that.aflags) {
     copy(that);
   }
@@ -108,12 +108,12 @@ namespace apl {
     temperatures = that.temperatures;
   }
 
-  //Destructor//////////////////////////////////////////////////////////////////
+  //Destructor////////////////////////////////////////////////////////////////
   TCONDCalculator::~TCONDCalculator() {
     free();
   }
 
-  //free////////////////////////////////////////////////////////////////////////
+  //free//////////////////////////////////////////////////////////////////////
   void TCONDCalculator::free() {
     calc_options.clear();
     eigenvectors.clear();
@@ -132,7 +132,7 @@ namespace apl {
     thermal_conductivity.clear();
   }
 
-  //clear///////////////////////////////////////////////////////////////////////
+  //clear/////////////////////////////////////////////////////////////////////
   void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) {
     TCONDCalculator that(pc, qm, l, a);
     copy(that);
@@ -144,7 +144,7 @@ namespace apl {
 
 namespace apl {
 
-  //calculateThermalConductvity/////////////////////////////////////////////////
+  //calculateThermalConductvity///////////////////////////////////////////////
   // The main function that calculates the thermal conductivity tensor, the
   // Grueneisen parameters, and the scattering phase space.
   void TCONDCalculator::calculateThermalConductivity() {
@@ -172,7 +172,7 @@ namespace apl {
 
     // Grueneisen parameters
     _logger << "Calculating Grueneisen parameters." << apl::endl;
-    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases();
+    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);  // false: not conjugate
     vector<vector<double> > grueneisen_modes = calculateModeGrueneisen(phases);
     phases.clear();
     vector<double> grueneisen_avg(temperatures.size());
@@ -188,12 +188,11 @@ namespace apl {
     // Thermal conductivity tensor and scattering rates
     thermal_conductivity.assign(temperatures.size(), xmatrix<double>(3, 3));
     vector<vector<vector<double> > > rates_total, rates_anharm;
-    // Only need small groups for full BTE
-    vector<vector<int> > small_groups;
-    if (!calc_options.flag("RTA")) small_groups = calculateSmallGroups();
+    // Only need little groups for full BTE
+    if (!calc_options.flag("RTA") && !_qm.littleGroupsCalculated()) _qm.calculateLittleGroups();
 
     for (uint t = 0; t < temperatures.size(); t++) {
-      thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], small_groups, rates_total, rates_anharm);
+      thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], rates_total, rates_anharm);
     }
 
     filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
@@ -205,32 +204,13 @@ namespace apl {
     writeThermalConductivity(filename);
   }
 
-  //calculateSmallGroups////////////////////////////////////////////////////////
-  // Calculates the small/little group for each irreducible q-point. These
-  // groups will be used to symmetrize the mean free displacement in the full
-  // BTE solution.
-  vector<vector<int> > TCONDCalculator::calculateSmallGroups() {
-    vector<vector<int> > small_groups(nIQPs, vector<int>(1, 0));  // Identity is always invariant
-    const vector<_sym_op>& symops = _qm.getReciprocalCell().pgroup;
-    const vector<int>& ibzqpts = _qm.getIbzqpts();
-    int q = -1;
-    for (int iq = 0; iq < nIQPs; iq++) {
-      q = ibzqpts[iq];
-      const xvector<double>& fpos = _qm.getQPoint(q).fpos;
-      for (uint isym = 1; isym < symops.size(); isym++) {
-        if (_qm.getQPointIndex(symops[isym].Uf * fpos) == q) small_groups[iq].push_back(isym);
-      }
-    }
-    return small_groups;
-  }
-
 } // namespace apl
 
 /*********************** FREQUENCIES/GROUP VELOCITIES ***********************/
 
 namespace apl {
 
-  //calculateFrequenciesGroupVelocities/////////////////////////////////////////
+  //calculateFrequenciesGroupVelocities///////////////////////////////////////
   // Calculates the frequencies and group velocities for each q-point.
   // This function is mostly overhead, the actual calculation happens in
   // calculateFreqGvel.
@@ -264,7 +244,7 @@ namespace apl {
 #endif
   }
 
-  //calculateFreqGvel///////////////////////////////////////////////////////////
+  //calculateFreqGvel/////////////////////////////////////////////////////////
   // Calculates the frequencies and group velocities using the eigenvalue
   // solver implemented in apl::PhononCalculator.
   void TCONDCalculator::calculateFreqGvel(int startIndex, int endIndex) {
@@ -282,7 +262,7 @@ namespace apl {
           xvector<xcomplex<double> > eigenvec_conj = conj(eigenvec);
           for (int i = 1; i < 4; i++) {
             xcomplex<double> integral = eigenvec_conj * (dDynMat[i-1] * eigenvec);
-            gvel[q][br][i] = au2THz * integral.re/(2.0 * freq[q][br]);
+            gvel[q][br][i] = au2nmTHz * integral.re/(2.0 * freq[q][br]);
           }
         } else {
           for (int i = 1; i < 4; i++) {
@@ -300,7 +280,7 @@ namespace apl {
 
 namespace apl {
 
-  //calculateModeGrueneisen/////////////////////////////////////////////////////
+  //calculateModeGrueneisen///////////////////////////////////////////////////
   // Calculates the Grueneisen parameters for each mode.
   vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases) {
     // Prepare and precompute
@@ -385,7 +365,7 @@ namespace apl {
               g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
             }
           }
-          g_mode *= -10.0*au2THz/(6.0 * std::pow(freq[q][br], 2));
+          g_mode *= -10.0 * au2nmTHz/(6.0 * std::pow(freq[q][br], 2));
           if (g_mode.im > _AFLOW_APL_EPS_) {  // _ZERO_TOL_ is too tight
             _logger << apl::warning << " Grueneisen parameter at mode "
               << iq << ", " << br << " is not real ("
@@ -401,7 +381,7 @@ namespace apl {
     return grueneisen;
   }
 
-  //calculateAverageGrueneisen//////////////////////////////////////////////////
+  //calculateAverageGrueneisen////////////////////////////////////////////////
   // Calculates the average Grueneisen parameter for a specific temperature.
   double TCONDCalculator::calculateAverageGrueneisen(double T,
       const vector<vector<double> >& grueneisen_modes) {
@@ -429,7 +409,7 @@ namespace apl {
 
 namespace apl {
 
-  //calculateTransitionProbabilities////////////////////////////////////////////
+  //calculateTransitionProbabilities//////////////////////////////////////////
   // Calculates the transition probabilities for three-phonon, isotope, and
   // boundary scattering. Also calculates the scattering phase space.
   void TCONDCalculator::calculateTransitionProbabilities() {
@@ -444,7 +424,7 @@ namespace apl {
     LTMethod _lt(_qm, _logger);
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
-    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);
+    vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);  // true: conjugate
 
     // Three-phonon transition probabilities
     message = "Transition Probabilities";
@@ -518,11 +498,11 @@ namespace apl {
     }
   }
 
-  //calculatePhases/////////////////////////////////////////////////////////////
-  // Calculates the phase factors for each atom in the supercell. The conjugate
-  // is used for the scattering matrices whereas the non-conjugate is used for
-  // the Grueneisen parameters. Calculating the phases ahead of time decreases
-  // runtime considerably.
+  //calculatePhases///////////////////////////////////////////////////////////
+  // Calculates the phase factors for each atom in the supercell. The
+  // conjugate is used for the scattering matrices whereas the non-conjugate
+  // is used for the Grueneisen parameters. Calculating the phases ahead of
+  // time decreases runtime considerably.
   vector<vector<vector<xcomplex<double> > > > TCONDCalculator::calculatePhases(bool conjugate) {
     const xstructure& scell = _pc.getSuperCellStructure();
     const xstructure& pcell = _pc.getInputCellStructure();
@@ -552,11 +532,11 @@ namespace apl {
     return phases;
   }
 
-  //calculateTransitionProbabilitiesPhonon//////////////////////////////////////
-  // Calculates the intrinsic transition probabilities and the scattering phase
-  // space for three-phonon scattering processes. It uses the inversion symmetry
-  // of the q-point grid and the transposition symmetry of the scattering matrix
-  // elements to reduce the computational cost.
+  //calculateTransitionProbabilitiesPhonon////////////////////////////////////
+  // Calculates the intrinsic transition probabilities and the scattering
+  // phase space for three-phonon scattering processes. It uses the inversion
+  // symmetry of the q-point grid and the transposition symmetry of the
+  // scattering matrix elements to reduce the computational cost.
   void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int endIndex, const LTMethod& _lt,
       vector<vector<vector<vector<double> > > >& phase_space,
       const vector<vector<vector<xcomplex<double> > > >& phases) {
@@ -587,7 +567,7 @@ namespace apl {
     uint nbr = branches.size();
 
     // Units are chosen so that probabilities are in THz (1/ps)
-    const double probability_prefactor = std::pow(au2THz * 10.0, 2) * PLANCKSCONSTANTAMU_hbar_THz * PI/4.0;
+    const double probability_prefactor = std::pow(au2nmTHz * 10.0, 2) * PLANCKSCONSTANTAMU_hbar_THz * PI/4.0;
     const double ps_prefactor = 2.0/(3.0 * std::pow(nBranches, 3) * nQPs);
 
     // Prepare precomputation of eigenvalue products
@@ -760,9 +740,9 @@ namespace apl {
     }
   }
 
-  //calculateTransitionProbabilitiesIsotope/////////////////////////////////////
-  // Calculates the intrinsic transition probabilities/scattering rates of the
-  // isotope scattering processes.
+  //calculateTransitionProbabilitiesIsotope///////////////////////////////////
+  // Calculates the intrinsic transition probabilities/scattering rates of
+  // the isotope scattering processes.
   void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, int endIndex, const LTMethod& _lt) {
     // Prepare
     const xstructure& pcell = _pc.getInputCellStructure();
@@ -820,9 +800,9 @@ namespace apl {
     }
   }
 
-  // calculateTransitionProbabilitiesBoundary///////////////////////////////////
-  // Calculates the intrinsic transition probabilities/scattering rates of the
-  // grain boundary scattering processes.
+  // calculateTransitionProbabilitiesBoundary/////////////////////////////////
+  // Calculates the intrinsic transition probabilities/scattering rates of
+  // the grain boundary scattering processes.
   vector<vector<double> > TCONDCalculator::calculateTransitionProbabilitiesBoundary() {
     int br = 0, iq = 0, q = 0;
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches));
@@ -838,10 +818,10 @@ namespace apl {
     return rates;
   }
 
-  //getWeightsLT////////////////////////////////////////////////////////////////
+  //getWeightsLT//////////////////////////////////////////////////////////////
   // Calculate the integration weights using the linear tetrahedron method.
-  // fij is a helper function that speeds up the calculation. It is not part of
-  // the class to allow for more efficient inlining.
+  // fij is a helper function that speeds up the calculation. It is not part
+  // of the class to allow for more efficient inlining.
   // Moving this function into the LTMethod class caused a significant runtime
   // increase, so it should stay here until the speed issues can be resolved.
   double fij(double fi, double fj, double f) {
@@ -944,9 +924,9 @@ namespace apl {
 
 namespace apl {
 
-  //getProcess//////////////////////////////////////////////////////////////////
-  // Information on scattering processes is stored in a sparse vector with only
-  // one index for sign and q-points, and one for branches. This function
+  //getProcess////////////////////////////////////////////////////////////////
+  // Information on scattering processes is stored in a sparse vector with
+  // only one index for sign and q-points, and one for branches. This function
   // restores the full information.
   void TCONDCalculator::getProcess(const vector<int>& process, vector<int>& qpts,
       vector<int>& branches, int& sign) {
@@ -974,12 +954,11 @@ namespace apl {
     branches[2] = br;
   }
 
-  //calculateThermalConductivityTensor//////////////////////////////////////////
+  //calculateThermalConductivityTensor////////////////////////////////////////
   // Calculates the thermal conductivity tensor, and the total and anharmonic
   // scattering rates for a specific temperature. The rates are passed by
   // reference so that they can be written into output files later.
   xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
-      const vector<vector<int> >& small_groups,
       vector<vector<vector<double> > >& rates_total,
       vector<vector<vector<double> > >& rates_anharm) {
     _logger << "Calculating thermal conductivity for " << T << " K." << apl::endl;
@@ -1006,7 +985,7 @@ namespace apl {
       std::cout << std::setw(25) << "Rel. Change in Norm" << std::endl;
       do {
         tcond_prev = tcond;
-        getMeanFreeDispFull(rates, small_groups, occ, mfd);
+        getMeanFreeDispFull(rates, occ, mfd);
 
         tcond = calcTCOND(T, occ, mfd);
         // Calculate relative changes to the Frobenius norm instead of just
@@ -1030,7 +1009,7 @@ namespace apl {
     return tcond;
   }
 
-  //getOccupationNumbers////////////////////////////////////////////////////////
+  //getOccupationNumbers//////////////////////////////////////////////////////
   // Calculates the Bose-Einstein distribution for all phonons at a specific
   // temperature.
   vector<vector<double> > TCONDCalculator::getOccupationNumbers(double T) {
@@ -1043,8 +1022,9 @@ namespace apl {
     return occ;
   }
 
-  //getOccupationTerm///////////////////////////////////////////////////////////
-  // Calculates the temperature-dependent prefactor for each scattering process.
+  //getOccupationTerm/////////////////////////////////////////////////////////
+  // Calculates the temperature-dependent prefactor for each scattering
+  // process.
   double TCONDCalculator::getOccupationTerm(const vector<vector<double> >& occ, int sign,
       const vector<int>& qpts, const vector<int>& branches) {
     if (sign) {  // -
@@ -1055,9 +1035,9 @@ namespace apl {
   }
 
 
-  //calculateTotalRates/////////////////////////////////////////////////////////
-  // Calculates the total scattering rates based on three-phonon, isotope, and
-  // boundary scattering.
+  //calculateTotalRates///////////////////////////////////////////////////////
+  // Calculates the total scattering rates based on three-phonon, isotope,
+  // and boundary scattering.
   vector<vector<double> > TCONDCalculator::calculateTotalRates(const vector<vector<double> >& occ,
       vector<vector<vector<double> > >& rates_anharm) {
     vector<vector<double> > rates = calculateAnharmonicRates(occ);
@@ -1082,7 +1062,7 @@ namespace apl {
     return rates;
   }
 
-  //calculateAnharmonicRates////////////////////////////////////////////////////
+  //calculateAnharmonicRates//////////////////////////////////////////////////
   // Calculates the three-phonon scattering rates for a specific temperature.
   // Since there are a lot of processes, threading makes the calculation
   // significantly faster.
@@ -1124,7 +1104,7 @@ namespace apl {
     }
   }
 
-  //getMeanFreeDispRTA//////////////////////////////////////////////////////////
+  //getMeanFreeDispRTA////////////////////////////////////////////////////////
   // Calculates the mean free displacement vector for the RTA.
   vector<vector<xvector<double> > > TCONDCalculator::getMeanFreeDispRTA(const vector<vector<double> >& rates) {
     xvector<double> xvec(3);
@@ -1141,7 +1121,7 @@ namespace apl {
     return mfd;
   }
 
-  //calcTCOND///////////////////////////////////////////////////////////////////
+  //calcTCOND/////////////////////////////////////////////////////////////////
   // Calculates the thermal conductivity tensor.
   xmatrix<double> TCONDCalculator::calcTCOND(double T, const vector<vector<double> >& occ,
       const vector<vector<xvector<double> > >& mfd) {
@@ -1172,12 +1152,11 @@ namespace apl {
     return tcond;
   }
 
-  //getMeanFreeDispFull/////////////////////////////////////////////////////////
+  //getMeanFreeDispFull///////////////////////////////////////////////////////
   // Calculates/corrects the mean free displacement vector for the iterative
-  // solution of the BTE. Since there are a lot of processes, threading speeds
-  // up the calculations considerably.
+  // solution of the BTE. Since there are a lot of processes, threading
+  // speeds up the calculations considerably.
   void TCONDCalculator::getMeanFreeDispFull(const vector<vector<double> >& rates,
-      const vector<vector<int> >& small_groups,
       const vector<vector<double> >& occ,
       vector<vector<xvector<double> > >& mfd) {
     // MPI variables
@@ -1195,25 +1174,24 @@ namespace apl {
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads.push_back(new std::thread(&TCONDCalculator::calculateDelta, this,
             thread_dist[icpu][0], thread_dist[icpu][1], 
-            std::ref(small_groups), std::ref(occ), std::ref(mfd), std::ref(delta)));
+            std::ref(occ), std::ref(mfd), std::ref(delta)));
     }
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads[icpu]->join();
       delete threads[icpu];
     }
 #else
-    calculateDelta(0, nIQPs, small_groups, occ, mfd, delta);
+    calculateDelta(0, nIQPs, occ, mfd, delta);
 #endif
 
     correctMFD(rates, delta, mfd);
   }
 
-  //calculateDelta//////////////////////////////////////////////////////////////
+  //calculateDelta////////////////////////////////////////////////////////////
   // Calculates the correction vector (delta) to the mean free displacement.
-  // Only irreducible q-points need to be calculated since deltas of equivalent
-  // q-points are related by symmetry.
+  // Only irreducible q-points need to be calculated since deltas of
+  // equivalent q-points are related by symmetry.
   void TCONDCalculator::calculateDelta(int startIndex, int endIndex, 
-      const vector<vector<int> >& small_groups,
       const vector<vector<double> >& occ,
       const vector<vector<xvector<double> > >& mfd,
       vector<vector<xvector<double> > >& delta) {
@@ -1246,9 +1224,10 @@ namespace apl {
       int symop = 0;
       const vector<_sym_op>& pgroup = _qm.getReciprocalCell().pgroup;
       xmatrix<double> Uc(3, 3);
-      uint nsym = small_groups[i].size();
+      const vector<int>& little_group = _qm.getLittleGroup(i);
+      uint nsym = little_group.size();
       for (uint isym = 0; isym < nsym; isym++) {
-        symop = small_groups[i][isym];
+        symop = little_group[isym];
         Uc += pgroup[symop].Uc;
       }
       Uc = 1.0/nsym * Uc;
@@ -1258,7 +1237,7 @@ namespace apl {
     }
   }
 
-  //correctMFD//////////////////////////////////////////////////////////////////
+  //correctMFD////////////////////////////////////////////////////////////////
   // Corrects the mean free displacement vectors of all phonon modes.
   void TCONDCalculator::correctMFD(const vector<vector<double> >& rates,
       const vector<vector<xvector<double> > >& delta,
@@ -1282,7 +1261,7 @@ namespace apl {
 
 namespace apl {
 
-  //writeTempIndepOutput////////////////////////////////////////////////////////
+  //writeTempIndepOutput//////////////////////////////////////////////////////
   // Writes temperature-independent output files.
   void TCONDCalculator::writeTempIndepOutput(const string& filename, string keyword,
       const string& unit, const vector<vector<double> >& data) {
@@ -1310,7 +1289,7 @@ namespace apl {
     }
   }
 
-  //writeTempDepOutput//////////////////////////////////////////////////////////
+  //writeTempDepOutput////////////////////////////////////////////////////////
   // Writes temperature-dependent output files.
   void TCONDCalculator::writeTempDepOutput(const string& filename, string keyword, const string& unit,
       const vector<double>& temps, const vector<vector<vector<double> > >& data) {
@@ -1339,9 +1318,9 @@ namespace apl {
     }
   }
 
-  //writeDataBlock//////////////////////////////////////////////////////////////
-  // Writes a block of data for each phonon mode into a stream. Used by output
-  // file writers.
+  //writeDataBlock////////////////////////////////////////////////////////////
+  // Writes a block of data for each phonon mode into a stream. Used by
+  // output file writers.
   void TCONDCalculator::writeDataBlock(stringstream& output,
       const vector<vector<double> >& data) {
     for (uint q = 0; q < data.size(); q++) {
@@ -1355,7 +1334,7 @@ namespace apl {
     }
   }
 
-  //writeGroupVelocities////////////////////////////////////////////////////////
+  //writeGroupVelocities//////////////////////////////////////////////////////
   // Writes the group velocities into a file. Each row belongs to a q-point,
   // and each column triplet belongs to a phonon branch.
   void TCONDCalculator::writeGroupVelocities(const string& filename) {
@@ -1398,7 +1377,7 @@ namespace apl {
     }
   }
 
-  //writePhaseSpace/////////////////////////////////////////////////////////////
+  //writePhaseSpace///////////////////////////////////////////////////////////
   // Writes the scattering phase space into an output file. Numbers are
   // converted into fs to get "nicer" numbers. OOO should be zero, but it is
   // output regardless in case there is a problem.
@@ -1448,7 +1427,7 @@ namespace apl {
     aurostd::stringstream2file(output, filename);
   }
 
-  //writeGrueneisen/////////////////////////////////////////////////////////////
+  //writeGrueneisen///////////////////////////////////////////////////////////
   // Outputs the temperature-dependent average Grueneisen parameters and the
   // mode Grueneisen parameters into a file.
   void TCONDCalculator::writeGrueneisen(const string& filename,
@@ -1530,3 +1509,10 @@ namespace apl {
   }
 
 }  // namespace apl
+
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
+// *                                                                         *
+//****************************************************************************

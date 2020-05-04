@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -877,6 +877,8 @@ LATTICES = (the ones with "")
             (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
           [--geometry_file=POSCAR.relax1] : Compare geometries from a particular step in the DFT relaxation 
             (e.g., `POSCAR.relax1', `POSCAR.relax2', `POSCAR.static', etc.).
+          [--relaxation_step=original|relax1|most_relaxed] : Compare geometries from a particular step in the DFT relaxation.
+            Allows numeric or string input (e.g., 0->original, 1->relax1, 2->most_relaxed).
       [GENERAL_COMPARISON_OPTIONS] :
         [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
         [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
@@ -1189,6 +1191,9 @@ LATTICES = (the ones with "")
         See --edos. Outputs total DOS and DOS of orbital s and d. The sDOS or dDOS is per species
         as given in POSCAR. Output format:
         Energy DOSup DOSdown s_up_spec1 s_down_spec1...s_up_specN s_down_specN d_up_spec1 d_down_spec1...d_up_specN d_down_specN
+  aflow --elk
+        Transforms an input geometry file to the ELK format.
+        The output follows the ELK conventions discussed in http://elk.sourceforge.net/elk.pdf.
   aflow --equivalent | --equiv | --iatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculate point/factor/space group and use them to label equivalent
         and inequivalent atoms. On the output, each structure atom has
@@ -2746,6 +2751,10 @@ LATTICES = (the ones with "")
         Give the list of prototypes (file LIST.txt) from the DMQC-HTQC
         project (SC oct 08)
 
+  aflow --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=
+       Returns unique identification information about the
+       pseudopotentials used for the calculations.   
+ 
   aflow [--server=XXXXXXXX] --prototypes_icsd[=N] | --protos_icsd[=N]                                  
         Give the list of prototypes from the ICSD database included in the code.   
         If N is passed, then it returns ONLY the N-ary compounds.
@@ -3575,7 +3584,7 @@ AFLOWLIB MODE
 	
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

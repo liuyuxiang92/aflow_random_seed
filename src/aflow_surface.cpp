@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo - Sept/Oct/Nov 2007, fixes May 2013
@@ -826,15 +826,15 @@ namespace surface {
             if(search_trivial)  oss << "TRIVIAL SEARCH" << endl;
             if(search_complete) oss << "COMPLETE SEARCH" << endl;
             str.LatticeReduction_avoid=TRUE;  // DOES NOT DO LATTICE REDUCTION // NIGGLI and MINK
-            str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                      // CO20171024 - new sym framework
-            _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO20171024 - new sym framework
-            pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO20171024 - new sym framework
-            pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO20171024 - new sym framework
-            //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 // CO20171024 - new sym framework
-            //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             // CO20171024 - new sym framework
-            //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                // CO20171024 - new sym framework
-            //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    // CO20171024 - new sym framework
-            //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    // CO20171024 - new sym framework
+            str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                      //CO20171024 - new sym framework
+            _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                //CO20171024 - new sym framework
+            pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  //CO20171024 - new sym framework
+            pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   //CO20171024 - new sym framework
+            //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 //CO20171024 - new sym framework
+            //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             //CO20171024 - new sym framework
+            //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                //CO20171024 - new sym framework
+            //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    //CO20171024 - new sym framework
+            //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    //CO20171024 - new sym framework
             //   oss << banner << endl; // ----------------------------------------------------------------
             oss << surface::PrintNNdists(num_types,num_types_combinations,bbfrac,nndist,nndists);
             oss << "hklmax=" << hklmax << endl;
@@ -914,14 +914,14 @@ namespace surface {
     if(search_complete) oss << "COMPLETE SEARCH" << endl;
     str.LatticeReduction_avoid=TRUE;
     str.sgroup_radius=1.05*RadiusSphereLattice(lattice);
-    _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                // CO20171024 - new sym framework
-    pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  // CO20171024 - new sym framework
-    pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   // CO20171024 - new sym framework
-    //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 // CO20171024 - new sym framework
-    //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             // CO20171024 - new sym framework
-    //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                // CO20171024 - new sym framework
-    //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    // CO20171024 - new sym framework
-    //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    // CO20171024 - new sym framework
+    _kflags kflags; pflow::defaultKFlags4SymCalc(kflags,true);                                //CO20171024 - new sym framework
+    pflow::defaultKFlags4SymWrite(kflags,PFSWRITE); kflags.KBIN_SYMMETRY_SGROUP_WRITE=false;  //CO20171024 - new sym framework
+    pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,OSSWRITE,oss);                   //CO20171024 - new sym framework
+    //SYM::CalculatePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                 //CO20171024 - new sym framework
+    //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);             //CO20171024 - new sym framework
+    //SYM::CalculateFactorGroup(FileDevNull,str,aflags,PFSWRITE,OSSWRITE,oss);                //CO20171024 - new sym framework
+    //str.sgroup_radius=1.05*RadiusSphereLattice(lattice);                                    //CO20171024 - new sym framework
+    //SYM::CalculateSpaceGroup(FileDevNull,str,aflags,FALSE,OSSWRITE,oss);                    //CO20171024 - new sym framework
     // oss
     oss << banner << endl; // ----------------------------------------------------------------
     oss << "HKL CALCULATION" << endl;
@@ -1094,10 +1094,10 @@ namespace surface {
 
 // ********************************************************************************************************/
 // ********************************************************************************************************/
-// RC-09: Depending on the initial input POSCAR, the obtained 2 basis vectors in the slab layer may be not as minimum as possible.
+//RC-09: Depending on the initial input POSCAR, the obtained 2 basis vectors in the slab layer may be not as minimum as possible.
 //        It should be corrected afterwards, by applying the general methods of unit cell minimization to the obtained here final slab POSCAR.
-// RC-09: The slab uc basis vectors coordinates are presented wrt initial POSCAR Cartesian system. So it is easy to find the position of slab uc basis vectors wrt initial POSCAR sites.
-// RC-09: If (a) parent latice is undistorted cubic-like and (b) Cartesian axises (wrt which the uc basis vectors of initial POSCAR are determined) are directed along cubic edges
+//RC-09: The slab uc basis vectors coordinates are presented wrt initial POSCAR Cartesian system. So it is easy to find the position of slab uc basis vectors wrt initial POSCAR sites.
+//RC-09: If (a) parent latice is undistorted cubic-like and (b) Cartesian axises (wrt which the uc basis vectors of initial POSCAR are determined) are directed along cubic edges
 //        then the Cartesian coordinates of third (normal to layers) basis bector of slab uc (S3) determine the slab Miller indices wrt parent CUBIC unit cell.
 //        E.g. for L10 with 4at/uc and 2at/us POSCAR definitions: (111)of4/uc=(101)of2/uc, (010)of4/uc=(110)of2/uc, (001)of4/uc=(001)of2/uc, (110)of4/uc=(100)of2/uc
 
@@ -1925,7 +1925,7 @@ namespace slab {
         str_out.lattice(i,j)=Slab_Basis_CartCoord(i,j);
       }
     }
-    str_out.FixLattices();  // CO20180202
+    str_out.FixLattices();  //CO20180202
 
     //str_out.num_each_type.clear();
     //str_out.comp_each_type.clear();
@@ -1953,7 +1953,7 @@ namespace slab {
             for(j=1;j<=3;j++) {
               newatom.fpos[j]=ListSiteDirectCoordWRTslab[k][AtomInLayer[OrderLayers[Layer]][i][2]][j];
             }
-            newatom.cpos=F2C(str_out.scale,str_out.lattice,newatom.fpos); // CO20180202
+            newatom.cpos=F2C(str_out.scale,str_out.lattice,newatom.fpos); //CO20180202
             str_out.AddAtom(newatom);
           }
         }
@@ -1961,7 +1961,7 @@ namespace slab {
     }
     if(assigning_fake_names){for(uint i=0;i<str_out.atoms.size();i++){str_out.atoms[i].name_is_given=false;}}	//CO20180724 - since these are fake names, don't print out them out
 
-    // CO20180202
+    //CO20180202
     if(LDEBUG) {
       cerr << "PRINTING OUT STRUCTURE ATTRIBUTES" << endl;
       cerr << "str_out.atoms.size()=" << str_out.atoms.size() << endl;
@@ -1974,7 +1974,7 @@ namespace slab {
     }
 
     ////////////////////////////////////////////////////////////
-    //CO + DU 180705 START
+    //CO+DU20180705 START
     //everything here (below AddAtom()) is a HACK and needs to be
     //fixed
     //AddAtom() must handle names/num_each_type/comp_each_type
@@ -1984,8 +1984,8 @@ namespace slab {
     //xstructure (newatom=str_in.atoms[XX]), otherwise
     //we lose type + name which is absolutely critical for AddAtom()
 
-    // CO20180202 - this is obsolete, it is done INSIDE AddAtom()
-    // DU 180705 - putting back as it doesn't work without it
+    //CO20180202 - this is obsolete, it is done INSIDE AddAtom()
+    //DU20180705 - putting back as it doesn't work without it
     // we need to add type + name before AddAtom()
     // this is a temporary patch, fix later
     //[OBSOLETE CO20180727]str_out.num_each_type.clear();
@@ -2003,7 +2003,7 @@ namespace slab {
     //[OBSOLETE CO20180727]
     //[OBSOLETE CO20180727]for(j=0;j<NumberElements;j++) {
     //[OBSOLETE CO20180727]  for(i=NumSites[j];i<NumSites[j+1]+NumSites[j];i++) {
-    //[OBSOLETE CO20180727]    // CO20180202 - added safety
+    //[OBSOLETE CO20180727]    //CO20180202 - added safety
     //[OBSOLETE CO20180727]    if(i>(int)str_out.atoms.size()-1){
     //[OBSOLETE CO20180727]      cerr << "pflow::MAKE_SLAB: ERROR - not as many atoms were created as cxpected (likely a problem with AddAtom())" << endl;
     //[OBSOLETE CO20180727]      cerr << "Exiting!" << endl;
@@ -2012,7 +2012,7 @@ namespace slab {
     //[OBSOLETE CO20180727]str_out.atoms.at(i).name=str_in.SpeciesLabel(j);
     //[OBSOLETE CO20180727]  }
     //[OBSOLETE CO20180727]}
-    //CO + DU 180705 STOP
+    //CO+DU20180705 STOP
     ////////////////////////////////////////////////////////////
 
     //for(i=0;i<NumberElements;i++)
@@ -2024,7 +2024,7 @@ namespace slab {
   }
 } // namespace slab
 
-//CO20190601 - START
+//CO20190601 START
 namespace slab {
   //[CO20190520 - this is wrong, do not convert to real space]#define HKL_DUAL_TEST 0 //CO20190520 - this is WRONG, so keep 0: do NOT convert to real space
   xvector<double> HKLPlane2Normal(const xstructure& xstr_in,int h,int k,int l){return HKLPlane2Normal(xstr_in.scale*xstr_in.lattice,h,k,l);}  //CO20190320
@@ -2195,32 +2195,32 @@ namespace slab {
       intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
       intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
     }else if(count_zeros==1){ 
-      if(aurostd::withinList(zero_indices,1)){
+      if(aurostd::WithinList(zero_indices,1)){
         intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
         intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
         //intercepts.push_back( intercepts[0] + a1 ); //consistent order, but it really doesn't matter
         xvector<double> tmp=( intercepts[0] + a1 );   //consistent order, but it really doesn't matter
         intercepts.insert(intercepts.begin(),tmp);    //consistent order, but it really doesn't matter
-      }else if(aurostd::withinList(zero_indices,2)){
+      }else if(aurostd::WithinList(zero_indices,2)){
         intercepts.push_back( ((double)multiple/(double)hkl[1]) * a1 );
         intercepts.push_back( intercepts[0] + a2 );
         intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
-      }else{  //aurostd::withinList(zero_indices,3)
+      }else{  //aurostd::WithinList(zero_indices,3)
         intercepts.push_back( ((double)multiple/(double)hkl[1]) * a1 );
         intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
         intercepts.push_back( intercepts[0] + a3 );
       }
     }else{  //count_zeros==2
       xvector<double> tmp;  //0,0,0
-      if(!aurostd::withinList(zero_indices,1)){
+      if(!aurostd::WithinList(zero_indices,1)){
         intercepts.push_back( tmp );
         intercepts.push_back( a2 );
         intercepts.push_back( a3 );
-      }else if(!aurostd::withinList(zero_indices,2)){
+      }else if(!aurostd::WithinList(zero_indices,2)){
         intercepts.push_back( a1 );
         intercepts.push_back( tmp );
         intercepts.push_back( a3 );
-      }else{  //!aurostd::withinList(zero_indices,3)
+      }else{  //!aurostd::WithinList(zero_indices,3)
         intercepts.push_back( a1 );
         intercepts.push_back( a2 );
         intercepts.push_back( tmp );
@@ -2428,7 +2428,7 @@ namespace slab {
       else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find starting atom",_INPUT_ERROR_);}
     }
     if(LDEBUG){cerr << soliloquy << " fpos_starting matches atom[" << starting_atom << "]" << endl;}
-    if(starting_atom!= AUROSTD_MAX_UINT && !aurostd::withinList(atoms2skip,starting_atom)){atoms2skip.push_back(starting_atom);}  //no duplicates is better
+    if(starting_atom!= AUROSTD_MAX_UINT && !aurostd::WithinList(atoms2skip,starting_atom)){atoms2skip.push_back(starting_atom);}  //no duplicates is better
 
     //[CO20190520 - safe-guard for working in fractional space (skew)]xvector<double> fpos_current=fpos_starting;
     //[CO20190520 - safe-guard for working in fractional space (skew)]xvector<double> cpos_current=f2c*fpos_current;
@@ -2462,7 +2462,7 @@ namespace slab {
       if(!(loop_iteration==loop_iteration_starting && outside_current_cell)){ //go OUTSIDE current cell
         for(uint i=0;i<atoms.size();i++){ //loop through all atoms, find nearest in line of sight
           if(loop_iteration==loop_iteration_starting && i==starting_atom){continue;}  //only for the first
-          if(aurostd::withinList(atoms2skip,i)){continue;}
+          if(aurostd::WithinList(atoms2skip,i)){continue;}
           //[CO20190520 - safe-guard for working in fractional space (skew)]point_line_intersection_fpos=aurostd::pointLineIntersection(fpos_current,l_fpos,atoms[i].fpos);
           //[CO20190520 - safe-guard for working in fractional space (skew)]point_line_intersection_cpos=f2c*point_line_intersection_fpos;
           point_line_intersection_cpos=aurostd::pointLineIntersection(cpos_current,l_cpos,atoms[i].cpos);
@@ -2710,7 +2710,7 @@ namespace slab {
     //[OBSOLETE - need to map atoms to same type]bool start=true;
     //[OBSOLETE - need to map atoms to same type]int count=0;
     //[OBSOLETE - need to map atoms to same type]while(start || !SYM::AtomFPOSMatch(fpos_orig,fpos,c2f,f2c,skew,sym_eps)) //!aurostd::isequal(fpos,fpos_orig))
-    //[OBSOLETE - need to map atoms to same type]{  //CO200106 - patching for auto-indenting
+    //[OBSOLETE - need to map atoms to same type]{  //CO20200106 - patching for auto-indenting
     //[OBSOLETE - need to map atoms to same type]  start=false;
     //[OBSOLETE - need to map atoms to same type]  cpos+=d_spacing * n;
     //[OBSOLETE - need to map atoms to same type]  fpos=c2f*cpos;  //C2F(lattice,cpos);
@@ -4024,7 +4024,10 @@ namespace slab {
     str_ss << "   0.66666666666667   0.01846437673106   0.08333333333333  O     " << endl;
     str_ss << "   0.33333333333333   0.35179771006440   0.41666666666667  O     " << endl;
     str_ss << "   0.00000000000000   0.68513104339773   0.75000000000000  O     " << endl;
-    xstructure xstr_in(str_ss);str_ss.str("");
+    xstructure xstr_in;
+    try{str_ss >> xstr_in;}           //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    str_ss.clear();str_ss.str("");    //CO20200404 - need clear() to reuse
     min_dist=min_dist_orig=xstr_in.MinDist();
     if(LDEBUG){
       cerr << soliloquy << " xstr_in=" << endl;cerr << xstr_in << endl;
@@ -4069,7 +4072,10 @@ namespace slab {
     str_ss << "   0.01846438      0.08333333     0.00000000   O " << endl;
     str_ss << "   0.35179771      0.41666667     0.00000000   O " << endl;
     str_ss << "   0.68513104      0.75000000     0.00000000   O " << endl;
-    xstructure xstr_slab_correct(str_ss);str_ss.str("");
+    xstructure xstr_slab_correct;
+    try{str_ss >> xstr_slab_correct;} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    str_ss.clear();str_ss.str("");    //CO20200404 - need clear() to reuse
     min_dist=xstr_slab_correct.MinDist();
     if(LDEBUG){
       cerr << soliloquy << " xstr_slab_correct=" << endl;cerr << xstr_slab_correct << endl;
@@ -4095,10 +4101,10 @@ namespace slab {
     return structures_match;
   }
 } // namespace slab
-//CO20190601 - STOP
+//CO20190601 STOP
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************

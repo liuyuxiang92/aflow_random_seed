@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************
 
@@ -65,7 +65,7 @@ using std::string;
 using std::vector;
 
 static const string _AFLOW_DB_ERR_PREFIX_ = "AflowDB::";
-static const int _DEFAULT_SET_LIMIT_ = 16;
+static const uint _DEFAULT_SET_LIMIT_ = 16; //DX20200317 - int -> uint
 static const int _N_AUID_TABLES_ = 256;
 
 /************************** CONSTRUCTOR/DESTRUCTOR **************************/
@@ -139,7 +139,7 @@ namespace aflowlib {
   void AflowDB::open(int open_flags) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "open(): Opening " << database_file << std::endl;
-    int sql_code = sqlite3_open_v2(database_file.c_str(), &db, open_flags, nullptr);
+    int sql_code = sqlite3_open_v2(database_file.c_str(), &db, open_flags, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
       string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
       string message = "Could not open database file " + database_file;
@@ -194,7 +194,7 @@ namespace aflowlib {
     // progress or failed.
     if (aurostd::FileExist(tmp_file)) {
       long int tm_tmp = aurostd::FileModificationTime(tmp_file);
-      time_t t = std::time(nullptr);
+      time_t t = std::time(NULL); //DX20200319 - nullptr -> NULL
       long int tm_curr = (long int) t;
       int pid = -1;
       bool del_tmp = false;
@@ -252,7 +252,7 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
-    sql_code = sqlite3_open_v2(tmp_file.c_str(), &db, open_flags, nullptr);
+    sql_code = sqlite3_open_v2(tmp_file.c_str(), &db, open_flags, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
       string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
       string message = "Could not open tmp database file " + tmp_file;
@@ -448,7 +448,7 @@ namespace aflowlib {
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
           key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
-          if (!aurostd::withinList(columns, key, index)) break;
+          if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
         }
         rebuild_db = (k != nkeys);
@@ -603,7 +603,7 @@ namespace aflowlib {
     string key = "";
     for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
       if(aurostd::substring2bool(XHOST.vschema.vxsghost[i], "::NAME:")) {
-        key = aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
+        key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
         keys.push_back(key);
       }
     }
@@ -831,7 +831,7 @@ namespace aflowlib {
                   nset = n;
                 } else {
                   for (uint i = 0; i < n; i++) {
-                    if (!aurostd::withinList(set, sets[t][c][i])) {
+                    if (!aurostd::WithinList(set, sets[t][c][i])) {
                       set.push_back(sets[t][c][i]);
                       nset++;
                     }
@@ -877,7 +877,7 @@ namespace aflowlib {
       vector<vector<int> >& counts, vector<vector<int> >& loop_counts,
       vector<vector<vector<string> > >& maxmin, vector<vector<vector<string> > >& sets) {
     sqlite3* cursor;
-    int sql_code = sqlite3_open_v2(database_file.c_str(), &cursor, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, nullptr);
+    int sql_code = sqlite3_open_v2(database_file.c_str(), &cursor, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
       string function = _AFLOW_DB_ERR_PREFIX_ + "getColStats()";
       string message = "Could not open cursor on database file " + database_file + ".";
@@ -919,9 +919,9 @@ namespace aflowlib {
     for (uint a = 0; a < arrays.size(); a++) {
       vector<string> tokens;
       arr = arrays[a];
-      arr = aurostd::RemoveSubString(arr, "[");
-      arr = aurostd::RemoveSubString(arr, "]");
-      arr = aurostd::RemoveSubString(arr, "\"");
+      arr=aurostd::RemoveSubString(arr, "[");
+      arr=aurostd::RemoveSubString(arr, "]");
+      arr=aurostd::RemoveSubString(arr, "\"");
       aurostd::string2tokens(arr, tokens, ", ");
       for (uint t = 0; t < tokens.size(); t++) {
         if (nunique == 0) {
@@ -961,7 +961,7 @@ namespace aflowlib {
       json << indent << tab << tab << tab << "\"count\": ";
       json << aurostd::utype2string<int>(db_stats.count[c]) << "," << std::endl;
       str_formatted = db_stats.min[c];
-      if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+      if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
         str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
         str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
         str_formatted = "\"" + str_formatted + "\"";
@@ -971,7 +971,7 @@ namespace aflowlib {
       json << indent << tab << tab << tab << "\"min\": "
         << (db_stats.min[c].empty()?"null":str_formatted) << "," << std::endl;
       str_formatted = db_stats.max[c];
-      if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+      if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
         str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
         str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
         str_formatted = "\"" + str_formatted + "\"";
@@ -992,7 +992,7 @@ namespace aflowlib {
         json << "[" << std::endl;
         for (uint s = 0; s < nset; s++) {
           str_formatted = db_stats.set[c][s];
-          if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+          if ((str_formatted[0] == '\"') && (str_formatted[str_formatted.size()-1] == '\"')) {  // Don't escape enclosing strings //DX20200317 - back() doesn't work for old GCC versions
             str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
             str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
             str_formatted = "\"" + str_formatted + "\"";
@@ -1273,7 +1273,7 @@ namespace aflowlib {
 
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2019                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
 //****************************************************************************

@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2017                    *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *            Aflow MARCO ESTERS - Duke University 2017-2020               *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
@@ -43,7 +43,7 @@ static const double C3[5] = {-0.5, 1.0, 0.0, -1.0, 0.5};
 
 namespace apl {
 
-  //Constructors////////////////////////////////////////////////////////////////
+  //Constructors//////////////////////////////////////////////////////////////
   // Default constructor
   AnharmonicIFCs::AnharmonicIFCs(ClusterSet& _clst,
       Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
@@ -54,14 +54,14 @@ namespace apl {
   AnharmonicIFCs::AnharmonicIFCs(vector<_xinput>& xInp,
       ClusterSet& _clst,
       const double& dist_mag, 
-      const aurostd::xoption& options,  // ME20190501
+      const aurostd::xoption& options,  //ME20190501
       Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
     free();
     distortion_magnitude = dist_mag;
-    max_iter = aurostd::string2utype<int>(options.getattachedscheme("MAX_ITER"));  // ME20190501
+    max_iter = aurostd::string2utype<int>(options.getattachedscheme("MAX_ITER"));  //ME20190501
     order = clst.order;
-    mixing_coefficient = aurostd::string2utype<double>(options.getattachedscheme("MIXING_COEFFICIENT"));  // ME20190501
-    sumrule_threshold = aurostd::string2utype<double>(options.getattachedscheme("THRESHOLD"));  // ME20190501
+    mixing_coefficient = aurostd::string2utype<double>(options.getattachedscheme("MIXING_COEFFICIENT"));  //ME20190501
+    sumrule_threshold = aurostd::string2utype<double>(options.getattachedscheme("THRESHOLD"));  //ME20190501
     cart_indices = getCartesianIndices();
 
     vector<vector<vector<xvector<double> > > > force_tensors;
@@ -79,14 +79,14 @@ namespace apl {
   AnharmonicIFCs::AnharmonicIFCs(const string& filename,
       ClusterSet& _clst,
       const double& dist_mag,
-      const aurostd::xoption& options,  // ME20190501
+      const aurostd::xoption& options,  //ME20190501
       Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
     free();
     distortion_magnitude = dist_mag;
-    max_iter = aurostd::string2utype<int>(options.getattachedscheme("MAX_ITER"));  // ME20190501
+    max_iter = aurostd::string2utype<int>(options.getattachedscheme("MAX_ITER"));  //ME20190501
     order = clst.order;
-    mixing_coefficient = aurostd::string2utype<double>(options.getattachedscheme("MIXING_COEFFICIENT"));  // ME20190501
-    sumrule_threshold = aurostd::string2utype<double>(options.getattachedscheme("THRESHOLD"));  // ME20190501
+    mixing_coefficient = aurostd::string2utype<double>(options.getattachedscheme("MIXING_COEFFICIENT"));  //ME20190501
+    sumrule_threshold = aurostd::string2utype<double>(options.getattachedscheme("THRESHOLD"));  //ME20190501
     readIFCsFromFile(filename);
   }
 
@@ -96,11 +96,14 @@ namespace apl {
   }
 
   const AnharmonicIFCs& AnharmonicIFCs::operator=(const AnharmonicIFCs& that) {
-    if (this != &that) copy(that);
+    if (this != &that) {
+      free();
+      copy(that);
+    }
     return *this;
   }
 
-  //copy////////////////////////////////////////////////////////////////////////
+  //copy//////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::copy(const AnharmonicIFCs& that) {
     _logger = that._logger;
     aflags = that.aflags;
@@ -114,12 +117,12 @@ namespace apl {
     sumrule_threshold = that.sumrule_threshold;
   }
 
-  //Destructor//////////////////////////////////////////////////////////////////
+  //Destructor////////////////////////////////////////////////////////////////
   AnharmonicIFCs::~AnharmonicIFCs() {
     free();
   }
 
-  //free////////////////////////////////////////////////////////////////////////
+  //free//////////////////////////////////////////////////////////////////////
   // Clears all vectors and resets all values.
   void AnharmonicIFCs::free() {
     cart_indices.clear();
@@ -131,7 +134,7 @@ namespace apl {
     sumrule_threshold = 0.0;
   }
 
-  //clear///////////////////////////////////////////////////////////////////////
+  //clear/////////////////////////////////////////////////////////////////////
   void AnharmonicIFCs::clear(ClusterSet& clst, Logger& l, _aflags& a) {
     AnharmonicIFCs that(clst, l, a);
     copy(that); 
@@ -143,9 +146,9 @@ namespace apl {
 
 namespace apl {
 
-  //getCartesianIndices/////////////////////////////////////////////////////////
-  // Returns a list of Cartesian indices. Since they are looped over frequently,
-  // it is quicker to calculate them once at the beginning.
+  //getCartesianIndices///////////////////////////////////////////////////////
+  // Returns a list of Cartesian indices. Since they are looped over
+  // frequently, it is quicker to calculate them once at the beginning.
   vector<vector<int> > AnharmonicIFCs::getCartesianIndices() {
     vector<vector<int> > indices;
     xcombos crt_ind(3, order, 'E', true);
@@ -156,9 +159,9 @@ namespace apl {
   }
 
   // BEGIN Forces
-  //storeForces/////////////////////////////////////////////////////////////////
-  // Stores the forces from the VASP calculations. Each item in the vector holds
-  // the force tensor for a set of distorted atoms.
+  //storeForces///////////////////////////////////////////////////////////////
+  // Stores the forces from the VASP calculations. Each item in the vector
+  // holds the force tensor for a set of distorted atoms.
   vector<vector<vector<xvector<double> > > > AnharmonicIFCs::storeForces(vector<_xinput>& xInp) {
     vector<vector<vector<xvector<double> > > > force_tensors(clst.ineq_distortions.size());
     int idxRun = 0;
@@ -169,7 +172,7 @@ namespace apl {
     return force_tensors;
   }
 
-  //getForces///////////////////////////////////////////////////////////////////
+  //getForces/////////////////////////////////////////////////////////////////
   // Retrieves all forces from the calculations. Also transforms the forces
   // into the forces of the equivalent distortions.
   vector<vector<xvector<double> > > AnharmonicIFCs::getForces(int id, int& idxRun,
@@ -250,7 +253,7 @@ namespace apl {
     }
   }
 
-  //getTransformedAtom//////////////////////////////////////////////////////////
+  //getTransformedAtom////////////////////////////////////////////////////////
   // Retrieves the atom that is obtained by the transformation in the given
   // symmetry map.
   int AnharmonicIFCs::getTransformedAtom(const vector<int>& symmap, const int& at) {
@@ -268,7 +271,7 @@ namespace apl {
   //END Forces
 
   // BEGIN Calculate unsymmetrized force constants
-  //calculateUnsymmetrizedIFCs//////////////////////////////////////////////////
+  //calculateUnsymmetrizedIFCs////////////////////////////////////////////////
   // Calculates the IFCs of the inequivalent clusters from the forces.
   vector<vector<double> >
     AnharmonicIFCs::calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>& idist,
@@ -289,12 +292,12 @@ namespace apl {
       return ifcs;
     }
 
-  //finiteDifference////////////////////////////////////////////////////////////
+  //finiteDifference//////////////////////////////////////////////////////////
   // Calculates the numerator for a specific IFC from the forces using the
   // central difference method. The denominator is calculated separately.
   //
-  // See https://www.geometrictools.com/Documentation/FiniteDifferences.pdf for
-  // formulas of higher order derivatives.
+  // See https://www.geometrictools.com/Documentation/FiniteDifferences.pdf
+  // for formulas of higher order derivatives.
   double AnharmonicIFCs::finiteDifference(const vector<vector<xvector<double> > >& forces, int at,
       const vector<int>& cart_ind, const vector<int>& atoms) {
     vector<int> powers(order - 1, 1);
@@ -367,13 +370,13 @@ namespace apl {
 
 namespace apl {
 
-  //symmetrizeIFCs//////////////////////////////////////////////////////////////
+  //symmetrizeIFCs////////////////////////////////////////////////////////////
   // Symmetrizes the IFCs using an iterative procedure to ensure 
   // that the force constants sum to zero.
   // 1. The IFCs of the inequivalent clusters will be symmetrized according to
   //    the linear combinations found while determining ClusterSets.
-  // 2. The force constants will be transformed to the other clusters using the
-  //    symmetry of the crystal.
+  // 2. The force constants will be transformed to the other clusters using
+  //    the symmetry of the crystal.
   // 3. Determine the deviations of the IFC sums from zero.
   // 4. If at least one deviation is above the chosen threshold, correct the
   //    linearly dependent IFCs. If none are above the threshold or too many
@@ -439,11 +442,11 @@ namespace apl {
   }
 
   // BEGIN Initializers
-  //getReducedClusters//////////////////////////////////////////////////////////
-  // Determines, for each set of inequivalent clusters, a uinque set of clusters
-  // that do not contain the last atom of the clusters. This set is important
-  // for the sum rules as they frequently require summations over the last atom
-  // within a set of inequivalent clusters.
+  //getReducedClusters////////////////////////////////////////////////////////
+  // Determines, for each set of inequivalent clusters, a uinque set of
+  // clusters that do not contain the last atom of the clusters. This set is
+  // important for the sum rules as they frequently require summations over
+  // the last atom within a set of inequivalent clusters.
   vector<vector<int> > AnharmonicIFCs::getReducedClusters() {
     vector<vector<int> > reduced_clusters;
     vector<int> cluster(order - 1);
@@ -470,13 +473,13 @@ namespace apl {
     return reduced_clusters;
   }
 
-  //getTensorTransformations////////////////////////////////////////////////////
+  //getTensorTransformations//////////////////////////////////////////////////
   // This algorithm does two things: it generates the tensor transformations
   // for each cluster to transform the IFCs of the inequivalent clusters; and
   // it generates a list of equivalent IFCs for each inequivalent cluster to
   // calculate the corrections.
   //
-  // Check the typedefs at the beginning of the file for tform and v5int
+  // Check the typedefs at the beginning of the file for tform and v4int
   void AnharmonicIFCs::getTensorTransformations(v4int& eq_ifcs,
       vector<vector<tform> >& transformations) {
     for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
@@ -529,7 +532,7 @@ namespace apl {
   // END Initializers
 
   // BEGIN Iterations
-  //applyLinCombs///////////////////////////////////////////////////////////////
+  //applyLinCombs/////////////////////////////////////////////////////////////
   // Sets the lineraly dependent IFCs according to the obtained linear
   // combinations.
   void AnharmonicIFCs::applyLinCombs(vector<vector<double> >& ifcs) {
@@ -548,7 +551,7 @@ namespace apl {
     }
   }
 
-  //transformIFCs///////////////////////////////////////////////////////////////
+  //transformIFCs/////////////////////////////////////////////////////////////
   // Transforms all IFCs using symmetry. The first two loops go over all
   // equivalent clusters and transform the inequivalent clusters using tensor
   // transformations.
@@ -575,7 +578,7 @@ namespace apl {
     }
   }
 
-  //calcSums////////////////////////////////////////////////////////////////////
+  //calcSums//////////////////////////////////////////////////////////////////
   // Determines the deviations from zero and the sum of the absolute values
   // for each reduced cluster. Both are used for the correction of the IFCs
   // while the deviations from zero are also used as errors for the sum rules.
@@ -596,7 +599,7 @@ namespace apl {
     }
   }
 
-  //correctIFCs/////////////////////////////////////////////////////////////////
+  //correctIFCs///////////////////////////////////////////////////////////////
   // Corrects the IFCs the comply with the sum rule using weighted averages.
   //
   // Check the typedef at the beginning of the file for v5int.
@@ -650,7 +653,7 @@ namespace apl {
     }
   }
 
-  //getCorrectionTerms//////////////////////////////////////////////////////////
+  //getCorrectionTerms////////////////////////////////////////////////////////
   // Calculates the correction term for each IFC.
   vector<double>
     AnharmonicIFCs::getCorrectionTerms(const int& c,
@@ -691,7 +694,7 @@ namespace apl {
 namespace apl {
 
   // BEGIN Write files
-  //writeIFCsToFile/////////////////////////////////////////////////////////////
+  //writeIFCsToFile///////////////////////////////////////////////////////////
   // Writes the AnharmonicIFCs object and minimal structure information to an
   // XML file.
   void AnharmonicIFCs::writeIFCsToFile(const string& filename) {
@@ -711,9 +714,9 @@ namespace apl {
     }
   }
 
-  //writeParameters/////////////////////////////////////////////////////////////
-  // Writes the calculation parameters and minimal structure information to the
-  // XML file.
+  //writeParameters///////////////////////////////////////////////////////////
+  // Writes the calculation parameters and minimal structure information to
+  // the XML file.
   string AnharmonicIFCs::writeParameters() {
     stringstream parameters;
     string tab = " ";
@@ -724,8 +727,8 @@ namespace apl {
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME20190219
-    parameters.unsetf(std::ios::hex);  // ME20190125 - Remove hexadecimal formatting
+    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  //ME20190219
+    parameters.unsetf(std::ios::hex);  //ME20190125 - Remove hexadecimal formatting
     parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
 
@@ -784,7 +787,7 @@ namespace apl {
     return parameters.str();
   }
 
-  //writeIFCs///////////////////////////////////////////////////////////////////
+  //writeIFCs/////////////////////////////////////////////////////////////////
   // Writes the force constants part of the XML file.
   string AnharmonicIFCs::writeIFCs() {
     stringstream ifcs;
@@ -836,7 +839,7 @@ namespace apl {
   // END Write files
 
   // BEGIN Read files
-  //readIFCsFromFile////////////////////////////////////////////////////////////
+  //readIFCsFromFile//////////////////////////////////////////////////////////
   // Reads an AnharmonicIFCs object from an XML file.
   void AnharmonicIFCs::readIFCsFromFile(const string& filename) {
     // Open file and handle exceptions
@@ -873,13 +876,14 @@ namespace apl {
     }
   }
 
-  //checkCompatibility//////////////////////////////////////////////////////////
-  // Checks if the hibernate XML file is compatible with the aflow.in file. If
-  // the checksum in the XML file is the same as the checksum of the aflow.in
-  // file, then the parameters are the same. If not, the function checks if the
-  // parameters relevant for the IFC calculation (supercell, order, calculation
-  // parameters) are the same. This prevents the anharmonic IFCs from being
-  // recalculated when only post-processing parameters are changed.
+  //checkCompatibility////////////////////////////////////////////////////////
+  // Checks if the hibernate XML file is compatible with the aflow.in file.
+  // If the checksum in the XML file is the same as the checksum of the
+  // aflow.in file, then the parameters are the same. If not, the function
+  // checks if the parameters relevant for the IFC calculation (supercell,
+  // order, calculation parameters) are the same. This prevents the anharmonic
+  // IFCs from being recalculated when only post-processing parameters are
+  // changed.
   bool AnharmonicIFCs::checkCompatibility(uint& line_count, 
       const vector<string>& vlines) {
     string function = _AAPL_IFCS_ERR_PREFIX_ + "checkCompatibility";
@@ -904,7 +908,7 @@ namespace apl {
 
     t = line.find_first_of(">") + 1;
     tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME20190219
+    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  //ME20190219
       message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
       tokens.clear();
@@ -1171,7 +1175,7 @@ namespace apl {
     return compatible;
   }
 
-  //readIFCs////////////////////////////////////////////////////////////////////
+  //readIFCs//////////////////////////////////////////////////////////////////
   // Reads the IFCs from the hibernate file.
   vector<vector<double> > AnharmonicIFCs::readIFCs(uint& line_count,
       const vector<string>& vlines) {
@@ -1232,7 +1236,7 @@ namespace apl {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow Marco Esters - Duke University 2018                *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *                Aflow MARCO ESTERS - Duke University 2018-2020           *
 // *                                                                         *
 // ***************************************************************************

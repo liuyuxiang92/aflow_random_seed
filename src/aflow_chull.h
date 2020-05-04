@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow COREY OSES - Duke University 2013-2019                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow COREY OSES - Duke University 2013-2020                  *
 // *                                                                         *
 // ***************************************************************************
 // Written by Corey Oses
@@ -35,15 +35,17 @@ const char _m_ = 'm';    // convert to milli-
 const int CHULL_PRECISION = 8;                          //must be less than _precision_ in aflow_xatom.cpp, which is currently set to 14
 const int FULL_PRECISION = 15;                          //max printing precision
 const int COEF_PRECISION = 4;
+const int MEV_PRECISION = 3;                            //precision to within 1 meV
 const double ZERO_TOL = pow(10,-CHULL_PRECISION);       //lower bound for absolute resolution of floats, significant differences among floats should be well above this threshold
-const double ROUNDOFF_TOL = pow(10,-CHULL_PRECISION+2); //make less strigent so we don't get 1e-6
+const double ROUNDOFF_TOL = pow(10,-CHULL_PRECISION+2); //make less stringent so we don't get 1e-6
 const double ZERO_FULL_TOL = pow(10,-FULL_PRECISION);
 const double ZERO_COEF_TOL = pow(10,-COEF_PRECISION);
+const double ZERO_MEV_TOL = pow(10,-MEV_PRECISION);
 const double ENERGY_TOL = 0.015;                        //eV, CO NOTES - structures within this thresold may be equivalent, I've seen as large as 5meV, keep at 15 to be safe
 const int ZERO_RANGE_TOL = 1;
 //[CO20180316 - moved to aflowrc]const uint BINARY_ENTRIES_THRESHOLD = 200;
 
-// CO20180419 - moved to AFLOWRuntimeError and AFLOWLogicError
+//CO20180419 - moved to AFLOWRuntimeError and AFLOWLogicError
 //namespace chull {
 //  class CHullRuntimeError : public std::runtime_error {
 //    public:
@@ -72,10 +74,10 @@ namespace chull {
   ////////////////////////////////////////////////////////////////////////////////
   // gets path to redirect output
   string getPath(bool add_backslash=true);
-  string getPath(const aurostd::xoption& vpflow, ostream& oss=cout, bool silent=true); // CO20180220
-  string getPath(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& oss=cout, bool silent=true);  // CO20180220
-  string getPath(string _path, ostream& oss=cout, bool silent=true); // CO20180220
-  string getPath(string _path, ofstream& FileMESSAGE, ostream& oss=cout, bool silent=true);  // CO20180220
+  string getPath(const aurostd::xoption& vpflow, ostream& oss=cout, bool silent=true); //CO20180220
+  string getPath(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& oss=cout, bool silent=true);  //CO20180220
+  string getPath(string _path, ostream& oss=cout, bool silent=true); //CO20180220
+  string getPath(string _path, ofstream& FileMESSAGE, ostream& oss=cout, bool silent=true);  //CO20180220
   ////////////////////////////////////////////////////////////////////////////////
   //logs which flags are on
   void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ostream& oss=cout, bool silent=false);
@@ -116,7 +118,7 @@ namespace chull {
   bool correctSignVerticalDistance(double dist_2_hull,bool should_be_positive);
 } // namespace chull
 
-// CO20180420 - moved to xStream (aflow.h)
+//CO20180420 - moved to xStream (aflow.h)
 //namespace chull {
 //  class ChullClassTemplate {
 //    public:
@@ -926,7 +928,7 @@ namespace chull {
 
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *           Aflow COREY OSES - Duke University 2013-2019                  *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
+// *           Aflow COREY OSES - Duke University 2013-2020                  *
 // *                                                                         *
 // ***************************************************************************

@@ -1,6 +1,6 @@
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************
@@ -1257,6 +1257,40 @@ DEFAULT_APL_PHEIGENVAL_FILE
   default: "PHEIGENVAL"
 
 ####################################################################################################
+DEFAULTS QHA
+
+DEFAULT_QHA_MODE
+  descriptions: Defines QHA mode to run (it is possible to run several modes simultaneously).
+  type: string
+  choices: "QHA", "QHA3P", "SCHQA" or their comma-separated combination
+  default: "QHA"
+
+DEFAULT_QHA_EOS
+  description: Runs equation of state (EOS) calculation (includes several APL runs) to obtain thermodynamic properties of material.
+  type: bool
+  default: 1
+
+DEFAULT_QHA_EOS_DISTORTION_RANGE
+  description: Sets the range of volumes and the volume increment for the set of EOS calculations.
+  type: string
+  default: "-12:16:3"
+
+DEFAULT_QHA_GP_DISTORTION
+  description: Sets the value of volume change (dV) for the calculation of the Grueneisen parameter using the finite difference method.
+  type: double
+  default: 1.0
+
+DEFAULT_QHA_INCLUDE_ELEC_CONTRIB
+  description: Defines if electronic contribution to the free energy is included.
+  type: bool
+  default: 0
+
+DEFAULT_QHA_SCQHA_PDIS_T
+  description: Defines the set of temperatures to calculate the temperature-dependent phonon band structure with the SCQHA method.
+  type: string
+  default: "50,100,600"
+
+####################################################################################################
 DEFAULTS AAPL
 
 DEFAULT_AAPL_BTE
@@ -1707,7 +1741,7 @@ For additional information contact: Stefano Curtarolo (stefano@duke.edu) or
 
 ****************************************************************************************************
 *                                                                                                  *
-*                        aflow - STEFANO CURTAROLO Duke University 2003-2019                       *
+*                        aflow - STEFANO CURTAROLO Duke University 2003-2020                       *
 *                            High-Throughput ab-initio Computing Project                           *
 *                                                                                                  *
 ****************************************************************************************************

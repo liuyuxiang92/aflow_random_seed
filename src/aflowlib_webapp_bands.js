@@ -159,7 +159,7 @@ $(document).ready(function() {
         return d3.max(array);
       })
     );
-    // PC --  2018/08/09
+    //PC --  2018/08/09
   // dosX = [-10, 10];
     //dosX = [min-1, max+1];
      dosX = [-finalMaxDosX, finalMaxDosX];
@@ -304,7 +304,7 @@ $(document).ready(function() {
         return d3.max(array);
       })
     );
-    // PC -- 2018/08/09 
+    //PC -- 2018/08/09 
     //dosX = [0, max + 2];
      dosX = [0, maxDosX];
 

@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2018
@@ -15,7 +15,7 @@
 //#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ double(1.0e-6)
 
 //#ifndef _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_
-//#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ 1.0e-6 // DX20171025
+//#define _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_ 1.0e-6 //DX20171025
 //#endif
 
 #ifndef XXEND
@@ -283,7 +283,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ME20180904 returns a matrix column as an xvector
+//ME20180904 returns a matrix column as an xvector
 namespace aurostd {  // namespace aurostd
   template<class utype>
     xvector<utype> xmatrix<utype>::getcol(int i) const {
@@ -710,7 +710,7 @@ namespace aurostd {  // namespace aurostd
       printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif    
       if(a.cols!=b.rows) {
-        // ME20190814 - eliminate exit
+        //ME20190814 - eliminate exit
         //{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*: (a.cols!=b.rows)=FALSE" << endl;exit(0);}    
         string function = "aurostd::xmatrix<utype>::operator*";
         string message = "a.cols != b.rows";
@@ -725,7 +725,7 @@ namespace aurostd {  // namespace aurostd
         ai=a[ii];
         //for(k=a.lcols,kk=b.lcols;k<=a.ucols;k++,kk++)
         for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)
-        { //CO200106 - patching for auto-indenting
+        { //CO20200106 - patching for auto-indenting
           bk=b[kk];
           aik=ai[k];
           for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)
@@ -743,7 +743,7 @@ namespace aurostd {  // namespace aurostd
       return  c;
     }
 
-  // ME20190814 - multiplication of a real matrix with a complex matrix
+  //ME20190814 - multiplication of a real matrix with a complex matrix
   template<class utype>
     xmatrix<xcomplex<utype> > operator*(const xmatrix<utype>& a, const xmatrix<xcomplex<utype> >& b) {
 #ifdef _XMATH_DEBUG_OPERATORS
@@ -839,7 +839,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
     operator/(const xmatrix<utype>& a,const utype s) {
-      return (utype) ((utype)1/s)*a;                     // DX20170115 - add utype to 1/s to account for xcomplex
+      return (utype) ((utype)1/s)*a;                     //DX20170115 - add utype to 1/s to account for xcomplex
     }
   template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
     operator/(const xmatrix<utype>& a,const xmatrix<utype>& b) {  //CO20191201
@@ -884,12 +884,12 @@ namespace aurostd {  // namespace aurostd
 
   template<class utype> bool                             // is xmatrix == xmatrix ?
     identical(const xmatrix<utype>& a,const xmatrix<utype>& b,const utype& _tol_,const char& _mode_) {
-      // ME20190814 - BEGIN
+      //ME20190814 BEGIN
       // [OBSOLETE - return false instead] if(a.rows!=b.rows) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[1]" << endl;exit(0);}
       // [OBSOLETE - return false instead] if(a.cols!=b.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[2]" << endl;exit(0);}
       if ((a.rows != b.rows) || (a.cols != b.cols)) return false;
-      //if(a.isfloat || a.iscomplex) { ME20190814 - this doesn't work for xcomplex because abs() and _tol_ have different types //[CO200106 - close bracket for indenting]}
-      // ME20190814 - END
+      //if(a.isfloat || a.iscomplex) { ME20190814 - this doesn't work for xcomplex because abs() and _tol_ have different types //[CO20200106 - close bracket for indenting]}
+      //ME20190814 END
       if(a.isfloat) {
         if(_mode_==1) { // relative tolerance
           for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++)
@@ -969,7 +969,7 @@ namespace aurostd {  // namespace aurostd
       return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
     }
 
-  // ME20190814 - xcomplex version
+  //ME20190814 - xcomplex version
   // namespace aurostd
   template<class utype> bool
     identical(const xmatrix<xcomplex<utype> >& a, const xmatrix<xcomplex<utype> >& b, const utype& _tol_, const char& _mode_) {
@@ -1067,7 +1067,7 @@ namespace aurostd {  // namespace aurostd
     }    
 
   // namespace aurostd
-  //CO - START
+  //CO START
   template<class utype> bool
     isidentity(const xmatrix<utype>& a) {
       if(a.rows!=a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in issymmetric (must be square)" << endl;exit(0);}
@@ -1080,11 +1080,11 @@ namespace aurostd {  // namespace aurostd
           }
       return TRUE;
     }
-  //CO - START
+  //CO START
 
   // namespace aurostd
   template<class utype> bool
-    isdiagonal(const xmatrix<utype>& a,const utype& _eps_) { // DX20171025
+    isdiagonal(const xmatrix<utype>& a,const utype& _eps_) { //DX20171025
       for(int i=a.lrows;i<=a.urows;i++)
         for(int j=a.lcols;j<=a.ucols;j++)
           if(i-a.lrows+1!=j-a.lcols+1)  // i != j
@@ -1365,13 +1365,13 @@ namespace aurostd {
 // -------------------------------------------------------------- xmatrix example types
 
 namespace aurostd {  // namespace aurostd
-  //171008 - CO
+  //20171008 - CO
   //doesn't have to be square like identity
   template<class utype> xmatrix<utype>
     eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO20190520
       if(nch==AUROSTD_MAX_INT){nch=nrh;}  //eye(3)==eye(3,3)
       xmatrix<utype> a(nrh,nch,nrl,ncl);
-      //[CO200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME200106
+      //[CO20200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME20200106
       int i=0,j=0;
       for (i=a.lrows;i<=a.urows;i++){
         for (j=a.lcols;j<=a.ucols;j++){
@@ -1383,7 +1383,7 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
-  //171008 - CO
+  //20171008 - CO
   template<class utype> xmatrix<utype>
     ones_xm(int nrh,int nch,int nrl,int ncl) __xprototype { //CO20190520
       xmatrix<utype> a(nrh,nch,nrl,ncl);
@@ -1682,7 +1682,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 // Cayley-Menger Determinant
 // http://mathworld.wolfram.com/Cayley-MengerDeterminant.html
-// CO20180515
+//CO20180515
 namespace aurostd { // namespace aurostd
   template<class utype> utype
     CMdet(const xmatrix<utype>& B){ //Cayley-Menger Determinant for simplex content
@@ -1707,8 +1707,8 @@ namespace aurostd { // namespace aurostd
 
 // ----------------------------------------------------------------------------
 // getRotationMatrix3D() rotating a onto b
-// https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
-// CO20190324
+// https://math.stackexchange.com/questions/20180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
+//CO20190324
 namespace aurostd { // namespace aurostd
   template<class utype> xmatrix<utype>
     getRotationMatrix3D(const xvector<utype>& a,const xvector<utype>& b){
@@ -2209,7 +2209,7 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-  template<class utype> utype  // DX20170115 - double to utype (needed for xcomplex)                                          // trace
+  template<class utype> utype  //DX20170115 - double to utype (needed for xcomplex)                                          // trace
     trace(const xmatrix<utype>& a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function trace: ");
@@ -2218,7 +2218,7 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(!a.issquare)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in trace defined for square xmatrixes" << endl;exit(0);}
-      utype out=0.0; // DX20170115 - double to utype (needed for xcomplex)
+      utype out=0.0; //DX20170115 - double to utype (needed for xcomplex)
       for(int i=a.lrows;i<=a.urows;i++)
         out+=a[i][i];
       return out;
@@ -2228,7 +2228,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {
   template<class utype>
-    xmatrix<utype> KroneckerProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { // ME20180614 - Kronecker product
+    xmatrix<utype> KroneckerProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //ME20180614 - Kronecker product
       int rows, cols, r, c;
       utype aelement, belement;
       rows = A.rows * B.rows;
@@ -2271,17 +2271,28 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-namespace aurostd {  // namespace aurostd
-  template<class utype>                                 // identity xmatrix
-    xmatrix<utype> identity(const utype& _type,const int& n,const int& m) {
-      xmatrix<utype> a(n,m);
-      if(!a.issquare)
-      {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in identity defined for square xmatrixes [2]" << endl;exit(0);}
-      for(int i=a.lrows;i<=a.urows;i++)
-        for(int j=a.lcols;j<=a.ucols;j++)
-          if(i==j) a[i][j]=(utype) 1.0; else a[i][j]=(utype) 0.0;
-      return a;
-      if(_type) {;}  // something phony to keep _type busy !
+// ME20200123 - if the identity matrix must be square, why would we allow two
+// input parameters?
+//[OBSOLETE]namespace aurostd {  // namespace aurostd
+//[OBSOLETE]  template<class utype>                                 // identity xmatrix
+//[OBSOLETE]    xmatrix<utype> identity(const utype& _type,const int& n,const int& m) {
+//[OBSOLETE]      xmatrix<utype> a(n,m);
+//[OBSOLETE]      if(!a.issquare)
+//[OBSOLETE]      {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in identity defined for square xmatrixes [2]" << endl;exit(0);}
+//[OBSOLETE]      for(int i=a.lrows;i<=a.urows;i++)
+//[OBSOLETE]        for(int j=a.lcols;j<=a.ucols;j++)
+//[OBSOLETE]          if(i==j) a[i][j]=(utype) 1.0; else a[i][j]=(utype) 0.0;
+//[OBSOLETE]      return a;
+//[OBSOLETE]      if(_type) {;}  // something phony to keep _type busy !
+//[OBSOLETE]    }
+//[OBSOLETE]}
+
+// ME20200123
+namespace aurostd {
+  template<class utype>
+    xmatrix<utype> identity(const utype& _type, int ubounds, int lbounds) {
+      return eye<utype>(ubounds, ubounds, lbounds, lbounds);
+      if (_type) {;}  // To suppress compiler warnings
     }
 }
 
@@ -2384,7 +2395,7 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-  // ME20180904
+  //ME20180904
   template<class utype> xmatrix<utype>                             // conj xmatrix
     conj(const xmatrix<utype>& a){
       if (a.iscomplex) {
@@ -2447,7 +2458,7 @@ namespace aurostd {  // namespace aurostd
       }
     }
   template<class utype> void                             // trasp xmatrix
-    traspInPlace(xmatrix<utype>& a,bool conjugate){  // ME20190813 - conjugate complex now an option //CO20191201 - in place
+    traspInPlace(xmatrix<utype>& a,bool conjugate){  //ME20190813 - conjugate complex now an option //CO20191201 - in place
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function traspose xmatrix: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
@@ -2481,7 +2492,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                             // trasp xvector
-    trasp(const xvector<utype>& a, bool conjugate){  // ME20190813 - conjugate complex now an option
+    trasp(const xvector<utype>& a, bool conjugate){  //ME20190813 - conjugate complex now an option
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function traspose xvector: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
@@ -3099,7 +3110,7 @@ namespace aurostd {  // namespace aurostd
     xmatrix<int> mx(ma.urows,ma.ucols,ma.lrows,ma.lcols),my(ma.urows,ma.ucols,ma.lrows,ma.lcols);
     return GCD(ma,mb,mgcd,mx,my);
   }
-  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my){ //CO20191291
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my){ //CO20191219
     if(ma.rows==0 || ma.cols==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.rows==0 || ma.cols==0",_INPUT_NUMBER_);}
     //ma vs. mb
     if(ma.lrows!=mb.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.lrows!=mb.lrows",_INDEX_MISMATCH_);}
@@ -3581,14 +3592,14 @@ namespace aurostd {
           z[ip]=0.0;
         }
       }
-      // ME200106 - replace with xerror
+      //ME20200106 - replace with xerror
       //cerr << _AUROSTD_XLIBS_ERROR_ << "JACOBI: Too many iterations in routine jacobi" << endl;
       //exit(0);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, "xmatrix::jacobi()", "Too many iterations.", _RUNTIME_ERROR_);
     }
 #undef ROTATE  
 
-  // ME20190815
+  //ME20190815
   // Jacobi algorithm for Hermitian matrices (used to be in APL/apl_aplmath.cpp)
   // Based on http://arxiv.org/abs/physics/0607103
   template<class utype>
@@ -3791,7 +3802,7 @@ namespace aurostd {
 }
 
 // ****************************************************
-// CO20171129
+//CO20171129
 namespace aurostd {
   template<class utype>
     void QRDecomposition_HouseHolder(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO20191110
@@ -3920,7 +3931,7 @@ namespace aurostd {
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }
   template<class utype>
-    void getEHermite(utype a,utype b,xmatrix<utype>& ehermite){ //CO+YL191201
+    void getEHermite(utype a,utype b,xmatrix<utype>& ehermite){ //CO+YL20191201
       //implementation is inspired by that found here: http://pydoc.net/GBpy/0.1.1/GBpy.tools/
       //original license: GNU-GPL Style.
       //Elementary Hermite transformation.
@@ -3954,7 +3965,7 @@ namespace aurostd {
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }
   template<class utype>
-    void getSmithNormalForm(const xmatrix<utype>& A_in,xmatrix<utype>& U_out,xmatrix<utype>& V_out,xmatrix<utype>& S_out,double tol){  //CO+YL191201
+    void getSmithNormalForm(const xmatrix<utype>& A_in,xmatrix<utype>& U_out,xmatrix<utype>& V_out,xmatrix<utype>& S_out,double tol){  //CO+YL20191201
       //implementation is inspired by that found here: http://pydoc.net/GBpy/0.1.1/GBpy.tools/
       //original license: GNU-GPL Style.
       //Smith normal form of an integer matrix.
@@ -5108,7 +5119,7 @@ namespace aurostd { // namespace aurostd
       // Loop over singular values and over alowed iterations
       for(int its=1;its<=_MAX_ITS;its++) {
         flag=true;
-        //for(l=k;l>=1;l-- ) { // test forsplitting //[CO200106 - close bracket for indenting]}
+        //for(l=k;l>=1;l-- ) { // test forsplitting //[CO20200106 - close bracket for indenting]}
         // to avoid out of range as nm cannot be 0
         // should check!!!!!
         nm=1;
@@ -5454,12 +5465,249 @@ namespace aurostd { // namespace aurostd
 }
 
 // **************************************************************************
+// **************************************************************************
+//CO20200404 - moving matrix() from pflow to aurostd because it is templated
+//doesn't compile otherwise
+
+// ***************************************************************************
+// Matrix classes in Dane Morgan Style
+// ***************************************************************************
+namespace aurostd {
+  // constructor
+
+  template<class utype> matrix<utype>::matrix(void) {free();} // default
+
+  template<class utype>
+    matrix<utype>::matrix(const int m) { // specifying rows
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
+      std::vector<utype> v;
+      mat=std::vector<std::vector<utype> > (m,v);
+    }
+
+  template<class utype>
+    matrix<utype>::matrix(const int m, const int n) { // specifying rows and columns
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
+      std::vector<utype> v(n);
+      mat=std::vector<std::vector<utype> > (m,v);
+    }
+
+  template<class utype>
+    matrix<utype>::matrix(const int m, const std::vector<utype>& inutypevec) { // specifying rows as vectors.
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
+      mat=std::vector<std::vector<utype> > (m,inutypevec);
+    }
+
+  template<class utype>
+    matrix<utype>::matrix(const int m, const int n, const utype& inutype) { // specifying rows and columns and initial values
+      free();  //CO20200404 pflow::matrix()->aurostd::matrix()
+      std::vector<utype> v(n);
+      mat=std::vector<std::vector<utype> > (m,v);
+      for(uint i=0;i<mat.size();i++) {
+        for(uint j=0;j<mat[i].size();j++) {
+          mat[i][j]=inutype;
+        }
+      }
+    }
+
+  //CO20200404 START - patching matrix for nietzsche
+  template<class utype> matrix<utype>::matrix(const matrix& b){copy(b);}
+  template<class utype> matrix<utype>::~matrix(void){free();}
+  template<class utype> void matrix<utype>::clear() {matrix a;copy(a);}  //clear PUBLIC
+  
+  template<class utype>
+    const matrix<utype>& matrix<utype>::operator=(const matrix& other) {
+      if(this!=&other) {copy(other);}
+      return *this;
+    }
+
+  template<class utype>
+    void matrix<utype>::free(){
+      for(uint i=0;i<mat.size();i++){mat[i].clear();} mat.clear();
+    }
+
+  template<class utype>
+    void matrix<utype>::copy(const matrix& b){
+      free();
+      for(uint i=0;i<b.mat.size();i++){mat.push_back(std::vector<utype>(0));for(uint j=0;j<b.mat[i].size();j++){mat[i].push_back(b.mat[i][j]);}}
+    }
+  //CO20200404 STOP - patching matrix for nietzsche
+
+  // accessors
+  template<class utype>
+    void matrix<utype>::print(void) {
+      cout.setf(std::ios::fixed,std::ios::floatfield);
+      cout.precision(4);
+      for(uint i=0;i<mat.size();i++) {
+        cout << "  ";
+        for(uint j=0;j<mat[i].size();j++) {
+          cout << " " << mat[i][j];
+        }
+        cout << endl;
+      }
+    }
+
+  //   template<class utype>
+  //   inline int matrix<utype>::size(void) const{
+  //     return (int) mat.size();
+  //   }
+
+
+  template<class utype>
+    matrix<utype> matrix<utype>::transpose() const{
+      matrix<utype> tmat;
+      uint m=mat.size();
+      if(m==0) return tmat;
+      uint n=mat[0].size();
+      tmat = matrix<utype> (n,m);
+      for(uint i=0;i<m;i++) {
+        for(uint j=0;j<n;j++) {
+          tmat[j][i]=mat[i][j];
+        }
+      }
+      return tmat;
+    }
+
+  // template<class utype>
+  // std::vector<std::vector<utype> >::iterator matrix<utype>::begin() {
+  // return mat.begin();
+  // }
+  //
+  // template<class utype>
+  // std::vector<std::vector<utype> >::iterator matrix<utype>::end() {
+  // return mat.end();
+  // }
+
+  // operator
+  //   template<class utype>
+  //   std::vector<utype>& matrix<utype>::operator[] (const int index) {
+  //     assert(index>=0 && index<=mat.size());
+  //     return mat[index];
+  //   }
+  //   template<class utype>
+  //   const std::vector<utype>& matrix<utype>::operator[] (const int index) const {
+  //     assert(index>=0 && index<=mat.size());
+  //     return mat[index];
+
+  //   }
+
+  //[CO20200404 - OBSOLETE]template<class utype>
+  //[CO20200404 - OBSOLETE]  const matrix<utype>& matrix<utype>::operator=(const matrix<utype> &b) {
+  //[CO20200404 - OBSOLETE]    if(this != &b) {
+  //[CO20200404 - OBSOLETE]      uint m=b.mat.size();
+  //[CO20200404 - OBSOLETE]      uint n=0;
+  //[CO20200404 - OBSOLETE]      mat=std::vector<std::vector<utype> > (m);
+  //[CO20200404 - OBSOLETE]      for(uint i=0;i<m;i++) {
+  //[CO20200404 - OBSOLETE]        n=b.mat[i].size();
+  //[CO20200404 - OBSOLETE]        mat[i]=std::vector<utype> (n);
+  //[CO20200404 - OBSOLETE]        for(uint j=0;j<n;j++) {
+  //[CO20200404 - OBSOLETE]          mat[i][j]=b.mat[i][j];
+  //[CO20200404 - OBSOLETE]        }
+  //[CO20200404 - OBSOLETE]      }
+  //[CO20200404 - OBSOLETE]    }
+  //[CO20200404 - OBSOLETE]    return *this;
+  //[CO20200404 - OBSOLETE]  }
+
+  // mutators
+  //  template<class utype>
+  // void matrix<utype>::push_back(const std::vector<utype>& inutypevec) {
+  //   mat.push_back(inutypevec);
+  //  }
+
+  //  template<class utype>
+  // void matrix<utype>::pop_back() {
+  //   mat.pop_back();
+  //  }
+
+  template<class utype>
+    void matrix<utype>::vecvec2mat(const std::vector<std::vector<utype> >& inVV) {
+      mat=std::vector<std::vector<utype> > (inVV.size());
+      for(uint i=0;i<mat.size();i++) {
+        mat[i]=std::vector<utype> (inVV[i].size());
+        for(uint j=0;j<mat[i].size();j++) {
+          mat[i][j]=inVV[i][j];
+        }
+      }
+    }
+
+  // template<class utype>
+  // void matrix<utype>::clear() {
+  //   mat.clear();
+  // }
+
+  template<class utype>
+    void matrix<utype>::vec2mat(const std::vector<utype>& inV) {
+      mat=std::vector<std::vector<utype> > (1);
+      mat[0]=std::vector<utype> (inV.size());
+      for(uint j=0;j<mat[0].size();j++) {
+        mat[0][j]=inV[j];
+      }
+    }
+
+  // template<class utype>
+  // void matrix<utype>::insert(const int& id, const std::vector<utype>& inV) {
+  //  mat.insert(mat.begin()+id,inV);
+  // }
+
+  // template<class utype>
+  // void matrix<utype>::erase(const int id) {
+  // std::vector<utype>::iterator p=mat.begin()+id;
+  // mat.erase(p);
+  // }
+
+  // template<class utype>
+  // void matrix<utype>::erase_col(const int id) {
+  //   for(int i=0;i<mat.size();i++) {
+  //           std::vector<utype>::iterator p=mat[i].begin()+id;
+  //     if(id<mat[i].size()) mat[i].erase(p);
+  //   }
+  // }
+
+  // template<class utype>
+  // void matrix<utype>::erase(const int id) {
+  //   std::vector<std::vector<utype> >::iterator p=mat.begin()+id;
+  //   mat.erase(p);
+  // }
+
+  template <class utype> matrix<utype>
+    xmatrix2matrix(const xmatrix<utype>& _xmatrix) {
+      int isize=_xmatrix.rows,jsize=_xmatrix.cols;
+      matrix<utype> _matrix(isize,jsize);
+      for(register int i=0;i<isize;i++)
+        for(register int j=0;j<jsize;j++)
+          _matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
+      return _matrix;
+    }
+
+  //   matrix<double> xmatrix2matrix(const xmatrix<double>& _xmatrix) {
+  //     int isize=_xmatrix.rows,jsize=_xmatrix.cols;
+  //     matrix<double> _matrix(isize,jsize);
+  //     for(register int i=0;i<isize;i++)
+  //       for(register int j=0;j<jsize;j++)
+  // 	_matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
+  //     return _matrix;
+  //   }
+
+  template <class utype> xmatrix<utype>
+    matrix2xmatrix(const matrix<utype>& _matrix) {
+      int isize=_matrix.size(),jsize=_matrix[0].size();
+      xmatrix<utype> _xmatrix(isize,jsize);
+      for(register int i=1;i<=isize;i++)
+        for(register int j=1;j<=jsize;j++)
+          _xmatrix(i,j)=_matrix[i-1][j-1];
+      return _xmatrix;
+    }
+
+
+
+}
+
+// **************************************************************************
 
 
 
 #endif
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************

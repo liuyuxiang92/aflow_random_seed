@@ -39,7 +39,7 @@ namespace apl {
 
     // Check if supercell is already built
     if (!_supercell.isConstructed()) {
-      // ME20191029 - use xerror
+      //ME20191029 - use xerror
       //throw APLRuntimeError("apl::DirectMethodPC::calculateForceFields(); The supercell structure has not been initialized yet.");
       string message = "The supercell structure has not been initialized yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
@@ -49,25 +49,25 @@ namespace apl {
     // Determine the distortion vectors
     estimateUniqueDistortions(_supercell.getSupercellStructure(), _uniqueDistortions);
 
-    //CO - START
-    vvgenerate_plus_minus.clear();  //CO //CO20181226  // ME20191029
+    //CO START
+    vvgenerate_plus_minus.clear();  //CO //CO20181226  //ME20191029
     bool generate_plus_minus;           //CO
     //bool         check_minus_needed = ( AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS && !_supercell.isDerivativeStructure() );
     //bool check_minus_needed = (AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS);  OBSOLETE ME20181028 - this overrides DPM=OFF
-    //[CO20181212]bool check_minus_needed = AUTO_GENERATE_PLUS_MINUS;  // ME20181028
-    int ncalcs = 0;  // ME20190107 - total number of calculations for padding
-    if (_calculateZeroStateForces) ncalcs++;  // ME20190112
-    if (_isPolarMaterial) ncalcs++;  // ME20190112
+    //[CO20181212]bool check_minus_needed = AUTO_GENERATE_PLUS_MINUS;  //ME20181028
+    int ncalcs = 0;  //ME20190107 - total number of calculations for padding
+    if (_calculateZeroStateForces) ncalcs++;  //ME20190112
+    if (_isPolarMaterial) ncalcs++;  //ME20190112
 
     for (uint i = 0; i < _uniqueDistortions.size(); i++) {
       vvgenerate_plus_minus.push_back(vector<bool>(0)); //CO20181226
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         //      vvgenerate_plus_minus.push_back(true);  //assume we need plus/minus OBSOLETE ME20181028 - this overrides DPM=OFF
-        // ME20190107 - Calculate "need minus" here
+        //ME20190107 - Calculate "need minus" here
         if (AUTO_GENERATE_PLUS_MINUS) {
           vvgenerate_plus_minus.back().push_back(needMinus(i, j, DISTORTION_INEQUIVONLY)); //CO20190218
         } else {
-          vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME20181028
+          vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  //ME20181028
         }
         if (vvgenerate_plus_minus[i][j]) {
           ncalcs += 2;
@@ -76,11 +76,11 @@ namespace apl {
         }
       }
     }
-    //CO - END
-    // ME20181022 - START
+    //CO END
+    //ME20181022 START
     // Generate calculation directories
     string chgcar_file = "";
-    if (zerostate_chgcar) {  // ME20191029 - for ZEROSTATE CHGCAR
+    if (zerostate_chgcar) {  //ME20191029 - for ZEROSTATE CHGCAR
       zerostate_dir = "ARUN.APL_";
       int index = ncalcs;
       if (_isPolarMaterial) index--;
@@ -91,10 +91,10 @@ namespace apl {
 
     for (uint i = 0; i < _uniqueDistortions.size(); i++) {
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-        //CO - START
+        //CO START
         //[CO20181212]if (check_minus_needed)
         //[ME20190107] if(AUTO_GENERATE_PLUS_MINUS)  //CHECK -
-        //[ME20190107] {  //CO200106 - patching for auto-indenting
+        //[ME20190107] {  //CO20200106 - patching for auto-indenting
         //[ME20190107]  vvgenerate_plus_minus[i][j] = needMinus(i, j);
         //[ME20190107]  if (!vvgenerate_plus_minus[i][j]) {_logger << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "]." << apl::endl;}
         //[ME20190107]}
@@ -103,15 +103,15 @@ namespace apl {
           _logger << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "]." << apl::endl;
         }
         for (uint k = 0; k < (generate_plus_minus ? 2 : 1); k++) {
-          //CO - END
+          //CO END
           // Copy settings from common case
           xInputs.push_back(_xInput);
           int idxRun = xInputs.size() - 1;
           int idAtom = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO20190218
 
           // Create run ID
-          // ME20190107 - added padding
-          string runname = aurostd::PaddedNumString(idxRun + 1, aurostd::getZeroPadding(ncalcs)) + "_";  // ME20190112
+          //ME20190107 - added padding
+          string runname = aurostd::PaddedNumString(idxRun + 1, aurostd::getZeroPadding(ncalcs)) + "_";  //ME20190112
           runname += "A" + stringify(idAtom) + "D" + stringify(j); //CO20190218
 
           if (generate_plus_minus) {  //CO
@@ -121,7 +121,7 @@ namespace apl {
           // Apply the unique distortion to one inequvalent atom
           // This distortion vector is stored in Cartesian form, hence use C2F before applying
           xInputs[idxRun].setXStr(_supercell.getSupercellStructureLight()); //CO faster, only what's necessary here
-          xstructure& xstr = xInputs[idxRun].getXStr(); // ME20190109 - Declare to make code more legible
+          xstructure& xstr = xInputs[idxRun].getXStr(); //ME20190109 - Declare to make code more legible
           //CO20190114 - it is very silly to try to add in fpos
           //add to cpos, then convert to fpos
           xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
@@ -131,23 +131,23 @@ namespace apl {
           //[CO20190114 - OBSOLETE]                                                 xInputs[idxRun].getXStr().atoms[idAtom].fpos);
 
           //clean title //CO20181226
-          //[CO20190131 - moved up]xstructure& xstr = xInputs[idxRun].getXStr(); // ME20190109 - Declare to make code more legible
+          //[CO20190131 - moved up]xstructure& xstr = xInputs[idxRun].getXStr(); //ME20190109 - Declare to make code more legible
           xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title); //CO20181226, ME20190109
           if(xstr.title.empty()){xstr.buildGenericTitle(true,false);} //CO20181226, ME20190109
           xstr.title += " APL supercell=" + aurostd::joinWDelimiter(_supercell.scell, 'x'); //ME20190109
           xstr.title += " atom=" + stringify(idAtom); //ME20190109
           //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(DISTORTION_MAGNITUDE*_uniqueDistortions[i][j])) + "]"; //ME20190109 - OBSOLETE ME20190112
-          std::stringstream distortion; // ME20190112 - need stringstream for nicer formatting
-          xvector<double> dist_cart = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];  // ME20190112
+          std::stringstream distortion; //ME20190112 - need stringstream for nicer formatting
+          xvector<double> dist_cart = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];  //ME20190112
           distortion << " distortion=["
             << std::setprecision(3) << dist_cart[1] << ","
             << std::setprecision(3) << dist_cart[2] << ","
-            << std::setprecision(3) << dist_cart[3] << "]"; // ME20190112
+            << std::setprecision(3) << dist_cart[3] << "]"; //ME20190112
           xstr.title += distortion.str();
 
           // For VASP, use the standardized aflow.in creator
           if (_kbinFlags.AFLOW_MODE_VASP){
-            // ME20191029
+            //ME20191029
             xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
             if (zerostate_chgcar) {
               xInputs[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
@@ -155,13 +155,13 @@ namespace apl {
 
             _kbinFlags.KBIN_MPI_AUTOTUNE = true;
             // Change format of POSCAR
-            // ME20190228 - OBSOLETE for two reasons:
+            //ME20190228 - OBSOLETE for two reasons:
             // 1. This method is not robust
             // 2. This will be taken care of when the actual POSCAR is generated
-            // [OBSOLETE - 190228] if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
-            // [OBSOLETE - 190228]    (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
-            // [OBSOLETE - 190228]  xInputs[idxRun].getXStr().is_vasp5_poscar_format = false;
-            // [OBSOLETE - 190228] }
+            // [OBSOLETE - 20190228] if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
+            // [OBSOLETE - 20190228]    (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
+            // [OBSOLETE - 20190228]  xInputs[idxRun].getXStr().is_vasp5_poscar_format = false;
+            // [OBSOLETE - 20190228] }
             _stagebreak = (createAflowInPhonons(xInputs[idxRun]) || _stagebreak);
           }
           // For AIMS, use the old method until we have AVASP_populateXAIMS
@@ -188,12 +188,12 @@ namespace apl {
       // Get structure
       xInputs[idxRun].setXStr(_supercell.getSupercellStructureLight()); //CO
 
-      // ME20190108 - Set title
+      //ME20190108 - Set title
       xInputs[idxRun].getXStr().title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInputs[idxRun].getXStr().title); //CO20181226
       if(xInputs[idxRun].getXStr().title.empty()){xInputs[idxRun].getXStr().buildGenericTitle(true,false);} //CO20181226
       xInputs[idxRun].getXStr().title += " APL supercell=" + aurostd::joinWDelimiter(_supercell.scell, 'x'); //ME20190112
       xInputs[idxRun].getXStr().title += " undistorted";
-      xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  // ME20191029
+      xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  //ME20191029
       // For VASP, use the standardized aflow.in creator
       if(_kbinFlags.AFLOW_MODE_VASP){
         xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
@@ -210,20 +210,20 @@ namespace apl {
       }
     }
 
-    // BEGIN STEFANO
+    // BEGIN SC
     // Do an additional calculation for polar materials
     if (_isPolarMaterial) {
       // Calc. Born effective charge tensors and dielectric constant matrix
-      _xinput xinpBE(_xInput);  // ME20190113
-      runVASPCalculationsBE(xinpBE, xInputs.size());  // ME20190113
+      _xinput xinpBE(_xInput);  //ME20190113
+      runVASPCalculationsBE(xinpBE, xInputs.size());  //ME20190113
       xInputs.push_back(xinpBE);
     }
-    // END STEFANO
+    // END SC
   }
 
   void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
       vector<vector<xvector<double> > >& uniqueDistortions) {
-    //COREY NOTES ON THIS FUNCTION
+    //CO NOTES ON THIS FUNCTION
     // - this function creates symmetrically unique distortion vectors for each iatom
     // - you can have at most 3 unique (orthogonal) distortions per atom, but probably fewer considering symmetry
     // - distortions are relative to the lattice vectors
@@ -242,7 +242,7 @@ namespace apl {
 
     // Is there a list of inequivalent atoms?
     if (DISTORTION_INEQUIVONLY && !xstr.iatoms_calculated) { //CO20190218
-      // ME20191031 - use xerror
+      //ME20191031 - use xerror
       //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); The list of the inequivalent atoms is missing.");
       string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
       string message = "The list of the inequivalent atoms is missing.";
@@ -333,7 +333,7 @@ namespace apl {
         int atomID = (DISTORTION_INEQUIVONLY ? xstr.iatoms[i][0] : i); //CO20190218
         //cout << "atomID = " << atomID << std::endl; //CO20190218
         if (xstr.agroup[atomID].size() == 0) { //CO20190218
-          // ME20191031 - use xerror
+          //ME20191031 - use xerror
           //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); Site point group operations are missing.");
           string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
           string message = "Site point group operations are missing.";
@@ -387,7 +387,7 @@ namespace apl {
       // Free useless stuff
       testDistortions.clear();
     } else {
-      // ME20191031
+      //ME20191031
       //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); The list of the site point group operations is missing.");
       string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
       string message = "The list of the site point group operations is missing.";
@@ -396,12 +396,12 @@ namespace apl {
 
     // Print some information
     int dof = 0;
-    for (uint i = 0; i < _uniqueDistortions.size(); i++){ //CO200106 - wrapping with guard
+    for (uint i = 0; i < _uniqueDistortions.size(); i++){ //CO20200106 - wrapping with guard
       dof += _uniqueDistortions[i].size();
     }
     _logger << "Found " << dof << " degree(s) of freedom." << apl::endl;
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms();
-    for (uint i = 0; i < natoms; i++) {  //CO200212 - int->uint
+    for (uint i = 0; i < natoms; i++) {  //CO20200212 - int->uint
       uint id = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO20190218
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         _logger << "Atom [" << sf("%03d") << id << "] (" << sf("%f")
@@ -457,7 +457,7 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
 
-  //CO - START
+  //CO START
   bool DirectMethodPC::needMinus(uint atom_index, uint distortion_index, bool inequiv_only) { //CO20190218
     //bool need_minus = true;
     const vector<_sym_op>& agroup = _supercell.getAGROUP( inequiv_only ? _supercell.getUniqueAtomID(atom_index) : atom_index);  //CO20190116
@@ -481,7 +481,7 @@ namespace apl {
     return TRUE;
     //return need_minus;
   }
-  //CO - END
+  //CO END
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -503,11 +503,11 @@ namespace apl {
 
     // Store forces //////////////////////////////////////////////////////////
 
-    bool generate_plus_minus = false;  // ME20190129
+    bool generate_plus_minus = false;  //ME20190129
 
     int idxRun = 0;
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms();
-    for (uint i = 0; i < natoms; i++) {  //CO200212 - int->uint
+    for (uint i = 0; i < natoms; i++) {  //CO20200212 - int->uint
       vector<vector<xvector<double> > > forcesForOneAtomAndAllDistortions;
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         generate_plus_minus = vvgenerate_plus_minus[i][j];  //CO20181226

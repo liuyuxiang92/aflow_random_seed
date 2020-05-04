@@ -1,6 +1,6 @@
 // ***************************************************************************
 // *                                                                         *
-// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Stefano Curtarolo 1994-2011
@@ -87,7 +87,7 @@ namespace aurostd {  // namespace aurostd
       //CO20170803 - ODD CORNER CASE, same corpus and rows, but different lrows and urows
       //if(rows!=b.rows)    // if dims(this)!=dims(a) => build a new xvector !!!
       if(lrows!=b.lrows||urows!=b.urows||vsize!=b.vsize)    // if dims(this)!=dims(a) => build a new xvector !!!  //CO20190808 - VERY IMPORTANT that we not only check lrows and urows, but vsize, as xvector could just have been initialized (vsize==0)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         free();
         lrows=b.lrows;urows=b.urows;rows=b.rows;
         //[simply copy instead]refresh();
@@ -129,7 +129,7 @@ namespace aurostd {  // namespace aurostd
       rows=urows-lrows+1;   // if(!nh) rows=0; this messes up convasp
       // [[BUG]    if(nh==0 && nl==0)
       if(rows==0)
-      { //CO200106 - patching for auto-indenting
+      { //CO20200106 - patching for auto-indenting
         cerr << "XVECTOR constructor: creating EMPTY xvector<utype>" << endl;
         lrows=0;urows=0;rows=0;
       };
@@ -717,15 +717,15 @@ namespace aurostd {  // namespace aurostd
       bool output=TRUE;
       if(a.isfloat || a.iscomplex) {
         for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++) {
-          if((abs(a[i]-b[ii])/(abs(a[i])+abs(b[ii])+_tol_))>_tol_)  output=FALSE; // SC 20180115
-          // output=output*(((abs(a[i]-b[ii]))/(abs(a[i])+abs(b[ii])+_tol_))<=_tol_);// SC 20180115
-          // output=output*(abs(a[i]-b[ii])<=_tol_); // SC pre 20180115
+          if((abs(a[i]-b[ii])/(abs(a[i])+abs(b[ii])+_tol_))>_tol_)  output=FALSE; //SC20180115
+          // output=output*(((abs(a[i]-b[ii]))/(abs(a[i])+abs(b[ii])+_tol_))<=_tol_);//SC20180115
+          // output=output*(abs(a[i]-b[ii])<=_tol_); //SC pre 20180115
         }
         if(output==FALSE) return (bool) output;
       } else {
         for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++) {
-          if(a[i]!=b[ii]) output=FALSE; // SC 20180115
-          // output=output*(a[i]==b[ii]); // SC 20180115
+          if(a[i]!=b[ii]) output=FALSE; //SC20180115
+          // output=output*(a[i]==b[ii]); //SC20180115
         }
         if(output==FALSE) return (bool) output;
       }    
@@ -803,7 +803,7 @@ namespace aurostd {  // namespace aurostd
   //[CO20191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<double>& a) { return isinteger(a);}
 }
 
-// ME20180702 - Tests if vector is the zero vector
+//ME20180702 - Tests if vector is the zero vector
 namespace aurostd {
   template<class utype> bool
     iszero(const xvector<utype>& a,double tol) {
@@ -1435,8 +1435,8 @@ namespace aurostd {
 
 namespace aurostd {
   template<class utype> void reduceByGCD(const xvector<utype>& in_V, xvector<utype>& out_V, utype tol)
-    // DX20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,const utype& tol)
-  { //CO200106 - patching for auto-indenting
+    //DX20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,const utype& tol)
+  { //CO20200106 - patching for auto-indenting
     //DX20191125 [OBSOLETE] xvector<utype> out_V=in_V;
     out_V=in_V;
     if(!isinteger(out_V,tol)){return;} //nothing to reduce //DX20191125 - return type is void
@@ -1467,7 +1467,7 @@ namespace aurostd {
     bool set=false;
     // REMOVE for(int i=vab.lrows;i<=vab.urows&&!set;i++)
     for(uint i=0;i<vab.size()&&!set;i++)
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       if(vab[i]) {
         counter=i;
         set=true;
@@ -1522,7 +1522,7 @@ namespace aurostd {
     bool set=false;
     // REMOVE for(int i=vab.lrows;i<=vab.urows&&!set;i++)
     for(uint i=0;i<vab.size()&&!set;i++)
-    { //CO200106 - patching for auto-indenting
+    { //CO20200106 - patching for auto-indenting
       if(vab[i]) {
         counter=i;
         set=true;
@@ -2576,7 +2576,7 @@ namespace aurostd {  // namespace aurostd
 #undef _XSORT_NSTACK
 #undef _XSORT_SWAPT
 
-//CO20190629 - START
+//CO20190629 START
 namespace aurostd {  // namespace aurostd
   //sort by a particular index ONLY
   //using bool ascending MAY become slow for long containers, as it needs to check the bool with every comparison
@@ -2614,7 +2614,7 @@ namespace aurostd {  // namespace aurostd
       return false;
     }
 } // namespace aurostd
-//CO20190629 - STOP
+//CO20190629 STOP
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------- STATS stuff
@@ -2769,7 +2769,7 @@ namespace aurostd {
       int ind2=lrows;
       sum_counts.clear();
       for(int i=conv.lrows;i<=conv.urows;i++){
-        if(!aurostd::withinList(ind_zero_padding,i)){
+        if(!aurostd::WithinList(ind_zero_padding,i)){
           conv_shape[ind2++]=conv[i];
           sum_counts.push_back(sum_counts_full[i]);
         }
@@ -2918,6 +2918,6 @@ namespace aurostd {
 
 // **************************************************************************
 // *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
 // *                                                                        *
 // **************************************************************************
