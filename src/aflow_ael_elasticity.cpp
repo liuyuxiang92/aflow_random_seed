@@ -314,7 +314,7 @@ namespace KBIN {
   void VASP_RunPhonons_AEL_postprocess(string directory_LIB, string AflowInName, string FileLockName) {  
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    uint aelerror = 0;
     ostringstream aus;
     _xvasp xvasp;
     string AflowIn;
