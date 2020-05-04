@@ -1832,6 +1832,9 @@ namespace apl {
 
 namespace apl
 {
+  /** Performs fit of energy-volume relation to a given equation of state.
+   *  The choises are: Murnaghan, Birch-Murnaghan or polynomial EOS models.
+   */
   class EOSfit{
     public:
       EOSfit();
@@ -1856,7 +1859,7 @@ namespace apl
    * This class will substitute old QHA class.
    * The old QHA class will be kept until the new one is finished.
    */
-  class QHAN{
+  class QHAN : public xStream {
     public:
       QHAN();
       QHAN(const QHAN& qha);

@@ -1138,7 +1138,7 @@ namespace apl {
           //outfile << setw(15) << _superCellStructure.atoms[k].cpos << " ";
 
           // Scale force, it is expected in Hartree/Angs.
-          xvector<double> f = hartree2ev * _uniqueForces[i][j][k];
+          xvector<double> f = hartree2eV * _uniqueForces[i][j][k];
 
           outfile << setw(15) << f(1)
             << setw(15) << f(2)

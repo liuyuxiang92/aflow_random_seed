@@ -32,7 +32,7 @@ using std::auto_ptr;
 #define SW 5  // width of separator when text is formatted
 #define TW 15 // width of label/number when text is formatted
 #define DCOEFF 1e-2 // coefficient used in numerical differentiation (should not
-                    // be too small. Use dT = DCOEFF*T
+                    // be too small). Usage dT = DCOEFF*T
 
 #define EOS_MURNAGHAN       0
 #define EOS_POLYNOMIAL      1
@@ -131,7 +131,7 @@ void NonlinearFit::Jacobian(xvector<double> &guess)
  */
 void NonlinearFit::fit()
 {
-  double LDEBUG = false;
+  bool LDEBUG = false;
   if (LDEBUG) cout << "NonlinearFit::fit()\n";
 
   xvector<double> pnew(Nparams);
@@ -305,7 +305,8 @@ double getEqVolume(xvector<double> p, double Vmin, double Vmax, double tol=_mm_e
   double fc = dEOS_poly(c, p);
 
   if (sign(fa) == sign(fc)){
-    cout << "ERROR: no root within the given region.\n";
+    pflow::logger("EOS", "getEqVolume","ERROR: no root within the given region.\n",
+        cout, _LOGGER_ERROR_);
     return -1;
   }
 
@@ -407,7 +408,7 @@ void apl::EOSfit::fit()
       guess[1] = min(E);
       guess[2] = (max(V)+min(V))/2;
       guess[3] = V[1]*(E[3]-2*E[2]+E[1])/pow(V[2]-V[1],2); // B from central differences 
-      guess[4] = 3.5; // a reasonble inital value for most materials
+      guess[4] = 3.5; // a reasonable intial value for most materials
 
       NonlinearFit nlfit(V,E,guess,murnaghan);
       nlfit.fit();
@@ -611,6 +612,7 @@ namespace apl
     Nbranches = NatomsOrigCell * 3;
     double Volume = origStructure.GetVolume();
 
+    // parse QHA-related aflow.in options
     string dirname;
     double gp_distortion;
     vector<double> eosrange(3);
@@ -667,8 +669,8 @@ namespace apl
       }
     }
 
-    // determine names for directories for Grueneisen parameter calculation
-    // calculated using finite differences
+    // determine names for directories for the calculation of Grueneisen parameter
+    // (calculated using finite differences)
     vector<double> gprange(3);
     gprange[0] = 1.0-gp_distortion; gprange[1] = 1.0; gprange[2] = 1.0+gp_distortion;
     N_GPvolumes = 3;
@@ -690,7 +692,7 @@ namespace apl
 
       N_EOSvolumes = floor((eosrange[1]-eosrange[0])/eosrange[2])+1;
 
-      // get a set of volumes that would be used for QHA calculation
+      // get a set of volumes that would be used for QHA-EOS calculation
       for (double i=eosrange[0]; i<=eosrange[1]; i+=eosrange[2]){
         arun_runnames_apl_eos.push_back("PHONON_" + apl::stringify(i));
         dirname = ARUN_DIRECTORY_PREFIX + QHA_ARUN_MODE + '_' +
@@ -748,8 +750,8 @@ namespace apl
 
   /** Perform QHA calculation
    *
-   * For a regular QHA calculation there is a choise between two posibilities:
-   * 1) calculate Gruneisen parameter using finite difference method.
+   * For a regular QHA calculation there is a choice between two possibilities:
+   * 1) calculate Grueneisen parameter using finite difference method.
    *    This calculation requires 3 phonon calculations (for volumes V, V-dV and V+dV);
    * 2) calculate temperature-dependent parameters (such as equilibrium volume,
    * free energy, bulk modulus, thermal expansion, isochoric and isobaric specific heat,
@@ -800,7 +802,7 @@ namespace apl
       }
 
       // QHA3P and SCQHA require that Grueneisen parameter is calculated via
-      // finite difference numerical derivation.
+      // finite difference numerical derivative.
       // For QHA calculation use GP_FD flag to turn on this type of calculation
       if (isGP_FD || runQHA3P || runSCQHA){
         gp_data_available = run_apl(subdirectories_apl_gp, arun_runnames_apl_gp,
@@ -965,7 +967,7 @@ namespace apl
       phcalc.setHarmonicForceConstants(*fccalc);
 
       // calculate all phonon-related data: DOS, frequencies at q-mesh and
-      // phononon dispersions
+      // phonon dispersions
       vector<xvector<double> > dummy_dos_projections; // do not need in QHA
       vector<int> dos_mesh(3);
 
@@ -1020,7 +1022,7 @@ namespace apl
         Nqpoints  = qPoints.size();
       }
 
-      // we have two different sets of data: one for finite difference Gruneisen
+      // we have two different sets of data: one for finite difference Grueneisen
       // parameter calculation and one for EOS APL calculation
       if (gp){
         gp_ph_dispersions.push_back(pdisc.createEIGENVAL());
@@ -1115,8 +1117,8 @@ namespace apl
   /** Calculates Grueneisen parameter of an individual vibrational mode for a
    * given volume.
    *
-   * gamma_i = -V*d(log(w))/dV,
-   * where w is frequency of a given mode at given volume
+   * gamma_i = -V/w*dw/dV,
+   * where w is frequency of a given mode a at given volume
    *
    * Volume dependence of w is approximated by the polynomial
    * w = a + b*V  + c*V**2 + d*V**3
@@ -1127,6 +1129,7 @@ namespace apl
    */
   double QHAN::calcGamma(double V, xvector<double> &xomega, double &w)
   {
+    bool LDEBUG = false | XHOST.DEBUG;
     // no weights in fit
     xvector<double> s(xomega.rows); for (int i=s.lrows;i<=s.urows;i++) s[i]=1;
     aurostd::cematrix lsfit(gp_fit_matrix);
@@ -1155,24 +1158,26 @@ namespace apl
       c = lsfit.AVec()[2];
       d = lsfit.AVec()[3];
 
-      xvector<double> tmp(4);
-      tmp[1] = a; tmp[2] = b; tmp[3] = c; tmp[4] = d;
+      if (LDEBUG){
+        xvector<double> tmp(4);
+        tmp[1] = a; tmp[2] = b; tmp[3] = c; tmp[4] = d;
 
-      // check fit error
-      for (int Vid=0; Vid<N_EOSvolumes; Vid++){
-        err = abs(a+b*EOSvolumes[Vid]+c*pow(EOSvolumes[Vid],2)+d*pow(EOSvolumes[Vid],3)
-              -xomega[Vid+1])/xomega[Vid+1];
-        err *= 100.0;
-        if (err>=10.0){
-          string msg="Relative error of log(w)=f(V) fit (used to ";
-          msg+="determine mode-decomposed Grueneisen parameter) is larger than ";
-          msg+="10\% for V="+apl::stringify(EOSvolumes[Vid])+'\n';
+        // check fit error
+        for (int Vid=0; Vid<N_EOSvolumes; Vid++){
+          err = abs(a+b*EOSvolumes[Vid]+c*pow(EOSvolumes[Vid],2)+d*pow(EOSvolumes[Vid],3)
+                -xomega[Vid+1])/xomega[Vid+1];
+          err *= 100.0;
+          if (err>=10.0){
+            string msg="Relative error of log(w)=f(V) fit (used to ";
+            msg+="determine mode-decomposed Grueneisen parameter) is larger than ";
+            msg+="10\% for V="+apl::stringify(EOSvolumes[Vid])+'\n';
 
-          pflow::logger(QHA_ARUN_MODE, "calcGamma()", msg, currentDirectory,
-              *messageFile, *oss, _LOGGER_MESSAGE_);
-          cout << xomega << '\n';
-          cout << gp_fit_matrix * tmp << '\n';
-          break;
+            pflow::logger(QHA_ARUN_MODE, "calcGamma()", msg, currentDirectory,
+                *messageFile, *oss, _LOGGER_MESSAGE_);
+            cout << xomega << '\n';
+            cout << gp_fit_matrix * tmp << '\n';
+            break;
+          }
         }
       }
 
@@ -1200,7 +1205,6 @@ namespace apl
       return 0.0;
     }
   }
-
 
 
   /** Calculates free energy as a function of volume and temperature.
@@ -1267,9 +1271,9 @@ namespace apl
       else return 0.5;
   }
 
-  /** Calculations electronic free energy using integration over DOS.
-   * Currently this function does not work for temperatures < 1000~K due to
-   * big numerical errors. */
+  /** Calculates electronic free energy using integration over DOS.
+   * Currently this function does not work (to be fixed in the future)
+   */
   double QHAN::electronicFreeEnergy(double T, int id)
   {
     double EelecT = 0; double SelecT = 0; double FelecT = 0; double Eelec0K = 0;
@@ -1320,6 +1324,9 @@ namespace apl
 
 
   /** Calculates average Grueneisen parameter (GP) and isochoric specific heat (CV)
+   *  using weighted sum over k-points mesh.
+   *  This function is used when Grueneisen parameter is calculated using finite
+   *  difference method.
    */
   void QHAN::calcCV_GP(double T, double &CV, double &GP)
   {
@@ -1360,6 +1367,8 @@ namespace apl
   /** Calculates average Grueneisen parameter (GP) and isochoric specific heat (CV)
    *  This function requires to input the volume at which those parameters are
    *  calculated.
+   *  This function is used when Grueneisen parameter is calculated using fit to
+   *  w(V) relation obtained from EOS calculations.
    */
   void QHAN::calcCV_GP_fit(double T, double V, double &CV, double &GP)
   {
@@ -1566,7 +1575,7 @@ namespace apl
             PLANCKSCONSTANTEV_h;
         fi = 0.5*w;
 
-        if (w>1e-12 && T>0) fi += KBOLTZEV*T*log(1-exp(-w/KBOLTZEV/T));
+        if (w>_mm_epsilon && T>_mm_epsilon) fi += KBOLTZEV*T*log(1-exp(-w/KBOLTZEV/T));
 
         fi *= qpWeights[q];
         F += fi;
@@ -1593,7 +1602,7 @@ namespace apl
         w = extrapolateFrequency(V, xomega) * THz2Hz * PLANCKSCONSTANTEV_h;
         ui = 0.5*w;
 
-        if (w>1e-12 && T>0) ui += w/(exp(w/KBOLTZEV/T)-1.0);
+        if (w>_mm_epsilon && T>_mm_epsilon) ui += w/(exp(w/KBOLTZEV/T)-1.0);
 
         ui *= qpWeights[q];
         U += ui;
@@ -1608,6 +1617,13 @@ namespace apl
   }
 
   // SCQHA-related functions
+  // Implementation is based on http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
+  // and https://doi.org/10.1016/j.commatsci.2016.04.012
+
+  /** Phononic pressure multiplied by volume.
+   * Check http://dx.doi.org/10.1103/PhysRevMaterials.3.073801
+   * for more details
+   */
   double QHAN::VPgamma(double T, double V)
   {
     double VPgamma = 0.0, ui = 0.0,  w = 0.0; 
@@ -1620,7 +1636,7 @@ namespace apl
         w = extrapolateFrequency(V, xomega) * THz2Hz * PLANCKSCONSTANTEV_h;
         ui = 0.5*w;
 
-        if (w>1e-12 && T>0) ui += w/(exp(w/KBOLTZEV/T)-1.0);
+        if (w>_mm_epsilon && T>_mm_epsilon) ui += w/(exp(w/KBOLTZEV/T)-1.0);
 
         ui *= qpWeights[q];
         VPgamma += ui * extrapolateGamma(V, xomega);
@@ -1634,6 +1650,13 @@ namespace apl
     return VPgamma;
   }
 
+  /** Performes SCQHA calculation.
+   *  Here there are two implementations:
+   *  1) perform self-consistent loop for initial nonzero temperature and extrapolate
+   *  the volume at next temperature step using V(T+dT) ~ (1+beta dT)*V.
+   *  Expect it to be inaccurate at high temperatures.
+   *  2) perform self-consistent loop for each temperature
+   */
   void QHAN::run_scqha(int method, bool all_iterations_self_consistent)
   {
     int max_scqha_iteration = 10000;
@@ -1644,13 +1667,17 @@ namespace apl
     pflow::logger(QHA_ARUN_MODE, function, "", currentDirectory, *messageFile, *oss,
         _LOGGER_MESSAGE_);
 
+    // get equilibrium volume from the fit to EOS based on energies from static
+    // calculations
     eos.method = method;
     eos.E = aurostd::vector2xvector<double>(E0_V);
     eos.fit();
-    double Pe, VPg;
-    double V = 1.1*eos.Veq;
+    double Pe, VPg; // electronic pressure and volume multiplied by phononic pressure
+    double V = 1.1*eos.Veq; // to avoid division by zero in self-consistent loop
+    // initial volume is taken to be 10% bigger
     double Vnew = 0;
 
+    // self-consistent loop for 0K temperature
     double V0K = 1.1*eos.Veq;
     for (int i=0; i<max_scqha_iteration; i++){
       Pe   = dEOS_poly(V, eos.p);
@@ -1659,6 +1686,7 @@ namespace apl
       if (abs(V0K - Vnew)/V > Vtol) V0K += (Vnew - V0K) * dV; else break;
     }
 
+    // output file name depends on the used EOS fit method
     ofstream file;
     string filename;
     string sc = all_iterations_self_consistent ? "sc." : "";
@@ -1678,6 +1706,7 @@ namespace apl
     file.open(filename.c_str());
     file.precision(10);
 
+    // print header
     file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
             setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
             setw(TW) << "F(Veq)[eV/atom]"      << setw(SW) << ' ' <<
@@ -1690,6 +1719,7 @@ namespace apl
 
     double T = Temperatures[0];
 
+    // self-consistent loop for initial temperature as given by user
     int iter=1;
     while (iter <= max_scqha_iteration){
       Pe   = dEOS_poly(V, eos.p);
@@ -1707,11 +1737,34 @@ namespace apl
 
     double dT = (Temperatures[Ntemperatures-1]-Temperatures[0])/(Ntemperatures-1);
 
-    double beta = 0;
-    // self-consistent loop to determine Veq
+    // a set of variables predefined here
+    double Cvi     = 0.0;  // mode-dependent specific heat at V=const
+    double w       = 0.0;  // frequency for a given volume
+    double w0K     = 0.0;  // frequency for a volume at T=0K
+    double expx    = 0.0;  // temperature-dependent exponential factor
+    double expx0   = 0.0;  // temperature-dependent exponential factor
+    double ui      = 0.0;  // mode-dependent internal energy
+    double Bgamma  = 0.0;  // contribution to bulk modulus of 2nd order gamma component
+    double Bdgamma = 0.0;  // check https://doi.org/10.1016/j.commatsci.2016.04.012
+    double Belec   = 0.0;  // "electronic" bulk modulus
+    double B       = 0.0;  // total bulk modulus
+    double Pgamma  = 0.0;  // "phononic" pressure
+    double gamma   = 0.0;  // Grueneisen parameter
+    double fi      = 0.0;  // mode-dependet free energy
+    double Feq     = 0.0;  // total free energy for equilibrium volume at given T
+    double CP      = 0.0;  // isobaric specific heat
+    double CV      = 0.0;  // isochoric specific heat
+    double GP      = 0.0;  // average Grueneisen parameter
+    double beta    = 0.0;  // coefficient of thermal expansion
+
+    uint NIrQpoints = omegaV_mesh.size(); // number of irreducible q-points
+    int NQpoints = 0; // the total number of q-points (to be determined in loop)
+
     for (int Tid=0; Tid<Ntemperatures; Tid++){
       T = Temperatures[Tid];
 
+      // calculate next equilibrium volume using self-consistent loop if beta=0 or
+      // if user wants so
       if (all_iterations_self_consistent || !(abs(beta)>0)){
         iter=1;
         while (iter <= max_scqha_iteration){
@@ -1732,25 +1785,13 @@ namespace apl
         V *= (1 + beta*dT);
       }
 
-      double CV = 0; double GP = 0;
-
-      uint NIrQpoints = omegaV_mesh.size();
-      int NQpoints = 0; // the total number of q-points
-
-      double Cvi     = 0.0;  // mode-dpendent specific heat at V=const
-      double w       = 0.0;  // frequency for a given volume
-      double w0K     = 0.0;  // frequency for a volume at T=0K
-      double expx    = 0.0;  // temperature-dependent exponential factor
-      double expx0   = 0.0;  // temperature-dependent exponential factor
-      double ui      = 0.0;
-      double Bgamma  = 0.0;
-      double Bdgamma = 0.0;
-      double gamma   = 0.0;
-      double Belec   = 0.0;
-      double Pgamma  = 0.0;
-      double B = 0.0;
-      double Feq = 0.0, fi =0.0;
-      double CP = 0;
+      // calculate thermodynamic properties
+      Cvi = 0.0; CP = 0; CV = 0.0; 
+      GP  = 0.0; gamma   = 0.0;
+      w       = 0.0; w0K     = 0.0; expx    = 0.0; expx0   = 0.0;
+      ui      = 0.0;
+      Bgamma  = 0.0; Bdgamma = 0.0; Belec   = 0.0; Pgamma  = 0.0; B = 0.0;
+      fi = 0.0; Feq = 0.0;
 
       for (uint q=0; q<NIrQpoints; q++){
         for (uint branch=0; branch<omegaV_mesh[q].size(); branch++){
@@ -1853,6 +1894,7 @@ namespace apl
         break;
     }
 
+    // the name of the output file depends on the used EOS fit method
     ofstream file;
     string filename;
     switch(eos_method){
@@ -1876,6 +1918,7 @@ namespace apl
     file.open(filename.c_str());
     file.precision(10);
 
+    // write header
     file << setw(5)  << "# T[K]"               << setw(SW) << ' ' <<
             setw(TW) << "Veq[ev/atom]"         << setw(SW) << ' ' <<
             setw(TW) << "F(V0)[eV/atom]"       << setw(SW) << ' ' <<
@@ -1891,7 +1934,7 @@ namespace apl
             setw(TW) << "gamma_mesh"           << setw(SW) << ' ' <<
             '\n';
 
-    xvector<double> F(N_EOSvolumes);
+    xvector<double> F(N_EOSvolumes); // free energy
     xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
 
     switch(qha_method){
@@ -1905,10 +1948,11 @@ namespace apl
     }
 
     eos.fit();
-    double V0K = eos.Veq;
+    double V0K = eos.Veq; // equilibrium volume at 0K
 
     double T, Veq, Feq, B, Bp, beta, CV, CP, GP;
-    double CV_mesh, GP_mesh, CP_mesh, beta_mesh;
+    double CV_mesh, GP_mesh, CP_mesh, beta_mesh; // these properties are calculated 
+    // by weighted sum over q-points mesh
     for (int Tid=0; Tid<Ntemperatures; Tid++){
       T = Temperatures[Tid];
 
@@ -1922,9 +1966,9 @@ namespace apl
           break;
       }
 
-      //if (includeElectronicContribution) eos.E += electronicFreeEnergyFit(T);
       if (includeElectronicContribution) eos.E += FreeEnergySommerfeld(T);
 
+      // stop if energy minimum is no longer within a given set of volumes
       if (!isMinimumWithinBounds(eos.E)){
         msg = "Stopping at T=" + apl::stringify(T) + " [K]";
         msg+= "since there is no free energy minimum within a given volume range.";
@@ -1949,6 +1993,7 @@ namespace apl
       beta_mesh = KBOLTZEV*CV_mesh*GP_mesh/Veq/(B/eV2GPa); // [K^-1]
       CP_mesh   = CV_mesh + Veq*T*B*pow(beta_mesh,2)/eV2GPa/KBOLTZEV; // [kB/atom]
 
+      // write values to file
       file << setw(5)  << T                   << setw(SW) << ' ' <<
               setw(TW) << Veq                 << setw(SW) << ' ' <<
               setw(TW) << Feq                 << setw(SW) << ' ' <<
@@ -2046,6 +2091,9 @@ namespace apl
   }
 
 
+  /** Writes average Gruneisen parameter, which is calculated using finite
+   *  difference method
+   */
   void QHAN::writeAverageGP_FD()
   {
     string function = "QHAN::writeGPmeshFD()";
@@ -2078,6 +2126,8 @@ namespace apl
     file.close();
   }
 
+  /** Writes mode-dependent Grueneisen parameter calculated at each q-point in IBZ
+   */
   void QHAN::writeGPmeshFD()
   {
     string function = "QHAN::writeGPmeshFD()";
@@ -2111,6 +2161,9 @@ namespace apl
     file.close();
   }
 
+  /** Writes volume-dependent phonon frequencies obtained from series of EOS APL
+   * calculations
+   */
   void QHAN::writeFrequencies()
   {
     ofstream file;
