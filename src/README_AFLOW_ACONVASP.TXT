@@ -3351,7 +3351,7 @@ LATTICES = (the ones with "")
 
 
         Options for XCRYSDEN:
-          --branches:  The branches of the phonon modes as a comma-separated list.
+          --branches:  The branches of the phonon modes as a comma-separated list (1-based).
                        Default: all.
 
           --periods:   The number of periods displayed in the output file.
@@ -3362,6 +3362,11 @@ LATTICES = (the ones with "")
 
           --scell:     The supercell to be displayed in the output file.
                        Default: unit cell.
+
+        Examples:
+          aflow --visualize_phonons --qpoint=0.5,0,0 --steps=40 --amplitude=0.3 --scell=3x3x3 -D ./
+          aflow --visualize_phonons --q=0,0,0;0.5,0.5,0.5 --branches=4,5,6 --format=XCRYSDEN --scell=4x4x2
+          aflow --visualize_phonons --q=0,0,0 --branches=1,2,3 --format=V_SIM --amplitude=0.2
 
   aflow --volume v < POSCAR
         Outputs POSCAR file giving having volume equal to v.

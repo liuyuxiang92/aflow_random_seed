@@ -621,14 +621,14 @@ The commands to create these output files are shown below:
                        Multiple points can be specified.
 
           --format:    The output file format.
-                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
+                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
 
           --amplitude: The amplitude of the displacements.
-                       Default: DEFAULT_APL_ADISP_SCENE_FORMAT in .aflow.rc.
+                       Default: DEFAULT_APL_ADISP_AMPLITUDE in .aflow.rc.
 
 
         Options for XCRYSDEN:
-          --branches:  The branches of the phonon modes as a comma-separated list.
+          --branches:  The branches of the phonon modes as a comma-separated list (1-based).
                        Default: all.
 
           --periods:   The number of periods displayed in the output file.
@@ -639,6 +639,11 @@ The commands to create these output files are shown below:
 
           --scell:     The supercell to be displayed in the output file.
                        Default: unit cell.
+
+        Examples:
+          aflow --visualize_phonons --qpoint=0.5,0,0 --steps=40 --amplitude=0.3 --scell=3x3x3 -D ./
+          aflow --visualize_phonons --q=0,0,0;0.5,0.5,0.5 --branches=4,5,6 --format=XCRYSDEN --scell=4x4x2
+          aflow --visualize_phonons --q=0,0,0 --branches=1,2,3 --format=V_SIM --amplitude=0.2
 
 For XCRYSDEN, APL creates an animated structure (axsf) file for each phonon mode. These files
 contain animations that show the motions of the atoms for each of the modes. These animations can

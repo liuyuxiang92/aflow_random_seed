@@ -31,7 +31,7 @@ namespace apl {
   }
 
   // ME20200102 - Refactored
-  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, ostream& oss, string directory) : xStream() {  //CO20181226
+  Supercell::Supercell(const xstructure& _xstr, ofstream& mf, string directory, ostream& oss) : xStream() {  //CO20181226
     free();
     xStream::initialize(mf, oss);
     _directory = directory;
@@ -39,7 +39,7 @@ namespace apl {
   }
 
   // ME20200212 - read from a state file
-  Supercell::Supercell(const string& filename, ofstream& mf, ostream& oss, string directory) {
+  Supercell::Supercell(const string& filename, ofstream& mf, string directory, ostream& oss) {
     free();
     xStream::initialize(mf, oss);
     _directory = directory;
@@ -269,7 +269,7 @@ namespace apl {
     kflags.KBIN_SYMMETRY_PGROUP_WRITE=VERBOSE;
     kflags.KBIN_SYMMETRY_FGROUP_WRITE=VERBOSE;
     kflags.KBIN_SYMMETRY_PGROUP_XTAL_WRITE=VERBOSE;
-    kflags.KBIN_SYMMETRY_PGROUPK=VERBOSE;
+    kflags.KBIN_SYMMETRY_PGROUPK_WRITE=VERBOSE;
     kflags.KBIN_SYMMETRY_PGROUPK_XTAL_WRITE=VERBOSE;
     kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=VERBOSE;
     kflags.KBIN_SYMMETRY_SGROUP_WRITE=VERBOSE;

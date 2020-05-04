@@ -884,6 +884,7 @@ namespace apl {
 
   // X. Gonze et al., Phys. Rev. B 50, 13035 (1994)
   // X. Gonze and Ch. Lee, Phys. Rev. B 55, 10355 (1997)
+  // ME20200504 - This function does not appear to be working!
 
   xmatrix<xcomplex<double> > PhononCalculator::getNonanalyticalTermGonze(const xvector<double> kpoint) {
     uint pcAtomsSize = _supercell.getInputStructure().atoms.size();
@@ -923,6 +924,7 @@ namespace apl {
 
   // ME20200207 - This function assummed that Born charges were stored for each type,
   // but it is actually stored for each iatom.
+  // ME20200504 - This function does not appear to be working!
   xmatrix<xcomplex<double> > PhononCalculator::getEwaldSumDipoleDipoleContribution(const xvector<double> qpoint, bool includeTerm1) {
     // Definitions
     const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
