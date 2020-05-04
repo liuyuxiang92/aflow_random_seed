@@ -109,6 +109,7 @@ namespace apl {
 
 namespace apl {
 
+  // Runs the force constant calculator (main post-processing engine)
   bool ForceConstantCalculator::run() {
     // Check if supercell is already built
     if (!_supercell->isConstructed()) {
@@ -132,6 +133,7 @@ namespace apl {
     return true;
   }
 
+  // Symmetrizes the force constant matrices using site point group symmetry
   void ForceConstantCalculator::symmetrizeForceConstantMatrices() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
     string soliloquy="apl::ForceConstantCalculator::symmetrizeForceConstantMatrices()"; //CO20190218
@@ -199,7 +201,8 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  // ME20200504 - this function needs more comments, overall explanation
+  // ME20200504 - this function needs to be rewritten to be more clear
+  // Enfoces acoustic sum rules
   void ForceConstantCalculator::correctSumRules() {
     // ME20200504
     // sum appears to be the self-interaction term (diagonal terms) of the
@@ -250,6 +253,8 @@ namespace apl {
 
 namespace apl {
  
+  // Sets up the calculations that determine the Born effective charges and
+  // the dielectric tensor
   bool ForceConstantCalculator::runVASPCalculationsBE(_xinput& xInput, _aflags& _aflowFlags,
       _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, uint ncalcs) {
     bool stagebreak = false;
@@ -283,7 +288,8 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
   
-  bool ForceConstantCalculator::calculateDielectricTensor(const _xinput& xinpBE) {
+  // Calculates the dielectric tensor and Born effective charges
+  bool ForceConstantCalculator::calculateBornChargesDielectricTensor(const _xinput& xinpBE) {
     stringstream message;
     // Parse effective charges from OUTCAR
     if (xinpBE.AFLOW_MODE_VASP) {
@@ -299,7 +305,7 @@ namespace apl {
         }
       }
     } else if (xinpBE.AFLOW_MODE_AIMS) {
-      string function = "ForceConstantCalculator::calculateDielectricTensor()";
+      string function = "ForceConstantCalculator::calculateBornChargesDielectricTensor()";
       message << "This functionality has not been implemented yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     } else {
@@ -325,13 +331,13 @@ namespace apl {
     return true;
   }
 
+  //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT(void) {
     string function = "ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT()";
     string message = "This functionality has not been implemented yet.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
-  //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  // ME20190113
     string directory = xinp.xvasp.Directory;  // ME20190113
     string function = "apl::ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR():";
@@ -587,6 +593,7 @@ namespace apl {
 
 namespace apl {
 
+  // Writes the results into xml files
   void ForceConstantCalculator::hibernate() {
     string base = _directory + "/" + DEFAULT_APL_FILE_PREFIX;
     string filename = aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE);
@@ -601,6 +608,7 @@ namespace apl {
     }
   }
 
+  // Writes the harmonic force constants into an xml file
   void ForceConstantCalculator::writeHarmonicIFCs(const string& filename) {
     stringstream outfile;
     string tab = " ";
@@ -655,6 +663,7 @@ namespace apl {
     }
   }
 
+  // Writes the Born effective charges and the dielectric tensor into an xml file
   void ForceConstantCalculator::writeBornChargesDielectricTensor(const string& filename) {
     stringstream outfile;
     string tab = " ";

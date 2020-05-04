@@ -651,7 +651,7 @@ namespace apl {
     }
 
     if (_isPolarMaterial) {
-      if (!calculateDielectricTensor(xInputs.back())) return false;
+      if (!calculateBornChargesDielectricTensor(xInputs.back())) return false;
     }
     return true;
   }
@@ -975,6 +975,7 @@ namespace apl {
 
 namespace apl {
 
+   // Writes the forces into a VASP DYNMAT format
    void DirectMethodPC::writeDYNMAT() {
      string filename = aurostd::CleanFileName(_directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
      string message = "Writing forces into file " + filename + ".";

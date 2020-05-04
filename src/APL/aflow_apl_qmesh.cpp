@@ -696,7 +696,7 @@ namespace apl {
   void QMesh::findMostCompactTetrahedra(vector<vector<xvector<int> > >& tetrahedra) {
     int lxx = 0;
     int lyy = 0;
-    double gmax = 1e30;
+    double gmax = AUROSTD_NAN;
     vector<xvector<double> > tet(4, xvector<double>(3));
     for (int lx = 0; lx <= 1; lx++) {
       for (int ly = 0; ly <= 1; ly++) {

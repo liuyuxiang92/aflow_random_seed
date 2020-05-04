@@ -807,7 +807,7 @@ namespace apl {
       void setDirectory(const string&);
 
       // Born charges + dielectric tensor
-      bool calculateDielectricTensor(const _xinput&);  // ME20191029
+      bool calculateBornChargesDielectricTensor(const _xinput&);  // ME20191029
       void readBornEffectiveChargesFromAIMSOUT(void);
       void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
       void symmetrizeBornEffectiveChargeTensors(void);

@@ -87,7 +87,7 @@ namespace apl {
     }
     bool stagebreak = false;
 
-    // Call VASP to calculate forces by LR
+    // Call VASP to calculate force constants using DFPT
     xInput.xvasp.AVASP_arun_mode = "APL";
     xInputs.clear();
     xInputs.push_back(xInput);
@@ -102,7 +102,7 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
   // We will use VASP5.2+ to calculate Born effective charge tensors and
   // dielectric constant matrix in the primitive cell with very high precision
-  // Both values are needed by non-analytical term of dynamic matrix for
+  // Both values are needed by the non-analytical term of the dynamic matrix for
   // correct TO-LO splitting of optical phonon branches of polar systems
   bool LinearResponsePC::runVASPCalculationsDFPT(_xinput& xInput, _aflags& _aflowFlags,
       _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn) {
@@ -161,7 +161,7 @@ namespace apl {
     if (!outfileFoundAnywherePhonons(xInputs)) return false;
     if (!readForceConstantsFromVasprun(xInputs[0])) return false;
     if (_isPolarMaterial) {
-      if (!calculateDielectricTensor(xInputs[1])) return false;
+      if (!calculateBornChargesDielectricTensor(xInputs[1])) return false;
     }
     return true;
   }
