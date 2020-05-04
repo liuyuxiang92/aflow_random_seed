@@ -175,7 +175,7 @@ namespace cce {
     if(functional!="exp"){
       functional=aurostd::toupper(functional);
     }
-    if (!aurostd::withinList(CCE_vallowed_functionals, functional) || get_offset(functional) == -1) {
+    if (!aurostd::WithinList(CCE_vallowed_functionals, functional) || get_offset(functional) == -1) {
       message << "Unknown functional " << functional << ". Please choose PBE, LDA, or SCAN.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
@@ -440,7 +440,7 @@ namespace cce {
       if(LDEBUG){
         cerr << soliloquy << "cce_vars.vfunctionals[" << k << "]: " << cce_vars.vfunctionals[k] << endl;
       }
-      if (!aurostd::withinList(CCE_vallowed_functionals, cce_vars.vfunctionals[k]) || get_offset(cce_vars.vfunctionals[k]) == -1) {
+      if (!aurostd::WithinList(CCE_vallowed_functionals, cce_vars.vfunctionals[k]) || get_offset(cce_vars.vfunctionals[k]) == -1) {
         message << "Unknown functional " << cce_vars.vfunctionals[k] << ". Please choose PBE, LDA, or SCAN.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
@@ -461,11 +461,11 @@ namespace cce {
       }
     }
     if(LDEBUG){
-      cerr << soliloquy << "PBE: " << aurostd::withinList(cce_vars.vfunctionals, "PBE") << endl;
-      cerr << soliloquy << "LDA: " << aurostd::withinList(cce_vars.vfunctionals, "LDA") << endl;
-      cerr << soliloquy << "SCAN: " << aurostd::withinList(cce_vars.vfunctionals, "SCAN") << endl;
-      cerr << soliloquy << "PBE+U_ICSD: " << aurostd::withinList(cce_vars.vfunctionals, "PBE+U_ICSD") << endl;
-      cerr << soliloquy << "exp: " << aurostd::withinList(cce_vars.vfunctionals, "exp") << endl;
+      cerr << soliloquy << "PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;
+      cerr << soliloquy << "LDA: " << aurostd::WithinList(cce_vars.vfunctionals, "LDA") << endl;
+      cerr << soliloquy << "SCAN: " << aurostd::WithinList(cce_vars.vfunctionals, "SCAN") << endl;
+      cerr << soliloquy << "PBE+U_ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U_ICSD") << endl;
+      cerr << soliloquy << "exp: " << aurostd::WithinList(cce_vars.vfunctionals, "exp") << endl;
       cerr << endl;
     }
   }
@@ -750,7 +750,7 @@ namespace cce {
     double anion_electronegativity = 0;
     for(uint k=0,ksize=structure.species.size();k<ksize;k++){
       z = GetAtomNumber(KBIN::VASP_PseudoPotential_CleanName(structure.species[k]));
-      xelement element(z);
+      xelement::xelement element(z);
       if (element.electronegativity_Allen == NNN) {
         message << "VERY BAD NEWS: There is no known electronegativity value for " << KBIN::VASP_PseudoPotential_CleanName(structure.species[k]) << ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
@@ -767,7 +767,7 @@ namespace cce {
     }
     // set anion charge and check whether it is negative
     z = GetAtomNumber(cce_vars.anion_species);
-    xelement element(z);
+    xelement::xelement element(z);
     cce_vars.standard_anion_charge = element.oxidation_states[element.oxidation_states.size()-1];
     if (cce_vars.standard_anion_charge > 0) {
       message << "VERY BAD NEWS: There is no known negative oxidation number for " << cce_vars.anion_species << " detected as anion species.";
@@ -810,9 +810,9 @@ namespace cce {
           } else if (atom.cleanname != cce_vars.anion_species && structure.atoms[i].cleanname != cce_vars.anion_species){ // second condition set since the anion_species cannot be set as a multi-anion species again
             neighbors_count+=1;
             z = GetAtomNumber(structure.atoms[i].cleanname);
-            xelement atom_element(z);
+            xelement::xelement atom_element(z);
             z = GetAtomNumber(atom.cleanname);
-            xelement neigh_element(z);
+            xelement::xelement neigh_element(z);
             double electronegativity_atom = atom_element.electronegativity_Allen;
             double electronegativity_neighbor = neigh_element.electronegativity_Allen;
             if(LDEBUG){
@@ -864,7 +864,7 @@ namespace cce {
         // set multi anion oxidation numbers and check whether it is negative
         _atom atom;
         z = GetAtomNumber(structure.atoms[i].cleanname);
-        xelement atom_element(z);
+        xelement::xelement atom_element(z);
         cce_vars.oxidation_states[i] = atom_element.oxidation_states[atom_element.oxidation_states.size()-1];
         if(LDEBUG){
           cerr << soliloquy << "Oxidation state for atom " << i << " (" << structure.atoms[i].cleanname << ") has been set to: " << cce_vars.oxidation_states[i] << endl;
@@ -1223,7 +1223,7 @@ namespace cce {
     uint z = 0;
     for(uint i=0,isize=structure.species.size();i<isize;i++){ 
       z = GetAtomNumber(KBIN::VASP_PseudoPotential_CleanName(cce_vars.species_electronegativity_sorted[i]));
-      xelement element(z);
+      xelement::xelement element(z);
       // load preferred oxidation states for each species
       cce_vars.num_pref_ox_states_electronegativity_sorted[i] = element.oxidation_states_preferred.size();
       if(element.oxidation_states_preferred[0] != NNN){
@@ -1885,13 +1885,13 @@ namespace cce {
     string alkali_metals = "Li,Na,K,Rb,Cs,Fr";
     vector<string> valkali_metals;
     aurostd::string2tokens(alkali_metals, valkali_metals, ",");
-    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1]))) || (aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[0])) && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;} // check whether it is a binary alkali metal oxide
+    if (! ( structure.species.size() == 2 && ((KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::WithinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1]))) || (aurostd::WithinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[0])) && KBIN::VASP_PseudoPotential_CleanName(structure.species[1]) == "O")) )) {return;} // check whether it is a binary alkali metal oxide
     if(LDEBUG){
       cerr << soliloquy << "This is a binary alkali metal oxide, checking whether it is an alkali metal sesquioxide..." << endl;
     }
     uint num_alkali_before_O = 0; // num cations before O not O before cations since setting oxidation states of anions below, not for cations as in other cases
     string alkali_metal = "";
-    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::withinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1])) ) {
+    if ( KBIN::VASP_PseudoPotential_CleanName(structure.species[0]) == "O" && aurostd::WithinList(valkali_metals, KBIN::VASP_PseudoPotential_CleanName(structure.species[1])) ) {
       num_alkali_before_O=0;
       alkali_metal=KBIN::VASP_PseudoPotential_CleanName(structure.species[1]);
     } else {
@@ -2436,11 +2436,11 @@ namespace cce {
     }
     if(LDEBUG){
       cerr << soliloquy << "functional determined from aflow.in: " << functional << endl;
-      cerr << soliloquy << "PBE: " << aurostd::withinList(cce_vars.vfunctionals, "PBE") << endl;
-      cerr << soliloquy << "LDA: " << aurostd::withinList(cce_vars.vfunctionals, "LDA") << endl;
-      cerr << soliloquy << "SCAN: " << aurostd::withinList(cce_vars.vfunctionals, "SCAN") << endl;
-      cerr << soliloquy << "PBE+U_ICSD: " << aurostd::withinList(cce_vars.vfunctionals, "PBE+U_ICSD") << endl;
-      cerr << soliloquy << "exp: " << aurostd::withinList(cce_vars.vfunctionals, "exp") << endl;
+      cerr << soliloquy << "PBE: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE") << endl;
+      cerr << soliloquy << "LDA: " << aurostd::WithinList(cce_vars.vfunctionals, "LDA") << endl;
+      cerr << soliloquy << "SCAN: " << aurostd::WithinList(cce_vars.vfunctionals, "SCAN") << endl;
+      cerr << soliloquy << "PBE+U_ICSD: " << aurostd::WithinList(cce_vars.vfunctionals, "PBE+U_ICSD") << endl;
+      cerr << soliloquy << "exp: " << aurostd::WithinList(cce_vars.vfunctionals, "exp") << endl;
     }
     // if functional determined from aflow.in is different from the ones given by the input options, 
     // throw warning that oxidation numbers are only determined on the basis of a specific functional
