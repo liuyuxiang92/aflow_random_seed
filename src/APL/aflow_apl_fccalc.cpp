@@ -607,6 +607,7 @@ namespace apl {
     outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
     outfile << "<apl>" << std::endl;
     outfile << tab << "<generator>" << std::endl;
+    outfile << tab << tab << "<i name=\"aflow_version\" type=\"string\">" << AFLOW_VERSION << "</i>" << std::endl;
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;

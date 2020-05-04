@@ -256,6 +256,17 @@ namespace apl {
     }
     //CO - END
 
+    // Check if a version string is in the xml file. If not, the force constants
+    // follow an older, incompatible format and need to be recalculated
+    while (true) {
+      if (line_count == vlines.size()) {
+        string message = "The format for harmonic force constants has changed and is incomptable with the format found in this file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      }
+      line = vlines[line_count++];  //CO
+      if (line.find("aflow_version") != string::npos) break;
+    }
+
     // Get force constant matrices
     while (true) {
       if (line_count == vlines.size()) { //CO

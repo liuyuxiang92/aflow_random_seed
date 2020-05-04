@@ -1350,6 +1350,7 @@ namespace apl {
 
     // Info about calculation run
     parameters << tab << "<generator>" << std::endl;
+    parameters << tab << tab << "<i name=\"aflow_version\" type=\"string\">" << AFLOW_VERSION << "</i>" << std::endl;
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
