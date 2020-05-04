@@ -474,7 +474,7 @@ namespace KBIN {
   void VASP_RunPhonons_AGL_postprocess(string directory_LIB, string AflowInName, string FileLockName) {  
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror;
+    uint aglerror = 0;
     ostringstream aus;
     _xvasp xvasp;
     string AflowIn;
