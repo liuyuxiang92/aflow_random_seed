@@ -140,7 +140,7 @@ namespace apl {
     if (_order > 1) {
       order = _order;
     } else {
-      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "build";
+      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "initialize";
       stringstream message;
       message << "Cluster order must be larger than 1 (is " << _order << ").";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
