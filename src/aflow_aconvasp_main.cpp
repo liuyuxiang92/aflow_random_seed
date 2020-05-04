@@ -6038,7 +6038,7 @@ namespace pflow {
     return sym_done;
   }
 
-  // ME20200224
+  // ME20200224 - added directory option
   bool PerformFullSymmetry(xstructure& a, ofstream &FileMESSAGE,const string& directory,_kflags &kflags,const bool& osswrite,ostream& oss, string format){
     _aflags aflags;
     aflags.Directory = directory;

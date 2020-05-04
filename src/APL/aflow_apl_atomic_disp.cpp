@@ -649,7 +649,7 @@ namespace apl {
           stringstream filename;
           filename << directory <<  DEFAULT_APL_FILE_PREFIX << "displacements_q";
           for (int i = 1; i < 4; i++) filename << "_" << qpoints[q][i];
-          filename << "_b_" << br << ".axsf";
+          filename << "_b_" << (branches[br] + 1) << ".axsf";
           ad.writeSceneFileXcrysden(filename.str(), scell.getSupercellStructure(), disp, nperiods);
         }
       }

@@ -1067,8 +1067,8 @@ namespace apl {
     public:
       QMesh(ostream& oss=std::cout);
       QMesh(ofstream&, ostream& os=std::cout);
-      QMesh(const xvector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
-      QMesh(const vector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, string directory="./", ostream& oss=std::cout);
+      QMesh(const vector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, string directory="./", ostream& oss=std::cout);
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
@@ -1549,8 +1549,8 @@ namespace apl {
     public:
       ThermalPropertiesCalculator(ostream& oss=std::cout);
       ThermalPropertiesCalculator(ofstream&, ostream& os=std::cout);
-      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, ostream& os=std::cout, string="./");
-      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, ostream& os=std::cout, string="./");
+      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, string directory="./", ostream& os=std::cout);
+      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, string directory="./", ostream& os=std::cout);
       ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
       ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
       ~ThermalPropertiesCalculator();

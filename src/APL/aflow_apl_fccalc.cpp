@@ -218,13 +218,14 @@ namespace apl {
     xmatrix<double> sum(3, 3);//, sum2(3, 3); OBSOLETE ME20200504 - not used
 
     for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
-      // Get SUMs
-      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
-        if (i != j) {
-          sum = sum + _forceConstantMatrices[i][j];
-          //sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);
-        }
-      }
+      // ME20200504 - sums are not used or cleared before they are used
+      //[OBSOLETE] // Get SUMs
+      //[OBSOLETE] for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
+      //[OBSOLETE]   if (i != j) {
+      //[OBSOLETE]     sum = sum + _forceConstantMatrices[i][j];
+      //[OBSOLETE]     //sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);
+      //[OBSOLETE]   }
+      //[OBSOLETE] }
 
       // Correct SUM2
       // ME20200504 - This appears to enforce the invariance of the force constants
@@ -235,7 +236,7 @@ namespace apl {
         _forceConstantMatrices[j][i] = trasp(_forceConstantMatrices[i][j]);
       }
 
-      // Get SUMs again // ME20200504 - why?
+      // Get SUMs again
       sum.clear();
       //sum2.clear(); OBSOLETE ME20200504 - not used
       for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {

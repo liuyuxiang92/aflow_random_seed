@@ -124,6 +124,7 @@ namespace KBIN {
       vflags.KBIN_VASP_KPOINTS_MODE.flag("EXPLICIT_START_STOP", true);
       vflags.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP << kpts_file.str();
 
+      // Run relxations
       Krun = runRelaxationsAPL_VASP(start_relax, AflowIn, xvasp, aflags, kflags, vflags, fileMessage);
 
       // Consistency check: Redetermine the supercell dimensions and the k-point
@@ -396,8 +397,7 @@ namespace KBIN {
       }
     }
 
-    // ME20200427 - added grid option. It takes precedence, so check
-    // that the formatting is correct.
+    // ME20200427 - added grid option. It has priority, so check that the formatting is correct.
     if (xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.isentry) {
       vector<int> kpts;
       aurostd::string2tokens(xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.content_string, kpts, " xX");
@@ -473,8 +473,8 @@ namespace KBIN {
       if (key == "DOSSMEAR") {USER_DOS_SMEAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
       if (key == "DOSPOINTS") {USER_DOS_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
       if (key == "DOS_PROJECT") {USER_DOS_PROJECT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME20200213
-      if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME20190625
-      if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME20190625
+      if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  //ME20190625
+      if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  //ME20190625
       if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "DISPLACEMENTS") {USER_DISPLACEMENTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "TPT") {USER_TPT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
@@ -644,7 +644,6 @@ namespace KBIN {
           if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
             message = "Ambiguous input in APL DOS projections. ";
             message += "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
-            //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
           }
           string projscheme = "";
@@ -1953,7 +1952,7 @@ namespace KBIN {
       // Calculate thermal properties
       if (USER_TP) {
         //if (!dosc.hasNegativeFrequencies()) //ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
-        apl::ThermalPropertiesCalculator tpc(dosc, messageFile, oss, aflags.Directory);  //ME20190423
+        apl::ThermalPropertiesCalculator tpc(dosc, messageFile, aflags.Directory, oss);  //ME20190423
         // ME20200108 - new ThermalPropertiesCalculator format
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
         tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);

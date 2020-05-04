@@ -285,7 +285,6 @@ namespace apl {
     //if (!pflow::CalculateFullSymmetry(af, xstr))
     if (!pflow::PerformFullSymmetry(xstr,*p_FileMESSAGE,_directory,kflags,VERBOSE,*p_oss)) //CO20181226
     { //CO20200106 - patching for auto-indenting
-      // ME20191031 - use xerror
       string function = "apl::Supercell::calculateWholeSymmetry()";
       string message = "Symmetry routine failed.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);

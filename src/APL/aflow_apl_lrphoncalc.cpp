@@ -179,7 +179,6 @@ namespace apl {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
-    string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
 
     // Read vasprun.xml
     string filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml.static");
@@ -214,6 +213,7 @@ namespace apl {
       }
     }
 
+    string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
     // Check that the file was read successfully.
     if (iline == nlines) {
       message << "Hessian tag not found or incomplete.";
