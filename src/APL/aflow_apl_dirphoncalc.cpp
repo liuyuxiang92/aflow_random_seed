@@ -1,8 +1,8 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -187,7 +187,7 @@ namespace apl {
           //CO20190114 - it is very silly to try to add in fpos
           //add to cpos, then convert to fpos
           xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-          xstr.atoms[idAtom].fpos = C2F(xstr.lattice, xstr.atoms[idAtom].cpos);
+          xstr.atoms[idAtom].fpos = xstr.c2f * xstr.atoms[idAtom].cpos;
           //[CO20190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].fpos = xInputs[idxRun].getXStr().atoms[idAtom].fpos + C2F(xInputs[idxRun].getXStr().lattice, ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
           //[CO20190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].cpos = F2C(xInputs[idxRun].getXStr().lattice,
           //[CO20190114 - OBSOLETE]                                                 xInputs[idxRun].getXStr().atoms[idAtom].fpos);
@@ -1138,7 +1138,7 @@ namespace apl {
           //outfile << setw(15) << _superCellStructure.atoms[k].cpos << " ";
 
           // Scale force, it is expected in Hartree/Angs.
-          xvector<double> f = 27.212 * _uniqueForces[i][j][k];
+          xvector<double> f = hartree2ev * _uniqueForces[i][j][k];
 
           outfile << setw(15) << f(1)
             << setw(15) << f(2)
@@ -1358,7 +1358,7 @@ namespace apl {
           xInputs[idxRun].setXStr(_supercell->getSupercellStructureLight());
           xstructure& xstr = xInputs[idxRun].getXStr();
           xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0 ) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-          xstr.atoms[idAtom].fpos = C2F(xstr.lattice, xstr.atoms[idAtom].cpos);
+          xstr.atoms[idAtom].fpos = xstr.c2f * xstr.atoms[idAtom].cpos;
           idxRun++;
         }
       }
@@ -1375,8 +1375,8 @@ namespace apl {
 
 }  // namespace apl
 
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************

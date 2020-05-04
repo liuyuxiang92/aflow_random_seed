@@ -1,9 +1,9 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *            Aflow MARCO ESTERS - Duke University 2017-2020               *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
 // DOI: 10.1038/s41524-017-0046-7) and Jesus Carrete (ShengBTE, 
 // DOI: 10.1016/j.cpc.2014.02.015).
@@ -284,7 +284,7 @@ namespace apl {
 
           // Set up runname and generate distorted structure
           xInputs[idxRun].xvasp.AVASP_arun_runname = buildRunName(distortions, atoms, idxRun, nruns);
-          xInputs[idxRun].xvasp.AVASP_arun_runname += "_3rd";
+          xInputs[idxRun].xvasp.AVASP_arun_runname += "_4th";
           applyDistortions(xInputs[idxRun], clst.distortion_vectors, distortions, atoms, 2.0);
 
           // Create aflow.in files if they don't exist. Stagebreak is true as soon
@@ -348,7 +348,7 @@ namespace apl {
         << std::setprecision(3) << dist_cart[3] << "]"; // ME20190112
       xstr.title += distortion.str();
       xstr.atoms[atsc].cpos += dist_cart;
-      xstr.atoms[atsc].fpos = C2F(xstr.lattice, xstr.atoms[atsc].cpos);
+      xstr.atoms[atsc].fpos = xstr.c2f * xstr.atoms[atsc].cpos;
     }
   }
 
