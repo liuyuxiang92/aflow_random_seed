@@ -610,7 +610,7 @@ namespace apl {
     apl::Supercell& sc_pcalc = pc.getSupercell();
     // Must project to primitive or the vibrations will be incorrect
     if (!sc_pcalc.projectToPrimitive()) {
-      message = "Could not project to primitive structure.";
+      message = "Could not project to the primitive structure.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     // Check branches
