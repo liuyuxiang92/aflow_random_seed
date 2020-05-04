@@ -481,7 +481,7 @@ namespace apl {
     vector<string> allowed_formats;
     aurostd::string2tokens(allowed_formats_str, allowed_formats, ",");
     if (!aurostd::WithinList(allowed_formats, format)) {
-      message = "Unregonized format " + format + ".";
+      message = "Unrecognized format " + format + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
     
