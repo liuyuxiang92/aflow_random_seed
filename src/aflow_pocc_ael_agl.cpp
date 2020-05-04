@@ -259,7 +259,7 @@ namespace pocc {
     stringstream message;
     ostringstream aus;
     ofstream FileMESSAGE;
-    double T;
+    double T = 0.0;
     vector<double> Yvoigt, Yreuss, Yvrh;
     vector<double> Hv_Teter_voigt, Hv_Teter_reuss, Hv_Teter_vrh;
     vector<double> Hv_Chen_voigt, Hv_Chen_reuss, Hv_Chen_vrh;
