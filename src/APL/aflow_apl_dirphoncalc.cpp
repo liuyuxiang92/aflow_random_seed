@@ -49,6 +49,7 @@ namespace apl {
   void DirectMethodPC::clear(Supercell& sc) {
     free();
     _supercell = &sc;
+    _sc_set = true;
   }
 
   void DirectMethodPC::copy(const DirectMethodPC& that) {
@@ -64,6 +65,7 @@ namespace apl {
     _directory = that._directory;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
+    _sc_set = that._sc_set;
     _supercell = that._supercell;
     xInputs = that.xInputs;
   }
@@ -98,6 +100,10 @@ namespace apl {
     string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO20190218
     bool stagebreak = false;
     stringstream message;
+    if (!_sc_set) {
+      message << "Supercell pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
+    }
 
     // Check if supercell is already built
     if (!_supercell->isConstructed()) {
@@ -1159,9 +1165,14 @@ namespace apl {
   // [OBSOLETE] }
 
   void DirectMethodPC::saveState(const string& filename) {
+    string function = "apl::DirectMethodPC::saveState()";
+    string message = "";
+    if (!_sc_set) {
+      message = "Supercell pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     if (xInputs.size() == 0) return;  // Nothing to write
-    string function = "apl::LinearResponsePC::saveState()";
-    string message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
+    message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
@@ -1196,7 +1207,7 @@ namespace apl {
     out << AFLOWIN_SEPARATION_LINE << std::endl;
     aurostd::stringstream2file(out, filename);
     if (!aurostd::FileExist(filename)) {
-      string message = "Could not save state into file " + filename + ".";
+      message = "Could not save state into file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
   }
@@ -1208,7 +1219,12 @@ namespace apl {
   // calculations. It is still in development and has only been tested with VASP.
   void DirectMethodPC::readFromStateFile(const string& filename) {
     string function = "apl::DirectMethodPC::readFromStateFile()";
-    string message = "Reading state of the phonon calculator from " + filename + ".";
+    string message = "";
+    if (!_sc_set) {
+      message = "Supercell pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    message = "Reading state of the phonon calculator from " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";

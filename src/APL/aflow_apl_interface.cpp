@@ -138,6 +138,8 @@ namespace apl {
 namespace apl {
 
   //outfileFoundAnywherePhonons/////////////////////////////////////////////////
+  // Checks if output files can be found anywhere. If true, APL will assume that
+  // no DFT calculations have run yet --> stagebreak
   bool outfileFoundAnywherePhonons(vector<_xinput>& xinps) {
     for (uint idxRun = 0; idxRun < xinps.size(); idxRun++) {
       string dir = xinps[idxRun].getDirectory();
@@ -181,7 +183,8 @@ namespace apl {
 
   //outfileFoundEverywherePhonons/////////////////////////////////////////////
   // Tests whether the necessary force files are present and complete in all
-  // directories for the phonon calculatios. Also reads all forces.
+  // directories for the phonon calculatios. Also reads all forces. If false,
+  // APL will assume that at least one DFT broke --> error
   bool outfileFoundEverywherePhonons(vector<_xinput>& xinps, const string& directory, ofstream& messageFile, ostream& oss, bool contains_born) {
     string function = "apl::outfileFoundEverywherePhonons()";
     string mode = xinps[0].xvasp.AVASP_arun_mode;
@@ -272,6 +275,8 @@ namespace apl {
 
   // ME20190114
   // Cannot use const reference for zerostate because of getXStr()
+  // This is used for AAPL and needs an extra input because the ZEROSTATE
+  // calculation is not part of the xInputs vector
   void subtractZeroStateForces(vector<_xinput>& xinps, _xinput& zerostate) {
     string function = "apl::subtractZeroStateForces()";
     stringstream _logger;

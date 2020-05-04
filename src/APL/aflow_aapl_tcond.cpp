@@ -79,10 +79,11 @@ namespace apl {
     free();
   }
 
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, _aflags& a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, const _aflags& a) {
     _pc = &pc;
     _qm = &_pc->getQMesh();  // This pointer is only defined to make the code more readable
-    aflags = &a;
+    _pc_set = true;
+    aflags = a;
     initialize();
   }
 
@@ -112,6 +113,7 @@ namespace apl {
     nBranches = that.nBranches;
     nIQPs = that.nIQPs;
     nQPs = that.nQPs;
+    _pc_set = that._pc_set;
     processes = that.processes;
     processes_iso = that.processes_iso;
     rates_boundary = that.rates_boundary;
@@ -135,6 +137,7 @@ namespace apl {
     nBranches = 0;
     nIQPs = 0;
     nQPs = 0;
+    _pc_set = false;
     processes.clear();
     processes_iso.clear();
     rates_boundary.clear();
@@ -144,16 +147,17 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void TCONDCalculator::clear(PhononCalculator& pc, _aflags& a) {
+  void TCONDCalculator::clear(PhononCalculator& pc, const _aflags& a) {
     free();
     _pc = &pc;
     _qm = &_pc->getQMesh();
-    aflags = &a;
+    _pc_set = true;
+    aflags = a;
     initialize();
   }
 
   void TCONDCalculator::initialize() {
-    _logger.initialize(*_pc->getOFStream(), *aflags);
+    _logger.initialize(*_pc->getOFStream(), aflags);
     _logger.setModuleName(_AAPL_TCOND_MODULE_);
     nBranches = _pc->getNumberOfBranches();
     nQPs = _qm->getnQPs();
@@ -172,6 +176,12 @@ namespace apl {
   void TCONDCalculator::calculateThermalConductivity() {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivity()";
     string message = "";
+
+    if (!_pc_set) {
+      message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+
     // Setup temperatures
     double tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
     double tend = aurostd::string2utype<double>(calc_options.getattachedscheme("TEND"));

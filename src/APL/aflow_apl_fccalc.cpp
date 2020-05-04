@@ -29,6 +29,7 @@ namespace apl {
   ForceConstantCalculator::ForceConstantCalculator(Supercell& sc, ofstream& mf, ostream& oss) {
     free();
     _supercell = &sc;
+    _sc_set = true;
     xStream::initialize(mf, oss);
     _directory = "./";
   }
@@ -58,6 +59,7 @@ namespace apl {
     _directory = that._directory;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
+    _sc_set = that._sc_set;
     _supercell = that._supercell;
     xInputs = that.xInputs;
   }
@@ -69,6 +71,7 @@ namespace apl {
     _directory = "";
     _forceConstantMatrices.clear();
     _isPolarMaterial = false;
+    _sc_set = false;
   }
 
 }  // namespace apl
@@ -111,10 +114,15 @@ namespace apl {
 
   // Runs the force constant calculator (main post-processing engine)
   bool ForceConstantCalculator::run() {
+    string function = "apl::ForceConstantCalculator::run():";
+    string message = "";
+    if (!_sc_set) {
+      message = "Supercell pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     // Check if supercell is already built
     if (!_supercell->isConstructed()) {
-      string function = "apl::ForceConstantCalculator::run()";
-      string message = "The supercell structure has not been initialized yet.";
+      message = "The supercell structure has not been initialized yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
 
@@ -595,9 +603,15 @@ namespace apl {
 
   // Writes the results into xml files
   void ForceConstantCalculator::hibernate() {
+    string function = "ForceConstantCalculator::hibernate():";
+    string message = "";
+    if (!_sc_set) {
+      message = "Supercell pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     string base = _directory + "/" + DEFAULT_APL_FILE_PREFIX;
     string filename = aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE);
-    string message = "Writing harmonic IFCs into file " + filename + ".";
+    message = "Writing harmonic IFCs into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     writeHarmonicIFCs(filename);
     if (_isPolarMaterial) {
@@ -657,7 +671,7 @@ namespace apl {
 
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "ForceConstantCalculator::writeHarmonicIFCs()";
+      string function = "apl::ForceConstantCalculator::writeHarmonicIFCs():";
       string message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
