@@ -329,7 +329,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
-    string line;
+    string line = "";
     uint line_count = 0;
     vector<string> tokens;
 
@@ -691,7 +691,7 @@ namespace apl {
     xmatrix<xcomplex<double> > dynamicalMatrix0(_nBranches, _nBranches, 1, 1);
 
     xcomplex<double> phase;
-    double value;
+    double value = 0.0;
     // ME20180828 - Prepare derivative calculation
     xvector<xcomplex<double> > derivative(3);
     vector<xmatrix<xcomplex<double> > > dDynMat_NAC;
@@ -713,7 +713,7 @@ namespace apl {
 
       for (uint isc2 = 0; isc2 < scAtomsSize; isc2++) {
         uint ipc2 = _supercell.sc2pcMap(isc2);
-        int neq;  // Important for NAC derivative
+        int neq = 0;  // Important for NAC derivative
         if (_supercell.calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  // ME20180827
           for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
             for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {

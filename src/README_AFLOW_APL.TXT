@@ -89,7 +89,7 @@ forces. This can be achieved in one of two ways:
     For more information on the PREC option, see Section 2.1.1.
 
     APL can automatically choose the k-point grid for the relaxation to be commensurate with the
-    k-point grid for the supercell. For example, if a 3x2x1 supercell uses a 2x2x3 k-point gird,
+    k-point grid for the supercell. For example, if a 3x2x1 supercell uses a 2x2x3 k-point grid,
     the unit cell will be relaxed using a 6x4x3 k-point grid. This minimizes the risk of ghost
     forces in the supercell calculations. This feature can be turned on by using:
 
@@ -641,7 +641,7 @@ The commands to create these output files are shown below:
                        Default: unit cell.
 
 For XCRYSDEN, APL creates an animated structure (axsf) file for each phonon mode. These files
-contain animations that show the motions of the atoms for each of the mode. These animations can
+contain animations that show the motions of the atoms for each of the modes. These animations can
 be used by XCRYSDEN to create mpeg movies or gif images. The parameter "steps" determines the
 number of steps for each period, and "periods" determines how many periods are output into the
 file. For gifs, one period is sufficient. The parameter "scell" can be used to show the
@@ -649,7 +649,7 @@ displacements in a supercell instead of the unit cell, which is important for mo
 point.
 
 V_sim files will be output as aflow.apl.displacements.ascii, which contains all modes for the
-desired q-points. The file can be opened using V_sim or ASCII-phonons. These programs are captable
+desired q-points. The file can be opened using V_sim or ASCII-phonons. These programs are capable
 of doing supercells and animations on their own and do not require steps, periods, or supercell
 parameters.
 
