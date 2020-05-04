@@ -5214,7 +5214,7 @@ namespace aflowlib {
           for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
             if(aurostd::FileExist(dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext))) {
               answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");
-              if(answer==0){answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");} //CO20200501 - soft patch, this could STILL break if xcat files to load anything
+              if(answer==0){answer=aurostd::execute2utype<int>(XHOST.vcat.at(iext)+" \""+dir+"/OUTCAR"+vrelax.at(irelax)+XHOST.vext.at(iext)+"\" | grep -c \"(sec)\" ");} //CO20200501 - soft patch, this could STILL break if xcat does NOT load anything
               if(answer!=4 && answer!=5) { ok=FALSE;obb<<". error(" << answer << ")=OUTCAR"+vrelax.at(irelax)+".EXT"; }}
           }
         }

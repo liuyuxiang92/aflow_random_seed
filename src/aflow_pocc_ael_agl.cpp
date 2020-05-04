@@ -55,11 +55,11 @@ namespace pocc {
     ael_write_full_results = false;
 
     if(XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING")){
-      ael_run_postprocess=XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING");
+      ael_run_postprocess=true; //[CO20200502 - speed]XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING");
     }  //command line input
 
     if(XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS")){
-      ael_write_full_results=XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS");
+      ael_write_full_results=true;  //[CO20200502 - speed]XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS");
     }  //command line input
   }
 } // namespace pocc
