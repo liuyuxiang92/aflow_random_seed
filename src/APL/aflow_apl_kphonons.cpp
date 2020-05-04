@@ -32,7 +32,6 @@ using std::auto_ptr;
 #endif
 
 static const string _ANHARMONIC_IFCS_FILE_[2] = {"anharmonicIFCs_3rd.xml", "anharmonicIFCs_4th.xml"};
-static const string _CLUSTER_SET_FILE_[2] = {"clusterSet_3rd.xml", "clusterSet_4th.xml"};
 static const int _NUM_RELAX_ = 2; //ME20181226
 static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME20181226  //ME20190125
 
@@ -286,12 +285,15 @@ namespace KBIN {
       ofstream& messageFile,
       ostream& oss) {
 
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
     //                               INITIALIZE                                //
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [0]" << std::endl;
     xinput.xvasp.AVASP_arun = true;
     string function = "KBIN::RunPhonons_APL()";  //ME20191029
     // Test
@@ -369,6 +371,8 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1a]" << std::endl;
+
     //ME20181019 - Overwrite defaults for CHGCAR, WAVECAR, etc. Only write
     // these files if the user explicitly sets these flags. Otherwise, APL will
     // use too much disk space.
@@ -420,6 +424,8 @@ namespace KBIN {
     }
 
     // APL ----------------------------------------------------------------------
+
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1b]" << std::endl;
 
     //ME20181026 START
 
@@ -782,6 +788,8 @@ namespace KBIN {
 
     // AAPL ----------------------------------------------------------------------
 
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1c]" << std::endl;
+
     //ME20181027 START
 
     /***************************** READ PARAMETERS *****************************/
@@ -976,6 +984,8 @@ namespace KBIN {
       logger << "Anharmonic force constants and thermal conductivity will NOT be calculated." << apl::endl;
     }
     //ME20181027 STOP
+
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1c]" << std::endl;
 
     // QHA ----------------------------------------------------------------------
 
@@ -1382,6 +1392,8 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [2]" << std::endl;
+
     //fix vasp bin for LR or DM+POLAR
     if (USER_ENGINE == string("LR") || (USER_ENGINE == string("DM") && USER_POLAR)) {
       if(xflags.AFLOW_MODE_VASP && !XHOST.GENERATE_AFLOWIN_ONLY){  //ME20190313 - Do not check the VASP binary for generate_aflowin_only
@@ -1429,7 +1441,19 @@ namespace KBIN {
       xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
     }
 
-    apl::Supercell supercell(xinput.getXStr(), messageFile, oss, aflags.Directory);
+    // Set up the phonon calculator
+    apl::PhononCalculator phcalc(messageFile, oss);
+    if (xflags.vflags.AFLOW_SYSTEM.content_string.empty()) {
+      phcalc.setSystem(xinput.getXStr().title);
+    } else {
+      phcalc.setSystem(xflags.vflags.AFLOW_SYSTEM.content_string);
+    }
+    phcalc.setDirectory(aflags.Directory);
+    phcalc.setNCPUs(kflags);
+    phcalc.setPolarMaterial(USER_POLAR);
+    phcalc.initialize_supercell(xinput.getXStr());
+    apl::Supercell& supercell = phcalc.getSupercell();
+
     // Determine the supercell dimensions
     xvector<int> scell_dims = supercell.determineSupercellDimensions(supercell_opts);
 
@@ -1528,17 +1552,6 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    // Set up the phonon calculator
-    apl::PhononCalculator phcalc(supercell, messageFile, oss);
-    if (xflags.vflags.AFLOW_SYSTEM.content_string.empty()) {
-      phcalc.setSystem(supercell.getInputStructure().title);
-    } else {
-      phcalc.setSystem(xflags.vflags.AFLOW_SYSTEM.content_string);
-    }
-    phcalc.setDirectory(aflags.Directory);
-    phcalc.setNCPUs(kflags);
-    phcalc.setPolarMaterial(USER_POLAR);
-
     // FORCE CONSTANTS ----------------------------------------------------------
     bool stagebreak = false;
 
@@ -1563,8 +1576,7 @@ namespace KBIN {
       // Set up calculator
       auto_ptr<apl::ForceConstantCalculator> fccalc;
       if (USER_ENGINE == string("DM")) {
-        apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, xinput, aflags,
-            kflags, xflags, AflowIn, messageFile, oss);
+        apl::DirectMethodPC*fccalcdm = new apl::DirectMethodPC(supercell, messageFile, oss);
         fccalcdm->setGeneratePlusMinus(USER_AUTO_DISTORTIONS, USER_DPM);  //CO auto
         fccalcdm->setGenerateOnlyXYZ(USER_DISTORTIONS_XYZ_ONLY);
         fccalcdm->setDistortionSYMMETRIZE(USER_DISTORTIONS_SYMMETRIZE);
@@ -1587,12 +1599,12 @@ namespace KBIN {
       //  phcalc.reset(gsa);
       //  } //CO20200106 - patching for auto-indenting
       else {
-        fccalc.reset(new apl::LinearResponsePC(supercell, xinput, aflags,
-              kflags, xflags, AflowIn, messageFile, oss));
+        fccalc.reset(new apl::LinearResponsePC(supercell, messageFile, oss));
         fccalc->setPolarMaterial(USER_POLAR);  // ME20200218
       }
       // Run calculations
-      apl_stagebreak = fccalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
+      fccalc->setDirectory(aflags.Directory);
+      apl_stagebreak = fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, AflowIn, USER_ZEROSTATE_CHGCAR);
       fccalc->saveState(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
       if (!apl_stagebreak) {
         apl_stagebreak = !(fccalc->run());
@@ -1602,6 +1614,8 @@ namespace KBIN {
         }
       }
     }
+
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [3b]" << std::endl;
 
     stagebreak = (stagebreak || apl_stagebreak);
 
@@ -1613,8 +1627,8 @@ namespace KBIN {
         CALCULATE_SCQHA_OPTION.option || CALCULATE_SCQHA_A_OPTION.option || CALCULATE_SCQHA_B_OPTION.option || CALCULATE_SCQHA_C_OPTION.option ||
         CALCULATE_QHA3P_OPTION.option || CALCULATE_QHA3P_A_OPTION.option || CALCULATE_QHA3P_B_OPTION.option || CALCULATE_QHA3P_C_OPTION.option)
     {
-      pheos.reset(new apl::QHA_AFLOWIN_CREATOR(supercell, xinput, aflags,
-            kflags, xflags, AflowIn, messageFile, oss));
+      pheos.reset(new apl::QHA_AFLOWIN_CREATOR(supercell, messageFile, oss));
+      pheos->setDirectory(aflags.Directory);
 
       pheos->setGP(CALCULATE_GRUNEISEN_OPTION.option, CALCULATE_GRUNEISEN_A_OPTION.option, CALCULATE_GRUNEISEN_B_OPTION.option, CALCULATE_GRUNEISEN_C_OPTION.option);
       if( CALCULATE_SCQHA_OPTION.option || CALCULATE_SCQHA_A_OPTION.option || CALCULATE_SCQHA_B_OPTION.option || CALCULATE_SCQHA_C_OPTION.option )
@@ -1638,10 +1652,12 @@ namespace KBIN {
         pheos->setEOS_NEDOS(NEDOS);
         pheos->set_edos_accurate(EDOS_ACURATE_OPTION.option);
       }
-      pheos->run_qha();
+      pheos->run_qha(xinput, kflags, xflags);
       pheos->close_log();
     }
     //QHA/SCQHA/QHA3P END
+
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [3c]" << std::endl;
 
     // Anharmonic force constants
     bool aapl_stagebreak = false;
@@ -1668,34 +1684,12 @@ namespace KBIN {
 
         // Reading failed - calculate
         if (!awakeAnharmIFCs) {
-          // Clusters
-          apl::ClusterSet clst;
-          string clust_hib_file = aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[o-3];
-          bool awakeClusterSet = (USER_HIBERNATE && aurostd::EFileExist(clust_hib_file));
-          if (awakeClusterSet) {
-            try {
-              clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
-                  USER_CUTOFF_DISTANCE[o-3], o, messageFile, aflags, oss);
-            } catch (aurostd::xerror excpt) {
-              message = excpt.error_message;
-              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
-              awakeClusterSet = false;
-            }
-          }
-          // Reading clusters failed - determine
-          if (!awakeClusterSet) {
-            clst = apl::ClusterSet(supercell, USER_CUTOFF_SHELL[o-3],
-                USER_CUTOFF_DISTANCE[o-3], messageFile, aflags, oss);
-            clst.build(o);
-            clst.buildDistortions();
-            if (USER_HIBERNATE) {
-              clst.writeClusterSetToFile(clust_hib_file);
-            }
-          }
           // Setup calculations
-          apl::AnharmonicIFCs anharm(xinput, aflags, kflags, xflags, clst, messageFile, oss);
+          apl::AnharmonicIFCs anharm(messageFile, oss);
+          anharm.setDirectory(aflags.Directory);
+          anharm.initialize(phcalc.getSupercell(), o, USER_CUTOFF_SHELL[o - 3], USER_CUTOFF_DISTANCE[o - 3]);
           anharm.setOptions(USER_DISTORTION_MAGNITUDE, USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM, USER_ZEROSTATE);
-          aapl_stagebreak = (anharm.runVASPCalculations(USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
+          aapl_stagebreak = (anharm.runVASPCalculations(xinput, aflags, kflags, xflags, USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
           // Calculate IFCs
           if (!aapl_stagebreak) {
             aapl_stagebreak = !(anharm.calculateForceConstants());
@@ -1754,6 +1748,8 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [4]" << std::endl;
+
     //QHA/SCQHA/QHA3P START //PN20180705
     //Store dynamical matrices and PDOS from different distorted directores
     if(CALCULATE_GRUNEISEN_SUBDIRECTORIES_OPTION.option ||
@@ -1805,14 +1801,9 @@ namespace KBIN {
       apl::QHAsubdirectoryData store(phcalc, logger);
       store.setdir_prefix(_TMPDIR_);
       string dirname=store.getdir_name(aflags.Directory);
-      // ME20190428 - START
-      apl::QMesh qmesh(messageFile, oss);
-      qmesh.setDirectory(aflags.Directory);
-      qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
-      if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME20190625
 
-      apl::DOSCalculator dosc(phcalc, qmesh, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
-      //ME20190428 END
+      if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
+      apl::DOSCalculator dosc(phcalc, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
       // Calculate DOS
       dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
       if (USER_DOS) dosc.writePDOS(_TMPDIR_, dirname);
@@ -1861,14 +1852,8 @@ namespace KBIN {
           qpoints.clear();
         }
         {
-          //ME20190428 BEGIN
-          apl::QMesh qmesh(messageFile, oss);
-          qmesh.setDirectory(aflags.Directory);
-          qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
-          if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME20190625
-
-          apl::DOSCalculator dosc(phcalc, qmesh, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
-          //ME20190428 END
+          if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
+          apl::DOSCalculator dosc(phcalc, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
           // Calculate DOS
           dosc.calc(USER_DOS_NPOINTS,USER_DOS_SMEAR);
           if(USER_DOS)dosc.writePDOS(_TMPDIR_, dirname);
@@ -1886,6 +1871,8 @@ namespace KBIN {
     /////////////////////////////////////////////////////////////////////////////
 
     // Get the format of frequency desired by user ///////////////////////
+
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5a]" << std::endl;
 
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
@@ -1931,6 +1918,8 @@ namespace KBIN {
     //high-symmery qpoint auto pointer END [PN]
 
     // PHONON DISPERSIONS ---------------------------------------------------------
+
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5b]" << std::endl;
 
     if (USER_DC) {
       apl::PhononDispersionCalculator pdisc(phcalc);
@@ -1991,18 +1980,12 @@ namespace KBIN {
 
     // PHONON DOS AND THERMODYNAMIC PROPERTIES ----------------------------------------
 
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5c]" << std::endl;
+
     if (USER_DOS || USER_TP) {
-      // Generate mesh for calculation of DOS...
-      //ME20190428 START
-
-      apl::QMesh qmesh(messageFile, oss);
-      qmesh.setDirectory(aflags.Directory);
-      qmesh.initialize(USER_DOS_MESH, phcalc.getInputCellStructure());
-      if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  //ME20190625
-
       // Calculate DOS
-      apl::DOSCalculator dosc(phcalc, qmesh, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
-      // ME20190428 END
+      if (!phcalc.getQMesh().initialized()) phcalc.initialize_qmesh(USER_DOS_MESH);
+      apl::DOSCalculator dosc(phcalc, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
       dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
       if (USER_DOS) {
         dosc.writePDOS(aflags.Directory);
@@ -2019,7 +2002,7 @@ namespace KBIN {
 
         if (USER_DISPLACEMENTS) {
           apl::AtomicDisplacements ad(phcalc);
-          ad.calculateMeanSquareDisplacements(qmesh, USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
+          ad.calculateMeanSquareDisplacements(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
           ad.writeMeanSquareDisplacementsToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE);
         }
         //QHA/SCQHA/QHA3P START //PN20180705
@@ -2027,6 +2010,11 @@ namespace KBIN {
         //ME20190428 START
         //calculate group velocities
         if (!dosc.hasNegativeFrequencies()) {  // ME20200210
+          // This is just here so that PN's code doesn't break. This should
+          // become obsolete in the future.
+          apl::QMesh& qmesh = phcalc.getQMesh();
+          if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  //ME20190625
+
           if(CALCULATE_GROUPVELOCITY_OPTION.option){
             apl::GroupVelocity vg(phcalc, qmesh, logger);
             if(vg.check_negative_frequencies()){
@@ -2235,19 +2223,21 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [6]" << std::endl;
+
     if (USER_TCOND) {
       // Get q-points
       message = "Starting thermal conductivity calculations.";
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss);
-      apl::QMesh qmtcond(messageFile, oss);
-      qmtcond.setDirectory(aflags.Directory);
-      qmtcond.initialize(USER_DOS_MESH, phcalc.getInputCellStructure(), true, true);
+      std::cout << aurostd::joinWDelimiter(USER_THERMALGRID, "x") << std::endl;
+      phcalc.initialize_qmesh(USER_THERMALGRID, true, true);
+      apl::QMesh& qmtcond = phcalc.getQMesh();
       qmtcond.makeIrreducible();
       qmtcond.writeQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE);
       qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);
 
       // Do the thermal conductivity calculation
-      apl::TCONDCalculator tcond(phcalc, qmtcond, aflags);
+      apl::TCONDCalculator tcond(phcalc, aflags);
 
       // Set calculation options
       tcond.calc_options.flag("RTA", (USER_BTE == "RTA"));

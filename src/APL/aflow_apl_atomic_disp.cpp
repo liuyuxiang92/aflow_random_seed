@@ -1,10 +1,10 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                Aflow PINKU NATH - Duke University 2014-2016             *
 // *                 Aflow MARCO ESTERS - Duke University 2020               *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 // Written by Marco Esters based on work by Pinku Nath
 
 #include "aflow_apl.h"
@@ -157,18 +157,25 @@ namespace apl {
   // temperatures. For the formula, see e.g. A. A. Mardudin "Theory of
   // Lattice Dynamics in the Harmonic Approximation", eq. 2.4.23 and 2.4.24.
   // Units are Angstrom^2.
-  void AtomicDisplacements::calculateMeanSquareDisplacements(const QMesh& qmesh, double Tstart, double Tend, double Tstep) {
+  void AtomicDisplacements::calculateMeanSquareDisplacements(double Tstart, double Tend, double Tstep) {
+    string function = "AtomicDisplacements::calculateDisplacements()";
+    string message = "";
     _qpoints.clear();
     _temperatures.clear();
 
+    QMesh& _qm = _pc->getQMesh();
+    if (!_qm.initialized()) {
+      message = "q-point mesh is not initialized.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    _qpoints = _pc->getQMesh().getPoints();
+
     if (Tstart > Tend) {
-      string function = "AtomicDisplacements::calculateDisplacements()";
-      string message = "Tstart cannot be higher than Tend.";
+      message = "Tstart cannot be higher than Tend.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
     for (double T = Tstart; T <= Tend; T += Tstep) _temperatures.push_back(T);
 
-    _qpoints = qmesh.getPoints();
     calculateMeanSquareDisplacementMatrices();
   }
 
@@ -474,7 +481,7 @@ namespace apl {
     vector<string> allowed_formats;
     aurostd::string2tokens(allowed_formats_str, allowed_formats, ",");
     if (!aurostd::WithinList(allowed_formats, format)) {
-      message = "Unregonized format " + format + ".";
+      message = "Unrecognized format " + format + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
     
@@ -565,10 +572,11 @@ namespace apl {
 
     // Initialize phonon calculator
     string statefile = directory + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE;
-    Supercell sc_pcalc(statefile, mf);
-    PhononCalculator pc(sc_pcalc, mf);
+    PhononCalculator pc(mf, oss);
     pc.setDirectory(directory);
+    pc.initialize_supercell(statefile);
     pc.awake();
+    apl::Supercell& sc_pcalc = pc.getSupercell();
     // Must project to primitive or the vibrations will be incorrect
     if (!sc_pcalc.projectToPrimitive()) {
       message = "Could not project to primitive structure.";
@@ -728,10 +736,10 @@ namespace apl {
 }  // namespace apl
 
 
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *               Pinku Nath - Duke University 2014 - 2016                  *
 // *                  Marco Esters - Duke University 2020                    *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************

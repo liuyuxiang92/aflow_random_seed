@@ -1,9 +1,9 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 // Written by Marco Esters, 2019.
 //
 // This class calculates the thermal conductivity of a material using the
@@ -79,9 +79,9 @@ namespace apl {
     free();
   }
 
-  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, _aflags& a) {
+  TCONDCalculator::TCONDCalculator(PhononCalculator& pc, _aflags& a) {
     _pc = &pc;
-    _qm = &qm;
+    _qm = &_pc->getQMesh();  // This pointer is only defined to make the code more readable
     aflags = &a;
     initialize();
   }
@@ -102,7 +102,6 @@ namespace apl {
 
   void TCONDCalculator::copy(const TCONDCalculator& that) {
     _pc = that._pc;
-    _qm = that._qm;
     aflags = that.aflags;
     calc_options = that.calc_options;
     eigenvectors = that.eigenvectors;
@@ -145,10 +144,10 @@ namespace apl {
   }
 
   //clear/////////////////////////////////////////////////////////////////////
-  void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, _aflags& a) {
+  void TCONDCalculator::clear(PhononCalculator& pc, _aflags& a) {
     free();
     _pc = &pc;
-    _qm = &qm;
+    _qm = &_pc->getQMesh();
     aflags = &a;
     initialize();
   }
@@ -171,17 +170,22 @@ namespace apl {
   // The main function that calculates the thermal conductivity tensor, the
   // Grueneisen parameters, and the scattering phase space.
   void TCONDCalculator::calculateThermalConductivity() {
+    string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivity()";
+    string message = "";
     // Setup temperatures
     double tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
     double tend = aurostd::string2utype<double>(calc_options.getattachedscheme("TEND"));
     double tstep = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTEP"));
 
-    if (tstart > tend) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalProperties()";
-      string message = "Tstart cannot be higher than Tend.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    if (!_qm->initialized()) {
+      message = "q-point mesh is not initialized.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
 
+    if (tstart > tend) {
+      message = "Tstart cannot be higher than Tend.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
     for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
 
     // Frequencies and group velocities
@@ -272,10 +276,10 @@ namespace apl {
   void TCONDCalculator::calculateFreqGvel(int startIndex, int endIndex) {
     xmatrix<xcomplex<double> > eigen(nBranches, nBranches, 1, 1);
     vector<xmatrix<xcomplex<double> > > dDynMat(3, eigen);
+    xvector<double> f;
     for (int q = startIndex; q < endIndex; q++) {
       // Frequency
-      xvector<double> f = _pc->getFrequency(_qm->getQPoint(q).cpos, apl::THZ | apl::OMEGA,
-          eigenvectors[q], dDynMat);
+      f = _pc->getFrequency(_qm->getQPoint(q).cpos, apl::THZ | apl::OMEGA, eigenvectors[q], dDynMat);
       freq[q] = aurostd::xvector2vector(f);  // Convert to vector to have same indexing as gvel
       // Group velocity
       for (int br = 0; br < nBranches; br++) {
@@ -442,7 +446,7 @@ namespace apl {
     vector<vector<int> > thread_dist;
 #endif
     string message = "";
-    LTMethod _lt(*_qm);
+    _qm->generateTetrahedra();
     // The conjugate is necessary because the three-phonon scattering processes
     // will be calculated for g - q' - q" = G
     vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);  // true: conjugate
@@ -459,13 +463,12 @@ namespace apl {
     threads.clear();
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
-            thread_dist[icpu][0], thread_dist[icpu][1],
-            std::ref(_lt), std::ref(phase_space), std::ref(phases)));
+            thread_dist[icpu][0], thread_dist[icpu][1], std::ref(phase_space), std::ref(phases)));
     }
     finishMPI(threads, _logger);
 #else
     _logger.initProgressBar(message);
-    calculateTransitionProbabilitiesPhonon(0, nIQPs, _lt, phase_space, phases);
+    calculateTransitionProbabilitiesPhonon(0, nIQPs, phase_space, phases);
     _logger.finishProgressBar();
 #endif
 
@@ -499,12 +502,12 @@ namespace apl {
         threads.clear();
         for (int icpu = 0; icpu < ncpus; icpu++) {
           threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this,
-                thread_dist[icpu][0], thread_dist[icpu][1], std::ref(_lt)));
+                thread_dist[icpu][0], thread_dist[icpu][1]));
         }
         finishMPI(threads, _logger);
 #else
         _logger.initProgressBar(message);
-        calculateTransitionProbabilitiesIsotope(0, nIQPs, _lt);
+        calculateTransitionProbabilitiesIsotope(0, nIQPs);
         _logger.finishProgressBar();
 #endif
       }
@@ -525,6 +528,7 @@ namespace apl {
   // is used for the Grueneisen parameters. Calculating the phases ahead of
   // time decreases runtime considerably.
   vector<vector<vector<xcomplex<double> > > > TCONDCalculator::calculatePhases(bool conjugate) {
+    vector<xvector<double> > qpts = _pc->getQMesh().getQPointsCPOS();
     const xstructure& scell = _pc->getSuperCellStructure();
     const xstructure& pcell = _pc->getInputCellStructure();
     const vector<int>& sc2pcMap = _pc->getSupercell()._sc2pcMap;
@@ -545,8 +549,8 @@ namespace apl {
         min_vec += iat_cpos;
         min_vec -= scell.atoms[at_eq_sc].cpos;
         for (int q = 0; q < nQPs; q++) {
-          if (conjugate) phases[iat][at][q] = exp(-iONE * scalar_product(_qm->getQPoint(q).cpos, min_vec));
-          else phases[iat][at][q] = exp(iONE * scalar_product(_qm->getQPoint(q).cpos, min_vec));
+          if (conjugate) phases[iat][at][q] = exp(-iONE * scalar_product(qpts[q], min_vec));
+          else phases[iat][at][q] = exp(iONE * scalar_product(qpts[q], min_vec));
         }
       }
     }
@@ -558,7 +562,7 @@ namespace apl {
   // phase space for three-phonon scattering processes. It uses the inversion
   // symmetry of the q-point grid and the transposition symmetry of the
   // scattering matrix elements to reduce the computational cost.
-  void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int endIndex, const LTMethod& _lt,
+  void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int endIndex,
       vector<vector<vector<vector<double> > > >& phase_space,
       const vector<vector<vector<xcomplex<double> > > >& phases) {
     // Prepare and precompute
@@ -636,7 +640,7 @@ namespace apl {
           frequencies[2][q] = freq[q][branches[br][1]] + freq[lq][branches[br][2]];
         }
 
-        for (j = 0; j < 3; j++) getWeightsLT(_lt, freq_ref, frequencies[j], weights[j]);
+        for (j = 0; j < 3; j++) getWeightsLT(freq_ref, frequencies[j], weights[j]);
 
         for (q = 0; q < nQPs; q++) {
           lq = lastq[q];
@@ -763,7 +767,7 @@ namespace apl {
   //calculateTransitionProbabilitiesIsotope///////////////////////////////////
   // Calculates the intrinsic transition probabilities/scattering rates of
   // the isotope scattering processes.
-  void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, int endIndex, const LTMethod& _lt) {
+  void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, int endIndex) {
     // Prepare
     const xstructure& pcell = _pc->getInputCellStructure();
     uint natoms = pcell.atoms.size();
@@ -783,7 +787,7 @@ namespace apl {
         prefactor = freq[q1][br1] * freq[q1][br1] * PI/2.0;
         for (br2 = 0; br2 < nBranches; br2++) {
           for (q2 = 0; q2 < nQPs; q2++) frequencies[q2] = freq[q2][br2];
-          getWeightsLT(_lt, freq[q1][br1], frequencies, weights);
+          getWeightsLT(freq[q1][br1], frequencies, weights);
           for (q2 = 0; q2 < nQPs; q2++) {
             // Only processes with non-zero weights need to be considered.
             if (weights[q2] > _ZERO_TOL_) {
@@ -848,12 +852,11 @@ namespace apl {
     return (f - fj)/(fi - fj);
   }
 
-  void TCONDCalculator::getWeightsLT(const LTMethod& _lt, double freq_ref,
-      const vector<double>& frequencies, vector<double>& weights) {
+  void TCONDCalculator::getWeightsLT(double freq_ref, const vector<double>& frequencies, vector<double>& weights) {
     for (int q = 0; q < nQPs; q++) weights[q] = 0;
-    const vector<vector<int> >& corners = _lt.getTetrahedra();
-    double vol = _lt.getVolumePerTetrahedron();
-    int ntet = _lt.getnTetrahedra();
+    const vector<vector<int> >& corners = _qm->getTetrahedra();
+    double vol = _qm->getVolumePerTetrahedron();
+    int ntet = _qm->getnTetrahedra();
 
     double g = 0.0, tmp = 0.0;
     int i = 0, j = 0, ii = 0, jj = 0;
@@ -1529,9 +1532,9 @@ namespace apl {
 
 }  // namespace apl
 
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *            Aflow MARCO ESTERS - Duke University 2019-2020               *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************

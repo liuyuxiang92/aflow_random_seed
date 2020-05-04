@@ -1,8 +1,8 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -25,13 +25,18 @@ namespace apl {
   PhononCalculator::PhononCalculator(ostream& oss) : xStream() {
     free();
     xStream::initialize(oss);
+    _qm = QMesh(oss);
+    _supercell = Supercell(oss);
+    setDirectory("./");
+    _ncpus = 1;
   }
 
-  PhononCalculator::PhononCalculator(Supercell& sc, ofstream& mf, ostream& oss) : xStream() {
+  PhononCalculator::PhononCalculator(ofstream& mf, ostream& oss) : xStream() {
     free();
     xStream::initialize(mf, oss);
-    _supercell = &sc;
-    _directory = "./";
+    _qm = QMesh(mf, oss);
+    _supercell = Supercell(mf, oss);
+    setDirectory("./");
     _ncpus = 1;
   }
 
@@ -60,6 +65,7 @@ namespace apl {
     _inverseDielectricTensor = that._inverseDielectricTensor;
     _isGammaEwaldPrecomputed = that._isGammaEwaldPrecomputed;
     _ncpus = that._ncpus;
+    _qm = that._qm;
     _recsqrtDielectricTensorDeterminant = that._recsqrtDielectricTensorDeterminant;
     _supercell = that._supercell;
     _system = that._system;
@@ -81,13 +87,14 @@ namespace apl {
     _isPolarMaterial = false;
     _ncpus = 0;
     _recsqrtDielectricTensorDeterminant = 0.0;
+    _qm.clear();
     _system = "";
+    _supercell.clear();
   }
 
 
-  void PhononCalculator::clear(Supercell& sc) {
+  void PhononCalculator::clear() {
     free();
-    _supercell = &sc;
   }
 
 }  // namespace apl
@@ -100,20 +107,24 @@ namespace apl {
 
 namespace apl {
 
-  const Supercell& PhononCalculator::getSupercell() const { //CO20180409
-    return *_supercell;
+  QMesh& PhononCalculator::getQMesh() {
+    return _qm;
+  }
+
+  Supercell& PhononCalculator::getSupercell() {
+    return _supercell;
   }
 
   const xstructure& PhononCalculator::getInputCellStructure() const {
-    return _supercell->getInputStructure();
+    return _supercell.getInputStructure();
   }
 
   const xstructure& PhononCalculator::getSuperCellStructure() const {
-    return _supercell->getSupercellStructure();
+    return _supercell.getSupercellStructure();
   }
 
   uint PhononCalculator::getNumberOfBranches() const {
-    return 3 * _supercell->getInputStructure().atoms.size();
+    return 3 * _supercell.getInputStructure().atoms.size();
   }
 
   // ME20190614
@@ -158,6 +169,8 @@ namespace apl {
 
   void PhononCalculator::setDirectory(const string& dir) {
     _directory = dir;
+    _qm.setDirectory(dir);
+    _supercell.setDirectory(dir);
   }
 
   void PhononCalculator::setNCPUs(const _kflags& kfl) {
@@ -169,6 +182,29 @@ namespace apl {
   }
 
 }  // namespace apl
+
+// ///////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  void PhononCalculator::initialize_qmesh(const vector<int>& grid, bool include_inversions, bool gamma_centered) {
+    initialize_qmesh(aurostd::vector2xvector(grid), include_inversions, gamma_centered);
+  }
+
+  void PhononCalculator::initialize_qmesh(const xvector<int>& grid, bool include_inversions, bool gamma_centered) {
+    _qm.clear();
+    _qm.initialize(grid, _supercell.getInputStructure(), include_inversions, gamma_centered);
+  }
+
+  void PhononCalculator::initialize_supercell(const xstructure& xstr) {
+    _supercell.clear();
+    _supercell.initialize(xstr);
+  }
+  void PhononCalculator::initialize_supercell(const string& filename) {
+    _supercell.clear();
+    _supercell.readFromStateFile(filename);
+  }
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
@@ -219,6 +255,17 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
     }
     //CO - END
+
+    // Check if a version string is in the xml file. If not, the force constants
+    // follow an older, incompatible format and need to be recalculated
+    while (true) {
+      if (line_count == vlines.size()) {
+        string message = "The format for harmonic force constants has changed and is incomptable with the format found in this file.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      }
+      line = vlines[line_count++];  //CO
+      if (line.find("aflow_version") != string::npos) break;
+    }
 
     // Get force constant matrices
     while (true) {
@@ -282,7 +329,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
-    string line;
+    string line = "";
     uint line_count = 0;
     vector<string> tokens;
 
@@ -302,28 +349,27 @@ namespace apl {
       }
       line = vlines[line_count++];  //CO
       if (line.find("born") != string::npos) break;
+    }
 
-      line = vlines[line_count++];  //CO
-      while (true) {
-        if (line_count == vlines.size()) { //CO
-          message = "Incomplete <born> tag.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
-        }
-        line = vlines[line_count++];  //CO
-        if (line.find("</varray>") != string::npos)
-          break;
-        for (int k = 1; k <= 3; k++) {
-          line = vlines[line_count++];  //CO
-          int t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          m(k, 1) = aurostd::string2utype<double>(tokens.at(0));
-          m(k, 2) = aurostd::string2utype<double>(tokens.at(1));
-          m(k, 3) = aurostd::string2utype<double>(tokens.at(2));
-          tokens.clear();
-        }
-        _bornEffectiveChargeTensor.push_back(m);
-        line = vlines[line_count++];  //CO
+    line = vlines[line_count++];  //CO
+    while (true) {
+      if (line_count == vlines.size()) { //CO
+        message = "Incomplete <born> tag.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
       }
+      line = vlines[line_count++];  //CO
+      if (line.find("</varray>") != string::npos) break;
+      for (int k = 1; k <= 3; k++) {
+        line = vlines[line_count++];  //CO
+        int t = line.find_first_of(">") + 1;
+        tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+        m(k, 1) = aurostd::string2utype<double>(tokens.at(0));
+        m(k, 2) = aurostd::string2utype<double>(tokens.at(1));
+        m(k, 3) = aurostd::string2utype<double>(tokens.at(2));
+        tokens.clear();
+      }
+      _bornEffectiveChargeTensor.push_back(m);
+      line = vlines[line_count++];  //CO
     }
 
     // Get dielectric constant tensor
@@ -637,15 +683,15 @@ namespace apl {
       const xvector<double>& kpoint_nac,
       vector<xmatrix<xcomplex<double> > >& dDynMat,
       bool calc_derivative) {
-    uint scAtomsSize = _supercell->getSupercellStructure().atoms.size();
-    uint pcAtomsSize = _supercell->getInputStructure().atoms.size();
+    uint scAtomsSize = _supercell.getSupercellStructure().atoms.size();
+    uint pcAtomsSize = _supercell.getInputStructure().atoms.size();
 
     uint _nBranches = getNumberOfBranches();
     xmatrix<xcomplex<double> > dynamicalMatrix(_nBranches, _nBranches, 1, 1);
     xmatrix<xcomplex<double> > dynamicalMatrix0(_nBranches, _nBranches, 1, 1);
 
     xcomplex<double> phase;
-    double value;
+    double value = 0.0;
     // ME20180828 - Prepare derivative calculation
     xvector<xcomplex<double> > derivative(3);
     vector<xmatrix<xcomplex<double> > > dDynMat_NAC;
@@ -663,12 +709,12 @@ namespace apl {
     // Loop over primitive cell
     xcomplex<double> nac;
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-      uint isc1 = _supercell->pc2scMap(ipc1);
+      uint isc1 = _supercell.pc2scMap(ipc1);
 
       for (uint isc2 = 0; isc2 < scAtomsSize; isc2++) {
-        uint ipc2 = _supercell->sc2pcMap(isc2);
-        int neq;  // Important for NAC derivative
-        if (_supercell->calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  // ME20180827
+        uint ipc2 = _supercell.sc2pcMap(isc2);
+        int neq = 0;  // Important for NAC derivative
+        if (_supercell.calcShellPhaseFactor(isc2, isc1, kpoint, phase, neq, derivative, calc_derivative)) {  // ME20180827
           for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
             for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
               value = 0.5 * (_forceConstantMatrices[isc1][isc2](ix, iy) + _forceConstantMatrices[isc2][isc1](iy, ix));
@@ -731,9 +777,9 @@ namespace apl {
 
     // Divide by masses
     for (uint i = 0; i < pcAtomsSize; i++) {
-      double mass_i = _supercell->getAtomMass(_supercell->pc2scMap(i));
+      double mass_i = _supercell.getAtomMass(_supercell.pc2scMap(i));
       for (uint j = 0; j < pcAtomsSize; j++) {
-        double mass_j = _supercell->getAtomMass(_supercell->pc2scMap(j));
+        double mass_j = _supercell.getAtomMass(_supercell.pc2scMap(j));
         for (_AFLOW_APL_REGISTER_ int ix = 1; ix <= 3; ix++) {
           for (_AFLOW_APL_REGISTER_ int iy = 1; iy <= 3; iy++) {
             dynamicalMatrix(3 * i + ix, 3 * j + iy) *= 1.0 / sqrt(mass_i * mass_j);
@@ -766,8 +812,8 @@ namespace apl {
   xmatrix<xcomplex<double> > PhononCalculator::getNonanalyticalTermWang(const xvector<double>& _q,
       vector<xmatrix<xcomplex<double> > >& derivative,
       bool calc_derivative) {
-    const xstructure& sc = _supercell->getSupercellStructureLight();           //CO
-    const xstructure& pc = _supercell->getInputStructure();  //CO  // ME20200207 - grab input structure (need iatoms)
+    const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
+    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME20200207 - grab input structure (need iatoms)
 
     // to correct the q=\Gamma as a limit
     xvector<double> q(_q);
@@ -840,7 +886,7 @@ namespace apl {
   // X. Gonze and Ch. Lee, Phys. Rev. B 55, 10355 (1997)
 
   xmatrix<xcomplex<double> > PhononCalculator::getNonanalyticalTermGonze(const xvector<double> kpoint) {
-    uint pcAtomsSize = _supercell->getInputStructure().atoms.size();
+    uint pcAtomsSize = _supercell.getInputStructure().atoms.size();
 
     if (!_isGammaEwaldPrecomputed) {
       xvector<double> zero(3);
@@ -879,8 +925,8 @@ namespace apl {
   // but it is actually stored for each iatom.
   xmatrix<xcomplex<double> > PhononCalculator::getEwaldSumDipoleDipoleContribution(const xvector<double> qpoint, bool includeTerm1) {
     // Definitions
-    const xstructure& sc = _supercell->getSupercellStructureLight();           //CO
-    const xstructure& pc = _supercell->getInputStructure();  //CO  // ME20200207 - grab input structure (need iatoms)
+    const xstructure& sc = _supercell.getSupercellStructureLight();           //CO
+    const xstructure& pc = _supercell.getInputStructure();  //CO  // ME20200207 - grab input structure (need iatoms)
 
     uint pcAtomsSize = pc.atoms.size();
 
@@ -1002,12 +1048,12 @@ namespace apl {
     // Term 2
     uint scAtomsSize = sc.atoms.size();
     for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
-      uint isc1 = _supercell->pc2scMap(ipc1);
+      uint isc1 = _supercell.pc2scMap(ipc1);
 
       for (uint isc2 = 0; isc2 < scAtomsSize; isc2++) {
-        uint ipc2 = _supercell->sc2pcMap(isc2);
+        uint ipc2 = _supercell.sc2pcMap(isc2);
 
-        xvector<double> rf = _supercell->getFPositionItsNearestImage(isc2, isc1);
+        xvector<double> rf = _supercell.getFPositionItsNearestImage(isc2, isc1);
         xvector<double> rc = F2C(sc.lattice, rf);
 
         if (aurostd::modulus(rc) < _AFLOW_APL_EPS_) continue;
@@ -1042,7 +1088,7 @@ namespace apl {
 
         //
         xcomplex<double> e;  // = exp( iONE * scalar_product(qpoint,rc) );
-        (void)_supercell->calcShellPhaseFactor(isc2, isc1, qpoint, e);
+        (void)_supercell.calcShellPhaseFactor(isc2, isc1, qpoint, e);
 
         //
         xcomplex<double> fac = fac0 * lambda3 * _recsqrtDielectricTensorDeterminant * e;
@@ -1072,8 +1118,8 @@ namespace apl {
 
 }  // namespace apl
 
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************

@@ -1,8 +1,8 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -22,16 +22,13 @@ namespace apl {
     free();
   }
 
-  DirectMethodPC::DirectMethodPC(Supercell& sc,
-      _xinput& xinput, _aflags& aflags, _kflags& kflags,
-      _xflags& xflags, string& AflowIn, ofstream& mf, ostream& oss)
-    : ForceConstantCalculator(sc, xinput, aflags, kflags, xflags, AflowIn, mf, oss) {
+  DirectMethodPC::DirectMethodPC(Supercell& sc, ofstream& mf, ostream& oss)
+    : ForceConstantCalculator(sc, mf, oss) {
       free();
     }
 
   DirectMethodPC::DirectMethodPC(const DirectMethodPC& that)
-    : ForceConstantCalculator(*that._supercell, *that._xInput, *that._aflowFlags, *that._kbinFlags,
-      *that._xFlags, *that._AflowIn, *that.getOFStream(), *that.getOSS()) {
+    : ForceConstantCalculator(*that._supercell, *that.getOFStream(), *that.getOSS()) {
     free();
     copy(that);
   }
@@ -49,15 +46,9 @@ namespace apl {
     free();
   }
 
-  void DirectMethodPC::clear(Supercell& sc, _xinput& xinput,
-      _aflags& aflags, _kflags& kflags, _xflags& xflags, string& AflowIn) {
+  void DirectMethodPC::clear(Supercell& sc) {
     free();
     _supercell = &sc;
-    _xInput = &xinput;
-    _aflowFlags = &aflags;
-    _kbinFlags = &kflags;
-    _xFlags = &xflags;
-    _AflowIn = &AflowIn;
   }
 
   void DirectMethodPC::copy(const DirectMethodPC& that) {
@@ -68,16 +59,12 @@ namespace apl {
     DISTORTION_SYMMETRIZE = that.DISTORTION_SYMMETRIZE;
     GENERATE_ONLY_XYZ = that.GENERATE_ONLY_XYZ;
     USER_GENERATE_PLUS_MINUS = that.USER_GENERATE_PLUS_MINUS;
-    _aflowFlags = that._aflowFlags;
-    _AflowIn = that._AflowIn;
     _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
     _dielectricTensor = that._dielectricTensor;
+    _directory = that._directory;
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
-    _kbinFlags = that._kbinFlags;
     _supercell = that._supercell;
-    _xFlags = that._xFlags;
-    _xInput = that._xInput;
     xInputs = that.xInputs;
   }
 
@@ -91,6 +78,7 @@ namespace apl {
     xInputs.clear();
     _bornEffectiveChargeTensor.clear();
     _dielectricTensor.clear();
+    _directory = "";
     _forceConstantMatrices.clear();
     _isPolarMaterial = false;
   }
@@ -105,7 +93,8 @@ namespace apl {
 
 namespace apl {
 
-  bool DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
+  bool DirectMethodPC::runVASPCalculations(_xinput& xInput, _aflags& _aflowFlags,
+      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, bool zerostate_chgcar) {
     string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO20190218
     bool stagebreak = false;
     stringstream message;
@@ -115,7 +104,7 @@ namespace apl {
       message << "The supercell structure has not been initialized yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
-    _xInput->xvasp.AVASP_arun_mode = "APL";
+    xInput.xvasp.AVASP_arun_mode = "APL";
 
     // Determine the distortion vectors
     estimateUniqueDistortions(_supercell->getSupercellStructure(), _uniqueDistortions);
@@ -158,7 +147,7 @@ namespace apl {
       if (_isPolarMaterial) index--;
       zerostate_dir += aurostd::PaddedNumString(index, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE";
       chgcar_file = "../" + zerostate_dir + "/CHGCAR.static";
-      if (_kbinFlags->KZIP_COMPRESS) chgcar_file += "." + _kbinFlags->KZIP_BIN;
+      if (_kbinFlags.KZIP_COMPRESS) chgcar_file += "." + _kbinFlags.KZIP_BIN;
     }
 
     for (uint i = 0; i < _uniqueDistortions.size(); i++) {
@@ -173,12 +162,12 @@ namespace apl {
         generate_plus_minus = vvgenerate_plus_minus[i][j];
         if (AUTO_GENERATE_PLUS_MINUS && !generate_plus_minus) {
           message << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "].";
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
         }
         for (uint k = 0; k < (generate_plus_minus ? 2 : 1); k++) {
           //CO END
           // Copy settings from common case
-          xInputs.push_back(*_xInput);
+          xInputs.push_back(xInput);
           int idxRun = xInputs.size() - 1;
           int idAtom = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
 
@@ -198,7 +187,7 @@ namespace apl {
           //CO20190114 - it is very silly to try to add in fpos
           //add to cpos, then convert to fpos
           xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-          xstr.atoms[idAtom].fpos = C2F(xstr.lattice, xstr.atoms[idAtom].cpos);
+          xstr.atoms[idAtom].fpos = xstr.c2f * xstr.atoms[idAtom].cpos;
           //[CO20190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].fpos = xInputs[idxRun].getXStr().atoms[idAtom].fpos + C2F(xInputs[idxRun].getXStr().lattice, ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
           //[CO20190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].cpos = F2C(xInputs[idxRun].getXStr().lattice,
           //[CO20190114 - OBSOLETE]                                                 xInputs[idxRun].getXStr().atoms[idAtom].fpos);
@@ -219,14 +208,13 @@ namespace apl {
           xstr.title += distortion.str();
 
           // For VASP, use the standardized aflow.in creator
-          if (_kbinFlags->AFLOW_MODE_VASP){
+          if (_kbinFlags.AFLOW_MODE_VASP){
             //ME20191029
             xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
             if (zerostate_chgcar) {
               xInputs[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
             }
 
-            _kbinFlags->KBIN_MPI_AUTOTUNE = true;
             // Change format of POSCAR
             //ME20190228 - OBSOLETE for two reasons:
             // 1. This method is not robust
@@ -235,16 +223,16 @@ namespace apl {
             // [OBSOLETE - 20190228]    (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
             // [OBSOLETE - 20190228]  xInputs[idxRun].getXStr().is_vasp5_poscar_format = false;
             // [OBSOLETE - 20190228] }
-            stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInputs[idxRun]) || stagebreak);
+            stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || stagebreak);
           }
           // For AIMS, use the old method until we have AVASP_populateXAIMS
-          if (_kbinFlags->AFLOW_MODE_AIMS) {
+          if (_kbinFlags.AFLOW_MODE_AIMS) {
             string runname = ARUN_DIRECTORY_PREFIX + "APL_" + stringify(idxRun) + "A" + stringify(_supercell->getUniqueAtomID(i)) + "D" + stringify(j);
-            xInputs[idxRun].setDirectory(_xInput->getDirectory() + "/" + runname);
+            xInputs[idxRun].setDirectory(_directory + "/" + runname);
             if (!filesExistPhonons(xInputs[idxRun])) {
               message << "Creating " << xInputs[idxRun].getDirectory();
-              pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
-              createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInputs[idxRun], *p_FileMESSAGE);
+              pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+              createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], *p_FileMESSAGE);
               stagebreak = true;
             }
           }
@@ -255,7 +243,7 @@ namespace apl {
     // Add zero state if requested
     if (_calculateZeroStateForces) {
       // Copy settings from common case
-      xInputs.push_back(*_xInput);
+      xInputs.push_back(xInput);
       int idxRun = xInputs.size() - 1;
       // Create run ID //ME20181226
       xInputs[idxRun].xvasp.AVASP_arun_runname = aurostd::PaddedNumString(idxRun+1, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE"; //ME20181226, ME20190112
@@ -270,18 +258,18 @@ namespace apl {
       xInputs[idxRun].getXStr().title += " undistorted";
       xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  //ME20191029
       // For VASP, use the standardized aflow.in creator
-      if(_kbinFlags->AFLOW_MODE_VASP){
+      if(_kbinFlags.AFLOW_MODE_VASP){
         xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
-        stagebreak = (createAflowInPhonons(*_aflowFlags, *_kbinFlags, *_xFlags, xInputs[idxRun]) || stagebreak); //ME20181226
+        stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || stagebreak); //ME20181226
       }
       // For AIMS, use the old method until we have AVASP_populateXAIMS //ME20181226
-      if(_kbinFlags->AFLOW_MODE_AIMS){
+      if(_kbinFlags.AFLOW_MODE_AIMS){
         string runname = ARUN_DIRECTORY_PREFIX + "APL_" + stringify(idxRun) + "ZEROSTATE";
-        xInputs[idxRun].setDirectory(_xInput->getDirectory() + "/" + runname);
+        xInputs[idxRun].setDirectory(_directory + "/" + runname);
         if (!filesExistPhonons(xInputs[idxRun])) {
           message << "Creating " << xInputs[idxRun].getDirectory();
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
-          createAflowInPhononsAIMS(*_aflowFlags, *_kbinFlags, *_xFlags, *_AflowIn, xInputs[idxRun], *p_FileMESSAGE);
+          pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+          createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], *p_FileMESSAGE);
           stagebreak = true;
         }
       }
@@ -291,8 +279,8 @@ namespace apl {
     // Do an additional calculation for polar materials
     if (_isPolarMaterial) {
       // Calc. Born effective charge tensors and dielectric constant matrix
-      _xinput xinpBE(*_xInput);  //ME20190113
-      stagebreak = (runVASPCalculationsBE(xinpBE, ncalcs) || stagebreak);  //ME20190113
+      _xinput xinpBE(xInput);  //ME20190113
+      stagebreak = (runVASPCalculationsBE(xinpBE, _aflowFlags, _kbinFlags, _xFlags, _AflowIn, ncalcs) || stagebreak);  //ME20190113
       xInputs.push_back(xinpBE);
     }
     return stagebreak;
@@ -471,7 +459,7 @@ namespace apl {
       dof += _uniqueDistortions[i].size();
     }
     message << "Found " << dof << " degree(s) of freedom.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms();
     for (uint i = 0; i < natoms; i++) {  //CO20200212 - int->uint
       uint id = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
@@ -482,7 +470,7 @@ namespace apl {
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](1) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](2) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](3) << "].";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     }
   }
@@ -601,7 +589,7 @@ namespace apl {
     if(!outfileFoundAnywherePhonons(xInputs)) return false;
 
     //second pass, make sure it's everywhere!
-    if (!outfileFoundEverywherePhonons(xInputs, _aflowFlags->Directory, *p_FileMESSAGE, *p_oss, _isPolarMaterial)) return false;
+    if (!outfileFoundEverywherePhonons(xInputs, _directory, *p_FileMESSAGE, *p_oss, _isPolarMaterial)) return false;
 
     // Remove zero state forces if necessary
     if (_calculateZeroStateForces) {
@@ -682,7 +670,7 @@ namespace apl {
     //CO - END
     // Show info
     message << "Calculating the missing force fields by symmetry.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // Let's go
     for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
@@ -746,7 +734,7 @@ namespace apl {
                 _uniqueForces[i].push_back(testForce);
               }
 
-              // Store for next ortogonalization procedure
+              // Store for next orthogonalization procedure
               forcePool.push_back(testForce);
             }
             if (_uniqueDistortions[i].size() == 3) break;
@@ -884,7 +872,7 @@ namespace apl {
 
     //
     message << "Calculating the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // We have a party. Let's fun with us...
     //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO20190218
@@ -988,9 +976,9 @@ namespace apl {
 namespace apl {
 
   void DirectMethodPC::writeDYNMAT() {
-    string filename = aurostd::CleanFileName(_aflowFlags->Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
+    string filename = aurostd::CleanFileName(_directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME20181226
     string message = "Writing forces into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     stringstream outfile;
 
@@ -1045,13 +1033,13 @@ namespace apl {
   void DirectMethodPC::writeFORCES() {
     string function = "apl::DirectMethodPC::writeFORCES()";
     string message = "Writing forces into file FORCES.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     xstructure ix;
     string filename = "SPOSCAR";
     if (!aurostd::FileEmpty(filename)) {
       message = "Reading " + filename;
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
       stringstream SPOSCAR;
       aurostd::efile2stringstream(filename, SPOSCAR);
       SPOSCAR >> ix;
@@ -1116,7 +1104,7 @@ namespace apl {
   void DirectMethodPC::writeXCrysDenForces() {
     string function = "apl::DirectMethodPC::writeXCrysDenForces()";
     string message = "Writing forces into file XCrysDenForces.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     _supercell->center_original();  //COREY
 
     stringstream outfile;  //CO
@@ -1150,7 +1138,7 @@ namespace apl {
           //outfile << setw(15) << _superCellStructure.atoms[k].cpos << " ";
 
           // Scale force, it is expected in Hartree/Angs.
-          xvector<double> f = 27.212 * _uniqueForces[i][j][k];
+          xvector<double> f = hartree2ev * _uniqueForces[i][j][k];
 
           outfile << setw(15) << f(1)
             << setw(15) << f(2)
@@ -1169,13 +1157,16 @@ namespace apl {
   }
 
   void DirectMethodPC::saveState(const string& filename) {
+    if (xInputs.size() == 0) return;  // Nothing to write
     string function = "apl::LinearResponsePC::saveState()";
     string message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
     out << AFLOWIN_SEPARATION_LINE << std::endl;
     out << tag << "ENGINE=DM" << std::endl;
+    if (xInputs[0].AFLOW_MODE_VASP) out << tag << "AFLOW_MODE=VASP" << std::endl;
+    else if (xInputs[0].AFLOW_MODE_AIMS) out << tag << "AFLOW_MODE=AIMS" << std::endl;
     out << AFLOWIN_SEPARATION_LINE << std::endl;
     out << tag << "SUPERCELL=" << _supercell->scell << std::endl;
     out << tag << "INPUT_STRUCTURE=START" << std::endl;
@@ -1208,17 +1199,50 @@ namespace apl {
     }
   }
 
+  // ME20200501
+  // The state reader is designed to read the directory structure and supercell
+  // structures from a prior run for post-processing. It cannot create APL
+  // aflow.in files and should only be used to read forces for force constant
+  // calculations. It is still in development and has only been tested with VASP.
   void DirectMethodPC::readFromStateFile(const string& filename) {
     string function = "apl::LinearResponsePC::readFromState()";
     string message = "Reading state of the phonon calculator from " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, *_aflowFlags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
 
+    // Find if the calculations are VASP or AIMS calculations
+    vector<string> vlines, tokens;
+    aurostd::efile2vectorstring(filename, vlines);
+    uint nlines = vlines.size();
+    uint iline = 0;
+    _xinput xInput;
+    while (++iline < nlines) {
+      if (aurostd::substring2bool(vlines[iline], "AFLOW_MODE")) {;
+        aurostd::string2tokens(vlines[iline], tokens, "=");
+        if (tokens.size() != 2) {
+          message = "Tag for AFLOW_MODE is broken.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        if (tokens[1] == "VASP") {
+          xInput.AFLOW_MODE_VASP = true;
+        } else if (tokens[1] == "AIMS") {
+          xInput.AFLOW_MODE_AIMS = true;
+        } else {
+          message = "Unknown AFLOW_MODE " + tokens[1] + ".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        }
+      }
+    }
+    if (iline >= nlines) {
+      message = "AFLOW_MODE tag is missing.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+
     // Defaults
-    _xInput->xvasp.AVASP_arun_mode = "APL";
+    xInput.xvasp.AVASP_arun_mode = "APL";
     _isPolarMaterial = DEFAULT_APL_POLAR;
     _calculateZeroStateForces = DEFAULT_APL_ZEROSTATE;
     DISTORTION_MAGNITUDE = DEFAULT_APL_DMAG;
@@ -1228,16 +1252,13 @@ namespace apl {
     xInputs.clear();
     _uniqueDistortions.clear();
     vvgenerate_plus_minus.clear();
-    vector<string> vlines, tokens;
-    aurostd::efile2vectorstring(filename, vlines);
-    uint nlines = vlines.size();
-    uint iline = 0;
+    iline = 0;
     while (++iline < nlines) {
       if (aurostd::substring2bool(vlines[iline], "DISTORTION_MAGNITUDE=")) {
         tokens.clear();
         aurostd::string2tokens(vlines[iline], tokens, "=");
         if (tokens.size() != 2) {
-          string message = "Tag for DISTORTION_MAGNITUDE is broken.";
+          message = "Tag for DISTORTION_MAGNITUDE is broken.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
         DISTORTION_MAGNITUDE = aurostd::string2utype<double>(tokens[1]);
@@ -1245,18 +1266,18 @@ namespace apl {
         tokens.clear();
         aurostd::string2tokens(vlines[iline], tokens, "=");
         if (tokens.size() != 2) {
-          string message = "Tag for DISTORTION_INEQUIVONLY correction is broken.";
+          message = "Tag for DISTORTION_INEQUIVONLY correction is broken.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
         DISTORTION_INEQUIVONLY = aurostd::string2utype<bool>(tokens[1]);
       } else if (aurostd::substring2bool(vlines[iline], "DISTORTIONS=START")) {
         xvector<double> distortion(3);
-        uint idist;
+        uint idist = 0;
         while ((iline++ < nlines) && !aurostd::substring2bool(vlines[iline], "DISTORTIONS=STOP")) {
           tokens.clear();
           aurostd::string2tokens(vlines[iline], tokens);
           if ((tokens.size() < 5) || (tokens.size() > 7)) {
-            string message = "Broken line in DISTORTIONS.";
+            message = "Broken line in DISTORTIONS.";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
           }
           // Distortions
@@ -1267,13 +1288,13 @@ namespace apl {
           }
           for (int i = 1; i < 4; i++) distortion[i] = aurostd::string2utype<double>(tokens[i]);
           _uniqueDistortions[idist].push_back(distortion);
-          xInputs.push_back(*_xInput);
+          xInputs.push_back(xInput);
           xInputs.back().xvasp.AVASP_arun_runname = tokens[4];
           if (tokens.size() == 5) {
             vvgenerate_plus_minus[idist].push_back(false);
           } else {
             vvgenerate_plus_minus[idist].push_back(true);
-            xInputs.push_back(*_xInput);
+            xInputs.push_back(xInput);
             xInputs.back().xvasp.AVASP_arun_runname = tokens[5];
           }
         }
@@ -1281,23 +1302,23 @@ namespace apl {
         tokens.clear();
         aurostd::string2tokens(vlines[iline], tokens, "=");
         if (tokens.size() != 2) {
-          string message = "Tag for ZEROSTATE calculation is broken.";
+          message = "Tag for ZEROSTATE calculation is broken.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
         _calculateZeroStateForces = aurostd::string2utype<bool>(tokens[1]);
         if (_calculateZeroStateForces) {
           iline++;
           if (iline == nlines) {
-            string message = "Runname for ZEROSTATE calculation is missing.";
+            message = "Runname for ZEROSTATE calculation is missing.";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
           }
           tokens.clear();
           aurostd::string2tokens(vlines[iline], tokens, "=");
           if (tokens.size() != 2) {
-            string message = "Runname tag for ZEROSTATE calculation is broken.";
+            message = "Runname tag for ZEROSTATE calculation is broken.";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
           }
-          xInputs.push_back(*_xInput);
+          xInputs.push_back(xInput);
           xInputs.back().setXStr(_supercell->getSupercellStructureLight());
           xInputs.back().xvasp.AVASP_arun_runname = tokens[1];
         }
@@ -1305,23 +1326,23 @@ namespace apl {
         tokens.clear();
         aurostd::string2tokens(vlines[iline], tokens, "=");
         if (tokens.size() != 2) {
-          string message = "Tag for POLAR is broken.";
+          message = "Tag for POLAR is broken.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
         _isPolarMaterial = aurostd::string2utype<bool>(tokens[1]);
         if (_isPolarMaterial) {
           iline++;
           if (iline == nlines) {
-            string message = "Runname for polar correction is missing.";
+            message = "Runname for polar correction is missing.";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
           }
           tokens.clear();
           aurostd::string2tokens(vlines[iline], tokens, "=");
           if (tokens.size() != 2) {
-            string message = "Runname tag for polar correction is broken.";
+            message = "Runname tag for polar correction is broken.";
             throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
           }
-          xInputs.push_back(*_xInput);
+          xInputs.push_back(xInput);
           xInputs.back().setXStr(_supercell->getInputStructureLight());
           xInputs.back().xvasp.AVASP_arun_runname = tokens[1];
         }
@@ -1337,26 +1358,25 @@ namespace apl {
           xInputs[idxRun].setXStr(_supercell->getSupercellStructureLight());
           xstructure& xstr = xInputs[idxRun].getXStr();
           xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0 ) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-          xstr.atoms[idAtom].fpos = C2F(xstr.lattice, xstr.atoms[idAtom].cpos);
+          xstr.atoms[idAtom].fpos = xstr.c2f * xstr.atoms[idAtom].cpos;
           idxRun++;
         }
       }
     }
 
     // Set directories
-    string base_directory = _xInput->getDirectory();
     string dir = "";
     for (uint i = 0; i < xInputs.size(); i++) {
       const _xvasp& xvasp = xInputs[i].xvasp;
-      dir = base_directory + "/ARUN." + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname + "/";
+      dir = _directory + "/ARUN." + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname + "/";
       xInputs[i].setDirectory(aurostd::CleanFileName(dir));
     }
   }
 
 }  // namespace apl
 
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************

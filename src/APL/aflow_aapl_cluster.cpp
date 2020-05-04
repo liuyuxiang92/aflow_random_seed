@@ -1,9 +1,9 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *            Aflow MARCO ESTERS - Duke University 2018-2020               *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
 // DOI: 10.1038/s41524-017-0046-7) and Jesus Carrete (ShengBTE, 
 // DOI: 10.1016/j.cpc.2014.02.015).
@@ -34,33 +34,31 @@ namespace apl {
   ClusterSet::ClusterSet(ostream& oss) : xStream() {
     free();
     xStream::initialize(oss);
+    directory = "./";
   }
 
-  ClusterSet::ClusterSet(const Supercell& supercell, int cut_shell,
-      double cut_rad, ofstream& mf, _aflags& a, ostream& oss) {
+  ClusterSet::ClusterSet(ofstream& mf, ostream& oss) : xStream() {
     free();
     xStream::initialize(mf, oss);
-    aflags = &a;
-    initialize(supercell, cut_shell, cut_rad);
+    directory = "./";
+  }
+
+  ClusterSet::ClusterSet(const Supercell& supercell, int _order, int cut_shell,
+      double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream() {
+    free();
+    xStream::initialize(mf, oss);
+    directory = dir;
+    initialize(supercell, _order, cut_shell, cut_rad);
   }
 
   //From file
-  ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
-      int cut_shell, double cut_rad, int _order, ofstream& mf, _aflags& a, ostream& oss) : xStream() {
+  ClusterSet::ClusterSet(const string& filename, const Supercell& supercell, int _order,
+      int cut_shell, double cut_rad, const string& dir, ofstream& mf, ostream& oss) : xStream() {
     free();  // Clear old vectors
     xStream::initialize(mf, oss);
-    aflags = &a;
-    initialize(supercell, cut_shell, cut_rad);
-    string message = "Reading ClusterSet from file " + aurostd::CleanFileName(filename) + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
-
-    order = _order;
+    directory = dir;
+    initialize(supercell, _order, cut_shell, cut_rad);
     readClusterSetFromFile(filename);
-    // Necessary for AAPL calculations; since these calculations are
-    // quick, they are not stored in the output file
-    distortion_vectors = getCartesianDistortionVectors();
-    permutations = getPermutations(order);
-    nifcs = aurostd::powint(3, order);
   }
 
   //Copy Constructors/////////////////////////////////////////////////////////
@@ -79,10 +77,10 @@ namespace apl {
 
   void ClusterSet::copy(const ClusterSet& that) {
     xStream::copy(that);
-    aflags = that.aflags;
     clusters = that.clusters;
     coordination_shells = that.coordination_shells;
     cutoff = that.cutoff;
+    directory = that.directory;
     distortion_vectors = that.distortion_vectors;
     higher_order_ineq_distortions = that.higher_order_ineq_distortions;
     ineq_clusters = that.ineq_clusters;
@@ -111,6 +109,7 @@ namespace apl {
     clusters.clear();
     coordination_shells.clear();
     cutoff = 0.0;
+    directory = "";
     distortion_vectors.clear();
     higher_order_ineq_distortions.clear();
     ineq_clusters.clear();
@@ -130,31 +129,71 @@ namespace apl {
 
   //clear/////////////////////////////////////////////////////////////////////
   // Creates an empty ClusterSet object.
-  void ClusterSet::clear(_aflags& a) {
+  void ClusterSet::clear() {
     free();
-    aflags = &a;
   }
 
-  void ClusterSet::initialize(const Supercell& supercell, int cut_shell, double cut_rad) {
+  //initialize////////////////////////////////////////////////////////////////
+  // Initialize basic parameters.
+  void ClusterSet::initialize(const Supercell& supercell, int _order, int cut_shell, double cut_rad) {
+    stringstream message;
+    if (_order > 1) {
+      order = _order;
+    } else {
+      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "initialize";
+      stringstream message;
+      message << "Cluster order must be larger than 1 (is " << _order << ").";
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
+    }
+    nifcs = aurostd::powint(3, order);
     scell = supercell.getSupercellStructure();
     pcell = supercell.getInputStructure();
     sc_dim = supercell.scell;
     pc2scMap = supercell._pc2scMap;
     sc2pcMap = supercell._sc2pcMap;
+    symmetry_map = getSymmetryMap();
     if (cut_shell > 0) {
       double max_rad = getMaxRad(scell, cut_shell);
       if (max_rad > cut_rad) {
-        // globally changes CUT_RAD
-        stringstream message;
         message << "Cutoff has been modified to " << max_rad << " Angstroms.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
         cut_rad = max_rad;
       }
     }
     cutoff = cut_rad;
+    permutations = getPermutations(order);
+
+    // Clear cluster data
+    clusters.clear();
+    coordination_shells.clear();
+    higher_order_ineq_distortions.clear();
+    ineq_clusters.clear();
+    ineq_distortions.clear();
+    linear_combinations.clear();
   }
 
 }  // namespace apl
+
+/******************************* INTERFACE **********************************/
+
+namespace apl {
+
+  //getCluster////////////////////////////////////////////////////////////////
+  // Returns a cluster from the list of clusters
+  const _cluster& ClusterSet::getCluster(const int& i) const {
+    return clusters[i];
+  }
+
+  //Directory/////////////////////////////////////////////////////////////////
+  const string& ClusterSet::getDirectory() const {
+    return directory;
+  }
+
+  void ClusterSet::setDirectory(const string& dir) {
+    directory = dir;
+  }
+
+}
 
 /************************** INITIAL CALCULATIONS ****************************/
 
@@ -291,7 +330,7 @@ namespace apl {
   void ClusterSet::buildShells() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
     string message = "Building coordination shells.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     int at1sc = 0;
     vector<int> shell;
     coordination_shells.clear();
@@ -333,31 +372,14 @@ namespace apl {
 
 namespace apl {
 
-  //getCluster////////////////////////////////////////////////////////////////
-  // Returns a cluster from the list of clusters
-  const _cluster& ClusterSet::getCluster(const int& i) const {
-    return clusters[i];
-  }
-
   //build/////////////////////////////////////////////////////////////////////
   // Builds the inequivalent clusters.
-  void ClusterSet::build(int _order) {
+  void ClusterSet::build() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
     stringstream message;
-    if (_order > 1) {
-      order = _order;
-    } else {
-      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "build";
-      message << "Cluster order must be larger than 1 (is " << _order << ").";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
-    }
     message << "Building clusters of order " << order << ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     buildShells();
-    nifcs = aurostd::powint(3, order);
-    symmetry_map = getSymmetryMap();
-
-    permutations = getPermutations(order);
     clusters = buildClusters();
     getInequivalentClusters(clusters, ineq_clusters);
 
@@ -453,7 +475,7 @@ namespace apl {
   void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
       vector<vector<int> > & ineq_clst) {
     string message = "Determining inequivalent clusters.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     int equivalent_clst = -1;
     vector<int> unique_atoms;
     vector<vector<int> > compositions;
@@ -685,7 +707,7 @@ namespace apl {
   // Builds the inequivalent distortions for the AAPL calculations.
   void ClusterSet::buildDistortions() {
     string message = "Getting inequivalent distortions.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     distortion_vectors = getCartesianDistortionVectors();
     linear_combinations = getLinearCombinations();
     ineq_distortions = initializeIneqDists();
@@ -1299,7 +1321,7 @@ namespace apl {
   // Writes the ClusterSet object to an XML file.
   void ClusterSet::writeClusterSetToFile(const string& filename) {
     string message = "Writing ClusterSet to file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
     std::stringstream output;
     // Header
     output << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
@@ -1328,11 +1350,12 @@ namespace apl {
 
     // Info about calculation run
     parameters << tab << "<generator>" << std::endl;
+    parameters << tab << tab << "<i name=\"aflow_version\" type=\"string\">" << AFLOW_VERSION << "</i>" << std::endl;
     string time = aflow_get_time_string();
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags->Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
+    parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
     parameters.unsetf(std::ios::hex);  //ME20190125 - Remove hexadecimal formatting
     parameters  << "</i>" << std::endl;
     parameters << tab << "</generator>" << std::endl;
@@ -1604,6 +1627,12 @@ namespace apl {
       message << "The settings in the hibernate file and the aflow.in file are incompatible.";
       throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
+
+    // Necessary for AAPL calculations; since these calculations are
+    // quick, they are not stored in the output file
+    distortion_vectors = getCartesianDistortionVectors();
+    permutations = getPermutations(order);
+    nifcs = aurostd::powint(3, order);
   }
 
   //checkCompatibility////////////////////////////////////////////////////////
@@ -1636,7 +1665,7 @@ namespace apl {
 
     t = line.find_first_of(">") + 1;
     tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags->Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  //ME20190219
+    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  //ME20190219
       message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
       tokens.clear();
@@ -1827,7 +1856,7 @@ namespace apl {
       } else {
         message << "The ClusterSet needs to be determined again.";
       }
-      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, *aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     }
     return compatible;
   }

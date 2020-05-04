@@ -1,8 +1,8 @@
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
 
 #include "aflow_apl.h"
 
@@ -49,7 +49,7 @@ namespace apl {
   // ME20181022 - Old method to create aflow.in files for AIMS
   void createAflowInPhononsAIMS(_aflags& _aflowFlags, _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, _xinput& xinp, ofstream& messageFile) {
     if (!xinp.AFLOW_MODE_AIMS) {
-      string function = "apl::createAflowInPhononsAIMS()";
+      string function = "apl::createAflowInPhononsAIMS():";
       string message = "This function only works with AIMS.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -66,7 +66,7 @@ namespace apl {
 
     string directory=xinp.getDirectory();
     if(directory.empty()){
-      string function = "apl::createAflowInPhonons()";
+      string function = "apl::createAflowInPhononsAIMS():";
       string message =  "no output directory found";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
@@ -108,7 +108,7 @@ namespace apl {
       string geom_filename = xaims.Directory + "/" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM;
       aurostd::stringstream2file(xaims.GEOM, geom_filename);
       if(!aurostd::FileExist(geom_filename)){
-        string function = "apl::createAflowInPhonons()";
+      string function = "apl::createAflowInPhononsAIMS():";
         string message = "Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
@@ -119,7 +119,7 @@ namespace apl {
     string filename = directory + string("/") + _AFLOWIN_;
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)){
-      string function = "apl::createAflowInPhonons()";
+      string function = "apl::createAflowInPhononsAIMS():";
       string message = "Cannot create [" + _AFLOWIN_ + "] file.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
@@ -297,8 +297,8 @@ namespace apl {
 
 }  // namespace apl
 
-//****************************************************************************
+// ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2020           *
 // *                                                                         *
-//****************************************************************************
+// ***************************************************************************
