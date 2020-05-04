@@ -134,7 +134,7 @@ namespace pocc {
     double elastic_const;
     vector<double> elastic_const_row;
     vector<vector<double> > elastic_tensor;
-    double compliance_const;
+    double compliance_const = 0.0;
     vector<double> compliance_const_row;
     vector<vector<double> > compliance_tensor;    
     unsigned long long int isupercell = 0;
