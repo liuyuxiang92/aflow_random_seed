@@ -358,7 +358,7 @@ namespace KBIN {
 			     _vflags& vflags, ofstream& FileMESSAGE) {
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror;
+    uint aglerror = 0;
     ostringstream aus;
     bool USER_RELAX=true;
 
