@@ -550,6 +550,8 @@ namespace apl {
         pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, directory, mf, oss);
       } else {
         aurostd::string2tokens(branches_str, branches, ",");
+        // Branch index is based on 1, not 0
+        for (uint br = 0; br < branches.size(); br++) branches[br] -= 1;
       }
     }
 
