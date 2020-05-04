@@ -477,7 +477,7 @@ namespace KBIN {
     uint aglerror = 0;
     ostringstream aus;
     _xvasp xvasp;
-    string AflowIn;
+    string AflowIn = "";
     _aflags aflags;
     _kflags kflags;
     _vflags vflags;
