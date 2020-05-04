@@ -363,7 +363,7 @@ namespace AEL_functions {
   uint Get_ElasticProperties_AEL_postprocess(string directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor) {  
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    uint aelerror = 0;
     ostringstream aus;
     _xvasp xvasp;
     string AflowIn;
