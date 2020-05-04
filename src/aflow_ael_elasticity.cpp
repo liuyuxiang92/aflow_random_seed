@@ -249,7 +249,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
-  // CT 20200323 - Relax structure if it hasn't relaxed yet before running AEL
+  // CT20200323 - Relax structure if it hasn't relaxed yet before running AEL
   uint relaxStructureAEL_VASP(const string& AflowIn,
       _xvasp& xvasp,
       _aflags& aflags,
@@ -261,7 +261,7 @@ namespace KBIN {
     // uint num_relax = xvasp.NRELAX;
     uint num_relax = 2;
     bool relax_complete = true;
-    bool krun;
+    bool krun = true;
 
     // First check if relaxation has already been performed
     for (uint i = 1; i <= num_relax; i++) {
@@ -314,10 +314,10 @@ namespace KBIN {
   void VASP_RunPhonons_AEL_postprocess(string directory_LIB, string AflowInName, string FileLockName) {  
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    uint aelerror = 0;
     ostringstream aus;
     _xvasp xvasp;
-    string AflowIn;
+    string AflowIn = "";
     _aflags aflags;
     _kflags kflags;
     _vflags vflags;
@@ -363,10 +363,10 @@ namespace AEL_functions {
   uint Get_ElasticProperties_AEL_postprocess(string directory, double& ael_bulk_modulus_voigt, double& ael_bulk_modulus_reuss, double& ael_bulk_modulus_vrh, double& ael_shear_modulus_voigt, double& ael_shear_modulus_reuss, double& ael_shear_modulus_vrh, double& ael_poisson_ratio, vector<vector<double> >& ael_elastic_tensor, vector<vector<double> >& ael_compliance_tensor) {  
     // Class to contain AEL input and output data
     _AEL_data AEL_data;
-    uint aelerror;
+    uint aelerror = 0;
     ostringstream aus;
     _xvasp xvasp;
-    string AflowIn;
+    string AflowIn = "";
     _aflags aflags;
     _kflags kflags;
     _vflags vflags;
