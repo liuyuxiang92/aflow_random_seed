@@ -416,7 +416,7 @@ namespace KBIN {
     // uint num_relax = xvasp.NRELAX;
     uint num_relax = 2;
     bool relax_complete = true;
-    bool krun;
+    bool krun = true;
 
     aurostd::StringstreamClean(aus);
     aus << _AELSTR_MESSAGE_ + "Number of requested relaxation runs = " << num_relax << endl;  
