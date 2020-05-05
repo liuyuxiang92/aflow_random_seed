@@ -19,6 +19,19 @@
 
 #define _DEBUG_POCC_AEL_AGL_ false  //CO20190116
 
+//CO20200502 START - may move to AUROSTD/aurostd_xscalar.h if these constants are needed elsewhere
+//adding hardness value constants from models of Chen et al., Teter, and Tian et al.
+//Chen et al. //doi:10.1016/J.INTERMET.2011.03.026
+#define HARDNESS_CHEN_EXP 0.585
+//Teter //doi:10.1557/S0883769400031420
+#define HARDNESS_TETER_COEF 0.151
+//Tian et al. //doi:10.1016/J.IJRMHM.2012.02.021
+#define HARDNESS_TIAN_COEF 0.92
+#define HARDNESS_TIAN_EXP_PUGHSMOD 1.137
+#define HARDNESS_TIAN_EXP_SHEARMOD 0.708
+//CO20200502 END - may move to AUROSTD/aurostd_xscalar.h if these constants are needed elsewhere
+
+
 // CT20200319 - POCC+AEL functions
 // ***************************************************************************
 //  void POccCalculator::calculateElasticProperties(const vector<double>& v_temperatures)
@@ -307,25 +320,25 @@ namespace pocc {
       Cauchy_val = ((elastic_tensor_list.at(isupercell).at(0).at(1) + elastic_tensor_list.at(isupercell).at(0).at(2) + elastic_tensor_list.at(isupercell).at(1).at(2)) / 3.0) - ((elastic_tensor_list.at(isupercell).at(3).at(3) + elastic_tensor_list.at(isupercell).at(4).at(4) + elastic_tensor_list.at(isupercell).at(5).at(5)) / 3.0);
       Cauchy_pressure.push_back(Cauchy_val);
       // Hardness: Teter model
-      Hv_Teter_voigt_val = 0.151 * Gvoigt.at(isupercell);
-      Hv_Teter_reuss_val = 0.151 * Greuss.at(isupercell);      
-      Hv_Teter_vrh_val = 0.151 * Gvrh.at(isupercell);
+      Hv_Teter_voigt_val = HARDNESS_TETER_COEF * Gvoigt.at(isupercell);
+      Hv_Teter_reuss_val = HARDNESS_TETER_COEF * Greuss.at(isupercell);      
+      Hv_Teter_vrh_val = HARDNESS_TETER_COEF * Gvrh.at(isupercell);
       Hv_Teter_voigt.push_back(Hv_Teter_voigt_val);
       Hv_Teter_reuss.push_back(Hv_Teter_reuss_val);
       Hv_Teter_vrh.push_back(Hv_Teter_vrh_val);
       // Hardness: Chen and Voigt models
       kval = Gvoigt.at(isupercell) / Bvoigt.at(isupercell);
       kvalsq = kval * kval;
-      Hv_Chen_voigt_val = (2.0 * pow(kvalsq * Gvoigt.at(isupercell), 0.585)) - 3.0;
-      Hv_Tian_voigt_val = 0.92 * pow(kval, 1.137) * pow(Gvoigt.at(isupercell), 0.708);
+      Hv_Chen_voigt_val = (2.0 * pow(kvalsq * Gvoigt.at(isupercell), HARDNESS_CHEN_EXP)) - 3.0;
+      Hv_Tian_voigt_val = HARDNESS_TIAN_COEF * pow(kval, HARDNESS_TIAN_EXP_PUGHSMOD) * pow(Gvoigt.at(isupercell), HARDNESS_TIAN_EXP_SHEARMOD);
       kval = Greuss.at(isupercell) / Breuss.at(isupercell);
       kvalsq = kval * kval;      
-      Hv_Chen_reuss_val = (2.0 * pow(kvalsq * Greuss.at(isupercell), 0.585)) - 3.0;
-      Hv_Tian_reuss_val = 0.92 * pow(kval, 1.137) * pow(Greuss.at(isupercell), 0.708);      
+      Hv_Chen_reuss_val = (2.0 * pow(kvalsq * Greuss.at(isupercell), HARDNESS_CHEN_EXP)) - 3.0;
+      Hv_Tian_reuss_val = HARDNESS_TIAN_COEF * pow(kval, HARDNESS_TIAN_EXP_PUGHSMOD) * pow(Greuss.at(isupercell), HARDNESS_TIAN_EXP_SHEARMOD);      
       kval = Gvrh.at(isupercell) / Bvrh.at(isupercell);
       kvalsq = kval * kval;      
-      Hv_Chen_vrh_val = (2.0 * pow(kvalsq * Gvrh.at(isupercell), 0.585)) - 3.0;
-      Hv_Tian_vrh_val = 0.92 * pow(kval, 1.137) * pow(Gvrh.at(isupercell), 0.708);
+      Hv_Chen_vrh_val = (2.0 * pow(kvalsq * Gvrh.at(isupercell), HARDNESS_CHEN_EXP)) - 3.0;
+      Hv_Tian_vrh_val = HARDNESS_TIAN_COEF * pow(kval, HARDNESS_TIAN_EXP_PUGHSMOD) * pow(Gvrh.at(isupercell), HARDNESS_TIAN_EXP_SHEARMOD);
       Hv_Chen_voigt.push_back(Hv_Chen_voigt_val);
       Hv_Chen_reuss.push_back(Hv_Chen_reuss_val);
       Hv_Chen_vrh.push_back(Hv_Chen_vrh_val);
