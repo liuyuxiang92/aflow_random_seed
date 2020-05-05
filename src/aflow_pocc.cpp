@@ -6924,6 +6924,6 @@ ostream& operator<<(ostream& oss, const pocc::POccStructuresFile& psf) {
 // ***************************************************************************
 // *                                                                         *
 // *              AFlow STEFANO CURTAROLO  Duke University 2003-2020         *
-// *              AFlow COREY OSES  Duke University 2013-2012                *
+// *              AFlow COREY OSES  Duke University 2013-2020                *
 // *                                                                         *
 // ***************************************************************************
