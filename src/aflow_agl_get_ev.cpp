@@ -29,8 +29,8 @@
 namespace AGL_functions {
   uint AGL_xvasp_flags_populate(_xvasp& xvasp, string& AflowIn, string AflowInName, string FileLockName, string directory_LIB, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMESSAGE) {
     ifstream FileAFLOWIN, FileAFLOWINcheck;
-    string FileNameAFLOWIN, FileNameAFLOWINcheck, AflowInCheck;
-    string FileNameMessage;
+    string FileNameAFLOWIN = "", FileNameAFLOWINcheck = "", AflowInCheck = "";
+    string FileNameMessage = "";
     ostringstream aus;
     vector<string> vAflowInCheck;
     bool agl_aflowin_found = false;

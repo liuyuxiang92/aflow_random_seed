@@ -474,10 +474,10 @@ namespace KBIN {
   void VASP_RunPhonons_AGL_postprocess(string directory_LIB, string AflowInName, string FileLockName) {  
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror;
+    uint aglerror = 0;
     ostringstream aus;
     _xvasp xvasp;
-    string AflowIn;
+    string AflowIn = "";
     _aflags aflags;
     _kflags kflags;
     _vflags vflags;
@@ -524,10 +524,10 @@ namespace AGL_functions {
   uint Get_ThermalProperties_AGL_postprocess(string directory, const uint& ntemperature, const double& stemperature, const uint& npressure, const double& spressure, vector<double>& agl_temperature, vector<double>& agl_gibbs_energy_atom, vector<double>& agl_vibrational_energy_atom) {  
     // Class to contain AGL input and output data
     _AGL_data AGL_data;
-    uint aglerror;
+    uint aglerror = 0;
     ostringstream aus;
     _xvasp xvasp;
-    string AflowIn;
+    string AflowIn = "";
     _aflags aflags;
     _kflags kflags;
     _vflags vflags;
@@ -536,7 +536,7 @@ namespace AGL_functions {
     // string FileLockName = "agl.LOCK";
     // string AflowInName = _AFLOWIN_;
     // string FileLockName = _AFLOWLOCK_;    
-    string AflowInName, FileLockName;
+    string AflowInName = "", FileLockName = "";
 
     // string filedirname = aurostd::CleanFileName(directory) + "agl.LOCK";
     if (aurostd::FileExist(aurostd::CleanFileName(directory) + "agl.LOCK")) {
