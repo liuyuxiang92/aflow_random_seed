@@ -109,8 +109,8 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
   // We will use VASP5.2+ to calculate Born effective charge tensors and
   // dielectric constant matrix in the primitive cell with very high precision
-  // Both values are needed by the non-analytical term of the dynamic matrix for
-  // correct TO-LO splitting of optical phonon branches of polar systems
+  // Both values are needed by the non-analytical term of the dynamical matrix
+  // to capture the TO-LO splitting of optical phonon branches of polar systems.
   bool LinearResponsePC::runVASPCalculationsDFPT(_xinput& xInput, _aflags& _aflowFlags,
       _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn) {
     bool stagebreak = false;
