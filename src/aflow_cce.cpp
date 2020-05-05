@@ -91,16 +91,16 @@ namespace cce {
     if (cce_flags.flag("CORRECTABLE")){
       //calculate CCE corrected DFT formation enthalpies if precalculated DFT formation energies are provided
       uint num_funcs=cce_vars.vfunctionals.size();
+      uint num_temps=cce_vars.vtemperatures.size();
       for(uint k=0,ksize=num_funcs;k<ksize;k++){ // looping over and checking of vfunctionals is necessary to ensure correct correspondence between given formation energies [k] and corrections with respect to the functional
         if (cce_vars.vfunctionals[k] != "exp") {
           if(cce_vars.dft_energies.size()!=0){ // only when precalculated DFT formation energies are provided, calculate corrected values
-            // for 298.15 K
-            cce_vars.cce_form_energy_cell[_CCE_NUMBER_TEMPERATURES_*k] = cce_vars.dft_energies[k] - cce_vars.cce_correction[_CCE_NUMBER_TEMPERATURES_*k] ;
-            // for 0 K
-            cce_vars.cce_form_energy_cell[_CCE_NUMBER_TEMPERATURES_*k+1] = cce_vars.dft_energies[k] - cce_vars.cce_correction[_CCE_NUMBER_TEMPERATURES_*k+1] ;
+            for (uint l = 0; l < num_temps; l++) {
+              cce_vars.cce_form_energy_cell[num_temps*k+l] = cce_vars.dft_energies[k] - cce_vars.cce_correction[num_temps*k+l] ; // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
+            }
           }
         } else { // for CCE@exp the formation enthalpy (only at 298.15 K) is directly calculated from the exp. formation enthalpies per bond times the number of cation-anion bonds and is not subtracted from a given value
-          cce_vars.cce_form_energy_cell[_CCE_NUMBER_TEMPERATURES_*k] = cce_vars.cce_correction[_CCE_NUMBER_TEMPERATURES_*k] ;
+          cce_vars.cce_form_energy_cell[num_temps*k] = cce_vars.cce_correction[num_temps*k] ;
         }
       }
 
@@ -196,13 +196,16 @@ namespace cce {
   void CCE_core(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::CCE_core():";
+    // determine temperatures
+    aurostd::string2tokens(CCE_temperatures, cce_vars.vtemperatures, ",");
+    uint num_temps=cce_vars.vtemperatures.size();
     // corrections_atom, (su-)perox_correction, cce_correction and cce_form_energy_cell can only be resized after vfunctionals.size() is known from previous main CCE functions calling CCE_core
-    // vfunctionals.size()*2 for 298.15 and 0K corrections
-    cce_vars.corrections_atom.resize(cce_vars.vfunctionals.size()*2, vector<double>(structure.atoms.size()));
-    cce_vars.perox_correction.resize(cce_vars.vfunctionals.size()*2);
-    cce_vars.superox_correction.resize(cce_vars.vfunctionals.size()*2);
-    cce_vars.cce_correction.resize(cce_vars.vfunctionals.size()*2);
-    cce_vars.cce_form_energy_cell.resize(cce_vars.vfunctionals.size()*2);
+    // vfunctionals.size()*num_temps for corrections for different temperatures (currently 298.15 and 0K)
+    cce_vars.corrections_atom.resize(cce_vars.vfunctionals.size()*num_temps, vector<double>(structure.atoms.size()));
+    cce_vars.perox_correction.resize(cce_vars.vfunctionals.size()*num_temps);
+    cce_vars.superox_correction.resize(cce_vars.vfunctionals.size()*num_temps);
+    cce_vars.cce_correction.resize(cce_vars.vfunctionals.size()*num_temps);
+    cce_vars.cce_form_energy_cell.resize(cce_vars.vfunctionals.size()*num_temps);
 
     // DETERMINE NUMBER OF NEAREST ANION NEIGHBORS FOR EACH CATION: STRUCTURAL PART OF CORRECTION ##
     /********************************************************/
@@ -294,12 +297,12 @@ namespace cce {
           if (cce_vars.num_neighbors[i] > 0){ // are there actually bonds between the cation and the (main) anion species
             uint num_funcs=cce_vars.vfunctionals.size();
             for (uint k = 0; k < num_funcs; k++) {
-              // for exp this calculates already the CCE@exp formation enthalpy (only at 298.15 K) from the exp. formation enthalpies per bond
-              // for 298.15 K
-              cce_vars.cce_correction[2*k] += (cce_vars.num_neighbors[i]*cce_vars.corrections_atom[2*k][i]) ; // 2*k since to each functional belong 2 corrections for 298.15 and 0K
               if (cce_vars.vfunctionals[k] != "exp") {
-                // for 0 K
-                cce_vars.cce_correction[2*k+1] += (cce_vars.num_neighbors[i]*cce_vars.corrections_atom[2*k+1][i]) ;
+                for (uint l = 0; l < num_temps; l++) {
+                  cce_vars.cce_correction[num_temps*k+l] += (cce_vars.num_neighbors[i]*cce_vars.corrections_atom[num_temps*k+l][i]) ; // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
+                }
+              } else { // for exp this calculates already the CCE@exp formation enthalpy (only at 298.15 K) from the exp. formation enthalpies per bond
+                cce_vars.cce_correction[num_temps*k] += (cce_vars.num_neighbors[i]*cce_vars.corrections_atom[num_temps*k][i]) ;
               }
             }
           }
@@ -317,12 +320,12 @@ namespace cce {
               if (multi_anion_num_neighbors[k][i] > 0){ // are there actually bonds between the cation and the anion species under consideration
                 uint num_funcs=cce_vars.vfunctionals.size();
                 for (uint l = 0; l < num_funcs; l++) {
-                  // for exp this calculates already the CCE@exp formation enthalpy from the exp. formation enthalpies per bond
-                  // for 298.15 K
-                  cce_vars.cce_correction[2*l] += (multi_anion_num_neighbors[k][i]*cce_vars.multi_anion_corrections_atom[k][2*l][i]) ;
                   if (cce_vars.vfunctionals[l] != "exp") {
-                    // for 0 K
-                    cce_vars.cce_correction[2*l+1] += (multi_anion_num_neighbors[k][i]*cce_vars.multi_anion_corrections_atom[k][2*l+1][i]) ;
+                    for (uint m = 0; m < num_temps; m++) {
+                      cce_vars.cce_correction[num_temps*l+m] += (multi_anion_num_neighbors[k][i]*cce_vars.multi_anion_corrections_atom[k][num_temps*l+m][i]) ;
+                    }
+                  } else { // for exp this calculates already the CCE@exp formation enthalpy (only at 298.15 K) from the exp. formation enthalpies per bond
+                    cce_vars.cce_correction[num_temps*l] += (multi_anion_num_neighbors[k][i]*cce_vars.multi_anion_corrections_atom[k][num_temps*l][i]) ;
                   }
                 }
               }
@@ -2513,7 +2516,7 @@ namespace cce {
             }
             int offset=get_offset(functional); // define also local offset variable since offset must correspond to functional detected from aflow.in
             for (uint i = 0; i < vfunctional_aflow_in.size(); i++) {
-              Bader_template = aurostd::string2utype<double>(Bader_tokens[offset/2+2+5*n]);
+              Bader_template = aurostd::string2utype<double>(Bader_tokens[offset/2+2+(CCE_num_functionals_Bader+1)*n]);
               if(LDEBUG){
                 cerr << soliloquy << "Bader_template " << vfunctional_aflow_in[i] << ": " << Bader_template << endl;
               }
@@ -2523,7 +2526,7 @@ namespace cce {
               if(LDEBUG){
                 cerr << soliloquy << "Bader_deviation: " << Bader_deviation << endl;
               }
-              cce_vars.oxidation_states[i]= aurostd::string2utype<double>(Bader_tokens[1+5*n]); // +5*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD)
+              cce_vars.oxidation_states[i]= aurostd::string2utype<double>(Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]); // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges
             } else { // only if element is found but no corrections can be assigned because above conditions are not met, update Bader_deviation_min
               if ( std::abs(Bader_template-cce_vars.Bader_charges[i]) < Bader_deviation_min ) {
                 Bader_deviation_min= std::abs(Bader_template-cce_vars.Bader_charges[i]);
@@ -2553,9 +2556,9 @@ namespace cce {
               string separator=", ";
               for(uint n=0;n<num_ox_states;n++){ 
                 if (n<num_ox_states-1){
-                  ox_nums_avail+= Bader_tokens[1+5*n] + separator ; // +5*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD)
+                  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n] + separator ; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges
                 } else if (n==num_ox_states-1){
-                  ox_nums_avail+= Bader_tokens[1+5*n]; // +5*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD)
+                  ox_nums_avail+= Bader_tokens[1+(CCE_num_functionals_Bader+1)*n]; // (CCE_num_functionals_Bader+1)*n because oxidation numbers in Bader_templ_line are separated by corrections for four different functionals (PBE, LDA, SCAN, and PBE+U_ICSD) and there is 1 formal oxidation number in front of the Bader charges
                 }
               }
               cerr << "Corrections for " << structure.atoms[i].cleanname << " coordinated by " << cce_vars.anion_species << " are available for oxidation states: " << ox_nums_avail << endl;
@@ -2697,15 +2700,19 @@ namespace cce {
     vector<string> corrections_tokens;
     aurostd::string2tokens(corrections_line, corrections_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one so that e.g. corrections_tokens[1] is not a space but the oxidation number
     uint num_funcs=cce_vars.vfunctionals.size();
+    uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
-      corrections_atom[2*k][i]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+2]); // 2*k since to each functional belong 2 corrections for 298.15 and 0K
-      if(LDEBUG){
-        cerr << soliloquy << cce_vars.vfunctionals[k] << " correction for " << structure.atoms[i].cleanname << " (atom[" << i << "]) for 298.15K: " << corrections_atom[2*k][i] << " eV/bond" << endl;
-      }
       if (cce_vars.vfunctionals[k] != "exp") {
-        corrections_atom[2*k+1][i]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+3]);
+        for (uint l = 0; l < num_temps; l++) {
+          corrections_atom[num_temps*k+l][i]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+l+2]); // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
+          if(LDEBUG){
+            cerr << soliloquy << cce_vars.vfunctionals[k] << " correction for " << structure.atoms[i].cleanname << " (atom[" << i << "]) for " << cce_vars.vtemperatures[l] << "K: " << corrections_atom[num_temps*k+l][i] << " eV/bond" << endl;
+          }
+        }
+      } else {
+        corrections_atom[num_temps*k][i]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+2]);
         if(LDEBUG){
-          cerr << soliloquy << cce_vars.vfunctionals[k] << " correction for " << structure.atoms[i].cleanname << " (atom[" << i << "]) for 0K: " << corrections_atom[2*k+1][i] << " eV/bond" << endl;
+          cerr << soliloquy << cce_vars.vfunctionals[k] << " correction for " << structure.atoms[i].cleanname << " (atom[" << i << "]) for 298.15K: " << corrections_atom[num_temps*k][i] << " eV/bond" << endl;
         }
       }
     }
@@ -2718,15 +2725,19 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::set_anion_corrections():";
     uint num_funcs=cce_vars.vfunctionals.size();
+    uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
-      corrections_atom[2*k][i]=0; // 2*k since to each functional belong 2 corrections for 298.15 and 0K
-      if(LDEBUG){
-        cerr << soliloquy << cce_vars.vfunctionals[k] << " correction for " << structure.atoms[i].cleanname << " (atom[" << i << "]) for 298.15K: " << corrections_atom[2*k][i] << " eV/bond" << endl;
-      }
       if (cce_vars.vfunctionals[k] != "exp") {
-        corrections_atom[2*k+1][i]=0;
+        for (uint l = 0; l < num_temps; l++) {
+          corrections_atom[num_temps*k+l][i]=0; // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
+          if(LDEBUG){
+            cerr << soliloquy << cce_vars.vfunctionals[k] << " correction for " << structure.atoms[i].cleanname << " (atom[" << i << "]) for " << cce_vars.vtemperatures[l] << "K: " << corrections_atom[num_temps*k+l][i] << " eV/bond" << endl;
+          }
+        }
+      } else {
+        corrections_atom[num_temps*k][i]=0;
         if(LDEBUG){
-          cerr << soliloquy << cce_vars.vfunctionals[k] << " correction for " << structure.atoms[i].cleanname << " (atom[" << i << "]) for 0K: " << corrections_atom[2*k+1][i] << " eV/bond" << endl;
+          cerr << soliloquy << cce_vars.vfunctionals[k] << " correction for " << structure.atoms[i].cleanname << " (atom[" << i << "]) for 298.15K: " << corrections_atom[num_temps*k][i] << " eV/bond" << endl;
         }
       }
     }
@@ -2738,6 +2749,8 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::check_get_per_super_ox_corrections():";
     // check for per- and superoxides should always be kept separate since a compound could have both per- and superoxide ions (alkali-metal sesquioxides)
+    uint num_funcs=cce_vars.vfunctionals.size();
+    uint num_temps=cce_vars.vtemperatures.size();
     if (cce_vars.num_perox_bonds > 0){
       string corrections_line="";
       corrections_line=get_corrections_line("O2_-2_O");
@@ -2746,16 +2759,18 @@ namespace cce {
       }
       vector<string> corrections_tokens;
       aurostd::string2tokens(corrections_line, corrections_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one so that e.g. corrections_tokens[1] is not a space but the oxidation number
-      uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
-        cce_vars.perox_correction[2*k]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+2]);
-        if(LDEBUG){
-          cerr << soliloquy << cce_vars.vfunctionals[k] << " peroxide correction for 298.15K: " << cce_vars.perox_correction[2*k] << " eV/bond" << endl;
-        }
         if (cce_vars.vfunctionals[k] != "exp") {
-          cce_vars.perox_correction[2*k+1]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+3]);
+          for (uint l = 0; l < num_temps; l++) {
+            cce_vars.perox_correction[num_temps*k+l]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+l+2]); // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
+            if(LDEBUG){
+              cerr << soliloquy << cce_vars.vfunctionals[k] << " peroxide correction for " << cce_vars.vtemperatures[l] << "K: " << cce_vars.perox_correction[num_temps*k+l] << " eV/bond" << endl;
+            }
+          }
+        } else {
+          cce_vars.perox_correction[num_temps*k]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+2]);
           if(LDEBUG){
-            cerr << soliloquy << cce_vars.vfunctionals[k] << " peroxide correction for 0K: " << cce_vars.perox_correction[2*k+1] << " eV/bond" << endl;
+            cerr << soliloquy << cce_vars.vfunctionals[k] << " peroxide correction for 298.15K: " << cce_vars.perox_correction[num_temps*k] << " eV/bond" << endl;
           }
         }
       }
@@ -2768,16 +2783,18 @@ namespace cce {
       }
       vector<string> corrections_tokens;
       aurostd::string2tokens(corrections_line, corrections_tokens, " "); // seems to automatically reduce the number of multiple spaces in a row to one so that e.g. corrections_tokens[1] is not a space but the oxidation number
-      uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
-        cce_vars.superox_correction[2*k]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+2]);
-        if(LDEBUG){
-          cerr << soliloquy << cce_vars.vfunctionals[k] << " superoxide correction for 298.15K: " << cce_vars.superox_correction[2*k] << " eV/bond" << endl;
-        }
         if (cce_vars.vfunctionals[k] != "exp") {
-          cce_vars.superox_correction[2*k+1]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+3]);
+          for (uint l = 0; l < num_temps; l++) {
+            cce_vars.superox_correction[num_temps*k+l]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+l+2]);
+            if(LDEBUG){
+              cerr << soliloquy << cce_vars.vfunctionals[k] << " superoxide correction for " << cce_vars.vtemperatures[l] << "K: " << cce_vars.superox_correction[num_temps*k+l] << " eV/bond" << endl;
+            }
+          }
+        } else {
+          cce_vars.superox_correction[num_temps*k]= aurostd::string2utype<double>(corrections_tokens[cce_vars.offset[k]+2]);
           if(LDEBUG){
-            cerr << soliloquy << cce_vars.vfunctionals[k] << " superoxide correction for 0K: " << cce_vars.superox_correction[2*k+1] << " eV/bond" << endl;
+            cerr << soliloquy << cce_vars.vfunctionals[k] << " superoxide correction for 298.15K: " << cce_vars.superox_correction[num_temps*k] << " eV/bond" << endl;
           }
         }
       }
@@ -2798,18 +2815,22 @@ namespace cce {
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::check_apply_per_super_ox_corrections():";
+    uint num_funcs=cce_vars.vfunctionals.size();
+    uint num_temps=cce_vars.vtemperatures.size();
     if (cce_vars.num_perox_bonds > 0){
-      uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
-        cce_vars.cce_correction[2*k] += (cce_vars.num_perox_bonds * cce_vars.perox_correction[2*k]) ;
-        if(LDEBUG){
-          cerr << soliloquy << cce_vars.vfunctionals[k] << " peroxide correction for 298.15K per cell: " << std::setprecision(3) << std::fixed << (cce_vars.num_perox_bonds * cce_vars.perox_correction[2*k]) << " eV" << endl;
-        }
         if (cce_vars.vfunctionals[k] != "exp") {
-          cce_vars.cce_correction[2*k+1] += (cce_vars.num_perox_bonds * cce_vars.perox_correction[2*k+1]) ;
+          for (uint l = 0; l < num_temps; l++) {
+            cce_vars.cce_correction[num_temps*k+l] += (cce_vars.num_perox_bonds * cce_vars.perox_correction[num_temps*k+l]) ; // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
+            if(LDEBUG){
+              cerr << soliloquy << cce_vars.vfunctionals[k] << " peroxide correction for " << cce_vars.vtemperatures[l] << "K per cell: " << std::setprecision(3) << std::fixed << (cce_vars.num_perox_bonds * cce_vars.perox_correction[num_temps*k+l]) << " eV" << endl;
+              cerr << endl;
+            }
+          }
+        } else {
+          cce_vars.cce_correction[num_temps*k] += (cce_vars.num_perox_bonds * cce_vars.perox_correction[num_temps*k]) ;
           if(LDEBUG){
-            cerr << soliloquy << cce_vars.vfunctionals[k] << " peroxide correction for 0K per cell: " << std::setprecision(3) << std::fixed << (cce_vars.num_perox_bonds * cce_vars.perox_correction[2*k+1]) << " eV" << endl;
-            cerr << endl;
+            cerr << soliloquy << cce_vars.vfunctionals[k] << " peroxide correction for 298.15K per cell: " << std::setprecision(3) << std::fixed << (cce_vars.num_perox_bonds * cce_vars.perox_correction[num_temps*k]) << " eV" << endl;
           }
         }
       }
@@ -2817,15 +2838,18 @@ namespace cce {
     if (cce_vars.num_superox_bonds > 0){
       uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
-        cce_vars.cce_correction[2*k] += (cce_vars.num_superox_bonds * cce_vars.superox_correction[2*k]) ;
-        if(LDEBUG){
-          cerr << soliloquy << cce_vars.vfunctionals[k] << " superoxide correction for 298.15K per cell: " << std::setprecision(3) << std::fixed << (cce_vars.num_superox_bonds * cce_vars.superox_correction[2*k]) << " eV" << endl;
-        }
         if (cce_vars.vfunctionals[k] != "exp") {
-          cce_vars.cce_correction[2*k+1] += (cce_vars.num_superox_bonds * cce_vars.superox_correction[2*k+1]) ;
+          for (uint l = 0; l < num_temps; l++) {
+            cce_vars.cce_correction[num_temps*k+l] += (cce_vars.num_superox_bonds * cce_vars.superox_correction[num_temps*k+l]) ; // num_temps*k since to each functional belong num_temps corrections (currently for 298.15 and 0K)
+            if(LDEBUG){
+              cerr << soliloquy << cce_vars.vfunctionals[k] << " superoxide correction for " << cce_vars.vtemperatures[l] << "K per cell: " << std::setprecision(3) << std::fixed << (cce_vars.num_superox_bonds * cce_vars.superox_correction[num_temps*k+l]) << " eV" << endl;
+              cerr << endl;
+            }
+          }
+        } else {
+          cce_vars.cce_correction[num_temps*k] += (cce_vars.num_superox_bonds * cce_vars.superox_correction[num_temps*k]) ;
           if(LDEBUG){
-            cerr << soliloquy << cce_vars.vfunctionals[k] << " superoxide correction for 0K per cell: " << std::setprecision(3) << std::fixed << (cce_vars.num_superox_bonds * cce_vars.superox_correction[2*k+1]) << " eV" << endl;
-            cerr << endl;
+            cerr << soliloquy << cce_vars.vfunctionals[k] << " superoxide correction for 298.15K per cell: " << std::setprecision(3) << std::fixed << (cce_vars.num_superox_bonds * cce_vars.superox_correction[num_temps*k]) << " eV" << endl;
           }
         }
       }
@@ -2866,6 +2890,7 @@ namespace cce {
     stringstream json;
     bool print_Hf = (cce_vars.dft_energies.size() > 0);
     uint nfuncs = cce_vars.vfunctionals.size();
+    uint num_temps=cce_vars.vtemperatures.size();
     uint natoms = structure.atoms.size();
 
     json << "{";
@@ -2874,23 +2899,26 @@ namespace cce {
     json << "\"CCE\":{";
     for (uint i = 0; i < nfuncs; i++) {
       json << "\"" << cce_vars.vfunctionals[i] << "\":{";
-      json << "\"298.15K\":{";
-      json << "\"cce_correction_cell\":" << cce_vars.cce_correction[2*i] << ",";
-      json << "\"cce_correction_atom\":" << (cce_vars.cce_correction[2*i]/natoms);
-      if (print_Hf) {
-        json << ",";
-        json << "\"formation_enthalpy_cell\":" << cce_vars.cce_form_energy_cell[2*i] << ",";
-        json << "\"formation_enthalpy_atom\":" << (cce_vars.cce_form_energy_cell[2*i]/natoms);
-      }
-      json << "}";
       if (cce_vars.vfunctionals[i] != "exp") {
-        json << ",\"0K\":{";
-        json << "\"cce_correction_cell\":" << cce_vars.cce_correction[2*i+1] << ",";
-        json << "\"cce_correction_atom\":" << (cce_vars.cce_correction[2*i+1]/natoms);
+        for (uint l = 0; l < num_temps; l++) {
+          json << (l!=0?",":"") << "\"" << cce_vars.vtemperatures[l] << "K\":{";
+          json << "\"cce_correction_cell\":" << cce_vars.cce_correction[num_temps*i+l] << ",";
+          json << "\"cce_correction_atom\":" << (cce_vars.cce_correction[num_temps*i+l]/natoms);
+          if (print_Hf) {
+            json << ",";
+            json << "\"formation_enthalpy_cell\":" << cce_vars.cce_form_energy_cell[num_temps*i+l] << ",";
+            json << "\"formation_enthalpy_atom\":" << (cce_vars.cce_form_energy_cell[num_temps*i+l]/natoms);
+          }
+          json << "}";
+        }
+      } else {
+        json << "\"298.15K\":{";
+        json << "\"cce_correction_cell\":" << cce_vars.cce_correction[num_temps*i] << ",";
+        json << "\"cce_correction_atom\":" << (cce_vars.cce_correction[num_temps*i]/natoms);
         if (print_Hf) {
           json << ",";
-          json << "\"formation_enthalpy_cell\":" << cce_vars.cce_form_energy_cell[2*i+1] << ",";
-          json << "\"formation_enthalpy_atom\":" << (cce_vars.cce_form_energy_cell[2*i+1]/natoms);
+          json << "\"formation_enthalpy_cell\":" << cce_vars.cce_form_energy_cell[num_temps*i] << ",";
+          json << "\"formation_enthalpy_atom\":" << (cce_vars.cce_form_energy_cell[num_temps*i]/natoms);
         }
         json << "}";
       }
@@ -2914,12 +2942,14 @@ namespace cce {
       output << "CCE CORRECTIONS (to be subtracted from precalculated DFT formation energies):" << endl;
     }
     uint num_funcs=cce_vars.vfunctionals.size();
+    uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
       if (cce_vars.vfunctionals[k] != "exp") {
-        output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k] << " eV/cell //" << "CCE@" << cce_vars.vfunctionals[k] << " correction for 298.15K." << endl;
-        output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k+1] << " eV/cell //" << "CCE@" << cce_vars.vfunctionals[k] << " correction for 0K." << endl;
-        output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k]/structure.atoms.size() << " eV/atom //" << "CCE@" << cce_vars.vfunctionals[k] << " correction for 298.15K." << endl;
-        output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k+1]/structure.atoms.size() << " eV/atom //" << "CCE@" << cce_vars.vfunctionals[k] << " correction for 0K." << endl;
+        for (uint i = 1; i < structure.atoms.size()+1; i+=structure.atoms.size()-1) { // loop over two values to print corrections per cell and atom
+          for (uint l = 0; l < num_temps; l++) {
+            output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[num_temps*k+l]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@" << cce_vars.vfunctionals[k] << " correction for " << cce_vars.vtemperatures[l] << "K." << endl;
+          }
+        }
         output << endl;
       }
     }
@@ -2927,8 +2957,9 @@ namespace cce {
     for (uint k = 0; k < num_funcs; k++) {
       if (cce_vars.vfunctionals[k] == "exp" && cce_vars.dft_energies.size()==0) { // second condition for that if precalc. form. energies are given and asking for exp., exp. result is not written twice
         output << "CCE FORMATION ENTHALPIES:" << endl;
-        output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << " eV/cell //" << "CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
-        output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k]/structure.atoms.size() << " eV/atom //" << "CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
+        for (uint i = 1; i < structure.atoms.size()+1; i+=structure.atoms.size()-1) { // loop over two values to print corrections per cell and atom
+          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
+        }
         output << "Note that this provides A ROUGH GUESS with an estimated average accuracy of only about 250 meV/atom (from test for ternary oxides)!" << endl;
         output << endl;
       }
@@ -2940,17 +2971,19 @@ namespace cce {
       uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
         if (cce_vars.vfunctionals[k] != "exp") {
-          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << " eV/cell //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 298.15K." << endl;
-          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k+1] << " eV/cell //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 0K." << endl;
-          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k]/structure.atoms.size() << " eV/atom //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 298.15K." << endl;
-          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k+1]/structure.atoms.size() << " eV/atom //" << "CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at 0K." << endl;
+          for (uint i = 1; i < structure.atoms.size()+1; i+=structure.atoms.size()-1) { // loop over two values to print corrections per cell and atom
+            for (uint l = 0; l < num_temps; l++) {
+              output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k+l]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@" << cce_vars.vfunctionals[k] << " formation enthalpy at " << cce_vars.vtemperatures[l] << "K." << endl;
+            }
+          }
           output << endl;
         } else if (cce_vars.vfunctionals[k] == "exp") {
-          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << " eV/cell //" << "CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
-          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k]/structure.atoms.size() << " eV/atom //" << "CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
+          for (uint i = 1; i < structure.atoms.size()+1; i+=structure.atoms.size()-1) { // loop over two values to print corrections per cell and atom
+            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k]/i << " eV/" << (i==1?"cell":"atom") << " //CCE@exp formation enthalpy at 298.15K from exp. formation enthalpies per bond." << endl;
+          }
           output << "Note that this provides A ROUGH GUESS with an estimated average accuracy of only about 250 meV/atom (from test for ternary oxides)!" << endl;
           output << endl;
-        } 
+        }
       }
     }
     return output.str();
@@ -2961,41 +2994,29 @@ namespace cce {
   string write_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell) {
     stringstream output;
     uint num_funcs=cce_vars.vfunctionals.size();
+    uint num_temps=cce_vars.vtemperatures.size();
     for (uint k = 0; k < num_funcs; k++) {
       if (cce_vars.vfunctionals[k] != "exp") {
-        if (k<num_funcs-1 || cce_vars.dft_energies.size()!=0) {
-          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k] << ",";
-          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k+1] << ",";
-        } else {
-          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k] << ",";
-          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[2*k+1];
+        for (uint l = 0; l < num_temps; l++) {
+          output << std::setprecision(3) << std::fixed << cce_vars.cce_correction[num_temps*k+l] << (k<num_funcs-1 || l==0 || cce_vars.dft_energies.size()!=0?",":"");
         }
       }
     }
     // exp part
     for (uint k = 0; k < num_funcs; k++) {
       if (cce_vars.vfunctionals[k] == "exp" && cce_vars.dft_energies.size()==0) { // second condition for that if precalc. form. energies are given and asking for exp., exp. result is not written twice
-        output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k];
+        output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k];
       }
     }
     // corrected DFT formation energies
     if(cce_vars.dft_energies.size()!=0){
-      uint num_funcs=cce_vars.vfunctionals.size();
       for (uint k = 0; k < num_funcs; k++) {
         if (cce_vars.vfunctionals[k] != "exp") {
-          if (k<num_funcs-1) {
-            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << ",";
-            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k+1] << ",";
-          } else {
-            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << ",";
-            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k+1];
+          for (uint l = 0; l < num_temps; l++) {
+            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k+l] << (k<num_funcs-1 || l==0?",":"");
           }
         } else if (cce_vars.vfunctionals[k] == "exp") {
-          if (k<num_funcs-1) {
-            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k] << ",";
-          } else {
-            output << std::setprecision(3) << std::fixed << cce_form_energy_cell[2*k];
-          }
+          output << std::setprecision(3) << std::fixed << cce_form_energy_cell[num_temps*k] << (k<num_funcs-1?",":"");
         }
       }
     }

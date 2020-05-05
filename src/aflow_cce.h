@@ -12,8 +12,7 @@
 
 static const string CCE_allowed_functionals = "PBE,LDA,SCAN,PBE+U_ICSD,exp"; // when adding a new functional also introduce new 'offset' in get_offset function needed for reading corrections from lookup table
 static const string CCE_default_output_functionals= "PBE,LDA,SCAN,exp"; // corrections are given for these functionals if only a structure is given as input for the command line and web tools (i.e. --functionals= is not set)
-static const string CCE_TEMPERATURES = "0,298.15"; // needs to be extended when adding new corrections for other temperatures
-static const double _CCE_NUMBER_TEMPERATURES_ = 2; // needs to be extended when adding new corrections for other temperatures
+static const string CCE_temperatures = "298.15,0"; // needs to be extended when adding new corrections for other temperatures
 static const double _CCE_NN_DIST_TOL_ = 0.5; // 0.5 Ang tolerance between shortest and longest bonds for each cation-anion pair; works best up to now; in future maybe bonding could be explicitly determined via Bader analysis
 static const double _CCE_NN_DIST_TOL_MULTI_ANION_ = 0.4; // 0.4 Ang tolerance between shortest and longest bonds for each bond when testing for multi-anion compound; it was found that the standard 0.5 Ang tol. is too large such that different anions appear to be bonded, which would prevent anions to be detected as such
 static const double _CCE_OX_TOL_ = 0.001; // choose small finite value since sum of oxidation states might not be exactly zero due to numerics
@@ -21,12 +20,14 @@ static const double _CCE_SELF_DIST_TOL_ = 0.001; // distance tolerance in Ang fo
 static const double _CCE_perox_cutoff_=1.6; // O-O bonds in peroxides for the studied examples are all shorter than 1.6 Ang
 static const double _CCE_superox_cutoff_=1.4; // O-O bonds in superoxides for the studied examples are all shorter than 1.4 Ang
 static const double _CCE_O2_molecule_cutoff_=1.2; // O-O bonds in the O2 molecule is about 1.21 Ang.
+static const uint CCE_num_functionals_Bader=4; // Currently, Bader charges used to determine oxidation states are available for 4 functionals: PBE, LDA, SCAN, and PBE+U_ICSD and ONLY for oxides, see get_Bader_templates function
 
 namespace cce {
   struct CCE_Variables {
     vector<double> dft_energies;
     vector<string> vfunctionals; // should be needed as long as output for corrected dft formation energies is based on vfunctionals
     vector<int> offset; // needed for reading corrections from lookup table for different functionals
+    vector<string> vtemperatures;
     double standard_anion_charge;
     vector<double> electronegativities;
     vector<uint> multi_anion_atoms; // vector in which elements will be 1 for multi_anion atoms and 0 otherwise

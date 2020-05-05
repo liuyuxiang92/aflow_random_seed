@@ -7456,29 +7456,29 @@ namespace xelement {
       thermal_expansion=NNN;
       thermal_conductivity=2;
       Brinelll_hardness=NNN;
-      Mohs_hardness=NNN;    
-      Vickers_hardness=NNN; 
-      Hardness_Pearson=NNN;   
-      Hardness_Putz=NNN;      
-      Hardness_RB=NNN;        
-      shear_modulus=NNN;    
-      Young_modulus=NNN;    
-      bulk_modulus=NNN;     
-      Poisson_ratio_PT=NNN;    
-      Miedema_BVm=NNN;        
+      Mohs_hardness=NNN;
+      Vickers_hardness=NNN;
+      Hardness_Pearson=NNN;
+      Hardness_Putz=NNN;
+      Hardness_RB=NNN;
+      shear_modulus=NNN;
+      Young_modulus=NNN;
+      bulk_modulus=NNN;
+      Poisson_ratio_PT=NNN;
+      Miedema_BVm=NNN;
       //
-      Magnetic_Type_PT="UNDEFINED";     
+      Magnetic_Type_PT="UNDEFINED";
       Mass_Magnetic_Susceptibility=NNN;
       Volume_Magnetic_Susceptibility=NNN;
-      Molar_Magnetic_Susceptibility=NNN; 
-      Curie_point=NNN;                  
+      Molar_Magnetic_Susceptibility=NNN;
+      Curie_point=NNN;
       //
-      refractive_index=NNN;             
-      color_PT="UNDEFINED";               
+      refractive_index=NNN;
+      color_PT="UNDEFINED";
       //
-      HHIP=NNN;                           
-      HHIR=NNN;                           
-      xray_scatt=NNN;   
+      HHIP=NNN;
+      HHIR=NNN;
+      xray_scatt=NNN;
       // [AFLOW]STOP=CONSTRUCTOR
     }
     // [AFLOW]STOP=Astatine
