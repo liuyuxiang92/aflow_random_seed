@@ -712,7 +712,7 @@ namespace pocc {
     // if(!aurostd::FileExist(aflowin)) {cerr << soliloquy << " file not found " << aflowin << endl; exit(1);}
     // string str_AflowIn; aurostd::file2string(aflowin, str_AflowIn);
     double agl_debye_temperature, agl_debye_acoustic, agl_gruneisen;
-    double agl_heat_capacity_Cv_300K, agl_heat_capacity_Cp_300K;
+    double agl_heat_capacity_Cv_300K = 0.0, agl_heat_capacity_Cp_300K = 0.0;
     double agl_vibrational_free_energy_300K_cell, agl_vibrational_free_energy_300K_atom;
     double agl_vibrational_entropy_300K_cell, agl_vibrational_entropy_300K_atom;	
     double agl_thermal_conductivity_300K;
