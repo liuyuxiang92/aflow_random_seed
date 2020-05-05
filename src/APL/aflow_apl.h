@@ -1864,11 +1864,11 @@ namespace apl
     public:
       QHAN();
       QHAN(const QHAN& qha);
-      QHAN(_xinput &xinput, _aflags &aflags, _kflags &kflags, _xflags &xflags,
-                  string *aflowin, const string &tpt, xoption &supercellopts, 
-                  ofstream &messageFile, ostream &oss=std::cout);
-      void initialize(_xinput &xinput, _aflags &aflags, _kflags &kflags,
-          _xflags &xflags, string *aflowin, const string &tpt, xoption &supercellopts,
+      QHAN(string &tpt,_xinput &xinput, _aflags &aflags, _kflags &kflags,
+          _xflags &xflags, string *aflowin, xoption &supercellopts,
+          ofstream &messageFile, ostream &oss=std::cout);
+      void initialize(string &tpt,_xinput &xinput, _aflags &aflags, _kflags &kflags,
+          _xflags &xflags, string *aflowin, xoption &supercellopts,
           ofstream &messageFile, ostream &oss);
       ~QHAN();
       const QHAN& operator=(const QHAN &qha);
@@ -1881,7 +1881,7 @@ namespace apl
       double FreeEnergy(double T, int id);
       double FreeEnergyFit(double T, double V, int method);
       double electronicFreeEnergy(double T, int id);
-      xvector<double> FreeEnergySommerfeld(double T);
+      xvector<double> electronicFreeEnergySommerfeld(double T);
       xvector<double> DOSatEf();
       double InternalEnergyFit(double T, double V);
       double Entropy(double T, double V, int method);
@@ -1900,8 +1900,7 @@ namespace apl
       // output
       void   writeThermalProperties(int eos_method, int qha_method);
       void   writeFVT();
-      void   writeGPpath(double V);
-      void   writeGPpath(double V, const string &directory);
+      void   writeGPpath(double V, const string &directory=".");
       void   writeAverageGP_FD();
       void   writeGPmeshFD();
       void   writeFrequencies();
@@ -1925,16 +1924,16 @@ namespace apl
       //int NatomsSupercell; ///< number of atoms in supercell
       xstructure origStructure;
       vector<double> Temperatures;
-      vector<double> GPvolumes;
-      vector<double> EOSvolumes;
-      vector<double> coefGPVolumes;
+      vector<double> GPvolumes; ///< a set of volumes for FD Grueneisen calculation
+      vector<double> EOSvolumes; ///< a set of volumes for EOS calculation
+      vector<double> coefGPVolumes; ///< multiplication coeffitient w.r.t inital volume
       vector<double> coefEOSVolumes;
       xvector<double> DOS_Ef;
       // data necessary to calculate thermodynamic properties
       vector<double> Efermi_V; ///< Fermi energy vs V
       vector<double> E0_V;     ///< total energy vs V
       vector<xEIGENVAL> static_eigvals;
-      vector<xIBZKPT> static_ibzkpts;
+      vector<xIBZKPT>   static_ibzkpts;
       vector<vector<double> > energies_V; ///< electronic energy bins vs V
       vector<vector<double> > edos_V; ///< electronic DOS
       vector<vector<double> > frequencies_V; ///< phonon frequency bins vs V
@@ -1961,8 +1960,6 @@ namespace apl
       string *aflowin;
       string currentDirectory;
       // methods
-      int  check();
-      int  check_apl();
       int  check_static();
       void read();
       double run_apl(vector<string> &subdirectories,
@@ -1970,7 +1967,6 @@ namespace apl
                      vector<double> &coefVolumes, bool gp=true);
       void read_static();
       void calculate();
-      void createSubCalculations();
       void createSubdirectoriesStaticRun();
       void free();
       void copy(const QHAN &qha);

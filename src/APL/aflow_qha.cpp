@@ -515,7 +515,7 @@ namespace apl
     xflags.clear();
     aflags.clear();
     kflags.clear();
-    currentDirectory = "";
+    currentDirectory = ".";
   }
 
   void QHAN::copy(const QHAN &qha)
@@ -576,17 +576,18 @@ namespace apl
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  QHAN::QHAN(_xinput &xinput, _aflags &aflags, _kflags &kflags, _xflags &xflags,
-              string *aflowin, const string &tpt, xoption &supercellopts,
-              ofstream &messageFile, ostream &oss)
+  QHAN::QHAN(string &tpt, _xinput &xinput, _aflags &aflags, _kflags &kflags,
+      _xflags &xflags, string *aflowin, xoption &supercellopts, ofstream &messageFile, 
+              ostream &oss)
   {
-    initialize(xinput, aflags, kflags, xflags, aflowin, tpt, supercellopts, messageFile, oss);
+    initialize(tpt, xinput, aflags, kflags, xflags, aflowin, supercellopts, messageFile,
+        oss);
   }
 
   /** Used to initialize QHAN class with all the necessary data.
    */
-  void QHAN::initialize(_xinput &xinput, _aflags &aflags, _kflags &kflags,
-          _xflags &xflags, string *aflowin, const string &tpt, xoption &supercellopts,
+  void QHAN::initialize(string &tpt, _xinput &xinput, _aflags &aflags, _kflags &kflags,
+          _xflags &xflags, string *aflowin, xoption &supercellopts,
           ofstream &messageFile, ostream &oss)
   {
     string function = "QHAN::initialize()";
@@ -712,10 +713,9 @@ namespace apl
       eos.E = xvector<double>(N_EOSvolumes);
     }
 
-    // parse parameters that define a range of temperatures
     tokens.clear();
-    apl::tokenize(tpt, tokens, string(" :"));
-    if (tokens.size() != 3) {
+    apl::tokenize(tpt, tokens, string (" :"));
+    if (tokens.size() != 3){
       msg = "Wrong setting in the ";
       msg += "[AFLOW_APL]TPT.\n";
       msg += "Specify as TPT=0:2000:10.\n";
@@ -723,10 +723,10 @@ namespace apl
       throw aurostd::xerror(_AFLOW_FILE_NAME_, QHA_ARUN_MODE, msg,
           _INPUT_NUMBER_);
     }
+    double tp_start = aurostd::string2utype<double>(tokens[0]);
+    double tp_end   = aurostd::string2utype<double>(tokens[1]);
+    double tp_step  = aurostd::string2utype<double>(tokens[2]);
 
-    double  tp_start = aurostd::string2utype<double>(tokens[0]);
-    double  tp_end   = aurostd::string2utype<double>(tokens[1]);
-    double  tp_step  = aurostd::string2utype<double>(tokens[2]);
 
     // define a set of temperatures for thermodynamic calculations
     Ntemperatures = floor((tp_end - tp_start)/tp_step) + 1;
@@ -765,6 +765,8 @@ namespace apl
    */
   void QHAN::run()
   {
+    bool LDEBUG = false | XHOST.DEBUG;
+
     string function = "QHAN::run()";
     string msg = "Performing QHA calculation.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
@@ -793,7 +795,7 @@ namespace apl
 
         if (eos_data_available){
           if (includeElectronicContribution) DOSatEf();
-          writeFrequencies();
+          if (LDEBUG) writeFrequencies();
           writeFVT();
 
           writeThermalProperties(EOS_POLYNOMIAL, QHA_CALC);
@@ -812,7 +814,7 @@ namespace apl
         if (gp_data_available){
           if (runQHA || runQHA3P){
             double V0 = origStructure.GetVolume()/NatomsOrigCell;
-            writeGPpath(V0, ".");
+            writeGPpath(V0);
             writeGPmeshFD();
             writeAverageGP_FD();
 
@@ -919,18 +921,18 @@ namespace apl
       xinput.xvasp.str.InflateVolume(coefVolumes[i]);
       // update cartesian coordinates
       for (uint at=0; at<xinput.xvasp.str.atoms.size(); at++){
-        xinput.xvasp.str.atoms.at(at).cpos= F2C(xinput.xvasp.str.scale,
-            xinput.xvasp.str.lattice,xinput.xvasp.str.atoms.at(at).fpos);
+        xinput.xvasp.str.atoms.at(at).cpos = F2C(xinput.xvasp.str.scale,
+            xinput.xvasp.str.lattice, xinput.xvasp.str.atoms.at(at).fpos);
       }
 
-      Supercell supercell(xinput.xvasp.str, *messageFile, subdirectories[i], *oss);
-      supercell.build(supercellopts);
+      apl::PhononCalculator phcalc(*messageFile, *oss);
+      phcalc.initialize_supercell(xinput.getXStr());
+      phcalc.getSupercell().build(supercellopts);
 
       auto_ptr<apl::ForceConstantCalculator> fccalc;
-      apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(supercell, *messageFile, *oss);
+      apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
+          *messageFile, *oss);
 
-      apl::PhononCalculator phcalc(*messageFile, *oss);
-      apl::QMesh qmesh(*messageFile);
       apl::PhononDispersionCalculator pdisc(phcalc);
 
       fccalc.reset(dmPC);
@@ -978,12 +980,7 @@ namespace apl
         dos_mesh[j] = aurostd::string2utype<int>(tokens[j]);
       }
 
-      qmesh.setDirectory(subdirectories[i]);
-      qmesh.initialize(dos_mesh, phcalc.getInputCellStructure());
-      qmesh.makeIrreducible();
-
-      // phcalc.initialize_qmesh(dos_mesh);
-
+      phcalc.initialize_qmesh(dos_mesh);
 
       apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOS_METHOD"),
            dummy_dos_projections);
@@ -1011,17 +1008,17 @@ namespace apl
         }
       }
 
-      supercell.projectToPrimitive();
       string USER_DC_INITLATTICE="";
-      int USER_DC_NPOINTS = 100;
-      pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
+      int USER_DC_NPOINTS = aurostd::string2utype<int>(
+          apl_options.getattachedscheme("BAND_NPOINTS"));
+      pdisc.initPathLattice(USER_DC_INITLATTICE, USER_DC_NPOINTS);
       pdisc.calc(apl::THZ | apl::ALLOW_NEGATIVE);
       pdisc.writePHEIGENVAL(subdirectories[i]);
 
       // save all the data that is necessary for QHA calculations
       if (i==0){// qmesh data is the same for all volumes: need to save it only once
-        qpWeights = qmesh.getWeights();
-        qPoints   = qmesh.getIrredQPointsFPOS();
+        qpWeights = phcalc.getQMesh().getWeights();
+        qPoints   = phcalc.getQMesh().getIrredQPointsFPOS();
         Nqpoints  = qPoints.size();
       }
 
@@ -1210,13 +1207,16 @@ namespace apl
   }
 
 
-  /** Calculates free energy as a function of volume and temperature.
+  /** Calculates free energy (without electronic contribution) as a function of volume
+   *  and temperature.
+   *  Volume dependency is obtained via fit to QHA model.
+   *  @param qha_method defines what type of QHA calculation is performed.
    */
-  double QHAN::FreeEnergyFit(double T, double V, int method)
+  double QHAN::FreeEnergyFit(double T, double V, int qha_method)
   {
     if (T<0) return 0;
 
-    switch(method){
+    switch(qha_method){
       case (QHA3P_CALC):
         for (int i=eos.E.lrows; i<=eos.E.urows; i++){
           eos.E[i] = FreeEnergyTE(T, i-1);
@@ -1229,7 +1229,7 @@ namespace apl
         }
         break;
     }
-    if (includeElectronicContribution) eos.E += FreeEnergySommerfeld(T);
+    if (includeElectronicContribution) eos.E += electronicFreeEnergySommerfeld(T);
     eos.fit();
     return eos.eval(V);
   }
@@ -1251,6 +1251,9 @@ namespace apl
     return EOS_poly(V, fitEOS_poly(xvolumes, U));
   }
 
+  /** Free energy (without electronic contribution) for a calculation at specific
+   *  volume (given by id).
+   */
   double QHAN::FreeEnergy(double T, int id)
   {
     return eos_vib_thermal_properties[id].getVibrationalFreeEnergy(T, apl::eV)
@@ -1275,7 +1278,9 @@ namespace apl
   }
 
   /** Calculates electronic free energy using integration over DOS.
-   * Currently this function does not work (to be fixed in the future)
+   *  Currently this function does not work (to be fixed in the future)
+   *
+   *  @param id selects the volume at which corresponding data was obtained 
    */
   double QHAN::electronicFreeEnergy(double T, int id)
   {
@@ -1302,10 +1307,12 @@ namespace apl
     return FelecT;
   }
 
-  /** Calculate equilibrium volume for a given temperature.  */
-  double QHAN::getEqVolumeT(double T, int method)
+  /** Calculate equilibrium volume for a given temperature.
+   * @param qha_method defines what type of QHA calculation is performed.
+   */
+  double QHAN::getEqVolumeT(double T, int qha_method)
   {
-    switch(method){
+    switch(qha_method){
       case (QHA3P_CALC):
         for (int i=eos.E.lrows; i<=eos.E.urows; i++){
           eos.E[i] = FreeEnergyTE(T, i-1);
@@ -1319,7 +1326,7 @@ namespace apl
         break;
     }
 
-    if (includeElectronicContribution) eos.E += FreeEnergySommerfeld(T);
+    if (includeElectronicContribution) eos.E += electronicFreeEnergySommerfeld(T);
     eos.fit();
 
     return eos.Veq;
@@ -1420,27 +1427,30 @@ namespace apl
    * For T=0K function returns 0, negative temperatures are ignored.
    *
    * @param T is the temperature at which the calculation is done.
-   * @return volumentric thermal expansion coefficient.
+   * @param eos_method defines which model is used for EOS fit
+   * @return volumetric thermal expansion coefficient.
    */
-  double QHAN::ThermalExpansion(double T, int method)
+  double QHAN::ThermalExpansion(double T, int eos_method)
   {
     if (!(T>0)) return 0;
 
     double dT = DCOEFF*T;
-    return 0.5*(getEqVolumeT(T+dT,method)-getEqVolumeT(T-dT,method))/dT/
-           getEqVolumeT(T,method);
+    return 0.5*(getEqVolumeT(T+dT,eos_method)-getEqVolumeT(T-dT,eos_method))/dT/
+           getEqVolumeT(T,eos_method);
   }
 
   /** Calculates isochoric specific heat as a temperature derivative of free
    * energy using central finite differences method.
+   *
+   * @param eos_method defines which model is used for EOS fit
    */
-  double QHAN::IsochoricSpecificHeat(double T, double V, int method)
+  double QHAN::IsochoricSpecificHeat(double T, double V, int eos_method)
   {
     double dT = DCOEFF*T;
     double CV = 0;
     if (T>0){
-      CV = -(FreeEnergyFit(T+dT,V,method)-2*FreeEnergyFit(T,V,method)
-             +FreeEnergyFit(T-dT,V,method));
+      CV = -(FreeEnergyFit(T+dT,V,eos_method)-2*FreeEnergyFit(T,V,eos_method)
+             +FreeEnergyFit(T-dT,V,eos_method));
       CV *= T/pow(dT,2);
     }
 
@@ -1449,15 +1459,18 @@ namespace apl
 
   /** Calculates entropy as a temperature derivative of free energy using
    * central finite differences method.
+   *
+   * @param eos_method defines which model is used for EOS fit
    */
-  double QHAN::Entropy(double T, double V, int method)
+  double QHAN::Entropy(double T, double V, int eos_method)
   {
     double dT = DCOEFF*T;
-    return -0.5*(FreeEnergyFit(T+dT, V, method) - FreeEnergyFit(T-dT, V, method))/dT;
+    return -0.5*(FreeEnergyFit(T+dT,V,eos_method)-FreeEnergyFit(T-dT,V,eos_method))/dT;
   }
 
-
-  /** Calculates DOS value at Fermi level using linear tetrahedron method. */
+  /** Calculates DOS value at Fermi level using linear tetrahedron method. 
+   *  For the details check: https://doi.org/10.1103/PhysRevB.49.16223
+   */
   xvector<double> QHAN::DOSatEf()
   {
     xvector<double> ET(4); // energy eigenvalues at corners of tetrahedra
@@ -1516,7 +1529,7 @@ namespace apl
   }
 
   /** Calculates electronic free energy using Sommerfeld expansion. */
-  xvector<double> QHAN::FreeEnergySommerfeld(double T)
+  xvector<double> QHAN::electronicFreeEnergySommerfeld(double T)
   {
     xvector<double> F_Som = DOS_Ef;
     for (int i=F_Som.lrows; i<=F_Som.urows; i++){
@@ -1545,7 +1558,6 @@ namespace apl
   {
     double gamma = 0;
     double V0 = GPvolumes[1];
-    //double w0 = xomega[2];
     double w  = extrapolateFrequency(V, xomega);
 
     double dwdV = 0, d2wdV2 = 0;
@@ -1555,14 +1567,16 @@ namespace apl
       d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
         pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
 
-      //gamma = -V0/w0*(dwdV + d2wdV2 * (V-V0));
       gamma = -V/w*(dwdV + d2wdV2 * (V-V0));
     }
 
     return gamma;
   }
 
-  /* Vibrational free energy obtained using Taylor expansion of frequencies.*/
+  /* Free energy (total energy + vibrational contribution) obtained using Taylor 
+   * expansion of frequencies.
+   * This function is related to QHA3P and SCQHA methods.
+   */
   double QHAN::FreeEnergyTE(double T, int Vid)
   {
     double w = 0.0; // extrapolated frequency at V_id volume
@@ -1592,7 +1606,8 @@ namespace apl
     return F + E0_V[Vid];
   }
 
-  /* Vibrational internal energy obtained using Taylor expansion of frequencies.*/
+  /* Vibrational internal energy obtained using Taylor expansion of frequencies.
+   * This function is related to QHA3P and SCQHA methods. */
   double QHAN::InternalEnergyTE(double T, double V)
   {
     double U = 0.0, ui = 0.0,  w = 0.0; 
@@ -1653,7 +1668,7 @@ namespace apl
     return VPgamma;
   }
 
-  /** Performes SCQHA calculation.
+  /** Performs SCQHA calculation.
    *  Here there are two implementations:
    *  1) perform self-consistent loop for initial nonzero temperature and extrapolate
    *  the volume at next temperature step using V(T+dT) ~ (1+beta dT)*V.
@@ -1722,7 +1737,7 @@ namespace apl
 
     double T = Temperatures[0];
 
-    // self-consistent loop for initial temperature as given by user
+    // self-consistent loop for initial temperature (defined by user)
     int iter=1;
     while (iter <= max_scqha_iteration){
       Pe   = dEOS_poly(V, eos.p);
@@ -1759,6 +1774,7 @@ namespace apl
     double CV      = 0.0;  // isochoric specific heat
     double GP      = 0.0;  // average Grueneisen parameter
     double beta    = 0.0;  // coefficient of thermal expansion
+    double d2wdV2  = 0.0;  // second derivative of frequency w.r.t volume
 
     uint NIrQpoints = omegaV_mesh.size(); // number of irreducible q-points
     int NQpoints = 0; // the total number of q-points (to be determined in loop)
@@ -1820,8 +1836,8 @@ namespace apl
             fi += KBOLTZEV*T*log(1-exp(-w/KBOLTZEV/T));
             fi *= qpWeights[q];
 
-            double d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
-                             pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
+            d2wdV2 = (xomega[1]+xomega[3]-2.0*xomega[2])/
+                      pow(0.5*(GPvolumes[0]-GPvolumes[2]),2);
             d2wdV2 *= THz2Hz*PLANCKSCONSTANTEV_h;
 
             gamma = extrapolateGamma(V, xomega);
@@ -1886,6 +1902,7 @@ namespace apl
   {
     eos.method = eos_method;
 
+    // type of qha calculation
     string qha;
     switch(qha_method){
       case (QHA3P_CALC):
@@ -1897,7 +1914,8 @@ namespace apl
         break;
     }
 
-    // the name of the output file depends on the used EOS fit method
+    // the name of the output file depends on the used EOS fit method and on type of
+    // QHA calculation
     ofstream file;
     string filename;
     switch(eos_method){
@@ -1969,7 +1987,7 @@ namespace apl
           break;
       }
 
-      if (includeElectronicContribution) eos.E += FreeEnergySommerfeld(T);
+      if (includeElectronicContribution) eos.E += electronicFreeEnergySommerfeld(T);
 
       // stop if energy minimum is no longer within a given set of volumes
       if (!isMinimumWithinBounds(eos.E)){
@@ -2035,7 +2053,7 @@ namespace apl
     for (int Tid = 0; Tid < Ntemperatures; Tid++){
       for (int Vid = 0; Vid < N_EOSvolumes; Vid++){
         T = Temperatures[Tid];
-        if (includeElectronicContribution) Felec = FreeEnergySommerfeld(T);
+        if (includeElectronicContribution) Felec = electronicFreeEnergySommerfeld(T);
         file << setw(TW) << EOSvolumes[Vid]    << setw(SW) << ' '
              << setw(TW) << FreeEnergy(T, Vid) << setw(SW) << ' '
              << setw(TW) << Felec[Vid+1]       << setw(SW) << ' '
@@ -2094,12 +2112,13 @@ namespace apl
   }
 
 
-  /** Writes average Gruneisen parameter, which is calculated using finite
-   *  difference method
+  /** Writes average Grueneisen parameter, which is calculated using finite
+   *  difference method and isochoric specific heat
+   *  Output file: "aflow.qha.gp.avg.out"
    */
   void QHAN::writeAverageGP_FD()
   {
-    string function = "QHAN::writeGPmeshFD()";
+    string function = "QHAN::writeAverageGP_FD";
     string msg = "Writing T-dependence of average Grueneisen parameter.";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
         _LOGGER_MESSAGE_);
@@ -2129,7 +2148,7 @@ namespace apl
     file.close();
   }
 
-  /** Writes mode-dependent Grueneisen parameter calculated at each q-point in IBZ
+  /** Writes mode-dependent Grueneisen parameter calculated at each q-point in IBZ.
    */
   void QHAN::writeGPmeshFD()
   {
@@ -2142,6 +2161,7 @@ namespace apl
     file.open((DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_GP_MESH_FILE).c_str());
     file.precision(6);
 
+    // write header
     file << "#" << setw(TW) << "Grueneisen" << setw(SW) << ' ' <<
                    setw(TW) << "Freq(THz)"  << setw(SW) << ' ' <<
                    setw(TW) << "phonon_mode\n";

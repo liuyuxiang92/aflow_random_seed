@@ -1520,9 +1520,7 @@ namespace KBIN {
           kflags.KBIN_PHONONS_CALCULATION_SCQHA || kflags.KBIN_PHONONS_CALCULATION_SCQHA_A || kflags.KBIN_PHONONS_CALCULATION_SCQHA_B || kflags.KBIN_PHONONS_CALCULATION_SCQHA_C ||
           kflags.KBIN_PHONONS_CALCULATION_QHA3P || kflags.KBIN_PHONONS_CALCULATION_QHA3P_A || kflags.KBIN_PHONONS_CALCULATION_QHA3P_B || kflags.KBIN_PHONONS_CALCULATION_QHA3P_C;
     if (NEW_QHA && run_any_qha){
-      cout << "QHA run\n";
-
-      apl::QHAN qha(xinput, aflags, kflags, xflags, &AflowIn, USER_TPT, supercell_opts,
+      apl::QHAN qha(USER_TPT, xinput, aflags, kflags, xflags, &AflowIn, supercell_opts,
           messageFile, oss);
       qha.apl_options.flag("AUTO_DIST", USER_AUTO_DISTORTIONS);
       qha.apl_options.flag("DPM", USER_DPM);
@@ -1540,6 +1538,10 @@ namespace KBIN {
           aurostd::utype2string<int>(USER_DOS_NPOINTS));
       qha.apl_options.push_attached("DOS_SMEAR",
           aurostd::utype2string<double>(USER_DOS_SMEAR));
+      qha.apl_options.push_attached("DOS_NPOINTS",
+          aurostd::utype2string<int>(USER_DOS_NPOINTS));
+      qha.apl_options.push_attached("BAND_NPOINTS",
+          aurostd::utype2string<int>(USER_DC_NPOINTS));
 
       qha.run();
       return;
