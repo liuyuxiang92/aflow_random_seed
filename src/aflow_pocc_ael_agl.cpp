@@ -791,7 +791,7 @@ namespace pocc {
     double agl_heat_capacity_Cv_300K, agl_heat_capacity_Cp_300K;
     double agl_vibrational_free_energy_300K_cell, agl_vibrational_free_energy_300K_atom;
     double agl_vibrational_entropy_300K_cell, agl_vibrational_entropy_300K_atom;	
-    double agl_thermal_conductivity_300K;
+    double agl_thermal_conductivity_300K = 0.0;
     vector<double> agl_temperature;
     vector<double> agl_gibbs_energy_atom;
     vector<double> agl_vibrational_energy_atom;
