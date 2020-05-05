@@ -322,7 +322,7 @@ namespace AGL_functions {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     ostringstream aus;
     vector<string> vfile, dfile;
-    string vfilename, dfilename, ffilename;
+    string vfilename = "", dfilename = "", ffilename = "";
     bool vfileexist = false;
     bool skipdir = false;
     aurostd::string2tokens(dirrunname, dfile, "/");
