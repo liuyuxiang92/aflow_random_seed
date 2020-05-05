@@ -284,7 +284,7 @@ namespace pocc {
     double Cauchy_ave, Cauchy_val, Cauchy_min, Cauchy_max;
     xmatrix<double> elastic_const(6, 6), elastic_const_inv(6, 6);
 
-    double kval, kvalsq;
+    double kval = 0.0, kvalsq = 0.0;
     stringstream ossmain, ossfull;
 
     if(LDEBUG){cerr << soliloquy << " v_temperatures=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",") << endl;}  //CO20200404
