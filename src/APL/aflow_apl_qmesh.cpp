@@ -652,7 +652,7 @@ namespace apl {
     generateAllTetrahedra(tetra_init);
   }
 
-  //buildInitialTetrahedra////////////////////////////////////////////////////
+  //initializeTetrahedra//////////////////////////////////////////////////////
   // Initializes the six tetrahedra of the microcell. For the numbered
   // corners, see Fig. 5 in DOI 10.1103/PhysRevB.49.16223.
   vector<vector<xvector<int> > > QMesh::initializeTetrahedra() {

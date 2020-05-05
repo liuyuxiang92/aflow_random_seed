@@ -2041,12 +2041,11 @@ namespace apl {
 
   //ME20191219
   void Supercell::getFullBasisAGROUP() {
-    stringstream message;
-    message << "Calculating the full basis for the site point groups of the supercell.";
+    string message = "Calculating the full basis for the site point groups of the supercell.";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!SYM::CalculateSitePointGroup_EquivalentSites(_scStructure, _sym_eps)) {
       string function = "apl::Supercell::getFullBasisAGROUP()";
-      message << "Could not calculate the bases of the site point groups.";
+      message = "Could not calculate the bases of the site point groups.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
