@@ -91,19 +91,32 @@ namespace aurostd {
     //for mac these numbers can be QUITE large, so better to be safe and return unsigned long long int
     //see here: http://elliotth.blogspot.com/2012/04/gettid-on-mac-os.html
     //also for macs: pid!=tid
-#ifdef _MACOSX_
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
-    uint64_t tid64;
-    pthread_threadid_np(NULL, &tid64);
-    pid_t tid = (pid_t)tid64;
-#else
-#include <sys/syscall.h>  //CO20200502 - need for gettid()
-    pid_t tid = syscall(__NR_gettid);
-#endif
-    return (unsigned long long int)tid;
-#else
-    return (unsigned long long int)gettid();
-#endif
+    #ifdef _MACOSX_
+      #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
+        uint64_t tid64;
+        pthread_threadid_np(NULL, &tid64);
+        pid_t tid = (pid_t)tid64;
+        return (unsigned long long int)tid;
+      #else
+      //////////////////////////////////////////////////////////
+        #ifdef __GLIBC__
+          #include <sys/syscall.h>  //CO20200502 - need for gettid()
+          pid_t tid = syscall(__NR_gettid);
+          return (unsigned long long int)tid;
+        #else //ONLY if _MACOSX_ AND not __GLIBC__
+          return (unsigned long long int)getpid();
+        #endif
+        //////////////////////////////////////////////////////////
+      #endif  //END _MACOSX_
+    #else //if NOT _MACOSX_
+    //////////////////////////////////////////////////////////
+      #ifdef __GLIBC__
+        return (unsigned long long int)gettid();
+      #else //for example CYGWIN
+        return (unsigned long long int)getpid();
+      #endif
+    //////////////////////////////////////////////////////////
+    #endif
   }
 }
 
