@@ -819,7 +819,7 @@ namespace KBIN {
         Krun=FALSE;
         return Krun;
       }
-      aus << "00000  MESSAGE GEOM  IMPLITIC Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetVolume(factor);
       aus << "00000  MESSAGE GEOM  IMPLITIC New Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
