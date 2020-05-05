@@ -909,7 +909,7 @@ namespace KBIN {
       double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME+=",FALSE);
       aus << "00000  MESSAGE GEOM  IMPLICIT Volume += " << factor << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aus << "00000  MESSAGE GEOM  IMPLITIC Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      aus << "00000  MESSAGE GEOM  IMPLICIT Old Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xaims.str.SetVolume(xaims.str.Volume()+factor);
       aus << "00000  MESSAGE GEOM  IMPLITIC New Volume= " << xaims.str.Volume() << " " << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
