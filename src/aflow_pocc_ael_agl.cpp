@@ -26,7 +26,7 @@
 // ***************************************************************************
 namespace pocc {
   void POccCalculator::calculateElasticProperties(const vector<double>& v_temperatures) {
-    bool ael_run_postprocess, ael_write_full_results;
+    bool ael_run_postprocess = false, ael_write_full_results = false;
     vector<double> Bvoigt, Breuss, Bvrh, Gvoigt, Greuss, Gvrh, Poisson_ratio;
     vector<vector<vector<double> > > elastic_tensor_list, compliance_tensor_list;
     // for (uint i = 0; i < v_temperatures.size(); i++) {
