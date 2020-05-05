@@ -80,7 +80,7 @@ namespace pocc {
       cerr << soliloquy << " directory=[" << m_aflags.Directory << "]" << endl;
     }
     double ael_bulk_modulus_voigt = 0.0, ael_bulk_modulus_reuss = 0.0, ael_bulk_modulus_vrh = 0.0;
-    double ael_shear_modulus_voigt, ael_shear_modulus_reuss, ael_shear_modulus_vrh;
+    double ael_shear_modulus_voigt = 0.0, ael_shear_modulus_reuss = 0.0, ael_shear_modulus_vrh = 0.0;
     double ael_poisson_ratio;
     // double elastic_const;
     // vector<double> elastic_const_row;
