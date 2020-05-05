@@ -14839,7 +14839,7 @@ string xstructure::findsym2print(double tolerance) {
 xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
   string soliloquy="Rotate():"; //CO20190520
-  if(LDEBUG) { //CO190520
+  if(LDEBUG) { //CO20190520
     cerr << soliloquy << " a=" << endl;cerr << a << endl; //CO20190520
     cerr << soliloquy << " a.origin=" << a.origin << endl; //CO20190520
     cerr << soliloquy << " rm=" << endl;cerr << rm << endl; // ME20200204
