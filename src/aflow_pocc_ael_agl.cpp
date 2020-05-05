@@ -144,7 +144,7 @@ namespace pocc {
     stringstream aflow_elastic_tensor;
     stringstream aflow_compliance_tensor;
     vector<string> vline, tokens, vfiles;
-    bool aelfilezipped;
+    bool aelfilezipped = false;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
       pocc_directory_abs=m_aflags.Directory+"/"+m_ARUN_directories[isupercell];
