@@ -25,6 +25,7 @@ namespace apl {
   PhononDispersionCalculator::PhononDispersionCalculator(PhononCalculator& pc) {
     free();
     _pc = &pc;
+    _pc_set = true;
     _system = _pc->getSystemName();  // ME20190614
   }
 
@@ -45,6 +46,7 @@ namespace apl {
     _frequencyFormat = that._frequencyFormat;
     _freqs = that._freqs;
     _pc = that._pc;
+    _pc_set = that._pc_set;
     _pb = that._pb;
     _qpoints = that._qpoints;
     _system = that._system;
@@ -59,6 +61,7 @@ namespace apl {
     _qpoints.clear();
     _freqs.clear();
     _frequencyFormat = apl::NONE;
+    _pc_set = false;
     _pb.clear();
     _system = "";
     _temperature = 0.0;  //ME20190614
@@ -67,6 +70,7 @@ namespace apl {
   void PhononDispersionCalculator::clear(PhononCalculator& pc) {
     free();
     _pc = &pc;
+    _pc_set = true;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -76,10 +80,13 @@ namespace apl {
       const string& USER_DC_INITLABELS,
       int USER_DC_NPOINTS, 
       bool CARTESIAN_COORDS) {
+    string function = "apl::PhononDispersionCalculator::initPathCoords():";
+    string message = "";
+    if (!_pc_set) {
+      message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     if(USER_DC_INITCOORDS.empty() || USER_DC_INITLABELS.empty()) {
-      //ME20191031 - use xerror
-      //throw APLRuntimeError("apl::PhononDispersionCalculator::initPathCoords; Inputs are empty.");
-      string function = "apl::PhononDispersionCalculator::initPathCoords";
       string message = "Inputs are empty.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
@@ -89,6 +96,11 @@ namespace apl {
   }
 
   void PhononDispersionCalculator::initPathLattice(const string& USER_DC_INITLATTICE,int USER_DC_NPOINTS){
+    if (!_pc_set) {
+      string function = "apl::PhononDispersionCalculator::initPathLattice():";
+      string message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     string lattice = USER_DC_INITLATTICE;
     if (lattice.empty()) {
       xstructure a(_pc->getInputCellStructure());
@@ -190,6 +202,11 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
 
   void PhononDispersionCalculator::calc(const IPCFreqFlags frequencyFormat) {
+    if (!_pc_set) {
+      string function = "apl::PhononDispersionCalculator::calc():";
+      string message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     // Save
     _frequencyFormat = frequencyFormat;
 
@@ -258,16 +275,18 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
 
   void PhononDispersionCalculator::writePDIS(const string& directory) {
+    string function = "apl::PhononDispersionCalculator::writePDIS():";
+    string message = "";
+    if (!_pc_set) {
+      message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE); //ME20181226
-    string message = "Writing dispersion curves into file " + filename + ".";
+    message = "Writing dispersion curves into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
     //CO START
-    //ofstream outfile("PDIS",ios_base::out);
     stringstream outfile;
-    //if( !outfile.is_open() ) {
-    //  throw apl::APLRuntimeError("Cannot open output PDIS file.");
-    //}
     //CO END
 
     // Write header
@@ -386,27 +405,18 @@ namespace apl {
       p++;
     }
 
-    //CO START
     aurostd::stringstream2file(outfile, filename); //ME20181226
     if (!aurostd::FileExist(filename)) { //ME20181226
-      string function = "PhononDispersionCalculator::writePDIS()";
       message = "Cannot open output file " + filename + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-      //    throw apl::APLRuntimeError("Cannot open output PDIS file.");
     }
-    //
-    //outfile.clear();
-    //outfile.close();
-    //CO END
 
     //PN //PN20180705
     string hskptsfile = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HSKPTS_FILE); //ME20181226
     aurostd::stringstream2file(ouths, hskptsfile); //ME20181226
     if (!aurostd::FileExist(hskptsfile)) { //ME20181226
-      string function = "PhononDispersionCalculator::writePDIS()";
       message = "Cannot open output file " + hskptsfile + "."; //ME20181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-      //    throw apl::APLRuntimeError("Cannot open output aflow.apl_hskpoints.out file.");
     }
     //PN
   }
@@ -444,14 +454,19 @@ namespace apl {
   //ME20190614 START
   // Write the eigenvalues into a VASP EIGENVAL-formatted file
   void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
+    string function = "PhononDispersionCalculator::writePHEIGENVAL()";
+    string message = "";
+    if (!_pc_set) {
+      message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHEIGENVAL_FILE);
-    string message = "Writing phonon eigenvalues into file " + filename + ".";
+    message = "Writing phonon eigenvalues into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     stringstream eigenval;
     eigenval << createEIGENVAL();
     aurostd::stringstream2file(eigenval, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "PhononDispersionCalculator::writePHEIGENVAL()";
       message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
@@ -473,6 +488,11 @@ namespace apl {
   }
 
   xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
+    if (!_pc_set) {
+      string function = "apl::PhononDispersionCalculator::createEIGENVAL():";
+      string message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     xEIGENVAL xeigen;
     stringstream outfile;
     // Header values
@@ -523,13 +543,18 @@ namespace apl {
 
   // Write the k-point path into a VASP KPOINTS-formatted file
   void PhononDispersionCalculator::writePHKPOINTS(const string& directory) {
+    string function = "PhononDispersionCalculator::writePHKPOINTS()";
+    string message = "";
+    if (!_pc_set) {
+      message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHKPOINTS_FILE);
     stringstream kpoints;
     kpoints << _pb.createKPOINTS(_pc->getSupercell());
     aurostd::stringstream2file(kpoints, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = "PhononDispersionCalculator::writePHKPOINTS()";
-      string message = "Cannot open output file " + filename + ".";
+      message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }

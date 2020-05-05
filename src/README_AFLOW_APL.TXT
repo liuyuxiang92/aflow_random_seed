@@ -95,8 +95,8 @@ forces. This can be achieved in one of two ways:
 
       [AFLOW_APL]RELAX_COMMENSURATE=ON
 
-    The default is ON. If this option is OFF, APL will use the k-point settings for RELAX runs.
-    See README_AFLOW.TXT for more information.
+    The default is ON. If this option is OFF, APL will use the k-point settings for AFLOW RELAX
+    runs. See README_AFLOW.TXT for more information.
 
     NOTE: Relaxations will be skipped when a PHPOSCAR file is present (see below).
 
@@ -267,7 +267,7 @@ LCALCEPS, the value DEFAULT_APL_USE_LEPSILON in the aflow.rc file needs to be se
 
 If NBANDS is set in the parent aflow.in file, APL will scale the number of bands automatically in
 the supercell file. For example, if NBANDS = 20 and a 2x2x2 supercell is used, NBANDS will be set
-to 80 in the supercell calculations.
+to 160 in the supercell calculations.
 
 2.2. Direct Method Parameters
 

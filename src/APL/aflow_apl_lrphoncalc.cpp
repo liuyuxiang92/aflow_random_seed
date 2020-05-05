@@ -47,6 +47,7 @@ namespace apl {
   void LinearResponsePC::clear(Supercell& sc) {
     free();
     _supercell = &sc;
+    _sc_set = true;
   }
 
   void LinearResponsePC::copy(const LinearResponsePC& that) {
@@ -57,6 +58,7 @@ namespace apl {
     _forceConstantMatrices = that._forceConstantMatrices;
     _isPolarMaterial = that._isPolarMaterial;
     _supercell = that._supercell;
+    _sc_set = that._sc_set;
     xInputs = that.xInputs;
   }
 
@@ -81,6 +83,11 @@ namespace apl {
 
   bool LinearResponsePC::runVASPCalculations(_xinput& xInput, _aflags& _aflowFlags,
       _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, bool zerostate_chgcar) {
+    if (!_sc_set) {
+      string function = "apl::LinearResponsePC::runVASPCalculations():";
+      string message = "Supercell pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     if (zerostate_chgcar) {
       string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
       pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
@@ -172,7 +179,6 @@ namespace apl {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
-    string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
 
     // Read vasprun.xml
     string filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml.static");
@@ -207,6 +213,7 @@ namespace apl {
       }
     }
 
+    string function = "apl::LinearResponsePC::readForceConstantsFromVasprun()";
     // Check that the file was read successfully.
     if (iline == nlines) {
       message << "Hessian tag not found or incomplete.";
@@ -258,9 +265,14 @@ namespace apl {
 namespace apl {
 
   void LinearResponsePC::saveState(const string& filename) {
-    if (xInputs.size() == 0) return;  // Nothing to write
     string function = "apl::LinearResponsePC::saveState()";
-    string message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
+    string message = "";
+    if (!_sc_set) {
+      message = "Supercell pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    if (xInputs.size() == 0) return;  // Nothing to write
+    message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
@@ -290,7 +302,12 @@ namespace apl {
   // calculations. It is still in development and has only been tested with VASP.
   void LinearResponsePC::readFromStateFile(const string& filename) {
     string function = "apl::LinearResponsePC::readFromStateFile()";
-    string message = "Reading state of the phonon calculator from " + filename + ".";
+    string message = "";
+    if (!_sc_set) {
+      message = "Supercell pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
+    message = "Reading state of the phonon calculator from " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";

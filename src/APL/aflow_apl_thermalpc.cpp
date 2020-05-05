@@ -47,14 +47,14 @@ namespace apl {
     xStream::initialize(mf, oss);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, ostream& oss, string directory) : xStream() {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, string directory, ostream& oss) : xStream() {
     free();
     xStream::initialize(mf, oss);
     _directory = directory;
     initialize(dosc.getBins(), dosc.getDOS(), dosc._system);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, ostream& oss, string directory) : xStream() {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, string directory, ostream& oss) : xStream() {
     free();
     xStream::initialize(mf, oss);
     _directory = directory;

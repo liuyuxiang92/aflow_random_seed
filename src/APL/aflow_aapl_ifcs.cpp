@@ -152,6 +152,7 @@ namespace apl {
       try {
         clst.readClusterSetFromFile(clust_hib_file);
       } catch (aurostd::xerror& excpt) {
+        awakeClusterSet = false;
         string message = excpt.error_message;
         pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
@@ -225,8 +226,14 @@ namespace apl {
         pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         zerostate_chgcar = false;
       } else {
-        chgcar_file = aurostd::CleanFileName("../" + dirs[d] + "/CHGCAR.static");
-        if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
+        // There are two possible cases: the CHGCAR file has already been
+        // calculated, so take the filename from EFileExist; or it will be
+        // calculated after all directories have been set up, in which case
+        // KZIP_BIN can be used for the compression extension.
+        string chgcar_file_base = aurostd::CleanFileName("../" + dirs[d] + "/CHGCAR.static");
+        if (!aurostd::EFileExist(chgcar_file_base, chgcar_file) && kflags.KZIP_COMPRESS) {
+          chgcar_file = chgcar_file_base + "." + kflags.KZIP_BIN;
+        }
       }
     }
 

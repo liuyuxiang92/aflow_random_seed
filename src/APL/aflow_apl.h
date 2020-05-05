@@ -751,6 +751,7 @@ namespace apl {
     protected:
       // Aflow's stuff required for running some routines
       Supercell* _supercell;
+      bool _sc_set;
 
       vector<_xinput> xInputs;
 
@@ -769,6 +770,9 @@ namespace apl {
       xmatrix<double> _dielectricTensor;
       string _directory;
 
+      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
+      bool calculateBornChargesDielectricTensor(const _xinput&);  // ME20191029
+
     private:
       void free();
       void copy(const ForceConstantCalculator&);
@@ -780,6 +784,13 @@ namespace apl {
 
       void writeHarmonicIFCs(const string&);
       void writeBornChargesDielectricTensor(const string&);
+
+      // Born charges + dielectric tensor
+      void readBornEffectiveChargesFromAIMSOUT(void);
+      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
+      void symmetrizeBornEffectiveChargeTensors(void);
+      void readDielectricTensorFromAIMSOUT(void);
+      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
 
       //void printForceConstantMatrices(ostream&);  // OBSOLETE ME20200504 - not used
       //void printFCShellInfo(ostream&);  // OBSOLETE ME20200504 - not used
@@ -793,7 +804,6 @@ namespace apl {
       void clear(Supercell&);
 
       virtual bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool) {return false;};  // ME20191029
-      bool runVASPCalculationsBE(_xinput&, _aflags&, _kflags&, _xflags&, string&, uint);
       void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME20200218
 
       bool run();  // ME20191029
@@ -806,13 +816,6 @@ namespace apl {
       const string& getDirectory() const;
       void setDirectory(const string&);
 
-      // Born charges + dielectric tensor
-      bool calculateBornChargesDielectricTensor(const _xinput&);  // ME20191029
-      void readBornEffectiveChargesFromAIMSOUT(void);
-      void readBornEffectiveChargesFromOUTCAR(const _xinput&);  //ME20190113
-      void symmetrizeBornEffectiveChargeTensors(void);
-      void readDielectricTensorFromAIMSOUT(void);
-      void readDielectricTensorFromOUTCAR(const _xinput&);  // ME20190113
       virtual void saveState(const string&) {}  // ME20200112
       virtual void readFromStateFile(const string&) {};  // ME20200112
   };
@@ -822,7 +825,7 @@ namespace apl {
 // "dirphoncalc.h"
 namespace apl {
   class DirectMethodPC : public ForceConstantCalculator {
-    protected:
+    private:
       //bool GENERATE_PLUS_MINUS;  //JAHNATEK ORIGINAL
       //CO START
       bool AUTO_GENERATE_PLUS_MINUS;
@@ -839,7 +842,6 @@ namespace apl {
       // of forces (for each atom of the supercell)
       vector<vector<vector<xvector<double> > > > _uniqueForces;
 
-    protected:
       void estimateUniqueDistortions(const xstructure&,
           vector<vector<xvector<double> > >&);
       void testDistortion(const xvector<double>&, const vector<_sym_op>&,
@@ -847,7 +849,6 @@ namespace apl {
           vector<xvector<double> >&,
           bool integrate_equivalent_distortions=true);  //CO20190114
       bool needMinus(uint atom_index, uint distortion_index, bool inequiv_only=true);  //CO //CO20190218
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
 
     public:
       DirectMethodPC(ostream& oss=std::cout);
@@ -857,7 +858,6 @@ namespace apl {
       ~DirectMethodPC();
       void clear(Supercell&);
 
-      bool calculateForceFields();  // ME20190412  //ME20191029
       // Easy access to global parameters
       //void setGeneratePlusMinus(bool b) { GENERATE_PLUS_MINUS = b; } //JAHNATEK ORIGINAL
       void setDistortionMagnitude(double f) { DISTORTION_MAGNITUDE = f; }
@@ -869,10 +869,9 @@ namespace apl {
       }  //CO
       void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO20190108
-      bool calculateForceConstants();  // ME20200211
 
       //void writeFORCES();  // OBSOLETE ME20200504 - not used
-      void writeDYNMAT();
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
       //void writeXCrysDenForces();  // OBSOLETE ME20200504 - not used
       void saveState(const string&);  // ME20200212
       void readFromStateFile(const string&);  // ME20200212
@@ -881,11 +880,13 @@ namespace apl {
       void copy(const DirectMethodPC&);
       void free();
       vector<vector<bool> > vvgenerate_plus_minus;  //ME20191029
+      bool calculateForceConstants();  // ME20200211
+      bool calculateForceFields();  // ME20190412  //ME20191029
       void completeForceFields();
       void projectToCartesianDirections();
       void buildForceConstantMatrices();
 
-      void writeForceField(stringstream&);
+      void writeDYNMAT();
   };
 }  // namespace apl
 
@@ -1013,6 +1014,7 @@ namespace apl {
       void copy(const LinearResponsePC&);
       bool runVASPCalculationsDFPT(_xinput&, _aflags&, _kflags&, _xflags&, string&);  //ME20190113  // ME20200213 - changed name
       bool readForceConstantsFromVasprun(_xinput&);  //ME20200211
+      bool calculateForceConstants();  //ME20200211
 
     public:
       LinearResponsePC(ostream& oss=std::cout);
@@ -1023,8 +1025,6 @@ namespace apl {
       void clear(Supercell&);
 
       bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
-      bool calculateForceConstants();  //ME20200211
-
       void saveState(const string&);  //ME20200212
       void readFromStateFile(const string&); //ME20200212
   };
@@ -1067,8 +1067,8 @@ namespace apl {
     public:
       QMesh(ostream& oss=std::cout);
       QMesh(ofstream&, ostream& os=std::cout);
-      QMesh(const xvector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
-      QMesh(const vector<int>&, const xstructure&, ofstream&, ostream& os=std::cout, bool=true, bool=true, string="./");
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, string directory="./", ostream& oss=std::cout);
+      QMesh(const vector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, string directory="./", ostream& oss=std::cout);
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();
@@ -1361,6 +1361,7 @@ namespace apl {
   class PhononDispersionCalculator {
     private:
       PhononCalculator* _pc;
+      bool _pc_set;
       PathBuilder _pb;
       void copy(const PhononDispersionCalculator&);
       void free();
@@ -1371,6 +1372,8 @@ namespace apl {
       //[OBSOLETE PN20180705]vector<double> path;       //[PINKU]
       //[OBSOLETE PN20180705]vector<int> path_segment;  //[PINKU]
       void calculateInOneThread(int, int);
+      bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
+      string _system;
 
     public:
       PhononDispersionCalculator();
@@ -1379,19 +1382,16 @@ namespace apl {
       PhononDispersionCalculator& operator=(const PhononDispersionCalculator&);
       ~PhononDispersionCalculator();
       void clear(PhononCalculator&);
-      void clear(PhononDispersionCalculator&);
       void initPathCoords(const string&,const string&,int,bool=false);  //CO20180406
       void initPathLattice(const string&, int);
       void setPath(const string&);
       void calc(const IPCFreqFlags);
       void writePDIS(const string&);
-      bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
       std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PN]
       //ME20190614 START
       xEIGENVAL createEIGENVAL();
       void writePHEIGENVAL(const string&);
       void writePHKPOINTS(const string&);
-      string _system;
       //ME20190614 STOP
       //[OBSOLETE PN20180705]std::vector<double> get_path() { return path; }                   //[PN]
       //[OBSOLETE PN20180705]std::vector<int> get_path_segment() { return path_segment; }      //[PN]
@@ -1437,6 +1437,7 @@ namespace apl {
   { //CO20200106 - patching for auto-indenting
     protected:
       PhononCalculator* _pc;
+      bool _pc_set;
       string _bzmethod;  //ME20190423
       std::vector<aurostd::xvector<double> > _qpoints;
       //std::vector<int> _qweights;  OBSOLETE ME20190423
@@ -1459,6 +1460,8 @@ namespace apl {
       //CO END
       void calculateFrequencies();
       void smearWithGaussian(vector<double>&, vector<double>&, double, double);  //ME20190614
+      void calcDosRS();
+      void calcDosLT();
 
     public:
       DOSCalculator();
@@ -1468,11 +1471,6 @@ namespace apl {
       ~DOSCalculator();
       void clear(PhononCalculator&);
       void initialize(const vector<xvector<double> >&, const string&);
-      // ME20190423 START
-      //virtual void rawCalc(int) {} OBSOLETE ME20190419
-      void calcDosRS();
-      void calcDosLT();
-      //ME20190423 END
       void calc(int);
       void calc(int, double);
       void calc(int, double, double, double);  //ME20200203
@@ -1552,8 +1550,8 @@ namespace apl {
     public:
       ThermalPropertiesCalculator(ostream& oss=std::cout);
       ThermalPropertiesCalculator(ofstream&, ostream& os=std::cout);
-      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, ostream& os=std::cout, string="./");
-      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, ostream& os=std::cout, string="./");
+      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, string directory="./", ostream& os=std::cout);
+      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, string directory="./", ostream& os=std::cout);
       ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
       ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
       ~ThermalPropertiesCalculator();
@@ -1612,11 +1610,11 @@ namespace apl {
     // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
     public:
       TCONDCalculator();
-      TCONDCalculator(PhononCalculator&, _aflags&);
+      TCONDCalculator(PhononCalculator&, const _aflags&);
       TCONDCalculator(const TCONDCalculator&);
       TCONDCalculator& operator=(const TCONDCalculator&);
       ~TCONDCalculator();
-      void clear(PhononCalculator&, _aflags&);
+      void clear(PhononCalculator&, const _aflags&);
       void initialize();
 
       aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
@@ -1641,7 +1639,8 @@ namespace apl {
       PhononCalculator* _pc;  // Reference to the phonon calculator
       QMesh* _qm;
       Logger _logger;  // The APL logger
-      _aflags* aflags;
+      _aflags aflags;
+      bool _pc_set;
 
       void free();
       void copy(const TCONDCalculator&);
@@ -1777,6 +1776,7 @@ namespace apl {
   class AtomicDisplacements {
     protected:
       PhononCalculator* _pc;
+      bool _pc_set;
 
     private:
       void free();

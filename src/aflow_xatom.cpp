@@ -2565,7 +2565,7 @@ void xstructure::copy(const xstructure& bstr) {
   // ----------------------------------
 }
 
-// ME20200220
+// ME20200220 - from CO's function in apl::Supercell
 void LightCopy(const xstructure& a, xstructure& b) {
   b.clear();
   stringstream POSCAR;

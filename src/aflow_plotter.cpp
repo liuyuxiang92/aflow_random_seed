@@ -82,7 +82,6 @@ namespace plotter {
     scheme = xopt.getattachedscheme("PLOTTER::TITLE");
     if (!scheme.empty()) plotoptions.push_attached("TITLE", scheme);
 
-
     // Get image format
     scheme = xopt.getattachedscheme("PLOTTER::PRINT");
     if (!scheme.empty()) plotoptions.push_attached("IMAGE_FORMAT", aurostd::tolower(scheme));
@@ -191,7 +190,7 @@ namespace plotter {
         << " size " << plotoptions.getattachedscheme("PLOT_SIZE") << " linewidth 2" << std::endl;
       out << "set output " << "'" << plotoptions.getattachedscheme("FILE_NAME_LATEX") << ".tex'" << std::endl;
       if (!plottitle.empty())
-        out << "set " << (multiplot?"multiplot layout 1,2 ":"")
+        out << "set " << (multiplot?"multiplot layout 1,2 ":"")  // ME20200313 - some machines require layout
           << "title '" << plottitle << "' offset 0, -0.5" << std::endl;
       if (plotoptions.flag("NOBORDER")) out << "unset border" << std::endl;
       out << "set object 1 rectangle from graph 0,0 to graph 1,1 fc"

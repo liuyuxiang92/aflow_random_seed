@@ -31,6 +31,7 @@ namespace apl {
   DOSCalculator::DOSCalculator(PhononCalculator& pc, const string& method, const vector<xvector<double> >& projections) {
     free();
     _pc = &pc;
+    _pc_set = true;
     initialize(projections, method);
   }
 
@@ -49,6 +50,7 @@ namespace apl {
 
   void DOSCalculator::copy(const DOSCalculator& that) {
     _pc = that._pc;
+    _pc_set = that._pc_set;
     _bzmethod = that._bzmethod;
     _qpoints = that._qpoints;
     _freqs = that._freqs;
@@ -87,11 +89,13 @@ namespace apl {
     _stepDOS = 0.0;
     _halfStepDOS = 0.0;
     _system = "";
+    _pc_set = false;
   }
 
   void DOSCalculator::clear(PhononCalculator& pc) {
     free();
     _pc = &pc;
+    _pc_set = true;
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -99,6 +103,10 @@ namespace apl {
   void DOSCalculator::initialize(const vector<xvector<double> >& projections, const string& method) {
     string function = "apl::DOSCalculator::initialize()";
     string message = "";
+    if (!_pc_set) {
+      message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     _bzmethod = method;
     _projections = projections;
     _system = _pc->getSystemName();
@@ -285,6 +293,11 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
   void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR,
       double fmin, double fmax) {
+    if (!_pc_set) {
+      string function = "DOSCalculator::calc()";
+      string message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     // Check parameters
     if (aurostd::isequal(fmax, fmin, _AFLOW_APL_EPS_)) {
       string function = "apl::DOSCalculator::calc()";
@@ -501,6 +514,11 @@ namespace apl {
   //ME20190423 END
 
   void DOSCalculator::writePDOS(const string& directory) {
+    if (!_pc_set) {
+      string function = "DOSCalculator::writePDOS()";
+      string message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     // Write PHDOS file
     //CO START
     //ofstream outfile("PDOS",ios_base::out);
@@ -544,6 +562,11 @@ namespace apl {
 
   //ME20190614 - writes phonon DOS in DOSCAR format
   void DOSCalculator::writePHDOSCAR(const string& directory) {
+    if (!_pc_set) {
+      string function = "DOSCalculator::writePHDOSCAR()";
+      string message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
     string message = "Writing phonon density of states into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
@@ -573,6 +596,11 @@ namespace apl {
   }
 
   xDOSCAR DOSCalculator::createDOSCAR() {
+    if (!_pc_set) {
+      string function = "DOSCalculator::createDOSCAR()";
+      string message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     xDOSCAR xdos;
     xdos.spin = 0;
     // Header values
@@ -660,6 +688,11 @@ namespace apl {
   //PN START
   void DOSCalculator::writePDOS(string path, string ex)  //[PN]
   {
+    if (!_pc_set) {
+      string function = "DOSCalculator::writePDOS()";
+      string message = "PhononCalculator pointer not set.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
     //CO START
     // Write PHDOS file
     stringstream outfile;
