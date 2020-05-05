@@ -642,7 +642,7 @@ The commands to create these output files are shown below:
 
         Examples:
           aflow --visualize_phonons --qpoint=0.5,0,0 --steps=40 --amplitude=0.3 --scell=3x3x3 -D ./
-          aflow --visualize_phonons --q=0,0,0;0.5,0.5,0.5 --branches=4,5,6 --format=XCRYSDEN --scell=4x4x2
+          aflow --visualize_phonons --q=0,0,0,0.5,0.5,0.5 --branches=4,5,6 --format=XCRYSDEN --scell=4x4x2
           aflow --visualize_phonons --q=0,0,0 --branches=1,2,3 --format=V_SIM --amplitude=0.2
 
 For XCRYSDEN, APL creates an animated structure (axsf) file for each phonon mode. These files
