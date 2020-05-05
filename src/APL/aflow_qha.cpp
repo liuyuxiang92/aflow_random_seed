@@ -450,14 +450,15 @@ double apl::EOSfit::eval(double Vin)
 //                         Definitions of QHA class members
 namespace apl
 {
-  QHAN::QHAN() { free(); }
+  QHAN::QHAN() { free(); xStream::free(); }
   QHAN::QHAN(const QHAN &qha){
-    free();
-    copy(qha);
+    free(); copy(qha);
+    xStream::free(); xStream::copy(qha);
   }
-  QHAN::~QHAN() { free(); }
+  QHAN::~QHAN() { xStream::free(); free(); }
   const QHAN& QHAN::operator=(const QHAN &qha){
     copy(qha);
+    xStream::copy(qha);
     return *this;
   }
 
@@ -471,8 +472,6 @@ namespace apl
    */
   void QHAN::free()
   {
-    messageFile = NULL;
-    oss = &cout;
     supercellopts.clear();
     isEOS = false; isGP_FD = false;
     ignore_imaginary = false;
@@ -524,8 +523,6 @@ namespace apl
 
     apl_options       = qha.apl_options;
     eos               = qha.eos;
-    messageFile       = qha.messageFile;
-    oss               = qha.oss;
     supercellopts     = qha.supercellopts;
     isEOS             = qha.isEOS;
     isGP_FD           = qha.isGP_FD;
@@ -590,14 +587,14 @@ namespace apl
           _xflags &xflags, string *aflowin, xoption &supercellopts,
           ofstream &messageFile, ostream &oss)
   {
+    xStream::initialize(messageFile, oss);
+
     string function = "QHAN::initialize()";
     string msg  = "Initializing QHA.";
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, messageFile, oss, 
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     free();
-
-    this->oss = &oss; this->messageFile = &messageFile;
 
     this->xinput = xinput; this->xflags = xflags;
     this->kflags = kflags; this->aflags = aflags;
@@ -769,7 +766,7 @@ namespace apl
 
     string function = "QHAN::run()";
     string msg = "Performing QHA calculation.";
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     try{
@@ -834,7 +831,7 @@ namespace apl
     }
     catch(aurostd::xerror &e){
       pflow::logger(e.whereFileName(),e.whereFunction(), e.what(), currentDirectory,
-          *messageFile, *oss, _LOGGER_ERROR_);
+          *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
       return;
     }
   }
@@ -890,8 +887,8 @@ namespace apl
       else{
         string msg = "QHA is not able to proceed: ";
         msg += subdirectories_static[i] + " is missing.\n";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
-           _LOGGER_WARNING_);
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_WARNING_);
         return 0;
       }
     }
@@ -910,7 +907,7 @@ namespace apl
   {
     string function = "QHAN::run_apl()";
     string msg = "Reading phonon DOS and dispersion relations.";
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     int Nqpoints = 0;
@@ -925,13 +922,13 @@ namespace apl
             xinput.xvasp.str.lattice, xinput.xvasp.str.atoms.at(at).fpos);
       }
 
-      apl::PhononCalculator phcalc(*messageFile, *oss);
+      apl::PhononCalculator phcalc(*p_FileMESSAGE, *p_oss);
       phcalc.initialize_supercell(xinput.getXStr());
       phcalc.getSupercell().build(supercellopts);
 
       auto_ptr<apl::ForceConstantCalculator> fccalc;
       apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(phcalc.getSupercell(),
-          *messageFile, *oss);
+          *p_FileMESSAGE, *p_oss);
 
       apl::PhononDispersionCalculator pdisc(phcalc);
 
@@ -993,8 +990,8 @@ namespace apl
         msg += subdirectories[i] + "folder were detected.\n";
         if (ignore_imaginary){
           msg += "They will be ignored. Check if results are still meaningful!\n";
-          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile,
-              *oss, _LOGGER_WARNING_);
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_WARNING_);
         }
         else{
           msg += "QHA calculation will be stopped after checking all available APL calculations.\n";
@@ -1002,8 +999,8 @@ namespace apl
           msg += "Workaround: adjust EOS_DISTORTION_RANGE to exclude problematic calculations or\n";
           msg += "ignore this error by setting IGNORE_IMAGINARY=ON.\n";
 
-          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile,
-              *oss, _LOGGER_ERROR_);
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_ERROR_);
           apl_data_calculated = false;
         }
       }
@@ -1045,7 +1042,7 @@ namespace apl
       }
       else {
         eos_vib_thermal_properties.push_back(ThermalPropertiesCalculator(dosc,
-              *messageFile));
+              *p_FileMESSAGE));
 
         // allocate memory at first run (entire chunk of memory is needed because
         // data will be reordered)
@@ -1073,7 +1070,7 @@ namespace apl
   {
     string function = "QHAN::read_static()";
     string msg = "";
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     xDOSCAR doscar;
@@ -1081,8 +1078,8 @@ namespace apl
     string  outcarfile, dosfile;
     for (uint i=0; i<subdirectories_static.size(); i++){
       msg = "Reading static data from " + subdirectories_static[i];
-      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
-        _LOGGER_MESSAGE_);
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
+          *p_oss, _LOGGER_MESSAGE_);
 
       outcarfile = subdirectories_static[i]+'/'+"OUTCAR.static";
       outcar.GetPropertiesFile(outcarfile);
@@ -1173,7 +1170,7 @@ namespace apl
             msg+="10\% for V="+apl::stringify(EOSvolumes[Vid])+'\n';
 
             pflow::logger(QHA_ARUN_MODE, "calcGamma()", msg, currentDirectory,
-                *messageFile, *oss, _LOGGER_MESSAGE_);
+                *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
             cout << xomega << '\n';
             cout << gp_fit_matrix * tmp << '\n';
             break;
@@ -1682,7 +1679,7 @@ namespace apl
     double Vtol = 1e-5;
 
     string function = "QHAN::run_scqha()";
-    pflow::logger(QHA_ARUN_MODE, function, "", currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, "", currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     // get equilibrium volume from the fit to EOS based on energies from static
@@ -1749,8 +1746,8 @@ namespace apl
     if (iter == max_scqha_iteration){
       string msg="Maximum number of iterations in self consistent loop is reached";
       msg += " at T="+apl::stringify(T)+"K.";
-      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
-        _LOGGER_MESSAGE_);
+      pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
+          *p_oss, _LOGGER_MESSAGE_);
     }
 
     double dT = (Temperatures[Ntemperatures-1]-Temperatures[0])/(Ntemperatures-1);
@@ -1796,8 +1793,8 @@ namespace apl
         if (iter == max_scqha_iteration){
           string msg="Maximum number of iterations in self consistent loop is reached";
           msg += " at T="+apl::stringify(T)+"K";
-          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, 
-              *oss, _LOGGER_MESSAGE_);
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, 
+              *p_oss, _LOGGER_MESSAGE_);
         }
       }
       else{
@@ -1933,7 +1930,7 @@ namespace apl
 
     string function = "QHAN::writeThermalProperties()";
     string msg = "Writing T-dependent properties to "+filename;
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     file.open(filename.c_str());
@@ -1993,8 +1990,8 @@ namespace apl
       if (!isMinimumWithinBounds(eos.E)){
         msg = "Stopping at T=" + apl::stringify(T) + " [K]";
         msg+= "since there is no free energy minimum within a given volume range.";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
-        _LOGGER_MESSAGE_);
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_MESSAGE_);
         break;
       }
 
@@ -2040,7 +2037,7 @@ namespace apl
   {
     string function = "QHA::writeFVT()";
     string msg = "Writing F(V,T) relations to file.";
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     ofstream file;
@@ -2071,7 +2068,7 @@ namespace apl
   {
     string function = "QHAN::writeGPpath()";
     string msg = "Calculate and save Grueneisen parameters along a path.";
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
     // we will save bands-projected Grueneisen parameter in xEIGENVAL
     xEIGENVAL GPpath(gp_ph_dispersions.front());
@@ -2120,7 +2117,7 @@ namespace apl
   {
     string function = "QHAN::writeAverageGP_FD";
     string msg = "Writing T-dependence of average Grueneisen parameter.";
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     ofstream file;
@@ -2154,7 +2151,7 @@ namespace apl
   {
     string function = "QHAN::writeGPmeshFD()";
     string msg = "Writing Grueneisen parameter calculated on mesh of q-points.";
-    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *messageFile, *oss,
+    pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     ofstream file;

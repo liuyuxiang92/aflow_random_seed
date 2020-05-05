@@ -1908,8 +1908,6 @@ namespace apl
       xoption apl_options;
       EOSfit eos;
     private:
-      ofstream *messageFile;
-      ostream *oss;
       xoption supercellopts;
       bool isEOS;
       bool isGP_FD;
