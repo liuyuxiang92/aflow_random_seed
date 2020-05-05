@@ -131,7 +131,7 @@ namespace pocc {
     double ael_bulk_modulus_voigt, ael_bulk_modulus_reuss, ael_bulk_modulus_vrh;
     double ael_shear_modulus_voigt, ael_shear_modulus_reuss, ael_shear_modulus_vrh;
     double ael_poisson_ratio;
-    double elastic_const;
+    double elastic_const = 0.0;
     vector<double> elastic_const_row;
     vector<vector<double> > elastic_tensor;
     double compliance_const = 0.0;
