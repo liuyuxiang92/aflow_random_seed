@@ -536,7 +536,7 @@ namespace AGL_functions {
     // string FileLockName = "agl.LOCK";
     // string AflowInName = _AFLOWIN_;
     // string FileLockName = _AFLOWLOCK_;    
-    string AflowInName, FileLockName;
+    string AflowInName = "", FileLockName = "";
 
     // string filedirname = aurostd::CleanFileName(directory) + "agl.LOCK";
     if (aurostd::FileExist(aurostd::CleanFileName(directory) + "agl.LOCK")) {
