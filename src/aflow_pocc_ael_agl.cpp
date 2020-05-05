@@ -632,7 +632,7 @@ namespace pocc {
 namespace pocc {
   void POccCalculator::calculateDebyeThermalProperties(const vector<double>& v_temperatures) {
     bool agl_run_postprocess, agl_write_full_results;
-    uint ntemperature, npressure;
+    uint ntemperature = 0, npressure = 0;
     double stemperature, spressure;
     vector<double> Debye_temperature, Debye_acoustic, Gruneisen, Cv300K, Cp300K, Fvib300K_atom, Fvib300K_cell, Svib300K_atom,  Svib300K_cell, kappa300K;
     vector<vector<double> > agl_temperatures, agl_gibbs_energies_atom, agl_vibrational_energies_atom;
