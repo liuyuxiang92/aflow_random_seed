@@ -1523,7 +1523,7 @@ namespace KBIN {
     if (NEW_QHA && run_any_qha){
       cout << "QHA run\n";
 
-      apl::QHAN qha(xinput, aflags, kflags, xflags, USER_TPT, supercell_opts,
+      apl::QHAN qha(xinput, aflags, kflags, xflags, &AflowIn, USER_TPT, supercell_opts,
           messageFile, oss);
       qha.apl_options.flag("AUTO_DIST", USER_AUTO_DISTORTIONS);
       qha.apl_options.flag("DPM", USER_DPM);

@@ -78,7 +78,7 @@ namespace apl {
     xInputs.clear();
     _bornEffectiveChargeTensor.clear();
     _dielectricTensor.clear();
-    _directory = "";
+    _directory = ".";
     _forceConstantMatrices.clear();
     _isPolarMaterial = false;
   }

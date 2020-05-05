@@ -577,16 +577,16 @@ namespace apl
 ///////////////////////////////////////////////////////////////////////////////
 
   QHAN::QHAN(_xinput &xinput, _aflags &aflags, _kflags &kflags, _xflags &xflags,
-              const string &tpt, xoption &supercellopts,
+              string *aflowin, const string &tpt, xoption &supercellopts,
               ofstream &messageFile, ostream &oss)
   {
-    initialize(xinput, aflags, kflags, xflags, tpt, supercellopts, messageFile, oss);
+    initialize(xinput, aflags, kflags, xflags, aflowin, tpt, supercellopts, messageFile, oss);
   }
 
   /** Used to initialize QHAN class with all the necessary data.
    */
   void QHAN::initialize(_xinput &xinput, _aflags &aflags, _kflags &kflags,
-          _xflags &xflags, const string &tpt, xoption &supercellopts,
+          _xflags &xflags, string *aflowin, const string &tpt, xoption &supercellopts,
           ofstream &messageFile, ostream &oss)
   {
     string function = "QHAN::initialize()";
@@ -602,6 +602,7 @@ namespace apl
     this->kflags = kflags; this->aflags = aflags;
 
     this->supercellopts = supercellopts;
+    this->aflowin = aflowin;
 
     currentDirectory = xinput.xvasp.Directory; // remember current directory
 
@@ -922,14 +923,13 @@ namespace apl
             xinput.xvasp.str.lattice,xinput.xvasp.str.atoms.at(at).fpos);
       }
 
-      Supercell supercell(xinput.xvasp.str, *messageFile, *oss, subdirectories[i]);
+      Supercell supercell(xinput.xvasp.str, *messageFile, subdirectories[i], *oss);
       supercell.build(supercellopts);
 
       auto_ptr<apl::ForceConstantCalculator> fccalc;
-      apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(supercell, xinput,
-          aflags, kflags, xflags, subdirectories[i], *messageFile);
+      apl::DirectMethodPC* dmPC = new apl::DirectMethodPC(supercell, *messageFile, *oss);
 
-      apl::PhononCalculator phcalc(supercell, *messageFile);
+      apl::PhononCalculator phcalc(*messageFile, *oss);
       apl::QMesh qmesh(*messageFile);
       apl::PhononDispersionCalculator pdisc(phcalc);
 
@@ -954,7 +954,7 @@ namespace apl
 
       // determine APL subdirectories: if it is first run skip to the next
       // volume calculation
-      if (fccalc->runVASPCalculations(false)){
+      if (fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, *aflowin, false)){
         apl_data_calculated = false;
         continue;
       }
@@ -982,7 +982,10 @@ namespace apl
       qmesh.initialize(dos_mesh, phcalc.getInputCellStructure());
       qmesh.makeIrreducible();
 
-      apl::DOSCalculator dosc(phcalc, qmesh, apl_options.getattachedscheme("DOS_METHOD"),
+      // phcalc.initialize_qmesh(dos_mesh);
+
+
+      apl::DOSCalculator dosc(phcalc, apl_options.getattachedscheme("DOS_METHOD"),
            dummy_dos_projections);
       dosc.calc(aurostd::string2utype<double>(apl_options.getattachedscheme("DOS_NPOINTS")),
           aurostd::string2utype<double>(apl_options.getattachedscheme("DOS_SMEAR")));

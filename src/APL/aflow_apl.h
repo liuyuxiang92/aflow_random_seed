@@ -1865,10 +1865,10 @@ namespace apl
       QHAN();
       QHAN(const QHAN& qha);
       QHAN(_xinput &xinput, _aflags &aflags, _kflags &kflags, _xflags &xflags,
-                  const string &tpt, xoption &supercellopts, 
+                  string *aflowin, const string &tpt, xoption &supercellopts, 
                   ofstream &messageFile, ostream &oss=std::cout);
       void initialize(_xinput &xinput, _aflags &aflags, _kflags &kflags,
-          _xflags &xflags, const string &tpt, xoption &supercellopts,
+          _xflags &xflags, string *aflowin, const string &tpt, xoption &supercellopts,
           ofstream &messageFile, ostream &oss);
       ~QHAN();
       const QHAN& operator=(const QHAN &qha);
@@ -1909,7 +1909,7 @@ namespace apl
       xoption apl_options;
       EOSfit eos;
     private:
-      ofstream* messageFile;
+      ofstream *messageFile;
       ostream *oss;
       xoption supercellopts;
       bool isEOS;
@@ -1958,6 +1958,7 @@ namespace apl
       _xflags xflags;
       _aflags aflags;
       _kflags kflags;
+      string *aflowin;
       string currentDirectory;
       // methods
       int  check();
