@@ -787,7 +787,7 @@ namespace pocc {
     if(LDEBUG) {
       cerr << soliloquy << " directory=[" << m_aflags.Directory << "]" << endl;
     }
-    double agl_debye_temperature, agl_debye_acoustic, agl_gruneisen;
+    double agl_debye_temperature = 0.0, agl_debye_acoustic = 0.0, agl_gruneisen = 0.0;
     double agl_heat_capacity_Cv_300K, agl_heat_capacity_Cp_300K;
     double agl_vibrational_free_energy_300K_cell = 0.0, agl_vibrational_free_energy_300K_atom = 0.0;
     double agl_vibrational_entropy_300K_cell = 0.0, agl_vibrational_entropy_300K_atom = 0.0;	
