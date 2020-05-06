@@ -102,7 +102,6 @@ namespace apl {
   }
 
   void TCONDCalculator::copy(const TCONDCalculator& that) {
-    _pc = that._pc;
     aflags = that.aflags;
     calc_options = that.calc_options;
     eigenvectors = that.eigenvectors;
@@ -113,9 +112,11 @@ namespace apl {
     nBranches = that.nBranches;
     nIQPs = that.nIQPs;
     nQPs = that.nQPs;
+    _pc = that._pc;
     _pc_set = that._pc_set;
     processes = that.processes;
     processes_iso = that.processes_iso;
+    _qm = that._qm;
     rates_boundary = that.rates_boundary;
     rates_isotope = that.rates_isotope;
     temperatures = that.temperatures;
@@ -137,9 +138,11 @@ namespace apl {
     nBranches = 0;
     nIQPs = 0;
     nQPs = 0;
+    _pc = NULL;
     _pc_set = false;
     processes.clear();
     processes_iso.clear();
+    _qm = NULL;
     rates_boundary.clear();
     rates_isotope.clear();
     temperatures.clear();

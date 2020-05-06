@@ -61,6 +61,7 @@ namespace apl {
     _qpoints.clear();
     _freqs.clear();
     _frequencyFormat = apl::NONE;
+    _pc = NULL;
     _pc_set = false;
     _pb.clear();
     _system = "";

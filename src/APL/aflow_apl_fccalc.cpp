@@ -72,6 +72,7 @@ namespace apl {
     _forceConstantMatrices.clear();
     _isPolarMaterial = false;
     _sc_set = false;
+    _supercell = NULL;
   }
 
 }  // namespace apl

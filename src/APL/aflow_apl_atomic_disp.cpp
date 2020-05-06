@@ -73,6 +73,7 @@ namespace apl {
     _frequencies.clear();
     _displacement_matrices.clear();
     _displacement_modes.clear();
+    _pc = NULL;
     _pc_set = false;
     _qpoints.clear();
     _temperatures.clear();
