@@ -1005,6 +1005,13 @@ namespace apl
         }
       }
 
+      if (!phcalc.getSupercell().projectToPrimitive()){
+        msg = "Could not map the AFLOW standard primitive cell to the supercell. ";
+        msg += "Phonon dispersions will be calculated using the original structure instead.";
+        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_ERROR_);
+      }
+
       string USER_DC_INITLATTICE="";
       int USER_DC_NPOINTS = aurostd::string2utype<int>(
           apl_options.getattachedscheme("BAND_NPOINTS"));
