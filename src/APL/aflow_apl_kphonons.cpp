@@ -288,9 +288,9 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [0]" << std::endl;
     xinput.xvasp.AVASP_arun = true;
-    string function = "KBIN::RunPhonons_APL()";  //ME20191029
+    string function = "KBIN::RunPhonons_APL():";  //ME20191029
+    if (LDEBUG) std::cerr << function << " DEBUG [0]" << std::endl;
     // Test
     //if (!(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL)) return; //PN20180705
     if (!(kflags.KBIN_PHONONS_CALCULATION_APL ||
@@ -366,7 +366,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1a]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [1a]" << std::endl;
 
     //ME20181019 - Overwrite defaults for CHGCAR, WAVECAR, etc. Only write
     // these files if the user explicitly sets these flags. Otherwise, APL will
@@ -419,7 +419,7 @@ namespace KBIN {
 
     // APL ----------------------------------------------------------------------
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1b]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [1b]" << std::endl;
 
     //ME20181026 START
 
@@ -781,7 +781,7 @@ namespace KBIN {
 
     // AAPL ----------------------------------------------------------------------
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1c]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [1c]" << std::endl;
 
     //ME20181027 START
 
@@ -978,7 +978,7 @@ namespace KBIN {
     }
     //ME20181027 STOP
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1c]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [1c]" << std::endl;
 
     // QHA ----------------------------------------------------------------------
 
@@ -1385,7 +1385,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [2]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [2]" << std::endl;
 
     //fix vasp bin for LR or DM+POLAR
     if (USER_ENGINE == string("LR") || (USER_ENGINE == string("DM") && USER_POLAR)) {
@@ -1572,7 +1572,7 @@ namespace KBIN {
       }
     }
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [3b]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [3b]" << std::endl;
 
     stagebreak = (stagebreak || apl_stagebreak);
 
@@ -1614,7 +1614,7 @@ namespace KBIN {
     }
     //QHA/SCQHA/QHA3P END
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [3c]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [3c]" << std::endl;
 
     // Anharmonic force constants
     bool aapl_stagebreak = false;
@@ -1705,7 +1705,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [4]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [4]" << std::endl;
 
     //QHA/SCQHA/QHA3P START //PN20180705
     //Store dynamical matrices and PDOS from different distorted directores
@@ -1829,7 +1829,7 @@ namespace KBIN {
 
     // Get the format of frequency desired by user ///////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5a]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [5a]" << std::endl;
 
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
@@ -1876,7 +1876,7 @@ namespace KBIN {
 
     // PHONON DISPERSIONS ---------------------------------------------------------
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5b]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [5b]" << std::endl;
 
     if (USER_DC) {
       apl::PhononDispersionCalculator pdisc(phcalc);
@@ -1937,7 +1937,7 @@ namespace KBIN {
 
     // PHONON DOS AND THERMODYNAMIC PROPERTIES ----------------------------------------
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5c]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [5c]" << std::endl;
 
     if (USER_DOS || USER_TP) {
       // Calculate DOS
@@ -2180,7 +2180,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [6]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [6]" << std::endl;
 
     if (USER_TCOND) {
       // Get q-points

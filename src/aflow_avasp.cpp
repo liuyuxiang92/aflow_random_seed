@@ -1105,15 +1105,12 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
 
       // k-point shift
       scheme = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS_SHIFT");
-      vector<double> shift;
-      aurostd::string2tokens(scheme, shift, " ,;");
       if (scheme.empty()) {
         xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << std::endl;
       } else {
-        for (int i = 0; i < 3; i++) {
-          if (i < 2) xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << shift[i] <<  " ";
-          else xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << shift[i] <<  std::endl;
-        }
+        vector<double> shift;
+        aurostd::string2tokens(scheme, shift, " ,;");
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(shift), " ") << std::endl;
       }
 
       // Set to explicit
