@@ -1067,8 +1067,8 @@ namespace apl {
     public:
       QMesh(ostream& oss=std::cout);
       QMesh(ofstream&, ostream& os=std::cout);
-      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, string directory="./", ostream& oss=std::cout);
-      QMesh(const vector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, string directory="./", ostream& oss=std::cout);
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, const string& directory="./", ostream& oss=std::cout);
+      QMesh(const vector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, const string& directory="./", ostream& oss=std::cout);
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();

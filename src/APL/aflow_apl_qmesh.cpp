@@ -38,7 +38,7 @@ namespace apl {
   }
 
   QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, ofstream& mf,
-      bool include_inversions, bool gamma_centered, string directory, ostream& oss) : xStream() {
+      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream() {
     free();
     xStream::initialize(mf, oss);
     _directory = directory;
@@ -46,7 +46,7 @@ namespace apl {
   }
 
   QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, ofstream& mf,
-      bool include_inversions, bool gamma_centered, string directory, ostream& oss) : xStream() {
+      bool include_inversions, bool gamma_centered, const string& directory, ostream& oss) : xStream() {
     free();
     xStream::initialize(mf, oss);
     _directory = directory;
