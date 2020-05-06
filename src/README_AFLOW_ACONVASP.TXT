@@ -2319,7 +2319,7 @@ LATTICES = (the ones with "")
         Example:
          aflow --plotphdispdos=./  --print=png --unit=cm-1
  	  
-  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+  aflow --plotphdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
         Plot a combined phonon dispersion and phonon DOS plot using GNUPLOT and pdfLaTex
         The following files must reside in the directory
                 PHDOSCAR

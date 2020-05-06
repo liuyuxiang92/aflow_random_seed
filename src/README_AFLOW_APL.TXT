@@ -557,7 +557,7 @@ The files PHEIGENVAL, PHKPOINTS, and PHPOSCAR must reside in the directory.
 
 Phonon DOS can be plotted in a similar fashion:
 
-  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
+  aflow --plotphdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
     Defaults.
      DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
     Other options: same as plotphdisp
