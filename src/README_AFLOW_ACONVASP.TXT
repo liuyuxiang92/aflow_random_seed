@@ -727,7 +727,7 @@ LATTICES = (the ones with "")
         Outputs to standard out a new POSCAR file with atom
         positions in cartesian coordinates.
 
-  aflow --cce/--cce=POSCAR --usage
+  aflow --cce/--cce[=POSCAR] --usage
         Prints user instructions for CCE.
   aflow --cce=POSCAR
         options:
@@ -735,9 +735,10 @@ LATTICES = (the ones with "")
             [ --functionals=PBE|LDA|SCAN]
             [ --dft_formation_energies=form_energy_1,form_energy_2,...]
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
-            [ --print=json|out]
+            [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file POSCAR (must be in VASP POSCAR format).
+        Determines the CCE corrections for the structure in file POSCAR. It can be in any structure 
+        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
         Precalculated DFT formation energies can be provided as a comma separated list using the option
         --dft_formation_energies=
         Functionals for which corrections should be returned can be provided as a comma separated list 
@@ -2637,9 +2638,10 @@ LATTICES = (the ones with "")
             [ --functionals=PBE|LDA|SCAN]
             [ --dft_formation_energies=form_energy_1,form_energy_2,...]
             [ --oxidation_numbers=ox_num_1,ox_num_2,...]
-            [ --print=json|out]
+            [ --print=json|out] (default is out)
 
-        Determines the CCE corrections for the structure in file POSCAR (must be in VASP POSCAR format).
+        Determines the CCE corrections for the structure in file POSCAR. It can be in any structure 
+        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
         Precalculated DFT formation energies can be provided as a comma separated list using the option
         --dft_formation_energies=
         Functionals for which corrections should be returned can be provided as a comma separated list 

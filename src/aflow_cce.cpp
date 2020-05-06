@@ -1320,7 +1320,7 @@ namespace cce {
       cerr << soliloquy << "number of Sb ions= " << amount_Sb << endl;
       cerr << soliloquy << "number of O ions= " << amount_O << endl;
     }
-    double Sb_O_ratio;
+    double Sb_O_ratio = 0.0;
     if ( amount_O != 0 ){
       Sb_O_ratio=amount_Sb/amount_O;
     } else {
@@ -1370,19 +1370,7 @@ namespace cce {
         message << "The total number of atoms is not divisible by 6 as needed for Sb2O4. Please check your structure.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << endl;
-      }
-      // print oxidation numbers and calculate sum
-      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-      // system should not be regarded correctable if sum over oxidation states is not zero
-      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Sb-O binary with Sb/O ratio 0.5 the above set oxidation states should always work
-        cce_flags.flag("CORRECTABLE",FALSE);
-        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-      } else {
-        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-      }
+      check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
   }
 
@@ -1463,19 +1451,7 @@ namespace cce {
         message << "The total number of atoms is not divisible by 7 as needed for Pb3O4. Please check your structure.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << endl;
-      }
-      // print oxidation numbers and calculate sum
-      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-      // system should not be regarded correctable if sum over oxidation states is not zero
-      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Pb-O binary with Pb/O ratio 0.75 the above set oxidation states should always work
-        cce_flags.flag("CORRECTABLE",FALSE);
-        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-      } else {
-        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-      }
+      check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
   }
 
@@ -1564,19 +1540,7 @@ namespace cce {
           }
         }
       }
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << endl;
-      }
-      // print oxidation numbers and calculate sum
-      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-      // system should not be regarded correctable if sum over oxidation states is not zero
-      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Magneli phase the above set oxidation states should always work
-        cce_flags.flag("CORRECTABLE",FALSE);
-        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-      } else {
-        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-      }
+      check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
   }
 
@@ -1665,19 +1629,7 @@ namespace cce {
         message << "The total number of atoms is not divisible by 7 as needed for Fe3O4. Please check your structure.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << endl;
-      }
-      // print oxidation numbers and calculate sum
-      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-      // system should not be regarded correctable if sum over oxidation states is not zero
-      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Fe-O binary with Fe/O ratio 0.75 the above set oxidation states should always work
-        cce_flags.flag("CORRECTABLE",FALSE);
-        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-      } else {
-        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-      }
+      check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
   }
 
@@ -1761,19 +1713,7 @@ namespace cce {
         message << "The total number of atoms is not divisible by 7 as needed for Mn3O4. Please check your structure.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << endl;
-      }
-      // print oxidation numbers and calculate sum
-      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-      // system should not be regarded correctable if sum over oxidation states is not zero
-      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Mn-O binary with Mn/O ratio 0.75 the above set oxidation states should always work
-        cce_flags.flag("CORRECTABLE",FALSE);
-        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-      } else {
-        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-      }
+      check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
   }
 
@@ -1857,19 +1797,7 @@ namespace cce {
         message << "The total number of atoms is not divisible by 7 as needed for Co3O4. Please check your structure.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << endl;
-      }
-      // print oxidation numbers and calculate sum
-      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-      // system should not be regarded correctable if sum over oxidation states is not zero
-      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for a Co-O binary with Co/O ratio 0.75 the above set oxidation states should always work
-        cce_flags.flag("CORRECTABLE",FALSE);
-        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-      } else {
-        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-      }
+      check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
   }
 
@@ -1972,19 +1900,7 @@ namespace cce {
         message << "The total number of atoms is not divisible by 5 as needed for alkali metal sesquioxide. Please check your structure.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
       }
-      if(cce_flags.flag("COMMAND_LINE")){
-        oss << endl;
-      }
-      // print oxidation numbers and calculate sum
-      cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-      // system should not be regarded correctable if sum over oxidation states is not zero
-      if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since for an alkali metal sesquioxide set oxidation states should always work
-        cce_flags.flag("CORRECTABLE",FALSE);
-        cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-        cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-      } else {
-        cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
-      }
+      check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
   }
 
@@ -2035,14 +1951,7 @@ namespace cce {
             }
           }
         }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        }
+        check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
       }
     } else {
       message << "Amount of Mo or O determined to be ZERO. Please check your structure.";
@@ -2110,14 +2019,7 @@ namespace cce {
             }
           }
         }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        }
+        check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
       }
     } else {
       message << "Amount of Fe or O determined to be ZERO. Please check your structure.";
@@ -2165,18 +2067,30 @@ namespace cce {
             }
           }
         }
-        // print oxidation numbers and calculate sum
-        cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
-        // system should not be regarded correctable if sum over oxidation states is not zero
-        if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) {
-          cce_flags.flag("CORRECTABLE",FALSE);
-          cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
-          cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        }
+        check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
       }
     } else {
       message << "Amount of Ti or O determined to be ZERO. Please check your structure.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    }
+  }
+
+  //check_ox_nums_special_case////////////////////////////////////////////////////////
+  // part checking oxidation numbers for special case treatment
+  void check_ox_nums_special_case(const xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
+    string soliloquy="cce::check_ox_nums_special_case():";
+    if(cce_flags.flag("COMMAND_LINE") && DEFAULT_CCE_OX_METHOD!="BADER"){
+      oss << endl;
+    }
+    // print oxidation numbers and calculate sum
+    cce_vars.oxidation_sum = print_oxidation_states_and_get_sum(structure, cce_flags, cce_vars);
+    // system should not be regarded correctable if sum over oxidation states is not zero
+    if (std::abs(cce_vars.oxidation_sum) > _CCE_OX_TOL_) { // this case should never occur since set oxidation states should always work
+      cce_flags.flag("CORRECTABLE",FALSE);
+      cerr << "BAD NEWS: The formation energy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
+      cerr << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
+    } else {
+      cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
     }
   }
 
@@ -3057,24 +2971,29 @@ namespace cce {
     oss << "can be found in README_AFLOW_CCE.TXT." << endl;
     oss << endl;
     oss << "(ii) AVAILABLE OPTIONS:" << endl;
-    oss << "--cce/--cce=POSCAR --usage  Prints these user instructions." << endl;
-    oss << "--cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP POSCAR format." << endl;
-    oss << "--dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies," << endl; 
-    oss << "                            they are assumed to be: (i) negative for compounds lower in energy" << endl; 
-    oss << "                            than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
-    oss << "                            for PBE, LDA and SCAN." << endl;
-    oss << "--functionals=              Provide a comma separated list of functionals for which corrections" << endl;
-    oss << "                            should be returned. If used together with --dft_formation energies," << endl;
-    oss << "                            the functionals must be in the same sequence as the DFT formation" << endl;
-    oss << "                            energies they correspond to. Available functionals are:" << endl;
-    oss << "                            (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation" << endl; 
-    oss << "                            energy is provided)." << endl;
-    oss << "--oxidation_numbers=        Provide as a comma separated list the oxidation numbers. It is" << endl;
-    oss << "                            assumed that: (i) one is provided for each atom of the structure and" << endl; 
-    oss << "                            (ii) they are in the same sequence as the corresponding atoms in the" << endl;
-    oss << "                            provided POSCAR file." << endl;
-    oss << "--poscar2cce < POSCAR       Determines the CCE corrections for the structure in file POSCAR (must" << endl;
-    oss << "                            be in VASP POSCAR format)." << endl;
+    oss << "--cce/--cce[=POSCAR] --usage  Prints these user instructions." << endl;
+    oss << "--cce=POSCAR_FILE_PATH        Provide the path to the structure file. It can be in any structure" << endl;
+    oss << "                              format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ..." << endl;
+    oss << "                              For VASP, a VASP5 POSCAR is required." << endl;
+    oss << "--dft_formation_energies=     Provide a comma separated list of precalculated DFT formation energies," << endl; 
+    oss << "                              they are assumed to be: (i) negative for compounds lower in energy" << endl; 
+    oss << "                              than the elements, (ii) in eV/cell. Currently, corrections are available" << endl; 
+    oss << "                              for PBE, LDA and SCAN." << endl;
+    oss << "--functionals=                Provide a comma separated list of functionals for which corrections" << endl;
+    oss << "                              should be returned. If used together with --dft_formation energies," << endl;
+    oss << "                              the functionals must be in the same sequence as the DFT formation" << endl;
+    oss << "                              energies they correspond to. Available functionals are:" << endl;
+    oss << "                              (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation" << endl; 
+    oss << "                              energy is provided)." << endl;
+    oss << "--oxidation_numbers=          Provide as a comma separated list the oxidation numbers. It is" << endl;
+    oss << "                              assumed that: (i) one is provided for each atom of the structure and" << endl; 
+    oss << "                              (ii) they are in the same sequence as the corresponding atoms in the" << endl;
+    oss << "                              provided POSCAR file." << endl;
+    oss << "--poscar2cce < POSCAR         Determines the CCE corrections for the structure in file POSCAR (must" << endl;
+    oss << "                              be in VASP POSCAR format)." << endl;
+    oss << "--poscar2cce < POSCAR         Determines the CCE corrections for the structure in file POSCAR. It can" << endl;
+    oss << "                              be in any structure format that AFLOW supports, e.g. VASP POSCAR, QE," << endl;
+    oss << "                              aims, ... For VASP, a VASP5 POSCAR is required." << endl;
     oss << endl;
     oss << "(iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:" << endl;
     oss << "Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)" << endl;

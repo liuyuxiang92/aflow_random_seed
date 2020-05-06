@@ -174,12 +174,12 @@ namespace pflow {
     // try with symbol
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).symbol)) Z=i;
+        if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).symbol)) Z=i;
     }
     // try with name
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).name)) Z=i;
+        if(aurostd::toupper(species)==aurostd::toupper(xelement::xelement(i).name)) Z=i;
     }
 
     if(LDEBUG) cerr << "Z=" << Z << endl;
@@ -196,103 +196,96 @@ namespace pflow {
 
       // now look at properties
       if(tokens.size()>=2) {
-	for(uint i=1;i<tokens.size();i++) {
-	  string c=aurostd::toupper(tokens.at(i));
-	  vector<string> vs; uint len=52;
-	  vs.clear();
-	  int prec=10;
-	  if(c=="ALL" || c==aurostd::toupper("name")) vs.push_back(aurostd::PaddedPOST("name="+xelement::xelement(Z).name,len));
-	  if(c=="ALL" || c==aurostd::toupper("symbol")) vs.push_back(aurostd::PaddedPOST("symbol="+xelement::xelement(Z).symbol,len));
-	  if(c=="ALL" || c==aurostd::toupper("Z")) vs.push_back(aurostd::PaddedPOST("Z="+aurostd::utype2string(xelement::xelement(Z).Z),len));
-	  if(c=="ALL" || c==aurostd::toupper("Period")) vs.push_back(aurostd::PaddedPOST("Period="+aurostd::utype2string(xelement::xelement(Z).Period),len));
-	  if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement::xelement(Z).Group),len));
-	  if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement::xelement(Z).Series,len));
-	  if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement::xelement(Z).Block,len));
-	  if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,prec),len)+"// (kg)");
-	  if(c=="ALL" || c==aurostd::toupper("MolarVolume")) vs.push_back(aurostd::PaddedPOST("MolarVolume="+aurostd::utype2string(xelement::xelement(Z).MolarVolume,prec),len)+"// (m^3/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,prec),len)+"// A^3");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_Vm")) vs.push_back(aurostd::PaddedPOST("Miedema_Vm="+aurostd::utype2string(xelement::xelement(Z).Miedema_Vm,prec),len)+"// (V_m^{2/3} in (cm^2))");
-	  if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement::xelement(Z).valence_std),len));
-	  if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement::xelement(Z).valence_iupac),len));
-	  if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement::xelement(Z).valence_PT),len));
-	  if(c=="ALL" || c==aurostd::toupper("Density_PT")) vs.push_back(aurostd::PaddedPOST("Density_PT="+aurostd::utype2string(xelement::xelement(Z).Density_PT,prec),len)+"// (g/cm^3)");
-	  if(c=="ALL" || c==aurostd::toupper("crystal")) vs.push_back(aurostd::PaddedPOST("crystal="+xelement::xelement(Z).crystal,len));
-	  if(c=="ALL" || c==aurostd::toupper("CrystalStr_PT")) vs.push_back(aurostd::PaddedPOST("CrystalStr_PT="+xelement::xelement(Z).CrystalStr_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement::xelement(Z).space_group,len));
-	  if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement::xelement(Z).space_group_number),len));
+        for(uint i=1;i<tokens.size();i++) {
+          string c=aurostd::toupper(tokens.at(i));
+          vector<string> vs; uint len=52;
+          vs.clear();
+          int prec=10;
+          if(c=="ALL" || c==aurostd::toupper("name")) vs.push_back(aurostd::PaddedPOST("name="+xelement::xelement(Z).name,len));
+          if(c=="ALL" || c==aurostd::toupper("symbol")) vs.push_back(aurostd::PaddedPOST("symbol="+xelement::xelement(Z).symbol,len));
+          if(c=="ALL" || c==aurostd::toupper("Z")) vs.push_back(aurostd::PaddedPOST("Z="+aurostd::utype2string(xelement::xelement(Z).Z),len));
+          if(c=="ALL" || c==aurostd::toupper("Period")) vs.push_back(aurostd::PaddedPOST("Period="+aurostd::utype2string(xelement::xelement(Z).Period),len));
+          if(c=="ALL" || c==aurostd::toupper("Group")) vs.push_back(aurostd::PaddedPOST("Group="+aurostd::utype2string(xelement::xelement(Z).Group),len));
+          if(c=="ALL" || c==aurostd::toupper("Series")) vs.push_back(aurostd::PaddedPOST("Series="+xelement::xelement(Z).Series,len));
+          if(c=="ALL" || c==aurostd::toupper("Block")) vs.push_back(aurostd::PaddedPOST("Block="+xelement::xelement(Z).Block,len));
+          if(c=="ALL" || c==aurostd::toupper("mass")) vs.push_back(aurostd::PaddedPOST("mass="+aurostd::utype2string(xelement::xelement(Z).mass,prec),len)+"// (kg)");
+          if(c=="ALL" || c==aurostd::toupper("MolarVolume")) vs.push_back(aurostd::PaddedPOST("MolarVolume="+aurostd::utype2string(xelement::xelement(Z).MolarVolume,prec),len)+"// (m^3/mol)");
+          if(c=="ALL" || c==aurostd::toupper("volume")) vs.push_back(aurostd::PaddedPOST("volume="+aurostd::utype2string(xelement::xelement(Z).volume,prec),len)+"// A^3");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_Vm")) vs.push_back(aurostd::PaddedPOST("Miedema_Vm="+aurostd::utype2string(xelement::xelement(Z).Miedema_Vm,prec),len)+"// (V_m^{2/3} in (cm^2))");
+          if(c=="ALL" || c==aurostd::toupper("valence_std")) vs.push_back(aurostd::PaddedPOST("valence_std="+aurostd::utype2string(xelement::xelement(Z).valence_std),len));
+          if(c=="ALL" || c==aurostd::toupper("valence_iupac")) vs.push_back(aurostd::PaddedPOST("valence_iupac="+aurostd::utype2string(xelement::xelement(Z).valence_iupac),len));
+          if(c=="ALL" || c==aurostd::toupper("valence_PT")) vs.push_back(aurostd::PaddedPOST("valence_PT="+aurostd::utype2string(xelement::xelement(Z).valence_PT),len));
+          if(c=="ALL" || c==aurostd::toupper("Density_PT")) vs.push_back(aurostd::PaddedPOST("Density_PT="+aurostd::utype2string(xelement::xelement(Z).Density_PT,prec),len)+"// (g/cm^3)");
+          if(c=="ALL" || c==aurostd::toupper("crystal")) vs.push_back(aurostd::PaddedPOST("crystal="+xelement::xelement(Z).crystal,len));
+          if(c=="ALL" || c==aurostd::toupper("CrystalStr_PT")) vs.push_back(aurostd::PaddedPOST("CrystalStr_PT="+xelement::xelement(Z).CrystalStr_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("space_group")) vs.push_back(aurostd::PaddedPOST("space_group="+xelement::xelement(Z).space_group,len));
+          if(c=="ALL" || c==aurostd::toupper("space_group_number")) vs.push_back(aurostd::PaddedPOST("space_group_number="+aurostd::utype2string(xelement::xelement(Z).space_group_number),len));
 
-	  if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement::xelement(Z).Pearson_coefficient,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement::xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement::xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
-	  if(c=="ALL" || c==aurostd::toupper("phase")) vs.push_back(aurostd::PaddedPOST("phase="+xelement::xelement(Z).phase,len));
-	  if(c=="ALL" || c==aurostd::toupper("radius")) vs.push_back(aurostd::PaddedPOST("radius="+aurostd::utype2string(xelement::xelement(Z).radius,prec),len)+"// (nm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_PT")) vs.push_back(aurostd::PaddedPOST("radius_PT="+aurostd::utype2string(xelement::xelement(Z).radius_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_covalent_PT")) vs.push_back(aurostd::PaddedPOST("radius_covalent_PT="+aurostd::utype2string(xelement::xelement(Z).radius_covalent_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_covalent")) vs.push_back(aurostd::PaddedPOST("radius_covalent="+aurostd::utype2string(xelement::xelement(Z).radius_covalent,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement::xelement(Z).radius_VanDerWaals_PT,prec),len)+"// (pm)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,prec),len)+"// (Angstrom)");
-	  if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("Pearson_coefficient")) vs.push_back(aurostd::PaddedPOST("Pearson_coefficient="+aurostd::utype2string(xelement::xelement(Z).Pearson_coefficient,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("lattice_constant")) vs.push_back(aurostd::PaddedPOST("lattice_constant="+aurostd::utype2string(xelement::xelement(Z).lattice_constant[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_constant[3],prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("lattice_angle")) vs.push_back(aurostd::PaddedPOST("lattice_angle="+aurostd::utype2string(xelement::xelement(Z).lattice_angle[1],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[2],prec)+","+aurostd::utype2string(xelement::xelement(Z).lattice_angle[3],prec),len)+"// (rad)");
+          if(c=="ALL" || c==aurostd::toupper("phase")) vs.push_back(aurostd::PaddedPOST("phase="+xelement::xelement(Z).phase,len));
+          if(c=="ALL" || c==aurostd::toupper("radius")) vs.push_back(aurostd::PaddedPOST("radius="+aurostd::utype2string(xelement::xelement(Z).radius,prec),len)+"// (nm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_PT")) vs.push_back(aurostd::PaddedPOST("radius_PT="+aurostd::utype2string(xelement::xelement(Z).radius_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_covalent_PT")) vs.push_back(aurostd::PaddedPOST("radius_covalent_PT="+aurostd::utype2string(xelement::xelement(Z).radius_covalent_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radius_covalent")) vs.push_back(aurostd::PaddedPOST("radius_covalent="+aurostd::utype2string(xelement::xelement(Z).radius_covalent,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radius_VanDerWaals_PT")) vs.push_back(aurostd::PaddedPOST("radius_VanDerWaals_PT="+aurostd::utype2string(xelement::xelement(Z).radius_VanDerWaals_PT,prec),len)+"// (pm)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Ghosh08")) vs.push_back(aurostd::PaddedPOST("radii_Ghosh08="+aurostd::utype2string(xelement::xelement(Z).radii_Ghosh08,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Slatter")) vs.push_back(aurostd::PaddedPOST("radii_Slatter="+aurostd::utype2string(xelement::xelement(Z).radii_Slatter,prec),len)+"// (Angstrom)");
+          if(c=="ALL" || c==aurostd::toupper("radii_Pyykko")) vs.push_back(aurostd::PaddedPOST("radii_Pyykko="+aurostd::utype2string(xelement::xelement(Z).radii_Pyykko,prec),len)+"// (pm)");
 
-	  if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement::xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement::xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement::xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement::xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
-	  if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement::xelement(Z).Pettifor_scale,prec),len)); 
-	  if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement::xelement(Z).boiling_point,prec),len)+"// (Celsius)");
-	  if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement::xelement(Z).melting_point,prec),len)+"// (Celsius)");
-	  if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,prec),len)+"// (J/(kg.K))");
-	  if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement::xelement(Z).critical_Pressure,prec),len)+"// (Atm) "); 
-	  if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
-	  if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
-	  if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement::xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
-	  if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement::xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement::xelement(Z).Mohs_hardness,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement::xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("Hardness_Pearson="+aurostd::utype2string(xelement::xelement(Z).Hardness_Pearson,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_Putz")) vs.push_back(aurostd::PaddedPOST("Hardness_Putz="+aurostd::utype2string(xelement::xelement(Z).Hardness_Putz,prec),len)+"// (eV/atom)");
-	  if(c=="ALL" || c==aurostd::toupper("Hardness_RB")) vs.push_back(aurostd::PaddedPOST("Hardness_RB="+aurostd::utype2string(xelement::xelement(Z).Hardness_RB,prec),len)+"// (eV)");
-	  if(c=="ALL" || c==aurostd::toupper("shear_modulus")) vs.push_back(aurostd::PaddedPOST("shear_modulus="+aurostd::utype2string(xelement::xelement(Z).shear_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Young_modulus")) vs.push_back(aurostd::PaddedPOST("Young_modulus="+aurostd::utype2string(xelement::xelement(Z).Young_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement::xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
-	  if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement::xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
+          if(c=="ALL" || c==aurostd::toupper("electrical_conductivity")) vs.push_back(aurostd::PaddedPOST("electrical_conductivity="+aurostd::utype2string(xelement::xelement(Z).electrical_conductivity,prec),len)+"// (S/m)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_vec")) vs.push_back(aurostd::PaddedPOST("electronegativity_vec="+aurostd::utype2string(xelement::xelement(Z).electronegativity_vec,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("hardness_Ghosh")) vs.push_back(aurostd::PaddedPOST("hardness_Ghosh="+aurostd::utype2string(xelement::xelement(Z).hardness_Ghosh,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Pearson")) vs.push_back(aurostd::PaddedPOST("electronegativity_Pearson="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Pearson,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electronegativity_Ghosh")) vs.push_back(aurostd::PaddedPOST("electronegativity_Ghosh="+aurostd::utype2string(xelement::xelement(Z).electronegativity_Ghosh,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("electron_affinity_PT")) vs.push_back(aurostd::PaddedPOST("electron_affinity_PT="+aurostd::utype2string(xelement::xelement(Z).electron_affinity_PT,prec),len)+"// (kJ/mol)");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_phi_star")) vs.push_back(aurostd::PaddedPOST("Miedema_phi_star="+aurostd::utype2string(xelement::xelement(Z).Miedema_phi_star,prec),len)+"// (V) (phi^star)");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_nws")) vs.push_back(aurostd::PaddedPOST("Miedema_nws="+aurostd::utype2string(xelement::xelement(Z).Miedema_nws,prec),len)+"// (d.u.)^1/3 n_{ws}^{1/3}");
+          if(c=="ALL" || c==aurostd::toupper("Miedema_gamma_s")) vs.push_back(aurostd::PaddedPOST("Miedema_gamma_s="+aurostd::utype2string(xelement::xelement(Z).Miedema_gamma_s,prec),len)+"// (mJ/m^2)");
+          if(c=="ALL" || c==aurostd::toupper("Pettifor_scale")) vs.push_back(aurostd::PaddedPOST("Pettifor_scale="+aurostd::utype2string(xelement::xelement(Z).Pettifor_scale,prec),len)); 
+          if(c=="ALL" || c==aurostd::toupper("boiling_point")) vs.push_back(aurostd::PaddedPOST("boiling_point="+aurostd::utype2string(xelement::xelement(Z).boiling_point,prec),len)+"// (Celsius)");
+          if(c=="ALL" || c==aurostd::toupper("melting_point")) vs.push_back(aurostd::PaddedPOST("melting_point="+aurostd::utype2string(xelement::xelement(Z).melting_point,prec),len)+"// (Celsius)");
+          if(c=="ALL" || c==aurostd::toupper("vaporization_heat_PT")) vs.push_back(aurostd::PaddedPOST("vaporization_heat_PT="+aurostd::utype2string(xelement::xelement(Z).vaporization_heat_PT,prec),len)+"// (kJ/mol)");
+          if(c=="ALL" || c==aurostd::toupper("specific_heat_PT")) vs.push_back(aurostd::PaddedPOST("specific_heat_PT="+aurostd::utype2string(xelement::xelement(Z).specific_heat_PT,prec),len)+"// (J/(kg.K))");
+          if(c=="ALL" || c==aurostd::toupper("critical_Pressure")) vs.push_back(aurostd::PaddedPOST("critical_Pressure="+aurostd::utype2string(xelement::xelement(Z).critical_Pressure,prec),len)+"// (Atm) "); 
+          if(c=="ALL" || c==aurostd::toupper("critical_Temperature_PT")) vs.push_back(aurostd::PaddedPOST("critical_Temperature_PT="+aurostd::utype2string(xelement::xelement(Z).critical_Temperature_PT,prec),len)+"// (K)"); 
+          if(c=="ALL" || c==aurostd::toupper("thermal_expansion")) vs.push_back(aurostd::PaddedPOST("thermal_expansion="+aurostd::utype2string(xelement::xelement(Z).thermal_expansion,prec),len)+"// (K^{-1})");
+          if(c=="ALL" || c==aurostd::toupper("thermal_conductivity")) vs.push_back(aurostd::PaddedPOST("thermal_conductivity="+aurostd::utype2string(xelement::xelement(Z).thermal_conductivity,prec),len)+"// (W/(mK))");
+          if(c=="ALL" || c==aurostd::toupper("Brinelll_hardness")) vs.push_back(aurostd::PaddedPOST("Brinelll_hardness="+aurostd::utype2string(xelement::xelement(Z).Brinelll_hardness,prec),len)+"// (MPa)");
+          if(c=="ALL" || c==aurostd::toupper("Mohs_hardness")) vs.push_back(aurostd::PaddedPOST("Mohs_hardness="+aurostd::utype2string(xelement::xelement(Z).Mohs_hardness,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Vickers_hardness")) vs.push_back(aurostd::PaddedPOST("Vickers_hardness="+aurostd::utype2string(xelement::xelement(Z).Vickers_hardness,prec),len)+"// (MPa)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_Pearson")) vs.push_back(aurostd::PaddedPOST("Hardness_Pearson="+aurostd::utype2string(xelement::xelement(Z).Hardness_Pearson,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_Putz")) vs.push_back(aurostd::PaddedPOST("Hardness_Putz="+aurostd::utype2string(xelement::xelement(Z).Hardness_Putz,prec),len)+"// (eV/atom)");
+          if(c=="ALL" || c==aurostd::toupper("Hardness_RB")) vs.push_back(aurostd::PaddedPOST("Hardness_RB="+aurostd::utype2string(xelement::xelement(Z).Hardness_RB,prec),len)+"// (eV)");
+          if(c=="ALL" || c==aurostd::toupper("shear_modulus")) vs.push_back(aurostd::PaddedPOST("shear_modulus="+aurostd::utype2string(xelement::xelement(Z).shear_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("Young_modulus")) vs.push_back(aurostd::PaddedPOST("Young_modulus="+aurostd::utype2string(xelement::xelement(Z).Young_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("bulk_modulus")) vs.push_back(aurostd::PaddedPOST("bulk_modulus="+aurostd::utype2string(xelement::xelement(Z).bulk_modulus,prec),len)+"// (GPa)");
+          if(c=="ALL" || c==aurostd::toupper("Poisson_ratio_PT")) vs.push_back(aurostd::PaddedPOST("Poisson_ratio_PT="+aurostd::utype2string(xelement::xelement(Z).Poisson_ratio_PT,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Miedema_BVm")) vs.push_back(aurostd::PaddedPOST("Miedema_BVm="+aurostd::utype2string(xelement::xelement(Z).Miedema_BVm,prec),len)+"// (kJ/mole)");
 
-	  if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement::xelement(Z).Magnetic_Type_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
-	  if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
-	  if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement::xelement(Z).Curie_point,prec),len)+"// (K)");
+          if(c=="ALL" || c==aurostd::toupper("Magnetic_Type_PT")) vs.push_back(aurostd::PaddedPOST("Magnetic_Type_PT="+xelement::xelement(Z).Magnetic_Type_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("Mass_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Mass_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Mass_Magnetic_Susceptibility,prec),len)+"// (m^3/K)");
+          if(c=="ALL" || c==aurostd::toupper("Volume_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Volume_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Volume_Magnetic_Susceptibility,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("Molar_Magnetic_Susceptibility")) vs.push_back(aurostd::PaddedPOST("Molar_Magnetic_Susceptibility="+aurostd::utype2string(xelement::xelement(Z).Molar_Magnetic_Susceptibility,prec),len)+"// (m^3/mol)");
+          if(c=="ALL" || c==aurostd::toupper("Curie_point")) vs.push_back(aurostd::PaddedPOST("Curie_point="+aurostd::utype2string(xelement::xelement(Z).Curie_point,prec),len)+"// (K)");
 
-	  if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement::xelement(Z).color_PT,len));
-	  if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,prec),len));
-	  if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,prec),len)+"// shift+1");
+          if(c=="ALL" || c==aurostd::toupper("refractive_index")) vs.push_back(aurostd::PaddedPOST("refractive_index="+aurostd::utype2string(xelement::xelement(Z).refractive_index,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("color_PT")) vs.push_back(aurostd::PaddedPOST("color_PT="+xelement::xelement(Z).color_PT,len));
+          if(c=="ALL" || c==aurostd::toupper("HHIP")) vs.push_back(aurostd::PaddedPOST("HHIP="+aurostd::utype2string(xelement::xelement(Z).HHIP,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("HHIR")) vs.push_back(aurostd::PaddedPOST("HHIR="+aurostd::utype2string(xelement::xelement(Z).HHIR,prec),len));
+          if(c=="ALL" || c==aurostd::toupper("xray_scatt")) vs.push_back(aurostd::PaddedPOST("xray_scatt="+aurostd::utype2string(xelement::xelement(Z).xray_scatt,prec),len)+"// shift+1");
 
-	  if(vs.size())
-	    for(uint j=0;j<vs.size();j++)
-	      oss << vs.at(j) << endl;
-	}
+          if(vs.size())
+            for(uint j=0;j<vs.size();j++)
+              oss << vs.at(j) << endl;
+        }
       }
     }
 
     if(LDEBUG) cerr << "pflow::XelementPrint [END]" << endl;
   }
 }
-
-void elements_initialize(void) {
-  for(uint Z=0;Z<NUM_ELEMENTS;Z++) {
-    velement.at(Z)=xelement::xelement(Z);
-  }
-}
-
 
 /*
    std::vector<string> vatom_symbol(NUM_ELEMENTS);   // store starting from ONE // DONE
@@ -301,14 +294,14 @@ void elements_initialize(void) {
    std::vector<double> vatom_volume(NUM_ELEMENTS);       // store starting from ONE // DONE
    std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);   // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
    std::vector<int> vatom_valence_std(NUM_ELEMENTS);     // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry) // DONE
-   std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+   std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS); // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
    std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
    std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
    std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
    std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);      // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
 std::vector<double> vatom_radius(NUM_ELEMENTS);       // store starting from ONE  // DONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE// DX and CO - 20170904
+std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE//DX+CO20170904 
 std::vector<double> vatom_electronegativity(NUM_ELEMENTS);       // store starting from ONE
 std::vector<string> vatom_crystal(NUM_ELEMENTS);       // store starting from ONE  // DONE
 std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);        // store starting from ONE
@@ -334,13 +327,14 @@ namespace xelement {
     // DEFAULT
     verbose=FALSE;
     // [AFLOW]START=CONSTRUCTOR
+    Z=0;
     symbol="XX";//"UNDEFINED";
     name="UNDEFINED";
     Period=NNN;
     Group=NNN; 
     Series="UNDEFINED";
     Block="nnn";      
-    //
+    //                                          
     mass=NNN;//  AMU2KILOGRAM goes inside.
     MolarVolume=NNN;  
     volume=NNN;      
@@ -366,12 +360,12 @@ namespace xelement {
     radii_Ghosh08=NNN;         
     radii_Slatter=NNN;         
     radii_Pyykko=NNN;          
-    //
+    //                                          
     electrical_conductivity=NNN;
     electronegativity_vec=NNN;    
     hardness_Ghosh=NNN;            
-    electronegativity_Pearson=NNN;
-    electronegativity_Ghosh=NNN;
+    electronegativity_Pearson=NNN;           
+    electronegativity_Ghosh=NNN;             
     electronegativity_Allen=NNN;
     oxidation_states.push_back(NNN);
     oxidation_states_preferred.push_back(NNN);
@@ -390,7 +384,7 @@ namespace xelement {
     critical_Temperature_PT=NNN;  
     thermal_expansion=NNN;     
     thermal_conductivity=NNN;  
-    //
+    //                                         
     Brinelll_hardness=NNN;
     Mohs_hardness=NNN;    
     Vickers_hardness=NNN; 
@@ -435,13 +429,14 @@ namespace xelement {
       // will populate
       verbose=b.verbose;
       // [AFLOW]START=ASSIGNMENT
+      Z=b.Z;
       symbol=b.symbol;
       name=b.name;
       Period=b.Period;
       Group=b.Group; 
       Series=b.Series;
       Block=b.Block;      
-      //
+      //                                          
       mass=b.mass;
       MolarVolume=b.MolarVolume;  
       volume=b.volume;      
@@ -467,12 +462,12 @@ namespace xelement {
       radii_Ghosh08=b.radii_Ghosh08;         
       radii_Slatter=b.radii_Slatter;         
       radii_Pyykko=b.radii_Pyykko;          
-      //
+      //                                          
       electrical_conductivity=b.electrical_conductivity;
       electronegativity_vec=b.electronegativity_vec;    
       hardness_Ghosh=b.hardness_Ghosh;            
-      electronegativity_Pearson=b.electronegativity_Pearson;
-      electronegativity_Ghosh=b.electronegativity_Ghosh;
+      electronegativity_Pearson=b.electronegativity_Pearson;           
+      electronegativity_Ghosh=b.electronegativity_Ghosh;             
 
       electronegativity_Allen=b.electronegativity_Allen;
       oxidation_states=b.oxidation_states;
@@ -493,7 +488,7 @@ namespace xelement {
       critical_Temperature_PT=b.critical_Temperature_PT;  
       thermal_expansion=b.thermal_expansion;     
       thermal_conductivity=b.thermal_conductivity;  
-      //
+      //                                         
       Brinelll_hardness=b.Brinelll_hardness;
       Mohs_hardness=b.Mohs_hardness;    
       Vickers_hardness=b.Vickers_hardness; 
@@ -535,8 +530,8 @@ namespace xelement {
     // [AFLOW]STOP=COUT
     return oss;
   }
-  
-  
+
+
   // ********************************************************************************************************************************************************
   // constructor by name or symbol
   xelement::xelement(string element) {
@@ -544,29 +539,30 @@ namespace xelement {
     // DEFAULT
     verbose=FALSE;
     uint Z=0;
-  
+
     // try with symbol
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(element)==aurostd::toupper(xelement(i).symbol)) Z=i;
+        if(aurostd::toupper(element)==aurostd::toupper(xelement(i).symbol)) Z=i;
     }
     // try with name
     if(Z==0) {
       for(uint i=1;i<=103;i++)
-	if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
+        if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
     }
     if(Z!=0) (*this)=xelement(Z);
+
   }
 
   // ********************************************************************************************************************************************************
   // constructor by Z
-  xelement::xelement(uint Z) {
+  xelement::xelement(uint ZZ) {
     free();
     // DEFAULT
     verbose=FALSE;
 
     // OFFSET
-    if(Z==0) {
+    if(ZZ==0) {
       xelement a;
       (*this)=a;
       mass=0.0;// override
@@ -579,7 +575,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Hydrogen
     // Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen Hydrogen
-    if(Z==1) { // Hydrogen
+    if(ZZ==1) { // Hydrogen
+      Z=ZZ;
       symbol="H";
       name="Hydrogen";
       Period=1;
@@ -660,7 +657,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Helium
     // Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium Helium
-    if(Z==2) { // Helium
+    if(ZZ==2) { // Helium
+      Z=ZZ;
       symbol="He";
       name="Helium";
       Period=1;
@@ -743,7 +741,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lithium
     // Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium Lithium
-    if(Z==3) { // Lithium
+    if(ZZ==3) { // Lithium
+      Z=ZZ;
       symbol="Li";
       name="Lithium";
       Period=2;
@@ -824,7 +823,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Beryllium
     // Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium Beryllium
-    if(Z==4) { // Beryllium
+    if(ZZ==4) { // Beryllium
+      Z=ZZ;
       symbol="Be";
       name="Beryllium";
       Period=2;
@@ -906,7 +906,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Boron
     // Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron Boron
-    if(Z==5) { // Boron
+    if(ZZ==5) { // Boron
+      Z=ZZ;
       symbol="B";
       name="Boron";
       Period=2;
@@ -987,7 +988,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Carbon
     // Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon Carbon
-    if(Z==6) { // Carbon
+    if(ZZ==6) { // Carbon
+      Z=ZZ;
       symbol="C";
       name="Carbon";
       Period=2;
@@ -1060,7 +1062,7 @@ namespace xelement {
       HHIP=500;
       HHIR=500;
       xray_scatt=6.019;
-      // C//DX and CO -9/4/17 radius_covalent uses sp3 hybridization (most common)
+      // C//DX+CO20170904 radius_covalent uses sp3 hybridization (most common)
     }
     // [AFLOW]STOP=Carbon
     // ********************************************************************************************************************************************************
@@ -1068,7 +1070,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Nitrogen
     // Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen Nitrogen
-    if(Z==7) { // Nitrogen
+    if(ZZ==7) { // Nitrogen
+      Z=ZZ;
       symbol="N";
       name="Nitrogen";
       Period=2;
@@ -1141,7 +1144,7 @@ namespace xelement {
       HHIP=1300;
       HHIR=500;
       /*xray_scatt=NNN;*/
-      //N JUNKAI CHANGED VALENCE
+      //N JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Nitrogen
     // ********************************************************************************************************************************************************
@@ -1149,7 +1152,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Oxygen
     // Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen Oxygen
-    if(Z==8) { // Oxygen
+    if(ZZ==8) { // Oxygen
+      Z=ZZ;
       symbol="O";
       name="Oxygen";
       Period=2;
@@ -1222,7 +1226,7 @@ namespace xelement {
       HHIP=500;
       HHIR=500;
       xray_scatt=8.052;
-      // O Table 27 of JUNKAI
+      // O Table 27 of JX
     }
     // [AFLOW]STOP=Oxygen
     // ********************************************************************************************************************************************************
@@ -1230,7 +1234,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Fluorine
     // Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine Fluorine
-    if(Z==9) { // Fluorine
+    if(ZZ==9) { // Fluorine
+      Z=ZZ;
       symbol="F";
       name="Fluorine";
       Period=2;
@@ -1311,7 +1316,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Neon
     // Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon
-    if(Z==10) { // Neon
+    if(ZZ==10) { // Neon
+      Z=ZZ;
       symbol="Ne";
       name="Neon";
       Period=2;
@@ -1394,7 +1400,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Sodium
     // Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium Sodium
-    if(Z==11) { // Sodium
+    if(ZZ==11) { // Sodium
+      Z=ZZ;
       symbol="Na";
       name="Sodium";
       Period=3;
@@ -1475,7 +1482,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Magnesium
     // Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium Magnesium
-    if(Z==12) { // Magnesium
+    if(ZZ==12) { // Magnesium
+      Z=ZZ;
       symbol="Mg";
       name="Magnesium";
       Period=3;
@@ -1557,7 +1565,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Aluminium
     //Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium Aluminium
-    if(Z==13) { // Aluminium
+    if(ZZ==13) { // Aluminium
+      Z=ZZ;
       symbol="Al";
       name="Aluminium";
       Period=3;
@@ -1638,7 +1647,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Silicon
     // Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon Silicon
-    if(Z==14) { // Silicon
+    if(ZZ==14) { // Silicon
+      Z=ZZ;
       symbol="Si";
       name="Silicon";
       Period=3;
@@ -1719,7 +1729,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Phosphorus
     // Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus Phosphorus
-    if(Z==15) { // Phosphorus
+    if(ZZ==15) { // Phosphorus
+      Z=ZZ;
       symbol="P";
       name="Phosphorus";
       Period=3;
@@ -1800,7 +1811,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Sulphur
     // Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur Sulphur
-    if(Z==16) { // Sulphur
+    if(ZZ==16) { // Sulphur
+      Z=ZZ;
       symbol="S";
       name="Sulphur";
       Period=3;
@@ -1873,7 +1885,7 @@ namespace xelement {
       HHIP=700;
       HHIR=1000;
       /*xray_scatt=NNN;*/
-      //S Table 27 of JUNKAI
+      //S Table 27 of JX
     }
     // [AFLOW]STOP=Sulphur
     // ********************************************************************************************************************************************************
@@ -1881,7 +1893,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Chlorine
     // Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine Chlorine
-    if(Z==17) { // Chlorine
+    if(ZZ==17) { // Chlorine
+      Z=ZZ;
       symbol="Cl";
       name="Chlorine";
       Period=3;
@@ -1954,7 +1967,7 @@ namespace xelement {
       HHIP=1500;
       HHIR=1500;
       /*xray_scatt=NNN;*/
-      //Cl interpolation phi_star, nws, Vm, gamma JUNKAI CHANGED VALENCE
+      //Cl interpolation phi_star, nws, Vm, gamma JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Chlorine
     // ********************************************************************************************************************************************************
@@ -1962,7 +1975,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Argon
     //Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon Argon
-    if(Z==18) { // Argon
+    if(ZZ==18) { // Argon
+      Z=ZZ;
       symbol="Ar";
       name="Argon";
       Period=3;
@@ -2035,7 +2049,7 @@ namespace xelement {
       HHIP=NNN;
       HHIR=NNN;
       /*xray_scatt=NNN;*/
-      //Ar guessed volume, must double check from results JUNKAI CHANGED VALENCE
+      //Ar guessed volume, must double check from results JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Argon
     // ********************************************************************************************************************************************************
@@ -2045,7 +2059,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Potassium
     // Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium Potassium
-    if(Z==19) { // Potassium
+    if(ZZ==19) { // Potassium
+      Z=ZZ;
       symbol="K";
       name="Potassium";
       Period=4;
@@ -2126,7 +2141,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Calcium
     // Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium Calcium
-    if(Z==20) { // Calcium
+    if(ZZ==20) { // Calcium
+      Z=ZZ;
       symbol="Ca";
       name="Calcium";
       Period=4;
@@ -2208,7 +2224,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Scandium
     // Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium Scandium
-    if(Z==21) { // Scandium
+    if(ZZ==21) { // Scandium
+      Z=ZZ;
       symbol="Sc";
       name="Scandium";
       Period=4;
@@ -2289,7 +2306,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Titanium
     // Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium Titanium
-    if(Z==22) { // Titanium
+    if(ZZ==22) { // Titanium
+      Z=ZZ;
       symbol="Ti";
       name="Titanium";
       Period=4;
@@ -2370,7 +2388,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Vanadium
     // Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium Vanadium
-    if(Z==23) { // Vanadium
+    if(ZZ==23) { // Vanadium
+      Z=ZZ;
       symbol="V";
       name="Vanadium";
       Period=4;
@@ -2451,7 +2470,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Chromium
     // Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium Chromium
-    if(Z==24) { // Chromium
+    if(ZZ==24) { // Chromium
+      Z=ZZ;
       symbol="Cr";
       name="Chromium";
       Period=4;
@@ -2532,7 +2552,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Manganese
     // Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese Manganese
-    if(Z==25) { // Manganese
+    if(ZZ==25) { // Manganese
+      Z=ZZ;
       symbol="Mn";
       name="Manganese";
       Period=4;
@@ -2605,7 +2626,7 @@ namespace xelement {
       HHIP=1600;
       HHIR=1800;
       xray_scatt=24.46;
-      //xray_scatt=24.3589; Mn JUNKAI CHANGED VALENCE// DX and CO- 9/4/17 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.3589; Mn JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
     }
     // [AFLOW]STOP=Manganese
     // ********************************************************************************************************************************************************
@@ -2613,7 +2634,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Iron
     // Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron Iron
-    if(Z==26) { // Iron
+    if(ZZ==26) { // Iron
+      Z=ZZ;
       symbol="Fe";
       name="Iron";
       Period=4;
@@ -2686,7 +2708,7 @@ namespace xelement {
       HHIP=2400;
       HHIR=1400;
       xray_scatt=24.85;
-      //xray_scatt=24.6830; Fe JUNKAI CHANGED VALENCE// DX and CO - 9/4/17 radius_covalent[i] uses high spin configuration (most frequent)
+      //xray_scatt=24.6830; Fe JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses high spin configuration (most frequent)
     }
     // [AFLOW]STOP=Iron
     // ********************************************************************************************************************************************************
@@ -2694,7 +2716,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Cobalt
     // Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt Cobalt
-    if(Z==27) { // Cobalt
+    if(ZZ==27) { // Cobalt
+      Z=ZZ;
       symbol="Co";
       name="Cobalt";
       Period=4;
@@ -2767,7 +2790,7 @@ namespace xelement {
       HHIP=3100;
       HHIR=2700;
       xray_scatt=24.59;
-      //Co JUNKAI CHANGED VALENCE// DX and CO - 9/4/17 radius_covalent[i] uses low spin configuration (most frequent)
+      //Co JX CHANGED VALENCE//DX+CO20170904 radius_covalent[i] uses low spin configuration (most frequent)
     }
     // [AFLOW]STOP=Cobalt
     // ********************************************************************************************************************************************************
@@ -2775,7 +2798,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Nickel
     // Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel Nickel
-    if(Z==28) { // Nickel
+    if(ZZ==28) { // Nickel
+      Z=ZZ;
       symbol="Ni";
       name="Nickel";
       Period=4;
@@ -2856,7 +2880,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Copper
     // Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper Copper
-    if(Z==29) { // Copper
+    if(ZZ==29) { // Copper
+      Z=ZZ;
       symbol="Cu";
       name="Copper";
       Period=4;
@@ -2929,7 +2954,7 @@ namespace xelement {
       HHIP=1600;
       HHIR=1500;
       xray_scatt=27.03;
-      //Cu JUNKAI CHANGED VALENCE
+      //Cu JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Copper
     // ********************************************************************************************************************************************************
@@ -2937,7 +2962,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Zinc
     // Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc Zinc
-    if(Z==30) { // Zinc
+    if(ZZ==30) { // Zinc
+      Z=ZZ;
       symbol="Zn";
       name="Zinc";
       Period=4;
@@ -3015,11 +3041,12 @@ namespace xelement {
     // [AFLOW]STOP=Zinc
     // ********************************************************************************************************************************************************
 
-    // p-electron systems
+    // p-electron systems 
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Gallium
     // Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium Gallium
-    if(Z==31) { // Gallium
+    if(ZZ==31) { // Gallium
+      Z=ZZ;
       symbol="Ga";
       name="Gallium";
       Period=4;
@@ -3100,7 +3127,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Germanium
     // Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium Germanium
-    if(Z==32) { // Germanium
+    if(ZZ==32) { // Germanium
+      Z=ZZ;
       symbol="Ge";
       name="Germanium";
       Period=4;
@@ -3181,7 +3209,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Arsenic
     // Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic Arsenic
-    if(Z==33) { // Arsenic
+    if(ZZ==33) { // Arsenic
+      Z=ZZ;
       symbol="As";
       name="Arsenic";
       Period=4;
@@ -3262,7 +3291,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Selenium
     // Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium Selenium
-    if(Z==34) { // Selenium
+    if(ZZ==34) { // Selenium
+      Z=ZZ;
       symbol="Se";
       name="Selenium";
       Period=4;
@@ -3335,7 +3365,7 @@ namespace xelement {
       HHIP=2200;
       HHIR=1900;
       /*xray_scatt=NNN;*/
-      //Se Table 27 of JUNKAI
+      //Se Table 27 of JX
     }
     // [AFLOW]STOP=Selenium
     // ********************************************************************************************************************************************************
@@ -3343,7 +3373,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Bromine
     // Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine Bromine
-    if(Z==35) { // Bromine
+    if(ZZ==35) { // Bromine
+      Z=ZZ;
       symbol="Br";
       name="Bromine";
       Period=4;
@@ -3416,7 +3447,7 @@ namespace xelement {
       HHIP=3300;
       HHIR=6900;
       /* xray_scatt=NNN;*/
-      //Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE
+      //Br interpolation phi_star, nws, Vm, gamma, BVm JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Bromine
     // ********************************************************************************************************************************************************
@@ -3424,7 +3455,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Krypton
     // Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton Krypton
-    if(Z==36) { // Krypton
+    if(ZZ==36) { // Krypton
+      Z=ZZ;
       symbol="Kr";
       name="Krypton";
       Period=4;
@@ -3507,7 +3539,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Rubidium
     // Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium Rubidium
-    if(Z==37) { // Rubidium
+    if(ZZ==37) { // Rubidium
+      Z=ZZ;
       symbol="Rb";
       name="Rubidium";
       Period=5;
@@ -3588,7 +3621,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Strontium
     // Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium Strontium
-    if(Z==38) { // Strontium
+    if(ZZ==38) { // Strontium
+      Z=ZZ;
       symbol="Sr";
       name="Strontium";
       Period=5;
@@ -3670,7 +3704,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Yttrium
     // Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium Yttrium
-    if(Z==39) { // Yttrium
+    if(ZZ==39) { // Yttrium
+      Z=ZZ;
       symbol="Y";
       name="Yttrium";
       Period=5;
@@ -3751,7 +3786,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Zirconium
     // Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium Zirconium
-    if(Z==40) { // Zirconium
+    if(ZZ==40) { // Zirconium
+      Z=ZZ;
       symbol="Zr";
       name="Zirconium";
       Period=5;
@@ -3832,7 +3868,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Niobium
     // Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium Niobium
-    if(Z==41) { // Niobium
+    if(ZZ==41) { // Niobium
+      Z=ZZ;
       symbol="Nb";
       name="Niobium";
       Period=5;
@@ -3913,7 +3950,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Molybdenum
     // Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum Molybdenum
-    if(Z==42) { // Molybdenum
+    if(ZZ==42) { // Molybdenum
+      Z=ZZ;
       symbol="Mo";
       name="Molybdenum";
       Period=5;
@@ -3994,7 +4032,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Technetium
     // Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium Technetium
-    if(Z==43) { // Technetium
+    if(ZZ==43) { // Technetium
+      Z=ZZ;
       symbol="Tc";
       name="Technetium";
       Period=5;
@@ -4067,7 +4106,7 @@ namespace xelement {
       HHIP=NNN;
       HHIR=NNN;
       /*xray_scatt=NNN;*/
-      //Tc JUNKAI CHANGED VALENCE
+      //Tc JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Technetium
     // ********************************************************************************************************************************************************
@@ -4075,7 +4114,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Ruthenium
     // Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium Ruthenium
-    if(Z==44) { // Ruthenium
+    if(ZZ==44) { // Ruthenium
+      Z=ZZ;
       symbol="Ru";
       name="Ruthenium";
       Period=5;
@@ -4148,7 +4188,7 @@ namespace xelement {
       HHIP=3200;
       HHIR=8000;
       /*xray_scatt=NNN;*/
-      //Ru JUNKAI CHANGED VALENCE
+      //Ru JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Ruthenium
     // ********************************************************************************************************************************************************
@@ -4156,7 +4196,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Rhodium
     // Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium Rhodium
-    if(Z==45) { // Rhodium
+    if(ZZ==45) { // Rhodium
+      Z=ZZ;
       symbol="Rh";
       name="Rhodium";
       Period=5;
@@ -4237,7 +4278,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Palladium
     // Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium Palladium
-    if(Z==46) { // Palladium
+    if(ZZ==46) { // Palladium
+      Z=ZZ;
       symbol="Pd";
       name="Palladium";
       Period=5;
@@ -4318,7 +4360,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Silver
     // Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver Silver
-    if(Z==47) { // Silver
+    if(ZZ==47) { // Silver
+      Z=ZZ;
       symbol="Ag";
       name="Silver";
       Period=5;
@@ -4391,7 +4434,7 @@ namespace xelement {
       HHIP=1200;
       HHIR=1400;
       xray_scatt=47.18;
-      //Ag JUNKAI CHANGED VALENCE
+      //Ag JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Silver
     // ********************************************************************************************************************************************************
@@ -4399,7 +4442,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Cadmium
     // Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium Cadmium
-    if(Z==48) { // Cadmium
+    if(ZZ==48) { // Cadmium
+      Z=ZZ;
       symbol="Cd";
       name="Cadmium";
       Period=5;
@@ -4481,7 +4525,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Indium
     // Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium Indium
-    if(Z==49) { // Indium
+    if(ZZ==49) { // Indium
+      Z=ZZ;
       symbol="In";
       name="Indium";
       Period=5;
@@ -4562,7 +4607,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Tin
     // Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin Tin
-    if(Z==50) { // Tin
+    if(ZZ==50) { // Tin
+      Z=ZZ;
       symbol="Sn";
       name="Tin";
       Period=5;
@@ -4643,7 +4689,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Antimony
     // Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony Antimony
-    if(Z==51) { // Antimony
+    if(ZZ==51) { // Antimony
+      Z=ZZ;
       symbol="Sb";
       name="Antimony";
       Period=5;
@@ -4724,7 +4771,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Tellurium
     // Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium Tellurium
-    if(Z==52) { // Tellurium
+    if(ZZ==52) { // Tellurium
+      Z=ZZ;
       symbol="Te";
       name="Tellurium";
       Period=5;
@@ -4797,7 +4845,7 @@ namespace xelement {
       HHIP=2900;
       HHIR=4900;
       /*xray_scatt=NNN;*/
-      //Te Table 27 of JUNKAI
+      //Te Table 27 of JX
     }
     // [AFLOW]STOP=Tellurium
     // ********************************************************************************************************************************************************
@@ -4805,7 +4853,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Iodine
     // Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine Iodine
-    if(Z==53) { // Iodine
+    if(ZZ==53) { // Iodine
+      Z=ZZ;
       symbol="I";
       name="Iodine";
       Period=5;
@@ -4886,7 +4935,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Xenon
     // Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon Xenon
-    if(Z==54) { // Xenon
+    if(ZZ==54) { // Xenon
+      Z=ZZ;
       symbol="Xe";
       name="Xenon";
       Period=5;
@@ -4959,7 +5009,7 @@ namespace xelement {
       HHIP=NNN;
       HHIR=NNN;
       /*xray_scatt=NNN;*/
-      //Xe JUNKAI CHANGED VALENCE
+      //Xe JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Xenon
     // ********************************************************************************************************************************************************
@@ -4969,7 +5019,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Cesium
     // Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium Cesium
-    if(Z==55) { // Cesium
+    if(ZZ==55) { // Cesium
+      Z=ZZ;
       symbol="Cs";
       name="Cesium";
       Period=6;
@@ -5050,7 +5101,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Barium
     // Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium Barium
-    if(Z==56) { // Barium
+    if(ZZ==56) { // Barium
+      Z=ZZ;
       symbol="Ba";
       name="Barium";
       Period=6;
@@ -5132,7 +5184,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lanthanium
     // Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium Lanthanium
-    if(Z==57) { // Lanthanium
+    if(ZZ==57) { // Lanthanium
+      Z=ZZ;
       symbol="La";
       name="Lanthanium";
       Period=6;
@@ -5214,7 +5267,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Cerium
     // Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium Cerium
-    if(Z==58) { // Cerium
+    if(ZZ==58) { // Cerium
+      Z=ZZ;
       symbol="Ce";
       name="Cerium";
       Period=6;
@@ -5295,7 +5349,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Praseodymium
     // Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium Praseodymium
-    if(Z==59) { // Praseodymium
+    if(ZZ==59) { // Praseodymium
+      Z=ZZ;
       symbol="Pr";
       name="Praseodymium";
       Period=6;
@@ -5376,7 +5431,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Neodymium
     // Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium Neodymium
-    if(Z==60) { // Neodymium
+    if(ZZ==60) { // Neodymium
+      Z=ZZ;
       symbol="Nd";
       name="Neodymium";
       Period=6;
@@ -5449,7 +5505,7 @@ namespace xelement {
       HHIP=9500;
       HHIR=3100;
       /*xray_scatt=NNN;*/
-      //Nd Pettifor linear interpolation JUNKAI CHANGED VALENCE
+      //Nd Pettifor linear interpolation JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Neodymium
     // ********************************************************************************************************************************************************
@@ -5457,7 +5513,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Promethium
     // Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium Promethium
-    if(Z==61) { // Promethium
+    if(ZZ==61) { // Promethium
+      Z=ZZ;
       symbol="Pm";
       name="Promethium";
       Period=6;
@@ -5476,14 +5533,14 @@ namespace xelement {
       CrystalStr_PT="NNN";
       space_group="NNN";
       space_group_number=NNN;
-      Pearson_coefficient=NNN;
+      Pearson_coefficient=0.0;
       lattice_constant[1]=NNN;lattice_constant[2]=NNN;lattice_constant[3]=NNN;
-      lattice_angle[1]=NNN;lattice_angle[2]=NNN;lattice_angle[3]=NNN; 
-      phase="nnn";         
-      radius=NNN;         
-      radius_PT=NNN;          
-      radius_covalent_PT=NNN;   
-      radius_covalent=NNN;  
+      lattice_angle[1]=NNN;lattice_angle[2]=NNN;lattice_angle[3]=NNN;
+      phase="Solid";
+      radius=NNN;
+      radius_PT=205;
+      radius_covalent=1.99;
+      radius_covalent_PT=199;
       radius_VanDerWaals_PT=NNN;
       radii_Ghosh08=1.5303;
       radii_Slatter=1.85;
@@ -5538,7 +5595,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Samarium
     // Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium Samarium
-    if(Z==62) { // Samarium
+    if(ZZ==62) { // Samarium
+      Z=ZZ;
       symbol="Sm";
       name="Samarium";
       Period=6;
@@ -5619,7 +5677,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Europium
     // Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium Europium
-    if(Z==63) { // Europium
+    if(ZZ==63) { // Europium
+      Z=ZZ;
       symbol="Eu";
       name="Europium";
       Period=6;
@@ -5700,7 +5759,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Gadolinium
     // Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium Gadolinium
-    if(Z==64) { // Gadolinium
+    if(ZZ==64) { // Gadolinium
+      Z=ZZ;
       symbol="Gd";
       name="Gadolinium";
       Period=6;
@@ -5781,7 +5841,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Terbium
     // Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium Terbium
-    if(Z==65) { // Terbium
+    if(ZZ==65) { // Terbium
+      Z=ZZ;
       symbol="Tb";
       name="Terbium";
       Period=6;
@@ -5862,7 +5923,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Dysprosium
     // Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium Dysprosium
-    if(Z==66) { // Dysprosium
+    if(ZZ==66) { // Dysprosium
+      Z=ZZ;
       symbol="Dy";
       name="Dysprosium";
       Period=6;
@@ -5935,7 +5997,7 @@ namespace xelement {
       HHIP=9500;
       HHIR=3100;
       /*xray_scatt=NNN;*/
-      //Dy Pettifor linear interpolation JUNKAI CHANGED VALENCE
+      //Dy Pettifor linear interpolation JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Dysprosium
     // ********************************************************************************************************************************************************
@@ -5943,7 +6005,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Holmium
     // Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium Holmium
-    if(Z==67) { // Holmium
+    if(ZZ==67) { // Holmium
+      Z=ZZ;
       symbol="Ho";
       name="Holmium";
       Period=6;
@@ -6024,7 +6087,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Erbium
     // Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium Erbium
-    if(Z==68) { // Erbium
+    if(ZZ==68) { // Erbium
+      Z=ZZ;
       symbol="Er";
       name="Erbium";
       Period=6;
@@ -6105,7 +6169,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Thulium
     // Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium Thulium
-    if(Z==69) { // Thulium
+    if(ZZ==69) { // Thulium
+      Z=ZZ;
       symbol="Tm";
       name="Thulium";
       Period=6;
@@ -6178,7 +6243,7 @@ namespace xelement {
       HHIP=9500;
       HHIR=3100;
       /*xray_scatt=NNN;*/
-      //Tm Pettifor linear interpolation JUNKAI CHANGED VALENCE
+      //Tm Pettifor linear interpolation JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Thulium
     // ********************************************************************************************************************************************************
@@ -6186,7 +6251,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Ytterbium
     // Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium Ytterbium
-    if(Z==70) { // Ytterbium
+    if(ZZ==70) { // Ytterbium
+      Z=ZZ;
       symbol="Yb";
       name="Ytterbium";
       Period=6;
@@ -6267,7 +6333,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lutetium
     // Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium Lutetium
-    if(Z==71) { // Lutetium
+    if(ZZ==71) { // Lutetium
+      Z=ZZ;
       symbol="Lu";
       name="Lutetium";
       Period=6;
@@ -6349,7 +6416,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Hafnium
     // Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium Hafnium
-    if(Z==72) { // Hafnium
+    if(ZZ==72) { // Hafnium
+      Z=ZZ;
       symbol="Hf";
       name="Hafnium";
       Period=6;
@@ -6430,7 +6498,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Tantalum
     // Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum Tantalum
-    if(Z==73) { // Tantalum
+    if(ZZ==73) { // Tantalum
+      Z=ZZ;
       symbol="Ta";
       name="Tantalum";
       Period=6;
@@ -6511,7 +6580,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Tungsten
     // Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten Tungsten
-    if(Z==74) { // Tungsten
+    if(ZZ==74) { // Tungsten
+      Z=ZZ;
       symbol="W";
       name="Tungsten";
       Period=6;
@@ -6592,7 +6662,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Rhenium
     // Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium Rhenium
-    if(Z==75) { // Rhenium
+    if(ZZ==75) { // Rhenium
+      Z=ZZ;
       symbol="Re";
       name="Rhenium";
       Period=6;
@@ -6673,7 +6744,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Osmium
     // Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium Osmium
-    if(Z==76) { // Osmium
+    if(ZZ==76) { // Osmium
+      Z=ZZ;
       symbol="Os";
       name="Osmium";
       Period=6;
@@ -6746,7 +6818,7 @@ namespace xelement {
       HHIP=5500;
       HHIR=9100;
       /*xray_scatt=NNN;*/
-      //Os JUNKAI CHANGED VALENCE
+      //Os JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Osmium
     // ********************************************************************************************************************************************************
@@ -6754,7 +6826,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Iridium
     // Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium Iridium
-    if(Z==77) { // Iridium
+    if(ZZ==77) { // Iridium
+      Z=ZZ;
       symbol="Ir";
       name="Iridium";
       Period=6;
@@ -6827,7 +6900,7 @@ namespace xelement {
       HHIP=5500;
       HHIR=9100;
       /*xray_scatt=NNN;*/
-      //Ir JUNKAI CHANGED VALENCE
+      //Ir JX CHANGED VALENCE
     }
     // [AFLOW]STOP=Iridium
     // ********************************************************************************************************************************************************
@@ -6835,7 +6908,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Platinum
     // Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum Platinum
-    if(Z==78) { // Platinum
+    if(ZZ==78) { // Platinum
+      Z=ZZ;
       symbol="Pt";
       name="Platinum";
       Period=6;
@@ -6916,7 +6990,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Gold
     // Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold Gold
-    if(Z==79) { // Gold
+    if(ZZ==79) { // Gold
+      Z=ZZ;
       symbol="Au";
       name="Gold";
       Period=6;
@@ -6997,7 +7072,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Mercury
     // Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury Mercury
-    if(Z==80) { // Mercury
+    if(ZZ==80) { // Mercury
+      Z=ZZ;
       symbol="Hg";
       name="Mercury";
       Period=6;
@@ -7079,7 +7155,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Thallium
     // Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium Thallium
-    if(Z==81) { // Thallium
+    if(ZZ==81) { // Thallium
+      Z=ZZ;
       symbol="Tl";
       name="Thallium";
       Period=6;
@@ -7160,7 +7237,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lead
     // Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead Lead
-    if(Z==82) { // Lead
+    if(ZZ==82) { // Lead
+      Z=ZZ;
       symbol="Pb";
       name="Lead";
       Period=6;
@@ -7241,7 +7319,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Bismuth
     // Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth Bismuth
-    if(Z==83) { // Bismuth
+    if(ZZ==83) { // Bismuth
+      Z=ZZ;
       symbol="Bi";
       name="Bismuth";
       Period=6;
@@ -7322,7 +7401,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Polonium
     // Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium Polonium
-    if(Z==84) { // Polonium
+    if(ZZ==84) { // Polonium
+      Z=ZZ;
       symbol="Po";
       name="Polonium";
       Period=6;
@@ -7403,7 +7483,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Astatine
     // Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine Astatine
-    if(Z==85) { // Astatine
+    if(ZZ==85) { // Astatine
+      Z=ZZ;
       symbol="At";
       name="Astatine";
       Period=6;
@@ -7460,26 +7541,23 @@ namespace xelement {
       Vickers_hardness=NNN;
       Hardness_Pearson=NNN;
       Hardness_Putz=NNN;
-      Hardness_RB=NNN;
+      Hardness_RB=3.57;
       shear_modulus=NNN;
       Young_modulus=NNN;
       bulk_modulus=NNN;
       Poisson_ratio_PT=NNN;
       Miedema_BVm=NNN;
-      //
-      Magnetic_Type_PT="UNDEFINED";
+      Magnetic_Type_PT="NNN";
       Mass_Magnetic_Susceptibility=NNN;
       Volume_Magnetic_Susceptibility=NNN;
       Molar_Magnetic_Susceptibility=NNN;
       Curie_point=NNN;
-      //
+      color_PT="SILVER";
       refractive_index=NNN;
-      color_PT="UNDEFINED";
-      //
       HHIP=NNN;
       HHIR=NNN;
-      xray_scatt=NNN;
-      // [AFLOW]STOP=CONSTRUCTOR
+      /*xray_scatt=NNN;*/
+      //At
     }
     // [AFLOW]STOP=Astatine
     // ********************************************************************************************************************************************************
@@ -7487,7 +7565,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Radon
     // Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon Radon
-    if(Z==86) { // Radon
+    if(ZZ==86) { // Radon
+      Z=ZZ;
       symbol="Rn";
       name="Radon";
       Period=6;
@@ -7570,7 +7649,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Francium
     // Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium Francium
-    if(Z==87) { // Francium
+    if(ZZ==87) { // Francium
+      Z=ZZ;
       symbol="Fr";
       name="Francium";
       Period=7;
@@ -7651,7 +7731,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Radium
     // Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium Radium
-    if(Z==88) { // Radium
+    if(ZZ==88) { // Radium
+      Z=ZZ;
       symbol="Ra";
       name="Radium";
       Period=7;
@@ -7733,7 +7814,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Actinium
     // Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium Actinium
-    if(Z==89) { // Actinium
+    if(ZZ==89) { // Actinium
+      Z=ZZ;
       symbol="Ac";
       name="Actinium";
       Period=7;
@@ -7815,7 +7897,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Thorium
     // Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium Thorium
-    if(Z==90) { // Thorium
+    if(ZZ==90) { // Thorium
+      Z=ZZ;
       symbol="Th";
       name="Thorium";
       Period=7;
@@ -7896,7 +7979,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Protoactinium
     // Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium Protoactinium
-    if(Z==91) { // Protoactinium
+    if(ZZ==91) { // Protoactinium
+      Z=ZZ;
       symbol="Pa";
       name="Protoactinium";
       Period=7;
@@ -7977,7 +8061,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Uranium
     // Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium Uranium
-    if(Z==92) { // Uranium
+    if(ZZ==92) { // Uranium
+      Z=ZZ;
       symbol="U";
       name="Uranium";
       Period=7;
@@ -8058,7 +8143,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Neptunium
     // Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium Neptunium
-    if(Z==93) { // Neptunium
+    if(ZZ==93) { // Neptunium
+      Z=ZZ;
       symbol="Np";
       name="Neptunium";
       Period=7;
@@ -8139,7 +8225,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Plutonium
     // Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium Plutonium
-    if(Z==94) { // Plutonium
+    if(ZZ==94) { // Plutonium
+      Z=ZZ;
       symbol="Pu";
       name="Plutonium";
       Period=7;
@@ -8220,7 +8307,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Americium
     // Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium Americium
-    if(Z==95) { // Americium
+    if(ZZ==95) { // Americium
+      Z=ZZ;
       symbol="Am";
       name="Americium";
       Period=7;
@@ -8301,7 +8389,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Curium
     // Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium Curium
-    if(Z==96) { // Curium
+    if(ZZ==96) { // Curium
+      Z=ZZ;
       symbol="Cm";
       name="Curium";
       Period=7;
@@ -8382,7 +8471,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Berkelium
     // Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium Berkelium
-    if(Z==97) { // Berkelium
+    if(ZZ==97) { // Berkelium
+      Z=ZZ;
       symbol="Bk";
       name="Berkelium";
       Period=7;
@@ -8463,7 +8553,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Californium
     // Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium Californium
-    if(Z==98) { // Californium
+    if(ZZ==98) { // Californium
+      Z=ZZ;
       symbol="Cf";
       name="Californium";
       Period=7;
@@ -8544,7 +8635,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Einsteinium
     // Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium Einsteinium
-    if(Z==99) { // Einsteinium
+    if(ZZ==99) { // Einsteinium
+      Z=ZZ;
       symbol="Es";
       name="Einsteinium";
       Period=7;
@@ -8625,7 +8717,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Fermium
     // Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium Fermium
-    if(Z==100) { // Fermium
+    if(ZZ==100) { // Fermium
+      Z=ZZ;
       symbol="Fm";
       name="Fermium";
       Period=7;
@@ -8706,7 +8799,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Mendelevium
     // Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium Mendelevium
-    if(Z==101) { // Mendelevium
+    if(ZZ==101) { // Mendelevium
+      Z=ZZ;
       symbol="Md";
       name="Mendelevium";
       Period=7;
@@ -8787,7 +8881,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Nobelium
     // Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium Nobelium
-    if(Z==102) { // Nobelium
+    if(ZZ==102) { // Nobelium
+      Z=ZZ;
       symbol="No";
       name="Nobelium";
       Period=7;
@@ -8868,7 +8963,8 @@ namespace xelement {
     // ********************************************************************************************************************************************************
     // [AFLOW]START=Lawrencium
     // Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium Lawrencium
-    if(Z==103) { // Lawrencium
+    if(ZZ==103) { // Lawrencium
+      Z=ZZ;
       symbol="Lr";
       name="Lawrencium";
       Period=7;
@@ -8950,8 +9046,8 @@ namespace xelement {
 
 #endif // _AFLOW_XELEMENT_CPP
 
-  // **************************************************************************
-  // *                                                                        *
-  // *             STEFANO CURTAROLO - Duke University 2003-2020              *
-  // *                                                                        *
-  // **************************************************************************
+// **************************************************************************
+// *                                                                        *
+// *             STEFANO CURTAROLO - Duke University 2003-2020              *
+// *                                                                        *
+// **************************************************************************
