@@ -629,21 +629,16 @@ namespace cce {
         standard_ICSD_Us_vector.push_back(vLDAUU[k]);
       }
       // compare read and standard Us
-      bool Us_disagree=false;
       for (uint k = 0; k < species_vector.size(); k++) {
         if (Us_vector[k] != standard_ICSD_Us_vector[k]){
-          Us_disagree=true;
           message << " BAD NEWS: For this DFT+U calculation with Dudarev's method the provided U value of " << Us_vector[k] << " eV for " << species_vector[k] << " does not match the standard value of " << standard_ICSD_Us_vector[k] << " eV. There are no corrections for this case.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
       }
-      if (!Us_disagree){
-        pbe_u_icsd = true;
-      }
+      pbe_u_icsd = true;
     }
     // check whether it is a DFT+U calculation with different parameters than for PBE+U_ICSD
     if ((vflags.KBIN_VASP_FORCE_OPTION_LDAU1.isentry || vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry) && !pbe_u_icsd){
-      ldau = true;
       message << " BAD NEWS: It seems you are providing an aflow.in for a DFT+U calculation with different parameters than for the AFLOW ICSD database (Dudarev's approach, LDAU2=ON). There are no corrections for this case.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
