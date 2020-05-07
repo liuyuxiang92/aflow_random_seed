@@ -230,11 +230,6 @@ namespace apl {
         }
         xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
 
-        xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
-        if (zerostate_chgcar) {
-          xInputs[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
-        }
-
         // Set up runname and generate distorted structure
         xInputs[idxRun].xvasp.AVASP_arun_runname = buildRunName(distortions, atoms, idxRun, nruns);
         applyDistortions(xInputs[idxRun], clst.distortion_vectors, distortions, atoms);
