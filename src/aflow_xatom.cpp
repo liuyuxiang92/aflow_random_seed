@@ -6112,7 +6112,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   for(int i=0;i<(int)a.atoms.size();i++) {
     if (a.atoms.at(i).cleanname.empty()) a.atoms.at(i).cleanname=(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(i).name));
   }
-  // RF 20200310 END
+  //RF20200310 END
   // CHECKS
   if(a.atoms.size()!=a.qm_atoms.size())     {
     //[CO20190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
