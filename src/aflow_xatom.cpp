@@ -6108,7 +6108,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.write_klattice_flag=TRUE;
   a.write_DEBUG_flag=TRUE;
 #endif
-  // RF 20200310 BEGIN
+  //RF20200310 BEGIN
   for(int i=0;i<(int)a.atoms.size();i++) {
     if (a.atoms.at(i).cleanname.empty()) a.atoms.at(i).cleanname=(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(i).name));
   }
