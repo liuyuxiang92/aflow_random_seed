@@ -162,14 +162,14 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     vector<xmatrix<double> > row;
-    for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
+    for (uint i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       const vector<_sym_op>& agroup = _supercell->getAGROUP(i);  //CO //CO20190218
       if (agroup.size() == 0) {
         string message = "Site point group operations are missing.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
       }
 
-      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
+      for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if(LDEBUG){ //CO20190218
           cerr << soliloquy << " compare original m=" << std::endl;
           cerr << _forceConstantMatrices[i][j] << std::endl;
@@ -218,7 +218,7 @@ namespace apl {
     // force constant matrices. See http://cmt.dur.ac.uk/sjc/thesis_prt/node83.html
     xmatrix<double> sum(3, 3);//, sum2(3, 3); OBSOLETE ME20200504 - not used
 
-    for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
+    for (uint i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       // ME20200504 - sums are not used or cleared before they are used
       //[OBSOLETE] // Get SUMs
       //[OBSOLETE] for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
@@ -231,7 +231,7 @@ namespace apl {
       // Correct SUM2
       // ME20200504 - This appears to enforce the invariance of the force constants
       // upon permutations
-      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
+      for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i == j) continue;
         _forceConstantMatrices[i][j] = 0.5 * (_forceConstantMatrices[i][j] + trasp(_forceConstantMatrices[j][i]));
         _forceConstantMatrices[j][i] = trasp(_forceConstantMatrices[i][j]);
@@ -240,7 +240,7 @@ namespace apl {
       // Get SUMs again
       sum.clear();
       //sum2.clear(); OBSOLETE ME20200504 - not used
-      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
+      for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if (i != j) {
           sum = sum + _forceConstantMatrices[i][j];
           //sum2 = sum2 + trasp(_forceConstantMatrices[j][i]);  // OBSOLETE ME20200504 - not used
@@ -445,11 +445,11 @@ namespace apl {
     }
 
     // Step1
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
       int basedUniqueAtomID = _supercell->getUniqueAtomID(i);
 
       xmatrix<double> sum(3, 3);
-      for (int j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO20190218
+      for (uint j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO20190218
         try {  //CO
           const _sym_op& symOp = _supercell->getSymOpWhichMatchAtoms(_supercell->getUniqueAtomID(i, j), basedUniqueAtomID, _FGROUP_);
           sum += inverse(symOp.Uc) * _bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i, j))] * symOp.Uc;
@@ -466,14 +466,14 @@ namespace apl {
 
       sum = (1.0 / _supercell->getNumberOfEquivalentAtomsOfType(i)) * sum; //CO20190218
 
-      for (int j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) //CO20190218
+      for (uint j = 0; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) //CO20190218
         _bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i, j))] = sum;
     }
 
     // Step2
     vector<xmatrix<double> > newbe = _bornEffectiveChargeTensor;
     const vector<vector<_sym_op> >& agroup = _supercell->getAGROUP();  //CO
-    for (int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
+    for (uint i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       // Translate the center to this atom
       _supercell->center(i);
 
@@ -503,14 +503,14 @@ namespace apl {
       _bornEffectiveChargeTensor[i] -= sum;
 
     // Make list only for unique atoms
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++)
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++)
       newbe.push_back(_bornEffectiveChargeTensor[_supercell->sc2pcMap(_supercell->getUniqueAtomID(i))]);
     _bornEffectiveChargeTensor.clear();
     _bornEffectiveChargeTensor = newbe;
     newbe.clear();
 
     // Show charges
-    for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+    for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
       int id = _supercell->getUniqueAtomID(i);
       message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
         << std::setw(2) << _supercell->getSupercellStructure().atoms[id].cleanname

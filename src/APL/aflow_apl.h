@@ -642,9 +642,9 @@ namespace apl {
       //ME20190715 BEGIN - added const to getter functions so they can be used with const Supercell &
       bool isShellRestricted() const;
       int getMaxShellID() const;
-      int getNumberOfAtoms() const;
-      int getNumberOfUniqueAtoms() const;
-      int getNumberOfEquivalentAtomsOfType(int) const; //CO20190218
+      uint getNumberOfAtoms() const;
+      uint getNumberOfUniqueAtoms() const;
+      uint getNumberOfEquivalentAtomsOfType(int) const; //CO20190218
       int getUniqueAtomID(int) const;
       int getUniqueAtomID(int, int) const;
       const _atom& getUniqueAtom(int) const;

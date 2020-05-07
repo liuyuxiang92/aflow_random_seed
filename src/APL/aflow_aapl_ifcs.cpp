@@ -177,19 +177,24 @@ namespace apl {
 namespace apl {
 
   bool AnharmonicIFCs::runVASPCalculations(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags, bool zerostate_chgcar) {
-    bool stagebreak = false;
+    string function = _AAPL_IFCS_ERR_PREFIX_ + "runVASPCalculations()";
+    string message = "";
+    if (order > 4) {
+      message = "Not implemented for order > 4.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
     if (!initialized) {
-      string function = _AAPL_IFCS_ERR_PREFIX_ + "runVASPCalculations()";
-      string message = "Not initialized.";
+      message = "Not initialized.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
 
+    bool stagebreak = false;
     xinput.xvasp.AVASP_arun_mode = _AAPL_IFCS_MODULE_;
     stringstream _logger;
     _logger << "Managing directories for ";
     if (order == 3) {
       _logger << "3rd";
-    } else {
+    } else if (order == 4) {
       _logger << "4th";
     }
     _logger << " order IFCs.";
@@ -222,7 +227,7 @@ namespace apl {
         }
       }
       if (d == ndir) {
-        string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
+        message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
         pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         zerostate_chgcar = false;
       } else {

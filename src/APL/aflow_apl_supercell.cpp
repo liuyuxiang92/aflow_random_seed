@@ -1322,21 +1322,21 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   //ME20190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfAtoms() const {
+  uint Supercell::getNumberOfAtoms() const {
     return _scStructure.atoms.size();
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   //ME20190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfUniqueAtoms() const {
+  uint Supercell::getNumberOfUniqueAtoms() const {
     return _scStructure.iatoms.size();
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   //ME20190715 - added const to use function with const Supercell &
-  int Supercell::getNumberOfEquivalentAtomsOfType(int i) const { //CO20190218
+  uint Supercell::getNumberOfEquivalentAtomsOfType(int i) const { //CO20190218
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
       //ME20191031 - use xerror
