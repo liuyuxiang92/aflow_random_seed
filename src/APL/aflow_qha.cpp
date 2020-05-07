@@ -953,7 +953,7 @@ namespace apl
 
       // determine APL subdirectories: if it is first run skip to the next
       // volume calculation
-      if (fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, *aflowin, false)){
+      if (fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, *aflowin)){
         apl_data_calculated = false;
         continue;
       }
