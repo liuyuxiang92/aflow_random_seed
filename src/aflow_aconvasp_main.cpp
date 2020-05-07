@@ -27,6 +27,7 @@
 // [OBSOLETE] #include "aflow_contrib_cormac.h"
 #include "aflowlib.h"
 #include "aflow_gfa.h" //DF20190329
+#include "aflow_cce.h" //RF20200203
 
 extern double NearestNeighbour(const xstructure& a);
 

@@ -32,8 +32,8 @@ be PBE (default).
 Details for the options available are explained in the following.
 
 (ii) AVAILABLE OPTIONS:
---cce/--cce[=POSCAR] --usage  Prints user instructions.
---cce=POSCAR_FILE_PATH        Provide the path to the structure file. It can be in any structure 
+--cce                         Prints user instructions.
+--cce=STRUCTURE_FILE_PATH     Provide the path to the structure file. It can be in any structure 
                               format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... 
                               For VASP, a VASP5 POSCAR is required.
 --dft_formation_energies=     Provide a comma separated list of precalculated DFT formation energies, 
@@ -49,10 +49,10 @@ Details for the options available are explained in the following.
 --oxidation_numbers=          Provide as a comma separated list the oxidation numbers. It is 
                               assumed that: (i) one is provided for each atom of the structure and 
                               (ii) they are in the same sequence as the corresponding atoms in the 
-                              provided POSCAR file.
---poscar2cce < POSCAR         Determines the CCE corrections for the structure in file POSCAR. It can
-                              be in any structure format that AFLOW supports, e.g. VASP POSCAR, QE,
-                              aims, ... For VASP, a VASP5 POSCAR is required.
+                              provided structure file.
+--poscar2cce < STRUCT_FILE    Determines the CCE corrections for the structure in file STRUCT_FILE. 
+                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR,
+                              QE, aims, ... For VASP, a VASP5 POSCAR is required.
 
 (iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
 Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)

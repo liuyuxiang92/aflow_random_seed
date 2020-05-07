@@ -9,7 +9,6 @@
 
 #include "aflow.h"
 #include "aflow_compare_structure.h" //DX20190314
-#include "aflow_cce.h" //RF20200203
 
 // pflow prototypes
 // aflow_pflow.cpp

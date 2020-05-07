@@ -989,6 +989,14 @@ DEFAULT_CHULL_PNG_RESOLUTION
   default: 300
 
 ####################################################################################################
+DEFAULTS CCE
+
+DEFAULT_CCE_OX_METHOD
+  description: Default method to determine oxidation numbers.
+  type: string
+  default: "ELECTRONEGATIVITY_ALLEN"
+
+####################################################################################################
 DEFAULTS GFA
 
 DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF

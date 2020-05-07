@@ -53,7 +53,7 @@ namespace cce {
     //read structural data from structure file provided on command line
     xstructure structure=read_structure(flags.getattachedscheme("CCE_CORRECTION::POSCAR_PATH"));
 
-    return write_corrections(structure, flags);
+    write_corrections(structure, flags);
   }
 
   void write_corrections(xstructure& structure, aurostd::xoption& flags) {
@@ -76,7 +76,7 @@ namespace cce {
       cce_flags.flag("OX_NUMS_PROVIDED",TRUE);
     }
 
-    return write_corrections(structure, flags, cce_flags, cce_vars);
+    write_corrections(structure, flags, cce_flags, cce_vars);
   }
 
   void write_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
@@ -126,7 +126,7 @@ namespace cce {
     // read structure
     xstructure structure=read_structure(ist);
 
-    return write_corrections(structure, flags);
+    write_corrections(structure, flags);
   }
 
 
@@ -139,10 +139,10 @@ namespace cce {
     string soliloquy="cce::calculate_corrections():";
     stringstream message;
     // get structure
-    string poscar;
+    string poscar="";
     try { // try most relaxed CONTCAR first
       poscar=aflowlib::vaspfile2stringstream(directory_path,"CONTCAR");
-    } catch (aurostd::xerror e) { // if that doesn't work try POSCAR
+    } catch (aurostd::xerror& e) { // if that doesn't work try POSCAR
       poscar=aflowlib::vaspfile2stringstream(directory_path,"POSCAR");
     }
     xstructure structure=read_structure(poscar); // AFLOW seems to automatically unzip and rezip zipped files so that only the file name without zipping extension needs to be given
@@ -2770,27 +2770,6 @@ namespace cce {
     }
   }
 
-  ////get_formation_enthalpies//////////////////////////////////////////////
-  //// ME20200213
-  //// Returns the formation enthalpy per cell for each functional
-  //vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars) {
-  //  vector<double> formation_enthalpies(cce_correction.size(), 0.0);
-  //  uint num_funcs=cce_vars.vfunctionals.size();
-  //  for (uint i = 0; i < num_funcs; i++) {
-  //    if (cce_vars.vfunctionals[i] != "exp" ) {
-  //      if (cce_vars.dft_energies.size() > 0) {
-  //        // for 298.15 K
-  //        formation_enthalpies[2*i] = cce_vars.dft_energies[i] - cce_correction[2*i];
-  //        // for 0 K
-  //        formation_enthalpies[2*i+1] = cce_vars.dft_energies[i] - cce_correction[2*i+1];
-  //      }
-  //    } else { // treat exp. separately since formation enthalpy is equal to sum of corrections in this case
-  //      formation_enthalpies[2*i] = cce_correction[2*i];
-  //    }
-  //  }
-  //  return formation_enthalpies;
-  //}
-
   /////////////////////////////////////////////////////////////////////////////
   //                                                                         //
   //                        WRITE OUTPUT AND CITATION                        //
@@ -2971,8 +2950,8 @@ namespace cce {
     oss << "can be found in README_AFLOW_CCE.TXT." << endl;
     oss << endl;
     oss << "(ii) AVAILABLE OPTIONS:" << endl;
-    oss << "--cce/--cce[=POSCAR] --usage  Prints these user instructions." << endl;
-    oss << "--cce=POSCAR_FILE_PATH        Provide the path to the structure file. It can be in any structure" << endl;
+    oss << "--cce                         Prints these user instructions." << endl;
+    oss << "--cce=STRUCTURE_FILE_PATH     Provide the path to the structure file. It can be in any structure" << endl;
     oss << "                              format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ..." << endl;
     oss << "                              For VASP, a VASP5 POSCAR is required." << endl;
     oss << "--dft_formation_energies=     Provide a comma separated list of precalculated DFT formation energies," << endl; 
@@ -2988,12 +2967,10 @@ namespace cce {
     oss << "--oxidation_numbers=          Provide as a comma separated list the oxidation numbers. It is" << endl;
     oss << "                              assumed that: (i) one is provided for each atom of the structure and" << endl; 
     oss << "                              (ii) they are in the same sequence as the corresponding atoms in the" << endl;
-    oss << "                              provided POSCAR file." << endl;
-    oss << "--poscar2cce < POSCAR         Determines the CCE corrections for the structure in file POSCAR (must" << endl;
-    oss << "                              be in VASP POSCAR format)." << endl;
-    oss << "--poscar2cce < POSCAR         Determines the CCE corrections for the structure in file POSCAR. It can" << endl;
-    oss << "                              be in any structure format that AFLOW supports, e.g. VASP POSCAR, QE," << endl;
-    oss << "                              aims, ... For VASP, a VASP5 POSCAR is required." << endl;
+    oss << "                              provided structure file." << endl;
+    oss << "--poscar2cce < STRUCT_FILE    Determines the CCE corrections for the structure in file STRUCT_FILE." << endl;
+    oss << "                              It can be in any structure format that AFLOW supports, e.g. VASP POSCAR," << endl;
+    oss << "                              QE, aims, ... For VASP, a VASP5 POSCAR is required." << endl;
     oss << endl;
     oss << "(iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:" << endl;
     oss << "Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)" << endl;
