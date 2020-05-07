@@ -105,7 +105,7 @@ namespace cce {
       }
 
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
-        oss << get_JSON(structure, cce_vars) << std::endl;
+        oss << print_JSON(structure, cce_vars) << std::endl;
       } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
         oss << print_test_output(cce_vars, cce_vars.cce_form_energy_cell) << std::endl;
       } else {
@@ -581,10 +581,14 @@ namespace cce {
     }
     // check whether it is a DFT+U calculation with parameters as for the ICSD (PBE+U_ICSD calculation)
     // new implementation checking Us explicitly
-    if (vflags.KBIN_VASP_LDAU_PARAMETERS != "" && vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry && !vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.isentry && !vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry){
+    if (!vflags.KBIN_VASP_LDAU_PARAMETERS.empty() && vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry && !vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.isentry && !vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry){
       ldau2=true;
       vector<string> ldau_params_vector;
       aurostd::string2tokens(vflags.KBIN_VASP_LDAU_PARAMETERS, ldau_params_vector, ";");
+      if (ldau_params_vector.size() != 4){
+        message << " BAD NEWS: The LDAU parameters are not of the right size. Please adapt and rerun.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+      }
       // get species
       string species_part = ldau_params_vector[0];
       vector<string> species_vector;
@@ -597,10 +601,7 @@ namespace cce {
       string Us_part = ldau_params_vector[2];
       vector<string> Us_string_vector;
       vector<double> Us_vector;
-      aurostd::string2tokens(Us_part, Us_string_vector, ",");
-      for (uint k = 0; k < Us_string_vector.size(); k++) {
-        Us_vector.push_back(aurostd::string2utype<double>(Us_string_vector[k]));
-      }
+      aurostd::string2tokens(Us_part, Us_vector,",");
       if (species_vector.size() != Us_vector.size()){
         message << " BAD NEWS: The number of species in the DFT+U settings differs from the number of provided U values. Please adapt and rerun.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
@@ -619,7 +620,10 @@ namespace cce {
           ostream& oss = cerr;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=".";
-          message << " BAD NEWS: It seems the standard DFT+U method for " << species_vector[k] << " was changed from Dudarev's approach (LDAU2=ON, vLDAUtype[" << k << "]=2) as used for the AFLOW ICSD database when obtaining the corrections to vLDAUtype[" << k << "]=" << vLDAUtype[k] << " now. If the standard U values have also been changed, then the corrections might have been constructed for other U values than used in this calculation and should not be applied. Please check this carefully!";
+          message << " BAD NEWS: It seems the standard DFT+U method for " << species_vector[k] << " was changed from Dudarev's approach (LDAU2=ON, vLDAUtype[" << k << "]=2)" << std::endl;
+          message << "as used for the AFLOW ICSD database when obtaining the corrections to vLDAUtype[" << k << "]=" << vLDAUtype[k] << " now." << std::endl;
+          message << "If the standard U values have also been changed, then the corrections might have been constructed for other U values than used in this calculation" << std::endl;
+          message << "and should not be applied. Please check this carefully!";
           pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         standard_ICSD_Us_vector.push_back(vLDAUU[k]);
@@ -2782,10 +2786,10 @@ namespace cce {
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
  
-  //get_JSON/////////////////////////////////////////////////////////////
+  //print_JSON/////////////////////////////////////////////////////////////
   // ME20200213
   // Returns CCE results in JSON format
-  string get_JSON(const xstructure& structure, const CCE_Variables& cce_vars) {
+  string print_JSON(const xstructure& structure, const CCE_Variables& cce_vars) {
     stringstream json;
     bool print_Hf = (cce_vars.dft_energies.size() > 0);
     uint nfuncs = cce_vars.vfunctionals.size();

@@ -126,7 +126,7 @@ namespace cce {
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
   //vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME20200213
   // print output and citation
-  string get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME20200213
+  string print_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME20200213
   string print_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
   string print_citation();
