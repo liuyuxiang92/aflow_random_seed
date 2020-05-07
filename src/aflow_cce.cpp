@@ -2563,7 +2563,7 @@ namespace cce {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::get_corrections():";
     if(LDEBUG){
-      cerr << soliloquy << "ASSIGNMENT OF CORRECTIONS:" << endl;
+      cerr << soliloquy << " ASSIGNMENT OF CORRECTIONS:" << endl;
     }
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
       if (structure.atoms[i].cleanname != cce_vars.anion_species && cce_vars.multi_anion_atoms[i] != 1){ // exclude main anion species and multi anion atoms detected previously
