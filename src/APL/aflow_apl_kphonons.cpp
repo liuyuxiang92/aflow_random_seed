@@ -1886,7 +1886,7 @@ namespace KBIN {
       if (USER_DC_METHOD == "LATTICE") {
         if (!supercell.projectToPrimitive()) {  //ME20200117 - project to primitive
           message = "Could not map the AFLOW standard primitive cell to the supercell.";
-          message += "Phonon dispersions will be calculated using the original structure instead.";
+          message += " Phonon dispersions will be calculated using the original structure instead.";
           pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
         }
         pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
