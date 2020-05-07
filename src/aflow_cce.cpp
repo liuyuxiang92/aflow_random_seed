@@ -32,11 +32,11 @@ namespace cce {
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
 
-  //write_corrections////////////////////////////////////////////////////////
+  //print_corrections////////////////////////////////////////////////////////
   // main CCE function for command line use 
   // for reading input, analyzing structure, determining oxidation numbers, assigning corrections, 
   // calculating total corrections and corrected formation enthalpies, and writing output
-  void write_corrections(aurostd::xoption& flags, ostream& oss) {
+  void print_corrections(aurostd::xoption& flags, ostream& oss) {
 
     /************************************/
     // Print user instructions
@@ -53,12 +53,12 @@ namespace cce {
     //read structural data from structure file provided on command line
     xstructure structure=read_structure(flags.getattachedscheme("CCE_CORRECTION::POSCAR_PATH"));
 
-    write_corrections(structure, flags);
+    print_corrections(structure, flags);
   }
 
-  void write_corrections(xstructure& structure, aurostd::xoption& flags) {
+  void print_corrections(xstructure& structure, aurostd::xoption& flags) {
     aurostd::xoption cce_flags = init_flags();
-    if(!(aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") && !aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))){ // additional output like oxidation numbers should not be provided for tests and json
+    if(!(aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") && !aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))){ // additional output like oxidation numbers should not be provided for tests and json; the oxidation numbers are included in the json and don't need to be printed twice
       cce_flags.flag("SCREEN_ONLY",TRUE);
     }
     CCE_Variables cce_vars = init_variables(structure);
@@ -76,10 +76,10 @@ namespace cce {
       cce_flags.flag("OX_NUMS_PROVIDED",TRUE);
     }
 
-    write_corrections(structure, flags, cce_flags, cce_vars);
+    print_corrections(structure, flags, cce_flags, cce_vars);
   }
 
-  void write_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
+  void print_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss) {
     /********************************************************/
     // Get CCE corrections
     /********************************************************/
@@ -107,26 +107,26 @@ namespace cce {
       if (aurostd::toupper(flags.getattachedscheme("CCE_CORRECTION::PRINT")) == "JSON") {
         oss << get_JSON(structure, cce_vars) << std::endl;
       } else if (aurostd::toupper(flags.flag("CCE_CORRECTION::TEST"))) {
-        oss << write_test_output(cce_vars, cce_vars.cce_form_energy_cell) << std::endl;
+        oss << print_test_output(cce_vars, cce_vars.cce_form_energy_cell) << std::endl;
       } else {
-        // write CCE corrections & corrected formation enthalpies per cell and atom
-        oss << write_output(structure, cce_vars, cce_vars.cce_form_energy_cell);
-        // write CCE citation
-        oss << write_citation();
+        // print CCE corrections & corrected formation enthalpies per cell and atom
+        oss << print_output(structure, cce_vars, cce_vars.cce_form_energy_cell);
+        // print CCE citation
+        oss << print_citation();
       }
     }
   } // main CCE function for command line use
 
 
 
-  //write_corrections///////////////////////////////////////////////////////////////////////
+  //print_corrections///////////////////////////////////////////////////////////////////////
   // ME20200213
   // For poscar2cce
-  void write_corrections(aurostd::xoption& flags, std::istream& ist) {
+  void print_corrections(aurostd::xoption& flags, std::istream& ist) {
     // read structure
     xstructure structure=read_structure(ist);
 
-    write_corrections(structure, flags);
+    print_corrections(structure, flags);
   }
 
 
@@ -2832,9 +2832,9 @@ namespace cce {
     return json.str();
   }
 
-  //write_output////////////////////////////////////////////////////////
-  // write CCE corrections and corrected formation enthalpies if precalculated DFT values are provided
-  string write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell) {
+  //print_output////////////////////////////////////////////////////////
+  // print CCE corrections and corrected formation enthalpies if precalculated DFT values are provided
+  string print_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell) {
     stringstream output;
     // print out CCE corrections per cell and atom for functionals selected
     if (!(cce_vars.vfunctionals.size() == 1 && cce_vars.vfunctionals[0] == "exp")){ // if only exp is set as functional CCE CORRECTIONS: should not be written
@@ -2852,7 +2852,7 @@ namespace cce {
         output << endl;
       }
     }
-    // exp result should always be written at the end, hence write only after writing output for other functionals
+    // exp result should always be written at the end, hence print only after writing output for other functionals
     for (uint k = 0; k < num_funcs; k++) {
       if (cce_vars.vfunctionals[k] == "exp" && cce_vars.dft_energies.size()==0) { // second condition for that if precalc. form. energies are given and asking for exp., exp. result is not written twice
         output << "CCE FORMATION ENTHALPIES:" << endl;
@@ -2888,9 +2888,9 @@ namespace cce {
     return output.str();
   }
 
-  //write_test_output////////////////////////////////////////////////////////
-  // write CCE corrections and corrected formation enthalpies for testing
-  string write_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell) {
+  //print_test_output////////////////////////////////////////////////////////
+  // print CCE corrections and corrected formation enthalpies for testing
+  string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell) {
     stringstream output;
     uint num_funcs=cce_vars.vfunctionals.size();
     uint num_temps=cce_vars.vtemperatures.size();
@@ -2922,9 +2922,9 @@ namespace cce {
     return output.str();
   }
 
-  //write_citation////////////////////////////////////////////////////////
-  // write citation information at end of output
-  string write_citation() {
+  //print_citation////////////////////////////////////////////////////////
+  // print citation information at end of output
+  string print_citation() {
     stringstream oss;
     oss << "#########################################################################################################" << endl;
     oss << "When you obtain results using the CCE methodology and/or this implementation," << endl; 

@@ -60,10 +60,10 @@ namespace cce {
   // for command line use, 
   // use inside AFLOW providing directory path or xstructure & functional string or flags and istream for web tool, 
   // and CCE core function called by all other main CCE functions
-  void write_corrections(aurostd::xoption& flags, ostream& oss=std::cout);
-  void write_corrections(xstructure& structure, aurostd::xoption& flags);
-  void write_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
-  void write_corrections(aurostd::xoption& flags, std::istream& ist); // ME20200213
+  void print_corrections(aurostd::xoption& flags, ostream& oss=std::cout);
+  void print_corrections(xstructure& structure, aurostd::xoption& flags);
+  void print_corrections(xstructure& structure, aurostd::xoption& flags, aurostd::xoption& cce_flags, CCE_Variables& cce_vars, ostream& oss=std::cout);
+  void print_corrections(aurostd::xoption& flags, std::istream& ist); // ME20200213
   vector<double> calculate_corrections(const string& directory_path);
   vector<double> calculate_corrections(xstructure& structure, string& functional);
   void CCE_core(xstructure& structure, xoption& cce_flags, CCE_Variables& cce_vars);
@@ -125,12 +125,12 @@ namespace cce {
   // apply corrections and get corrected formation enthalpies
   void check_apply_per_super_ox_corrections(CCE_Variables& cce_vars);
   //vector<double> get_formation_enthalpies(const vector<double>& cce_correction, CCE_Variables& cce_vars); // ME20200213
-  // write output and citation
+  // print output and citation
   string get_JSON(const xstructure& structure, const CCE_Variables& cce_vars); // ME20200213
-  string write_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
-  string write_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
-  string write_citation();
-  // write user instructions
+  string print_output(const xstructure& structure, CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
+  string print_test_output(CCE_Variables& cce_vars, const vector<double>& cce_form_energy_cell);
+  string print_citation();
+  // print user instructions
   string print_usage();
   // aflow_cce_data.cpp load corrections and other data
   string get_corrections_line(const string& cor_identifier);
