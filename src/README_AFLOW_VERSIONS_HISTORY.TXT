@@ -51,6 +51,7 @@
         -- Simplified symmetry calculations in (A)APL. (ME)
         -- Changed the determination of the irreducible Brillouin zone in APL. (ME)
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
+        -- Made ZEROSTATE_CHGCAR obsolete. (ME)
         -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
         -- added 67 structure prototypes from Y. Lederer: 58 new ANRL files (generates 60 new protos), 7 generated with existing files with different internal degrees of freedom (DX)
         -- updated README_PROTO.TXT with new prototypes, unique atom decorations, and supplemental notes (DX)

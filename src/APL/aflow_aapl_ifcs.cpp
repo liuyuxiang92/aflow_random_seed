@@ -176,7 +176,7 @@ namespace apl {
 
 namespace apl {
 
-  bool AnharmonicIFCs::runVASPCalculations(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags, bool zerostate_chgcar) {
+  bool AnharmonicIFCs::runVASPCalculations(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags) {
     string function = _AAPL_IFCS_ERR_PREFIX_ + "runVASPCalculations()";
     string message = "";
     if (order > 4) {
@@ -213,34 +213,6 @@ namespace apl {
     }
 
     xInputs.assign(nruns, xinput);
-
-    string chgcar_file = "";
-    if (zerostate_chgcar) {  // ME20191029 - for ZEROSTATE CHGCAR
-      // Find ZEROSTATE directory
-      vector<string> dirs;
-      aurostd::DirectoryLS(directory, dirs);
-      uint ndir = dirs.size();
-      uint d = 0;
-      for (d = 0; d < ndir; d++) {
-        if (aurostd::IsDirectory(directory + "/" + dirs[d]) && aurostd::substring2bool(dirs[d], "ZEROSTATE")) {
-          break;
-        }
-      }
-      if (d == ndir) {
-        message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-        zerostate_chgcar = false;
-      } else {
-        // There are two possible cases: the CHGCAR file has already been
-        // calculated, so take the filename from EFileExist; or it will be
-        // calculated after all directories have been set up, in which case
-        // KZIP_BIN can be used for the compression extension.
-        string chgcar_file_base = aurostd::CleanFileName("../" + dirs[d] + "/CHGCAR.static");
-        if (!aurostd::EFileExist(chgcar_file_base, chgcar_file) && kflags.KZIP_COMPRESS) {
-          chgcar_file = chgcar_file_base + "." + kflags.KZIP_BIN;
-        }
-      }
-    }
 
     int idxRun = 0;
     for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {

@@ -336,13 +336,6 @@ WARNING: This method is not well tested yet and should be used with caution.
 NOTE: Using DPM=ON cancels out zerostate forces, so DPM=ON and ZEROSTATE=ON is redundant. However,
       the zerostate calculation can still be used to test for the presence of ghost forces.
 
-The ZEROSTATE calculation can also be used to accelerate the DFT calculations of the distorted
-cells by using its charge density. To do this, the following keyword needs to be activated:
-
-    [AFLOW_APL]ZEROSTATE_CHGCAR=ON
-
-The default is OFF.
-
 2.3.  Linear Response Method Parameters
 
 NOTE: the linear response method is currently untested!

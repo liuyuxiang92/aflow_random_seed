@@ -346,7 +346,7 @@ namespace apl {
       void setDirectory(const string&);
       int getOrder() const;
 
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, bool);
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&);
       bool calculateForceConstants();
       const vector<vector<double> >& getForceConstants() const;
       vector<vector<int> > getClusters() const;
@@ -803,7 +803,7 @@ namespace apl {
       virtual ~ForceConstantCalculator() {};
       void clear(Supercell&);
 
-      virtual bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool) {return false;};  // ME20191029
+      virtual bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&) {return false;};  // ME20191029
       void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME20200218
 
       bool run();  // ME20191029
@@ -871,7 +871,7 @@ namespace apl {
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO20190108
 
       //void writeFORCES();  // OBSOLETE ME20200504 - not used
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
       //void writeXCrysDenForces();  // OBSOLETE ME20200504 - not used
       void saveState(const string&);  // ME20200212
       void readFromStateFile(const string&);  // ME20200212
@@ -1024,7 +1024,7 @@ namespace apl {
       ~LinearResponsePC();
       void clear(Supercell&);
 
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
       void saveState(const string&);  //ME20200212
       void readFromStateFile(const string&); //ME20200212
   };

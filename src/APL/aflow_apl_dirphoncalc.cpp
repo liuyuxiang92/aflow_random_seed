@@ -96,7 +96,7 @@ namespace apl {
 namespace apl {
 
   bool DirectMethodPC::runVASPCalculations(_xinput& xInput, _aflags& _aflowFlags,
-      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, bool zerostate_chgcar) {
+      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn) {
     string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO20190218
     bool stagebreak = false;
     stringstream message;
@@ -147,14 +147,6 @@ namespace apl {
     // Generate calculation directories
     string chgcar_file = "";
     string zerostate_dir = "";
-    if (zerostate_chgcar) {  //ME20191029 - for ZEROSTATE CHGCAR
-      zerostate_dir = "ARUN.APL_";
-      int index = ncalcs;
-      if (_isPolarMaterial) index--;
-      zerostate_dir += aurostd::PaddedNumString(index, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE";
-      chgcar_file = "../" + zerostate_dir + "/CHGCAR.static";
-      if (_kbinFlags.KZIP_COMPRESS) chgcar_file += "." + _kbinFlags.KZIP_BIN;
-    }
 
     for (uint i = 0; i < _uniqueDistortions.size(); i++) {
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
@@ -215,12 +207,6 @@ namespace apl {
 
           // For VASP, use the standardized aflow.in creator
           if (_kbinFlags.AFLOW_MODE_VASP){
-            //ME20191029
-            xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
-            if (zerostate_chgcar) {
-              xInputs[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
-            }
-
             // Change format of POSCAR
             //ME20190228 - OBSOLETE for two reasons:
             // 1. This method is not robust
@@ -265,7 +251,6 @@ namespace apl {
       xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  //ME20191029
       // For VASP, use the standardized aflow.in creator
       if(_kbinFlags.AFLOW_MODE_VASP){
-        xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
         stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || stagebreak); //ME20181226
       }
       // For AIMS, use the old method until we have AVASP_populateXAIMS //ME20181226
