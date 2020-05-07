@@ -408,7 +408,7 @@ namespace apl {
         output << std::setw(4) << natoms << " 1" << std::endl;
         for (uint at = 0; at < natoms; at++) {
           output << std::setw(5) << scell.atoms[at].atomic_number;
-          for (int k = 0; k < 6; k++) {
+          for (uint k = 0; k < 6; k++) {
             output << std::setw(15) << std::fixed << std::setprecision(8) << disp[j][at][k];
           }
           output << std::endl;
