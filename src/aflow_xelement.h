@@ -71,7 +71,7 @@ namespace xelement {
     double electronegativity_Pearson;                  // (eV) Inorg. Chem., 27(4), 734–740 (1988)      //DU20190517
     double electronegativity_Ghosh;                    // (eV) Journal of Theoretical and Computational Chemistry, 4, 21-33 (2005)      //DU20190517
 
-    // RF/SK20200410 START
+    // RF+SK20200410 START
     // Allen electronegativities were chosen for CCE since the IUPAC definition of oxidation states seems to use Allen electronegativities and since they also gave the best results
     // https://en.wikipedia.org/wiki/Oxidation_state#Determination
     // since there were no Allen electronegativities available for f-elements besides Lu but these elements are usually very similar,
