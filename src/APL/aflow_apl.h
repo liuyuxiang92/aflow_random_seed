@@ -614,8 +614,8 @@ namespace apl {
     public:
       Supercell(ostream& oss=std::cout);
       Supercell(ofstream&, ostream& os=std::cout);
-      Supercell(const xstructure&, ofstream&, string directory="./", ostream& oss=std::cout); //CO20181226
-      Supercell(const string&, ofstream&, string directory="./", ostream& os=std::cout);  // ME20200112
+      Supercell(const xstructure&, ofstream&, const string& directory="./", ostream& oss=std::cout); //CO20181226
+      Supercell(const string&, ofstream&, const string& directory="./", ostream& os=std::cout);  // ME20200112
       Supercell(const Supercell&);
       Supercell& operator=(const Supercell&);
       ~Supercell();
