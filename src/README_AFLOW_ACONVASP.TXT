@@ -740,7 +740,7 @@ LATTICES = (the ones with "")
         Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
         format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
         Precalculated DFT formation energies can be provided as a comma separated list using the option
-        --dft_formation_energies=
+        --dft_formation_energies= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
         using the option --functionals=. If used together with --dft_formation energies, the functionals
         must be in the same sequence as the DFT formation energies they correspond to. 
@@ -2643,7 +2643,7 @@ LATTICES = (the ones with "")
         Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
         format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
         Precalculated DFT formation energies can be provided as a comma separated list using the option
-        --dft_formation_energies=
+        --dft_formation_energies= in eV/cell.
         Functionals for which corrections should be returned can be provided as a comma separated list 
         using the option --functionals=. If used together with --dft_formation energies, the functionals
         must be in the same sequence as the DFT formation energies they correspond to. 
