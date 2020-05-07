@@ -1011,6 +1011,7 @@ namespace apl
         pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_ERROR_);
       }
+      Nbranches = phcalc.getNumberOfBranches();
 
       string USER_DC_INITLATTICE="";
       int USER_DC_NPOINTS = aurostd::string2utype<int>(
