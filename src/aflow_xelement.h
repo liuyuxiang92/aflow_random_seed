@@ -81,7 +81,7 @@ namespace xelement {
     // preferred and all oxidation states of the elements according to the periodic table of the elements from Wiley-VCH, 5th edition (2012) with some modifications (e. g. for Cr, Cu, Fe, Ti)
     vector<double> oxidation_states_preferred;
     vector<double> oxidation_states;
-    // RF/SK20200410 END
+    // RF+SK20200410 END
 
     double electron_affinity_PT;             // (kJ/mol)  http://periodictable.com       //DU20190517
     double Miedema_phi_star;                // (V)        (phi^\star   Miedema Rule Table 1a Physica 100B 1-28 (1980)
