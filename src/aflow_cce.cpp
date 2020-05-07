@@ -2154,12 +2154,12 @@ namespace cce {
         if (possible_ox_states[j].size() > maxsize) maxsize = possible_ox_states[j].size();
       }
 
-      uint n = 0;
-      uint i = 1; // can start at 1 since 0th pref./all ox states has been used during initialization
+      uint num_ox_states = 0;
+      uint i = 1; // i: number of tested ox state; can start at 1 since 0th pref./all ox states has been used during initialization
       while (!iszero && (i < maxsize)) {
         for (uint j = num_cation_species; j > 0; j--) { // have to loop downward since species are sorted ascending by electronegativity and oxidation number should be changed for less electronegative species first
-          n = possible_ox_states[j-1].size(); // j-1 since species loop goes downward and j_min should be comapred to be > 0 for uint, how many pref./all ox. states there are for the jth cation species
-          if (i < n) { // the index i looping over all possible ox states for species j must be smaller than the maximum number of pref./all ox states for this species 
+          num_ox_states = possible_ox_states[j-1].size(); // j-1 since species loop goes downward and j_min should be comapred to be > 0 for uint, how many pref./all ox. states there are for the jth cation species
+          if (i < num_ox_states) { // the index i looping over all possible ox states for species j must be smaller than the maximum number of pref./all ox states for this species 
             for (uint k = 0; k < cce_vars.cations_map[j-1].size(); k++) {
               if (cce_vars.multi_anion_atoms[cce_vars.cations_map[j-1][k]] != 1){ // exclude atoms that have been identified as multi anion atoms previously
                 if(LDEBUG){
