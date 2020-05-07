@@ -2377,7 +2377,7 @@ namespace cce {
   }
 
   //get_Bader_charges_from_Bader_file////////////////////////////////////////////////////////
-  // determine the Bader charges from the Bader file
+  // determine the Bader charges from the AFLOW Bader file (_abader.out)
   vector<double> get_Bader_charges_from_Bader_file(const xstructure& structure, CCE_Variables& cce_vars, const string& Bader_file) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || CCE_DEBUG);
     string soliloquy="cce::get_Bader_charges_from_Bader_file():";
