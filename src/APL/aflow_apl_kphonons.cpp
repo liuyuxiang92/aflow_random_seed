@@ -294,9 +294,9 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [0]" << std::endl;
     xinput.xvasp.AVASP_arun = true;
-    string function = "KBIN::RunPhonons_APL()";  //ME20191029
+    string function = "KBIN::RunPhonons_APL():";  //ME20191029
+    if (LDEBUG) std::cerr << function << " DEBUG [0]" << std::endl;
     // Test
     //if (!(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL)) return; //PN20180705
     if (!(kflags.KBIN_PHONONS_CALCULATION_APL ||
@@ -372,7 +372,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1a]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [1a]" << std::endl;
 
     //ME20181019 - Overwrite defaults for CHGCAR, WAVECAR, etc. Only write
     // these files if the user explicitly sets these flags. Otherwise, APL will
@@ -425,7 +425,7 @@ namespace KBIN {
 
     // APL ----------------------------------------------------------------------
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1b]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [1b]" << std::endl;
 
     //ME20181026 START
 
@@ -434,7 +434,7 @@ namespace KBIN {
     string USER_ENGINE="", USER_FREQFORMAT="", USER_SUPERCELL="", DOS_MESH_SCHEME="", USER_DOS_METHOD="", USER_TPT="", USER_DC_METHOD=""; //CO20190114 - initialize everything
     string USER_DOS_PROJECTIONS_CART_SCHEME = "", USER_DOS_PROJECTIONS_FRAC_SCHEME = ""; //ME20190625
     string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO20190114 - initialize everything
-    bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false, USER_ZEROSTATE_CHGCAR = false; //CO20190114 - initialize everything
+    bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false; //USER_ZEROSTATE_CHGCAR = false; //CO20190114 - initialize everything
     bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO20190114 - initialize everything
     bool USER_DOS_PROJECT = false, USER_RELAX_COMMENSURATE = false, USER_DISPLACEMENTS;  // ME20200213
     double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO20190114 - initialize everything  
@@ -464,7 +464,7 @@ namespace KBIN {
         continue;
       }
       if (key == "ZEROSTATE") {USER_ZEROSTATE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
-      if (key == "ZEROSTATE_CHGCAR") {USER_ZEROSTATE_CHGCAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  //ME20191029
+      //if (key == "ZEROSTATE_CHGCAR") {USER_ZEROSTATE_CHGCAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  //OBSOLETE ME20200507
       if (key == "FREQFORMAT") {USER_FREQFORMAT = aurostd::toupper(kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme); continue;}
       if (key == "DC") {USER_DC = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
       if (key == "DCPATH") {USER_DC_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
@@ -534,16 +534,16 @@ namespace KBIN {
       //throw apl::APLRuntimeError(message);  OBSOLETE ME20191029 - replace with xerror
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
     }
-    //ME20191029
-    if (USER_ZEROSTATE_CHGCAR) {
-      if (USER_ENGINE == "DM") {
-        logger << "ZEROSTATE_CHGCAR requires the calculation of the undistorted supercell. ZEROSTATE will be switched on." << apl::endl;
-        USER_ZEROSTATE = true;
-      } else if (USER_ENGINE == "LR") {
-        logger << "ZEROSTATE_CHGCAR cannot be used with Linear Response calculations and will be switched off." << apl::endl;
-        USER_ZEROSTATE_CHGCAR = false;
-      }
-    }
+    //OBSOLETE ME20200507
+    //[OBSOLETE]if (USER_ZEROSTATE_CHGCAR) {
+    //[OBSOLETE]  if (USER_ENGINE == "DM") {
+    //[OBSOLETE]    logger << "ZEROSTATE_CHGCAR requires the calculation of the undistorted supercell. ZEROSTATE will be switched on." << apl::endl;
+    //[OBSOLETE]    USER_ZEROSTATE = true;
+    //[OBSOLETE]  } else if (USER_ENGINE == "LR") {
+    //[OBSOLETE]    logger << "ZEROSTATE_CHGCAR cannot be used with Linear Response calculations and will be switched off." << apl::endl;
+    //[OBSOLETE]    USER_ZEROSTATE_CHGCAR = false;
+    //[OBSOLETE]  }
+    //[OBSOLETE]}
 
     // SUPERCELL
     // Correct MINATOMS if restricted
@@ -722,7 +722,7 @@ namespace KBIN {
         logger << apl::warning << "Distortions will only be generated in the positive direction - this is NOT recommended." << apl::endl;
       }
       logger << "Forces from the undistored state will " << (USER_ZEROSTATE?"":"NOT ") << "be used." << apl::endl;
-      logger << "The CHGCAR file of the undistorted state will " << (USER_ZEROSTATE_CHGCAR?"":"NOT ") << "be used for distorted cells." << apl::endl;  //ME20191029
+      //logger << "The CHGCAR file of the undistorted state will " << (USER_ZEROSTATE_CHGCAR?"":"NOT ") << "be used for distorted cells." << apl::endl;  //OBSOLETE ME20200507
     }
 
     logger << "Polar corrections will " << (USER_POLAR?"":"NOT ") << "be employed." << apl::endl;
@@ -787,7 +787,7 @@ namespace KBIN {
 
     // AAPL ----------------------------------------------------------------------
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1c]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [1c]" << std::endl;
 
     //ME20181027 START
 
@@ -984,7 +984,7 @@ namespace KBIN {
     }
     //ME20181027 STOP
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [1c]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [1c]" << std::endl;
 
     // QHA ----------------------------------------------------------------------
 
@@ -1391,7 +1391,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [2]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [2]" << std::endl;
 
     //fix vasp bin for LR or DM+POLAR
     if (USER_ENGINE == string("LR") || (USER_ENGINE == string("DM") && USER_POLAR)) {
@@ -1605,7 +1605,7 @@ namespace KBIN {
       }
       // Run calculations
       fccalc->setDirectory(aflags.Directory);
-      apl_stagebreak = fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, AflowIn, USER_ZEROSTATE_CHGCAR);
+      apl_stagebreak = fccalc->runVASPCalculations(xinput, aflags, kflags, xflags, AflowIn);
       fccalc->saveState(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
       if (!apl_stagebreak) {
         apl_stagebreak = !(fccalc->run());
@@ -1616,7 +1616,7 @@ namespace KBIN {
       }
     }
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [3b]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [3b]" << std::endl;
 
     stagebreak = (stagebreak || apl_stagebreak);
 
@@ -1658,7 +1658,7 @@ namespace KBIN {
     }
     //QHA/SCQHA/QHA3P END
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [3c]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [3c]" << std::endl;
 
     // Anharmonic force constants
     bool aapl_stagebreak = false;
@@ -1690,7 +1690,7 @@ namespace KBIN {
           anharm.setDirectory(aflags.Directory);
           anharm.initialize(phcalc.getSupercell(), o, USER_CUTOFF_SHELL[o - 3], USER_CUTOFF_DISTANCE[o - 3]);
           anharm.setOptions(USER_DISTORTION_MAGNITUDE, USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM, USER_ZEROSTATE);
-          aapl_stagebreak = (anharm.runVASPCalculations(xinput, aflags, kflags, xflags, USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
+          aapl_stagebreak = (anharm.runVASPCalculations(xinput, aflags, kflags, xflags) || aapl_stagebreak);
           // Calculate IFCs
           if (!aapl_stagebreak) {
             aapl_stagebreak = !(anharm.calculateForceConstants());
@@ -1706,35 +1706,38 @@ namespace KBIN {
     stagebreak = (stagebreak || aapl_stagebreak);
 
     // Run ZEROSTATE calculation if ZEROSTATE CHGCAR
-    if (USER_ZEROSTATE_CHGCAR && !XHOST.GENERATE_AFLOWIN_ONLY) {
-      // Find ZEROSTATE directory
-      vector<string> directory;
-      aurostd::DirectoryLS(aflags.Directory, directory);
-      uint ndir = directory.size();
-      uint d = 0;
-      for (d = 0; d < ndir; d++) {
-        if (aurostd::IsDirectory(aflags.Directory + "/" + directory[d]) && aurostd::substring2bool(directory[d], "ZEROSTATE")) {
-          break;
-        }
-      }
-      if (d == ndir) {
-        string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
-        USER_ZEROSTATE_CHGCAR = false;
-      } else {
-        string chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
-        if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
-        if (!aurostd::FileExist(chgcar_file)) {
-          logger << "Executing ZEROSTATE directory." << apl::endl;
-          stringstream cmd;
-          cmd << "aflow --use_aflow.in=" << _AFLOWIN_
-            << " --use_LOCK=" << _AFLOWLOCK_
-            << " --quiet -D ./" << directory[d];
-          aurostd::execute(cmd.str());
-          logger << "Finished executing ZEROSTATE directory." << apl::endl;
-        }
-      }
-    }
+    // ME20200507 - This feature is not ready yet. The speed-ups
+    // are not reliable enough and it makes the workflow too complicated.
+    // Revisit when the concept is more solid.
+    //[OBSOLETE] if (USER_ZEROSTATE_CHGCAR && !XHOST.GENERATE_AFLOWIN_ONLY) {
+    //[OBSOLETE]   // Find ZEROSTATE directory
+    //[OBSOLETE]   vector<string> directory;
+    //[OBSOLETE]   aurostd::DirectoryLS(aflags.Directory, directory);
+    //[OBSOLETE]   uint ndir = directory.size();
+    //[OBSOLETE]   uint d = 0;
+    //[OBSOLETE]   for (d = 0; d < ndir; d++) {
+    //[OBSOLETE]     if (aurostd::IsDirectory(aflags.Directory + "/" + directory[d]) && aurostd::substring2bool(directory[d], "ZEROSTATE")) {
+    //[OBSOLETE]       break;
+    //[OBSOLETE]     }
+    //[OBSOLETE]   }
+    //[OBSOLETE]   if (d == ndir) {
+    //[OBSOLETE]     string message = "Could not find ZEROSTATE directory. ZEROSTATE_CHGCAR will be skipped.";
+    //[OBSOLETE]     pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, messageFile, oss, _LOGGER_WARNING_);
+    //[OBSOLETE]     USER_ZEROSTATE_CHGCAR = false;
+    //[OBSOLETE]   } else {
+    //[OBSOLETE]     string chgcar_file = aurostd::CleanFileName("../" + directory[d] + "/CHGCAR.static");
+    //[OBSOLETE]     if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
+    //[OBSOLETE]     if (!aurostd::FileExist(chgcar_file)) {
+    //[OBSOLETE]       logger << "Executing ZEROSTATE directory." << apl::endl;
+    //[OBSOLETE]       stringstream cmd;
+    //[OBSOLETE]       cmd << "aflow --use_aflow.in=" << _AFLOWIN_
+    //[OBSOLETE]         << " --use_LOCK=" << _AFLOWLOCK_
+    //[OBSOLETE]         << " --quiet -D ./" << directory[d];
+    //[OBSOLETE]       aurostd::execute(cmd.str());
+    //[OBSOLETE]       logger << "Finished executing ZEROSTATE directory." << apl::endl;
+    //[OBSOLETE]     }
+    //[OBSOLETE]   }
+    //[OBSOLETE] }
 
     // At least one calculation has not finished - return
     if (stagebreak) {
@@ -1749,7 +1752,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [4]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [4]" << std::endl;
 
     //QHA/SCQHA/QHA3P START //PN20180705
     //Store dynamical matrices and PDOS from different distorted directores
@@ -1873,7 +1876,7 @@ namespace KBIN {
 
     // Get the format of frequency desired by user ///////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5a]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [5a]" << std::endl;
 
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
@@ -1920,7 +1923,7 @@ namespace KBIN {
 
     // PHONON DISPERSIONS ---------------------------------------------------------
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5b]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [5b]" << std::endl;
 
     if (USER_DC) {
       apl::PhononDispersionCalculator pdisc(phcalc);
@@ -1929,8 +1932,8 @@ namespace KBIN {
       //ME20181029 - Restructured
       if (USER_DC_METHOD == "LATTICE") {
         if (!supercell.projectToPrimitive()) {  //ME20200117 - project to primitive
-          message = "Could not map the AFLOW standard primitive cell to the supercell.\
-                     Phonon dispersions will be calculated using the original structure instead.";
+          message = "Could not map the AFLOW standard primitive cell to the supercell.";
+          message += " Phonon dispersions will be calculated using the original structure instead.";
           pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, messageFile, oss, _LOGGER_WARNING_);
         }
         pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
@@ -1981,7 +1984,7 @@ namespace KBIN {
 
     // PHONON DOS AND THERMODYNAMIC PROPERTIES ----------------------------------------
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [5c]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [5c]" << std::endl;
 
     if (USER_DOS || USER_TP) {
       // Calculate DOS
@@ -2224,7 +2227,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << "KBIN::RunPhonon_APL(): DEBUG [6]" << std::endl;
+    if (LDEBUG) std::cerr << function << " DEBUG [6]" << std::endl;
 
     if (USER_TCOND) {
       // Get q-points

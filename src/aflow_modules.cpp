@@ -125,7 +125,7 @@ namespace KBIN {
     opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="DISPLACEMENTS"; opt.option = DEFAULT_APL_DISPLACEMENTS; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
     opt.keyword="TPT"; opt.xscheme = DEFAULT_APL_TPT; aplflags.push_back(opt); opt.clear();
-    opt.keyword="ZEROSTATE_CHGCAR"; opt.option = DEFAULT_APL_ZEROSTATE_CHGCAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
+    //opt.keyword="ZEROSTATE_CHGCAR"; opt.option = DEFAULT_APL_ZEROSTATE_CHGCAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();  // OBSOLETE ME20200507
     if (LDEBUG) {
       for (uint i = 0; i < aplflags.size(); i++) {
         std::cerr << soliloquy << " key: " << aplflags[i].keyword << ", xscheme: " << aplflags[i].xscheme << ", option: " << aplflags[i].option << std::endl;

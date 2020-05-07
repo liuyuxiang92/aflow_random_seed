@@ -96,7 +96,7 @@ namespace apl {
 namespace apl {
 
   bool DirectMethodPC::runVASPCalculations(_xinput& xInput, _aflags& _aflowFlags,
-      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, bool zerostate_chgcar) {
+      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn) {
     string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO20190218
     bool stagebreak = false;
     stringstream message;
@@ -147,14 +147,6 @@ namespace apl {
     // Generate calculation directories
     string chgcar_file = "";
     string zerostate_dir = "";
-    if (zerostate_chgcar) {  //ME20191029 - for ZEROSTATE CHGCAR
-      zerostate_dir = "ARUN.APL_";
-      int index = ncalcs;
-      if (_isPolarMaterial) index--;
-      zerostate_dir += aurostd::PaddedNumString(index, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE";
-      chgcar_file = "../" + zerostate_dir + "/CHGCAR.static";
-      if (_kbinFlags.KZIP_COMPRESS) chgcar_file += "." + _kbinFlags.KZIP_BIN;
-    }
 
     for (uint i = 0; i < _uniqueDistortions.size(); i++) {
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
@@ -215,12 +207,6 @@ namespace apl {
 
           // For VASP, use the standardized aflow.in creator
           if (_kbinFlags.AFLOW_MODE_VASP){
-            //ME20191029
-            xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
-            if (zerostate_chgcar) {
-              xInputs[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
-            }
-
             // Change format of POSCAR
             //ME20190228 - OBSOLETE for two reasons:
             // 1. This method is not robust
@@ -265,7 +251,6 @@ namespace apl {
       xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  //ME20191029
       // For VASP, use the standardized aflow.in creator
       if(_kbinFlags.AFLOW_MODE_VASP){
-        xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
         stagebreak = (createAflowInPhonons(_aflowFlags, _kbinFlags, _xFlags, xInputs[idxRun]) || stagebreak); //ME20181226
       }
       // For AIMS, use the old method until we have AVASP_populateXAIMS //ME20181226
@@ -614,7 +599,7 @@ namespace apl {
         generate_plus_minus = vvgenerate_plus_minus[i][j];  //CO20181226
         vector<xvector<double> > forcefield;
         xvector<double> drift(3);
-        for (int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
+        for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++) {
           xvector<double> force(3);
           force(1) = xInputs[idxRun].getXStr().qm_forces[k](1);
           force(2) = xInputs[idxRun].getXStr().qm_forces[k](2);
@@ -679,7 +664,7 @@ namespace apl {
     pflow::logger(_AFLOW_FILE_NAME_, _APL_DMPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // Let's go
-    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
+    for (uint i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
       // We need to have 3 linearly independent distortions
       if (_uniqueDistortions[i].size() != 3) {
         vector<xvector<double> > allDistortionsOfAtom;
@@ -698,7 +683,7 @@ namespace apl {
             const _sym_op& symOp = agroup[symOpID];
 
             testForce.clear();
-            for (_AFLOW_APL_REGISTER_ int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
+            for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++) {
               try {
                 // ME20191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
                 // the basis has not been calculated for some reason
@@ -715,7 +700,7 @@ namespace apl {
 
             // Orthogonalize new rotated distortion vector on all accepted distortion vectors
             for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
-              for (_AFLOW_APL_REGISTER_ int l = 0; l < _supercell->getNumberOfAtoms(); l++) {
+              for (uint l = 0; l < _supercell->getNumberOfAtoms(); l++) {
                 testForce[l] = testForce[l] - getModeratedVectorProjection(forcePool[k][l], testVec, allDistortionsOfAtom[k]);
               }
               testVec = testVec - getVectorProjection(testVec, allDistortionsOfAtom[k]);
@@ -725,7 +710,7 @@ namespace apl {
             if (aurostd::modulus(testVec) > _AFLOW_APL_EPS_) {
               // Normalize to unit length
               double testVectorLength = aurostd::modulus(testVec);
-              for (int l = 0; l < _supercell->getNumberOfAtoms(); l++) {
+              for (uint l = 0; l < _supercell->getNumberOfAtoms(); l++) {
                 testForce[l] = testForce[l] / testVectorLength;
               }
               testVec = testVec / testVectorLength;
@@ -765,7 +750,7 @@ namespace apl {
   void DirectMethodPC::projectToCartesianDirections() {
     bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
     string soliloquy="apl::DirectMethodPC::projectToCartesianDirections():"; //CO20190218
-    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
+    for (uint i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
       if(LDEBUG) {cerr << soliloquy << " looking at distorted atom[idistortion=" << i << "]" << std::endl;} //CO20190218
       // Construct transformation matrix A
       xmatrix<double> A(3, 3), U(3, 3);
@@ -814,7 +799,7 @@ namespace apl {
 
       // Update forces
       xmatrix<double> m(3, 3);
-      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
+      for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if(LDEBUG) {cerr << soliloquy << " looking at supercell atom[" << j << "]" << std::endl;} //CO20190218
         for (_AFLOW_APL_REGISTER_ int k = 0; k < 3; k++)
           for (_AFLOW_APL_REGISTER_ int l = 1; l <= 3; l++)
@@ -868,9 +853,9 @@ namespace apl {
     //therefore, we create the vector of the necessary dimensions, and put the row in the right place
     //CO20190131 UPDATE - this is NOT the only part of the code for which this dependency (iatoms sorted) exists
 
-    for (_AFLOW_APL_REGISTER_ int i = 0; i < _supercell->getNumberOfAtoms(); i++) {
+    for (uint i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       _forceConstantMatrices.push_back(vector<xmatrix<double> >(0));
-      for (_AFLOW_APL_REGISTER_ int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
+      for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         _forceConstantMatrices.back().push_back(xmatrix<double>(3,3,1,1));
       }
     }
@@ -882,13 +867,13 @@ namespace apl {
 
     // We have a party. Let's fun with us...
     //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO20190218
-    for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
+    for (uint i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
       // Get the number of this atom in the whole list
       int basedAtomID = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
 
       // This is easy. We know everything. Just construct a set of matrices.
       xmatrix<double> m(3, 3, 1, 1);
-      for (int j = 0; j < _supercell->getNumberOfAtoms(); j++) {
+      for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         for (uint k = 0; k < _uniqueDistortions[i].size(); k++) {
           double distortionLength = aurostd::modulus(DISTORTION_MAGNITUDE * _uniqueDistortions[i][k]);
           // FCM element = -F/d, but we will omit minus, because next force transformations are better
@@ -914,7 +899,7 @@ namespace apl {
       if(DISTORTION_INEQUIVONLY){ //CO20190218
         _sym_op symOp;  //CO
         // Calculate rows for next equivalent atoms starting 1 (structure of iatoms)... //CO20190218
-        for (int j = 1; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO20190218
+        for (uint j = 1; j < _supercell->getNumberOfEquivalentAtomsOfType(i); j++) { //CO20190218
           try {
             //CO20190116 - we want to map the forces of the inequivalent atoms (for which we ran vasp) onto the equivalent ones
             //hence, we need the FGROUP that takes us from the inequivalent atom to the equivalent
@@ -930,7 +915,7 @@ namespace apl {
             throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
           }
 
-          for (_AFLOW_APL_REGISTER_ int k = 0; k < _supercell->getNumberOfAtoms(); k++) {
+          for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++) {
             try {
               //CO20190116 - read atomComesFrom() as: applying symOp to l makes k
               //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, _supercell->getUniqueAtomID(i, j));  //CO NEW //CO20190218
@@ -958,7 +943,7 @@ namespace apl {
     }
 
     // Test of correctness
-    if ((int)_forceConstantMatrices.size() != _supercell->getNumberOfAtoms()) {
+    if (_forceConstantMatrices.size() != _supercell->getNumberOfAtoms()) {
       message << "Some problem with the application of factor group operations.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
@@ -1000,14 +985,14 @@ namespace apl {
      // 2nd line
      outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
      outfile << setprecision(3);
-     for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+     for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
        if (i != 0) outfile << " ";
        outfile << _supercell->getUniqueAtomMass(i);
      }
      outfile << std::endl;
 
      // forces + 1 line info about distortion
-     for (int i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
+     for (uint i = 0; i < _supercell->getNumberOfUniqueAtoms(); i++) {
        for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
          // line info
          outfile << (_supercell->getUniqueAtomID(i) + 1) << " ";
@@ -1018,7 +1003,7 @@ namespace apl {
          outfile << shift(1) << " " << shift(2) << " " << shift(3) << std::endl;
          // forces
          outfile << setprecision(6);
-         for (int k = 0; k < _supercell->getNumberOfAtoms(); k++)
+         for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++)
            outfile << setw(15) << _uniqueForces[i][j][k](1)
              << setw(15) << _uniqueForces[i][j][k](2)
              << setw(15) << _uniqueForces[i][j][k](3) << std::endl;

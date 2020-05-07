@@ -89,6 +89,7 @@ namespace apl {
     _stepDOS = 0.0;
     _halfStepDOS = 0.0;
     _system = "";
+    _pc = NULL;
     _pc_set = false;
   }
 

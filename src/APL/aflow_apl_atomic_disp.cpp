@@ -73,6 +73,7 @@ namespace apl {
     _frequencies.clear();
     _displacement_matrices.clear();
     _displacement_modes.clear();
+    _pc = NULL;
     _pc_set = false;
     _qpoints.clear();
     _temperatures.clear();
@@ -407,7 +408,7 @@ namespace apl {
         output << std::setw(4) << natoms << " 1" << std::endl;
         for (uint at = 0; at < natoms; at++) {
           output << std::setw(5) << scell.atoms[at].atomic_number;
-          for (int k = 0; k < 6; k++) {
+          for (uint k = 0; k < 6; k++) {
             output << std::setw(15) << std::fixed << std::setprecision(8) << disp[j][at][k];
           }
           output << std::endl;
@@ -542,7 +543,7 @@ namespace apl {
     if (format != "V_SIM") {
       if (nperiods_str.empty()) nperiods = DEFAULT_APL_ADISP_NPERIODS;
       else nperiods = aurostd::string2utype<int>(nperiods_str);
-      if (nsteps < 1) {
+      if (nperiods < 1) {
         message = "Number of periods must be a positive integer";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
       }
@@ -621,8 +622,8 @@ namespace apl {
     } else {
       int nbranches = pc.getNumberOfBranches();
       for (int br = 0; br < nbr; br++) {
-        if (branches[br] >= nbranches) {
-          message = "Index " + aurostd::utype2string<int>(branches[br]) + " out of range.";
+        if (branches[br] >= nbranches || branches[br] < 0) {
+          message = "Index " + aurostd::utype2string<int>(branches[br] + 1) + " out of range.";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
         }
       }

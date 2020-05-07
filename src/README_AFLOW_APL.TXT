@@ -336,13 +336,6 @@ WARNING: This method is not well tested yet and should be used with caution.
 NOTE: Using DPM=ON cancels out zerostate forces, so DPM=ON and ZEROSTATE=ON is redundant. However,
       the zerostate calculation can still be used to test for the presence of ghost forces.
 
-The ZEROSTATE calculation can also be used to accelerate the DFT calculations of the distorted
-cells by using its charge density. To do this, the following keyword needs to be activated:
-
-    [AFLOW_APL]ZEROSTATE_CHGCAR=ON
-
-The default is OFF.
-
 2.3.  Linear Response Method Parameters
 
 NOTE: the linear response method is currently untested!
@@ -557,7 +550,7 @@ The files PHEIGENVAL, PHKPOINTS, and PHPOSCAR must reside in the directory.
 
 Phonon DOS can be plotted in a similar fashion:
 
-  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
+  aflow --plotphdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
     Defaults.
      DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
     Other options: same as plotphdisp

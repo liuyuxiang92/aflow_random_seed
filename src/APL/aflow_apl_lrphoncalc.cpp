@@ -82,15 +82,11 @@ namespace apl {
 namespace apl {
 
   bool LinearResponsePC::runVASPCalculations(_xinput& xInput, _aflags& _aflowFlags,
-      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, bool zerostate_chgcar) {
+      _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn) {
     if (!_sc_set) {
       string function = "apl::LinearResponsePC::runVASPCalculations():";
       string message = "Supercell pointer not set.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
-    }
-    if (zerostate_chgcar) {
-      string message = "ZEROSTATE_CHGCAR not implemented for linear response calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_LRPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     }
     bool stagebreak = false;
 

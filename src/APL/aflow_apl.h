@@ -346,7 +346,7 @@ namespace apl {
       void setDirectory(const string&);
       int getOrder() const;
 
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, bool);
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&);
       bool calculateForceConstants();
       const vector<vector<double> >& getForceConstants() const;
       vector<vector<int> > getClusters() const;
@@ -614,8 +614,8 @@ namespace apl {
     public:
       Supercell(ostream& oss=std::cout);
       Supercell(ofstream&, ostream& os=std::cout);
-      Supercell(const xstructure&, ofstream&, string directory="./", ostream& oss=std::cout); //CO20181226
-      Supercell(const string&, ofstream&, string directory="./", ostream& os=std::cout);  // ME20200112
+      Supercell(const xstructure&, ofstream&, const string& directory="./", ostream& oss=std::cout); //CO20181226
+      Supercell(const string&, ofstream&, const string& directory="./", ostream& os=std::cout);  // ME20200112
       Supercell(const Supercell&);
       Supercell& operator=(const Supercell&);
       ~Supercell();
@@ -642,9 +642,9 @@ namespace apl {
       //ME20190715 BEGIN - added const to getter functions so they can be used with const Supercell &
       bool isShellRestricted() const;
       int getMaxShellID() const;
-      int getNumberOfAtoms() const;
-      int getNumberOfUniqueAtoms() const;
-      int getNumberOfEquivalentAtomsOfType(int) const; //CO20190218
+      uint getNumberOfAtoms() const;
+      uint getNumberOfUniqueAtoms() const;
+      uint getNumberOfEquivalentAtomsOfType(int) const; //CO20190218
       int getUniqueAtomID(int) const;
       int getUniqueAtomID(int, int) const;
       const _atom& getUniqueAtom(int) const;
@@ -803,7 +803,7 @@ namespace apl {
       virtual ~ForceConstantCalculator() {};
       void clear(Supercell&);
 
-      virtual bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool) {return false;};  // ME20191029
+      virtual bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&) {return false;};  // ME20191029
       void setPolarMaterial(bool b) { _isPolarMaterial = b; }  // ME20200218
 
       bool run();  // ME20191029
@@ -871,7 +871,7 @@ namespace apl {
       void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO20190108
 
       //void writeFORCES();  // OBSOLETE ME20200504 - not used
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
       //void writeXCrysDenForces();  // OBSOLETE ME20200504 - not used
       void saveState(const string&);  // ME20200212
       void readFromStateFile(const string&);  // ME20200212
@@ -1024,7 +1024,7 @@ namespace apl {
       ~LinearResponsePC();
       void clear(Supercell&);
 
-      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&, bool);
+      bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
       void saveState(const string&);  //ME20200212
       void readFromStateFile(const string&); //ME20200212
   };
@@ -1067,8 +1067,8 @@ namespace apl {
     public:
       QMesh(ostream& oss=std::cout);
       QMesh(ofstream&, ostream& os=std::cout);
-      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, string directory="./", ostream& oss=std::cout);
-      QMesh(const vector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, string directory="./", ostream& oss=std::cout);
+      QMesh(const xvector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, const string& directory="./", ostream& oss=std::cout);
+      QMesh(const vector<int>&, const xstructure&, ofstream&, bool include_inversions=true, bool gamma_centered=true, const string& directory="./", ostream& oss=std::cout);
       QMesh(const QMesh&);
       QMesh& operator=(const QMesh&);
       ~QMesh();

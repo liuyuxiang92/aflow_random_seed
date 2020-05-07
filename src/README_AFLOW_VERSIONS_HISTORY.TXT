@@ -51,6 +51,7 @@
         -- Simplified symmetry calculations in (A)APL. (ME)
         -- Changed the determination of the irreducible Brillouin zone in APL. (ME)
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
+        -- Made ZEROSTATE_CHGCAR obsolete. (ME)
         -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
         -- Fixed bug that deleted old qmvasp files. (ME)
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
