@@ -1711,20 +1711,21 @@ namespace apl
 
     // output file name depends on the used EOS fit method
     ofstream file;
-    string filename = "";
+    string filename = DEFAULT_QHA_FILE_PREFIX;
     string sc = all_iterations_self_consistent ? "sc." : "";
     switch(method){
       case(EOS_POLYNOMIAL):
-        filename = "aflow.scqha."+sc+"polynomial.thermo.out";
+        filename += sc+"polynomial.";
         break;
       case(EOS_BIRCH_MURNAGHAN):
-        filename = "aflow.scqha."+sc+"birch-murnaghan.thermo.out";
+        filename += sc+"birch-murnaghan.";
         break;
       case(EOS_MURNAGHAN):
       default:
-        filename = "aflow.scqha."+sc+"murnaghan.thermo.out";
+        filename += sc+"murnaghan.";
         break;
     }
+    filename += DEFAULT_QHA_THERMO_FILE;
 
     file.open(filename.c_str());
     file.precision(10);
@@ -1922,19 +1923,20 @@ namespace apl
     // the name of the output file depends on the used EOS fit method and on type of
     // QHA calculation
     ofstream file;
-    string filename = "";
+    string filename = DEFAULT_QHA_FILE_PREFIX;
     switch(eos_method){
       case(EOS_POLYNOMIAL):
-        filename = "aflow." + qha + ".polynomial.thermo.out";
+        filename += qha + ".polynomial.";
         break;
       case(EOS_BIRCH_MURNAGHAN):
-        filename = "aflow." + qha + ".birch-murnaghan.thermo.out";
+        filename += qha + ".birch-murnaghan.";
         break;
       case(EOS_MURNAGHAN):
       default:
-        filename = "aflow." + qha + ".murnaghan.thermo.out";
+        filename += qha + ".murnaghan.";
         break;
     }
+    filename += DEFAULT_QHA_THERMO_FILE;
 
     string function = "QHAN::writeThermalProperties():";
     string msg = "Writing T-dependent properties to "+filename;
@@ -2049,7 +2051,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     ofstream file;
-    file.open("aflow.qha.FVT.out");
+    file.open(DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_FVT_FILE);
     file.precision(10);
 
     xvector<double> Felec(N_EOSvolumes);
@@ -2108,7 +2110,7 @@ namespace apl
     stringstream eigenval;
     eigenval << GPpath;
 
-    string filename = directory + '/' + DEFAULT_QHA_GP_PATH_FILE;
+    string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_GP_PATH_FILE;
     aurostd::stringstream2file(eigenval, filename);
     if (!aurostd::FileExist(filename)){
       msg = "Cannot open "+filename+" file.";
@@ -2130,7 +2132,7 @@ namespace apl
 
     ofstream file;
 
-    file.open("aflow.qha.gp.avg.out");
+    file.open((DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_GP_AVG_FILE).c_str());
     file.precision(10);
 
     file << setw(5)  << "# T[K]"           << setw(SW) << ' ' <<
@@ -2195,7 +2197,7 @@ namespace apl
   void QHAN::writeFrequencies()
   {
     ofstream file;
-    file.open("aflow.qha.frequencies.out");
+    file.open((DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_FREQS_FILE).c_str());
     for (uint q=0; q<omegaV_mesh_EOS.size(); q++){
       for (int branch=0; branch<Nbranches; branch++){
         for (int Vid=0; Vid<N_EOSvolumes; Vid++){
