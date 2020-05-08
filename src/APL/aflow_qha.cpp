@@ -1139,7 +1139,7 @@ namespace apl
     xvector<double> s(xomega.rows); for (int i=s.lrows;i<=s.urows;i++) s[i]=1;
     aurostd::cematrix lsfit(gp_fit_matrix);
 
-    double a,b,c,d; //  fit parameters
+    double a=0.0, b=0.0, c=0.0, d=0.0; //  fit parameters
     double gamma = 0;
     w = 0;
 
