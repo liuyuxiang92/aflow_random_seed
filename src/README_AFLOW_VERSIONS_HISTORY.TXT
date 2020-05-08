@@ -1,5 +1,15 @@
 3.2.3 - 2020/05/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.3.tar.xz
+        -- updated and restructured CCE for PBE, LDA and SCAN (RF)
+        -- added CCE functions for command line, web tool, and internal AFLOW use (RF)
+        -- CCE can now determine oxidation numbers automatically from structure and Allen electronegativities (RF)
+        -- added CCE function to determine oxidation numbers from Allen electronegativities (RF)
+        -- added CCE function to get number of neighbors for all atoms (RF)
+        -- added CCE function to get number of neighbors of a certain type for all atoms (RF)
+        -- extended CCE scheme to PBE+U_ICSD functional and approach based on experimental formation enthalpies per bond (RF)
+        -- extended CCE to work for general anion systems (RF)
+        -- extended CCE to multi-anion sytems (RF)
+        -- CCE corrections added for nitrides (RF)
         -- added --np1 (N+1 enthalpy gain) and --sc (stability criterion) chull web functionality (SK)
         -- added check for broken REST-API to aflow_chull_python.py (MB)
         -- Fixed segmentation fault when DINEQUIV_ONLY option was used. (AS)

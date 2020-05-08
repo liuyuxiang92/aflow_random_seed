@@ -744,6 +744,12 @@
 #define AFLOWRC_DEFAULT_AGL_PLOT_RESULTS                      FALSE
 #define         DEFAULT_AGL_PLOT_RESULTS                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_PLOT_RESULTS")
 
+// RF20200413 - START
+// DEFAULT CCE
+#define AFLOWRC_DEFAULT_CCE_OX_METHOD                         string("ELECTRONEGATIVITY_ALLEN")
+#define         DEFAULT_CCE_OX_METHOD                         XHOST.adefault.getattachedscheme("DEFAULT_CCE_OX_METHOD")
+// RF20200413 - END
+
 // CORES // DONE
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP                   56.0    // Celsius
 #define         AFLOW_CORE_TEMPERATURE_BEEP                   XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_BEEP") 
@@ -1419,6 +1425,11 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AGL_WRITE_GIBBS_INPUT",AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT);
     aflowrc::load_default("DEFAULT_AGL_PLOT_RESULTS",AFLOWRC_DEFAULT_AGL_PLOT_RESULTS);    
 
+    // RF20200413 - START
+    // DEFAULT CCE
+    aflowrc::load_default("DEFAULT_CCE_OX_METHOD",AFLOWRC_DEFAULT_CCE_OX_METHOD);
+    // RF20200413 - END
+
     // DEFAULT CORE
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_BEEP",AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP);
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_HALT",AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT);
@@ -1506,7 +1517,6 @@ namespace aflowrc {
     aflowrc::load_default("MPI_OPTIONS_MACHINE2",AFLOWRC_MPI_OPTIONS_MACHINE2); 
     aflowrc::load_default("MPI_COMMAND_MACHINE2",AFLOWRC_MPI_COMMAND_MACHINE2); 
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE2",AFLOWRC_MPI_BINARY_DIR_MACHINE2); 
-
     if(LDEBUG) oss << "aflowrc::read: END" << endl;
 
     return TRUE;
@@ -1938,6 +1948,12 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AGL_WRITE_GIBBS_INPUT=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     aflowrc << "DEFAULT_AGL_PLOT_RESULTS=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
 
+    // RF20200413 - START
+    aflowrc << " " << endl;
+    aflowrc << "// DEFAULTS CCE" << endl;
+    aflowrc << "DEFAULT_CCE_OX_METHOD=\"" << AFLOWRC_DEFAULT_CCE_OX_METHOD << "\"" << "  // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
+    // RF20200413 - END
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CORE" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP << " // Celsius" << endl;
@@ -2027,7 +2043,6 @@ namespace aflowrc {
     aflowrc << "MPI_OPTIONS_MACHINE2=\"" << AFLOWRC_MPI_OPTIONS_MACHINE2 << "\"" << "  // MACHINE2" << endl;
     aflowrc << "MPI_COMMAND_MACHINE2=\"" << AFLOWRC_MPI_COMMAND_MACHINE2 << "\"" << "  // MACHINE2" << endl;
     aflowrc << "MPI_BINARY_DIR_MACHINE2=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE2 << "\"" << "  // MACHINE2" << endl; 
-
 
     aflowrc << " " << endl;
     aflowrc << "// ****************************************************************************************************" << endl;
@@ -2428,6 +2443,11 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_DIRNAME_ARUN\")=" << AFLOWRC_DEFAULT_AGL_DIRNAME_ARUN << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_WRITE_GIBBS_INPUT\")=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_PLOT_RESULTS\")=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
+
+    // RF20200413 - START
+    if(LDEBUG) oss << "// DEFAULTS CCE" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_CCE_OX_METHOD\")=\"" << DEFAULT_CCE_OX_METHOD << "\"" << "               // ELECTRONEGATIVITY_ALLEN, BADER" << endl;
+    // RF20200413 - END
 
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;

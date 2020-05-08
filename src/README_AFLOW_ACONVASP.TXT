@@ -726,6 +726,29 @@ LATTICES = (the ones with "")
   aflow --cart [-c] < POSCAR
         Outputs to standard out a new POSCAR file with atom
         positions in cartesian coordinates.
+
+  aflow --cce[=STRUCT_FILE --usage]
+        Prints user instructions for CCE.
+  aflow --cce=STRUCT_FILE
+        options:
+            [ --usage ]
+            [ --functionals=PBE|LDA|SCAN]
+            [ --dft_formation_energies=form_energy_1,form_energy_2,...]
+            [ --oxidation_numbers=ox_num_1,ox_num_2,...]
+            [ --print=json|out] (default is out)
+
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
+        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
+        Precalculated DFT formation energies can be provided as a comma separated list using the option
+        --dft_formation_energies= in eV/cell.
+        Functionals for which corrections should be returned can be provided as a comma separated list 
+        using the option --functionals=. If used together with --dft_formation energies, the functionals
+        must be in the same sequence as the DFT formation energies they correspond to. 
+        Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
+        It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
+        same sequence as the corresponding atoms in the provided structure file.
+        Output in json format can be obtained using the option --print=json
+
   aflow --chgcar2jvxl=|--c2j=CHGCAR11[,CHGCAR2,...]::CUTOFF1,CUTOFF2...[::DOWNSAMPLE1,DOWNSAMPLE2,...]
                               |CHGCAR1,CUTOFF1[,DOWNSAMPLE1:CHGCAR2,CUTOFF2[,DOWNSAMPLE2:...]]
                               |CHGCAR,CUTOFF[,DOWNSAMPLE]
@@ -2618,6 +2641,25 @@ LATTICES = (the ones with "")
   aflow --poscar2aflowin < POSCAR
         Makes an "almost standard" aflow.in starting from the poscar.
         Useful for scripting (SC100630).
+
+  aflow --poscar2cce < STRUCT_FILE
+        options:
+            [ --functionals=PBE|LDA|SCAN]
+            [ --dft_formation_energies=form_energy_1,form_energy_2,...]
+            [ --oxidation_numbers=ox_num_1,ox_num_2,...]
+            [ --print=json|out] (default is out)
+
+        Determines the CCE corrections for the structure in file STRUCT_FILE. It can be in any structure 
+        format that AFLOW supports, e.g. VASP POSCAR, QE, aims, ... For VASP, a VASP5 POSCAR is required.
+        Precalculated DFT formation energies can be provided as a comma separated list using the option
+        --dft_formation_energies= in eV/cell.
+        Functionals for which corrections should be returned can be provided as a comma separated list 
+        using the option --functionals=. If used together with --dft_formation energies, the functionals
+        must be in the same sequence as the DFT formation energies they correspond to. 
+        Oxidation numbers can be provided as a comma separated list using the option --oxidation_numbers=
+        It is assumed that: (i) one is provided for each atom of the structure and (ii) they are in the 
+        same sequence as the corresponding atoms in the provided structure file.
+        Output in json format can be obtained using the option --print=json
 
   aflow --poscar2enum < POSCAR
         Convert a POSCAR into an input format for MULTIENUM (partial occupation).
