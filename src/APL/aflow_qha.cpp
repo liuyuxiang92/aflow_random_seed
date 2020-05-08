@@ -1076,7 +1076,7 @@ namespace apl
   /** Read data from static calculations. */
   void QHAN::read_static()
   {
-    string function = "QHAN::read_static()";
+    string function = "QHAN::read_static():";
     string msg = "";
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
